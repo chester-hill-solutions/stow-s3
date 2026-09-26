@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -186,6 +187,18 @@ func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry Ou
 	pending := a.orderingEntries()
 	current, ok := findPendingEntry(a.outbox.Pending(), entry.ID)
 	if !ok || current.Terminal || (respectSchedule && !current.NextAttempt.IsZero() && current.NextAttempt.After(time.Now())) || !isFirstPendingForKey(pending, current) {
+		return nil
+	}
+	// The grant is checked here, in the one funnel every propagation goes through,
+	// rather than at each caller. The write path already gated before enqueuing;
+	// this is what stops the *other* two ways in — the per-second retry worker and
+	// the admin retry route — which is where R-201 found propagation reaching
+	// upstream without ever consulting a permission.
+	//
+	// The entry is left pending rather than failed. Refusing to propagate is not a
+	// failure of the entry, and marking it terminal would discard a write the
+	// operator may yet authorise.
+	if !a.authority.Allows(authority.UpstreamWrite) {
 		return nil
 	}
 	claim, err := a.claimPropagation(current)

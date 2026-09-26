@@ -294,16 +294,19 @@ func serve(args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// The environment's authority, decided once here and enforced by the runtime
-	// below every interface, so a read-only server refuses writes for an S3
-	// client, an in-process caller and the admin surface alike. A nil pointer
-	// permits everything, which is what this server has always done.
+	// The environment's authority, decided once here and enforced below every
+	// interface. A nil pointer permits everything, which is what this server has
+	// always done. One value, two consumers: the run-through adapter gates upstream
+	// on it, the runtime instance gates everything else, and both are built from
+	// this. See ADR 0010 decision 2.
 	var granted *authority.Authority
 	if *readOnly {
 		narrowed := authority.ReadOnly()
 		granted = &narrowed
 		log.Printf("read-only: writes, deletes, bucket changes and upstream access are refused")
 	}
+	// Before buildStore, which constructs the run-through adapter.
+	rtCfg.Authority = granted
 	if err := validateLiveWriteBackend(mode, backend, rtCfg); err != nil {
 		log.Fatal(err)
 	}

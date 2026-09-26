@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -26,6 +26,11 @@ const (
 // Adapter wraps a local storage.Store with optional upstream read-through caching
 // and controlled live writes. It implements storage.Store for s3api routing.
 type Adapter struct {
+	// authority is the grant this adapter gates on, resolved once at construction
+	// from the caller's Authority and the AllowLiveWrites attenuation. Every
+	// upstream decision consults this and nothing else, so there is one mechanism
+	// rather than two kept in step. See ADR 0010 decision 2.
+	authority         authority.Authority
 	local             storage.Store
 	localMultipart    storage.MultipartStore
 	cache             storage.Store
@@ -74,6 +79,7 @@ func NewWithOutbox(cfg Config, local, cache storage.Store, upstream Client, outb
 	localMultipart, _ := local.(storage.MultipartStore)
 	return &Adapter{
 		cfg:               cfg,
+		authority:         cfg.effectiveAuthority(),
 		local:             local,
 		localMultipart:    localMultipart,
 		cache:             cache,
@@ -176,8 +182,19 @@ func (a *Adapter) DiscardOutboxEntry(id string) error {
 	return fmt.Errorf("outbox entry %q not found", id)
 }
 
+// upstreamEnabled reports whether a request for this bucket may reach the
+// upstream provider at all.
+//
+// It is the read-side chokepoint: HeadObject, GetObject, and the revalidation
+// walk all consult it before touching a.upstream, so gating reads here rather
+// than at each call site is what makes "no code path reaches upstream without the
+// grant" a property of the code rather than a claim about it. The write side has
+// its own decision, because a write has three outcomes rather than two.
 func (a *Adapter) upstreamEnabled(bucket string) bool {
 	if a.upstream == nil {
+		return false
+	}
+	if !a.authority.Allows(authority.UpstreamRead) {
 		return false
 	}
 	if a.cfg.Upstream.Bucket == "" {
@@ -198,17 +215,27 @@ func (a *Adapter) decideUpstreamWrite(bucket string) writeAction {
 	if !a.upstreamEnabled(bucket) {
 		return writeSkip
 	}
-	switch a.cfg.Policy {
-	case PolicyMirrorWrites:
-		if a.cfg.AllowLiveWrites {
-			return writePropagate
-		}
-		return writeError
-	case PolicyReadThroughCache:
-		if a.cfg.AllowLiveWrites {
-			return writePropagate
+	// The grant answers first and on its own. An operation the environment was not
+	// given is refused whatever the policy says, because the policy is a
+	// configuration choice and the grant is the permission.
+	//
+	// a.authority was resolved once at construction, folding AllowLiveWrites into
+	// the caller's grant. Reading either field here would be the second mechanism
+	// ADR 0010 exists to remove - two fields answering the same question, kept in
+	// step by hand.
+	if !a.authority.Allows(authority.UpstreamWrite) {
+		// A policy of mirror-writes is not satisfied by keeping the write local, so
+		// refusing to propagate is a failure the caller should see. Read-through
+		// with a local cache is satisfied by the local write, so declining to
+		// propagate is the policy working, not a failure.
+		if a.cfg.Policy == PolicyMirrorWrites {
+			return writeError
 		}
 		return writeSkip
+	}
+	switch a.cfg.Policy {
+	case PolicyMirrorWrites, PolicyReadThroughCache:
+		return writePropagate
 	default:
 		return writeError
 	}
@@ -444,48 +471,4 @@ func (a *Adapter) listCacheItems(ctx context.Context, bucket, prefix string) ([]
 		return nil, nil
 	}
 	return items, err
-}
-
-// listAllObjects walks every page for a prefix so merged listings can re-paginate stably.
-func listAllObjects(ctx context.Context, store interface {
-	ListObjectsV2(context.Context, string, storage.ListOptions) (*storage.ListResult, error)
-}, bucket, prefix string) ([]storage.ObjectMeta, error) {
-	var out []storage.ObjectMeta
-	token := ""
-	for {
-		page, err := store.ListObjectsV2(ctx, bucket, storage.ListOptions{
-			Prefix:            prefix,
-			MaxKeys:           1000,
-			ContinuationToken: token,
-		})
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, page.Objects...)
-		if !page.IsTruncated || page.NextContinuationToken == "" {
-			return out, nil
-		}
-		token = page.NextContinuationToken
-	}
-}
-
-// mergeObjectLists unions by key; local metadata wins on duplicates.
-func mergeObjectLists(local, upstream []storage.ObjectMeta) []storage.ObjectMeta {
-	byKey := make(map[string]storage.ObjectMeta, len(local)+len(upstream))
-	for _, obj := range upstream {
-		byKey[obj.Key] = obj
-	}
-	for _, obj := range local {
-		byKey[obj.Key] = obj
-	}
-	keys := make([]string, 0, len(byKey))
-	for k := range byKey {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	out := make([]storage.ObjectMeta, 0, len(keys))
-	for _, k := range keys {
-		out = append(out, byKey[k])
-	}
-	return out
 }

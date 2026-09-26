@@ -89,6 +89,37 @@ admin route, both outside the runtime instance.
 Configuration alone never manufactures authority. That is ADR 0005 and ADR 0002
 invariant 5; this ADR only makes it reachable.
 
+**How the value reaches the adapter, decided 2026-09-26.** Three shapes were
+available and the one chosen is *one resolved value, constructed once, passed to
+both*. The alternatives were a `func() Authority` the adapter reads live, and
+inverting the construction so the adapter sits above the instance.
+
+The live closure was rejected because a retry worker runs once a second: a gate
+whose answer can change between the check and the use is harder to reason about
+than a value, and a closure is not something a refusal-matrix table can assert on.
+Inverting the construction was rejected as disproportionate — it inverts the
+layering and restructures the CLI, and it is the shape that per-caller authority
+(M3.1) will need, not the shape that environment-wide authority needs today.
+
+What was implemented: the caller resolves the grant once, and
+`Config.effectiveAuthority` folds `AllowLiveWrites` into it *at construction*.
+The adapter stores the result and every upstream decision consults only that.
+`AllowLiveWrites` is therefore read exactly once, in one place, instead of at every
+decision — which is the substance of this decision. The two fields were previously
+both consulted at the decision, which is what made them two mechanisms kept in
+step by hand.
+
+The authority is a field on `Config` rather than a sixth argument to
+`NewWithOutbox`: the adapter is built from a Config, and a parameter past the
+ceiling buys no behaviour. Its location is not the point; its being read in exactly
+one place is.
+
+One consequence worth recording. Because the grant is resolved at construction, the
+enqueue and the retry can no longer disagree — the shape of R-201's original bug
+is no longer reachable through configuration. The gate in the propagation funnel is
+therefore defence in depth, and the test for it seeds an outbox entry directly
+rather than producing one with a write.
+
 ### 3. The anti-recurrence test is part of the definition
 
 A test asserts that **every** operation in `authority.Defined()` is either

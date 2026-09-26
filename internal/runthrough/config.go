@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 )
 
 // Mode describes whether stow runs local-only or with an upstream adapter.
@@ -45,13 +47,54 @@ type CachePolicy struct {
 
 // Config is the full run-through adapter configuration.
 type Config struct {
-	Policy                 Policy
+	Policy Policy
+	// Authority is the environment's grant. It is an input to the effective
+	// authority this adapter gates on rather than the gate itself: see
+	// effectiveAuthority.
+	//
+	// It lives here rather than as a sixth positional argument to NewWithOutbox
+	// because the adapter is built from a Config, and a parameter past the ceiling
+	// buys no behaviour. What matters is that the grant is resolved once by the
+	// caller and handed to both this adapter and the runtime instance, so the two
+	// cannot disagree about what was granted. See ADR 0010 decision 2.
+	Authority *authority.Authority
+	// AllowLiveWrites is an attenuation input, read exactly once when the adapter
+	// is built. It is not consulted at any decision point: it is folded into the
+	// effective authority there, and the gate consults only the result.
+	//
+	// That is the whole of decision 2. When the two were read at the decision -
+	// AllowLiveWrites here and Authority there - they were two mechanisms answering
+	// the same question, kept in step by hand, and either could be changed without
+	// the other.
 	AllowLiveWrites        bool
 	Revalidate             bool
 	CacheDir               string
 	Upstream               UpstreamConfig
 	EvictOnUpstreamMissing bool
 	Cache                  CachePolicy
+}
+
+// effectiveAuthority folds the attenuation inputs into the one value the adapter
+// gates on.
+//
+// A nil Authority means the caller supplied none, which is this adapter's
+// historical behaviour: everything permitted, matching the default the runtime
+// documents. Narrowing that default is a separate deliberate change, so it is not
+// narrowed here.
+//
+// AllowLiveWrites false withholds UpstreamWrite and nothing else. Reads are
+// unaffected: refusing consent to change someone else's data has never been a
+// reason to stop reading from them, and a read-through cache over a locally
+// authoritative write is the configuration this preserves.
+func (c Config) effectiveAuthority() authority.Authority {
+	base := authority.All()
+	if c.Authority != nil {
+		base = *c.Authority
+	}
+	if !c.AllowLiveWrites {
+		base = base.Without(authority.UpstreamWrite)
+	}
+	return base
 }
 
 // FromEnv resolves upstream credentials from environment variables with
