@@ -57,8 +57,17 @@ recording because the plan was wrong:
 previously-untested scripts have tests, and the two release scripts were unable to
 be tested at all until their entry points were guarded.
 
-Still pending: **C2.2** is delivered; what remains is **C1.3** (the authority
-chokepoint, gated on ADR 0010 decision 2).
+**C2.2** (the workspace manifest split, at version 2, refusing version 1) and
+**C1.3** (the run-through adapter consulting the authority, with `RetryPending`
+brought inside the gate) were delivered after this section was written. **Every
+item in this document is now delivered.**
+
+The one honest remainder is not a work item here. The authority is still
+environment-wide rather than per-caller: `--read-only` makes a restricted
+`Authority` reachable and enforced below every interface, but
+`s3api.AuthFunc` is `func(*http.Request) error` and surfaces no principal, and one
+`Instance` holds one `Authority` for its whole life. Varying it per request is
+M3.1, and it is a decision rather than a task — see `R-203` and §7.
 
 ### 0.0.1 What landed underneath this document
 
@@ -1087,7 +1096,7 @@ owns each concept. They share one shape, given in §4.1.
 |---|---|---|---|
 | C1.1 `DeleteObjects` reports both sets | R-301 | 🔴 | 1 |
 | C1.2 `x-amz-copy-source` percent-decoded | R-305 | 🔴 | <1 |
-| C1.3 Authority chokepoint real, parallel mechanism deleted | R-201,202 | 🔴 | 3–4 (in M1.3/M2.4) |
+| C1.3 Authority chokepoint real, parallel mechanism deleted | R-201,202 | ✅ delivered — one resolved value, one gate, `RetryPending` inside it | — |
 | C1.4 Clamp over-long range ends | R-306 | 🔴 | <1 |
 | C1.5 Stop discarding the `ListParts` error | R-307 | 🟠 | <1 |
 | C1.6 Delete eleven swallowed durability errors | R-702 | 🟠 | 2 |
@@ -1180,8 +1189,8 @@ when in §4.
 | R-102 | `main.go:76,77` | M1.1 | readiness payload == runtime capabilities |
 | R-103 | two test files, 8 and 5 tests | M1.3 | one table drives both suites |
 | R-104 | `pkg/stow/workspace.go:198`; `instance.go:70` | M1.3 | `ReadWrite()` refuses `Destroy` |
-| R-201 | `adapter.go:194`; `outbox_adapter.go:230` | M1.5, M2.4, C1.3 | `ReadWrite()` in mirror-writes → 0 upstream calls |
-| R-202 | `runtime_store.go:36-53` | M2.4, C1.3 | adapter holds the authority at construction |
+| R-201 | delivered — `upstreamEnabled`, `decideUpstreamWrite`, and the propagation funnel all consult one resolved authority | M1.5, M2.4, C1.3 ✅ | a seeded outbox entry retries to 0 upstream calls with `UpstreamWrite` withheld, and still propagates with the full grant |
+| R-202 | delivered — the grant is resolved once and folded with `AllowLiveWrites` at construction | M2.4, C1.3 ✅ | adapter holds the resolved authority; the funnel check is defence in depth |
 | R-203 | `auth.go:13-14`; no mapping exists | M1.3 | principal maps to authority on the S3 path |
 | R-301 | `workspace/objects.go:183-200` vs `memory.go:251-261` | M1.8, C1.1 | `DeleteResult{Deleted:["exists"]}` on 3 backends; workspace `Usage()` returns to baseline |
 | R-302 | 0 occurrences of pagination terms in the contract test | C5.3 | contract cases for each dimension |
