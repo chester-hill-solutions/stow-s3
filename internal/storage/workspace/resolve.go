@@ -19,7 +19,7 @@ var ErrClosed = errors.New("workspace store is closed")
 // The fallback is what makes adoption work: a file the host wrote has no
 // manifest entry, so the only way to find it is to look.
 func (s *Store) locate(bucket, key string) (string, error) {
-	recorded, hasEntry := s.manifest.entry(bucket, key)
+	recorded, hasEntry := s.objectIndex.entry(bucket, key)
 	if hasEntry && recorded.Form == FormEscaped {
 		path := EscapedPath(s.root, key)
 		if fileExists(path) {
@@ -57,7 +57,7 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
 	}
 
-	entry, recorded := s.manifest.entry(bucket, key)
+	entry, recorded := s.objectIndex.entry(bucket, key)
 	if !recorded || entry.stale(info.Size(), info.ModTime()) {
 		entry = s.derive(absPath, info)
 		entry.Form = s.formOf(bucket, key, absPath)
@@ -66,7 +66,7 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 		}
 		// Reuse the recorded version so that re-reading an unchanged file keeps
 		// reporting the same version rather than minting one per call.
-		if prior, had := s.manifest.entry(bucket, key); had {
+		if prior, had := s.objectIndex.entry(bucket, key); had {
 			entry.VersionID = prior.VersionID
 		}
 		if err := s.record(bucket, key, entry); err != nil {
@@ -109,7 +109,7 @@ func (s *Store) derive(absPath string, info os.FileInfo) ManifestEntry {
 
 // absorb records a derived entry so the next read does not pay for it again.
 func (s *Store) absorb(bucket, key, absPath string, info os.FileInfo, entry *ManifestEntry) error {
-	recorded, hasEntry := s.manifest.entry(bucket, key)
+	recorded, hasEntry := s.objectIndex.entry(bucket, key)
 	if hasEntry && !recorded.stale(info.Size(), info.ModTime()) {
 		return nil
 	}
@@ -136,17 +136,17 @@ func (s *Store) record(bucket, key string, entry ManifestEntry) error {
 	if s.closed {
 		return ErrClosed
 	}
-	s.manifest.setEntry(bucket, key, entry)
+	s.objectIndex.setEntry(bucket, key, entry)
 	if entry.Form == FormNatural {
 		s.folded[foldKey(bucket, key)] = key
 	}
-	return s.manifest.save()
+	return s.objectIndex.save()
 }
 
 // forget drops a key from the manifest and the index. It does not remove bytes;
 // the caller does that.
 func (s *Store) forget(bucket, key string) {
-	s.manifest.removeEntry(bucket, key)
+	s.objectIndex.removeEntry(bucket, key)
 	delete(s.folded, foldKey(bucket, key))
 }
 

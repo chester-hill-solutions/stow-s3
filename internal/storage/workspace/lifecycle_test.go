@@ -3,6 +3,7 @@ package workspace_test
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -132,12 +133,62 @@ func TestNewerManifestVersionIsRefused(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read manifest: %v", err)
 	}
-	future := bytes.Replace(raw, []byte(`"version": 1`), []byte(`"version": 99`), 1)
-	if err := os.WriteFile(manifestPath(root), future, 0o644); err != nil {
+	// The version is bumped by field, not by replacing `"version": 1` in the
+	// text. That replacement stopped matching the moment the version moved to 2,
+	// and the test went on passing: bytes.Replace finds nothing, writes the file
+	// back unchanged, and the workspace opens. A test that cannot fail is worse
+	// than no test, because it is counted.
+	//
+	// RawMessage rather than map[string]any: the document round-trips exactly,
+	// and the quality ratchet counts `any`.
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &fields); err != nil {
+		t.Fatalf("decode manifest: %v", err)
+	}
+	fields["version"] = json.RawMessage("99")
+	future, err := json.MarshalIndent(fields, "", "  ")
+	if err != nil {
+		t.Fatalf("encode future manifest: %v", err)
+	}
+	if err := os.WriteFile(manifestPath(root), append(future, '\n'), 0o644); err != nil {
 		t.Fatalf("write future manifest: %v", err)
 	}
 	if _, err := workspace.New(workspace.Options{Root: root, Bucket: bucket}); !errors.Is(err, workspace.ErrManifestCorrupt) {
 		t.Fatalf("open with a future manifest = %v, want ErrManifestCorrupt", err)
+	}
+}
+
+// A version 1 workspace is refused rather than migrated, and the refusal says
+// what to do about it. Refusing a directory whose files are all still on disk
+// would otherwise read as data loss.
+func TestVersionOneWorkspaceIsRefusedWithGuidance(t *testing.T) {
+	root := t.TempDir()
+	legacy := filepath.Join(root, ".stow")
+	if err := os.MkdirAll(legacy, 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	// A version 1 manifest: identity and index in one document, which is exactly
+	// what this build no longer implements.
+	legacyManifest := `{
+  "version": 1,
+  "workspace_id": "abc123",
+  "bucket": "legacy",
+  "created": "2026-01-01T00:00:00Z",
+  "last_used": "2026-01-01T00:00:00Z",
+  "ttl_seconds": 0,
+  "owned": true,
+  "buckets": {}
+}`
+	if err := os.WriteFile(filepath.Join(legacy, "manifest.json"), []byte(legacyManifest), 0o644); err != nil {
+		t.Fatalf("write legacy manifest: %v", err)
+	}
+
+	_, err := workspace.New(workspace.Options{Root: root, Bucket: "legacy"})
+	if !errors.Is(err, workspace.ErrManifestCorrupt) {
+		t.Fatalf("open a version 1 workspace = %v, want ErrManifestCorrupt", err)
+	}
+	if !strings.Contains(err.Error(), "still on disk") {
+		t.Errorf("error %q does not say the files are still on disk", err)
 	}
 }
 

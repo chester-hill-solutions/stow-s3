@@ -12,10 +12,15 @@ import (
 )
 
 type Store struct {
-	root      string
-	layout    Layout
-	manifest  *Manifest
-	workspace string
+	root     string
+	layout   Layout
+	manifest *Manifest
+	// index is the object index, split out of the manifest because it changes per
+	// object and the manifest does not. See manifestVersion.
+	// objectIndex is the object index, split out of the manifest because it changes
+	// per object and the manifest does not. See manifestVersion.
+	objectIndex *Index
+	workspace   string
 
 	// folded maps a case-folded workspace-relative path, qualified by bucket,
 	// to the key that owns it. It is the collision defence from
@@ -77,48 +82,61 @@ func New(options Options) (*Store, error) {
 	if err := os.MkdirAll(InternalPath(options.Root, "keys"), 0o755); err != nil {
 		return nil, fmt.Errorf("workspace store: create internal directory: %w", err)
 	}
-	manifest, err := loadManifest(options.Root)
+	manifest, index, err := loadManifest(options.Root)
 	if err != nil {
 		return nil, err
 	}
 	store := &Store{
-		root:      options.Root,
-		layout:    NewLayout(),
-		manifest:  manifest,
-		workspace: options.Bucket,
-		folded:    map[string]string{},
-		Now:       now,
+		root:        options.Root,
+		layout:      NewLayout(),
+		manifest:    manifest,
+		objectIndex: index,
+		workspace:   options.Bucket,
+		folded:      map[string]string{},
+		Now:         now,
 	}
-	if store.manifest.WorkspaceID == "" {
-		id, err := newWorkspaceID()
-		if err != nil {
-			return nil, err
-		}
-		store.manifest.WorkspaceID = id
-	}
-	if store.manifest.Bucket == "" {
-		store.manifest.Bucket = options.Bucket
-	}
-	if store.manifest.TTLSeconds == 0 {
-		store.manifest.TTLSeconds = options.TTLSeconds
-	}
-	// Ownership is set once, by whoever made the directory, and then preserved.
-	//
-	// A directory stow creates right now is owned, full stop. A directory that
-	// already existed is only owned if the manifest already said so — which
-	// happens when stow created it on an earlier run and this is a reopen. The
-	// distinction has to survive the reopen, or a workspace stow created would
-	// quietly become undeletable the second time it was opened, and Destroy
-	// would be useless for the case it exists for.
-	store.manifest.Owned = !adopted || manifest.Owned
-	store.manifest.Created = store.manifest.Created.UTC()
-	if store.manifest.Created.IsZero() {
-		store.manifest.Created = now().UTC()
+	if err := store.establishIdentity(options, adopted, now); err != nil {
+		return nil, err
 	}
 	if err := store.index(); err != nil {
 		return nil, err
 	}
-	return store, store.manifest.save()
+	if err := store.manifest.saveIdentity(); err != nil {
+		return nil, err
+	}
+	return store, store.objectIndex.save()
+}
+
+// establishIdentity fills in the identity fields a new workspace does not have
+// yet, and preserves the ones it does.
+//
+// Ownership is set once, by whoever made the directory, and then preserved. A
+// directory stow creates right now is owned, full stop. A directory that already
+// existed is only owned if the manifest already said so — which happens when stow
+// created it on an earlier run and this is a reopen. The distinction has to
+// survive the reopen, or a workspace stow created would quietly become
+// undeletable the second time it was opened, and Destroy would be useless for
+// the case it exists for.
+func (s *Store) establishIdentity(options Options, adopted bool, now func() time.Time) error {
+	if s.manifest.WorkspaceID == "" {
+		id, err := newWorkspaceID()
+		if err != nil {
+			return err
+		}
+		s.manifest.WorkspaceID = id
+	}
+	if s.manifest.Bucket == "" {
+		s.manifest.Bucket = options.Bucket
+	}
+	if s.manifest.TTLSeconds == 0 {
+		s.manifest.TTLSeconds = options.TTLSeconds
+	}
+	s.manifest.Owned = !adopted || s.manifest.Owned
+	s.manifest.Created = s.manifest.Created.UTC()
+	if s.manifest.Created.IsZero() {
+		s.manifest.Created = now().UTC()
+	}
+	return nil
 }
 
 // Now is the store's clock, replaceable in tests.
@@ -171,8 +189,13 @@ func (s *Store) Close() error {
 		return nil
 	}
 	s.closed = true
+	// Close is one of only two places identity changes, so the identity document
+	// is written here alongside the index. The other is creation.
 	s.manifest.LastUsed = s.now().UTC()
-	return s.manifest.save()
+	if err := s.manifest.saveIdentity(); err != nil {
+		return err
+	}
+	return s.objectIndex.save()
 }
 
 func (s *Store) checkOpen() error {

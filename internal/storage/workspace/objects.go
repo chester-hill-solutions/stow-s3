@@ -85,8 +85,8 @@ func (s *Store) putLocked(ctx context.Context, bucket, key string, body io.Reade
 	} else {
 		s.folded[foldKey(bucket, key)] = key
 	}
-	s.manifest.setEntry(bucket, key, entry)
-	if err := s.manifest.save(); err != nil {
+	s.objectIndex.setEntry(bucket, key, entry)
+	if err := s.objectIndex.save(); err != nil {
 		return nil, err
 	}
 	return s.metaFromEntry(bucket, key, entry), nil
@@ -176,7 +176,7 @@ func (s *Store) DeleteObject(ctx context.Context, bucket, key string) error {
 	}
 	s.pruneEmptyParents(bucket, absPath)
 	s.forget(bucket, key)
-	return s.manifest.save()
+	return s.objectIndex.save()
 }
 
 // DeleteObjects removes several keys and returns the ones that were not
@@ -219,7 +219,7 @@ func (s *Store) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, ds
 	if err != nil {
 		return nil, storage.ErrObjectNotFound
 	}
-	entry, _ := s.manifest.entry(srcBucket, srcKey)
+	entry, _ := s.objectIndex.entry(srcBucket, srcKey)
 	opts := storage.PutOptions{
 		ContentType:       entry.ContentType,
 		Metadata:          entry.Metadata,
@@ -285,7 +285,7 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 		if statErr != nil {
 			return nil
 		}
-		manifestEntry, _ := s.manifest.entry(bucket, key)
+		manifestEntry, _ := s.objectIndex.entry(bucket, key)
 		if meta := s.metaFromEntry(bucket, key, manifestEntry, info); meta != nil {
 			byKey[key] = *meta
 		}
@@ -298,7 +298,7 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 	// Escaped keys live under the internal directory, so the walk above cannot
 	// see them. They come from the manifest, and an entry whose file is gone
 	// serves as absent rather than as a phantom object.
-	for key, entry := range s.manifest.Buckets[bucket] {
+	for key, entry := range s.objectIndex.Buckets[bucket] {
 		if entry.Form != FormEscaped {
 			continue
 		}
