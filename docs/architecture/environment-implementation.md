@@ -53,9 +53,12 @@ recording because the plan was wrong:
 (every authority operation enforced or declared ungated), and **C2.1**
 (`internal/atomicfile`).
 
-Still pending: M0.1's untested gates (`check-coverage`, `check-version`,
-`pack-platform-package`, `publish-if-absent`), **C2.2** (split the workspace
-manifest, `R-802`), and ADR 0010 decision 2 gating **C1.3**.
+**M0.1 is now complete**: `tools/quality`, the four ratchet gates, and all four
+previously-untested scripts have tests, and the two release scripts were unable to
+be tested at all until their entry points were guarded.
+
+Still pending: **C2.2** is delivered; what remains is **C1.3** (the authority
+chokepoint, gated on ADR 0010 decision 2).
 
 ### 0.0.1 What landed underneath this document
 
@@ -1215,7 +1218,7 @@ when in §4.
 | R-912 | four copies of the bind-wait | C4.1 | `Server.Ready()` exported; zero polls |
 | R-913 | `internal/runtime/adapter.go:53` | C4.5 | failed `Open` closes the store |
 | R-914 | `pkg/stow/runtime.go:159` | C4.5 | every error has a `stow.` sentinel |
-| R-1001 | `tools/quality` has no test; 1 of 8 gates tested | M0.1 | four ratchet behaviours per gate |
+| R-1001 | `tools/quality` has no test; 1 of 8 gates tested — **delivered**: 59 script cases plus 13 Go cases, and the ratchet policy is one tested module | M0.1 ✅ | four ratchet behaviours per gate |
 | R-1002 | `check-lint-ratchet.mjs:31` | M0.2 | multi-line disable is counted |
 | R-1003 | `check-file-size.mjs:8-18` | M0.3 | oversized file in `scripts/` fails |
 | R-1004 | M1.3 closed on prose criteria | M0.4 | every Done when is an assertion |

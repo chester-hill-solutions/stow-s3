@@ -3,14 +3,52 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+// versionProblems compares the versions this repository declares in four places
+// and reports every disagreement.
+//
+// It is a pure function of the discovered strings, separated from the reading, so
+// it can be tested. The risk it exists to cover is a source pattern that stops
+// matching: every version here is found by a regex or a JSON field, and a pattern
+// that no longer matches yields undefined. Treating that as agreement would make
+// the gate pass because it could not see.
+export function versionProblems({ goVersion, packageVersion, pythonProjectVersion, pythonInitVersion }) {
+  const problems = [];
+  if (!goVersion) {
+    // The Go constant is the anchor every other version is compared against, so
+    // once it cannot be read the comparisons against it are not information - they
+    // are the same unreadable value failing four times. The Python pair is
+    // independent of the anchor and is still checked.
+    problems.push("internal/version/version.go declares no version");
+  } else {
+    if (goVersion !== packageVersion) {
+      problems.push(`version mismatch: internal/version=${goVersion}, packages/stow-s3=${packageVersion}`);
+    }
+    if (!pythonProjectVersion) {
+      problems.push("packages/stow-s3-py/pyproject.toml has no top-level version");
+    } else if (pythonProjectVersion !== goVersion) {
+      problems.push(
+        `version mismatch: internal/version=${goVersion}, packages/stow-s3-py=${pythonProjectVersion}`,
+      );
+    }
+  }
+  if (!pythonProjectVersion) {
+    const alreadyReported = problems.some((p) => p.includes("pyproject.toml has no top-level version"));
+    if (!alreadyReported) {
+      problems.push("packages/stow-s3-py/pyproject.toml has no top-level version");
+    }
+  } else if (pythonInitVersion !== pythonProjectVersion) {
+    problems.push(
+      `stow_s3.__version__=${pythonInitVersion ?? "missing"} does not match pyproject version=${pythonProjectVersion}`,
+    );
+  }
+  return problems;
+}
+
 const root = resolve(import.meta.dirname, "..");
 const goSource = readFileSync(resolve(root, "internal/version/version.go"), "utf8");
 const goVersion = goSource.match(/const Version = "([^"]+)"/)?.[1];
 const packageJson = JSON.parse(readFileSync(resolve(root, "packages/stow-s3/package.json"), "utf8"));
 const problems = [];
-if (!goVersion || goVersion !== packageJson.version) {
-  problems.push(`version mismatch: internal/version=${goVersion ?? "missing"}, packages/stow-s3=${packageJson.version}`);
-}
 
 // The platform packages carry the native binary, so a version skew between them
 // and the main package would publish a tarball whose binary is from a different
@@ -30,23 +68,19 @@ const optional = packageJson.optionalDependencies ?? {};
 // packages are checked for above.
 const pythonProject = readFileSync(resolve(root, "packages/stow-s3-py/pyproject.toml"), "utf8");
 const pythonVersion = pythonProject.match(/^version = "([^"]+)"/m)?.[1];
-if (!pythonVersion) {
-  problems.push("packages/stow-s3-py/pyproject.toml has no top-level version");
-} else if (pythonVersion !== goVersion) {
-  problems.push(
-    `version mismatch: internal/version=${goVersion}, packages/stow-s3-py=${pythonVersion}`,
-  );
-}
 
 // The Python package reports its own __version__, and a user comparing it with
 // the binary version needs the two to be the same number.
 const pythonInit = readFileSync(resolve(root, "packages/stow-s3-py/src/stow_s3/__init__.py"), "utf8");
 const pythonInitVersion = pythonInit.match(/^__version__ = "([^"]+)"/m)?.[1];
-if (pythonInitVersion !== pythonVersion) {
-  problems.push(
-    `stow_s3.__version__=${pythonInitVersion ?? "missing"} does not match pyproject version=${pythonVersion}`,
-  );
-}
+problems.push(
+  ...versionProblems({
+    goVersion,
+    packageVersion: packageJson.version,
+    pythonProjectVersion: pythonVersion,
+    pythonInitVersion,
+  }),
+);
 
 // Outside a git work tree, such as a source export, there is no index to
 // consult and the tracked-file check below is skipped.

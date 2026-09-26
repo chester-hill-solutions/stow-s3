@@ -63,6 +63,39 @@ if (process.argv.includes("--baseline")) {
   process.exit(0);
 }
 
+// coverageProblems is the ratchet decision, as a pure function of what was
+// measured, what is recorded, and what was recorded before.
+//
+// It is separated from the measurement so it can be tested. The gate decides
+// whether a change is allowed to reduce what is tested, and until this was
+// extracted there was no way to ask what it decides - the only evidence it had ever
+// given was a number in a CI log.
+export function coverageProblems(measured, baseline, previous, maxPercentageDrop) {
+  const problems = [];
+  if (measured.coveredStatements < baseline.coveredStatements) {
+    problems.push(
+      `covered statements fell: ${measured.coveredStatements} < ${baseline.coveredStatements}`,
+    );
+  }
+  const drop = round(baseline.percentage - measured.percentage);
+  if (drop > maxPercentageDrop) {
+    problems.push(
+      `coverage percentage fell by ${drop} points (${baseline.percentage}% -> ${measured.percentage}%), above the ${maxPercentageDrop} point allowance`,
+    );
+  }
+  // An improvement is reported, never a failure. The measurement varies by a
+  // statement or two between runs because concurrency tests in internal/runthrough
+  // interleave differently, so failing on an improvement would make the gate flap
+  // on scheduling rather than on coverage. Record a real improvement deliberately
+  // with --baseline, which is where the judgement belongs.
+  if (previous && baseline.coveredStatements < previous.coveredStatements) {
+    problems.push(
+      `the stored baseline was lowered: ${baseline.coveredStatements} < ${previous.coveredStatements}`,
+    );
+  }
+  return problems;
+}
+
 const measured = measure();
 if (!existsSync(baselinePath)) {
   console.error(`Coverage baseline missing: ${baselinePath}`);
@@ -76,24 +109,6 @@ if (typeof baseline.coveredStatements !== "number" || typeof baseline.percentage
   process.exit(2);
 }
 
-const problems = [];
-if (measured.coveredStatements < baseline.coveredStatements) {
-  problems.push(
-    `covered statements fell: ${measured.coveredStatements} < ${baseline.coveredStatements}`,
-  );
-}
-const drop = round(baseline.percentage - measured.percentage);
-if (drop > MAX_PERCENTAGE_DROP) {
-  problems.push(
-    `coverage percentage fell by ${drop} points (${baseline.percentage}% -> ${measured.percentage}%), above the ${MAX_PERCENTAGE_DROP} point allowance`,
-  );
-}
-// An improvement is reported, never a failure. The measurement varies by a
-// statement or two between runs because concurrency tests in internal/runthrough
-// interleave differently, so failing on an improvement would make the gate flap
-// on scheduling rather than on coverage. Record a real improvement deliberately
-// with --baseline, which is where the judgement belongs.
-
 let previous = null;
 try {
   previous = readPreviousBaseline(repoRoot, "scripts/baselines/go-coverage.json");
@@ -101,11 +116,7 @@ try {
   console.error(error.message);
   process.exit(2);
 }
-if (previous && baseline.coveredStatements < previous.coveredStatements) {
-  problems.push(
-    `the stored baseline was lowered: ${baseline.coveredStatements} < ${previous.coveredStatements}`,
-  );
-}
+const problems = coverageProblems(measured, baseline, previous, MAX_PERCENTAGE_DROP);
 
 if (problems.length > 0) {
   for (const problem of problems) {
