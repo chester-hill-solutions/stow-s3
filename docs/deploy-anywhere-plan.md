@@ -44,6 +44,10 @@ the design if they stopped being true.
 | 200 small objects | **+0 MiB** | probe `miBPer200SmallObjects: 0` |
 | Store a 1 MiB object | **+4.5 MiB** | probe `miBPer1MiBObject` |
 | Read that object back | **+7.5 MiB** | probe `afterReadMiB` |
+
+Those two rows are the large-object case. The agent case is many small reads, and
+it is not measured yet — Phase 2 measures it before the transport is changed on
+the strength of numbers from the large-object case alone.
 | Cold start to first operation (Node, 7 runs, median) | ready ~45 ms, first op ~16 ms, total ~62 ms | `wasm-coldstart.mjs` |
 
 ### Two premises that changed
@@ -110,28 +114,68 @@ Phase 1 is therefore a use of existing capability, not a new mechanism.
    conflicts; the same write replayed after a crash does not conflict; a delete
    racing a write conflicts.
 
+**Reuse before building.** The browser persistence path already implements
+compare-and-swap conflict detection, and it is the model to conform to rather
+than a mechanism to reinvent alongside:
+
+- `packages/stow-s3/src/browser-types.ts` — `PersistenceAdapter` is an interface
+  whose `commit` takes `(namespace, expectedGeneration, changes)`.
+- `packages/stow-s3/src/indexeddb-store.ts` — the generation check runs inside a
+  `readwrite` IndexedDB transaction, so the compare-and-swap is atomic, and a
+  mismatch throws `BrowserPersistenceError("persistence_error", ...)`. It is a
+  refusal, not a merge.
+- Quota validation and a lock manager sit alongside it.
+
+That surface detects a conflict at write time on the local store, by refusing a
+stale write. The run-through path overwrites *upstream* with no check at all, so
+this is a different position and Phase 1 is not redundant. But the shape is the
+same problem solved once already, on the surface closest to the edge, and the two
+must be reconciled rather than coexisting. Concretely: prefer the generation-
+counter pattern where a store can carry one, keep `If-Match` where the target is
+a foreign bucket that cannot, and say in the contract which mechanism applies
+where. Two unreconciled conflict vocabularies is the failure mode ADR 0010
+already names for permissions — a set that can grow without anyone noticing.
+
 **Exit:** a second writer's update is never silently overwritten; the conflict is
-visible in the outbox and mapped to a stable error code. ADR 0005's consent
-rules and ADR 0011's local-default rule are untouched.
+visible in the outbox and mapped to a stable error code, using the same refusal
+vocabulary as browser persistence. ADR 0005's consent rules and ADR 0011's
+local-default rule are untouched.
 
-### Phase 2 — A binary transport for the wasm bridge (P0)
+### Phase 2 — Agent workload shape, and only then a binary transport (P0/P1)
 
-1. Add a length-prefixed binary path over shared linear memory for object bytes,
-   keeping the JSON envelope for control messages. Bump `protocolVersion` in
-   `cmd/stow-wasm/main.go`; the bridge refuses a version it does not speak, so
-   this is a breaking change with an explicit gate rather than a silent one.
-2. Target: a 1 MiB object costs 1–2× its size to move, not 4.5×/7.5×. Measure
-   with the existing probe, and tighten the probe's floor assertion when the
-   number lands.
-3. Stream where the operation allows it. A `GetObject` that must materialize a
+**The workload is an agent, and that changes the ranking.** An agent's turn is
+many small reads and few writes across a working set, and the cost that compounds
+is per-call, not per-byte. The 4.5×/7.5× transport cost measured above is
+proportional to payload, so for typical source files it is small in absolute
+terms; the fixed 8 MiB post-boot floor dominates. The transport is therefore
+P1 for agent-shaped work and P0 only where large objects are routine — build
+artifacts, test output, vendored binaries, archives. Measure the agent case
+before committing to the order.
+
+1. Measure an agent-shaped workload against the committed artifact: read a
+   realistic working set of small files, write a handful, and report per-call
+   latency and total linear memory. The existing
+   `scripts/wasm-isolate-probe.mjs` is the harness; extend it rather than
+   writing a second one.
+2. Only then choose the transport. If the agent case is dominated by the fixed
+   floor, attack the floor — a smaller runtime, or a build with the reflect
+   allocator and the parts of the standard library the embedded path does not
+   use — before optimizing the bridge.
+3. If large objects are routine, add the length-prefixed binary path over shared
+   linear memory for object bytes, keeping the JSON envelope for control
+   messages, and bump `protocolVersion` in `cmd/stow-wasm/main.go`. The bridge
+   refuses a version it does not speak, so this is a breaking change with an
+   explicit gate rather than a silent one.
+4. Stream where the operation allows it. A `GetObject` that must materialize a
    base64 copy of the whole object is the single largest cost today.
-4. Regenerate `dist/stow-runtime.wasm` with the source change. `check-generated`
+5. Regenerate `dist/stow-runtime.wasm` with the source change. `check-generated`
    compares against `HEAD`, and the retired facade plan records two releases
    broken by that byte-diff for reasons unrelated to the source; expect it and
    read the diff before assuming a real change.
 
-**Exit:** the probe reports a per-object cost within budget, and the 8 MiB
-post-boot floor is documented as the device-target floor.
+**Exit:** an agent-shaped workload has a measured latency and memory profile; the
+transport decision follows that measurement rather than preceding it; any
+protocol bump regenerates the committed artifact.
 
 ### Phase 3 — Make the cache an incremental eviction index (P0)
 
@@ -204,6 +248,33 @@ still serves from RAM. So this is demoted and conditional.
 **Exit:** a named target, a backend implementing `storage.Store`, green against
 the shared contract suite, and its guarantees written down.
 
+### Phase 4b — Name the browser path as the edge deployment (P1)
+
+The tension between the workspace flagship and a filesystem-less host is real but
+already has an answer, and it is shipping. The workspace backend stores objects as
+real files at key-derived paths
+(`internal/storage/workspace/workspace.go` `New` requires a `Root` and creates
+it), so it needs a filesystem. A Worker isolate has none.
+
+The browser path already demonstrates a durable agent object store with no
+filesystem: `BrowserEmbeddedStow` with an `IndexedDbPersistenceAdapter`, a
+generation-checked commit inside a readwrite transaction, quota validation, and a
+lock manager. That is the "execute on nothing" agent surface, and it is tested.
+
+1. State it plainly in the docs: for a filesystem-less host, the browser/persistent
+   embedded path is the deployment, and the workspace backend is not available.
+   This is currently implied and never said.
+2. Reconcile the vocabulary. Two persistence models, two conflict vocabularies,
+   and two capability reports is how a caller cannot tell which guarantee they
+   have. Decide what a capability means on a host with no filesystem rather than
+   reporting `false` for something that is merely unavailable.
+3. Note the honest limits: an isolate is ephemeral, so a durable workspace is not
+   possible there, and the workspace contract already rules out a network relay.
+   Do not let "deploy anywhere" imply a workspace that cannot exist.
+
+**Exit:** the documentation says which surface runs where, and a caller can tell
+from the capability report what guarantee they actually hold.
+
 ### Phase 5 — Delta sync as a first-class operation (P1)
 
 The checkpoint diff already computes add/change/delete
@@ -249,7 +320,9 @@ Sequenced last, and deliberately:
 1. **The MCP stdio adapter**, which `docs/agent-workspace-plan.md` Phase 5 item 3
    already defers. It is pushed, not dropped. An adapter built before Phase 1
    would expose multi-writer semantics that silently lose writes, and would just
-   be a faster route to that failure.
+   be a faster route to that failure. It is also the surface agents actually
+   drive, so it is last in build order and first in importance — which is the
+   tension this plan resolves by putting correctness ahead of surface area.
 2. **In-process TypeScript and Python workspace handles**, which the workspace
    contract's delivery table records as not yet shipped.
 3. **A virtual-hosted corpus case**, which is the missing half of
@@ -268,6 +341,10 @@ Sequenced last, and deliberately:
   contract suite as the memory and filesystem backends.
 - A changed-object cache refresh examines zero cache rows, and the byte and count
   limits are still enforced.
+- A caller can tell, from the capability report alone, which of the workspace and
+  persistent-embedded surfaces their host supports and what durability each gives.
+- An agent-shaped workload has a measured latency and memory profile against the
+  committed artifact.
 - `make standards` and `make test-all` green; no ratchet baseline grows.
 - Every consistency claim in `docs/compat-contract.md` matches a test.
 
