@@ -27,7 +27,21 @@ import (
 // can be interrupted with the index as the only copy, and the alternative -
 // treating a missing index as empty - discards them silently. Neither is worth it
 // for a store whose contents are disposable and whose owner is usually mid-task.
-const manifestVersion = 2
+//
+// Version 3 namespaces the escaped form by bucket. An escaped key used to be stored
+// at a digest of the key alone, so the same key in two buckets resolved to one file
+// and the buckets read, wrote and deleted over each other. The fix moved those
+// files, and that is what forces the version rather than the other way round.
+//
+// A version 2 workspace is refused for the same reason version 1 is, and it is worth
+// being explicit about why refusing beats opening it. Its manifest is still valid -
+// the path was always derived from the key, never recorded - but its escaped objects
+// now sit at a path this build does not look at. Opening it would make every
+// escaped key resolve to absent while its file stayed on disk, which is the
+// total-loss reading that ErrManifestCorrupt's own comment calls the one thing
+// worse than losing bytes. A clear refusal is the only safe answer. Version 2 was
+// never released, so what this costs is a developer's local workspace.
+const manifestVersion = 3
 
 // ErrManifestCorrupt is returned when a manifest exists and cannot be trusted.
 //
@@ -152,9 +166,8 @@ func loadDocument(path string, into versioned) error {
 		return fmt.Errorf("%w: %s: %v", ErrManifestCorrupt, filepath.Base(path), err)
 	}
 	if into.layoutVersion() != manifestVersion {
-		return fmt.Errorf("%w: %s is version %d, this build implements %d; a version 1 workspace "+
-			"predates the identity/index split and must be removed and recreated — its files are "+
-			"still on disk and nothing else needs doing",
+		return fmt.Errorf("%w: %s is version %d, this build implements %d; this workspace must be "+
+			"removed and recreated — its files are still on disk and nothing else needs doing",
 			ErrManifestCorrupt, filepath.Base(path), into.layoutVersion(), manifestVersion)
 	}
 	return nil

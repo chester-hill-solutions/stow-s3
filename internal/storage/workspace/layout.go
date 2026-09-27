@@ -196,11 +196,24 @@ func NaturalPath(root, key string) string {
 	return filepath.Join(append([]string{root}, strings.Split(key, "/")...)...)
 }
 
-// EscapedPath returns the absolute path a key occupies when it is stored
-// escaped. The file name is a digest, so the path is within every filesystem's
-// component limit for a key of any supported length.
-func EscapedPath(root, key string) string {
-	return filepath.Join(root, internalDir, "keys", Digest(key))
+// EscapedPath returns the absolute path a key occupies when it is stored escaped.
+// The file name is a digest, so the path is within every filesystem's component
+// limit for a key of any supported length.
+//
+// The bucket is part of the path, as a directory of its own, and it has to be. A
+// digest of the key alone gave the same key in two buckets one physical file: a
+// write in either bucket overwrote the other's object, a read returned the other
+// bucket's bytes, and a delete in one bucket removed an object belonging to a
+// bucket the caller never named. Natural keys were never affected, because their
+// path already runs through the bucket's directory - which is why a workspace
+// holding only ordinary keys never showed it.
+//
+// The bucket is hashed rather than used as a directory name so the directory stays
+// within the component limit whatever the bucket is called, and so a bucket name
+// can never collide with stow's own bookkeeping the way a key that resolves to
+// .stow/keys/... would.
+func EscapedPath(root, bucket, key string) string {
+	return filepath.Join(root, internalDir, "keys", Digest(bucket), Digest(key))
 }
 
 // InternalPath joins a path inside the reserved internal directory.

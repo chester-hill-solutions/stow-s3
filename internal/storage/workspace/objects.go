@@ -308,7 +308,7 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 		if _, known := byKey[key]; known {
 			continue
 		}
-		if _, err := os.Stat(EscapedPath(s.root, key)); err != nil {
+		if _, err := os.Stat(EscapedPath(s.root, bucket, key)); err != nil {
 			continue
 		}
 		byKey[key] = *s.metaFromEntry(bucket, key, entry)

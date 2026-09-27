@@ -21,7 +21,7 @@ var ErrClosed = errors.New("workspace store is closed")
 func (s *Store) locate(bucket, key string) (string, error) {
 	recorded, hasEntry := s.objectIndex.entry(bucket, key)
 	if hasEntry && recorded.Form == FormEscaped {
-		path := EscapedPath(s.root, key)
+		path := EscapedPath(s.root, bucket, key)
 		if fileExists(path) {
 			return path, nil
 		}
@@ -34,7 +34,7 @@ func (s *Store) locate(bucket, key string) (string, error) {
 		}
 	}
 
-	escaped := EscapedPath(s.root, key)
+	escaped := EscapedPath(s.root, bucket, key)
 	if fileExists(escaped) {
 		return escaped, nil
 	}

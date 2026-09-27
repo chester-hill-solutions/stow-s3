@@ -114,7 +114,7 @@ func (s *Store) pathFor(bucket, key string) (string, Form) {
 			return NaturalPath(s.bucketDir(bucket), key), FormNatural
 		}
 	}
-	return EscapedPath(s.root, key), FormEscaped
+	return EscapedPath(s.root, bucket, key), FormEscaped
 }
 
 // CreateBucket makes a bucket's directory. The workspace bucket needs none: the

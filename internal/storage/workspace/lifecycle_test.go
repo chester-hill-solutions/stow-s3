@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -158,19 +159,29 @@ func TestNewerManifestVersionIsRefused(t *testing.T) {
 	}
 }
 
-// A version 1 workspace is refused rather than migrated, and the refusal says
-// what to do about it. Refusing a directory whose files are all still on disk
-// would otherwise read as data loss.
-func TestVersionOneWorkspaceIsRefusedWithGuidance(t *testing.T) {
-	root := t.TempDir()
-	legacy := filepath.Join(root, ".stow")
-	if err := os.MkdirAll(legacy, 0o755); err != nil {
-		t.Fatalf("mkdir: %v", err)
-	}
-	// A version 1 manifest: identity and index in one document, which is exactly
-	// what this build no longer implements.
-	legacyManifest := `{
-  "version": 1,
+// An older workspace is refused rather than migrated, and the refusal says what to
+// do about it. Refusing a directory whose files are all still on disk would
+// otherwise read as data loss.
+//
+// Both superseded versions are covered, because they are refused for different
+// reasons and only one of them is a schema this build ever shared. Version 1 held
+// identity and index in one document. Version 2 is a valid document that this
+// build still understands perfectly well, and it is refused anyway because the
+// escaped keys it points at have moved: opening it would make every escaped key
+// resolve to absent while its file stayed on disk, which is the reading that reads
+// as data loss.
+func TestOlderWorkspaceVersionsAreRefusedWithGuidance(t *testing.T) {
+	for _, version := range []int{1, 2} {
+		t.Run(fmt.Sprintf("version %d", version), func(t *testing.T) {
+			root := t.TempDir()
+			legacy := filepath.Join(root, ".stow")
+			if err := os.MkdirAll(legacy, 0o755); err != nil {
+				t.Fatalf("mkdir: %v", err)
+			}
+			// The identity document, which is the one carrying the version. Its
+			// contents are valid for both versions; only the number differs.
+			legacyManifest := fmt.Sprintf(`{
+  "version": %d,
   "workspace_id": "abc123",
   "bucket": "legacy",
   "created": "2026-01-01T00:00:00Z",
@@ -178,17 +189,22 @@ func TestVersionOneWorkspaceIsRefusedWithGuidance(t *testing.T) {
   "ttl_seconds": 0,
   "owned": true,
   "buckets": {}
-}`
-	if err := os.WriteFile(filepath.Join(legacy, "manifest.json"), []byte(legacyManifest), 0o644); err != nil {
-		t.Fatalf("write legacy manifest: %v", err)
-	}
+}`, version)
+			if err := os.WriteFile(filepath.Join(legacy, "manifest.json"), []byte(legacyManifest), 0o644); err != nil {
+				t.Fatalf("write legacy manifest: %v", err)
+			}
 
-	_, err := workspace.New(workspace.Options{Root: root, Bucket: "legacy"})
-	if !errors.Is(err, workspace.ErrManifestCorrupt) {
-		t.Fatalf("open a version 1 workspace = %v, want ErrManifestCorrupt", err)
-	}
-	if !strings.Contains(err.Error(), "still on disk") {
-		t.Errorf("error %q does not say the files are still on disk", err)
+			_, err := workspace.New(workspace.Options{Root: root, Bucket: "legacy"})
+			if !errors.Is(err, workspace.ErrManifestCorrupt) {
+				t.Fatalf("open a version %d workspace = %v, want ErrManifestCorrupt", version, err)
+			}
+			if !strings.Contains(err.Error(), "still on disk") {
+				t.Errorf("error %q does not say the files are still on disk", err)
+			}
+			if !strings.Contains(err.Error(), fmt.Sprintf("is version %d", version)) {
+				t.Errorf("error %q does not name the version found", err)
+			}
+		})
 	}
 }
 

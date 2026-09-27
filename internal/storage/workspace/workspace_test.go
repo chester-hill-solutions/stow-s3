@@ -162,7 +162,12 @@ func TestAwkwardKeysAreStoredInTheEscapedForm(t *testing.T) {
 					t.Errorf("key %q was stored at its natural path %s", key, natural)
 				}
 			}
-			escaped := filepath.Join(root, ".stow", "keys", workspace.Digest(key))
+			// EscapedPath rather than a hand-built path, so this asserts the
+			// behaviour instead of a layout that has to be edited here every time
+			// the layout changes. It did exactly that: when the bucket became part
+			// of the escaped path, this test failed on a path it had hardcoded
+			// rather than on a real defect.
+			escaped := workspace.EscapedPath(root, bucket, key)
 			if _, err := os.Lstat(escaped); err != nil {
 				t.Errorf("key %q is not in the escaped form at %s: %v", key, escaped, err)
 			}
@@ -229,7 +234,7 @@ func TestDeleteObjectRemovesAnEscapedFile(t *testing.T) {
 	ctx := context.Background()
 	key := "dir/../name.txt"
 	put(t, store, key, "bye")
-	escaped := filepath.Join(root, ".stow", "keys", workspace.Digest(key))
+	escaped := workspace.EscapedPath(root, bucket, key)
 	if _, err := os.Lstat(escaped); err != nil {
 		t.Fatalf("precondition: %v", err)
 	}
