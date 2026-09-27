@@ -100,6 +100,45 @@ func TestResumePreservesAuthorityAndQuotaAndRejectsWidening(t *testing.T) {
 	}
 }
 
+func TestResumePreservesCheckpointRetentionLimits(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "workspace")
+	reg := registryDir(t)
+	first, err := stow.OpenWorkspace(stow.WorkspaceOptions{
+		Dir: dir, RegistryDir: reg, MaxCheckpointBytes: 64, MaxCheckpoints: 1,
+	})
+	if err != nil {
+		t.Fatalf("OpenWorkspace: %v", err)
+	}
+	id := first.ID()
+	if _, err := first.CreateCheckpoint(context.Background(), stow.CheckpointOptions{}); err != nil {
+		t.Fatalf("initial checkpoint: %v", err)
+	}
+	if err := first.Close(); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+
+	resumed, err := stow.ResumeIn(reg, id)
+	if err != nil {
+		t.Fatalf("ResumeIn: %v", err)
+	}
+	defer resumed.Close()
+	if resumed.MaxCheckpointBytes() != 64 || resumed.MaxCheckpoints() != 1 {
+		t.Fatalf("resumed retention limits = (%d bytes, %d checkpoints), want (64, 1)", resumed.MaxCheckpointBytes(), resumed.MaxCheckpoints())
+	}
+	if _, err := resumed.CreateCheckpoint(context.Background(), stow.CheckpointOptions{}); err == nil {
+		t.Fatal("resumed workspace did not enforce its checkpoint count cap")
+	}
+	if err := resumed.Close(); err != nil {
+		t.Fatalf("close resumed workspace: %v", err)
+	}
+	if _, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: reg, MaxCheckpointBytes: 65}, id); err == nil {
+		t.Fatal("resume accepted a broader checkpoint byte limit")
+	}
+	if _, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: reg, MaxCheckpoints: 3}, id); err == nil {
+		t.Fatal("resume accepted a broader checkpoint count limit")
+	}
+}
+
 func TestResumeRefusesLegacyRegistryEntryWithoutPolicy(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "workspace")
 	reg := registryDir(t)

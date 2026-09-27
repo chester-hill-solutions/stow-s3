@@ -122,6 +122,12 @@ func measureGitSeed(root string, includeSensitive bool) (int64, int64, error) {
 		if err != nil {
 			return err
 		}
+		portableRel := filepath.ToSlash(rel)
+		for _, segment := range strings.Split(portableRel, "/") {
+			if !validPortablePathSegment(segment) {
+				return fmt.Errorf("stow: Git input path is not portable: %s", portableRel)
+			}
+		}
 		if !includeSensitive && sensitiveSeedPath(rel) {
 			return fmt.Errorf("stow: sensitive-looking Git input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", rel)
 		}

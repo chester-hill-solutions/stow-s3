@@ -62,7 +62,7 @@ func TestWorkspacePrepareCommandStagesGitRefAndReportsCommit(t *testing.T) {
 	workspaceGitTestCommand(t, git, source, "commit", "-m", "baseline")
 	commit := workspaceGitTestCommand(t, git, source, "rev-parse", "HEAD")
 	manifestPath := filepath.Join(base, "task.json")
-	manifest := `{"version":1,"root":"task-root","working_directory":"repo","repositories":[{"source":"source","destination":"repo","ref":"refs/heads/main"}],"registry_dir":"registry"}`
+	manifest := `{"version":1,"root":"task-root","working_directory":"repo","repositories":[{"source":"source","destination":"repo","ref":"refs/heads/main"}],"registry_dir":"registry","max_checkpoint_bytes":4096,"max_checkpoints":3}`
 	if err := os.WriteFile(manifestPath, []byte(manifest), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -75,6 +75,9 @@ func TestWorkspacePrepareCommandStagesGitRefAndReportsCommit(t *testing.T) {
 	}
 	if result.WorkingDirectory != filepath.Join(base, "task-root", "repo") || len(result.Repositories) != 1 || result.Repositories[0].Commit != commit {
 		t.Fatalf("prepare result = %+v", result)
+	}
+	if result.Capabilities.CheckpointLimits.MaxBytes != 4096 || result.Capabilities.CheckpointLimits.MaxCount != 3 {
+		t.Fatalf("checkpoint retention limits = %+v", result.Capabilities.CheckpointLimits)
 	}
 	if _, err := os.Stat(filepath.Join(result.WorkingDirectory, "main.go")); err != nil {
 		t.Fatalf("prepared source file missing: %v", err)
@@ -146,6 +149,13 @@ func TestWorkspaceExportAndImportCommands(t *testing.T) {
 	}
 	if err := json.Unmarshal(output, &exported); err != nil || exported.CheckpointID != checkpoint.ID {
 		t.Fatalf("export command response = %s, %v", output, err)
+	}
+	output = captureWorkspaceCommand(t, func() error {
+		return previewCheckpointCommand([]string{"--archive", archive})
+	})
+	var preview stow.CheckpointArchivePreview
+	if err := json.Unmarshal(output, &preview); err != nil || preview.CheckpointID != checkpoint.ID || len(preview.Files) != 1 || preview.Files[0].Path != "TASK.md" {
+		t.Fatalf("preview command response = %s, %v", output, err)
 	}
 	destinationRegistry := filepath.Join(t.TempDir(), "destination-registry")
 	output = captureWorkspaceCommand(t, func() error {

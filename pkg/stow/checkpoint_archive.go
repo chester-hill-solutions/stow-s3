@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,6 +21,7 @@ import (
 const (
 	checkpointArchiveVersion      = 1
 	maxCheckpointManifestSize     = 16 << 20
+	maxCheckpointArchiveTrailer   = 1 << 20
 	defaultCheckpointArchiveBytes = 1 << 30
 	defaultCheckpointArchiveFiles = 100_000
 )
@@ -29,6 +32,19 @@ type CheckpointArchiveOptions struct {
 	MaxBytes              int64
 	MaxFiles              int64
 	IncludeSensitiveFiles bool
+}
+
+// CheckpointArchivePreview describes the verified contents of an archive.
+// Sensitive-looking paths are reported so callers can make an informed choice;
+// preview itself does not import or extract data and does not require opt-in.
+type CheckpointArchivePreview struct {
+	CheckpointID   string           `json:"checkpoint_id"`
+	WorkspaceID    string           `json:"workspace_id"`
+	ParentID       string           `json:"parent_checkpoint_id,omitempty"`
+	Files          []CheckpointFile `json:"files"`
+	Excluded       []string         `json:"excluded_sensitive_paths,omitempty"`
+	SensitivePaths []string         `json:"sensitive_paths,omitempty"`
+	Bytes          int64            `json:"bytes"`
 }
 
 type checkpointArchiveHeader struct {
@@ -45,6 +61,9 @@ func ExportCheckpoint(ctx context.Context, registryDir, id string, output io.Wri
 	}
 	if ctx == nil {
 		ctx = context.Background()
+	}
+	if err := validateCheckpointArchiveOptions(options); err != nil {
+		return err
 	}
 	manifest, err := LoadCheckpoint(registryDir, id)
 	if err != nil {
@@ -65,6 +84,99 @@ func ExportCheckpoint(ctx context.Context, registryDir, id string, output io.Wri
 		return fmt.Errorf("stow: checkpoint bytes %d exceed archive limit %d", total, archiveByteLimit(options.MaxBytes))
 	}
 	return writeCheckpointArchive(ctx, manifest, checkpointDir, output)
+}
+
+// PreviewCheckpointArchive validates archive structure, file paths, limits,
+// content digests, and the gzip trailer without extracting or publishing files.
+// The returned paths are sorted for stable machine-readable output.
+func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options CheckpointArchiveOptions) (CheckpointArchivePreview, error) {
+	if input == nil {
+		return CheckpointArchivePreview{}, fmt.Errorf("stow: checkpoint archive input is required")
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if err := validateCheckpointArchiveOptions(options); err != nil {
+		return CheckpointArchivePreview{}, err
+	}
+	gz, tr, manifest, err := readCheckpointArchive(ctx, input)
+	if err != nil {
+		return CheckpointArchivePreview{}, err
+	}
+	defer gz.Close()
+	if int64(len(manifest.Files)) > archiveFileLimit(options.MaxFiles) {
+		return CheckpointArchivePreview{}, fmt.Errorf("stow: checkpoint file count %d exceeds preview limit %d", len(manifest.Files), archiveFileLimit(options.MaxFiles))
+	}
+	bytes := checkpointManifestBytes(manifest)
+	if bytes > archiveByteLimit(options.MaxBytes) {
+		return CheckpointArchivePreview{}, fmt.Errorf("stow: checkpoint bytes %d exceed preview limit %d", bytes, archiveByteLimit(options.MaxBytes))
+	}
+	if err := verifyCheckpointArchiveFiles(ctx, tr, manifest); err != nil {
+		return CheckpointArchivePreview{}, err
+	}
+	if err := verifyCheckpointArchiveTrailer(gz); err != nil {
+		return CheckpointArchivePreview{}, err
+	}
+	files := append([]CheckpointFile(nil), manifest.Files...)
+	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
+	sensitive := make([]string, 0)
+	for _, file := range files {
+		if sensitiveSeedPath(file.Path) {
+			sensitive = append(sensitive, file.Path)
+		}
+	}
+	return CheckpointArchivePreview{
+		CheckpointID: manifest.ID, WorkspaceID: manifest.WorkspaceID,
+		ParentID: manifest.ParentID, Files: files,
+		Excluded:       append([]string(nil), manifest.Excluded...),
+		SensitivePaths: sensitive, Bytes: bytes,
+	}, nil
+}
+
+func verifyCheckpointArchiveFiles(ctx context.Context, tr *tar.Reader, manifest CheckpointManifest) error {
+	expected := make(map[string]CheckpointFile, len(manifest.Files))
+	for _, file := range manifest.Files {
+		expected["files/"+file.Path] = file
+	}
+	seen := make(map[string]struct{}, len(expected))
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		header, err := tr.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("stow: read checkpoint archive entry: %w", err)
+		}
+		file, ok := expected[header.Name]
+		if !ok || header.Typeflag != tar.TypeReg || header.Size != file.Size {
+			return fmt.Errorf("stow: unexpected or invalid checkpoint archive entry %q", header.Name)
+		}
+		if _, duplicate := seen[header.Name]; duplicate {
+			return fmt.Errorf("stow: duplicate checkpoint archive entry %q", header.Name)
+		}
+		seen[header.Name] = struct{}{}
+		digest := sha256.New()
+		if _, err := io.CopyN(digest, contextReader{ctx: ctx, reader: tr}, file.Size); err != nil {
+			return fmt.Errorf("stow: read checkpoint archive file %q: %w", file.Path, err)
+		}
+		if hex.EncodeToString(digest.Sum(nil)) != file.SHA256 {
+			return fmt.Errorf("stow: checkpoint archive file %q failed integrity validation", file.Path)
+		}
+	}
+	if len(seen) != len(expected) {
+		return fmt.Errorf("stow: checkpoint archive is missing files")
+	}
+	return nil
+}
+
+func validateCheckpointArchiveOptions(options CheckpointArchiveOptions) error {
+	if options.MaxBytes < 0 || options.MaxFiles < 0 {
+		return fmt.Errorf("stow: checkpoint archive limits must not be negative")
+	}
+	return nil
 }
 
 func writeCheckpointArchive(ctx context.Context, manifest CheckpointManifest, checkpointDir string, output io.Writer) error {
@@ -102,18 +214,27 @@ func writeCheckpointArchiveFiles(ctx context.Context, tw *tar.Writer, manifest C
 			return err
 		}
 		path := filepath.Join(checkpointDir, "files", filepath.FromSlash(file.Path))
-		digest, size, err := digestFile(path)
-		if err != nil || digest != file.SHA256 || size != file.Size {
+		pathInfo, err := os.Lstat(path)
+		if err != nil || !pathInfo.Mode().IsRegular() {
 			return fmt.Errorf("stow: checkpoint file %q failed integrity validation", file.Path)
 		}
 		input, err := os.Open(path)
 		if err != nil {
 			return fmt.Errorf("stow: open checkpoint file %q: %w", file.Path, err)
 		}
-		err = writeArchiveEntry(tw, "files/"+file.Path, file.Size, contextReader{ctx: ctx, reader: input})
+		openedInfo, statErr := input.Stat()
+		if statErr != nil || !openedInfo.Mode().IsRegular() || !os.SameFile(pathInfo, openedInfo) || openedInfo.Size() != file.Size {
+			_ = input.Close()
+			return fmt.Errorf("stow: checkpoint file %q changed before export", file.Path)
+		}
+		hash := sha256.New()
+		err = writeArchiveEntry(tw, "files/"+file.Path, file.Size, io.TeeReader(contextReader{ctx: ctx, reader: input}, hash))
 		closeErr := input.Close()
 		if err != nil {
 			return err
+		}
+		if hex.EncodeToString(hash.Sum(nil)) != file.SHA256 {
+			return fmt.Errorf("stow: checkpoint file %q changed during export", file.Path)
 		}
 		if closeErr != nil {
 			return closeErr
@@ -130,6 +251,9 @@ func ImportCheckpoint(ctx context.Context, registryDir string, input io.Reader, 
 	}
 	if ctx == nil {
 		ctx = context.Background()
+	}
+	if err := validateCheckpointArchiveOptions(options); err != nil {
+		return CheckpointInfo{}, err
 	}
 	if registryDir == "" {
 		var err error
@@ -176,8 +300,17 @@ func ImportCheckpoint(ctx context.Context, registryDir string, input io.Reader, 
 }
 
 func verifyCheckpointArchiveTrailer(gz *gzip.Reader) error {
-	if _, err := io.Copy(io.Discard, gz); err != nil {
+	trailer, err := io.ReadAll(io.LimitReader(gz, maxCheckpointArchiveTrailer+1))
+	if err != nil {
 		return fmt.Errorf("stow: verify checkpoint archive trailer: %w", err)
+	}
+	if len(trailer) > maxCheckpointArchiveTrailer {
+		return fmt.Errorf("stow: checkpoint archive has an oversized trailer")
+	}
+	for _, value := range trailer {
+		if value != 0 {
+			return fmt.Errorf("stow: checkpoint archive has unexpected data after its tar entries")
+		}
 	}
 	return nil
 }
@@ -308,18 +441,43 @@ func publishImportedCheckpoint(ctx context.Context, stage, checkpointRoot string
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(filepath.Join(stage, "manifest.json"), append(encoded, '\n'), 0o600); err != nil {
-		return err
-	}
 	target := filepath.Join(checkpointRoot, manifest.ID)
-	if _, err := os.Lstat(target); err == nil {
-		return fmt.Errorf("stow: checkpoint %s already exists", manifest.ID)
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return err
+	if err := os.Mkdir(target, 0o700); err != nil {
+		if errors.Is(err, os.ErrExist) {
+			return fmt.Errorf("stow: checkpoint %s already exists", manifest.ID)
+		}
+		return fmt.Errorf("stow: reserve imported checkpoint: %w", err)
 	}
-	if err := os.Rename(stage, target); err != nil {
-		return fmt.Errorf("stow: publish imported checkpoint: %w", err)
+	published := false
+	defer func() {
+		if !published {
+			_ = os.RemoveAll(target)
+		}
+	}()
+	if err := os.Rename(filepath.Join(stage, "files"), filepath.Join(target, "files")); err != nil {
+		return fmt.Errorf("stow: stage imported checkpoint files: %w", err)
 	}
+	manifestTemp, err := os.CreateTemp(target, ".manifest-*")
+	if err != nil {
+		return fmt.Errorf("stow: stage imported checkpoint manifest: %w", err)
+	}
+	manifestTempPath := manifestTemp.Name()
+	defer os.Remove(manifestTempPath)
+	if _, err := manifestTemp.Write(append(encoded, '\n')); err != nil {
+		_ = manifestTemp.Close()
+		return fmt.Errorf("stow: write imported checkpoint manifest: %w", err)
+	}
+	if err := manifestTemp.Sync(); err != nil {
+		_ = manifestTemp.Close()
+		return fmt.Errorf("stow: sync imported checkpoint manifest: %w", err)
+	}
+	if err := manifestTemp.Close(); err != nil {
+		return fmt.Errorf("stow: close imported checkpoint manifest: %w", err)
+	}
+	if err := os.Link(manifestTempPath, filepath.Join(target, "manifest.json")); err != nil {
+		return fmt.Errorf("stow: publish imported checkpoint manifest: %w", err)
+	}
+	published = true
 	return nil
 }
 

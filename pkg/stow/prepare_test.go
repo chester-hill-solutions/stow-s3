@@ -251,6 +251,28 @@ func TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions(t *testing.T) {
 	}
 }
 
+func TestPrepareWorkspaceRejectsNonPortableDestinationSegments(t *testing.T) {
+	source := filepath.Join(t.TempDir(), "input.txt")
+	if err := os.WriteFile(source, []byte("task"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, destination := range []string{"CON/output.txt", "folder./output.txt", "bad?/output.txt"} {
+		t.Run(destination, func(t *testing.T) {
+			root := filepath.Join(t.TempDir(), "task")
+			_, err := stow.PrepareWorkspace(stow.PrepareOptions{
+				WorkspaceOptions: stow.WorkspaceOptions{Dir: root, RegistryDir: filepath.Join(t.TempDir(), "registry")},
+				Inputs:           []stow.WorkspaceInput{{Source: source, Destination: destination}},
+			})
+			if err == nil {
+				t.Fatalf("PrepareWorkspace accepted non-portable destination %q", destination)
+			}
+			if _, statErr := os.Lstat(root); !os.IsNotExist(statErr) {
+				t.Fatalf("failed prepare left partial root: %v", statErr)
+			}
+		})
+	}
+}
+
 func TestPrepareWorkspaceRequiresExplicitSensitiveInputOptIn(t *testing.T) {
 	source := t.TempDir()
 	if err := os.WriteFile(filepath.Join(source, ".env.local"), []byte("TOKEN=example"), 0o600); err != nil {

@@ -67,6 +67,8 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	if err := w.assertOpen(); err != nil {
 		return CheckpointInfo{}, err
 	}
+	w.checkpointMu.Lock()
+	defer w.checkpointMu.Unlock()
 	if err := ctx.Err(); err != nil {
 		return CheckpointInfo{}, err
 	}
@@ -77,6 +79,9 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	}
 	before, excluded, size, err := checkpointInputs(w.dir, options)
 	if err != nil {
+		return CheckpointInfo{}, err
+	}
+	if err := w.checkCheckpointRetention(size); err != nil {
 		return CheckpointInfo{}, err
 	}
 	checkpointRoot, tempDir, err := stageCheckpointDirectory(w.registryDir)
@@ -103,6 +108,60 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 		return CheckpointInfo{}, err
 	}
 	return CheckpointInfo{ID: id, WorkspaceID: w.id, ParentID: options.ParentID, Created: manifest.Created, Files: int64(len(before)), Bytes: size, Excluded: excluded}, nil
+}
+
+// checkCheckpointRetention accounts only published checkpoints. The caller
+// holds checkpointMu through publication, so parallel captures on this handle
+// cannot both pass the same remaining capacity.
+func (w *Workspace) checkCheckpointRetention(nextBytes int64) error {
+	if w.maxCheckpointBytes == 0 && w.maxCheckpoints == 0 {
+		return nil
+	}
+	count, total, err := checkpointRetentionUsage(w.registryDir, w.id)
+	if err != nil {
+		return err
+	}
+	if w.maxCheckpoints > 0 && count >= w.maxCheckpoints {
+		return fmt.Errorf("stow: checkpoint count limit reached (%d of %d); remove a checkpoint or raise the workspace limit", count, w.maxCheckpoints)
+	}
+	if w.maxCheckpointBytes > 0 && (total > w.maxCheckpointBytes || nextBytes > w.maxCheckpointBytes-total) {
+		return fmt.Errorf("stow: checkpoint byte limit exceeded (%d existing + %d new > %d); remove a checkpoint or raise the workspace limit", total, nextBytes, w.maxCheckpointBytes)
+	}
+	return nil
+}
+
+func checkpointRetentionUsage(registryDir, workspaceID string) (int64, int64, error) {
+	root := filepath.Join(registryDir, "checkpoints")
+	entries, err := os.ReadDir(root)
+	if os.IsNotExist(err) {
+		entries = nil
+	} else if err != nil {
+		return 0, 0, fmt.Errorf("stow: inspect checkpoint retention: %w", err)
+	}
+	var count, total int64
+	for _, entry := range entries {
+		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".checkpoint-") {
+			continue
+		}
+		manifest, err := LoadCheckpoint(registryDir, entry.Name())
+		if err != nil {
+			return 0, 0, fmt.Errorf("stow: cannot enforce checkpoint retention because checkpoint %s is invalid: %w", entry.Name(), err)
+		}
+		if manifest.WorkspaceID != workspaceID {
+			continue
+		}
+		if count == int64(^uint64(0)>>1) {
+			return 0, 0, fmt.Errorf("stow: checkpoint count accounting overflow")
+		}
+		count++
+		for _, file := range manifest.Files {
+			if file.Size < 0 || total > int64(^uint64(0)>>1)-file.Size {
+				return 0, 0, fmt.Errorf("stow: checkpoint byte accounting overflow")
+			}
+			total += file.Size
+		}
+	}
+	return count, total, nil
 }
 
 func checkpointInputs(root string, options CheckpointOptions) ([]CheckpointFile, []string, int64, error) {
@@ -252,13 +311,40 @@ func validCheckpointPath(path string) bool {
 	if clean != path || strings.HasPrefix(path, "../") || path == ".." {
 		return false
 	}
+	return validCheckpointPathSegments(path)
+}
+
+func validCheckpointPathSegments(path string) bool {
 	for i, segment := range strings.Split(path, "/") {
 		if segment == "" || strings.Contains(segment, ":") || strings.EqualFold(segment, ".git") {
+			return false
+		}
+		if !validPortablePathSegment(segment) {
 			return false
 		}
 		if i == 0 && strings.EqualFold(segment, ".stow") {
 			return false
 		}
+	}
+	return true
+}
+
+func validPortablePathSegment(segment string) bool {
+	if strings.HasSuffix(segment, ".") || strings.HasSuffix(segment, " ") || strings.ContainsAny(segment, `<>:"|?*`) {
+		return false
+	}
+	for _, char := range segment {
+		if char < 0x20 {
+			return false
+		}
+	}
+	base := strings.ToUpper(strings.SplitN(segment, ".", 2)[0])
+	switch base {
+	case "CON", "PRN", "AUX", "NUL":
+		return false
+	}
+	if len(base) == 4 && (strings.HasPrefix(base, "COM") || strings.HasPrefix(base, "LPT")) && base[3] >= '1' && base[3] <= '9' {
+		return false
 	}
 	return true
 }

@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
@@ -25,17 +26,20 @@ import (
 type Workspace struct {
 	*Runtime
 
-	dir              string
-	workingDirectory string
-	bucket           string
-	id               string
-	store            *workspace.Store
-	session          *workspace.Session
-	registry         *workspace.Registry
-	registryDir      string
-	now              func() time.Time
-	closed           bool
-	destroyed        bool
+	dir                string
+	workingDirectory   string
+	bucket             string
+	id                 string
+	store              *workspace.Store
+	session            *workspace.Session
+	registry           *workspace.Registry
+	registryDir        string
+	maxCheckpointBytes int64
+	maxCheckpoints     int64
+	checkpointMu       sync.Mutex
+	now                func() time.Time
+	closed             bool
+	destroyed          bool
 }
 
 // WorkspaceOptions configures a workspace.
@@ -56,6 +60,11 @@ type WorkspaceOptions struct {
 	// the bound.
 	MaxBytes   int64
 	MaxObjects int64
+	// MaxCheckpointBytes and MaxCheckpoints bound the total payload bytes and
+	// number of retained checkpoints for this workspace. Zero means unlimited.
+	// A cap rejects a new checkpoint; it never evicts an older one.
+	MaxCheckpointBytes int64
+	MaxCheckpoints     int64
 	// Authority is what the workspace permits, enforced below every interface so
 	// the filesystem surface and the S3 surface cannot be granted different
 	// things. A nil pointer permits everything, which is what a workspace has
@@ -89,6 +98,9 @@ type WorkspaceOptions struct {
 func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	if options.Dir == "" {
 		return nil, fmt.Errorf("stow: workspace Dir is required")
+	}
+	if options.MaxCheckpointBytes < 0 || options.MaxCheckpoints < 0 {
+		return nil, fmt.Errorf("stow: checkpoint retention limits must not be negative")
 	}
 	bucket := options.Bucket
 	if bucket == "" {
@@ -137,6 +149,8 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		session:          session,
 	}
 	ws.now = options.Now
+	ws.maxCheckpointBytes = options.MaxCheckpointBytes
+	ws.maxCheckpoints = options.MaxCheckpoints
 	// The workspace bucket is bootstrapped through the store rather than through
 	// the runtime, because it is a construction step and not a caller operation.
 	// The runtime carries the authority the caller asked for, so routing this
@@ -172,6 +186,13 @@ func (w *Workspace) Bucket() string { return w.bucket }
 
 // ID is the workspace's durable identity, which outlives this handle.
 func (w *Workspace) ID() string { return w.id }
+
+// MaxCheckpointBytes is the cumulative payload-byte cap for retained
+// checkpoints; zero means unlimited.
+func (w *Workspace) MaxCheckpointBytes() int64 { return w.maxCheckpointBytes }
+
+// MaxCheckpoints is the retained checkpoint count cap; zero means unlimited.
+func (w *Workspace) MaxCheckpoints() int64 { return w.maxCheckpoints }
 
 // Path returns where a key's bytes live, and whether they are there. It answers
 // without an S3 round trip, so a host can print a real path for a caller.

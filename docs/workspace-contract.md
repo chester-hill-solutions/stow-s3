@@ -138,6 +138,12 @@ saying which member lands in which phase is more useful than a promise:
 
 The current task manifest, CLI commands, archive limits, sensitive-path rules,
 and cleanup behavior are documented in [`task-manifest.md`](task-manifest.md).
+Workspace manifests can set separate cumulative checkpoint payload-byte and
+checkpoint-count limits. Exceeding either refuses the new checkpoint without
+removing an existing one; zero leaves that cap unlimited.
+Portable archive paths and prepared input paths reject platform-reserved names.
+`workspace preview --archive` verifies archive contents and reports included
+and sensitive-looking paths before an import; it does not extract files.
 Destroying a workspace removes its associated checkpoints. TTL collection also
 removes those checkpoints after it has safely reclaimed an eligible
 Stow-owned workspace; adopted or live workspaces and their checkpoints remain.

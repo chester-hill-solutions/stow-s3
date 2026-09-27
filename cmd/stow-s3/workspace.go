@@ -32,12 +32,18 @@ type workspaceResult struct {
 }
 
 type workspaceCapabilities struct {
-	Backend    stow.Backend `json:"backend"`
-	MaxBytes   int64        `json:"max_bytes"`
-	MaxObjects int64        `json:"max_objects"`
-	Persistent bool         `json:"persistent"`
-	Multipart  bool         `json:"multipart"`
-	Upstream   bool         `json:"upstream"`
+	Backend          stow.Backend              `json:"backend"`
+	MaxBytes         int64                     `json:"max_bytes"`
+	MaxObjects       int64                     `json:"max_objects"`
+	Persistent       bool                      `json:"persistent"`
+	Multipart        bool                      `json:"multipart"`
+	Upstream         bool                      `json:"upstream"`
+	CheckpointLimits checkpointRetentionLimits `json:"checkpoint_limits"`
+}
+
+type checkpointRetentionLimits struct {
+	MaxBytes int64 `json:"max_bytes"`
+	MaxCount int64 `json:"max_count"`
 }
 
 type workspaceHandoff struct {
@@ -60,7 +66,7 @@ type checkpointResult struct {
 
 func workspaceCommand(args []string) error {
 	if len(args) == 0 {
-		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|diff|restore|handoff|export|import>")
+		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|diff|restore|handoff|export|preview|import>")
 	}
 	switch args[0] {
 	case "prepare":
@@ -79,9 +85,39 @@ func workspaceCommand(args []string) error {
 		return exportCheckpointCommand(args[1:])
 	case "import":
 		return importCheckpointCommand(args[1:])
+	case "preview":
+		return previewCheckpointCommand(args[1:])
 	default:
 		return fmt.Errorf("unknown workspace command %q", args[0])
 	}
+}
+
+func previewCheckpointCommand(args []string) error {
+	flags := flag.NewFlagSet("workspace preview", flag.ContinueOnError)
+	archivePath := flags.String("archive", "", "Checkpoint archive to inspect")
+	maxBytes := flags.Int64("max-bytes", 0, "Uncompressed byte cap (0 uses the 1 GiB default)")
+	maxFiles := flags.Int64("max-files", 0, "File count cap (0 uses the 100000-file default)")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *archivePath == "" {
+		return errors.New("workspace preview requires --archive")
+	}
+	if *maxBytes < 0 || *maxFiles < 0 {
+		return errors.New("workspace preview limits must not be negative")
+	}
+	file, err := os.Open(*archivePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	preview, err := stow.PreviewCheckpointArchive(context.Background(), file, stow.CheckpointArchiveOptions{
+		MaxBytes: *maxBytes, MaxFiles: *maxFiles,
+	})
+	if err != nil {
+		return err
+	}
+	return writeWorkspaceJSON(preview)
 }
 
 func exportCheckpointCommand(args []string) error {
@@ -228,7 +264,7 @@ func readWorkspaceManifest(path string) (stow.WorkspaceTaskManifest, error) {
 	if manifest.Version != 1 {
 		return manifest, fmt.Errorf("unsupported task manifest version %d (supported: 1)", manifest.Version)
 	}
-	if manifest.MaxBytes < 0 || manifest.MaxObjects < 0 || manifest.TTLSeconds < 0 {
+	if manifest.MaxBytes < 0 || manifest.MaxObjects < 0 || manifest.MaxCheckpointBytes < 0 || manifest.MaxCheckpoints < 0 || manifest.TTLSeconds < 0 {
 		return manifest, errors.New("task manifest limits and TTL must not be negative")
 	}
 	base, err := filepath.Abs(filepath.Dir(path))
@@ -263,6 +299,7 @@ func prepareWorkspaceFromManifest(manifest stow.WorkspaceTaskManifest) (*stow.Pr
 		WorkspaceOptions: stow.WorkspaceOptions{
 			Dir: manifest.Root, Bucket: manifest.Bucket,
 			MaxBytes: manifest.MaxBytes, MaxObjects: manifest.MaxObjects,
+			MaxCheckpointBytes: manifest.MaxCheckpointBytes, MaxCheckpoints: manifest.MaxCheckpoints,
 			TTL:         time.Duration(manifest.TTLSeconds) * time.Second,
 			RegistryDir: manifest.RegistryDir,
 		},
@@ -475,6 +512,7 @@ func makeWorkspaceResult(ws *stow.Workspace, seededBytes, seededObjects int64) w
 			Backend: capabilities.Backend, MaxBytes: capabilities.MaxBytes,
 			MaxObjects: capabilities.MaxObjects, Persistent: capabilities.Persistent,
 			Multipart: capabilities.Multipart, Upstream: capabilities.Upstream,
+			CheckpointLimits: checkpointRetentionLimits{MaxBytes: ws.MaxCheckpointBytes(), MaxCount: ws.MaxCheckpoints()},
 		},
 		Authority: ws.Authority().Operations(),
 	}

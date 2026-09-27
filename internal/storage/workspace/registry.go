@@ -33,10 +33,12 @@ type Entry struct {
 	// PolicyVersion is zero for registry entries written before resume preserved
 	// authority and normalized quota limits. Such entries must not be reopened
 	// with today's permissive defaults.
-	PolicyVersion int    `json:"policy_version,omitempty"`
-	AuthorityMask uint32 `json:"authority_mask,omitempty"`
-	MaxBytes      int64  `json:"max_bytes,omitempty"`
-	MaxObjects    int64  `json:"max_objects,omitempty"`
+	PolicyVersion      int    `json:"policy_version,omitempty"`
+	AuthorityMask      uint32 `json:"authority_mask,omitempty"`
+	MaxBytes           int64  `json:"max_bytes,omitempty"`
+	MaxObjects         int64  `json:"max_objects,omitempty"`
+	MaxCheckpointBytes int64  `json:"max_checkpoint_bytes,omitempty"`
+	MaxCheckpoints     int64  `json:"max_checkpoints,omitempty"`
 	// Owned mirrors the workspace manifest. The collector uses it to refuse
 	// adopted workspaces outright, which is the single most important safety
 	// property in this file: an adopted workspace is somebody's project, and no

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -135,6 +136,118 @@ func TestCheckpointRefusesCorruptFilesAndEnforcesLimits(t *testing.T) {
 	}
 }
 
+func TestWorkspaceCheckpointCountCapRejectsWithoutEviction(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "workspace")
+	registry := registryDir(t)
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root, RegistryDir: registry, MaxCheckpoints: 1})
+	if err != nil {
+		t.Fatalf("OpenWorkspace: %v", err)
+	}
+	defer ws.Close()
+	writeTaskFile(t, root, "result.txt", "first")
+	first, err := ws.CreateCheckpoint(context.Background(), stow.CheckpointOptions{})
+	if err != nil {
+		t.Fatalf("first checkpoint: %v", err)
+	}
+	writeTaskFile(t, root, "result.txt", "second")
+	if _, err := ws.CreateCheckpoint(context.Background(), stow.CheckpointOptions{}); err == nil {
+		t.Fatal("second checkpoint exceeded count cap")
+	}
+	if _, err := stow.LoadCheckpoint(registry, first.ID); err != nil {
+		t.Fatalf("count cap removed the first checkpoint: %v", err)
+	}
+}
+
+func TestWorkspaceCheckpointByteCapCountsRetainedPayload(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "workspace")
+	registry := registryDir(t)
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root, RegistryDir: registry, MaxCheckpointBytes: 6})
+	if err != nil {
+		t.Fatalf("OpenWorkspace: %v", err)
+	}
+	defer ws.Close()
+	writeTaskFile(t, root, "result.txt", "1234")
+	first, err := ws.CreateCheckpoint(context.Background(), stow.CheckpointOptions{})
+	if err != nil {
+		t.Fatalf("first checkpoint: %v", err)
+	}
+	writeTaskFile(t, root, "result.txt", "123")
+	if _, err := ws.CreateCheckpoint(context.Background(), stow.CheckpointOptions{}); err == nil {
+		t.Fatal("checkpoint exceeded cumulative payload byte cap")
+	}
+	if _, err := stow.LoadCheckpoint(registry, first.ID); err != nil {
+		t.Fatalf("byte cap removed the first checkpoint: %v", err)
+	}
+}
+
+func TestConcurrentCheckpointsRespectCountCap(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "workspace")
+	registry := registryDir(t)
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root, RegistryDir: registry, MaxCheckpoints: 1})
+	if err != nil {
+		t.Fatalf("OpenWorkspace: %v", err)
+	}
+	defer ws.Close()
+	writeTaskFile(t, root, "result.txt", "stable")
+	var group sync.WaitGroup
+	results := make(chan error, 2)
+	for range 2 {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			_, err := ws.CreateCheckpoint(context.Background(), stow.CheckpointOptions{})
+			results <- err
+		}()
+	}
+	group.Wait()
+	close(results)
+	var succeeded int
+	for err := range results {
+		if err == nil {
+			succeeded++
+		}
+	}
+	if succeeded != 1 {
+		t.Fatalf("successful concurrent checkpoints = %d, want exactly one", succeeded)
+	}
+}
+
+func TestConcurrentDuplicateImportsPublishOnlyOneCheckpoint(t *testing.T) {
+	content := []byte("verified")
+	digest := sha256.Sum256(content)
+	manifest := stow.CheckpointManifest{
+		Version: 1, ID: "cp_bbbbbbbbbbbbbbbbbbbbbbbb", WorkspaceID: "ws_concurrent_import",
+		Created: time.Unix(1, 0).UTC(),
+		Files:   []stow.CheckpointFile{{Path: "result.txt", Size: int64(len(content)), Mode: 0o600, SHA256: hex.EncodeToString(digest[:])}},
+	}
+	archive := makeCheckpointArchive(t, manifest, content)
+	registry := registryDir(t)
+	var group sync.WaitGroup
+	results := make(chan error, 2)
+	for range 2 {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			_, err := stow.ImportCheckpoint(context.Background(), registry, bytes.NewReader(archive), stow.CheckpointArchiveOptions{})
+			results <- err
+		}()
+	}
+	group.Wait()
+	close(results)
+	var succeeded int
+	for err := range results {
+		if err == nil {
+			succeeded++
+		}
+	}
+	if succeeded != 1 {
+		t.Fatalf("successful concurrent imports = %d, want exactly one", succeeded)
+	}
+	if _, err := stow.LoadCheckpoint(registry, manifest.ID); err != nil {
+		t.Fatalf("published checkpoint is invalid: %v", err)
+	}
+}
+
 func TestCheckpointArchiveRoundTripsToAnotherRegistryAndRestores(t *testing.T) {
 	root, sourceRegistry, ws := openCheckpointTestWorkspace(t)
 	writeTaskFile(t, root, "src/main.go", "package task\n")
@@ -151,6 +264,12 @@ func TestCheckpointArchiveRoundTripsToAnotherRegistryAndRestores(t *testing.T) {
 	imported, err := stow.ImportCheckpoint(context.Background(), destinationRegistry, bytes.NewReader(archive.Bytes()), stow.CheckpointArchiveOptions{})
 	if err != nil {
 		t.Fatalf("ImportCheckpoint: %v", err)
+	}
+	if _, err := stow.ImportCheckpoint(context.Background(), destinationRegistry, bytes.NewReader(archive.Bytes()), stow.CheckpointArchiveOptions{}); err == nil {
+		t.Fatal("duplicate import replaced an existing checkpoint")
+	}
+	if _, err := stow.LoadCheckpoint(destinationRegistry, checkpoint.ID); err != nil {
+		t.Fatalf("duplicate import damaged the existing checkpoint: %v", err)
 	}
 	if imported.ID != checkpoint.ID || imported.Files != 1 || len(imported.Excluded) != 1 || imported.Excluded[0] != ".env" {
 		t.Fatalf("imported checkpoint = %+v", imported)
@@ -183,6 +302,17 @@ func TestCheckpointArchiveRequiresSensitivePathOptIn(t *testing.T) {
 	if err := stow.ExportCheckpoint(context.Background(), registry, checkpoint.ID, &bytes.Buffer{}, stow.CheckpointArchiveOptions{IncludeSensitiveFiles: true}); err != nil {
 		t.Fatalf("explicit sensitive export: %v", err)
 	}
+	var archive bytes.Buffer
+	if err := stow.ExportCheckpoint(context.Background(), registry, checkpoint.ID, &archive, stow.CheckpointArchiveOptions{IncludeSensitiveFiles: true}); err != nil {
+		t.Fatalf("write sensitive archive for preview: %v", err)
+	}
+	preview, err := stow.PreviewCheckpointArchive(context.Background(), bytes.NewReader(archive.Bytes()), stow.CheckpointArchiveOptions{})
+	if err != nil {
+		t.Fatalf("preview sensitive archive without import opt-in: %v", err)
+	}
+	if len(preview.SensitivePaths) != 1 || preview.SensitivePaths[0] != ".env" || preview.Bytes != int64(len("TOKEN=private\n")) {
+		t.Fatalf("archive preview = %+v", preview)
+	}
 }
 
 func TestCheckpointImportRejectsCorruptAndTraversingArchives(t *testing.T) {
@@ -197,6 +327,9 @@ func TestCheckpointImportRejectsCorruptAndTraversingArchives(t *testing.T) {
 	corrupt := makeCheckpointArchive(t, manifest, []byte("wrong"))
 	if _, err := stow.ImportCheckpoint(context.Background(), registry, bytes.NewReader(corrupt), stow.CheckpointArchiveOptions{}); err == nil {
 		t.Fatal("import accepted bytes that did not match the manifest digest")
+	}
+	if _, err := stow.PreviewCheckpointArchive(context.Background(), bytes.NewReader(corrupt), stow.CheckpointArchiveOptions{}); err == nil {
+		t.Fatal("preview accepted bytes that did not match the manifest digest")
 	}
 	if _, err := os.Stat(filepath.Join(registry, "checkpoints", manifest.ID)); !os.IsNotExist(err) {
 		t.Fatalf("failed import left a published checkpoint: %v", err)

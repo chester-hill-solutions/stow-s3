@@ -45,19 +45,21 @@ func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 	if err != nil {
 		return nil, err
 	}
-	policy, maxBytes, maxObjects, err := resumedPolicy(entry, options)
+	policy, maxBytes, maxObjects, maxCheckpointBytes, maxCheckpoints, err := resumedPolicy(entry, options)
 	if err != nil {
 		return nil, err
 	}
 	ws, err := OpenWorkspace(WorkspaceOptions{
-		Dir:         entry.Dir,
-		Bucket:      entry.Bucket,
-		MaxBytes:    maxBytes,
-		MaxObjects:  maxObjects,
-		Authority:   &policy,
-		TTL:         time.Duration(entry.TTLSeconds) * time.Second,
-		RegistryDir: options.RegistryDir,
-		Now:         options.Now,
+		Dir:                entry.Dir,
+		Bucket:             entry.Bucket,
+		MaxBytes:           maxBytes,
+		MaxObjects:         maxObjects,
+		MaxCheckpointBytes: maxCheckpointBytes,
+		MaxCheckpoints:     maxCheckpoints,
+		Authority:          &policy,
+		TTL:                time.Duration(entry.TTLSeconds) * time.Second,
+		RegistryDir:        options.RegistryDir,
+		Now:                options.Now,
 	})
 	if err != nil {
 		return nil, err
@@ -87,26 +89,34 @@ func lookupWorkspaceEntry(registry *workspace.Registry, id string) (workspace.En
 	return entry, nil
 }
 
-func resumedPolicy(entry workspace.Entry, options WorkspaceOptions) (Authority, int64, int64, error) {
+func resumedPolicy(entry workspace.Entry, options WorkspaceOptions) (Authority, int64, int64, int64, int64, error) {
 	if entry.PolicyVersion != 1 {
-		return Authority{}, 0, 0, fmt.Errorf("stow: workspace %s has no supported persisted access policy; reopen it explicitly with OpenWorkspace or recreate it before resuming", entry.ID)
+		return Authority{}, 0, 0, 0, 0, fmt.Errorf("stow: workspace %s has no supported persisted access policy; reopen it explicitly with OpenWorkspace or recreate it before resuming", entry.ID)
 	}
 	policy := Authority{Mask: entry.AuthorityMask}
 	if options.Authority != nil {
 		if !policy.IsSupersetOf(*options.Authority) {
-			return Authority{}, 0, 0, fmt.Errorf("stow: resume authority would widen the workspace policy")
+			return Authority{}, 0, 0, 0, 0, fmt.Errorf("stow: resume authority would widen the workspace policy")
 		}
 		policy = *options.Authority
 	}
 	maxBytes, err := resumeLimit("MaxBytes", entry.MaxBytes, options.MaxBytes)
 	if err != nil {
-		return Authority{}, 0, 0, err
+		return Authority{}, 0, 0, 0, 0, err
 	}
 	maxObjects, err := resumeLimit("MaxObjects", entry.MaxObjects, options.MaxObjects)
 	if err != nil {
-		return Authority{}, 0, 0, err
+		return Authority{}, 0, 0, 0, 0, err
 	}
-	return policy, maxBytes, maxObjects, nil
+	maxCheckpointBytes, err := resumeLimit("MaxCheckpointBytes", entry.MaxCheckpointBytes, options.MaxCheckpointBytes)
+	if err != nil {
+		return Authority{}, 0, 0, 0, 0, err
+	}
+	maxCheckpoints, err := resumeLimit("MaxCheckpoints", entry.MaxCheckpoints, options.MaxCheckpoints)
+	if err != nil {
+		return Authority{}, 0, 0, 0, 0, err
+	}
+	return policy, maxBytes, maxObjects, maxCheckpointBytes, maxCheckpoints, nil
 }
 
 func resumeLimit(name string, persisted, requested int64) (int64, error) {
@@ -262,18 +272,20 @@ func (w *Workspace) register(registryDir string, ttlSeconds int64) error {
 	w.registryDir = registry.Dir()
 	now := w.nowFunc()()
 	return registry.Register(workspace.Entry{
-		ID:               w.id,
-		Dir:              w.dir,
-		WorkingDirectory: w.workingDirectory,
-		Bucket:           w.bucket,
-		Created:          now,
-		LastUsed:         now,
-		TTLSeconds:       ttlSeconds,
-		PolicyVersion:    1,
-		AuthorityMask:    w.Runtime.Authority().Mask,
-		MaxBytes:         w.Runtime.Capabilities().MaxBytes,
-		MaxObjects:       w.Runtime.Capabilities().MaxObjects,
-		Owned:            w.store.IsOwned(),
+		ID:                 w.id,
+		Dir:                w.dir,
+		WorkingDirectory:   w.workingDirectory,
+		Bucket:             w.bucket,
+		Created:            now,
+		LastUsed:           now,
+		TTLSeconds:         ttlSeconds,
+		PolicyVersion:      1,
+		AuthorityMask:      w.Runtime.Authority().Mask,
+		MaxBytes:           w.Runtime.Capabilities().MaxBytes,
+		MaxObjects:         w.Runtime.Capabilities().MaxObjects,
+		MaxCheckpointBytes: w.maxCheckpointBytes,
+		MaxCheckpoints:     w.maxCheckpoints,
+		Owned:              w.store.IsOwned(),
 	})
 }
 

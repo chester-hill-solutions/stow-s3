@@ -22,6 +22,8 @@ starts its agent with the returned `working_directory` as the process cwd.
   ],
   "max_bytes": 67108864,
   "max_objects": 10000,
+  "max_checkpoint_bytes": 536870912,
+  "max_checkpoints": 20,
   "ttl_seconds": 604800,
   "registry_dir": "../stow-registry",
   "include_sensitive_inputs": false
@@ -52,6 +54,10 @@ default; an explicit `include_sensitive_inputs: true` is required to copy them.
 This filename check is a guard against accidental inclusion, not secret
 scanning. Sources are copied; they are not moved or modified.
 
+Destination paths and copied input path segments are checked against portable
+filesystem naming rules, including Windows device names and characters that
+cannot be represented consistently across supported platforms.
+
 Preparation checks the seed's size and file count (including the shallow Git
 metadata) against the workspace limits and returns a `base_identity`
 fingerprint, workspace ID, bucket, root, actual working directory, effective
@@ -76,12 +82,17 @@ credential-looking paths are recorded as excluded unless explicitly included.
 
 Export a checkpoint for transfer with
 `stow-s3 workspace export --checkpoint-id <id> --output checkpoint.tar.gz`;
-import it on another machine with
+inspect a transfer archive before importing it with
+`stow-s3 workspace preview --archive checkpoint.tar.gz`; import it on another
+machine with
 `stow-s3 workspace import --archive checkpoint.tar.gz`. The archive is a
 gzip-compressed tar containing checkpoint files and manifest metadata only. It
 does not contain workspace credentials or registry state. Export refuses
 sensitive-looking paths unless `--include-sensitive` is explicitly supplied;
 import requires the same explicit opt-in for an archive that contains them.
+Preview validates paths, types, sizes, file digests, and the archive trailer
+without extracting or publishing files. It reports included paths and any
+sensitive-looking paths, so the import opt-in decision can be made after review.
 Both operations default to limits of 1 GiB and 100,000 files, which can be
 lowered or raised with `--max-bytes` and `--max-files`. Import validates paths,
 types, sizes, and digests in a private staging directory before publishing the
@@ -92,8 +103,15 @@ scanning.
 Checkpoint directories are removed when their owning workspace is explicitly
 destroyed or successfully reclaimed by TTL collection. A workspace kept alive
 because it is adopted, locked, or otherwise not eligible for collection keeps
-its checkpoints too. There is not yet a separate checkpoint retention or total
-disk quota; hosts should manage workspace TTL and archive size deliberately.
+its checkpoints too. `max_checkpoint_bytes` and `max_checkpoints` set separate
+per-workspace caps on retained checkpoint payload. Payload bytes are the sum of
+captured file sizes; manifest and filesystem overhead are not included. Zero or
+an omitted field means unlimited. A checkpoint that would cross either cap is
+refused; Stow never evicts an older checkpoint to make room. These caps are
+separate from the per-capture `--max-bytes` and `--max-files` archive limits.
+The `prepare` result reports both values in `capabilities.checkpoint_limits`.
+Retention limits bound captured payload bytes and count, not manifest or
+filesystem overhead or arbitrary files written directly into the registry.
 
 TypeScript and Python expose thin wrappers over the same installed
 `stow-s3 workspace` CLI contract. TypeScript imports them from

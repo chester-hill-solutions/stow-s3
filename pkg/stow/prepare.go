@@ -57,6 +57,8 @@ type WorkspaceTaskManifest struct {
 	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
 	MaxBytes               int64                `json:"max_bytes,omitempty"`
 	MaxObjects             int64                `json:"max_objects,omitempty"`
+	MaxCheckpointBytes     int64                `json:"max_checkpoint_bytes,omitempty"`
+	MaxCheckpoints         int64                `json:"max_checkpoints,omitempty"`
 	TTLSeconds             int64                `json:"ttl_seconds,omitempty"`
 	RegistryDir            string               `json:"registry_dir,omitempty"`
 	Bucket                 string               `json:"bucket,omitempty"`
@@ -182,7 +184,7 @@ func validatePrepareRoot(dir string) (string, error) {
 }
 
 func seedWorkspaceInputs(root string, inputs []WorkspaceInput, includeSensitive bool) (int64, int64, error) {
-	var totalBytes, totalObjects int64
+	totals := &seedContext{includeSensitive: includeSensitive}
 	for _, input := range inputs {
 		if strings.TrimSpace(input.Source) == "" {
 			return 0, 0, fmt.Errorf("stow: input source is required")
@@ -191,11 +193,11 @@ func seedWorkspaceInputs(root string, inputs []WorkspaceInput, includeSensitive 
 		if err != nil {
 			return 0, 0, fmt.Errorf("stow: invalid input destination %q: %w", input.Destination, err)
 		}
-		if err := copySeed(input.Source, destination, includeSensitive, &totalBytes, &totalObjects); err != nil {
+		if err := copySeed(input.Source, destination, totals); err != nil {
 			return 0, 0, fmt.Errorf("stow: seed %q: %w", input.Source, err)
 		}
 	}
-	return totalBytes, totalObjects, nil
+	return totals.bytes, totals.objects, nil
 }
 
 func prepareWorkingDirectory(root, relative string) (string, error) {
@@ -306,6 +308,9 @@ func safeDestination(root, destination string) (string, error) {
 		if segment == ".." {
 			return "", fmt.Errorf("must not contain parent-directory traversal")
 		}
+		if segment != "" && segment != "." && !validPortablePathSegment(segment) {
+			return "", fmt.Errorf("contains a path segment that is not portable")
+		}
 	}
 	clean := filepath.Clean(destination)
 	if clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
@@ -323,7 +328,25 @@ func safeDestination(root, destination string) (string, error) {
 	return resolved, nil
 }
 
-func copySeed(source, destination string, includeSensitive bool, totalBytes, totalObjects *int64) error {
+func validPortableRelativePath(path string) bool {
+	if path == "" || filepath.IsAbs(path) || strings.Contains(path, `\`) {
+		return false
+	}
+	for _, segment := range strings.Split(filepath.ToSlash(path), "/") {
+		if segment == "" || segment == "." || segment == ".." || !validPortablePathSegment(segment) {
+			return false
+		}
+	}
+	return true
+}
+
+type seedContext struct {
+	includeSensitive bool
+	bytes            int64
+	objects          int64
+}
+
+func copySeed(source, destination string, totals *seedContext) error {
 	info, err := os.Lstat(source)
 	if err != nil {
 		return err
@@ -332,41 +355,56 @@ func copySeed(source, destination string, includeSensitive bool, totalBytes, tot
 		return fmt.Errorf("symbolic link inputs are not supported")
 	}
 	if info.IsDir() {
-		if err := os.MkdirAll(destination, 0o755); err != nil {
-			return err
-		}
-		return filepath.WalkDir(source, func(path string, entry os.DirEntry, walkErr error) error {
-			if walkErr != nil {
-				return walkErr
-			}
-			if path == source {
-				return nil
-			}
-			rel, err := filepath.Rel(source, path)
-			if err != nil {
-				return err
-			}
-			target := filepath.Join(destination, rel)
-			entryInfo, err := entry.Info()
-			if err != nil {
-				return err
-			}
-			if entryInfo.Mode()&os.ModeSymlink != 0 {
-				return fmt.Errorf("symbolic link input %s is not supported", path)
-			}
-			if entry.IsDir() {
-				return os.MkdirAll(target, 0o755)
-			}
-			if !includeSensitive && sensitiveSeedPath(rel) {
-				return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", rel)
-			}
-			return copySeedFile(path, target, entryInfo, totalBytes, totalObjects)
-		})
+		return copySeedDirectory(source, destination, totals)
 	}
-	if !includeSensitive && sensitiveSeedPath(filepath.Base(source)) {
+	if !totals.includeSensitive && sensitiveSeedPath(filepath.Base(source)) {
 		return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", filepath.Base(source))
 	}
-	return copySeedFile(source, destination, info, totalBytes, totalObjects)
+	return copySeedFile(source, destination, info, totals)
+}
+
+func copySeedDirectory(source, destination string, totals *seedContext) error {
+	if err := os.MkdirAll(destination, 0o755); err != nil {
+		return err
+	}
+	return filepath.WalkDir(source, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if path == source {
+			return nil
+		}
+		rel, err := filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+		if !validPortableRelativePath(rel) {
+			return fmt.Errorf("input path is not portable: %q", rel)
+		}
+		return copySeedEntry(source, destination, path, entry, totals)
+	})
+}
+
+func copySeedEntry(sourceRoot, destinationRoot, path string, entry os.DirEntry, totals *seedContext) error {
+	relative, err := filepath.Rel(sourceRoot, path)
+	if err != nil {
+		return err
+	}
+	destination := filepath.Join(destinationRoot, relative)
+	info, err := entry.Info()
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("symbolic link input %s is not supported", path)
+	}
+	if entry.IsDir() {
+		return os.MkdirAll(destination, 0o755)
+	}
+	if !totals.includeSensitive && sensitiveSeedPath(relative) {
+		return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", relative)
+	}
+	return copySeedFile(path, destination, info, totals)
 }
 
 func sensitiveSeedPath(path string) bool {
@@ -399,7 +437,7 @@ func hasPathSegment(path, segment string) bool {
 	return strings.Contains(path, "/"+segment)
 }
 
-func copySeedFile(source, destination string, info os.FileInfo, totalBytes, totalObjects *int64) error {
+func copySeedFile(source, destination string, info os.FileInfo, totals *seedContext) error {
 	if !info.Mode().IsRegular() {
 		return fmt.Errorf("only regular files and directories are supported: %s", source)
 	}
@@ -424,10 +462,10 @@ func copySeedFile(source, destination string, info os.FileInfo, totalBytes, tota
 		return closeErr
 	}
 	maxInt64 := int64(^uint64(0) >> 1)
-	if n > maxInt64-*totalBytes || *totalObjects == maxInt64 {
+	if n > maxInt64-totals.bytes || totals.objects == maxInt64 {
 		return fmt.Errorf("seeded totals exceed supported limits")
 	}
-	*totalBytes += n
-	(*totalObjects)++
+	totals.bytes += n
+	totals.objects++
 	return nil
 }

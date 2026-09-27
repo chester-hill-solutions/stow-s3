@@ -64,6 +64,9 @@ func skipCheckpointMetadata(entry os.DirEntry) error {
 }
 
 func (s *checkpointScan) addRegularFile(path, rel string, entry os.DirEntry) error {
+	if !validCheckpointPath(rel) {
+		return fmt.Errorf("stow: checkpoint path is not portable: %q", rel)
+	}
 	info, err := entry.Info()
 	if err != nil {
 		return err
