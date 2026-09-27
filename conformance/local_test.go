@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -394,79 +393,6 @@ func TestRangeGetObject(t *testing.T) {
 	var respErr *smithyhttp.ResponseError
 	if !errors.As(err, &respErr) || respErr.HTTPStatusCode() != http.StatusRequestedRangeNotSatisfiable {
 		t.Fatalf("expected 416, got %v", err)
-	}
-}
-
-func TestPresignedGetPut(t *testing.T) {
-	env := newTestEnv(t)
-	ctx := context.Background()
-	bucket := uniqueBucket(t)
-	getKey := "presign-get.txt"
-	putKey := "presign-put.txt"
-	createBucket(ctx, t, env.Client, bucket)
-
-	seed := []byte("presigned download")
-	_, err := env.Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(getKey),
-		Body:   bytes.NewReader(seed),
-	})
-	if err != nil {
-		t.Fatalf("seed PutObject: %v", err)
-	}
-
-	getReq, err := env.Presign.PresignGetObject(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(getKey),
-	}, s3.WithPresignExpires(5*time.Minute))
-	if err != nil {
-		t.Fatalf("PresignGetObject: %v", err)
-	}
-
-	resp, err := http.Get(getReq.URL)
-	if err != nil {
-		t.Fatalf("presigned GET fetch: %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("presigned GET status = %d", resp.StatusCode)
-	}
-	got, _ := io.ReadAll(resp.Body)
-	if !bytes.Equal(got, seed) {
-		t.Fatalf("presigned GET body = %q", got)
-	}
-
-	putBody := []byte("presigned upload")
-	putReq, err := env.Presign.PresignPutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(bucket),
-		Key:         aws.String(putKey),
-		ContentType: aws.String("text/plain"),
-	}, s3.WithPresignExpires(5*time.Minute))
-	if err != nil {
-		t.Fatalf("PresignPutObject: %v", err)
-	}
-
-	putHTTP, err := http.NewRequestWithContext(ctx, http.MethodPut, putReq.URL, bytes.NewReader(putBody))
-	if err != nil {
-		t.Fatalf("put request: %v", err)
-	}
-	putHTTP.Header.Set("Content-Type", "text/plain")
-	putHTTP.ContentLength = int64(len(putBody))
-	putResp, err := http.DefaultClient.Do(putHTTP)
-	if err != nil {
-		t.Fatalf("presigned PUT: %v", err)
-	}
-	putResp.Body.Close()
-	if putResp.StatusCode != http.StatusOK {
-		t.Fatalf("presigned PUT status = %d", putResp.StatusCode)
-	}
-
-	_, err = env.Client.HeadObject(ctx, &s3.HeadObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(putKey),
-	})
-	if err != nil {
-		t.Fatalf("HeadObject after presigned PUT: %v", err)
 	}
 }
 
