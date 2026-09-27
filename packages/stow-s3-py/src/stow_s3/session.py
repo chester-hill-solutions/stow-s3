@@ -314,8 +314,13 @@ def open_session(
             env=build_child_env(),
         )
     except BaseException:
+        # write_fd is closed by the finally below, not here. It used to be closed
+        # in both, and when the spawn failed the second close raised EBADF from
+        # inside the finally - which does not merely add a confusing extra error,
+        # it replaces the exception on its way out. A caller whose binary was
+        # missing was told the descriptor was bad, so every diagnosis of "the
+        # server would not start" began from the wrong error.
         os.close(read_fd)
-        os.close(write_fd)
         stdout_log.close()
         stderr_log.close()
         if owned_dir is not None:
@@ -323,7 +328,8 @@ def open_session(
         raise
     finally:
         # The child owns the write end now. Closing our copy is what makes the
-        # reader see EOF if the child dies before it writes.
+        # reader see EOF if the child dies before it writes. This runs on both
+        # paths, which is why the except above leaves it alone.
         os.close(write_fd)
 
     try:

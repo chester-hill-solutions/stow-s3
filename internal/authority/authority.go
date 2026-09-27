@@ -248,18 +248,25 @@ func Defined() []Operation {
 // The set is a floor, not a target. Each entry below is work already specified;
 // see docs/architecture/environment-implementation.md R-101 and ADR 0010.
 //
-//   - EnvironmentDestroy and UpstreamRead/UpstreamWrite are enforced by M1.3,
-//     which is reopened: its criteria were closed as met while three of four
-//     failed and the fourth was vacuous, because the principal-to-authority
-//     translator the criterion assumed does not exist.
+//   - EnvironmentDestroy is enforced by M1.3, which is reopened: its criteria were
+//     closed as met while three of four failed and the fourth was vacuous, because
+//     the principal-to-authority translator the criterion assumed does not exist.
 //   - EnvironmentPromote is not implemented at all. It is deleted rather than
 //     wired until M4.3, because a permission for an operation with no
 //     implementation is a claim about behaviour that does not exist.
+//
+// UpstreamRead and UpstreamWrite were in this list until the run-through adapter
+// started consulting the authority on reads, writes and the retry funnel, and they
+// stayed after it did. The enforcement test could not see the change, because its
+// scan matched a method named check and the adapter gates with Authority.Allows —
+// so the test not only failed to notice the enforcement, it required the code to go
+// on claiming in this map that a permission was described and not granted. The scan
+// now recognises both forms. Behaviour was always covered by
+// internal/runthrough/authority_gate_test.go; what was wrong was this file's
+// description of it.
 var Ungated = map[Operation]string{
 	EnvironmentDestroy: "M1.3 is reopened; enforced there, not here",
 	EnvironmentPromote: "M4.3. Deleted rather than wired until it has an implementation",
-	UpstreamRead:       "M1.3 is reopened; enforced there, not here",
-	UpstreamWrite:      "M1.3 is reopened; enforced there, not here",
 }
 
 // UngatedOperations lists the defined operations with no enforcement site, in the

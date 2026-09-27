@@ -70,12 +70,33 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 	return byName
 }
 
-// checkSitesInFile records every check(authority.Op) call in one file.
+// enforcementMethods are the method names that count as consulting an authority.
 //
-// The shape is <receiver>.check(authority.Op): the receiver is the environment,
-// and the operation is the argument. Split out from the walk so that neither half
-// carries the other's branching — the walk plus the matcher together exceeded the
-// complexity ceiling, which the ratchet caught on this file the moment it landed.
+// There are exactly two, and both are the chokepoint rather than a convention:
+// Authority.Allows is the predicate the whole package is built to make true, and
+// check is the runtime's wrapper that turns a refusal into an error. Anything
+// reaching a decision about an operation goes through one of them.
+//
+// This set used to hold only "check", and the scan therefore reported UpstreamRead
+// and UpstreamWrite as unenforced after the run-through adapter had started gating
+// on them with Allows. That is worse than a missed detection, because the test
+// demands an entry in Ungated for anything it cannot see: the scan did not just
+// fail to notice the enforcement, it required the code to go on claiming in
+// Ungated that a permission was described and not granted. A detector whose blind
+// spot makes the documentation wrong is not a safe detector, so the fix is to widen
+// it to the real chokepoint rather than to add the operations back by hand.
+//
+// Narrowing to a named set is deliberate. Matching any call that merely mentions an
+// operation would also match a log statement or a slice, and would let a real gap
+// pass as enforced.
+var enforcementMethods = map[string]bool{"check": true, "Allows": true}
+
+// checkSitesInFile records every call of the form <recv>.m(authority.Op) in one
+// file, where m is one of enforcementMethods.
+//
+// Split out from the walk so that neither half carries the other's branching — the
+// walk plus the matcher together exceeded the complexity ceiling, which the ratchet
+// caught on this file the moment it landed.
 func checkSitesInFile(path string, byName map[string]authority.Operation, found map[authority.Operation]bool) error {
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, path, nil, 0)
@@ -88,7 +109,7 @@ func checkSitesInFile(path string, byName map[string]authority.Operation, found 
 			return true
 		}
 		sel, ok := call.Fun.(*ast.SelectorExpr)
-		if !ok || sel.Sel.Name != "check" {
+		if !ok || !enforcementMethods[sel.Sel.Name] {
 			return true
 		}
 		lit, ok := call.Args[0].(*ast.SelectorExpr)
@@ -157,8 +178,8 @@ func TestEveryDefinedOperationIsEnforcedOrDeclaredUngated(t *testing.T) {
 
 // The ungated list is the whole of what is known-unenforced, so it is worth
 // stating its size rather than letting it drift upward unnoticed. It is a floor:
-// M1.3 enforces three of these four and M4.3 removes the fifth, at which point
-// this number changes and the change is a thing somebody decided.
+// M1.3 enforces EnvironmentDestroy and M4.3 removes EnvironmentPromote, at which
+// point this number changes and the change is a thing somebody decided.
 func TestUngatedListIsTheKnownGap(t *testing.T) {
 	enforced := enforcedOperations(t)
 
@@ -167,7 +188,7 @@ func TestUngatedListIsTheKnownGap(t *testing.T) {
 		actual = append(actual, string(op))
 	}
 
-	want := []string{"environment.destroy", "environment.promote", "upstream.read", "upstream.write"}
+	want := []string{"environment.destroy", "environment.promote"}
 	if strings.Join(actual, ",") != strings.Join(want, ",") {
 		t.Fatalf("ungated operations = %v, want %v\n"+
 			"If a check site landed, remove the entry. If enforcement is still owed, the\n"+

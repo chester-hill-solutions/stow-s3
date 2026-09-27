@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Fixed: `authority.Ungated` claimed two permissions were described and not granted, after the code had started granting them.** The run-through adapter consults the authority on upstream reads, on upstream writes, and in the retry propagation funnel, but `UpstreamRead` and `UpstreamWrite` were still listed as having no enforcement site. The list is the repository's record of which permissions are *not* enforced, so this was the code asserting a falsehood about itself, in the one file whose purpose is to prevent exactly that.
+
+  The cause was the detector rather than the list. The enforcement test scans source for `<recv>.check(authority.Op)` and matched only a method named `check`; the adapter gates with `Authority.Allows`, which is the package's actual chokepoint. That made the failure worse than a missed detection: the test *requires* an entry in `Ungated` for any operation it cannot see, so it not only failed to notice the enforcement, it required the false claim to stay. A detector whose blind spot corrupts the documentation is not a safe detector.
+
+  The scan now recognises both forms — `check`, which is the runtime's wrapper turning a refusal into an error, and `Allows`, which is the predicate the package exists to make true. It is deliberately a named set rather than "any call mentioning an operation": matching a log statement or a slice would let a real gap pass as enforced. Verified as load-bearing by narrowing the set back to `check` and watching both operations become undeclared.
+
+  Behaviour was never at risk — `internal/runthrough/authority_gate_test.go` has covered these gates behaviourally since they landed, including the funnel case that withholds only `UpstreamWrite`. What was wrong was this file's description of that behaviour. `EnvironmentDestroy` and `EnvironmentPromote` remain ungated, for the reasons already recorded.
+
 - **Fixed: two buckets holding the same escaped key shared one file, so writes clobbered each other, reads returned the other bucket's bytes, and a delete removed an object belonging to a bucket the caller never named.** A key that cannot be a path component — one with a `..` segment, one longer than a path may be, one that would land inside stow's own `.stow` directory — is stored under a digest of the key, and that digest did not include the bucket. The escaped path is now namespaced by a directory per bucket, `.stow/keys/<digest of bucket>/<digest of key>`.
 
   Natural keys were never affected, because their path already runs through the bucket's own directory, which is why a workspace holding only ordinary keys never showed it. The bucket is hashed rather than used as a directory name so the directory stays within the component limit whatever the bucket is called, and so a bucket name can never collide with stow's own bookkeeping the way a key that resolves to `.stow/keys/…` would.
