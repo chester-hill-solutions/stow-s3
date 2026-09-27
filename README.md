@@ -394,6 +394,21 @@ Run-through is opt-in: pass `--mode run-through` or set `STOW_MODE=run-through`.
 
 In run-through mode, local data is authoritative. Reads can fall back to an existing upstream bucket. Upstream configuration comes from `STOW_*`, `S3_*`, or `AWS_*` environment variables, or from the corresponding command-line options.
 
+`STOW_UPSTREAM_ADDRESSING` selects how stow addresses a bucket on the upstream:
+`path` (the default) sends `https://endpoint/bucket/key`, and `virtual-hosted`
+sends `https://bucket.endpoint/key`. Some providers serve only one of the two.
+The default is path-style because every S3-compatible endpoint accepts it and it
+works with bucket names a hostname cannot carry. An unrecognized value is
+refused at startup rather than defaulted, because a misspelling that silently
+became path-style would send every request somewhere the provider does not
+answer.
+
+This names *how* to address a bucket. It is not a request to use an upstream, so
+setting it alone never selects one — that is `--mode run-through`, as above. Note
+that virtual-hosted addressing needs a resolvable hostname: given a bare IP
+address as the endpoint, the AWS SDK keeps the bucket in the path, since a bucket
+name cannot be prefixed onto an IP.
+
 Live upstream writes require all of the following:
 
 - run-through mode;

@@ -62,7 +62,20 @@ func NewS3Client(cfg UpstreamConfig) (*S3Client, error) {
 		if cfg.Endpoint != "" {
 			o.BaseEndpoint = aws.String(cfg.Endpoint)
 		}
-		o.UsePathStyle = true
+		// Path-style unless the configuration asks for virtual-hosted. This was
+		// hard-coded, so a provider that only serves bucket-in-host addressing
+		// was unreachable and the failure was a DNS lookup with nothing in
+		// stow's output to explain it.
+		//
+		// The SDK derives the virtual-hosted hostname from BaseEndpoint, so
+		// setting UsePathStyle false is only meaningful alongside an explicit
+		// endpoint; without one the SDK uses the region endpoint, which is
+		// already virtual-hosted and would be overridden by asking for
+		// path-style. Deriving the style from the configuration rather than from
+		// whether an endpoint happens to be set keeps the two from disagreeing,
+		// which is the same defect the client-side forcePathStyle/baseHost
+		// divergence has.
+		o.UsePathStyle = !cfg.UseVirtualHosted()
 	})
 
 	return &S3Client{s3: client, region: region}, nil

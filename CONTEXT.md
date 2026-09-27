@@ -20,6 +20,10 @@ A routing layer that accepts S3 requests at a local endpoint and, when explicitl
 
 The endpoint and credentials used by the run-through adapter to reach a live S3-compatible provider, including an optional session token for short-lived credentials. Resolved from environment variables with precedence: `STOW_*` > `S3_*` > `AWS_*`. Credentials determine how an explicitly requested upstream is authenticated; they never determine whether an upstream is used.
 
+### Upstream Addressing
+
+How a request names its bucket on the upstream: in the path, or in the host. `STOW_UPSTREAM_ADDRESSING` selects it, path-style is the default because every S3-compatible endpoint accepts it, and an unrecognized value is refused at startup rather than defaulted. Addressing is not a request to use an upstream — it configures how a requested one is reached, so setting it alone never selects one. The same distinction separates it from the client's own `forcePathStyle`, which is a separate setting on a separate surface.
+
 ### Mode Selection
 
 The operational mode, and local-only is what stow runs unless something asks for run-through by name. Ambient AWS or S3 credentials are not an ask: a developer's shell and a CI runner both export them for unrelated tools, and inferring an upstream from their presence made whether stow contacted a live provider a property of the machine rather than of anything the user requested. Run-through is selected by `--mode run-through` or `STOW_MODE=run-through`; `STOW_MODE=local` forces local-only, and an unrecognized value is local rather than an error or a fallback. See [ADR 0011](docs/adr/0011-local-is-the-default-mode.md); it supersedes ADR 0001.

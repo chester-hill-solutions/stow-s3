@@ -35,6 +35,13 @@ type UpstreamConfig struct {
 	Region       string
 	// Bucket optionally restricts upstream access to a single bucket name.
 	Bucket string
+	// Addressing is how requests name their bucket. The zero value is
+	// AddressingPath, which is what this field was before it existed; an
+	// existing UpstreamConfig literal therefore keeps its behavior.
+	//
+	// It configures how an upstream is addressed, not whether one is used. See
+	// Addressing, and ADR 0011: no explicit request, no upstream.
+	Addressing Addressing
 }
 
 // CachePolicy bounds the separate upstream-derived cache. Zero values disable
@@ -138,6 +145,12 @@ func (UpstreamConfig) FromEnv() (UpstreamConfig, bool) {
 			"AWS_DEFAULT_REGION",
 		),
 		Bucket: envFirst("STOW_BUCKET", "S3_BUCKET"),
+		// Resolved leniently: FromEnv reports whether an upstream is configured,
+		// and an invalid style is a startup error rather than a reason to decide
+		// there is no upstream. ConfigFromEnvChecked is what refuses it, so a
+		// misspelling is reported rather than silently changing the addressing of
+		// a server that was about to start.
+		Addressing: Addressing(envFirst("STOW_UPSTREAM_ADDRESSING")),
 	}, true
 }
 
@@ -198,6 +211,12 @@ func ConfigFromEnvChecked() (Config, error) {
 	if raw := strings.TrimSpace(os.Getenv("STOW_POLICY")); raw != "" {
 		if _, ok := ParsePolicy(raw); !ok {
 			return cfg, fmt.Errorf("invalid STOW_POLICY %q", raw)
+		}
+	}
+	if raw := strings.TrimSpace(os.Getenv("STOW_UPSTREAM_ADDRESSING")); raw != "" {
+		if _, ok := ParseAddressing(raw); !ok {
+			return cfg, fmt.Errorf("invalid STOW_UPSTREAM_ADDRESSING %q: expected %q or %q",
+				raw, AddressingPath, AddressingVirtualHosted)
 		}
 	}
 	return cfg, nil
