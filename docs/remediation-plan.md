@@ -6,6 +6,12 @@
 **Primary compatibility target:** observable behavior of pinned AWS SDK v3 (Node) and AWS SDK for Go v2
 **Safety boundary:** SDK compatibility never relaxes local credential, path-safety, authentication, or explicit live-write protections
 
+**Plan relationship:** this remains the authoritative S3 remediation acceptance
+and release gate. For the current implementation order covering run-through,
+ready workspaces, and checkpoint/handoff, see
+[`agent-workspace-plan.md`](agent-workspace-plan.md); that plan adds to, and does
+not replace, this release gate.
+
 ## 1. Outcome and release gate
 
 Ship a Docker-free local S3-compatible service whose externally observable behavior passes a shared, version-pinned SDK conformance suite. The release must include:

@@ -1,5 +1,13 @@
 # Stow 10/10 Plan
 
+> **Historical plan — delivery sequence superseded.** Its release targets and
+> phase ordering are no longer authoritative. The product and architecture
+> history is carried forward in [Agent DX and Python Plan](agent-dx-plan.md);
+> the current implementation order for run-through, ready workspaces, and
+> checkpoint/handoff is [Agent Workspace, Handoff, and Run-Through Plan](agent-workspace-plan.md).
+> The S3 remediation and release gate remains in
+> [Remediation Execution Plan](remediation-plan.md).
+
 ## 1. Product target
 
 **Primary job:** Give any coding agent an isolated S3 bucket for one task in under 60 seconds, with one command, no credentials, no network, and guaranteed cleanup.

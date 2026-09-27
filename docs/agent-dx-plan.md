@@ -1,5 +1,13 @@
 # Stow Agent DX and Python Plan
 
+> **Plan status:** this remains product and architecture context, but its
+> implementation ordering is superseded. Use
+> [Agent Workspace, Handoff, and Run-Through Plan](agent-workspace-plan.md) for
+> the current code sequence. The S3 acceptance criteria and release gate remain
+> in [Remediation Execution Plan](remediation-plan.md). The earlier
+> [Stow 10/10 Plan](agentic-dx-10-plan.md) is historical; its phase order and
+> release targets have been superseded by these plans and the accepted ADRs.
+
 **Status:** proposed
 **Last updated:** 2026-09-27
 **Scope:** open-source package evolution for short-lived agents and developer workflows

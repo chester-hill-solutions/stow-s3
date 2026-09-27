@@ -3,7 +3,7 @@
 **Status:** implementation in progress; baseline checked against `main` at `260bbe82e114a0f9c4c84c51250f402af2a0b1d8`
 **Date:** 2026-09-27
 **Scope:** remediate production run-through composition; prepare isolated, pre-seeded agent workspaces; checkpoint and hand off their results.
-**Relationship:** additive to the accepted decisions in ADRs 0005–0011 and `docs/workspace-contract.md`. This is the current execution order for these workstreams and supersedes the related backlog ordering in `docs/agent-dx-plan.md` §0.11/§10.1. The older plan remains historical context; it is not a second implementation specification.
+**Relationship:** additive to the accepted decisions in ADRs 0005–0011 and `docs/workspace-contract.md`. This is the current execution order for these workstreams and supersedes the related backlog ordering in `docs/agent-dx-plan.md` §0.11/§10.1 and the phase ordering in `docs/agentic-dx-10-plan.md`. Those older plans remain product history and architecture context; they are not parallel implementation specifications.
 
 ## 1. Plan validation summary
 
