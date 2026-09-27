@@ -20,6 +20,16 @@ const LockName = "session.lock"
 // ErrUnsupported rather than pretending to work.
 var ErrLockUnsupported = errors.New("advisory file locks are unsupported on this host")
 
+// SessionLockSupported reports whether this host can establish workspace liveness
+// with an advisory file lock.
+//
+// It is exported so a caller — and a test outside this package — can ask, rather
+// than discovering the answer by getting ErrLockUnsupported back from an
+// operation it believed had worked. Where it is false a workspace is never
+// collectable and TTL collection refuses instead of guessing, which ADR 0009
+// makes a correctness property rather than a policy.
+func SessionLockSupported() bool { return lockSupported }
+
 // ErrWorkspaceInUse is returned when a caller asks to reclaim a workspace that a
 // live session still holds.
 //

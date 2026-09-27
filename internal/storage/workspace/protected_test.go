@@ -97,20 +97,34 @@ func TestProtectedReasonSeesThroughRelativePaths(t *testing.T) {
 // that a naive prefix test gets wrong: /home/alice must not be treated as an
 // ancestor of /home/alice2.
 func TestIsAncestorOrSelf(t *testing.T) {
+	// The cases go through resolvePath, which is what both production call sites
+	// do, and they are built from the platform's own separator. Hard-coded POSIX
+	// literals were used here first and this test failed on windows-latest, where
+	// "/a" is not a native path and the separator is not "/". The production code
+	// was right: destroy.go always calls isAncestorOrSelf with resolvePath
+	// results, and a function that stops deletion reaching an ancestor of the
+	// working directory has no business being handed a path it cannot parse.
+	sep := string(filepath.Separator)
+	root := filepath.VolumeName(t.TempDir()) + sep
+	a := filepath.Join(root, "a")
+	ab := filepath.Join(a, "b")
+	abc := filepath.Join(ab, "c")
+	abSibling := filepath.Join(a, "bc")
+
 	cases := []struct {
 		candidate string
 		protected string
 		want      bool
 		why       string
 	}{
-		{"/a/b", "/a/b", true, "a path is its own ancestor"},
-		{"/a", "/a/b", true, "a parent is an ancestor"},
-		{"/a/b", "/a/bc", false, "a shared prefix is not an ancestor"},
-		{"/a/bc", "/a/b", false, "a longer path is not an ancestor of a shorter one"},
-		{"/a/b/c", "/a/b", false, "a descendant is not an ancestor"},
+		{ab, ab, true, "a path is its own ancestor"},
+		{a, ab, true, "a parent is an ancestor"},
+		{ab, abSibling, false, "a shared prefix is not an ancestor"},
+		{abSibling, ab, false, "a longer path is not an ancestor of a shorter one"},
+		{abc, ab, false, "a descendant is not an ancestor"},
 	}
 	for _, c := range cases {
-		if got := isAncestorOrSelf(c.candidate, c.protected); got != c.want {
+		if got := isAncestorOrSelf(resolvePath(c.candidate), resolvePath(c.protected)); got != c.want {
 			t.Errorf("isAncestorOrSelf(%q, %q) = %v, want %v (%s)",
 				c.candidate, c.protected, got, c.want, c.why)
 		}

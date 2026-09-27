@@ -414,3 +414,14 @@ are the first two cases written and the first two run.
 - **Multi-writer coordination.** stow does not lock the directory. Two agents
   writing concurrently is allowed and last-writer-wins per key, which is the
   same guarantee the record store gives.
+- **Session liveness is not available on every host.** A workspace is reclaimed
+  only when stow can *establish* that no live session holds it, and it establishes
+  that with an advisory file lock. Where the platform has no such lock — Windows
+  today — `SessionLockSupported()` is false, TTL collection refuses with
+  `ErrLockUnsupported`, and a workspace on that host is **never collectable**.
+  This is a stated limitation rather than a bug worked around: reclaiming a
+  workspace a live agent is using destroys the artifact it is producing, so
+  refusing is the only safe answer. `close()` and `destroy()` are unaffected, so
+  an explicit reclaim still works everywhere; only automatic TTL reclamation is
+  unavailable. Windows is a first-class release target, so this is a real gap
+  rather than a footnote.

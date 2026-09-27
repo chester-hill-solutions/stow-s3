@@ -1,6 +1,7 @@
 package workspace_test
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"sync"
@@ -56,6 +57,7 @@ func reasons(results []workspace.Reclaim) map[string]string {
 }
 
 func TestCollectRemovesAnExpiredUnusedWorkspace(t *testing.T) {
+	requireSessionLocks(t)
 	registry := registryIn(t)
 	id, root := registerOwned(t, registry, time.Hour)
 
@@ -78,6 +80,7 @@ func TestCollectRemovesAnExpiredUnusedWorkspace(t *testing.T) {
 // to hold. A workspace is a working directory, so collecting one out from under
 // a running agent destroys the artifact it is producing.
 func TestCollectNeverRemovesALiveWorkspace(t *testing.T) {
+	requireSessionLocks(t)
 	registry := registryIn(t)
 	root := filepath.Join(t.TempDir(), "workspace")
 	store, err := workspace.New(workspace.Options{Root: root, Bucket: bucket, TTLSeconds: 1})
@@ -116,6 +119,7 @@ func TestCollectNeverRemovesALiveWorkspace(t *testing.T) {
 // that would be catastrophic rather than merely wrong: an adopted workspace is
 // somebody's project, and an unattended sweep must never be able to remove one.
 func TestCollectNeverRemovesAnAdoptedWorkspace(t *testing.T) {
+	requireSessionLocks(t)
 	registry := registryIn(t)
 	root := t.TempDir()
 	if err := os.WriteFile(filepath.Join(root, "thesis.md"), []byte("a year of work"), 0o644); err != nil {
@@ -152,6 +156,7 @@ func TestCollectNeverRemovesAnAdoptedWorkspace(t *testing.T) {
 // TestCollectKeepsUnexpiredWorkspaces covers the ordinary case: nothing is old
 // enough, so nothing happens.
 func TestCollectKeepsUnexpiredWorkspaces(t *testing.T) {
+	requireSessionLocks(t)
 	registry := registryIn(t)
 	id, root := registerOwned(t, registry, 24*time.Hour)
 
@@ -171,6 +176,7 @@ func TestCollectKeepsUnexpiredWorkspaces(t *testing.T) {
 // a window is never collected. An absent TTL means "no opinion", and treating
 // that as "expired" would delete on a default nobody chose.
 func TestCollectKeepsWorkspacesWithNoTTL(t *testing.T) {
+	requireSessionLocks(t)
 	registry := registryIn(t)
 	root := filepath.Join(t.TempDir(), "workspace")
 	store, err := workspace.New(workspace.Options{Root: root, Bucket: bucket})
@@ -202,6 +208,7 @@ func TestCollectKeepsWorkspacesWithNoTTL(t *testing.T) {
 // and "three were skipped because they are in use" are different answers, and a
 // caller debugging a leak has to be able to tell them apart.
 func TestCollectReportsEveryDecision(t *testing.T) {
+	requireSessionLocks(t)
 	registry := registryIn(t)
 	live := filepath.Join(t.TempDir(), "live")
 	adopted := t.TempDir()
@@ -247,6 +254,7 @@ func TestCollectReportsEveryDecision(t *testing.T) {
 // advisory lock the right primitive: there is no stale state to clean up, so a
 // crashed session cannot make its workspace permanent.
 func TestLivenessIsReleasedWhenTheHolderExits(t *testing.T) {
+	requireSessionLocks(t)
 	root := filepath.Join(t.TempDir(), "workspace")
 	if _, err := workspace.New(workspace.Options{Root: root, Bucket: bucket}); err != nil {
 		t.Fatalf("new workspace: %v", err)
@@ -270,6 +278,7 @@ func TestLivenessIsReleasedWhenTheHolderExits(t *testing.T) {
 // at once. Exactly one may hold it, which is what makes "somebody is using
 // this" a fact rather than a race.
 func TestLivenessIsPerProcessAndConcurrent(t *testing.T) {
+	requireSessionLocks(t)
 	root := filepath.Join(t.TempDir(), "workspace")
 	if _, err := workspace.New(workspace.Options{Root: root, Bucket: bucket}); err != nil {
 		t.Fatalf("new workspace: %v", err)
@@ -301,5 +310,62 @@ func TestLivenessIsPerProcessAndConcurrent(t *testing.T) {
 		if !live {
 			t.Errorf("probe %d disagreed that a held workspace is live", i)
 		}
+	}
+}
+
+// requireSessionLocks skips a test that needs workspace liveness on a host that
+// cannot establish it.
+//
+// The package refuses rather than guessing: where advisory file locks are
+// unsupported, a workspace is never collectable, because deleting one out from
+// under a live session destroys the artifact it is producing. That is the
+// documented behaviour and it is the safe direction, so these cases are skipped
+// rather than rewritten. TestUnsupportedLocksRefuseCollection below pins what
+// the host does instead, so skipping here does not leave the refusal untested.
+func requireSessionLocks(t *testing.T) {
+	t.Helper()
+	if !workspace.SessionLockSupported() {
+		t.Skip("workspace liveness needs advisory file locks, unsupported on this host; " +
+			"the refusal is covered by TestUnsupportedLocksRefuseCollection")
+	}
+}
+
+// TestUnsupportedLocksRefuseCollection runs on every host, and is the only test
+// that covers what stow does where liveness cannot be established.
+//
+// Before this existed, a host without advisory locks simply failed every
+// collection test, which read as a broken port rather than a stated limitation.
+// The invariant worth asserting is the destructive one: nothing is deleted, and
+// the caller is told why.
+//
+// On a host that *does* have locks the opposite is correct — an expired,
+// unlocked workspace is collected — so the destructive assertions are scoped to
+// the unsupported case. Writing them unconditionally made this test fail on
+// Linux, which is the check that it is asserting something.
+func TestUnsupportedLocksRefuseCollection(t *testing.T) {
+	registry := registryIn(t)
+	id, root := registerOwned(t, registry, time.Hour)
+
+	_, err := registry.Collect(expired())
+	if workspace.SessionLockSupported() {
+		if err != nil {
+			t.Fatalf("collect on a host with locks: %v", err)
+		}
+		// The supported path is the one the rest of this file covers.
+		return
+	}
+
+	if !errors.Is(err, workspace.ErrLockUnsupported) {
+		t.Fatalf("collect error = %v, want ErrLockUnsupported", err)
+	}
+
+	// The refusal must not have deleted anything. An expired workspace is the
+	// strongest candidate for reclamation, so if anything could be removed
+	// without a liveness answer it would be this one.
+	if _, err := os.Stat(root); err != nil {
+		t.Fatalf("expired workspace was removed without a liveness answer: %v", err)
+	}
+	if _, found, err := registry.Lookup(id); err != nil || !found {
+		t.Fatalf("registry entry was removed without a liveness answer: found=%v err=%v", found, err)
 	}
 }
