@@ -7,11 +7,17 @@ supersedes: 0002 (section 5, only as to what constitutes live-write consent)
 
 This ADR narrows one decision in
 [ADR 0002: SDK compatibility and mirror-writes](0002-sdk-compatibility-and-mirror-writes.md)
-and leaves the rest of it, and all of
-[ADR 0001: auto-detect run-through mode](0001-auto-detect-run-through.md), in
-force. It does not change mode detection: a developer with upstream credentials
-in their environment still gets run-through by default, and that remains a
-deliberate trade-off recorded in ADR 0001.
+and leaves the rest of it in force.
+
+**Update.** The last paragraph above originally continued "and all of ADR 0001 …
+a developer with upstream credentials in their environment still gets run-through
+by default, and that remains a deliberate trade-off." That is no longer true:
+ADR 0001 is superseded, and run-through is no longer selected by the presence of
+credentials. It had to be, because the chain this ADR describes needed a mode
+selection nobody asked for as its first step, and the same environment that
+carried the policy also carried the credentials. The two decisions are now the
+same shape: a policy is a routing choice, and ambient configuration is not a
+request.
 
 ## Context
 
@@ -32,15 +38,18 @@ The policy therefore granted consent by default, and the absence of the env var
 was what enabled writes.
 
 Combined with ADR 0001's auto-detect default, that produced a plausible chain to
-a real data-loss event with no deliberate act by the developer:
+a real data-loss event with no deliberate act by the developer. Steps 3 and 4 are
+what this ADR and its successor now each prevent, one at a time:
 
 1. A `.env` copied from a staging machine sits in the project root. It contains
    `STOW_POLICY=mirrorWrites` and a `STOW_ENDPOINT` with credentials for a
    bucket several people write to.
 2. `Stow.start()` is called with no options, which is how the README and the
    existing tests call it.
-3. Auto-detect finds the credentials and selects run-through.
-4. The policy grants live-write consent on its own.
+3. ~~Auto-detect finds the credentials and selects run-through.~~ No longer
+   possible: ambient credentials do not select a mode.
+4. ~~The policy grants live-write consent on its own.~~ No longer possible: the
+   policy is a routing choice and the consent is separate.
 5. Every mutation the application performs during the test run is propagated to
    a shared bucket.
 
