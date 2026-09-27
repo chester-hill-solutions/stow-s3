@@ -1,6 +1,6 @@
 # Deploy-Anywhere Plan
 
-**Status:** proposed. Phase 0 evidence is measured and committed; Phases 1–5 are not started.
+**Status:** Phase 0 measured and committed; Phase 1 implemented; Phase 2 measured and its premise corrected. Phases 3–7 are not started.
 **Date:** 2026-09-27
 **Baseline:** `main` at `4ca2c1a`
 **Relationship:** additive to the accepted decisions in ADRs 0005–0011, `docs/compat-contract.md`, and `docs/workspace-contract.md`. This plan is the current execution order for the *portability and multi-writer* workstreams, and it sequences the MCP adapter that `docs/agent-workspace-plan.md` Phase 5 item 3 defers. It does not supersede that plan's workspace phases; the two run in parallel and this one is ordered first where they touch the same code.
@@ -141,41 +141,58 @@ visible in the outbox and mapped to a stable error code, using the same refusal
 vocabulary as browser persistence. ADR 0005's consent rules and ADR 0011's
 local-default rule are untouched.
 
-### Phase 2 — Agent workload shape, and only then a binary transport (P0/P1)
+### Phase 2 — Shrink the runtime floor, not the bridge (P0, revised by measurement)
 
-**The workload is an agent, and that changes the ranking.** An agent's turn is
-many small reads and few writes across a working set, and the cost that compounds
-is per-call, not per-byte. The 4.5×/7.5× transport cost measured above is
-proportional to payload, so for typical source files it is small in absolute
-terms; the fixed 8 MiB post-boot floor dominates. The transport is therefore
-P1 for agent-shaped work and P0 only where large objects are routine — build
-artifacts, test output, vendored binaries, archives. Measure the agent case
-before committing to the order.
+**Measured on 2026-09-27, and the plan's original premise was wrong.**
+`scripts/wasm-agent-workload.mjs` runs an agent-shaped workload against the
+committed artifact in the same isolate harness: 24 files totalling 597 KB, seeded
+the way `workspace prepare` seeds a repository, then read back, then six
+read-modify-writes. `scripts/wasm-agent-workload.test.mjs` pins the properties.
 
-1. Measure an agent-shaped workload against the committed artifact: read a
-   realistic working set of small files, write a handful, and report per-call
-   latency and total linear memory. The existing
-   `scripts/wasm-isolate-probe.mjs` is the harness; extend it rather than
-   writing a second one.
-2. Only then choose the transport. If the agent case is dominated by the fixed
-   floor, attack the floor — a smaller runtime, or a build with the reflect
-   allocator and the parts of the standard library the embedded path does not
-   use — before optimizing the bridge.
-3. If large objects are routine, add the length-prefixed binary path over shared
-   linear memory for object bytes, keeping the JSON envelope for control
-   messages, and bump `protocolVersion` in `cmd/stow-wasm/main.go`. The bridge
-   refuses a version it does not speak, so this is a breaking change with an
-   explicit gate rather than a silent one.
-4. Stream where the operation allows it. A `GetObject` that must materialize a
-   base64 copy of the whole object is the single largest cost today.
-5. Regenerate `dist/stow-runtime.wasm` with the source change. `check-generated`
-   compares against `HEAD`, and the retired facade plan records two releases
-   broken by that byte-diff for reasons unrelated to the source; expect it and
-   read the diff before assuming a real change.
+| | Measured |
+|---|---:|
+| Read, whole working set | 33.5 ms total, **1.4 ms/file**, p50 0.77 ms, p95 3.6 ms |
+| Linear memory committed by reading | **0 MiB** |
+| Seed cost, high-water | **7.9× the payload** |
+| Post-boot floor | **8 MiB, 64% of total footprint** |
+| Final footprint | 12.5 MiB for a 597 KB working set |
 
-**Exit:** an agent-shaped workload has a measured latency and memory profile; the
-transport decision follows that measurement rather than preceding it; any
-protocol bump regenerates the committed artifact.
+What this changes:
+
+1. **Reads are not the problem, so a transport change would not help them.** A full
+   pass over the working set commits zero new pages — the memory is already there
+   from the seed — and a read costs about a millisecond. An agent's compounding
+   per-call cost is therefore not dominated by the bridge. The original P0, "add a
+   binary transport", was ranked on two 1 MiB-object numbers that do not describe
+   this workload.
+2. **The fixed floor is the largest single term**, at 64% of the footprint. That
+   makes runtime size the first lever, not the bridge.
+3. **Writes do pay the transport**, at 7.9× the payload. That is the one place a
+   binary path helps, and it is paid at `prepare` time rather than per turn, so it
+   is a seeding cost rather than a latency one.
+
+So the phase is reordered around what the numbers say:
+
+1. Attack the floor. A Go build of the embedded path with the reflect allocator
+   and without the parts of the standard library it does not use is the obvious
+   first attempt; 8 MiB is the number to beat and the artifact is 5.15 MiB on disk,
+   so the floor is not simply the file size. Measure before assuming the win.
+2. Keep the binary transport, scoped to the **write** path, where the 7.9× is
+   real. `workspace prepare` seeding a large repository is the case that hurts.
+3. Leave the read path alone. It commits no memory and costs about a millisecond;
+   changing it would be work against a number that does not justify it.
+
+Two honest limits on the figures. Linear memory is a high-water mark and does not
+shrink, so 7.9× measures the peak the write path reached, not a steady-state cost
+per stored byte; the read phase is what bounds the steady state, and it commits
+nothing. And these are Node timings, not isolate timings — a real isolate bills
+CPU, and the free Cloudflare plan allows 10 ms, which this workload's 33.5 ms read
+pass would exceed. A paid plan allows five minutes and has no issue. That is a
+deployment-cost fact rather than a runtime defect, but it decides who can use this.
+
+**Exit:** the post-boot floor is below 8 MiB or the reason it is not is written
+down; the seed path's multiple of payload is reported after any transport change;
+the read path is measured again to confirm it still commits nothing.
 
 ### Phase 3 — Make the cache an incremental eviction index (P0)
 
@@ -332,19 +349,19 @@ Sequenced last, and deliberately:
 ## 5. Acceptance
 
 - A second writer's update is never silently overwritten, and the conflict is
-  reachable by a caller rather than only visible in a log.
+  reachable by a caller rather than only visible in a log. **Done** in `6f86e92`;
+  the boundary is that a key stow has never read carries no precondition.
 - The wasm runtime boots and serves operations in a realm with no Node APIs,
-  asserted in CI rather than measured once.
-- A 1 MiB object moves at a cost stated in the probe, and the assertion tracks
-  the real number.
+  asserted in CI rather than measured once. **Done** in `4ca2c1a`.
+- An agent-shaped workload has a measured latency and memory profile against the
+  committed artifact, and the transport decision follows it. **Done**; the answer
+  was that reads are cheap and the floor dominates, so the phase was reordered.
 - Every persistence backend, including a new one, passes the same behavioral
   contract suite as the memory and filesystem backends.
 - A changed-object cache refresh examines zero cache rows, and the byte and count
   limits are still enforced.
 - A caller can tell, from the capability report alone, which of the workspace and
   persistent-embedded surfaces their host supports and what durability each gives.
-- An agent-shaped workload has a measured latency and memory profile against the
-  committed artifact.
 - `make standards` and `make test-all` green; no ratchet baseline grows.
 - Every consistency claim in `docs/compat-contract.md` matches a test.
 
@@ -353,7 +370,14 @@ Sequenced last, and deliberately:
 - **The wasm protocol bump is the expensive step, not the transport work.** The
   retired facade plan measured this at 0.73 confidence and sequenced it early
   for that reason. Two releases were previously broken by the `check-generated`
-  byte-diff for reasons unrelated to the source.
+  byte-diff for reasons unrelated to the source. It is now scoped to the write
+  path, so it is smaller work than the original phase implied — but the bump is
+  still the risk, not the code around it.
+- **The floor may not be reducible.** 8 MiB of linear memory for a runtime whose
+  artifact is 5.15 MiB suggests the difference is allocator arena and Go runtime
+  overhead rather than reachable code. If a reflect-allocator build does not move
+  it, the honest answer is a documented floor rather than an optimisation, and
+  that would change which devices are viable targets.
 - **Adding `If-Match` to propagation changes retry behavior.** A precondition
   failure is terminal by nature; an entry that retries forever against a diverged
   upstream is worse than one that reports a conflict. The outbox's durable
