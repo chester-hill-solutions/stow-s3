@@ -105,7 +105,7 @@ instead, and asserted rather than asserted-by-comment: `buildStore` is the singl
 function that constructs a store, and in local mode it never constructs an
 upstream client. A local server therefore holds no object capable of reaching a
 provider, regardless of environment, policy, or consent. `cmd/stow-s3`'s
-`TestLocalModeMakesZeroUpstreamRequests` sets the full hazardous environment,
+`TestAmbientCredentialsDoNotSelectRunThrough` sets the full hazardous environment,
 forces local mode, exercises create/put/get/head/list/delete against a recording
 upstream, and requires zero hits.
 

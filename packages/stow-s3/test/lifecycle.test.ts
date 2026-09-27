@@ -326,8 +326,24 @@ describe("optional SDK credentials", () => {
       sessionToken: "token",
       forcePathStyle: false,
     });
+    // Omitting the option must still yield path-style, so removing the override
+    // changes what an existing caller gets only when they asked for something
+    // else. This is the default the local server and every S3-compatible
+    // endpoint accept.
+    const defaultedConfig = Stow.awsSdkV3Config({
+      endpoint: "http://127.0.0.1:9000",
+      accessKeyId: "access",
+      secretAccessKey: "secret",
+    });
+    assert.equal(defaultedConfig.forcePathStyle, true);
+
     assert.deepEqual(publicTokenConfig.credentials, tokenConfig.credentials);
-    assert.equal(publicTokenConfig.forcePathStyle, true);
+    // The caller's value is honored. This asserted `true` while the call above
+    // passed `false`, which pinned the defect rather than the intent: the option
+    // is in the public type, buildAwsSdkV3Config honors it, and
+    // Stow.awsSdkV3Config then overwrote it. A declared option that cannot be set
+    // is worse than an absent one, because the type says it works.
+    assert.equal(publicTokenConfig.forcePathStyle, false);
 
     const provider = async () => ({
       accessKeyId: "provider-access",

@@ -82,7 +82,7 @@ Estimate assumes two experienced engineers.
 - **Landed.** Local mode is now proven to make zero upstream requests rather than
   assumed to. `buildStore` is the single function that constructs a store and it
   never constructs an upstream client in local mode, so a local server holds no
-  object capable of reaching a provider. `TestLocalModeMakesZeroUpstreamRequests`
+  object capable of reaching a provider. `TestAmbientCredentialsDoNotSelectRunThrough`
   sets the full hazardous environment, forces local mode, exercises
   create/put/get/head/list/delete against a recording upstream, and requires zero
   hits. The consent flag and the store wiring are asserted separately, because

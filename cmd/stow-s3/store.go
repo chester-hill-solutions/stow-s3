@@ -18,8 +18,9 @@ import (
 // `--mode local`: a local server holds no object capable of reaching a provider,
 // so it cannot make an upstream request regardless of what STOW_*, S3_*, or
 // AWS_* say. Keeping that construction inside this one branch is what makes it
-// checkable, so it is asserted in TestLocalModeBuildsNoUpstreamPath rather than
-// left as a claim in a comment.
+// checkable, so it is asserted in
+// TestBuildStoreIgnoresUpstreamConfigInLocalMode rather than left as a claim in a
+// comment.
 func buildStore(mode runthrough.Mode, backend runtime.Backend, dataDir string, cfg runthrough.Config) (storage.Store, *runthrough.Adapter, error) {
 	localStore := openLocalStore(backend, dataDir)
 	if mode != runthrough.ModeRunThrough {

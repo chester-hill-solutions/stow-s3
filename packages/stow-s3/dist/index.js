@@ -35,7 +35,15 @@ export const Stow = {
         }
         return buildAwsSdkV3Config({
             ...options,
-            forcePathStyle: true,
+            // No override. The caller's forcePathStyle is part of the public type and
+            // buildAwsSdkV3Config already defaults it to true, so spreading the options
+            // and then replacing the field with `true` made a declared option
+            // impossible to set: a caller asking for virtual-hosted addressing got
+            // path-style and a 404 from a provider that never sees the request.
+            //
+            // The StowInstance arm above keeps a fixed true. An instance is stow's own
+            // loopback server with a generated bucket, where path-style is the address
+            // that works, and StowInstance carries no addressing field to forward.
         });
     },
     upstream: {
