@@ -240,7 +240,12 @@ func signHeaderRequest(t *testing.T, req *http.Request, creds auth.Credentials, 
 	canonicalHeaders := buildCanonicalHeaders(req, signedHeaders)
 	canonicalRequest := strings.Join([]string{
 		req.Method,
-		canonicalURI(req.URL.EscapedPath()),
+		// The decoded path, encoded once - see buildCanonicalRequest. These two
+		// signers used the escaped path, which double-encoded any key needing it
+		// and so agreed with the server while both were wrong. conformance/
+		// encoding_test.go is the case that would have caught it, because it signs
+		// with the real SDK; nothing here exercises a key that needs encoding.
+		canonicalURI(req.URL.Path),
 		canonicalQuery(req.URL.RawQuery),
 		canonicalHeaders,
 		strings.Join(signedHeaders, ";"),
@@ -295,7 +300,8 @@ func signPresignedURL(t *testing.T, method, rawURL string, creds auth.Credential
 	canonicalQuery := canonicalQuery(req.URL.RawQuery)
 	canonicalRequest := strings.Join([]string{
 		method,
-		canonicalURI(parsed.EscapedPath()),
+		// See the note at the other signer: the decoded path, encoded once.
+		canonicalURI(parsed.Path),
 		canonicalQuery,
 		canonicalHeaders,
 		strings.Join(signedHeaders, ";"),

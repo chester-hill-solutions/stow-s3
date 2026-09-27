@@ -293,6 +293,7 @@ Both MUST succeed on the same bucket/object.
 | Credential scope | `{date}/{region}/s3/aws4_request` — region MUST match stow configured region (default `us-east-1`) |
 | Access key | Stow-issued **local dev credentials** printed at startup / returned from `Stow.start()` |
 | Secret key | Paired with local access key; NEVER upstream credentials for local endpoint auth |
+| Canonical URI | The **decoded** request path, percent-encoded exactly once per path segment, with `/` separators left as separators. Encoding an already-encoded path produces `%2520` for a space and rejects the request with `403 SignatureDoesNotMatch` |
 
 **Failure responses:**
 - Missing / malformed auth → `403 Forbidden`, code `AccessDenied` or `SignatureDoesNotMatch`

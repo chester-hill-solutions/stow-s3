@@ -358,7 +358,21 @@ func computeSignature(r *http.Request, sr signedRequest, secret string) (string,
 }
 
 func buildCanonicalRequest(r *http.Request, sr signedRequest) (string, error) {
-	canonicalURI := canonicalURIPath(r.URL.EscapedPath())
+	// The canonical URI is built from the *decoded* path, encoded once.
+	//
+	// It used to be built from r.URL.EscapedPath(), which is already encoded, and
+	// canonicalURIPath encodes each segment again: a key of "a b" arrives as
+	// /a%20b and was signed as /a%2520b. Every key in the conformance corpus was
+	// made of characters that survive encoding unchanged, and the two hand-written
+	// signers in this package built the canonical URI the same wrong way, so the
+	// server and its tests agreed with each other and neither agreed with AWS.
+	// A real SDK signing "a b" produced 403 SignatureDoesNotMatch.
+	//
+	// Encoding the decoded path once is what the SigV4 specification asks for and
+	// what every SDK does, and it also gets the awkward cases right: a literal plus
+	// in a path is a plus, not an encoded space, so "a+b" signs as /a%2Bb rather
+	// than being rewritten to "a b".
+	canonicalURI := canonicalURIPath(r.URL.Path)
 	canonicalQuery := canonicalQueryString(r.URL.RawQuery)
 	canonicalHeaders, signedHeaders, err := canonicalHeaders(r, sr.signedHeaders)
 	if err != nil {
