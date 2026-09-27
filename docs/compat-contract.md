@@ -356,13 +356,15 @@ Every response MUST include `x-amz-request-id` header matching `RequestId` in bo
 
 ## 6. Run-Through Mode Behavior Contract
 
-Run-through mode is enabled by explicit config or **auto-detect** when upstream endpoint + access key + secret key are present in environment (`STOW_*` > `S3_*` > `AWS_*`). Override: `STOW_MODE=local` forces local-only.
+Run-through mode is enabled **only** by naming it: `--mode run-through` or `STOW_MODE=run-through`, with upstream endpoint + access key + secret key present in the environment (`STOW_*` > `S3_*` > `AWS_*`). Local-only is the default, and the presence of credentials alone does not change it — credentials decide how a requested upstream is authenticated, not whether one is used. Override: `STOW_MODE=local` forces local-only. See `docs/adr/0001-auto-detect-run-through.md`.
 
 ### 6.1 Policies
 
 | Policy | Reads | Writes |
 |--------|-------|--------|
-| **local mode** (default when no upstream) | Local store only | Local store only |
+| **local mode** (the default, always) | Local store only | Local store only |
+
+A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local. See `docs/adr/0005-live-write-requires-explicit-consent.md`.
 | **readThroughCache** (default when upstream detected) | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
 | **mirrorWrites** | Same read-through behavior | Local first, then upstream with durable outbox; startup warning required |
 
@@ -409,7 +411,7 @@ On every `Stow.start()`, log to stdout (and expose via `/_stow/status`):
 - Upstream endpoint (host only; no secrets)
 - Cache policy: `readThroughCache` | `mirrorWrites` | none
 - Write policy: `local-only` | `allowLiveWrites` | `mirrorWrites`
-- Override hints: `STOW_MODE=local`, `allowLiveWrites` flag
+- Override hints: `STOW_MODE=local` forces local; in local mode, how to ask for run-through (`--mode run-through` or `STOW_MODE=run-through`); `allowLiveWrites` flag
 
 ### 6.4 Conformance Tests (Run-Through)
 

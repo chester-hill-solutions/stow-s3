@@ -159,6 +159,8 @@ yours to do, which is what keeps `boto3` a genuinely optional extra.
 - **It cannot inherit your cloud configuration.** `STOW_*`, `S3_*`, and `AWS_*`
   are stripped from the child environment before anything is set, so a stray
   credential in your shell cannot turn a local session into a run-through one.
+  A server you start yourself is safe for the same reason: ambient credentials no
+  longer select a mode at all.
 - **It cannot outlive you.** A session passes its parent's process ID, and the
   server exits if that process dies, including when it is killed rather than
   closed.
@@ -367,7 +369,9 @@ The browser profile requires a compatible embedded host and persistence adapter.
 
 ## Run-through mode
 
-Local mode keeps all object data in the selected local backend. Run-through mode adds an upstream S3 client and a separate cache.
+Local mode keeps all object data in the selected local backend, and it is the default. Run-through mode adds an upstream S3 client and a separate cache.
+
+Run-through is opt-in: pass `--mode run-through` or set `STOW_MODE=run-through`. It is never selected by the presence of credentials, because `AWS_*` variables are exported by CI runners and developer shells for unrelated tools — credentials decide how a requested upstream is authenticated, not whether one is used. `STOW_MODE=local` forces local-only.
 
 In run-through mode, local data is authoritative. Reads can fall back to an existing upstream bucket. Upstream configuration comes from `STOW_*`, `S3_*`, or `AWS_*` environment variables, or from the corresponding command-line options.
 

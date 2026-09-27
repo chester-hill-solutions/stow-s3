@@ -6,11 +6,11 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-func (a *Adapter) CreateMultipartUpload(ctx context.Context, bucket, key string) (*storage.MultipartUpload, error) {
+func (a *Adapter) CreateMultipartUpload(ctx context.Context, bucket, key string, opts storage.MultipartOptions) (*storage.MultipartUpload, error) {
 	if a.localMultipart == nil {
 		return nil, storage.ErrMultipartUnsupported
 	}
-	return a.localMultipart.CreateMultipartUpload(ctx, bucket, key)
+	return a.localMultipart.CreateMultipartUpload(ctx, bucket, key, opts)
 }
 
 func (a *Adapter) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {

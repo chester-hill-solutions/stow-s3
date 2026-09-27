@@ -13,8 +13,6 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-const minPartSize = 5 * 1024 * 1024
-
 func (s *Server) validateMultipartRoute(ctx context.Context, w http.ResponseWriter, r *http.Request, route routeInfo, uploadID string) bool {
 	if err := s.multipart.ValidateMultipartUpload(ctx, uploadID, route.bucket, route.key); err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(route.bucket, route.key)))
@@ -23,8 +21,42 @@ func (s *Server) validateMultipartRoute(ctx context.Context, w http.ResponseWrit
 	return true
 }
 
+// initiationOptions reads the object properties an upload fixes at initiation.
+//
+// These are the same properties handlePutObject reads, read from the same
+// headers, and they are passed to the store rather than dropped: a completion
+// cannot know them later, because nothing else records them. An upload
+// initiated with a content type used to complete into an object with none.
+func initiationOptions(r *http.Request) (storage.MultipartOptions, *s3Error) {
+	contentType := r.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	metadata := extractMetadata(r.Header)
+	if metadataSize(metadata) > maxMetadataBytes {
+		return storage.MultipartOptions{}, &s3Error{
+			Code:       "InvalidArgument",
+			Message:    "Metadata too large",
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	algorithm, value := declaredChecksum(r)
+	return storage.MultipartOptions{
+		ContentType:       contentType,
+		Metadata:          metadata,
+		ChecksumAlgorithm: algorithm,
+		ChecksumValue:     value,
+	}, nil
+}
+
 func (s *Server) handleCreateMultipartUpload(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket, key string) {
-	upload, err := s.multipart.CreateMultipartUpload(ctx, bucket, key)
+	opts, badRequest := initiationOptions(r)
+	if badRequest != nil {
+		badRequest.Resource = resourcePath(bucket, key)
+		writeError(w, r, *badRequest)
+		return
+	}
+	upload, err := s.multipart.CreateMultipartUpload(ctx, bucket, key, opts)
 	if err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
 		return
@@ -102,34 +134,25 @@ func (s *Server) handleCompleteMultipartUpload(ctx context.Context, w http.Respo
 		parts = append(parts, storage.PartInfo{PartNumber: p.PartNumber, ETag: "\"" + etag + "\""})
 	}
 
-	// Validate minimum part size for non-final parts. A store that cannot list the
-	// parts cannot be asked whether they are big enough, so this error is reported
-	// rather than treated as an empty listing: an empty map would make every size
-	// lookup miss and silently pass every part.
-	storedParts, err := s.multipart.ListParts(ctx, uploadID)
-	if err != nil {
-		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
-		return
-	}
-	partSizes := map[int]int64{}
-	for _, p := range storedParts {
-		partSizes[p.PartNumber] = p.Size
-	}
-	maxPart := 0
-	for _, p := range parts {
-		if p.PartNumber > maxPart {
-			maxPart = p.PartNumber
-		}
-	}
-	for _, p := range parts {
-		if p.PartNumber < maxPart {
-			if sz, ok := partSizes[p.PartNumber]; ok && sz < minPartSize {
-				writeError(w, r, s3Error{Code: "EntityTooSmall", Message: "Your proposed upload is smaller than the minimum allowed size", Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
-				return
-			}
-		}
-	}
-
+	// The minimum part size is the store's rule, not this layer's, and that is a
+	// change of where the answer comes from rather than of what it is.
+	//
+	// It used to be enforced here, from a ListParts call this layer made: it
+	// built a map of part numbers to sizes, and for each part below the highest
+	// one named in the request it looked the size up and refused if it was small.
+	// Two things were wrong with that. It asked the store what its parts were and
+	// then trusted the answer without checking that the parts it was about to
+	// assemble were the parts it had asked about. And a part missing from the
+	// listing — because it was never uploaded, or the listing failed — was skipped
+	// rather than refused, so the one case that must never pass was the one case
+	// the check was blind to.
+	//
+	// Every backend now validates the stored sizes of the exact parts being
+	// completed, before it assembles anything, and reports ErrEntityTooSmall,
+	// which mapStorageError renders as S3's EntityTooSmall. A client gets the
+	// same answer whichever store is underneath, and a store used directly —
+	// through the embedded API, or the workspace — enforces the same rule instead
+	// of accepting what the S3 layer would have refused.
 	meta, err := s.multipart.CompleteMultipartUpload(ctx, uploadID, parts)
 	if err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))

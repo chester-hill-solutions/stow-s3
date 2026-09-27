@@ -23,17 +23,17 @@ func TestMultipartUploadReservesOneObjectSlotPerTarget(t *testing.T) {
 	}
 
 	// The first upload for a missing object spends the only object slot.
-	first, err := instance.CreateMultipartUpload(ctx, "bucket", "key")
+	first, err := instance.CreateMultipartUpload(ctx, "bucket", "key", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("first upload: %v", err)
 	}
 	// A second upload for the same target reuses that slot instead of
 	// demanding another one.
-	if _, err := instance.CreateMultipartUpload(ctx, "bucket", "key"); err != nil {
+	if _, err := instance.CreateMultipartUpload(ctx, "bucket", "key", storage.MultipartOptions{}); err != nil {
 		t.Fatalf("second upload for the same key: %v", err)
 	}
 	// A different target has no slot left.
-	if _, err := instance.CreateMultipartUpload(ctx, "bucket", "other"); !errors.Is(err, ErrQuotaExceeded) {
+	if _, err := instance.CreateMultipartUpload(ctx, "bucket", "other", storage.MultipartOptions{}); !errors.Is(err, ErrQuotaExceeded) {
 		t.Fatalf("upload for a new key error = %v, want quota exceeded", err)
 	}
 	if usage := instance.Usage(); usage.Objects != 0 || usage.Bytes != 0 {

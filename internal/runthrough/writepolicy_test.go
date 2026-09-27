@@ -84,6 +84,52 @@ func TestConfigFromEnvExplicitFalseOptOutStaysLocal(t *testing.T) {
 	}
 }
 
+// The invariant this documentation has to match, asserted where it is decided.
+//
+// A run-through configuration plus a mirrorWrites policy is not permission to
+// mutate upstream. Only the live-write consent is, and it is the same mechanism
+// the startup banner reports and the same one the adapter gates on — so the two
+// cannot drift apart without a test here failing.
+//
+// The regression this is here for: a `.env` copied from a staging machine
+// arrives with STOW_POLICY=mirrorWrites and credentials for a shared bucket, and
+// the policy used to be read as the consent. It is a routing choice; the consent
+// is separate and has to be given.
+func TestRunThroughWithMirrorWritesIsNotPermissionToMutateUpstream(t *testing.T) {
+	os.Clearenv()
+	t.Setenv("STOW_ENDPOINT", "https://upstream.example")
+	t.Setenv("STOW_ACCESS_KEY_ID", "AKIASHARED")
+	t.Setenv("STOW_SECRET_ACCESS_KEY", "shared-secret")
+	t.Setenv("STOW_POLICY", "mirrorWrites")
+	t.Setenv("STOW_MODE", "run-through")
+
+	cfg := runthrough.ConfigFromEnv()
+
+	// The configuration is run-through and the policy is mirrorWrites: both of
+	// the things the stale documentation said were enough.
+	if cfg.Policy != runthrough.PolicyMirrorWrites {
+		t.Fatalf("policy = %q, want mirrorWrites", cfg.Policy)
+	}
+	if mode := runthrough.DetectMode(); mode != runthrough.ModeRunThrough {
+		t.Fatalf("mode = %q, want run-through", mode)
+	}
+	// And it is still not permission.
+	if cfg.AllowLiveWrites {
+		t.Fatal("a run-through mirrorWrites configuration granted live-write consent on its own")
+	}
+	if runthrough.PropagatesUpstream(cfg) {
+		t.Fatal("a run-through mirrorWrites configuration reports that it propagates upstream")
+	}
+	if got := runthrough.EffectiveWritePolicy(cfg); got != runthrough.WritePolicyMirrorWritesDisabled {
+		t.Fatalf("write policy = %q, want %q", got, runthrough.WritePolicyMirrorWritesDisabled)
+	}
+	// The banner an operator reads must not describe propagation that is off.
+	banner := runthrough.StartupBanner(cfg, runthrough.ModeRunThrough)
+	if strings.Contains(banner, "mirrorWrites propagates supported mutations upstream") {
+		t.Fatalf("the banner warns about propagation that is disabled:\n%s", banner)
+	}
+}
+
 // The banner is the only thing an operator reads before finding out a write
 // reached a real bucket, so it must not describe propagation that is off.
 func TestStartupBannerReflectsEffectiveWritePolicy(t *testing.T) {

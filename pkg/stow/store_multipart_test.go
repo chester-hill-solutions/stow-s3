@@ -33,14 +33,16 @@ func newMultipartStore() *multipartStore {
 	}
 }
 
-func (m *multipartStore) CreateMultipartUpload(_ context.Context, bucket, key string) (stow.MultipartUpload, error) {
+func (m *multipartStore) CreateMultipartUpload(_ context.Context, bucket, key string, options stow.MultipartOptions) (stow.MultipartUpload, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	upload := stow.MultipartUpload{
-		UploadID:  "upload-1",
-		Bucket:    bucket,
-		Key:       key,
-		Initiated: time.Now().UTC(),
+		UploadID:    "upload-1",
+		Bucket:      bucket,
+		Key:         key,
+		Initiated:   time.Now().UTC(),
+		ContentType: options.ContentType,
+		Metadata:    options.Metadata,
 	}
 	m.uploads[upload.UploadID] = upload
 	m.parts[upload.UploadID] = nil

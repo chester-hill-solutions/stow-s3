@@ -27,7 +27,7 @@ func completeOnePart(t *testing.T, store storage.Store, body []byte) string {
 		t.Fatalf("create bucket: %v", err)
 	}
 	multi := requireMultipart(t, store)
-	upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+	upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}
@@ -73,11 +73,15 @@ func TestStoreMultiPartCompletionETagIsComposite(t *testing.T) {
 			t.Fatalf("create bucket: %v", err)
 		}
 		multi := requireMultipart(t, store)
-		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 		if err != nil {
 			t.Fatalf("create upload: %v", err)
 		}
-		first, err := multi.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("first"))
+		// The first part is at the minimum, because a non-final part below it is
+		// refused. This case is about which ETag a genuine two-part object gets,
+		// and it cannot reach that question through a completion that is rejected
+		// for an unrelated reason.
+		first, err := multi.UploadPart(ctx, upload.UploadID, 1, bytes.NewReader(make([]byte, storage.MinPartSize)))
 		if err != nil {
 			t.Fatalf("upload first part: %v", err)
 		}
@@ -130,7 +134,7 @@ func TestStoreRejectsEmptyMultipartCompletion(t *testing.T) {
 			t.Fatalf("create bucket: %v", err)
 		}
 		multi := requireMultipart(t, store)
-		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 		if err != nil {
 			t.Fatalf("create upload: %v", err)
 		}
@@ -147,7 +151,7 @@ func TestStoreRejectsDuplicateMultipartParts(t *testing.T) {
 			t.Fatalf("create bucket: %v", err)
 		}
 		multi := requireMultipart(t, store)
-		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 		if err != nil {
 			t.Fatalf("create upload: %v", err)
 		}
@@ -169,7 +173,7 @@ func TestStoreRejectsUnsortedMultipartCompletionParts(t *testing.T) {
 			t.Fatalf("create bucket: %v", err)
 		}
 		multi := requireMultipart(t, store)
-		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 		if err != nil {
 			t.Fatalf("create upload: %v", err)
 		}

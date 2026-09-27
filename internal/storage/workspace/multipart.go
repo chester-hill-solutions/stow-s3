@@ -25,12 +25,30 @@ const (
 )
 
 // uploadState is the on-disk record of an in-progress upload.
+//
+// The object properties are part of it because the upload outlives the process
+// that started it: a workspace's whole premise is that its state survives, and a
+// completion may be issued by a later process against a state file an earlier
+// one wrote. Keeping them in memory until completion would publish an object
+// with no content type and no user metadata whenever that happened.
 type uploadState struct {
-	UploadID  string             `json:"upload_id"`
-	Bucket    string             `json:"bucket"`
-	Key       string             `json:"key"`
-	Initiated time.Time          `json:"initiated"`
-	Parts     []storage.PartInfo `json:"parts"`
+	UploadID  string                   `json:"upload_id"`
+	Bucket    string                   `json:"bucket"`
+	Key       string                   `json:"key"`
+	Initiated time.Time                `json:"initiated"`
+	Options   storage.MultipartOptions `json:"options"`
+	Parts     []storage.PartInfo       `json:"parts"`
+}
+
+// upload renders the state as the descriptor the storage contract describes.
+func (s *uploadState) upload() storage.MultipartUpload {
+	return storage.MultipartUpload{
+		UploadID:  s.UploadID,
+		Bucket:    s.Bucket,
+		Key:       s.Key,
+		Initiated: s.Initiated,
+		Options:   s.Options,
+	}
 }
 
 // uploadDir is where one upload's parts live.
@@ -72,7 +90,7 @@ func (s *Store) saveUpload(state *uploadState) error {
 // CreateMultipartUpload starts an upload. The object does not exist until
 // CompleteMultipartUpload, which is what makes an abandoned upload leave
 // nothing in the workspace a caller can see.
-func (s *Store) CreateMultipartUpload(ctx context.Context, bucket, key string) (*storage.MultipartUpload, error) {
+func (s *Store) CreateMultipartUpload(ctx context.Context, bucket, key string, opts storage.MultipartOptions) (*storage.MultipartUpload, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
 	}
@@ -92,16 +110,19 @@ func (s *Store) CreateMultipartUpload(ctx context.Context, bucket, key string) (
 	if err := os.MkdirAll(s.uploadDir(uploadID), 0o755); err != nil {
 		return nil, fmt.Errorf("workspace store: stage upload: %w", err)
 	}
-	state := &uploadState{UploadID: uploadID, Bucket: bucket, Key: key, Initiated: s.now().UTC()}
-	if err := s.saveUpload(state); err != nil {
-		return nil, err
-	}
-	return &storage.MultipartUpload{
+	state := &uploadState{
 		UploadID:  uploadID,
 		Bucket:    bucket,
 		Key:       key,
-		Initiated: state.Initiated,
-	}, nil
+		Initiated: s.now().UTC(),
+		Options:   opts,
+	}
+	state.Options.Metadata = storage.CloneMetadata(opts.Metadata)
+	if err := s.saveUpload(state); err != nil {
+		return nil, err
+	}
+	upload := state.upload()
+	return &upload, nil
 }
 
 // GetMultipartUpload returns an in-progress upload.
@@ -113,12 +134,9 @@ func (s *Store) GetMultipartUpload(_ context.Context, uploadID string) (*storage
 	if err != nil {
 		return nil, err
 	}
-	return &storage.MultipartUpload{
-		UploadID:  state.UploadID,
-		Bucket:    state.Bucket,
-		Key:       state.Key,
-		Initiated: state.Initiated,
-	}, nil
+	upload := state.upload()
+	upload.Options.Metadata = storage.CloneMetadata(state.Options.Metadata)
+	return &upload, nil
 }
 
 // ValidateMultipartUpload confirms an upload exists and belongs to the bucket
@@ -206,8 +224,14 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 	if err != nil {
 		return nil, err
 	}
-	meta, err := s.putLocked(ctx, state.Bucket, state.Key, bytes.NewReader(assembled),
-		storage.PutOptions{ContentType: detectContentTypeFromBytes(assembled)})
+	// The object properties come from the upload rather than from the bytes:
+	// they were fixed when the upload was initiated, and no part of a multipart
+	// upload may change them.
+	opts := storage.MultipartPutOptions(state.Options)
+	if opts.ContentType == "" {
+		opts.ContentType = detectContentTypeFromBytes(assembled)
+	}
+	meta, err := s.putLocked(ctx, state.Bucket, state.Key, bytes.NewReader(assembled), opts)
 	if err != nil {
 		return nil, err
 	}
@@ -221,19 +245,43 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 }
 
 // assemble concatenates the requested parts in order.
+//
+// Every part is checked before any of it is appended, and the result is
+// allocated once at the size the parts already say they add up to. Appending
+// as it went reallocated on the way and briefly held two buffers; the sizes are
+// known as soon as the parts are read, so there is nothing to discover by
+// growing.
 func (s *Store) assemble(uploadID string, parts []storage.PartInfo) ([]byte, []string, error) {
-	var out []byte
+	chunks := make([][]byte, 0, len(parts))
+	sizes := make([]int64, 0, len(parts))
 	etags := make([]string, 0, len(parts))
+	var total int64
 	for _, part := range parts {
 		data, err := os.ReadFile(s.partPath(uploadID, part.PartNumber))
 		if err != nil {
 			return nil, nil, storage.ErrInvalidPart
 		}
+		// ErrInvalidPart, not ErrChecksumMismatch, and the other two backends
+		// agree: the ETag in a completion identifies which version of a part is
+		// wanted, and a name that does not match is a part that cannot be found.
+		// ErrChecksumMismatch is for a body that contradicts a checksum claim
+		// about itself, which is a different mistake, and it is not a code the S3
+		// surface maps — so it reached a client as a 500 InternalError for what
+		// is a malformed request.
 		if !storage.ETagEqual(storage.ETagForBytes(data), part.ETag) {
-			return nil, nil, storage.ErrChecksumMismatch
+			return nil, nil, storage.ErrInvalidPart
 		}
-		out = append(out, data...)
+		chunks = append(chunks, data)
+		sizes = append(sizes, int64(len(data)))
 		etags = append(etags, part.ETag)
+		total += int64(len(data))
+	}
+	if err := storage.ValidateMinPartSizes(sizes); err != nil {
+		return nil, nil, err
+	}
+	out := make([]byte, 0, total)
+	for _, chunk := range chunks {
+		out = append(out, chunk...)
 	}
 	return out, etags, nil
 }
@@ -310,12 +358,9 @@ func (s *Store) scanUploads(bucket string) ([]storage.MultipartUpload, error) {
 		if err != nil || state.Bucket != bucket {
 			continue
 		}
-		uploads = append(uploads, storage.MultipartUpload{
-			UploadID:  state.UploadID,
-			Bucket:    state.Bucket,
-			Key:       state.Key,
-			Initiated: state.Initiated,
-		})
+		upload := state.upload()
+		upload.Options.Metadata = storage.CloneMetadata(state.Options.Metadata)
+		uploads = append(uploads, upload)
 	}
 	sort.Slice(uploads, func(i, j int) bool { return uploads[i].Key < uploads[j].Key })
 	return uploads, nil

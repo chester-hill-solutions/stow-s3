@@ -229,36 +229,73 @@ func httptestRequest(t *testing.T, method, rawURL string, body io.Reader) *http.
 	return req
 }
 
+// signHeaderRequest signs a request over the standard header list. A case that
+// needs a different list uses newHeaderSigner(req, creds, region, hash).withSignedList.
 func signHeaderRequest(t *testing.T, req *http.Request, creds auth.Credentials, region, payloadHash string) {
 	t.Helper()
-	amzDate := req.Header.Get("X-Amz-Date")
+	signer := newHeaderSigner(req, creds, region, payloadHash).withSignedList("host;x-amz-content-sha256;x-amz-date")
+	// Sorted, because that list is already the conforming form and every other
+	// caller of this helper means a well-formed one.
+	entries := strings.Split(signer.signedList, ";")
+	sort.Strings(entries)
+	signer.signedList = strings.Join(entries, ";")
+	signer.sign(t)
+}
+
+// headerSigner is a request, a credential set and a signing context, with the
+// SignedHeaders list as the one thing that varies between cases. It exists so a
+// case that needs a different list says so by name rather than by passing six
+// arguments to a helper.
+type headerSigner struct {
+	req         *http.Request
+	creds       auth.Credentials
+	region      string
+	payloadHash string
+	signedList  string
+}
+
+func newHeaderSigner(req *http.Request, creds auth.Credentials, region, payloadHash string) *headerSigner {
+	return &headerSigner{req: req, creds: creds, region: region, payloadHash: payloadHash}
+}
+
+// withSignedList names the headers the signature will cover. The list must be the
+// lower-case, semicolon-separated, ascending form AWS's signer emits.
+func (s *headerSigner) withSignedList(list string) *headerSigner {
+	s.signedList = list
+	return s
+}
+
+func (s *headerSigner) sign(t *testing.T) {
+	t.Helper()
+	amzDate := s.req.Header.Get("X-Amz-Date")
 	dateStamp := amzDate[:8]
 
-	signedHeaders := []string{"host", "x-amz-content-sha256", "x-amz-date"}
-	sort.Strings(signedHeaders)
-
-	canonicalHeaders := buildCanonicalHeaders(req, signedHeaders)
+	// The list is signed as written, not sorted: the canonical request embeds it
+	// verbatim, and a case that signs a repaired list could not tell a verifier
+	// that repairs one from one that refuses it.
+	signedHeaders := strings.Split(s.signedList, ";")
+	canonicalHeaders := buildCanonicalHeaders(s.req, signedHeaders)
 	canonicalRequest := strings.Join([]string{
-		req.Method,
+		s.req.Method,
 		// The decoded path, encoded once - see buildCanonicalRequest. These two
 		// signers used the escaped path, which double-encoded any key needing it
 		// and so agreed with the server while both were wrong. conformance/
 		// encoding_test.go is the case that would have caught it, because it signs
 		// with the real SDK; nothing here exercises a key that needs encoding.
-		canonicalURI(req.URL.Path),
-		canonicalQuery(req.URL.RawQuery),
+		canonicalURI(s.req.URL.Path),
+		canonicalQuery(s.req.URL.RawQuery),
 		canonicalHeaders,
 		strings.Join(signedHeaders, ";"),
-		payloadHash,
+		s.payloadHash,
 	}, "\n")
 
-	signature := signString(creds.SecretAccessKey, dateStamp, region, "s3", amzDate, canonicalRequest)
-	req.Header.Set("Authorization", fmt.Sprintf(
+	signature := signString(s.creds.SecretAccessKey, dateStamp, s.region, "s3", amzDate, canonicalRequest)
+	s.req.Header.Set("Authorization", fmt.Sprintf(
 		"%s Credential=%s/%s/%s/s3/aws4_request, SignedHeaders=%s, Signature=%s",
 		"AWS4-HMAC-SHA256",
-		creds.AccessKeyID,
+		s.creds.AccessKeyID,
 		dateStamp,
-		region,
+		s.region,
 		strings.Join(signedHeaders, ";"),
 		signature,
 	))

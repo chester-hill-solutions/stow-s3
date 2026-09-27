@@ -177,6 +177,25 @@ func (a *Adapter) propagateIntents(ctx context.Context, entries []OutboxEntry) e
 }
 
 func (a *Adapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*storage.ObjectMeta, error) {
+	return a.CopyObjectCond(ctx, storage.CopyRequest{
+		SourceBucket: srcBucket,
+		SourceKey:    srcKey,
+		DestBucket:   dstBucket,
+		DestKey:      dstKey,
+	})
+}
+
+// CopyObjectCond is the conditional form, and it is here so a run-through server
+// keeps the local store's copy semantics rather than quietly dropping to a
+// head-then-copy: the conditions and the copied bytes would otherwise come from
+// two different reads of the source.
+//
+// The outbox is written for the destination either way, so a refused copy
+// propagates nothing — the local store's own precondition failure comes back
+// before anything is prepared.
+func (a *Adapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
+	srcBucket, srcKey := req.SourceBucket, req.SourceKey
+	dstBucket, dstKey := req.DestBucket, req.DestKey
 	action := a.decideUpstreamWrite(dstBucket)
 	if action == writeError {
 		return nil, ErrLiveWritesDisabled
@@ -201,7 +220,7 @@ func (a *Adapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, 
 		}
 	}
 
-	meta, err := a.local.CopyObject(ctx, srcBucket, srcKey, dstBucket, dstKey)
+	meta, err := a.localCopy(ctx, req)
 	if err != nil {
 		if prepared.ID != "" {
 			return nil, a.reconcilePreparedAfterError(ctx, prepared, err)
@@ -218,6 +237,16 @@ func (a *Adapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, 
 		}
 	}
 	return meta, nil
+}
+
+// localCopy performs the copy against the local store, through whichever
+// capability it offers, so the conditions are evaluated on the version the store
+// copies rather than on one this layer read separately.
+func (a *Adapter) localCopy(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
+	if conditional, ok := a.local.(storage.ConditionalCopyStore); ok {
+		return conditional.CopyObjectCond(ctx, req)
+	}
+	return a.local.CopyObject(ctx, req.SourceBucket, req.SourceKey, req.DestBucket, req.DestKey)
 }
 
 func (a *Adapter) UploadPart(ctx context.Context, uploadID string, partNumber int, body io.Reader) (*storage.PartInfo, error) {

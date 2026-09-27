@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -130,7 +131,13 @@ func TestStoreAdapterPreservesChecksumsAndConditionalWrites(t *testing.T) {
 
 func TestStoreAdapterMultipartUsesRuntimeQuotas(t *testing.T) {
 	ctx := context.Background()
-	instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 8, MaxObjects: 1}, storage.NewMemoryStore(), nil)
+	// 20 bytes rather than the smallest workable budget, because a completion
+	// now also reserves the buffer the store assembles. The parts here are six
+	// bytes and completing both would need twelve: with a budget of eight there
+	// is no completion this upload could ever finish, and the test would be
+	// asserting a quota refusal while claiming to assert an accounting
+	// lifecycle.
+	instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 20, MaxObjects: 1}, storage.NewMemoryStore(), nil)
 	if err != nil {
 		t.Fatalf("open with store: %v", err)
 	}
@@ -145,7 +152,7 @@ func TestStoreAdapterMultipartUsesRuntimeQuotas(t *testing.T) {
 func assertMultipartQuotaLifecycle(t *testing.T, ctx context.Context, adapter *StoreAdapter, instance *Instance) {
 	t.Helper()
 	requireNoError(t, adapter.CreateBucket(ctx, "adapter"), "create bucket")
-	upload, err := adapter.CreateMultipartUpload(ctx, "adapter", "object")
+	upload, err := adapter.CreateMultipartUpload(ctx, "adapter", "object", storage.MultipartOptions{})
 	requireNoError(t, err, "create multipart")
 	_, err = adapter.UploadPart(ctx, upload.UploadID, 1, bytes.NewBufferString("1234"))
 	requireNoError(t, err, "first part")
@@ -155,14 +162,33 @@ func assertMultipartQuotaLifecycle(t *testing.T, ctx context.Context, adapter *S
 	requireNoError(t, err, "replace first part")
 	_, err = adapter.UploadPart(ctx, upload.UploadID, 2, bytes.NewBufferString("1"))
 	requireNoError(t, err, "second part")
-	_, err = adapter.UploadPart(ctx, upload.UploadID, 3, bytes.NewBufferString("xxx"))
+	// Six bytes are reserved, so a part that would take the total past twenty is
+	// refused, and the upload keeps what it already had.
+	_, err = adapter.UploadPart(ctx, upload.UploadID, 3, bytes.NewBufferString(strings.Repeat("x", 20)))
 	requireQuotaError(t, err, "multipart byte quota")
 	parts, err := adapter.ListParts(ctx, upload.UploadID)
 	requireParts(t, parts, err)
-	_, err = adapter.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{{PartNumber: 1, ETag: parts[0].ETag}, {PartNumber: 2, ETag: parts[1].ETag}})
+	// Completing with both five-byte parts is refused, because a non-final part
+	// below the minimum is. The parts stay in flight and their bytes stay
+	// reserved: a refused completion is not a failed upload, and the caller
+	// retries with a legal part list.
+	_, err = adapter.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{
+		{PartNumber: 1, ETag: parts[0].ETag},
+		{PartNumber: 2, ETag: parts[1].ETag},
+	})
+	if !errors.Is(err, storage.ErrEntityTooSmall) {
+		t.Fatalf("two undersized parts = %v, want ErrEntityTooSmall", err)
+	}
+	if instance.reservedBytes != 6 {
+		t.Fatalf("a refused completion released the upload's reservation: %d bytes left", instance.reservedBytes)
+	}
+	// One part is always the final part, so this completes.
+	_, err = adapter.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{{PartNumber: 1, ETag: parts[0].ETag}})
 	requireNoError(t, err, "complete multipart")
-	if usage := instance.Usage(); usage.Bytes != 6 || instance.reservedBytes != 0 || usage.Objects != 1 {
-		t.Fatalf("usage = %+v", usage)
+	// usage is the committed object's 5 bytes, and no reservation survives: the
+	// parts' bytes were released exactly once, as the object took their place.
+	if usage := instance.Usage(); usage.Bytes != 5 || instance.reservedBytes != 0 || usage.Objects != 1 {
+		t.Fatalf("usage = %+v, reserved = %d", usage, instance.reservedBytes)
 	}
 }
 
@@ -300,7 +326,7 @@ func TestMultipartCapabilityIsReadFromTheStoreNotTheConstructor(t *testing.T) {
 	if instance.Capabilities().Multipart {
 		t.Fatal("capability claims multipart for a store that does not implement it")
 	}
-	if _, err := instance.CreateMultipartUpload(ctx, "already-here", "k"); !errors.Is(err, ErrMultipartUnsupported) {
+	if _, err := instance.CreateMultipartUpload(ctx, "already-here", "k", storage.MultipartOptions{}); !errors.Is(err, ErrMultipartUnsupported) {
 		t.Fatalf("create upload = %v, want ErrMultipartUnsupported", err)
 	}
 }

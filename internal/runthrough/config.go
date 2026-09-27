@@ -251,16 +251,32 @@ func ParsePolicy(raw string) (Policy, bool) {
 	}
 }
 
-// DetectMode returns local when STOW_MODE=local or upstream credentials are
-// absent; otherwise run-through.
+// DetectMode returns the operational mode, and local is what it returns unless
+// something asks for run-through by name.
+//
+// It used to return run-through whenever the upstream environment resolved, so a
+// developer's ambient AWS_* variables were enough to make stow reach a live
+// provider. That is the wrong direction for a default: the variables exist for
+// every other tool on the machine, a CI runner usually has them, and the
+// consequence of being wrong is stow reading and writing someone else's bucket.
+// Being wrong in the other direction costs a command-line flag.
+//
+// So the invariant is one line: no explicit request, no upstream. Ambient
+// credentials decide how an explicitly requested upstream is *authenticated*;
+// they do not decide whether one is used. STOW_MODE=run-through (or the --mode
+// flag, which is the same decision at a different layer) is the request.
 func DetectMode() Mode {
-	if strings.EqualFold(strings.TrimSpace(os.Getenv("STOW_MODE")), "local") {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("STOW_MODE"))) {
+	case "run-through", "runthrough", "upstream":
+		return ModeRunThrough
+	default:
+		// "local", "auto", unset, and anything unrecognized. An unrecognized
+		// value is local rather than an error here, because refusing to start is
+		// worse than starting local; the startup banner says which mode was
+		// chosen, and STOW_MODE is not a place where a typo should stop a dev
+		// server from starting.
 		return ModeLocal
 	}
-	if _, ok := (UpstreamConfig{}).FromEnv(); ok {
-		return ModeRunThrough
-	}
-	return ModeLocal
 }
 
 func envFirst(keys ...string) string {

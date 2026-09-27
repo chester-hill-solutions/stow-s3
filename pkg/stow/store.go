@@ -62,7 +62,12 @@ type Store interface {
 // with empty results, which is a lie the moment a caller asks.
 type MultipartStore interface {
 	// The write half.
-	CreateMultipartUpload(ctx context.Context, bucket, key string) (MultipartUpload, error)
+	//
+	// ContentType and Metadata are the properties the completed object is
+	// published with. They are fields here rather than arguments because they are
+	// the multipart half of PutOptions, and an upload fixes them once: no part
+	// changes them and completion publishes exactly these.
+	CreateMultipartUpload(ctx context.Context, bucket, key string, options MultipartOptions) (MultipartUpload, error)
 	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
 	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
 	AbortMultipartUpload(ctx context.Context, uploadID string) error
@@ -74,12 +79,22 @@ type MultipartStore interface {
 	ListMultipartUploads(ctx context.Context, bucket string) ([]MultipartUpload, error)
 }
 
+// MultipartOptions are the object properties a multipart upload fixes at
+// initiation. They mirror the fields of PutOptions that describe an object
+// rather than a write over one.
+type MultipartOptions struct {
+	ContentType string
+	Metadata    map[string]string
+}
+
 // MultipartUpload is an in-flight upload.
 type MultipartUpload struct {
-	UploadID  string
-	Bucket    string
-	Key       string
-	Initiated time.Time
+	UploadID    string
+	Bucket      string
+	Key         string
+	Initiated   time.Time
+	ContentType string
+	Metadata    map[string]string
 }
 
 // Part is one uploaded piece of a multipart upload. ETag is what the completing
@@ -287,8 +302,14 @@ type multipartAdapter struct{ multi MultipartStore }
 
 var _ storage.MultipartStore = multipartAdapter{}
 
-func (a multipartAdapter) CreateMultipartUpload(ctx context.Context, bucket, key string) (*storage.MultipartUpload, error) {
-	upload, err := a.multi.CreateMultipartUpload(ctx, bucket, key)
+func (a multipartAdapter) CreateMultipartUpload(ctx context.Context, bucket, key string, opts storage.MultipartOptions) (*storage.MultipartUpload, error) {
+	// The internal contract carries the initiation-time properties a caller
+	// supplied; the public one carries a subset, and what it does not carry is
+	// not passed as a fabricated default.
+	upload, err := a.multi.CreateMultipartUpload(ctx, bucket, key, MultipartOptions{
+		ContentType: opts.ContentType,
+		Metadata:    storage.CloneMetadata(opts.Metadata),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -379,6 +400,7 @@ func uploadMetaOf(upload MultipartUpload) *storage.MultipartUpload {
 		Bucket:    upload.Bucket,
 		Key:       upload.Key,
 		Initiated: upload.Initiated,
+		Options:   storage.MultipartOptions{ContentType: upload.ContentType, Metadata: storage.CloneMetadata(upload.Metadata)},
 	}
 }
 

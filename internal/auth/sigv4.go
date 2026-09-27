@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -41,6 +39,13 @@ type credentialScope struct {
 	service     string
 }
 
+// The Authorization header is the same material on every request and is parsed
+// by hand, which makes the parse a security boundary: everything downstream
+// trusts the access key, the signed headers and the signature it returns. A parse
+// that accepts what it should refuse is a hole, and so is one that repairs what
+// it should refuse — repairing means interpreting something the client did not
+// send, and a verifier that guesses at the client's intent is verifying something
+// other than what the client signed.
 func parseAuthorizationHeader(value string) (signedRequest, error) {
 	value = strings.TrimSpace(value)
 	if value == "" {
@@ -55,28 +60,21 @@ func parseAuthorizationHeader(value string) (signedRequest, error) {
 	var sr signedRequest
 	sr.algorithm = parts[0]
 
+	// The grammar has exactly three components, and each may appear once.
+	//
+	// A repeat is not a variant to reconcile; it is a header that says two
+	// different things. Last-one-wins, which is what this did, means the meaning
+	// of the header depends on the order the components happen to arrive in: a
+	// request carrying a valid Credential and a substituted Signature is read as
+	// whichever of the two Signatures came last.
+	seen := make(map[string]struct{}, len(authorizationComponents))
 	for _, segment := range strings.Split(parts[1], ",") {
-		segment = strings.TrimSpace(segment)
-		if segment == "" {
-			continue
+		key, value, err := splitAuthorizationComponent(segment)
+		if err != nil {
+			return signedRequest{}, err
 		}
-		kv := strings.SplitN(segment, "=", 2)
-		if len(kv) != 2 {
-			return signedRequest{}, authError("AccessDenied", "malformed Authorization header")
-		}
-		key := strings.TrimSpace(kv[0])
-		val := strings.TrimSpace(kv[1])
-		switch key {
-		case "Credential":
-			scope, err := parseCredentialScope(val)
-			if err != nil {
-				return signedRequest{}, err
-			}
-			sr.credential = scope
-		case "SignedHeaders":
-			sr.signedHeaders = parseSignedHeaders(val)
-		case "Signature":
-			sr.signature = val
+		if err := applyAuthorizationComponent(&sr, key, value, seen); err != nil {
+			return signedRequest{}, err
 		}
 	}
 
@@ -86,51 +84,59 @@ func parseAuthorizationHeader(value string) (signedRequest, error) {
 	return sr, nil
 }
 
-func parsePresignedQuery(query url.Values) (signedRequest, error) {
-	algorithm := queryValue(query, "X-Amz-Algorithm")
-	if algorithm == "" {
-		return signedRequest{}, authError("AccessDenied", "missing presigned auth parameters")
+// splitAuthorizationComponent splits one `Key=Value` segment.
+func splitAuthorizationComponent(segment string) (string, string, error) {
+	segment = strings.TrimSpace(segment)
+	kv := strings.SplitN(segment, "=", 2)
+	if segment == "" || len(kv) != 2 {
+		return "", "", authError("AccessDenied", "malformed Authorization header")
 	}
-	if algorithm != algorithmAWS4HMACSHA256 {
-		return signedRequest{}, authError("AccessDenied", "unsupported presigned algorithm")
-	}
+	return strings.TrimSpace(kv[0]), strings.TrimSpace(kv[1]), nil
+}
 
-	credentialRaw := queryValue(query, "X-Amz-Credential")
-	scope, err := parseCredentialScope(credentialRaw)
-	if err != nil {
-		return signedRequest{}, err
+// applyAuthorizationComponent records one component of the header, refusing a
+// repeat and a name the grammar does not define.
+func applyAuthorizationComponent(sr *signedRequest, key, value string, seen map[string]struct{}) error {
+	// An unrecognized component is refused rather than skipped. The grammar is
+	// closed, so an extra component is a claim stow cannot check, and a verifier
+	// that ignores the claims it cannot check is verifying a subset of the header
+	// and reporting it as the whole.
+	if !isAuthorizationComponent(key) {
+		return authError("AccessDenied", "malformed Authorization header")
 	}
+	if _, repeated := seen[key]; repeated {
+		return authError("AccessDenied", "malformed Authorization header")
+	}
+	seen[key] = struct{}{}
+	switch key {
+	case "Credential":
+		scope, err := parseCredentialScope(value)
+		if err != nil {
+			return err
+		}
+		sr.credential = scope
+	case "SignedHeaders":
+		signed, err := parseSignedHeaders(value)
+		if err != nil {
+			return err
+		}
+		sr.signedHeaders = signed
+	case "Signature":
+		sr.signature = value
+	}
+	return nil
+}
 
-	amzDate := queryValue(query, "X-Amz-Date")
-	if amzDate == "" {
-		return signedRequest{}, authError("AccessDenied", "missing X-Amz-Date")
-	}
+// authorizationComponents is the closed set the Authorization grammar defines.
+var authorizationComponents = [...]string{"Credential", "SignedHeaders", "Signature"}
 
-	expiresRaw := queryValue(query, "X-Amz-Expires")
-	expires, err := strconv.Atoi(expiresRaw)
-	if err != nil || expires <= 0 || expires > 604800 {
-		return signedRequest{}, authError("AccessDenied", "invalid X-Amz-Expires")
+func isAuthorizationComponent(key string) bool {
+	for _, component := range authorizationComponents {
+		if key == component {
+			return true
+		}
 	}
-	signedHeaders := parseSignedHeaders(queryValue(query, "X-Amz-SignedHeaders"))
-	if len(signedHeaders) == 0 {
-		return signedRequest{}, authError("AccessDenied", "missing X-Amz-SignedHeaders")
-	}
-
-	signature := queryValue(query, "X-Amz-Signature")
-	if signature == "" {
-		return signedRequest{}, authError("AccessDenied", "missing X-Amz-Signature")
-	}
-
-	return signedRequest{
-		algorithm:     algorithm,
-		credential:    scope,
-		signedHeaders: signedHeaders,
-		signature:     signature,
-		amzDate:       amzDate,
-		payloadHash:   unsignedPayload,
-		presigned:     true,
-		expires:       expires,
-	}, nil
+	return false
 }
 
 func parseCredentialScope(raw string) (credentialScope, error) {
@@ -146,20 +152,71 @@ func parseCredentialScope(raw string) (credentialScope, error) {
 	}, nil
 }
 
-func parseSignedHeaders(raw string) []string {
+// parseSignedHeaders reads the SignedHeaders list strictly, or refuses it.
+//
+// The list is the client's statement of which headers it covered, and the
+// signature is computed over a canonical request that names exactly those. Every
+// leniency in here is therefore a way to authenticate a request against a set of
+// headers the client did not actually commit to — which this used to have four of:
+//
+//   - empty entries were dropped, so "host;;x-amz-date" became the same list as
+//     "host;x-amz-date". A client that emitted a stray separator, or one whose
+//     list was assembled from a filter that produced nothing for a header, got a
+//     request accepted against a list it never wrote.
+//   - entries were trimmed and lowercased, so "host; X-Amz-Date" and
+//     "host;x-amz-date" were the same list, and a header named in a different
+//     case than the one on the wire was quietly accepted.
+//   - duplicates were kept, so "host;host" named the same header twice, and the
+//     canonical request carried it twice while the request carried it once.
+//   - the list was sorted, so the order the client wrote was discarded. Ordering
+//     is not cosmetic here: the canonical request embeds the list verbatim, so
+//     sorting locally and not in the signature would make the two disagree — and
+//     a list that is silently reordered is a list whose text is no longer the
+//     client's.
+//
+// AWS's own signer emits lower-case, semicolon-separated, ascending and
+// duplicate-free, so a conforming client is unaffected by refusing anything else.
+func parseSignedHeaders(raw string) ([]string, error) {
 	if raw == "" {
-		return nil
+		return nil, authError("AccessDenied", "malformed SignedHeaders")
 	}
 	parts := strings.Split(raw, ";")
 	out := make([]string, 0, len(parts))
+	seen := make(map[string]struct{}, len(parts))
 	for _, part := range parts {
-		part = strings.TrimSpace(strings.ToLower(part))
-		if part != "" {
-			out = append(out, part)
+		if part == "" {
+			return nil, authError("AccessDenied", "malformed SignedHeaders")
+		}
+		if !isHTTPToken(part) {
+			return nil, authError("AccessDenied", "malformed SignedHeaders")
+		}
+		if part != strings.ToLower(part) {
+			return nil, authError("AccessDenied", "malformed SignedHeaders")
+		}
+		if _, repeated := seen[part]; repeated {
+			return nil, authError("AccessDenied", "malformed SignedHeaders")
+		}
+		seen[part] = struct{}{}
+		out = append(out, part)
+	}
+	if !sort.StringsAreSorted(out) {
+		return nil, authError("AccessDenied", "malformed SignedHeaders")
+	}
+	return out, nil
+}
+
+// isHTTPToken reports whether name is a valid RFC 9110 field name.
+func isHTTPToken(name string) bool {
+	for i := 0; i < len(name); i++ {
+		c := name[i]
+		switch {
+		case c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z', c >= '0' && c <= '9':
+		case strings.IndexByte("!#$%&'*+-.^_`|~", c) >= 0:
+		default:
+			return false
 		}
 	}
-	sort.Strings(out)
-	return out
+	return len(name) > 0
 }
 
 func containsHeader(headers []string, name string) bool {
@@ -169,15 +226,6 @@ func containsHeader(headers []string, name string) bool {
 		}
 	}
 	return false
-}
-
-func queryValue(query url.Values, key string) string {
-	for k, values := range query {
-		if strings.EqualFold(k, key) && len(values) > 0 {
-			return values[0]
-		}
-	}
-	return ""
 }
 
 func detectSignedRequest(r *http.Request) (signedRequest, error) {
@@ -234,7 +282,10 @@ func verifySignedRequest(r *http.Request, creds Credentials, region string, maxS
 	if err != nil {
 		return err
 	}
-	if !hmac.Equal([]byte(strings.ToLower(sr.signature)), []byte(strings.ToLower(expected))) {
+	// A signature is hex, so the comparison is over the hex. Case-folding it
+	// first would accept a signature that differs from the computed one only in
+	// case, which is not a signature anyone computed.
+	if !hmac.Equal([]byte(sr.signature), []byte(expected)) {
 		return authError("SignatureDoesNotMatch", "signature mismatch")
 	}
 	return nil
@@ -277,7 +328,7 @@ func validateRequestTime(r *http.Request, sr signedRequest, maxSkew time.Duratio
 		return err
 	}
 	if sr.presigned {
-		return validatePresignedTime(r, sr, requestTime, now)
+		return validatePresignedTime(r, sr, requestTime, now, maxSkew)
 	}
 	if skew := now.Sub(requestTime); skew > maxSkew || skew < -maxSkew {
 		return authError("RequestTimeTooSkewed", "request time skew too large")
@@ -285,9 +336,26 @@ func validateRequestTime(r *http.Request, sr signedRequest, maxSkew time.Duratio
 	return nil
 }
 
-func validatePresignedTime(r *http.Request, sr signedRequest, requestTime, now time.Time) error {
+func validatePresignedTime(r *http.Request, sr signedRequest, requestTime, now time.Time, maxSkew time.Duration) error {
 	if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodHead {
 		return authError("AccessDenied", "unsupported presigned method")
+	}
+	// The far edge of the window, not only the near one.
+	//
+	// A presigned URL is valid from its signing time until its expiry, and the
+	// signing time is inside the URL — so a client can put any time it likes
+	// there, including one far in the future, and produce a URL that is valid for
+	// a very long time. The expiry check alone never noticed: with the signing
+	// time in the future, "now is after the expiry" is false for years.
+	//
+	// An ordinary signed request has no such freedom, because its date is a
+	// header the client cannot choose freely without invalidating the signature —
+	// and stow checks that header's skew in both directions. A presigned URL
+	// carried the same freedom without the same check, which is the asymmetry
+	// this closes: both now bound how far the request's own clock may be from the
+	// server's, by the verifier's configured allowance.
+	if requestTime.After(now.Add(maxSkew)) {
+		return authError("RequestTimeTooSkewed", "request time skew too large")
 	}
 	expiry := requestTime.Add(time.Duration(sr.expires) * time.Second)
 	if now.After(expiry) {

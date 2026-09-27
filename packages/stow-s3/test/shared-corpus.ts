@@ -300,9 +300,15 @@ async function runCopyObject(client: S3Client, testCase: CorpusCase): Promise<vo
 
 async function runMultipartUpload(client: S3Client, testCase: CorpusCase): Promise<void> {
   assert.ok(testCase.key && testCase.parts && testCase.parts.length > 0);
+  // The properties fixed at initiation are part of the request, and the completed
+  // object is expected to carry them: an upload that drops the content type and
+  // metadata its initiation named publishes an object indistinguishable from one
+  // written with no options.
   const created = await client.send(new CreateMultipartUploadCommand({
     Bucket: testCase.bucket,
     Key: testCase.key,
+    ContentType: testCase.contentType,
+    Metadata: testCase.metadata,
   }));
   assert.equal(created.$metadata.httpStatusCode, 200);
   assert.ok(created.UploadId, "CreateMultipartUpload must return an upload ID");
@@ -345,6 +351,18 @@ async function runMultipartUpload(client: S3Client, testCase: CorpusCase): Promi
     assert.equal(get.$metadata.httpStatusCode, 200);
     const body = Buffer.from(await get.Body?.transformToByteArray() ?? []);
     assert.equal(body.equals(expectedBody), true, "multipart body must equal concatenated parts");
+    // HeadObject rather than the completion response: the completed object is what
+    // the properties are about, and it is where a client reads them back.
+    const head = await client.send(new HeadObjectCommand({ Bucket: testCase.bucket, Key: testCase.key }));
+    assert.equal(head.$metadata.httpStatusCode, 200);
+    if (testCase.expect.contentType) {
+      assert.equal(
+        head.ContentType,
+        testCase.expect.contentType,
+        "content type given at initiation must reach the completed object",
+      );
+    }
+    assertMetadata(head.Metadata, testCase.expect.metadata, "completed multipart object");
   } finally {
     if (!completed) {
       await client.send(new AbortMultipartUploadCommand({

@@ -380,20 +380,6 @@ func (s *FilesystemStore) DeleteObjects(_ context.Context, bucket string, keys [
 	return deleted, nil
 }
 
-func (s *FilesystemStore) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*storage.ObjectMeta, error) {
-	rc, meta, err := s.GetObject(ctx, srcBucket, srcKey)
-	if err != nil {
-		return nil, err
-	}
-	defer rc.Close()
-	return s.PutObject(ctx, dstBucket, dstKey, rc, storage.PutOptions{
-		ContentType:       meta.ContentType,
-		Metadata:          storage.CloneMetadata(meta.Metadata),
-		ChecksumAlgorithm: meta.ChecksumAlgorithm,
-		ChecksumValue:     meta.ChecksumValue,
-	})
-}
-
 func readBucketCreated(dir string) (time.Time, error) {
 	data, err := os.ReadFile(filepath.Join(dir, "bucket.json"))
 	if err != nil {

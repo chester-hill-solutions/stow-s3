@@ -105,7 +105,7 @@ func TestFilesystemStoreMultipartContract(t *testing.T) {
 	if err := store.CreateBucket(ctx, "source"); err != nil {
 		t.Fatalf("create source bucket: %v", err)
 	}
-	upload, err := store.CreateMultipartUpload(ctx, "source", "multipart.bin")
+	upload, err := store.CreateMultipartUpload(ctx, "source", "multipart.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create multipart upload: %v", err)
 	}

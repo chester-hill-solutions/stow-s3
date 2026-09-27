@@ -14,15 +14,15 @@ A direct in-process object runtime with a small lifecycle interface (`open`, obj
 
 ### Run-Through Adapter
 
-A routing layer that accepts S3 requests at a local endpoint and, when configured, reads from or propagates supported mutations to a live upstream provider using the developer's existing environment credentials. Upstream propagation requires the explicit `mirrorWrites` policy or the agreed live-write opt-in.
+A routing layer that accepts S3 requests at a local endpoint and, when explicitly configured, reads from or propagates supported mutations to a live upstream provider using the developer's existing environment credentials. Reachability and mutation are two separate decisions: the adapter is only constructed in run-through mode, and within it, run-through configuration plus a `mirrorWrites` policy is still not permission to mutate upstream.
 
 ### Upstream Configuration
 
-The endpoint and credentials used by the run-through adapter to reach a live S3-compatible provider, including an optional session token for short-lived credentials. Resolved from environment variables with precedence: `STOW_*` > `S3_*` > `AWS_*`.
+The endpoint and credentials used by the run-through adapter to reach a live S3-compatible provider, including an optional session token for short-lived credentials. Resolved from environment variables with precedence: `STOW_*` > `S3_*` > `AWS_*`. Credentials determine how an explicitly requested upstream is authenticated; they never determine whether an upstream is used.
 
-### Auto-Detect Mode
+### Mode Selection
 
-When no explicit operational mode is configured, stow inspects environment variables for upstream credentials. If present, it starts in run-through mode with `readThroughCache` policy; otherwise it starts local-only. `STOW_MODE=local` always forces local-only behavior.
+The operational mode, and local-only is what stow runs unless something asks for run-through by name. Ambient AWS or S3 credentials are not an ask: a developer's shell and a CI runner both export them for unrelated tools, and inferring an upstream from their presence made whether stow contacted a live provider a property of the machine rather than of anything the user requested. Run-through is selected by `--mode run-through` or `STOW_MODE=run-through`; `STOW_MODE=local` forces local-only, and an unrecognized value is local rather than an error or a fallback. See ADR 0001.
 
 ### Read-Through Cache
 
@@ -30,7 +30,11 @@ Isolated local copy of upstream-derived objects populated on cache miss. On cach
 
 ### Mirror-Writes Policy
 
-An explicit run-through policy that combines read-through behavior with propagation of supported local mutations to upstream. It emits a startup warning and records failed propagation in a durable per-key outbox.
+An explicit run-through policy that asks for read-through behavior combined with propagation of supported local mutations to upstream. It is a routing choice, not a consent: propagation additionally requires live-write consent, so a run-through configuration carrying this policy still keeps every write local unless the consent is given. It emits a startup warning and records failed propagation in a durable per-key outbox. See ADR 0005.
+
+### Live-Write Consent
+
+The one mechanism that authorizes stow to mutate a live upstream, given separately from any policy — `STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`. It is the whole of the permission: run-through mode and the `mirrorWrites` policy together are not enough, and an explicit `false` is a refusal the policy cannot override. See ADR 0005.
 
 ### Write Outbox
 
@@ -42,7 +46,11 @@ Filesystem-backed storage using atomic object records and a versioned data forma
 
 ### In-Memory Backend
 
-Ephemeral storage backend with no filesystem persistence. It is explicitly selectable through the backend option and must satisfy the same behavioral storage contract as the filesystem backend.
+Ephemeral storage backend with no filesystem persistence. It is explicitly selectable through the backend option and must satisfy the same behavioral storage contract as the filesystem backend. Because it holds every object in process memory, the session's byte budget is the only thing bounding it, so an upload in flight and the object a completion assembles from it are both counted against that budget.
+
+### Multipart Initiation Properties
+
+The object properties — content type, user metadata and checksum configuration — that a multipart upload fixes when it is created. They belong to the upload rather than to any part, because no part may change them: the object completion publishes carries exactly these, and they survive the process that initiated the upload.
 
 ### Local Dev Credentials
 

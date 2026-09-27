@@ -205,31 +205,60 @@ func (s *Store) DeleteObjects(ctx context.Context, bucket string, keys []string)
 // CopyObject writes an existing object to a new key, as a real file at the new
 // key's natural path where that is possible.
 func (s *Store) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*storage.ObjectMeta, error) {
+	return s.CopyObjectCond(ctx, storage.CopyRequest{
+		SourceBucket: srcBucket,
+		SourceKey:    srcKey,
+		DestBucket:   dstBucket,
+		DestKey:      dstKey,
+	})
+}
+
+// CopyObjectCond captures the source and publishes the destination under one
+// lock, and evaluates the conditions against the version it captured.
+//
+// The read and the write used to be separate calls, each taking the lock in
+// turn, so a source overwritten in between was copied as the bytes of one
+// version with the metadata of another. Here the source file and its manifest
+// entry are read together, and the conditions are checked against that entry
+// before the destination is written.
+func (s *Store) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
 	}
-	if !s.bucketExists(dstBucket) {
+	if !s.bucketExists(req.DestBucket) {
 		return nil, storage.ErrBucketNotFound
 	}
-	if err := storage.ValidateKey(dstKey); err != nil {
+	if err := storage.ValidateCopyRequest(req); err != nil {
 		return nil, err
 	}
-	srcPath, _, _, err := s.resolve(srcBucket, srcKey)
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// resolveLocked, not resolve: the lock is already held, and resolve would
+	// take it a second time on this goroutine and hang along with every other
+	// goroutine behind it. See the note on resolveLocked.
+	srcPath, info, entry, err := s.resolveLocked(req.SourceBucket, req.SourceKey)
 	if err != nil {
+		return nil, err
+	}
+	sourceMeta := s.metaFromEntry(req.SourceBucket, req.SourceKey, entry, info)
+	if err := storage.CheckCopySourceConditions(req.Options, sourceMeta); err != nil {
 		return nil, err
 	}
 	data, err := os.ReadFile(srcPath)
 	if err != nil {
 		return nil, storage.ErrObjectNotFound
 	}
-	entry, _ := s.objectIndex.entry(srcBucket, srcKey)
-	opts := storage.PutOptions{
-		ContentType:       entry.ContentType,
-		Metadata:          entry.Metadata,
-		ChecksumAlgorithm: entry.ChecksumAlgorithm,
-		ChecksumValue:     entry.ChecksumValue,
-	}
-	return s.PutObject(ctx, dstBucket, dstKey, bytes.NewReader(data), opts)
+	return s.putLocked(ctx, req.DestBucket, req.DestKey, bytes.NewReader(data), storage.PutOptions{
+		ContentType:       sourceMeta.ContentType,
+		Metadata:          sourceMeta.Metadata,
+		ChecksumAlgorithm: sourceMeta.ChecksumAlgorithm,
+		ChecksumValue:     sourceMeta.ChecksumValue,
+	})
 }
 
 // ListObjectsV2 lists a bucket's objects: every file in its tree, plus the

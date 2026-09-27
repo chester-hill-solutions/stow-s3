@@ -40,9 +40,9 @@ func (r *upstreamRecorder) requireUntouched(t *testing.T, step string) {
 	}
 }
 
-// setHazardousEnv reproduces the environment that makes auto-detect choose
-// run-through and, before this slice, made mirrorWrites grant live-write
-// consent on its own: a .env copied from a staging machine.
+// setHazardousEnv reproduces the environment that used to make stow reach a live
+// provider on its own: a .env copied from a staging machine, and the AWS_*
+// variables a CI runner or a developer shell has for every other tool.
 func setHazardousEnv(t *testing.T, endpoint string) {
 	t.Helper()
 	t.Setenv("STOW_ENDPOINT", endpoint)
@@ -51,14 +51,38 @@ func setHazardousEnv(t *testing.T, endpoint string) {
 	t.Setenv("STOW_POLICY", "mirrorWrites")
 }
 
-// assertHazardIsReal proves the environment really would have selected
-// run-through and really would have granted consent, so a later assertion of
-// "no upstream traffic" is not passing for a trivial reason.
-func assertHazardIsReal(t *testing.T) {
+// setAmbientAWSEnv adds the ambient AWS variables, which is the realistic half of
+// the hazard: a machine with AWS credentials exported for unrelated reasons.
+func setAmbientAWSEnv(t *testing.T, endpoint string) {
 	t.Helper()
-	if mode := runthrough.DetectMode(); mode != runthrough.ModeRunThrough {
-		t.Fatalf("test setup did not create the hazard: DetectMode = %q, want run-through", mode)
+	t.Setenv("AWS_ACCESS_KEY_ID", "AKIAAMBIENTMACHINE01")
+	t.Setenv("AWS_SECRET_ACCESS_KEY", "ambient-machine-secret")
+	t.Setenv("AWS_SESSION_TOKEN", "ambient-session-token")
+	t.Setenv("AWS_REGION", "eu-west-1")
+	t.Setenv("AWS_DEFAULT_REGION", "eu-west-1")
+	t.Setenv("AWS_PROFILE", "some-profile-stow-never-asked-for")
+	t.Setenv("AWS_ENDPOINT_URL", endpoint)
+}
+
+// assertCredentialsAreResolved proves the environment really does carry usable
+// upstream credentials, so a later assertion of "no upstream traffic" is not
+// passing because the configuration was incomplete.
+func assertCredentialsAreResolved(t *testing.T) {
+	t.Helper()
+	upstream, ok := (runthrough.UpstreamConfig{}).FromEnv()
+	if !ok {
+		t.Fatal("test setup did not resolve upstream credentials")
 	}
+	if upstream.AccessKey == "" || upstream.SecretKey == "" || upstream.Endpoint == "" {
+		t.Fatalf("resolved upstream credentials are incomplete: %+v", upstream)
+	}
+}
+
+// assertPolicyIsInert proves the run-through *policy* was configured, so a
+// later assertion of "no propagation" is not passing because the policy was
+// never set.
+func assertPolicyIsInert(t *testing.T) {
+	t.Helper()
 	cfg := runthrough.ConfigFromEnv()
 	if cfg.Policy != runthrough.PolicyMirrorWrites {
 		t.Fatalf("policy = %q, want mirrorWrites", cfg.Policy)
@@ -112,26 +136,28 @@ func request(t *testing.T, base, method, path, body string) *http.Response {
 	return resp
 }
 
-// The hazard this guards: a developer's shell has STOW_POLICY=mirrorWrites and
-// credentials for a shared bucket in a copied .env. Auto-detect sees those and
-// selects run-through, and the mirrorWrites policy used to turn live writes on
-// by itself. Two defenses are asserted, because either alone is not enough:
+// Local is the default, and ambient credentials do not change that.
 //
-//  1. mirrorWrites alone no longer grants live-write consent (runthrough config);
-//  2. a local-mode server builds no upstream client at all, so it holds no
-//     object capable of reaching the provider even if consent were granted.
+// The hazard: a developer's shell, or a CI runner, has AWS credentials exported
+// for every other tool on the machine. DetectMode used to read those and select
+// run-through, so whether stow reached a live provider depended on the machine's
+// environment rather than on anything the user asked for.
 //
-// Asserting only (1) rests the defense on a boolean. Asserting only (2) hides
-// the fact that the consent flag was being misread.
-func TestLocalModeMakesZeroUpstreamRequests(t *testing.T) {
+// The invariant is one line: no explicit run-through request, no upstream. Two
+// things are asserted, because the hazard is only real if both are true — the
+// credentials really do resolve (so the test is not passing because the
+// configuration was incomplete), and the run-through policy really is configured
+// (so the propagation assertions are not passing because the policy was absent).
+func TestAmbientCredentialsDoNotSelectRunThrough(t *testing.T) {
 	upstream := newUpstreamRecorder(t)
 	setHazardousEnv(t, upstream.server.URL)
-	assertHazardIsReal(t)
+	setAmbientAWSEnv(t, upstream.server.URL)
+	assertCredentialsAreResolved(t)
+	assertPolicyIsInert(t)
 
-	// STOW_MODE=local is the documented override.
-	t.Setenv("STOW_MODE", "local")
+	// Nothing asked for run-through, so nothing gets it.
 	if mode := runthrough.DetectMode(); mode != runthrough.ModeLocal {
-		t.Fatalf("STOW_MODE=local did not force local mode: got %q", mode)
+		t.Fatalf("DetectMode with ambient credentials = %q, want local", mode)
 	}
 
 	dataDir := t.TempDir()
@@ -139,7 +165,7 @@ func TestLocalModeMakesZeroUpstreamRequests(t *testing.T) {
 	cfg.CacheDir = filepath.Join(dataDir, "cache")
 	local := startLocalServer(t, dataDir, cfg)
 
-	// Every operation that would propagate if the store were an adapter.
+	// Every operation that would reach upstream if the store were an adapter.
 	steps := []struct{ method, path, body string }{
 		{http.MethodPut, "/agent-bucket", ""},
 		{http.MethodPut, "/agent-bucket/input.json", `{"task":"summarize"}`},
@@ -170,12 +196,79 @@ func TestLocalModeMakesZeroUpstreamRequests(t *testing.T) {
 	upstream.requireUntouched(t, "verify read")
 }
 
+// The AWS_* variables alone, with no stow configuration at all.
+//
+// The staging .env case above is a deliberate act; this is not. A machine with
+// AWS credentials exported for the CLI, the SDK and everything else has, without
+// anyone intending stow to use them, exactly the variables UpstreamConfig.FromEnv
+// falls back to. It is the same hazard with nothing configured at all, which is
+// why it is asserted separately.
+func TestBareAWSEnvironmentVariablesDoNotSelectRunThrough(t *testing.T) {
+	upstream := newUpstreamRecorder(t)
+	setAmbientAWSEnv(t, upstream.server.URL)
+	assertCredentialsAreResolved(t)
+
+	if mode := runthrough.DetectMode(); mode != runthrough.ModeLocal {
+		t.Fatalf("DetectMode with only AWS_* set = %q, want local", mode)
+	}
+	store, adapter, err := buildStore(runthrough.DetectMode(), runtime.BackendMemory, t.TempDir(), runthrough.ConfigFromEnv())
+	if err != nil {
+		t.Fatalf("build store: %v", err)
+	}
+	if adapter != nil {
+		t.Fatal("an AWS_* environment alone built a run-through adapter")
+	}
+	if _, ok := store.(*storage.MemoryStore); !ok {
+		t.Fatalf("store = %T, want the plain local memory store", store)
+	}
+	upstream.requireUntouched(t, "build store with AWS credentials present")
+}
+
+// Run-through is reachable, and only by asking.
+//
+// The default being safe is only useful if the thing it replaced is still
+// available, so this asserts the request works: STOW_MODE=run-through with
+// credentials present really does select run-through. Without it, "local by
+// default" could be satisfied by a build that cannot reach upstream at all, and
+// the default would be a removal rather than a change.
+func TestRunThroughIsReachableByExplicitRequest(t *testing.T) {
+	upstream := newUpstreamRecorder(t)
+	setHazardousEnv(t, upstream.server.URL)
+	t.Setenv("STOW_MODE", "run-through")
+
+	if mode := runthrough.DetectMode(); mode != runthrough.ModeRunThrough {
+		t.Fatalf("DetectMode with STOW_MODE=run-through = %q, want run-through", mode)
+	}
+}
+
+// STOW_MODE=local still forces local, so the explicit request is reversible.
+func TestExplicitLocalModeIsStillLocal(t *testing.T) {
+	upstream := newUpstreamRecorder(t)
+	setHazardousEnv(t, upstream.server.URL)
+	assertCredentialsAreResolved(t)
+	t.Setenv("STOW_MODE", "local")
+
+	if mode := runthrough.DetectMode(); mode != runthrough.ModeLocal {
+		t.Fatalf("STOW_MODE=local did not force local mode: got %q", mode)
+	}
+
+	dataDir := t.TempDir()
+	cfg := runthrough.ConfigFromEnv()
+	cfg.CacheDir = filepath.Join(dataDir, "cache")
+	local := startLocalServer(t, dataDir, cfg)
+	request(t, local.URL, http.MethodPut, "/agent-bucket", "").Body.Close()
+	resp := request(t, local.URL, http.MethodPut, "/agent-bucket/key", "body")
+	resp.Body.Close()
+	upstream.requireUntouched(t, "explicit local mode")
+}
+
 // buildStore must not build an upstream client in local mode even when the
-// configuration is the most aggressive the tool accepts.
+// configuration is the most aggressive the tool accepts, which now includes live
+// write consent — the one thing that used to be the only thing standing between
+// this configuration and a live write.
 func TestBuildStoreIgnoresUpstreamConfigInLocalMode(t *testing.T) {
 	setHazardousEnv(t, "https://upstream.example")
 	t.Setenv("STOW_ALLOW_LIVE_WRITES", "true")
-	t.Setenv("STOW_MODE", "local")
 
 	cfg := runthrough.ConfigFromEnv()
 	dataDir := t.TempDir()

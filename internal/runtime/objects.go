@@ -235,6 +235,24 @@ func (i *Instance) DeleteObject(ctx context.Context, bucket, key string) error {
 }
 
 func (i *Instance) CopyObject(ctx context.Context, sourceBucket, sourceKey, destinationBucket, destinationKey string) (Object, error) {
+	return i.CopyObjectCond(ctx, storage.CopyRequest{
+		SourceBucket: sourceBucket,
+		SourceKey:    sourceKey,
+		DestBucket:   destinationBucket,
+		DestKey:      destinationKey,
+	})
+}
+
+// CopyObjectCond copies with the source conditions evaluated on the version the
+// store copies.
+//
+// The conditions and the bytes come from one capture inside the store, which is
+// the whole point: a caller naming an ETag is asking for that version, and a copy
+// that re-reads the source after the check can publish a different one. When the
+// store cannot evaluate them, they are checked here against the version this
+// observed and the copy still happens — coherent, but a weaker guarantee, which
+// storage.ConditionalCopyStore documents.
+func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (Object, error) {
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
@@ -246,23 +264,30 @@ func (i *Instance) CopyObject(ctx context.Context, sourceBucket, sourceKey, dest
 	if err := i.checkOpen(); err != nil {
 		return Object{}, err
 	}
-	sourceMeta, err := i.store.HeadObject(ctx, sourceBucket, sourceKey)
+	// The size of the source, for the quota check, and the conditions to apply if
+	// the store cannot. Both are answers about a version the caller may then race.
+	sourceMeta, err := i.store.HeadObject(ctx, req.SourceBucket, req.SourceKey)
 	if err != nil {
 		return Object{}, err
 	}
-	oldSize, exists, err := i.objectSize(ctx, destinationBucket, destinationKey)
+	if !i.storeCopyChecksConditions() {
+		if err := storage.CheckCopySourceConditions(req.Options, sourceMeta); err != nil {
+			return Object{}, err
+		}
+	}
+	oldSize, exists, err := i.objectSize(ctx, req.DestBucket, req.DestKey)
 	if err != nil {
 		return Object{}, err
 	}
-	if !exists && !i.objectQuotaFits(objectTarget(destinationBucket, destinationKey), 1) {
+	target := objectTarget(req.DestBucket, req.DestKey)
+	if !exists && !i.objectQuotaFits(target, 1) {
 		return Object{}, ErrQuotaExceeded
 	}
 	if !i.bytesQuotaFits(oldSize, sourceMeta.Size) {
 		return Object{}, ErrQuotaExceeded
 	}
-	target := objectTarget(destinationBucket, destinationKey)
 	_, targetReserved := i.reservedTargets[target]
-	meta, err := i.store.CopyObject(ctx, sourceBucket, sourceKey, destinationBucket, destinationKey)
+	meta, err := i.storeCopy(ctx, req)
 	if err != nil {
 		return Object{}, err
 	}
@@ -277,6 +302,23 @@ func (i *Instance) CopyObject(ctx context.Context, sourceBucket, sourceKey, dest
 	}
 	i.reconcileTargetReservation(target, true)
 	return objectFromMeta(meta, nil), nil
+}
+
+// storeCopy performs the copy through whichever capability the store offers, so
+// a store that can evaluate the conditions on the version it copies is used for
+// that rather than being asked to copy blindly.
+func (i *Instance) storeCopy(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
+	if conditional, ok := i.store.(storage.ConditionalCopyStore); ok {
+		return conditional.CopyObjectCond(ctx, req)
+	}
+	return i.store.CopyObject(ctx, req.SourceBucket, req.SourceKey, req.DestBucket, req.DestKey)
+}
+
+// storeCopyChecksConditions reports whether the store evaluates the copy's source
+// conditions itself, which decides whether this layer has to.
+func (i *Instance) storeCopyChecksConditions() bool {
+	_, ok := i.store.(storage.ConditionalCopyStore)
+	return ok
 }
 
 func objectTarget(bucket, key string) string {

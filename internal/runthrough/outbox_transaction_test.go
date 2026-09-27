@@ -169,7 +169,7 @@ func TestMultipartIntentRetainsOperationIdentity(t *testing.T) {
 	if err := local.CreateBucket(ctx, "bucket"); err != nil {
 		t.Fatalf("create bucket: %v", err)
 	}
-	upload, err := local.CreateMultipartUpload(ctx, "bucket", "multipart-object")
+	upload, err := local.CreateMultipartUpload(ctx, "bucket", "multipart-object", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create multipart: %v", err)
 	}
