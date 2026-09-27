@@ -41,7 +41,16 @@ func StartupBanner(cfg Config, mode Mode) string {
 		fmt.Fprintf(&b, "  WARNING: mirrorWrites is configured but propagation is disabled, so writes stay local\n")
 	}
 	fmt.Fprintf(&b, "  write policy: %s\n", writePolicy)
-	fmt.Fprintf(&b, "  override: STOW_MODE=local forces local-only\n")
+	if mode == ModeLocal {
+		// Stated, because the two plausible causes of a local-only server are
+		// indistinguishable from the outside: the configuration was never asking
+		// for an upstream, or the credentials were absent. A developer who
+		// expected run-through and got this would otherwise have no way to tell
+		// which half to fix.
+		fmt.Fprintf(&b, "  upstream: not in use; run-through requires --mode run-through or STOW_MODE=run-through\n")
+	} else {
+		fmt.Fprintf(&b, "  override: --mode local or STOW_MODE=local forces local-only\n")
+	}
 	if mode == ModeRunThrough && !cfg.AllowLiveWrites {
 		fmt.Fprintf(&b, "  hint: set STOW_ALLOW_LIVE_WRITES=true to propagate writes upstream\n")
 	}

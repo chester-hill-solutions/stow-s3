@@ -198,6 +198,27 @@ func applyCacheLimits(config *runthrough.Config, maxBytes, maxObjects int64, ttl
 	return nil
 }
 
+// resolveMode combines the flag with the environment into one mode.
+//
+// The flag is the explicit request and it wins; an empty flag means nothing was
+// asked for, and DetectMode's answer is local unless the environment named
+// run-through. An empty default rather than "auto" is deliberate: "auto" would
+// suggest that something else can select run-through, and the thing that used to
+// select it was the machine's ambient AWS configuration.
+func resolveMode(flagValue string) runthrough.Mode {
+	switch strings.ToLower(strings.TrimSpace(flagValue)) {
+	case "local":
+		return runthrough.ModeLocal
+	case "run-through":
+		return runthrough.ModeRunThrough
+	case "", "auto":
+		return runthrough.DetectMode()
+	default:
+		log.Fatalf("invalid --mode %q (want local or run-through)", flagValue)
+		return runthrough.ModeLocal
+	}
+}
+
 func validateLiveWriteBackend(mode runthrough.Mode, backend runtime.Backend, config runthrough.Config) error {
 	// Keyed on consent, not policy. A mirrorWrites policy without
 	// STOW_ALLOW_LIVE_WRITES keeps every write local, so it is perfectly
@@ -246,7 +267,7 @@ func serve(args []string) {
 	adminToken := flags.String("admin-token", "", "Credential for admin and metrics routes; prefer STOW_ADMIN_TOKEN so it is not visible in the process list")
 	var corsOrigins corsOriginList
 	flags.Var(&corsOrigins, "cors-origin", "Browser origin permitted to read responses; repeatable. Default permits loopback origins only")
-	modeFlag := flags.String("mode", "auto", "Operational mode: local, run-through, or auto (default)")
+	modeFlag := flags.String("mode", "", "Operational mode: local or run-through. Run-through is never selected implicitly; ask for it with --mode run-through or STOW_MODE=run-through")
 	regionFlag := flags.String("region", auth.DefaultRegion, "Region the server verifies signatures against and reports in the readiness message")
 	allowLiveWrites := flags.Bool("allow-live-writes", false, "Propagate writes to upstream S3")
 	readOnly := flags.Bool("read-only", false, "Serve reads and lists only: writes, deletes, bucket changes and upstream access are refused")
@@ -267,16 +288,7 @@ func serve(args []string) {
 	if err := applyCacheLimits(&rtCfg, *cacheMaxBytes, *cacheMaxObjects, *cacheTTL); err != nil {
 		log.Fatal(err)
 	}
-	mode := runthrough.DetectMode()
-	switch strings.ToLower(strings.TrimSpace(*modeFlag)) {
-	case "auto", "":
-	case "local":
-		mode = runthrough.ModeLocal
-	case "run-through":
-		mode = runthrough.ModeRunThrough
-	default:
-		log.Fatalf("invalid --mode %q (want local, run-through, or auto)", *modeFlag)
-	}
+	mode := resolveMode(*modeFlag)
 
 	if *allowPublicAdmin {
 		log.Printf("WARNING: --allow-public-admin no longer grants access and is ignored; use --admin-token or STOW_ADMIN_TOKEN to authorize remote admin routes")

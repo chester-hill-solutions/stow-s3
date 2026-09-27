@@ -113,16 +113,48 @@ func TestDetectMode(t *testing.T) {
 		t.Fatalf("DetectMode() = %q, want local", got)
 	}
 
+	// Credentials alone do not select an upstream. This is the invariant the
+	// default was changed to enforce, so it is the first thing asserted rather
+	// than a detail of the resolution order.
 	t.Setenv("STOW_ENDPOINT", "https://upstream.example")
 	t.Setenv("STOW_ACCESS_KEY_ID", "key")
 	t.Setenv("STOW_SECRET_ACCESS_KEY", "secret")
-	if got := runthrough.DetectMode(); got != runthrough.ModeRunThrough {
-		t.Fatalf("DetectMode() = %q, want run-through", got)
+	if got := runthrough.DetectMode(); got != runthrough.ModeLocal {
+		t.Fatalf("DetectMode() with upstream credentials present = %q, want local", got)
 	}
 
+	// Naming run-through is the request, and it is enough.
+	t.Setenv("STOW_MODE", "run-through")
+	if got := runthrough.DetectMode(); got != runthrough.ModeRunThrough {
+		t.Fatalf("DetectMode() with STOW_MODE=run-through = %q, want run-through", got)
+	}
+
+	// And naming local still wins, so the explicit request is reversible.
 	t.Setenv("STOW_MODE", "local")
 	if got := runthrough.DetectMode(); got != runthrough.ModeLocal {
 		t.Fatalf("DetectMode() with STOW_MODE=local = %q, want local", got)
+	}
+}
+
+// An unrecognized STOW_MODE is local, not an error and not run-through.
+//
+// Two plausible wrong answers, both refused. Refusing to start would mean a typo
+// stops a dev server that would otherwise be harmless; falling back to
+// auto-detection would mean the typo re-enabled the behaviour this default exists
+// to remove.
+func TestDetectModeTreatsAnUnrecognizedModeAsLocal(t *testing.T) {
+	os.Clearenv()
+	for _, value := range []string{"upstream-on", "runtohrough", "yes", "1", "true", "RUN THROUGH"} {
+		t.Setenv("STOW_MODE", value)
+		if got := runthrough.DetectMode(); got != runthrough.ModeLocal {
+			t.Errorf("STOW_MODE=%q selected %q, want local", value, got)
+		}
+	}
+	for _, value := range []string{"run-through", "RUN-THROUGH", " Run-Through "} {
+		t.Setenv("STOW_MODE", value)
+		if got := runthrough.DetectMode(); got != runthrough.ModeRunThrough {
+			t.Errorf("STOW_MODE=%q selected %q, want run-through", value, got)
+		}
 	}
 }
 
@@ -248,6 +280,18 @@ func TestStartupBanner(t *testing.T) {
 	for _, want := range []string{"run-through", "readThroughCache", "local-only", "STOW_MODE=local"} {
 		if !strings.Contains(banner, want) {
 			t.Fatalf("banner missing %q:\n%s", want, banner)
+		}
+	}
+}
+
+// A local-only banner says how to ask for run-through, because a developer who
+// expected it and did not get it otherwise has no way to tell a missing
+// credential from a missing request.
+func TestLocalBannerNamesTheRequestForRunThrough(t *testing.T) {
+	banner := runthrough.StartupBanner(runthrough.Config{}, runthrough.ModeLocal)
+	for _, want := range []string{"mode: local", "not in use", "STOW_MODE=run-through"} {
+		if !strings.Contains(banner, want) {
+			t.Errorf("local banner missing %q:\n%s", want, banner)
 		}
 	}
 }
