@@ -444,6 +444,15 @@ pilot evidence on clean installs and recovery, completion of the chosen npm and
 PyPI distribution setup, and the package/version/tag checks. Any follow-up
 release needs a new version; do not move or reuse `v0.2.0`.
 
+Supplemental local check on 2026-09-27: `go test ./conformance -run
+'^TestUpstreamRunThrough$' -count=1 -v` passed against a temporary loopback
+MinIO bucket. It verified a mirrored write, upstream and local reads, and
+delete-and-list cleanup. The container was removed afterward. Railway project
+creation was denied for the available personal workspace, so no Railway bucket
+was created and no data was written to the linked production project. The local
+MinIO result is useful S3-compatible coverage, but does not satisfy the required
+live-provider run for a release commit.
+
 ## 6. Acceptance criteria
 
 ### Contract and SDK behavior
