@@ -120,6 +120,16 @@ func (c *S3Client) PutObject(ctx context.Context, bucket, key string, body io.Re
 	if opts.ContentType != "" {
 		input.ContentType = aws.String(opts.ContentType)
 	}
+	// Preconditions are forwarded, not dropped. Propagation uses them to detect
+	// that another writer moved the object between enqueue and the write, and a
+	// client that silently discarded them would make that detection unreachable
+	// against a real provider while passing against anything that ignores them.
+	if opts.IfMatch != "" {
+		input.IfMatch = aws.String(opts.IfMatch)
+	}
+	if opts.IfNoneMatch != "" {
+		input.IfNoneMatch = aws.String(opts.IfNoneMatch)
+	}
 	if len(opts.Metadata) > 0 {
 		input.Metadata = opts.Metadata
 	}

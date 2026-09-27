@@ -55,7 +55,48 @@ func (a *Adapter) enqueueIntentLocked(ctx context.Context, operation OutboxOpera
 		version = objectVersion(meta)
 	}
 	entry := OutboxEntry{Operation: operation, Bucket: bucket, Key: key, Version: version, CreatedAt: time.Now().UTC()}
+	if operation == OutboxPut {
+		a.recordUpstreamState(ctx, &entry)
+	}
 	return a.outbox.Enqueue(entry)
+}
+
+// recordUpstreamState sets the precondition a propagating write will assert.
+//
+// The precondition is the upstream state stow's own copy was derived from, not
+// whatever upstream holds at enqueue time. Those differ, and the difference is
+// the whole defect: a fresh HeadObject reports the current state, so it always
+// matches, and a writer that moved on *before* this write was enqueued is
+// invisible. The recorded provenance is what makes that detectable.
+//
+// Where stow has no provenance — the key was never read from upstream, so there is
+// no claim to defend — upstream is consulted once, and only to learn whether the
+// key exists. An absent key is asserted with If-None-Match "*" so a key created in
+// the interval is caught; an existing one contributes its ETag, which at least
+// catches a change between enqueue and propagation.
+//
+// A failure to observe upstream is not an error. The write is local and
+// authoritative either way, and a HeadObject that times out or is refused must not
+// fail the caller's write; it only means the propagation carries a weaker
+// precondition than it might have carried.
+func (a *Adapter) recordUpstreamState(ctx context.Context, entry *OutboxEntry) {
+	if !a.upstreamEnabled(entry.Bucket) {
+		return
+	}
+	if etag, ok := a.observedUpstreamETag(entry.Bucket, entry.Key); ok {
+		entry.UpstreamVersion = etag
+		return
+	}
+	meta, err := a.upstream.HeadObject(ctx, entry.Bucket, entry.Key)
+	if err != nil {
+		if errors.Is(err, storage.ErrObjectNotFound) {
+			entry.UpstreamAbsent = true
+		}
+		return
+	}
+	if meta != nil && meta.ETag != "" {
+		entry.UpstreamVersion = meta.ETag
+	}
 }
 
 func (a *Adapter) prepareIntent(operation OutboxOperation, bucket, key, previousVersion string, source ...string) (OutboxEntry, error) {
@@ -69,6 +110,13 @@ func (a *Adapter) prepareIntent(operation OutboxOperation, bucket, key, previous
 		PreviousVersion: previousVersion,
 		Prepared:        true,
 		CreatedAt:       time.Now().UTC(),
+	}
+	if operation == OutboxPut {
+		// Recorded here rather than only in enqueueIntentLocked, because this is
+		// the path a mirror write actually takes. Prepare is also the more correct
+		// moment: it precedes stow's own write, so the precondition describes the
+		// upstream state as it was before this write was issued.
+		a.recordUpstreamState(context.Background(), &entry)
 	}
 	if len(source) > 0 {
 		entry.SourceBucket = source[0]
@@ -145,10 +193,31 @@ func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconci
 			return err
 		}
 	}
-	return a.upstream.PutObject(ctx, entry.Bucket, entry.Key, rc, storage.PutOptions{
+	if err := a.upstream.PutObject(ctx, entry.Bucket, entry.Key, rc, storage.PutOptions{
 		ContentType: meta.ContentType,
 		Metadata:    meta.Metadata,
-	})
+		// The precondition recorded at enqueue. Absent upstream is asserted with
+		// If-None-Match "*" rather than left unguarded, because a key created
+		// between enqueue and propagation has no ETag for If-Match to compare.
+		IfMatch:     entry.UpstreamVersion,
+		IfNoneMatch: upstreamAbsentCondition(entry.UpstreamAbsent),
+	}); err != nil {
+		// A refused precondition is a conflict, not a failure to try again. It
+		// classifies as deterministic, so the entry goes terminal and somebody
+		// decides which object should win.
+		if errors.Is(err, storage.ErrPreconditionFailed) {
+			return ErrUpstreamConflict
+		}
+		return err
+	}
+	return nil
+}
+
+func upstreamAbsentCondition(absent bool) string {
+	if absent {
+		return "*"
+	}
+	return ""
 }
 
 func (a *Adapter) propagateDelete(ctx context.Context, entry OutboxEntry, reconcile bool) error {

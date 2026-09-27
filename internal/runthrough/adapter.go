@@ -439,6 +439,10 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err := a.trackCacheObject(ctx, bucket, key); err != nil {
 		return nil, nil, err
 	}
+	// Record which upstream state this copy came from. It is the only provenance
+	// available, and a later write needs it to tell "upstream still matches what I
+	// based this on" from "somebody else changed it".
+	a.noteUpstreamETag(bucket, key, meta.ETag)
 	if !needBody {
 		return nil, cached, nil
 	}

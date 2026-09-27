@@ -13,7 +13,23 @@ import (
 type OutboxOperation string
 
 var (
-	ErrOutboxVersionConflict    = errors.New("outbox object version no longer matches the committed record")
+	ErrOutboxVersionConflict = errors.New("outbox object version no longer matches the committed record")
+
+	// ErrUpstreamConflict reports that the upstream object changed after stow
+	// decided to write it, so the write was refused rather than applied.
+	//
+	// It is a distinct error from a transport failure because a caller has to be
+	// able to tell them apart: a precondition failure cannot succeed on a retry,
+	// so the entry is terminal and somebody has to decide what should win. Before
+	// this existed, propagateWrite compared the upstream ETag only to decide
+	// whether a previous attempt had already landed, and overwrote upstream
+	// whenever they differed — so two writers sharing a key silently lost one
+	// side's object with nothing reported to either.
+	//
+	// The refusal is deliberately not a merge. stow's local store stays
+	// authoritative for the caller's own read, and the conflict is surfaced for a
+	// decision rather than resolved by picking a winner.
+	ErrUpstreamConflict         = errors.New("upstream object was changed by another writer")
 	ErrOutboxPreparedUnresolved = errors.New("outbox prepared intent cannot be reconciled")
 	// ErrOutboxFormatVersion reports a durable outbox written by a different
 	// Stow schema revision. Writers sharing one outbox file must run the same
@@ -43,19 +59,29 @@ type OutboxEntry struct {
 	SourceKey       string          `json:"source_key,omitempty"`
 	Version         string          `json:"version,omitempty"`
 	PreviousVersion string          `json:"previous_version,omitempty"`
-	Prepared        bool            `json:"prepared,omitempty"`
-	CreatedAt       time.Time       `json:"created_at"`
-	Attempts        int             `json:"attempts"`
-	NextAttempt     time.Time       `json:"next_attempt"`
-	LastError       string          `json:"last_error,omitempty"`
-	Terminal        bool            `json:"terminal,omitempty"`
-	ClaimOwner      string          `json:"claim_owner,omitempty"`
-	ClaimUntil      time.Time       `json:"claim_until,omitempty"`
-	ClaimToken      uint64          `json:"claim_token,omitempty"`
-	Attempted       bool            `json:"attempted,omitempty"`
-	PreparedOwner   string          `json:"prepared_owner,omitempty"`
-	PreparedUntil   time.Time       `json:"prepared_until,omitempty"`
-	PreparedToken   uint64          `json:"prepared_token,omitempty"`
+	// UpstreamVersion is the ETag the upstream object held when this write was
+	// enqueued, and UpstreamAbsent records that it held nothing at all. One of
+	// the two is set on a put that is expected to propagate.
+	//
+	// Propagation requires the upstream to still be in this state: UpstreamVersion
+	// becomes an If-Match, and UpstreamAbsent becomes an If-None-Match of "*" so a
+	// key created between enqueue and propagation is caught too. If-Match alone
+	// would not catch that race, because a missing object has no ETag to compare.
+	UpstreamVersion string    `json:"upstream_version,omitempty"`
+	UpstreamAbsent  bool      `json:"upstream_absent,omitempty"`
+	Prepared        bool      `json:"prepared,omitempty"`
+	CreatedAt       time.Time `json:"created_at"`
+	Attempts        int       `json:"attempts"`
+	NextAttempt     time.Time `json:"next_attempt"`
+	LastError       string    `json:"last_error,omitempty"`
+	Terminal        bool      `json:"terminal,omitempty"`
+	ClaimOwner      string    `json:"claim_owner,omitempty"`
+	ClaimUntil      time.Time `json:"claim_until,omitempty"`
+	ClaimToken      uint64    `json:"claim_token,omitempty"`
+	Attempted       bool      `json:"attempted,omitempty"`
+	PreparedOwner   string    `json:"prepared_owner,omitempty"`
+	PreparedUntil   time.Time `json:"prepared_until,omitempty"`
+	PreparedToken   uint64    `json:"prepared_token,omitempty"`
 }
 
 type Outbox interface {

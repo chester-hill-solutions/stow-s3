@@ -159,6 +159,16 @@ func classifyRetry(err error) RetryClass {
 	if errors.Is(err, ErrOutboxVersionConflict) {
 		return RetryClassDeterministic
 	}
+	// A conflict is deterministic for the same reason, and the reason it is listed
+	// here rather than left to the storage-error path is that ErrUpstreamConflict is
+	// stow's own error: it never reaches a provider, so nothing downstream of the
+	// status-code and API-code classifiers would ever see it. Without this an entry
+	// would sit pending and be retried forever against an upstream that has not
+	// changed and will not, which is worse than either losing the write or
+	// reporting it.
+	if errors.Is(err, ErrUpstreamConflict) {
+		return RetryClassDeterministic
+	}
 	if class, ok := explicitRetryClass(err); ok {
 		return class
 	}

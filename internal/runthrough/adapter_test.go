@@ -84,6 +84,19 @@ func (m *mockUpstream) PutObject(_ context.Context, bucket, key string, body io.
 	if m.putErr != nil {
 		return m.putErr
 	}
+	// Preconditions, because a client that does not honour them cannot be used to
+	// prove that stow detects a concurrent writer. The real S3 semantics apply:
+	// If-Match requires the current ETag to match, If-None-Match "*" requires the
+	// object to be absent, and either failing is ErrPreconditionFailed.
+	if opts.IfMatch != "" || opts.IfNoneMatch == "*" {
+		current, exists := m.objects[k]
+		if opts.IfNoneMatch == "*" && exists {
+			return storage.ErrPreconditionFailed
+		}
+		if opts.IfMatch != "" && (!exists || !storage.ETagEqual(current.ETag, opts.IfMatch)) {
+			return storage.ErrPreconditionFailed
+		}
+	}
 	data, err := io.ReadAll(body)
 	if err != nil {
 		return err
