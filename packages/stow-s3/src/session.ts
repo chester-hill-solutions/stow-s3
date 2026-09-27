@@ -263,10 +263,33 @@ class Session implements StowSession {
     }
     this.state = "closed";
     this.closePromise = (async () => {
-      await this.s3.destroy();
-      await this.instance.stop();
+      // Every release runs even if an earlier one throws, and the failures are
+      // reported together afterwards. They used to be sequential with no
+      // isolation, so a throw from destroying the client abandoned the server and
+      // the directory: the caller got an exception, believed the session was
+      // closed, and left a process and a directory behind. Reporting only the
+      // first failure is the other half of that — a caller who breaks one step
+      // should not lose the information that another also broke.
+      const failures: unknown[] = [];
+      const release = async (step: () => Promise<void> | void): Promise<void> => {
+        try {
+          await step();
+        } catch (error) {
+          failures.push(error);
+        }
+      };
+
+      await release(() => this.s3.destroy());
+      await release(() => this.instance.stop());
       if (this.context.ownsDataDir) {
-        await rm(this.context.dataDir, { recursive: true, force: true });
+        await release(() => rm(this.context.dataDir, { recursive: true, force: true }));
+      }
+
+      if (failures.length === 1) {
+        throw failures[0];
+      }
+      if (failures.length > 1) {
+        throw new AggregateError(failures, "closing the stow session did not fully succeed");
       }
     })();
     return this.closePromise;
