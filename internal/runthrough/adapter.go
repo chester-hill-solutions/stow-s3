@@ -248,6 +248,7 @@ func (a *Adapter) invalidateCache(ctx context.Context, bucket, key string) {
 	if err := a.cache.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
 		return
 	}
+	a.forgetCacheObject(bucket, key)
 }
 
 func (a *Adapter) CreateBucket(ctx context.Context, name string) error {
@@ -347,6 +348,7 @@ func (a *Adapter) resolveCachedObject(ctx context.Context, bucket, key string, n
 		if err := a.cache.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
 			return nil, nil, err
 		}
+		a.forgetCacheObject(bucket, key)
 		a.cacheEvictions.Add(1)
 		cacheMeta, cacheErr = nil, storage.ErrObjectNotFound
 	}
@@ -370,6 +372,7 @@ func (a *Adapter) revalidateCachedObject(ctx context.Context, bucket, key string
 	if headErr == storage.ErrObjectNotFound {
 		if a.cfg.EvictOnUpstreamMissing {
 			_ = a.cache.DeleteObject(ctx, bucket, key)
+			a.forgetCacheObject(bucket, key)
 			if !a.separateCache {
 				_ = a.local.DeleteObject(ctx, bucket, key)
 			}
@@ -436,7 +439,10 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := a.trackCacheObject(ctx, bucket, key); err != nil {
+	// cached.Size is the stored length, which is what the cache byte limit is
+	// measured against. Passing it in avoids a store round trip to re-read what
+	// PutObject just returned.
+	if err := a.trackCacheObject(ctx, bucket, key, cached.Size); err != nil {
 		return nil, nil, err
 	}
 	// Record which upstream state this copy came from. It is the only provenance

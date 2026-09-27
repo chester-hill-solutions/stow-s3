@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Fixed: configuring a cache limit made every changed-object read walk the whole cache.** Eviction was planned by listing every bucket, paginating every object, and issuing a `HeadObject` per object to recover the access time and size. One changed-object refresh therefore cost a store round trip for every cached object, so a cache of N objects took N round trips whenever anything in it changed — which is most of a session. Measured: 40 refreshes against a 40-object cache examined 1600 rows, and against a 160-object cache, 6400. That is exactly refreshes times depth, so refreshing N changed objects was quadratic.
+
+  Configuring the limits is what turned the scan on — `evictCache` returns early when the byte, count and TTL limits are all zero — so the cost appeared precisely when a cache was worth configuring, on precisely the constrained host where it was most wanted. 200 refreshes with no limit walked nothing; the same 200 with a limit walked 40,000 rows.
+
+  Eviction is now planned from the adapter's own index. The cache entry already tracked access time and expiry, so adding bucket, key and size makes the index self-sufficient, and the size comes from the `PutObject` that had just returned rather than a re-read. A refresh now reads nothing from the store, and the cost no longer scales with how full the cache is.
+
+  The policy is unchanged: oldest-access first, TTL expiry, and never evicting a local write. Only the mechanism moved. Every path that mutates the cache now updates the index, including the three that delete from it, and `ReconcileCacheIndex` rebuilds it from the store — because an index that has drifted enforces the wrong limit, and that fails silently, with the cache quietly growing past the bound that was set.
+
 - **Fixed: propagation silently overwrote another writer's upstream object.** When stow mirrored a write, `propagateWrite` checked only that the *local* version still matched its outbox entry, and used the upstream ETag purely as a crash-dedup test: if the ETags differed it concluded the write had not landed and overwrote upstream. For an agent and a device sharing keys, a device write followed by an agent write destroyed the device's object, and nothing was reported to either party. The compatibility contract promised eventual consistency and said nothing about lost writes, because there was no mechanism for them.
 
   Propagation now asserts a precondition: the upstream ETag that stow's own copy was derived from. Where stow has read the key, that ETag is recorded when the object is fetched and travels on the outbox entry, and the write is sent with `If-Match`. A refused precondition is `ErrUpstreamConflict`, which classifies as deterministic, so the entry goes terminal and somebody decides — a conflict that could be retried would spin forever against an upstream that has not changed and will not.

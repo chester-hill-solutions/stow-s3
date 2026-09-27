@@ -135,14 +135,17 @@ func TestCacheRefreshesWithoutALimitDoNotListTheCache(t *testing.T) {
 	t.Logf("200 changed refreshes, no cache limit: %d cache rows examined", examined)
 }
 
-// With a limit configured, every changed-object refresh lists the whole cache,
-// because collectCacheCandidates walks every bucket and every object. The count
-// is the evidence, and it scales with depth: a linear read path would be one
-// listing per refresh regardless of how full the cache is.
-func TestLimitedCacheRefreshesListTheWholeCachePerRefresh(t *testing.T) {
+// With a limit configured, a changed-object refresh must not walk the cache at
+// all. Eviction is planned from the adapter's own index, so the cost of a refresh
+// no longer scales with how full the cache is.
+//
+// This test used to assert the opposite. It counted refreshes x depth — 1600 rows
+// for 40 refreshes at depth 40, 6400 at depth 160 — and failed when the count did
+// not grow with depth. The fix made the count zero, so the test failed, which is
+// the intended direction: the property worth pinning is that planning reads
+// nothing from the store, not that it reads a predictable amount.
+func TestLimitedCacheRefreshesDoNotWalkTheCache(t *testing.T) {
 	const batch = 40
-	// Large enough that nothing is evicted, so this measures the scan rather than
-	// the deletion cost.
 	const limit = 1 << 30
 
 	measure := func(depth int) int64 {
@@ -162,16 +165,62 @@ func TestLimitedCacheRefreshesListTheWholeCachePerRefresh(t *testing.T) {
 	shallow := measure(batch)
 	deep := measure(batch * 4)
 
-	// Each refresh lists every bucket and then paginates that bucket's objects.
-	// The count therefore grows with depth; a linear or incremental path would not.
-	t.Logf("%d refreshes against a %d-object cache: %d cache rows examined; against %d: %d rows; ratio %.2fx",
-		batch, batch, shallow, batch*4, deep, float64(deep)/float64(shallow))
+	t.Logf("%d refreshes against a %d-object cache: %d cache rows examined; against %d: %d rows",
+		batch, batch, shallow, batch*4, deep)
 
-	if shallow < batch {
-		t.Errorf("only %d cache rows examined for %d refreshes with a limit set; the eviction scan appears to have stopped running", shallow, batch)
+	if shallow != 0 || deep != 0 {
+		t.Errorf("a refresh still walks the cache: %d rows at depth %d, %d at depth %d; "+
+			"eviction should be planned from the index", shallow, batch, deep, batch*4)
 	}
-	if shallow > 0 && deep <= shallow {
-		t.Errorf("cache listings did not grow with depth (%d at %d objects, %d at %d); if the scan was made incremental, update this assertion",
-			shallow, batch, deep, batch*4)
+}
+
+// The index is maintained on every path that populates or deletes from the cache,
+// which is what makes planning free. If that stops being true the index drifts, the
+// byte limit is enforced against the wrong number, and the cache grows past the
+// bound the operator set — silently, because nothing about a drifted index is
+// observable from the outside.
+//
+// ReconcileCacheIndex exists to detect exactly that, so it is asserted against a
+// real workload rather than assumed.
+func TestTheEvictionIndexAgreesWithTheCache(t *testing.T) {
+	adapter, _, upstream := seedCachingAdapter(t, 1<<30, 60)
+	changedEverywhere(t, upstream, 60)
+	ctx := context.Background()
+	for i := 0; i < 20; i++ {
+		rc, _, err := adapter.GetObject(ctx, "bucket", cacheProbeKey(i))
+		if err != nil {
+			t.Fatalf("refresh %d: %v", i, err)
+		}
+		_ = rc.Close()
+	}
+
+	if err := adapter.ReconcileCacheIndex(ctx); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+	if got := adapter.CacheIndexEntries(); got != 60 {
+		t.Fatalf("index holds %d entries after reconciliation, want the 60 objects in the cache", got)
+	}
+}
+
+// A delete outside the tracked paths must not leave the index claiming an object
+// the cache no longer has. This is the drift case, injected directly: the object
+// is removed from the store without going through the adapter, which is what an
+// out-of-band deletion or a future untracked path would look like.
+func TestReconciliationDropsIndexEntriesForObjectsThatAreGone(t *testing.T) {
+	adapter, cache, _ := seedCachingAdapter(t, 1<<30, 30)
+	ctx := context.Background()
+
+	if err := cache.DeleteObject(ctx, "bucket", cacheProbeKey(0)); err != nil {
+		t.Fatalf("out-of-band delete: %v", err)
+	}
+	if got := adapter.CacheIndexEntries(); got != 30 {
+		t.Fatalf("index holds %d entries before reconciliation, want 30", got)
+	}
+
+	if err := adapter.ReconcileCacheIndex(ctx); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+	if got := adapter.CacheIndexEntries(); got != 29 {
+		t.Fatalf("index holds %d entries after reconciliation, want 29", got)
 	}
 }

@@ -1,6 +1,6 @@
 # Deploy-Anywhere Plan
 
-**Status:** Phase 0 measured and committed; Phase 1 implemented; Phase 2 measured and its premise corrected. Phases 3–7 are not started.
+**Status:** Phase 0 measured and committed; Phase 1 implemented; Phase 2 measured and its premise corrected; Phase 3 implemented. Phases 4b and 5–7 are not started.
 **Date:** 2026-09-27
 **Baseline:** `main` at `4ca2c1a`
 **Relationship:** additive to the accepted decisions in ADRs 0005–0011, `docs/compat-contract.md`, and `docs/workspace-contract.md`. This plan is the current execution order for the *portability and multi-writer* workstreams, and it sequences the MCP adapter that `docs/agent-workspace-plan.md` Phase 5 item 3 defers. It does not supersede that plan's workspace phases; the two run in parallel and this one is ordered first where they touch the same code.
@@ -243,6 +243,14 @@ cache is most wanted.
 **Exit:** a refresh examines zero cache rows; the byte and count limits are still
 enforced; the existing eviction and TTL tests stay green unchanged.
 
+**Done.** A refresh reads nothing from the store, down from refreshes x depth. The
+test that pinned the defect asserted the count *grew* with depth, so it failed when
+the count fell to zero — which is the intended direction, and the reason the
+assertion was rewritten to pin "plans from the index" rather than "reads a
+predictable amount". `ReconcileCacheIndex` and `CacheIndexEntries` exist so the
+index-versus-store agreement is a test rather than a claim, including the drift case
+where an object is removed behind the adapter's back.
+
 ### Phase 4 — A persistence seam, only if a target is named (P2, demoted)
 
 Three backends exist: `memory` (ephemeral), `fs` (POSIX), and `workspace` (needs a
@@ -359,7 +367,7 @@ Sequenced last, and deliberately:
 - Every persistence backend, including a new one, passes the same behavioral
   contract suite as the memory and filesystem backends.
 - A changed-object cache refresh examines zero cache rows, and the byte and count
-  limits are still enforced.
+  limits are still enforced. **Done.**
 - A caller can tell, from the capability report alone, which of the workspace and
   persistent-embedded surfaces their host supports and what durability each gives.
 - `make standards` and `make test-all` green; no ratchet baseline grows.
