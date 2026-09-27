@@ -42,12 +42,32 @@ func (s *Store) locate(bucket, key string) (string, error) {
 }
 
 // resolve finds a key's file and its metadata, adopting the file when stow has
-// no manifest entry for it.
+// no manifest entry for it. It takes the write lock, because adopting means
+// writing a manifest entry.
 //
 // Adoption is not an import step. There is no separate registration pass,
 // because a workspace whose files need registering before they can be read is
 // not a working directory.
 func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.resolveLocked(bucket, key)
+}
+
+// resolveLocked is resolve for a caller that already holds the write lock.
+//
+// It exists because the lock is not reentrant and the write path has to look at an
+// object while holding it: PutObject peeks to evaluate its preconditions before it
+// knows what it is overwriting, and that peek may need to re-derive and persist an
+// entry that has gone stale. Reaching resolve from there would take the lock a
+// second time on the same goroutine and hang, along with every other goroutine
+// waiting behind it - including Close.
+//
+// This is the same split as putLocked, and it was missing here. The hazard was
+// already known when putLocked was separated out for multipart completion, which
+// holds the lock for the same reason; the ordinary write was simply not converted
+// when it grew the same peek.
+func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	absPath, err := s.locate(bucket, key)
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
@@ -69,7 +89,7 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 		if prior, had := s.objectIndex.entry(bucket, key); had {
 			entry.VersionID = prior.VersionID
 		}
-		if err := s.record(bucket, key, entry); err != nil {
+		if err := s.recordLocked(bucket, key, entry); err != nil {
 			return "", nil, ManifestEntry{}, err
 		}
 	}
@@ -127,12 +147,16 @@ func (s *Store) absorb(bucket, key, absPath string, info os.FileInfo, entry *Man
 	return s.record(bucket, key, derived)
 }
 
-// record writes an entry to the manifest and the case-folded index, and
-// persists. It takes the write lock, so it is only called from paths that do
-// not already hold it.
+// record writes an entry to the manifest and the case-folded index, and persists.
+// It takes the write lock, so it is only for callers that do not already hold it.
 func (s *Store) record(bucket, key string, entry ManifestEntry) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.recordLocked(bucket, key, entry)
+}
+
+// recordLocked is record for a caller that already holds the write lock.
+func (s *Store) recordLocked(bucket, key string, entry ManifestEntry) error {
 	if s.closed {
 		return ErrClosed
 	}
@@ -159,6 +183,16 @@ func (s *Store) peek(_ context.Context, bucket, key string) (*storage.ObjectMeta
 	}
 	meta := s.metaFromEntry(bucket, key, entry, info)
 	return meta, nil
+}
+
+// peekLocked is peek for a caller that already holds the write lock, for the same
+// reason resolveLocked exists.
+func (s *Store) peekLocked(bucket, key string) (*storage.ObjectMeta, error) {
+	_, info, entry, err := s.resolveLocked(bucket, key)
+	if err != nil {
+		return nil, err
+	}
+	return s.metaFromEntry(bucket, key, entry, info), nil
 }
 
 func fileExists(path string) bool {

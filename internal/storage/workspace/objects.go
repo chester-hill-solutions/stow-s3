@@ -38,8 +38,11 @@ func (s *Store) PutObject(ctx context.Context, bucket, key string, body io.Reade
 // putLocked is PutObject's body, split out so that multipart completion, which
 // already holds the lock, can assemble an object without deadlocking on a
 // non-reentrant mutex.
-func (s *Store) putLocked(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (*storage.ObjectMeta, error) {
-	existing, err := s.peek(ctx, bucket, key)
+func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (*storage.ObjectMeta, error) {
+	// peekLocked, not peek: the lock is already held, and peek would take it a
+	// second time whenever the key has no manifest entry or a stale one - which is
+	// every write over a file the host has touched, and every adoption.
+	existing, err := s.peekLocked(bucket, key)
 	if err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
 		return nil, err
 	}
