@@ -43,7 +43,7 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 	if err := s.requireBucket(req.DestBucket); err != nil {
 		return nil, err
 	}
-	record, err := readObjectRecord(s.objectPath(req.SourceBucket, req.SourceKey))
+	record, err := s.readObject(req.SourceBucket, req.SourceKey)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, storage.ErrObjectNotFound
@@ -70,7 +70,7 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 		ChecksumValue:     record.ChecksumValue,
 		LastModified:      time.Now().UTC(),
 	}
-	if err := writeObjectRecord(s.objectPath(req.DestBucket, req.DestKey), copied); err != nil {
+	if err := s.writeObject(req.DestBucket, req.DestKey, copied); err != nil {
 		return nil, err
 	}
 	meta := copied.meta(req.DestBucket, req.DestKey)

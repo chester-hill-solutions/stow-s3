@@ -65,7 +65,7 @@ Estimate assumes two experienced engineers.
 - Non-loopback and non-HTTPS upstreams fail unless an explicit insecure flag is set.
 - Add tests proving local mode makes zero upstream requests.
 
-**Status: the two data-loss items are done; the mode default is deferred by decision.**
+**Status: local-only mode and explicit live-write consent are landed; insecure endpoint validation remains open.**
 
 - **Landed.** `mirrorWrites` no longer grants live-write consent on its own.
   `STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes` is required and is
@@ -79,11 +79,11 @@ Estimate assumes two experienced engineers.
   create/put/get/head/list/delete against a recording upstream, and requires zero
   hits. The consent flag and the store wiring are asserted separately, because
   either alone is insufficient.
-- **Deferred.** The mode default itself is unchanged: a developer with upstream
-  credentials in their environment still gets run-through, per ADR 0001. Flipping
-  it reverses that ADR and breaks every existing run-through user, which is a
-  1.0 breaking-change proposal rather than a side effect of a safety fix. The
-  reasoning is recorded in ADR 0005 under "Why not change the mode default".
+- **Landed.** Ambient credentials no longer select run-through. It requires an
+  explicit `--mode run-through` or `STOW_MODE=run-through`; the current decision
+  is recorded in [ADR 0011](adr/0011-local-is-the-default-mode.md), which
+  supersedes ADR 0001. ADR 0005's section on why it did not change the default
+  records the rationale at that earlier point in time.
 - **Open.** The insecure-flag item is untouched: `NewS3Client` still takes a
   configured endpoint verbatim with no loopback or HTTPS check.
 

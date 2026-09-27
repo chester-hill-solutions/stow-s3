@@ -37,7 +37,7 @@ The existing `docs/compat-contract.md` remains the acceptance document, but the 
 11. **Operations:** the amended contract includes ListMultipartUploads, full conditional CopyObject, single-range support, SDK-supported conditional writes, and the common checksum set (`Content-MD5`, CRC32, CRC32C, SHA-1, SHA-256).
 12. **Release identity:** `0.2.0` is the first release targeting the amended v1 contract. Publish both the Go binary and `@chester-hill-solutions/stow-s3` after the full gate passes.
 
-Update `docs/adr/0001-auto-detect-run-through.md` through a new amendment ADR rather than rewriting accepted history. Update `docs/compat-contract.md`, `CONTEXT.md`, `README.md`, `packages/stow-s3/README.md`, and a new changelog/release-note document.
+**Completed:** ADR 0001 was preserved and superseded by [ADR 0011](adr/0011-local-is-the-default-mode.md). The compatibility contract, `CONTEXT.md`, README files, and changelog were updated to record the explicit run-through opt-in.
 
 ### Normative contract tables required in R0
 

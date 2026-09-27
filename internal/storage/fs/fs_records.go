@@ -12,8 +12,11 @@ import (
 const objectRecordVersion = 1
 
 type objectRecord struct {
-	Version           int               `json:"version"`
-	RecordVersion     string            `json:"record_version,omitempty"`
+	Version       int    `json:"version"`
+	RecordVersion string `json:"record_version,omitempty"`
+	// Key is set for digest-addressed records, whose pathname cannot be
+	// reversed into the original key. Legacy flat and sharded records omit it.
+	Key               string            `json:"key,omitempty"`
 	Data              []byte            `json:"data"`
 	ContentType       string            `json:"content_type,omitempty"`
 	Metadata          map[string]string `json:"metadata,omitempty"`
@@ -21,6 +24,32 @@ type objectRecord struct {
 	ChecksumAlgorithm string            `json:"checksum_algorithm,omitempty"`
 	ChecksumValue     string            `json:"checksum_value,omitempty"`
 	LastModified      time.Time         `json:"last_modified"`
+}
+
+func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) error {
+	path := s.objectPath(bucket, key)
+	if s.isBoundedObjectPath(bucket, path) {
+		if existing, err := readObjectRecord(path); err == nil && existing.Key != key {
+			return fmt.Errorf("object path digest collision: refusing to replace a different key")
+		} else if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		record.Key = key
+	} else {
+		record.Key = ""
+	}
+	return writeObjectRecord(path, record)
+}
+
+func (s *FilesystemStore) readObject(bucket, key string) (objectRecord, error) {
+	record, err := readObjectRecord(s.objectPath(bucket, key))
+	if err != nil {
+		return record, err
+	}
+	if record.Key != "" && record.Key != key {
+		return objectRecord{}, fmt.Errorf("object path digest collision: stored key does not match requested key")
+	}
+	return record, nil
 }
 
 func writeObjectRecord(path string, record objectRecord) error {

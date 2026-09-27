@@ -374,7 +374,7 @@ Every response MUST include `x-amz-request-id` header matching `RequestId` in bo
 
 ## 6. Run-Through Mode Behavior Contract
 
-Run-through mode is enabled **only** by naming it: `--mode run-through` or `STOW_MODE=run-through`, with upstream endpoint + access key + secret key present in the environment (`STOW_*` > `S3_*` > `AWS_*`). Local-only is the default, and the presence of credentials alone does not change it — credentials decide how a requested upstream is authenticated, not whether one is used. Override: `STOW_MODE=local` forces local-only. See `docs/adr/0001-auto-detect-run-through.md`.
+Run-through mode is enabled **only** by naming it: `--mode run-through` or `STOW_MODE=run-through`, with upstream endpoint + access key + secret key present in the environment (`STOW_*` > `S3_*` > `AWS_*`). Local-only is the default, and the presence of credentials alone does not change it — credentials decide how a requested upstream is authenticated, not whether one is used. Override: `STOW_MODE=local` forces local-only. See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001.
 
 ### 6.1 Policies
 
@@ -403,7 +403,7 @@ GET/HeadObject flow (readThroughCache):
 - Returns **union** of local keys and upstream keys (deduplicated by key name).
 - For duplicate keys, **local metadata wins** for `ETag`/`Size`/`LastModified` in listing (local is authoritative for dev).
 - The merged result is ordered by key, then `max-keys` and `continuation-token` are applied to the merged set. Continuation tokens are opaque; a client resumes by returning a token it received and MUST NOT construct one.
-- **Consistency: eventual.** The local store and the upstream provider are independent systems read at different times, and there is no transaction spanning them. The listing is therefore a union of two separately-timed reads, not a snapshot of one instant — and no implementation can make it one without abandoning the merge. Under concurrent writes a key **MAY appear in two consecutive pages, or in neither**, and a key deleted upstream mid-listing MAY still be returned. Clients MUST tolerate this. This is the guarantee S3's own `ListObjectsV2` offers, and it is not stronger here: claiming a cross-source snapshot would be a divergence from the compatibility target, not an improvement. See ADR 0001 for the policy modes and `docs/architecture/environment-implementation.md` R-707 for the fetch bound this permits.
+- **Consistency: eventual.** The local store and the upstream provider are independent systems read at different times, and there is no transaction spanning them. The listing is therefore a union of two separately-timed reads, not a snapshot of one instant — and no implementation can make it one without abandoning the merge. Under concurrent writes a key **MAY appear in two consecutive pages, or in neither**, and a key deleted upstream mid-listing MAY still be returned. Clients MUST tolerate this. This is the guarantee S3's own `ListObjectsV2` offers, and it is not stronger here: claiming a cross-source snapshot would be a divergence from the compatibility target, not an improvement. The policy definitions are in the table above; [ADR 0011](adr/0011-local-is-the-default-mode.md) records the current mode-selection rule, and `docs/architecture/environment-implementation.md` R-707 records the fetch bound this permits.
 - Under `readThroughCache` and `mirrorWrites`, listing is the merged local/upstream result described above; the legacy `proxy` policy is not supported.
 
 **Object size / buffering (v1, intentional):**

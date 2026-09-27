@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"strings"
 )
@@ -28,6 +29,22 @@ const shardChunk = 200
 // exotic shape. A prefix that cannot occur in hex separates the two name spaces,
 // which makes every component's role decidable from its form.
 const shardPrefix = "_"
+
+// boundedPathPrefix identifies records whose reversible key encoding would
+// make an unacceptably long complete pathname. It cannot be confused with a
+// shard: the remainder is not hex.
+const boundedPathPrefix = "_long"
+
+// maxEncodedPathLength keeps the old reversible layout for ordinary keys while
+// bounding the path contribution from a key. In particular, 512-byte and
+// 1024-byte keys use the fixed-size digest layout instead of hundreds of path
+// components.
+const maxEncodedPathLength = 600
+
+// maxFilesystemPathLength leaves room below Darwin's 1024-byte pathname limit.
+// The decision also considers the store root, since a moderate key can overflow
+// the total path limit when the data directory itself is deeply nested.
+const maxFilesystemPathLength = 900
 
 // objectRelPath returns a reversible, flat filesystem name for an object key.
 // Encoding the complete key avoids path traversal and preserves empty, repeated,
@@ -66,6 +83,16 @@ func objectRelSegments(key string) []string {
 		encoded = encoded[shardChunk:]
 	}
 	return append(segments, encoded)
+}
+
+func usesBoundedObjectPath(key string) bool {
+	return len(objectRelPath(key)) > maxEncodedPathLength
+}
+
+func boundedObjectRelSegments(key string) []string {
+	digest := sha256.Sum256([]byte(key))
+	encoded := hex.EncodeToString(digest[:])
+	return []string{boundedPathPrefix, encoded[:2], encoded}
 }
 
 // isShardName reports whether a path component is a shard directory this package

@@ -202,6 +202,53 @@ func TestKeysDifferingOnlyInCaseAreDistinct(t *testing.T) {
 	}
 }
 
+func TestCaseDistinctWriteDoesNotOverwriteAnAdoptedFile(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "Report.pdf"), []byte("host upper"), 0o644); err != nil {
+		t.Fatalf("write host file: %v", err)
+	}
+	store, err := workspace.New(workspace.Options{Root: root, Bucket: bucket})
+	if err != nil {
+		t.Fatalf("new workspace store: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := store.Close(); err != nil {
+			t.Errorf("close store: %v", err)
+		}
+	})
+	ctx := context.Background()
+
+	if _, _, err := store.GetObject(ctx, bucket, "report.pdf"); !errors.Is(err, storage.ErrObjectNotFound) {
+		t.Fatalf("case-distinct key before write error = %v, want ErrObjectNotFound", err)
+	}
+	put(t, store, "report.pdf", "stow lower")
+	if got := get(t, store, "Report.pdf"); got != "host upper" {
+		t.Errorf("adopted Report.pdf = %q, want unchanged host bytes", got)
+	}
+	if got := get(t, store, "report.pdf"); got != "stow lower" {
+		t.Errorf("report.pdf = %q, want the new case-distinct object", got)
+	}
+
+	if err := store.Close(); err != nil {
+		t.Fatalf("close before reopen: %v", err)
+	}
+	reopened, err := workspace.New(workspace.Options{Root: root, Bucket: bucket})
+	if err != nil {
+		t.Fatalf("reopen workspace store: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := reopened.Close(); err != nil {
+			t.Errorf("close reopened store: %v", err)
+		}
+	})
+	if got := get(t, reopened, "Report.pdf"); got != "host upper" {
+		t.Errorf("reopened Report.pdf = %q, want unchanged host bytes", got)
+	}
+	if got := get(t, reopened, "report.pdf"); got != "stow lower" {
+		t.Errorf("reopened report.pdf = %q, want the new case-distinct object", got)
+	}
+}
+
 // WS-07: deleting an object removes its file, and forgets it.
 func TestDeleteObjectRemovesTheFile(t *testing.T) {
 	store, root := newStore(t)

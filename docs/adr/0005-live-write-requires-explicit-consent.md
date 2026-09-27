@@ -87,7 +87,12 @@ run-through server on the memory backend with `mirrorWrites` configured and no
 consent is no longer refused. Under this decision it performs no propagation, so
 requiring the filesystem backend for it was refusing a configuration that works.
 
-## Why not change the mode default
+## Historical rationale: why this ADR did not change the mode default
+
+This section records the rationale when ADR 0005 was accepted. The mode decision
+was later changed by [ADR 0011](0011-local-is-the-default-mode.md), which
+supersedes ADR 0001 in full. The claims below about the mode default and existing
+run-through users are historical, not the current rule.
 
 The 10-plan proposes that `Stow.start()` pass `--mode local` unless run-through
 is requested. That reverses ADR 0001 and would break every existing run-through

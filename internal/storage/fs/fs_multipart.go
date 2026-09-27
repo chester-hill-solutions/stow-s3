@@ -199,8 +199,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		ChecksumValue:     meta.ChecksumValue,
 		LastModified:      meta.LastModified,
 	}
-	objPath := s.objectPath(manifest.Bucket, manifest.Key)
-	if err := writeObjectRecord(objPath, record); err != nil {
+	if err := s.writeObject(manifest.Bucket, manifest.Key, record); err != nil {
 		return nil, err
 	}
 	if err := os.RemoveAll(dir); err != nil {

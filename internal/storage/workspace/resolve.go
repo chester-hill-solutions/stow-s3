@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -28,8 +30,7 @@ func (s *Store) locate(bucket, key string) (string, error) {
 	}
 
 	if s.layout.IsNatural(key) {
-		path := NaturalPath(s.bucketDir(bucket), key)
-		if fileExists(path) {
+		if path, exists, _ := exactNaturalPath(s.bucketDir(bucket), key); exists {
 			return path, nil
 		}
 	}
@@ -39,6 +40,43 @@ func (s *Store) locate(bucket, key string) (string, error) {
 		return escaped, nil
 	}
 	return "", storage.ErrObjectNotFound
+}
+
+// exactNaturalPath resolves a natural key without letting a case-insensitive
+// filesystem turn a different spelling into the requested object. os.Stat on
+// macOS and Windows can succeed for `report.pdf` when only `Report.pdf` exists;
+// that is a path collision, not an exact match for the S3 key.
+//
+// The third result reports that a differently-cased segment occupies the
+// candidate path. Callers use it to choose the escaped form for a new object.
+func exactNaturalPath(root, key string) (path string, exists, caseCollision bool) {
+	path = root
+	segments := strings.Split(key, "/")
+	for i, segment := range segments {
+		entries, err := os.ReadDir(path)
+		if err != nil {
+			return "", false, false
+		}
+		exactName := ""
+		foldedMatch := false
+		for _, entry := range entries {
+			if entry.Name() == segment {
+				exactName = entry.Name()
+				break
+			}
+			if strings.EqualFold(entry.Name(), segment) {
+				foldedMatch = true
+			}
+		}
+		if exactName == "" {
+			return "", false, foldedMatch
+		}
+		path = filepath.Join(path, exactName)
+		if i == len(segments)-1 {
+			return path, fileExists(path), false
+		}
+	}
+	return "", false, false
 }
 
 // resolve finds a key's file and its metadata, adopting the file when stow has

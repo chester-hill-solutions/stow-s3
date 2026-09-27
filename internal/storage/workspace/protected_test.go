@@ -69,9 +69,21 @@ func TestProtectedReasonSeesThroughRelativePaths(t *testing.T) {
 	if err != nil || home == "" {
 		t.Skip("no home directory on this host")
 	}
-	// A path that walks up out of a temporary directory and back down onto home
-	// must be recognised as home.
-	sneaky := filepath.Join(t.TempDir(), "..", "..", "..", strings.TrimPrefix(home, string(filepath.Separator)))
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Skipf("no working directory: %v", err)
+	}
+	// Build the relative spelling from this host's actual working directory.
+	// Assuming a fixed depth from t.TempDir made this resolve somewhere other
+	// than home on platforms with a different temporary-directory layout.
+	sneaky, err := filepath.Rel(cwd, home)
+	if err != nil {
+		t.Skipf("home and working directory cannot be related: %v", err)
+	}
+	resolved, err := filepath.Abs(sneaky)
+	if err != nil || filepath.Clean(resolved) != filepath.Clean(home) {
+		t.Fatalf("relative fixture %q resolves to %q, want home %q", sneaky, resolved, home)
+	}
 	if _, protected := protectedReason(sneaky); !protected {
 		t.Errorf("a relative path resolving to the home directory was not protected")
 	}

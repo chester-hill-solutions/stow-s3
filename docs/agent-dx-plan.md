@@ -71,9 +71,11 @@ Closed since this section was written:
 
 1. **Live writes were granted implicitly.** `STOW_POLICY=mirrorWrites` set
    `AllowLiveWrites` whenever `STOW_ALLOW_LIVE_WRITES` was *unset*, so the
-   absence of a variable was the enabling condition. With ADR 0001's auto-detect
-   default, a staging `.env` was enough to propagate mutations to a shared
-   bucket. Fixed; `docs/adr/0005-live-write-requires-explicit-consent.md`.
+   absence of a variable was the enabling condition. At the time, ADR 0001's
+   auto-detect default meant a staging `.env` could propagate mutations to a
+   shared bucket. Both decisions have since been corrected: live writes require
+   consent under ADR 0005, and ADR 0011 supersedes ADR 0001 with local-only as
+   the default.
 2. **`cleanSlate` was an unguarded recursive delete** of any caller-supplied
    path, including the home directory, in the published `dist/`. Fixed;
    `docs/adr/0006-owned-data-directory-reset.md`.
@@ -89,6 +91,10 @@ Closed since this section was written:
    in the page. Now an allowlist defaulting to loopback, `Vary: Origin` on every
    response, and a refused preflight. This also wires `Config.CORSOrigins`,
    which had been declared and never read.
+
+**Closed: ambient credentials selected run-through implicitly.** This was a
+known defect when the audit below was written; [ADR 0011](adr/0011-local-is-the-default-mode.md)
+now requires an explicit mode request and supersedes ADR 0001 in full.
 
 Still open, in descending order of harm:
 
@@ -254,7 +260,6 @@ either blocked or must carry its fix.
 | 3 | **The request-body cap cannot be raised.** `server.go:220` applies `MaxBytesReader` at `s.config.MaxRequestBytes`, and `cmd/stow-s3/main.go:77` sets it to the constant — with no flag and no option. A `PUT` above 8 MiB fails with `EntityTooLarge` whatever the caller asks for | `internal/s3api/errors.go:63`; `cmd/stow-s3/main.go:77` | Requirement 7, and any workspace where an agent legitimately writes a large file through S3. A quota a host cannot raise is not a quota, it is a surprise |
 | 4 | **Two unimplemented S3 features return the wrong error code.** 18 sub-resources correctly return `NotImplemented`; `versions` and `location` are omitted from the list and fall through to `InvalidRequest` | `internal/s3api/dispatch.go:121-138` | Requirement 6, which is explicitly about *error codes SDKs already understand*. An SDK feature-gate keyed on the code takes the wrong branch. Two entries to add |
 | 5 | **The coverage floor is an aggregate, and it hides the shipped entry points.** 62.38% of 5,253 statements is the floor; `cmd/stow-s3` is 40.9% and `internal/s3api` 55.9% | `scripts/baselines/go-coverage.json` | W1 adds a new public entry point. An aggregate floor lets the new path ship uncovered while the total still rises |
-| 6 | **An ambient AWS profile silently switches a server into run-through mode.** `DetectMode` selects run-through whenever the upstream variables resolve, which the `AWS_*` fallback makes easy. `STOW_MODE=local` is the escape hatch and is not discoverable | `internal/runthrough/config.go:213` | Requirement 6's safety claim, and the workspace default. A workspace must never auto-detect an upstream |
 | 7 | **The user-facing docs still describe the superseded default.** `site/agent.md`, `site/llms.txt`, and `skills/stow-s3/SKILL.md` all present `withStow`/`with_session` as *the* pattern, and the skill's own description says "a bucket that is thrown away afterwards" — the exact default revision 2 removes. `check-install-surface.mjs` reads those files for publication status only | `site/agent.md:66,86`; `skills/stow-s3/SKILL.md:3,69,90` | Adoption. The install surface is the first thing an agent reads, and it currently teaches the old contract. No gate catches this, which was predicted when those files were created |
 | 8 | **`npm view` reports a package a consumer cannot install.** On this machine the `@chester-hill-solutions` scope is bound to `https://npm.pkg.github.com` in `.npmrc`, and a scope binding beats `--registry`. So `npm view @chester-hill-solutions/stow-s3 version` answers `0.2.0` for a package that is not on npmjs at all | Verified 2026-09-25 by direct HTTP: npmjs `404`, GitHub Packages `401`, PyPI `404` | Any "is it published?" check done with `npm view` on this machine is wrong, including a human's. Query the registry API with `curl` and read the status code. This one produced a false positive during this very work |
 | 9 | **The install-surface gate's disclaimer rule is inverted.** A *published* target must be accompanied by a disclaimer matching `/not published\|not yet\|not on npm\|not on PyPI\|404/`, so a document that correctly says "the Go module is published and works" is failed for not also saying that something else is unpublished. It passes today only because the prose happens to contain those words elsewhere | `scripts/check-install-surface.mjs:84` | W13. That work extends this pattern to declare the *default* once in a script, so extending a rule with a known backwards test propagates the bug. Fix the rule first, or do not build on the pattern |

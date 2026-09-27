@@ -126,6 +126,16 @@ func TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithm(t *testing.T) {
 		if described.Options.ChecksumAlgorithm != "CRC32" {
 			t.Errorf("declared checksum algorithm = %q, want %q", described.Options.ChecksumAlgorithm, "CRC32")
 		}
+		listed, err := multi.ListMultipartUploads(ctx, "declared", storage.MultipartListOptions{})
+		if err != nil {
+			t.Fatalf("list multipart uploads: %v", err)
+		}
+		if len(listed.Uploads) != 1 {
+			t.Fatalf("listed %d uploads, want 1", len(listed.Uploads))
+		}
+		if listed.Uploads[0].Options.ChecksumAlgorithm != "CRC32" {
+			t.Errorf("listed checksum algorithm = %q, want %q", listed.Uploads[0].Options.ChecksumAlgorithm, "CRC32")
+		}
 
 		part, err := multi.UploadPart(ctx, upload.UploadID, 1, bytes.NewReader(body))
 		if err != nil {

@@ -4,7 +4,7 @@ status: accepted
 
 # SDK compatibility profile and mirror-writes
 
-This ADR extends [ADR 0001: Auto-detect run-through mode](0001-auto-detect-run-through.md). It records the decisions agreed for the 0.2.0 remediation release. Where this ADR conflicts with the earlier ADR or the original compatibility contract, this ADR is normative until the corresponding contract sections are amended and linked here.
+This ADR was originally written as an extension of [ADR 0001: Auto-detect run-through mode](0001-auto-detect-run-through.md). [ADR 0011](0011-local-is-the-default-mode.md) later superseded ADR 0001 in full, including its mode-selection decision. The remaining compatibility decisions in this ADR continue to apply except where a later ADR narrows them; in particular, see [ADR 0005](0005-live-write-requires-explicit-consent.md) for live-write consent.
 
 ## Context
 
@@ -62,6 +62,13 @@ The shared SDK profile includes atomic `If-None-Match: *` and `If-Match` conditi
 ### 7. Versioning
 
 The existing rule requiring a major version bump is amended for the pre-1.0 line: `0.2.0` may contain documented breaking behavior because it is not yet the stable `@chester-hill-solutions/stow-s3` 1.x contract. The 1.x boundary is reserved for the first stable, non-breaking contract. The npm version, binary build version, and status version must come from one version source.
+
+The Go `stow.MultipartStore` interface changes incompatibly in 0.2.0:
+`CreateMultipartUpload` takes `MultipartOptions` so initiation-time content type
+and metadata are part of the public storage contract. Custom implementations
+must add the options parameter and preserve those properties through completion.
+This break is accepted for the pre-1.0 release and must appear in its migration
+notes; no source-compatibility shim is promised.
 
 ### 8. Backends and storage format
 

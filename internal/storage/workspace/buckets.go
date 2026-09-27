@@ -110,7 +110,8 @@ func keysOf(set map[string]bool) []string {
 func (s *Store) pathFor(bucket, key string) (string, Form) {
 	if s.layout.IsNatural(key) {
 		owner, taken := s.folded[foldKey(bucket, key)]
-		if !taken || owner == key {
+		_, _, caseCollision := exactNaturalPath(s.bucketDir(bucket), key)
+		if (!taken || owner == key) && !caseCollision {
 			return NaturalPath(s.bucketDir(bucket), key), FormNatural
 		}
 	}

@@ -22,7 +22,7 @@ The endpoint and credentials used by the run-through adapter to reach a live S3-
 
 ### Mode Selection
 
-The operational mode, and local-only is what stow runs unless something asks for run-through by name. Ambient AWS or S3 credentials are not an ask: a developer's shell and a CI runner both export them for unrelated tools, and inferring an upstream from their presence made whether stow contacted a live provider a property of the machine rather than of anything the user requested. Run-through is selected by `--mode run-through` or `STOW_MODE=run-through`; `STOW_MODE=local` forces local-only, and an unrecognized value is local rather than an error or a fallback. See ADR 0001.
+The operational mode, and local-only is what stow runs unless something asks for run-through by name. Ambient AWS or S3 credentials are not an ask: a developer's shell and a CI runner both export them for unrelated tools, and inferring an upstream from their presence made whether stow contacted a live provider a property of the machine rather than of anything the user requested. Run-through is selected by `--mode run-through` or `STOW_MODE=run-through`; `STOW_MODE=local` forces local-only, and an unrecognized value is local rather than an error or a fallback. See [ADR 0011](docs/adr/0011-local-is-the-default-mode.md); it supersedes ADR 0001.
 
 ### Read-Through Cache
 

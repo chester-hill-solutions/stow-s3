@@ -90,9 +90,41 @@ func (s *FilesystemStore) objectsDir(bucket string) string {
 	return filepath.Join(s.bucketDir(bucket), "objects")
 }
 
+func (s *FilesystemStore) usesBoundedPath(bucket, key string) bool {
+	legacy := filepath.Join(append([]string{s.objectsDir(bucket)}, objectRelSegments(key)...)...)
+	return usesBoundedObjectPath(key) || len(legacy) > maxFilesystemPathLength
+}
+
 func (s *FilesystemStore) objectPath(bucket, key string) string {
-	segments := append([]string{s.objectsDir(bucket)}, objectRelSegments(key)...)
-	return filepath.Join(segments...)
+	legacy := filepath.Join(append([]string{s.objectsDir(bucket)}, objectRelSegments(key)...)...)
+	segments := append([]string{s.objectsDir(bucket)}, boundedObjectRelSegments(key)...)
+	bounded := filepath.Join(segments...)
+	if _, err := os.Stat(bounded); err == nil {
+		return bounded
+	} else if !os.IsNotExist(err) {
+		// A digest-addressed record takes precedence, including when an
+		// unexpected filesystem error occurs. Callers will report the error
+		// when they access it rather than falling through to stale data.
+		return bounded
+	}
+	if s.usesBoundedPath(bucket, key) {
+		// Linux could store keys in the old reversible sharded layout. Continue
+		// resolving those records after the bounded layout is introduced.
+		if _, err := os.Stat(legacy); err == nil {
+			return legacy
+		}
+		return bounded
+	}
+	return legacy
+}
+
+func (s *FilesystemStore) isBoundedObjectPath(bucket, path string) bool {
+	rel, err := filepath.Rel(s.objectsDir(bucket), path)
+	if err != nil {
+		return false
+	}
+	parts := strings.Split(rel, string(filepath.Separator))
+	return len(parts) == 3 && parts[0] == boundedPathPrefix && len(parts[1]) == 2 && isHexString(parts[1]) && len(parts[2]) == 64 && isHexString(parts[2])
 }
 
 // pruneEmptyShards removes the shard directories a delete leaves behind, up to
@@ -105,6 +137,14 @@ func (s *FilesystemStore) objectPath(bucket, key string) string {
 // walk the loop upward deleting directories it did not create.
 func (s *FilesystemStore) pruneEmptyShards(bucket, objPath string) {
 	root := s.objectsDir(bucket)
+	if rel, err := filepath.Rel(root, objPath); err == nil {
+		parts := strings.Split(rel, string(filepath.Separator))
+		if len(parts) == 3 && parts[0] == boundedPathPrefix {
+			_ = os.Remove(filepath.Dir(objPath))
+			_ = os.Remove(filepath.Dir(filepath.Dir(objPath)))
+			return
+		}
+	}
 	for dir := filepath.Dir(objPath); dir != root && filepath.Dir(dir) != dir; dir = filepath.Dir(dir) {
 		base := filepath.Base(dir)
 		if base == "." || base == string(filepath.Separator) {
@@ -234,7 +274,7 @@ func (s *FilesystemStore) PutObject(_ context.Context, bucket, key string, body 
 	objPath := s.objectPath(bucket, key)
 	var existing *storage.ObjectMeta
 	if _, statErr := os.Stat(objPath); statErr == nil {
-		record, readErr := readObjectRecord(objPath)
+		record, readErr := s.readObject(bucket, key)
 		if readErr != nil {
 			return nil, readErr
 		}
@@ -269,7 +309,7 @@ func (s *FilesystemStore) PutObject(_ context.Context, bucket, key string, body 
 		ChecksumValue:     opts.ChecksumValue,
 		LastModified:      now,
 	}
-	if err := writeObjectRecord(objPath, record); err != nil {
+	if err := s.writeObject(bucket, key, record); err != nil {
 		return nil, err
 	}
 	meta := record.meta(bucket, key)
@@ -289,7 +329,7 @@ func (s *FilesystemStore) GetObject(_ context.Context, bucket, key string) (io.R
 	if err := s.requireBucket(bucket); err != nil {
 		return nil, nil, err
 	}
-	record, err := readObjectRecord(s.objectPath(bucket, key))
+	record, err := s.readObject(bucket, key)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil, storage.ErrObjectNotFound
@@ -313,7 +353,7 @@ func (s *FilesystemStore) HeadObject(_ context.Context, bucket, key string) (*st
 	if err := s.requireBucket(bucket); err != nil {
 		return nil, err
 	}
-	record, err := readObjectRecord(s.objectPath(bucket, key))
+	record, err := s.readObject(bucket, key)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, storage.ErrObjectNotFound

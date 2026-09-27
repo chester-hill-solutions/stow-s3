@@ -67,6 +67,10 @@ type MultipartStore interface {
 	// published with. They are fields here rather than arguments because they are
 	// the multipart half of PutOptions, and an upload fixes them once: no part
 	// changes them and completion publishes exactly these.
+	//
+	// The options parameter was added in 0.2.0. Custom implementations must
+	// accept it and preserve those object properties through completion; the
+	// source-incompatible change is documented in CHANGELOG.md.
 	CreateMultipartUpload(ctx context.Context, bucket, key string, options MultipartOptions) (MultipartUpload, error)
 	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
 	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
