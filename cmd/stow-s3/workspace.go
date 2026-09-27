@@ -16,18 +16,19 @@ import (
 )
 
 type workspaceResult struct {
-	Version          int                   `json:"version"`
-	WorkspaceID      string                `json:"workspace_id"`
-	Root             string                `json:"root"`
-	WorkingDirectory string                `json:"working_directory"`
-	Bucket           string                `json:"bucket"`
-	CheckpointID     string                `json:"checkpoint_id,omitempty"`
-	RegistryDir      string                `json:"registry_dir,omitempty"`
-	SeededBytes      int64                 `json:"seeded_bytes,omitempty"`
-	SeededObjects    int64                 `json:"seeded_objects,omitempty"`
-	BaseIdentity     string                `json:"base_identity,omitempty"`
-	Capabilities     workspaceCapabilities `json:"capabilities"`
-	Authority        []stow.Operation      `json:"authority"`
+	Version          int                       `json:"version"`
+	WorkspaceID      string                    `json:"workspace_id"`
+	Root             string                    `json:"root"`
+	WorkingDirectory string                    `json:"working_directory"`
+	Bucket           string                    `json:"bucket"`
+	CheckpointID     string                    `json:"checkpoint_id,omitempty"`
+	RegistryDir      string                    `json:"registry_dir,omitempty"`
+	SeededBytes      int64                     `json:"seeded_bytes,omitempty"`
+	SeededObjects    int64                     `json:"seeded_objects,omitempty"`
+	BaseIdentity     string                    `json:"base_identity,omitempty"`
+	Repositories     []stow.PreparedRepository `json:"repositories,omitempty"`
+	Capabilities     workspaceCapabilities     `json:"capabilities"`
+	Authority        []stow.Operation          `json:"authority"`
 }
 
 type workspaceCapabilities struct {
@@ -206,6 +207,7 @@ func prepareWorkspaceCommand(args []string) error {
 		}
 	}
 	result.BaseIdentity = prepared.BaseIdentity
+	result.Repositories = prepared.Repositories
 	return writeWorkspaceJSON(result)
 }
 
@@ -245,6 +247,9 @@ func resolveTaskManifestPaths(base string, manifest *stow.WorkspaceTaskManifest)
 	for i := range manifest.Inputs {
 		manifest.Inputs[i].Source = resolveManifestPath(base, manifest.Inputs[i].Source)
 	}
+	for i := range manifest.Repositories {
+		manifest.Repositories[i].Source = resolveManifestPath(base, manifest.Repositories[i].Source)
+	}
 	if manifest.Root == base || manifest.Root == "." {
 		manifest.Root = ""
 	}
@@ -263,6 +268,7 @@ func prepareWorkspaceFromManifest(manifest stow.WorkspaceTaskManifest) (*stow.Pr
 		},
 		WorkingDirectory:       manifest.WorkingDirectory,
 		Inputs:                 manifest.Inputs,
+		Repositories:           manifest.Repositories,
 		IncludeSensitiveInputs: manifest.IncludeSensitiveInputs,
 	})
 	if err != nil {
@@ -472,13 +478,6 @@ func makeWorkspaceResult(ws *stow.Workspace, seededBytes, seededObjects int64) w
 		},
 		Authority: ws.Authority().Operations(),
 	}
-}
-
-func resolveManifestPath(base, path string) string {
-	if path == "" || filepath.IsAbs(path) {
-		return path
-	}
-	return filepath.Join(base, path)
 }
 
 func writeWorkspaceJSON(value interface{}) error { return writeWorkspaceJSONTo("", value) }

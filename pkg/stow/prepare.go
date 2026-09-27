@@ -19,28 +19,48 @@ type WorkspaceInput struct {
 	Destination string `json:"destination"`
 }
 
-// PrepareOptions describes a local, deterministic workspace seed. It does not
-// clone repositories, read credentials, or modify the source inputs.
+// GitRepositoryInput fetches one local repository commit into a fresh shallow
+// repository and checks it out detached. It never registers a worktree in or
+// modifies the source repository.
+type GitRepositoryInput struct {
+	Source      string `json:"source"`
+	Destination string `json:"destination"`
+	Ref         string `json:"ref"`
+}
+
+// PreparedRepository records the immutable revision selected for one input.
+type PreparedRepository struct {
+	Source      string `json:"source"`
+	Destination string `json:"destination"`
+	Ref         string `json:"ref"`
+	Commit      string `json:"commit"`
+}
+
+// PrepareOptions describes a local, deterministic workspace seed. Git inputs
+// fetch one selected commit without copying prior history. Preparation does not
+// read credential stores or modify the source inputs.
 type PrepareOptions struct {
 	WorkspaceOptions
-	WorkingDirectory       string           `json:"working_directory,omitempty"`
-	Inputs                 []WorkspaceInput `json:"inputs"`
-	IncludeSensitiveInputs bool             `json:"include_sensitive_inputs,omitempty"`
+	WorkingDirectory       string               `json:"working_directory,omitempty"`
+	Inputs                 []WorkspaceInput     `json:"inputs,omitempty"`
+	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
+	IncludeSensitiveInputs bool                 `json:"include_sensitive_inputs,omitempty"`
 }
 
 // WorkspaceTaskManifest is the versioned JSON input accepted by workspace
 // preparation tools. The path naming an input is local to the preparing host.
 type WorkspaceTaskManifest struct {
-	Version                int              `json:"version"`
-	Root                   string           `json:"root"`
-	WorkingDirectory       string           `json:"working_directory,omitempty"`
-	Inputs                 []WorkspaceInput `json:"inputs"`
-	MaxBytes               int64            `json:"max_bytes,omitempty"`
-	MaxObjects             int64            `json:"max_objects,omitempty"`
-	TTLSeconds             int64            `json:"ttl_seconds,omitempty"`
-	RegistryDir            string           `json:"registry_dir,omitempty"`
-	Bucket                 string           `json:"bucket,omitempty"`
-	IncludeSensitiveInputs bool             `json:"include_sensitive_inputs,omitempty"`
+	Version                int                  `json:"version"`
+	Root                   string               `json:"root"`
+	WorkingDirectory       string               `json:"working_directory,omitempty"`
+	Inputs                 []WorkspaceInput     `json:"inputs,omitempty"`
+	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
+	MaxBytes               int64                `json:"max_bytes,omitempty"`
+	MaxObjects             int64                `json:"max_objects,omitempty"`
+	TTLSeconds             int64                `json:"ttl_seconds,omitempty"`
+	RegistryDir            string               `json:"registry_dir,omitempty"`
+	Bucket                 string               `json:"bucket,omitempty"`
+	IncludeSensitiveInputs bool                 `json:"include_sensitive_inputs,omitempty"`
 }
 
 // PreparedWorkspace is the ready-to-launch result. WorkingDirectory is the
@@ -51,17 +71,18 @@ type PreparedWorkspace struct {
 	SeededBytes      int64
 	SeededObjects    int64
 	BaseIdentity     string
+	Repositories     []PreparedRepository
 }
 
-// PrepareWorkspace creates a Stow-owned workspace, copies its declared local
-// inputs into place, checks the seed against effective runtime limits, then
+// PrepareWorkspace creates a Stow-owned workspace, stages declared local files
+// and selected Git refs, checks the seed against effective runtime limits, then
 // returns the directory an agent can use. A failed prepare removes only the
 // root this call created.
 func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr error) {
 	if options.Dir == "" {
 		return nil, fmt.Errorf("stow: prepare requires a workspace Dir")
 	}
-	if len(options.Inputs) == 0 {
+	if len(options.Inputs) == 0 && len(options.Repositories) == 0 {
 		return nil, fmt.Errorf("stow: prepare requires at least one input")
 	}
 	root, err := validatePrepareRoot(options.Dir)
@@ -88,7 +109,7 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 		}
 	}()
 
-	bytes, objects, err := seedWorkspaceInputs(root, options.Inputs, options.IncludeSensitiveInputs)
+	bytes, objects, repositories, err := seedPreparedWorkspace(root, options)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +129,23 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 		return nil, fmt.Errorf("stow: fingerprint prepared inputs: %w", err)
 	}
 	committed = true
-	return &PreparedWorkspace{Workspace: ws, WorkingDirectory: workingDirectory, SeededBytes: bytes, SeededObjects: objects, BaseIdentity: baseIdentity}, nil
+	return &PreparedWorkspace{Workspace: ws, WorkingDirectory: workingDirectory, SeededBytes: bytes, SeededObjects: objects, BaseIdentity: baseIdentity, Repositories: repositories}, nil
+}
+
+func seedPreparedWorkspace(root string, options PrepareOptions) (int64, int64, []PreparedRepository, error) {
+	bytes, objects, repositories, err := cloneGitRepositories(root, options.Repositories, options.IncludeSensitiveInputs)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	inputBytes, inputObjects, err := seedWorkspaceInputs(root, options.Inputs, options.IncludeSensitiveInputs)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	maxInt64 := int64(^uint64(0) >> 1)
+	if inputBytes > maxInt64-bytes || inputObjects > maxInt64-objects {
+		return 0, 0, nil, fmt.Errorf("stow: seeded totals exceed supported limits")
+	}
+	return bytes + inputBytes, objects + inputObjects, repositories, nil
 }
 
 func openPreparedWorkspace(options WorkspaceOptions, root string) (*Workspace, error) {
@@ -213,6 +250,12 @@ func workspaceFingerprint(root string) (string, error) {
 		}
 		if path == filepath.Join(root, ".stow") {
 			return filepath.SkipDir
+		}
+		if path != root && strings.EqualFold(entry.Name(), ".git") {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
 		}
 		if entry.IsDir() {
 			return nil
@@ -379,6 +422,10 @@ func copySeedFile(source, destination string, info os.FileInfo, totalBytes, tota
 	}
 	if closeErr != nil {
 		return closeErr
+	}
+	maxInt64 := int64(^uint64(0) >> 1)
+	if n > maxInt64-*totalBytes || *totalObjects == maxInt64 {
+		return fmt.Errorf("seeded totals exceed supported limits")
 	}
 	*totalBytes += n
 	(*totalObjects)++

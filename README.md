@@ -62,8 +62,9 @@ and import. The S3 endpoint remains optional.
 See [the task manifest and workspace lifecycle guide](docs/task-manifest.md)
 for the schema, examples, archive safety rules, and limitations. A workspace is
 filesystem isolation for task editing, not an OS sandbox; direct filesystem
-writes by the agent are not hard-limited by Stow's object API quotas. The current
-preparer accepts local paths; Git-ref worktrees are not implemented yet.
+writes by the agent are not hard-limited by Stow's object API quotas. Task
+manifests can stage explicit refs from local Git repositories; dirty files,
+older history, submodules, and Git LFS payloads are not included.
 
 ## Install
 

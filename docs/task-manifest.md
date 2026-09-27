@@ -10,9 +10,15 @@ starts its agent with the returned `working_directory` as the process cwd.
   "root": "../tasks/fix-parser",
   "working_directory": "repo",
   "inputs": [
-    { "source": "../../projects/parser", "destination": "repo" },
     { "source": "./task-notes.md", "destination": "repo/TASK.md" },
     { "source": "./fixtures", "destination": "repo/testdata" }
+  ],
+  "repositories": [
+    {
+      "source": "../../projects/parser",
+      "destination": "repo",
+      "ref": "refs/heads/main"
+    }
   ],
   "max_bytes": 67108864,
   "max_objects": 10000,
@@ -28,23 +34,31 @@ Save this as `task.json`, then run:
 stow-s3 workspace prepare --manifest task.json
 ```
 
-Relative `root`, `registry_dir`, and input `source` paths are resolved from the
-manifest's directory. Input destinations are relative to the new workspace;
-directories copy their contents beneath the destination. The root's parent must
-already exist and the root itself must not. Duplicate file destinations,
-absolute or parent-traversing destination
-paths, `.stow` destinations, symlink inputs, and non-regular input files are
-refused. Common credential-looking filenames and paths (such as `.env`, `.npmrc`,
-`.netrc`, SSH private keys, certificate/key files, and cloud credentials) are refused by default; an explicit
-`include_sensitive_inputs: true` is required to copy them. This filename check
-is a guard against accidental inclusion, not secret scanning. Sources are copied;
-they are not moved or modified.
+Relative `root`, `registry_dir`, input `source`, and repository `source` paths
+are resolved from the manifest's directory. Input destinations are relative to
+the new workspace; directories copy their contents beneath the destination.
+Each repository needs an explicit `ref` that resolves to a commit in the local
+repository. Preparation fetches only that commit into a new detached shallow
+repository inside the task root. It does not register a linked worktree or
+modify the source repository, add a source remote to the task copy, or include
+source changes that are uncommitted or untracked. Older Git history is not
+fetched. Submodules are not initialized; Git LFS content is not downloaded.
+The root's parent must already exist and the root itself must not. Duplicate
+file destinations, absolute or parent-traversing destination paths, `.stow`
+destinations, symlink inputs, and non-regular input files are refused. Common
+credential-looking filenames and paths (such as `.env`, `.npmrc`, `.netrc`, SSH
+private keys, certificate/key files, and cloud credentials) are refused by
+default; an explicit `include_sensitive_inputs: true` is required to copy them.
+This filename check is a guard against accidental inclusion, not secret
+scanning. Sources are copied; they are not moved or modified.
 
-Preparation checks the seed's size and file count against the workspace limits
-and returns a `base_identity` fingerprint, workspace ID, bucket, root, actual
-working directory, effective capabilities, and authority. The prepared task
-defaults to local `ReadWrite` authority and has no upstream access. It returns no
-S3 credentials. A same-machine handoff reference can be printed with
+Preparation checks the seed's size and file count (including the shallow Git
+metadata) against the workspace limits and returns a `base_identity`
+fingerprint, workspace ID, bucket, root, actual working directory, effective
+capabilities, authority, and a `repositories` array with the resolved commit
+for each Git input. The prepared task defaults to local `ReadWrite` authority
+and has no upstream access. It returns no S3 credentials. A same-machine
+handoff reference can be printed with
 `stow-s3 workspace handoff --id <workspace-id> --output handoff.json` and
 resumed with `stow-s3 workspace resume --handoff handoff.json`.
 
@@ -87,11 +101,12 @@ TypeScript and Python expose thin wrappers over the same installed
 from `stow_s3`. The wrappers return the CLI's JSON object and do not duplicate
 workspace or archive semantics.
 
-The current manifest accepts local file and directory inputs. It does not clone
-Git repositories; callers that need a repo copy should provide an explicit local
-source directory. Symlink inputs are rejected so preparation cannot copy a path
-that escapes the declared source tree. Git-ref worktrees remain a later stage
-of the workspace plan.
+The manifest accepts local file and directory inputs plus explicit refs from
+local Git repositories. Repository checkouts support regular files only;
+checked out symbolic links are refused to avoid a staged path resolving outside
+the task tree. A selected tree that contains a sensitive-looking path still
+requires `include_sensitive_inputs: true`. The path check is not secret
+scanning.
 
 The workspace is an isolated copy for safe task editing. It is not an OS sandbox:
 an agent running as the same user can still access other paths and network

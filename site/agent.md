@@ -11,11 +11,12 @@ cleans itself up on close.
 For a coding task whose files should persist across process restarts, use a
 prepared workspace. Define a version 1 task manifest and run
 `stow-s3 workspace prepare --manifest task.json`; start the agent with the
-returned `working_directory` as its cwd. The manifest supports local file and
-directory inputs. See [`docs/task-manifest.md`](../docs/task-manifest.md) for
-resume, checkpoint, diff, restore, same-machine handoff, and portable archive
-commands.
-Git-ref worktrees are not implemented yet.
+returned `working_directory` as its cwd. The manifest supports local files,
+directories, and explicit refs from local Git repositories. Git preparation
+uses a fresh shallow checkout of the selected commit; dirty files, older
+history, submodules, and Git LFS payloads are excluded. See
+[`docs/task-manifest.md`](../docs/task-manifest.md) for resume, checkpoint,
+diff, restore, same-machine handoff, and portable archive commands.
 
 Use a scoped session when you need only disposable S3 bytes and none of these
 are true:

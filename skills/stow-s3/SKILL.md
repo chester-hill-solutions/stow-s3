@@ -18,9 +18,13 @@ Machine-readable instructions: https://stow.chesterhillsolutions.ca/agent.md
 For a coding task, prepare a workspace when the agent needs declared project
 files in its own cwd and its work must survive a process restart. Start with a
 version 1 task manifest and `stow-s3 workspace prepare --manifest task.json`;
-use the returned `working_directory` as the agent process cwd. The workspace
-CLI also supports resume, handoff, checkpoint, diff, restore, and portable
-checkpoint export/import. See [`docs/task-manifest.md`](../../docs/task-manifest.md).
+use the returned `working_directory` as the agent process cwd. Manifests accept
+local files/directories and explicit refs from local Git repositories. Git
+inputs stage only the selected commit into a fresh shallow repository; dirty
+files, older history, submodules, and Git LFS payloads are excluded. The
+workspace CLI also supports resume, handoff, checkpoint, diff, restore, and
+portable checkpoint export/import. See
+[`docs/task-manifest.md`](../../docs/task-manifest.md).
 
 Reach for a disposable scoped session only when **all** of these hold:
 

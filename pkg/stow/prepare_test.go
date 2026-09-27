@@ -2,6 +2,7 @@ package stow_test
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -47,6 +48,139 @@ func TestPrepareWorkspaceCopiesInputsIntoOwnedWorkingDirectory(t *testing.T) {
 		t.Fatalf("source input was modified or removed: %v", err)
 	}
 	assertPreparedWorkingDirectoryResumes(t, prepared.Workspace, registry, prepared.WorkingDirectory)
+}
+
+func TestPrepareWorkspaceClonesAnExplicitGitRefWithoutTouchingSource(t *testing.T) {
+	git, source, parentCommit, commit := newPreparedGitSource(t)
+	writeGitTestFile(t, source, "README.md", "dirty source")
+	writeGitTestFile(t, source, "untracked.txt", "source only")
+	sourceStatus := gitTestCommand(t, git, source, "status", "--porcelain")
+	worktreesBefore := gitTestCommand(t, git, source, "worktree", "list", "--porcelain")
+
+	root := filepath.Join(t.TempDir(), "task")
+	prepared, err := stow.PrepareWorkspace(stow.PrepareOptions{
+		WorkspaceOptions: stow.WorkspaceOptions{Dir: root, RegistryDir: filepath.Join(t.TempDir(), "registry")},
+		WorkingDirectory: "repo",
+		Repositories: []stow.GitRepositoryInput{{
+			Source: source, Destination: "repo", Ref: "refs/heads/main",
+		}},
+	})
+	if err != nil {
+		t.Fatalf("PrepareWorkspace: %v", err)
+	}
+	defer prepared.Workspace.Close()
+	assertPreparedGitCheckout(t, git, prepared, parentCommit, commit)
+	assertGitSourceUnchanged(t, git, source, sourceStatus, worktreesBefore)
+	if prepared.SeededObjects == 0 || prepared.SeededBytes == 0 {
+		t.Fatalf("Git seed totals = (%d bytes, %d objects)", prepared.SeededBytes, prepared.SeededObjects)
+	}
+}
+
+func newPreparedGitSource(t *testing.T) (git, source, parentCommit, commit string) {
+	t.Helper()
+	git, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("git is not installed")
+	}
+	source = filepath.Join(t.TempDir(), "source")
+	if err := os.Mkdir(source, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	gitTestCommand(t, git, source, "init", "-b", "main")
+	gitTestCommand(t, git, source, "config", "user.name", "Stow Test")
+	gitTestCommand(t, git, source, "config", "user.email", "stow-test@example.invalid")
+	writeGitTestFile(t, source, "README.md", "old version")
+	gitTestCommand(t, git, source, "add", "README.md")
+	gitTestCommand(t, git, source, "commit", "-m", "baseline")
+	parentCommit = gitTestCommand(t, git, source, "rev-parse", "HEAD")
+	writeGitTestFile(t, source, "README.md", "committed version")
+	gitTestCommand(t, git, source, "commit", "-am", "task base")
+	commit = gitTestCommand(t, git, source, "rev-parse", "HEAD")
+	return git, source, parentCommit, commit
+}
+
+func writeGitTestFile(t *testing.T, root, name, contents string) {
+	t.Helper()
+	if err := os.WriteFile(filepath.Join(root, name), []byte(contents), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func assertPreparedGitCheckout(t *testing.T, git string, prepared *stow.PreparedWorkspace, parentCommit, commit string) {
+	t.Helper()
+	checkout := prepared.WorkingDirectory
+	if got := gitTestCommand(t, git, checkout, "rev-parse", "HEAD"); got != commit {
+		t.Fatalf("checked out commit = %s, want %s", got, commit)
+	}
+	if got, err := os.ReadFile(filepath.Join(checkout, "README.md")); err != nil || string(got) != "committed version" {
+		t.Fatalf("checked out README = %q, %v", got, err)
+	}
+	if got := gitTestCommand(t, git, checkout, "rev-list", "--count", "HEAD"); got != "1" {
+		t.Fatalf("task repository history count = %s, want only the selected commit", got)
+	}
+	command := exec.Command(git, "-C", checkout, "cat-file", "-e", parentCommit+"^{commit}")
+	if command.Run() == nil {
+		t.Fatal("task repository contains history before the selected ref")
+	}
+	if got := gitTestCommand(t, git, checkout, "remote"); got != "" {
+		t.Fatalf("task repository unexpectedly has a source remote: %q", got)
+	}
+	if _, err := os.Stat(filepath.Join(checkout, "untracked.txt")); !os.IsNotExist(err) {
+		t.Fatalf("untracked source file leaked into task repository: %v", err)
+	}
+	if len(prepared.Repositories) != 1 || prepared.Repositories[0].Commit != commit {
+		t.Fatalf("prepared repository identity = %+v", prepared.Repositories)
+	}
+}
+
+func assertGitSourceUnchanged(t *testing.T, git, source, status, worktrees string) {
+	t.Helper()
+	if got := gitTestCommand(t, git, source, "status", "--porcelain"); got != status {
+		t.Fatalf("source checkout status changed: before %q, after %q", status, got)
+	}
+	if got := gitTestCommand(t, git, source, "worktree", "list", "--porcelain"); got != worktrees {
+		t.Fatalf("source worktree registrations changed:\nbefore %s\nafter %s", worktrees, got)
+	}
+}
+
+func TestPrepareWorkspaceRejectsUnknownGitRefAndCleansRoot(t *testing.T) {
+	git, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("git is not installed")
+	}
+	source := filepath.Join(t.TempDir(), "source")
+	if err := os.Mkdir(source, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	gitTestCommand(t, git, source, "init", "-b", "main")
+	gitTestCommand(t, git, source, "config", "user.name", "Stow Test")
+	gitTestCommand(t, git, source, "config", "user.email", "stow-test@example.invalid")
+	if err := os.WriteFile(filepath.Join(source, "task.txt"), []byte("task"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitTestCommand(t, git, source, "add", "task.txt")
+	gitTestCommand(t, git, source, "commit", "-m", "baseline")
+	root := filepath.Join(t.TempDir(), "task")
+	_, err = stow.PrepareWorkspace(stow.PrepareOptions{
+		WorkspaceOptions: stow.WorkspaceOptions{Dir: root, RegistryDir: filepath.Join(t.TempDir(), "registry")},
+		Repositories:     []stow.GitRepositoryInput{{Source: source, Destination: "repo", Ref: "refs/heads/missing"}},
+	})
+	if err == nil {
+		t.Fatal("PrepareWorkspace accepted an unknown Git ref")
+	}
+	if _, statErr := os.Lstat(root); !os.IsNotExist(statErr) {
+		t.Fatalf("failed Git prepare left an owned partial root: %v", statErr)
+	}
+}
+
+func gitTestCommand(t *testing.T, git, directory string, args ...string) string {
+	t.Helper()
+	command := exec.Command(git, append([]string{"-C", directory}, args...)...)
+	output, err := command.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v: %v\n%s", args, err, output)
+	}
+	return strings.TrimSpace(string(output))
 }
 
 func assertPreparedWorkingDirectoryResumes(t *testing.T, ws *stow.Workspace, registry, workingDirectory string) {

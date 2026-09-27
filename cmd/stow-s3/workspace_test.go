@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
@@ -18,7 +20,7 @@ func TestReadWorkspaceManifestResolvesLocalPaths(t *testing.T) {
 	if err := os.WriteFile(input, []byte("task"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	manifestJSON := `{"version":1,"root":"../tasks/work","working_directory":"repo","inputs":[{"source":"input.txt","destination":"repo/TASK.md"}],"registry_dir":"../registry"}`
+	manifestJSON := `{"version":1,"root":"../tasks/work","working_directory":"repo","inputs":[{"source":"input.txt","destination":"repo/TASK.md"}],"repositories":[{"source":"../source-repo","destination":"repo","ref":"refs/heads/main"}],"registry_dir":"../registry"}`
 	if err := os.WriteFile(manifestPath, []byte(manifestJSON), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -32,9 +34,61 @@ func TestReadWorkspaceManifestResolvesLocalPaths(t *testing.T) {
 	if manifest.Inputs[0].Source != input {
 		t.Fatalf("input source = %q, want %q", manifest.Inputs[0].Source, input)
 	}
+	if manifest.Repositories[0].Source != filepath.Join(dir, "../source-repo") || manifest.Repositories[0].Ref != "refs/heads/main" {
+		t.Fatalf("repository input = %+v", manifest.Repositories[0])
+	}
 	if manifest.RegistryDir != filepath.Join(dir, "../registry") {
 		t.Fatalf("registry = %q", manifest.RegistryDir)
 	}
+}
+
+func TestWorkspacePrepareCommandStagesGitRefAndReportsCommit(t *testing.T) {
+	git, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("git is not installed")
+	}
+	base := t.TempDir()
+	source := filepath.Join(base, "source")
+	if err := os.Mkdir(source, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	workspaceGitTestCommand(t, git, source, "init", "-b", "main")
+	workspaceGitTestCommand(t, git, source, "config", "user.name", "Stow Test")
+	workspaceGitTestCommand(t, git, source, "config", "user.email", "stow-test@example.invalid")
+	if err := os.WriteFile(filepath.Join(source, "main.go"), []byte("package main\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	workspaceGitTestCommand(t, git, source, "add", "main.go")
+	workspaceGitTestCommand(t, git, source, "commit", "-m", "baseline")
+	commit := workspaceGitTestCommand(t, git, source, "rev-parse", "HEAD")
+	manifestPath := filepath.Join(base, "task.json")
+	manifest := `{"version":1,"root":"task-root","working_directory":"repo","repositories":[{"source":"source","destination":"repo","ref":"refs/heads/main"}],"registry_dir":"registry"}`
+	if err := os.WriteFile(manifestPath, []byte(manifest), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	output := captureWorkspaceCommand(t, func() error {
+		return prepareWorkspaceCommand([]string{"--manifest", manifestPath})
+	})
+	var result workspaceResult
+	if err := json.Unmarshal(output, &result); err != nil {
+		t.Fatalf("prepare result = %s: %v", output, err)
+	}
+	if result.WorkingDirectory != filepath.Join(base, "task-root", "repo") || len(result.Repositories) != 1 || result.Repositories[0].Commit != commit {
+		t.Fatalf("prepare result = %+v", result)
+	}
+	if _, err := os.Stat(filepath.Join(result.WorkingDirectory, "main.go")); err != nil {
+		t.Fatalf("prepared source file missing: %v", err)
+	}
+}
+
+func workspaceGitTestCommand(t *testing.T, git, directory string, args ...string) string {
+	t.Helper()
+	command := exec.Command(git, append([]string{"-C", directory}, args...)...)
+	output, err := command.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v: %v\n%s", args, err, output)
+	}
+	return strings.TrimSpace(string(output))
 }
 
 func TestExportCheckpointFileRefusesToOverwrite(t *testing.T) {
