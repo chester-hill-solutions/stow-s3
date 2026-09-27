@@ -392,3 +392,50 @@ func TestCompleteMultipartMinimumPartSize(t *testing.T) {
 		})
 	}
 }
+
+// Naming a checksum algorithm at initiation must not fail the completion.
+//
+// x-amz-checksum-algorithm on CreateMultipartUpload says which algorithm the
+// client means to use. The initiation has no body, so no value comes with it -
+// the record is a declaration, not a claim about the object.
+//
+// It was handed to the store as a claim, and the store rightly refuses a claim
+// with no value, so every completion of an upload that named one answered
+// 500 InternalError. The SDK retried three times before giving up, and the
+// client's own error said nothing about the cause. This is the case at the wire
+// and through the real SDK, because that is where it presented as a service
+// outage rather than as a bug in a store.
+func TestMultipartCompletionSucceedsWhenInitiationNamesAChecksumAlgorithm(t *testing.T) {
+	env := newTestEnv(t)
+	ctx := context.Background()
+	bucket := uniqueBucket(t, "multipart-checksum-declaration")
+	key := "payload.bin"
+	createBucket(ctx, t, env.Client, bucket)
+
+	created, err := env.Client.CreateMultipartUpload(ctx, &s3.CreateMultipartUploadInput{
+		Bucket:            aws.String(bucket),
+		Key:               aws.String(key),
+		ChecksumAlgorithm: types.ChecksumAlgorithmCrc32,
+	})
+	if err != nil {
+		t.Fatalf("CreateMultipartUpload: %v", err)
+	}
+	uploadID := aws.ToString(created.UploadId)
+
+	body := []byte("hello")
+	etags := uploadNumberedParts(t, ctx, env, uploadTarget{bucket, key, uploadID}, body)
+	if _, err := env.Client.CompleteMultipartUpload(ctx, &s3.CompleteMultipartUploadInput{
+		Bucket:   aws.String(bucket),
+		Key:      aws.String(key),
+		UploadId: aws.String(uploadID),
+		MultipartUpload: &types.CompletedMultipartUpload{
+			Parts: []types.CompletedPart{{ETag: aws.String(etags[0]), PartNumber: aws.Int32(1)}},
+		},
+	}); err != nil {
+		t.Fatalf("CompleteMultipartUpload after naming a checksum algorithm: %v", err)
+	}
+
+	if got := readCompletedObject(t, ctx, env, bucket, key); !bytes.Equal(got, body) {
+		t.Errorf("body = %q, want %q", got, body)
+	}
+}

@@ -267,7 +267,15 @@ func ParsePolicy(raw string) (Policy, bool) {
 // flag, which is the same decision at a different layer) is the request.
 func DetectMode() Mode {
 	switch strings.ToLower(strings.TrimSpace(os.Getenv("STOW_MODE"))) {
-	case "run-through", "runthrough", "upstream":
+	case "run-through", "runthrough":
+		// The hyphen is optional because losing it is a typo of the same word
+		// and the intent is unambiguous. Nothing else is accepted, and the
+		// spelling that was briefly allowed here deserves naming: "upstream" is
+		// a different word, not a misspelling of this one. It was also the name
+		// of the reserved-and-unused start option the 0.2.0 plan removed, so
+		// accepting it here would have let exactly the configuration that plan
+		// set out to delete select a live provider — the opposite of what this
+		// function is for, through a spelling that looks like it was meant.
 		return ModeRunThrough
 	default:
 		// "local", "auto", unset, and anything unrecognized. An unrecognized

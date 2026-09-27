@@ -98,19 +98,6 @@ type CopyRequest struct {
 	Options      CopyOptions
 }
 
-// Copy returns the request as its two halves, for a store that validates each
-// pair separately.
-func (r CopyRequest) Source() (string, string) { return r.SourceBucket, r.SourceKey }
-func (r CopyRequest) Destination() (string, string) {
-	return r.DestBucket, r.DestKey
-}
-
-// HasSourceConditions reports whether the request carries any, so a caller can
-// tell "no conditions" from "conditions that happen to be empty".
-func (r CopyRequest) HasSourceConditions() bool {
-	return r.Options.SourceIfMatch != "" || r.Options.SourceIfNoneMatch != ""
-}
-
 // ConditionalCopyStore is the optional extension: a copy that can refuse to
 // publish anything unless the source version satisfies the caller's conditions.
 //
