@@ -13,6 +13,21 @@ export interface EmbeddedCapabilities {
   backend: "memory" | "indexeddb";
   maxBytes: number;
   maxObjects: number;
+  /**
+   * Whether objects outlive this instance. This is a property of the backend and
+   * the host, not a setting: it is `false` on a memory backend because the host
+   * has nowhere to persist, which is the same `false` a caller would get from
+   * forgetting to ask.
+   *
+   * Branch on `backend` to tell the cases apart. `"indexeddb"` means a durable
+   * store with generation-checked commits; `"memory"` means everything is gone when
+   * the instance closes.
+   *
+   * It is also `false` on a host that cannot persist at all — a Worker or any
+   * other isolate, where the object store is not the same thing as a workspace
+   * and a durable workspace is not available. See "Where each surface can run" in
+   * the README.
+   */
   persistent: boolean;
   multipart: boolean;
   upstream: boolean;

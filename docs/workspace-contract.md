@@ -135,6 +135,37 @@ saying which member lands in which phase is more useful than a promise:
 | `Touch`, a registry on disk, and TTL collection | **Shipped** in Go, refusing live and adopted workspaces | W4 |
 | `Facade` | Not yet. A workspace speaks no S3 today | W5 |
 | TypeScript and Python workspace lifecycle objects | Not yet. `workspace` CLI wrappers are shipped, but they return JSON command results rather than in-process `openWorkspace` handles | Future API phase |
+| A workspace on a host with no filesystem | **Not possible, and not planned.** This contract describes a real directory; a host without one cannot provide it | — |
+
+### Where the workspace is not the answer
+
+A workspace is the agent surface, and it is built on a real directory: every
+object is a real file at a key-derived path, which is the whole point of ADR 0008.
+A host with no filesystem therefore cannot provide one, and this contract does not
+describe a variant that can.
+
+On such a host the deployment is the embedded profile with a persistence adapter.
+The browser profile's `IndexedDbPersistenceAdapter` is the reference
+implementation: generation-checked commits inside a readwrite transaction, quota
+validation, and a lock manager. That is a durable object store with no filesystem
+at all, and it is tested.
+
+Two consequences a caller must be able to tell apart, because the capability
+report does not distinguish them on its own:
+
+- **`persistent: false` is structural here, not a setting.** It means the backend
+  and host have nowhere to persist, which is the same `false` a caller would get
+  from forgetting to ask. `backend` is the field to branch on — `memory`,
+  `filesystem`, `workspace`, or the browser profile's `indexeddb`.
+- **An isolate is ephemeral.** A Worker or any other isolate can be reclaimed
+  between requests, so durability there comes from the platform's storage rather
+  than the process, and a workspace that must outlive the process (ADR 0009) is not
+  available. The relay is excluded for the same reason (§9).
+
+A caller that cannot tell "unavailable on this host" from "not enabled here" will
+misreport what it has, so this boundary is stated in the contract and in the README
+rather than left to be inferred from a boolean.
+
 
 The current task manifest, CLI commands, archive limits, sensitive-path rules,
 and cleanup behavior are documented in [`task-manifest.md`](task-manifest.md).

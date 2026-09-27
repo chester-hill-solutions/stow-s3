@@ -39,6 +39,14 @@ class StowProtocolError(Exception):
 class StowCapabilities:
     """What a caller may rely on before issuing operations."""
 
+    # Whether objects outlive the session. A property of the backend and the host,
+    # not a setting: it is False on a memory backend because the host has nowhere
+    # to persist, which is the same False a caller would get from forgetting to
+    # ask. Branch on ``backend`` to tell the cases apart.
+    #
+    # It is also False on a host that cannot persist at all -- a Worker or any
+    # other isolate -- where the object store is not a workspace and a durable
+    # workspace is unavailable. See "Where each surface can run" in the README.
     persistent: bool
     multipart: bool
     upstream: bool

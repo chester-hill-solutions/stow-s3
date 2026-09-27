@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Documented which surface runs where, because a capability report could not tell a caller.** Nothing said that the browser profile is *the* deployment on a host with no filesystem, or that the workspace — the agent surface — is unavailable there. A host with no filesystem cannot provide a workspace at all, since a workspace is a real directory and every object in it is a real file at a key-derived path; that is structural, and `stow.OpenWorkspace` refuses rather than pretending.
+
+  The capability report's `persistent` is the field that hid this. It is a property of the backend and the host, not a setting, so it reads `false` on a memory backend for the same reason it would read `false` if a caller had forgotten to ask. `backend` is the field to branch on, and the boundary is now stated in the README, in the workspace contract's delivery table, and on the capability in each of the three client languages.
+
+  The honest limit is recorded rather than smoothed over: an isolate is ephemeral, so durability there comes from the platform's own storage and a workspace that must outlive its process is not available — the same reason the relay is excluded. A durable object store *is* available on such a host, through the embedded profile with a persistence adapter, and the browser profile's `IndexedDbPersistenceAdapter` is the reference implementation: generation-checked commits inside a readwrite transaction, quota validation, and a lock manager, with no filesystem at all.
+
+  This changes no wire shape. `backend` already carried the distinction, so the fix is telling a caller which field to read. A tri-state capability would distinguish unavailable from disabled in the payload itself, and that is a protocol decision left open rather than made silently here.
+
 - **Fixed: configuring a cache limit made every changed-object read walk the whole cache.** Eviction was planned by listing every bucket, paginating every object, and issuing a `HeadObject` per object to recover the access time and size. One changed-object refresh therefore cost a store round trip for every cached object, so a cache of N objects took N round trips whenever anything in it changed — which is most of a session. Measured: 40 refreshes against a 40-object cache examined 1600 rows, and against a 160-object cache, 6400. That is exactly refreshes times depth, so refreshing N changed objects was quadratic.
 
   Configuring the limits is what turned the scan on — `evictCache` returns early when the byte, count and TTL limits are all zero — so the cost appeared precisely when a cache was worth configuring, on precisely the constrained host where it was most wanted. 200 refreshes with no limit walked nothing; the same 200 with a limit walked 40,000 rows.

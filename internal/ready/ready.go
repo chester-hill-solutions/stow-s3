@@ -19,6 +19,14 @@ const ProtocolVersion = 1
 
 // Capabilities is what a caller can rely on before issuing operations.
 type Capabilities struct {
+	// Persistent reports whether objects outlive the session. It is a property of
+	// the backend and the host, not a setting: it is false on a memory backend
+	// because the host has nowhere to persist, which is the same false a caller
+	// would get from forgetting to ask. Backend is the field to branch on.
+	//
+	// A caller that cannot tell "unavailable on this host" from "not enabled here"
+	// will misreport what it holds, so the boundary is stated rather than left to
+	// be inferred from a boolean.
 	Persistent        bool  `json:"persistent"`
 	Multipart         bool  `json:"multipart"`
 	Upstream          bool  `json:"upstream"`

@@ -1,6 +1,6 @@
 # Deploy-Anywhere Plan
 
-**Status:** Phase 0 measured and committed; Phase 1 implemented; Phase 2 measured and its premise corrected; Phase 3 implemented. Phases 4b and 5–7 are not started.
+**Status:** Phases 0–4b done. Phases 5–7 are not started.
 **Date:** 2026-09-27
 **Baseline:** `main` at `4ca2c1a`
 **Relationship:** additive to the accepted decisions in ADRs 0005–0011, `docs/compat-contract.md`, and `docs/workspace-contract.md`. This plan is the current execution order for the *portability and multi-writer* workstreams, and it sequences the MCP adapter that `docs/agent-workspace-plan.md` Phase 5 item 3 defers. It does not supersede that plan's workspace phases; the two run in parallel and this one is ordered first where they touch the same code.
@@ -300,6 +300,17 @@ lock manager. That is the "execute on nothing" agent surface, and it is tested.
 **Exit:** the documentation says which surface runs where, and a caller can tell
 from the capability report what guarantee they actually hold.
 
+**Done**, in the README, the workspace contract's delivery table, and on the
+capability in Go, TypeScript and Python. The boundary is stated rather than
+smoothed: a workspace needs a real directory, so a filesystem-less host gets the
+embedded profile with a persistence adapter; an isolate is ephemeral, so durability
+there is the platform's storage and a process-outliving workspace is unavailable.
+
+No wire shape changed, because `backend` already carried the distinction — the fix
+is telling a caller which field to read. A tri-state capability would put
+"unavailable" and "disabled" in the payload itself, and that is a protocol
+decision left open rather than made silently here.
+
 ### Phase 5 — Delta sync as a first-class operation (P1)
 
 The checkpoint diff already computes add/change/delete
@@ -370,6 +381,8 @@ Sequenced last, and deliberately:
   limits are still enforced. **Done.**
 - A caller can tell, from the capability report alone, which of the workspace and
   persistent-embedded surfaces their host supports and what durability each gives.
+  **Done**, by naming `backend` as the field to branch on and stating why
+  `persistent` cannot answer it.
 - `make standards` and `make test-all` green; no ratchet baseline grows.
 - Every consistency claim in `docs/compat-contract.md` matches a test.
 

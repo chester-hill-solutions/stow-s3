@@ -386,6 +386,44 @@ try {
 
 The browser profile requires a compatible embedded host and persistence adapter. It can store snapshots in IndexedDB and restore them when the profile opens again.
 
+### Where each surface can run
+
+The object model is the same everywhere. What changes is the storage underneath, and one surface is not available at all without a filesystem.
+
+| Surface | Needs a filesystem | Use it for |
+|---|---|---|
+| `serve` (S3 over HTTP) | yes | a local S3 endpoint, SDK compatibility |
+| `workspace` | **yes** | giving an agent a real working directory |
+| `/embedded` on Node | no | an in-process object runtime in Node |
+| `/embedded` in a browser | no | a durable object store on a host with no filesystem |
+| `/browser` with IndexedDB | no | the same, surviving a reload |
+
+**The workspace is the agent surface, and it requires a real directory.** It
+stores each object as a real file at a key-derived path, so a host with no
+filesystem cannot provide one. That is a structural limit, not a configuration
+choice, and `stow.OpenWorkspace` refuses rather than pretending.
+
+**On a host with no filesystem — a browser, or an edge isolate — the deployment is
+the embedded profile with a persistence adapter**, and the browser profile's
+generation-checked IndexedDB adapter is the reference implementation. It records
+which upstream state a local copy was derived from, refuses a commit whose
+generation has moved, and validates its quota, so it is a durable object store
+with generation-based conflict detection and no filesystem at all.
+
+**Read `backend`, not `persistent`, to tell the cases apart.** The capability
+report's `persistent` is a property of the backend and the host, not a setting you
+can turn on: it is `false` on a memory backend because that host has nowhere to
+persist, and that is the same answer a caller would get from forgetting to ask.
+`backend` names what is underneath — `memory`, `filesystem`, `workspace`, or the
+browser profile's `indexeddb` — and that is the field to branch on.
+
+**An isolate is ephemeral.** A Worker or any other isolate can be reclaimed
+between requests, so durability on that host comes from the platform's own storage
+rather than from the process. A *durable workspace* is therefore not possible
+there: the directory a workspace is, cannot outlive the isolate holding it. The
+workspace contract rules out a network relay for the same reason.
+
+
 ## Run-through mode
 
 Local mode keeps all object data in the selected local backend, and it is the default. Run-through mode adds an upstream S3 client and a separate cache.
