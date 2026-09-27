@@ -94,6 +94,28 @@ stow doctor --json
 If the Python package cannot find a binary at all, `StowBinaryNotFoundError`
 names the resolution order it used.
 
+## Ready-to-work agent workspaces
+
+The workspace helpers wrap the same native CLI contract. Prepare a task from its
+JSON manifest, then start the agent process with the returned
+`working_directory` as its cwd:
+
+```python
+from stow_s3 import prepare_workspace, checkpoint_workspace
+
+task = prepare_workspace("task.json")
+# Start the agent with cwd=task["working_directory"].
+snapshot = checkpoint_workspace(task["workspace_id"])
+```
+
+The package also exports resume, same-machine handoff, diff, restore, portable
+checkpoint export, and import helpers. Results are JSON objects from the Go CLI;
+`WorkspaceCommandError` includes the failed command and stderr. The platform
+binary must be installed or selected with `STOW_BIN`. Workspaces persist beyond
+the process and are separate from disposable `with_session` sessions. See
+[`docs/task-manifest.md`](../../docs/task-manifest.md) for manifest fields,
+archive safeguards, and the isolation boundary.
+
 ## License
 
 Apache-2.0

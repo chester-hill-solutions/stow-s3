@@ -338,7 +338,10 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 	if !a.upstreamEnabled(bucket) {
 		return nil, nil, storage.ErrObjectNotFound
 	}
+	return a.resolveCachedObject(ctx, bucket, key, needBody)
+}
 
+func (a *Adapter) resolveCachedObject(ctx context.Context, bucket, key string, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
 	cacheMeta, cacheErr := a.cache.HeadObject(ctx, bucket, key)
 	if cacheErr == nil && a.cacheEntryExpired(bucket, key) {
 		if err := a.cache.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
@@ -353,7 +356,10 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 		}
 		return a.revalidateCachedObject(ctx, bucket, key, cacheMeta, needBody)
 	}
-	if cacheErr != nil && !errors.Is(cacheErr, storage.ErrObjectNotFound) {
+	// A separately configured cache starts empty and does not need bucket
+	// scaffolding. Treat a missing cache bucket as an empty cache; the local
+	// bucket remains the authoritative namespace and is checked above.
+	if !storageErrIsMissingObject(cacheErr) && !storageErrIsMissingBucket(cacheErr) {
 		return nil, nil, cacheErr
 	}
 	return a.refreshFromUpstream(ctx, bucket, key, needBody)

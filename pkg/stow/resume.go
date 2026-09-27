@@ -2,6 +2,9 @@ package stow
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
@@ -38,16 +41,20 @@ func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 	if err != nil {
 		return nil, err
 	}
-	entry, found, err := registry.Lookup(id)
+	entry, err := lookupWorkspaceEntry(registry, id)
 	if err != nil {
-		return nil, fmt.Errorf("stow: look up workspace %s: %w", id, err)
+		return nil, err
 	}
-	if !found {
-		return nil, fmt.Errorf("stow: no workspace with id %s", id)
+	policy, maxBytes, maxObjects, err := resumedPolicy(entry, options)
+	if err != nil {
+		return nil, err
 	}
 	ws, err := OpenWorkspace(WorkspaceOptions{
 		Dir:         entry.Dir,
 		Bucket:      entry.Bucket,
+		MaxBytes:    maxBytes,
+		MaxObjects:  maxObjects,
+		Authority:   &policy,
 		TTL:         time.Duration(entry.TTLSeconds) * time.Second,
 		RegistryDir: options.RegistryDir,
 		Now:         options.Now,
@@ -62,7 +69,99 @@ func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 		_ = ws.Close()
 		return nil, fmt.Errorf("stow: workspace %s does not match the workspace registered at %s", id, entry.Dir)
 	}
+	if err := restoreWorkingDirectory(ws, registry, entry); err != nil {
+		_ = ws.Close()
+		return nil, err
+	}
 	return ws, nil
+}
+
+func lookupWorkspaceEntry(registry *workspace.Registry, id string) (workspace.Entry, error) {
+	entry, found, err := registry.Lookup(id)
+	if err != nil {
+		return workspace.Entry{}, fmt.Errorf("stow: look up workspace %s: %w", id, err)
+	}
+	if !found {
+		return workspace.Entry{}, fmt.Errorf("stow: no workspace with id %s", id)
+	}
+	return entry, nil
+}
+
+func resumedPolicy(entry workspace.Entry, options WorkspaceOptions) (Authority, int64, int64, error) {
+	if entry.PolicyVersion != 1 {
+		return Authority{}, 0, 0, fmt.Errorf("stow: workspace %s has no supported persisted access policy; reopen it explicitly with OpenWorkspace or recreate it before resuming", entry.ID)
+	}
+	policy := Authority{Mask: entry.AuthorityMask}
+	if options.Authority != nil {
+		if !policy.IsSupersetOf(*options.Authority) {
+			return Authority{}, 0, 0, fmt.Errorf("stow: resume authority would widen the workspace policy")
+		}
+		policy = *options.Authority
+	}
+	maxBytes, err := resumeLimit("MaxBytes", entry.MaxBytes, options.MaxBytes)
+	if err != nil {
+		return Authority{}, 0, 0, err
+	}
+	maxObjects, err := resumeLimit("MaxObjects", entry.MaxObjects, options.MaxObjects)
+	if err != nil {
+		return Authority{}, 0, 0, err
+	}
+	return policy, maxBytes, maxObjects, nil
+}
+
+func resumeLimit(name string, persisted, requested int64) (int64, error) {
+	if requested < 0 {
+		return 0, fmt.Errorf("stow: resume %s must not be negative", name)
+	}
+	if requested == 0 {
+		return persisted, nil
+	}
+	if requested > persisted {
+		return 0, fmt.Errorf("stow: resume %s would widen the workspace limit", name)
+	}
+	return requested, nil
+}
+
+func restoreWorkingDirectory(ws *Workspace, registry *workspace.Registry, original workspace.Entry) error {
+	workingDirectory := original.WorkingDirectory
+	if workingDirectory == "" {
+		workingDirectory = original.Dir
+	}
+	rootAbs, err := filepath.Abs(original.Dir)
+	if err != nil {
+		return fmt.Errorf("stow: resolve workspace root: %w", err)
+	}
+	workAbs, err := filepath.Abs(workingDirectory)
+	if err != nil || !pathWithin(rootAbs, workAbs) {
+		return fmt.Errorf("stow: registered working directory is invalid or outside the workspace")
+	}
+	info, err := os.Stat(workAbs)
+	if err != nil || !info.IsDir() {
+		return fmt.Errorf("stow: registered working directory is not an existing directory")
+	}
+	rootReal, err := filepath.EvalSymlinks(rootAbs)
+	if err != nil {
+		return fmt.Errorf("stow: resolve workspace root: %w", err)
+	}
+	workReal, err := filepath.EvalSymlinks(workAbs)
+	if err != nil || !pathWithin(rootReal, workReal) {
+		return fmt.Errorf("stow: registered working directory resolves outside the workspace")
+	}
+	ws.workingDirectory = workAbs
+	current, err := lookupWorkspaceEntry(registry, ws.id)
+	if err != nil {
+		return fmt.Errorf("stow: restore working directory in workspace registry: %w", err)
+	}
+	current.WorkingDirectory = workAbs
+	if err := registry.Register(current); err != nil {
+		return fmt.Errorf("stow: restore working directory in workspace registry: %w", err)
+	}
+	return nil
+}
+
+func pathWithin(root, path string) bool {
+	rel, err := filepath.Rel(root, path)
+	return err == nil && rel != ".." && !filepath.IsAbs(rel) && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
 }
 
 // CollectResult is one workspace a sweep considered, and what it did about it.
@@ -145,6 +244,12 @@ func openRegistry(dir string) (*workspace.Registry, error) {
 	return registry, nil
 }
 
+// DefaultWorkspaceRegistryDir reports where this host stores local workspace
+// references. The registry contains IDs and paths, never S3 credentials.
+func DefaultWorkspaceRegistryDir() (string, error) {
+	return workspace.DefaultRegistryDir()
+}
+
 // register records a workspace so a later process can resume it. A failure to
 // register is reported rather than swallowed: an unregistered workspace cannot
 // be resumed, and the caller is the only one who can decide that is acceptable.
@@ -154,15 +259,21 @@ func (w *Workspace) register(registryDir string, ttlSeconds int64) error {
 		return err
 	}
 	w.registry = registry
+	w.registryDir = registry.Dir()
 	now := w.nowFunc()()
 	return registry.Register(workspace.Entry{
-		ID:         w.id,
-		Dir:        w.dir,
-		Bucket:     w.bucket,
-		Created:    now,
-		LastUsed:   now,
-		TTLSeconds: ttlSeconds,
-		Owned:      w.store.IsOwned(),
+		ID:               w.id,
+		Dir:              w.dir,
+		WorkingDirectory: w.workingDirectory,
+		Bucket:           w.bucket,
+		Created:          now,
+		LastUsed:         now,
+		TTLSeconds:       ttlSeconds,
+		PolicyVersion:    1,
+		AuthorityMask:    w.Runtime.Authority().Mask,
+		MaxBytes:         w.Runtime.Capabilities().MaxBytes,
+		MaxObjects:       w.Runtime.Capabilities().MaxObjects,
+		Owned:            w.store.IsOwned(),
 	})
 }
 

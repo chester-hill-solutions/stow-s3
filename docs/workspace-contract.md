@@ -1,6 +1,6 @@
 # Stow Workspace Contract
 
-**Status:** proposed
+**Status:** workspace core implemented; this contract also records future language surfaces
 **Date:** 2026-09-25
 **Scope:** the default agent-facing surface defined by
 `docs/adr/0007-workspace-is-the-default.md`
@@ -13,6 +13,21 @@ Implementers and test authors MUST treat this as the acceptance spec. It exists
 because ADR 0008 deliberately deferred the key-to-path encoding and the manifest
 format, and because the encoding is where a workspace backend either works on
 every platform or silently loses data on one.
+
+## Run-through bucket namespace
+
+Run-through does not import a provider's bucket namespace. A bucket must first
+exist in Stow's local store; create, head, list, and delete bucket operations
+remain local. This is the local shadow for object reads and writes. An upstream
+bucket that has not been explicitly shadowed is not visible through Stow.
+Upstream object reads may fill an initially absent cache bucket; the cache is
+created lazily and is not part of the namespace contract. Live upstream writes
+still require the explicit upstream-write authority and durable outbox described
+by ADR 0005.
+
+The additive local preparation format and CLI are specified in
+[`task-manifest.md`](task-manifest.md). It describes filesystem isolation only;
+it does not claim process or network sandboxing.
 
 ---
 
@@ -119,7 +134,13 @@ saying which member lands in which phase is more useful than a promise:
 | `open` / `resume` selected by one argument | **Shipped** in Go, via the registry | W4 |
 | `Touch`, a registry on disk, and TTL collection | **Shipped** in Go, refusing live and adopted workspaces | W4 |
 | `Facade` | Not yet. A workspace speaks no S3 today | W5 |
-| TypeScript and Python surfaces | Not yet. The close/destroy split is settled and recorded in `docs/agent-dx-plan.md` §0.8; only the surface is missing | W7, and Python's is W7's known exception |
+| TypeScript and Python workspace lifecycle objects | Not yet. `workspace` CLI wrappers are shipped, but they return JSON command results rather than in-process `openWorkspace` handles | Future API phase |
+
+The current task manifest, CLI commands, archive limits, sensitive-path rules,
+and cleanup behavior are documented in [`task-manifest.md`](task-manifest.md).
+Destroying a workspace removes its associated checkpoints. TTL collection also
+removes those checkpoints after it has safely reclaimed an eligible
+Stow-owned workspace; adopted or live workspaces and their checkpoints remain.
 
 A member that does not exist yet is a compile error for a caller who reads this
 document, which is the correct failure. None of them is a stub that returns

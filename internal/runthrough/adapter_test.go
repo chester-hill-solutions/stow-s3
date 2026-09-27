@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"sort"
 	"sync"
 	"testing"
 	"time"
@@ -24,6 +25,7 @@ type mockUpstream struct {
 	getCalls  int
 	putCalls  int
 	delCalls  int
+	listCalls int
 	putErr    error
 	delErr    error
 	listErr   error
@@ -117,6 +119,7 @@ func (m *mockUpstream) DeleteObject(_ context.Context, bucket, key string) error
 func (m *mockUpstream) ListObjectsV2(_ context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	m.listCalls++
 	if m.listErr != nil {
 		return nil, m.listErr
 	}
@@ -131,7 +134,8 @@ func (m *mockUpstream) ListObjectsV2(_ context.Context, bucket string, opts stor
 		objects = append(objects, meta)
 		_ = k
 	}
-	return &storage.ListResult{Objects: objects, KeyCount: len(objects)}, nil
+	sort.Slice(objects, func(i, j int) bool { return objects[i].Key < objects[j].Key })
+	return storage.PaginateObjects(objects, opts), nil
 }
 
 func storagePutMeta(data []byte) (string, []byte, error) {

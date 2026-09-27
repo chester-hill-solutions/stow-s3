@@ -20,7 +20,7 @@ import (
 // openWorkspace opens a workspace in a fresh directory and closes it after.
 func openWorkspace(t *testing.T, dir string) *stow.Workspace {
 	t.Helper()
-	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir})
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir, RegistryDir: filepath.Join(t.TempDir(), "registry")})
 	if err != nil {
 		t.Fatalf("OpenWorkspace: %v", err)
 	}
@@ -110,9 +110,10 @@ func TestWorkspacePathAnswersWithoutReading(t *testing.T) {
 func TestWorkspaceIsPersistentAndBounded(t *testing.T) {
 	dir := t.TempDir()
 	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{
-		Dir:        dir,
-		MaxBytes:   64,
-		MaxObjects: 2,
+		Dir:         dir,
+		MaxBytes:    64,
+		MaxObjects:  2,
+		RegistryDir: filepath.Join(t.TempDir(), "registry"),
 	})
 	if err != nil {
 		t.Fatalf("OpenWorkspace: %v", err)
@@ -163,7 +164,7 @@ func TestWorkspaceIsPersistentAndBounded(t *testing.T) {
 // so. Removal itself is Phase B work, which is why there is no Destroy here yet.
 func TestCloseLeavesTheData(t *testing.T) {
 	dir := t.TempDir()
-	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir})
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir, RegistryDir: filepath.Join(t.TempDir(), "registry")})
 	if err != nil {
 		t.Fatalf("OpenWorkspace: %v", err)
 	}
@@ -208,7 +209,7 @@ func TestOpenWorkspaceAcceptsAReadOnlyAuthorityAndRefusesWrites(t *testing.T) {
 	dir := t.TempDir()
 	readOnly := stow.ReadOnly()
 
-	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir, Authority: &readOnly})
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir, Authority: &readOnly, RegistryDir: filepath.Join(t.TempDir(), "registry")})
 	if err != nil {
 		t.Fatalf("OpenWorkspace with a read-only authority: %v", err)
 	}
@@ -343,7 +344,7 @@ func TestAdoptingAnExistingDirectory(t *testing.T) {
 func newOwnedWorkspace(t *testing.T) (*stow.Workspace, string) {
 	t.Helper()
 	root := filepath.Join(t.TempDir(), "workspace")
-	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root})
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root, RegistryDir: filepath.Join(t.TempDir(), "registry")})
 	if err != nil {
 		t.Fatalf("OpenWorkspace: %v", err)
 	}
@@ -421,7 +422,7 @@ func TestCloseThenDestroy(t *testing.T) {
 
 	// Reopen the same directory and destroy it, which is what a caller does
 	// when the workspace outlived the process that made it.
-	reopened, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root})
+	reopened, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: root, RegistryDir: filepath.Join(t.TempDir(), "registry")})
 	if err != nil {
 		t.Fatalf("reopen: %v", err)
 	}

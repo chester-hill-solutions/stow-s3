@@ -1,6 +1,6 @@
 # Stow
 
-Stow is an S3-compatible object store for local development, tests, and short-lived tools or agents.
+Stow is an S3-compatible object store and ready-to-work workspace for local development, tests, and agents.
 
 Applications use Stow to create buckets and upload or download files through the S3 APIs they already use. Local mode stores data on the machine or host where Stow runs. Run-through mode can use an upstream S3-compatible service as a cache or write target.
 
@@ -43,6 +43,27 @@ Use Stow when a workload needs S3 behavior without a cloud account or network se
 - Go programs that want an in-process object runtime;
 - browser or Node.js integrations that need an embedded runtime;
 - development against an existing upstream S3-compatible service.
+
+## Ready-to-work agent workspace
+
+Give an agent an isolated working directory that already contains its declared
+local inputs. Save a version 1 manifest and prepare it with the CLI:
+
+```sh
+stow-s3 workspace prepare --manifest task.json
+```
+
+The JSON result includes the workspace root and the actual
+`working_directory` to use as the agent process cwd. Stow copies local files and
+directories into a new Stow-owned root, then supports resume, same-machine
+handoff, immutable checkpoints, diff, restore, and portable checkpoint export
+and import. The S3 endpoint remains optional.
+
+See [the task manifest and workspace lifecycle guide](docs/task-manifest.md)
+for the schema, examples, archive safety rules, and limitations. A workspace is
+filesystem isolation for task editing, not an OS sandbox; direct filesystem
+writes by the agent are not hard-limited by Stow's object API quotas. The current
+preparer accepts local paths; Git-ref worktrees are not implemented yet.
 
 ## Install
 

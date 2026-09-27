@@ -25,15 +25,17 @@ import (
 type Workspace struct {
 	*Runtime
 
-	dir       string
-	bucket    string
-	id        string
-	store     *workspace.Store
-	session   *workspace.Session
-	registry  *workspace.Registry
-	now       func() time.Time
-	closed    bool
-	destroyed bool
+	dir              string
+	workingDirectory string
+	bucket           string
+	id               string
+	store            *workspace.Store
+	session          *workspace.Session
+	registry         *workspace.Registry
+	registryDir      string
+	now              func() time.Time
+	closed           bool
+	destroyed        bool
 }
 
 // WorkspaceOptions configures a workspace.
@@ -72,7 +74,8 @@ type WorkspaceOptions struct {
 	// never touch a real one.
 	RegistryDir string
 	// Now is injectable for tests.
-	Now func() time.Time
+	Now   func() time.Time
+	owned bool
 }
 
 // OpenWorkspace opens a workspace rooted at options.Dir.
@@ -93,10 +96,11 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	}
 
 	store, err := workspace.New(workspace.Options{
-		Root:       options.Dir,
-		Bucket:     bucket,
-		TTLSeconds: int64(options.TTL.Seconds()),
-		Now:        options.Now,
+		Root:           options.Dir,
+		Bucket:         bucket,
+		TTLSeconds:     int64(options.TTL.Seconds()),
+		Now:            options.Now,
+		InitiallyOwned: options.owned,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("stow: open workspace: %w", err)
@@ -124,12 +128,13 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	}
 
 	ws := &Workspace{
-		Runtime: &Runtime{inner: instance},
-		dir:     store.Root(),
-		bucket:  store.WorkspaceBucket(),
-		id:      store.ID(),
-		store:   store,
-		session: session,
+		Runtime:          &Runtime{inner: instance},
+		dir:              store.Root(),
+		workingDirectory: store.Root(),
+		bucket:           store.WorkspaceBucket(),
+		id:               store.ID(),
+		store:            store,
+		session:          session,
 	}
 	ws.now = options.Now
 	// The workspace bucket is bootstrapped through the store rather than through
@@ -156,6 +161,10 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 
 // Dir is the absolute workspace directory, stable for the workspace's life.
 func (w *Workspace) Dir() string { return w.dir }
+
+// WorkingDirectory is the directory an external task runner should use as its
+// current working directory. Ordinary workspaces default to their root.
+func (w *Workspace) WorkingDirectory() string { return w.workingDirectory }
 
 // Bucket is the bucket over the workspace's bytes. Its objects are the directory
 // itself, which is what makes a local file and an s3:// key the same bytes.
@@ -219,6 +228,9 @@ func (w *Workspace) Destroy(ctx context.Context) error {
 	// The bytes are gone, so the name they were filed under must go too, or the
 	// registry accumulates entries that resolve to nothing.
 	if w.registry != nil {
+		if err := w.registry.ForgetCheckpoints(w.id); err != nil {
+			return err
+		}
 		return w.registry.Forget(w.id)
 	}
 	return nil

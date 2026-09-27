@@ -118,6 +118,28 @@ const summary = await withStow(async (session) => {
 `Stow.start()`, `Stow.connect()`, and `EmbeddedStow` are unchanged and remain the
 advanced process-owned and external-endpoint APIs.
 
+### Ready-to-work agent workspaces
+
+The `./workspace` entry point wraps the native `stow-s3 workspace` CLI. Prepare
+from a task manifest, then launch the agent with the returned
+`working_directory` as its cwd:
+
+```ts
+import { prepareWorkspace, checkpointWorkspace } from "@chester-hill-solutions/stow-s3/workspace";
+
+const task = await prepareWorkspace("task.json");
+// Start your agent process with cwd: String(task.working_directory).
+const snapshot = await checkpointWorkspace({ id: String(task.workspace_id) });
+```
+
+The wrapper also exports resume, same-machine handoff, diff, restore, portable
+checkpoint export, and import helpers. These calls return the CLI's JSON result
+and use the same validation and limits as the Go implementation. They require
+the package's platform binary or `STOW_BIN` when developing from a checkout.
+See [`docs/task-manifest.md`](../../docs/task-manifest.md) for the schema,
+archive rules, and the filesystem-isolation boundary. This is a persistent
+workspace API; it is separate from the disposable S3 session APIs above.
+
 ### Browser persistence profile
 
 The additive [`@chester-hill-solutions/stow-s3/browser`](../../docs/browser-persistence.md) entry

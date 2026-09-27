@@ -2,6 +2,7 @@ package stow_test
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -57,6 +58,74 @@ func TestResumeReturnsTheSameWorkspace(t *testing.T) {
 	}
 }
 
+func TestResumePreservesAuthorityAndQuotaAndRejectsWidening(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "workspace")
+	reg := registryDir(t)
+	readOnly := stow.ReadOnly()
+	first, err := stow.OpenWorkspace(stow.WorkspaceOptions{
+		Dir: dir, RegistryDir: reg, MaxBytes: 8, MaxObjects: 2, Authority: &readOnly,
+	})
+	if err != nil {
+		t.Fatalf("OpenWorkspace: %v", err)
+	}
+	id := first.ID()
+	if err := first.Close(); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+
+	resumed, err := stow.ResumeIn(reg, id)
+	if err != nil {
+		t.Fatalf("ResumeIn: %v", err)
+	}
+	defer resumed.Close()
+	if got := resumed.Capabilities(); got.MaxBytes != 8 || got.MaxObjects != 2 {
+		t.Fatalf("resumed limits = (%d, %d), want (8, 2)", got.MaxBytes, got.MaxObjects)
+	}
+	if resumed.Authority().IsSupersetOf(stow.ReadWrite()) {
+		t.Fatal("resumed read-only authority permits writes")
+	}
+	if _, err := resumed.PutObject(context.Background(), resumed.Bucket(), "x", []byte("x"), stow.PutOptions{}); err == nil {
+		t.Fatal("PutObject succeeded after resuming read-only workspace")
+	}
+
+	broader := stow.AllowAll()
+	if _, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: reg, Authority: &broader}, id); err == nil {
+		t.Fatal("resume accepted a broader authority")
+	}
+	if _, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: reg, MaxBytes: 9}, id); err == nil {
+		t.Fatal("resume accepted a broader byte limit")
+	}
+	if _, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: reg, MaxObjects: 3}, id); err == nil {
+		t.Fatal("resume accepted a broader object limit")
+	}
+}
+
+func TestResumeRefusesLegacyRegistryEntryWithoutPolicy(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "workspace")
+	reg := registryDir(t)
+	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: dir, RegistryDir: reg})
+	if err != nil {
+		t.Fatalf("OpenWorkspace: %v", err)
+	}
+	id := ws.ID()
+	if err := ws.Close(); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+	entryPath := filepath.Join(reg, id+".json")
+	legacy, err := json.Marshal(map[string]interface{}{
+		"id": id, "dir": dir, "bucket": ws.Bucket(), "owned": true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(entryPath, legacy, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := stow.ResumeIn(reg, id); err == nil {
+		t.Fatal("resume accepted a registry entry without persisted policy")
+	}
+}
+
 // TestResumeRejectsAnUnknownID keeps a typo from opening the wrong thing.
 func TestResumeRejectsAnUnknownID(t *testing.T) {
 	if _, err := stow.ResumeIn(registryDir(t), "ws_does_not_exist"); err == nil {
@@ -79,6 +148,11 @@ func TestCollectRemovesAnExpiredUnusedWorkspace(t *testing.T) {
 	if _, err := ws.PutObject(ctx, ws.Bucket(), "k.txt", []byte("v"), stow.PutOptions{}); err != nil {
 		t.Fatalf("PutObject: %v", err)
 	}
+	checkpoint, err := ws.CreateCheckpoint(ctx, stow.CheckpointOptions{})
+	if err != nil {
+		t.Fatalf("CreateCheckpoint: %v", err)
+	}
+	checkpointDir := filepath.Join(reg, "checkpoints", checkpoint.ID)
 	root := ws.Dir()
 	id := ws.ID()
 	// Closing is what makes it collectable: the session lock is released.
@@ -99,6 +173,9 @@ func TestCollectRemovesAnExpiredUnusedWorkspace(t *testing.T) {
 	}
 	if _, err := os.Lstat(root); !os.IsNotExist(err) {
 		t.Errorf("an expired workspace survived collection: %v", err)
+	}
+	if _, err := os.Lstat(checkpointDir); !os.IsNotExist(err) {
+		t.Errorf("checkpoint for an expired workspace survived collection: %v", err)
 	}
 }
 
@@ -205,8 +282,16 @@ func TestDestroyForgetsTheRegistryEntry(t *testing.T) {
 	if _, err := ws.PutObject(ctx, ws.Bucket(), "k.txt", []byte("v"), stow.PutOptions{}); err != nil {
 		t.Fatalf("PutObject: %v", err)
 	}
+	checkpoint, err := ws.CreateCheckpoint(ctx, stow.CheckpointOptions{})
+	if err != nil {
+		t.Fatalf("CreateCheckpoint: %v", err)
+	}
+	checkpointDir := filepath.Join(reg, "checkpoints", checkpoint.ID)
 	if err := ws.Destroy(ctx); err != nil {
 		t.Fatalf("Destroy: %v", err)
+	}
+	if _, err := os.Lstat(checkpointDir); !os.IsNotExist(err) {
+		t.Errorf("checkpoint for a destroyed workspace survived: %v", err)
 	}
 	results, err := stow.Collect(stow.CollectOptions{RegistryDir: reg, Now: time.Now})
 	if err != nil {

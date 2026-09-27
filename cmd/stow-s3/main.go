@@ -162,6 +162,10 @@ func main() {
 		serve(os.Args[2:])
 	case "doctor":
 		doctor(os.Args[2:])
+	case "workspace":
+		if err := workspaceCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	default:
 		usage()
 		os.Exit(1)
@@ -169,7 +173,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve    start the S3-compatible server\n  doctor   report whether this machine can run a stow-s3 session\n")
+	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n")
 }
 
 func resolveLocalCredentials(accessKey, secretKey string) (string, string) {

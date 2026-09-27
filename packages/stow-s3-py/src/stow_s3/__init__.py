@@ -44,6 +44,19 @@ from .session import (
     open_session,
     with_session,
 )
+from .workspace import (
+    WorkspaceCommandError,
+    WorkspaceJSON,
+    checkpoint_workspace,
+    diff_workspaces,
+    export_workspace_checkpoint,
+    handoff_workspace,
+    import_workspace_checkpoint,
+    prepare_workspace,
+    restore_workspace_checkpoint,
+    resume_workspace,
+    run_workspace_command,
+)
 
 __version__ = "0.2.0"
 
@@ -59,12 +72,23 @@ __all__ = [
     "StowCapabilities",
     "StowProtocolError",
     "StowReady",
+    "WorkspaceCommandError",
+    "WorkspaceJSON",
     "__version__",
     "build_child_env",
+    "checkpoint_workspace",
+    "diff_workspaces",
     "describe_source",
+    "export_workspace_checkpoint",
+    "handoff_workspace",
+    "import_workspace_checkpoint",
     "open_session",
     "parse_ready_message",
+    "prepare_workspace",
     "require_stow_binary",
+    "restore_workspace_checkpoint",
+    "resume_workspace",
+    "run_workspace_command",
     "resolve_stow_binary",
     "resolve_stow_binary_detailed",
     "stow_binary_available",

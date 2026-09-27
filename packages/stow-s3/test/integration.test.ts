@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -71,7 +71,9 @@ describe("stow binary discovery", () => {
       process.env.PATH = "";
       process.env.STOW_BIN = "";
       try {
-        assert.equal(isolated.resolveStowBinary(), bundled);
+        // macOS exposes the temporary directory through /var while mkdtemp
+        // may return its canonical /private/var path (or vice versa).
+        assert.equal(await realpath(isolated.resolveStowBinary()), await realpath(bundled));
         assert.equal(isolated.stowBinaryAvailable(), true);
       } finally {
         restore(process.env, "PATH", previousPath);

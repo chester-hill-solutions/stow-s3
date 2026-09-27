@@ -15,6 +15,7 @@ export { DEFAULT_SESSION_MAX_BYTES, DEFAULT_SESSION_MAX_OBJECTS, openStow, withS
 export { READY_PROTOCOL_VERSION, StowProtocolError, parseReadyMessage, } from "./ready.js";
 export { StowBinaryNotFoundError, resolveStowBinary, stowBinaryAvailable, } from "./bin.js";
 export { upstreamFromEnv } from "./upstream.js";
+export { checkpointWorkspace, diffWorkspaces, exportWorkspaceCheckpoint, handoffWorkspace, importWorkspaceCheckpoint, prepareWorkspace, restoreWorkspaceCheckpoint, resumeWorkspace, runWorkspaceCommand, } from "./workspace.js";
 export const Stow = {
     start(options) {
         return startStow(options);

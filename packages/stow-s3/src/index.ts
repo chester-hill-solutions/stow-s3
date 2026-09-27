@@ -82,6 +82,23 @@ export {
   stowBinaryAvailable,
 } from "./bin.js";
 export { upstreamFromEnv } from "./upstream.js";
+export {
+  checkpointWorkspace,
+  diffWorkspaces,
+  exportWorkspaceCheckpoint,
+  handoffWorkspace,
+  importWorkspaceCheckpoint,
+  prepareWorkspace,
+  restoreWorkspaceCheckpoint,
+  resumeWorkspace,
+  runWorkspaceCommand,
+} from "./workspace.js";
+export type {
+  ResumeWorkspaceOptions,
+  WorkspaceArchiveOptions,
+  WorkspaceCheckpointOptions,
+  WorkspaceJSON,
+} from "./workspace.js";
 
 export const Stow = {
   start(options?: StartOptions): Promise<StowInstance> {

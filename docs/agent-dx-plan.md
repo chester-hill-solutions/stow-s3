@@ -1,9 +1,9 @@
 # Stow Agent DX and Python Plan
 
 **Status:** proposed
-**Last updated:** 2026-09-25
+**Last updated:** 2026-09-27
 **Scope:** open-source package evolution for short-lived agents and developer workflows
-**Relationship to existing work:** additive to `docs/remediation-plan.md`; the remediation release remains the foundation and release gate for this work
+**Relationship to existing work:** additive to `docs/remediation-plan.md`; the remediation release remains the foundation and release gate for this work. The current execution order for run-through remediation, isolated ready-to-work workspaces, and checkpoint/handoff is in [`docs/agent-workspace-plan.md`](agent-workspace-plan.md), validated against the 2026-09-27 test run. That plan supersedes the related ordering below; this document remains the product history and architecture context.
 
 ## 0. Revision note and current state
 

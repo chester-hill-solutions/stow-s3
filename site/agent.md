@@ -1,19 +1,32 @@
 # Stow S3 — agent instructions
 
 You are reading this because someone pointed you at Stow S3, an S3-compatible
-object store that runs on the local machine. It speaks real S3 over HTTP with
-SigV4, so the same SDK code that works against Amazon S3 works against it
-unchanged. The storage is local, and a scoped session deletes it.
+object store and task workspace that runs on the local machine. It speaks real
+S3 over HTTP with SigV4. For coding tasks, Stow can prepare an isolated working
+directory from declared local inputs; for disposable S3 tests, a scoped session
+cleans itself up on close.
 
 ## When to reach for it
 
-Use Stow when you need somewhere to put bytes and none of these are true:
+For a coding task whose files should persist across process restarts, use a
+prepared workspace. Define a version 1 task manifest and run
+`stow-s3 workspace prepare --manifest task.json`; start the agent with the
+returned `working_directory` as its cwd. The manifest supports local file and
+directory inputs. See [`docs/task-manifest.md`](../docs/task-manifest.md) for
+resume, checkpoint, diff, restore, same-machine handoff, and portable archive
+commands.
+Git-ref worktrees are not implemented yet.
+
+Use a scoped session when you need only disposable S3 bytes and none of these
+are true:
 
 - the bytes have to survive the process
 - the bucket has to be shared with something outside this machine
 - it has to be reachable after the test run
 
-If any of those hold, use real S3. Stow is disposable by design.
+If any of those hold and a prepared workspace does not fit, use real S3. Scoped
+sessions are disposable; prepared workspaces persist until explicitly destroyed
+or safely collected.
 
 Typical uses: a test that uploads and downloads, a build step that passes an
 artifact between stages, an agent that needs scratch space, or a fixture that

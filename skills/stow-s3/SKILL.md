@@ -1,27 +1,37 @@
 ---
 name: stow-s3
-description: Local S3-compatible object store for tests, CI, dev, and agents. Use when a test or script needs to upload, download, or pass S3 objects but no real bucket should be provisioned; when an agent needs scratch storage; when a fixture needs a bucket that is thrown away afterwards; or when asked to mock, fake, stub, or localise S3. Provides the withStow scoped-session pattern in TypeScript and Python, the Go embedded runtime, and the stow-s3 CLI. Triggers on "needs an S3 bucket in a test", "don't want to hit real S3 in CI", "S3 mock", "localstack alternative", "give the agent a bucket", "put an artifact somewhere in a build".
+description: Local S3-compatible object store and isolated ready-to-work filesystem workspaces for tests, CI, development, and agents. Use when a coding agent needs declared files staged into its own working directory, a persistent task with checkpoint/handoff, or disposable local S3 for tests. Also use when asked to mock, fake, stub, or localise S3. Provides task-manifest and workspace CLI workflows, TypeScript/Python CLI wrappers, scoped S3 sessions, the Go runtime, and the stow-s3 CLI. Triggers on "start the agent with files in place", "isolated agent workspace", "handoff an agent task", "checkpoint agent changes", "needs an S3 bucket in a test", "don't want to hit real S3 in CI", "S3 mock", "localstack alternative", "put an artifact somewhere in a build".
 ---
 
 # Stow S3
 
-An S3-compatible object store that runs on the local machine. Real S3 over
-HTTP with SigV4, so existing SDK code works unchanged. Nothing to provision, no
-account, and a scoped session deletes itself when it closes.
+An S3-compatible object store and filesystem workspace that runs on the local
+machine. Real S3 over HTTP with SigV4, so existing SDK code works unchanged. A
+prepared workspace is a persistent isolated copy for a coding task; a scoped
+S3 session is disposable and deletes itself when it closes.
 
 Repository: https://github.com/chester-hill-solutions/stow-s3
 Machine-readable instructions: https://stow.chesterhillsolutions.ca/agent.md
 
 ## Decide first
 
-Reach for Stow only when **all** of these hold:
+For a coding task, prepare a workspace when the agent needs declared project
+files in its own cwd and its work must survive a process restart. Start with a
+version 1 task manifest and `stow-s3 workspace prepare --manifest task.json`;
+use the returned `working_directory` as the agent process cwd. The workspace
+CLI also supports resume, handoff, checkpoint, diff, restore, and portable
+checkpoint export/import. See [`docs/task-manifest.md`](../../docs/task-manifest.md).
+
+Reach for a disposable scoped session only when **all** of these hold:
 
 - the bytes do not have to survive the process
 - the bucket does not have to be shared with another machine
 - the data does not have to be there after the test run
 
-If any one of them does, use real S3. Stow is disposable by design, and
-pretending otherwise wastes the next debugging session.
+If any one of them does, use a prepared workspace or real S3 as appropriate.
+Scoped sessions are disposable; prepared workspaces persist until explicit
+destruction or safe TTL collection. Workspace isolation is not an OS sandbox,
+and direct filesystem writes are not hard-limited by Stow's object API quotas.
 
 If the code only calls two or three S3 operations and never asserts on
 behaviour you care about, a plain in-memory fake is less machinery. Stow is

@@ -23,12 +23,20 @@ const registryVersion = 1
 // reconstructing state from an environment mapping, and that is only possible if
 // the directory and the bucket survive independently of any handle.
 type Entry struct {
-	ID         string    `json:"id"`
-	Dir        string    `json:"dir"`
-	Bucket     string    `json:"bucket"`
-	Created    time.Time `json:"created"`
-	LastUsed   time.Time `json:"last_used"`
-	TTLSeconds int64     `json:"ttl_seconds"`
+	ID               string    `json:"id"`
+	Dir              string    `json:"dir"`
+	WorkingDirectory string    `json:"working_directory,omitempty"`
+	Bucket           string    `json:"bucket"`
+	Created          time.Time `json:"created"`
+	LastUsed         time.Time `json:"last_used"`
+	TTLSeconds       int64     `json:"ttl_seconds"`
+	// PolicyVersion is zero for registry entries written before resume preserved
+	// authority and normalized quota limits. Such entries must not be reopened
+	// with today's permissive defaults.
+	PolicyVersion int    `json:"policy_version,omitempty"`
+	AuthorityMask uint32 `json:"authority_mask,omitempty"`
+	MaxBytes      int64  `json:"max_bytes,omitempty"`
+	MaxObjects    int64  `json:"max_objects,omitempty"`
 	// Owned mirrors the workspace manifest. The collector uses it to refuse
 	// adopted workspaces outright, which is the single most important safety
 	// property in this file: an adopted workspace is somebody's project, and no
@@ -40,6 +48,9 @@ type Entry struct {
 type Registry struct {
 	dir string
 }
+
+// Dir is the absolute registry location on this machine.
+func (r *Registry) Dir() string { return r.dir }
 
 // DefaultRegistryDir is where the registry lives: the user's configuration
 // directory, under the package's own name. It holds small metadata only, never
@@ -197,6 +208,10 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 			// A workspace that cannot be opened right now — a permission
 			// problem, a path that has gone — is recorded and skipped, not
 			// fatal. One bad entry must not make the rest permanent.
+			out[len(out)-1].Reason = "unreadable: " + err.Error()
+			continue
+		}
+		if err := r.ForgetCheckpoints(entry.ID); err != nil {
 			out[len(out)-1].Reason = "unreadable: " + err.Error()
 			continue
 		}

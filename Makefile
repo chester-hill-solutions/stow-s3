@@ -1,10 +1,12 @@
 .PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface standards check-generated benchmark
 
 BINARY := bin/stow-s3
+GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
+PINNED_GO := GOTOOLCHAIN=go$(GO_TOOLCHAIN) go
 
 build:
 	# Match the release build exactly, so a local binary is the binary that ships.
-	go build -trimpath -ldflags "-s -w" -o $(BINARY) ./cmd/stow-s3
+	$(PINNED_GO) build -trimpath -ldflags "-s -w" -o $(BINARY) ./cmd/stow-s3
 
 # -trimpath matches the native build and is what makes the artifact reproducible
 # across directories. Without it the wasm embeds its source path, so the
@@ -12,19 +14,19 @@ build:
 # fails for a reason unrelated to the source.
 build-wasm:
 	mkdir -p bin
-	GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -o bin/stow-runtime.wasm ./cmd/stow-wasm
+	GOTOOLCHAIN=go$(GO_TOOLCHAIN) GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -o bin/stow-runtime.wasm ./cmd/stow-wasm
 
 test:
-	go test ./...
+	$(PINNED_GO) test ./...
 
 test-race:
-	go test -race ./...
+	$(PINNED_GO) test -race ./...
 
 test-conformance:
-	STOW_CONFORMANCE_BACKEND=memory go test ./conformance/... -count=1 -v
-	STOW_CONFORMANCE_BACKEND=filesystem go test ./conformance/... -count=1 -v
-	STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=memory go test ./conformance/... -count=1 -v
-	STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=filesystem go test ./conformance/... -count=1 -v
+	STOW_CONFORMANCE_BACKEND=memory $(PINNED_GO) test ./conformance/... -count=1 -v
+	STOW_CONFORMANCE_BACKEND=filesystem $(PINNED_GO) test ./conformance/... -count=1 -v
+	STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=memory $(PINNED_GO) test ./conformance/... -count=1 -v
+	STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=filesystem $(PINNED_GO) test ./conformance/... -count=1 -v
 
 # NPM_INSTALL installs everything, then removes exactly the thing that breaks
 # the tests: the four bundled carrier binaries.
@@ -73,7 +75,7 @@ test-wasm: build-wasm
 test-all: build test test-race test-conformance test-node test-python test-wasm
 
 lint:
-	go vet ./...
+	$(PINNED_GO) vet ./...
 
 check-generated: build-wasm
 	$(NPM_INSTALL) && npm run build
@@ -84,7 +86,7 @@ format-check:
 	@test -z "$$(gofmt -l $$(find cmd internal conformance tools pkg -name '*.go' -type f))" || (gofmt -l $$(find cmd internal conformance tools pkg -name '*.go' -type f); exit 1)
 
 check-go-quality:
-	go run ./tools/quality
+	$(PINNED_GO) run ./tools/quality
 
 check-ts-quality:
 	$(NPM_INSTALL) && npm run check:standards

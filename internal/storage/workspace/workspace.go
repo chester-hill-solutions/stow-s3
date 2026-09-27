@@ -55,6 +55,10 @@ type Options struct {
 	TTLSeconds int64
 	// Now is injectable for tests.
 	Now func() time.Time
+	// InitiallyOwned is set only by the task preparer after it has exclusively
+	// created Root. It lets that construction path reserve a root before writing
+	// files without making a normal caller-owned directory deletable.
+	InitiallyOwned bool
 }
 
 // New opens a workspace store rooted at options.Root.
@@ -131,7 +135,7 @@ func (s *Store) establishIdentity(options Options, adopted bool, now func() time
 	if s.manifest.TTLSeconds == 0 {
 		s.manifest.TTLSeconds = options.TTLSeconds
 	}
-	s.manifest.Owned = !adopted || s.manifest.Owned
+	s.manifest.Owned = options.InitiallyOwned || !adopted || s.manifest.Owned
 	s.manifest.Created = s.manifest.Created.UTC()
 	if s.manifest.Created.IsZero() {
 		s.manifest.Created = now().UTC()
