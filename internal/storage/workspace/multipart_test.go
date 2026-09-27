@@ -1,6 +1,7 @@
 package workspace_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"os"
@@ -25,11 +26,15 @@ func TestAnUploadIsInvisibleUntilItCompletes(t *testing.T) {
 	store, root := newStore(t)
 	ctx := context.Background()
 
-	upload, err := store.CreateMultipartUpload(ctx, bucket, "output/big.bin")
+	upload, err := store.CreateMultipartUpload(ctx, bucket, "output/big.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("CreateMultipartUpload: %v", err)
 	}
-	if _, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("first half ")); err != nil {
+	// The first part is at the minimum rather than a few words: a non-final part
+	// below it is refused at completion, and this case is about a workspace
+	// showing nothing until the object is complete.
+	firstHalf := append(bytes.Repeat([]byte("a"), storage.MinPartSize), []byte(" first half ")...)
+	if _, err := store.UploadPart(ctx, upload.UploadID, 1, bytes.NewReader(firstHalf)); err != nil {
 		t.Fatalf("UploadPart: %v", err)
 	}
 	if _, err := store.UploadPart(ctx, upload.UploadID, 2, strings.NewReader("second half")); err != nil {
@@ -60,8 +65,8 @@ func TestAnUploadIsInvisibleUntilItCompletes(t *testing.T) {
 		t.Fatalf("CompleteMultipartUpload: %v", err)
 	}
 
-	if got := get(t, store, "output/big.bin"); got != "first half second half" {
-		t.Errorf("assembled object = %q, want the parts in order", got)
+	if got := get(t, store, "output/big.bin"); !strings.HasSuffix(got, "first half second half") {
+		t.Errorf("assembled object does not end with the parts in order")
 	}
 	// And the completed object is a real file, like any other.
 	if _, err := os.Lstat(filepath.Join(root, "output", "big.bin")); err != nil {
@@ -80,7 +85,7 @@ func TestAbortingAnUploadLeavesNothing(t *testing.T) {
 	store, root := newStore(t)
 	ctx := context.Background()
 
-	upload, err := store.CreateMultipartUpload(ctx, bucket, "abandoned.bin")
+	upload, err := store.CreateMultipartUpload(ctx, bucket, "abandoned.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("CreateMultipartUpload: %v", err)
 	}
@@ -151,7 +156,7 @@ func TestBucketDeletionRefusesWorkInFlight(t *testing.T) {
 	if err := store.CreateBucket(ctx, other); err != nil {
 		t.Fatalf("CreateBucket: %v", err)
 	}
-	upload, err := store.CreateMultipartUpload(ctx, other, "pending.bin")
+	upload, err := store.CreateMultipartUpload(ctx, other, "pending.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("CreateMultipartUpload: %v", err)
 	}

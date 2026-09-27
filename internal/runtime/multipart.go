@@ -9,7 +9,7 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string) (*storage.MultipartUpload, error) {
+func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string, opts storage.MultipartOptions) (*storage.MultipartUpload, error) {
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
@@ -32,11 +32,11 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 	if needsObjectSlot && !i.objectQuotaFits(target, 1) {
 		return nil, ErrQuotaExceeded
 	}
-	upload, err := i.multipartStore.CreateMultipartUpload(ctx, bucket, key)
+	upload, err := i.multipartStore.CreateMultipartUpload(ctx, bucket, key, opts)
 	if err != nil {
 		return nil, err
 	}
-	clone := *upload
+	clone := storage.CloneMultipartUpload(*upload)
 	i.multipart[upload.UploadID] = multipartUsage{upload: clone, parts: make(map[int]int64)}
 	i.addMultipartTarget(target)
 	if needsObjectSlot {
@@ -63,7 +63,7 @@ func (i *Instance) GetMultipartUpload(ctx context.Context, uploadID string) (*st
 	if err != nil {
 		return nil, err
 	}
-	clone := *upload
+	clone := storage.CloneMultipartUpload(*upload)
 	return &clone, nil
 }
 
@@ -152,33 +152,53 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if err != nil {
 		return nil, err
 	}
+	// completedBytes is what the object will weigh: the selected parts, in the
+	// order they will be concatenated.
 	var completedBytes int64
 	for _, part := range parts {
 		completedBytes += uploadUsage.parts[part.PartNumber]
 	}
-	if !exists && !i.objectQuotaFits(objectTarget(uploadUsage.upload.Bucket, uploadUsage.upload.Key), 1) {
+	target := objectTarget(uploadUsage.upload.Bucket, uploadUsage.upload.Key)
+	if !exists && !i.objectQuotaFits(target, 1) {
 		return nil, ErrQuotaExceeded
 	}
-	completedReservation := uploadUsage.bytes()
-	if completedReservation > i.reservedBytes {
+	// The parts of an upload in flight are already reserved, so the only
+	// accounting question left is whether the completion itself fits.
+	uploadReservation := uploadUsage.bytes()
+	if uploadReservation > i.reservedBytes {
 		return nil, ErrQuotaExceeded
 	}
-	otherReservedBytes := i.reservedBytes - completedReservation
-	if i.usage.Bytes-oldSize+completedBytes+otherReservedBytes > i.options.MaxBytes {
+	// A completion holds the parts and assembles a second copy of the same bytes
+	// before the object is published, so for the length of this call the bounded
+	// state is every committed object, every in-flight part, and the buffer
+	// being assembled. That last term is the completion reservation, and it is
+	// what used to be missing: the store transiently held the object twice while
+	// the advertised ceiling counted it once, so a memory-backed session could
+	// exceed the bound it publishes by one object per in-flight completion.
+	//
+	// The check precedes the store call, so a completion that cannot fit is
+	// refused before anything is assembled and reserves nothing. A completion
+	// that fails afterwards leaves the upload's own reservation in place, which
+	// is correct: the upload is still in flight and still holding its parts.
+	peak := i.usage.Bytes - oldSize + i.reservedBytes + completedBytes
+	if peak > i.options.MaxBytes {
 		return nil, ErrQuotaExceeded
 	}
 	meta, err := i.multipartStore.CompleteMultipartUpload(ctx, uploadID, parts)
 	if err != nil {
 		return nil, err
 	}
+	// One transition, from in-flight to committed: the parts' reservation is
+	// released and the object's bytes are counted, so the same bytes are never
+	// counted twice and never dropped. This is the only place the two states
+	// meet, which is what makes "exactly once" a property rather than a hope.
 	if exists {
 		i.usage.Bytes -= oldSize
 	} else {
 		i.usage.Objects++
 	}
 	i.usage.Bytes += meta.Size
-	i.reservedBytes -= completedReservation
-	target := objectTarget(uploadUsage.upload.Bucket, uploadUsage.upload.Key)
+	i.reservedBytes -= uploadReservation
 	i.removeMultipartTarget(target)
 	i.consumeTargetReservation(target)
 	i.reconcileTargetReservation(target, true)

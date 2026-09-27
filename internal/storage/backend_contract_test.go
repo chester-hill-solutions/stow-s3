@@ -88,6 +88,42 @@ func requireMultipart(t *testing.T, store storage.Store) storage.MultipartStore 
 	return multi
 }
 
+// A bucket that does not exist must be refused before the body is read.
+//
+// The store reads and hashes a body to publish it, and for a request naming a
+// bucket that is not there every byte of that work is thrown away. Worse, the
+// memory backend did it while holding the store's single lock, so one impossible
+// request blocked every other operation in the process for as long as its body
+// took to arrive.
+//
+// The observable difference is in the reader, not in the error: the answer is
+// still ErrBucketNotFound either way, but the body should not have been touched
+// to produce it. A missing bucket is knowable from the request alone.
+func TestStoreRejectsAMissingBucketBeforeReadingTheBody(t *testing.T) {
+	withStores(t, func(t *testing.T, store storage.Store) {
+		body := &countingReader{Reader: strings.NewReader(strings.Repeat("x", 64))}
+		_, err := store.PutObject(context.Background(), "no-such-bucket", "key", body, storage.PutOptions{})
+		if !errors.Is(err, storage.ErrBucketNotFound) {
+			t.Fatalf("put into a missing bucket = %v, want ErrBucketNotFound", err)
+		}
+		if body.reads != 0 {
+			t.Fatalf("the body of an impossible request was read %d time(s)", body.reads)
+		}
+	})
+}
+
+// countingReader counts the Read calls made against it, so a test can tell that a
+// body was not touched rather than inferring it from a timing.
+type countingReader struct {
+	*strings.Reader
+	reads int
+}
+
+func (r *countingReader) Read(p []byte) (int, error) {
+	r.reads++
+	return r.Reader.Read(p)
+}
+
 // A batch delete returns the keys it confirmed deleted.
 //
 // DeleteObjects returns a []string whose meaning is not visible in its
@@ -270,7 +306,7 @@ func TestStoreMultipartLookup(t *testing.T) {
 		if err := store.CreateBucket(ctx, "uploads"); err != nil {
 			t.Fatalf("create bucket: %v", err)
 		}
-		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 		if err != nil {
 			t.Fatalf("create upload: %v", err)
 		}
@@ -291,7 +327,7 @@ func TestStoreBucketDeletionRejectsActiveMultipartUpload(t *testing.T) {
 		if err := store.CreateBucket(ctx, "uploads"); err != nil {
 			t.Fatalf("create bucket: %v", err)
 		}
-		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 		if err != nil {
 			t.Fatalf("create upload: %v", err)
 		}
@@ -324,7 +360,7 @@ func seedPartUpload(t *testing.T, store storage.Store) string {
 	if err := store.CreateBucket(ctx, "uploads"); err != nil {
 		t.Fatalf("create bucket: %v", err)
 	}
-	upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin")
+	upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}

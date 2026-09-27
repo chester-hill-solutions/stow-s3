@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
@@ -169,12 +168,9 @@ func (s *Server) handlePutObject(ctx context.Context, w http.ResponseWriter, r *
 		contentType = "application/octet-stream"
 	}
 	metadata := extractMetadata(r.Header)
-	if len(metadata) > 0 {
-		total := metadataSize(metadata)
-		if total > 2048 {
-			writeError(w, r, s3Error{Code: "InvalidArgument", Message: "Metadata too large", Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
-			return
-		}
+	if len(metadata) > 0 && metadataSize(metadata) > maxMetadataBytes {
+		writeError(w, r, s3Error{Code: "InvalidArgument", Message: "Metadata too large", Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
+		return
 	}
 
 	meta, err := s.store.PutObject(ctx, bucket, key, newBodyReader(body), storage.PutOptions{
@@ -295,50 +291,30 @@ func (s *Server) handleDeleteObjects(ctx context.Context, w http.ResponseWriter,
 	writeXML(w, r, http.StatusOK, resp)
 }
 
+// handleCopyObject dispatches a copy to the path its metadata directive names.
+// The paths themselves are in copy.go.
 func (s *Server) handleCopyObject(ctx context.Context, w http.ResponseWriter, r *http.Request, dstBucket, dstKey, copySource string) {
 	srcBucket, srcKey, err := parseCopySource(copySource)
 	if err != nil {
 		writeError(w, r, s3Error{Code: "InvalidArgument", Message: err.Error(), Resource: resourcePath(dstBucket, dstKey), StatusCode: http.StatusBadRequest})
 		return
 	}
+	copyReq := copyRequest{sourceBucket: srcBucket, sourceKey: srcKey, destBucket: dstBucket, destKey: dstKey}
 
-	srcMeta, err := s.store.HeadObject(ctx, srcBucket, srcKey)
+	directive, err := readCopyDirective(r)
 	if err != nil {
-		writeError(w, r, mapStorageError(err, resourcePath(dstBucket, dstKey)))
-		return
-	}
-
-	if err := checkCopyPreconditions(r.Header, srcMeta); err != nil {
-		writeError(w, r, mapStorageError(err, resourcePath(dstBucket, dstKey)))
+		writeError(w, r, s3Error{Code: "InvalidArgument", Message: err.Error(), Resource: copyReq.resource(), StatusCode: http.StatusBadRequest})
 		return
 	}
 
 	var meta *storage.ObjectMeta
-	directive := strings.ToUpper(strings.TrimSpace(r.Header.Get("x-amz-metadata-directive")))
-	switch directive {
-	case "", "COPY":
-		meta, err = s.store.CopyObject(ctx, srcBucket, srcKey, dstBucket, dstKey)
-	case "REPLACE":
-		rc, _, openErr := s.store.GetObject(ctx, srcBucket, srcKey)
-		if openErr != nil {
-			writeError(w, r, mapStorageError(openErr, resourcePath(dstBucket, dstKey)))
-			return
-		}
-		defer rc.Close()
-		contentType := r.Header.Get("Content-Type")
-		if contentType == "" {
-			contentType = "application/octet-stream"
-		}
-		meta, err = s.store.PutObject(ctx, dstBucket, dstKey, rc, storage.PutOptions{
-			ContentType: contentType,
-			Metadata:    extractMetadata(r.Header),
-		})
-	default:
-		writeError(w, r, s3Error{Code: "InvalidArgument", Message: "Invalid metadata directive", Resource: resourcePath(dstBucket, dstKey), StatusCode: http.StatusBadRequest})
-		return
+	if directive == directiveReplace {
+		meta, err = s.replaceMetadata(ctx, r, copyReq)
+	} else {
+		meta, err = s.copyVerbatim(ctx, r, copyReq)
 	}
 	if err != nil {
-		writeError(w, r, mapStorageError(err, resourcePath(dstBucket, dstKey)))
+		writeError(w, r, mapCopyError(err, copyReq.resource()))
 		return
 	}
 	writeXML(w, r, http.StatusOK, copyObjectResult{

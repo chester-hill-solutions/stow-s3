@@ -15,10 +15,22 @@ func runCorpusMultipart(corpusContext *sharedCorpusContext) {
 	corpusContext.t.Helper()
 	testCase := corpusContext.testCase
 	bucket := corpusContext.bucket(testCase.Bucket)
-	created, err := corpusContext.env.Client.CreateMultipartUpload(corpusContext.ctx, &s3.CreateMultipartUploadInput{
+	input := &s3.CreateMultipartUploadInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(testCase.Key),
-	})
+	}
+	// The object properties fixed at initiation. They are part of the request
+	// rather than an extra step, and the expectation below is that the completed
+	// object carries them: a multipart upload that drops the content type and
+	// metadata its initiation named publishes an object indistinguishable from one
+	// written with no options.
+	if testCase.ContentType != "" {
+		input.ContentType = aws.String(testCase.ContentType)
+	}
+	if len(testCase.Metadata) > 0 {
+		input.Metadata = testCase.Metadata
+	}
+	created, err := corpusContext.env.Client.CreateMultipartUpload(corpusContext.ctx, input)
 	if err != nil {
 		corpusContext.t.Fatalf("CreateMultipartUpload: %v", err)
 	}
@@ -77,6 +89,38 @@ func runCorpusMultipart(corpusContext *sharedCorpusContext) {
 	assertCorpusStatus(corpusContext.t, corpusContext.env, testCase.Expect.Status)
 	assertCorpusMultipartETag(corpusContext.t, aws.ToString(finished.ETag), testCase.Expect.ETag)
 	assertCorpusMultipartBody(corpusContext, bucket, testCase.Key, expectedBody, testCase.Expect.BodyLength)
+	assertCorpusMultipartProperties(corpusContext, bucket, testCase)
+}
+
+// assertCorpusMultipartProperties checks that the completed object carries the
+// properties the initiation fixed.
+//
+// HeadObject rather than the completion response, because the completed object is
+// the thing the properties are about: a client that uploads with a content type
+// and metadata and reads them back later is the case, and the response to the
+// completing call is not where it observes them.
+func assertCorpusMultipartProperties(corpusContext *sharedCorpusContext, bucket string, testCase sharedCorpusCase) {
+	corpusContext.t.Helper()
+	if testCase.Expect.ContentType == "" && len(testCase.Expect.Metadata) == 0 {
+		return
+	}
+	head, err := corpusContext.env.Client.HeadObject(corpusContext.ctx, &s3.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(testCase.Key),
+	})
+	if err != nil {
+		corpusContext.t.Fatalf("HeadObject after completion: %v", err)
+	}
+	assertCorpusStatus(corpusContext.t, corpusContext.env, http.StatusOK)
+	if testCase.Expect.ContentType != "" && aws.ToString(head.ContentType) != testCase.Expect.ContentType {
+		corpusContext.t.Fatalf("completed content type = %q, want %q; the content type given at initiation did not reach the object",
+			aws.ToString(head.ContentType), testCase.Expect.ContentType)
+	}
+	for name, want := range testCase.Expect.Metadata {
+		if got := head.Metadata[name]; got != want {
+			corpusContext.t.Fatalf("completed metadata %s = %q, want %q; the metadata given at initiation did not reach the object", name, got, want)
+		}
+	}
 }
 
 func assertCorpusMultipartListing(corpusContext *sharedCorpusContext, bucket, key, uploadID string) {

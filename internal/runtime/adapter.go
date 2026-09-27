@@ -142,6 +142,19 @@ func (a *StoreAdapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBuc
 	return objectMeta(&object), nil
 }
 
+// CopyObjectCond is the conditional form, and it is here rather than only on the
+// stores so that a server built on the runtime gets the same atomicity the stores
+// have. Without it the S3 layer's conditional copy would fall back to checking a
+// version it observed and then copying whatever is current, which is the window
+// the capability exists to close.
+func (a *StoreAdapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
+	object, err := a.instance.CopyObjectCond(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return objectMeta(&object), nil
+}
+
 func (a *StoreAdapter) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
 	if opts.MaxKeys < 0 {
 		return nil, ErrInvalidListLimit
@@ -188,8 +201,8 @@ func objectMeta(object *Object) *storage.ObjectMeta {
 	}
 }
 
-func (a *StoreAdapter) CreateMultipartUpload(ctx context.Context, bucket, key string) (*storage.MultipartUpload, error) {
-	return a.instance.CreateMultipartUpload(ctx, bucket, key)
+func (a *StoreAdapter) CreateMultipartUpload(ctx context.Context, bucket, key string, opts storage.MultipartOptions) (*storage.MultipartUpload, error) {
+	return a.instance.CreateMultipartUpload(ctx, bucket, key, opts)
 }
 
 func (a *StoreAdapter) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {

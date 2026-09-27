@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -22,27 +23,26 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-// unreadablePartsStore is a store whose ListParts fails while its other
-// operations work, which is the condition the completion handler mishandled: it
-// discarded the error, leaving the part-size map empty and skipping the
-// minimum-part-size check without saying so.
+// failingCompletionStore is a store whose completion fails while its other
+// operations work, so the wire status can only come from how the handler renders
+// the store's error.
 //
 // Both halves of the store contract are embedded because multipart is an
 // optional interface the server discovers by assertion. Overriding only the
 // object-model half would leave the real multipart implementation in place, and
 // the test would pass or fail for the wrong reason - which is exactly what
 // happened when the interface was split and this stub was not updated with it.
-type unreadablePartsStore struct {
+type failingCompletionStore struct {
 	storage.Store
 	storage.MultipartStore
 	failure error
 }
 
-// newUnreadablePartsStore wraps a real store so that only ListParts fails and
-// only CompleteMultipartUpload is replaced. The embedded interfaces have to be a
-// working store: a nil one panics the moment the test sets an upload up, which
-// looks like a server crash rather than a stub.
-func newUnreadablePartsStore(t *testing.T, failure error) storage.Store {
+// newFailingCompletionStore wraps a real store so that only completion is
+// replaced. The embedded interfaces have to be a working store: a nil one panics
+// the moment the test sets an upload up, which looks like a server crash rather
+// than a stub.
+func newFailingCompletionStore(t *testing.T, failure error) storage.Store {
 	t.Helper()
 	base := storage.NewMemoryStore()
 	var asStore storage.Store = base
@@ -50,28 +50,41 @@ func newUnreadablePartsStore(t *testing.T, failure error) storage.Store {
 	if !ok {
 		t.Fatalf("%T does not implement storage.MultipartStore", base)
 	}
-	return unreadablePartsStore{Store: base, MultipartStore: multi, failure: failure}
+	return failingCompletionStore{Store: base, MultipartStore: multi, failure: failure}
 }
 
-func (s unreadablePartsStore) ListParts(context.Context, string) ([]storage.PartInfo, error) {
+func (s failingCompletionStore) CompleteMultipartUpload(context.Context, string, []storage.PartInfo) (*storage.ObjectMeta, error) {
 	return nil, s.failure
 }
 
-// CompleteMultipartUpload succeeds, so that a 200 in the test below can only
-// come from the handler proceeding in spite of the listing failure rather than
-// from some later check happening to fail.
-func (s unreadablePartsStore) CompleteMultipartUpload(_ context.Context, uploadID string, _ []storage.PartInfo) (*storage.ObjectMeta, error) {
-	return &storage.ObjectMeta{Bucket: "uploads", Key: "object.bin", ETag: `"stub"`, Size: 1}, nil
-}
-
 // completeOverWire issues a CompleteMultipartUpload naming the given part
-// numbers, and returns the status and body.
+// numbers with a placeholder ETag each, and returns the status and body. The
+// ETag is deliberately wrong: it is for reaching a refusal that happens before
+// the parts are matched, which is what the part-size and store-failure cases
+// are about.
 func completeOverWire(t *testing.T, ts *httptest.Server, ref objectRef, uploadID string, partNumbers ...int) (int, string) {
 	t.Helper()
+	parts := make(map[int]string, len(partNumbers))
+	for _, number := range partNumbers {
+		parts[number] = `"etag"`
+	}
+	return completeWithETags(t, ts, ref, uploadID, parts)
+}
+
+// completeWithETags issues a CompleteMultipartUpload naming each part with its
+// real ETag, and returns the status and body.
+func completeWithETags(t *testing.T, ts *httptest.Server, ref objectRef, uploadID string, parts map[int]string) (int, string) {
+	t.Helper()
+	numbers := make([]int, 0, len(parts))
+	for number := range parts {
+		numbers = append(numbers, number)
+	}
+	sort.Ints(numbers)
+
 	var request strings.Builder
 	request.WriteString("<CompleteMultipartUpload>")
-	for _, number := range partNumbers {
-		fmt.Fprintf(&request, "<Part><PartNumber>%d</PartNumber><ETag>\"etag\"</ETag></Part>", number)
+	for _, number := range numbers {
+		fmt.Fprintf(&request, "<Part><PartNumber>%d</PartNumber><ETag>%s</ETag></Part>", number, parts[number])
 	}
 	request.WriteString("</CompleteMultipartUpload>")
 	body := request.String()
@@ -94,9 +107,33 @@ func completeOverWire(t *testing.T, ts *httptest.Server, ref objectRef, uploadID
 // given size, returning the upload ID and each part's ETag.
 func uploadPartsOverWire(t *testing.T, ts *httptest.Server, ref objectRef, count, size int) (string, []string) {
 	t.Helper()
+	sizes := make([]int, count)
+	for i := range sizes {
+		sizes[i] = size
+	}
+	uploadID, etags := uploadVariableParts(t, ts, ref, sizes)
+	return uploadID, etags
+}
+
+// uploadVariableParts starts a multipart upload and uploads one part per size, in
+// order, returning the upload ID and each part's ETag. The parts differ in
+// content, so each ETag identifies its own part rather than every part sharing
+// one.
+func uploadVariableParts(t *testing.T, ts *httptest.Server, ref objectRef, sizes []int) (string, []string) {
+	t.Helper()
+	uploadID := startUpload(t, ts, ref, nil)
+	return uploadID, uploadPartsTo(t, ts, ref, uploadID, sizes)
+}
+
+// startUpload initiates an upload, optionally with headers, and returns its ID.
+func startUpload(t *testing.T, ts *httptest.Server, ref objectRef, headers map[string]string) string {
+	t.Helper()
 	req, err := http.NewRequest(http.MethodPost, ts.URL+ref.path()+"?uploads", nil)
 	if err != nil {
 		t.Fatalf("build create upload: %v", err)
+	}
+	for name, value := range headers {
+		req.Header.Set(name, value)
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -113,18 +150,25 @@ func uploadPartsOverWire(t *testing.T, ts *httptest.Server, ref objectRef, count
 	if initiated.UploadID == "" {
 		t.Fatalf("create upload returned no id: %s", data)
 	}
+	return initiated.UploadID
+}
 
-	etags := make([]string, 0, count)
-	payload := strings.Repeat("x", size)
-	for number := 1; number <= count; number++ {
-		req, err := http.NewRequest(http.MethodPut, ts.URL+ref.path()+"?partNumber="+strconv.Itoa(number)+"&uploadId="+initiated.UploadID, strings.NewReader(payload))
+// uploadPartsTo uploads one part per size to an existing upload, in order,
+// returning each part's ETag. Part N is filled with the Nth letter, so no two
+// parts share an ETag.
+func uploadPartsTo(t *testing.T, ts *httptest.Server, ref objectRef, uploadID string, sizes []int) []string {
+	t.Helper()
+	etags := make([]string, 0, len(sizes))
+	for number, size := range sizes {
+		payload := strings.Repeat(string(rune('a'+number)), size)
+		req, err := http.NewRequest(http.MethodPut, ts.URL+ref.path()+"?partNumber="+strconv.Itoa(number+1)+"&uploadId="+uploadID, strings.NewReader(payload))
 		if err != nil {
 			t.Fatalf("build upload part: %v", err)
 		}
 		req.ContentLength = int64(len(payload))
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			t.Fatalf("upload part %d: %v", number, err)
+			t.Fatalf("upload part %d: %v", number+1, err)
 		}
 		partData, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
@@ -132,26 +176,26 @@ func uploadPartsOverWire(t *testing.T, ts *httptest.Server, ref objectRef, count
 			ETag string `xml:"ETag"`
 		}
 		if err := xml.Unmarshal(partData, &part); err != nil {
-			t.Fatalf("parse upload part %d %q: %v", number, partData, err)
+			t.Fatalf("parse upload part %d %q: %v", number+1, partData, err)
 		}
 		etags = append(etags, part.ETag)
 	}
-	return initiated.UploadID, etags
+	return etags
 }
 
-// A failure to list the upload's parts is reported, not absorbed.
+// A failure to complete is reported, not absorbed.
 //
-// The completion handler called ListParts to build the map it uses to enforce
-// S3's 5 MiB minimum on non-final parts, and discarded the error. An empty map
-// made every lookup miss, so the size check passed for every part and a client
-// could complete an upload made of 1-byte parts - the one thing that check
-// exists to prevent. The failure was invisible: the request carried on to
+// The completion handler used to call ListParts to build the map it used to
+// enforce S3's 5 MiB minimum on non-final parts, and it discarded the error. An
+// empty map made every lookup miss, so the size check passed for every part and
+// a client could complete an upload made of 1-byte parts - the one thing that
+// check exists to prevent. The failure was invisible: the request carried on to
 // CompleteMultipartUpload and reported success.
 //
-// The store here fails ListParts and completes successfully, so the only correct
-// outcome is a refusal. A 200 is the bug, and it is reachable rather than
-// theoretical: any I/O error reading the upload directory produced it.
-func TestCompleteMultipartUploadReportsAFailedPartListing(t *testing.T) {
+// The size check is now the store's, so this asserts the property that survives
+// the move: whatever the store says about a completion is what the client is
+// told, and a store that breaks is a 500 rather than a success.
+func TestCompleteMultipartUploadReportsAStoreFailure(t *testing.T) {
 	cases := []struct {
 		name       string
 		failure    error
@@ -170,7 +214,7 @@ func TestCompleteMultipartUploadReportsAFailedPartListing(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			ts := newStoreServer(t, newUnreadablePartsStore(t, tc.failure))
+			ts := newStoreServer(t, newFailingCompletionStore(t, tc.failure))
 			createBucketOverWire(t, ts, "uploads")
 			uploadID, _ := uploadPartsOverWire(t, ts, objectRef{"uploads", "object.bin"}, 2, 16)
 
@@ -185,14 +229,20 @@ func TestCompleteMultipartUploadReportsAFailedPartListing(t *testing.T) {
 	}
 }
 
-// The minimum part size is enforced on non-final parts: two 16-byte parts, the
-// first of which is not final, are refused.
+// The minimum part size is enforced on non-final parts, and the client is told
+// so in S3's words: two 16-byte parts, the first of which is not final, are
+// refused with EntityTooSmall.
+//
+// The parts are named with their real ETags. A completion whose ETags are wrong
+// is refused for a different reason first, and the size rule is not what that
+// refusal is about.
 func TestCompleteMultipartUploadEnforcesTheMinimumPartSize(t *testing.T) {
 	ts := newStoreServer(t, storage.NewMemoryStore())
 	createBucketOverWire(t, ts, "uploads")
-	uploadID, _ := uploadPartsOverWire(t, ts, objectRef{"uploads", "object.bin"}, 2, 16)
+	ref := objectRef{"uploads", "object.bin"}
+	uploadID, etags := uploadVariableParts(t, ts, ref, []int{16, 16})
 
-	status, body := completeOverWire(t, ts, objectRef{"uploads", "object.bin"}, uploadID, 1, 2)
+	status, body := completeWithETags(t, ts, ref, uploadID, map[int]string{1: etags[0], 2: etags[1]})
 	if status != http.StatusBadRequest {
 		t.Fatalf("complete of two 16-byte parts = %d, want 400: %s", status, body)
 	}
@@ -210,24 +260,87 @@ func TestCompleteMultipartUploadExemptsTheFinalPartFromTheMinimum(t *testing.T) 
 	createBucketOverWire(t, ts, "uploads")
 	uploadID, etags := uploadPartsOverWire(t, ts, objectRef{"uploads", "object.bin"}, 1, 16)
 
-	var request strings.Builder
-	request.WriteString("<CompleteMultipartUpload>")
-	fmt.Fprintf(&request, "<Part><PartNumber>1</PartNumber><ETag>%s</ETag></Part>", etags[0])
-	request.WriteString("</CompleteMultipartUpload>")
-	body := request.String()
+	status, body := completeWithETags(t, ts, objectRef{"uploads", "object.bin"}, uploadID, map[int]string{1: etags[0]})
+	if status != http.StatusOK {
+		t.Fatalf("complete of a single small final part = %d, want 200: %s", status, body)
+	}
+}
 
-	req, err := http.NewRequest(http.MethodPost, ts.URL+objectRef{"uploads", "object.bin"}.path()+"?uploadId="+uploadID, strings.NewReader(body))
-	if err != nil {
-		t.Fatalf("build complete: %v", err)
+// The three sizes the minimum is stated in, at the wire.
+//
+// One byte plus one byte is refused because the first part is not final. Five
+// mebibytes plus one byte is accepted because the first part is exactly the
+// minimum — the boundary belongs to the legal side. One part of one byte is
+// accepted because a single part is always final.
+func TestCompleteMultipartUploadMinimumPartSizeAtTheWire(t *testing.T) {
+	const minPart = 5 * 1024 * 1024
+	cases := []struct {
+		name       string
+		sizes      []int
+		wantStatus int
+	}{
+		{"one byte plus one byte", []int{1, 1}, http.StatusBadRequest},
+		{"five mebibytes plus one byte", []int{minPart, 1}, http.StatusOK},
+		{"a single one-byte part", []int{1}, http.StatusOK},
 	}
-	req.ContentLength = int64(len(body))
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatalf("complete: %v", err)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ts := newStoreServer(t, storage.NewMemoryStore())
+			createBucketOverWire(t, ts, "uploads")
+			ref := objectRef{"uploads", "object.bin"}
+			uploadID, etags := uploadVariableParts(t, ts, ref, tc.sizes)
+
+			parts := make(map[int]string, len(tc.sizes))
+			for i := range tc.sizes {
+				parts[i+1] = etags[i]
+			}
+			status, body := completeWithETags(t, ts, ref, uploadID, parts)
+			if status != tc.wantStatus {
+				t.Fatalf("complete = %d, want %d: %s", status, tc.wantStatus, body)
+			}
+			if tc.wantStatus == http.StatusBadRequest && !strings.Contains(body, "EntityTooSmall") {
+				t.Fatalf("complete body = %s, want EntityTooSmall", body)
+			}
+		})
 	}
-	defer resp.Body.Close()
-	data, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("complete of a single small final part = %d, want 200: %s", resp.StatusCode, data)
+}
+
+// The properties fixed at initiation reach the completed object.
+//
+// A Content-Type and user metadata given to CreateMultipartUpload used to be
+// dropped on the floor: the storage model kept only the upload ID, the bucket,
+// the key and the initiation time, so completion had nothing to build the
+// object's metadata from and published an object with neither. A client that
+// uploaded a JSON document with a content type and read it back over HeadObject
+// was told it was application/octet-stream with no metadata at all.
+func TestCompletedObjectKeepsTheInitiationProperties(t *testing.T) {
+	ts := newStoreServer(t, storage.NewMemoryStore())
+	createBucketOverWire(t, ts, "uploads")
+	ref := objectRef{"uploads", "document.json"}
+
+	uploadID := startUpload(t, ts, ref, map[string]string{
+		"Content-Type":   "application/json",
+		"x-amz-meta-foo": "bar",
+	})
+	etags := uploadPartsTo(t, ts, ref, uploadID, []int{1})
+	status, body := completeWithETags(t, ts, ref, uploadID, map[int]string{1: etags[0]})
+	if status != http.StatusOK {
+		t.Fatalf("complete = %d, want 200: %s", status, body)
+	}
+
+	head, err := http.NewRequest(http.MethodHead, ts.URL+ref.path(), nil)
+	if err != nil {
+		t.Fatalf("build head: %v", err)
+	}
+	headResp, err := http.DefaultClient.Do(head)
+	if err != nil {
+		t.Fatalf("head: %v", err)
+	}
+	defer headResp.Body.Close()
+	if got := headResp.Header.Get("Content-Type"); got != "application/json" {
+		t.Errorf("completed object Content-Type = %q, want application/json", got)
+	}
+	if got := headResp.Header.Get("x-amz-meta-foo"); got != "bar" {
+		t.Errorf("completed object x-amz-meta-foo = %q, want bar", got)
 	}
 }

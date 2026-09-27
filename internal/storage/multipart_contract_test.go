@@ -15,7 +15,7 @@ func runMultipartListContract(t *testing.T, store storage.Store) {
 	if err := store.CreateBucket(ctx, "uploads"); err != nil {
 		t.Fatalf("create bucket: %v", err)
 	}
-	upload, err := multi.CreateMultipartUpload(ctx, "uploads", "dir/object.bin")
+	upload, err := multi.CreateMultipartUpload(ctx, "uploads", "dir/object.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}

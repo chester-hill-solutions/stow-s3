@@ -59,6 +59,11 @@ type errorResponse struct {
 	RequestID string   `xml:"RequestId"`
 }
 
+// maxMetadataBytes bounds the user metadata a single write may carry, in the
+// sum of the names and values. It is the same ceiling for a single write and for
+// a multipart initiation, which is why both read it from here.
+const maxMetadataBytes = 2048
+
 // DefaultMaxRequestBytes bounds a single request body when Config does not set
 // a limit. It matches the documented default agent-session request ceiling.
 const DefaultMaxRequestBytes int64 = 8 * 1024 * 1024
@@ -125,6 +130,7 @@ var storageErrorCases = []storageErrorCase{
 	{storage.ErrBucketNotEmpty, "BucketNotEmpty", "The bucket you tried to delete is not empty", http.StatusConflict},
 	{storage.ErrInvalidKey, "InvalidArgument", "Invalid object key", http.StatusBadRequest},
 	{storage.ErrInvalidPart, "InvalidPart", "One or more of the specified parts could not be found", http.StatusBadRequest},
+	{storage.ErrEntityTooSmall, "EntityTooSmall", "Your proposed upload is smaller than the minimum allowed object size", http.StatusBadRequest},
 	{storage.ErrUploadNotFound, "NoSuchUpload", "The specified multipart upload does not exist", http.StatusNotFound},
 	{storage.ErrNoSuchUpload, "NoSuchUpload", "The specified multipart upload does not exist", http.StatusNotFound},
 	{storage.ErrPreconditionFailed, "PreconditionFailed", "At least one of the pre-conditions you specified did not hold", http.StatusPreconditionFailed},

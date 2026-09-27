@@ -206,6 +206,36 @@ func checksumHeaderValuesByName(name string) (string, bool) {
 	return "", false
 }
 
+// declaredChecksum returns the checksum configuration a request declares about a
+// body it is not sending, which is what a multipart initiation is.
+//
+// A multipart initiation carries no body, so the value cannot be computed here
+// and is not invented: an algorithm with no value is a claim about a whole
+// object that has not been assembled yet. Both are passed on as declared, and
+// the store verifies the value against the assembled object when the upload
+// completes — so a client that declares a checksum for the object it is
+// uploading has it checked against the object that is actually published, the
+// same check a single write gets.
+//
+// Dropping the declaration instead would ignore a request the client believes it
+// made, and storing it unverified would advertise an integrity property nobody
+// confirmed.
+func declaredChecksum(r *http.Request) (string, string) {
+	algorithm, value, err := providedChecksum(r)
+	if err != nil {
+		// A malformed or contradictory declaration is not carried forward. There
+		// is no body here to check it against, so there is nothing to be done with
+		// it but decline to record it.
+		return "", ""
+	}
+	if algorithm == "" {
+		if requested, reqErr := requestedChecksumAlgorithm(r); reqErr == nil {
+			algorithm = requested
+		}
+	}
+	return algorithm, value
+}
+
 func checksumFromRequest(r *http.Request, data []byte) (string, string, error) {
 	algorithm, providedValue, err := checksumHeaderValues(r)
 	if err != nil || algorithm == "" {

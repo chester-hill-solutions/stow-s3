@@ -1,6 +1,7 @@
 package storage_test
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"strings"
@@ -72,12 +73,15 @@ func TestMemoryStoreMultipart(t *testing.T) {
 		t.Fatalf("create bucket: %v", err)
 	}
 
-	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin")
+	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}
 
-	p1, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("foo"))
+	// The first part is at the minimum rather than three bytes, because a
+	// non-final part below it is refused at completion — the rule this test is
+	// not about, and one it must not trip over.
+	p1, err := store.UploadPart(ctx, upload.UploadID, 1, bytes.NewReader(make([]byte, storage.MinPartSize)))
 	if err != nil {
 		t.Fatalf("upload part 1: %v", err)
 	}
@@ -90,8 +94,8 @@ func TestMemoryStoreMultipart(t *testing.T) {
 	if err != nil {
 		t.Fatalf("complete upload: %v", err)
 	}
-	if meta.Size != 6 {
-		t.Fatalf("size = %d, want 6", meta.Size)
+	if meta.Size != int64(storage.MinPartSize+3) {
+		t.Fatalf("size = %d, want %d", meta.Size, storage.MinPartSize+3)
 	}
 
 	rc, _, err := store.GetObject(ctx, "data", "big.bin")
@@ -100,8 +104,8 @@ func TestMemoryStoreMultipart(t *testing.T) {
 	}
 	defer rc.Close()
 	data, _ := io.ReadAll(rc)
-	if string(data) != "foobar" {
-		t.Fatalf("data = %q", string(data))
+	if len(data) != storage.MinPartSize+3 || string(data[storage.MinPartSize:]) != "bar" {
+		t.Fatalf("data does not end with the final part")
 	}
 }
 

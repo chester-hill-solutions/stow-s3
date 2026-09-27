@@ -127,6 +127,30 @@ func (s *MemoryStore) PutObject(_ context.Context, bucket, key string, body io.R
 	if err := ValidateKey(key); err != nil {
 		return nil, err
 	}
+	// The bucket is checked before the body is read, not after.
+	//
+	// Reading it means materializing the whole request and hashing it, and it
+	// used to happen before the store lock was taken so that the preconditions
+	// could be checked against committed state under it. So an impossible
+	// request — a body for a bucket that does not exist — was fully read,
+	// hashed and copied before anyone said no, with the whole store locked for
+	// the duration and every other caller waiting on it.
+	//
+	// The check here is a fast refusal, not the answer: the bucket can be
+	// deleted between this line and the commit, so the commit revalidates it
+	// under the lock. That is what makes a bucket deleted mid-request still
+	// produce the correct failure rather than an object in a bucket that is
+	// gone.
+	s.mu.RLock()
+	_, bucketExists := s.buckets[bucket]
+	s.mu.RUnlock()
+	if !bucketExists {
+		return nil, ErrBucketNotFound
+	}
+
+	// The body is consumed outside the lock, for the same reason: a reader can
+	// be arbitrarily slow, and holding the store's single lock across an
+	// arbitrary reader blocks every other operation in the process.
 	etag, data, err := ETagForReader(body)
 	if err != nil {
 		return nil, err
@@ -263,20 +287,6 @@ func (s *MemoryStore) DeleteObjects(_ context.Context, bucket string, keys []str
 	return deleted, nil
 }
 
-func (s *MemoryStore) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*ObjectMeta, error) {
-	rc, meta, err := s.GetObject(ctx, srcBucket, srcKey)
-	if err != nil {
-		return nil, err
-	}
-	defer rc.Close()
-	return s.PutObject(ctx, dstBucket, dstKey, rc, PutOptions{
-		ContentType:       meta.ContentType,
-		Metadata:          CloneMetadata(meta.Metadata),
-		ChecksumAlgorithm: meta.ChecksumAlgorithm,
-		ChecksumValue:     meta.ChecksumValue,
-	})
-}
-
 func (s *MemoryStore) ListObjectsV2(_ context.Context, bucket string, opts ListOptions) (*ListResult, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -297,7 +307,7 @@ func (s *MemoryStore) ListObjectsV2(_ context.Context, bucket string, opts ListO
 	return PaginateObjects(items, opts), nil
 }
 
-func (s *MemoryStore) CreateMultipartUpload(_ context.Context, bucket, key string) (*MultipartUpload, error) {
+func (s *MemoryStore) CreateMultipartUpload(_ context.Context, bucket, key string, opts MultipartOptions) (*MultipartUpload, error) {
 	if err := ValidateBucketName(bucket); err != nil {
 		return nil, err
 	}
@@ -321,8 +331,9 @@ func (s *MemoryStore) CreateMultipartUpload(_ context.Context, bucket, key strin
 		Bucket:    bucket,
 		Key:       key,
 		Initiated: time.Now().UTC(),
+		Options:   opts.clone(),
 	}
-	b.multipart[uploadID] = &memMultipart{upload: upload, parts: make(map[int]memPart)}
+	b.multipart[uploadID] = &memMultipart{upload: CloneMultipartUpload(upload), parts: make(map[int]memPart)}
 	out := upload
 	return &out, nil
 }
@@ -334,7 +345,7 @@ func (s *MemoryStore) GetMultipartUpload(_ context.Context, uploadID string) (*M
 	if !ok {
 		return nil, ErrUploadNotFound
 	}
-	upload := mp.upload
+	upload := CloneMultipartUpload(mp.upload)
 	return &upload, nil
 }
 
@@ -363,53 +374,6 @@ func (s *MemoryStore) UploadPart(_ context.Context, uploadID string, partNumber 
 	}
 	mp.parts[partNumber] = memPart{info: part, data: data}
 	out := part
-	return &out, nil
-}
-
-func (s *MemoryStore) CompleteMultipartUpload(_ context.Context, uploadID string, parts []PartInfo) (*ObjectMeta, error) {
-	if err := ValidateMultipartPartNumbers(parts); err != nil {
-		return nil, err
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	mp, bucket, ok := s.findMultipart(uploadID)
-	if !ok {
-		return nil, ErrUploadNotFound
-	}
-
-	var combined []byte
-	partETags := make([]string, 0, len(parts))
-	for _, p := range parts {
-		part, ok := mp.parts[p.PartNumber]
-		if !ok {
-			return nil, ErrInvalidPart
-		}
-		if p.ETag == "" || !ETagEqual(p.ETag, part.info.ETag) {
-			return nil, ErrInvalidPart
-		}
-		partETags = append(partETags, part.info.ETag)
-		combined = append(combined, part.data...)
-	}
-
-	etag := CompletionETag(partETags)
-	versionID, err := NewRecordVersion()
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now().UTC()
-	meta := ObjectMeta{
-		Bucket:       mp.upload.Bucket,
-		Key:          mp.upload.Key,
-		VersionID:    versionID,
-		Size:         int64(len(combined)),
-		ETag:         etag,
-		LastModified: now,
-	}
-	bucket.objects[mp.upload.Key] = &memObject{data: combined, meta: meta}
-	delete(bucket.multipart, uploadID)
-	out := meta
 	return &out, nil
 }
 
@@ -482,7 +446,7 @@ func (s *MemoryStore) ListMultipartUploads(_ context.Context, bucket string, opt
 	}
 	uploads := make([]MultipartUpload, 0, len(b.multipart))
 	for _, upload := range b.multipart {
-		uploads = append(uploads, upload.upload)
+		uploads = append(uploads, CloneMultipartUpload(upload.upload))
 	}
 	return PaginateMultipartUploads(uploads, opts), nil
 }

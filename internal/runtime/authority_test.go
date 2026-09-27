@@ -119,7 +119,7 @@ func TestReadOnlyRefusesMultipartWrites(t *testing.T) {
 	ctx := context.Background()
 	instance := openWith(t, authority.All().Without(authority.ObjectWrite))
 
-	upload, err := instance.CreateMultipartUpload(ctx, "bucket", "big")
+	upload, err := instance.CreateMultipartUpload(ctx, "bucket", "big", storage.MultipartOptions{})
 	if !denied(t, err) {
 		t.Fatalf("CreateMultipartUpload = %v, want a refusal", err)
 	}
@@ -140,7 +140,7 @@ func TestARefusedWriteStoresNothing(t *testing.T) {
 	if _, err := instance.HeadObject(ctx, "bucket", "k"); !errors.Is(err, storage.ErrObjectNotFound) {
 		t.Errorf("a refused put left an object: %v", err)
 	}
-	if _, err := instance.CreateMultipartUpload(ctx, "bucket", "big"); !denied(t, err) {
+	if _, err := instance.CreateMultipartUpload(ctx, "bucket", "big", storage.MultipartOptions{}); !denied(t, err) {
 		t.Errorf("CreateMultipartUpload = %v, want a refusal", err)
 	}
 	if uploads, err := instance.ListMultipartUploads(ctx, "bucket", storage.MultipartListOptions{}); err != nil {

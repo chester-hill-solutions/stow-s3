@@ -212,7 +212,7 @@ func TestAdapter_RejectsMultipartLiveWriteWithoutDurableOutbox(t *testing.T) {
 	ctx := context.Background()
 	local := storage.NewMemoryStore()
 	_ = local.CreateBucket(ctx, "bucket")
-	upload, err := local.CreateMultipartUpload(ctx, "bucket", "key")
+	upload, err := local.CreateMultipartUpload(ctx, "bucket", "key", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}

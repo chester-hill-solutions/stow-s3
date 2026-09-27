@@ -1,6 +1,7 @@
 package fs_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"io"
@@ -192,7 +193,7 @@ func TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover(t 
 		t.Fatalf("create bucket: %v", err)
 	}
 
-	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin")
+	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}
@@ -320,12 +321,15 @@ func TestFilesystemStoreMultipart(t *testing.T) {
 	}
 	_ = store.CreateBucket(ctx, "data")
 
-	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin")
+	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin", storage.MultipartOptions{})
 	if err != nil {
 		t.Fatalf("create upload: %v", err)
 	}
 
-	p1, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("foo"))
+	// The first part is at the minimum rather than three bytes: a non-final part
+	// below it is refused at completion, and this case is about the staging
+	// directory disappearing, which it cannot reach through a refusal.
+	p1, err := store.UploadPart(ctx, upload.UploadID, 1, bytes.NewReader(make([]byte, storage.MinPartSize)))
 	if err != nil {
 		t.Fatalf("part 1: %v", err)
 	}
@@ -349,10 +353,10 @@ func TestFilesystemStoreMultipart(t *testing.T) {
 	}
 	defer rc.Close()
 	data, _ := io.ReadAll(rc)
-	if string(data) != "foobar" {
-		t.Fatalf("data = %q", string(data))
+	if len(data) != storage.MinPartSize+3 || string(data[storage.MinPartSize:]) != "bar" {
+		t.Fatalf("data does not end with the final part")
 	}
-	if meta.Size != 6 {
+	if meta.Size != int64(storage.MinPartSize+3) {
 		t.Fatalf("size = %d", meta.Size)
 	}
 }
