@@ -37,9 +37,23 @@ func Open(options Options) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newInstance(normalized, storage.NewMemoryStore(), func() (storage.Store, error) {
+	instance := newInstance(normalized, storage.NewMemoryStore(), func() (storage.Store, error) {
 		return storage.NewMemoryStore(), nil
-	}, false), nil
+	}, false)
+	// Initialized for the same reason OpenWithStore initializes, and the
+	// asymmetry was a landmine rather than a live defect: normalizeOptions
+	// above rejects every backend but memory, and the memory store is built
+	// here, so this walk currently finds no buckets and reconciles nothing.
+	// It matters on the day Open accepts a store that can arrive populated --
+	// a filesystem backend, or anything reusing a data directory. Skipping it
+	// would start usage at zero against objects that already exist, which
+	// makes MaxBytes and MaxObjects unenforceable rather than merely
+	// unenforced, and it would skip the open-time ErrQuotaExceeded check that
+	// decides whether an over-quota store may be opened at all.
+	if err := instance.initialize(context.Background()); err != nil {
+		return nil, err
+	}
+	return instance, nil
 }
 
 func newInstance(options Options, store storage.Store, resetStore func() (storage.Store, error), persistent bool) *Instance {
