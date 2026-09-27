@@ -68,26 +68,23 @@ older history, submodules, and Git LFS payloads are not included.
 
 ## Install
 
-**The npm and PyPI packages are not published yet.** Both names are reserved and
-the release pipeline that will publish them is built and green, but `@chester-hill-solutions/stow-s3`
-is not on npm and `stow-s3` is not on PyPI. `npm install @chester-hill-solutions/stow-s3` and
-`pip install stow-s3` will fail with a 404 today.
+**The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release
+partially published the main npm package to GitHub Packages, but failed before
+publishing its platform packages. PyPI was not published. Do not use the npm or
+Python install commands below until a complete release is announced.
 
-**The npm package will live on GitHub Packages, not npmjs.org, so the bare
-install command will not work when it is published.** This organisation owns
-nothing on npmjs — the scope does not exist there — and a scope-specific
-registry in `.npmrc` overrides `--registry`, so npm will silently resolve against
-the wrong host and report a 404 that looks like a naming problem. Route the scope
-explicitly, and commit that line so it cannot be forgotten:
+**The npm package is distributed through GitHub Packages, not npmjs.org.** This
+organisation owns nothing on npmjs — the scope does not exist there — and a
+scope-specific registry in `.npmrc` overrides `--registry`. Once a complete
+release is announced, route the scope explicitly:
 
 ```ini
 # .npmrc
 @chester-hill-solutions:registry=https://npm.pkg.github.com
 ```
 
-Then `npm install @chester-hill-solutions/stow-s3` resolves. PyPI has no such
-step. This is recorded now, while the packages are still private, so the publish
-step is a visibility flip rather than a documentation change under time pressure.
+Then `npm install @chester-hill-solutions/stow-s3` resolves against the intended
+registry. PyPI has no such configuration step.
 
 The Go module is published and installs today:
 

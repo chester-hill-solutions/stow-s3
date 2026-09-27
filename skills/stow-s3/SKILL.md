@@ -44,15 +44,15 @@ reads, error shapes.
 
 ## Install
 
-**npm and PyPI are not published yet.** `@chester-hill-solutions/stow-s3` and `stow-s3` are not on
-npm or PyPI, so those two commands fail with a 404. Do not try them first. The
-Go module is published and is the shortest working path.
+**The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release
+partially published the main npm package to GitHub Packages, but failed before
+publishing its platform packages. PyPI was not published. Do not try those
+install commands first. The Go module is published and is the shortest working
+path.
 
-When the npm package is published it will be on **GitHub Packages**, not
-npmjs.org, and the bare command will still fail: this organisation owns nothing
-on npmjs, and a scope-specific registry in `.npmrc` beats `--registry`, so npm
-resolves against the wrong host and returns a 404 that reads like a naming
-problem. Add this to `.npmrc` first:
+The npm package is distributed through **GitHub Packages**, not npmjs.org. Once
+a complete release is announced, add this to `.npmrc` so npm resolves the scope
+against the intended registry:
 
 ```ini
 @chester-hill-solutions:registry=https://npm.pkg.github.com

@@ -427,6 +427,23 @@ This standards phase is a release blocker: no new remediation PR may increase a 
 4. Review logs/status/metrics manually for secret and key redaction.
 5. Publish `v0.2.0` only after the release checklist is signed off.
 
+### Release status — 2026-09-27
+
+The `v0.2.0` tag exists at `dafc0b4a11583904c516954e37cc36dd380798ff`, but it
+is not a completed release. Its [release workflow run](https://github.com/chester-hill-solutions/stow-s3/actions/runs/36194627941)
+passed verification and build jobs, published the main npm package to GitHub
+Packages, then failed while publishing the platform packages. PyPI publishing
+and GitHub Release creation were skipped. The tagged workflow passed multiple
+tarballs to one `npm publish` command; the current `main` workflow uses
+`scripts/publish-if-absent.mjs` to publish each tarball and safely resume partial
+publishes. Re-running the immutable old tag still uses its old workflow.
+
+Do not publish a new tag until R11 is complete. The open release blockers include
+the successful disposable live-provider run for the release commit, external
+pilot evidence on clean installs and recovery, completion of the chosen npm and
+PyPI distribution setup, and the package/version/tag checks. Any follow-up
+release needs a new version; do not move or reuse `v0.2.0`.
+
 ## 6. Acceptance criteria
 
 ### Contract and SDK behavior
