@@ -5,6 +5,8 @@
 **Scope:** remediate production run-through composition; prepare isolated, pre-seeded agent workspaces; checkpoint and hand off their results.
 **Relationship:** additive to the accepted decisions in ADRs 0005–0011 and `docs/workspace-contract.md`. This is the current execution order for these workstreams and supersedes the related backlog ordering in `docs/agent-dx-plan.md` §0.11/§10.1 and the phase ordering in `docs/agentic-dx-10-plan.md`. Those older plans remain product history and architecture context; they are not parallel implementation specifications.
 
+**Sequencing against the deploy-anywhere work:** [`Deploy-Anywhere Plan`](deploy-anywhere-plan.md) is the current execution order for portability, multi-writer safety, and the read-through cache, and it runs in parallel with this one. Where the two touch the same code it is ordered first. Its Phase 1 (concurrent-write detection on propagation) and Phase 3 (incremental cache eviction) are P0 and precede this plan's Phase 5 item 3. The MCP stdio adapter is **pushed, not dropped**: an adapter built over propagation that silently overwrites another writer would be a faster route to that failure rather than a use of the product.
+
 ## 1. Plan validation summary
 
 **Verdict: Adjust before implementation; the direction aligns, but the resume-policy gap and production/test wiring mismatch must be addressed first.** The existing workspace backend, registry, TTL collection, explicit destruction, runtime authority checks, and durable run-through outbox are reusable foundations. The accepted ADRs require real files, same-machine durability, explicit deletion, separate live-write consent, and a handoff reference that carries no S3 secret; this plan preserves those constraints.

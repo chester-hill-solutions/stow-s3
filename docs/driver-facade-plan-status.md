@@ -70,15 +70,34 @@ are still true. None of them depends on the facade.
   ADR 0002 §Consequences requires the corpus to be amended before behaviour
   changes, so this is owed work regardless of the plan.
 
-- **Addressing is derived in two places that cannot disagree by construction.**
-  `forcePathStyle` is hardcoded `true` in three places in the TypeScript client
-  (`instance.ts`, `index.ts` ×2), discarding any caller value, while Go derives
-  `baseHost` twice (`internal/s3api/server.go`). A single option should derive
-  both, and a virtual-hosted corpus case is what would keep them honest.
+- **Addressing was derived in two places that could disagree, and is now split
+  across two fixes.** As of 2026-09-27 this finding is half resolved, and the
+  remainder is tracked in
+  [`Deploy-Anywhere Plan`](deploy-anywhere-plan.md) Phase 7 item 3 rather than
+  here. `Stow.awsSdkV3Config` spread the caller's options and then set
+  `forcePathStyle: true` over the top, so the option was in the public type,
+  honored by `buildAwsSdkV3Config`, and discarded by the one function that
+  mattered — and the existing test asserted the discarded value. Fixed in
+  `59568ca`. The run-through upstream client was worse: `UsePathStyle: true` was
+  hard-coded, so a provider serving only virtual-hosted addressing was
+  unreachable and the failure was a DNS lookup with nothing in stow's output to
+  explain it; `STOW_UPSTREAM_ADDRESSING` and `UpstreamConfig.Addressing` landed in
+  `87b0a4a`. Still open: the local server's `STOW_BASE_HOST`, which is
+  `docs/remediation-plan.md` open item 5, and the virtual-hosted corpus case that
+  would keep any of it honest.
 
 - **A latent asymmetry in the runtime constructors.** `runtime.Open` returned an
   instance whose initialization had never run. Fixed on 2026-09-27; it was inert
   at the time and the commit says so.
+
+- **The corpus grew its first range-read cases, and the first one found a defect
+  on `main`.** `range-partial-object` failed against the real
+  `@aws-sdk/client-s3` because a 206 carried the whole-object checksum beside a
+  partial body. Fixed in `e393166`. This is the plan's corpus finding paying out
+  two days after the plan was retired, which is the argument for having kept the
+  finding rather than the plan. Range is not the only gap: presigned URLs,
+  virtual-hosted addressing, `HeadBucket`, `DeleteObjects` and five of seven
+  multipart operations are still uncovered.
 
 ## If this is ever revived
 
