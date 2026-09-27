@@ -1032,8 +1032,8 @@ threat list.
 
 | Item | Requirement | Status | Effort |
 |---|---|---|---|
-| M3.0 Cost baseline **[do first]** | — | ⬜ no density benchmark exists | 2 |
-| M3.1 Multi-environment runtime | — | ⬜ | — |
+| M3.0 Cost baseline | — | 🟡 the benchmark existed; nothing compared it to the committed baseline. `make check-density` now does | 1 |
+| M3.1 Multi-environment runtime | R-203 | ⬜ unspecified — no requirement, no effort, and the authority is still environment-wide | — |
 | M3.2 Environment descriptor | R-308,803 | ⬜ premise corrected | 2 |
 | M3.3 Profile normalization across surfaces | — | ⬜ `session.ts:117` vs `session.py:253` | — |
 | M3.4 Density and churn benchmarks in CI | — | ⬜ | — |

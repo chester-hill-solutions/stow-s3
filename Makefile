@@ -1,4 +1,4 @@
-.PHONY: build build-wasm test test-race test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface standards check-generated benchmark
+.PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface standards check-generated benchmark
 
 BINARY := bin/stow-s3
 
@@ -106,6 +106,13 @@ check-coverage:
 benchmark: build build-wasm
 	node packages/stow-s3/scripts/benchmark-session.mjs --sessions 30 --payload-bytes 1048576
 	node packages/stow-s3/scripts/benchmark-session.mjs --sweep
+
+# The committed density baseline, re-measured and compared. Kept out of
+# `standards` for the same reason as benchmark: RSS depends on the machine, and a
+# required check that fails on a loaded runner is worse than none. What was
+# missing before was any comparison at all, so the baseline could drift unnoticed.
+check-density: build
+	node scripts/check-density.mjs
 
 check-version:
 	node scripts/check-version.mjs
