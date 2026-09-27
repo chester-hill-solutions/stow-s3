@@ -453,11 +453,35 @@ release needs a new version; do not move or reuse `v0.2.0`.
 Supplemental local check on 2026-09-27: `go test ./conformance -run
 '^TestUpstreamRunThrough$' -count=1 -v` passed against a temporary loopback
 MinIO bucket. It verified a mirrored write, upstream and local reads, and
-delete-and-list cleanup. The container was removed afterward. Railway project
-creation was denied for the available personal workspace, so no Railway bucket
-was created and no data was written to the linked production project. The local
-MinIO result is useful S3-compatible coverage, but does not satisfy the required
-live-provider run for a release commit.
+delete-and-list cleanup. The container was removed afterward.
+
+Supplemental **live-provider** run on 2026-09-27, at commit `59568ca`: the same
+test passed against a Railway bucket, `STOW_CONFORMANCE_PROVIDER=custom`. It was
+run with `STOW_UPSTREAM_ADDRESSING=virtual-hosted`, which is the setting added
+earlier the same day, and the endpoint reports `urlStyle: virtual-host`.
+
+What this establishes: run-through composition works against a real
+S3-compatible provider over the network, not only against loopback MinIO, and
+cleanup is verified. The bucket was created in a **dedicated scratch project**
+(`stow-conformance-scratch`) rather than in any of the 42 existing production
+projects, and a follow-up list confirmed `keycount=0` with no objects left
+behind.
+
+What it does not establish, stated plainly because the distinction matters for
+the release gate:
+
+- The provider matrix is **not** complete. R11 asks for AWS S3, Cloudflare R2,
+  and a custom endpoint. This covers only `custom`. The other two remain.
+- The addressing result is weaker than it looks. The same test also passes with
+  `STOW_UPSTREAM_ADDRESSING=path`, so this endpoint accepts both styles and does
+  not by itself prove the virtual-hosted path is exercised in a way path-style
+  could not. The deterministic proof of both request forms is the wire test in
+  `internal/runthrough/addressing_wire_test.go`, not this run.
+- The credentials are long-lived Railway access keys rather than the
+  short-lived session tokens the plan asks live tests to use.
+
+So the live-provider blocker is **partially** discharged: one of three providers,
+with the matrix, the credential form, and external pilot evidence still open.
 
 ## 6. Acceptance criteria
 
