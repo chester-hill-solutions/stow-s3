@@ -119,18 +119,6 @@ func assertInitiationProperties(t *testing.T, got storage.MultipartOptions, labe
 	}
 }
 
-// The 5 MiB minimum applies to every part but the last, and the boundary belongs
-// to the legal side.
-//
-// It is enforced by the store rather than by the S3 layer because a store used
-// directly — through the embedded API, or a workspace — has to enforce it too. When
-// it was the S3 layer's rule, a caller who completed an upload the S3 surface
-// would have refused got a different answer purely from the interface they used.
-//
-// The three sizes are the rule stated: two one-byte parts are refused because the
-// first is not final, five mebibytes plus one byte is accepted because the first
-// is exactly the minimum, and a single one-byte part is accepted because a single
-// part is always final.
 // A checksum the client claims for the object it is assembling is verified
 // against the object that is published.
 //

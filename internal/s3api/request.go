@@ -210,16 +210,23 @@ func checksumHeaderValuesByName(name string) (string, bool) {
 // body it is not sending, which is what a multipart initiation is.
 //
 // A multipart initiation carries no body, so the value cannot be computed here
-// and is not invented: an algorithm with no value is a claim about a whole
-// object that has not been assembled yet. Both are passed on as declared, and
-// the store verifies the value against the assembled object when the upload
-// completes — so a client that declares a checksum for the object it is
-// uploading has it checked against the object that is actually published, the
-// same check a single write gets.
+// and is not invented. What it can carry is an algorithm - the one the client
+// intends to use, named before the object it describes has been assembled - and
+// that is recorded as declared, so GetMultipartUpload and ListMultipartUploads
+// report it and a client that made the request is not ignored.
+//
+// It is worth being exact about what the record buys, because the obvious
+// reading of it is wrong. A declared algorithm is not a whole-object checksum
+// claim, so there is nothing for the completion to verify: no value was supplied
+// and none can be derived without computing the composite of the per-part
+// checksums, which this does not do. Presenting the declaration to the store as
+// though it were a claim is what turned `x-amz-checksum-algorithm` on
+// CreateMultipartUpload into a 500 on every completion - see
+// storage.MultipartPutOptions, which is where the distinction is now drawn.
 //
 // Dropping the declaration instead would ignore a request the client believes it
-// made, and storing it unverified would advertise an integrity property nobody
-// confirmed.
+// made, and recording it as though it had been confirmed would advertise an
+// integrity property nobody checked.
 func declaredChecksum(r *http.Request) (string, string) {
 	algorithm, value, err := providedChecksum(r)
 	if err != nil {

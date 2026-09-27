@@ -150,7 +150,21 @@ func TestDetectModeTreatsAnUnrecognizedModeAsLocal(t *testing.T) {
 			t.Errorf("STOW_MODE=%q selected %q, want local", value, got)
 		}
 	}
-	for _, value := range []string{"run-through", "RUN-THROUGH", " Run-Through "} {
+	// "upstream" is in that list on its own terms, because it is a different
+	// word rather than a misspelling of run-through — and it was the name of the
+	// reserved start option the 0.2.0 plan removed, so it is the one spelling
+	// most likely to be sitting in somebody's environment. It was briefly
+	// accepted here, which meant a leftover value selected a live provider
+	// through a name that reads as though it were meant to.
+	for _, value := range []string{"upstream", "UPSTREAM", " Upstream "} {
+		t.Setenv("STOW_MODE", value)
+		if got := runthrough.DetectMode(); got != runthrough.ModeLocal {
+			t.Errorf("STOW_MODE=%q selected %q, want local", value, got)
+		}
+	}
+	// Losing the hyphen is a typo of the same word, so it is accepted; the case
+	// and surrounding space are trimmed.
+	for _, value := range []string{"run-through", "runthrough", "RUN-THROUGH", " Run-Through "} {
 		t.Setenv("STOW_MODE", value)
 		if got := runthrough.DetectMode(); got != runthrough.ModeRunThrough {
 			t.Errorf("STOW_MODE=%q selected %q, want run-through", value, got)

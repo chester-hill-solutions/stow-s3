@@ -51,6 +51,20 @@ ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{
 })
 ```
 
+`MaxBytes` bounds the bytes a session may hold, and the bounded state is committed
+object bytes, plus the parts of every multipart upload in flight, plus the buffer
+a completion is assembling. The third term is the one to plan around: because the
+stores materialize an object to publish it, a completion needs room for the object
+*and* for the buffer it is assembled in, so the largest object a session of
+`MaxBytes: N` can complete is `N/2`, not `N`. The check runs before the store call,
+so a completion that cannot fit is refused with `InsufficientStorage` rather than
+attempted. With the `64 << 20` example above, that is a 32 MiB ceiling per
+multipart object. Single writes are unaffected.
+
+A refused completion is not a cancellation: the upload keeps its parts and remains
+completable, and nothing is released until the completion succeeds. A successful
+one transitions exactly once, the parts' reservation becoming the object.
+
 | Member | Guarantee |
 |---|---|
 | `ws.Dir() string` | The absolute workspace directory. Stable for the workspace's life. |

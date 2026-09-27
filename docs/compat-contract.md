@@ -24,6 +24,8 @@ Bucket names use 3–63 characters from `[a-z0-9._-]`. This local extension perm
 
 Header authentication may use the SDK-compatible `Date` header when `X-Amz-Date` is absent, provided the selected date header is in `SignedHeaders` and the signature validates. Presigned URLs still require `X-Amz-Date`. Presigned methods are GET, PUT, and HEAD; `X-Amz-Expires` must be in `1..604800`.
 
+Authentication material is read as the client wrote it, not repaired into a form the verifier prefers. A `SignedHeaders` list that is not in canonical form, an `Authorization` header carrying a repeated or unrecognized component, and an authentication query parameter that appears twice or under another spelling are each refused (`403`) rather than normalized. The accepted grammar and the reasons are in §4.1 and §4.2; this is a narrowing of what is accepted, deliberately, and it is inside the contract's own "Safety invariants" clause rather than undocumented Amazon strictness — the canonical forms in question are the SigV4 specification, not an Amazon service behaviour, and the refusals make the verifier's input match the signature's input.
+
 The shared corpus must cover missing/malformed auth, both date forms, wrong secret, skew, expired presigns, 604800, 604801, unsupported methods, and anonymous requests.
 
 ### 0.4 Policies and propagation
@@ -294,11 +296,25 @@ Both MUST succeed on the same bucket/object.
 | Access key | Stow-issued **local dev credentials** printed at startup / returned from `Stow.start()` |
 | Secret key | Paired with local access key; NEVER upstream credentials for local endpoint auth |
 | Canonical URI | The **decoded** request path, percent-encoded exactly once per path segment, with `/` separators left as separators. Encoding an already-encoded path produces `%2520` for a space and rejects the request with `403 SignatureDoesNotMatch` |
+| `SignedHeaders` form | Must be the canonical SigV4 form: lowercase, `;`-delimited, no empty entries, no repeats, ascending. Header *names* are matched case-insensitively, so a signed header sent as `X-Amz-Meta-Foo` against a list entry of `x-amz-meta-foo` is accepted |
+| `Authorization` components | Exactly `Credential`, `SignedHeaders`, `Signature`, each at most once. A repeated component is refused, and so is an unrecognized one — the grammar is closed, and a verifier that skips a claim it cannot check is verifying a subset of the header and reporting it as the whole |
+| Signature comparison | Exact. A signature is lowercase hex and is compared byte for byte; two spellings of the same hex are not interchangeable |
 
 **Failure responses:**
 - Missing / malformed auth → `403 Forbidden`, code `AccessDenied` or `SignatureDoesNotMatch`
 - Wrong secret → `403 SignatureDoesNotMatch`
 - Request time skew > 15 minutes → `403 RequestTimeTooSkewed`
+
+**On refusing rather than repairing.** The canonical form of `SignedHeaders` is what
+the SigV4 specification defines and what the canonical request embeds verbatim, so
+a list that is not in it is a client statement the verifier cannot reproduce.
+Normalizing it — trimming, lower-casing, dropping empties, sorting — authenticates
+against a header list the client never wrote: `host;host` names one header twice,
+and an unsorted list is silently sorted into the conforming form and then verified
+against that. The same reasoning covers a repeated `Authorization` component, where
+last-one-wins would make the header's meaning depend on the order two claims were
+written in. These refusals are inside the safe union of the pinned SDKs' behaviour,
+neither of which can emit any of these forms.
 
 ### 4.2 Presigned URLs
 
@@ -306,6 +322,8 @@ Both MUST succeed on the same bucket/object.
 - `X-Amz-Expires` maximum: **604800** seconds (7 days).
 - Supported signed operations: `GET`, `PUT`, `HEAD` (HEAD via GET presign with SDK options).
 - Unsigned query params not in signature MAY be ignored unless they alter signed headers/body.
+- Authentication parameters (`X-Amz-Algorithm`, `X-Amz-Credential`, `X-Amz-Date`, `X-Amz-Expires`, `X-Amz-SignedHeaders`, `X-Amz-Signature`) are read by **exact name**. A parameter appearing twice, or under another spelling such as `x-amz-signature`, is refused rather than resolved: the signed query and the values the verifier consumes are two readings of one string, so a query carrying two spellings could be checked against a value that was not the one signed. Ordinary duplicate query parameters are deliberately unaffected — AWS canonicalizes those by sorting, and they are not authentication material.
+- **Far-edge skew.** A presigned URL is refused when its signing time is further than the configured `MaxSkew` (default 15 minutes) in the future, as well as after its expiry. The expiry is derived from the signing time, which is inside the URL and therefore the client's to choose, so without this bound a URL signed for a date next year would never expire. The bound is the verifier's own allowance rather than a constant of the presigned branch, so both kinds of request are limited by the same number. A client whose host clock is more than 15 minutes fast will see `403 RequestTimeTooSkewed`; that is the intended behaviour and matches what an ordinary signed request already did.
 
 ### 4.3 Anonymous Access
 
@@ -363,10 +381,10 @@ Run-through mode is enabled **only** by naming it: `--mode run-through` or `STOW
 | Policy | Reads | Writes |
 |--------|-------|--------|
 | **local mode** (the default, always) | Local store only | Local store only |
+| **readThroughCache** | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
+| **mirrorWrites** | Same read-through behavior | Local first, then upstream with durable outbox; startup warning required |
 
 A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local. See `docs/adr/0005-live-write-requires-explicit-consent.md`.
-| **readThroughCache** (default when upstream detected) | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
-| **mirrorWrites** | Same read-through behavior | Local first, then upstream with durable outbox; startup warning required |
 
 ### 6.2 Read-Through Cache Semantics
 
