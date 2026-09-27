@@ -29,6 +29,12 @@ export interface CorpusExpectation {
   bodyLength?: number;
   checksumAlgorithm?: string;
   checksumValue?: string;
+  /**
+   * The full header value: "bytes 0-4/10" for a satisfied range, or
+   * "bytes star-slash 10" — the star form — for an unsatisfiable one. Spelled
+   * out in words because a literal asterisk-slash pair closes a JSDoc comment.
+   */
+  contentRange?: string;
   contents?: string[];
   commonPrefixes?: string[];
   keyCount?: number;
@@ -65,6 +71,8 @@ export interface CorpusCase {
   copySourceIfNoneMatch?: string;
   parts?: CorpusPart[];
   listMultipartUploads?: boolean;
+  /** A raw HTTP Range header value, sent verbatim. */
+  range?: string;
 }
 
 export interface Corpus {

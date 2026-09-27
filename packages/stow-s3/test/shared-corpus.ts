@@ -26,6 +26,8 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { Stow, type StowInstance } from "../dist/index.js";
+import { assertFailure, assertMetadata } from "./shared-corpus-assert.js";
+import { runRangeGet } from "./shared-corpus-range.js";
 import type {
   Corpus,
   CorpusCase,
@@ -129,6 +131,9 @@ async function runCorpusOperation(client: S3Client, testCase: CorpusCase): Promi
       return;
     case "multipartUpload":
       await runMultipartUpload(client, testCase);
+      return;
+    case "rangeGet":
+      await runRangeGet(client, testCase);
       return;
     default:
       assert.fail(`unsupported corpus operation ${testCase.operation}`);
@@ -407,12 +412,6 @@ async function assertObject(output: GetObjectCommandOutput, expected: CorpusExpe
   assertMetadata(output.Metadata, expected.metadata, "GetObject");
 }
 
-function assertMetadata(actual: Record<string, string> | undefined, expected: Record<string, string> | undefined, label: string): void {
-  for (const [key, value] of Object.entries(expected ?? {})) {
-    assert.equal(actual?.[key], value, `${label} metadata ${key}`);
-  }
-}
-
 function assertStatus(output: { $metadata: { httpStatusCode?: number } }, expected: number): void {
   assert.equal(output.$metadata.httpStatusCode, expected);
 }
@@ -436,36 +435,5 @@ async function assertCorpusError(
   action: () => Promise<unknown>,
   expected: CorpusExpectation,
 ): Promise<void> {
-  let failure: unknown;
-  try {
-    await action();
-  } catch (error) {
-    failure = error;
-  }
-  assert.ok(failure !== undefined, "expected corpus operation to fail");
-  assert.equal(errorStatus(failure), expected.status);
-  if (expected.errorCode) assert.equal(errorCode(failure), expected.errorCode);
-}
-
-function errorStatus(error: unknown): number | undefined {
-  if (!isRecord(error)) return undefined;
-  const metadata = error["$metadata"];
-  if (!isRecord(metadata)) return undefined;
-  const status = metadata["httpStatusCode"];
-  return typeof status === "number" ? status : undefined;
-}
-
-function errorCode(error: unknown): string | undefined {
-  if (!isRecord(error)) return undefined;
-  for (const key of ["Code", "code", "name"]) {
-    const value = error[key];
-    if (typeof value === "string") return value;
-  }
-  const message = error["message"];
-  if (typeof message !== "string") return undefined;
-  return /<Code>([^<]+)<\/Code>/.exec(message)?.[1];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  await assertFailure(action, expected, "corpus operation");
 }

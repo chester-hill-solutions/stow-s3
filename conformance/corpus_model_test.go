@@ -49,6 +49,11 @@ type sharedCorpusCase struct {
 
 	Parts                []sharedCorpusPart `json:"parts"`
 	ListMultipartUploads bool               `json:"listMultipartUploads"`
+
+	// Range is a raw HTTP Range header value, sent verbatim. The corpus states
+	// the header a client would write rather than a parsed form, because the
+	// parsing rules are the thing under test.
+	Range string `json:"range"`
 }
 
 type sharedCorpusObject struct {
@@ -66,21 +71,26 @@ type sharedCorpusPart struct {
 }
 
 type sharedCorpusExpectation struct {
-	Status            int                `json:"status"`
-	Body              string             `json:"body"`
-	ContentType       string             `json:"contentType"`
-	Metadata          map[string]string  `json:"metadata"`
-	ErrorCode         string             `json:"errorCode"`
-	ETag              string             `json:"etag"`
-	BodyLength        int64              `json:"bodyLength"`
-	ChecksumAlgorithm string             `json:"checksumAlgorithm"`
-	ChecksumValue     string             `json:"checksumValue"`
-	Contents          []string           `json:"contents"`
-	CommonPrefixes    []string           `json:"commonPrefixes"`
-	KeyCount          int                `json:"keyCount"`
-	IsTruncated       *bool              `json:"isTruncated"`
-	Pages             []sharedCorpusPage `json:"pages"`
-	PartNumbers       []int              `json:"partNumbers"`
+	Status            int               `json:"status"`
+	Body              string            `json:"body"`
+	ContentType       string            `json:"contentType"`
+	Metadata          map[string]string `json:"metadata"`
+	ErrorCode         string            `json:"errorCode"`
+	ETag              string            `json:"etag"`
+	BodyLength        int64             `json:"bodyLength"`
+	ChecksumAlgorithm string            `json:"checksumAlgorithm"`
+	ChecksumValue     string            `json:"checksumValue"`
+	// ContentRange is the full header value, `bytes <first>-<last>/<size>`, or
+	// `bytes */<size>` on an unsatisfiable request. Asserting the whole string
+	// rather than the span alone is what catches a server that reports the
+	// right bytes against the wrong total.
+	ContentRange   string             `json:"contentRange"`
+	Contents       []string           `json:"contents"`
+	CommonPrefixes []string           `json:"commonPrefixes"`
+	KeyCount       int                `json:"keyCount"`
+	IsTruncated    *bool              `json:"isTruncated"`
+	Pages          []sharedCorpusPage `json:"pages"`
+	PartNumbers    []int              `json:"partNumbers"`
 }
 
 type sharedCorpusPage struct {

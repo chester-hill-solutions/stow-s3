@@ -25,7 +25,25 @@ func setChecksumHeader(w http.ResponseWriter, meta *storage.ObjectMeta) {
 	w.Header().Set("x-amz-checksum-"+strings.ToLower(meta.ChecksumAlgorithm), meta.ChecksumValue)
 }
 
+// setObjectHeaders emits the headers for a response whose body is the whole
+// object.
 func setObjectHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
+	setRepresentationHeaders(w, meta)
+	setChecksumHeader(w, meta)
+}
+
+// setRepresentationHeaders emits everything that describes the object itself
+// rather than the bytes of this particular response: content type, caching
+// validators, and user metadata.
+//
+// It is the correct set for a response that is not carrying the whole object —
+// a 206, or a bodiless 304. A whole-object checksum is deliberately not among
+// them, because on such a response it describes bytes the client is not
+// receiving, and the SDKs hash what they did receive and report a mismatch on an
+// answer that is telling the truth. That is the same reason a 304 does not carry
+// one, and it is why this is a separate function rather than a flag: the two
+// callers differ in which headers they owe, and the difference is the bug.
+func setRepresentationHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
 	if meta.ContentType != "" {
 		w.Header().Set("Content-Type", meta.ContentType)
 	} else {
@@ -33,7 +51,6 @@ func setObjectHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
 	}
 	w.Header().Set("Content-Length", strconv.FormatInt(meta.Size, 10))
 	setValidators(w, meta)
-	setChecksumHeader(w, meta)
 	for k, v := range meta.Metadata {
 		w.Header().Set(k, v)
 	}

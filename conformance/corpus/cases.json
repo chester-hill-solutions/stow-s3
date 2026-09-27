@@ -374,6 +374,139 @@
         "x-amz-meta-foo": "bar",
         "x-amz-meta-owner": "dev"
       }
+    },
+    {
+      "id": "range-partial-object",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "lines.txt",
+      "range": "bytes=0-4",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "lines.txt",
+          "body": "0123456789"
+        }
+      ],
+      "expect": {
+        "status": 206,
+        "body": "01234",
+        "contentRange": "bytes 0-4/10"
+      }
+    },
+    {
+      "id": "range-suffix-returns-the-last-bytes",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "lines.txt",
+      "range": "bytes=-3",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "lines.txt",
+          "body": "0123456789"
+        }
+      ],
+      "expect": {
+        "status": 206,
+        "body": "789",
+        "contentRange": "bytes 7-9/10"
+      }
+    },
+    {
+      "id": "range-open-ended-runs-to-the-last-byte",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "lines.txt",
+      "range": "bytes=5-",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "lines.txt",
+          "body": "0123456789"
+        }
+      ],
+      "expect": {
+        "status": 206,
+        "body": "56789",
+        "contentRange": "bytes 5-9/10"
+      }
+    },
+    {
+      "id": "range-end-past-the-object-is-clamped",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "lines.txt",
+      "range": "bytes=8-9999",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "lines.txt",
+          "body": "0123456789"
+        }
+      ],
+      "expect": {
+        "status": 206,
+        "body": "89",
+        "contentRange": "bytes 8-9/10"
+      }
+    },
+    {
+      "id": "range-whole-object-is-still-partial-content",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "lines.txt",
+      "range": "bytes=0-9",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "lines.txt",
+          "body": "0123456789"
+        }
+      ],
+      "expect": {
+        "status": 206,
+        "body": "0123456789",
+        "contentRange": "bytes 0-9/10"
+      }
+    },
+    {
+      "id": "range-start-past-the-object-is-unsatisfiable",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "lines.txt",
+      "range": "bytes=50-60",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "lines.txt",
+          "body": "0123456789"
+        }
+      ],
+      "expect": {
+        "status": 416,
+        "errorCode": "InvalidRange",
+        "contentRange": "bytes */10"
+      }
+    },
+    {
+      "id": "range-unsatisfiable-reports-the-real-object-size",
+      "operation": "rangeGet",
+      "bucket": "contract-range",
+      "key": "long.txt",
+      "range": "bytes=9999-",
+      "setup": [
+        {
+          "bucket": "contract-range",
+          "key": "long.txt",
+          "body": "0123456789abcdefghij"
+        }
+      ],
+      "expect": {
+        "status": 416,
+        "errorCode": "InvalidRange",
+        "contentRange": "bytes */20"
+      }
     }
   ]
 }

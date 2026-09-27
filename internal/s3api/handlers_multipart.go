@@ -264,7 +264,13 @@ func (s *Server) serveRange(w http.ResponseWriter, r *http.Request, rc io.ReadCl
 		_, _ = io.CopyN(io.Discard, rc, start)
 	}
 
-	setObjectHeaders(w, meta)
+	// Representation headers but not the whole-object checksum. A 206 carries a
+	// fragment, so an x-amz-checksum-* header beside it describes bytes the
+	// client never receives, and @aws-sdk/client-s3 hashes the fragment and
+	// refuses the response. Verified through that SDK, not by reading it: the
+	// shared corpus case range-partial-object fails on the checksum header and
+	// passes without it. Content-Length is corrected to the range length below.
+	setRepresentationHeaders(w, meta)
 	w.Header().Set("Content-Length", strconv.FormatInt(length, 10))
 	w.Header().Set("Content-Range", "bytes "+strconv.FormatInt(start, 10)+"-"+strconv.FormatInt(end, 10)+"/"+strconv.FormatInt(meta.Size, 10))
 	setCORS(w, r)

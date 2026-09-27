@@ -95,6 +95,11 @@ configuration or network access. With no opt-in variables, a normal
 
 ## Gaps / not yet covered
 
+- **Range reads** (§2.9): covered as of 2026-09-27 by seven `rangeGet` cases in
+  the shared corpus — plain, suffix, open-ended, a clamped end, a whole object
+  requested as a range, and two unsatisfiable requests. Still not covered at the
+  wire in `internal/s3api` for a checksummed object, which is where the defect
+  the corpus cases found lived.
 - **Virtual-hosted URL style** (§2.8): path-style only in this suite; virtual-hosted smoke test pending.
 - **ListObjectsV2** token bounds/invalid-token behavior (§2.4): the shared corpus covers prefix, delimiter, `encoding-type=url`, and multi-page continuation; the negative token matrix is pending.
 - **CopyObject** remaining conditional/status combinations (§2.6): cross-bucket copy, `REPLACE` metadata, and `if-none-match` are in the shared corpus; the full date/if-match matrix is pending.

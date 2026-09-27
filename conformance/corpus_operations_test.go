@@ -34,6 +34,8 @@ func runSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		runCorpusCopyObject(corpusContext)
 	case "multipartUpload":
 		runCorpusMultipart(corpusContext)
+	case "rangeGet":
+		runCorpusRangeGet(corpusContext)
 	default:
 		t.Fatalf("unsupported corpus operation %q", testCase.Operation)
 	}

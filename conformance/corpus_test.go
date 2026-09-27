@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -82,6 +83,7 @@ func validateSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		"listObjectsV2":   validateListCorpusCase,
 		"copyObject":      validateCopyCorpusCase,
 		"multipartUpload": validateMultipartCorpusCase,
+		"rangeGet":        validateRangeCorpusCase,
 	}
 	validator, ok := validators[testCase.Operation]
 	if !ok {
@@ -113,6 +115,38 @@ func validateChecksumCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 	}
 	if testCase.ChecksumAlgorithm != "" && !supportedCorpusChecksum(testCase.ChecksumAlgorithm) {
 		t.Fatalf("checksum case %q has unsupported algorithm %q", testCase.ID, testCase.ChecksumAlgorithm)
+	}
+}
+
+// validateRangeCorpusCase refuses a range case that could pass without the
+// range being honoured. A case that expected 200 would be satisfied by a server
+// that ignored the header entirely, and a satisfiable case with no expected
+// Content-Range would not notice a wrong total. The seeded object is required
+// because a range against a missing key is a different case, already covered by
+// the not-found paths.
+func validateRangeCorpusCase(t *testing.T, testCase sharedCorpusCase) {
+	t.Helper()
+	validateObjectCorpusCase(t, testCase)
+	if testCase.Range == "" {
+		t.Fatalf("range case %q requires a range header", testCase.ID)
+	}
+	if len(testCase.Setup) == 0 {
+		t.Fatalf("range case %q requires a setup object to read a range of", testCase.ID)
+	}
+	switch testCase.Expect.Status {
+	case http.StatusPartialContent:
+		if testCase.Expect.Body == "" {
+			t.Fatalf("range case %q expects 206 and must state the body it expects", testCase.ID)
+		}
+		if testCase.Expect.ContentRange == "" {
+			t.Fatalf("range case %q expects 206 and must state the Content-Range", testCase.ID)
+		}
+	case http.StatusRequestedRangeNotSatisfiable:
+		if testCase.Expect.ContentRange == "" {
+			t.Fatalf("range case %q expects 416 and must state the Content-Range", testCase.ID)
+		}
+	default:
+		t.Fatalf("range case %q must expect 206 or 416, not %d", testCase.ID, testCase.Expect.Status)
 	}
 }
 
