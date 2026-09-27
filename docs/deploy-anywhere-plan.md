@@ -1,6 +1,6 @@
 # Deploy-Anywhere Plan
 
-**Status:** Phases 0–4b done. Phases 5–7 are not started.
+**Status:** Phases 0–5 done. Phases 6–7 are not started.
 **Date:** 2026-09-27
 **Baseline:** `main` at `4ca2c1a`
 **Relationship:** additive to the accepted decisions in ADRs 0005–0011, `docs/compat-contract.md`, and `docs/workspace-contract.md`. This plan is the current execution order for the *portability and multi-writer* workstreams, and it sequences the MCP adapter that `docs/agent-workspace-plan.md` Phase 5 item 3 defers. It does not supersede that plan's workspace phases; the two run in parallel and this one is ordered first where they touch the same code.
@@ -325,8 +325,21 @@ set, sending a delta instead of a bucket is what makes bandwidth cost irrelevant
    not grow a second answer.
 3. Bound it: the same size and file caps the archive path already enforces.
 
-**Exit:** a caller can compute a delta between two workspaces and apply it to a
+**Exit:** a caller can compute a delta between two checkpoints and apply it to a
 third, with conflicts surfaced rather than resolved.
+
+**Done**, for checkpoints in one registry — the diff already computed the three
+change kinds, so what was missing was the content and a verified base. The conflict
+rule reuses Phase 1's mechanism rather than inventing one: every precondition is
+checked before any of them is written, because a delta applied part way leaves a
+target matching neither end and nothing reports it. An "added" path asserts absence,
+the same shape as an `If-None-Match` of `*`, so `ErrDeltaConflict` is the same
+refusal in the same words.
+
+What is not done is the wire half. A delta today is produced and applied inside one
+registry. Carrying one between machines means the archive transport, and
+`EncodeDelta`/`DecodeDelta` exist for it but are not yet wired to a command, so
+nothing moves a delta off the machine yet.
 
 ### Phase 6 — SSE-S3 wire semantics (P1)
 

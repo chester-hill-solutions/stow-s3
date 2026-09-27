@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Added a versioned delta document that can bring one checkpoint to another.** The checkpoint diff already computed added/changed/deleted by comparing two captures, but it was a private function producing a *report*: it named what differed and hashed both sides, and carried no bytes, so nothing could be changed with it. That is enough to tell a human what happened and not enough to synchronise anything.
+
+  `CreateDelta` promotes it to a document that names both ends and carries the content for every added or changed path, and `ApplyDelta` brings a third point to the second. The point for an agent and a device is that the cost is what the difference costs rather than what the tree costs: a delta over a working set with three changed files carries those three files, and the test asserts that an unchanged file appears in neither the change list nor the content.
+
+  The conflict rule is deliberately the one run-through propagation uses, because it is the same problem. A delta says "this file was A and is now B", so applying it to a target whose copy of that file is neither A nor B is applying one writer's intent to a state that does not exist. Every precondition is verified **before any of them is written**, because a delta applied part way leaves a target matching neither end, which is worse than a refusal: nothing reports it. An "added" path asserts absence, the same shape as an `If-None-Match` of `*`, so a delta cannot take a file that already belongs to someone else. The refusal is `ErrDeltaConflict` and it is not retried.
+
+  Bounds are the archive path's, so a delta and an archive of the same work are accepted or refused together. Zero means the default, not unlimited. A delta crossing two workspaces is refused, because the change list is meaningless between different histories.
+
+  Applying publishes a new point by rename and never modifies the base, so a delta can be applied twice and a refused application leaves the target byte-identical — both asserted. The original is untouched precisely because a caller retrying must get the same answer.
+
 - **Documented which surface runs where, because a capability report could not tell a caller.** Nothing said that the browser profile is *the* deployment on a host with no filesystem, or that the workspace — the agent surface — is unavailable there. A host with no filesystem cannot provide a workspace at all, since a workspace is a real directory and every object in it is a real file at a key-derived path; that is structural, and `stow.OpenWorkspace` refuses rather than pretending.
 
   The capability report's `persistent` is the field that hid this. It is a property of the backend and the host, not a setting, so it reads `false` on a memory backend for the same reason it would read `false` if a caller had forgotten to ask. `backend` is the field to branch on, and the boundary is now stated in the README, in the workspace contract's delivery table, and on the capability in each of the three client languages.

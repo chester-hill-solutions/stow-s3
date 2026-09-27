@@ -1,0 +1,285 @@
+package stow
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sort"
+	"time"
+)
+
+// A delta is the difference between two known points, expressed as a versioned
+// document that can bring a third point to the second.
+//
+// The checkpoint diff already computed added/changed/deleted by comparing two
+// captures. That is a *report* — it names what differs and hashes both sides, but
+// carries no bytes, so it cannot change anything. Promoting it to a document that
+// can be applied is what turns "here is what changed" into "here is the change",
+// which is the thing that makes exchanging a working set between an agent and a
+// device cost what the difference costs rather than what the tree costs.
+//
+// The conflict rule is the same one run-through propagation uses, deliberately. A
+// delta says "this file was A and is now B", so applying it to a target whose copy
+// of that file is neither A nor B is applying one writer's intent to a state that
+// does not exist. That is a precondition failure, refused rather than merged, and
+// it must not acquire a second vocabulary: the mechanism is identical and so is
+// the refusal.
+
+// DeltaVersion is the delta document's format version. A receiver refuses a
+// version it does not speak rather than guessing at the fields.
+const DeltaVersion = 1
+
+// changeSide is what the two ends held for one path, so the comparison can be
+// passed as one value rather than as four parameters. It is not a public type.
+type changeSide struct {
+	old        CheckpointFile
+	hadOld     bool
+	current    CheckpointFile
+	hasCurrent bool
+}
+
+// Change kinds, matching what the checkpoint diff already emits. They are strings
+// on the wire because a checkpoint manifest is the same shape, and a delta that
+// disagreed with the vocabulary it came from would be a second dialect.
+const (
+	DeltaChangeAdded   = "added"
+	DeltaChangeChanged = "changed"
+	DeltaChangeDeleted = "deleted"
+)
+
+// Default bounds for a delta, the same as the archive path so a delta and an
+// archive of the same work are accepted or refused together.
+const (
+	defaultDeltaBytes = 1 << 30
+	defaultDeltaFiles = 100_000
+	maxDeltaBytes     = 16 << 20
+)
+
+// ErrDeltaConflict reports that a delta could not be applied because the target
+// is not where the delta was written to be applied.
+//
+// It is a refusal, not a merge, and it is deliberately the same shape as
+// runthrough.ErrUpstreamConflict: a precondition that cannot succeed on a retry,
+// so the caller has to decide what should win.
+var ErrDeltaConflict = errors.New("delta target has diverged from the delta's base")
+
+// ErrDeltaVersionUnsupported reports a delta whose format version this build does
+// not speak. It is separate from a conflict because retrying will not help and
+// because a version mismatch is a deployment problem rather than a data one.
+var ErrDeltaVersionUnsupported = errors.New("delta document version is not supported")
+
+// DeltaOptions bounds the work a delta may describe. Zero takes the defaults,
+// matching CheckpointArchiveOptions: a cap of zero is not "unlimited", because an
+// unbounded document is exactly what the archive path refuses to produce.
+type DeltaOptions struct {
+	MaxBytes int64
+	MaxFiles int64
+	// IncludeSensitive carries paths the sensitive-name guard would otherwise
+	// refuse. It is the same opt-in the archive path requires, because a delta can
+	// carry the same bytes an archive can.
+	IncludeSensitive bool
+}
+
+// DeltaDocument is the transferable form. It names both ends, so a receiver can
+// check it is being applied where it thinks it is, and carries the content for
+// every added or changed path.
+type DeltaDocument struct {
+	Version  int               `json:"version"`
+	BaseID   string            `json:"base_id"`
+	TargetID string            `json:"target_id"`
+	Created  time.Time         `json:"created"`
+	Changes  []DeltaChange     `json:"changes"`
+	Files    int64             `json:"files"`
+	Bytes    int64             `json:"bytes"`
+	Content  map[string][]byte `json:"-"`
+}
+
+// DeltaChange is one path's difference. From is what the base held and To is what
+// the target holds, as digests, so the receiver can assert the precondition before
+// touching anything.
+type DeltaChange struct {
+	Path string          `json:"path"`
+	Kind string          `json:"kind"`
+	From *CheckpointFile `json:"from,omitempty"`
+	To   *CheckpointFile `json:"to,omitempty"`
+}
+
+// CreateDelta describes the difference between two checkpoints in one registry.
+//
+// The base is required and the target defaults to the most recent checkpoint of
+// the same workspace when empty, because "what changed since where I was" is the
+// question a caller usually has.
+func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, options DeltaOptions) (*DeltaDocument, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if baseID == "" {
+		return nil, errors.New("stow: a delta needs a base checkpoint")
+	}
+	if targetID == "" {
+		return nil, errors.New("stow: a delta needs a target checkpoint")
+	}
+	if err := validateDeltaOptions(options); err != nil {
+		return nil, err
+	}
+
+	base, err := LoadCheckpoint(registryDir, baseID)
+	if err != nil {
+		return nil, err
+	}
+	target, err := LoadCheckpoint(registryDir, targetID)
+	if err != nil {
+		return nil, err
+	}
+	if base.WorkspaceID != target.WorkspaceID {
+		return nil, fmt.Errorf("stow: delta crosses workspaces: %q and %q", base.WorkspaceID, target.WorkspaceID)
+	}
+
+	targetDir, err := checkpointDirectory(registryDir, targetID)
+	if err != nil {
+		return nil, err
+	}
+
+	baseFiles := indexCheckpointFiles(base)
+	targetFiles := indexCheckpointFiles(target)
+	paths := make(map[string]struct{}, len(baseFiles)+len(targetFiles))
+	for path := range baseFiles {
+		paths[path] = struct{}{}
+	}
+	for path := range targetFiles {
+		paths[path] = struct{}{}
+	}
+	ordered := make([]string, 0, len(paths))
+	for path := range paths {
+		ordered = append(ordered, path)
+	}
+	sort.Strings(ordered)
+
+	delta := &DeltaDocument{
+		Version:  DeltaVersion,
+		BaseID:   baseID,
+		TargetID: targetID,
+		Created:  time.Now().UTC(),
+		Content:  map[string][]byte{},
+	}
+	for _, path := range ordered {
+		old, hadOld := baseFiles[path]
+		current, hasCurrent := targetFiles[path]
+		if err := delta.recordChange(targetDir, path, changeSide{old: old, hadOld: hadOld, current: current, hasCurrent: hasCurrent}); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := delta.enforceBounds(options); err != nil {
+		return nil, err
+	}
+	delta.Files = int64(len(delta.Changes))
+	return delta, nil
+}
+
+// recordChange decides what happened to one path and, when the change carries
+// bytes, attaches them. Split out of CreateDelta so the comparison reads as the
+// three-way thing it is rather than as a switch buried in a loop.
+func (d *DeltaDocument) recordChange(targetDir, path string, side changeSide) error {
+	old, hadOld, current, hasCurrent := side.old, side.hadOld, side.current, side.hasCurrent
+	switch {
+	case !hadOld:
+		entry := current
+		d.Changes = append(d.Changes, DeltaChange{Path: path, Kind: DeltaChangeAdded, To: &entry})
+		return d.attach(targetDir, path, &entry)
+	case !hasCurrent:
+		entry := old
+		d.Changes = append(d.Changes, DeltaChange{Path: path, Kind: DeltaChangeDeleted, From: &entry})
+		return nil
+	case old.SHA256 != current.SHA256 || old.Mode != current.Mode:
+		oldEntry, newEntry := old, current
+		d.Changes = append(d.Changes, DeltaChange{Path: path, Kind: DeltaChangeChanged, From: &oldEntry, To: &newEntry})
+		return d.attach(targetDir, path, &newEntry)
+	}
+	return nil
+}
+
+// attach reads one path's bytes out of the target checkpoint, verifying the
+// digest the manifest claims. A delta whose content does not match its own
+// description would apply a different change than the one it names.
+func (d *DeltaDocument) attach(checkpointDir, path string, file *CheckpointFile) error {
+	if sensitiveSeedPath(path) {
+		return fmt.Errorf("stow: delta includes sensitive-looking path %q (explicit opt-in required)", path)
+	}
+	source := filepath.Join(checkpointDir, "files", filepath.FromSlash(path))
+	data, err := os.ReadFile(source)
+	if err != nil {
+		return fmt.Errorf("stow: read delta content %q: %w", path, err)
+	}
+	if int64(len(data)) != file.Size {
+		return fmt.Errorf("stow: delta content %q is %d bytes, manifest says %d", path, len(data), file.Size)
+	}
+	d.Content[path] = data
+	return nil
+}
+
+// enforceBounds refuses a delta the receiver could not accept, rather than
+// producing one and letting it fail on the other side.
+func (d *DeltaDocument) enforceBounds(options DeltaOptions) error {
+	maxBytes, maxFiles := options.MaxBytes, options.MaxFiles
+	if maxBytes == 0 {
+		maxBytes = defaultDeltaBytes
+	}
+	if maxFiles == 0 {
+		maxFiles = defaultDeltaFiles
+	}
+	if int64(len(d.Changes)) > maxFiles {
+		return fmt.Errorf("stow: delta describes %d files, over the cap of %d", len(d.Changes), maxFiles)
+	}
+	for _, data := range d.Content {
+		d.Bytes += int64(len(data))
+	}
+	if d.Bytes > maxBytes {
+		return fmt.Errorf("stow: delta carries %d bytes, over the cap of %d", d.Bytes, maxBytes)
+	}
+	if d.Bytes > maxDeltaBytes {
+		return fmt.Errorf("stow: delta carries %d bytes, over the %d a document may declare", d.Bytes, maxDeltaBytes)
+	}
+	return nil
+}
+
+func validateDeltaOptions(options DeltaOptions) error {
+	if options.MaxBytes < 0 {
+		return errors.New("stow: delta MaxBytes must not be negative")
+	}
+	if options.MaxFiles < 0 {
+		return errors.New("stow: delta MaxFiles must not be negative")
+	}
+	return nil
+}
+
+func indexCheckpointFiles(manifest CheckpointManifest) map[string]CheckpointFile {
+	out := make(map[string]CheckpointFile, len(manifest.Files))
+	for _, file := range manifest.Files {
+		out[file.Path] = file
+	}
+	return out
+}
+
+// EncodeDelta serializes a delta, including its content, for transport.
+func EncodeDelta(delta *DeltaDocument) ([]byte, error) {
+	if delta.Version != DeltaVersion {
+		return nil, ErrDeltaVersionUnsupported
+	}
+	return json.Marshal(delta)
+}
+
+// DecodeDelta parses a transported delta.
+func DecodeDelta(raw []byte) (*DeltaDocument, error) {
+	var delta DeltaDocument
+	if err := json.Unmarshal(raw, &delta); err != nil {
+		return nil, fmt.Errorf("stow: parse delta: %w", err)
+	}
+	if delta.Version != DeltaVersion {
+		return nil, ErrDeltaVersionUnsupported
+	}
+	return &delta, nil
+}
