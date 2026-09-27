@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -38,16 +37,25 @@ func NewS3Client(cfg UpstreamConfig) (*S3Client, error) {
 		region = "us-east-1"
 	}
 
-	awsCfg, err := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion(region),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			cfg.AccessKey,
-			cfg.SecretKey,
-			cfg.SessionToken,
-		)),
-	)
-	if err != nil {
-		return nil, err
+	// The config is built literally rather than through config.LoadDefaultConfig.
+	//
+	// LoadDefaultConfig resolves the entire default AWS chain on top of whatever it
+	// is given: ~/.aws/config, ~/.aws/credentials, SSO, web-identity token files,
+	// and the EC2 instance metadata provider. Region and credentials are both
+	// overridden below, and the endpoint is set on the client, so most of that chain
+	// turned out to be inert — a shared config declaring another region still signed
+	// for us-east-1, and s3_use_accelerate_endpoint did not redirect the request.
+	// Those two are asserted as invariants in upstream_config_test.go.
+	//
+	// Reading the chain was not inert, though. Naming a profile stow never asked for
+	// made this function fail, so whether stow could reach upstream storage at all
+	// depended on the machine's AWS configuration — and UpstreamConfig is documented
+	// as coming from a fixed list of STOW_*/S3_*/AWS_* environment variables and
+	// nothing else. The env vars are read where they are documented; this stops the
+	// machine from having an opinion.
+	awsCfg := aws.Config{
+		Region:      region,
+		Credentials: credentials.NewStaticCredentialsProvider(cfg.AccessKey, cfg.SecretKey, cfg.SessionToken),
 	}
 
 	client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
