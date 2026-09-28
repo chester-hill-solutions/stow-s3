@@ -58,6 +58,7 @@ func prewarm(args []string) error {
 	bucket := flags.String("bucket", "", "Upstream bucket to warm (required)")
 	keysFlag := flags.String("keys", "", "Comma-separated keys to warm (required; there is no prefix form)")
 	keysFile := flags.String("keys-file", "", "Read the key list from this file, one key per line")
+	offline := registerOfflineFlag(flags)
 	dataDir := flags.String("data-dir", "", "Local data directory")
 	cacheDir := flags.String("cache-dir", "", "Cache directory (default: <data-dir>/cache)")
 	if err := flags.Parse(args); err != nil {
@@ -74,7 +75,7 @@ func prewarm(args []string) error {
 	if len(keys) == 0 {
 		return errors.New("prewarm requires at least one key: pass --keys or --keys-file")
 	}
-	entries, err := runPrewarm(*dataDir, *cacheDir, *bucket, keys)
+	entries, err := runPrewarm(*dataDir, *cacheDir, *bucket, keys, offline)
 	if err != nil {
 		return err
 	}
@@ -88,11 +89,16 @@ func prewarm(args []string) error {
 // inline is a function nobody can review, and the wiring is the part that has to be
 // right — it is where the local namespace is created, and without that every key
 // reports "bucket not found" instead of being fetched.
-func runPrewarm(dataDir, cacheDir, bucket string, keys []string) ([]runthrough.PrewarmResult, error) {
+func runPrewarm(dataDir, cacheDir, bucket string, keys []string, offline *offlineFlag) ([]runthrough.PrewarmResult, error) {
 	cfg, err := runthrough.ConfigFromEnvChecked()
 	if err != nil {
 		return nil, err
 	}
+	// The flag is here because checking a warm-up is what this verb is for, and a
+	// caller who exported STOW_OFFLINE to warm cannot then pass --offline to see the
+	// result. It is the same tri-state as serve's, so --offline=false still opens the
+	// network for one command against an exported STOW_OFFLINE=true.
+	applyOfflineFlag(offline, &cfg)
 	if dataDir != "" {
 		cfg.CacheDir = cacheDir
 		if cacheDir == "" {

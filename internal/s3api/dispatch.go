@@ -51,6 +51,10 @@ func (s *Server) dispatchBucket(ctx context.Context, w http.ResponseWriter, r *h
 		}
 		s.handleDeleteBucket(ctx, w, r, bucket)
 	case http.MethodGet:
+		if q.Has("location") {
+			s.handleGetBucketLocation(ctx, w, r, bucket)
+			return
+		}
 		if q.Get("list-type") == "2" {
 			s.handleListObjectsV2(ctx, w, r, bucket, q)
 			return

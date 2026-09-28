@@ -12,6 +12,19 @@ type listBucketsResult struct {
 	Buckets buckets  `xml:"Buckets"`
 }
 
+// locationConstraint is the GetBucketLocation response.
+//
+// The value is an empty string, which is what S3 itself returns for us-east-1 and
+// what every SDK accepts as "the default region". The element is present and empty
+// rather than absent: a client that decodes into a string field cannot tell an
+// absent element from a refusal, and a client that checks for presence gets the
+// answer S3 gives it.
+type locationConstraint struct {
+	XMLName  xml.Name `xml:"LocationConstraint"`
+	Xmlns    string   `xml:"xmlns,attr,omitempty"`
+	Location string   `xml:",chardata"`
+}
+
 type owner struct {
 	ID          string `xml:"ID"`
 	DisplayName string `xml:"DisplayName"`

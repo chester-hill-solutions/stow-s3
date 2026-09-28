@@ -49,6 +49,26 @@ export function listWorkspaces(options = {}) {
     appendFlag(args, "--team", options.team);
     return runWorkspaceCommand(args);
 }
+/**
+ * Remove registry entries whose workspace directory no longer exists.
+ *
+ * `collect` asks whether a workspace is finished with, a judgement about time and
+ * ownership, and destroys directories. This asks whether there is anything there at
+ * all, and removes stow's own records and nothing else — so it cannot delete user
+ * data, and it needs no lock support.
+ *
+ * An adopted entry whose directory is gone is the record that the caller ever adopted
+ * that project, so it is kept unless `includeAdopted` asks otherwise. A registry can
+ * reach a size where a listing is mostly records for directories that no longer exist,
+ * and there is otherwise no way to clear them.
+ */
+export function pruneWorkspaces(options = {}) {
+    const args = ["prune"];
+    appendFlag(args, "--registry-dir", options.registryDir);
+    appendFlag(args, "--team", options.team);
+    appendBooleanFlag(args, "--include-adopted", options.includeAdopted);
+    return runWorkspaceCommand(args);
+}
 export function collectWorkspaces(registryDir) {
     const args = ["collect"];
     appendFlag(args, "--registry-dir", registryDir);

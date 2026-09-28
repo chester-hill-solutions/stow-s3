@@ -289,6 +289,64 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 	return out, nil
 }
 
+// Prune forgets entries whose workspace directory no longer exists.
+//
+// Not Collect with a different threshold: Collect asks whether a workspace is
+// finished with, a judgement about time and ownership that destroys directories.
+// Prune asks whether anything is there at all, which is a fact, and removes stow's
+// own records and nothing else — so it cannot delete user data, and it needs no lock
+// support because there is nothing to quiesce.
+//
+// Collect cannot reach these by default: a prepared workspace has no TTL and one
+// opened on a caller's directory is adopted, so both classify forever and nothing takes
+// them out. includeAdopted covers the second. It is off by default because the entry
+// is the only record the caller has that they adopted the project, and it is offered
+// because the directory is already gone — only the record is at stake, and a registry
+// can otherwise grow until a listing is mostly records for directories that are not.
+func (r *Registry) Prune(includeAdopted bool) ([]Reclaim, error) {
+	entries, err := r.All()
+	if err != nil {
+		return nil, err
+	}
+	var out []Reclaim
+	for _, entry := range entries {
+		reason, act := classifyPrunable(entry, includeAdopted)
+		out = append(out, Reclaim{Entry: entry, Reason: reason})
+		if !act {
+			continue
+		}
+		if err := r.ForgetCheckpoints(entry.ID); err != nil {
+			out[len(out)-1].Reason = "unreadable: " + err.Error()
+			continue
+		}
+		if err := r.Forget(entry.ID); err != nil {
+			return out, err
+		}
+	}
+	return out, nil
+}
+
+// classifyPrunable decides whether one entry is stow's own debris. A missing
+// directory is the only prunable thing, because it is the only one that is a fact
+// rather than a judgement; anything present is left for Collect, which owns the
+// ownership and age rules this does not want to restate.
+func classifyPrunable(entry Entry, includeAdopted bool) (reason string, act bool) {
+	_, err := os.Stat(entry.Dir)
+	switch {
+	case err == nil:
+		return "present", false
+	case !errors.Is(err, os.ErrNotExist):
+		// A permission problem or a path that is not a directory is not evidence the
+		// workspace is gone, and treating it as gone would forget a live one.
+		return "unreadable: " + err.Error(), false
+	case !entry.Owned && !includeAdopted:
+		return "gone-adopted", false
+	case !entry.Owned:
+		return "pruned-adopted", true
+	}
+	return "pruned", true
+}
+
 // classify decides whether one workspace may be removed, and says why.
 func (r *Registry) classify(entry Entry, now time.Time) (reason string, act bool) {
 	live, err := ProbeLiveness(entry.Dir)

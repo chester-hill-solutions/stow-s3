@@ -103,6 +103,31 @@ def list_workspaces(
     return run_workspace_command(*args)
 
 
+def prune_workspaces(
+    *,
+    registry_dir: str | None = None,
+    team: str | None = None,
+    include_adopted: bool = False,
+) -> WorkspaceJSON:
+    """Remove registry entries whose workspace directory no longer exists.
+
+    ``collect_workspaces`` asks whether a workspace is finished with, a judgement
+    about time and ownership, and destroys directories. This asks whether there is
+    anything there at all, and removes stow's own records and nothing else — so it
+    cannot delete user data, and it needs no lock support.
+
+    An adopted entry whose directory is gone is the record that the caller ever
+    adopted that project, so it is kept unless ``include_adopted`` asks otherwise. A
+    registry can reach a size where a listing is mostly records for directories that
+    no longer exist, and there is otherwise no way to clear them.
+    """
+    args = ["prune"]
+    _append_flag(args, "--registry-dir", registry_dir)
+    _append_flag(args, "--team", team)
+    _append_bool(args, "--include-adopted", include_adopted)
+    return run_workspace_command(*args)
+
+
 def collect_workspaces(*, registry_dir: str | None = None) -> WorkspaceJSON:
     args = ["collect"]
     _append_flag(args, "--registry-dir", registry_dir)

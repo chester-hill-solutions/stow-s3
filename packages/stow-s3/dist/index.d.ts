@@ -12,7 +12,7 @@ export { READY_PROTOCOL_VERSION, StowProtocolError, parseReadyMessage, } from ".
 export type { StowReady, StowReadyCapabilities, } from "./ready.js";
 export { StowBinaryNotFoundError, resolveStowBinary, stowBinaryAvailable, } from "./bin.js";
 export { upstreamFromEnv } from "./upstream.js";
-export { checkpointWorkspace, collectWorkspaces, destroyWorkspace, diffWorkspaces, exportWorkspaceCheckpoint, handoffWorkspace, importWorkspaceCheckpoint, prepareWorkspace, restoreWorkspaceCheckpoint, resumeWorkspace, runWorkspaceCommand, } from "./workspace.js";
+export { checkpointWorkspace, collectWorkspaces, pruneWorkspaces, destroyWorkspace, diffWorkspaces, exportWorkspaceCheckpoint, handoffWorkspace, importWorkspaceCheckpoint, prepareWorkspace, restoreWorkspaceCheckpoint, resumeWorkspace, runWorkspaceCommand, } from "./workspace.js";
 export type { ResumeWorkspaceOptions, WorkspaceArchiveOptions, WorkspaceCheckpointOptions, WorkspaceJSON, } from "./workspace.js";
 export declare const Stow: {
     start(options?: StartOptions): Promise<StowInstance>;

@@ -562,6 +562,30 @@
       }
     },
     {
+      "id": "prune forgets a registry entry whose directory is gone, and leaves a present one alone",
+      "verb": "prune",
+      "expect": {
+        "count": {
+          "equals": 1
+        },
+        "removed": {
+          "equals": 0
+        },
+        "results[0].id": {
+          "equals": "{{ws2}}"
+        },
+        "results[0].removed": {
+          "equals": false
+        },
+        "results[0].reason": {
+          "equals": "present"
+        }
+      },
+      "args": {
+        "registry-dir": "{{registryA}}"
+      }
+    },
+    {
       "id": "list names the workspaces left in the team partition after one is destroyed",
       "verb": "list",
       "registry": "a",

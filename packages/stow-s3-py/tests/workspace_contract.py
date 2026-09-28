@@ -40,6 +40,7 @@ from stow_s3 import (
     apply_workspace_delta,
     checkpoint_workspace,
     collect_workspaces,
+    prune_workspaces,
     create_workspace_delta,
     destroy_workspace,
     diff_workspaces,
@@ -202,6 +203,12 @@ def _invoke(run: Run, step: dict[str, Any]) -> Any:
         )
     if verb == "collect":
         return collect_workspaces(registry_dir=_registry_dir_for(run, step))
+    if verb == "prune":
+        return prune_workspaces(
+            registry_dir=_registry_dir_for(run, step),
+            team=step.get("team"),
+            include_adopted=step.get("includeAdopted") is True,
+        )
     if verb == "destroy":
         return destroy_workspace(args["id"], registry_dir=_registry_dir_for(run, step))
     raise ContractError(f"the contract runner has no wrapper call for {verb!r}")

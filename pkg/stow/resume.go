@@ -241,6 +241,74 @@ func Collect(options CollectOptions) ([]CollectResult, error) {
 	return out, nil
 }
 
+// openRegistryReadOnly resolves a registry and opens it without creating it.
+//
+// Prune reads every entry and removes some, and neither step should bring a registry
+// into existence: a prune against a registry that is not there has nothing to do,
+// and a tool that tidies up on the way past is a tool that cannot be run against a
+// directory somebody is watching.
+func openRegistryReadOnly(dir, team string) (*workspace.Registry, error) {
+	resolved, err := ResolveRegistryDir(dir, team)
+	if err != nil {
+		return nil, err
+	}
+	registry, err := workspace.OpenRegistryReadOnly(resolved)
+	if err != nil {
+		return nil, fmt.Errorf("stow: read workspace registry: %w", err)
+	}
+	return registry, nil
+}
+
+// PruneResult is one registry entry prune considered, and what it did about it.
+type PruneResult struct {
+	ID  string `json:"id"`
+	Dir string `json:"dir"`
+	// Removed is true only when the entry itself is gone.
+	Removed bool `json:"removed"`
+	// Reason explains a decision. "pruned" means the entry was removed;
+	// "gone-adopted", "present" and "unreadable: …" all mean it was left alone.
+	Reason string `json:"reason"`
+}
+
+// PruneOptions bounds a prune.
+type PruneOptions struct {
+	RegistryDir string
+	Team        string
+	// IncludeAdopted also forgets adopted entries whose directory is gone. Nothing is
+	// at stake but the record, but the record is the only evidence the caller ever
+	// adopted that project, so it is not taken by default.
+	IncludeAdopted bool
+}
+
+// Prune removes registry entries whose workspace directory no longer exists.
+//
+// It exists because Collect cannot reach them, and by default never will: a prepared
+// workspace has no TTL and one opened on a caller's directory is adopted, so both
+// classify forever, and nothing takes them out. So a registry accumulates records
+// pointing at directories that were deleted, and every listing is mostly those.
+//
+// It removes stow's own records and nothing else.
+func Prune(options PruneOptions) ([]PruneResult, error) {
+	registry, err := openRegistryReadOnly(options.RegistryDir, options.Team)
+	if err != nil {
+		return nil, err
+	}
+	results, err := registry.Prune(options.IncludeAdopted)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]PruneResult, 0, len(results))
+	for _, result := range results {
+		out = append(out, PruneResult{
+			ID:      result.Entry.ID,
+			Dir:     result.Entry.Dir,
+			Removed: strings.HasPrefix(result.Reason, "pruned"),
+			Reason:  result.Reason,
+		})
+	}
+	return out, nil
+}
+
 // CollectOptions configures a sweep.
 type CollectOptions struct {
 	// RegistryDir places the machine's workspace registry. Empty takes the

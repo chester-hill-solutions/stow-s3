@@ -21,6 +21,7 @@ import {
   applyWorkspaceDelta,
   checkpointWorkspace,
   collectWorkspaces,
+  pruneWorkspaces,
   createWorkspaceDelta,
   destroyWorkspace,
   diffWorkspaces,
@@ -49,6 +50,7 @@ export interface ContractWrite {
 export interface ContractManifestSpec {
   readonly root: string;
   readonly team?: string;
+  readonly includeAdopted?: boolean;
   readonly inputs?: readonly ContractInput[];
 }
 
@@ -215,6 +217,12 @@ async function invoke(run: Run, step: ContractStep): Promise<JsonValue> {
       });
     case "collect":
       return collectWorkspaces(registryDirFor(run, step, registryDir));
+    case "prune":
+      return pruneWorkspaces({
+        registryDir: registryDirFor(run, step, registryDir),
+        team,
+        includeAdopted: step.includeAdopted === true,
+      });
     case "destroy":
       return destroyWorkspace(required("id"), registryDirFor(run, step, registryDir));
     default:

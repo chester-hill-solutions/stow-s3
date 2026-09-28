@@ -321,6 +321,29 @@ A team's partition is a directory boundary, so `list` shows one team's workspace
 and `--team` selects which. Listing creates nothing: it does not make a registry
 that was not there, and it does not open a workspace.
 
+`workspace collect` reclaims workspaces that are past their TTL and provably unused.
+It will not reach most of what a registry accumulates, and by design: a prepared
+workspace has no lifetime — that is the default — and a workspace opened on your own
+project directory counts as adopted, which no unattended sweep may ever remove. So
+`workspace prune` exists for the rest:
+
+```sh
+stow-s3 workspace prune --include-adopted
+```
+
+`prune` forgets entries whose workspace directory **no longer exists**. It cannot
+delete your data, because everything it removes is already gone — the only things it
+touches are stow's own records, the entry and its checkpoint references. It asks for
+no age and needs no lock support, because there is nothing to judge and nothing to
+quiesce. An entry that still points at a real directory is left alone and reported
+as `present`; that is `collect`'s question, not this one's.
+
+Adopted entries are kept by default, because the entry is the only remaining record
+that you ever adopted that project. `--include-adopted` forgets those too. Nothing
+but the record is at stake — the directory has already been deleted — and a registry
+can otherwise reach a size where one `workspace list` is mostly entries for
+directories that no longer exist, with no way to clear them.
+
 ## Install
 
 **The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release
@@ -779,6 +802,11 @@ from a file with `--keys-file`, one key per line, when the set is long. Blank li
 are skipped, and a line whose first non-space character is `#` is a comment. A `#`
 inside a key is a key — `builds/#1234/model.bin` is a real S3 key and is warmed as
 one — so a comment has to be on a line of its own. A repeated key is warmed once.
+
+`prewarm --offline` asks the same verb what it can reach without the network, so it
+fetches nothing and reports what the cache already holds. It is a flag and not only
+`STOW_OFFLINE` because checking a warm-up is what this verb is for, and a caller who
+exported the variable in order to warm cannot then pass it to see the result.
 
 Keys that cannot be warmed are reported individually and the rest continue — one
 missing key should not abandon a warm-up of a thousand — and the exit status is

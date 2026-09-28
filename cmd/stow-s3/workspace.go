@@ -115,6 +115,7 @@ var workspaceVerbs = map[string]func([]string) error{
 	"list":       listWorkspacesCommand,
 	"prepare":    prepareWorkspaceCommand,
 	"preview":    previewCheckpointCommand,
+	"prune":      pruneWorkspacesCommand,
 	"restore":    restoreCheckpointCommand,
 	"resume":     resumeWorkspaceCommand,
 }

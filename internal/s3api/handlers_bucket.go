@@ -12,6 +12,27 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
+// handleGetBucketLocation answers ?location.
+//
+// It existed as a 400, which is the one status an SDK cannot recover from: the
+// operation is part of a bucket's own surface, so a client doing a bucket feature
+// probe or configuring a client from an existing bucket hits it before anything
+// else works, and "Invalid request" names neither the operation nor the fix.
+//
+// The answer is the empty string, which is what S3 returns for us-east-1 and what
+// every SDK reads as the default region. There is one region here and it is not
+// configurable, so a single fixed value is the honest answer rather than a
+// fabricated one — and a caller that needs to know which region this is can be told
+// by the endpoint it is already talking to.
+func (s *Server) handleGetBucketLocation(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket string) {
+	if _, err := s.store.HeadBucket(ctx, bucket); err != nil {
+		writeError(w, r, mapStorageError(err, "/"+bucket))
+		return
+	}
+	w.Header().Set("x-amz-request-id", requestIDFromContext(ctx))
+	writeXML(w, r, http.StatusOK, locationConstraint{})
+}
+
 func (s *Server) handleListBuckets(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	buckets, err := s.store.ListBuckets(ctx)
 	if err != nil {
