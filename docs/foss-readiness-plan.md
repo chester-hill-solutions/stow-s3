@@ -19,6 +19,45 @@ to locate text that needs rewriting, never as evidence about behaviour.
 
 ---
 
+## 0. Status
+
+Recorded 2026-09-28, after the work in this plan was committed. Read this table before
+the item sections: the sections below are the reasoning and were written before the
+work, so they describe intentions rather than outcomes, and where the two disagree
+this table is current.
+
+| Item | State | Evidence |
+|---|---|---|
+| A1 `--version` | **Done** | `cmd/stow-s3/version.go`; four spellings plus bare `version`, exit 0 |
+| A2 publish the five npm packages | **Blocked on one admin action** | Gate present; `published: false` is correct until the packages are public |
+| A3 PyPI | **Not started** | Needs a token and a decision on whether to publish there at all |
+| A4 site | **Open decision** | `stow.chesterhillsolutions.ca` returns Cloudflare 530 |
+| A5 ship v0.3.0 | **Blocked on the release gate** | Needs the R2 pair as `STOW_LIVE_*` secrets |
+| B1 committed write reported missing | **Done** | `TestMirrorWritesDoesNotTellTheCallerTheObjectIsMissing` |
+| B2 `mirrorWrites` never created the bucket | **Done** | `TestMirrorWritesCreatesTheBucketUpstream` |
+| B3 `serve --workspace` | **Not started — product decision** | Served workspace, or an honest refusal |
+| C1 workspace backend in the matrix | **Done** | `conformance/workspace_contract_test.go` |
+| C2 two real things talking | **Done** | `conformance/runthrough_pair_test.go`, six tests |
+| D1 the four documents | **Done** | `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` |
+| D2 templates and ownership | **Done** | `.github/PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/`, `CODEOWNERS` |
+| D3 dependency updates | **Done** | `.github/dependabot.yml` |
+| D4 delete `EnvironmentPromote` | **Already done before this plan** | Refused by name in `internal/authority/authority.go`; only the refusal record remains |
+| D5 legacy data directory | **Open decision** | — |
+| E1 split `serve` | **Done, partially** | Complexity 31 → 22 against a ceiling of 15. The shutdown sequence moved the number; the flag block moved no complexity and is worth keeping for readability. `cmd/stow-s3/shutdown.go`, `serve_flags.go` |
+| E2 aim the coverage ratchet at behaviour | **Not started** | The floor is still a single aggregate |
+| E3 object record layout cost | **Not started** | — |
+| F1 README restructure | **Not started** | — |
+| F2 agent-facing documents | **Not started** | Partly overtaken: the cache section was added to the skill |
+| F3 extend the doc gate | **Done** | `scripts/check-doc-commands.mjs`, in `make standards` |
+
+One item in this plan was answered by a decision rather than by code, and that
+decision is now [ADR 0012](adr/0012-run-through-serves-only-its-own-buckets.md): a
+run-through server refuses a bucket it was not given, rather than fetching any bucket
+the upstream credential can see. The natural fix for B1 is the wrong fix for the
+credential boundary, and the reasoning belongs somewhere more durable than a branch
+comment.
+
+
 ## 1. What the evidence says
 
 Four facts dominate everything else.
