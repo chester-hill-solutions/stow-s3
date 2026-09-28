@@ -216,9 +216,57 @@ func repoRoot() string {
 	}
 }
 
+// commentRatioRule and commentLinesRule are the repo-wide comment volume, ratcheted
+// so they can only go down.
+//
+// They exist because every other rule here measures something countable, and comment
+// volume was the one maintainability cost with no gate on it. The coverage ratchet
+// has the same blind spot in the other direction: it fails when covered statements
+// decrease, so a whole verb added with no tests leaves it satisfied. Between them, a
+// session shipped a verb whose report was wrong and a file that was half comment with
+// every gate green throughout.
+//
+// Both are measured because neither is sufficient on its own. The ratio is
+// repo-wide and weighted by line count, so it cannot be satisfied by deleting code —
+// but across 55,000 scanned lines it is stored as an integer, and four added
+// comments move it by zero. The count is exact, so one line is enough to fail — but
+// deleting uncommented code would satisfy it. A change has to either delete comments
+// or delete code, and both are visible in a diff.
+//
+// A per-file ceiling was the obvious alternative to both and is worse: it punishes
+// the file that most needs explaining, and it is defeated outright by splitting a
+// file in two.
+const (
+	commentLinesRule = "comment-lines"
+	commentRatioRule = "comment-ratio"
+)
+
+// lineTally counts lines and comment lines across the scanned tree.
+type lineTally struct {
+	total   int
+	comment int
+}
+
+// add counts one file. A comment line is one whose first non-space characters are
+// //; this codebase does not use block comments, and a line that is a comment and
+// nothing else is unambiguous where an inline trailing comment is not.
+func (t *lineTally) add(path string) {
+	source, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+	for _, line := range strings.Split(string(source), "\n") {
+		t.total++
+		if strings.HasPrefix(strings.TrimSpace(line), "//") {
+			t.comment++
+		}
+	}
+}
+
 func scanRoots(roots []string) (report, error) {
 	result := report{Version: baselineVersion, Counts: map[string]int{}}
 	seen := map[string]int{}
+	lines := &lineTally{}
 	for _, root := range roots {
 		if err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
 			if err != nil {
@@ -227,10 +275,18 @@ func scanRoots(roots []string) (report, error) {
 			if entry.IsDir() || !strings.HasSuffix(path, ".go") {
 				return nil
 			}
+			lines.add(path)
 			return scanFile(path, &result, seen)
 		}); err != nil {
 			return report{}, err
 		}
+	}
+	// Counts, not Violations: there is no per-site thing to record, and countIncreases
+	// is the check that matters. Any increase fails, the same contract the `any` count
+	// has.
+	if lines.total > 0 {
+		result.Counts[commentLinesRule] = lines.comment
+		result.Counts[commentRatioRule] = lines.comment * 10000 / lines.total
 	}
 	sort.Slice(result.Violations, func(i, j int) bool {
 		return result.Violations[i].Identity < result.Violations[j].Identity
