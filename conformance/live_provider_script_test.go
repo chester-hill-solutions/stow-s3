@@ -166,3 +166,109 @@ func resolveLiveProvider(t *testing.T, env map[string]string) (liveProviderResol
 	}
 	return resolution, stderr.String(), err
 }
+
+// The provider is classified in resolve, a different process that reports through
+// $GITHUB_OUTPUT. Outside CI that goes nowhere, so the documented local invocation
+// classifies cleanly: a gate only the workflow running it could satisfy.
+func TestLiveProviderTestDerivesTheProviderItCannotInherit(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("live-provider.sh requires a POSIX shell")
+	}
+	script := filepath.Join("live-provider.sh")
+
+	for _, testCase := range []struct {
+		name    string
+		env     map[string]string
+		wantErr string
+	}{
+		{
+			name: "an r2 endpoint under the r2 profile derives cloudflare-r2",
+			env: map[string]string{
+				"STOW_ENDPOINT":     "https://6b149553c5075c79bbc132c481f387fe.r2.cloudflarestorage.com",
+				"STOW_LIVE_PROFILE": "cloudflare-r2-custom",
+			},
+		},
+		{
+			name: "a mismatched profile is refused rather than derived from the endpoint",
+			env: map[string]string{
+				"STOW_ENDPOINT":     "https://6b149553c5075c79bbc132c481f387fe.r2.cloudflarestorage.com",
+				"STOW_LIVE_PROFILE": "aws-s3",
+			},
+			wantErr: "does not match the aws-s3 profile",
+		},
+		{
+			name: "a plaintext endpoint is refused before the provider matters",
+			env: map[string]string{
+				"STOW_ENDPOINT":     "http://6b149553c5075c79bbc132c481f387fe.r2.cloudflarestorage.com",
+				"STOW_LIVE_PROFILE": "cloudflare-r2-custom",
+			},
+			wantErr: "must use https",
+		},
+		{
+			name: "neither a profile nor a provider is refused rather than guessed",
+			env: map[string]string{
+				"STOW_ENDPOINT": "https://6b149553c5075c79bbc132c481f387fe.r2.cloudflarestorage.com",
+			},
+			wantErr: "STOW_LIVE_PROFILE is too",
+		},
+		{
+			name: "a provider the caller named is trusted over the endpoint",
+			env: map[string]string{
+				"STOW_ENDPOINT":             "https://6b149553c5075c79bbc132c481f387fe.r2.cloudflarestorage.com",
+				"STOW_LIVE_PROFILE":         "aws-s3",
+				"STOW_CONFORMANCE_PROVIDER": "cloudflare-r2",
+			},
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			// Dummy credentials and no disposable flag, so the run fails in the
+			// script's own validation. Which message it fails with is the assertion.
+			cmd := exec.Command("bash", script, "test")
+			cmd.Env = append(os.Environ(),
+				"STOW_ACCESS_KEY_ID=derivation-test-key",
+				"STOW_SECRET_ACCESS_KEY=derivation-test-secret",
+				"STOW_LIVE_BUCKET=stow-live",
+				"STOW_LIVE_BUCKET_PREFIX=ci/live",
+			)
+			cmd.Env = replaceEnv(cmd.Env, testCase.env)
+			output, err := cmd.CombinedOutput()
+
+			if testCase.wantErr != "" {
+				if err == nil {
+					t.Fatalf("the run succeeded, want a refusal containing %q:\n%s", testCase.wantErr, output)
+				}
+				if !strings.Contains(string(output), testCase.wantErr) {
+					t.Fatalf("the refusal does not contain %q:\n%s", testCase.wantErr, output)
+				}
+				return
+			}
+			// The deriving cases get past validation and fail later, on the network
+			// or the disposable guard. The message this change removes must be absent.
+			if strings.Contains(string(output), "STOW_CONFORMANCE_PROVIDER is required") {
+				t.Fatalf("the provider was still not derived:\n%s", output)
+			}
+		})
+	}
+}
+
+// replaceEnv lets a case express "this variable is absent", which is the state under
+// test and the one an inherited environment silently defeats.
+func replaceEnv(env []string, overrides map[string]string) []string {
+	kept := make([]string, 0, len(env))
+	for _, entry := range env {
+		name := entry
+		if i := strings.IndexByte(entry, '='); i >= 0 {
+			name = entry[:i]
+		}
+		if _, replaced := overrides[name]; !replaced {
+			kept = append(kept, entry)
+		}
+	}
+	for name, value := range overrides {
+		if value == "" {
+			continue
+		}
+		kept = append(kept, name+"="+value)
+	}
+	return kept
+}

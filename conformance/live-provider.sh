@@ -159,6 +159,23 @@ resolve() {
 
 run_test() {
   export STOW_CONFORMANCE_UPSTREAM=1
+  # resolve classifies the provider in a different process and reports it through
+  # $GITHUB_OUTPUT, which does not exist outside CI — so the documented local
+  # invocation could never satisfy the requirement it printed. Derive it here, and
+  # refuse rather than guess. An explicit value is trusted: CI supplies one, and a
+  # caller who names the provider knows something the endpoint does not.
+  if [[ -z ${STOW_CONFORMANCE_PROVIDER:-} ]]; then
+    local profile actual
+    profile=${STOW_LIVE_PROFILE:-}
+    [[ -n $profile ]] || fail "STOW_CONFORMANCE_PROVIDER is unset and STOW_LIVE_PROFILE is too, so the provider cannot be identified"
+    [[ -n ${STOW_ENDPOINT:-} ]] || fail "STOW_CONFORMANCE_PROVIDER is unset and STOW_ENDPOINT is too, so the provider cannot be identified"
+    actual=$(classify_endpoint "$STOW_ENDPOINT")
+    if ! profile_accepts "$profile" "$actual"; then
+      fail "STOW_CONFORMANCE_PROVIDER is unset and the configured endpoint is $actual, which does not match the $profile profile"
+    fi
+    STOW_CONFORMANCE_PROVIDER=$actual
+    export STOW_CONFORMANCE_PROVIDER
+  fi
   go test ./conformance -run '^TestUpstreamRunThrough$' -count=1 -v
 }
 
