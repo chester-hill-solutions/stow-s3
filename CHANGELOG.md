@@ -2,6 +2,79 @@
 
 ## Unreleased
 
+- **Added the second pillar, and then made three of its claims true.** A run-through
+  server can now be pre-warmed with a named list of keys, refused the network
+  outright with `--offline`, and asked what it can read. The gap was not the
+  mechanism — the read-through cache had always fallen back to the cached copy on an
+  upstream failure — it was that no agent could *know* that, and an autonomous agent
+  that cannot ask is guessing.
+
+  Three things were wrong with the first version, and all three passed every gate:
+
+  - A pre-warm reported the fetch, not the cache. Warming six keys into a cache
+    bounded to two reported all six warm and exited 0. A caller about to cut the
+    network was wrong about four of them, with a success status. It also had no unit
+    test at all — it had been verified once by hand, on a run where the numbers
+    happened to agree.
+  - A key list could not be documented. A `--keys-file` comment containing a comma
+    was cut in half by a comma-first parse, and the half that no longer started with
+    `#` was warmed as a key.
+  - `workspace collect` cannot reclaim what a registry accumulates, and by default
+    never will: a prepared workspace has no TTL and one opened on your own directory
+    is adopted, so both classify forever. On one machine that had run the suite 254
+    times, `workspace list` returned 1961 records of which 1959 pointed at `/tmp`
+    directories a test had already deleted, and nothing could clear them. Those were
+    the residue of the registry leak below.
+
+  `workspace prune` is the other half: it forgets entries whose directory no longer
+  exists. It cannot delete your data, because everything it removes is already gone —
+  the only things it touches are stow's own records — it needs no lock support
+  because there is nothing to quiesce, and it asks for no age, because "this
+  directory is not there" is a fact rather than a judgement. An unreadable directory
+  is not treated as a gone one. Adopted entries are kept by default, because the entry
+  is the only record you have that you adopted the project; `--include-adopted`
+  forgets those too, where only the record is at stake.
+
+- **`workspace list`, so a workspace can be found without keeping a note of its id.**
+  Fifteen verbs and none of them enumerated, on a product whose promise is "your work
+  will still be here". It reports every entry, quietest first, including the ones whose
+  directory has been deleted — which used to need an `--all` flag, so the default
+  output of the one verb whose job is surfacing a problem did not have them. It also
+  names the registry it actually read, rather than the pair of flags it was given.
+
+- **Stopped the test suite writing into your own registry.** `pkg/stow` had no
+  `TestMain`, so a test that resolved the default registry wrote to
+  `~/.config/stow-s3/workspaces`. The conformance driver already set a temporary
+  `XDG_CONFIG_HOME` and `HOME` for its child process for exactly this reason; the Go
+  unit tests never got the same treatment. The residue is the 1961 records above.
+
+- **A delta document can be checked for tampering.** `--expect-sha256` verifies the
+  change list as a whole, which catches a change moved to a different destination in
+  transit. It is opt-in, because it only proves nothing was altered after the digest
+  was taken — it is not provenance, and there is no author anywhere in a handoff.
+
+- **A dead upstream is reported as 503, not as 500.** It answered
+  `InternalError: internal storage error`, which said this server was broken when only
+  its dependency was, was not a status a client retries, and named stow's own storage
+  layer for a network that had gone away — in the one situation this product exists to
+  be running when. An upstream 4xx is now passed through rather than guessed at.
+
+- **A SigV2 request is refused by name.** It was told it had no `Authorization`
+  header, which is both false — it is signed, just not with SigV4 — and impossible to
+  act on, because a presigned URL cannot carry one. Both forms now say which scheme
+  was used and which to use instead. SigV2 is still not implemented, and a weakened
+  signature check would not be discoverable the way a 403 is.
+
+- **`GetBucketLocation` answers.** It returned 400 for every request, which is the one
+  status an SDK cannot recover from: a client probing a bucket, or configuring itself
+  from a bucket it was handed, hits it before anything else works.
+
+- **Ratcheted comment volume, and found the ratchet was measuring nothing.** A
+  repo-wide ratio in basis points looked like the right measurement and could not see
+  a single added comment line across 55,000 lines of Go. There is now an exact count
+  beside it, because a ratchet that cannot see a one-line change reports a property
+  holds when nothing checked it.
+
 - **Documented how to run and probe a server, and made the claims executable.** An
   agent implementing a launcher reported four findings against this build. Two were
   real gaps in the product, and two were beliefs the code contradicted — and the

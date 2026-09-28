@@ -22,9 +22,10 @@ use the returned `working_directory` as the agent process cwd. Manifests accept
 local files/directories and explicit refs from local Git repositories. Git
 inputs stage only the selected commit into a fresh shallow repository; dirty
 files, older history, submodules, and Git LFS payloads are excluded. The
-workspace CLI also supports resume, handoff, checkpoint, diff, restore, and
-portable checkpoint export/import. See
-[`docs/task-manifest.md`](../../docs/task-manifest.md).
+workspace CLI also supports resume, handoff, checkpoint, diff, restore, portable
+checkpoint export/import, `list` to find a workspace again without keeping a note of
+its id, `collect` for TTL reclamation, and `prune` to forget entries whose directory is
+gone. See [`docs/task-manifest.md`](../../docs/task-manifest.md).
 
 Reach for a disposable scoped session only when **all** of these hold:
 
@@ -184,6 +185,37 @@ Server-enforced, so these are safe to rely on:
   server enforces them on every request; the client does not police them.
 - Capabilities and limits come from the readiness message, so a client never
   reports a limit the server has not confirmed.
+
+## When the network goes away
+
+Use this when the bytes have to survive a network that might not come back, but the
+work does not have to be shared. A run-through server keeps a local store in front
+of a real bucket, and a separate cache in front of that:
+
+```sh
+# Warm the exact keys the task needs. A prefix or a glob is refused.
+stow-s3 prewarm --bucket models --data-dir /srv/agent --keys bert.bin,bert.config.json
+
+# Ask what you can read with the network gone.
+curl -s http://127.0.0.1:PORT/_stow/inspect        # loopback needs no token
+```
+
+`stow-s3 prewarm --offline` runs the same verb as a check: it fetches nothing and
+reports what the cache already holds. `cached: true` means the key is in the cache
+**once the warm finished**, not that it was fetched — a warm larger than the cache
+limit reports what survived it.
+
+`readable: false` on a cached key means it is indexed but its lifetime has run. Read
+`has_expiry` beside `expires_at`, because an entry with no lifetime has a zero
+timestamp, and a zero that means both "never expires" and "expired long ago" is not a
+value to branch on.
+
+`--offline` (or `STOW_OFFLINE=true`) refuses every upstream call, so the guarantee is
+checkable rather than a side effect of a timeout. `--offline=false` overrides an
+exported `STOW_OFFLINE=true` for one command.
+
+A dead upstream is reported as 503 naming it, not as a 500 blaming this server. A
+read the cache can serve still succeeds.
 
 ## Other shapes
 
