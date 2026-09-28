@@ -91,6 +91,13 @@ type contractFailure struct {
 	Contains string `json:"contains"`
 }
 
+// contractRename describes one substitution to perform on a produced document.
+type contractRename struct {
+	From string `json:"from"`
+	Path string `json:"path"`
+	To   string `json:"to"`
+}
+
 // contractWrite is one file a step puts into the workspace, the way an agent
 // editing a file would between two checkpoints.
 type contractWrite struct {
@@ -110,6 +117,11 @@ type contractStep struct {
 	Capture     map[string]string              `json:"capture"`
 	Expect      map[string]contractExpectation `json:"expect"`
 	AlsoWritten string                         `json:"alsoWritten"`
+	// RenameInTransit builds a substituted document: the named change is moved to
+	// a different path, in the change list and the content map together, and the
+	// result re-encoded. It is how a document altered on the way to the receiver is
+	// built, and the case file uses it to state the substitution as a refusal.
+	RenameInTransit *contractRename `json:"renameInTransit"`
 	// Returns says where the caller gets its document: "stdout" (the default) or
 	// "file". The two verbs that take --output disagree, and that disagreement is
 	// the contract rather than an inconsistency to smooth over. handoff writes the

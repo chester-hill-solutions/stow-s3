@@ -239,6 +239,28 @@ stow-s3 workspace delta --from cp_a4424a293103532626d4a507 \
 `apply` verifies every precondition before it writes anything, so a delta whose
 payload no longer matches its digest is refused rather than applied.
 
+**Verify the document itself.** The digests inside a delta cover its content bytes
+and nothing else, so a document altered in transit can keep every one of them
+intact and still name a different destination than the sender chose. Pass the
+digest `delta` reported:
+
+```sh
+stow-s3 workspace apply --delta change.stowdelta --base cp_a4424a293103532626d4a507 \
+  --team platform --expect-sha256 58338f9f00c64e4d2...
+```
+
+```console
+$ stow-s3 workspace apply --delta renamed.stowdelta --base cp_a4424a... --team platform \
+    --expect-sha256 58338f9f00c64e4d2...
+delta refused: delta document does not match the digest the sender published:
+the document hashes to f7388c05885e824e8..., the sender published 58338f9f00c64e4d2...
+```
+
+The check is opt-in, and that is a real limitation rather than a convenience: a
+receiver with no trusted copy of the digest cannot invent one, so it applies what
+it was given. If your delta crossed a channel you do not control, treat the digest
+as part of the delta and carry it with the document.
+
 See [the task manifest and workspace lifecycle guide](docs/task-manifest.md)
 for the schema, archive safety rules, and limitations. A workspace is filesystem
 isolation for task editing, not an OS sandbox; direct filesystem writes by the

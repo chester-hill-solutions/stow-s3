@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"flag"
 	"fmt"
@@ -74,12 +72,16 @@ func deltaWorkspaceCommand(args []string) error {
 	if err != nil {
 		return err
 	}
-	digest := sha256.Sum256(encoded)
+	// The digest is the document's, not a summary of it, and the receiver is
+	// expected to hand it back as --expect-sha256. Without that comparison the
+	// change list is unauthenticated: the per-file digests cover content bytes, so
+	// a document altered in transit keeps them and simply names a different
+	// destination than this one chose.
 	return writeWorkspaceJSON(deltaResult{
 		Version:  stow.DeltaVersion,
 		BaseID:   delta.BaseID,
 		TargetID: delta.TargetID,
-		Document: path, SHA256: hex.EncodeToString(digest[:]),
+		Document: path, SHA256: stow.DeltaDocumentDigest(encoded),
 		Files: delta.Files, Bytes: delta.Bytes,
 	})
 }
@@ -93,6 +95,12 @@ func applyDeltaCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace apply", flag.ContinueOnError)
 	path := flags.String("delta", "", "Delta document to apply")
 	base := flags.String("base", "", "Checkpoint the delta applies to")
+	// The digest `workspace delta` reported when it wrote the document. Passing it
+	// is what makes the change list verifiable: the per-file digests inside the
+	// document cover content bytes, and a document altered in transit can keep
+	// those intact while naming a different destination.
+	expectSHA256 := flags.String("expect-sha256", "", "Digest the sender published for this document (refuses a mismatch)")
+	includeSensitive := flags.Bool("include-sensitive", false, "Allow sensitive-looking paths in the document")
 	chosen := registryFlag(flags)
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -105,11 +113,25 @@ func applyDeltaCommand(args []string) error {
 	if err != nil {
 		return err
 	}
-	delta, err := readDeltaDocument(*path)
+	raw, err := readDeltaDocumentBytes(*path)
 	if err != nil {
 		return err
 	}
-	info, err := stow.ApplyDelta(context.Background(), registry, *base, delta)
+	// The digest check comes before the decode, so a document altered in transit is
+	// refused on that ground rather than on whatever the alteration happened to
+	// break. A renamed added file is otherwise entirely self-consistent: the
+	// content digest still matches the bytes, and the precondition passes because
+	// the new name is absent from the target.
+	if err := stow.VerifyDeltaDigest(raw, *expectSHA256); err != nil {
+		return err
+	}
+	delta, err := stow.DecodeDelta(raw)
+	if err != nil {
+		return err
+	}
+	info, err := stow.ApplyDeltaWithOptions(context.Background(), registry, *base, delta, stow.DeltaOptions{
+		IncludeSensitive: *includeSensitive,
+	})
 	if err != nil {
 		return describeDeltaFailure(err)
 	}
@@ -120,7 +142,9 @@ func applyDeltaCommand(args []string) error {
 	})
 }
 
-func readDeltaDocument(path string) (*stow.DeltaDocument, error) {
+// readDeltaDocumentBytes reads a transported document whole, because the digest is
+// over the bytes and a stream cannot be both hashed and re-read.
+func readDeltaDocumentBytes(path string) ([]byte, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -133,7 +157,7 @@ func readDeltaDocument(path string) (*stow.DeltaDocument, error) {
 	if int64(len(raw)) > deltaDocumentBytes {
 		return nil, fmt.Errorf("%w: file is over the %d byte read limit", stow.ErrDeltaTooLarge, deltaDocumentBytes)
 	}
-	return stow.DecodeDelta(raw)
+	return raw, nil
 }
 
 // describeDeltaFailure names the two refusals an operator can act on and leaves
@@ -146,6 +170,8 @@ func describeDeltaFailure(err error) error {
 	case errors.Is(err, stow.ErrDeltaVersionUnsupported):
 		return fmt.Errorf("delta refused: this build does not speak the document's version (%w)", err)
 	case errors.Is(err, stow.ErrDeltaTooLarge):
+		return fmt.Errorf("delta refused: %w", err)
+	case errors.Is(err, stow.ErrDeltaDigestMismatch):
 		return fmt.Errorf("delta refused: %w", err)
 	default:
 		return err

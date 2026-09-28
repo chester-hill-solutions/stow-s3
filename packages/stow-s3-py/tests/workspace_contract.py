@@ -24,6 +24,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+# _MISSING and _parse_indexes are re-exported for the matcher tests rather than
+# used here: the runner reads declared values through _lookup_declared and never
+# needs to know how a path is resolved.
+from workspace_contract_matchers import (
+    _check_field,
+    _lookup_declared,
+    _lookup_field,
+    _MISSING,  # noqa: F401  re-exported for the matcher tests
+    _parse_indexes,  # noqa: F401  re-exported for the matcher tests
+    _same_json,
+)
 from stow_s3 import (
     adopt_workspace_handoff,
     apply_workspace_delta,
@@ -38,6 +49,7 @@ from stow_s3 import (
 )
 
 CONTRACT_PATH = Path(__file__).resolve().parents[3] / "conformance" / "workspace" / "cases.json"
+CAPTURE_PATTERN = re.compile(r"\{\{([A-Za-z0-9_]+)\}\}")
 RETURNS_FILE = "file"
 REGISTRY_A = "a"
 CAPTURE_PATTERN = re.compile(r"\{\{([A-Za-z0-9_]+)\}\}")
@@ -170,7 +182,16 @@ def _invoke(run: Run, step: dict[str, Any]) -> Any:
         delta = args["delta"]
         if step.get("tamper") is not None:
             delta = _tamper(run, step)
-        return apply_workspace_delta(delta, base=args["base"], registry_dir=registry_dir, team=team)
+        renamed = step.get("renameInTransit")
+        if renamed is not None:
+            delta = _rename_in_transit(run, renamed)
+        return apply_workspace_delta(
+            delta,
+            base=args["base"],
+            expect_sha256=args.get("expect-sha256"),
+            registry_dir=registry_dir,
+            team=team,
+        )
     if verb == "resume":
         return resume_workspace(handoff=args["handoff"])
     if verb == "collect":
@@ -278,6 +299,51 @@ def _tamper(run: Run, step: dict[str, Any]) -> str:
     return str(target)
 
 
+def _rename_in_transit(run: Run, rename: dict[str, str]) -> str:
+    """Build the substitution the document digest exists to catch.
+
+    The change's declared path moves, in the change list and in the change's own
+    to-metadata, and the payload moves with it in the content map. All three have to
+    move together or the document stops being self-consistent and is refused by the
+    decoder, which is a different refusal and would make the digest look like it was
+    working when it was not the thing under test.
+
+    The result passes every check the document makes about itself: the per-file
+    content digest still matches the bytes it carries, and an addition's precondition
+    passes because the new name is absent from the base. The only thing that can
+    catch it is a digest over the document as a whole.
+    """
+    # Substituted, like every other path a case file names. Reading the raw
+    # "{{work}}/..." would look for a directory of that name and report a missing
+    # file, which reads as a broken fixture rather than a driver that skipped a step.
+    source = _work_path(run, run.substitute(rename["from"]))
+    document = json.loads(source.read_text())
+
+    changes = document.get("changes")
+    if not isinstance(changes, list):
+        raise ContractError(f"{source} carries no change list, so there is nothing to substitute")
+    moved = False
+    for change in changes:
+        if change.get("path") != rename["path"]:
+            continue
+        change["path"] = rename["to"]
+        target = change.get("to")
+        if isinstance(target, dict):
+            target["path"] = rename["to"]
+        moved = True
+    if not moved:
+        raise ContractError(f"{source} has no change naming {rename['path']!r}")
+
+    content = document.get("content")
+    if not isinstance(content, dict) or rename["path"] not in content:
+        raise ContractError(f"{source} carries no content for {rename['path']!r}")
+    content[rename["to"]] = content.pop(rename["path"])
+
+    target_path = _work_path(run, "renamed.stowdelta")
+    target_path.write_text(json.dumps(document, separators=(",", ":")))
+    return str(target_path)
+
+
 def _work_path(run: Run, name: str) -> Path:
     path = Path(name)
     return path if path.is_absolute() else run.work / name
@@ -345,125 +411,3 @@ def _describe(error: Exception) -> str:
     if isinstance(stderr, str) and stderr.strip():
         return f"{error}\n{stderr}"
     return str(error)
-
-
-def _lookup_declared(step: dict[str, Any], result: Any, name: str) -> Any:
-    """A "read" step's keys are file paths and are taken literally.
-
-    A workspace is full of names that contain dots -- "seed.txt" is a file, not a
-    field called seed inside a field called txt. Every other verb's keys are field
-    paths into the returned document.
-    """
-    if step["verb"] == "read" and isinstance(result, dict):
-        return result.get(name)
-    return _lookup_field(result, name)
-
-
-_MISSING = object()
-
-
-def _lookup_field(document: Any, path: str) -> Any:
-    """Resolve a dotted path with optional indexes, so a case can say changes[0].path."""
-    current = document
-    for segment in path.split("."):
-        name, bracket, tail = segment.partition("[")
-        if not isinstance(current, dict) or name not in current:
-            return _MISSING
-        current = current[name]
-        indexes = _parse_indexes(bracket + tail)
-        if indexes is None:
-            return _MISSING
-        for index in indexes:
-            if not isinstance(current, list) or index >= len(current):
-                return _MISSING
-            current = current[index]
-    return current
-
-
-def _parse_indexes(tail: str) -> list[int] | None:
-    """Read the "[0][1]" tail of a field path, or None if it is malformed.
-
-    None rather than an empty list is the point: an unparseable tail must leave the
-    field unresolved, because the alternative is that a typo silently resolves to
-    the container and the assertion quietly stops testing the field it names. The Go
-    and TypeScript drivers do the same, and the case file is shared, so all three
-    have to agree about what a typo means.
-    """
-    indexes: list[int] = []
-    rest = tail
-    while rest.startswith("["):
-        closing = rest.find("]")
-        if closing < 0:
-            return None
-        try:
-            indexes.append(int(rest[1:closing]))
-        except ValueError:
-            return None
-        rest = rest[closing + 1 :]
-    return indexes if rest == "" else None
-
-
-def _check_field(name: str, value: Any, want: dict[str, Any], substitute) -> list[str]:
-    """Check one field and return every problem with it, not just the first."""
-    if want.get("absent"):
-        if value is not _MISSING:
-            return [f"should be absent, but it is {_show(value)}"]
-        return []
-    if value is _MISSING:
-        return ["is missing from the result"]
-    problems: list[str] = []
-    if "equals" in want:
-        expected = _resolve_expected(want["equals"], substitute)
-        if not _same_json(expected, value):
-            problems.append(f"is {_show(value)}, and the contract says {_show(expected)}")
-    if "notEquals" in want:
-        expected = _resolve_expected(want["notEquals"], substitute)
-        if _same_json(expected, value):
-            problems.append(f"is {_show(value)}, and the contract says it must differ from that")
-    if "matches" in want:
-        if not isinstance(value, str):
-            problems.append(f"holds {type(value).__name__}, and a pattern needs a string")
-        elif re.search(want["matches"], value) is None:
-            problems.append(f"is {_show(value)}, which does not match {want['matches']!r}")
-    for key, comparison in (("length", "=="), ("minLength", ">=")):
-        if key in want:
-            length = _length_of(value)
-            failed = length != want[key] if comparison == "==" else length < want[key]
-            if failed:
-                bound = "exactly" if comparison == "==" else "at least"
-                problems.append(f"holds {length} entries, and the contract says {bound} {want[key]}")
-    if "min" in want:
-        if not isinstance(value, (int, float)) or isinstance(value, bool):
-            problems.append(f"holds {type(value).__name__}, and a bound needs a number")
-        elif value < want["min"]:
-            problems.append(f"is {value}, and the contract says at least {want['min']}")
-    return problems
-
-
-def _resolve_expected(value: Any, substitute) -> Any:
-    return substitute(value) if isinstance(value, str) else value
-
-
-def _same_json(want: Any, got: Any) -> bool:
-    """Compare structurally, so key order and 2 versus 2.0 are not disagreements."""
-    if isinstance(want, bool) or isinstance(got, bool):
-        return want is got
-    if isinstance(want, (int, float)) and isinstance(got, (int, float)):
-        return float(want) == float(got)
-    if isinstance(want, dict) and isinstance(got, dict):
-        return want.keys() == got.keys() and all(_same_json(want[k], got[k]) for k in want)
-    if isinstance(want, list) and isinstance(got, list):
-        return len(want) == len(got) and all(_same_json(a, b) for a, b in zip(want, got))
-    return type(want) is type(got) and want == got
-
-
-def _length_of(value: Any) -> int:
-    if isinstance(value, (list, str)):
-        return len(value)
-    if isinstance(value, dict):
-        return len(value)
-    return -1
-
-
-def _show(value: Any) -> str:
-    return json.dumps(value)

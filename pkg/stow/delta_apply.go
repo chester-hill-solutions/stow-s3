@@ -40,6 +40,16 @@ func ApplyDeltaWithOptions(ctx context.Context, registryDir, baseID string, delt
 		return CheckpointInfo{}, errors.New("stow: a delta needs a base checkpoint to apply to")
 	}
 
+	// Before the base is even loaded. The document is what arrived, and whether it
+	// is the document the sender published is a question about the document — asking
+	// it first means a substituted one is refused on that ground rather than on
+	// whatever the substitution happened to break, and before any staging.
+	if options.Encoded != nil {
+		if err := VerifyDeltaDigest(options.Encoded, options.ExpectSHA256); err != nil {
+			return CheckpointInfo{}, err
+		}
+	}
+
 	base, err := LoadCheckpoint(registryDir, baseID)
 	if err != nil {
 		return CheckpointInfo{}, err

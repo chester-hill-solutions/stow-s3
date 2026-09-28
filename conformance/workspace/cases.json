@@ -34,7 +34,16 @@
     "resume takes the registry from the document and refuses --handoff alongside",
     "--registry-dir. A caller that could point a handoff at a different registry",
     "would resume a workspace in a place the document never named, so the refusal",
-    "is a safety property and is asserted rather than worked around."
+    "is a safety property and is asserted rather than worked around.",
+    "",
+    "The substitution step is the one worth reading twice. A delta's own digests",
+    "cover its content bytes and nothing else, so renaming an addition in the",
+    "change list and in the content map together leaves the document entirely",
+    "self-consistent: the content digest still matches, and the precondition passes",
+    "because the new name is absent from the base. Applied without a digest it",
+    "produces a published checkpoint holding a file the sender never named. The",
+    "check that stops it is the one the handoff archive path already had, applied",
+    "to the delta path where it was missing."
   ],
   "steps": [
     {
@@ -413,6 +422,9 @@
       "documentFields": {
         "base_id": "{{cp1}}",
         "target_id": "{{cp2}}"
+      },
+      "capture": {
+        "sha": "sha256"
       }
     },
     {
@@ -422,7 +434,8 @@
       "team": "platform",
       "args": {
         "delta": "{{work}}/change.stowdelta",
-        "base": "{{cp1}}"
+        "base": "{{cp1}}",
+        "expect-sha256": "{{sha}}"
       },
       "expect": {
         "checkpoint_id": {
@@ -464,6 +477,48 @@
       "tamper": "change.stowdelta",
       "fail": {
         "contains": "disagrees with"
+      }
+    },
+    {
+      "id": "a substituted destination applies when the receiver is not told the digest, which is why the check is opt-in",
+      "verb": "apply",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "delta": "{{work}}/renamed.stowdelta",
+        "base": "{{cp1}}"
+      },
+      "renameInTransit": {
+        "from": "{{work}}/change.stowdelta",
+        "path": "notes.txt",
+        "to": "planted.sh"
+      },
+      "expect": {
+        "files": {
+          "equals": 3
+        },
+        "bytes": {
+          "equals": 30
+        }
+      }
+    },
+    {
+      "id": "a delta whose destination was renamed in transit is refused on the document digest",
+      "verb": "apply",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "delta": "{{work}}/renamed.stowdelta",
+        "base": "{{cp1}}",
+        "expect-sha256": "{{sha}}"
+      },
+      "renameInTransit": {
+        "from": "{{work}}/change.stowdelta",
+        "path": "notes.txt",
+        "to": "planted.sh"
+      },
+      "fail": {
+        "contains": "does not match the digest"
       }
     },
     {

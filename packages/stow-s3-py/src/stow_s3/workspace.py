@@ -160,6 +160,7 @@ def apply_workspace_delta(
     delta: str,
     *,
     base: str,
+    expect_sha256: str | None = None,
     registry_dir: str | None = None,
     team: str | None = None,
 ) -> WorkspaceJSON:
@@ -167,8 +168,15 @@ def apply_workspace_delta(
 
     The base is named rather than defaulted, because a delta states what a path
     was and is now and the point it applies to is part of that meaning.
+
+    ``expect_sha256`` is the digest ``create_workspace_delta`` reported for the
+    document. The digests inside a delta cover its content bytes and nothing
+    else, so a document altered in transit keeps them and simply names a
+    different destination. Passing this makes the change list verifiable: a
+    document that does not hash to it is refused before anything is staged.
     """
     args = ["apply", "--delta", delta, "--base", base]
+    _append_flag(args, "--expect-sha256", expect_sha256)
     _append_flag(args, "--registry-dir", registry_dir)
     # The CLI takes --team on apply, and a checkpoint filed under a team partition
     # is invisible without it, so omitting this made every apply against a

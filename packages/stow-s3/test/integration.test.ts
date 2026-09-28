@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { chmod, copyFile, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, it } from "node:test";
 import type * as BinModule from "../dist/bin.js";
@@ -111,28 +111,96 @@ describe("stow binary discovery", () => {
       return;
     }
     const dir = await mkdtemp(join(tmpdir(), "stow-path-"));
-    const binary = join(dir, "stow-s3");
-    await writeFile(binary, "#!/bin/sh\nexit 0\n");
-    await chmod(binary, 0o755);
-    const isolatedDist = join(dir, "isolated", "dist");
-    await mkdir(isolatedDist, { recursive: true });
-    await copyFile(new URL("../dist/bin.js", import.meta.url), join(isolatedDist, "bin.js"));
-    const isolated = await import(pathToFileURL(join(isolatedDist, "bin.js")).href);
-    const previousPath = process.env.PATH;
-    process.env.PATH = dir;
-    try {
+    const onPath = join(dir, "stow-s3");
+    await writeFile(onPath, "#!/bin/sh\nexit 0\n");
+    await chmod(onPath, 0o755);
+    const isolated = await loadIsolatedResolver(dir);
+    // STOW_BIN outranks PATH, so a test about PATH that leaves STOW_BIN set is
+    // asserting the environment rather than the resolver. It passed in CI only
+    // because that job does not set STOW_BIN, and failed for anyone who exported
+    // it to point at a local build — which is the documented way to run this
+    // package from a source checkout.
+    await withResolverEnvironment({ PATH: dir, STOW_BIN: undefined }, () => {
       assert.equal(isolated.resolveStowBinary(), "stow-s3");
       assert.equal(isolated.stowBinaryAvailable(), true);
-    } finally {
-      if (previousPath === undefined) {
-        delete process.env.PATH;
-      } else {
-        process.env.PATH = previousPath;
-      }
-      await rm(dir, { recursive: true, force: true });
+    });
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("prefers STOW_BIN over PATH, because a pinned build outranks a floating one", async () => {
+    if (process.platform === "win32") {
+      return;
     }
+    const dir = await mkdtemp(join(tmpdir(), "stow-precedence-"));
+    const onPath = join(dir, "stow-s3");
+    await writeFile(onPath, "#!/bin/sh\nexit 0\n");
+    await chmod(onPath, 0o755);
+    const pinned = join(dir, "pinned", "stow-s3");
+    await mkdir(dirname(pinned), { recursive: true });
+    await writeFile(pinned, "#!/bin/sh\nexit 0\n");
+    await chmod(pinned, 0o755);
+    const isolated = await loadIsolatedResolver(dir);
+    await withResolverEnvironment({ PATH: dir, STOW_BIN: pinned }, () => {
+      // A caller who upgrades the package and still exports a STOW_BIN from an
+      // older release should get the binary that shipped with the version they
+      // installed, not the stale one their shell carries. Stating that here is what
+      // stops the next reader from "fixing" the precedence the other way.
+      assert.equal(isolated.resolveStowBinaryDetailed().source, "environment");
+      assert.equal(isolated.resolveStowBinary(), pinned);
+    });
+    await rm(dir, { recursive: true, force: true });
   });
 });
+
+/**
+ * Loads the resolver from a copy of dist/bin.js in a directory of its own.
+ *
+ * The copy is what makes the test about the resolver rather than about this
+ * process: a module caches its environment lookups' surroundings at import time, so
+ * importing the real one would test whichever STOW_BIN and PATH happened to be set
+ * when the suite started.
+ */
+async function loadIsolatedResolver(dir: string): Promise<typeof BinModule> {
+  const isolatedDist = join(dir, "isolated", "dist");
+  await mkdir(isolatedDist, { recursive: true });
+  await copyFile(new URL("../dist/bin.js", import.meta.url), join(isolatedDist, "bin.js"));
+  return (await import(pathToFileURL(join(isolatedDist, "bin.js")).href)) as typeof BinModule;
+}
+
+/**
+ * Runs a body with the given environment variables set, restoring every one of
+ * them afterwards.
+ *
+ * An undefined value means "remove it", which is not the same as setting it to the
+ * empty string: the resolver trims and then tests for truthiness, so both would
+ * read as absent, and a test that meant to prove a variable is ignored would pass
+ * for the wrong reason if it only ever set the variable.
+ */
+async function withResolverEnvironment(
+  variables: Readonly<Record<string, string | undefined>>,
+  body: () => void | Promise<void>,
+): Promise<void> {
+  const previous = new Map<string, string | undefined>();
+  for (const [name, value] of Object.entries(variables)) {
+    previous.set(name, process.env[name]);
+    if (value === undefined) {
+      delete process.env[name];
+    } else {
+      process.env[name] = value;
+    }
+  }
+  try {
+    await body();
+  } finally {
+    for (const [name, value] of previous) {
+      if (value === undefined) {
+        delete process.env[name];
+      } else {
+        process.env[name] = value;
+      }
+    }
+  }
+}
 
 describe("shared conformance corpus", () => {
   it("runs every corpus case against the filesystem backend", async () => {

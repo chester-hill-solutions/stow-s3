@@ -35,6 +35,15 @@ export interface WorkspaceDeltaOptions extends WorkspaceArchiveOptions {
 export interface WorkspaceApplyOptions extends WorkspaceArchiveOptions {
     readonly delta: string;
     readonly base: string;
+    /**
+     * The digest `createWorkspaceDelta` reported for the document.
+     *
+     * The digests inside a delta cover its content bytes and nothing else, so a
+     * document altered in transit keeps them and simply names a different
+     * destination. Passing this makes the change list verifiable: a document that
+     * does not hash to it is refused before anything is staged.
+     */
+    readonly expectSHA256?: string;
 }
 export interface WorkspaceAdoptOptions extends WorkspaceArchiveOptions {
     readonly handoffPath: string;

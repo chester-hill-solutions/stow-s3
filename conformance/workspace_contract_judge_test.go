@@ -408,6 +408,43 @@ func decodeNumber(raw json.RawMessage) (float64, error) {
 	return number, err
 }
 
+// The encoders below are separate rather than one generic. A generic needs `any`
+// in its constraint, and this repository ratchets against `any` because it is where
+// a lost type assertion becomes a silent wrong answer. They are called from a
+// helper that has already checked each shape, so an encoding failure is not a case
+// worth distinguishing from any other.
+func encodeJSONString(value string) json.RawMessage {
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return json.RawMessage("null")
+	}
+	return encoded
+}
+
+func encodeDocument(value document) json.RawMessage {
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return json.RawMessage("null")
+	}
+	return encoded
+}
+
+func encodeChangeList(value []json.RawMessage) json.RawMessage {
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return json.RawMessage("null")
+	}
+	return encoded
+}
+
+func encodeContentMap(value map[string]json.RawMessage) json.RawMessage {
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return json.RawMessage("null")
+	}
+	return encoded
+}
+
 func mustEncode(value document) json.RawMessage {
 	encoded, err := json.Marshal(value)
 	if err != nil {

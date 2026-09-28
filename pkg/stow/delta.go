@@ -2,10 +2,13 @@ package stow
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -81,6 +84,23 @@ var ErrDeltaVersionUnsupported = errors.New("delta document version is not suppo
 // bigger than this format admits.
 var ErrDeltaTooLarge = errors.New("delta document is larger than the format allows")
 
+// ErrDeltaDigestMismatch reports that a delta document does not hash to the
+// digest the sender published for it.
+//
+// The per-file digests inside a document cover content bytes only. Nothing in the
+// document itself binds the change list — the paths, the kinds, and the from/to
+// metadata — to the sender's intent, so a document altered in transit can carry a
+// valid content digest for a path the sender never named. Measured: renaming an
+// added file from "notes.txt" to "planted.sh", in the change and in the content
+// map together, produced a document that applied cleanly.
+//
+// This is the check the handoff archive path already had and the delta path did
+// not: `delta` reports the document's digest, and the receiver compares against it
+// before anything is written. It is separate from a conflict because the document
+// is self-consistent and the target may well be fine — the disagreement is between
+// the document and the sender, and retrying cannot resolve it.
+var ErrDeltaDigestMismatch = errors.New("delta document does not match the digest the sender published")
+
 // DeltaOptions bounds the work a delta may describe. Zero takes the defaults,
 // matching CheckpointArchiveOptions: a cap of zero is not "unlimited", because an
 // unbounded document is exactly what the archive path refuses to produce.
@@ -91,6 +111,24 @@ type DeltaOptions struct {
 	// refuse. It is the same opt-in the archive path requires, because a delta can
 	// carry the same bytes an archive can.
 	IncludeSensitive bool
+	// Encoded is the document exactly as it travelled, and ExpectSHA256 the digest
+	// the sender published for it. When both are set, the document is refused
+	// unless the bytes hash to that digest, before any precondition is checked and
+	// before anything is staged.
+	//
+	// A *DeltaDocument has already been parsed, so the bytes that produced it are
+	// not recoverable: re-encoding a struct would hash a document this build
+	// happened to produce rather than the one that arrived, and a digest over that
+	// would pass for any alteration that survives a round trip. That is why the
+	// bytes are carried alongside rather than recomputed. VerifyDeltaDigest is the
+	// same check for a caller that wants it on its own.
+	//
+	// It is optional because a receiver with no trusted copy of the digest cannot
+	// invent one, and demanding it would make every apply impossible rather than
+	// safe. A receiver that *can* compare should: the digest is the only thing that
+	// covers the change list rather than the content.
+	Encoded      []byte
+	ExpectSHA256 string
 }
 
 // DeltaDocument is the transferable form. It names both ends, so a receiver can
@@ -303,6 +341,40 @@ func EncodeDelta(delta *DeltaDocument) ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(delta)
+}
+
+// DeltaDocumentDigest is the digest a sender publishes for a document and a
+// receiver checks it against. It is the digest of the encoded bytes, so it covers
+// the whole document: the change list, the paths, the kinds, the from/to metadata
+// and the content together.
+func DeltaDocumentDigest(encoded []byte) string {
+	sum := sha256.Sum256(encoded)
+	return hex.EncodeToString(sum[:])
+}
+
+// VerifyDeltaDigest refuses a document that does not hash to what the sender said
+// it hashes to.
+//
+// This is the same check the handoff archive path has had all along, applied to
+// the delta path where it was missing. Without it a document altered in transit
+// can keep a valid per-file content digest while naming a different destination
+// than the sender chose, because the content digest covers bytes and not the name
+// those bytes are filed under.
+//
+// An empty expected digest is not a check, so it returns nil rather than refusing:
+// a receiver with no trusted copy of the digest has nothing to compare against, and
+// failing closed there would make the option mandatory in every call and honest in
+// none.
+func VerifyDeltaDigest(encoded []byte, expected string) error {
+	if strings.TrimSpace(expected) == "" {
+		return nil
+	}
+	actual := DeltaDocumentDigest(encoded)
+	if !strings.EqualFold(actual, strings.TrimSpace(expected)) {
+		return fmt.Errorf("%w: the document hashes to %s, the sender published %s",
+			ErrDeltaDigestMismatch, actual, strings.TrimSpace(expected))
+	}
+	return nil
 }
 
 // DecodeDelta parses a transported delta.

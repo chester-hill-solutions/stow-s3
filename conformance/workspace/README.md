@@ -121,6 +121,40 @@ The scenario is one linear pass: the steps share a registry and a work directory
 so a step cannot be run alone. A failing step stops the run rather than reporting
 the same missing workspace as a dozen later failures.
 
+## The substitution the document digest exists to stop
+
+The digests inside a delta cover its **content bytes and nothing else**. Nothing in
+the document binds the change list — the path a change names, its kind, its from/to
+metadata — to the sender's intent.
+
+So take a document that adds `notes.txt`, and rename the addition to
+`planted.sh` in the change list and the content map together. The result is
+entirely self-consistent: the content digest still matches the bytes, and the
+precondition passes because `planted.sh` is absent from the base. Applied, it
+publishes a valid checkpoint holding a file the sender never named, and reports
+success. Verified against the binary: two checkpoints from one apply, same
+timestamp, one holding `notes.txt` and one holding `planted.sh`.
+
+This is the same class of check the handoff archive path already had. `delta`
+reports the document's `sha256`; the receiver hands it back as `--expect-sha256`
+and `apply` refuses a document that does not hash to it, before the base is loaded
+and before anything is staged.
+
+Two contract steps pin it, and the pair matters:
+
+- **A substituted destination still applies when the receiver is not told the
+  digest.** This asserts the substitution *succeeds*, deliberately. It is what
+  makes the next step mean something — a refusal test that has never seen the
+  vulnerable path cannot tell a working check from a check that fires for an
+  unrelated reason.
+- **A substituted destination is refused when the digest is supplied.**
+
+That first step is also why the check is opt-in. A receiver with no trusted copy of
+the digest cannot invent one, so failing closed would make `apply` unusable rather
+than safe. The honest position is that the digest is the only thing covering the
+change list, a receiver that can compare should, and the contract now says so
+rather than leaving it implied.
+
 ## The limitation worth stating
 
 This covers the `workspace` verbs, which is where the wrappers were wrong. It does

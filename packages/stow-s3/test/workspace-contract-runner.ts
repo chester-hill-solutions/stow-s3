@@ -28,6 +28,7 @@ import {
   prepareWorkspace,
   resumeWorkspace,
 } from "../src/workspace.js";
+import { documentFor } from "./workspace-contract-alterations.js";
 import { checkField, lookupField, sameJSON } from "./workspace-contract-matchers.js";
 import type { ContractExpectation, JsonValue } from "./workspace-contract-matchers.js";
 
@@ -64,7 +65,21 @@ export interface ContractStep {
   readonly alsoWritten?: string;
   readonly returns?: string;
   readonly tamper?: string;
+  /**
+   * Builds a substituted document: the named change is moved to a different path,
+   * in the change list and the content map together, and the result re-encoded. It
+   * is how a document altered on the way to a receiver is built, and the case file
+   * uses it to state the substitution as a refusal.
+   */
+  readonly renameInTransit?: ContractRename;
   readonly fail?: ContractFailure;
+}
+
+/** One substitution to perform on a document a previous step produced. */
+export interface ContractRename {
+  readonly from: string;
+  readonly path: string;
+  readonly to: string;
 }
 
 /** What a step expects a refusal to say, and that it happened at all. */
@@ -91,7 +106,7 @@ export async function loadContract(): Promise<Contract> {
   return JSON.parse(await readFile(path, "utf8")) as Contract;
 }
 
-interface Run {
+export interface Run {
   readonly work: string;
   readonly captures: Map<string, string>;
   readonly problems: ContractProblem[];
@@ -184,8 +199,9 @@ async function invoke(run: Run, step: ContractStep): Promise<JsonValue> {
       });
     case "apply":
       return applyWorkspaceDelta({
-        delta: step.tamper === undefined ? required("delta") : await tamper(run, step),
+        delta: await documentFor(run, step, required("delta")),
         base: required("base"),
+        expectSHA256: args["expect-sha256"],
         registryDir: registryDirFor(run, step, registryDir),
         team,
       });
@@ -243,7 +259,7 @@ function registryDirFor(run: Run, step: ContractStep, fallback: string | undefin
   return declared === undefined ? fallback : substitute(run, declared);
 }
 
-function substitute(run: Run, text: string): string {
+export function substitute(run: Run, text: string): string {
   let out = text;
   for (const [name, value] of run.captures) {
     out = out.replaceAll(`{{${name}}}`, value);
@@ -311,44 +327,8 @@ async function readTree(root: string): Promise<Record<string, JsonValue>> {
   return files;
 }
 
-/**
- * Substitutes one byte of one file's payload and re-encodes, so the document stays
- * well formed and only its content stops matching the digest it carries. A raw byte
- * flip usually lands in the JSON and is caught by the parser, which would make the
- * test pass for a reason that has nothing to do with integrity.
- */
-async function tamper(run: Run, step: ContractStep): Promise<string> {
-  const declared = step.tamper;
-  if (declared === undefined) {
-    throw new Error(`step ${JSON.stringify(step.id)}: nothing to tamper with`);
-  }
-  const source = workPath(run, declared);
-  const document = JSON.parse(await readFile(source, "utf8")) as Record<string, JsonValue>;
-  const content = document["content"] as Record<string, string> | undefined;
-  if (content === undefined || Object.keys(content).length === 0) {
-    throw new Error(`${source} carries no content, so there is nothing to substitute`);
-  }
-  const [name] = Object.keys(content).sort();
-  if (name === undefined) {
-    throw new Error(`${source} carries no content, so there is nothing to substitute`);
-  }
-  const encoded = content[name];
-  if (encoded === undefined) {
-    throw new Error(`${source}: ${name} has no content`);
-  }
-  const payload = Buffer.from(encoded, "base64");
-  const first = payload.at(0);
-  if (first === undefined) {
-    throw new Error(`${source}: the content of ${name} is empty, so there is nothing to substitute`);
-  }
-  payload[0] = first ^ 0x01;
-  content[name] = payload.toString("base64");
-  const target = workPath(run, `tampered-${declared}`);
-  await writeFile(target, JSON.stringify(document));
-  return target;
-}
-
-function workPath(run: Run, name: string): string {
+/** Resolves a path a case file names: absolute as given, otherwise under the work directory. */
+export function workPath(run: Run, name: string): string {
   return name.startsWith("/") ? name : join(run.work, name);
 }
 

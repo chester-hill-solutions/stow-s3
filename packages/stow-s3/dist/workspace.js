@@ -81,6 +81,7 @@ export function createWorkspaceDelta(options) {
 /** Bring a base checkpoint to the state a delta describes, publishing a new checkpoint. */
 export function applyWorkspaceDelta(options) {
     const args = ["apply", "--delta", options.delta, "--base", options.base];
+    appendFlag(args, "--expect-sha256", options.expectSHA256);
     appendFlag(args, "--registry-dir", options.registryDir);
     // The CLI takes --team on apply, and a checkpoint filed under a team partition is
     // invisible without it, so omitting this made every apply against a partitioned

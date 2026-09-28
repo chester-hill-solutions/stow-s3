@@ -47,6 +47,15 @@ export interface WorkspaceDeltaOptions extends WorkspaceArchiveOptions {
 export interface WorkspaceApplyOptions extends WorkspaceArchiveOptions {
   readonly delta: string;
   readonly base: string;
+  /**
+   * The digest `createWorkspaceDelta` reported for the document.
+   *
+   * The digests inside a delta cover its content bytes and nothing else, so a
+   * document altered in transit keeps them and simply names a different
+   * destination. Passing this makes the change list verifiable: a document that
+   * does not hash to it is refused before anything is staged.
+   */
+  readonly expectSHA256?: string;
 }
 
 export interface WorkspaceAdoptOptions extends WorkspaceArchiveOptions {
@@ -153,6 +162,7 @@ export function createWorkspaceDelta(options: WorkspaceDeltaOptions): Promise<Wo
 /** Bring a base checkpoint to the state a delta describes, publishing a new checkpoint. */
 export function applyWorkspaceDelta(options: WorkspaceApplyOptions): Promise<WorkspaceJSON> {
   const args = ["apply", "--delta", options.delta, "--base", options.base];
+  appendFlag(args, "--expect-sha256", options.expectSHA256);
   appendFlag(args, "--registry-dir", options.registryDir);
   // The CLI takes --team on apply, and a checkpoint filed under a team partition is
   // invisible without it, so omitting this made every apply against a partitioned

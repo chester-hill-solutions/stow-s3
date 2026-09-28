@@ -54,6 +54,11 @@ func (r *contractRun) performVerb(step contractStep) contractOutcome {
 		r.tamper(r.workPath(step.Tamper), tampered)
 		argv = replaceArgValue(argv, "--delta", tampered)
 	}
+	if step.RenameInTransit != nil {
+		renamed := r.workPath("renamed.stowdelta")
+		r.renameInTransit(step.RenameInTransit, renamed)
+		argv = replaceArgValue(argv, "--delta", renamed)
+	}
 
 	cmd := exec.Command(r.binary, argv...)
 	cmd.Env = r.childEnv()
@@ -232,6 +237,100 @@ func (r *contractRun) tamper(source, target string) {
 	if err := os.WriteFile(target, altered, 0o600); err != nil {
 		r.t.Fatalf("write the tampered copy %q: %v", target, err)
 	}
+}
+
+// renameInTransit builds the substitution the document digest exists to catch: a
+// change is moved to a different path, in the change list and the content map
+// together, and the result re-encoded.
+//
+// The two have to move together or the document stops being self-consistent and is
+// refused for the wrong reason. The result passes every check the document makes
+// about itself — the per-file content digest still matches the bytes it carries,
+// and an addition's precondition passes because the new name is absent from the
+// base — so the only thing that can catch it is a digest over the document as a
+// whole, which is what the step supplies as --expect-sha256.
+func (r *contractRun) renameInTransit(rename *contractRename, target string) {
+	r.t.Helper()
+	raw, err := os.ReadFile(r.workPath(r.substitute(rename.From)))
+	if err != nil {
+		r.t.Fatalf("read %q to substitute it: %v", rename.From, err)
+	}
+	var document document
+	if err := json.Unmarshal(raw, &document); err != nil {
+		r.t.Fatalf("%q is not a JSON object, so it cannot be substituted: %v", rename.From, err)
+	}
+	if !r.renameChange(&document, rename) {
+		r.t.Fatalf("%q has no change naming %q, so there is nothing to substitute", rename.From, rename.Path)
+	}
+	if !r.moveContent(&document, rename) {
+		r.t.Fatalf("%q carries no content for %q, so a rename cannot stay self-consistent", rename.From, rename.Path)
+	}
+
+	altered, err := json.Marshal(document)
+	if err != nil {
+		r.t.Fatalf("re-encode the substituted document: %v", err)
+	}
+	if err := os.WriteFile(target, altered, 0o600); err != nil {
+		r.t.Fatalf("write the substituted document %q: %v", target, err)
+	}
+}
+
+// renameChange moves one change's declared path, in the change list and in the
+// change's own to-metadata. It reports whether it found the change at all, so a
+// case file naming a path the document does not carry fails as a broken case rather
+// than as a substitution that quietly did nothing.
+func (r *contractRun) renameChange(doc *document, rename *contractRename) bool {
+	var changes []json.RawMessage
+	raw, ok := (*doc)["changes"]
+	if !ok || json.Unmarshal(raw, &changes) != nil {
+		r.t.Fatalf("the document carries no change list")
+	}
+	renamed := false
+	for i, entry := range changes {
+		var change document
+		if json.Unmarshal(entry, &change) != nil {
+			continue
+		}
+		// The comparison is against the decoded string. Comparing the raw JSON
+		// would include the quotes, and a case file that names a real path would
+		// silently match nothing — which is a broken case file reported as a
+		// substitution that did nothing.
+		if decoded, err := decodeString(change["path"]); err != nil || decoded != rename.Path {
+			continue
+		}
+		change["path"] = encodeJSONString(rename.To)
+		if to, ok := change["to"]; ok {
+			var target document
+			if json.Unmarshal(to, &target) == nil {
+				target["path"] = encodeJSONString(rename.To)
+				change["to"] = encodeDocument(target)
+			}
+		}
+		changes[i] = encodeDocument(change)
+		renamed = true
+	}
+	(*doc)["changes"] = encodeChangeList(changes)
+	return renamed
+}
+
+// moveContent moves the payload a change carries, so the renamed document stays
+// self-consistent. Without this the substitution is caught by the document refusing
+// to decode, which is a different refusal and would make the digest look like it
+// was working when it was not the thing being tested.
+func (r *contractRun) moveContent(doc *document, rename *contractRename) bool {
+	var content map[string]json.RawMessage
+	raw, ok := (*doc)["content"]
+	if !ok || json.Unmarshal(raw, &content) != nil {
+		r.t.Fatalf("the document carries no content map")
+	}
+	payload, ok := content[rename.Path]
+	if !ok {
+		return false
+	}
+	delete(content, rename.Path)
+	content[rename.To] = payload
+	(*doc)["content"] = encodeContentMap(content)
+	return true
 }
 
 func replaceArgValue(argv []string, flag, value string) []string {
