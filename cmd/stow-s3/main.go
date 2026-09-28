@@ -173,7 +173,14 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n")
+	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n\n")
+	// A caller that has just failed to find a health endpoint needs to be told where
+	// it is, in the one place it will look. It is /_stow/health: every other path is
+	// an S3 path that requires signing, so a bare probe of /health is refused and
+	// looks like a server that is not serving.
+	fmt.Fprintf(os.Stderr, "probing a server: curl -s http://127.0.0.1:<port>/_stow/health\n")
+	fmt.Fprintf(os.Stderr, "stow-s3 doctor does that and more, on a throwaway port\n")
+	fmt.Fprintf(os.Stderr, "writing a launcher: docs/running-and-probing.md (readiness record, port and mode traps)\n")
 }
 
 func resolveLocalCredentials(accessKey, secretKey string) (string, string) {

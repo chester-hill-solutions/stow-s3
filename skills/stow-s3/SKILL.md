@@ -81,6 +81,38 @@ A published package ships its own binary and needs no `STOW_BIN`. If the binary
 is missing or unrunnable, `stow-s3 doctor` reports which of the two sides is
 broken rather than failing opaquely.
 
+## Starting and probing a server
+
+Reach for this when you are writing a launcher, a CI step, or anything that starts
+`stow-s3` itself rather than calling `withStow`.
+
+- **Health is `/_stow/health`, not `/health`.** Every path outside `/_stow/` is an
+  S3 path and requires SigV4, so an unsigned `GET /health` returns
+  `403 AccessDenied`. That is a wrong-path probe, not an unhealthy server.
+  `/_stow/health`, `/_stow/status`, and `/_stow/metrics` answer unsigned from
+  loopback and need `STOW_ADMIN_TOKEN` (header `X-Stow-Admin`) from any other
+  address. `/_stow/status` also reports `mode`, `write_policy`, `version`, and
+  `uptime_sec`, so it is the one to assert on.
+- **`--port` is a request.** `0` means ephemeral, and any port can be taken, so read
+  the bound address from the server rather than assuming one. Credentials are
+  generated unless you pass `--access-key`/`--secret-key`.
+- **Use `--ready-fd 3`.** The server writes one JSON record to that descriptor
+  (`endpoint`, `region`, `accessKeyId`, `secretAccessKey`, `mode`, `backend`,
+  `capabilities`) and keeps credentials off stdout. Without the flag it prints a
+  `STOW_READY endpoint=… access_key=… secret_key=…` line instead, which is easy to
+  satisfy by an unrelated program's output. Do not cache readiness on disk: it
+  outlives the process that wrote it.
+- **It is loopback-only by default** and local-only by default. `STOW_ENDPOINT` and
+  ambient AWS credentials describe an upstream but do not select one; that needs
+  `--mode run-through` or `STOW_MODE=run-through`, and propagating writes upstream
+  needs `--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`. The banner says
+  `upstream: not in use` when local.
+- **No Windows build**, and the workspace backend needs an advisory file lock that
+  Windows does not offer, so `workspace prepare` refuses there. Use WSL.
+
+Full contract, with a copy-pasteable launcher:
+[`docs/running-and-probing.md`](../../docs/running-and-probing.md).
+
 ## The scoped session
 
 This is the pattern to reach for by default: one call, a private server on an

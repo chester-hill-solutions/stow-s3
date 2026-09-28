@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+- **Documented how to run and probe a server, and made the claims executable.** An
+  agent implementing a launcher reported four findings against this build. Two were
+  real gaps in the product, and two were beliefs the code contradicted — and the
+  beliefs were the expensive half, because an agent that believes `STOW_ENDPOINT`
+  can turn a CI shim into a proxy to a live bucket will add workarounds for a
+  failure mode that cannot happen.
+
+  The gaps: there was no single document answering "start a server, learn the
+  endpoint it actually got, confirm it is up". The pieces were all present — the
+  admin route table in the README, the readiness record in the TypeScript client,
+  the banner that states the mode — and a caller had to assemble them from three
+  files before writing the first line of a launcher. `docs/running-and-probing.md` is
+  that document: both readiness channels with their traps, the probe routes and
+  which need a token, what the defaults will not do, platform support, and a
+  copy-pasteable launcher that does all of it correctly.
+
+  The two contradictions are now stated where a caller will meet them. The health
+  endpoint is `/_stow/health`; `/health` is an S3 path, so an unsigned probe of it
+  returns `403 AccessDenied` and reads as a dead server — which is exactly the
+  report that prompted this. And no combination of ambient configuration selects an
+  upstream: `STOW_ENDPOINT`, `STOW_ACCESS_KEY_ID`, and `STOW_SECRET_ACCESS_KEY`
+  describe an upstream, and run-through still requires naming it. The banner
+  distinguishes the two cases, and the `override:` line appears only in
+  run-through mode, so its presence is the signal that an upstream *is* in use.
+
+  The pointer is in the places an agent is actually handed, not only in the README:
+  `site/agent.md` and the `stow-s3` skill both gained a "starting and probing a
+  server" section, `site/llms.txt` lists the document under "start here", and
+  `stow-s3` with no arguments now prints the health path and the document name —
+  because that is where a stuck caller looks, and the previous usage text answered
+  a question nobody asking it had.
+
+  Every claim is asserted. `internal/s3api/probe_contract_test.go` is the route
+  table with the signed and unsigned cases side by side, which is the pair nothing
+  covered and the one that misled. `cmd/stow-s3/probe_contract_test.go` builds the
+  binary and runs it, because the claims are about a process: that the readiness
+  record carries the address the server *bound* rather than the port requested,
+  that using the descriptor keeps the generated secret off stdout, that the legacy
+  line is printed only without it, and that ambient upstream configuration still
+  yields a local server with a local-only write policy. A document that can fail is
+  a document; one that cannot is a comment.
+
 - **A workspace can now be checkpointed while an agent is using it.** `checkpoint`
   and `handoff` both went through `ResumeWith`, and a resume claims the session
   lock, so the only way to ask "what has it done so far?" was to make the agent

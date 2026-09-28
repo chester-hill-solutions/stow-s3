@@ -227,6 +227,14 @@ Start a filesystem-backed server:
 ./bin/stow-s3 serve --port 0 --data-dir .stow
 ```
 
+`--port 0` asks for an ephemeral port, and the endpoint the server reports is the
+one it actually bound — read it rather than assuming a port, because any port can
+be taken and the credentials are generated unless you pass them. For a launcher or
+a script, pass `--ready-fd 3` and read the JSON readiness record from that
+descriptor instead of parsing stdout, and probe `/_stow/health` to confirm the
+server is up. Both, plus the port and mode traps, are in
+[`docs/running-and-probing.md`](docs/running-and-probing.md).
+
 The server prints a machine-readable readiness line:
 
 ```text
@@ -490,7 +498,10 @@ The S3 routes require the generated or configured credentials. Use the current s
 
 ## Admin and metrics routes
 
-Diagnostics live under `/_stow/`, separate from S3 authentication:
+Diagnostics live under `/_stow/`, separate from S3 authentication. **`/_stow/health`
+is the health endpoint; `/health` is not** — every path outside `/_stow/` is an S3
+path requiring SigV4, so an unsigned `GET /health` is refused with `403`, which
+means the probe used the wrong path rather than that the server is unhealthy.
 
 | Route | Effect |
 |---|---|

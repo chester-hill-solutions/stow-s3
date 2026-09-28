@@ -76,6 +76,43 @@ carries its own binary and does not need it.
 If the binary cannot be found or run, `stow-s3 doctor` reports which of the
 client and server sides is broken instead of failing opaquely.
 
+## Starting a server yourself
+
+A scoped session is the default, but a launcher, a CI step, or a test that wants
+one endpoint for several cases starts the server directly. Two things about that
+are not guessable:
+
+- **The health endpoint is `/_stow/health`, not `/health`.** Every path outside
+  `/_stow/` is an S3 path and needs SigV4 signing, so an unsigned `GET /health` is
+  refused with `403 AccessDenied`. That 403 means the probe used the wrong path,
+  not that the server is unhealthy. `/_stow/health`, `/_stow/status`, and
+  `/_stow/metrics` answer with no credential from loopback; from any other address
+  (another container, another host) they need `STOW_ADMIN_TOKEN` in the
+  `X-Stow-Admin` header. `/_stow/status` is the better probe because it reports
+  `mode`, `write_policy`, `version`, and `uptime_sec`.
+- **Do not hardcode the port, and do not cache readiness.** `--port` is a request:
+  `0` asks for an ephemeral port and any port can be taken, so the bound address is
+  whatever the server reports. Credentials are generated unless you pass them. Pass
+  `--ready-fd 3` and the server writes a JSON readiness record to that descriptor
+  carrying the endpoint it actually bound, its region, its credentials, and its
+  capabilities — and the descriptor dies with the process, so nothing on disk can
+  outlive a server the way a cached "ready" file does.
+
+```bash
+./bin/stow-s3 serve --port 0 --mode local --data-dir "$PWD/.stow" --ready-fd 3
+```
+
+The full contract — both readiness channels and their traps, the probe routes, what
+the defaults will not do, and platform support — is in
+[`docs/running-and-probing.md`](../docs/running-and-probing.md). Every claim in it
+is asserted by a test.
+
+`STOW_ENDPOINT` and AWS credentials in the environment describe an upstream; they do
+not select one. The server is local-only unless you pass `--mode run-through` or
+`STOW_MODE=run-through`, and it propagates writes upstream only with
+`--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`. The startup banner states
+which you got: `upstream: not in use` means local.
+
 ## The pattern you want
 
 Start a scoped session, use a normal S3 client, let the session clean up. This
