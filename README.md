@@ -1,23 +1,67 @@
 # Stow
 
-Stow is an S3-compatible object store and ready-to-work workspace for local development, tests, and agents.
+A detached working environment for coding agents: a workspace of files and a
+cache of S3 data, both of which survive the machine, both of which you can verify,
+and neither of which needs a live privileged connection to use.
 
-Applications use Stow to create buckets and upload or download files through the S3 APIs they already use. Local mode stores data on the machine or host where Stow runs. Run-through mode can use an upstream S3-compatible service as a cache or write target.
+It is also an S3-compatible object store, and a good one for local development and
+tests. That part is not the interesting part, and this README leads with the other
+thing because the interesting part is what an agent can be *given*.
 
-A **bucket** is a named container. An **object** is a file stored in a bucket, together with metadata such as its content type, size, and ETag.
+## The two pillars
+
+**A workspace** is an isolated directory that already contains the inputs you
+declared, checkpointed immutably, diffable, and resumable on another machine.
+Fan out sixteen agents, each with its own workspace, and each one hands back a
+checkpoint you can compare.
+
+**An S3 cache** (`stow-s3 serve --mode run-through`) keeps a local copy of object
+data, scoped to one bucket, that stays readable when the upstream is unreachable.
+
+Both are instances of one property: **the agent process never holds the upstream
+AWS credential.** The keys live in the stow server's environment. The agent is
+handed a local endpoint and a generated local key pair, and cannot reach anything
+it was not given. Disconnect it from the network and the workspace is still there
+and the cached data is still readable.
+
+This matters more than it first appears. An agent that reads untrusted text — a
+ticked issue, a fetched page, a file from a repository it does not control — is
+being fed instructions by whoever wrote that text. Giving it a credential that
+reaches a real bucket gives those instructions somewhere to go. Stow's answer is
+that the thing the agent holds is worth nothing outside the process that made it.
+
+## This is not version control
+
+Worth saying plainly, because the vocabulary invites the mistake. A delta
+describes what a path *was* and what it *is now*, and applying one verifies the
+"was" against the checkpoint you name. A delta that crosses two workspaces is
+refused outright. There is no merge, no conflict resolution, and no history you
+can walk.
+
+So: fan out, checkpoint, compare, and take what you want. Do not fork a workspace,
+edit it for a week, and expect to bring the work back. That is not what this does,
+and pretending otherwise is how you lose an afternoon to a refusal that was
+designed to stop you.
 
 ## What Stow provides
 
+- A workspace for an agent: declared inputs, immutable checkpoints, diff,
+  restore, portable handoff, and adoption on another machine.
 - An S3 HTTP server for local development and tests.
 - A scoped session API for TypeScript and Python: one call starts a private
   server, hands back a ready S3 client, and cleans everything up on close.
+- A run-through cache: local data with an upstream behind it, usable offline.
 - A Go runtime for in-process, memory-backed storage.
 - A WebAssembly runtime for Node.js and browser integrations.
 - Filesystem persistence for data that must survive a process restart.
-- Read-through caching and explicit upstream write propagation for run-through workflows.
 - SigV4 authentication for the S3 endpoint.
 - `stow doctor`, a diagnostic that reports both the client and server sides of an
   installation.
+
+Applications use Stow to create buckets and upload or download files through the
+S3 APIs they already use. A **bucket** is a named container. An **object** is a
+file stored in a bucket, together with metadata such as its content type, size,
+and ETag.
 
 Stow implements the common S3 operations needed by application and test workloads:
 
@@ -32,10 +76,22 @@ Stow implements the common S3 operations needed by application and test workload
 
 Stow implements a subset of Amazon S3. Versioning, ACLs, bucket policies, lifecycle rules, replication, notifications, tagging, object lock, S3 Select, and KMS-backed encryption are not implemented.
 
+If you are choosing between Stow and a fuller S3 emulator for a test suite: Stow
+is one static binary with no runtime dependency, it is fast enough to run
+per-test-case, and it implements the operations above and refuses the rest
+explicitly rather than pretending. It is not a drop-in for a workload that needs
+versioning or bucket policies.
+
 ## When to use it
 
-Use Stow when a workload needs S3 behavior without a cloud account or network service:
+Use Stow when a workload needs S3 behavior without a cloud account or network
+service, or when you are giving an agent somewhere to work that will still be
+there afterwards:
 
+- giving a coding agent an isolated directory seeded with its declared inputs;
+- checkpointing what an agent did, and comparing two agents' work;
+- moving a workspace to another machine and picking it up there;
+- keeping object data readable when the upstream is not;
 - local application development;
 - unit and integration tests that need a real S3-shaped API;
 - CI jobs that need disposable object storage;
@@ -44,27 +100,151 @@ Use Stow when a workload needs S3 behavior without a cloud account or network se
 - browser or Node.js integrations that need an embedded runtime;
 - development against an existing upstream S3-compatible service.
 
-## Ready-to-work agent workspace
+## A workspace, end to end
 
-Give an agent an isolated working directory that already contains its declared
-local inputs. Save a version 1 manifest and prepare it with the CLI:
+Declare the inputs in a manifest. The manifest states where the workspace lives,
+which files to seed it with, and which team's partition of the registry it
+belongs to. The root's parent directory must already exist:
+
+```json
+{
+  "version": 1,
+  "root": "/srv/agents/task-42",
+  "team": "platform",
+  "inputs": [
+    { "source": "/srv/inputs/spec.md", "destination": "spec.md" },
+    { "source": "/srv/inputs/fixtures", "destination": "fixtures" }
+  ]
+}
+```
+
+Prepare it. The result names the workspace, the totals it seeded, and the
+directory to use as the agent process's cwd:
 
 ```sh
 stow-s3 workspace prepare --manifest task.json
 ```
 
-The JSON result includes the workspace root and the actual
-`working_directory` to use as the agent process cwd. Stow copies local files and
-directories into a new Stow-owned root, then supports resume, same-machine
-handoff, immutable checkpoints, diff, restore, and portable checkpoint export
-and import. The S3 endpoint remains optional.
+```json
+{
+  "workspace_id": "ws_843fbd0cdf9b744b",
+  "root": "/srv/agents/task-42",
+  "seeded_objects": 2,
+  "seeded_bytes": 16,
+  "team": "platform"
+}
+```
+
+The agent works in `root`. When you want what it did, checkpoint it. The
+checkpoint is immutable and content-addressed. Every later verb needs `--team
+platform` too, because a team's partition is a real directory boundary and a
+checkpoint filed under it is invisible without it:
+
+```sh
+stow-s3 workspace checkpoint --id ws_843fbd0cdf9b744b --team platform
+```
+
+```json
+{
+  "checkpoint_id": "cp_a4424a293103532626d4a507",
+  "workspace_id": "ws_843fbd0cdf9b744b",
+  "files": 2,
+  "bytes": 16
+}
+```
+
+Two checkpoints of the same workspace diff into exactly what changed between
+them, which is how you compare two agents working from the same inputs:
+
+```sh
+stow-s3 workspace checkpoint --id ws_843fbd0cdf9b744b \
+  --parent cp_a4424a293103532626d4a507 --team platform
+stow-s3 workspace diff --from cp_a4424a293103532626d4a507 \
+  --to cp_77f5079ad25db3e0a66ae6cb --team platform
+```
+
+```json
+{
+  "changes": [{ "path": "report.md", "kind": "added" }]
+}
+```
+
+To move the work to another machine, write a handoff. With `--archive` the
+document is portable and carries a checkpoint you can adopt anywhere:
+
+```sh
+stow-s3 workspace handoff \
+  --id ws_843fbd0cdf9b744b \
+  --checkpoint-id cp_77f5079ad25db3e0a66ae6cb \
+  --team platform \
+  --archive /tmp/task-42.tar.gz \
+  --output /tmp/task-42.handoff.json
+```
+
+`--output` writes the document to that path and prints nothing, which is the
+point: the file is the artifact the receiving machine gets. Without `--archive`
+the reference is local (version 1); with it, portable (version 2).
+
+On the other machine, adopt it. The archive and its digest are verified before
+anything is written, so a handoff that arrived over a channel is checked rather
+than trusted:
+
+```sh
+stow-s3 workspace adopt --handoff /tmp/task-42.handoff.json --root /srv/agents/task-42
+```
+
+```json
+{
+  "workspace_id": "ws_460a0b6f67fb107b",
+  "root": "/srv/agents/task-42",
+  "checkpoint_id": "cp_77f5079ad25db3e0a66ae6cb",
+  "seeded_objects": 3,
+  "seeded_bytes": 32
+}
+```
+
+Note the ids above: `adopt` built `ws_460a0b6f67fb107b` from a handoff naming
+`ws_843fbd0cdf9b744b`. A handoff reference *names* a workspace; it does not carry
+its identity. `workspace resume --handoff` returns the workspace the document names
+— `ws_843fbd0cdf9b744b` above, not the copy — while `adopt` builds a different
+workspace from the archive. And `resume` refuses `--handoff` alongside
+`--registry-dir` on purpose:
+
+```console
+$ stow-s3 workspace resume --handoff task-42.handoff.json --registry-dir /elsewhere
+workspace resume accepts --handoff or --id/--registry-dir/--team, not both
+```
+
+A caller that could redirect a handoff at a different registry would resume a
+workspace somewhere the document never pointed at.
+
+The last verb worth knowing is `delta`, which writes the difference between two
+checkpoints to a document the other side can apply:
+
+```sh
+stow-s3 workspace delta --from cp_a4424a293103532626d4a507 \
+  --to cp_77f5079ad25db3e0a66ae6cb --team platform --output change.stowdelta
+```
+
+```json
+{
+  "version": 1,
+  "base_id": "cp_a4424a293103532626d4a507",
+  "target_id": "cp_77f5079ad25db3e0a66ae6cb",
+  "files": 1,
+  "bytes": 16
+}
+```
+
+`apply` verifies every precondition before it writes anything, so a delta whose
+payload no longer matches its digest is refused rather than applied.
 
 See [the task manifest and workspace lifecycle guide](docs/task-manifest.md)
-for the schema, examples, archive safety rules, and limitations. A workspace is
-filesystem isolation for task editing, not an OS sandbox; direct filesystem
-writes by the agent are not hard-limited by Stow's object API quotas. Task
-manifests can stage explicit refs from local Git repositories; dirty files,
-older history, submodules, and Git LFS payloads are not included.
+for the schema, archive safety rules, and limitations. A workspace is filesystem
+isolation for task editing, not an OS sandbox; direct filesystem writes by the
+agent are not hard-limited by Stow's object API quotas. Task manifests can stage
+explicit refs from local Git repositories; dirty files, older history,
+submodules, and Git LFS payloads are not included.
 
 ## Install
 
@@ -126,10 +306,11 @@ which side is broken if the binary cannot be found or run.
 
 ## Quick start: a scoped session
 
-A session is the shortest path from nothing to a working S3 client. It starts a
-private server on an ephemeral port, creates a bucket, waits until the server
-reports itself ready, and hands back a client that is already pointed at it. On
-close it stops the server and removes the data directory.
+For a test that needs an S3 API and nothing else, a session is the shortest path
+from nothing to a working client. It starts a private server on an ephemeral port,
+creates a bucket, waits until the server reports itself ready, and hands back a
+client that is already pointed at it. On close it stops the server and removes the
+data directory.
 
 TypeScript (not yet on npm — see [Install](#install)):
 
@@ -445,13 +626,51 @@ there: the directory a workspace is, cannot outlive the isolate holding it. The
 workspace contract rules out a network relay for the same reason.
 
 
-## Run-through mode
+## Run-through mode: the offline cache
 
-Local mode keeps all object data in the selected local backend, and it is the default. Run-through mode adds an upstream S3 client and a separate cache.
+Local mode keeps all object data in the selected local backend, and it is the
+default. Run-through mode adds an upstream S3 client and a separate cache.
+
+This is the second pillar, and the reason to care is the credential split. The
+upstream keys are read by the stow server. An agent pointed at the local endpoint
+gets a local key pair that means nothing to the bucket, so it can read and write
+the cache and cannot touch the account behind it. Take the network away and the
+cached data is still there.
+
+```sh
+stow-s3 serve --mode run-through \
+  --data-dir /srv/agent-data \
+  --cache-dir /srv/agent-cache \
+  --upstream-endpoint https://s3.example.com \
+  --upstream-bucket datasets
+```
+
+The cache is a separate directory from the data directory, and that separation is
+load-bearing: the cache is a copy of someone else's data, and a data directory you
+can reset should not be a directory that holds it.
+
+A read of an already-cached object falls back to the cached copy when the upstream
+cannot be reached, so losing the network does not become the agent's problem. This
+is verified rather than asserted: with an upstream killed outright, a read of a
+cached key still returns its bytes. A key that was never cached and cannot be
+fetched returns an error rather than an empty body — the fallback covers a failed
+revalidation, not a missing object.
+
+A note on the shape of the cache: the bucket is created locally first, because
+bucket namespace operations stay local. A first read against a bucket that exists
+only upstream returns `NoSuchBucket` until the bucket exists locally. That is
+deliberate — a run-through server does not create upstream buckets behind your
+back — but it surprises people the first time, so it is written down here.
+
+Bound it with `--cache-max-bytes` and `--cache-max-objects` (or
+`STOW_CACHE_MAX_BYTES` and `STOW_CACHE_MAX_OBJECTS`), and give entries a lifetime
+with `STOW_CACHE_TTL`. The limits are re-applied on startup rather than only on
+writes, because the cache directory outlives the process: a server that only ever
+reads would otherwise drift past its cap indefinitely.
 
 Run-through is opt-in: pass `--mode run-through` or set `STOW_MODE=run-through`. It is never selected by the presence of credentials, because `AWS_*` variables are exported by CI runners and developer shells for unrelated tools — credentials decide how a requested upstream is authenticated, not whether one is used. `STOW_MODE=local` forces local-only.
 
-In run-through mode, local data is authoritative. Reads can fall back to an existing upstream bucket. Upstream configuration comes from `STOW_*`, `S3_*`, or `AWS_*` environment variables, or from the corresponding command-line options.
+In run-through mode, local data is authoritative. Upstream configuration comes from `STOW_*`, `S3_*`, or `AWS_*` environment variables, or from the corresponding command-line options.
 
 `STOW_UPSTREAM_ADDRESSING` selects how stow addresses a bucket on the upstream:
 `path` (the default) sends `https://endpoint/bucket/key`, and `virtual-hosted`
@@ -579,6 +798,16 @@ make standards
 backend, the TypeScript client, the Python client, and the WebAssembly bridge.
 `make standards` runs the quality ratchets; these are floors, so an improvement is
 reported rather than failed and a regression fails the build.
+
+The workspace verbs are specified once, in
+[`conformance/workspace/cases.json`](conformance/workspace/cases.json), and
+asserted by three independent drivers: the Go suite against the binary, the
+TypeScript wrapper against itself, and the Python wrapper against itself. A client
+cannot disagree with the engine about what a verb returns without one of them
+failing. The reason that file exists is in
+[its README](conformance/workspace/README.md); the short version is that both
+client wrappers shipped the same bug for a long time, each hidden by a test double
+that answered with a contract the production code did not have.
 
 The Go version is pinned exactly, in `.go-version` and in the `toolchain` line of
 `go.mod`. The WebAssembly artifact in `packages/stow-s3/dist` is committed and
