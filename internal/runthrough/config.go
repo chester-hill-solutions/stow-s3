@@ -79,6 +79,22 @@ type Config struct {
 	Upstream               UpstreamConfig
 	EvictOnUpstreamMissing bool
 	Cache                  CachePolicy
+	// Offline is a refusal, not a preference. When it is set the adapter makes no
+	// upstream call of any kind: a read that is not in the local store or the cache
+	// is a miss, and the cache is served as-is with no revalidation.
+	//
+	// The distinction matters because the stale-if-error fallback already covers the
+	// case this is for — an upstream that cannot be reached falls back to the cached
+	// copy. That fallback is a consequence of error handling, so it cannot be
+	// asserted, proven, audited, or cost-bounded: nothing states that the network was
+	// not touched, and a hung upstream turns every read into a timeout. Setting
+	// Offline makes the guarantee checkable. The credential-safety claim is only
+	// worth something if it is provable, and this is what makes it provable.
+	//
+	// It also bounds cost. A read that would have gone to the upstream is a
+	// synchronous network call inside a request, and an agent running a thousand of
+	// them against a dead endpoint pays for the failure a thousand times.
+	Offline bool
 }
 
 // effectiveAuthority folds the attenuation inputs into the one value the adapter
@@ -178,6 +194,20 @@ func ConfigFromEnv() Config {
 		}
 	}
 
+	// STOW_OFFLINE is the environment's copy of the flag, and an explicit false is
+	// honoured: a server started with --offline=false on a machine whose shell
+	// exports STOW_OFFLINE=true is making a choice, and the flag has to win. Only a
+	// recognised true/false value is read, because a misspelling must not silently
+	// leave the network open on a server whose operator believed it was closed.
+	if raw, ok := os.LookupEnv("STOW_OFFLINE"); ok {
+		switch strings.ToLower(strings.TrimSpace(raw)) {
+		case "1", "true", "yes", "on":
+			cfg.Offline = true
+		case "", "0", "false", "no", "off":
+			cfg.Offline = false
+		}
+	}
+
 	// A policy is a routing choice; this flag is the consent to mutate a real
 	// provider. The two are deliberately independent: STOW_POLICY=mirrorWrites
 	// in an inherited .env must not, on its own, start writing to a shared
@@ -205,6 +235,15 @@ func ConfigFromEnvChecked() (Config, error) {
 	}
 	if raw, present := os.LookupEnv("STOW_REVALIDATE"); present && strings.TrimSpace(raw) != "" {
 		if _, _, err := parseEnvBool("STOW_REVALIDATE"); err != nil {
+			return cfg, err
+		}
+	}
+	// An unrecognised STOW_OFFLINE is a startup error, on the same reasoning as
+	// STOW_REVALIDATE: this flag is a safety property, and a value nobody
+	// recognises is a server whose operator believes the network is closed when it
+	// is not. That is the one failure worth refusing at startup.
+	if raw, present := os.LookupEnv("STOW_OFFLINE"); present && strings.TrimSpace(raw) != "" {
+		if _, _, err := parseEnvBool("STOW_OFFLINE"); err != nil {
 			return cfg, err
 		}
 	}

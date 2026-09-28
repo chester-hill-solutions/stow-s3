@@ -320,15 +320,15 @@ func (a *Adapter) HeadObject(ctx context.Context, bucket, key string) (*storage.
 	return meta, err
 }
 
-// resolveObject implements read-through cache with optional revalidation.
-// When needBody is false, the returned ReadCloser is always nil.
+// resolveObject implements read-through cache with optional revalidation. When
+// needBody is false the returned ReadCloser is always nil.
 func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
 	localMeta, localErr := a.local.HeadObject(ctx, bucket, key)
 	if localErr == nil {
 		// With separate stores, local writes are authoritative and must not be
 		// replaced by an upstream revalidation. The legacy single-store mode
 		// retains its historical revalidation behavior for compatibility.
-		if a.separateCache || !a.upstreamEnabled(bucket) || !a.cfg.Revalidate {
+		if a.separateCache || a.cfg.Offline || !a.upstreamEnabled(bucket) || !a.cfg.Revalidate {
 			return a.openLocal(ctx, bucket, key, localMeta, needBody)
 		}
 		return a.revalidateCachedObject(ctx, bucket, key, localMeta, needBody)
@@ -340,76 +340,6 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 		return nil, nil, storage.ErrObjectNotFound
 	}
 	return a.resolveCachedObject(ctx, bucket, key, needBody)
-}
-
-func (a *Adapter) resolveCachedObject(ctx context.Context, bucket, key string, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
-	cacheMeta, cacheErr := a.cache.HeadObject(ctx, bucket, key)
-	if cacheErr == nil && a.cacheEntryExpired(bucket, key) {
-		if err := a.cache.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
-			return nil, nil, err
-		}
-		a.forgetCacheObject(bucket, key)
-		a.cacheEvictions.Add(1)
-		cacheMeta, cacheErr = nil, storage.ErrObjectNotFound
-	}
-	if cacheErr == nil {
-		if !a.cfg.Revalidate {
-			return a.openCached(ctx, bucket, key, cacheMeta, needBody)
-		}
-		return a.revalidateCachedObject(ctx, bucket, key, cacheMeta, needBody)
-	}
-	// A separately configured cache starts empty and does not need bucket
-	// scaffolding. Treat a missing cache bucket as an empty cache; the local
-	// bucket remains the authoritative namespace and is checked above.
-	if !storageErrIsMissingObject(cacheErr) && !storageErrIsMissingBucket(cacheErr) {
-		return nil, nil, cacheErr
-	}
-	return a.refreshFromUpstream(ctx, bucket, key, needBody)
-}
-
-func (a *Adapter) revalidateCachedObject(ctx context.Context, bucket, key string, cachedMeta *storage.ObjectMeta, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
-	upMeta, headErr := a.upstream.HeadObject(ctx, bucket, key)
-	if headErr == storage.ErrObjectNotFound {
-		if a.cfg.EvictOnUpstreamMissing {
-			_ = a.cache.DeleteObject(ctx, bucket, key)
-			a.forgetCacheObject(bucket, key)
-			if !a.separateCache {
-				_ = a.local.DeleteObject(ctx, bucket, key)
-			}
-		}
-		return nil, nil, storage.ErrObjectNotFound
-	}
-	if headErr != nil {
-		return a.openCached(ctx, bucket, key, cachedMeta, needBody)
-	}
-	if !upstreamChanged(upMeta, cachedMeta) {
-		return a.openCached(ctx, bucket, key, cachedMeta, needBody)
-	}
-	return a.refreshFromUpstream(ctx, bucket, key, needBody)
-}
-
-func (a *Adapter) openLocal(ctx context.Context, bucket, key string, meta *storage.ObjectMeta, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
-	if !needBody {
-		return nil, meta, nil
-	}
-	rc, bodyMeta, err := a.local.GetObject(ctx, bucket, key)
-	if err != nil {
-		return nil, nil, err
-	}
-	return rc, bodyMeta, nil
-}
-
-func (a *Adapter) openCached(ctx context.Context, bucket, key string, meta *storage.ObjectMeta, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
-	a.cacheHits.Add(1)
-	a.touchCache(bucket, key)
-	if !needBody {
-		return nil, meta, nil
-	}
-	store := a.local
-	if a.separateCache {
-		store = a.cache
-	}
-	return store.GetObject(ctx, bucket, key)
 }
 
 func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {

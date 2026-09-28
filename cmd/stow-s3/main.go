@@ -166,6 +166,10 @@ func main() {
 		if err := workspaceCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
 		}
+	case "prewarm":
+		if err := prewarm(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	default:
 		usage()
 		os.Exit(1)
@@ -173,7 +177,11 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n\n")
+	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n  prewarm     fetch named keys into the run-through cache so they survive the network\n\n")
+	// prewarm takes an explicit key list, and saying so here is the documentation
+	// that matters: a prefix would be the obvious thing to reach for, and it is a
+	// data-exfiltration shape on a bucket an agent was never given.
+	fmt.Fprintf(os.Stderr, "warming a cache: stow-s3 prewarm --bucket B --keys k1,k2 (exact keys only, no prefixes)\n")
 	// A caller that has just failed to find a health endpoint needs to be told where
 	// it is, in the one place it will look. It is /_stow/health: every other path is
 	// an S3 path that requires signing, so a bare probe of /health is refused and
@@ -286,6 +294,10 @@ func serve(args []string) {
 	cacheMaxBytes := flags.Int64("cache-max-bytes", -1, "Maximum separate cache bytes (0 disables the limit; -1 uses environment)")
 	cacheMaxObjects := flags.Int64("cache-max-objects", -1, "Maximum separate cache objects (0 disables the limit; -1 uses environment)")
 	cacheTTL := flags.Duration("cache-ttl", -1, "Separate cache entry lifetime (0 disables expiry; -1 uses environment)")
+	// A bool, and it stays a bool. The obvious way to get an explicit false is a
+	// string flag, and that is a trap: `--offline` as a string consumed the next
+	// argument, so `--offline --ready-fd 3` failed with "invalid --offline
+	registerOfflineFlag(flags)
 	maxBytes := flags.Int64("max-bytes", 0, "Maximum stored object bytes enforced on every native S3 request (0 disables the limit)")
 	maxObjects := flags.Int64("max-objects", 0, "Maximum stored object count enforced on every native S3 request (0 disables the limit)")
 	readyFd := flags.Int("ready-fd", -1, "Write one machine-readable readiness object to this file descriptor instead of the STOW_READY line on stdout")
@@ -299,6 +311,10 @@ func serve(args []string) {
 	if err := applyCacheLimits(&rtCfg, *cacheMaxBytes, *cacheMaxObjects, *cacheTTL); err != nil {
 		log.Fatal(err)
 	}
+	// The flag wins over the environment in both directions, and an explicit false
+	// is a real answer: a shell that exports STOW_OFFLINE=true is a default, not an
+	// instruction, and a server started with --offline=false is saying so.
+	applyOfflineFlag(flags, &rtCfg)
 	mode := resolveMode(*modeFlag)
 
 	if *allowPublicAdmin {

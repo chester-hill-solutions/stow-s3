@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +20,21 @@ type cacheStatsProvider interface {
 
 type cacheEvictionsProvider interface {
 	CacheEvictions() uint64
+}
+
+// cacheListingProvider is a store that can name the objects it is holding.
+//
+// The counters an inspection already reports — hits, misses, evictions — say that
+// caching is happening and nothing about what is cached. An agent that has been cut
+// off from the network needs the second thing, and there is no way to derive it
+// from the first: a cache can be 100% hit rate and hold nothing the agent asked
+// for.
+//
+// The type is runthrough's rather than one declared here because this file already
+// imports that package for OutboxEntry, and a second identical struct would mean
+// two shapes for one document and a conversion somebody has to remember to write.
+type cacheListingProvider interface {
+	CachedObjects() []runthrough.CachedObject
 }
 
 type outboxStatsProvider interface {
@@ -200,6 +216,63 @@ func (s *Server) writeStatus(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(payload)
 }
 
+// defaultCachedKeyLimit bounds a cache listing when the caller does not ask for a
+// bound. It is generous enough to answer "what did I warm" for a real session and
+// small enough that the response is a document rather than a dump.
+const defaultCachedKeyLimit = 500
+
+// maxCachedKeyLimit is the ceiling a caller can ask for. A limit that could be
+// unbounded is not a limit, and this route is admin-authenticated but not
+// rate-limited, so the bound has to be in the code rather than in the request.
+const maxCachedKeyLimit = 10000
+
+// listCachedObjects returns a page of the cache's contents and the total it holds.
+//
+// The total is reported alongside the page on purpose. An agent that has been cut
+// off needs to know whether the listing is complete, and a page with no total is
+// indistinguishable from a cache holding exactly that much — which is the
+// difference between "you can read all of it" and "you are missing four keys".
+func (s *Server) listCachedObjects(r *http.Request) ([]runthrough.CachedObject, int, bool) {
+	provider, ok := s.store.(cacheListingProvider)
+	if !ok {
+		return []runthrough.CachedObject{}, 0, true
+	}
+	all := provider.CachedObjects()
+
+	bucketFilter := r.URL.Query().Get("bucket")
+	prefix := r.URL.Query().Get("prefix")
+	filtered := make([]runthrough.CachedObject, 0, len(all))
+	for _, object := range all {
+		if bucketFilter != "" && object.Bucket != bucketFilter {
+			continue
+		}
+		if prefix != "" && !strings.HasPrefix(object.Key, prefix) {
+			continue
+		}
+		filtered = append(filtered, object)
+	}
+
+	limit := defaultCachedKeyLimit
+	if raw := r.URL.Query().Get("limit"); raw != "" {
+		parsed, err := strconv.Atoi(raw)
+		// A malformed limit is a refusal rather than a default. Defaulting would
+		// mean a typo silently returns a truncated answer that looks complete,
+		// which for a route whose purpose is "tell me what I can read" is the one
+		// wrong thing to do.
+		if err != nil || parsed < 0 {
+			return nil, 0, false
+		}
+		if parsed > maxCachedKeyLimit {
+			parsed = maxCachedKeyLimit
+		}
+		limit = parsed
+	}
+	if len(filtered) > limit {
+		filtered = filtered[:limit]
+	}
+	return filtered, len(all), true
+}
+
 func (s *Server) writeInspect(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	bucketFilter := r.URL.Query().Get("bucket")
@@ -246,6 +319,15 @@ func (s *Server) writeInspect(w http.ResponseWriter, r *http.Request) {
 	if provider, ok := s.store.(cacheEvictionsProvider); ok {
 		cacheEvictions = provider.CacheEvictions()
 	}
+	// The keys, not just the counters. A `limit` query parameter bounds the
+	// listing, because an inspection that walks a large cache to answer a
+	// question about one bucket is a denial of service wearing a diagnostic's
+	// clothes, and an agent asking "what can I read" wants a page it can hold.
+	cachedKeys, cachedTotal, ok := s.listCachedObjects(r)
+	if !ok {
+		writeAdminError(w, http.StatusBadRequest, "limit must be a non-negative integer")
+		return
+	}
 	outboxPending, outboxTerminal := 0, 0
 	if provider, ok := s.store.(outboxStatsProvider); ok {
 		outboxPending, outboxTerminal = provider.OutboxStats()
@@ -271,6 +353,8 @@ func (s *Server) writeInspect(w http.ResponseWriter, r *http.Request) {
 		"cache_hits":            cacheHits,
 		"cache_misses":          cacheMisses,
 		"cache_evictions":       cacheEvictions,
+		"cached_keys":           cachedKeys,
+		"cached_key_count":      cachedTotal,
 		"outbox_pending":        outboxPending,
 		"outbox_terminal":       outboxTerminal,
 		"outbox_entries":        outboxEntries,

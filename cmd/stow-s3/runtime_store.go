@@ -71,6 +71,19 @@ func (s *runThroughRuntimeStore) CacheStats() (uint64, uint64) {
 
 func (s *runThroughRuntimeStore) CacheEvictions() uint64 { return s.admin.CacheEvictions() }
 
+// CachedObjects forwards the cache listing, which is the only way an agent cut off
+// from the network learns what it can read.
+//
+// It is here for the same reason every method above it is: this type is what the
+// S3 server actually holds, and the admin route discovers the cache by a type
+// assertion on it. A listing that was not forwarded would answer with an empty
+// list — which reads as "the cache is empty" rather than as "nobody wired this
+// up", and is the most misleading possible answer to the one question an offline
+// agent asks.
+func (s *runThroughRuntimeStore) CachedObjects() []runthrough.CachedObject {
+	return s.admin.CachedObjects()
+}
+
 func (s *runThroughRuntimeStore) OutboxStats() (int, int) { return s.admin.OutboxStats() }
 
 func (s *runThroughRuntimeStore) OutboxPreparedStats() int { return s.admin.OutboxPreparedStats() }

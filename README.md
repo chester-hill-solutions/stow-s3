@@ -17,7 +17,6 @@ checkpoint you can compare.
 
 **An S3 cache** (`stow-s3 serve --mode run-through`) keeps a local copy of object
 data, scoped to one bucket, that stays readable when the upstream is unreachable.
-
 Both are instances of one property: **the agent process never holds the upstream
 AWS credential.** The keys live in the stow server's environment. The agent is
 handed a local endpoint and a generated local key pair, and cannot reach anything
@@ -689,6 +688,72 @@ Bound it with `--cache-max-bytes` and `--cache-max-objects` (or
 with `STOW_CACHE_TTL`. The limits are re-applied on startup rather than only on
 writes, because the cache directory outlives the process: a server that only ever
 reads would otherwise drift past its cap indefinitely.
+
+### Working with the network gone
+
+`--offline` makes the guarantee checkable rather than merely true. Without it, a
+read that cannot be revalidated falls back to the cached copy — which is the right
+behaviour, but it is a *consequence of error handling*, so nothing states that the
+network was not touched and a hung upstream turns every read into a timeout. With
+`--offline` the server makes no upstream call at all: a read is served from the local
+store or the cache, or it is a miss.
+
+```sh
+stow-s3 serve --mode run-through --offline \
+  --data-dir /srv/agent-data --cache-dir /srv/agent-cache
+```
+
+`STOW_OFFLINE=true` does the same. The flag wins in both directions, so
+`--offline=false` overrides an exported `STOW_OFFLINE=true` for one command — which
+matters, because a shell default should not be able to contradict a deliberate
+command line on a safety flag.
+
+**Warm the cache first.** `prewarm` fetches a named set of keys so they survive the
+network going away:
+
+```sh
+stow-s3 prewarm --bucket datasets --data-dir /srv/agent-data \
+  --keys models/bert.bin,models/bert.config.json
+```
+
+It takes **exact keys, never a prefix**, and a glob is refused with a message that
+says why. A prefix on a real bucket is a data-exfiltration shape, and the caller
+here is an agent that reads untrusted text: handed "warm everything under `logs/`"
+it would have a way to copy a bucket it was never given, and the operator who wrote
+the prefix would have no way to tell that from a harmless cache fill. Read the list
+from a file with `--keys-file`, one key per line, when the set is long.
+
+Keys that cannot be warmed are reported individually and the rest continue — one
+missing key should not abandon a warm-up of a thousand — and the exit status is
+nonzero for a partial warm-up, so a script notices.
+
+**Then ask what you can read.** The inspection route names the cached keys, not just
+the counters:
+
+```sh
+curl -s -H "X-Stow-Admin: $TOKEN" http://127.0.0.1:PORT/_stow/inspect
+```
+
+```json
+{
+  "cache_hits": 0,
+  "cached_key_count": 3,
+  "cached_keys": [
+    { "bucket": "datasets", "key": "models/bert.bin", "size": 411000000, "readable": true }
+  ]
+}
+```
+
+`readable: false` means the entry is indexed but its lifetime has passed, so it is
+about to be evicted — which is the difference between "you can read this" and "you
+can read this until the next sweep". The listing takes `?bucket=`, `?prefix=` and
+`?limit=`; the count beside it is the whole cache rather than the page, so a
+truncated answer is never mistaken for a complete one. A malformed `limit` is
+refused rather than defaulted, because a typo that silently returns half the list
+looks exactly like a cache holding half as much.
+
+Counters alone could not answer this. A cache can post a perfect hit rate and hold
+nothing the agent asked for, and there was no way to tell those apart from outside.
 
 Run-through is opt-in: pass `--mode run-through` or set `STOW_MODE=run-through`. It is never selected by the presence of credentials, because `AWS_*` variables are exported by CI runners and developer shells for unrelated tools — credentials decide how a requested upstream is authenticated, not whether one is used. `STOW_MODE=local` forces local-only.
 

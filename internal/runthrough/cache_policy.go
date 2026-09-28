@@ -277,6 +277,56 @@ func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 // CacheIndexEntries reports how many objects the eviction index holds. It exists
 // so a test can compare the index against the store rather than assuming they
 // agree.
+// CachedObject is one object the cache currently holds.
+type CachedObject struct {
+	Bucket    string    `json:"bucket"`
+	Key       string    `json:"key"`
+	Size      int64     `json:"size"`
+	Accessed  time.Time `json:"accessed"`
+	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	// Readable says whether this object can be served with the network gone.
+	//
+	// It is false for an object the upstream has moved past, and it is the whole
+	// point of the listing: a cache that reports only counters tells an agent that
+	// caching is happening and not what it can actually read, so an agent working
+	// offline has to guess and then discover the answer by failing.
+	Readable bool `json:"readable"`
+}
+
+// CachedObjects lists what the cache holds, oldest access first.
+//
+// It answers the question a detached session actually asks — what can I read
+// without the network — and it is the index rather than a fresh store walk, so it
+// is what the eviction policy is reasoning about. A listing built from the store
+// would disagree with the policy the moment the two drifted, and the disagreement
+// would be invisible.
+func (a *Adapter) CachedObjects() []CachedObject {
+	if !a.separateCache {
+		return nil
+	}
+	a.cacheMu.Lock()
+	defer a.cacheMu.Unlock()
+
+	now := time.Now()
+	objects := make([]CachedObject, 0, len(a.cacheEntries))
+	for _, entry := range a.cacheEntries {
+		objects = append(objects, CachedObject{
+			Bucket: entry.bucket, Key: entry.key, Size: entry.size,
+			Accessed: entry.accessedAt, ExpiresAt: entry.expiresAt,
+			Readable: entry.expiresAt.IsZero() || now.Before(entry.expiresAt),
+		})
+	}
+	// Oldest first: an agent about to be cut off wants the keys least likely to
+	// still be there, and an operator wants the eviction order.
+	sort.Slice(objects, func(i, j int) bool {
+		if objects[i].Accessed.Equal(objects[j].Accessed) {
+			return objects[i].Key < objects[j].Key
+		}
+		return objects[i].Accessed.Before(objects[j].Accessed)
+	})
+	return objects
+}
+
 func (a *Adapter) CacheIndexEntries() int {
 	a.cacheMu.Lock()
 	defer a.cacheMu.Unlock()
