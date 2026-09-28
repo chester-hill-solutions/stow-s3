@@ -4,6 +4,15 @@
 
 **Parallel axis:** [`foss-readiness-plan.md`](foss-readiness-plan.md) covers installability, the conformance matrix's missing backend, and the contribution surface. It is not a competing backlog: it holds no workspace or handoff work, and where the two touch — the conformance matrix and the workspace backend — this document still governs ordering.
 
+**Second parallel axis:** [`work-session-plan.md`](work-session-plan.md) covers the
+execution layer above this one — task specs, execution attempts, artifacts, executors,
+and integrations. It is the next product layer and holds no outstanding implementation
+of the work tracked below. Its E0 is this document's backlog restated as a
+precondition, so where the two describe the same work this document governs the
+ordering. It carries one rule this repository has already learned the hard way: code
+coverage is not a proxy for contract coverage, and a gate whose untested mode produces
+a silently empty baseline is worse than no gate.
+
 The three defects it named on 2026-09-28 have all been resolved since, and the decision behind one of them is now [ADR 0012](adr/0012-run-through-serves-only-its-own-buckets.md). Read-through on an unseeded local bucket and `mirrorWrites` never creating the upstream bucket are both fixed and both pinned by `conformance/runthrough_pair_test.go`; the workspace backend is in the matrix via the workspace contract. The read-through fix is deliberately **not** applied to the bucket case — a run-through server refuses a bucket it was not given, because fetching any bucket the upstream credential can see would hand the agent the credential it is promised not to hold.
 
 ## Goal
