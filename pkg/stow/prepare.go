@@ -45,6 +45,16 @@ type PrepareOptions struct {
 	Inputs                 []WorkspaceInput     `json:"inputs,omitempty"`
 	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
 	IncludeSensitiveInputs bool                 `json:"include_sensitive_inputs,omitempty"`
+	// MaxWorkspaces refuses this prepare when the registry already holds that many
+	// workspaces. Zero means unlimited, which is the default: a bound nobody asked
+	// for is a bound that fails a legitimate task.
+	//
+	// Unlike MaxCheckpoints, which is recorded on the workspace it bounds, this is
+	// not persisted. The registry is what is being bounded, so storing the cap on any
+	// one entry would make it a property of a workspace rather than of the policy
+	// that declared it, and a caller that forgets the field on the next prepare would
+	// get no bound — which is the unbounded registry this exists to prevent.
+	MaxWorkspaces int64 `json:"max_workspaces,omitempty"`
 }
 
 // WorkspaceTaskManifest is the versioned JSON input accepted by workspace
@@ -59,7 +69,13 @@ type WorkspaceTaskManifest struct {
 	MaxObjects         int64                `json:"max_objects,omitempty"`
 	MaxCheckpointBytes int64                `json:"max_checkpoint_bytes,omitempty"`
 	MaxCheckpoints     int64                `json:"max_checkpoints,omitempty"`
-	TTLSeconds         int64                `json:"ttl_seconds,omitempty"`
+	// MaxWorkspaces bounds how many workspaces this registry may hold. Zero means
+	// unlimited. It is declared per prepare rather than stored on the registry,
+	// because the thing being bounded is the registry and the thing declaring the
+	// policy is the caller: a bound that lived only in the registry would be written
+	// once by whoever found the problem and read by nobody.
+	MaxWorkspaces int64 `json:"max_workspaces,omitempty"`
+	TTLSeconds    int64 `json:"ttl_seconds,omitempty"`
 	// Team files the workspace under one team's partition of the registry. On a
 	// shared runner this is what keeps one job's workspaces, checkpoints, and
 	// sweeps away from another's, and it is recorded in the manifest so the
@@ -80,6 +96,34 @@ type PreparedWorkspace struct {
 	SeededObjects    int64
 	BaseIdentity     string
 	Repositories     []PreparedRepository
+	// RegistryEntries is how many workspaces the registry held when this one was
+	// added, so a caller can see its headroom instead of discovering the bound by
+	// being refused. It is counted only when a bound is declared; a prepare with no
+	// bound reports zero rather than paying for a read nothing will use.
+	RegistryEntries int64
+	// MaxWorkspaces is the bound that was applied, echoed so a caller reading only
+	// the result knows which policy produced the count above.
+	MaxWorkspaces int64
+}
+
+// discardOnFailure removes a workspace this call created but did not finish, and
+// folds any cleanup failure into the error that caused it.
+//
+// Both failures are reported together rather than one overwriting the other, because
+// a caller seeing only "cleanup failed" cannot tell whether the prepare failed for
+// its own reason or succeeded and was then torn down. A committed workspace is left
+// alone, which is the whole reason the flag is a pointer: the defer closes over it
+// and sees the final value.
+func discardOnFailure(resultErr error, ws *Workspace, committed *bool) error {
+	if *committed || resultErr == nil {
+		return resultErr
+	}
+	closeErr := ws.Close()
+	destroyErr := ws.Destroy(context.Background())
+	if closeErr != nil || destroyErr != nil {
+		return fmt.Errorf("%w (cleanup close: %v; cleanup destroy: %v)", resultErr, closeErr, destroyErr)
+	}
+	return resultErr
 }
 
 // PrepareWorkspace creates a Stow-owned workspace, stages declared local files
@@ -97,6 +141,12 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 	if err != nil {
 		return nil, err
 	}
+	// Before anything is created, so a refusal costs a command rather than a
+	// half-made workspace and a cleanup.
+	entries, err := checkWorkspaceRetention(options.RegistryDir, options.Team, options.MaxWorkspaces)
+	if err != nil {
+		return nil, err
+	}
 	if options.Authority == nil {
 		localAuthority := ReadWrite()
 		options.Authority = &localAuthority
@@ -106,16 +156,7 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 		return nil, err
 	}
 	committed := false
-	defer func() {
-		if committed {
-			return
-		}
-		closeErr := ws.Close()
-		destroyErr := ws.Destroy(context.Background())
-		if closeErr != nil || destroyErr != nil {
-			resultErr = fmt.Errorf("%w (cleanup close: %v; cleanup destroy: %v)", resultErr, closeErr, destroyErr)
-		}
-	}()
+	defer func() { resultErr = discardOnFailure(resultErr, ws, &committed) }()
 
 	bytes, objects, repositories, err := seedPreparedWorkspace(root, options)
 	if err != nil {
@@ -137,7 +178,12 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 		return nil, fmt.Errorf("stow: fingerprint prepared inputs: %w", err)
 	}
 	committed = true
-	return &PreparedWorkspace{Workspace: ws, WorkingDirectory: workingDirectory, SeededBytes: bytes, SeededObjects: objects, BaseIdentity: baseIdentity, Repositories: repositories}, nil
+	return &PreparedWorkspace{
+		Workspace: ws, WorkingDirectory: workingDirectory,
+		SeededBytes: bytes, SeededObjects: objects, BaseIdentity: baseIdentity,
+		Repositories:    repositories,
+		RegistryEntries: entries + 1, MaxWorkspaces: options.MaxWorkspaces,
+	}, nil
 }
 
 func seedPreparedWorkspace(root string, options PrepareOptions) (int64, int64, []PreparedRepository, error) {
@@ -301,177 +347,4 @@ func workspaceFingerprint(root string) (string, error) {
 		return "", err
 	}
 	return "sha256:" + hex.EncodeToString(hash.Sum(nil)), nil
-}
-
-func safeDestination(root, destination string) (string, error) {
-	if destination == "" {
-		destination = "."
-	}
-	if filepath.IsAbs(destination) || strings.Contains(destination, `\`) {
-		return "", fmt.Errorf("must be relative")
-	}
-	for _, segment := range strings.Split(filepath.ToSlash(destination), "/") {
-		if segment == ".." {
-			return "", fmt.Errorf("must not contain parent-directory traversal")
-		}
-		if segment != "" && segment != "." && !validPortablePathSegment(segment) {
-			return "", fmt.Errorf("contains a path segment that is not portable")
-		}
-	}
-	clean := filepath.Clean(destination)
-	if clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
-		return "", fmt.Errorf("must not escape the workspace")
-	}
-	first := strings.Split(clean, string(filepath.Separator))[0]
-	if strings.EqualFold(first, ".stow") {
-		return "", fmt.Errorf(".stow is reserved")
-	}
-	resolved := filepath.Join(root, clean)
-	rel, err := filepath.Rel(root, resolved)
-	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-		return "", fmt.Errorf("must not escape the workspace")
-	}
-	return resolved, nil
-}
-
-func validPortableRelativePath(path string) bool {
-	if path == "" || filepath.IsAbs(path) || strings.Contains(path, `\`) {
-		return false
-	}
-	for _, segment := range strings.Split(filepath.ToSlash(path), "/") {
-		if segment == "" || segment == "." || segment == ".." || !validPortablePathSegment(segment) {
-			return false
-		}
-	}
-	return true
-}
-
-type seedContext struct {
-	includeSensitive bool
-	bytes            int64
-	objects          int64
-}
-
-func copySeed(source, destination string, totals *seedContext) error {
-	info, err := os.Lstat(source)
-	if err != nil {
-		return err
-	}
-	if info.Mode()&os.ModeSymlink != 0 {
-		return fmt.Errorf("symbolic link inputs are not supported")
-	}
-	if info.IsDir() {
-		return copySeedDirectory(source, destination, totals)
-	}
-	if !totals.includeSensitive && sensitiveSeedPath(filepath.Base(source)) {
-		return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", filepath.Base(source))
-	}
-	return copySeedFile(source, destination, info, totals)
-}
-
-func copySeedDirectory(source, destination string, totals *seedContext) error {
-	if err := os.MkdirAll(destination, 0o755); err != nil {
-		return err
-	}
-	return filepath.WalkDir(source, func(path string, entry os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if path == source {
-			return nil
-		}
-		rel, err := filepath.Rel(source, path)
-		if err != nil {
-			return err
-		}
-		if !validPortableRelativePath(rel) {
-			return fmt.Errorf("input path is not portable: %q", rel)
-		}
-		return copySeedEntry(source, destination, path, entry, totals)
-	})
-}
-
-func copySeedEntry(sourceRoot, destinationRoot, path string, entry os.DirEntry, totals *seedContext) error {
-	relative, err := filepath.Rel(sourceRoot, path)
-	if err != nil {
-		return err
-	}
-	destination := filepath.Join(destinationRoot, relative)
-	info, err := entry.Info()
-	if err != nil {
-		return err
-	}
-	if info.Mode()&os.ModeSymlink != 0 {
-		return fmt.Errorf("symbolic link input %s is not supported", path)
-	}
-	if entry.IsDir() {
-		return os.MkdirAll(destination, 0o755)
-	}
-	if !totals.includeSensitive && sensitiveSeedPath(relative) {
-		return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", relative)
-	}
-	return copySeedFile(path, destination, info, totals)
-}
-
-func sensitiveSeedPath(path string) bool {
-	clean := strings.ToLower(filepath.ToSlash(path))
-	base := filepath.Base(clean)
-	return sensitiveSeedBasename(base) || sensitiveSeedLocation(clean)
-}
-
-func sensitiveSeedBasename(base string) bool {
-	return base == ".env" || strings.HasPrefix(base, ".env.") ||
-		base == ".npmrc" || base == ".netrc" || base == "credentials" ||
-		base == "credentials.json" || base == "service-account.json" ||
-		base == "id_rsa" || strings.HasPrefix(base, "id_rsa.") ||
-		base == "id_ed25519" || strings.HasPrefix(base, "id_ed25519.") ||
-		strings.HasSuffix(base, ".pem") || strings.HasSuffix(base, ".key") ||
-		strings.HasSuffix(base, ".p12") || strings.HasSuffix(base, ".pfx")
-}
-
-func sensitiveSeedLocation(clean string) bool {
-	return hasPathPrefix(clean, ".aws/credentials") || hasPathSegment(clean, ".aws/credentials") ||
-		hasPathPrefix(clean, ".ssh/") || hasPathSegment(clean, ".ssh/") ||
-		hasPathPrefix(clean, ".config/gcloud/credentials.db") || hasPathSegment(clean, ".config/gcloud/credentials.db")
-}
-
-func hasPathPrefix(path, prefix string) bool {
-	return strings.HasPrefix(path, prefix)
-}
-
-func hasPathSegment(path, segment string) bool {
-	return strings.Contains(path, "/"+segment)
-}
-
-func copySeedFile(source, destination string, info os.FileInfo, totals *seedContext) error {
-	if !info.Mode().IsRegular() {
-		return fmt.Errorf("only regular files and directories are supported: %s", source)
-	}
-	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
-		return err
-	}
-	in, err := os.Open(source)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-	out, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, info.Mode().Perm()&0o755)
-	if err != nil {
-		return err
-	}
-	n, copyErr := io.Copy(out, in)
-	closeErr := out.Close()
-	if copyErr != nil {
-		return copyErr
-	}
-	if closeErr != nil {
-		return closeErr
-	}
-	maxInt64 := int64(^uint64(0) >> 1)
-	if n > maxInt64-totals.bytes || totals.objects == maxInt64 {
-		return fmt.Errorf("seeded totals exceed supported limits")
-	}
-	totals.bytes += n
-	totals.objects++
-	return nil
 }

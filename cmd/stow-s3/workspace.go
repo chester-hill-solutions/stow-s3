@@ -41,11 +41,26 @@ type workspaceCapabilities struct {
 	Multipart        bool                      `json:"multipart"`
 	Upstream         bool                      `json:"upstream"`
 	CheckpointLimits checkpointRetentionLimits `json:"checkpoint_limits"`
+	// RegistryBound is the workspace count limit that was applied and how much of it
+	// this prepare used, so an agent can see its remaining headroom from the result
+	// instead of learning the bound by being refused. Both are zero when no bound was
+	// declared, which is the unbounded default.
+	RegistryBound registryBound `json:"registry_bound"`
 }
 
 type checkpointRetentionLimits struct {
 	MaxBytes int64 `json:"max_bytes"`
 	MaxCount int64 `json:"max_count"`
+}
+
+type registryBound struct {
+	MaxWorkspaces int64 `json:"max_workspaces"`
+	InUse         int64 `json:"in_use"`
+	// Remaining is what is left before the next prepare is refused. It is negative
+	// never and equal to zero when the registry is exactly full, so a caller that
+	// branches on it is branching on headroom rather than on a comparison it has to
+	// reconstruct.
+	Remaining int64 `json:"remaining"`
 }
 
 // registrySelection is what a caller asked for on the command line: a root, and
@@ -133,6 +148,11 @@ func workspaceUsage() string {
 var helpFlag = map[string]bool{"-h": true, "--h": true, "-help": true, "--help": true, "help": true}
 
 func workspaceCommand(args []string) error {
+	// Ahead of the verb table: `workspace --version` names no verb.
+	if versionRequested(args) {
+		printVersion(os.Stdout, true)
+		return nil
+	}
 	if len(args) == 0 {
 		return errors.New(workspaceUsage())
 	}
@@ -192,6 +212,13 @@ func prepareWorkspaceCommand(args []string) error {
 	defer prepared.Workspace.Close()
 	result := makeWorkspaceResult(prepared.Workspace, prepared.SeededBytes, prepared.SeededObjects)
 	result.Team = manifest.Team
+	// Set here rather than in makeWorkspaceResult, which three other verbs share and
+	// none of which has a bound: only a prepare that asked for one has a count.
+	result.Capabilities.RegistryBound = registryBound{
+		MaxWorkspaces: prepared.MaxWorkspaces,
+		InUse:         prepared.RegistryEntries,
+		Remaining:     prepared.MaxWorkspaces - prepared.RegistryEntries,
+	}
 	result.RegistryDir, err = stow.ResolveRegistryDir(manifest.RegistryDir, manifest.Team)
 	if err != nil {
 		return err
@@ -218,7 +245,8 @@ func readWorkspaceManifest(path string) (stow.WorkspaceTaskManifest, error) {
 	if manifest.Version != 1 {
 		return manifest, fmt.Errorf("unsupported task manifest version %d (supported: 1)", manifest.Version)
 	}
-	if manifest.MaxBytes < 0 || manifest.MaxObjects < 0 || manifest.MaxCheckpointBytes < 0 || manifest.MaxCheckpoints < 0 || manifest.TTLSeconds < 0 {
+	if manifest.MaxBytes < 0 || manifest.MaxObjects < 0 || manifest.MaxCheckpointBytes < 0 ||
+		manifest.MaxCheckpoints < 0 || manifest.MaxWorkspaces < 0 || manifest.TTLSeconds < 0 {
 		return manifest, errors.New("task manifest limits and TTL must not be negative")
 	}
 	base, err := filepath.Abs(filepath.Dir(path))
@@ -262,6 +290,7 @@ func prepareWorkspaceFromManifest(manifest stow.WorkspaceTaskManifest) (*stow.Pr
 		Inputs:                 manifest.Inputs,
 		Repositories:           manifest.Repositories,
 		IncludeSensitiveInputs: manifest.IncludeSensitiveInputs,
+		MaxWorkspaces:          manifest.MaxWorkspaces,
 	})
 	if err != nil {
 		return nil, err
