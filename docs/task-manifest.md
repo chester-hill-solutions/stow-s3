@@ -26,6 +26,7 @@ starts its agent with the returned `working_directory` as the process cwd.
   "max_checkpoints": 20,
   "ttl_seconds": 604800,
   "registry_dir": "../stow-registry",
+  "team": "platform",
   "include_sensitive_inputs": false
 }
 ```
@@ -67,6 +68,14 @@ and has no upstream access. It returns no S3 credentials. A same-machine
 handoff reference can be printed with
 `stow-s3 workspace handoff --id <workspace-id> --output handoff.json` and
 resumed with `stow-s3 workspace resume --handoff handoff.json`.
+
+`team` partitions the registry: the workspace and its checkpoints are filed under
+`<registry_dir>/teams/<team>`, so two jobs sharing one machine cannot resume,
+list, or collect each other's workspaces. It is a directory, not a label — a
+sweep in one partition does not see the other — and it names an organization, not
+an identity, so it carries no authorization of its own. Omit it and the
+workspace is filed at the registry root, which is where every workspace that
+predates the field already is.
 
 Create an immutable snapshot with `stow-s3 workspace checkpoint --id <id>`.
 Compare two snapshots with

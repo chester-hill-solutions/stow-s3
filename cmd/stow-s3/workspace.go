@@ -22,6 +22,7 @@ type workspaceResult struct {
 	Bucket           string                    `json:"bucket"`
 	CheckpointID     string                    `json:"checkpoint_id,omitempty"`
 	RegistryDir      string                    `json:"registry_dir,omitempty"`
+	Team             string                    `json:"team,omitempty"`
 	SeededBytes      int64                     `json:"seeded_bytes,omitempty"`
 	SeededObjects    int64                     `json:"seeded_objects,omitempty"`
 	BaseIdentity     string                    `json:"base_identity,omitempty"`
@@ -45,11 +46,45 @@ type checkpointRetentionLimits struct {
 	MaxCount int64 `json:"max_count"`
 }
 
+// registrySelection is what a caller asked for on the command line: a root, and
+// optionally a partition inside it.
+type registrySelection struct {
+	dir  string
+	team string
+}
+
+// resolve turns the selection into one directory. An override team replaces the
+// flagged one, which is how a handoff document's partition wins over a flag that
+// merely repeats it.
+func (r registrySelection) resolve(overrideTeam string) (string, error) {
+	team := r.team
+	if overrideTeam != "" {
+		team = overrideTeam
+	}
+	return stow.ResolveRegistryDir(r.dir, team)
+}
+
+// registryFlag registers the pair of flags every registry-scoped verb takes, and
+// returns the reader that reports what was asked for.
+//
+// A team is a partition of the registry directory, so a verb that addresses a
+// workspace without both flags can only reach the root, and a caller holding a
+// team's workspace ID would have to spell the partition by hand — `teams/<name>`
+// in a path, from a caller, in every script. That leaves the feature present only
+// on the verbs where somebody remembered to add it, so the pair is registered in
+// one place and every verb resolves it the same way.
+func registryFlag(flags *flag.FlagSet) func() registrySelection {
+	dir := flags.String("registry-dir", "", "Workspace registry directory")
+	team := flags.String("team", "", "Team partition within the registry directory")
+	return func() registrySelection { return registrySelection{dir: *dir, team: *team} }
+}
+
 type workspaceHandoff struct {
 	Version      int    `json:"version"`
 	WorkspaceID  string `json:"workspace_id"`
 	CheckpointID string `json:"checkpoint_id,omitempty"`
-	RegistryDir  string `json:"registry_dir"`
+	RegistryDir  string `json:"registry_dir,omitempty"`
+	Team         string `json:"team,omitempty"`
 }
 
 type checkpointResult struct {
@@ -110,12 +145,10 @@ func prepareWorkspaceCommand(args []string) error {
 	}
 	defer prepared.Workspace.Close()
 	result := makeWorkspaceResult(prepared.Workspace, prepared.SeededBytes, prepared.SeededObjects)
-	result.RegistryDir = manifest.RegistryDir
-	if result.RegistryDir == "" {
-		result.RegistryDir, err = stow.DefaultWorkspaceRegistryDir()
-		if err != nil {
-			return err
-		}
+	result.Team = manifest.Team
+	result.RegistryDir, err = stow.ResolveRegistryDir(manifest.RegistryDir, manifest.Team)
+	if err != nil {
+		return err
 	}
 	result.BaseIdentity = prepared.BaseIdentity
 	result.Repositories = prepared.Repositories
@@ -177,6 +210,7 @@ func prepareWorkspaceFromManifest(manifest stow.WorkspaceTaskManifest) (*stow.Pr
 			MaxCheckpointBytes: manifest.MaxCheckpointBytes, MaxCheckpoints: manifest.MaxCheckpoints,
 			TTL:         time.Duration(manifest.TTLSeconds) * time.Second,
 			RegistryDir: manifest.RegistryDir,
+			Team:        manifest.Team,
 		},
 		WorkingDirectory:       manifest.WorkingDirectory,
 		Inputs:                 manifest.Inputs,
@@ -192,33 +226,35 @@ func prepareWorkspaceFromManifest(manifest stow.WorkspaceTaskManifest) (*stow.Pr
 func resumeWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace resume", flag.ContinueOnError)
 	id := flags.String("id", "", "Workspace ID to resume")
-	handoffPath := flags.String("handoff", "", "Read a same-machine workspace handoff reference")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
+	handoffPath := flags.String("handoff", "", "Read a workspace handoff reference")
+	chosen := registryFlag(flags)
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	resolvedID, resolvedRegistryDir, checkpointID, err := resumeIdentifiers(*id, *handoffPath, *registryDir)
+	selection := chosen()
+	resolvedID, resolvedRegistryDir, checkpointID, err := resumeIdentifiers(*id, *handoffPath, selection)
 	if err != nil {
 		return err
 	}
-	*id, *registryDir = resolvedID, resolvedRegistryDir
-	if *id == "" {
+	if resolvedID == "" {
 		return errors.New("workspace resume requires --id or --handoff")
 	}
-	if *registryDir != "" {
-		absolute, err := filepath.Abs(*registryDir)
-		if err != nil {
+	// A handoff reference carries the partition it resolved to, so the team is not
+	// re-applied to it; the directory it names is already the team's. Where the
+	// caller named the flags instead, the selection is what gets resolved.
+	registry := resolvedRegistryDir
+	if registry == "" {
+		if registry, err = selection.resolve(""); err != nil {
 			return err
 		}
-		*registryDir = absolute
 	}
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: *registryDir}, *id)
+	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, resolvedID)
 	if err != nil {
 		return err
 	}
 	defer ws.Close()
 	if checkpointID != "" {
-		manifest, err := stow.LoadCheckpoint(*registryDir, checkpointID)
+		manifest, err := stow.LoadCheckpoint(registry, checkpointID)
 		if err != nil {
 			return err
 		}
@@ -228,22 +264,17 @@ func resumeWorkspaceCommand(args []string) error {
 	}
 	result := makeWorkspaceResult(ws, 0, 0)
 	result.CheckpointID = checkpointID
-	result.RegistryDir = *registryDir
-	if result.RegistryDir == "" {
-		result.RegistryDir, err = stow.DefaultWorkspaceRegistryDir()
-		if err != nil {
-			return err
-		}
-	}
+	result.RegistryDir = registry
+	result.Team = selection.team
 	return writeWorkspaceJSON(result)
 }
 
-func resumeIdentifiers(id, handoffPath, registryDir string) (string, string, string, error) {
+func resumeIdentifiers(id, handoffPath string, selection registrySelection) (string, string, string, error) {
 	if handoffPath == "" {
-		return id, registryDir, "", nil
+		return id, selection.dir, "", nil
 	}
-	if id != "" || registryDir != "" {
-		return "", "", "", errors.New("workspace resume accepts --handoff or --id/--registry-dir, not both")
+	if id != "" || selection.dir != "" || selection.team != "" {
+		return "", "", "", errors.New("workspace resume accepts --handoff or --id/--registry-dir/--team, not both")
 	}
 	data, err := os.ReadFile(handoffPath)
 	if err != nil {
@@ -264,22 +295,27 @@ func resumeIdentifiers(id, handoffPath, registryDir string) (string, string, str
 func handoffWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace handoff", flag.ContinueOnError)
 	id := flags.String("id", "", "Workspace ID to hand off")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
 	checkpointID := flags.String("checkpoint-id", "", "Optional immutable checkpoint to include")
 	output := flags.String("output", "", "Write the local handoff reference to this file")
+	chosen := registryFlag(flags)
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
 	if *id == "" {
 		return errors.New("workspace handoff requires --id")
 	}
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: *registryDir}, *id)
+	selection := chosen()
+	registry, err := selection.resolve("")
+	if err != nil {
+		return err
+	}
+	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, *id)
 	if err != nil {
 		return err
 	}
 	defer ws.Close()
 	if *checkpointID != "" {
-		manifest, err := stow.LoadCheckpoint(*registryDir, *checkpointID)
+		manifest, err := stow.LoadCheckpoint(registry, *checkpointID)
 		if err != nil {
 			return err
 		}
@@ -287,19 +323,12 @@ func handoffWorkspaceCommand(args []string) error {
 			return errors.New("checkpoint belongs to a different workspace")
 		}
 	}
-	registry := *registryDir
-	if registry == "" {
-		registry, err = stow.DefaultWorkspaceRegistryDir()
-		if err != nil {
-			return err
-		}
-	} else {
-		registry, err = filepath.Abs(registry)
-		if err != nil {
-			return err
-		}
-	}
-	return writeWorkspaceJSONTo(*output, workspaceHandoff{Version: 1, WorkspaceID: ws.ID(), CheckpointID: *checkpointID, RegistryDir: registry})
+	// The reference records the partition as well as the directory it resolved to,
+	// so whoever reads it can tell which namespace this workspace belonged to.
+	return writeWorkspaceJSONTo(*output, workspaceHandoff{
+		Version: 1, WorkspaceID: ws.ID(), CheckpointID: *checkpointID,
+		RegistryDir: registry, Team: selection.team,
+	})
 }
 
 func makeWorkspaceResult(ws *stow.Workspace, seededBytes, seededObjects int64) workspaceResult {

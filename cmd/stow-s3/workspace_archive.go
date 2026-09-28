@@ -43,7 +43,7 @@ func previewCheckpointCommand(args []string) error {
 func exportCheckpointCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace export", flag.ContinueOnError)
 	id := flags.String("checkpoint-id", "", "Checkpoint ID to export")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
+	chosen := registryFlag(flags)
 	output := flags.String("output", "", "New archive file path")
 	maxBytes := flags.Int64("max-bytes", 0, "Uncompressed byte cap (0 uses the 1 GiB default)")
 	maxFiles := flags.Int64("max-files", 0, "File count cap (0 uses the 100000-file default)")
@@ -57,7 +57,12 @@ func exportCheckpointCommand(args []string) error {
 	if *maxBytes < 0 || *maxFiles < 0 {
 		return errors.New("workspace export limits must not be negative")
 	}
-	if err := exportCheckpointFile(*registryDir, *id, *output, stow.CheckpointArchiveOptions{
+	selection := chosen()
+	registry, err := selection.resolve("")
+	if err != nil {
+		return err
+	}
+	if err := exportCheckpointFile(registry, *id, *output, stow.CheckpointArchiveOptions{
 		MaxBytes: *maxBytes, MaxFiles: *maxFiles, IncludeSensitiveFiles: *includeSensitive,
 	}); err != nil {
 		return err
@@ -105,7 +110,7 @@ func exportCheckpointFile(registryDir, id, output string, options stow.Checkpoin
 func importCheckpointCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace import", flag.ContinueOnError)
 	archivePath := flags.String("archive", "", "Checkpoint archive file")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
+	chosen := registryFlag(flags)
 	maxBytes := flags.Int64("max-bytes", 0, "Uncompressed byte cap (0 uses the 1 GiB default)")
 	maxFiles := flags.Int64("max-files", 0, "File count cap (0 uses the 100000-file default)")
 	includeSensitive := flags.Bool("include-sensitive", false, "Allow sensitive-looking paths in the archive")
@@ -118,12 +123,17 @@ func importCheckpointCommand(args []string) error {
 	if *maxBytes < 0 || *maxFiles < 0 {
 		return errors.New("workspace import limits must not be negative")
 	}
+	selection := chosen()
+	registry, err := selection.resolve("")
+	if err != nil {
+		return err
+	}
 	file, err := os.Open(*archivePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	checkpoint, err := stow.ImportCheckpoint(context.Background(), *registryDir, file, stow.CheckpointArchiveOptions{
+	checkpoint, err := stow.ImportCheckpoint(context.Background(), registry, file, stow.CheckpointArchiveOptions{
 		MaxBytes: *maxBytes, MaxFiles: *maxFiles, IncludeSensitiveFiles: *includeSensitive,
 	})
 	if err != nil {
@@ -138,7 +148,7 @@ func importCheckpointCommand(args []string) error {
 func checkpointWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace checkpoint", flag.ContinueOnError)
 	id := flags.String("id", "", "Workspace ID to checkpoint")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
+	chosen := registryFlag(flags)
 	parentID := flags.String("parent", "", "Parent checkpoint ID")
 	maxBytes := flags.Int64("max-bytes", 0, "Checkpoint byte cap (0 uses no separate cap)")
 	maxFiles := flags.Int64("max-files", 0, "Checkpoint file cap (0 uses no separate cap)")
@@ -149,7 +159,12 @@ func checkpointWorkspaceCommand(args []string) error {
 	if *id == "" {
 		return errors.New("workspace checkpoint requires --id")
 	}
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: *registryDir}, *id)
+	selection := chosen()
+	registry, err := selection.resolve("")
+	if err != nil {
+		return err
+	}
+	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, *id)
 	if err != nil {
 		return err
 	}
@@ -172,14 +187,19 @@ func diffWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace diff", flag.ContinueOnError)
 	fromID := flags.String("from", "", "Starting checkpoint ID")
 	toID := flags.String("to", "", "Ending checkpoint ID")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
+	chosen := registryFlag(flags)
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
 	if *fromID == "" || *toID == "" {
 		return errors.New("workspace diff requires --from and --to")
 	}
-	changes, err := stow.CompareCheckpoints(*registryDir, *fromID, *toID)
+	selection := chosen()
+	registry, err := selection.resolve("")
+	if err != nil {
+		return err
+	}
+	changes, err := stow.CompareCheckpoints(registry, *fromID, *toID)
 	if err != nil {
 		return err
 	}
@@ -192,7 +212,7 @@ func diffWorkspaceCommand(args []string) error {
 func restoreCheckpointCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace restore", flag.ContinueOnError)
 	checkpointID := flags.String("checkpoint-id", "", "Checkpoint ID to restore")
-	registryDir := flags.String("registry-dir", "", "Workspace registry directory")
+	chosen := registryFlag(flags)
 	root := flags.String("root", "", "New workspace root (must not exist; parent must exist)")
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -200,8 +220,13 @@ func restoreCheckpointCommand(args []string) error {
 	if *checkpointID == "" || *root == "" {
 		return errors.New("workspace restore requires --checkpoint-id and --root")
 	}
-	ws, err := stow.RestoreCheckpoint(*registryDir, *checkpointID, stow.WorkspaceOptions{
-		Dir: *root, RegistryDir: *registryDir,
+	selection := chosen()
+	registry, err := selection.resolve("")
+	if err != nil {
+		return err
+	}
+	ws, err := stow.RestoreCheckpoint(registry, *checkpointID, stow.WorkspaceOptions{
+		Dir: *root, RegistryDir: registry,
 	})
 	if err != nil {
 		return err

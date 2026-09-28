@@ -37,7 +37,19 @@ func ResumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 
 // resumeWith is Resume with options.
 func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
-	registry, err := openRegistry(options.RegistryDir)
+	// The registry is resolved once, and the resolved path is what the reopened
+	// workspace is handed. Passing the unresolved pair through instead would let
+	// the reopened workspace register itself somewhere other than where it was
+	// found — a team workspace re-registered at the registry root is a workspace
+	// two sweeps can now both reach.
+	registryDir, err := ResolveRegistryDir(options.RegistryDir, options.Team)
+	if err != nil {
+		return nil, err
+	}
+	resolved := options
+	resolved.RegistryDir = registryDir
+	resolved.Team = ""
+	registry, err := openRegistry(registryDir, "")
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +57,7 @@ func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 	if err != nil {
 		return nil, err
 	}
-	policy, maxBytes, maxObjects, maxCheckpointBytes, maxCheckpoints, err := resumedPolicy(entry, options)
+	policy, maxBytes, maxObjects, maxCheckpointBytes, maxCheckpoints, err := resumedPolicy(entry, resolved)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +70,8 @@ func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 		MaxCheckpoints:     maxCheckpoints,
 		Authority:          &policy,
 		TTL:                time.Duration(entry.TTLSeconds) * time.Second,
-		RegistryDir:        options.RegistryDir,
-		Now:                options.Now,
+		RegistryDir:        registryDir,
+		Now:                resolved.Now,
 	})
 	if err != nil {
 		return nil, err
@@ -202,7 +214,7 @@ type CollectResult struct {
 // Collect is a no-op with an explanatory error on a host that cannot establish
 // liveness, rather than guessing.
 func Collect(options CollectOptions) ([]CollectResult, error) {
-	registry, err := openRegistry(options.RegistryDir)
+	registry, err := openRegistry(options.RegistryDir, options.Team)
 	if err != nil {
 		return nil, err
 	}
@@ -234,24 +246,72 @@ type CollectOptions struct {
 	// RegistryDir places the machine's workspace registry. Empty takes the
 	// default under the user's configuration directory.
 	RegistryDir string
+	// Team restricts the sweep to one team's partition. Empty sweeps the root
+	// registry, which is every workspace on this machine that is not filed under
+	// a team. A team's workspaces are not visible from the root sweep at all,
+	// which is the point of the partition: one team's TTL must not decide
+	// another team's bytes.
+	Team string
 	// Now is the clock. Empty takes the wall clock; tests set it.
 	Now func() time.Time
 }
 
 // openRegistry opens the workspace registry, creating it if absent.
-func openRegistry(dir string) (*workspace.Registry, error) {
-	if dir == "" {
-		defaultDir, err := workspace.DefaultRegistryDir()
-		if err != nil {
-			return nil, err
-		}
-		dir = defaultDir
+//
+// A team partitions that registry by directory, so it is resolved here rather
+// than at each call site: every path into a registry goes through this function,
+// and a caller that resolved a team by hand anywhere else would be one refactor
+// away from silently reading the machine's root registry instead.
+func openRegistry(dir, team string) (*workspace.Registry, error) {
+	resolved, err := ResolveRegistryDir(dir, team)
+	if err != nil {
+		return nil, err
 	}
-	registry, err := workspace.OpenRegistry(dir)
+	registry, err := workspace.OpenRegistry(resolved)
 	if err != nil {
 		return nil, fmt.Errorf("stow: open workspace registry: %w", err)
 	}
 	return registry, nil
+}
+
+// ResolveRegistryDir is the one rule for where a workspace's metadata lives.
+//
+// A registry directory is the root, and a team is a partition inside it, so the
+// two compose rather than compete: a runner that keeps its workspaces under one
+// directory gives that directory, and a team inside it. An empty team is no team
+// and resolves to the root itself, which is what every caller that never heard
+// of this is already doing.
+func ResolveRegistryDir(dir, team string) (string, error) {
+	base, err := orDefaultRegistryDir(dir)
+	if err != nil {
+		return "", err
+	}
+	if base == "" {
+		return base, nil
+	}
+	// Absolute, because the answer is recorded in a handoff reference and read by
+	// the next process. A relative registry directory means one thing to the
+	// process that wrote it and another to the one that reads it, and the
+	// difference is a workspace nobody can find.
+	absolute, err := filepath.Abs(base)
+	if err != nil {
+		return "", fmt.Errorf("stow: resolve registry directory: %w", err)
+	}
+	if team == "" {
+		return absolute, nil
+	}
+	return workspace.TeamRegistryDir(absolute, team)
+}
+
+func orDefaultRegistryDir(dir string) (string, error) {
+	if dir != "" {
+		return dir, nil
+	}
+	defaultDir, err := workspace.DefaultRegistryDir()
+	if err != nil {
+		return "", err
+	}
+	return defaultDir, nil
 }
 
 // DefaultWorkspaceRegistryDir reports where this host stores local workspace
@@ -260,11 +320,21 @@ func DefaultWorkspaceRegistryDir() (string, error) {
 	return workspace.DefaultRegistryDir()
 }
 
+// DefaultWorkspaceRegistryDirForTeam reports where a named team's workspace
+// references live on this host.
+func DefaultWorkspaceRegistryDirForTeam(team string) (string, error) {
+	base, err := workspace.DefaultRegistryDir()
+	if err != nil {
+		return "", err
+	}
+	return workspace.TeamRegistryDir(base, team)
+}
+
 // register records a workspace so a later process can resume it. A failure to
 // register is reported rather than swallowed: an unregistered workspace cannot
 // be resumed, and the caller is the only one who can decide that is acceptable.
 func (w *Workspace) register(registryDir string, ttlSeconds int64) error {
-	registry, err := openRegistry(registryDir)
+	registry, err := openRegistry(registryDir, "")
 	if err != nil {
 		return err
 	}

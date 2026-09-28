@@ -133,6 +133,7 @@ saying which member lands in which phase is more useful than a promise:
 | `Destroy` | **Shipped** in Go, with the adoption guard it required | W3 |
 | `open` / `resume` selected by one argument | **Shipped** in Go, via the registry | W4 |
 | `Touch`, a registry on disk, and TTL collection | **Shipped** in Go, refusing live and adopted workspaces | W4 |
+| Team partitions of the registry | **Shipped** in Go, as directories rather than labels | — |
 | `Facade` | Not yet. A workspace speaks no S3 today | W5 |
 | TypeScript and Python workspace lifecycle objects | Not yet. `workspace` CLI wrappers are shipped, but they return JSON command results rather than in-process `openWorkspace` handles | Future API phase |
 | A workspace on a host with no filesystem | **Not possible, and not planned.** This contract describes a real directory; a host without one cannot provide it | — |
@@ -445,6 +446,13 @@ are the first two cases written and the first two run.
 - **Multi-writer coordination.** stow does not lock the directory. Two agents
   writing concurrently is allowed and last-writer-wins per key, which is the
   same guarantee the record store gives.
+- **A team is a partition, not an identity.** `Team` files a workspace under
+  `<registry>/teams/<name>`, so two teams sharing a machine cannot see or sweep
+  each other's entries or checkpoints. It carries no identity, no credentials, and
+  no authorization: on a machine where every caller is the same user, the
+  partition is organization, not security. It exists because a shared CI runner
+  runs two jobs and one job's TTL must not decide the other's bytes, not because
+  the two are strangers.
 - **Session liveness is not available on every host.** A workspace is reclaimed
   only when stow can *establish* that no live session holds it, and it establishes
   that with an advisory file lock. Where the platform has no such lock — Windows

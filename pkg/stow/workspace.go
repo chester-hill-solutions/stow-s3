@@ -82,6 +82,12 @@ type WorkspaceOptions struct {
 	// default under the user's configuration directory. Tests set it so they
 	// never touch a real one.
 	RegistryDir string
+	// Team files this workspace under one team's partition of the registry, so
+	// two teams sharing a machine — two jobs on one CI runner, say — never see
+	// each other's workspaces, checkpoints, or sweeps. It is a directory
+	// partition, not a label: RegistryDir is the root and Team is a directory
+	// inside it, so the two compose.
+	Team string
 	// Now is injectable for tests.
 	Now   func() time.Time
 	owned bool
@@ -166,7 +172,16 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		_ = ws.Close()
 		return nil, fmt.Errorf("stow: create workspace bucket: %w", err)
 	}
-	if err := ws.register(options.RegistryDir, int64(options.TTL.Seconds())); err != nil {
+	// The registry directory is resolved once, here, and the resolved path is what
+	// gets recorded. Resolving it per consumer would let the workspace's own entry
+	// and a later resume disagree about which partition this workspace belongs to,
+	// and a disagreement about a namespace is not recoverable by retrying.
+	registryDir, err := ResolveRegistryDir(options.RegistryDir, options.Team)
+	if err != nil {
+		_ = ws.Close()
+		return nil, err
+	}
+	if err := ws.register(registryDir, int64(options.TTL.Seconds())); err != nil {
 		_ = ws.Close()
 		return nil, err
 	}

@@ -50,19 +50,25 @@ type PrepareOptions struct {
 // WorkspaceTaskManifest is the versioned JSON input accepted by workspace
 // preparation tools. The path naming an input is local to the preparing host.
 type WorkspaceTaskManifest struct {
-	Version                int                  `json:"version"`
-	Root                   string               `json:"root"`
-	WorkingDirectory       string               `json:"working_directory,omitempty"`
-	Inputs                 []WorkspaceInput     `json:"inputs,omitempty"`
-	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
-	MaxBytes               int64                `json:"max_bytes,omitempty"`
-	MaxObjects             int64                `json:"max_objects,omitempty"`
-	MaxCheckpointBytes     int64                `json:"max_checkpoint_bytes,omitempty"`
-	MaxCheckpoints         int64                `json:"max_checkpoints,omitempty"`
-	TTLSeconds             int64                `json:"ttl_seconds,omitempty"`
-	RegistryDir            string               `json:"registry_dir,omitempty"`
-	Bucket                 string               `json:"bucket,omitempty"`
-	IncludeSensitiveInputs bool                 `json:"include_sensitive_inputs,omitempty"`
+	Version            int                  `json:"version"`
+	Root               string               `json:"root"`
+	WorkingDirectory   string               `json:"working_directory,omitempty"`
+	Inputs             []WorkspaceInput     `json:"inputs,omitempty"`
+	Repositories       []GitRepositoryInput `json:"repositories,omitempty"`
+	MaxBytes           int64                `json:"max_bytes,omitempty"`
+	MaxObjects         int64                `json:"max_objects,omitempty"`
+	MaxCheckpointBytes int64                `json:"max_checkpoint_bytes,omitempty"`
+	MaxCheckpoints     int64                `json:"max_checkpoints,omitempty"`
+	TTLSeconds         int64                `json:"ttl_seconds,omitempty"`
+	// Team files the workspace under one team's partition of the registry. On a
+	// shared runner this is what keeps one job's workspaces, checkpoints, and
+	// sweeps away from another's, and it is recorded in the manifest so the
+	// partitioning is declared where the workspace is asked for rather than
+	// inferred by whoever resumes it.
+	Team                   string `json:"team,omitempty"`
+	RegistryDir            string `json:"registry_dir,omitempty"`
+	Bucket                 string `json:"bucket,omitempty"`
+	IncludeSensitiveInputs bool   `json:"include_sensitive_inputs,omitempty"`
 }
 
 // PreparedWorkspace is the ready-to-launch result. WorkingDirectory is the

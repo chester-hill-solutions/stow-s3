@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -64,6 +65,56 @@ func DefaultRegistryDir() (string, error) {
 		return "", fmt.Errorf("workspace: locate config directory: %w", err)
 	}
 	return filepath.Join(base, "stow-s3", "workspaces"), nil
+}
+
+// TeamRegistryDir is the registry root for one team: a directory beneath the
+// machine's registry that holds that team's entries and that team's checkpoints,
+// and nothing of anybody else's.
+//
+// It is a partition of the directory rather than a field on the entry, and that
+// choice is the whole point. A label recorded on an entry is a label: `All` would
+// still return every team's workspaces, a sweep would still consider them, and
+// two teams sharing a runner would still be one namespace with extra steps. A
+// partition is enforced by the filesystem, so a team cannot be resumed, collected,
+// or checkpointed from outside its own root, and no code path has to remember to
+// check.
+//
+// The root registry is unaffected. Its entries sit beside the `teams` directory,
+// which `All` already skips because it ignores subdirectories, so a machine that
+// never names a team behaves exactly as it did.
+func TeamRegistryDir(base, team string) (string, error) {
+	if base == "" {
+		var err error
+		if base, err = DefaultRegistryDir(); err != nil {
+			return "", err
+		}
+	}
+	if !ValidTeamName(team) {
+		return "", fmt.Errorf("workspace: %q is not a usable team name", team)
+	}
+	return filepath.Join(base, "teams", team), nil
+}
+
+// ValidTeamName reports whether a team can be a directory name.
+//
+// The rules are the portable-path-segment rules the rest of this package already
+// applies to checkpoint paths, for the same reason: a team becomes a directory
+// that entries are filed under, so a name that can climb out of its namespace or
+// that is not portable across the machines that share it is refused rather than
+// sanitised. A sanitised name is a name two callers did not agree on.
+func ValidTeamName(team string) bool {
+	if team == "" || len(team) > 64 || team == "." || team == ".." {
+		return false
+	}
+	for _, r := range team {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9':
+		case r == '-', r == '_', r == '.':
+		default:
+			return false
+		}
+	}
+	return !strings.HasPrefix(team, ".")
 }
 
 // OpenRegistry opens the registry at dir, creating it if absent.
