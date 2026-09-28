@@ -1,6 +1,7 @@
 ---
 ---
 status: accepted
+decision_digest: cd06bc5411c3fbe9
 relates_to: 0004, 0007, 0009, 0010
 ---
 

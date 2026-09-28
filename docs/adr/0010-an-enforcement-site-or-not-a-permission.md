@@ -1,6 +1,7 @@
 ---
 ---
 status: accepted
+decision_digest: fd14bf057a343e4d
 ---
 
 # A permission that is not checked is not a permission

@@ -1,6 +1,7 @@
 ---
 ---
 status: accepted
+decision_digest: 5c21a54c68397ba5
 ---
 
 # The workspace is the default; S3 is an opt-in facade

@@ -61,14 +61,23 @@ That is the whole argument for two rules:
 An ADR may be edited, and editing one is the normal case rather than an exception. What
 the gate requires is that the edit be visible:
 
-- bump `amended:` to the date of the change;
 - add a dated entry under the ADR's `## Amendments` section saying **what changed and
   why** — a reader who disagrees with the change needs the reason more than the diff;
+- bump `amended:` to the date;
+- re-run `node scripts/check-adr-index.mjs --write-digests` to re-record
+  `decision_digest:`, which is a hash of the decision prose;
 - update the row in the table above if the status changed.
 
-A change to the decision text that does none of those fails `make check-adr-index`. That
-is the friction, and it is deliberately small: it costs three lines, and it means no
-reader can find a decision that quietly became something else.
+`decision_digest` is what makes the friction mechanical. Change an ADR's decision
+without re-recording it and the gate fails with both hashes in the message. It is a
+digest rather than a comparison against git history because a history comparison
+cannot be validated in the commit that changes what it measures — every ADR would
+differ from a parent that predates the digest, so the check would pass everything
+exactly once and start working afterwards. A digest is self-contained and survives a
+shallow clone.
+
+The cost is four lines. The guarantee is that no reader can find a decision that
+quietly became something else.
 
 ## Adding an ADR
 

@@ -64,9 +64,12 @@ them, which is the intent. Three are load-bearing for E2 and E4:
 - **ADR 0012** — a run-through server serves the buckets it was given. E4's "the
   executor must not inherit upstream credentials" is the same boundary at the executor.
 
-**ADR 0013 is the natural home for E1's TaskSpec/Session/Attempt/Artifact ADR.** It
-must state its relationship to workspace IDs and scoped S3 sessions rather than
-inventing a third identity, or this plan will build the layer E0 exists to prevent.
+**ADR 0013 is E1's TaskSpec/Session/Attempt/Artifact decision**, and it is written. Its
+load-bearing answer to the risk named above: an attempt is a fourth identity rather
+than a third kind of the existing two, a session *is* a workspace rather than a new
+container, and a retry is always a new attempt ID with its meaning stated rather than
+inferred. One thing it deliberately makes impossible is expressing "the same attempt,
+again" — identity the caller can choose is identity the caller can collide.
 
 ### One thing this plan gets right that the gates do not
 
@@ -190,7 +193,8 @@ Purpose: give every caller the same vocabulary before adding a runner.
 
 - Write an ADR for TaskSpec, Session, Attempt, and Artifact semantics, including
   identity, ownership, lifecycle, retry, and compatibility with existing workspace IDs
-  and scoped S3 sessions. **This is ADR 0013; it has not been written.**
+  and scoped S3 sessions. **Written:**
+  [ADR 0013](adr/0013-task-session-attempt-artifact.md).
 - Define a versioned task specification for declared inputs, working directory,
   command and arguments, environment allowlist, secret references, timeout, output
   paths, and requested capabilities. Do not put secret values or implicit host

@@ -1,6 +1,7 @@
 ---
 ---
 status: accepted
+decision_digest: 9232fb24252fbd75
 ---
 
 # Agent session contract

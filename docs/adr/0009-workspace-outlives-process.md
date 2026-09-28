@@ -1,6 +1,7 @@
 ---
 ---
 status: accepted
+decision_digest: bea7dbc71eb0c63d
 ---
 
 # A workspace outlives the process that created it

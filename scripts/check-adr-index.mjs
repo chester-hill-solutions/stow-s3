@@ -17,9 +17,9 @@
 // drift cases fail. It does not prevent an ADR from being edited — that is the point
 // of a sprint artifact — it requires the edit to be recorded.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve, basename } from "node:path";
-import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const adrDir = resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "docs", "adr");
@@ -57,13 +57,42 @@ export function parseAdr(text, file) {
     supersededBy: frontmatter.superseded_by,
     narrowedBy: frontmatter.narrowed_by,
     amended: frontmatter.amended,
+    decisionDigest: frontmatter.decision_digest,
     amendments,
     title: (/^#\s+(.+)$/m.exec(text)?.[1] ?? "").trim(),
+    text,
   };
 }
 
 // adrProblems is the whole rule, as a pure function of the parsed ADRs and the index
 // text, so it can be tested in every state it has rather than only by editing files.
+// decisionText is the prose an amendment would change: the body, with the frontmatter
+// and the Amendments section removed. Those two are where a change is *recorded*, so
+// including them would make the digest change on every amendment even when the
+// decision itself did not — which is the distinction the digest exists to draw.
+function decisionText(text) {
+  const body = text.startsWith("---\n") ? text.slice(text.indexOf("\n---\n", 4) + 5) : text;
+  return body.split(/^##\s+Amendments\s*$/m)[0].trim();
+}
+
+// decisionDigest hashes the prose an amendment would change, so changing it without
+// recording the change is detectable without consulting history.
+//
+// A digest rather than a comparison against git, because a history comparison cannot
+// be validated in the commit that changes what it measures: every ADR differs from a
+// parent that predates the digest, so the check would pass everything exactly once
+// and start working afterwards. A digest is self-contained, survives a shallow clone,
+// and is checkable the moment it is written.
+export function decisionDigest(text) {
+  return createHash("sha256").update(decisionText(text)).digest("hex").slice(0, 16);
+}
+
+function adrsOf() {
+  return readdirSync(adrDir)
+    .filter((name) => /^\d{4}-.*\.md$/.test(name))
+    .map((name) => parseAdr(readFileSync(resolve(adrDir, name), "utf8"), name));
+}
+
 export function adrProblems(adrs, indexText) {
   const problems = [];
   const byId = new Map(adrs.map((adr) => [adr.id, adr]));
@@ -89,6 +118,18 @@ export function adrProblems(adrs, indexText) {
       problems.push(
         `${adr.file}: no "## Amendments" section, so an amended decision and an untouched one look the same`,
       );
+    }
+    if (adr.decisionDigest === undefined) {
+      problems.push(
+        `${adr.file}: no decision_digest, so a change to the decision cannot be told from no change at all`,
+      );
+    } else {
+      const actual = decisionDigest(adr.text);
+      if (adr.decisionDigest !== actual) {
+        problems.push(
+          `${adr.file}: the decision is ${actual} but decision_digest says ${adr.decisionDigest}, so it changed without being recorded — bump amended:, add a dated entry under Amendments, then re-run this gate with --write-digests`,
+        );
+      }
     }
     // A decision that is not in force has to say what replaced it, or it is a file
     // that reads as current and is not. This is the 0001 case.
@@ -150,9 +191,24 @@ export function adrProblems(adrs, indexText) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const adrs = readdirSync(adrDir)
-    .filter((name) => /^\d{4}-.*\.md$/.test(name))
-    .map((name) => parseAdr(readFileSync(resolve(adrDir, name), "utf8"), name));
+  if (process.argv.includes("--write-digests")) {
+    let changed = 0;
+    for (const adr of adrsOf()) {
+      const path = resolve(adrDir, adr.file);
+      const text = readFileSync(path, "utf8");
+      const digest = decisionDigest(text);
+      if (adr.decisionDigest === digest) continue;
+      const next = text.replace(/^(status:.*)$/m, `$1\ndecision_digest: ${digest}`);
+      if (next === text) continue;
+      writeFileSync(path, next);
+      console.log(`  ${adr.file}: ${adr.decisionDigest ?? "(none)"} -> ${digest}`);
+      changed += 1;
+    }
+    console.log(changed === 0 ? "All decision digests already current" : `Updated ${changed}`);
+    process.exit(0);
+  }
+
+  const adrs = adrsOf();
 
   let indexText;
   try {
@@ -173,46 +229,6 @@ function decisionText(text) {
   const body = text.startsWith("---\n") ? text.slice(text.indexOf("\n---\n", 4) + 5) : text;
   return body.split(/^##\s+Amendments\s*$/m)[0].trim();
 }
-
-// The friction: an ADR may be edited, but the edit has to be recorded. This compares
-  // each ADR against the previous commit and fails if the decision text moved without
-  // the `amended` field or the Amendments section following it. A shallow clone has no
-  // parent to compare against, and that is not a reason to fail a gate.
-  const hasParent = (() => {
-    try {
-      execFileSync("git", ["rev-parse", "--verify", "HEAD^"], { stdio: "ignore" });
-      return true;
-    } catch {
-      return false;
-    }
-  })();
-  if (hasParent) {
-    for (const adr of adrs) {
-      if (adr.id === undefined) continue;
-      const path = `docs/adr/${adr.file}`;
-      let before;
-      try {
-        before = execFileSync("git", ["show", `HEAD^:${path}`], {
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "ignore"],
-        });
-      } catch {
-        continue; // New ADR: nothing to compare against.
-      }
-      const after = readFileSync(resolve(adrDir, adr.file), "utf8");
-      const then = parseAdr(before, adr.file);
-      const decisionBefore = decisionText(before);
-      const decisionNow = decisionText(readFileSync(resolve(adrDir, adr.file), "utf8"));
-      if (decisionBefore === decisionNow) continue;
-      if (then.amended !== adr.amended) continue;
-      if (before !== after) {
-        continue; // The Amendments section moved, so the change was recorded.
-      }
-      problems.push(
-        `${adr.file}: the decision text changed against HEAD^ without the amended: field or the Amendments section changing with it, so an amendment would be invisible to a reader`,
-      );
-    }
-  }
 
   if (problems.length > 0) {
     console.error("ADR index and lifecycle do not agree:\n");

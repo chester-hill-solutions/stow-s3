@@ -1,4 +1,4 @@
-.PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-scripts standards check-generated benchmark
+.PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -134,6 +134,12 @@ check-install-surface:
 check-doc-commands:
 	node scripts/check-doc-commands.mjs
 
+# The ADR index and the lifecycle that keeps it true. It is a required check because
+# the drift it catches is invisible from inside any single ADR: a decision that was
+# replaced, described only by the ADR that replaced it.
+check-adr-index:
+	node scripts/check-adr-index.mjs
+
 # The gates under scripts/ are code, and a gate with no test is a gate whose
 # rules are never exercised in the modes they claim to handle. check-install-surface
 # shipped a rule that only misbehaved once every package was published, and the
@@ -141,4 +147,4 @@ check-doc-commands:
 check-scripts:
 	node --test scripts/*.test.mjs
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-install-surface check-doc-commands check-scripts check-ts-quality check-generated
+standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts check-ts-quality check-generated

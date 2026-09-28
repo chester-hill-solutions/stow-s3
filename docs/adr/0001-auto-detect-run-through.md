@@ -1,6 +1,7 @@
 ---
 ---
 status: superseded
+decision_digest: 2550096a7ceb5fe6
 superseded_by: 0011
 ---
 

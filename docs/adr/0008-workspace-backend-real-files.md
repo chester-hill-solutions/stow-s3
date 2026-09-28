@@ -1,6 +1,7 @@
 ---
 ---
 status: accepted
+decision_digest: cb5ff6133ffa3c4f
 ---
 
 # A workspace stores objects as real files, with metadata in one manifest
