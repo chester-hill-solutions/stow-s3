@@ -155,10 +155,45 @@ const contractManifestVersion = 1
 // to the named path and prints nothing else. See contractStep.Returns.
 const contractReturnsFile = "file"
 
+// contractRegistryDirFlags names the verbs the driver points at its own registry
+// directory, because the contract runs every step against one registry and a
+// registry is state.
+//
+// prepare is absent on purpose: its registry comes from the manifest the driver
+// writes. collect and destroy are listed because they take --registry-dir but no
+// --team, so a step reaches a team partition by naming the partition itself, which
+// prepare reports once it has created one.
+//
+// This is a hand-maintained statement about another program's flags, and such a
+// statement drifts. Both directions fail at runtime — a verb handed a flag it does
+// not define says so, and a verb that needs the directory and is not given it
+// reports an empty registry — but at runtime it fails as a step disagreeing with
+// the contract, which names the wrong cause. checkContractRegistryFlags says it at
+// load time, where the cause is the table.
 var contractRegistryDirFlags = map[string]bool{
 	"checkpoint": true, "diff": true, "export": true, "import": true,
 	"restore": true, "resume": true, "handoff": true, "delta": true,
 	"apply": true, "destroy": true, "collect": true, "list": true,
+}
+
+// checkContractRegistryFlags asserts that every step in registry "a" either names
+// its own registry directory or is covered by contractRegistryDirFlags, so a verb
+// added to the case file without a table entry is reported as the missing entry
+// rather than as whatever that verb does when handed the wrong registry.
+func checkContractRegistryFlags(steps []contractStep) []string {
+	var problems []string
+	for _, step := range steps {
+		if step.Registry != contractRegistryA || contractRegistryDirFlags[step.Verb] {
+			continue
+		}
+		if _, declared := step.Args["registry-dir"]; declared || step.Manifest != nil {
+			continue
+		}
+		problems = append(problems, fmt.Sprintf(
+			"the workspace contract step %q runs %q in registry %q, but %q is not in contractRegistryDirFlags and the step declares no registry of its own: the verb would run against the default registry and report an empty one",
+			step.ID, step.Verb, step.Registry, step.Verb))
+	}
+	return problems
 }
 
 var (
@@ -224,6 +259,9 @@ func loadContract(t *testing.T) contract {
 			t.Errorf("the workspace contract step %q declares neither an expectation nor a refusal, so it asserts nothing", step.ID)
 		}
 	}
+	for _, problem := range checkContractRegistryFlags(c.Steps) {
+		t.Error(problem)
+	}
 	return c
 }
 
@@ -261,10 +299,9 @@ func newContractRun(t *testing.T) *contractRun {
 	}
 }
 
-// substitute replaces the {{...}} references a step's arguments may carry. The
-// work directory and every capture are in one namespace, so a capture called
-// "work" would shadow the directory; the case file is the contract and it does not
-// do that.
+// substitute replaces the {{...}} references a step's text may carry. The work
+// directory and every capture are in one namespace, so a capture called "work" would
+// shadow the directory; the case file is the contract and it does not do that.
 func (r *contractRun) substitute(text string) string {
 	for name, value := range r.captures {
 		text = strings.ReplaceAll(text, "{{"+name+"}}", value)
@@ -274,28 +311,133 @@ func (r *contractRun) substitute(text string) string {
 
 var contractCapturePattern = regexp.MustCompile(`\{\{([a-zA-Z0-9_]+)\}\}`)
 
-// substituteArgs substitutes every declared argument and fails on one that names a
-// capture nobody produced. A silently empty argument is a scenario that quietly
-// stopped testing what it says it tests, which is the failure mode a shared
-// contract cannot have.
-func (r *contractRun) substituteArgs(step contractStep) []string {
-	var argv []string
-	for _, name := range sortedArgs(step.Args) {
-		value := r.substitute(step.Args[name])
-		if match := contractCapturePattern.FindStringSubmatch(value); match != nil {
-			if _, ok := r.captures[match[1]]; !ok {
-				r.t.Fatalf("step %q: argument %q refers to {{%s}}, which no earlier step captured",
-					step.ID, name, match[1])
-			}
-		}
-		argv = append(argv, "--"+name, value)
-	}
-	return argv
+// resolve returns the step with every {{...}} reference replaced by the value the
+// named capture holds. A step that arrives resolved has no unresolved text left in
+// it, so a reference nothing captured is a broken case file rather than a silently
+// empty argument.
+//
+// It is one pass, and doing it once is the point. Resolution used to happen wherever
+// a resolved value was wanted — the command line, the registry directory, the
+// manifest, the writes, the document to substitute, and each expectation — and six
+// call sites each remembering to resolve is six chances to forget. One of them
+// already forgot: the registry directory was read from the raw arguments, so a step
+// was pointed at a directory literally named "{{registryA}}", and `collect` reported
+// an empty registry rather than an error. A pass that cannot be skipped deletes that
+// class of bug instead of documenting it.
+//
+// It also covers the expectations, which is not a convenience. A step that expects
+// "the root the manifest named" is stating a fact about the contract, and comparing
+// that against the literal text {{work}}/workspace fails on the substitution rather
+// than on the property the step is about.
+func (r *contractRun) resolve(step contractStep) contractStep {
+	step.Args = r.resolveArgs(step, step.Args)
+	step.Root = r.resolveText(step, "root", step.Root)
+	step.Team = r.resolveText(step, "team", step.Team)
+	step.AlsoWritten = r.resolveText(step, "alsoWritten", step.AlsoWritten)
+	step.Tamper = r.resolveText(step, "tamper", step.Tamper)
+	step.Write = r.resolveWrites(step, step.Write)
+	step.Manifest = r.resolveManifest(step, step.Manifest)
+	step.RenameInTransit = r.resolveRename(step, step.RenameInTransit)
+	step.Expect = r.resolveExpectations(step, step.Expect)
+	return step
 }
 
-// sortedKeys is a map walked in a stable order, so a failure is reported against
-// the first field the case file declares rather than whichever one the runtime
-// happened to yield.
+// resolveText resolves one text and fails on a reference no capture produced.
+// substitute has already replaced every reference it could, so a reference still
+// standing names a capture that does not exist — and handing the verb the literal
+// text is how a step passes without testing the thing it names.
+func (r *contractRun) resolveText(step contractStep, what, text string) string {
+	resolved := r.substitute(text)
+	if match := contractCapturePattern.FindStringSubmatch(resolved); match != nil {
+		if _, ok := r.captures[match[1]]; !ok {
+			r.t.Fatalf("step %q: its %s refers to {{%s}}, which no earlier step captured",
+				step.ID, what, match[1])
+		}
+	}
+	return resolved
+}
+
+// resolveArgs resolves the flags into a new map, so the case file the run loaded is
+// not edited underneath it.
+func (r *contractRun) resolveArgs(step contractStep, args map[string]string) map[string]string {
+	resolved := make(map[string]string, len(args))
+	for name, value := range args {
+		resolved[name] = r.resolveText(step, "argument "+name, value)
+	}
+	return resolved
+}
+
+func (r *contractRun) resolveWrites(step contractStep, writes []contractWrite) []contractWrite {
+	resolved := make([]contractWrite, len(writes))
+	for i, write := range writes {
+		// Body is a literal the case file states rather than a path it names, so it
+		// is the one field here that is left exactly as written.
+		resolved[i] = contractWrite{
+			Path: r.resolveText(step, "write path", write.Path),
+			Body: write.Body,
+		}
+	}
+	return resolved
+}
+
+func (r *contractRun) resolveManifest(step contractStep, spec *contractManifestSpec) *contractManifestSpec {
+	if spec == nil {
+		return nil
+	}
+	resolved := *spec
+	resolved.Root = r.resolveText(step, "manifest root", spec.Root)
+	resolved.Team = r.resolveText(step, "manifest team", spec.Team)
+	resolved.Inputs = make([]contractInput, len(spec.Inputs))
+	for i, input := range spec.Inputs {
+		resolved.Inputs[i] = contractInput{
+			Body:        input.Body,
+			Destination: r.resolveText(step, "input destination", input.Destination),
+		}
+	}
+	return &resolved
+}
+
+// resolveRename resolves only the source. Path names a path inside the transported
+// document and To is the path that document will claim instead; neither is a fact
+// about this machine, so no capture produces either.
+func (r *contractRun) resolveRename(step contractStep, rename *contractRename) *contractRename {
+	if rename == nil {
+		return nil
+	}
+	return &contractRename{
+		From: r.resolveText(step, "rename source", rename.From),
+		Path: rename.Path,
+		To:   rename.To,
+	}
+}
+
+func (r *contractRun) resolveExpectations(step contractStep, expect map[string]contractExpectation) map[string]contractExpectation {
+	resolved := make(map[string]contractExpectation, len(expect))
+	for path, want := range expect {
+		want.Equals = r.resolveValue(step, path, want.Equals)
+		want.NotEquals = r.resolveValue(step, path, want.NotEquals)
+		resolved[path] = want
+	}
+	return resolved
+}
+
+// resolveValue resolves a reference inside an expected value, which the case file
+// states as a JSON string. A value that is not a string is a number, a boolean, an
+// object or an array, and none of those can carry one: every path a capture produces
+// is a string, and a case that buried one inside an object would be stating a fact
+// no capture can supply.
+func (r *contractRun) resolveValue(step contractStep, path string, raw *json.RawMessage) *json.RawMessage {
+	if raw == nil {
+		return nil
+	}
+	text, err := decodeString(*raw)
+	if err != nil {
+		return raw
+	}
+	encoded := r.encodeJSON(r.resolveText(step, "expected "+path, text))
+	return &encoded
+}
+
 // workPath resolves a path a case file names. A bare name means a file in the work
 // directory, so a case can say "handoff.json" rather than repeating the work
 // directory on every artifact; an absolute path is taken as given. Resolving this
@@ -308,21 +450,11 @@ func (r *contractRun) workPath(name string) string {
 	return filepath.Join(r.work, name)
 }
 
-// sortedFieldNames is a map walked in a stable order, so a failure is reported
-// against the first field the case file declares rather than whichever one the
-// runtime happened to yield. The order is part of the contract: three drivers
-// reporting a different "first" failure for the same defect is three bug reports.
-//
-// Two small functions rather than one generic, because the generic's type
-// parameter would need `any` and this repository ratchets against `any`.
 // sortedExpectations and sortedArgs are the two maps the driver walks, each in a
 // stable order so a failure is reported against the first field the case file
 // declares rather than whichever one the runtime happened to yield. The order is
 // part of the contract: three drivers reporting a different "first" failure for the
 // same defect is three bug reports.
-//
-// Two small functions rather than one generic, because the generic's type
-// parameter would need `any` and this repository ratchets against `any`.
 func sortedExpectations(fields map[string]contractExpectation) []string {
 	return slices.Sorted(maps.Keys(fields))
 }

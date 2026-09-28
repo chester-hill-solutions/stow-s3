@@ -22,6 +22,10 @@ type contractOutcome struct {
 }
 
 // perform runs one step and returns what came of it, without judging anything.
+//
+// The step arrives resolved, so nothing here resolves anything. That is the whole
+// reason resolve is a separate pass: every reader of a step's text below can assume
+// it is a real path or a real flag value, and none of them has to remember to ask.
 func (r *contractRun) perform(step contractStep) contractOutcome {
 	r.t.Helper()
 	switch step.Verb {
@@ -29,7 +33,7 @@ func (r *contractRun) perform(step contractStep) contractOutcome {
 		r.applyWrites(step.Write)
 		return contractOutcome{}
 	case "read":
-		return contractOutcome{stdout: r.readTree(r.substitute(step.Root))}
+		return contractOutcome{stdout: r.readTree(step.Root)}
 	case "prepare":
 		return r.performPrepare(step)
 	default:
@@ -37,15 +41,36 @@ func (r *contractRun) perform(step contractStep) contractOutcome {
 	}
 }
 
-func (r *contractRun) performVerb(step contractStep) contractOutcome {
-	r.t.Helper()
-	argv := append([]string{"workspace", step.Verb}, r.substituteArgs(step)...)
-	if dir := r.registryDirFor(step); dir != "" {
-		argv = append(argv, "--registry-dir", dir)
+// argv builds the command line for a verb, and is the only place the registry
+// directory is decided.
+//
+// A step that names --registry-dir is authoritative, and that is how the contract
+// reaches a team partition: prepare reports the partition it created, and collect
+// and destroy — which take --registry-dir but no --team — are pointed straight at
+// it. Every other step in registry "a" gets the driver's own directory plus the
+// step's --team, and the CLI composes the two exactly as it does for a manifest.
+// A driver that reconstructed the partition path itself would be asserting a belief
+// about the store rather than about the verb, and reconstructing it wrongly is
+// silent: the verb reports an empty registry rather than an error.
+func (r *contractRun) argv(step contractStep) []string {
+	argv := []string{"workspace", step.Verb}
+	for _, name := range sortedArgs(step.Args) {
+		argv = append(argv, "--"+name, step.Args[name])
+	}
+	if _, declared := step.Args["registry-dir"]; !declared {
+		if step.Registry == contractRegistryA && contractRegistryDirFlags[step.Verb] {
+			argv = append(argv, "--registry-dir", filepath.Join(r.work, "registry-a"))
+		}
 	}
 	if step.Team != "" {
 		argv = append(argv, "--team", step.Team)
 	}
+	return argv
+}
+
+func (r *contractRun) performVerb(step contractStep) contractOutcome {
+	r.t.Helper()
+	argv := r.argv(step)
 	if step.Tamper != "" {
 		// The refusal has to come from the digest, so the file the verb reads is a
 		// corrupt copy of a document this scenario really produced. A path that
@@ -111,14 +136,13 @@ func (r *contractRun) performPrepare(step contractStep) contractOutcome {
 	r.t.Helper()
 	manifest := contractManifest{
 		Version:     contractManifestVersion,
-		Root:        r.substitute(step.Manifest.Root),
-		Team:        r.substitute(step.Manifest.Team),
+		Root:        step.Manifest.Root,
+		Team:        step.Manifest.Team,
 		RegistryDir: filepath.Join(r.work, "registry-a"),
 	}
 	for _, input := range step.Manifest.Inputs {
-		destination := r.substitute(input.Destination)
 		manifest.Inputs = append(manifest.Inputs, contractManifestInput{
-			Source: r.writeInput(destination, input.Body), Destination: destination,
+			Source: r.writeInput(input.Destination, input.Body), Destination: input.Destination,
 		})
 	}
 	encoded, err := json.Marshal(manifest)
@@ -153,31 +177,6 @@ func (r *contractRun) childEnv() []string {
 		env = append(env, entry)
 	}
 	return env
-}
-
-// registryDirFor names the explicit registry a step works in. The team partition
-// inside it is not resolved here: the step states its team and the CLI composes
-// the two exactly as it does for a manifest, so the driver never has to know the
-// partition layout. Reconstructing it was the earlier approach and it was wrong in
-// the way that matters — a driver that guesses where a team lives will quietly look
-// in the wrong place and report a missing workspace.
-func (r *contractRun) registryDirFor(step contractStep) string {
-	// A step that names --registry-dir itself is authoritative, and that is how the
-	// contract reaches a team partition: prepare reports the partition it created,
-	// and collect and destroy — which take --registry-dir but no --team — are
-	// pointed straight at it. Every other verb gets the driver's own directory plus
-	// the team's --team flag and lets the CLI compose the two, because a driver that
-	// reconstructed the partition path itself would be asserting a belief about the
-	// store rather than about the verb.
-	for _, name := range sortedArgs(step.Args) {
-		if name == "registry-dir" {
-			return r.substitute(step.Args[name])
-		}
-	}
-	if step.Registry != contractRegistryA || !contractRegistryDirFlags[step.Verb] {
-		return ""
-	}
-	return filepath.Join(r.work, "registry-a")
 }
 
 // writeInput materialises one declared input outside the workspace and returns its
@@ -251,7 +250,7 @@ func (r *contractRun) tamper(source, target string) {
 // whole, which is what the step supplies as --expect-sha256.
 func (r *contractRun) renameInTransit(rename *contractRename, target string) {
 	r.t.Helper()
-	raw, err := os.ReadFile(r.workPath(r.substitute(rename.From)))
+	raw, err := os.ReadFile(r.workPath(rename.From))
 	if err != nil {
 		r.t.Fatalf("read %q to substitute it: %v", rename.From, err)
 	}
@@ -298,18 +297,18 @@ func (r *contractRun) renameChange(doc *document, rename *contractRename) bool {
 		if decoded, err := decodeString(change["path"]); err != nil || decoded != rename.Path {
 			continue
 		}
-		change["path"] = encodeJSONString(rename.To)
+		change["path"] = r.encodeJSON(rename.To)
 		if to, ok := change["to"]; ok {
 			var target document
 			if json.Unmarshal(to, &target) == nil {
-				target["path"] = encodeJSONString(rename.To)
-				change["to"] = encodeDocument(target)
+				target["path"] = r.encodeJSON(rename.To)
+				change["to"] = r.encodeJSON(target)
 			}
 		}
-		changes[i] = encodeDocument(change)
+		changes[i] = r.encodeJSON(change)
 		renamed = true
 	}
-	(*doc)["changes"] = encodeChangeList(changes)
+	(*doc)["changes"] = r.encodeJSON(changes)
 	return renamed
 }
 
@@ -329,7 +328,7 @@ func (r *contractRun) moveContent(doc *document, rename *contractRename) bool {
 	}
 	delete(content, rename.Path)
 	content[rename.To] = payload
-	(*doc)["content"] = encodeContentMap(content)
+	(*doc)["content"] = r.encodeJSON(content)
 	return true
 }
 
@@ -351,7 +350,7 @@ func (r *contractRun) applyWrites(writes []contractWrite) {
 		r.t.Fatal("a step writes into the workspace before any step has prepared one")
 	}
 	for _, write := range writes {
-		full := filepath.Join(root, filepath.FromSlash(r.substitute(write.Path)))
+		full := filepath.Join(root, filepath.FromSlash(write.Path))
 		if err := os.MkdirAll(filepath.Dir(full), 0o700); err != nil {
 			r.t.Fatalf("create the parent of %q: %v", write.Path, err)
 		}

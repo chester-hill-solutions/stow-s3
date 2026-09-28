@@ -3,6 +3,7 @@ package stow_test
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -50,16 +51,25 @@ func newListedWorkspace(t *testing.T, registryDir, root, name string) string {
 	return ws.Workspace.ID()
 }
 
+// listed runs a listing and fails the test if it errors, so a test that is about the
+// entries is not also about the envelope. The one test that is about the envelope —
+// the registry a listing says it read — calls List directly.
+func listed(t *testing.T, options stow.ListWorkspacesOptions) []stow.WorkspaceSummary {
+	t.Helper()
+	listing, err := stow.List(options)
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	return listing.Workspaces
+}
+
 func TestListNamesEveryWorkspaceWithoutResumingOne(t *testing.T) {
 	registry := t.TempDir()
 	base := t.TempDir()
 	first := newListedWorkspace(t, registry, filepath.Join(base, "one"), "one")
 	second := newListedWorkspace(t, registry, filepath.Join(base, "two"), "two")
 
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry})
-	if err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	summaries := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry})
 	if len(summaries) != 2 {
 		t.Fatalf("the listing holds %d workspaces, want 2: %+v", len(summaries), summaries)
 	}
@@ -93,10 +103,7 @@ func TestListReportsAWorkspaceWhoseDirectoryIsGone(t *testing.T) {
 		t.Fatalf("remove: %v", err)
 	}
 
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry})
-	if err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	summaries := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry})
 	readable := map[string]bool{}
 	for _, summary := range summaries {
 		readable[summary.ID] = summary.Readable
@@ -124,10 +131,7 @@ func TestListIsOrderedByHowQuietEachWorkspaceIs(t *testing.T) {
 	time.Sleep(1100 * time.Millisecond)
 	newListedWorkspace(t, registry, filepath.Join(base, "two"), "two")
 
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry})
-	if err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	summaries := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry})
 	if len(summaries) != 2 {
 		t.Fatalf("the listing holds %d workspaces, want 2", len(summaries))
 	}
@@ -155,10 +159,7 @@ func TestListOrdersByIdleSecondsUsingAnInjectedClock(t *testing.T) {
 	newListedWorkspace(t, registry, filepath.Join(base, "beta"), "beta")
 
 	now := time.Now()
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry, Now: now.Add(time.Hour)})
-	if err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	summaries := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry, Now: now.Add(time.Hour)})
 	for _, summary := range summaries {
 		// An hour after creation, and neither has been resumed, so both are an hour
 		// idle. Equal values must still produce a stable order rather than depending
@@ -178,10 +179,7 @@ func TestListDistinguishesNoLifetimeFromExpiringNow(t *testing.T) {
 	base := t.TempDir()
 	newListedWorkspace(t, registry, filepath.Join(base, "forever"), "forever")
 
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry})
-	if err != nil {
-		t.Fatalf("list: %v", err)
-	}
+	summaries := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry})
 	if len(summaries) != 1 {
 		t.Fatalf("the listing holds %d workspaces, want 1", len(summaries))
 	}
@@ -221,19 +219,47 @@ func TestListKeepsTeamsApart(t *testing.T) {
 	}
 	_ = other.Workspace.Close()
 
-	platformList, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry, Team: "platform"})
-	if err != nil {
-		t.Fatalf("list platform: %v", err)
-	}
+	platformList := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry, Team: "platform"})
 	if len(platformList) != 1 || platformList[0].ID != platform.Workspace.ID() {
 		t.Fatalf("listing the platform team returned %+v, want only %s", platformList, platform.Workspace.ID())
 	}
-	researchList, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry, Team: "research"})
-	if err != nil {
-		t.Fatalf("list research: %v", err)
-	}
+	researchList := listed(t, stow.ListWorkspacesOptions{RegistryDir: registry, Team: "research"})
 	if len(researchList) != 1 || researchList[0].ID != other.Workspace.ID() {
 		t.Fatalf("listing the research team returned %+v, want only %s", researchList, other.Workspace.ID())
+	}
+}
+
+// A listing names the directory it read. It is the only thing that makes a report
+// of one checkable, and it is not the pair that was passed in: those differ
+// whenever a team was given, because the team is composed into the path. The CLI
+// used to resolve the directory a second time to put in its output, and fell back
+// to the unresolved pair when that failed — so the one field saying where the
+// entries came from was the one field that could name a directory nobody opened.
+func TestListReportsTheRegistryItActuallyRead(t *testing.T) {
+	registry := t.TempDir()
+	base := t.TempDir()
+	newListedWorkspace(t, registry, filepath.Join(base, "one"), "one")
+
+	root, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry})
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if root.Registry != registry {
+		t.Errorf("a listing with no team reports registry %q, want the directory it was given (%q)", root.Registry, registry)
+	}
+
+	partitioned, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: registry, Team: "platform"})
+	if err != nil {
+		t.Fatalf("list the platform team: %v", err)
+	}
+	if partitioned.Team != "platform" {
+		t.Errorf("a listing for team %q reports team %q", "platform", partitioned.Team)
+	}
+	if partitioned.Registry == registry {
+		t.Errorf("a listing for a team reports registry %q, which is the unpartitioned directory: a team's partition is a directory boundary, so the registry it read is not the root", partitioned.Registry)
+	}
+	if !strings.Contains(partitioned.Registry, "platform") {
+		t.Errorf("the resolved registry %q does not mention the team, so it does not look like the partition that was asked for", partitioned.Registry)
 	}
 }
 
@@ -241,10 +267,7 @@ func TestListOfAnEmptyRegistryIsEmptyRatherThanAnError(t *testing.T) {
 	// A machine that has never prepared a workspace has nothing to list, and that is
 	// a fact rather than a failure — otherwise the verb cannot be used in a script
 	// that has not created anything yet.
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: t.TempDir()})
-	if err != nil {
-		t.Fatalf("listing an empty registry: %v", err)
-	}
+	summaries := listed(t, stow.ListWorkspacesOptions{RegistryDir: t.TempDir()})
 	if len(summaries) != 0 {
 		t.Fatalf("an empty registry listed %+v", summaries)
 	}

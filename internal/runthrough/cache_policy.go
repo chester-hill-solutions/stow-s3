@@ -76,7 +76,44 @@ func (a *Adapter) trackCacheObject(ctx context.Context, bucket, key string, size
 		entry.expiresAt = now.Add(a.cfg.Cache.TTL)
 	}
 	a.cacheEntries[accessKey] = entry
+	held := a.evictionsHeld > 0
 	a.cacheMu.Unlock()
+	if held {
+		return nil
+	}
+	return a.evictCache(ctx)
+}
+
+// holdEvictions suspends per-write eviction until the matching releaseEvictions.
+//
+// A write normally evicts immediately, and that is what makes a limit hold at all
+// times. A bulk fill is the one case where the immediate shape is wrong twice over.
+// It re-plans the whole index on every write — a walk and a sort of every cached
+// object — so warming N keys into a cache of M costs N sorts of M, which is the
+// dominant cost of warming a large cache. And a warm's own output is read while the
+// fill is still running, so a key warmed early can be pushed out by a key warmed
+// later, and a report taken per key claims keys are warm that the cache is about to
+// disagree about. See Prewarm, which is the one caller.
+func (a *Adapter) holdEvictions() {
+	a.cacheMu.Lock()
+	defer a.cacheMu.Unlock()
+	a.evictionsHeld++
+}
+
+// releaseEvictions resumes eviction and applies the limits once to everything
+// accumulated while they were held.
+//
+// The hold is counted rather than a boolean so two overlapping fills cannot resume
+// eviction while the other is still filling, which would reintroduce exactly the
+// per-write plan the hold exists to avoid.
+func (a *Adapter) releaseEvictions(ctx context.Context) error {
+	a.cacheMu.Lock()
+	a.evictionsHeld--
+	held := a.evictionsHeld > 0
+	a.cacheMu.Unlock()
+	if held {
+		return nil
+	}
 	return a.evictCache(ctx)
 }
 
@@ -274,23 +311,26 @@ func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 	return a.evictCache(ctx)
 }
 
-// CacheIndexEntries reports how many objects the eviction index holds. It exists
-// so a test can compare the index against the store rather than assuming they
-// agree.
 // CachedObject is one object the cache currently holds.
+//
+// It carries no JSON tags. A store-layer type is not a wire shape, and the surface
+// that reports these renders them through its own type — the same arrangement the
+// outbox inspection already uses. The tags were here so the admin route could
+// marshal the struct directly, which made the HTTP contract a property of this
+// package that no one reading this file would expect to be responsible for.
 type CachedObject struct {
-	Bucket    string    `json:"bucket"`
-	Key       string    `json:"key"`
-	Size      int64     `json:"size"`
-	Accessed  time.Time `json:"accessed"`
-	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	Bucket    string
+	Key       string
+	Size      int64
+	Accessed  time.Time
+	ExpiresAt time.Time
 	// Readable says whether this object can be served with the network gone.
 	//
 	// It is false for an object the upstream has moved past, and it is the whole
 	// point of the listing: a cache that reports only counters tells an agent that
 	// caching is happening and not what it can actually read, so an agent working
 	// offline has to guess and then discover the answer by failing.
-	Readable bool `json:"readable"`
+	Readable bool
 }
 
 // CachedObjects lists what the cache holds, oldest access first.
@@ -327,6 +367,9 @@ func (a *Adapter) CachedObjects() []CachedObject {
 	return objects
 }
 
+// CacheIndexEntries reports how many objects the eviction index holds. It exists
+// so a test can compare the index against the store rather than assuming they
+// agree.
 func (a *Adapter) CacheIndexEntries() int {
 	a.cacheMu.Lock()
 	defer a.cacheMu.Unlock()

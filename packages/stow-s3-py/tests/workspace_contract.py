@@ -199,7 +199,6 @@ def _invoke(run: Run, step: dict[str, Any]) -> Any:
         return list_workspaces(
             registry_dir=_registry_dir_for(run, step),
             team=step.get("team"),
-            all=step.get("all") is True,
         )
     if verb == "collect":
         return collect_workspaces(registry_dir=_registry_dir_for(run, step))

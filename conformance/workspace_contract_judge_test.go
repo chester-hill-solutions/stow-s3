@@ -3,6 +3,7 @@ package conformance_test
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -28,7 +29,7 @@ func (r *contractRun) judge(step contractStep, out contractOutcome) {
 		r.judgeAlsoWritten(step, out)
 	}
 	for _, path := range sortedExpectations(step.Expect) {
-		r.judgeField(step, out.stdout, path, r.substituteExpectation(step.Expect[path]))
+		r.judgeField(step, out.stdout, path, step.Expect[path])
 	}
 	for _, name := range sortedArgs(step.Capture) {
 		r.capture(step, name, step.Capture[name], out.stdout)
@@ -73,7 +74,7 @@ func (r *contractRun) judgeAlsoWritten(step contractStep, out contractOutcome) {
 		r.t.Errorf("step %q: the verb wrote %q and also printed something, but the contract says the document goes to the file and nowhere else.\nstdout: %s",
 			step.ID, step.AlsoWritten, out.rawStdout)
 	}
-	if !sameDocument(written, out.stdout) {
+	if !r.sameDocument(written, out.stdout) {
 		r.t.Fatalf("step %q: the document written to %q is not the one that was returned.\non disk: %s\nreturned: %s",
 			step.ID, step.AlsoWritten, indent(written), indent(out.stdout))
 	}
@@ -92,33 +93,6 @@ func (r *contractRun) capture(step contractStep, name, field string, from docume
 			step.ID, field, string(raw))
 	}
 	r.captures[name] = text
-}
-
-// substituteExpectation resolves the {{...}} references inside an expected value,
-// so a step can state "the root the manifest named" rather than repeating the path
-// the manifest already declared. Without this the first step compared a real
-// /tmp/... path against the literal text {{work}}/workspace and failed on the
-// substitution rather than on the contract.
-func (r *contractRun) substituteExpectation(want contractExpectation) contractExpectation {
-	want.Equals = r.substituteValue(want.Equals)
-	want.NotEquals = r.substituteValue(want.NotEquals)
-	return want
-}
-
-func (r *contractRun) substituteValue(raw *json.RawMessage) *json.RawMessage {
-	if raw == nil {
-		return nil
-	}
-	text, err := decodeString(*raw)
-	if err != nil {
-		return raw
-	}
-	resolved, err := json.Marshal(r.substitute(text))
-	if err != nil {
-		return raw
-	}
-	encoded := json.RawMessage(resolved)
-	return &encoded
 }
 
 // judgeField checks one declared field against one expectation, and reports
@@ -304,84 +278,32 @@ func parseIndexes(tail string) []int {
 // that compared bytes would fail on a reformat, which is a difference in encoding
 // and not in meaning.
 //
-// The walk is written over raw JSON rather than over decoded interface values
-// because a decoded walk needs a type switch on `any`, and this repository ratchets
-// against `any` for good reason: it is where a lost type assertion becomes a silent
-// wrong answer. Here every value is either an object, an array, a number, or a
-// literal, and each is compared as itself.
+// Decoding both sides and comparing the values is the whole implementation, and it
+// is the right shape for this particular matcher: the values are arbitrary — a verb's
+// output is whatever that verb chose to print — so there is no shape to hand-write a
+// comparison for. A hand-written canonicaliser is what this replaced, and it cost
+// seventy-odd lines to get object, array and number comparison subtly right. Numbers
+// land on both sides as float64, so a contract that says 2 and an engine that says
+// 2.0 agree, which is the reformat rule applied to the one case where the text
+// genuinely differs.
+//
+// A fragment that is not JSON is a disagreement. An expectation is read from the
+// case file and a result from a verb the driver has already parsed, so neither can
+// reach here unparsed, and the one way to be wrong here is to pass.
 func sameJSON(want, got json.RawMessage) bool {
-	wantText, gotText := strings.TrimSpace(string(want)), strings.TrimSpace(string(got))
-	if wantText == gotText {
-		return true
+	var wantValue, gotValue any
+	if json.Unmarshal(want, &wantValue) != nil || json.Unmarshal(got, &gotValue) != nil {
+		return false
 	}
-	if isJSONObject(wantText) && isJSONObject(gotText) {
-		return sameJSONObject(wantText, gotText)
-	}
-	if isJSONArray(wantText) && isJSONArray(gotText) {
-		return sameJSONArray(wantText, gotText)
-	}
-	if wantNumber, ok := jsonNumber(wantText); ok {
-		gotNumber, gotIsNumber := jsonNumber(gotText)
-		return gotIsNumber && wantNumber == gotNumber
-	}
-	return false
+	return reflect.DeepEqual(wantValue, gotValue)
 }
 
-func sameDocument(want, got document) bool {
-	return sameJSON(mustEncode(want), mustEncode(got))
-}
-
-func sameJSONObject(want, got string) bool {
-	var wantObject, gotObject document
-	if err := json.Unmarshal([]byte(want), &wantObject); err != nil {
-		return false
-	}
-	if err := json.Unmarshal([]byte(got), &gotObject); err != nil {
-		return false
-	}
-	if len(wantObject) != len(gotObject) {
-		return false
-	}
-	for key, wantChild := range wantObject {
-		gotChild, ok := gotObject[key]
-		if !ok || !sameJSON(wantChild, gotChild) {
-			return false
-		}
-	}
-	return true
-}
-
-func sameJSONArray(want, got string) bool {
-	var wantList, gotList []json.RawMessage
-	if err := json.Unmarshal([]byte(want), &wantList); err != nil {
-		return false
-	}
-	if err := json.Unmarshal([]byte(got), &gotList); err != nil {
-		return false
-	}
-	if len(wantList) != len(gotList) {
-		return false
-	}
-	for i := range wantList {
-		if !sameJSON(wantList[i], gotList[i]) {
-			return false
-		}
-	}
-	return true
-}
-
-func isJSONObject(text string) bool { return strings.HasPrefix(text, "{") }
-func isJSONArray(text string) bool  { return strings.HasPrefix(text, "[") }
-
-// jsonNumber parses a JSON number, so a contract that says 2 and an engine that
-// says 2.0 are equal. Comparing the text instead would make a reformat a
-// disagreement about meaning.
-func jsonNumber(text string) (float64, bool) {
-	number, err := strconv.ParseFloat(text, 64)
-	if err != nil {
-		return 0, false
-	}
-	return number, true
+// sameDocument compares two decoded documents. Both sides are re-encoded first
+// because a document is a map of raw fragments, and two fragments equal in meaning
+// can differ in bytes. The comparison itself is sameJSON, so a document is not
+// judged by a second and slightly different rule.
+func (r *contractRun) sameDocument(want, got document) bool {
+	return sameJSON(r.encodeJSON(want), r.encodeJSON(got))
 }
 
 func lengthOf(raw json.RawMessage) int {
@@ -408,47 +330,18 @@ func decodeNumber(raw json.RawMessage) (float64, error) {
 	return number, err
 }
 
-// The encoders below are separate rather than one generic. A generic needs `any`
-// in its constraint, and this repository ratchets against `any` because it is where
-// a lost type assertion becomes a silent wrong answer. They are called from a
-// helper that has already checked each shape, so an encoding failure is not a case
-// worth distinguishing from any other.
-func encodeJSONString(value string) json.RawMessage {
+// encodeJSON puts a value into a slot of a document, which holds raw fragments.
+//
+// Every other document in this driver is decoded rather than built, so this exists
+// only for the substitution: a document the driver alters and hands back. Failing
+// loudly is right here for the same reason the rest of the driver fails loudly — a
+// value the driver built and cannot encode is a broken case file, and returning null
+// would turn it into a document that is well-formed and wrong.
+func (r *contractRun) encodeJSON(value any) json.RawMessage {
+	r.t.Helper()
 	encoded, err := json.Marshal(value)
 	if err != nil {
-		return json.RawMessage("null")
-	}
-	return encoded
-}
-
-func encodeDocument(value document) json.RawMessage {
-	encoded, err := json.Marshal(value)
-	if err != nil {
-		return json.RawMessage("null")
-	}
-	return encoded
-}
-
-func encodeChangeList(value []json.RawMessage) json.RawMessage {
-	encoded, err := json.Marshal(value)
-	if err != nil {
-		return json.RawMessage("null")
-	}
-	return encoded
-}
-
-func encodeContentMap(value map[string]json.RawMessage) json.RawMessage {
-	encoded, err := json.Marshal(value)
-	if err != nil {
-		return json.RawMessage("null")
-	}
-	return encoded
-}
-
-func mustEncode(value document) json.RawMessage {
-	encoded, err := json.Marshal(value)
-	if err != nil {
-		return json.RawMessage("null")
+		r.t.Fatalf("encode a value for a document the driver built: %v", err)
 	}
 	return encoded
 }

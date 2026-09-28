@@ -87,20 +87,19 @@ def list_workspaces(
     *,
     registry_dir: str | None = None,
     team: str | None = None,
-    all: bool = False,
 ) -> WorkspaceJSON:
     """Enumerate the workspaces this machine knows about, quietest first.
 
     Every other verb needs an id, and there was no way to get one short of having
     kept a note of it. ``readable`` is false for an entry whose directory is gone,
     which is the state a crashed or hand-cleaned run leaves behind and the thing a
-    list is most useful for finding; pass ``all`` to include those rather than hide
-    them.
+    list is most useful for finding — so every entry is reported, and filtering out
+    the unreadable ones is the caller's one line rather than a flag it has to know
+    about.
     """
     args = ["list"]
     _append_flag(args, "--registry-dir", registry_dir)
     _append_flag(args, "--team", team)
-    _append_bool(args, "--all", all)
     return run_workspace_command(*args)
 
 

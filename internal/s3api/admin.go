@@ -31,8 +31,10 @@ type cacheEvictionsProvider interface {
 // for.
 //
 // The type is runthrough's rather than one declared here because this file already
-// imports that package for OutboxEntry, and a second identical struct would mean
-// two shapes for one document and a conversion somebody has to remember to write.
+// imports that package for OutboxEntry, and a second struct describing the same
+// cached objects would mean two definitions of one thing to keep in step. What the
+// inspection actually says is a separate type, cachedInspectEntry, for the reason
+// its own comment gives.
 type cacheListingProvider interface {
 	CachedObjects() []runthrough.CachedObject
 }
@@ -226,16 +228,54 @@ const defaultCachedKeyLimit = 500
 // rate-limited, so the bound has to be in the code rather than in the request.
 const maxCachedKeyLimit = 10000
 
+// cachedInspectEntry is one cached object as an inspection reports it.
+//
+// It is declared here rather than reusing runthrough.CachedObject, and the JSON tags
+// are here rather than on that type, so the store layer carries no HTTP concern. The
+// fields happen to be the same today. They are separate because an inspection is
+// allowed to answer a question the store has no opinion about, and it already does:
+// a cache entry with no lifetime has a zero expiry, and `omitempty` does not omit a
+// zero time.Time, so an agent reading expires_at saw 0001-01-01 and had no way to
+// tell "expires at the beginning of time" from "never expires". HasExpiry is the
+// same shape WorkspaceSummary uses for has_ttl, for the same reason: a zero that
+// means two things is not a value, and the boolean beside it is what a caller
+// branches on.
+type cachedInspectEntry struct {
+	Bucket    string    `json:"bucket"`
+	Key       string    `json:"key"`
+	Size      int64     `json:"size"`
+	Accessed  time.Time `json:"accessed"`
+	ExpiresAt time.Time `json:"expires_at"`
+	HasExpiry bool      `json:"has_expiry"`
+	Readable  bool      `json:"readable"`
+}
+
+func cachedInspectEntries(objects []runthrough.CachedObject) []cachedInspectEntry {
+	entries := make([]cachedInspectEntry, 0, len(objects))
+	for _, object := range objects {
+		entries = append(entries, cachedInspectEntry{
+			Bucket:    object.Bucket,
+			Key:       object.Key,
+			Size:      object.Size,
+			Accessed:  object.Accessed,
+			ExpiresAt: object.ExpiresAt,
+			HasExpiry: !object.ExpiresAt.IsZero(),
+			Readable:  object.Readable,
+		})
+	}
+	return entries
+}
+
 // listCachedObjects returns a page of the cache's contents and the total it holds.
 //
 // The total is reported alongside the page on purpose. An agent that has been cut
 // off needs to know whether the listing is complete, and a page with no total is
 // indistinguishable from a cache holding exactly that much — which is the
 // difference between "you can read all of it" and "you are missing four keys".
-func (s *Server) listCachedObjects(r *http.Request) ([]runthrough.CachedObject, int, bool) {
+func (s *Server) listCachedObjects(r *http.Request) ([]cachedInspectEntry, int, bool) {
 	provider, ok := s.store.(cacheListingProvider)
 	if !ok {
-		return []runthrough.CachedObject{}, 0, true
+		return []cachedInspectEntry{}, 0, true
 	}
 	all := provider.CachedObjects()
 
@@ -270,7 +310,7 @@ func (s *Server) listCachedObjects(r *http.Request) ([]runthrough.CachedObject, 
 	if len(filtered) > limit {
 		filtered = filtered[:limit]
 	}
-	return filtered, len(all), true
+	return cachedInspectEntries(filtered), len(all), true
 }
 
 func (s *Server) writeInspect(w http.ResponseWriter, r *http.Request) {

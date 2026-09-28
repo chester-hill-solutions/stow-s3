@@ -57,8 +57,6 @@ export interface ContractStep {
   readonly verb: string;
   readonly registry?: string;
   readonly team?: string;
-  /** Include entries whose directory is gone, rather than hiding them. */
-  readonly all?: boolean;
   readonly args?: Readonly<Record<string, string>>;
   readonly root?: string;
   readonly manifest?: ContractManifestSpec;
@@ -214,7 +212,6 @@ async function invoke(run: Run, step: ContractStep): Promise<JsonValue> {
       return listWorkspaces({
         registryDir: registryDirFor(run, step, registryDir),
         team,
-        all: step.all === true,
       });
     case "collect":
       return collectWorkspaces(registryDirFor(run, step, registryDir));

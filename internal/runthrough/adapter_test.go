@@ -30,6 +30,11 @@ type mockUpstream struct {
 	delErr    error
 	listErr   error
 	putErrors map[string]error
+	// getErrors makes a read of a named key fail. putErrors covers writes only, and
+	// without this a test cannot tell a key the upstream does not have from a read
+	// it could not perform — two answers that are both "not warm" and only one of
+	// which is the upstream's.
+	getErrors map[string]error
 
 	objects map[string]storage.ObjectMeta
 	bodies  map[string][]byte
@@ -40,6 +45,7 @@ func newMockUpstream() *mockUpstream {
 		objects:   make(map[string]storage.ObjectMeta),
 		bodies:    make(map[string][]byte),
 		putErrors: make(map[string]error),
+		getErrors: make(map[string]error),
 	}
 }
 
@@ -64,6 +70,9 @@ func (m *mockUpstream) GetObject(_ context.Context, bucket, key string) (io.Read
 	defer m.mu.Unlock()
 	m.getCalls++
 	k := objectKey(bucket, key)
+	if err := m.getErrors[k]; err != nil {
+		return nil, nil, err
+	}
 	meta, ok := m.objects[k]
 	if !ok {
 		return nil, nil, storage.ErrObjectNotFound

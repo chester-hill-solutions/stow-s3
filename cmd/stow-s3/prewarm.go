@@ -36,10 +36,12 @@ type prewarmResult struct {
 	// require counting an array.
 	Warmed int `json:"warmed"`
 	Failed int `json:"failed"`
-	// Skipped is how many keys were named but not attempted, which happens only when
-	// the adapter is offline. Reported separately from Failed because an offline
-	// pre-warm is a configured choice, not a failure, and lumping the two together
-	// would make a deliberate configuration look like a broken one.
+	// Skipped is how many keys were named, are not in the cache, and were not
+	// attempted — which happens only when the adapter is offline. Reported separately
+	// from Failed because an offline pre-warm is a configured choice, not a failure,
+	// and lumping the two together would make a deliberate configuration look like a
+	// broken one. A key already in the cache counts as Warmed whatever the mode, so
+	// the offline run still answers "what can I read now".
 	Skipped int `json:"skipped"`
 }
 
@@ -135,7 +137,11 @@ func runPrewarm(dataDir, cacheDir, bucket string, keys []string) ([]runthrough.P
 		return nil, fmt.Errorf("reconcile the cache index: %w", err)
 	}
 
-	return adapter.Prewarm(context.Background(), bucket, keys), nil
+	entries, err := adapter.Prewarm(context.Background(), bucket, keys)
+	if err != nil {
+		return nil, fmt.Errorf("prewarm %s: %w", bucket, err)
+	}
+	return entries, nil
 }
 
 // reportPrewarm prints the result and decides the exit status.

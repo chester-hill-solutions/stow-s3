@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -44,10 +45,12 @@ type inspectPayload struct {
 }
 
 type cachedKey struct {
-	Bucket   string `json:"bucket"`
-	Key      string `json:"key"`
-	Size     int64  `json:"size"`
-	Readable bool   `json:"readable"`
+	Bucket    string    `json:"bucket"`
+	Key       string    `json:"key"`
+	Size      int64     `json:"size"`
+	Readable  bool      `json:"readable"`
+	ExpiresAt time.Time `json:"expires_at"`
+	HasExpiry bool      `json:"has_expiry"`
 }
 
 func inspect(t *testing.T, store storage.Store, query string) inspectPayload {
@@ -119,6 +122,43 @@ func TestInspectSaysWhichCachedKeysAreReadable(t *testing.T) {
 	}
 	if readable["z.bin"] {
 		t.Error("an unreadable key is reported as readable")
+	}
+}
+
+// has_expiry is the boolean beside a zero timestamp, and it is here because
+// `omitempty` does not omit a zero time.Time.
+//
+// So before it, every entry with no lifetime serialised as
+// "expires_at": "0001-01-01T00:00:00Z". An agent reading that could not tell a
+// cache entry that never expires from one that expired at the beginning of time,
+// and the field it could branch on did not exist. The same shape as has_ttl beside
+// expires_in_seconds, for the same reason: a zero that means two things is not a
+// value.
+func TestInspectSaysWhetherACachedKeyHasALifetimeAtAll(t *testing.T) {
+	expiring := time.Now().Add(time.Hour).Round(time.Second)
+	payload := inspect(t, listingStore([]runthrough.CachedObject{
+		{Bucket: "datasets", Key: "forever", Size: 1, Readable: true},
+		{Bucket: "datasets", Key: "expires", Size: 1, Readable: true, ExpiresAt: expiring},
+	}), "")
+
+	byKey := map[string]cachedKey{}
+	for _, object := range payload.CachedKeys {
+		byKey[object.Key] = object
+	}
+	if entry, present := byKey["forever"]; !present {
+		t.Fatalf("the listing does not name the entry with no lifetime: %v", byKey)
+	} else if entry.HasExpiry {
+		t.Error("an entry with no lifetime reports has_expiry, so a caller cannot tell it from one that expires")
+	}
+	if entry, present := byKey["expires"]; !present {
+		t.Fatalf("the listing does not name the entry with a lifetime: %v", byKey)
+	} else {
+		if !entry.HasExpiry {
+			t.Error("an entry with a lifetime reports has_expiry false, so its expires_at looks like the no-lifetime case")
+		}
+		if !entry.ExpiresAt.Equal(expiring) {
+			t.Errorf("expires_at is %v, want the entry's own %v", entry.ExpiresAt, expiring)
+		}
 	}
 }
 

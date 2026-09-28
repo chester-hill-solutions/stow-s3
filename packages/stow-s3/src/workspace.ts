@@ -107,15 +107,15 @@ export function destroyWorkspace(id: string, registryDir?: string): Promise<Work
  * Every other verb needs an id, and there was no way to get one short of having
  * kept a note of it. `readable: false` marks an entry whose directory is gone, which
  * is the state a crashed or hand-cleaned run leaves behind and the thing a list is
- * most useful for finding; pass `all` to include those rather than hide them.
+ * most useful for finding — so every entry is reported, and filtering out the
+ * unreadable ones is the caller's one line rather than a flag it has to know about.
  */
 export function listWorkspaces(
-  options: { readonly registryDir?: string; readonly team?: string; readonly all?: boolean } = {},
+  options: { readonly registryDir?: string; readonly team?: string } = {},
 ): Promise<WorkspaceJSON> {
   const args = ["list"];
   appendFlag(args, "--registry-dir", options.registryDir);
   appendFlag(args, "--team", options.team);
-  appendBooleanFlag(args, "--all", options.all);
   return runWorkspaceCommand(args);
 }
 

@@ -40,6 +40,11 @@ func TestWorkspaceContractHoldsInTheCLI(t *testing.T) {
 					run.broken = step.ID
 				}
 			})
+			// Resolved once, here, and handed to both halves. A step's text is
+			// resolved at the only point where every capture it might name already
+			// exists, and perform and judge then read the same resolved step rather
+			// than each resolving it themselves.
+			step := run.resolve(step)
 			outcome := run.perform(step)
 			run.judge(step, outcome)
 		})

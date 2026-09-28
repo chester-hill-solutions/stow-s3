@@ -45,9 +45,14 @@ type Adapter struct {
 	cacheEvictions    atomic.Uint64
 	cacheMu           sync.Mutex
 	cacheEntries      map[string]cacheEntry
-	outboxLocks       outboxKeyLocks
-	claimOwner        string
-	claimLease        time.Duration
+	// evictionsHeld counts the bulk fills in progress. While it is above zero,
+	// trackCacheObject records the object and does not evict; the fill applies the
+	// limits once when it releases. Guarded by cacheMu, because it is read on every
+	// cache write. See holdEvictions.
+	evictionsHeld int
+	outboxLocks   outboxKeyLocks
+	claimOwner    string
+	claimLease    time.Duration
 }
 
 // New creates a run-through adapter. upstream may be nil for local-only behavior.

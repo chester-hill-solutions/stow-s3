@@ -297,38 +297,22 @@ func serve(args []string) {
 	// A bool, and it stays a bool. The obvious way to get an explicit false is a
 	// string flag, and that is a trap: `--offline` as a string consumed the next
 	// argument, so `--offline --ready-fd 3` failed with "invalid --offline
-	registerOfflineFlag(flags)
+	offline := registerOfflineFlag(flags)
 	maxBytes := flags.Int64("max-bytes", 0, "Maximum stored object bytes enforced on every native S3 request (0 disables the limit)")
 	maxObjects := flags.Int64("max-objects", 0, "Maximum stored object count enforced on every native S3 request (0 disables the limit)")
 	readyFd := flags.Int("ready-fd", -1, "Write one machine-readable readiness object to this file descriptor instead of the STOW_READY line on stdout")
 	parentPid := flags.Int("parent-pid", 0, "Exit when this parent process dies (0 disables the watch, which is the default for a hand-run server)")
+	// The error is safe to discard: this flag set is ExitOnError, so a flag the
+	// package cannot read has already printed why and exited. See offline.go.
 	flags.Parse(args)
-	*accessKey, *secretKey = resolveLocalCredentials(*accessKey, *secretKey)
-	rtCfg, cfgErr := runthrough.ConfigFromEnvChecked()
-	if cfgErr != nil {
-		log.Fatal(cfgErr)
-	}
-	if err := applyCacheLimits(&rtCfg, *cacheMaxBytes, *cacheMaxObjects, *cacheTTL); err != nil {
-		log.Fatal(err)
-	}
-	// The flag wins over the environment in both directions, and an explicit false
-	// is a real answer: a shell that exports STOW_OFFLINE=true is a default, not an
-	// instruction, and a server started with --offline=false is saying so.
-	applyOfflineFlag(flags, &rtCfg)
+	rtCfg := serveRunThroughConfig(serveConfigInput{
+		AccessKey: accessKey, SecretKey: secretKey,
+		MaxBytes: *cacheMaxBytes, MaxObjects: *cacheMaxObjects, TTL: *cacheTTL,
+		Offline: offline, Mode: *modeFlag, AdminToken: adminToken,
+		AllowLiveWrites: *allowLiveWrites, AllowPublicAdmin: *allowPublicAdmin,
+		CacheDir: *cacheDir,
+	})
 	mode := resolveMode(*modeFlag)
-
-	if *allowPublicAdmin {
-		log.Printf("WARNING: --allow-public-admin no longer grants access and is ignored; use --admin-token or STOW_ADMIN_TOKEN to authorize remote admin routes")
-	}
-	if *adminToken == "" {
-		*adminToken = strings.TrimSpace(os.Getenv("STOW_ADMIN_TOKEN"))
-	}
-	if *allowLiveWrites {
-		rtCfg.AllowLiveWrites = true
-	}
-	if *cacheDir != "" {
-		rtCfg.CacheDir = *cacheDir
-	}
 	backend, err := parseBackend(*backendFlag)
 	if err != nil {
 		log.Fatal(err)

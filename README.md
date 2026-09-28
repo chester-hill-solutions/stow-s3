@@ -277,14 +277,21 @@ stow-s3 workspace list --team platform
 
 ```json
 {
+  "version": 1,
+  "registry_dir": "/srv/agents/registry/teams/platform",
+  "team": "platform",
   "count": 1,
   "results": [
     {
-      "workspace_id": "ws_a8b5f66d008f6d1f",
+      "id": "ws_a8b5f66d008f6d1f",
       "dir": "/srv/agents/task-42",
       "bucket": "stow-workspace-195241444f2339e0",
+      "created": "2026-09-26T09:14:02Z",
+      "last_used": "2026-09-27T09:14:02Z",
       "idle_seconds": 86400,
       "age_seconds": 172800,
+      "ttl_seconds": 0,
+      "expires_in_seconds": 0,
       "has_ttl": false,
       "owned": true,
       "readable": true
@@ -297,9 +304,14 @@ Every other verb needs an id, and there was no way to get one short of keeping a
 note of it — which made a feature whose whole promise is "your work will still be
 here" impossible to show to somebody who had not. `readable: false` marks an entry
 whose directory has been deleted: the registry entry is real, the workspace is not,
-and nothing else in the product reports that state. It is hidden by default and
-`--all` includes it, because the listing's job is to surface a problem rather than
-tidy it away.
+and nothing else in the product reports that state. Every entry is listed, including
+those — the listing's job is to surface a problem rather than tidy it away, and an
+entry you have to pass a flag to see is one you never think to look for. Dropping
+the unreadable ones is one line in your own code.
+
+`registry_dir` is the directory the entries came from, after `--team` has been
+composed into it. With `--team platform` above that names the partition rather than
+the root, so it is a path you can open and look at.
 
 `has_ttl` is there because `expires_in_seconds` is zero both for a workspace with
 no lifetime — the default — and for one expiring this second, and a sweep that
@@ -769,6 +781,26 @@ Keys that cannot be warmed are reported individually and the rest continue — o
 missing key should not abandon a warm-up of a thousand — and the exit status is
 nonzero for a partial warm-up, so a script notices.
 
+`cached: true` means the key is in the cache **after the warm finished**, not that it
+was fetched. The cache's limits apply while the warm fills it, so warming more keys
+than it can hold evicts some of them, and a per-key report taken as each one landed
+would claim keys that are not there. If you warmed a thousand keys into a cache that
+holds a hundred, the report says a hundred — which is the number you are about to
+need when you cut the network. Keys are fetched concurrently and the report keeps the
+order you asked in.
+
+`reason` keeps the causes apart, because you can act on each: `not-found` is the
+bucket's answer, `offline` is `stow-s3` declining to ask, `not in the cache: the
+limits did not leave room for it` means raise the cache, and `held in the local
+store, so it was never a cache candidate` means that key was never going to be
+cached. A partial warm exits nonzero; a deliberate `--offline` one does not.
+
+The same verb with `--offline` answers the question you actually have after cutting
+the network: it fetches nothing and reports what the cache already holds. Nothing it
+fails to have is counted as `skipped` rather than `failed`, because an offline
+pre-warm is a configured choice and not a broken one — so the exit status is
+nonzero for a partial warm and zero for a deliberate one.
+
 **Then ask what you can read.** The inspection route names the cached keys, not just
 the counters:
 
@@ -781,18 +813,28 @@ curl -s -H "X-Stow-Admin: $TOKEN" http://127.0.0.1:PORT/_stow/inspect
   "cache_hits": 0,
   "cached_key_count": 3,
   "cached_keys": [
-    { "bucket": "datasets", "key": "models/bert.bin", "size": 411000000, "readable": true }
+    {
+      "bucket": "datasets",
+      "key": "models/bert.bin",
+      "size": 411000000,
+      "accessed": "2026-09-28T09:14:02Z",
+      "expires_at": "2026-10-28T09:14:02Z",
+      "has_expiry": true,
+      "readable": true
+    }
   ]
 }
 ```
 
 `readable: false` means the entry is indexed but its lifetime has passed, so it is
 about to be evicted — which is the difference between "you can read this" and "you
-can read this until the next sweep". The listing takes `?bucket=`, `?prefix=` and
-`?limit=`; the count beside it is the whole cache rather than the page, so a
-truncated answer is never mistaken for a complete one. A malformed `limit` is
-refused rather than defaulted, because a typo that silently returns half the list
-looks exactly like a cache holding half as much.
+can read this until the next sweep". `has_expiry` is beside `expires_at` because an
+entry with no lifetime has a zero timestamp, and a zero that means both "never
+expires" and "expired long ago" is not a value to branch on. The listing takes
+`?bucket=`, `?prefix=` and `?limit=`; the count beside it is the whole cache rather
+than the page, so a truncated answer is never mistaken for a complete one. A
+malformed `limit` is refused rather than defaulted, because a typo that silently
+returns half the list looks exactly like a cache holding half as much.
 
 Counters alone could not answer this. A cache can post a perfect hit rate and hold
 nothing the agent asked for, and there was no way to tell those apart from outside.

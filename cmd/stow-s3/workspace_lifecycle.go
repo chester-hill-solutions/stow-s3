@@ -37,31 +37,28 @@ func destroyWorkspaceCommand(args []string) error {
 //
 // Fifteen verbs and none of them listed, so a feature whose whole promise is "your
 // work will still be here" could not be shown to anybody who had not kept a note of
-// the ids. It reports the quiet ones first and flags the ones whose directory is
+// the ids. It reports the quiet ones first and marks the ones whose directory is
 // gone, because those are the two things a list is for.
+//
+// Every entry is reported, including the ones that are not readable. There used to
+// be an --all flag that included them, and it was the wrong way round: an entry
+// whose directory has been deleted is the state a crashed or hand-cleaned run
+// leaves behind, and it is the single thing a list is most worth finding. A flag to
+// ask for it means the default output does not have it, and a caller who does not
+// know the flag does not know the entry exists. Readable is on every summary, so
+// dropping the broken ones is one line in whatever language the caller is written
+// in — and the flag is gone from the CLI and from both wrappers because there is
+// nothing left for it to select.
 func listWorkspacesCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace list", flag.ContinueOnError)
 	registry := flags.String("registry-dir", "", "Workspace registry directory")
 	team := flags.String("team", "", "Team partition within the registry directory")
-	all := flags.Bool("all", false, "Include workspaces whose directory is missing")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	summaries, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: *registry, Team: *team})
+	listing, err := stow.List(stow.ListWorkspacesOptions{RegistryDir: *registry, Team: *team})
 	if err != nil {
 		return err
-	}
-	results := make([]stow.WorkspaceSummary, 0, len(summaries))
-	for _, summary := range summaries {
-		// A missing directory is reported by default rather than hidden. It is the
-		// state a crashed or hand-cleaned run leaves behind, and it is exactly what
-		// somebody listing workspaces is looking for — so --all is the opt-in that
-		// *includes* the broken ones, because the default that matters is the one
-		// that surfaces a problem rather than the one that tidies it away.
-		if !summary.Readable && !*all {
-			continue
-		}
-		results = append(results, summary)
 	}
 	return writeWorkspaceJSON(struct {
 		Version  int                     `json:"version"`
@@ -69,15 +66,7 @@ func listWorkspacesCommand(args []string) error {
 		Team     string                  `json:"team,omitempty"`
 		Count    int                     `json:"count"`
 		Results  []stow.WorkspaceSummary `json:"results"`
-	}{1, registryDirOrEmpty(*registry, *team), *team, len(results), results})
-}
-
-func registryDirOrEmpty(dir, team string) string {
-	resolved, err := stow.ResolveRegistryDir(dir, team)
-	if err != nil {
-		return dir
-	}
-	return resolved
+	}{1, listing.Registry, listing.Team, len(listing.Workspaces), listing.Workspaces})
 }
 
 func collectWorkspacesCommand(args []string) error {
