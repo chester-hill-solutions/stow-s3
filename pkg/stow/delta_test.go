@@ -2,7 +2,9 @@ package stow_test
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -129,6 +131,92 @@ func TestADeltaBringsAThirdPointToTheTarget(t *testing.T) {
 	// answer.
 	assertCheckpointBody(t, registry, base, "edit.txt", "before")
 	assertCheckpointHas(t, registry, base, map[string]bool{"keep.txt": true, "added.txt": false})
+}
+
+// A delta that has been through a file is the only kind two machines ever
+// exchange, and the encoding is what carries it. It used not to: the content map
+// was excluded from the JSON, so a decoded delta described every change and held
+// none of the bytes, and applying it failed on the first added or changed path.
+func TestADeltaSurvivesEncodingAndDecoding(t *testing.T) {
+	ctx := context.Background()
+	registry := t.TempDir()
+	ws, base := live(t, registry, map[string]string{"edit.txt": "before"})
+
+	write(t, ws, "edit.txt", "after")
+	write(t, ws, "added.txt", "new file")
+	target := checkpoint(t, ws)
+
+	delta, err := stow.CreateDelta(ctx, registry, base, target, stow.DeltaOptions{})
+	if err != nil {
+		t.Fatalf("create delta: %v", err)
+	}
+	encoded, err := stow.EncodeDelta(delta)
+	if err != nil {
+		t.Fatalf("encode delta: %v", err)
+	}
+	decoded, err := stow.DecodeDelta(encoded)
+	if err != nil {
+		t.Fatalf("decode delta: %v", err)
+	}
+	if decoded.BaseID != delta.BaseID || decoded.TargetID != delta.TargetID {
+		t.Fatalf("decoded delta names %q -> %q, want %q -> %q",
+			decoded.BaseID, decoded.TargetID, delta.BaseID, delta.TargetID)
+	}
+	for path, want := range delta.Content {
+		if string(decoded.Content[path]) != string(want) {
+			t.Errorf("decoded delta content for %q = %q, want %q", path, decoded.Content[path], want)
+		}
+	}
+
+	// The transported document is what gets applied, to the base, on the other side.
+	applied, err := stow.ApplyDelta(ctx, registry, base, decoded)
+	if err != nil {
+		t.Fatalf("apply decoded delta: %v", err)
+	}
+	assertCheckpointBody(t, registry, applied.ID, "edit.txt", "after")
+	assertCheckpointBody(t, registry, applied.ID, "added.txt", "new file")
+}
+
+// Content arrives from somewhere else, so it is verified against the digest the
+// document itself claims before it is written. Create verifies what it reads out
+// of a checkpoint; a decoded document can carry anything, and a delta that applies
+// bytes nobody hashed is a delta that can change a working set silently.
+func TestApplyingADeltaWithContentThatFailsItsDigestIsRefused(t *testing.T) {
+	ctx := context.Background()
+	registry := t.TempDir()
+	ws, base := live(t, registry, map[string]string{"edit.txt": "before"})
+
+	write(t, ws, "edit.txt", "after")
+	target := checkpoint(t, ws)
+	delta, err := stow.CreateDelta(ctx, registry, base, target, stow.DeltaOptions{})
+	if err != nil {
+		t.Fatalf("create delta: %v", err)
+	}
+	encoded, err := stow.EncodeDelta(delta)
+	if err != nil {
+		t.Fatalf("encode delta: %v", err)
+	}
+	decoded, err := stow.DecodeDelta(encoded)
+	if err != nil {
+		t.Fatalf("decode delta: %v", err)
+	}
+	decoded.Content["edit.txt"] = []byte("not what the digest says")
+
+	if _, err := stow.ApplyDelta(ctx, registry, base, decoded); err == nil {
+		t.Fatal("a delta whose content failed its digest was applied")
+	}
+	assertCheckpointBody(t, registry, base, "edit.txt", "before")
+}
+
+// A document is bounded on the way in as well as on the way out, because a
+// decoded document can arrive from anywhere and the decoder is the only place
+// that sees it before the bytes are in memory.
+func TestDecodeDeltaRefusesAnOversizedDocument(t *testing.T) {
+	oversized := fmt.Sprintf(`{"version":%d,"base_id":"cp_1","target_id":"cp_2","bytes":%d,"content":{"a.txt":%q}}`,
+		stow.DeltaVersion, stow.MaxDeltaBytes+1, base64.StdEncoding.EncodeToString([]byte("x")))
+	if _, err := stow.DecodeDelta([]byte(oversized)); !errors.Is(err, stow.ErrDeltaTooLarge) {
+		t.Fatalf("error = %v, want ErrDeltaTooLarge", err)
+	}
 }
 
 // Applying a delta to a diverged target is a conflict, and the refusal must leave

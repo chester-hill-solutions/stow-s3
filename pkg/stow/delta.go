@@ -55,8 +55,13 @@ const (
 const (
 	defaultDeltaBytes = 1 << 30
 	defaultDeltaFiles = 100_000
-	maxDeltaBytes     = 16 << 20
 )
+
+// MaxDeltaBytes is the largest content a delta document may declare, on the way
+// out and on the way in. It is exported because a caller reading a delta from
+// somewhere it does not control has to bound the read itself, and a bound it
+// cannot name is a bound it has to guess.
+const MaxDeltaBytes int64 = 16 << 20
 
 // ErrDeltaConflict reports that a delta could not be applied because the target
 // is not where the delta was written to be applied.
@@ -70,6 +75,13 @@ var ErrDeltaConflict = errors.New("delta target has diverged from the delta's ba
 // not speak. It is separate from a conflict because retrying will not help and
 // because a version mismatch is a deployment problem rather than a data one.
 var ErrDeltaVersionUnsupported = errors.New("delta document version is not supported")
+
+// ErrDeltaTooLarge reports a delta document whose content is over MaxDeltaBytes.
+//
+// It is separate from a conflict because nothing is wrong with the target, and
+// separate from a version refusal because the document is readable: it is simply
+// bigger than this format admits.
+var ErrDeltaTooLarge = errors.New("delta document is larger than the format allows")
 
 // DeltaOptions bounds the work a delta may describe. Zero takes the defaults,
 // matching CheckpointArchiveOptions: a cap of zero is not "unlimited", because an
@@ -86,6 +98,12 @@ type DeltaOptions struct {
 // DeltaDocument is the transferable form. It names both ends, so a receiver can
 // check it is being applied where it thinks it is, and carries the content for
 // every added or changed path.
+//
+// Content is on the wire as base64 values under its own name. It used to be
+// excluded from the encoding, which left every delta describable and none of them
+// applicable: the document a caller wrote to a file held no bytes, and applying
+// it failed on the first added or changed path. A delta's reason to exist is that
+// it can be carried somewhere, so the encoding carries it.
 type DeltaDocument struct {
 	Version  int               `json:"version"`
 	BaseID   string            `json:"base_id"`
@@ -94,7 +112,7 @@ type DeltaDocument struct {
 	Changes  []DeltaChange     `json:"changes"`
 	Files    int64             `json:"files"`
 	Bytes    int64             `json:"bytes"`
-	Content  map[string][]byte `json:"-"`
+	Content  map[string][]byte `json:"content,omitempty"`
 }
 
 // DeltaChange is one path's difference. From is what the base held and To is what
@@ -240,8 +258,8 @@ func (d *DeltaDocument) enforceBounds(options DeltaOptions) error {
 	if d.Bytes > maxBytes {
 		return fmt.Errorf("stow: delta carries %d bytes, over the cap of %d", d.Bytes, maxBytes)
 	}
-	if d.Bytes > maxDeltaBytes {
-		return fmt.Errorf("stow: delta carries %d bytes, over the %d a document may declare", d.Bytes, maxDeltaBytes)
+	if d.Bytes > MaxDeltaBytes {
+		return fmt.Errorf("stow: delta carries %d bytes, over the %d a document may declare", d.Bytes, MaxDeltaBytes)
 	}
 	return nil
 }
@@ -273,6 +291,11 @@ func EncodeDelta(delta *DeltaDocument) ([]byte, error) {
 }
 
 // DecodeDelta parses a transported delta.
+//
+// The bound is applied here rather than at the point of application because this
+// is the only place a document from outside this process exists, and a decoder
+// that accepts an unbounded document has already paid for the memory by the time
+// anyone gets to refuse it.
 func DecodeDelta(raw []byte) (*DeltaDocument, error) {
 	var delta DeltaDocument
 	if err := json.Unmarshal(raw, &delta); err != nil {
@@ -281,5 +304,25 @@ func DecodeDelta(raw []byte) (*DeltaDocument, error) {
 	if delta.Version != DeltaVersion {
 		return nil, ErrDeltaVersionUnsupported
 	}
+	if err := checkDeltaSize(delta); err != nil {
+		return nil, err
+	}
 	return &delta, nil
+}
+
+// checkDeltaSize refuses a document over the format's limit, counting the content
+// it actually carries rather than the Bytes field it declares. A declaration is a
+// claim; the map is the evidence.
+func checkDeltaSize(delta DeltaDocument) error {
+	if delta.Bytes > MaxDeltaBytes {
+		return fmt.Errorf("%w: declares %d bytes, over %d", ErrDeltaTooLarge, delta.Bytes, MaxDeltaBytes)
+	}
+	var total int64
+	for _, data := range delta.Content {
+		total += int64(len(data))
+	}
+	if total > MaxDeltaBytes {
+		return fmt.Errorf("%w: carries %d bytes, over %d", ErrDeltaTooLarge, total, MaxDeltaBytes)
+	}
+	return nil
 }

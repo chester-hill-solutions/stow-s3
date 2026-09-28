@@ -2,6 +2,8 @@ package stow
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -116,6 +118,14 @@ func applyDeltaWrite(delta *DeltaDocument, files string, change DeltaChange) err
 	if !ok {
 		return fmt.Errorf("stow: delta carries no content for %q", change.Path)
 	}
+	// The content is verified against the digest the document itself declares
+	// before a byte is written. Create verifies what it reads out of a
+	// checkpoint, but a document that came through a file carries whatever its
+	// author put there, and a delta that writes unverified bytes is a delta that
+	// can change a working set without changing what it claims to change.
+	if err := verifyDeltaContent(change, data); err != nil {
+		return err
+	}
 	mode := os.FileMode(0o644)
 	if change.To != nil && change.To.Mode != 0 {
 		mode = os.FileMode(change.To.Mode) & os.ModePerm
@@ -126,6 +136,25 @@ func applyDeltaWrite(delta *DeltaDocument, files string, change DeltaChange) err
 	}
 	if err := os.WriteFile(destination, data, mode); err != nil {
 		return fmt.Errorf("stow: apply delta %q: %w", change.Path, err)
+	}
+	return nil
+}
+
+// verifyDeltaContent checks the bytes against the size and digest the change
+// declares. A change that declares no digest cannot be verified, and a delta
+// writer that could omit one would make every later check optional, so the
+// omission is refused rather than tolerated.
+func verifyDeltaContent(change DeltaChange, data []byte) error {
+	if change.To == nil || change.To.SHA256 == "" {
+		return fmt.Errorf("stow: delta change %q carries content but declares no digest", change.Path)
+	}
+	if int64(len(data)) != change.To.Size {
+		return fmt.Errorf("stow: delta content %q is %d bytes, its change says %d",
+			change.Path, len(data), change.To.Size)
+	}
+	digest := sha256.Sum256(data)
+	if hex.EncodeToString(digest[:]) != change.To.SHA256 {
+		return fmt.Errorf("stow: delta content %q failed integrity validation", change.Path)
 	}
 	return nil
 }

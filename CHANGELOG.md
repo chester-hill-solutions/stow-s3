@@ -2,6 +2,71 @@
 
 ## Unreleased
 
+- **Fixed: a delta document could not cross a machine.** `DeltaDocument.Content`
+  was tagged `json:"-"`, so `EncodeDelta` wrote a document that named every
+  change and carried none of the bytes. Every test applied the in-memory
+  `*DeltaDocument`, so the round trip through a file was never exercised, and the
+  defect was invisible until there was anything to encode it for. A delta read
+  back from disk failed on the first added or changed path with `delta carries no
+  content`, which is the one error a caller cannot act on: the document is
+  correct, the base is correct, and the transfer still does not work.
+
+  The content is on the wire now, as base64 under its own name, and the round
+  trip is asserted end to end: create, encode, decode, apply, read the bytes back
+  out of the published checkpoint. The in-memory field keeps its type, so nothing
+  that builds a delta by hand changed.
+
+  Applying content also stopped verifying it. `CreateDelta` hashes what it reads
+  out of a checkpoint, and `applyDeltaWrite` trusted the result — which held only
+  while a delta could never be built by anyone else. A document that came through
+  a file carries whatever its author put in it, and the change it declares carries
+  a digest that was never checked, so a tampered or truncated delta would have
+  written bytes that did not match the change it claimed to be making. The size
+  and SHA-256 in the change are now verified before any of them is written, and a
+  change that declares no digest is refused rather than trusted: a writer that
+  could omit one would make every later check optional. `DecodeDelta` bounds the
+  document it accepts by counting the content it actually carries rather than the
+  `bytes` field it declares, because a declaration is a claim and the map is the
+  evidence, and the decoder is the only place a document from outside this
+  process exists. `MaxDeltaBytes` is exported for the same reason a caller
+  reading a delta from a channel it does not control should not have to guess the
+  bound.
+
+- **Added: a team partitions the workspace registry.** Two jobs on one CI runner
+  shared one registry, so one job's TTL could decide the other's bytes and
+  either could name the other's workspace ID. The registry is a file per workspace
+  in one directory, and a sweep lists that directory, so the collision was not a
+  bug in the sweep — it was the shape.
+
+  `Team` files a workspace and its checkpoints under `<registry>/teams/<name>`,
+  a directory partition rather than a field on the entry. A label would not have
+  fixed it: `All` would still return both teams' workspaces, a sweep would still
+  consider them, and two teams would still be one namespace with extra steps. With
+  a partition, one team cannot resume another's workspace by ID, its sweep cannot
+  see it, and its checkpoints are not readable from the other side. The root
+  registry is unaffected — its entries sit beside the `teams` directory, which
+  `All` already skips — so a machine that never names a team behaves exactly as
+  it did, and every workspace that predates the field is where it already was.
+
+  The name becomes a directory entries are filed under, so it is validated with
+  the portable-segment rules the checkpoint paths already use and refused rather
+  than sanitised: a sanitised name is a name two callers did not agree on. A
+  registry directory is a root and a team is a partition inside it, so the two
+  compose rather than compete.
+
+  One bug was in the first version of this and the tests caught it before it
+  shipped: `resumeWith` passed the unresolved options through, so a resumed team
+  workspace re-registered *itself* at the registry root — a workspace two sweeps
+  could reach, filed by the act of resuming it. The registry is now resolved once
+  per operation and the resolved path is what gets recorded.
+
+  What this is not: identity. A team names an organization, not a principal, and
+  on a machine where every caller is the same user the partition is organization
+  rather than security. There is no credential, no membership, and no
+  authorization here — a caller that can read the registry can read every
+  partition under it. The precondition for treating it as a boundary is per-user
+  registries, which is separate work and is not implied by this.
+
 - **Added a versioned delta document that can bring one checkpoint to another.** The checkpoint diff already computed added/changed/deleted by comparing two captures, but it was a private function producing a *report*: it named what differed and hashed both sides, and carried no bytes, so nothing could be changed with it. That is enough to tell a human what happened and not enough to synchronise anything.
 
   `CreateDelta` promotes it to a document that names both ends and carries the content for every added or changed path, and `ApplyDelta` brings a third point to the second. The point for an agent and a device is that the cost is what the difference costs rather than what the tree costs: a delta over a working set with three changed files carries those three files, and the test asserts that an unchanged file appears in neither the change list nor the content.
