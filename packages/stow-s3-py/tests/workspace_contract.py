@@ -44,6 +44,7 @@ from stow_s3 import (
     destroy_workspace,
     diff_workspaces,
     handoff_workspace,
+    list_workspaces,
     prepare_workspace,
     resume_workspace,
 )
@@ -194,6 +195,12 @@ def _invoke(run: Run, step: dict[str, Any]) -> Any:
         )
     if verb == "resume":
         return resume_workspace(handoff=args["handoff"])
+    if verb == "list":
+        return list_workspaces(
+            registry_dir=_registry_dir_for(run, step),
+            team=step.get("team"),
+            all=step.get("all") is True,
+        )
     if verb == "collect":
         return collect_workspaces(registry_dir=_registry_dir_for(run, step))
     if verb == "destroy":

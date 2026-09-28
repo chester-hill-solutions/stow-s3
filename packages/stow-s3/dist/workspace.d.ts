@@ -55,6 +55,19 @@ export declare function runWorkspaceCommand(args: readonly string[]): Promise<Wo
 export declare function prepareWorkspace(manifestPath: string): Promise<WorkspaceJSON>;
 export declare function resumeWorkspace(options: ResumeWorkspaceOptions): Promise<WorkspaceJSON>;
 export declare function destroyWorkspace(id: string, registryDir?: string): Promise<WorkspaceJSON>;
+/**
+ * Enumerate the workspaces this machine knows about, quietest first.
+ *
+ * Every other verb needs an id, and there was no way to get one short of having
+ * kept a note of it. `readable: false` marks an entry whose directory is gone, which
+ * is the state a crashed or hand-cleaned run leaves behind and the thing a list is
+ * most useful for finding; pass `all` to include those rather than hide them.
+ */
+export declare function listWorkspaces(options?: {
+    readonly registryDir?: string;
+    readonly team?: string;
+    readonly all?: boolean;
+}): Promise<WorkspaceJSON>;
 export declare function collectWorkspaces(registryDir?: string): Promise<WorkspaceJSON>;
 export declare function handoffWorkspace(id: string, options?: {
     readonly registryDir?: string;

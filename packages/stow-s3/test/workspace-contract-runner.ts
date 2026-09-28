@@ -24,6 +24,7 @@ import {
   createWorkspaceDelta,
   destroyWorkspace,
   diffWorkspaces,
+  listWorkspaces,
   handoffWorkspace,
   prepareWorkspace,
   resumeWorkspace,
@@ -56,6 +57,8 @@ export interface ContractStep {
   readonly verb: string;
   readonly registry?: string;
   readonly team?: string;
+  /** Include entries whose directory is gone, rather than hiding them. */
+  readonly all?: boolean;
   readonly args?: Readonly<Record<string, string>>;
   readonly root?: string;
   readonly manifest?: ContractManifestSpec;
@@ -207,6 +210,12 @@ async function invoke(run: Run, step: ContractStep): Promise<JsonValue> {
       });
     case "resume":
       return resumeWorkspace({ handoffPath: required("handoff") });
+    case "list":
+      return listWorkspaces({
+        registryDir: registryDirFor(run, step, registryDir),
+        team,
+        all: step.all === true,
+      });
     case "collect":
       return collectWorkspaces(registryDirFor(run, step, registryDir));
     case "destroy":

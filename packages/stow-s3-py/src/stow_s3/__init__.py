@@ -56,6 +56,7 @@ from .workspace import (
     diff_workspaces,
     export_workspace_checkpoint,
     handoff_workspace,
+    list_workspaces,
     import_workspace_checkpoint,
     prepare_workspace,
     restore_workspace_checkpoint,

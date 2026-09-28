@@ -34,6 +34,21 @@ export function destroyWorkspace(id, registryDir) {
     appendFlag(args, "--registry-dir", registryDir);
     return runWorkspaceCommand(args);
 }
+/**
+ * Enumerate the workspaces this machine knows about, quietest first.
+ *
+ * Every other verb needs an id, and there was no way to get one short of having
+ * kept a note of it. `readable: false` marks an entry whose directory is gone, which
+ * is the state a crashed or hand-cleaned run leaves behind and the thing a list is
+ * most useful for finding; pass `all` to include those rather than hide them.
+ */
+export function listWorkspaces(options = {}) {
+    const args = ["list"];
+    appendFlag(args, "--registry-dir", options.registryDir);
+    appendFlag(args, "--team", options.team);
+    appendBooleanFlag(args, "--all", options.all);
+    return runWorkspaceCommand(args);
+}
 export function collectWorkspaces(registryDir) {
     const args = ["collect"];
     appendFlag(args, "--registry-dir", registryDir);

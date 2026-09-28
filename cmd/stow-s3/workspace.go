@@ -112,6 +112,7 @@ var workspaceVerbs = map[string]func([]string) error{
 	"export":     exportCheckpointCommand,
 	"handoff":    handoffWorkspaceCommand,
 	"import":     importCheckpointCommand,
+	"list":       listWorkspacesCommand,
 	"prepare":    prepareWorkspaceCommand,
 	"preview":    previewCheckpointCommand,
 	"restore":    restoreCheckpointCommand,

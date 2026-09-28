@@ -128,6 +128,20 @@ func OpenRegistry(dir string) (*Registry, error) {
 	return &Registry{dir: dir}, nil
 }
 
+// OpenRegistryReadOnly opens a registry without creating its directory.
+//
+// OpenRegistry makes the directory, which is right for a verb about to write an
+// entry and wrong for a verb about to read them: listing would otherwise bring a
+// registry into existence on a machine that has never had one, and a caller could
+// not tell afterwards whether it had always been there. A missing directory is an
+// empty registry, and All already reports that.
+func OpenRegistryReadOnly(dir string) (*Registry, error) {
+	if dir == "" {
+		return nil, fmt.Errorf("workspace: registry directory is required")
+	}
+	return &Registry{dir: dir}, nil
+}
+
 func (r *Registry) entryPath(id string) string {
 	return filepath.Join(r.dir, id+".json")
 }

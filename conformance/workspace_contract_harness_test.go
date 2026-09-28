@@ -158,7 +158,7 @@ const contractReturnsFile = "file"
 var contractRegistryDirFlags = map[string]bool{
 	"checkpoint": true, "diff": true, "export": true, "import": true,
 	"restore": true, "resume": true, "handoff": true, "delta": true,
-	"apply": true, "destroy": true, "collect": true,
+	"apply": true, "destroy": true, "collect": true, "list": true,
 }
 
 var (

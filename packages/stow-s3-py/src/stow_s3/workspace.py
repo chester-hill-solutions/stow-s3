@@ -83,6 +83,27 @@ def destroy_workspace(id: str, *, registry_dir: str | None = None) -> WorkspaceJ
     return run_workspace_command(*args)
 
 
+def list_workspaces(
+    *,
+    registry_dir: str | None = None,
+    team: str | None = None,
+    all: bool = False,
+) -> WorkspaceJSON:
+    """Enumerate the workspaces this machine knows about, quietest first.
+
+    Every other verb needs an id, and there was no way to get one short of having
+    kept a note of it. ``readable`` is false for an entry whose directory is gone,
+    which is the state a crashed or hand-cleaned run leaves behind and the thing a
+    list is most useful for finding; pass ``all`` to include those rather than hide
+    them.
+    """
+    args = ["list"]
+    _append_flag(args, "--registry-dir", registry_dir)
+    _append_flag(args, "--team", team)
+    _append_bool(args, "--all", all)
+    return run_workspace_command(*args)
+
+
 def collect_workspaces(*, registry_dir: str | None = None) -> WorkspaceJSON:
     args = ["collect"]
     _append_flag(args, "--registry-dir", registry_dir)

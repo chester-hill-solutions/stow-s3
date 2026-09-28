@@ -267,6 +267,48 @@ agent are not hard-limited by Stow's object API quotas. Task manifests can stage
 explicit refs from local Git repositories; dirty files, older history,
 submodules, and Git LFS payloads are not included.
 
+### Finding a workspace again
+
+`workspace list` enumerates what this machine knows about, quietest first:
+
+```sh
+stow-s3 workspace list --team platform
+```
+
+```json
+{
+  "count": 1,
+  "results": [
+    {
+      "workspace_id": "ws_a8b5f66d008f6d1f",
+      "dir": "/srv/agents/task-42",
+      "bucket": "stow-workspace-195241444f2339e0",
+      "idle_seconds": 86400,
+      "age_seconds": 172800,
+      "has_ttl": false,
+      "owned": true,
+      "readable": true
+    }
+  ]
+}
+```
+
+Every other verb needs an id, and there was no way to get one short of keeping a
+note of it — which made a feature whose whole promise is "your work will still be
+here" impossible to show to somebody who had not. `readable: false` marks an entry
+whose directory has been deleted: the registry entry is real, the workspace is not,
+and nothing else in the product reports that state. It is hidden by default and
+`--all` includes it, because the listing's job is to surface a problem rather than
+tidy it away.
+
+`has_ttl` is there because `expires_in_seconds` is zero both for a workspace with
+no lifetime — the default — and for one expiring this second, and a sweep that
+branched on the number would take half a registry with it.
+
+A team's partition is a directory boundary, so `list` shows one team's workspaces
+and `--team` selects which. Listing creates nothing: it does not make a registry
+that was not there, and it does not open a workspace.
+
 ## Install
 
 **The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release

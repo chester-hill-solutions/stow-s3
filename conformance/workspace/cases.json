@@ -548,6 +548,26 @@
           "equals": "{{ws}}"
         }
       }
+    },
+    {
+      "id": "list names the workspaces left in the team partition after one is destroyed",
+      "verb": "list",
+      "registry": "a",
+      "team": "platform",
+      "expect": {
+        "count": {
+          "equals": 1
+        },
+        "results": {
+          "length": 1
+        },
+        "results[0].id": {
+          "equals": "{{ws2}}"
+        },
+        "results[0].readable": {
+          "equals": true
+        }
+      }
     }
   ]
 }
