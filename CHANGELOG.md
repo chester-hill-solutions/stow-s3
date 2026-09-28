@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+- **Bounded the registry, and made the bound refusable rather than automatic.** Nothing
+  stopped a registry growing without limit. `TTLSeconds` defaults to unlimited and
+  `prune` is manual, so the only evidence of the cost was 1961 records on one machine,
+  1959 of them pointing at directories a test had already deleted. `prune` clears
+  those; it does not stop the next 1961.
+
+  `max_workspaces` in the task manifest refuses a prepare that would take a registry
+  past a declared bound, naming the two ways out. It refuses rather than collecting
+  because collecting the oldest idle workspace destroys a task nobody said was
+  finished, and an adopted entry is somebody's project — which is why `collect`
+  already refuses those outright. A cap that deletes user data unattended is not a
+  default worth shipping; one that costs a named command is.
+
+  The count is of registry records, not directories, and of the team partition rather
+  than the root. Records, because a record whose directory is gone is exactly what
+  makes a registry large and is the one thing `prune` clears without touching data.
+  The partition, because a bound on the root would let one team's workspaces consume
+  another's quota on a shared runner.
+
+  It is declared per `prepare` and deliberately not persisted: the registry is what is
+  bounded, so a cap stored on one entry would be a property of a workspace rather than
+  of the policy that asked for it, and a caller who omitted the field next time would
+  get no bound at all. The cost is that the policy's owner sets it every time, so
+  `prepare` now reports `capabilities.registry_bound` — the limit, the count, and the
+  remainder — and an agent can see its headroom instead of hitting a wall.
+
 - **Added the second pillar, and then made three of its claims true.** A run-through
   server can now be pre-warmed with a named list of keys, refused the network
   outright with `--offline`, and asked what it can read. The gap was not the

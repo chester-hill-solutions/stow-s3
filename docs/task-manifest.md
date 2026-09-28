@@ -24,6 +24,7 @@ starts its agent with the returned `working_directory` as the process cwd.
   "max_objects": 10000,
   "max_checkpoint_bytes": 536870912,
   "max_checkpoints": 20,
+  "max_workspaces": 100,
   "ttl_seconds": 604800,
   "registry_dir": "../stow-registry",
   "team": "platform",
@@ -150,6 +151,24 @@ an omitted field means unlimited. A checkpoint that would cross either cap is
 refused; Stow never evicts an older checkpoint to make room. These caps are
 separate from the per-capture `--max-bytes` and `--max-files` archive limits.
 The `prepare` result reports both values in `capabilities.checkpoint_limits`.
+
+`max_workspaces` is a different kind of cap: it bounds the registry rather than one
+workspace, and it is checked before anything is created. Zero or an omitted field
+means unlimited, which is the default. Reaching the limit refuses the prepare and
+names the two ways out — `workspace prune`, which forgets records whose directory is
+already gone, and `workspace collect`, which reclaims finished workspaces. Stow never
+collects on its own to make room, because an adopted entry is somebody's project and
+the oldest idle workspace is a task nobody said was finished. The count is of
+registry records rather than directories, and of the team partition when `team` is
+set, so one team's workspaces cannot consume another's quota on a shared runner.
+
+It is declared per `prepare` and is not stored in the registry. The registry is what
+is bounded, so a cap recorded on one workspace would be a property of that workspace
+rather than of the policy that asked for it, and a caller that omitted the field next
+time would get no bound at all. The cost is that the owner of the policy sets it every
+time, which is why the `prepare` result reports `capabilities.registry_bound` — the
+limit, the number in use, and how much remains — so a caller can see its headroom
+rather than discover the bound by being refused.
 Retention limits bound captured payload bytes and count, not manifest or
 filesystem overhead or arbitrary files written directly into the registry.
 
