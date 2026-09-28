@@ -17,6 +17,21 @@
 // --online to additionally resolve each published target against its registry,
 // which is the check that would have caught issue #3 on its own, but which
 // depends on the network and so does not belong in a required check.
+//
+// The npm entry is checked against GitHub Packages rather than npmjs, so making
+// the five @chester-hill-solutions/stow-s3* packages installable is a three-step
+// change that has to land as one:
+//
+//   1. set each package to public in its GitHub package settings;
+//   2. change `published` to true for the npm entry here;
+//   3. update the install prose in every file DOCS names, and drop the "not
+//      published" disclaimer once nothing is unpublished.
+//
+// The order of the first two does not matter as long as they happen together — an
+// anonymous fetch returns 401 until the first, and this gate compares the two states
+// — but splitting them across commits leaves a red build in between that says nothing
+// useful on its own. Step 3 is separate and lands in the same commit: the gate names
+// the document that has not caught up.
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -117,6 +132,34 @@ export function docProblems(surface, doc, text) {
 
 export { SURFACE, DOCS };
 
+// reachabilityProblems is what a registry's answer costs, as a pure function so it
+// can be tested in every mode it has.
+//
+// docProblems above is pure for the same reason and with the same intent: the rule
+// that decides whether the gate passes should not only be reachable by running the
+// gate against the network.
+export function reachabilityProblems(check, reachable, detail) {
+  if (reachable === check.published) return [];
+  const problems = [
+    `${check.ecosystem} ${check.name} is ${reachable ? "reachable" : "not reachable"} (${detail}) ` +
+      `but is declared published=${check.published}`,
+  ];
+  // A 401 from GitHub Packages is the case worth naming, because the two changes it
+  // implies have to happen together and nothing in the failure says so. Flipping
+  // published: true before the package is public produces exactly this message, and
+  // it reads as though the repository were wrong about itself rather than as a
+  // half-finished admin action.
+  if (check.ecosystem === "npm" && detail === "HTTP 401") {
+    problems.push(
+      `  ${check.name}: HTTP 401 from GitHub Packages means the package is private. ` +
+        `Set it to public in the package settings, and change published to true in this ` +
+        `file in the same commit — an anonymous fetch cannot succeed until the first, ` +
+        `and the two states are only consistent once both have happened.`,
+    );
+  }
+  return problems;
+}
+
 const problems = [];
 
 for (const entry of SURFACE) {
@@ -164,10 +207,7 @@ if (process.argv.includes("--online")) {
       detail = error.message;
     }
     if (reachable !== check.published) {
-      problems.push(
-        `${check.ecosystem} ${check.name} is ${reachable ? "reachable" : "not reachable"} (${detail}) ` +
-          `but is declared published=${check.published}`,
-      );
+      problems.push(...reachabilityProblems(check, reachable, detail));
     } else {
       console.log(
         `  ${reachable ? "ok" : "unpublished"}  ${check.ecosystem} ${check.name} (${detail})`,

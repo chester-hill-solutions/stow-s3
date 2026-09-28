@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { docProblems, SURFACE } from "./check-install-surface.mjs";
+import { docProblems, reachabilityProblems, SURFACE } from "./check-install-surface.mjs";
 
 // A surface where everything is published. This is the state the repository is
 // heading toward and the one the gate had never been asked about.
@@ -104,4 +104,40 @@ test("a doc may reference the module path as a repository URL", () => {
     `${docFor(ALL_PUBLISHED, { disclaimer: false })}\nSource: ${repo}`,
   );
   assert.deepEqual(problems, [], `got ${JSON.stringify(problems)}`);
+});
+
+// The reachability comparison is the half of the gate that decides whether a package
+// is installable, and the mode that matters most is the one nobody has run: declared
+// published, not yet public. That is a half-finished admin action, and the failure
+// has to say so — otherwise it reads as the repository disagreeing with itself, and
+// the next thing somebody does is flip the flag back.
+test("a declared-published package that answers 401 is told what to do about it", () => {
+  const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
+  const problems = reachabilityProblems({ ...npm, published: true }, false, "HTTP 401");
+  assert.equal(problems.length, 2, "the mismatch and the remedy are both owed");
+  assert.match(problems[1], /401/);
+  assert.match(problems[1], /private/);
+  assert.match(problems[1], /same commit/);
+});
+
+test("a 401 remedy is not offered for a registry that does not use one", () => {
+  const pypi = SURFACE.find((entry) => entry.ecosystem === "pypi");
+  const problems = reachabilityProblems({ ...pypi, published: true }, false, "HTTP 401");
+  assert.equal(problems.length, 1, "only the mismatch: a PyPI 401 means something else entirely");
+});
+
+test("a matching answer is never a problem, in either direction", () => {
+  const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
+  assert.deepEqual(reachabilityProblems(npm, false, "HTTP 401"), []);
+  assert.deepEqual(reachabilityProblems({ ...npm, published: true }, true, "HTTP 200"), []);
+});
+
+test("a genuinely reachable package declared unpublished is still a problem", () => {
+  // The other direction: something is installable that this file says is not, which
+  // is the state that makes a document's "not published" prose wrong.
+  const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
+  const problems = reachabilityProblems(npm, true, "HTTP 200");
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /reachable \(HTTP 200\)/);
+  assert.match(problems[0], /published=false/);
 });
