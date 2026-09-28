@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -152,6 +153,12 @@ func armParentWatch(pid int) {
 }
 
 func main() {
+	// Ahead of the no-argument check: someone asking what they have is not asking
+	// how to use it.
+	if topLevelVersion(os.Args[1:]) {
+		return
+	}
+
 	if len(os.Args) < 2 {
 		usage()
 		os.Exit(1)
@@ -176,20 +183,27 @@ func main() {
 	}
 }
 
-func usage() {
-	fmt.Fprintf(os.Stderr, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n  prewarm     fetch named keys into the run-through cache so they survive the network\n\n")
+// usageTo takes a writer so a test can assert on it. A usage text no test can
+// read silently loses lines.
+func usageTo(out io.Writer) {
+	fmt.Fprintf(out, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n  prewarm     fetch named keys into the run-through cache so they survive the network\n\n")
 	// prewarm takes an explicit key list, and saying so here is the documentation
 	// that matters: a prefix would be the obvious thing to reach for, and it is a
 	// data-exfiltration shape on a bucket an agent was never given.
-	fmt.Fprintf(os.Stderr, "warming a cache: stow-s3 prewarm --bucket B --keys k1,k2 (exact keys only, no prefixes)\n")
+	fmt.Fprintf(out, "warming a cache: stow-s3 prewarm --bucket B --keys k1,k2 (exact keys only, no prefixes)\n")
 	// A caller that has just failed to find a health endpoint needs to be told where
 	// it is, in the one place it will look. It is /_stow/health: every other path is
 	// an S3 path that requires signing, so a bare probe of /health is refused and
 	// looks like a server that is not serving.
-	fmt.Fprintf(os.Stderr, "probing a server: curl -s http://127.0.0.1:<port>/_stow/health\n")
-	fmt.Fprintf(os.Stderr, "stow-s3 doctor does that and more, on a throwaway port\n")
-	fmt.Fprintf(os.Stderr, "writing a launcher: docs/running-and-probing.md (readiness record, port and mode traps)\n")
+	fmt.Fprintf(out, "probing a server: curl -s http://127.0.0.1:<port>/_stow/health\n")
+	fmt.Fprintf(out, "stow-s3 doctor does that and more, on a throwaway port\n")
+	fmt.Fprintf(out, "writing a launcher: docs/running-and-probing.md (readiness record, port and mode traps)\n")
+	// Stated here as well as behind a flag, because this is where someone lands who
+	// has just been told to check it.
+	fmt.Fprintf(out, "checking a version: stow-s3 --version (every subcommand answers it too)\n")
 }
+
+func usage() { usageTo(os.Stderr) }
 
 func resolveLocalCredentials(accessKey, secretKey string) (string, string) {
 	if strings.TrimSpace(accessKey) == "" {
@@ -298,6 +312,7 @@ func serve(args []string) {
 	// string flag, and that is a trap: `--offline` as a string consumed the next
 	// argument, so `--offline --ready-fd 3` failed with "invalid --offline
 	offline := registerOfflineFlag(flags)
+	showVersion := versionFlag(flags)
 	maxBytes := flags.Int64("max-bytes", 0, "Maximum stored object bytes enforced on every native S3 request (0 disables the limit)")
 	maxObjects := flags.Int64("max-objects", 0, "Maximum stored object count enforced on every native S3 request (0 disables the limit)")
 	readyFd := flags.Int("ready-fd", -1, "Write one machine-readable readiness object to this file descriptor instead of the STOW_READY line on stdout")
@@ -305,6 +320,9 @@ func serve(args []string) {
 	// The error is safe to discard: this flag set is ExitOnError, so a flag the
 	// package cannot read has already printed why and exited. See offline.go.
 	flags.Parse(args)
+	if printVersion(os.Stdout, *showVersion) {
+		return
+	}
 	rtCfg := serveRunThroughConfig(serveConfigInput{
 		AccessKey: accessKey, SecretKey: secretKey,
 		MaxBytes: *cacheMaxBytes, MaxObjects: *cacheMaxObjects, TTL: *cacheTTL,

@@ -68,7 +68,11 @@ const (
 func doctor(args []string) {
 	flags := flag.NewFlagSet("doctor", flag.ExitOnError)
 	asJSON := flags.Bool("json", false, "Emit one machine-readable JSON object instead of the human-readable report")
+	showVersion := versionFlag(flags)
 	flags.Parse(args)
+	if printVersion(os.Stdout, *showVersion) {
+		return
+	}
 
 	report, err := collectDoctorReport()
 	if err != nil {

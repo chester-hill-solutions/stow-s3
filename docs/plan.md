@@ -2,6 +2,8 @@
 
 **Canonical status and ordering:** 2026-09-27. This is the single current execution plan for workspace/handoff and deploy-anywhere work. The linked specialist plans retain detailed rationale, acceptance criteria, and design notes; if their status or ordering conflicts with this document, this document governs. Historical product plans are not separate backlogs.
 
+**Parallel axis:** [`foss-readiness-plan.md`](foss-readiness-plan.md) covers installability, the conformance matrix's missing backend, and the contribution surface. It is not a competing backlog: it holds no workspace or handoff work, and where the two touch — the conformance matrix and the workspace backend — this document still governs ordering. Three defects it names (read-through on an unseeded local bucket, `mirrorWrites` never creating the upstream bucket, and the workspace backend being outside the conformance matrix) were reproduced against two live instances on 2026-09-28 and are not recorded in the status table below.
+
 ## Goal
 
 Deliver one installable, trustworthy workflow for local S3-compatible use and prepared agent workspaces. Then use provider-backed and independent-user evidence to choose portability features. Preserve the accepted boundaries: local behavior is the default, live writes require explicit consent, workspaces are same-machine filesystem directories rather than security sandboxes, and handoffs do not carry credentials.

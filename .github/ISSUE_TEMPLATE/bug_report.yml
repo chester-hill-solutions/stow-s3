@@ -1,0 +1,70 @@
+name: Bug report
+description: Something behaves differently from what the code or the documentation says it does.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These three outputs answer most of the first round. Please paste them.
+
+  - type: textarea
+    id: version
+    attributes:
+      label: "`stow-s3 --version`"
+      description: The version of the binary you are running.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "`stow-s3 doctor --json`"
+      description: The diagnostic report. It reports platform, temp dir, backends, and whether an upstream is configured, without printing any secret.
+      render: text
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface is the problem on?
+      options:
+        - S3 protocol — an SDK operation returned the wrong answer or the wrong wire response
+        - Run-through — the cache, the offline path, or propagation to an upstream
+        - Workspace — a `stow-s3 workspace` verb
+        - Install or packaging — npm, PyPI, the Go module, or a release tarball
+        - The documentation — it describes something the code does not do
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: What did you do, and what happened?
+      description: |
+        A minimal reproduction is worth more than a description. If the answer
+        depends on an upstream bucket, say whether that bucket exists locally as
+        well as upstream: the local store is the namespace, so a read of a bucket
+        it was never given is refused on purpose.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Relevant configuration, the exact command line, or a log excerpt.
+      render: text
+    validations:
+      required: false

@@ -1,0 +1,56 @@
+name: Feature or design discussion
+description: Propose a change, or ask how to do something, before writing it.
+labels: ["needs discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A design that arrives as a patch is much harder to steer than one that
+        arrives as a question. Please start here for anything larger than a bug
+        fix, especially if it changes observable S3 behaviour or adds a verb.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: The situation, not the solution. What are you doing today that is hard?
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What are you proposing?
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: fidelity
+    attributes:
+      label: Does this move clients toward or away from real AWS S3?
+      description: |
+        Fidelity to the real service is a design goal here, and a deviation needs a
+        reason someone can check. If the proposal is stow-specific behaviour that
+        real S3 does not have, say so and say why that is worth it.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: adr
+    attributes:
+      label: Does this contradict a decision in `docs/adr/`?
+      description: If so, name the ADR. An ADR that is now wrong is worth revisiting deliberately rather than quietly.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: prior
+    attributes:
+      label: Before filing
+      options:
+        - label: I searched the existing issues and this is not already covered.
+          required: true

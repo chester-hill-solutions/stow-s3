@@ -1,0 +1,58 @@
+# The workflows pin every action to a commit SHA with a version comment, which is
+# the right discipline and the reason this file groups them: without grouping,
+# Dependabot opens one pull request per action and every one of them is a no-op
+# review. With grouping, an action bump is a single change touching one file in
+# each workflow.
+version: 2
+
+updates:
+  # The Go module's dependencies are few and pinned, and aws-sdk-go-v2 is the
+  # surface the conformance suite is written against, so a minor bump is usually a
+  # small diff and a major one is worth reading.
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 4
+    groups:
+      aws-sdk:
+        patterns:
+          - "github.com/aws/*"
+          - "github.com/smithy-go"
+        update-types:
+          - minor
+          - patch
+    labels: ["dependencies"]
+
+  # Two npm trees. The root one is the TypeScript client; the platform carrier
+  # packages are published from the same build and their manifests are checked by
+  # scripts/check-version.mjs, so a change to one of those needs that gate to move
+  # in the same commit.
+  - package-ecosystem: npm
+    directory: /packages/stow-s3
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 4
+    labels: ["dependencies"]
+
+  - package-ecosystem: pip
+    directory: /packages/stow-s3-py
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    labels: ["dependencies"]
+
+  # Every action in the three workflows is SHA-pinned, so Dependabot is the only
+  # thing that will ever move them. Grouped for the reason in the header.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      actions:
+        patterns:
+          - "*"
+    labels: ["dependencies", "ci"]

@@ -338,6 +338,9 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 		}
 		return a.revalidateCachedObject(ctx, bucket, key, localMeta, needBody)
 	}
+	// The local store is the namespace, not merely a cache: a bucket it was never
+	// given does not exist here, and reading through for it would let a client
+	// reach any bucket on the upstream by guessing the name.
 	if !errors.Is(localErr, storage.ErrObjectNotFound) {
 		return nil, nil, localErr
 	}

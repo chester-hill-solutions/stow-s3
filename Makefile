@@ -1,4 +1,4 @@
-.PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface standards check-generated benchmark
+.PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-scripts standards check-generated benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -127,6 +127,13 @@ check-version:
 check-install-surface:
 	node scripts/check-install-surface.mjs
 
+# The command surface the documentation is checked against comes from running the
+# binary, so this target builds it rather than trusting whatever is in bin/. A
+# gate that checked prose against a stale binary would pass on a flag that no
+# longer exists and fail on one that does.
+check-doc-commands:
+	node scripts/check-doc-commands.mjs
+
 # The gates under scripts/ are code, and a gate with no test is a gate whose
 # rules are never exercised in the modes they claim to handle. check-install-surface
 # shipped a rule that only misbehaved once every package was published, and the
@@ -134,4 +141,4 @@ check-install-surface:
 check-scripts:
 	node --test scripts/*.test.mjs
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-install-surface check-scripts check-ts-quality check-generated
+standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-install-surface check-doc-commands check-scripts check-ts-quality check-generated

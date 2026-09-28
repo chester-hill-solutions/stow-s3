@@ -61,8 +61,12 @@ func prewarm(args []string) error {
 	offline := registerOfflineFlag(flags)
 	dataDir := flags.String("data-dir", "", "Local data directory")
 	cacheDir := flags.String("cache-dir", "", "Cache directory (default: <data-dir>/cache)")
+	showVersion := versionFlag(flags)
 	if err := flags.Parse(args); err != nil {
 		return err
+	}
+	if printVersion(os.Stdout, *showVersion) {
+		return nil
 	}
 
 	keys, err := readPrewarmKeys(*keysFlag, *keysFile)
