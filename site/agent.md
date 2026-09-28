@@ -16,7 +16,9 @@ directories, and explicit refs from local Git repositories. Git preparation
 uses a fresh shallow checkout of the selected commit; dirty files, older
 history, submodules, and Git LFS payloads are excluded. See
 [`docs/task-manifest.md`](../docs/task-manifest.md) for resume, checkpoint,
-diff, restore, same-machine handoff, and portable archive commands.
+diff, restore, same-machine handoff, and portable archive commands. This is
+filesystem isolation for task editing, not an OS security sandbox; direct file
+writes by an agent are not hard-limited by Stow's object API quotas.
 
 Use a scoped session when you need only disposable S3 bytes and none of these
 are true:
@@ -76,10 +78,12 @@ carries its own binary and does not need it.
 If the binary cannot be found or run, `stow-s3 doctor` reports which of the
 client and server sides is broken instead of failing opaquely.
 
-## The pattern you want
+## Disposable S3 fixture
 
-Start a scoped session, use a normal S3 client, let the session clean up. This
-is the shortest correct path and it is what the library is built around.
+When you only need temporary S3 objects for a test or build step, start a scoped
+session, use a normal S3 client, and let the session clean up. This pattern is
+for disposable data; use a prepared workspace when task files need to persist or
+be handed off.
 
 TypeScript:
 

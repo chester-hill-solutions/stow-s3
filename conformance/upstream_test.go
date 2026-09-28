@@ -181,13 +181,13 @@ func liveAdapter(t *testing.T, ctx context.Context, config runthrough.UpstreamCo
 }
 
 type liveObjectCleaner interface {
-	DeleteObject(context.Context, string, string) error
+	DeleteObject(context.Context, string, string, string) error
 	HeadObject(context.Context, string, string) (*storage.ObjectMeta, error)
 	ListObjectsV2(context.Context, string, storage.ListOptions) (*storage.ListResult, error)
 }
 
 func removeAndVerifyLiveObject(ctx context.Context, upstream liveObjectCleaner, bucket, key string) error {
-	if err := upstream.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
+	if err := upstream.DeleteObject(ctx, bucket, key, ""); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
 		return fmt.Errorf("delete %q: %w", key, err)
 	}
 	for {

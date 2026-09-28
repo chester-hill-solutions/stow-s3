@@ -22,6 +22,8 @@ export interface WorkspaceArchiveOptions {
 export declare function runWorkspaceCommand(args: readonly string[]): Promise<WorkspaceJSON>;
 export declare function prepareWorkspace(manifestPath: string): Promise<WorkspaceJSON>;
 export declare function resumeWorkspace(options: ResumeWorkspaceOptions): Promise<WorkspaceJSON>;
+export declare function destroyWorkspace(id: string, registryDir?: string): Promise<WorkspaceJSON>;
+export declare function collectWorkspaces(registryDir?: string): Promise<WorkspaceJSON>;
 export declare function handoffWorkspace(id: string, options?: {
     readonly registryDir?: string;
     readonly checkpointId?: string;

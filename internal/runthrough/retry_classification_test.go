@@ -28,7 +28,7 @@ func TestRetryClassification(t *testing.T) {
 	}
 
 	outbox := runthrough.NewMemoryOutbox()
-	entry, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
+	entry, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
 	if err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}

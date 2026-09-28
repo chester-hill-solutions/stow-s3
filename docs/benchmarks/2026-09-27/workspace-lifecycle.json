@@ -1,0 +1,602 @@
+{
+  "environment": {
+    "measuredAt": "2026-09-28T02:15:11.703Z",
+    "node": "v25.9.0",
+    "os": "darwin arm64",
+    "cpu": "Apple M1 Pro",
+    "cpuCount": 8,
+    "totalMemoryMb": 16384,
+    "runsPerWorkload": 7,
+    "surface": "TypeScript workspace wrapper invoking the local native CLI",
+    "note": "Per-operation elapsed time includes a fresh CLI child process; source fixture generation is excluded."
+  },
+  "workloads": {
+    "tiny": {
+      "seededFiles": 2,
+      "seededBytes": 70,
+      "operations": {
+        "prepare": {
+          "samples": 7,
+          "minMs": 62.95,
+          "p50Ms": 68.3,
+          "p95Ms": 139.04,
+          "maxMs": 139.04
+        },
+        "handoff": {
+          "samples": 7,
+          "minMs": 58.85,
+          "p50Ms": 65.48,
+          "p95Ms": 78.44,
+          "maxMs": 78.44
+        },
+        "resume": {
+          "samples": 7,
+          "minMs": 58.05,
+          "p50Ms": 63.98,
+          "p95Ms": 85.14,
+          "maxMs": 85.14
+        },
+        "initialCheckpoint": {
+          "samples": 7,
+          "minMs": 60.62,
+          "p50Ms": 66.65,
+          "p95Ms": 70.12,
+          "maxMs": 70.12
+        },
+        "checkpointAfterEdit": {
+          "samples": 7,
+          "minMs": 61.81,
+          "p50Ms": 65.63,
+          "p95Ms": 79.9,
+          "maxMs": 79.9
+        },
+        "diff": {
+          "samples": 7,
+          "minMs": 5.46,
+          "p50Ms": 6.06,
+          "p95Ms": 6.6,
+          "maxMs": 6.6
+        },
+        "export": {
+          "samples": 7,
+          "minMs": 8.95,
+          "p50Ms": 10.68,
+          "p95Ms": 15.78,
+          "maxMs": 15.78
+        },
+        "preview": {
+          "samples": 7,
+          "minMs": 4.99,
+          "p50Ms": 5.42,
+          "p95Ms": 9.3,
+          "maxMs": 9.3
+        },
+        "import": {
+          "samples": 7,
+          "minMs": 10.95,
+          "p50Ms": 11.55,
+          "p95Ms": 24.29,
+          "maxMs": 24.29
+        },
+        "restore": {
+          "samples": 7,
+          "minMs": 59.65,
+          "p50Ms": 61.42,
+          "p95Ms": 89.52,
+          "maxMs": 89.52
+        },
+        "destroyOriginal": {
+          "samples": 7,
+          "minMs": 62.19,
+          "p50Ms": 65.17,
+          "p95Ms": 95.12,
+          "maxMs": 95.12
+        },
+        "destroyRestored": {
+          "samples": 7,
+          "minMs": 57.27,
+          "p50Ms": 64.36,
+          "p95Ms": 87.6,
+          "maxMs": 87.6
+        }
+      },
+      "workspaceBytesOnDiskBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 1364,
+        "p50Bytes": 1364,
+        "p95Bytes": 1364,
+        "maxBytes": 1364
+      },
+      "registryBytesOnDiskBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 3468,
+        "p50Bytes": 3469,
+        "p95Bytes": 3469,
+        "maxBytes": 3469
+      },
+      "workspaceAndRegistryBytesBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 4832,
+        "p50Bytes": 4833,
+        "p95Bytes": 4833,
+        "maxBytes": 4833
+      },
+      "checkpointBytes": {
+        "samples": 7,
+        "minBytes": 1094,
+        "p50Bytes": 1094,
+        "p95Bytes": 1094,
+        "maxBytes": 1094
+      },
+      "archiveBytes": {
+        "samples": 7,
+        "minBytes": 545,
+        "p50Bytes": 549,
+        "p95Bytes": 550,
+        "maxBytes": 550
+      },
+      "handoffBytes": {
+        "samples": 7,
+        "minBytes": 167,
+        "p50Bytes": 167,
+        "p95Bytes": 167,
+        "maxBytes": 167
+      },
+      "nativeCliMemory": {
+        "note": "Run with --memory-only under system resource measurement to capture CLI high-water RSS."
+      }
+    },
+    "agent": {
+      "seededFiles": 24,
+      "seededBytes": 597007,
+      "operations": {
+        "prepare": {
+          "samples": 7,
+          "minMs": 75.73,
+          "p50Ms": 81.48,
+          "p95Ms": 88.39,
+          "maxMs": 88.39
+        },
+        "handoff": {
+          "samples": 7,
+          "minMs": 59.1,
+          "p50Ms": 65.12,
+          "p95Ms": 85.61,
+          "maxMs": 85.61
+        },
+        "resume": {
+          "samples": 7,
+          "minMs": 58.45,
+          "p50Ms": 63.15,
+          "p95Ms": 75.23,
+          "maxMs": 75.23
+        },
+        "initialCheckpoint": {
+          "samples": 7,
+          "minMs": 66.06,
+          "p50Ms": 80.57,
+          "p95Ms": 120.5,
+          "maxMs": 120.5
+        },
+        "checkpointAfterEdit": {
+          "samples": 7,
+          "minMs": 70.9,
+          "p50Ms": 75.61,
+          "p95Ms": 140.84,
+          "maxMs": 140.84
+        },
+        "diff": {
+          "samples": 7,
+          "minMs": 5.42,
+          "p50Ms": 5.71,
+          "p95Ms": 5.92,
+          "maxMs": 5.92
+        },
+        "export": {
+          "samples": 7,
+          "minMs": 19.71,
+          "p50Ms": 21.05,
+          "p95Ms": 51.94,
+          "maxMs": 51.94
+        },
+        "preview": {
+          "samples": 7,
+          "minMs": 5.5,
+          "p50Ms": 6.09,
+          "p95Ms": 12.61,
+          "maxMs": 12.61
+        },
+        "import": {
+          "samples": 7,
+          "minMs": 17.55,
+          "p50Ms": 18.25,
+          "p95Ms": 25.09,
+          "maxMs": 25.09
+        },
+        "restore": {
+          "samples": 7,
+          "minMs": 68.41,
+          "p50Ms": 74.21,
+          "p95Ms": 78.67,
+          "maxMs": 78.67
+        },
+        "destroyOriginal": {
+          "samples": 7,
+          "minMs": 71.25,
+          "p50Ms": 75.2,
+          "p95Ms": 80.74,
+          "maxMs": 80.74
+        },
+        "destroyRestored": {
+          "samples": 7,
+          "minMs": 65.14,
+          "p50Ms": 67.42,
+          "p95Ms": 95.88,
+          "maxMs": 95.88
+        }
+      },
+      "workspaceBytesOnDiskBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 598299,
+        "p50Bytes": 598301,
+        "p95Bytes": 598301,
+        "maxBytes": 598301
+      },
+      "registryBytesOnDiskBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 1205142,
+        "p50Bytes": 1205143,
+        "p95Bytes": 1205145,
+        "maxBytes": 1205145
+      },
+      "workspaceAndRegistryBytesBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 1803441,
+        "p50Bytes": 1803444,
+        "p95Bytes": 1803446,
+        "maxBytes": 1803446
+      },
+      "checkpointBytes": {
+        "samples": 7,
+        "minBytes": 598031,
+        "p50Bytes": 598031,
+        "p95Bytes": 598031,
+        "maxBytes": 598031
+      },
+      "archiveBytes": {
+        "samples": 7,
+        "minBytes": 267993,
+        "p50Bytes": 267999,
+        "p95Bytes": 268000,
+        "maxBytes": 268000
+      },
+      "handoffBytes": {
+        "samples": 7,
+        "minBytes": 167,
+        "p50Bytes": 167,
+        "p95Bytes": 167,
+        "maxBytes": 167
+      },
+      "nativeCliMemory": {
+        "note": "Run with --memory-only under system resource measurement to capture CLI high-water RSS."
+      }
+    },
+    "scale": {
+      "seededFiles": 500,
+      "seededBytes": 16384000,
+      "operations": {
+        "prepare": {
+          "samples": 7,
+          "minMs": 196.15,
+          "p50Ms": 240.28,
+          "p95Ms": 460.81,
+          "maxMs": 460.81
+        },
+        "handoff": {
+          "samples": 7,
+          "minMs": 64.65,
+          "p50Ms": 70.76,
+          "p95Ms": 92.36,
+          "maxMs": 92.36
+        },
+        "resume": {
+          "samples": 7,
+          "minMs": 65.79,
+          "p50Ms": 71.14,
+          "p95Ms": 134.71,
+          "maxMs": 134.71
+        },
+        "initialCheckpoint": {
+          "samples": 7,
+          "minMs": 205.19,
+          "p50Ms": 233.89,
+          "p95Ms": 411.85,
+          "maxMs": 411.85
+        },
+        "checkpointAfterEdit": {
+          "samples": 7,
+          "minMs": 262.89,
+          "p50Ms": 372.89,
+          "p95Ms": 404.61,
+          "maxMs": 404.61
+        },
+        "diff": {
+          "samples": 7,
+          "minMs": 6.47,
+          "p50Ms": 7.13,
+          "p95Ms": 7.73,
+          "maxMs": 7.73
+        },
+        "export": {
+          "samples": 7,
+          "minMs": 126.24,
+          "p50Ms": 144.37,
+          "p95Ms": 206,
+          "maxMs": 206
+        },
+        "preview": {
+          "samples": 7,
+          "minMs": 27.2,
+          "p50Ms": 28.28,
+          "p95Ms": 36.46,
+          "maxMs": 36.46
+        },
+        "import": {
+          "samples": 7,
+          "minMs": 144.1,
+          "p50Ms": 291.94,
+          "p95Ms": 480.41,
+          "maxMs": 480.41
+        },
+        "restore": {
+          "samples": 7,
+          "minMs": 257.47,
+          "p50Ms": 342.08,
+          "p95Ms": 541.85,
+          "maxMs": 541.85
+        },
+        "destroyOriginal": {
+          "samples": 7,
+          "minMs": 214.62,
+          "p50Ms": 247.37,
+          "p95Ms": 446.58,
+          "maxMs": 446.58
+        },
+        "destroyRestored": {
+          "samples": 7,
+          "minMs": 105.8,
+          "p50Ms": 113.65,
+          "p95Ms": 1903.85,
+          "maxMs": 1903.85
+        }
+      },
+      "workspaceBytesOnDiskBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 16385293,
+        "p50Bytes": 16385294,
+        "p95Bytes": 16385294,
+        "maxBytes": 16385294
+      },
+      "registryBytesOnDiskBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 32948363,
+        "p50Bytes": 32948365,
+        "p95Bytes": 32948365,
+        "maxBytes": 32948365
+      },
+      "workspaceAndRegistryBytesBeforeDestroy": {
+        "samples": 7,
+        "minBytes": 49333657,
+        "p50Bytes": 49333659,
+        "p95Bytes": 49333659,
+        "maxBytes": 49333659
+      },
+      "checkpointBytes": {
+        "samples": 7,
+        "minBytes": 16385024,
+        "p50Bytes": 16385024,
+        "p95Bytes": 16385024,
+        "maxBytes": 16385024
+      },
+      "archiveBytes": {
+        "samples": 7,
+        "minBytes": 1750045,
+        "p50Bytes": 1750048,
+        "p95Bytes": 1750051,
+        "maxBytes": 1750051
+      },
+      "handoffBytes": {
+        "samples": 7,
+        "minBytes": 167,
+        "p50Bytes": 167,
+        "p95Bytes": 167,
+        "maxBytes": 167
+      },
+      "nativeCliMemory": {
+        "note": "Run with --memory-only under system resource measurement to capture CLI high-water RSS."
+      }
+    }
+  },
+  "parallelWorkspacePrepare": {
+    "1": {
+      "workspaces": 1,
+      "samples": 5,
+      "batchMs": {
+        "samples": 5,
+        "minMs": 72.06,
+        "p50Ms": 87.47,
+        "p95Ms": 119.34,
+        "maxMs": 119.34
+      },
+      "firstWorkspaceReadyMs": {
+        "samples": 5,
+        "minMs": 72.05,
+        "p50Ms": 87.46,
+        "p95Ms": 119.32,
+        "maxMs": 119.32
+      },
+      "lastWorkspaceReadyMs": {
+        "samples": 5,
+        "minMs": 72.05,
+        "p50Ms": 87.46,
+        "p95Ms": 119.32,
+        "maxMs": 119.32
+      },
+      "perPrepareMs": {
+        "samples": 5,
+        "minMs": 72.04,
+        "p50Ms": 87.46,
+        "p95Ms": 119.27,
+        "maxMs": 119.27
+      },
+      "workspacesPerSecond": {
+        "samples": 5,
+        "minWorkspacesPerSecond": 8.38,
+        "p50WorkspacesPerSecond": 11.43,
+        "p95WorkspacesPerSecond": 13.88,
+        "maxWorkspacesPerSecond": 13.88
+      },
+      "seededBytesTotal": {
+        "samples": 5,
+        "minBytes": 597007,
+        "p50Bytes": 597007,
+        "p95Bytes": 597007,
+        "maxBytes": 597007
+      },
+      "workspaceBytesOnDiskTotal": {
+        "samples": 5,
+        "minBytes": 597277,
+        "p50Bytes": 597277,
+        "p95Bytes": 597277,
+        "maxBytes": 597277
+      },
+      "sharedRegistryBytesOnDisk": {
+        "samples": 5,
+        "minBytes": 532,
+        "p50Bytes": 536,
+        "p95Bytes": 536,
+        "maxBytes": 536
+      }
+    },
+    "4": {
+      "workspaces": 4,
+      "samples": 5,
+      "batchMs": {
+        "samples": 5,
+        "minMs": 217.56,
+        "p50Ms": 224.11,
+        "p95Ms": 251.68,
+        "maxMs": 251.68
+      },
+      "firstWorkspaceReadyMs": {
+        "samples": 5,
+        "minMs": 193.33,
+        "p50Ms": 206.26,
+        "p95Ms": 228.09,
+        "maxMs": 228.09
+      },
+      "lastWorkspaceReadyMs": {
+        "samples": 5,
+        "minMs": 217.55,
+        "p50Ms": 224.1,
+        "p95Ms": 251.67,
+        "maxMs": 251.67
+      },
+      "perPrepareMs": {
+        "samples": 20,
+        "minMs": 192.58,
+        "p50Ms": 215.8,
+        "p95Ms": 245.81,
+        "maxMs": 250.26
+      },
+      "workspacesPerSecond": {
+        "samples": 5,
+        "minWorkspacesPerSecond": 15.89,
+        "p50WorkspacesPerSecond": 17.85,
+        "p95WorkspacesPerSecond": 18.39,
+        "maxWorkspacesPerSecond": 18.39
+      },
+      "seededBytesTotal": {
+        "samples": 5,
+        "minBytes": 2388028,
+        "p50Bytes": 2388028,
+        "p95Bytes": 2388028,
+        "maxBytes": 2388028
+      },
+      "workspaceBytesOnDiskTotal": {
+        "samples": 5,
+        "minBytes": 2389106,
+        "p50Bytes": 2389107,
+        "p95Bytes": 2389108,
+        "maxBytes": 2389108
+      },
+      "sharedRegistryBytesOnDisk": {
+        "samples": 5,
+        "minBytes": 2142,
+        "p50Bytes": 2144,
+        "p95Bytes": 2144,
+        "maxBytes": 2144
+      }
+    },
+    "8": {
+      "workspaces": 8,
+      "samples": 5,
+      "batchMs": {
+        "samples": 5,
+        "minMs": 365.44,
+        "p50Ms": 397.84,
+        "p95Ms": 416.88,
+        "maxMs": 416.88
+      },
+      "firstWorkspaceReadyMs": {
+        "samples": 5,
+        "minMs": 298.62,
+        "p50Ms": 321,
+        "p95Ms": 335.99,
+        "maxMs": 335.99
+      },
+      "lastWorkspaceReadyMs": {
+        "samples": 5,
+        "minMs": 365.44,
+        "p50Ms": 397.83,
+        "p95Ms": 416.88,
+        "maxMs": 416.88
+      },
+      "perPrepareMs": {
+        "samples": 40,
+        "minMs": 296.92,
+        "p50Ms": 366.08,
+        "p95Ms": 404.48,
+        "maxMs": 414.15
+      },
+      "workspacesPerSecond": {
+        "samples": 5,
+        "minWorkspacesPerSecond": 19.19,
+        "p50WorkspacesPerSecond": 20.11,
+        "p95WorkspacesPerSecond": 21.89,
+        "maxWorkspacesPerSecond": 21.89
+      },
+      "seededBytesTotal": {
+        "samples": 5,
+        "minBytes": 4776056,
+        "p50Bytes": 4776056,
+        "p95Bytes": 4776056,
+        "maxBytes": 4776056
+      },
+      "workspaceBytesOnDiskTotal": {
+        "samples": 5,
+        "minBytes": 4778213,
+        "p50Bytes": 4778216,
+        "p95Bytes": 4778216,
+        "maxBytes": 4778216
+      },
+      "sharedRegistryBytesOnDisk": {
+        "samples": 5,
+        "minBytes": 4282,
+        "p50Bytes": 4282,
+        "p95Bytes": 4288,
+        "maxBytes": 4288
+      }
+    }
+  }
+}

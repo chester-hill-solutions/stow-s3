@@ -20,7 +20,7 @@ func TestFileOutboxRestartsWithMonotonicIDs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new file outbox: %v", err)
 	}
-	if _, err := first.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "one"}); err != nil {
+	if _, err := first.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "one"}); err != nil {
 		t.Fatalf("enqueue first: %v", err)
 	}
 	firstPending := first.Pending()
@@ -35,7 +35,7 @@ func TestFileOutboxRestartsWithMonotonicIDs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reopen file outbox: %v", err)
 	}
-	if _, err := second.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "two"}); err != nil {
+	if _, err := second.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "two"}); err != nil {
 		t.Fatalf("enqueue second: %v", err)
 	}
 	pending := second.Pending()
@@ -88,7 +88,7 @@ func TestFileOutboxUpgradesLegacyAttemptedEntries(t *testing.T) {
 		t.Fatalf("mark success: %v", err)
 	}
 
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "later"}); err != nil {
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "later"}); err != nil {
 		t.Fatalf("enqueue after upgrade: %v", err)
 	}
 	data, err := os.ReadFile(path)

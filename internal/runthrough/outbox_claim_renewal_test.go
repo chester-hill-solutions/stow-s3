@@ -54,7 +54,7 @@ func newSlowUpstream(delay time.Duration) *slowUpstream {
 	}
 }
 
-func (u *slowUpstream) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) error {
+func (u *slowUpstream) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (string, error) {
 	select {
 	case u.held <- struct{}{}:
 	default:
@@ -62,7 +62,7 @@ func (u *slowUpstream) PutObject(ctx context.Context, bucket, key string, body i
 	time.Sleep(u.delay)
 	data, err := io.ReadAll(body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	location := bucket + "/" + key
 	u.stored[location] = data
@@ -74,7 +74,7 @@ func (u *slowUpstream) PutObject(ctx context.Context, bucket, key string, body i
 		ContentType: opts.ContentType,
 		Metadata:    opts.Metadata,
 	}
-	return nil
+	return u.meta[location].ETag, nil
 }
 
 func (u *slowUpstream) HeadObject(_ context.Context, bucket, key string) (*storage.ObjectMeta, error) {
@@ -95,7 +95,7 @@ func (u *slowUpstream) GetObject(_ context.Context, bucket, key string) (io.Read
 	return io.NopCloser(bytes.NewReader(data)), &meta, nil
 }
 
-func (u *slowUpstream) DeleteObject(_ context.Context, bucket, key string) error {
+func (u *slowUpstream) DeleteObject(_ context.Context, bucket, key, ifMatch string) error {
 	location := bucket + "/" + key
 	delete(u.stored, location)
 	delete(u.meta, location)
@@ -126,7 +126,7 @@ func TestClaimLeaseIsRenewedDuringSlowPropagation(t *testing.T) {
 		t.Fatalf("file outbox: %v", err)
 	}
 	counting := &countingClaimOutbox{FileOutbox: outbox}
-	entry, err := counting.Enqueue(OutboxEntry{
+	entry, err := counting.Enqueue(OutboxEntry{UpstreamAbsent: true,
 		Operation: OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",

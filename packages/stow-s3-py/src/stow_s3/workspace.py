@@ -27,7 +27,7 @@ def run_workspace_command(*args: str) -> WorkspaceJSON:
 
     command = ("workspace", *args)
     result = subprocess.run(
-        [require_stow_binary(), *command],
+        [require_stow_binary().path, *command],
         check=False,
         capture_output=True,
         text=True,
@@ -53,6 +53,18 @@ def resume_workspace(
     args = ["resume"]
     _append_flag(args, "--id", id)
     _append_flag(args, "--handoff", handoff)
+    _append_flag(args, "--registry-dir", registry_dir)
+    return run_workspace_command(*args)
+
+
+def destroy_workspace(id: str, *, registry_dir: str | None = None) -> WorkspaceJSON:
+    args = ["destroy", "--id", id]
+    _append_flag(args, "--registry-dir", registry_dir)
+    return run_workspace_command(*args)
+
+
+def collect_workspaces(*, registry_dir: str | None = None) -> WorkspaceJSON:
+    args = ["collect"]
     _append_flag(args, "--registry-dir", registry_dir)
     return run_workspace_command(*args)
 

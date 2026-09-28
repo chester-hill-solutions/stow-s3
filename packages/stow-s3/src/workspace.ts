@@ -56,6 +56,18 @@ export function resumeWorkspace(options: ResumeWorkspaceOptions): Promise<Worksp
   return runWorkspaceCommand(args);
 }
 
+export function destroyWorkspace(id: string, registryDir?: string): Promise<WorkspaceJSON> {
+  const args = ["destroy", "--id", id];
+  appendFlag(args, "--registry-dir", registryDir);
+  return runWorkspaceCommand(args);
+}
+
+export function collectWorkspaces(registryDir?: string): Promise<WorkspaceJSON> {
+  const args = ["collect"];
+  appendFlag(args, "--registry-dir", registryDir);
+  return runWorkspaceCommand(args);
+}
+
 export function handoffWorkspace(
   id: string,
   options: { readonly registryDir?: string; readonly checkpointId?: string; readonly output?: string } = {},

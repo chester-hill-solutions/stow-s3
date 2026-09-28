@@ -20,7 +20,7 @@ func TestFileOutboxPersistsPreparedCommit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	entry, err := outbox.Prepare(runthrough.OutboxEntry{
+	entry, err := outbox.Prepare(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",
@@ -50,15 +50,16 @@ type postCommitErrorUpstream struct {
 	failNextPut bool
 }
 
-func (u *postCommitErrorUpstream) PutObject(ctx context.Context, bucket, key string, body io.Reader, options storage.PutOptions) error {
-	if err := u.mockUpstream.PutObject(ctx, bucket, key, body, options); err != nil {
-		return err
+func (u *postCommitErrorUpstream) PutObject(ctx context.Context, bucket, key string, body io.Reader, options storage.PutOptions) (string, error) {
+	etag, err := u.mockUpstream.PutObject(ctx, bucket, key, body, options)
+	if err != nil {
+		return "", err
 	}
 	if u.failNextPut {
 		u.failNextPut = false
-		return runthrough.NewTransientUpstreamError(errors.New("upstream acknowledgement lost"))
+		return "", runthrough.NewTransientUpstreamError(errors.New("upstream acknowledgement lost"))
 	}
-	return nil
+	return etag, nil
 }
 
 func TestRetryReconcilesCommittedUpstreamPut(t *testing.T) {
@@ -75,7 +76,7 @@ func TestRetryReconcilesCommittedUpstreamPut(t *testing.T) {
 	if err != nil {
 		t.Fatalf("outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key", Version: meta.VersionID}); err != nil {
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key", Version: meta.VersionID}); err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
 	up := &postCommitErrorUpstream{mockUpstream: newMockUpstream(), failNextPut: true}
@@ -100,8 +101,8 @@ type postCommitErrorDeleteUpstream struct {
 	failNextDelete bool
 }
 
-func (u *postCommitErrorDeleteUpstream) DeleteObject(ctx context.Context, bucket, key string) error {
-	if err := u.mockUpstream.DeleteObject(ctx, bucket, key); err != nil {
+func (u *postCommitErrorDeleteUpstream) DeleteObject(ctx context.Context, bucket, key, ifMatch string) error {
+	if err := u.mockUpstream.DeleteObject(ctx, bucket, key, ifMatch); err != nil {
 		return err
 	}
 	if u.failNextDelete {
@@ -128,11 +129,11 @@ func TestRetryReconcilesCommittedUpstreamDelete(t *testing.T) {
 	if err != nil {
 		t.Fatalf("outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxDelete, Bucket: "bucket", Key: "key", Version: meta.VersionID}); err != nil {
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxDelete, Bucket: "bucket", Key: "key", Version: meta.VersionID, UpstreamVersion: meta.ETag}); err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
 	up := &postCommitErrorDeleteUpstream{mockUpstream: newMockUpstream(), failNextDelete: true}
-	if err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("value")), storage.PutOptions{}); err != nil {
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("value")), storage.PutOptions{}); err != nil {
 		t.Fatalf("seed upstream: %v", err)
 	}
 	adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, local, local, up, outbox)
@@ -280,10 +281,10 @@ func TestOutboxInspectionSnapshotsActiveAndPreparedEntries(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "active"}); err != nil {
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "active"}); err != nil {
 		t.Fatalf("enqueue active: %v", err)
 	}
-	if _, err := outbox.Prepare(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "prepared"}); err != nil {
+	if _, err := outbox.Prepare(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "prepared"}); err != nil {
 		t.Fatalf("prepare entry: %v", err)
 	}
 	adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, local, local, newMockUpstream(), outbox)
@@ -305,7 +306,7 @@ func TestFileOutboxPersistsPreparedIntentAcrossRestart(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	entry, err := outbox.Prepare(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
+	entry, err := outbox.Prepare(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
 	if err != nil {
 		t.Fatalf("prepare: %v", err)
 	}
@@ -334,7 +335,7 @@ func TestRetryPendingCommitsPreparedIntentAfterLocalMutation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Prepare(runthrough.OutboxEntry{
+	if _, err := outbox.Prepare(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",
@@ -373,7 +374,7 @@ func TestRetryPendingDiscardsPreparedIntentWhenLocalMutationDidNotCommit(t *test
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	entry, err := outbox.Prepare(runthrough.OutboxEntry{
+	entry, err := outbox.Prepare(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation:       runthrough.OutboxPut,
 		Bucket:          "bucket",
 		Key:             "key",

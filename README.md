@@ -566,18 +566,21 @@ artifact.
 
 The repository contains the Go server, storage backends, runtime packages, WebAssembly bridge, TypeScript package, Python package, and shared conformance tests.
 
-Measure session memory with the benchmark. It is deliberately not part of
-`make standards`, because it is a measurement tool rather than a check:
+Measure session startup, first upload, request latency, memory scaling, parallel
+connections and sessions, and the workspace handoff/checkpoint lifecycle with:
 
 ```bash
-make build
-node packages/stow-s3/scripts/benchmark-session.mjs --sweep
+make benchmark
 ```
 
-Rebuild before measuring. A benchmark run against a stale binary reports the
-previous build's numbers without saying so. The results, including several
-findings that contradicted an earlier theory about what drives session memory,
-are recorded in `docs/benchmarks/session-baseline.md`.
+This is measurement rather than a gate, so it is deliberately not part of
+`make standards`. It builds the binaries first. Session measurements need
+loopback binding; workspace measurements run through the TypeScript wrapper and
+native CLI. To capture the workspace CLI's high-water RSS separately, run
+`node packages/stow-s3/scripts/benchmark-workspace.mjs --memory-only`. The
+recorded machine-specific baseline and raw JSON are in
+`docs/benchmarks/2026-09-27/`; the older session memory experiments remain in
+`docs/benchmarks/session-baseline.md`.
 
 ## License
 

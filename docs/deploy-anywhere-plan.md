@@ -1,8 +1,8 @@
 # Deploy-Anywhere Plan
 
-**Status:** Phases 0–5 done. Phases 6–7 are not started.
+**Status (2026-09-27):** Phases 0, 1, 3, 4b, and 5 are implemented. Phase 2 is closed with a documented runtime-floor limitation: linker stripping reduces the artifact but not the 8 MiB post-boot floor. Phase 4 remains conditional on naming a persistence target. Phases 6–7 are not started. Phase 3 removes backend listing from refresh; planner cost is now benchmarked, and a more complex incremental index is deferred pending a named workload.
 **Date:** 2026-09-27
-**Baseline:** `main` at `4ca2c1a`
+**Baseline:** `main` at `155dff2` (follow-up changes are currently uncommitted)
 **Relationship:** additive to the accepted decisions in ADRs 0005–0011, `docs/compat-contract.md`, and `docs/workspace-contract.md`. This plan is the current execution order for the *portability and multi-writer* workstreams, and it sequences the MCP adapter that `docs/agent-workspace-plan.md` Phase 5 item 3 defers. It does not supersede that plan's workspace phases; the two run in parallel and this one is ordered first where they touch the same code.
 
 ## 1. Goal
@@ -39,7 +39,8 @@ the design if they stopped being true.
 | Stored bytes match what was written | 1049576 B / 201 objects | probe `usage` |
 | Host surface required | **22 functions, 1 module** (`gojs`) | binary import section |
 | Import modules beyond `gojs` | none — no `fs`, no `net`, no `Date` | binary import section |
-| Bundle size | **5.15 MiB** | committed artifact |
+| Bundle size before stripping | **5.15 MiB** | prior committed artifact |
+| Bundle size with `-s -w` | **5.04 MiB** (5,286,611 bytes; 2.2% smaller) | current committed artifact |
 | Linear memory after boot, zero objects | **8 MiB** | probe `afterBootMiB` |
 | 200 small objects | **+0 MiB** | probe `miBPer200SmallObjects: 0` |
 | Store a 1 MiB object | **+4.5 MiB** | probe `miBPer1MiBObject` |
@@ -63,10 +64,10 @@ linear memory to store and 7.5 MiB more to read back, because the bytes are
 encoded, copied across the JS boundary, and decoded again. On a 512 MB machine
 that is noise. On a device with hundreds of megabytes it is the whole budget.
 
-## 3. The defect that makes the consistency claim unsafe
+## 3. The consistency defect found and repaired
 
-`internal/runthrough/outbox_adapter.go` `propagateWrite` performs two checks and
-then overwrites unconditionally:
+`propagateWrite` previously performed two checks and then overwrote
+unconditionally. This defect was repaired in the 2026-09-27 review follow-up:
 
 1. the **local** version still matches the outbox entry, else
    `ErrOutboxVersionConflict`;
@@ -89,10 +90,7 @@ contract states last-writer-wins per key for concurrent writers on one host
 (`docs/workspace-contract.md` §9); that is a different situation from two
 independent writers converging, and the two should not be conflated.
 
-**The primitive already exists.** `storage.PutOptions` carries `IfMatch` and
-`IfNoneMatch` (`internal/storage/types.go`), and the S3 surface honors them
-(`internal/s3api/handlers_bucket.go`). `outbox_adapter.go` references neither.
-Phase 1 is therefore a use of existing capability, not a new mechanism.
+**The primitive is implemented.** The outbox records a durable upstream validator, sends atomic `If-Match` / `If-None-Match` conditions for writes, and sends conditional deletes. It retains the provider ETag returned by a successful put and refuses propagation when the observed baseline is unknown. Copy and multipart use the same precondition contract.
 
 ## 4. Phases
 
@@ -141,7 +139,7 @@ visible in the outbox and mapped to a stable error code, using the same refusal
 vocabulary as browser persistence. ADR 0005's consent rules and ADR 0011's
 local-default rule are untouched.
 
-### Phase 2 — Shrink the runtime floor, not the bridge (P0, revised by measurement)
+### Phase 2 — Shrink the runtime floor, not the bridge (P0, closed with measured limitation)
 
 **Measured on 2026-09-27, and the plan's original premise was wrong.**
 `scripts/wasm-agent-workload.mjs` runs an agent-shaped workload against the
@@ -173,14 +171,21 @@ What this changes:
 
 So the phase is reordered around what the numbers say:
 
-1. Attack the floor. A Go build of the embedded path with the reflect allocator
-   and without the parts of the standard library it does not use is the obvious
-   first attempt; 8 MiB is the number to beat and the artifact is 5.15 MiB on disk,
-   so the floor is not simply the file size. Measure before assuming the win.
-2. Keep the binary transport, scoped to the **write** path, where the 7.9× is
-   real. `workspace prepare` seeding a large repository is the case that hurts.
-3. Leave the read path alone. It commits no memory and costs about a millisecond;
-   changing it would be work against a number that does not justify it.
+1. The scoped low-risk build attempt is complete: `-ldflags "-s -w"` reduces the
+   WASM artifact from 5,404,915 to 5,286,611 bytes (2.2%), while all probes still
+   report an 8 MiB post-boot floor. Stripping debug/symbol data changes file size,
+   not Go runtime memory.
+2. No supported Go build switch was found to remove runtime reflection/type
+   machinery from this program; Go's runtime and type metadata remain linked even
+   without application-level `reflect` imports. A lower floor needs a narrower
+   runtime/API contract or a different compiler/runtime, and is deferred until a
+   concrete target budget makes that tradeoff worthwhile.
+3. Keep the binary transport decision scoped to writes. The 24-file, 597,007-byte
+   workload seeds to 12.5 MiB (7.9× payload) and reads in ~26 ms with 0 MiB of
+   additional linear memory. Separately, a single 1 MiB object adds 4.5 MiB to
+   store and 7.5 MiB more to read. The small-file agent case does not justify a
+   read transport rewrite; large-object users should account for the measured
+   high-water cost.
 
 Two honest limits on the figures. Linear memory is a high-water mark and does not
 shrink, so 7.9× measures the peak the write path reached, not a steady-state cost
@@ -190,15 +195,17 @@ CPU, and the free Cloudflare plan allows 10 ms, which this workload's 33.5 ms re
 pass would exceed. A paid plan allows five minutes and has no issue. That is a
 deployment-cost fact rather than a runtime defect, but it decides who can use this.
 
-**Exit:** the post-boot floor is below 8 MiB or the reason it is not is written
-down; the seed path's multiple of payload is reported after any transport change;
-the read path is measured again to confirm it still commits nothing.
+**Exit: met by documented limitation.** The post-boot floor remains 8 MiB after
+the low-risk stripping attempt. A sub-8-MiB floor requires a different runtime/API
+design; the agent-shaped and large-object read cases are both recorded above.
 
 ### Phase 3 — Make the cache an incremental eviction index (P0)
 
 **The cache is the deploy-anywhere story, and it is already built.** This phase
-exists because the thing that makes the cache worth configuring is also what makes
-it expensive, and the measurement is in `internal/runthrough/cache_scaling_test.go`.
+exists because the thing that makes the cache worth configuring may also make it
+expensive. `internal/runthrough/cache_scaling_test.go` measures backend listing
+rows; `internal/runthrough/cache_policy_benchmark_test.go` now measures the
+remaining in-memory planner cost directly.
 
 The cache is bounded by bytes, object count and TTL, with eviction that does not
 touch local writes, and revalidation is on by default
@@ -209,12 +216,12 @@ connectivity keeps serving. That is the "execute on nothing" property, and it do
 not need a local persistence backend: upstream is durable, the device holds a
 bounded working set in RAM, and a disconnected host still reads.
 
-The cost is in the eviction scan. `evictCache` calls `collectCacheCandidates`,
-which lists every bucket and walks every object in the cache
-(`internal/runthrough/cache_policy.go`). Its only caller is `trackCacheObject`,
-whose only caller is `refreshFromUpstream` — so the scan runs on every
-changed-object refresh, not on every write. Measured, with a byte limit
-configured:
+The original cost was a backend listing on every changed-object refresh. That
+listing has been removed: eviction now reads the in-memory index. The remaining
+planner walks and sorts that index for each bounded-cache refresh, so CPU and
+allocations grow with cache depth. The existing metric counts backend listing
+rows. Synthetic planner timings below measure scan/sort and candidate allocation,
+not store I/O or an end-to-end refresh:
 
 | Refreshes | Cache depth | Cache rows examined |
 |---:|---:|---:|
@@ -227,6 +234,24 @@ refreshing N changed objects costs O(N²), and a wall-clock run put it at 4.95×
 a 4× deeper cache. The limits are what turn the scan on, so **configuring the
 cache is what introduces the cost** — on precisely the constrained host where the
 cache is most wanted.
+
+Planner benchmark (`BenchmarkCacheEvictionPlanner`, 200 ms, three samples):
+
+| Cache entries | Median time/op | Bytes/op | Allocs/op |
+|---:|---:|---:|---:|
+| 40 | 5.9 µs | 8.5 KB | 4 |
+| 160 | 26.7 µs | 33.0 KB | 4 |
+| 1,000 | 208 µs | 196.9 KB | 4 |
+| 10,000 | 2.69 ms | 1.93 MB | 4 |
+
+The benchmark isolates the planner. Removing a redundant pre-sort reduced
+allocations from seven to four per operation, but timings remained within noise.
+This is a modest allocation reduction, not evidence of a meaningful latency fix.
+The recorded default cache bounds are unconfigured (zero/unbounded), so these
+synthetic depths do not establish the typical configured workload. Defer a
+maintained incremental eviction index until a deployment names its cache depth and
+refresh p95 budget; such an index adds synchronization and consistency risks when
+entries are touched, replaced, or expired during writes.
 
 1. Track cached bytes and object count incrementally, updated on insert, on
    eviction and on delete, rather than rediscovered by listing. The adapter
@@ -243,13 +268,11 @@ cache is most wanted.
 **Exit:** a refresh examines zero cache rows; the byte and count limits are still
 enforced; the existing eviction and TTL tests stay green unchanged.
 
-**Done.** A refresh reads nothing from the store, down from refreshes x depth. The
-test that pinned the defect asserted the count *grew* with depth, so it failed when
-the count fell to zero — which is the intended direction, and the reason the
-assertion was rewritten to pin "plans from the index" rather than "reads a
-predictable amount". `ReconcileCacheIndex` and `CacheIndexEntries` exist so the
-index-versus-store agreement is a test rather than a claim, including the drift case
-where an object is removed behind the adapter's back.
+**Partially complete; measured, with incremental index deferred.** The refresh path
+no longer lists the backing cache store, and index drift has reconciliation
+coverage. Planner cost is quantified above. The O(N) scan and sort remain; decide
+whether to replace them after a target workload establishes configured cache depth
+and latency requirements.
 
 ### Phase 4 — A persistence seam, only if a target is named (P2, demoted)
 
@@ -336,10 +359,10 @@ target matching neither end and nothing reports it. An "added" path asserts abse
 the same shape as an `If-None-Match` of `*`, so `ErrDeltaConflict` is the same
 refusal in the same words.
 
-What is not done is the wire half. A delta today is produced and applied inside one
-registry. Carrying one between machines means the archive transport, and
-`EncodeDelta`/`DecodeDelta` exist for it but are not yet wired to a command, so
-nothing moves a delta off the machine yet.
+The wire codec now carries content and validates document shape, caps, file paths,
+and SHA-256 digests. There is still no CLI or language-wrapper delta transport;
+cross-machine workflow integration remains open. Sensitive paths require opt-in by
+both the delta creator and the applying caller.
 
 ### Phase 6 — SSE-S3 wire semantics (P1)
 

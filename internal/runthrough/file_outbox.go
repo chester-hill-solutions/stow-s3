@@ -19,11 +19,12 @@ type FileOutbox struct {
 }
 
 type persistedOutbox struct {
-	Version   int                    `json:"version,omitempty"`
-	Entries   map[string]OutboxEntry `json:"entries"`
-	Prepared  map[string]OutboxEntry `json:"prepared,omitempty"`
-	Seq       uint64                 `json:"seq"`
-	NextToken uint64                 `json:"next_token,omitempty"`
+	Provenance map[string]UpstreamState `json:"provenance,omitempty"`
+	Version    int                      `json:"version,omitempty"`
+	Entries    map[string]OutboxEntry   `json:"entries"`
+	Prepared   map[string]OutboxEntry   `json:"prepared,omitempty"`
+	Seq        uint64                   `json:"seq"`
+	NextToken  uint64                   `json:"next_token,omitempty"`
 }
 
 func NewFileOutbox(path string) (*FileOutbox, error) {
@@ -79,9 +80,12 @@ func decodeOutboxState(data []byte) (outboxState, error) {
 			return outboxState{}, fmt.Errorf("outbox entry %q is both prepared and active", id)
 		}
 	}
+	if persisted.Provenance == nil {
+		persisted.Provenance = make(map[string]UpstreamState)
+	}
 	migrateOutboxAttempts(persisted.Entries)
 	migrateOutboxAttempts(persisted.Prepared)
-	return outboxState{entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken}, nil
+	return outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken}, nil
 }
 
 // migrateOutboxAttempts records that entries from a pre-version writer were
@@ -295,7 +299,7 @@ func (o *FileOutbox) Close() error {
 }
 
 func (o *FileOutbox) persistState(state outboxState) error {
-	data, err := json.MarshalIndent(persistedOutbox{Version: outboxFormatVersion, Entries: state.entries, Prepared: state.prepared, Seq: state.seq, NextToken: state.nextToken}, "", "  ")
+	data, err := json.MarshalIndent(persistedOutbox{Provenance: state.provenance, Version: outboxFormatVersion, Entries: state.entries, Prepared: state.prepared, Seq: state.seq, NextToken: state.nextToken}, "", "  ")
 	if err != nil {
 		return err
 	}

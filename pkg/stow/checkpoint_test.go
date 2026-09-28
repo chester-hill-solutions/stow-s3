@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -334,6 +335,7 @@ func TestCheckpointImportRejectsCorruptAndTraversingArchives(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(registry, "checkpoints", manifest.ID)); !os.IsNotExist(err) {
 		t.Fatalf("failed import left a published checkpoint: %v", err)
 	}
+	assertNoImportStagingDirs(t, registry)
 
 	manifest.Files[0].Path = "../escape"
 	traversing := makeCheckpointArchive(t, manifest, content)
@@ -342,6 +344,20 @@ func TestCheckpointImportRejectsCorruptAndTraversingArchives(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(filepath.Dir(registry), "escape")); !os.IsNotExist(err) {
 		t.Fatalf("traversing import wrote outside registry: %v", err)
+	}
+	assertNoImportStagingDirs(t, registry)
+}
+
+func assertNoImportStagingDirs(t *testing.T, registry string) {
+	t.Helper()
+	entries, err := os.ReadDir(filepath.Join(registry, "checkpoints"))
+	if err != nil && !os.IsNotExist(err) {
+		t.Fatalf("read checkpoint staging directory: %v", err)
+	}
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), ".import-") {
+			t.Errorf("failed import left staging directory %q", entry.Name())
+		}
 	}
 }
 

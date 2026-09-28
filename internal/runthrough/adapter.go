@@ -295,17 +295,17 @@ func (a *Adapter) PutObject(ctx context.Context, bucket, key string, body io.Rea
 	meta, err := a.local.PutObject(ctx, bucket, key, body, opts)
 	if err != nil {
 		if prepared.ID != "" {
-			return nil, a.reconcilePreparedAfterError(ctx, prepared, err)
+			return a.reconcilePreparedWrite(ctx, prepared, err)
 		}
 		return nil, err
 	}
 	a.invalidateCache(ctx, bucket, key)
 	if action == writePropagate {
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
-			return meta, err
+			return meta, storage.CommittedError(err)
 		}
 		if err := a.completeIntentLocked(ctx, prepared); err != nil {
-			return meta, err
+			return meta, storage.CommittedError(err)
 		}
 	}
 	return meta, nil
@@ -430,6 +430,12 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 			return nil, nil, err
 		}
 	}
+	// Record which upstream state this copy came from. It is the only provenance
+	// available, and a later write needs it to tell "upstream still matches what I
+	// based this on" from "somebody else changed it".
+	if err := a.saveUpstreamState(bucket, key, UpstreamState{ETag: meta.ETag}); err != nil {
+		return nil, nil, err
+	}
 	cached, err := cacheStore.PutObject(ctx, bucket, key, bytes.NewReader(data), storage.PutOptions{
 		ContentType:       meta.ContentType,
 		Metadata:          meta.Metadata,
@@ -445,10 +451,6 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err := a.trackCacheObject(ctx, bucket, key, cached.Size); err != nil {
 		return nil, nil, err
 	}
-	// Record which upstream state this copy came from. It is the only provenance
-	// available, and a later write needs it to tell "upstream still matches what I
-	// based this on" from "somebody else changed it".
-	a.noteUpstreamETag(bucket, key, meta.ETag)
 	if !needBody {
 		return nil, cached, nil
 	}
@@ -488,3 +490,6 @@ func (a *Adapter) listCacheItems(ctx context.Context, bucket, prefix string) ([]
 	}
 	return items, err
 }
+
+// QuotaStore excludes upstream objects and the separately bounded read cache.
+func (a *Adapter) QuotaStore() storage.Store { return a.local }

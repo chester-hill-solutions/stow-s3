@@ -25,6 +25,16 @@ export function resumeWorkspace(options) {
     appendFlag(args, "--registry-dir", options.registryDir);
     return runWorkspaceCommand(args);
 }
+export function destroyWorkspace(id, registryDir) {
+    const args = ["destroy", "--id", id];
+    appendFlag(args, "--registry-dir", registryDir);
+    return runWorkspaceCommand(args);
+}
+export function collectWorkspaces(registryDir) {
+    const args = ["collect"];
+    appendFlag(args, "--registry-dir", registryDir);
+    return runWorkspaceCommand(args);
+}
 export function handoffWorkspace(id, options = {}) {
     const args = ["handoff", "--id", id];
     appendFlag(args, "--registry-dir", options.registryDir);

@@ -14,7 +14,7 @@ build:
 # fails for a reason unrelated to the source.
 build-wasm:
 	mkdir -p bin
-	GOTOOLCHAIN=go$(GO_TOOLCHAIN) GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -o bin/stow-runtime.wasm ./cmd/stow-wasm
+	GOTOOLCHAIN=go$(GO_TOOLCHAIN) GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -ldflags "-s -w" -o bin/stow-runtime.wasm ./cmd/stow-wasm
 
 test:
 	$(PINNED_GO) test ./...
@@ -79,8 +79,7 @@ lint:
 
 check-generated: build-wasm
 	$(NPM_INSTALL) && npm run build
-	@git diff --quiet HEAD -- packages/stow-s3/dist || (git status --short -- packages/stow-s3/dist; exit 1)
-	@test -z "$$(git ls-files --others --exclude-standard -- packages/stow-s3/dist)" || (git ls-files --others --exclude-standard -- packages/stow-s3/dist; exit 1)
+	node scripts/check-generated.mjs
 
 format-check:
 	@test -z "$$(gofmt -l $$(find cmd internal conformance tools pkg -name '*.go' -type f))" || (gofmt -l $$(find cmd internal conformance tools pkg -name '*.go' -type f); exit 1)
@@ -108,6 +107,8 @@ check-coverage:
 benchmark: build build-wasm
 	node packages/stow-s3/scripts/benchmark-session.mjs --sessions 30 --payload-bytes 1048576
 	node packages/stow-s3/scripts/benchmark-session.mjs --sweep
+	node packages/stow-s3/scripts/benchmark-concurrency.mjs --runs 5 --payload-bytes 1048576
+	node packages/stow-s3/scripts/benchmark-workspace.mjs --runs 7
 
 # The committed density baseline, re-measured and compared. Kept out of
 # `standards` for the same reason as benchmark: RSS depends on the machine, and a

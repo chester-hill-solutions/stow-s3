@@ -204,7 +204,7 @@ func TestRetryPendingCannotBypassTheGrant(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",
@@ -266,7 +266,7 @@ func TestRetryPendingPropagatesWithTheFullGrant(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",

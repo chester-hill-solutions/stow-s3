@@ -29,7 +29,7 @@ import (
 func conflictUpstream(t *testing.T, ctx context.Context, body string) *mockUpstream {
 	t.Helper()
 	up := newMockUpstream()
-	if err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte(body)), storage.PutOptions{}); err != nil {
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte(body)), storage.PutOptions{}); err != nil {
 		t.Fatalf("second writer upstream put: %v", err)
 	}
 	return up
@@ -84,7 +84,7 @@ func TestPropagationDoesNotOverwriteAConcurrentlyChangedObject(t *testing.T) {
 	// The other writer moves on after stow read but before stow writes. This is
 	// the case a fresh HeadObject at enqueue time cannot see, because it would
 	// report this new state and match it.
-	if err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("written by the device")), storage.PutOptions{}); err != nil {
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("written by the device")), storage.PutOptions{}); err != nil {
 		t.Fatalf("second writer: %v", err)
 	}
 
@@ -125,7 +125,7 @@ func TestAConflictIsTerminalAndNotRetriedForever(t *testing.T) {
 
 	adapter := mirroringAdapter(t, local, up)
 	readThrough(t, adapter, ctx)
-	if err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("written by the device")), storage.PutOptions{}); err != nil {
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("written by the device")), storage.PutOptions{}); err != nil {
 		t.Fatalf("second writer: %v", err)
 	}
 
@@ -219,7 +219,7 @@ func TestAKeyWithNoProvenancePropagatesWithoutAPrecondition(t *testing.T) {
 
 	// Upstream already holds this key, but stow has never read it, so it holds no
 	// record of the state it would be defending.
-	if err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("someone else's file")), storage.PutOptions{}); err != nil {
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("someone else's file")), storage.PutOptions{}); err != nil {
 		t.Fatalf("seed upstream: %v", err)
 	}
 

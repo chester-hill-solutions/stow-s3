@@ -81,10 +81,12 @@ A published package ships its own binary and needs no `STOW_BIN`. If the binary
 is missing or unrunnable, `stow-s3 doctor` reports which of the two sides is
 broken rather than failing opaquely.
 
-## The scoped session
+## Disposable S3 fixture
 
-This is the pattern to reach for by default: one call, a private server on an
-ephemeral port, a bucket already created, and cleanup on close.
+Use a scoped session when a test or build step needs temporary S3 objects: one
+call, a private server on an ephemeral port, a bucket already created, and
+cleanup on close. For coding tasks whose files must persist or be handed off,
+use the prepared-workspace flow described above.
 
 TypeScript:
 

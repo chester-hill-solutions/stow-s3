@@ -30,7 +30,7 @@ func TestRetryPendingContinuesAcrossKeys(t *testing.T) {
 		if err != nil {
 			t.Fatalf("put %s: %v", key, err)
 		}
-		if _, err := outbox.Enqueue(runthrough.OutboxEntry{
+		if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 			Operation: runthrough.OutboxPut,
 			Bucket:    "bucket",
 			Key:       key,
@@ -60,7 +60,7 @@ func TestRetryPendingContinuesAcrossKeys(t *testing.T) {
 
 func TestMemoryOutboxLifecycle(t *testing.T) {
 	outbox := runthrough.NewMemoryOutbox()
-	entry := runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}
+	entry := runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}
 	if _, err := outbox.Enqueue(entry); err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
@@ -152,18 +152,18 @@ func newBlockingUpstream() *blockingUpstream {
 	}
 }
 
-func (u *blockingUpstream) PutObject(ctx context.Context, _, _ string, _ io.Reader, _ storage.PutOptions) error {
+func (u *blockingUpstream) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (string, error) {
 	u.calls.Add(1)
 	select {
 	case u.started <- struct{}{}:
 	case <-ctx.Done():
-		return ctx.Err()
+		return "", ctx.Err()
 	}
 	select {
 	case <-u.release:
-		return nil
+		return u.mockUpstream.PutObject(ctx, bucket, key, body, opts)
 	case <-ctx.Done():
-		return ctx.Err()
+		return "", ctx.Err()
 	}
 }
 
@@ -174,7 +174,7 @@ func runFileOutboxPersistenceFailure(t *testing.T, operation func(*runthrough.Fi
 	if err != nil {
 		t.Fatalf("new file outbox: %v", err)
 	}
-	entry, err := outbox.Enqueue(runthrough.OutboxEntry{
+	entry, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",
@@ -211,7 +211,7 @@ func assertFileOutboxEntryUnchanged(t *testing.T, pending []runthrough.OutboxEnt
 
 func TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails(t *testing.T) {
 	outbox, path, entry := runFileOutboxPersistenceFailure(t, func(o *runthrough.FileOutbox, _ runthrough.OutboxEntry) error {
-		_, err := o.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "new"})
+		_, err := o.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "new"})
 		return err
 	})
 	assertFileOutboxEntryUnchanged(t, outbox.Pending(), entry)
@@ -279,6 +279,11 @@ func TestDeleteObjectsEnqueuesEveryIntentBeforePropagation(t *testing.T) {
 		}
 	}
 	up := newMockUpstream()
+	for _, key := range []string{"a", "b"} {
+		if _, err := up.PutObject(ctx, "bucket", key, bytes.NewBufferString(key), storage.PutOptions{}); err != nil {
+			t.Fatal(err)
+		}
+	}
 	up.delErr = errors.New("temporary delete failure")
 	outbox, err := runthrough.NewFileOutbox(filepath.Join(t.TempDir(), "outbox.json"))
 	if err != nil {
@@ -352,7 +357,7 @@ func TestAdapterDoesNotOvertakeOlderPendingSameKeyIntent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation:   runthrough.OutboxPut,
 		Bucket:      "bucket",
 		Key:         "key",
@@ -392,7 +397,7 @@ func TestRetryPendingSerializesConcurrentAttemptsForOneEntry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",
@@ -448,7 +453,7 @@ func TestImmediatePropagationWaitsForInFlightRetryOnSameKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true,
 		Operation: runthrough.OutboxPut,
 		Bucket:    "bucket",
 		Key:       "key",

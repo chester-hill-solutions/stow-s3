@@ -50,7 +50,7 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 		IfMatch:           options.IfMatch,
 		IfNoneMatch:       options.IfNoneMatch,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return Object{}, err
 	}
 	if exists {
@@ -63,7 +63,7 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 		i.consumeTargetReservation(target)
 	}
 	i.reconcileTargetReservation(target, true)
-	return objectFromMeta(meta, nil), nil
+	return objectFromMeta(meta, nil), err
 }
 
 func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, error) {
@@ -178,7 +178,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 		if err := i.checkContext(ctx); err != nil {
 			return nil, err
 		}
-		meta, err := i.store.HeadObject(ctx, bucket, key)
+		meta, err := i.quotaStore().HeadObject(ctx, bucket, key)
 		if err == nil {
 			sizes[key] = meta.Size
 		} else if !errors.Is(err, storage.ErrObjectNotFound) {
@@ -194,6 +194,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 			// its own quota by deleting keys that never existed.
 			continue
 		}
+		delete(sizes, key)
 		i.usage.Bytes -= size
 		i.usage.Objects--
 		target := objectTarget(bucket, key)
@@ -204,19 +205,22 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 }
 
 func (i *Instance) deleteObjectLocked(ctx context.Context, bucket, key string) error {
-	meta, err := i.store.HeadObject(ctx, bucket, key)
+	size, exists, err := i.objectSize(ctx, bucket, key)
 	if err != nil {
 		return err
 	}
-	if err := i.store.DeleteObject(ctx, bucket, key); err != nil {
+	err = i.store.DeleteObject(ctx, bucket, key)
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return err
 	}
-	i.usage.Bytes -= meta.Size
-	i.usage.Objects--
+	if exists {
+		i.usage.Bytes -= size
+		i.usage.Objects--
+	}
 	target := objectTarget(bucket, key)
 	i.consumeTargetReservation(target)
 	i.reconcileTargetReservation(target, false)
-	return nil
+	return err
 }
 
 func (i *Instance) DeleteObject(ctx context.Context, bucket, key string) error {
@@ -288,7 +292,7 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	}
 	_, targetReserved := i.reservedTargets[target]
 	meta, err := i.storeCopy(ctx, req)
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return Object{}, err
 	}
 	if exists {
@@ -296,12 +300,12 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	} else {
 		i.usage.Objects++
 	}
-	i.usage.Bytes += sourceMeta.Size
+	i.usage.Bytes += meta.Size
 	if targetReserved {
 		i.consumeTargetReservation(target)
 	}
 	i.reconcileTargetReservation(target, true)
-	return objectFromMeta(meta, nil), nil
+	return objectFromMeta(meta, nil), err
 }
 
 // storeCopy performs the copy through whichever capability the store offers, so
@@ -326,7 +330,7 @@ func objectTarget(bucket, key string) string {
 }
 
 func (i *Instance) objectSize(ctx context.Context, bucket, key string) (int64, bool, error) {
-	meta, err := i.store.HeadObject(ctx, bucket, key)
+	meta, err := i.quotaStore().HeadObject(ctx, bucket, key)
 	if err == nil {
 		return meta.Size, true, nil
 	}
@@ -353,4 +357,11 @@ func objectFromMeta(meta *storage.ObjectMeta, data []byte) Object {
 		ChecksumAlgorithm: meta.ChecksumAlgorithm,
 		ChecksumValue:     meta.ChecksumValue,
 	}
+}
+
+func (i *Instance) quotaStore() storage.Store {
+	if provider, ok := i.store.(storage.QuotaStoreProvider); ok {
+		return provider.QuotaStore()
+	}
+	return i.store
 }

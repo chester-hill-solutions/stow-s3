@@ -84,6 +84,8 @@ export {
 export { upstreamFromEnv } from "./upstream.js";
 export {
   checkpointWorkspace,
+  collectWorkspaces,
+  destroyWorkspace,
   diffWorkspaces,
   exportWorkspaceCheckpoint,
   handoffWorkspace,

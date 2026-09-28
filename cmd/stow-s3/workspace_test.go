@@ -109,6 +109,19 @@ func TestExportCheckpointFileRefusesToOverwrite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateCheckpoint: %v", err)
 	}
+	failedArchive := filepath.Join(t.TempDir(), "failed.tar.gz")
+	if err := exportCheckpointFile(registry, checkpoint.ID, failedArchive, stow.CheckpointArchiveOptions{MaxBytes: 1}); err == nil {
+		t.Fatal("export accepted a checkpoint over the configured byte limit")
+	}
+	failedEntries, err := os.ReadDir(filepath.Dir(failedArchive))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range failedEntries {
+		if strings.HasPrefix(entry.Name(), ".stow-checkpoint-export-") {
+			t.Errorf("failed export left temporary file %q", entry.Name())
+		}
+	}
 	archive := filepath.Join(t.TempDir(), "task.tar.gz")
 	if err := exportCheckpointFile(registry, checkpoint.ID, archive, stow.CheckpointArchiveOptions{}); err != nil {
 		t.Fatalf("export checkpoint: %v", err)

@@ -30,6 +30,7 @@ var (
 	// authoritative for the caller's own read, and the conflict is surfaced for a
 	// decision rather than resolved by picking a winner.
 	ErrUpstreamConflict         = errors.New("upstream object was changed by another writer")
+	ErrUpstreamStateUnknown     = errors.New("upstream state could not be observed; propagation is refused")
 	ErrOutboxPreparedUnresolved = errors.New("outbox prepared intent cannot be reconciled")
 	// ErrOutboxFormatVersion reports a durable outbox written by a different
 	// Stow schema revision. Writers sharing one outbox file must run the same
@@ -41,7 +42,7 @@ var (
 // outboxFormatVersion is the on-disk schema revision written by this build.
 // Version 0 (unversioned) files are migrated on read; anything newer is
 // rejected rather than downgraded.
-const outboxFormatVersion = 2
+const outboxFormatVersion = 3
 
 const (
 	OutboxPut       OutboxOperation = "put"
@@ -113,14 +114,15 @@ type SnapshotOutbox interface {
 }
 
 type outboxState struct {
-	entries   map[string]OutboxEntry
-	prepared  map[string]OutboxEntry
-	seq       uint64
-	nextToken uint64
+	provenance map[string]UpstreamState
+	entries    map[string]OutboxEntry
+	prepared   map[string]OutboxEntry
+	seq        uint64
+	nextToken  uint64
 }
 
 func newOutboxState() outboxState {
-	return outboxState{entries: make(map[string]OutboxEntry), prepared: make(map[string]OutboxEntry)}
+	return outboxState{provenance: make(map[string]UpstreamState), entries: make(map[string]OutboxEntry), prepared: make(map[string]OutboxEntry)}
 }
 
 func (s outboxState) clone() outboxState {
@@ -132,7 +134,11 @@ func (s outboxState) clone() outboxState {
 	for id, entry := range s.prepared {
 		prepared[id] = entry
 	}
-	return outboxState{entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
+	provenance := make(map[string]UpstreamState, len(s.provenance))
+	for key, value := range s.provenance {
+		provenance[key] = value
+	}
+	return outboxState{provenance: provenance, entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
 }
 
 func (s *outboxState) assignID(entry OutboxEntry) OutboxEntry {

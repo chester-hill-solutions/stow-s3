@@ -18,8 +18,8 @@ func TestAdapter_SeparateCacheEvictsByObjectLimit(t *testing.T) {
 	_ = local.CreateBucket(ctx, "bucket")
 	_ = cache.CreateBucket(ctx, "bucket")
 	up := newMockUpstream()
-	_ = up.PutObject(ctx, "bucket", "first", bytes.NewReader([]byte("one")), storage.PutOptions{})
-	_ = up.PutObject(ctx, "bucket", "second", bytes.NewReader([]byte("two")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "bucket", "first", bytes.NewReader([]byte("one")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "bucket", "second", bytes.NewReader([]byte("two")), storage.PutOptions{})
 
 	adapter := runthrough.NewWithCache(runthrough.Config{
 		Policy:     runthrough.PolicyReadThroughCache,
@@ -50,7 +50,7 @@ func TestAdapter_SeparateCacheEvictsByByteLimit(t *testing.T) {
 	_ = local.CreateBucket(ctx, "bucket")
 	_ = cache.CreateBucket(ctx, "bucket")
 	up := newMockUpstream()
-	_ = up.PutObject(ctx, "bucket", "large", bytes.NewReader([]byte("12345")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "bucket", "large", bytes.NewReader([]byte("12345")), storage.PutOptions{})
 	adapter := runthrough.NewWithCache(runthrough.Config{
 		Policy:     runthrough.PolicyReadThroughCache,
 		Revalidate: false,
@@ -74,7 +74,7 @@ func TestAdapter_SeparateCacheExpiresEntries(t *testing.T) {
 	_ = local.CreateBucket(ctx, "bucket")
 	_ = cache.CreateBucket(ctx, "bucket")
 	up := newMockUpstream()
-	if err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("value")), storage.PutOptions{}); err != nil {
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("value")), storage.PutOptions{}); err != nil {
 		t.Fatalf("seed upstream: %v", err)
 	}
 	adapter := runthrough.NewWithCache(runthrough.Config{

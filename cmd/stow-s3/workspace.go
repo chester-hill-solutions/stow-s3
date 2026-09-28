@@ -65,9 +65,13 @@ type checkpointResult struct {
 
 func workspaceCommand(args []string) error {
 	if len(args) == 0 {
-		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|diff|restore|handoff|export|preview|import>")
+		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|diff|restore|handoff|export|preview|import|destroy|collect>")
 	}
 	switch args[0] {
+	case "destroy":
+		return destroyWorkspaceCommand(args[1:])
+	case "collect":
+		return collectWorkspacesCommand(args[1:])
 	case "prepare":
 		return prepareWorkspaceCommand(args[1:])
 	case "resume":
@@ -299,7 +303,13 @@ func handoffWorkspaceCommand(args []string) error {
 			return err
 		}
 	}
-	return writeWorkspaceJSONTo(*output, workspaceHandoff{Version: 1, WorkspaceID: ws.ID(), CheckpointID: *checkpointID, RegistryDir: registry})
+	result := workspaceHandoff{Version: 1, WorkspaceID: ws.ID(), CheckpointID: *checkpointID, RegistryDir: registry}
+	if *output != "" {
+		if err := writeWorkspaceJSONTo(*output, result); err != nil {
+			return err
+		}
+	}
+	return writeWorkspaceJSON(result)
 }
 
 func makeWorkspaceResult(ws *stow.Workspace, seededBytes, seededObjects int64) workspaceResult {

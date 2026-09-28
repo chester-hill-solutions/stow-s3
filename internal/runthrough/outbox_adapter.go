@@ -55,48 +55,10 @@ func (a *Adapter) enqueueIntentLocked(ctx context.Context, operation OutboxOpera
 		version = objectVersion(meta)
 	}
 	entry := OutboxEntry{Operation: operation, Bucket: bucket, Key: key, Version: version, CreatedAt: time.Now().UTC()}
-	if operation == OutboxPut {
-		a.recordUpstreamState(ctx, &entry)
+	if err := a.recordUpstreamState(ctx, &entry); err != nil {
+		return OutboxEntry{}, err
 	}
 	return a.outbox.Enqueue(entry)
-}
-
-// recordUpstreamState sets the precondition a propagating write will assert.
-//
-// The precondition is the upstream state stow's own copy was derived from, not
-// whatever upstream holds at enqueue time. Those differ, and the difference is
-// the whole defect: a fresh HeadObject reports the current state, so it always
-// matches, and a writer that moved on *before* this write was enqueued is
-// invisible. The recorded provenance is what makes that detectable.
-//
-// Where stow has no provenance — the key was never read from upstream, so there is
-// no claim to defend — upstream is consulted once, and only to learn whether the
-// key exists. An absent key is asserted with If-None-Match "*" so a key created in
-// the interval is caught; an existing one contributes its ETag, which at least
-// catches a change between enqueue and propagation.
-//
-// A failure to observe upstream is not an error. The write is local and
-// authoritative either way, and a HeadObject that times out or is refused must not
-// fail the caller's write; it only means the propagation carries a weaker
-// precondition than it might have carried.
-func (a *Adapter) recordUpstreamState(ctx context.Context, entry *OutboxEntry) {
-	if !a.upstreamEnabled(entry.Bucket) {
-		return
-	}
-	if etag, ok := a.observedUpstreamETag(entry.Bucket, entry.Key); ok {
-		entry.UpstreamVersion = etag
-		return
-	}
-	meta, err := a.upstream.HeadObject(ctx, entry.Bucket, entry.Key)
-	if err != nil {
-		if errors.Is(err, storage.ErrObjectNotFound) {
-			entry.UpstreamAbsent = true
-		}
-		return
-	}
-	if meta != nil && meta.ETag != "" {
-		entry.UpstreamVersion = meta.ETag
-	}
 }
 
 func (a *Adapter) prepareIntent(operation OutboxOperation, bucket, key, previousVersion string, source ...string) (OutboxEntry, error) {
@@ -111,12 +73,8 @@ func (a *Adapter) prepareIntent(operation OutboxOperation, bucket, key, previous
 		Prepared:        true,
 		CreatedAt:       time.Now().UTC(),
 	}
-	if operation == OutboxPut {
-		// Recorded here rather than only in enqueueIntentLocked, because this is
-		// the path a mirror write actually takes. Prepare is also the more correct
-		// moment: it precedes stow's own write, so the precondition describes the
-		// upstream state as it was before this write was issued.
-		a.recordUpstreamState(context.Background(), &entry)
+	if err := a.recordUpstreamState(context.Background(), &entry); err != nil {
+		return OutboxEntry{}, err
 	}
 	if len(source) > 0 {
 		entry.SourceBucket = source[0]
@@ -160,6 +118,9 @@ func (a *Adapter) enqueuePreparedIntentLocked(operation OutboxOperation, bucket,
 // acknowledged, so each effect checks upstream against the immutable local
 // version before repeating the mutation.
 func (a *Adapter) propagateEntry(ctx context.Context, entry OutboxEntry, reconcile bool) error {
+	if entry.UpstreamVersion == "" && !entry.UpstreamAbsent {
+		return NewDeterministicUpstreamError(ErrUpstreamStateUnknown)
+	}
 	switch entry.Operation {
 	case OutboxPut, OutboxCopy, OutboxMultipart:
 		return a.propagateWrite(ctx, entry, reconcile)
@@ -187,13 +148,13 @@ func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconci
 				return errors.New("upstream head returned no object metadata")
 			}
 			if storage.ETagEqual(remote.ETag, meta.ETag) {
-				return nil
+				return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{ETag: remote.ETag})
 			}
 		} else if !errors.Is(err, storage.ErrObjectNotFound) {
 			return err
 		}
 	}
-	if err := a.upstream.PutObject(ctx, entry.Bucket, entry.Key, rc, storage.PutOptions{
+	etag, err := a.upstream.PutObject(ctx, entry.Bucket, entry.Key, rc, storage.PutOptions{
 		ContentType: meta.ContentType,
 		Metadata:    meta.Metadata,
 		// The precondition recorded at enqueue. Absent upstream is asserted with
@@ -201,7 +162,8 @@ func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconci
 		// between enqueue and propagation has no ETag for If-Match to compare.
 		IfMatch:     entry.UpstreamVersion,
 		IfNoneMatch: upstreamAbsentCondition(entry.UpstreamAbsent),
-	}); err != nil {
+	})
+	if err != nil {
 		// A refused precondition is a conflict, not a failure to try again. It
 		// classifies as deterministic, so the entry goes terminal and somebody
 		// decides which object should win.
@@ -210,7 +172,7 @@ func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconci
 		}
 		return err
 	}
-	return nil
+	return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{ETag: etag})
 }
 
 func upstreamAbsentCondition(absent bool) string {
@@ -233,13 +195,22 @@ func (a *Adapter) propagateDelete(ctx context.Context, entry OutboxEntry, reconc
 	if reconcile {
 		_, err := a.upstream.HeadObject(ctx, entry.Bucket, entry.Key)
 		if errors.Is(err, storage.ErrObjectNotFound) {
-			return nil
+			return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{Absent: true})
 		}
 		if err != nil {
 			return err
 		}
 	}
-	return a.upstream.DeleteObject(ctx, entry.Bucket, entry.Key)
+	if entry.UpstreamAbsent {
+		return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{Absent: true})
+	}
+	if err := a.upstream.DeleteObject(ctx, entry.Bucket, entry.Key, entry.UpstreamVersion); err != nil {
+		if errors.Is(err, storage.ErrPreconditionFailed) {
+			return ErrUpstreamConflict
+		}
+		return err
+	}
+	return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{Absent: true})
 }
 
 func (a *Adapter) completeIntent(ctx context.Context, entry OutboxEntry) error {
@@ -416,9 +387,15 @@ func (a *Adapter) retryEntry(ctx context.Context, entry OutboxEntry, now time.Ti
 	return stillPending && (!outboxEntryDue(remaining, time.Now()) || !isFirstPendingForKey(remainingState, remaining)), nil
 }
 
-func (a *Adapter) reconcilePreparedAfterError(ctx context.Context, entry OutboxEntry, cause error) error {
-	_, recoveryErr := a.reconcilePreparedEntryLocked(ctx, entry)
-	return errors.Join(cause, recoveryErr)
+func (a *Adapter) reconcilePreparedWrite(ctx context.Context, entry OutboxEntry, cause error) (*storage.ObjectMeta, error) {
+	committed, recoveryErr := a.reconcilePreparedEntryLocked(ctx, entry)
+	err := errors.Join(cause, recoveryErr)
+	if !committed {
+		return nil, err
+	}
+	a.invalidateCache(ctx, entry.Bucket, entry.Key)
+	meta, headErr := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
+	return meta, storage.CommittedError(errors.Join(err, headErr))
 }
 
 func (a *Adapter) reconcilePreparedEntryLocked(ctx context.Context, entry OutboxEntry) (bool, error) {

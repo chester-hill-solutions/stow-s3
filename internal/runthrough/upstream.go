@@ -19,8 +19,8 @@ import (
 type Client interface {
 	HeadObject(ctx context.Context, bucket, key string) (*storage.ObjectMeta, error)
 	GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error)
-	PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) error
-	DeleteObject(ctx context.Context, bucket, key string) error
+	PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (string, error)
+	DeleteObject(ctx context.Context, bucket, key, ifMatch string) error
 	ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error)
 }
 
@@ -104,13 +104,13 @@ func (c *S3Client) GetObject(ctx context.Context, bucket, key string) (io.ReadCl
 	return out.Body, meta, nil
 }
 
-func (c *S3Client) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) error {
+func (c *S3Client) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (string, error) {
 	if body == nil {
-		return errors.New("upstream put body is nil")
+		return "", errors.New("upstream put body is nil")
 	}
 	data, err := io.ReadAll(body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
@@ -148,14 +148,18 @@ func (c *S3Client) PutObject(ctx context.Context, bucket, key string, body io.Re
 			}
 		}
 	}
-	_, err = c.s3.PutObject(ctx, input)
-	return mapUpstreamError(err)
+	out, err := c.s3.PutObject(ctx, input)
+	if err != nil {
+		return "", mapUpstreamError(err)
+	}
+	return normalizeETag(aws.ToString(out.ETag)), nil
 }
 
-func (c *S3Client) DeleteObject(ctx context.Context, bucket, key string) error {
+func (c *S3Client) DeleteObject(ctx context.Context, bucket, key, ifMatch string) error {
 	_, err := c.s3.DeleteObject(ctx, &s3.DeleteObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
+		Bucket:  aws.String(bucket),
+		Key:     aws.String(key),
+		IfMatch: aws.String(ifMatch),
 	})
 	return mapUpstreamError(err)
 }
@@ -205,6 +209,9 @@ func (c *S3Client) ListObjectsV2(ctx context.Context, bucket string, opts storag
 func mapUpstreamError(err error) error {
 	if err == nil {
 		return nil
+	}
+	if upstreamHTTPStatus(err) == 412 {
+		return storage.ErrPreconditionFailed
 	}
 	var noKey *types.NoSuchKey
 	if errors.As(err, &noKey) {
