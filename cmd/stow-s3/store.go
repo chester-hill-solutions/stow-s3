@@ -40,5 +40,13 @@ func buildStore(mode runthrough.Mode, backend runtime.Backend, dataDir string, c
 	if err := adapter.RecoverPrepared(context.Background()); err != nil {
 		return nil, nil, fmt.Errorf("recover outbox: %w", err)
 	}
+	// The cache directory outlives the process and the eviction index does not, so
+	// a server starting over an existing cache directory would otherwise plan
+	// eviction from an index that has never heard of the cached objects and
+	// enforce --cache-max-bytes against what it wrote since startup alone. The
+	// bytes would be found; the bound would not be applied to them.
+	if err := adapter.ReconcileCacheIndex(context.Background()); err != nil {
+		return nil, nil, fmt.Errorf("reconcile cache index: %w", err)
+	}
 	return adapter, adapter, nil
 }

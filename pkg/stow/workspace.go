@@ -73,10 +73,11 @@ type WorkspaceOptions struct {
 	//	readOnly := stow.ReadOnly()
 	//	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Authority: &readOnly})
 	Authority *Authority
-	// TTL is the collection window the workspace records for itself. A later
-	// collector reclaims a workspace whose session is gone; until that exists
-	// the value is recorded in the workspace manifest and honoured by nothing,
-	// which is why it is documented as advisory here rather than promised.
+	// TTL is the collection window the workspace records for itself. A collector
+	// reclaims a workspace that is past its TTL and whose session is gone; see
+	// Collect. The collector is not automatic, so a caller that wants the window
+	// honoured has to run one — recording a TTL does not schedule a sweep, and a
+	// workspace left past its TTL is retained until something collects it.
 	TTL time.Duration
 	// RegistryDir places the machine's workspace registry. Empty takes the
 	// default under the user's configuration directory. Tests set it so they

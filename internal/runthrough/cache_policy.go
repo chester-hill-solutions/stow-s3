@@ -231,16 +231,42 @@ func (a *Adapter) collectCacheCandidates(ctx context.Context) ([]cacheCandidate,
 // enforces the wrong limit, and a wrong limit fails silently: the cache grows past
 // the bound the operator set. Cheap enough to call from a test, and from an
 // operator-facing repair path if one is ever added.
-// ReconcileCacheIndex rebuilds the eviction index from the cache store. Exported
-// so the drift check is a test rather than a claim.
+// ReconcileCacheIndex rebuilds the eviction index from the cache store, in both
+// directions. Exported so the drift check is a test rather than a claim, and
+// called at startup so a server over an existing cache directory is not
+// enforcing its limits against an index that starts empty.
 func (a *Adapter) ReconcileCacheIndex(ctx context.Context) error { return a.reconcileCacheIndex(ctx) }
 
+// reconcileCacheIndex brings the index into agreement with the cache store in
+// both directions: it drops entries for objects the store no longer has, and it
+// adds entries for objects the store has and the index has never seen.
+//
+// The second half is the one that decides whether a restart is safe. The cache
+// lives in a directory and this index lives in memory, so a server that comes
+// up over an existing cache directory holds bytes it knows nothing about. Every
+// eviction plan is computed from the index and from nothing else, so an index
+// that starts empty computes the cache total from the objects written since
+// startup alone, and a byte limit the operator set is then enforced against
+// that. The cache then grows past the bound with nothing to indicate it.
+//
+// This function used to prune only. Pruning is the half that matters when the
+// assumption holds and the index is complete, and it is the half its own comment
+// described, so the gap was invisible until the index was not complete — which
+// is precisely the restart case it claimed to cover.
+//
+// A discovered object is recorded with the store's own LastModified as its
+// access time, because that is real evidence about the bytes rather than a
+// guess. Using the discovery time instead would make every pre-restart object
+// look freshly used, so the objects most overdue for eviction would be the ones
+// eviction spared. Its expiry is left unset, which is what touchCache does for
+// an object whose TTL has not started, and it starts on the next read rather
+// than wiping the cache on every restart.
 func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 	buckets, err := a.cache.ListBuckets(ctx)
 	if err != nil {
 		return err
 	}
-	found := make(map[string]struct{})
+	found := make(map[string]storage.ObjectMeta)
 	for _, bucket := range buckets {
 		objects, listErr := listAllObjects(ctx, a.cache, bucket.Name, "")
 		if listErr != nil {
@@ -250,17 +276,46 @@ func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 			return listErr
 		}
 		for _, object := range objects {
-			found[cacheEntryKey(bucket.Name, object.Key)] = struct{}{}
+			found[cacheEntryKey(bucket.Name, object.Key)] = object
 		}
 	}
 	a.cacheMu.Lock()
-	defer a.cacheMu.Unlock()
 	for accessKey := range a.cacheEntries {
 		if _, ok := found[accessKey]; !ok {
 			delete(a.cacheEntries, accessKey)
 		}
 	}
-	return nil
+	for accessKey, object := range found {
+		if _, ok := a.cacheEntries[accessKey]; ok {
+			continue
+		}
+		accessed := object.LastModified
+		if accessed.IsZero() {
+			accessed = time.Now()
+		}
+		a.cacheEntries[accessKey] = cacheEntry{
+			accessedAt: accessed,
+			bucket:     object.Bucket,
+			key:        object.Key,
+			size:       object.Size,
+		}
+	}
+	a.cacheMu.Unlock()
+
+	// Then apply the limits, once, to what was just discovered.
+	//
+	// Eviction is otherwise reached from exactly one place: trackCacheObject,
+	// which only runs when this process writes to the cache. A server that came
+	// up over a cache already larger than its bound, and then only reads, never
+	// evicts and never converges. That is not a hypothetical shape: a detached
+	// session spends its life reading, so "reads do not enforce the limit" is
+	// "the limit does not hold while offline".
+	//
+	// This runs once at startup rather than on every read, because the
+	// alternative is an eviction re-plan per request, which is the walk
+	// TestLimitedCacheRefreshesDoNotWalkTheCache exists to keep out of the
+	// refresh path.
+	return a.evictCache(ctx)
 }
 
 // CacheIndexEntries reports how many objects the eviction index holds. It exists
