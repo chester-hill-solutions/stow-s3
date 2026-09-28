@@ -28,6 +28,29 @@ export interface WorkspaceArchiveOptions {
   readonly includeSensitive?: boolean;
 }
 
+export interface WorkspaceDeltaOptions extends WorkspaceArchiveOptions {
+  readonly from: string;
+  readonly to: string;
+  readonly output: string;
+}
+
+/**
+ * The base a delta applies to, and the document that says what changes.
+ *
+ * Both are named rather than defaulted: a delta states "this path was A and is
+ * now B", so the point it is applied to is part of its meaning and inferring one
+ * would let a change be applied to a state it was never measured against.
+ */
+export interface WorkspaceApplyOptions extends WorkspaceArchiveOptions {
+  readonly delta: string;
+  readonly base: string;
+}
+
+export interface WorkspaceAdoptOptions extends WorkspaceArchiveOptions {
+  readonly handoffPath: string;
+  readonly root: string;
+}
+
 /** Run the native workspace command contract without invoking a shell. */
 export async function runWorkspaceCommand(
   args: readonly string[],
@@ -58,12 +81,45 @@ export function resumeWorkspace(options: ResumeWorkspaceOptions): Promise<Worksp
 
 export function handoffWorkspace(
   id: string,
-  options: { readonly registryDir?: string; readonly checkpointId?: string; readonly output?: string } = {},
+  options: {
+    readonly registryDir?: string;
+    readonly checkpointId?: string;
+    /** Write the checkpoint to this path so another machine can adopt the handoff. */
+    readonly archive?: string;
+    readonly output?: string;
+  } = {},
 ): Promise<WorkspaceJSON> {
   const args = ["handoff", "--id", id];
   appendFlag(args, "--registry-dir", options.registryDir);
   appendFlag(args, "--checkpoint-id", options.checkpointId);
+  appendFlag(args, "--archive", options.archive);
   appendFlag(args, "--output", options.output);
+  return runWorkspaceCommand(args);
+}
+
+/**
+ * Adopt a portable handoff on the machine that received it.
+ *
+ * The document and the archive it names are verified before anything is written,
+ * so a handoff that arrived over a channel is checked rather than trusted.
+ */
+export function adoptWorkspaceHandoff(options: WorkspaceAdoptOptions): Promise<WorkspaceJSON> {
+  const args = ["adopt", "--handoff", options.handoffPath, "--root", options.root];
+  appendArchiveOptions(args, options);
+  return runWorkspaceCommand(args);
+}
+
+/** Write the difference between two checkpoints to a document the other side can apply. */
+export function createWorkspaceDelta(options: WorkspaceDeltaOptions): Promise<WorkspaceJSON> {
+  const args = ["delta", "--from", options.from, "--to", options.to, "--output", options.output];
+  appendArchiveOptions(args, options);
+  return runWorkspaceCommand(args);
+}
+
+/** Bring a base checkpoint to the state a delta describes, publishing a new checkpoint. */
+export function applyWorkspaceDelta(options: WorkspaceApplyOptions): Promise<WorkspaceJSON> {
+  const args = ["apply", "--delta", options.delta, "--base", options.base];
+  appendFlag(args, "--registry-dir", options.registryDir);
   return runWorkspaceCommand(args);
 }
 

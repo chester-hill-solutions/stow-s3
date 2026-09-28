@@ -32,6 +32,47 @@
   reading a delta from a channel it does not control should not have to guess the
   bound.
 
+- **Added: a delta and a portable handoff are reachable, and a handoff can carry
+  the bytes it names.** `CreateDelta` and `ApplyDelta` had no caller outside their
+  own tests. The whole point of a delta is that one machine holds a base and
+  another holds the change, and there was no way to write one or apply one — a
+  caller in Go had to re-implement the CLI's argument handling to reach a
+  capability the library already had.
+
+  `stow-s3 workspace delta --from --to --output` and `stow-s3 workspace apply
+  --delta --base` are that surface, with the same limits and the same refusals as
+  the library, and `createWorkspaceDelta` / `applyWorkspaceDelta` in TypeScript and
+  `create_workspace_delta` / `apply_workspace_delta` in Python wrap it. The base
+  is a required argument in all three, because the conflict rule is stated
+  against it and inferring a base would let a change be applied to a state it was
+  never measured against. Every published artifact is written through a temporary
+  file and linked into place, so a reader never sees a partial document and an
+  existing destination is refused rather than replaced — which is why
+  `exportCheckpointFile`'s logic is now one shared function rather than a second
+  copy of the same four steps.
+
+  A handoff reference was a same-machine document: a workspace ID and the
+  registry directory holding it, which is meaningless to the machine that receives
+  it. Handing work to another runner meant exporting an archive by hand, telling
+  the receiver to import it, and trusting that the archive was the one the
+  reference named. `handoff --archive <path>` now writes the checkpoint beside the
+  reference and records the archive's SHA-256, size, and file count in the
+  document, and `adopt --handoff <reference> --root <new-root>` verifies that
+  digest, imports the archive, and restores a working workspace in one step. A
+  relative archive path resolves against the reference's own directory, so a
+  copied pair stays valid — which is what moving work between runners actually
+  looks like.
+
+  The checks are ordered so nothing is written before the bytes are vouched for:
+  the document is parsed under the same strictness as a task manifest, the
+  archive's digest is compared, the import verifies every file against the
+  manifest inside the archive, and only then is a directory created. A test
+  corrupts one byte of a handoff's archive and asserts the refusal *and* that the
+  workspace root was not created. A document whose names disagree with the bytes
+  it carries is refused too, since restoring either would put somebody's work in
+  the wrong place. Version 1 references are unchanged and still resume; `adopt`
+  refuses one and names the flag that would make it portable.
+
 - **Added: a team partitions the workspace registry.** Two jobs on one CI runner
   shared one registry, so one job's TTL could decide the other's bytes and
   either could name the other's workspace ID. The registry is a file per workspace

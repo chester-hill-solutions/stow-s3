@@ -79,14 +79,6 @@ func registryFlag(flags *flag.FlagSet) func() registrySelection {
 	return func() registrySelection { return registrySelection{dir: *dir, team: *team} }
 }
 
-type workspaceHandoff struct {
-	Version      int    `json:"version"`
-	WorkspaceID  string `json:"workspace_id"`
-	CheckpointID string `json:"checkpoint_id,omitempty"`
-	RegistryDir  string `json:"registry_dir,omitempty"`
-	Team         string `json:"team,omitempty"`
-}
-
 type checkpointResult struct {
 	Version     int      `json:"version"`
 	ID          string   `json:"checkpoint_id"`
@@ -100,7 +92,7 @@ type checkpointResult struct {
 
 func workspaceCommand(args []string) error {
 	if len(args) == 0 {
-		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|diff|restore|handoff|export|preview|import>")
+		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|delta|apply|diff|restore|handoff|export|preview|import|adopt>")
 	}
 	switch args[0] {
 	case "prepare":
@@ -111,6 +103,10 @@ func workspaceCommand(args []string) error {
 		return handoffWorkspaceCommand(args[1:])
 	case "checkpoint":
 		return checkpointWorkspaceCommand(args[1:])
+	case "delta":
+		return deltaWorkspaceCommand(args[1:])
+	case "apply":
+		return applyDeltaCommand(args[1:])
 	case "diff":
 		return diffWorkspaceCommand(args[1:])
 	case "restore":
@@ -119,6 +115,8 @@ func workspaceCommand(args []string) error {
 		return exportCheckpointCommand(args[1:])
 	case "import":
 		return importCheckpointCommand(args[1:])
+	case "adopt":
+		return adoptHandoffCommand(args[1:])
 	case "preview":
 		return previewCheckpointCommand(args[1:])
 	default:
@@ -232,7 +230,7 @@ func resumeWorkspaceCommand(args []string) error {
 		return err
 	}
 	selection := chosen()
-	resolvedID, resolvedRegistryDir, checkpointID, err := resumeIdentifiers(*id, *handoffPath, selection)
+	resolvedID, resolvedRegistryDir, checkpointID, resolvedTeam, err := resumeIdentifiers(*id, *handoffPath, selection)
 	if err != nil {
 		return err
 	}
@@ -243,6 +241,10 @@ func resumeWorkspaceCommand(args []string) error {
 	// re-applied to it; the directory it names is already the team's. Where the
 	// caller named the flags instead, the selection is what gets resolved.
 	registry := resolvedRegistryDir
+	team := resolvedTeam
+	if team == "" {
+		team = selection.team
+	}
 	if registry == "" {
 		if registry, err = selection.resolve(""); err != nil {
 			return err
@@ -265,70 +267,24 @@ func resumeWorkspaceCommand(args []string) error {
 	result := makeWorkspaceResult(ws, 0, 0)
 	result.CheckpointID = checkpointID
 	result.RegistryDir = registry
-	result.Team = selection.team
+	result.Team = team
 	return writeWorkspaceJSON(result)
 }
 
-func resumeIdentifiers(id, handoffPath string, selection registrySelection) (string, string, string, error) {
+func resumeIdentifiers(id, handoffPath string, selection registrySelection) (string, string, string, string, error) {
 	if handoffPath == "" {
-		return id, selection.dir, "", nil
+		return id, selection.dir, "", "", nil
 	}
 	if id != "" || selection.dir != "" || selection.team != "" {
-		return "", "", "", errors.New("workspace resume accepts --handoff or --id/--registry-dir/--team, not both")
+		return "", "", "", "", errors.New("workspace resume accepts --handoff or --id/--registry-dir/--team, not both")
 	}
-	data, err := os.ReadFile(handoffPath)
+	document, err := readHandoffDocument(handoffPath)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", "", err
 	}
-	var handoff workspaceHandoff
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&handoff); err != nil {
-		return "", "", "", fmt.Errorf("decode handoff reference: %w", err)
-	}
-	if handoff.Version != 1 || handoff.WorkspaceID == "" || handoff.RegistryDir == "" {
-		return "", "", "", errors.New("invalid or unsupported workspace handoff reference")
-	}
-	return handoff.WorkspaceID, handoff.RegistryDir, handoff.CheckpointID, nil
-}
-
-func handoffWorkspaceCommand(args []string) error {
-	flags := flag.NewFlagSet("workspace handoff", flag.ContinueOnError)
-	id := flags.String("id", "", "Workspace ID to hand off")
-	checkpointID := flags.String("checkpoint-id", "", "Optional immutable checkpoint to include")
-	output := flags.String("output", "", "Write the local handoff reference to this file")
-	chosen := registryFlag(flags)
-	if err := flags.Parse(args); err != nil {
-		return err
-	}
-	if *id == "" {
-		return errors.New("workspace handoff requires --id")
-	}
-	selection := chosen()
-	registry, err := selection.resolve("")
-	if err != nil {
-		return err
-	}
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, *id)
-	if err != nil {
-		return err
-	}
-	defer ws.Close()
-	if *checkpointID != "" {
-		manifest, err := stow.LoadCheckpoint(registry, *checkpointID)
-		if err != nil {
-			return err
-		}
-		if manifest.WorkspaceID != ws.ID() {
-			return errors.New("checkpoint belongs to a different workspace")
-		}
-	}
-	// The reference records the partition as well as the directory it resolved to,
-	// so whoever reads it can tell which namespace this workspace belonged to.
-	return writeWorkspaceJSONTo(*output, workspaceHandoff{
-		Version: 1, WorkspaceID: ws.ID(), CheckpointID: *checkpointID,
-		RegistryDir: registry, Team: selection.team,
-	})
+	// The reference carries the partition it resolved to, so the team is reported
+	// from the directory rather than re-derived from a flag.
+	return document.WorkspaceID, document.RegistryDir, document.CheckpointID, "", nil
 }
 
 func makeWorkspaceResult(ws *stow.Workspace, seededBytes, seededObjects int64) workspaceResult {

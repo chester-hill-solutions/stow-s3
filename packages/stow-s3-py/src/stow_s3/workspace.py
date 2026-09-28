@@ -61,13 +61,71 @@ def handoff_workspace(
     id: str,
     *,
     registry_dir: str | None = None,
+    team: str | None = None,
     checkpoint_id: str | None = None,
+    archive: str | None = None,
     output: str | None = None,
 ) -> WorkspaceJSON:
     args = ["handoff", "--id", id]
     _append_flag(args, "--registry-dir", registry_dir)
+    _append_flag(args, "--team", team)
     _append_flag(args, "--checkpoint-id", checkpoint_id)
+    _append_flag(args, "--archive", archive)
     _append_flag(args, "--output", output)
+    return run_workspace_command(*args)
+
+
+def adopt_workspace_handoff(
+    handoff: str,
+    root: str,
+    *,
+    registry_dir: str | None = None,
+    team: str | None = None,
+    max_bytes: int | None = None,
+    max_files: int | None = None,
+    include_sensitive: bool = False,
+) -> WorkspaceJSON:
+    """Adopt a portable handoff on the machine that received it.
+
+    The document and the archive it names are verified before anything is
+    written, so a handoff that arrived over a channel is checked rather than
+    trusted.
+    """
+    args = ["adopt", "--handoff", handoff, "--root", root]
+    _append_archive_options(args, registry_dir, max_bytes, max_files, include_sensitive)
+    _append_flag(args, "--team", team)
+    return run_workspace_command(*args)
+
+
+def create_workspace_delta(
+    *,
+    from_id: str,
+    to_id: str,
+    output: str,
+    registry_dir: str | None = None,
+    max_bytes: int | None = None,
+    max_files: int | None = None,
+    include_sensitive: bool = False,
+) -> WorkspaceJSON:
+    """Write the difference between two checkpoints to a document the other side can apply."""
+    args = ["delta", "--from", from_id, "--to", to_id, "--output", output]
+    _append_archive_options(args, registry_dir, max_bytes, max_files, include_sensitive)
+    return run_workspace_command(*args)
+
+
+def apply_workspace_delta(
+    delta: str,
+    *,
+    base: str,
+    registry_dir: str | None = None,
+) -> WorkspaceJSON:
+    """Bring a base checkpoint to the state a delta describes.
+
+    The base is named rather than defaulted, because a delta states what a path
+    was and is now and the point it applies to is part of that meaning.
+    """
+    args = ["apply", "--delta", delta, "--base", base]
+    _append_flag(args, "--registry-dir", registry_dir)
     return run_workspace_command(*args)
 
 

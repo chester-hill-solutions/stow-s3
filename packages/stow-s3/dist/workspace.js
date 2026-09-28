@@ -29,7 +29,31 @@ export function handoffWorkspace(id, options = {}) {
     const args = ["handoff", "--id", id];
     appendFlag(args, "--registry-dir", options.registryDir);
     appendFlag(args, "--checkpoint-id", options.checkpointId);
+    appendFlag(args, "--archive", options.archive);
     appendFlag(args, "--output", options.output);
+    return runWorkspaceCommand(args);
+}
+/**
+ * Adopt a portable handoff on the machine that received it.
+ *
+ * The document and the archive it names are verified before anything is written,
+ * so a handoff that arrived over a channel is checked rather than trusted.
+ */
+export function adoptWorkspaceHandoff(options) {
+    const args = ["adopt", "--handoff", options.handoffPath, "--root", options.root];
+    appendArchiveOptions(args, options);
+    return runWorkspaceCommand(args);
+}
+/** Write the difference between two checkpoints to a document the other side can apply. */
+export function createWorkspaceDelta(options) {
+    const args = ["delta", "--from", options.from, "--to", options.to, "--output", options.output];
+    appendArchiveOptions(args, options);
+    return runWorkspaceCommand(args);
+}
+/** Bring a base checkpoint to the state a delta describes, publishing a new checkpoint. */
+export function applyWorkspaceDelta(options) {
+    const args = ["apply", "--delta", options.delta, "--base", options.base];
+    appendFlag(args, "--registry-dir", options.registryDir);
     return runWorkspaceCommand(args);
 }
 export function checkpointWorkspace(options) {

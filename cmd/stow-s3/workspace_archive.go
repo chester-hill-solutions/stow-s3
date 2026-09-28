@@ -75,36 +75,52 @@ func exportCheckpointCommand(args []string) error {
 }
 
 func exportCheckpointFile(registryDir, id, output string, options stow.CheckpointArchiveOptions) error {
-	absolute, err := filepath.Abs(output)
+	_, err := publishNewFile(output, "archive", func(file *os.File) error {
+		return stow.ExportCheckpoint(context.Background(), registryDir, id, file, options)
+	})
+	return err
+}
+
+// publishNewFile writes through a temporary file in the destination's own
+// directory and links it into place.
+//
+// Both properties matter and neither comes from the write. A reader never sees a
+// partial file, because the name appears atomically. An existing destination is
+// refused rather than replaced, because every artifact this product publishes —
+// an archive, a delta document, a handoff reference — is something a caller may
+// already be holding a path to, and overwriting it would swap the bytes out from
+// under that reference.
+func publishNewFile(destination, label string, write func(*os.File) error) (string, error) {
+	absolute, err := filepath.Abs(destination)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if _, err := os.Lstat(absolute); err == nil {
-		return fmt.Errorf("archive destination already exists: %s", absolute)
+		return "", fmt.Errorf("%s destination already exists: %s", label, absolute)
 	} else if !os.IsNotExist(err) {
-		return err
+		return "", err
 	}
-	temp, err := os.CreateTemp(filepath.Dir(absolute), ".stow-checkpoint-export-*")
+	temp, err := os.CreateTemp(filepath.Dir(absolute), ".stow-publish-*")
 	if err != nil {
-		return err
+		return "", err
 	}
 	tempName := temp.Name()
 	defer os.Remove(tempName)
-	if err := stow.ExportCheckpoint(context.Background(), registryDir, id, temp, options); err != nil {
+	if err := write(temp); err != nil {
 		_ = temp.Close()
-		return err
+		return "", err
 	}
 	if err := temp.Sync(); err != nil {
 		_ = temp.Close()
-		return err
+		return "", err
 	}
 	if err := temp.Close(); err != nil {
-		return err
+		return "", err
 	}
 	if err := os.Link(tempName, absolute); err != nil {
-		return fmt.Errorf("publish checkpoint archive: %w", err)
+		return "", fmt.Errorf("publish %s: %w", label, err)
 	}
-	return nil
+	return absolute, nil
 }
 
 func importCheckpointCommand(args []string) error {

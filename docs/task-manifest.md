@@ -109,6 +109,32 @@ checkpoint. It refuses traversal, symlinks, special files, corruption, and an
 existing checkpoint ID. This is integrity validation, not encryption or secret
 scanning.
 
+A handoff can carry the bytes as well as the names. `handoff --archive
+<path>` writes the named checkpoint beside the reference and records the
+archive's SHA-256, size, and file count in the document, so the two travel
+together; `adopt --handoff <reference> --root <new-root>` on the receiving
+machine verifies that digest, imports the archive, and restores a working
+workspace in one step. A relative archive path is resolved against the
+reference's own directory, so a copied pair stays valid. The digest is the
+contract: a handoff that names bytes it cannot vouch for is refused before any
+directory is created. A version 1 reference — an ID and a registry directory,
+no archive — is still accepted by `resume` and still means the same thing;
+`adopt` refuses it, and says which flag would make it portable.
+
+Two machines that already share a point can exchange only what changed. `delta
+--from <base> --to <target> --output <path>` writes a versioned document naming
+both ends and carrying the content of every added or changed path;
+`apply --delta <path> --base <checkpoint-id>` brings a third point to the
+target and publishes a new checkpoint, leaving the base untouched. The base is
+required rather than defaulted, because the conflict rule is stated against it:
+a path the document says was A and is now B, applied to a target holding
+neither, is one writer's intent applied to a state that does not exist. That is
+`ErrDeltaConflict` and it is a refusal, never a merge, and the target is left
+byte-identical. Content is verified against the digest each change declares
+before it is written, and a document over `MaxDeltaBytes` is refused at decode.
+Bounds match the archive path's, so a delta and an archive of the same work are
+accepted or refused together. A delta crossing two workspaces is refused.
+
 Checkpoint directories are removed when their owning workspace is explicitly
 destroyed or successfully reclaimed by TTL collection. A workspace kept alive
 because it is adopted, locked, or otherwise not eligible for collection keeps
