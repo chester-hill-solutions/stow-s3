@@ -76,6 +76,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # This job's contract file is the shared one, and two other jobs read it too,
+      # so it is checked in from a clean checkout rather than regenerated here. A
+      # job that formatted or rewrote it would make the TypeScript and Python
+      # drivers assert against a file that is not the committed one, which is the
+      # failure a shared contract cannot detect about itself.
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -129,6 +134,12 @@ jobs:
         working-directory: packages/stow-s3
       - name: Check generated output
         run: git diff --exit-code -- packages/stow-s3/dist
+      # The workspace contract has its own runner inside npm test, but the case
+      # file it reads lives outside the package. This asserts the two drivers of one
+      # contract are looking at the same file, which is the thing a shared contract
+      # cannot check about itself.
+      - name: The workspace contract is the one the Go driver reads
+        run: git diff --exit-code -- conformance/workspace/cases.json
 
   python:
     name: Python client
@@ -168,6 +179,12 @@ jobs:
         run: python -m pytest packages/stow-s3-py/tests
         env:
           STOW_BIN: ${{ github.workspace }}/bin/stow-s3
+      # Same reasoning as the TypeScript job: the contract is one file read by three
+      # drivers, and a driver that grew a private copy of it would assert its own
+      # beliefs instead of the shared ones. The Python test asserts the path it
+      # resolved; this asserts the file is the one that is committed.
+      - name: The workspace contract is the one the other drivers read
+        run: git diff --exit-code -- conformance/workspace/cases.json
 
   wasm:
     name: WASM memory profile

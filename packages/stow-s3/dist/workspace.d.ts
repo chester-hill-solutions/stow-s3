@@ -7,6 +7,7 @@ export interface ResumeWorkspaceOptions {
 export interface WorkspaceCheckpointOptions {
     readonly id: string;
     readonly registryDir?: string;
+    readonly team?: string;
     readonly parent?: string;
     readonly maxBytes?: number;
     readonly maxFiles?: number;
@@ -14,6 +15,7 @@ export interface WorkspaceCheckpointOptions {
 }
 export interface WorkspaceArchiveOptions {
     readonly registryDir?: string;
+    readonly team?: string;
     readonly maxBytes?: number;
     readonly maxFiles?: number;
     readonly includeSensitive?: boolean;
@@ -47,6 +49,7 @@ export declare function destroyWorkspace(id: string, registryDir?: string): Prom
 export declare function collectWorkspaces(registryDir?: string): Promise<WorkspaceJSON>;
 export declare function handoffWorkspace(id: string, options?: {
     readonly registryDir?: string;
+    readonly team?: string;
     readonly checkpointId?: string;
     /** Write the checkpoint to this path so another machine can adopt the handoff. */
     readonly archive?: string;
@@ -64,7 +67,7 @@ export declare function createWorkspaceDelta(options: WorkspaceDeltaOptions): Pr
 /** Bring a base checkpoint to the state a delta describes, publishing a new checkpoint. */
 export declare function applyWorkspaceDelta(options: WorkspaceApplyOptions): Promise<WorkspaceJSON>;
 export declare function checkpointWorkspace(options: WorkspaceCheckpointOptions): Promise<WorkspaceJSON>;
-export declare function diffWorkspaces(from: string, to: string, registryDir?: string): Promise<WorkspaceJSON>;
+export declare function diffWorkspaces(from: string, to: string, registryDir?: string, team?: string): Promise<WorkspaceJSON>;
 export declare function restoreWorkspaceCheckpoint(checkpointId: string, root: string, registryDir?: string): Promise<WorkspaceJSON>;
 export declare function exportWorkspaceCheckpoint(checkpointId: string, output: string, options?: WorkspaceArchiveOptions): Promise<WorkspaceJSON>;
 export declare function importWorkspaceCheckpoint(archive: string, options?: WorkspaceArchiveOptions): Promise<WorkspaceJSON>;

@@ -144,6 +144,7 @@ def create_workspace_delta(
     to_id: str,
     output: str,
     registry_dir: str | None = None,
+    team: str | None = None,
     max_bytes: int | None = None,
     max_files: int | None = None,
     include_sensitive: bool = False,
@@ -151,6 +152,7 @@ def create_workspace_delta(
     """Write the difference between two checkpoints to a document the other side can apply."""
     args = ["delta", "--from", from_id, "--to", to_id, "--output", output]
     _append_archive_options(args, registry_dir, max_bytes, max_files, include_sensitive)
+    _append_flag(args, "--team", team)
     return run_workspace_command(*args)
 
 
@@ -159,6 +161,7 @@ def apply_workspace_delta(
     *,
     base: str,
     registry_dir: str | None = None,
+    team: str | None = None,
 ) -> WorkspaceJSON:
     """Bring a base checkpoint to the state a delta describes.
 
@@ -167,6 +170,10 @@ def apply_workspace_delta(
     """
     args = ["apply", "--delta", delta, "--base", base]
     _append_flag(args, "--registry-dir", registry_dir)
+    # The CLI takes --team on apply, and a checkpoint filed under a team partition
+    # is invisible without it, so omitting this made every apply against a
+    # partitioned registry fail to find its own base.
+    _append_flag(args, "--team", team)
     return run_workspace_command(*args)
 
 
@@ -174,6 +181,7 @@ def checkpoint_workspace(
     id: str,
     *,
     registry_dir: str | None = None,
+    team: str | None = None,
     parent: str | None = None,
     max_bytes: int | None = None,
     max_files: int | None = None,
@@ -181,6 +189,7 @@ def checkpoint_workspace(
 ) -> WorkspaceJSON:
     args = ["checkpoint", "--id", id]
     _append_flag(args, "--registry-dir", registry_dir)
+    _append_flag(args, "--team", team)
     _append_flag(args, "--parent", parent)
     _append_flag(args, "--max-bytes", max_bytes)
     _append_flag(args, "--max-files", max_files)
@@ -188,17 +197,25 @@ def checkpoint_workspace(
     return run_workspace_command(*args)
 
 
-def diff_workspaces(from_id: str, to_id: str, *, registry_dir: str | None = None) -> WorkspaceJSON:
+def diff_workspaces(
+    from_id: str, to_id: str, *, registry_dir: str | None = None, team: str | None = None
+) -> WorkspaceJSON:
     args = ["diff", "--from", from_id, "--to", to_id]
     _append_flag(args, "--registry-dir", registry_dir)
+    _append_flag(args, "--team", team)
     return run_workspace_command(*args)
 
 
 def restore_workspace_checkpoint(
-    checkpoint_id: str, root: str, *, registry_dir: str | None = None
+    checkpoint_id: str,
+    root: str,
+    *,
+    registry_dir: str | None = None,
+    team: str | None = None,
 ) -> WorkspaceJSON:
     args = ["restore", "--checkpoint-id", checkpoint_id, "--root", root]
     _append_flag(args, "--registry-dir", registry_dir)
+    _append_flag(args, "--team", team)
     return run_workspace_command(*args)
 
 

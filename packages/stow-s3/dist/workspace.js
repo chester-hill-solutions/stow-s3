@@ -42,6 +42,7 @@ export function collectWorkspaces(registryDir) {
 export async function handoffWorkspace(id, options = {}) {
     const args = ["handoff", "--id", id];
     appendFlag(args, "--registry-dir", options.registryDir);
+    appendFlag(args, "--team", options.team);
     appendFlag(args, "--checkpoint-id", options.checkpointId);
     appendFlag(args, "--archive", options.archive);
     appendFlag(args, "--output", options.output);
@@ -81,20 +82,26 @@ export function createWorkspaceDelta(options) {
 export function applyWorkspaceDelta(options) {
     const args = ["apply", "--delta", options.delta, "--base", options.base];
     appendFlag(args, "--registry-dir", options.registryDir);
+    // The CLI takes --team on apply, and a checkpoint filed under a team partition is
+    // invisible without it, so omitting this made every apply against a partitioned
+    // registry fail to find its own base.
+    appendFlag(args, "--team", options.team);
     return runWorkspaceCommand(args);
 }
 export function checkpointWorkspace(options) {
     const args = ["checkpoint", "--id", options.id];
     appendFlag(args, "--registry-dir", options.registryDir);
+    appendFlag(args, "--team", options.team);
     appendFlag(args, "--parent", options.parent);
     appendFlag(args, "--max-bytes", options.maxBytes);
     appendFlag(args, "--max-files", options.maxFiles);
     appendBooleanFlag(args, "--include-sensitive", options.includeSensitive);
     return runWorkspaceCommand(args);
 }
-export function diffWorkspaces(from, to, registryDir) {
+export function diffWorkspaces(from, to, registryDir, team) {
     const args = ["diff", "--from", from, "--to", to];
     appendFlag(args, "--registry-dir", registryDir);
+    appendFlag(args, "--team", team);
     return runWorkspaceCommand(args);
 }
 export function restoreWorkspaceCheckpoint(checkpointId, root, registryDir) {
@@ -114,6 +121,7 @@ export function importWorkspaceCheckpoint(archive, options = {}) {
 }
 function appendArchiveOptions(args, options) {
     appendFlag(args, "--registry-dir", options.registryDir);
+    appendFlag(args, "--team", options.team);
     appendFlag(args, "--max-bytes", options.maxBytes);
     appendFlag(args, "--max-files", options.maxFiles);
     appendBooleanFlag(args, "--include-sensitive", options.includeSensitive);

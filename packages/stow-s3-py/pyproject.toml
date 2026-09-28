@@ -50,3 +50,7 @@ include = ["src/stow_s3", "tests", "README.md", "pyproject.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The workspace contract driver lives beside the tests rather than inside the
+# package, because it is a test asset and not something a user of stow_s3 should
+# have installed. rootdir here is what lets the tests import it by name.
+pythonpath = ["tests"]

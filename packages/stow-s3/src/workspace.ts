@@ -16,6 +16,7 @@ export interface ResumeWorkspaceOptions {
 export interface WorkspaceCheckpointOptions {
   readonly id: string;
   readonly registryDir?: string;
+  readonly team?: string;
   readonly parent?: string;
   readonly maxBytes?: number;
   readonly maxFiles?: number;
@@ -24,6 +25,7 @@ export interface WorkspaceCheckpointOptions {
 
 export interface WorkspaceArchiveOptions {
   readonly registryDir?: string;
+  readonly team?: string;
   readonly maxBytes?: number;
   readonly maxFiles?: number;
   readonly includeSensitive?: boolean;
@@ -100,6 +102,7 @@ export async function handoffWorkspace(
   id: string,
   options: {
     readonly registryDir?: string;
+    readonly team?: string;
     readonly checkpointId?: string;
     /** Write the checkpoint to this path so another machine can adopt the handoff. */
     readonly archive?: string;
@@ -108,6 +111,7 @@ export async function handoffWorkspace(
 ): Promise<WorkspaceJSON> {
   const args = ["handoff", "--id", id];
   appendFlag(args, "--registry-dir", options.registryDir);
+  appendFlag(args, "--team", options.team);
   appendFlag(args, "--checkpoint-id", options.checkpointId);
   appendFlag(args, "--archive", options.archive);
   appendFlag(args, "--output", options.output);
@@ -150,12 +154,17 @@ export function createWorkspaceDelta(options: WorkspaceDeltaOptions): Promise<Wo
 export function applyWorkspaceDelta(options: WorkspaceApplyOptions): Promise<WorkspaceJSON> {
   const args = ["apply", "--delta", options.delta, "--base", options.base];
   appendFlag(args, "--registry-dir", options.registryDir);
+  // The CLI takes --team on apply, and a checkpoint filed under a team partition is
+  // invisible without it, so omitting this made every apply against a partitioned
+  // registry fail to find its own base.
+  appendFlag(args, "--team", options.team);
   return runWorkspaceCommand(args);
 }
 
 export function checkpointWorkspace(options: WorkspaceCheckpointOptions): Promise<WorkspaceJSON> {
   const args = ["checkpoint", "--id", options.id];
   appendFlag(args, "--registry-dir", options.registryDir);
+  appendFlag(args, "--team", options.team);
   appendFlag(args, "--parent", options.parent);
   appendFlag(args, "--max-bytes", options.maxBytes);
   appendFlag(args, "--max-files", options.maxFiles);
@@ -167,9 +176,11 @@ export function diffWorkspaces(
   from: string,
   to: string,
   registryDir?: string,
+  team?: string,
 ): Promise<WorkspaceJSON> {
   const args = ["diff", "--from", from, "--to", to];
   appendFlag(args, "--registry-dir", registryDir);
+  appendFlag(args, "--team", team);
   return runWorkspaceCommand(args);
 }
 
@@ -204,6 +215,7 @@ export function importWorkspaceCheckpoint(
 
 function appendArchiveOptions(args: string[], options: WorkspaceArchiveOptions): void {
   appendFlag(args, "--registry-dir", options.registryDir);
+  appendFlag(args, "--team", options.team);
   appendFlag(args, "--max-bytes", options.maxBytes);
   appendFlag(args, "--max-files", options.maxFiles);
   appendBooleanFlag(args, "--include-sensitive", options.includeSensitive);

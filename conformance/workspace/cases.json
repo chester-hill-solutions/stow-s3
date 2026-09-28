@@ -1,0 +1,498 @@
+{
+  "version": 1,
+  "description": [
+    "The workspace contract, asserted by three independent drivers: the Go runner",
+    "against the CLI, the TypeScript wrapper, and the Python wrapper. Every driver",
+    "reads this one file, so a client cannot disagree with the engine about what a",
+    "verb returns without one of them failing.",
+    "",
+    "This exists because the client wrappers had never been run against the binary",
+    "they wrap. They were wrong in the same way in both languages: `handoff",
+    "--output` writes the document to the named path and prints nothing, and both",
+    "decoded stdout anyway. The divergence that hid it is what kept the surface out",
+    "of CI. The 'handoff' step below is that regression, stated once.",
+    "",
+    "Absolute paths, workspace ids, checkpoint ids and digests are generated per",
+    "run, so no step states one literally. The harness owns the work directory,",
+    "isolates the default registry under a temporary home, substitutes",
+    "{{captures}} into arguments, and applies a step's 'write' block so a step can",
+    "change the workspace the way an agent would.",
+    "",
+    "A team's partition is a directory boundary, not a label: a checkpoint filed",
+    "under teams/<name> is invisible from the registry root, so a delta across two",
+    "teams cannot even be attempted \u2014 the checkpoint is simply not found. The",
+    "'crosses workspaces' refusal is therefore reachable only between two",
+    "workspaces inside one partition, which is what the scenario does. Both",
+    "boundaries are real; only one of them is a refusal with a message.",
+    "",
+    "A handoff reference names a workspace; it does not transfer its identity.",
+    "resume --handoff therefore returns the workspace the document names, in the",
+    "registry the document recorded, while adopt builds a different workspace from",
+    "the archive. Both are asserted, because a caller that assumed the two returned",
+    "the same id would resume the sender's workspace instead of the receiver's.",
+    "",
+    "resume takes the registry from the document and refuses --handoff alongside",
+    "--registry-dir. A caller that could point a handoff at a different registry",
+    "would resume a workspace in a place the document never named, so the refusal",
+    "is a safety property and is asserted rather than worked around."
+  ],
+  "steps": [
+    {
+      "id": "prepare seeds every declared input and reports the totals it seeded",
+      "verb": "prepare",
+      "registry": "a",
+      "manifest": {
+        "root": "{{work}}/workspace",
+        "team": "platform",
+        "inputs": [
+          {
+            "body": "seed",
+            "destination": "seed.txt"
+          },
+          {
+            "body": "second",
+            "destination": "nested/second.txt"
+          }
+        ]
+      },
+      "capture": {
+        "ws": "workspace_id",
+        "root": "root",
+        "registryA": "registry_dir"
+      },
+      "expect": {
+        "workspace_id": {
+          "matches": "^ws_[0-9a-f]+$"
+        },
+        "seeded_objects": {
+          "equals": 2
+        },
+        "seeded_bytes": {
+          "equals": 10
+        },
+        "team": {
+          "equals": "platform"
+        },
+        "root": {
+          "equals": "{{work}}/workspace"
+        },
+        "registry_dir": {
+          "underWork": true
+        }
+      }
+    },
+    {
+      "id": "the seeded inputs are really on disk, at the destinations the manifest named",
+      "verb": "read",
+      "root": "{{work}}/workspace",
+      "expect": {
+        "seed.txt": {
+          "equals": "seed"
+        },
+        "nested/second.txt": {
+          "equals": "second"
+        }
+      }
+    },
+    {
+      "id": "checkpoint counts the same files and bytes the seed did",
+      "verb": "checkpoint",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "id": "{{ws}}"
+      },
+      "capture": {
+        "cp1": "checkpoint_id"
+      },
+      "expect": {
+        "checkpoint_id": {
+          "matches": "^cp_[0-9a-f]+$"
+        },
+        "workspace_id": {
+          "equals": "{{ws}}"
+        },
+        "files": {
+          "equals": 2
+        },
+        "bytes": {
+          "equals": 10
+        }
+      }
+    },
+    {
+      "id": "an agent changes the workspace between checkpoints",
+      "verb": "noop",
+      "write": [
+        {
+          "path": "notes.txt",
+          "body": "written by the agent"
+        }
+      ]
+    },
+    {
+      "id": "a second checkpoint names the first as its parent and counts the new file",
+      "verb": "checkpoint",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "id": "{{ws}}",
+        "parent": "{{cp1}}"
+      },
+      "capture": {
+        "cp2": "checkpoint_id"
+      },
+      "expect": {
+        "parent_checkpoint_id": {
+          "equals": "{{cp1}}"
+        },
+        "checkpoint_id": {
+          "notEquals": "{{cp1}}"
+        },
+        "files": {
+          "equals": 3
+        },
+        "bytes": {
+          "equals": 30
+        }
+      }
+    },
+    {
+      "id": "diff between the two checkpoints names only what the agent changed",
+      "verb": "diff",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "from": "{{cp1}}",
+        "to": "{{cp2}}"
+      },
+      "expect": {
+        "changes": {
+          "length": 1
+        },
+        "changes[0].path": {
+          "equals": "notes.txt"
+        },
+        "changes[0].kind": {
+          "equals": "added"
+        }
+      }
+    },
+    {
+      "id": "a second workspace can share the registry without sharing the workspace",
+      "verb": "prepare",
+      "registry": "a",
+      "manifest": {
+        "root": "{{work}}/workspace2",
+        "inputs": [
+          {
+            "body": "elsewhere",
+            "destination": "other.txt"
+          }
+        ],
+        "team": "platform"
+      },
+      "capture": {
+        "ws2": "workspace_id"
+      },
+      "expect": {
+        "workspace_id": {
+          "notEquals": "{{ws}}"
+        },
+        "seeded_objects": {
+          "equals": 1
+        },
+        "root": {
+          "equals": "{{work}}/workspace2"
+        }
+      }
+    },
+    {
+      "id": "a checkpoint of the second workspace is its own, in the same registry",
+      "verb": "checkpoint",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "id": "{{ws2}}"
+      },
+      "capture": {
+        "cpB": "checkpoint_id"
+      },
+      "expect": {
+        "workspace_id": {
+          "equals": "{{ws2}}"
+        },
+        "files": {
+          "equals": 1
+        },
+        "bytes": {
+          "equals": 9
+        }
+      }
+    },
+    {
+      "id": "a delta across two workspaces is refused, which is why this is not version control",
+      "verb": "delta",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "from": "{{cp1}}",
+        "to": "{{cpB}}",
+        "output": "{{work}}/crossed.stowdelta"
+      },
+      "fail": {
+        "contains": "crosses workspaces"
+      }
+    },
+    {
+      "id": "handoff without an archive is a local reference, version 1",
+      "verb": "handoff",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "id": "{{ws}}",
+        "output": "{{work}}/local-handoff.json"
+      },
+      "alsoWritten": "local-handoff.json",
+      "expect": {
+        "version": {
+          "equals": 1
+        },
+        "workspace_id": {
+          "equals": "{{ws}}"
+        },
+        "team": {
+          "equals": "platform"
+        },
+        "checkpoint_id": {
+          "absent": true
+        }
+      },
+      "returns": "file"
+    },
+    {
+      "id": "handoff with an archive is a portable reference, version 2",
+      "verb": "handoff",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "id": "{{ws}}",
+        "checkpoint-id": "{{cp2}}",
+        "archive": "{{work}}/checkpoint.tar.gz",
+        "output": "{{work}}/handoff.json"
+      },
+      "alsoWritten": "handoff.json",
+      "expect": {
+        "version": {
+          "equals": 2
+        },
+        "workspace_id": {
+          "equals": "{{ws}}"
+        },
+        "checkpoint_id": {
+          "equals": "{{cp2}}"
+        },
+        "team": {
+          "equals": "platform"
+        },
+        "archive.path": {
+          "equals": "{{work}}/checkpoint.tar.gz"
+        },
+        "archive.sha256": {
+          "matches": "^[0-9a-f]{64}$"
+        },
+        "archive.files": {
+          "equals": 3
+        },
+        "archive.bytes": {
+          "min": 1
+        }
+      },
+      "returns": "file"
+    },
+    {
+      "id": "adopt restores the archive into a registry that has never seen it",
+      "verb": "adopt",
+      "registry": "default",
+      "args": {
+        "handoff": "{{work}}/handoff.json",
+        "root": "{{work}}/adopted"
+      },
+      "capture": {
+        "adopted": "workspace_id"
+      },
+      "expect": {
+        "workspace_id": {
+          "notEquals": "{{ws}}"
+        },
+        "checkpoint_id": {
+          "equals": "{{cp2}}"
+        },
+        "team": {
+          "equals": "platform"
+        },
+        "root": {
+          "equals": "{{work}}/adopted"
+        }
+      }
+    },
+    {
+      "id": "the adopted workspace holds the agent's file, not only the seed",
+      "verb": "read",
+      "root": "{{work}}/adopted",
+      "expect": {
+        "notes.txt": {
+          "equals": "written by the agent"
+        },
+        "nested/second.txt": {
+          "equals": "second"
+        }
+      }
+    },
+    {
+      "id": "resume takes the registry from the document, not from a flag",
+      "verb": "resume",
+      "args": {
+        "handoff": "{{work}}/handoff.json"
+      },
+      "expect": {
+        "workspace_id": {
+          "equals": "{{ws}}"
+        },
+        "checkpoint_id": {
+          "equals": "{{cp2}}"
+        }
+      }
+    },
+    {
+      "id": "resume refuses to override the registry a handoff document names",
+      "verb": "resume",
+      "registry": "a",
+      "args": {
+        "handoff": "{{work}}/handoff.json"
+      },
+      "fail": {
+        "contains": "not both"
+      }
+    },
+    {
+      "id": "delta names both ends, and writes the document it describes",
+      "verb": "delta",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "from": "{{cp1}}",
+        "to": "{{cp2}}",
+        "output": "{{work}}/change.stowdelta"
+      },
+      "alsoWritten": "change.stowdelta",
+      "expect": {
+        "version": {
+          "equals": 1
+        },
+        "base_id": {
+          "equals": "{{cp1}}"
+        },
+        "target_id": {
+          "equals": "{{cp2}}"
+        },
+        "document": {
+          "equals": "{{work}}/change.stowdelta"
+        },
+        "sha256": {
+          "matches": "^[0-9a-f]{64}$"
+        },
+        "files": {
+          "equals": 1
+        },
+        "bytes": {
+          "equals": 20
+        }
+      },
+      "returns": "stdout",
+      "documentFields": {
+        "base_id": "{{cp1}}",
+        "target_id": "{{cp2}}"
+      }
+    },
+    {
+      "id": "apply rebuilds the base plus the delta into a new checkpoint",
+      "verb": "apply",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "delta": "{{work}}/change.stowdelta",
+        "base": "{{cp1}}"
+      },
+      "expect": {
+        "checkpoint_id": {
+          "matches": "^cp_[0-9a-f]+$"
+        },
+        "parent_checkpoint_id": {
+          "equals": "{{cp1}}"
+        },
+        "files": {
+          "equals": 3
+        },
+        "bytes": {
+          "equals": 30
+        }
+      }
+    },
+    {
+      "id": "applying a delta to a base it was not measured from is refused",
+      "verb": "apply",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "delta": "{{work}}/change.stowdelta",
+        "base": "{{cp2}}"
+      },
+      "fail": {
+        "contains": "diverged"
+      }
+    },
+    {
+      "id": "a delta whose payload no longer matches its digest is refused",
+      "verb": "apply",
+      "registry": "a",
+      "team": "platform",
+      "args": {
+        "delta": "{{work}}/tampered.stowdelta",
+        "base": "{{cp1}}"
+      },
+      "tamper": "change.stowdelta",
+      "fail": {
+        "contains": "disagrees with"
+      }
+    },
+    {
+      "id": "collect sweeps the registry it is pointed at and reports what it swept",
+      "verb": "collect",
+      "expect": {
+        "results": {
+          "minLength": 2
+        }
+      },
+      "args": {
+        "registry-dir": "{{registryA}}"
+      }
+    },
+    {
+      "id": "destroy removes the workspace stow created, and says so",
+      "verb": "destroy",
+      "args": {
+        "id": "{{ws}}",
+        "registry-dir": "{{registryA}}"
+      },
+      "expect": {
+        "destroyed": {
+          "equals": true
+        },
+        "workspace_id": {
+          "equals": "{{ws}}"
+        }
+      }
+    }
+  ]
+}
