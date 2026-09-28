@@ -161,7 +161,12 @@ func adoptHandoffCommand(args []string) error {
 		return err
 	}
 	defer ws.Close()
-	result := makeWorkspaceResult(ws, imported.Files, imported.Bytes)
+	// The two totals are a byte count and a file count, and they are passed in
+	// that order because that is the constructor's order. Passing the fields by
+	// name would remove the only reason this can be got wrong: the two are
+	// adjacent in CheckpointInfo and the types are identical, so a positional
+	// call compiles silently and reports a file count as a byte total.
+	result := makeWorkspaceResult(ws, imported.Bytes, imported.Files)
 	result.CheckpointID = imported.ID
 	result.Team = document.Team
 	result.RegistryDir = registry
