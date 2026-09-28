@@ -138,7 +138,21 @@ describe("workspace delta and handoff", () => {
 
   it("carries the archive path so a handoff can be adopted elsewhere", async () => {
     await withFakeStowBinary(
-      "#!/usr/bin/env node\nprocess.stdout.write(JSON.stringify({args: process.argv.slice(2)}));\n",
+      // `handoff --output` writes the document to the named path and prints
+      // nothing, and the wrapper reads it back from there. The double has to do
+      // the same, or it models a command shape the real binary never has, and the
+      // read-back the native-CLI test exercises is never reached here.
+      [
+        "#!/usr/bin/env node",
+        'const a = process.argv.slice(2);',
+        'const i = a.indexOf("--output");',
+        'if (a[1] === "handoff" && i >= 0) {',
+        '  require("node:fs").writeFileSync(a[i + 1], JSON.stringify({args: a}));',
+        "  process.exit(0);",
+        "}",
+        "process.stdout.write(JSON.stringify({args: a}));",
+        "",
+      ].join("\n"),
       async () => {
         const handed = await handoffWorkspace("ws_1", {
           checkpointId: "cp_1",

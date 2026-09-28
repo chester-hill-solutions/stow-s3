@@ -1,3 +1,4 @@
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -18,9 +19,29 @@ def calls(monkeypatch):
 
     def fake_run(command, **kwargs):
         recorded.append(command)
-        return SimpleNamespace(returncode=0, stdout='{"ok":true}', stderr="")
+        # The two commands that take --output do not agree about stdout, and the
+        # double has to model each one rather than guessing:
+        #   handoff  writes the document to the path and prints nothing, and the
+        #            wrapper reads it back from there;
+        #   delta    writes the transported document to the path AND prints its own
+        #            result, which the wrapper decodes from stdout.
+        # A double that printed for both hid the handoff disagreement, which is
+        # the one the lifecycle test then caught against the real binary.
+        printed = '{"ok":true}'
+        if "--output" in command:
+            Path(command[command.index("--output") + 1]).write_text(printed)
+            if command[1] == "handoff":
+                printed = ""
+        return SimpleNamespace(returncode=0, stdout=printed, stderr="")
 
-    monkeypatch.setattr(workspace, "require_stow_binary", lambda: "/tools/stow-s3")
+    # The double has to answer with the same shape the real resolver returns.
+    # require_stow_binary() returns a ResolvedBinary, and the wrapper passes its
+    # .path into argv, so returning a bare string here left the test asserting
+    # against a contract the production code does not have. It passed while
+    # subprocess.run was mocked, because nothing validated argv.
+    monkeypatch.setattr(
+        workspace, "require_stow_binary", lambda: SimpleNamespace(path="/tools/stow-s3")
+    )
     monkeypatch.setattr(workspace.subprocess, "run", fake_run)
     return recorded
 

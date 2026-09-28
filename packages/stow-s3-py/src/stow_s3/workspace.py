@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 from collections.abc import Sequence
+from pathlib import Path
 
 from .bin import require_stow_binary
 
@@ -22,8 +23,13 @@ class WorkspaceCommandError(RuntimeError):
         self.stderr = stderr
 
 
-def run_workspace_command(*args: str) -> WorkspaceJSON:
-    """Run a workspace CLI command directly, without a shell, and decode JSON."""
+def _run_workspace_command(*args: str) -> subprocess.CompletedProcess[str]:
+    """Run a workspace CLI command directly, without a shell, and check it succeeded.
+
+    The raw result, not the decoded one. A command that writes its output to a
+    named file has nothing on stdout, so decoding is the caller's decision rather
+    than something every caller inherits.
+    """
 
     command = ("workspace", *args)
     result = subprocess.run(
@@ -34,13 +40,27 @@ def run_workspace_command(*args: str) -> WorkspaceJSON:
     )
     if result.returncode != 0:
         raise WorkspaceCommandError(command, result.returncode, result.stderr)
+    return result
+
+
+def _decode_workspace_json(raw: str) -> WorkspaceJSON:
     try:
-        value = json.loads(result.stdout)
+        value = json.loads(raw)
     except json.JSONDecodeError as error:
         raise ValueError("stow-s3 workspace command returned invalid JSON") from error
     if not isinstance(value, dict):
         raise ValueError("stow-s3 workspace command returned a non-object JSON value")
     return value
+
+
+def _read_workspace_json(path: str) -> WorkspaceJSON:
+    return _decode_workspace_json(Path(path).read_text())
+
+
+def run_workspace_command(*args: str) -> WorkspaceJSON:
+    """Run a workspace CLI command directly, without a shell, and decode JSON."""
+
+    return _decode_workspace_json(_run_workspace_command(*args).stdout)
 
 
 def prepare_workspace(manifest_path: str) -> WorkspaceJSON:
@@ -84,7 +104,16 @@ def handoff_workspace(
     _append_flag(args, "--checkpoint-id", checkpoint_id)
     _append_flag(args, "--archive", archive)
     _append_flag(args, "--output", output)
-    return run_workspace_command(*args)
+    result = _run_workspace_command(*args)
+    if output is not None:
+        # `handoff --output` is the whole point of a handoff: the document is the
+        # artifact the receiving machine gets, and the command writes it to the
+        # named path and prints nothing. There is no JSON on stdout to decode, so
+        # the document the caller asked for is the one on disk. Reading it back is
+        # what makes this wrapper return the same value whether or not a path was
+        # given.
+        return _read_workspace_json(output)
+    return _decode_workspace_json(result.stdout)
 
 
 def adopt_workspace_handoff(

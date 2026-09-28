@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { resolveStowBinary } from "./bin.js";
 
@@ -52,6 +53,14 @@ export interface WorkspaceAdoptOptions extends WorkspaceArchiveOptions {
 }
 
 /** Run the native workspace command contract without invoking a shell. */
+export function decodeWorkspaceJSON(raw: string): WorkspaceJSON {
+  const value: unknown = JSON.parse(raw);
+  if (!isWorkspaceJSON(value)) {
+    throw new Error("stow-s3 workspace command returned a non-object JSON value");
+  }
+  return value;
+}
+
 export async function runWorkspaceCommand(
   args: readonly string[],
 ): Promise<WorkspaceJSON> {
@@ -60,11 +69,7 @@ export async function runWorkspaceCommand(
     encoding: "utf8",
     maxBuffer: 16 * 1024 * 1024,
   });
-  const value: unknown = JSON.parse(stdout);
-  if (!isWorkspaceJSON(value)) {
-    throw new Error("stow-s3 workspace command returned a non-object JSON value");
-  }
-  return value;
+  return decodeWorkspaceJSON(stdout);
 }
 
 export function prepareWorkspace(manifestPath: string): Promise<WorkspaceJSON> {
@@ -91,7 +96,7 @@ export function collectWorkspaces(registryDir?: string): Promise<WorkspaceJSON> 
   return runWorkspaceCommand(args);
 }
 
-export function handoffWorkspace(
+export async function handoffWorkspace(
   id: string,
   options: {
     readonly registryDir?: string;
@@ -106,7 +111,20 @@ export function handoffWorkspace(
   appendFlag(args, "--checkpoint-id", options.checkpointId);
   appendFlag(args, "--archive", options.archive);
   appendFlag(args, "--output", options.output);
-  return runWorkspaceCommand(args);
+  if (options.output === undefined) {
+    return runWorkspaceCommand(args);
+  }
+  // `handoff --output` is the whole point of a handoff: the document is the
+  // artifact the receiving machine gets, and the command writes it to the named
+  // path and prints nothing. There is no JSON on stdout to parse, so the document
+  // the caller asked for is the one on disk. Reading it back is what makes this
+  // wrapper return the same value whether or not a path was given.
+  const binary = resolveStowBinary();
+  await execFileAsync(binary, ["workspace", ...args], {
+    encoding: "utf8",
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  return decodeWorkspaceJSON(await readFile(options.output, "utf8"));
 }
 
 /**

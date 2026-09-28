@@ -39,6 +39,7 @@ export interface WorkspaceAdoptOptions extends WorkspaceArchiveOptions {
     readonly root: string;
 }
 /** Run the native workspace command contract without invoking a shell. */
+export declare function decodeWorkspaceJSON(raw: string): WorkspaceJSON;
 export declare function runWorkspaceCommand(args: readonly string[]): Promise<WorkspaceJSON>;
 export declare function prepareWorkspace(manifestPath: string): Promise<WorkspaceJSON>;
 export declare function resumeWorkspace(options: ResumeWorkspaceOptions): Promise<WorkspaceJSON>;
