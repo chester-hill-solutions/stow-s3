@@ -4,9 +4,25 @@ TypeScript client for the [stow](https://github.com/chester-hill-solutions/stow-
 
 ## Install
 
+This package is hosted on GitHub Packages. That registry requires authentication
+for npm packages, including public ones. Configure the scope in your project
+`.npmrc`:
+
+```ini
+@chester-hill-solutions:registry=https://npm.pkg.github.com
+```
+
+Then authenticate with a GitHub personal access token (classic) with the
+`read:packages` scope before installing:
+
 ```sh
+npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
 npm install @chester-hill-solutions/stow-s3
 ```
+
+Enter your GitHub username and use the token as the password. Keep the token in
+your user-level npm config; do not commit it. See [GitHub's npm registry
+authentication guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
 
 Build the Go binary first when working from the monorepo:
 

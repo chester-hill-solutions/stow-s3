@@ -19,6 +19,8 @@ const (
 	crashRegistryEnv = "STOW_RESUME_CRASH_REGISTRY"
 	crashIDEnv       = "STOW_RESUME_CRASH_ID"
 	crashReadyEnv    = "STOW_RESUME_CRASH_READY"
+	crashObjectKey   = "output/result.txt"
+	crashObjectValue = "survives abrupt process death"
 )
 
 // TestResumeRecoversAfterHolderIsKilled verifies that the kernel releases a
@@ -33,104 +35,135 @@ func TestResumeRecoversAfterHolderIsKilled(t *testing.T) {
 		t.Skip("session locks are unsupported on this host")
 	}
 
-	ctx := context.Background()
-	registry := filepath.Join(t.TempDir(), "registry")
+	registry, id := prepareCrashRecoveryWorkspace(t)
+	ready := filepath.Join(t.TempDir(), "holder-ready")
+	holder := startCrashHolder(t, registry, id, ready)
+	waitForCrashHolder(t, holder, ready)
+	assertCrashHolderOwnsSession(t, registry, id)
+	killCrashHolder(t, holder)
+	assertWorkspaceResumesAfterCrash(t, holder, registry, id)
+}
+
+type crashHolder struct {
+	command    *exec.Cmd
+	outputPath string
+	done       bool
+}
+
+func prepareCrashRecoveryWorkspace(t *testing.T) (registry, id string) {
+	t.Helper()
+	registry = filepath.Join(t.TempDir(), "registry")
 	source := filepath.Join(t.TempDir(), "seed.txt")
 	if err := os.WriteFile(source, []byte("prepared"), 0o600); err != nil {
 		t.Fatalf("write seed: %v", err)
 	}
-	root := filepath.Join(t.TempDir(), "owned-workspace")
 	prepared, err := stow.PrepareWorkspace(stow.PrepareOptions{
-		WorkspaceOptions: stow.WorkspaceOptions{Dir: root, RegistryDir: registry},
-		Inputs:           []stow.WorkspaceInput{{Source: source, Destination: "seed.txt"}},
+		WorkspaceOptions: stow.WorkspaceOptions{
+			Dir: filepath.Join(t.TempDir(), "owned-workspace"), RegistryDir: registry,
+		},
+		Inputs: []stow.WorkspaceInput{{Source: source, Destination: "seed.txt"}},
 	})
 	if err != nil {
 		t.Fatalf("PrepareWorkspace: %v", err)
 	}
-	const key, value = "output/result.txt", "survives abrupt process death"
-	if _, err := prepared.Workspace.PutObject(ctx, prepared.Workspace.Bucket(), key, []byte(value), stow.PutOptions{}); err != nil {
+	if _, err := prepared.Workspace.PutObject(context.Background(), prepared.Workspace.Bucket(), crashObjectKey, []byte(crashObjectValue), stow.PutOptions{}); err != nil {
 		t.Fatalf("PutObject: %v", err)
 	}
-	id := prepared.Workspace.ID()
+	id = prepared.Workspace.ID()
 	if err := prepared.Workspace.Close(); err != nil {
 		t.Fatalf("close prepared workspace: %v", err)
 	}
+	return registry, id
+}
 
-	ready := filepath.Join(t.TempDir(), "holder-ready")
+func startCrashHolder(t *testing.T, registry, id, ready string) *crashHolder {
+	t.Helper()
 	outputPath := filepath.Join(filepath.Dir(ready), "holder.log")
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		t.Fatalf("create holder log: %v", err)
 	}
-	cmd := exec.Command(os.Args[0], "-test.run=^TestResumeRecoversAfterHolderIsKilled$")
-	cmd.Env = append(os.Environ(),
+	command := exec.Command(os.Args[0], "-test.run=^TestResumeRecoversAfterHolderIsKilled$")
+	command.Env = append(os.Environ(),
 		crashHelperEnv+"=1",
 		crashRegistryEnv+"="+registry,
 		crashIDEnv+"="+id,
 		crashReadyEnv+"="+ready,
 	)
-	cmd.Stdout = outputFile
-	cmd.Stderr = outputFile
-	if err := cmd.Start(); err != nil {
+	command.Stdout = outputFile
+	command.Stderr = outputFile
+	if err := command.Start(); err != nil {
 		_ = outputFile.Close()
 		t.Fatalf("start holder child: %v", err)
 	}
 	if err := outputFile.Close(); err != nil {
 		t.Fatalf("close holder log: %v", err)
 	}
-	childDone := false
+	holder := &crashHolder{command: command, outputPath: outputPath}
 	t.Cleanup(func() {
-		if childDone {
-			return
+		if !holder.done {
+			_ = holder.command.Process.Kill()
+			_ = holder.command.Wait()
 		}
-		_ = cmd.Process.Kill()
-		_ = cmd.Wait()
 	})
+	return holder
+}
 
+func waitForCrashHolder(t *testing.T, holder *crashHolder, ready string) {
+	t.Helper()
 	deadline := time.Now().Add(10 * time.Second)
 	for {
 		if _, err := os.Stat(ready); err == nil {
-			break
+			return
 		}
 		if time.Now().After(deadline) {
-			_ = cmd.Process.Kill()
-			_ = cmd.Wait()
-			childDone = true
-			output, _ := os.ReadFile(outputPath)
+			_ = holder.command.Process.Kill()
+			_ = holder.command.Wait()
+			holder.done = true
+			output, _ := os.ReadFile(holder.outputPath)
 			t.Fatalf("holder child did not become ready; output: %s", output)
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
+}
 
+func assertCrashHolderOwnsSession(t *testing.T, registry, id string) {
+	t.Helper()
 	if _, err := stow.ResumeIn(registry, id); err == nil {
 		t.Fatal("simultaneous ResumeIn succeeded while the child held the session lock")
 	} else if !strings.Contains(err.Error(), "in use by a live session") {
 		t.Fatalf("simultaneous ResumeIn error = %v, want live-session refusal", err)
 	}
+}
 
-	if err := cmd.Process.Kill(); err != nil && !errors.Is(err, os.ErrProcessDone) {
+func killCrashHolder(t *testing.T, holder *crashHolder) {
+	t.Helper()
+	if err := holder.command.Process.Kill(); err != nil && !errors.Is(err, os.ErrProcessDone) {
 		t.Fatalf("kill holder child: %v", err)
 	}
-	if err := cmd.Wait(); err == nil {
+	if err := holder.command.Wait(); err == nil {
 		t.Fatal("holder child exited successfully after being killed")
 	}
-	childDone = true
+	holder.done = true
+}
 
+func assertWorkspaceResumesAfterCrash(t *testing.T, holder *crashHolder, registry, id string) {
+	t.Helper()
 	resumed, err := stow.ResumeIn(registry, id)
 	if err != nil {
-		output, _ := os.ReadFile(outputPath)
+		output, _ := os.ReadFile(holder.outputPath)
 		t.Fatalf("ResumeIn after child death: %v; child output: %s", err, output)
 	}
 	defer resumed.Close()
 	if resumed.ID() != id {
 		t.Fatalf("resumed ID = %q, want %q", resumed.ID(), id)
 	}
-	object, err := resumed.GetObject(ctx, resumed.Bucket(), key)
+	object, err := resumed.GetObject(context.Background(), resumed.Bucket(), crashObjectKey)
 	if err != nil {
 		t.Fatalf("GetObject after child death: %v", err)
 	}
-	if string(object.Data) != value {
-		t.Fatalf("object after child death = %q, want %q", object.Data, value)
+	if string(object.Data) != crashObjectValue {
+		t.Fatalf("object after child death = %q, want %q", object.Data, crashObjectValue)
 	}
 }
 
