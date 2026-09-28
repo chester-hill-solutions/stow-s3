@@ -50,7 +50,6 @@ export interface ContractWrite {
 export interface ContractManifestSpec {
   readonly root: string;
   readonly team?: string;
-  readonly includeAdopted?: boolean;
   readonly inputs?: readonly ContractInput[];
 }
 
@@ -60,6 +59,12 @@ export interface ContractStep {
   readonly registry?: string;
   readonly team?: string;
   readonly args?: Readonly<Record<string, string>>;
+  /**
+   * prune only: forget adopted entries whose directory is gone. Declared on the step
+   * rather than left in the free-form argument map because the driver passes it as a
+   * typed option, and a flag that matters for one verb is easier to find here.
+   */
+  readonly includeAdopted?: boolean;
   readonly root?: string;
   readonly manifest?: ContractManifestSpec;
   readonly write?: readonly ContractWrite[];
