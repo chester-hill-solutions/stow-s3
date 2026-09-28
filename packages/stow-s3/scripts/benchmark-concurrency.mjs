@@ -181,7 +181,6 @@ async function runParallelSessions(count) {
       await fetched.Body.transformToByteArray();
       return performance.now() - start;
     }));
-    const done = performance.now();
     const loadedRssKb = loadedServerRssKb();
     return {
       sessions: count,
