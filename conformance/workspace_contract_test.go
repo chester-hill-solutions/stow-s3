@@ -10,14 +10,12 @@ import (
 //
 // The other two drivers for this contract are the TypeScript and Python wrappers.
 // They are not redundant with this one: this asserts the engine is self-consistent
-// and that the case file says something true, and theirs assert that a client
-// wrapper passes the same document through unchanged. The two wrappers had never
-// been run against the binary at all, and both were wrong in the same way, so the
-// engine being correct is not evidence about them.
+// and the case file true, and theirs assert that a wrapper passes the same document
+// through unchanged. Both wrappers were wrong in the same way, so the engine being
+// correct is not evidence about them.
 //
-// Each step is a subtest so a failure names the property that broke rather than
-// "the scenario", and so the whole pass is one linear run: the steps share a
-// registry, and a registry is state.
+// Each step is a subtest so a failure names the property that broke, and the pass is
+// one linear run: the steps share a registry, and a registry is state.
 func TestWorkspaceContractHoldsInTheCLI(t *testing.T) {
 	contract := loadContract(t)
 	run := newContractRun(t)

@@ -48,10 +48,9 @@ func (r *contractRun) perform(step contractStep) contractOutcome {
 // reaches a team partition: prepare reports the partition it created, and collect
 // and destroy — which take --registry-dir but no --team — are pointed straight at
 // it. Every other step in registry "a" gets the driver's own directory plus the
-// step's --team, and the CLI composes the two exactly as it does for a manifest.
-// A driver that reconstructed the partition path itself would be asserting a belief
-// about the store rather than about the verb, and reconstructing it wrongly is
-// silent: the verb reports an empty registry rather than an error.
+// step's --team, and the CLI composes the two as it does for a manifest. A driver
+// reconstructing the partition path itself would be asserting a belief about the
+// store rather than about the verb, and getting it wrong is silent.
 func (r *contractRun) argv(step contractStep) []string {
 	argv := []string{"workspace", step.Verb}
 	for _, name := range sortedArgs(step.Args) {
@@ -107,11 +106,10 @@ func (r *contractRun) performVerb(step contractStep) contractOutcome {
 	}
 	// A step whose verb writes the document itself to the named path gets that
 	// document, because there is nothing on stdout to decode. `handoff --output`
-	// prints nothing, and a driver that decodes stdout sees an empty object — which
-	// is precisely the bug the TypeScript and Python wrappers had, reproduced by a
-	// third implementation written from the CLI's observable behaviour. Three
-	// drivers making the same mistake is what makes this a contract rather than a
-	// convention.
+	// prints nothing, and a driver that decodes stdout sees an empty object — the bug
+	// the TypeScript and Python wrappers both had, reproduced by a third
+	// implementation written from the CLI's observable behaviour. Three drivers
+	// making the same mistake is what makes this a contract rather than convention.
 	if step.AlsoWritten != "" && step.Returns == contractReturnsFile {
 		out.stdout = r.readDocument(r.workPath(step.AlsoWritten), step.ID)
 	}
@@ -196,9 +194,8 @@ func (r *contractRun) writeInput(destination, body string) string {
 // tamper corrupts a produced document in the way that matters, which is not a
 // flipped byte. A byte flip usually lands in the JSON and is refused by the parser,
 // so a test built on one passes for a reason that has nothing to do with integrity.
-// This decodes the document, alters one byte of one file's payload, and re-encodes
-// it: the result is a well-formed document whose content no longer matches the
-// digest it carries, which is the substitution a receiver has to catch.
+// This alters one byte of one payload and re-encodes: the result is well-formed and
+// no longer matches the digest it carries.
 func (r *contractRun) tamper(source, target string) {
 	r.t.Helper()
 	raw, err := os.ReadFile(source)
@@ -244,10 +241,10 @@ func (r *contractRun) tamper(source, target string) {
 //
 // The two have to move together or the document stops being self-consistent and is
 // refused for the wrong reason. The result passes every check the document makes
-// about itself — the per-file content digest still matches the bytes it carries,
-// and an addition's precondition passes because the new name is absent from the
-// base — so the only thing that can catch it is a digest over the document as a
-// whole, which is what the step supplies as --expect-sha256.
+// about itself — the per-file digest still matches the bytes it carries, and an
+// addition's precondition passes because the new name is absent from the base — so
+// only a digest over the document as a whole can catch it, which is what
+// --expect-sha256 supplies.
 func (r *contractRun) renameInTransit(rename *contractRename, target string) {
 	r.t.Helper()
 	raw, err := os.ReadFile(r.workPath(rename.From))

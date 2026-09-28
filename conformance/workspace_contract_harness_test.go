@@ -16,26 +16,23 @@ import (
 )
 
 // The workspace contract in conformance/workspace/cases.json is read by three
-// drivers: this one, the TypeScript wrapper's, and the Python wrapper's. The point
-// is not that the engine works — conformance/ already proves that against the S3
-// surface — but that a client cannot quietly disagree with the engine about what a
-// verb returns.
+// drivers: this one and the TypeScript and Python wrappers'. The point is not that
+// the engine works — the rest of conformance/ proves that — but that a client cannot
+// quietly disagree with the engine about what a verb returns.
 //
-// The two wrappers had never been run against the binary they wrap. They were
-// wrong in the same way in both languages, and the only reason anyone found out is
-// that a divergence finally put the surface into CI. A surface that was wrong on
-// its first automated run should be assumed to be wrong in ways nobody has looked
-// at yet, which is what this file exists to make cheap.
+// The two wrappers had never been run against the binary they wrap, and were wrong
+// in the same way in both languages. A surface wrong on its first automated run
+// should be assumed wrong in ways nobody has looked at yet, which is what this file
+// makes cheap.
 
 // document is one decoded JSON object, held as raw values rather than as a tree
 // of interface{}.
 //
 // The raw form is deliberate. A driver that decodes into a tree of `any` has to
 // re-marshal before it can compare, has to type-assert before it can read a field,
-// and puts a use of `any` on nearly every line — which this repository's quality
-// gate counts. Keeping the JSON raw means each matcher interprets exactly the value
-// it needs, comparisons run on a canonical encoding so object key order cannot make
-// two equal documents look different, and the driver says what it is about.
+// and puts a use of `any` on nearly every line, which the quality gate counts. Raw
+// means each matcher interprets exactly the value it needs, and comparisons run on a
+// canonical encoding so key order cannot make two equal documents look different.
 type document = map[string]json.RawMessage
 
 // contractExpectation is one declared property of one field. Everything the
@@ -63,8 +60,7 @@ type contractInput struct {
 // contractManifestInput is the manifest's own input shape, kept apart from
 // contractInput because the two are different contracts: one is what a case file
 // declares, the other is what the CLI reads. Conflating them put a "body" field
-// into a manifest that refuses unknown fields, which is a sharper failure than a
-// missing seed would have been.
+// into a manifest that refuses unknown fields.
 type contractManifestInput struct {
 	Source      string `json:"source"`
 	Destination string `json:"destination"`
@@ -155,31 +151,10 @@ const contractManifestVersion = 1
 // to the named path and prints nothing else. See contractStep.Returns.
 const contractReturnsFile = "file"
 
-// contractRegistryDirFlags names the verbs the driver points at its own registry
-// directory, because the contract runs every step against one registry and a
-// registry is state.
-//
-// prepare is absent on purpose: its registry comes from the manifest the driver
-// writes. collect and destroy are listed because they take --registry-dir but no
-// --team, so a step reaches a team partition by naming the partition itself, which
-// prepare reports once it has created one.
-//
-// This is a hand-maintained statement about another program's flags, and such a
-// statement drifts. Both directions fail at runtime — a verb handed a flag it does
-// not define says so, and a verb that needs the directory and is not given it
-// reports an empty registry — but at runtime it fails as a step disagreeing with
-// the contract, which names the wrong cause. checkContractRegistryFlags says it at
-// load time, where the cause is the table.
-var contractRegistryDirFlags = map[string]bool{
-	"checkpoint": true, "diff": true, "export": true, "import": true,
-	"restore": true, "resume": true, "handoff": true, "delta": true,
-	"apply": true, "destroy": true, "collect": true, "list": true,
-}
-
 // checkContractRegistryFlags asserts that every step in registry "a" either names
-// its own registry directory or is covered by contractRegistryDirFlags, so a verb
-// added to the case file without a table entry is reported as the missing entry
-// rather than as whatever that verb does when handed the wrong registry.
+// its own registry directory or is covered by the table, so a verb added without a
+// table entry is reported as the missing entry rather than as what that verb does
+// when handed the wrong registry.
 func checkContractRegistryFlags(steps []contractStep) []string {
 	var problems []string
 	for _, step := range steps {
@@ -262,6 +237,12 @@ func loadContract(t *testing.T) contract {
 	for _, problem := range checkContractRegistryFlags(c.Steps) {
 		t.Error(problem)
 	}
+	// Checked here rather than in a separate test: loading the case file is already
+	// the moment the driver is about to run every verb.
+	takes, verbs := registryFlagsFromBinary(t, contractBinary(t))
+	for _, problem := range checkRegistryFlagsAgainstBinary(takes, verbs) {
+		t.Error(problem)
+	}
 	return c
 }
 
@@ -317,13 +298,11 @@ var contractCapturePattern = regexp.MustCompile(`\{\{([a-zA-Z0-9_]+)\}\}`)
 // empty argument.
 //
 // It is one pass, and doing it once is the point. Resolution used to happen wherever
-// a resolved value was wanted — the command line, the registry directory, the
-// manifest, the writes, the document to substitute, and each expectation — and six
-// call sites each remembering to resolve is six chances to forget. One of them
-// already forgot: the registry directory was read from the raw arguments, so a step
-// was pointed at a directory literally named "{{registryA}}", and `collect` reported
-// an empty registry rather than an error. A pass that cannot be skipped deletes that
-// class of bug instead of documenting it.
+// a resolved value was wanted, and one of six call sites already forgot: the registry
+// directory was read from the raw arguments, so a step was pointed at a directory
+// literally named "{{registryA}}" and `collect` reported an empty registry rather
+// than an error. A pass that cannot be skipped deletes that class of bug instead of
+// documenting it.
 //
 // It also covers the expectations, which is not a convenience. A step that expects
 // "the root the manifest named" is stating a fact about the contract, and comparing

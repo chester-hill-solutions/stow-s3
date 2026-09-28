@@ -30,12 +30,11 @@ func newResolveRun(t *testing.T) *contractRun {
 
 // resolvableText is every field of a step that resolution is responsible for.
 //
-// It excludes the three kinds of field that legitimately keep their text, and the
-// exclusions are the design rather than an omission. A write body and a seed body
-// are content the case file states, not paths it names, so a body containing braces
-// is a body. A rename's Path and To name paths inside the transported document
-// rather than on this machine, so no capture produces either. A field left out of
-// this list is a field nothing checks.
+// It excludes three kinds of field that legitimately keep their text, and the
+// exclusions are the design rather than an omission. A write body is content the
+// case file states, not a path it names, so a body containing braces is a body. A
+// rename's Path and To name paths inside the transported document rather than on
+// this machine. A field left out of this list is a field nothing checks.
 func resolvableText(step contractStep) map[string]string {
 	texts := map[string]string{
 		"root": step.Root, "team": step.Team,
@@ -97,12 +96,10 @@ func aStepThatNamesEveryField(t *testing.T, work string) contractStep {
 	}
 }
 
-// Resolve has to reach every field. The previous arrangement resolved at each place a
-// resolved value was wanted, and one of those places did not: the registry directory
-// was read from the raw arguments, so a step was pointed at a directory literally
-// named "{{registryA}}" and `collect` reported an empty registry rather than an
-// error. Six call sites each remembering is six chances to forget, and this is the
-// test that names the sixth.
+// Resolve has to reach every field. It used to happen at each place a resolved value
+// was wanted, and one of those places did not: the registry directory was read from
+// the raw arguments, so a step was pointed at a directory literally named
+// "{{registryA}}" and `collect` reported an empty registry rather than an error.
 func TestResolveLeavesNoReferenceInAnyFieldOfAStep(t *testing.T) {
 	run := newResolveRun(t)
 	step := aStepThatNamesEveryField(t, run.work)
@@ -117,11 +114,9 @@ func TestResolveLeavesNoReferenceInAnyFieldOfAStep(t *testing.T) {
 	}
 }
 
-// The excluded fields keep their text on purpose, so this is the other half of the
-// list above. A seed body or a written file that happens to contain braces is a
-// body, and resolving it would rewrite what the case file says the workspace
-// contains; a rename's Path and To are paths inside the transported document, which
-// no capture on this machine produces.
+// The other half of the list above. A seed body containing braces is a body, and
+// resolving it would rewrite what the case file says the workspace contains; a
+// rename's Path and To are paths inside the transported document.
 func TestResolveLeavesStatedBodiesAlone(t *testing.T) {
 	run := newResolveRun(t)
 	resolved := run.resolve(aStepThatNamesEveryField(t, run.work))
@@ -223,7 +218,7 @@ func TestCheckContractRegistryFlagsNamesAVerbTheTableDoesNotCover(t *testing.T) 
 	}
 }
 
-// The three ways a step reaches a registry all have to be silent, because all three
+// The four ways a step reaches a registry all have to be silent, because all four
 // are how the real case file works. A guard that fired on the case file would be a
 // guard nobody keeps.
 func TestCheckContractRegistryFlagsAcceptsTheThreeWaysAStepReachesARegistry(t *testing.T) {
@@ -236,6 +231,59 @@ func TestCheckContractRegistryFlagsAcceptsTheThreeWaysAStepReachesARegistry(t *t
 	}
 	if problems := checkContractRegistryFlags(steps); len(problems) > 0 {
 		t.Errorf("the driver raised %d problems about steps that each reach a registry: %v", len(problems), problems)
+	}
+}
+
+// The guard that would have caught adopt and prune.
+func TestTheRegistryFlagTableMatchesTheBinary(t *testing.T) {
+	takes, verbs := registryFlagsFromBinary(t, contractBinary(t))
+	if problems := checkRegistryFlagsAgainstBinary(takes, verbs); len(problems) > 0 {
+		t.Errorf("contractRegistryDirFlags does not describe the binary's workspace verbs: %v", problems)
+	}
+}
+
+// The two directions cost different amounts and only the second is loud, so a
+// message saying only "the table is wrong" leaves the reader guessing which line to
+// add or delete.
+func TestCheckRegistryFlagsAgainstBinaryNamesBothDirections(t *testing.T) {
+	// A verb the table does not list, so the test keeps testing the omission whatever
+	// the table contains: a real verb would make it pass by accident the day it is
+	// added, which is the failure it exists to catch.
+	missing := checkRegistryFlagsAgainstBinary(map[string]bool{"anewverb": true}, []string{"anewverb"})
+	if len(missing) != 1 {
+		t.Fatalf("a verb the table omits produced %d problems, want 1: %v", len(missing), missing)
+	}
+	for _, want := range []string{"anewverb", "contractRegistryDirFlags", "default registry"} {
+		if !strings.Contains(missing[0], want) {
+			t.Errorf("the problem %q does not mention %q", missing[0], want)
+		}
+	}
+	// Read from the table: naming a real verb in prose breaks the day the product
+	// improves, and a test that breaks then gets deleted.
+	listed := "prune"
+	if !contractRegistryDirFlags[listed] {
+		t.Fatalf("this test picked %q as a verb the table lists, and it does not", listed)
+	}
+	extra := checkRegistryFlagsAgainstBinary(map[string]bool{}, []string{listed})
+	if len(extra) != 1 {
+		t.Fatalf("a verb the table lists wrongly produced %d problems, want 1: %v", len(extra), extra)
+	}
+	if !strings.Contains(extra[0], "refuse") {
+		t.Errorf("the problem %q does not say what happens when the flag is handed over", extra[0])
+	}
+}
+
+// A verb that agrees with the table produces nothing. The function is handed the
+// binary's own verb list, so it has no opinion about a verb the binary lacks.
+func TestCheckRegistryFlagsAgainstBinaryIsSilentOnAgreement(t *testing.T) {
+	for _, verb := range []string{"list", "prune", "prepare"} {
+		takes := map[string]bool{}
+		if contractRegistryDirFlags[verb] {
+			takes[verb] = true
+		}
+		if problems := checkRegistryFlagsAgainstBinary(takes, []string{verb}); len(problems) > 0 {
+			t.Errorf("verb %q agrees with the table but produced problems: %v", verb, problems)
+		}
 	}
 }
 
