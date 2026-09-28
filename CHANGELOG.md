@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **`serve` opens on what it does.** The command was 187 lines with twenty-two flag
+  declarations in front of the wiring, and complexity 31 against a ceiling of 15. The
+  shutdown sequence now has a name and a contract — two seconds for the outbox worker
+  to stop before the server is asked to stop, ten for the server itself, and a stated
+  asymmetry between an operator's signal and a listener that failed — which took the
+  complexity to 22 and made the path testable at all, since it previously could not be
+  reached without binding a port. The flags moved too, which cost no complexity and is
+  worth having anyway: the flags are what changes most often, and they are no longer in
+  the way of reading the rest.
+
 - **The live-provider gate can be run by hand, and the release gate is one secret pair
   from being closed.** `conformance/live-provider.sh test` could only ever succeed
   inside the workflow that invokes it: the provider is classified in `resolve`, a
