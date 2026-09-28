@@ -65,13 +65,11 @@ Promotion is a live write and carries the same consent requirement as any
 other: the opt-in that ADR 0005 introduced, and not a policy flag. A caller
 who has not opted in gets a local copy and a refusal, not a partial upload.
 
-**The contract above is decided; the implementation is blocked.** Run-through
-mode has never read through to an upstream or propagated a write: the
-cache-miss branch is unreachable and a quota pre-check fails the write before
-the outbox is reached (`docs/agent-dx-plan.md` section 0.6, defect 1). Promote
-is therefore sequenced after that is fixed, not merely after a workspace
-exists. Splitting it from the handoff reference (section 5) is deliberate:
-the handoff is local and unblocked, and the two must not share a release.
+**The contract above is decided.** Run-through read-through and conditional
+propagation are implemented. Explicit promotion to a named destination remains
+unimplemented and is sequenced after the local workspace flow. It must retain the
+consent requirements above. Splitting promotion from a handoff reference (section
+5) remains deliberate: a local handoff does not itself authorize a live write.
 
 ### 5. A handoff is a reference, not a credential
 

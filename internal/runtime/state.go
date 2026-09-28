@@ -70,7 +70,7 @@ func (i *Instance) initialize(ctx context.Context) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	buckets, err := i.store.ListBuckets(ctx)
+	buckets, err := i.quotaStore().ListBuckets(ctx)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (i *Instance) initializeBucket(ctx context.Context, bucket string) error {
 func (i *Instance) initializeObjects(ctx context.Context, bucket string) error {
 	continuation := ""
 	for {
-		result, err := i.store.ListObjectsV2(ctx, bucket, storage.ListOptions{ContinuationToken: continuation, MaxKeys: 1000})
+		result, err := i.quotaStore().ListObjectsV2(ctx, bucket, storage.ListOptions{ContinuationToken: continuation, MaxKeys: 1000})
 		if err != nil {
 			return err
 		}

@@ -21,14 +21,20 @@ import (
 // worse than a refusal because it is silent. So the preconditions are collected
 // and verified first, and only a delta that applies cleanly is written.
 func ApplyDelta(ctx context.Context, registryDir, baseID string, delta *DeltaDocument) (CheckpointInfo, error) {
+	return ApplyDeltaWithOptions(ctx, registryDir, baseID, delta, DeltaOptions{})
+}
+
+// ApplyDeltaWithOptions applies a transported delta when the receiver explicitly
+// consents to carrying sensitive-looking paths as well as the sender's consent.
+func ApplyDeltaWithOptions(ctx context.Context, registryDir, baseID string, delta *DeltaDocument, options DeltaOptions) (CheckpointInfo, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	if delta == nil {
-		return CheckpointInfo{}, errors.New("stow: a nil delta cannot be applied")
+	if err := validateDeltaDocument(delta, options.IncludeSensitive); err != nil {
+		return CheckpointInfo{}, err
 	}
-	if delta.Version != DeltaVersion {
-		return CheckpointInfo{}, ErrDeltaVersionUnsupported
+	if err := ctx.Err(); err != nil {
+		return CheckpointInfo{}, err
 	}
 	if baseID == "" {
 		return CheckpointInfo{}, errors.New("stow: a delta needs a base checkpoint to apply to")
@@ -51,7 +57,8 @@ func ApplyDelta(ctx context.Context, registryDir, baseID string, delta *DeltaDoc
 		}
 	}
 
-	stage, err := os.MkdirTemp(baseDir, ".delta-")
+	registryDir = filepath.Dir(filepath.Dir(baseDir))
+	_, stage, err := stageCheckpointDirectory(registryDir)
 	if err != nil {
 		return CheckpointInfo{}, fmt.Errorf("stow: stage delta: %w", err)
 	}
@@ -70,7 +77,7 @@ func ApplyDelta(ctx context.Context, registryDir, baseID string, delta *DeltaDoc
 		return CheckpointInfo{}, err
 	}
 
-	return publishDeltaCheckpoint(ctx, registryDir, stage, base, delta)
+	return publishDeltaCheckpoint(ctx, registryDir, stage, base)
 }
 
 // stageBaseFiles copies the base's files into the staging tree, so a replay only
@@ -137,7 +144,7 @@ func applyDeltaWrite(delta *DeltaDocument, files string, change DeltaChange) err
 	if err := os.WriteFile(destination, data, mode); err != nil {
 		return fmt.Errorf("stow: apply delta %q: %w", change.Path, err)
 	}
-	return nil
+	return os.Chmod(destination, mode)
 }
 
 // verifyDeltaContent checks the bytes against the size and digest the change
@@ -175,7 +182,7 @@ func checkDeltaPrecondition(change DeltaChange, current map[string]CheckpointFil
 		if !present {
 			return fmt.Errorf("%w: %q is marked deleted but the target does not have it", ErrDeltaConflict, change.Path)
 		}
-		if change.From != nil && existing.SHA256 != change.From.SHA256 {
+		if change.From != nil && existing != *change.From {
 			return fmt.Errorf("%w: %q is marked deleted from %s but the target holds %s",
 				ErrDeltaConflict, change.Path, shortDigest(change.From.SHA256), shortDigest(existing.SHA256))
 		}
@@ -183,7 +190,7 @@ func checkDeltaPrecondition(change DeltaChange, current map[string]CheckpointFil
 		if !present {
 			return fmt.Errorf("%w: %q is marked changed but the target does not have it", ErrDeltaConflict, change.Path)
 		}
-		if change.From != nil && existing.SHA256 != change.From.SHA256 {
+		if change.From != nil && existing != *change.From {
 			return fmt.Errorf("%w: %q is marked changed from %s but the target holds %s",
 				ErrDeltaConflict, change.Path, shortDigest(change.From.SHA256), shortDigest(existing.SHA256))
 		}
@@ -194,9 +201,8 @@ func checkDeltaPrecondition(change DeltaChange, current map[string]CheckpointFil
 }
 
 func copyCheckpointFile(fromDir, toDir, path string, file CheckpointFile) error {
-	source := filepath.Join(fromDir, "files", filepath.FromSlash(path))
 	destination := filepath.Join(toDir, filepath.FromSlash(path))
-	data, err := os.ReadFile(source)
+	data, err := readVerifiedCheckpointFile(fromDir, file)
 	if err != nil {
 		return fmt.Errorf("stow: read base file %q: %w", path, err)
 	}
@@ -226,18 +232,20 @@ func shortDigest(digest string) string {
 // refuses an ID that already exists rather than replacing one — the same rule the
 // import path follows. A delta applied twice must produce two checkpoints, not
 // overwrite the first.
-func publishDeltaCheckpoint(ctx context.Context, registryDir, stage string, base CheckpointManifest, delta *DeltaDocument) (CheckpointInfo, error) {
+func publishDeltaCheckpoint(ctx context.Context, registryDir, stage string, base CheckpointManifest) (CheckpointInfo, error) {
 	checkpointRoot := filepath.Join(registryDir, "checkpoints")
 	if err := os.MkdirAll(checkpointRoot, 0o700); err != nil {
 		return CheckpointInfo{}, fmt.Errorf("stow: create checkpoint store: %w", err)
 	}
-	_ = ctx
+	if err := ctx.Err(); err != nil {
+		return CheckpointInfo{}, err
+	}
 
 	// The published layout is <checkpoint>/manifest.json plus <checkpoint>/files/<path>,
 	// so the scan root is the staged files directory. Scanning the stage itself
 	// would record every path with a "files/" prefix, and the manifest would then
 	// disagree with the layout the loader expects.
-	files, excluded, totalBytes, err := scanCheckpointFiles(filepath.Join(stage, "files"), false)
+	files, excluded, totalBytes, err := scanCheckpointFiles(filepath.Join(stage, "files"), true)
 	if err != nil {
 		return CheckpointInfo{}, err
 	}
@@ -297,13 +305,5 @@ func ReadCheckpointFile(registryDir, checkpointID, path string) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
-	data, err := os.ReadFile(filepath.Join(dir, "files", filepath.FromSlash(path)))
-	if err != nil {
-		return nil, fmt.Errorf("stow: read %q from checkpoint %s: %w", path, checkpointID, err)
-	}
-	if int64(len(data)) != expected.Size {
-		return nil, fmt.Errorf("stow: %q in checkpoint %s is %d bytes, manifest says %d",
-			path, checkpointID, len(data), expected.Size)
-	}
-	return data, nil
+	return readVerifiedCheckpointFile(dir, *expected)
 }

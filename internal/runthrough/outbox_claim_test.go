@@ -53,10 +53,10 @@ func TestFileOutboxSharedInstancesReloadBeforeMutation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("second outbox: %v", err)
 	}
-	if _, err := first.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "one"}); err != nil {
+	if _, err := first.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "one"}); err != nil {
 		t.Fatalf("enqueue one: %v", err)
 	}
-	if _, err := second.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "two"}); err != nil {
+	if _, err := second.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "two"}); err != nil {
 		t.Fatalf("enqueue two: %v", err)
 	}
 	if pending := first.Pending(); len(pending) != 2 {
@@ -75,7 +75,7 @@ func TestFileOutboxProcessHelper(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open helper outbox: %v", err)
 	}
-	if _, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: os.Getenv("STOW_OUTBOX_KEY")}); err != nil {
+	if _, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: os.Getenv("STOW_OUTBOX_KEY")}); err != nil {
 		t.Fatalf("enqueue helper entry: %v", err)
 	}
 }
@@ -115,7 +115,7 @@ func TestFileOutboxClaimIsExclusiveAndExpires(t *testing.T) {
 	if err != nil {
 		t.Fatalf("second outbox: %v", err)
 	}
-	entry, err := first.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
+	entry, err := first.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
 	if err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
@@ -160,7 +160,7 @@ func TestPreparedIntentIsOwnedAndRejectsDuplicateKey(t *testing.T) {
 		t.Fatalf("first outbox: %v", err)
 	}
 	owner := "stow-" + strconv.Itoa(os.Getpid()) + "-prepared"
-	entry, err := first.PrepareOwned(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}, owner, time.Minute)
+	entry, err := first.PrepareOwned(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}, owner, time.Minute)
 	if err != nil {
 		t.Fatalf("prepare owned: %v", err)
 	}
@@ -168,7 +168,7 @@ func TestPreparedIntentIsOwnedAndRejectsDuplicateKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("second outbox: %v", err)
 	}
-	if _, err := second.PrepareOwned(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}, "other", time.Minute); !errors.Is(err, runthrough.ErrOutboxPreparedUnresolved) {
+	if _, err := second.PrepareOwned(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}, "other", time.Minute); !errors.Is(err, runthrough.ErrOutboxPreparedUnresolved) {
 		t.Fatalf("duplicate prepare error = %v", err)
 	}
 	if _, err := second.CommitPrepared(entry.ID, owner, entry.PreparedToken, "version-1"); err != nil {
@@ -190,7 +190,7 @@ func TestRecoverPreparedSkipsLiveOwner(t *testing.T) {
 		t.Fatalf("outbox: %v", err)
 	}
 	owner := "stow-" + strconv.Itoa(os.Getpid()) + "-prepared"
-	if _, err := outbox.PrepareOwned(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}, owner, time.Minute); err != nil {
+	if _, err := outbox.PrepareOwned(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"}, owner, time.Minute); err != nil {
 		t.Fatalf("prepare owned: %v", err)
 	}
 	adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, local, local, newMockUpstream(), outbox)
@@ -208,7 +208,7 @@ func TestLegacyMutationsCannotBypassClaim(t *testing.T) {
 	if err != nil {
 		t.Fatalf("outbox: %v", err)
 	}
-	entry, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
+	entry, err := outbox.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
 	if err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
@@ -237,7 +237,7 @@ func TestClaimTokenFencesStaleOwner(t *testing.T) {
 	if err != nil {
 		t.Fatalf("second outbox: %v", err)
 	}
-	entry, err := first.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
+	entry, err := first.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key"})
 	if err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
@@ -276,7 +276,7 @@ func TestConcurrentRetryClaimsOnePropagation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("first outbox: %v", err)
 	}
-	if _, err := first.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key", Version: meta.VersionID}); err != nil {
+	if _, err := first.Enqueue(runthrough.OutboxEntry{UpstreamAbsent: true, Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "key", Version: meta.VersionID}); err != nil {
 		t.Fatalf("enqueue: %v", err)
 	}
 	second, err := runthrough.NewFileOutbox(path)

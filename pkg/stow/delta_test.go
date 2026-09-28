@@ -2,6 +2,7 @@ package stow_test
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -212,8 +213,26 @@ func TestApplyingADeltaWithContentThatFailsItsDigestIsRefused(t *testing.T) {
 // decoded document can arrive from anywhere and the decoder is the only place
 // that sees it before the bytes are in memory.
 func TestDecodeDeltaRefusesAnOversizedDocument(t *testing.T) {
-	oversized := fmt.Sprintf(`{"version":%d,"base_id":"cp_1","target_id":"cp_2","bytes":%d,"content":{"a.txt":%q}}`,
-		stow.DeltaVersion, stow.MaxDeltaBytes+1, base64.StdEncoding.EncodeToString([]byte("x")))
+	// The document has to be well-formed AND genuinely oversized, which is why
+	// this builds real bytes rather than declaring a large size. DecodeDelta
+	// validates the version, the checkpoint ids, the shape of every change, and
+	// the length and digest of the content each change carries, and then requires
+	// the declared totals to equal what those changes actually add up to. So a
+	// fixture that merely claims to be large is refused as inconsistent before the
+	// bound is ever reached, and a fixture that is small enough to be consistent
+	// never trips it. The only document that is both is one carrying more than
+	// MaxDeltaBytes of real content, so that is what this makes.
+	payload := make([]byte, stow.MaxDeltaBytes+1)
+	for i := range payload {
+		payload[i] = 'x'
+	}
+	digest := sha256.Sum256(payload)
+	oversized := fmt.Sprintf(
+		`{"version":%d,"base_id":"cp_aaaaaaaaaaaaaaaaaaaaaaaa","target_id":"cp_bbbbbbbbbbbbbbbbbbbbbbbb","bytes":%d,`+
+			`"changes":[{"path":"a.txt","kind":"added","to":{"path":"a.txt","size":%d,"mode":420,"sha256":"%x"}}],`+
+			`"content":{"a.txt":%q}}`,
+		stow.DeltaVersion, len(payload), len(payload), digest,
+		base64.StdEncoding.EncodeToString(payload))
 	if _, err := stow.DecodeDelta([]byte(oversized)); !errors.Is(err, stow.ErrDeltaTooLarge) {
 		t.Fatalf("error = %v, want ErrDeltaTooLarge", err)
 	}

@@ -25,7 +25,7 @@ func TestRuntimeWithSeparateEmptyCacheReadsThroughAndAcceptsLocalWrite(t *testin
 	local := storage.NewMemoryStore()
 	cache := storage.NewMemoryStore()
 	upstream := newMockUpstream()
-	if err := upstream.PutObject(ctx, "bucket", "remote.txt", strings.NewReader("remote"), storage.PutOptions{}); err != nil {
+	if _, err := upstream.PutObject(ctx, "bucket", "remote.txt", strings.NewReader("remote"), storage.PutOptions{}); err != nil {
 		t.Fatalf("seed upstream: %v", err)
 	}
 
@@ -56,7 +56,7 @@ func TestRuntimeCompositionHeadsReadsAndPaginatesWithEmptyCache(t *testing.T) {
 	cache := storage.NewMemoryStore()
 	upstream := newMockUpstream()
 	for key, body := range map[string]string{"a.txt": "alpha", "b.txt": "bravo", "c.txt": "charlie"} {
-		if err := upstream.PutObject(ctx, "bucket", key, strings.NewReader(body), storage.PutOptions{}); err != nil {
+		if _, err := upstream.PutObject(ctx, "bucket", key, strings.NewReader(body), storage.PutOptions{}); err != nil {
 			t.Fatalf("seed upstream %s: %v", key, err)
 		}
 	}

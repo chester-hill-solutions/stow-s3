@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"sort"
 	"time"
 )
@@ -105,14 +103,15 @@ type DeltaOptions struct {
 // it failed on the first added or changed path. A delta's reason to exist is that
 // it can be carried somewhere, so the encoding carries it.
 type DeltaDocument struct {
-	Version  int               `json:"version"`
-	BaseID   string            `json:"base_id"`
-	TargetID string            `json:"target_id"`
-	Created  time.Time         `json:"created"`
-	Changes  []DeltaChange     `json:"changes"`
-	Files    int64             `json:"files"`
-	Bytes    int64             `json:"bytes"`
-	Content  map[string][]byte `json:"content,omitempty"`
+	Version          int               `json:"version"`
+	BaseID           string            `json:"base_id"`
+	TargetID         string            `json:"target_id"`
+	Created          time.Time         `json:"created"`
+	Changes          []DeltaChange     `json:"changes"`
+	Files            int64             `json:"files"`
+	Bytes            int64             `json:"bytes"`
+	Content          map[string][]byte `json:"content,omitempty"`
+	IncludeSensitive bool              `json:"include_sensitive,omitempty"`
 }
 
 // DeltaChange is one path's difference. From is what the base held and To is what
@@ -127,9 +126,7 @@ type DeltaChange struct {
 
 // CreateDelta describes the difference between two checkpoints in one registry.
 //
-// The base is required and the target defaults to the most recent checkpoint of
-// the same workspace when empty, because "what changed since where I was" is the
-// question a caller usually has.
+// Both checkpoint IDs are required and must belong to the same workspace.
 func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, options DeltaOptions) (*DeltaDocument, error) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -161,8 +158,29 @@ func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, opti
 		return nil, err
 	}
 
-	baseFiles := indexCheckpointFiles(base)
-	targetFiles := indexCheckpointFiles(target)
+	delta := &DeltaDocument{
+		Version:          DeltaVersion,
+		BaseID:           baseID,
+		TargetID:         targetID,
+		Created:          time.Now().UTC(),
+		Content:          map[string][]byte{},
+		IncludeSensitive: options.IncludeSensitive,
+	}
+	if err := recordDeltaChanges(ctx, delta, deltaBuild{targetDir: targetDir, base: base, target: target, options: options}); err != nil {
+		return nil, err
+	}
+	delta.Files = int64(len(delta.Changes))
+	return delta, nil
+}
+
+type deltaBuild struct {
+	targetDir    string
+	base, target CheckpointManifest
+	options      DeltaOptions
+}
+
+func recordDeltaChanges(ctx context.Context, delta *DeltaDocument, build deltaBuild) error {
+	baseFiles, targetFiles := indexCheckpointFiles(build.base), indexCheckpointFiles(build.target)
 	paths := make(map[string]struct{}, len(baseFiles)+len(targetFiles))
 	for path := range baseFiles {
 		paths[path] = struct{}{}
@@ -175,27 +193,24 @@ func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, opti
 		ordered = append(ordered, path)
 	}
 	sort.Strings(ordered)
-
-	delta := &DeltaDocument{
-		Version:  DeltaVersion,
-		BaseID:   baseID,
-		TargetID: targetID,
-		Created:  time.Now().UTC(),
-		Content:  map[string][]byte{},
-	}
 	for _, path := range ordered {
-		old, hadOld := baseFiles[path]
-		current, hasCurrent := targetFiles[path]
-		if err := delta.recordChange(targetDir, path, changeSide{old: old, hadOld: hadOld, current: current, hasCurrent: hasCurrent}); err != nil {
-			return nil, err
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		err := delta.recordChange(build.targetDir, path, changeSide{old: baseFiles[path], hadOld: hasCheckpointFile(baseFiles, path), current: targetFiles[path], hasCurrent: hasCheckpointFile(targetFiles, path)})
+		if err != nil {
+			return err
+		}
+		if err := delta.enforceBounds(build.options); err != nil {
+			return err
 		}
 	}
+	return delta.enforceBounds(build.options)
+}
 
-	if err := delta.enforceBounds(options); err != nil {
-		return nil, err
-	}
-	delta.Files = int64(len(delta.Changes))
-	return delta, nil
+func hasCheckpointFile(files map[string]CheckpointFile, path string) bool {
+	_, ok := files[path]
+	return ok
 }
 
 // recordChange decides what happened to one path and, when the change carries
@@ -224,16 +239,15 @@ func (d *DeltaDocument) recordChange(targetDir, path string, side changeSide) er
 // digest the manifest claims. A delta whose content does not match its own
 // description would apply a different change than the one it names.
 func (d *DeltaDocument) attach(checkpointDir, path string, file *CheckpointFile) error {
-	if sensitiveSeedPath(path) {
+	if sensitiveSeedPath(path) && !d.IncludeSensitive {
 		return fmt.Errorf("stow: delta includes sensitive-looking path %q (explicit opt-in required)", path)
 	}
-	source := filepath.Join(checkpointDir, "files", filepath.FromSlash(path))
-	data, err := os.ReadFile(source)
-	if err != nil {
-		return fmt.Errorf("stow: read delta content %q: %w", path, err)
+	if file.Size > MaxDeltaBytes-d.Bytes {
+		return fmt.Errorf("stow: delta exceeds content limit")
 	}
-	if int64(len(data)) != file.Size {
-		return fmt.Errorf("stow: delta content %q is %d bytes, manifest says %d", path, len(data), file.Size)
+	data, err := readVerifiedCheckpointFile(checkpointDir, *file)
+	if err != nil {
+		return err
 	}
 	d.Content[path] = data
 	return nil
@@ -252,6 +266,7 @@ func (d *DeltaDocument) enforceBounds(options DeltaOptions) error {
 	if int64(len(d.Changes)) > maxFiles {
 		return fmt.Errorf("stow: delta describes %d files, over the cap of %d", len(d.Changes), maxFiles)
 	}
+	d.Bytes = 0
 	for _, data := range d.Content {
 		d.Bytes += int64(len(data))
 	}
@@ -284,8 +299,8 @@ func indexCheckpointFiles(manifest CheckpointManifest) map[string]CheckpointFile
 
 // EncodeDelta serializes a delta, including its content, for transport.
 func EncodeDelta(delta *DeltaDocument) ([]byte, error) {
-	if delta.Version != DeltaVersion {
-		return nil, ErrDeltaVersionUnsupported
+	if err := validateDeltaDocument(delta, delta != nil && delta.IncludeSensitive); err != nil {
+		return nil, err
 	}
 	return json.Marshal(delta)
 }
@@ -297,12 +312,15 @@ func EncodeDelta(delta *DeltaDocument) ([]byte, error) {
 // that accepts an unbounded document has already paid for the memory by the time
 // anyone gets to refuse it.
 func DecodeDelta(raw []byte) (*DeltaDocument, error) {
+	if len(raw) > 32<<20 {
+		return nil, errors.New("stow: encoded delta exceeds limit")
+	}
 	var delta DeltaDocument
 	if err := json.Unmarshal(raw, &delta); err != nil {
 		return nil, fmt.Errorf("stow: parse delta: %w", err)
 	}
-	if delta.Version != DeltaVersion {
-		return nil, ErrDeltaVersionUnsupported
+	if err := validateDeltaDocument(&delta, delta.IncludeSensitive); err != nil {
+		return nil, err
 	}
 	if err := checkDeltaSize(delta); err != nil {
 		return nil, err

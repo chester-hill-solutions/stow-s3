@@ -9,8 +9,8 @@
 // be adopted only after a baseline exists and a named machine is recorded.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { cpus, totalmem, platform, arch, release } from "node:os";
-import { dirname, resolve } from "node:path";
+import { cpus, totalmem, platform, arch, release, tmpdir } from "node:os";
+import { dirname, resolve, join } from "node:path";
 import { performance } from "node:perf_hooks";
 
 const root = resolve(import.meta.dirname, "..");
@@ -23,16 +23,26 @@ function argument(name, fallback) {
 
 const SESSIONS = Number(argument("sessions", "20"));
 const PAYLOAD_BYTES = Number(argument("payload-bytes", String(1 << 20)));
-const JSON_OUT = argument("json", "docs/benchmarks/session-baseline.json");
 const SWEEP = process.argv.includes("--sweep");
+const JSON_OUT = argument("json", join(tmpdir(), SWEEP ? "stow-session-memory.json" : "stow-session-lifecycle.json"));
 const SWEEP_MIB = [0, 1, 2, 4, 8];
 
 // The built client beside this script is the only supported way to start a
 // managed session, so the benchmark measures what a user measures.
 const { Stow } = await import(resolve(root, "dist/index.js"));
-const { S3Client, CreateBucketCommand, PutObjectCommand, GetObjectCommand } = await import(
-  "@aws-sdk/client-s3"
-);
+const {
+  CompleteMultipartUploadCommand,
+  CopyObjectCommand,
+  CreateBucketCommand,
+  CreateMultipartUploadCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+  UploadPartCommand,
+} = await import("@aws-sdk/client-s3");
 
 function childPids(parent) {
   try {
@@ -83,6 +93,7 @@ async function runSession(payloadBytes) {
   const bucket = `bench-${process.pid}-${Math.random().toString(36).slice(2, 8)}`;
   await client.send(new CreateBucketCommand({ Bucket: bucket }));
   const bucketReady = performance.now();
+  const uploadStarted = performance.now();
   try {
     await client.send(
       new PutObjectCommand({ Bucket: bucket, Key: "payload.bin", Body: payload }),
@@ -98,30 +109,93 @@ async function runSession(payloadBytes) {
     throw error;
   }
   const putDone = performance.now();
+  const getStarted = performance.now();
   const fetched = await client.send(new GetObjectCommand({ Bucket: bucket, Key: "payload.bin" }));
   const body = await fetched.Body.transformToByteArray();
   if (body.length !== payloadBytes) {
     throw new Error(`round trip returned ${body.length} bytes, want ${payloadBytes}`);
   }
   const firstOperation = performance.now();
+  const getDone = firstOperation;
 
-  // Sample the server child's resident set while it holds the payload.
-  let peakRssKb = 0;
+  // Sample the server child's resident set while it holds the 1 MiB payload.
+  let loadedRssKb = 0;
   for (const pid of childPids(process.pid)) {
-    peakRssKb = Math.max(peakRssKb, rssKb(pid));
+    loadedRssKb = Math.max(loadedRssKb, rssKb(pid));
   }
 
+  const operationStarted = performance.now();
+  const headStarted = performance.now();
+  await client.send(new HeadObjectCommand({ Bucket: bucket, Key: "payload.bin" }));
+  const headDone = performance.now();
+  const listStarted = performance.now();
+  await client.send(new ListObjectsV2Command({ Bucket: bucket, MaxKeys: 1000 }));
+  const listDone = performance.now();
+  const copyStarted = performance.now();
+  await client.send(new CopyObjectCommand({ Bucket: bucket, Key: "copy.bin", CopySource: `${bucket}/payload.bin` }));
+  const copyDone = performance.now();
+  const deleteStarted = performance.now();
+  await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: "copy.bin" }));
+  const deleteDone = performance.now();
+
+  const multipartKey = "multipart.bin";
+  const multipartCreateStarted = performance.now();
+  const multipart = await client.send(new CreateMultipartUploadCommand({ Bucket: bucket, Key: multipartKey }));
+  const multipartCreateDone = performance.now();
+  const partOneStarted = performance.now();
+  const partOne = await client.send(new UploadPartCommand({
+    Bucket: bucket, Key: multipartKey, UploadId: multipart.UploadId,
+    PartNumber: 1, Body: Buffer.alloc(5 * 1048576, 0x62),
+  }));
+  const partOneDone = performance.now();
+  const partTwoStarted = performance.now();
+  const partTwo = await client.send(new UploadPartCommand({
+    Bucket: bucket, Key: multipartKey, UploadId: multipart.UploadId,
+    PartNumber: 2, Body: Buffer.alloc(1048576, 0x63),
+  }));
+  const partTwoDone = performance.now();
+  const multipartCompleteStarted = performance.now();
+  await client.send(new CompleteMultipartUploadCommand({
+    Bucket: bucket,
+    Key: multipartKey,
+    UploadId: multipart.UploadId,
+    MultipartUpload: {
+      Parts: [
+        { ETag: partOne.ETag, PartNumber: 1 },
+        { ETag: partTwo.ETag, PartNumber: 2 },
+      ],
+    },
+  }));
+  const multipartCompleteDone = performance.now();
+  const multipartDeleteStarted = performance.now();
+  await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: multipartKey }));
+  const multipartDeleteDone = performance.now();
+  const operationsDone = performance.now();
+
+  const stopStarted = performance.now();
   await instance.stop();
   const stopped = performance.now();
 
   return {
     readyMs: ready - started,
     bucketMs: bucketReady - ready,
-    putMs: putDone - bucketReady,
+    putMs: putDone - uploadStarted,
+    firstUploadMs: putDone - started,
+    getMs: getDone - getStarted,
     firstOperationMs: firstOperation - bucketReady,
     totalToFirstOperationMs: firstOperation - started,
-    shutdownMs: stopped - firstOperation,
-    peakRssKb,
+    shutdownMs: stopped - stopStarted,
+    operationSuiteMs: operationsDone - operationStarted,
+    headMs: headDone - headStarted,
+    listMs: listDone - listStarted,
+    copyMs: copyDone - copyStarted,
+    deleteMs: deleteDone - deleteStarted,
+    multipartCreateMs: multipartCreateDone - multipartCreateStarted,
+    multipartPartOneMs: partOneDone - partOneStarted,
+    multipartPartTwoMs: partTwoDone - partTwoStarted,
+    multipartCompleteMs: multipartCompleteDone - multipartCompleteStarted,
+    multipartDeleteMs: multipartDeleteDone - multipartDeleteStarted,
+    loadedRssKb,
   };
 }
 
@@ -145,15 +219,15 @@ if (SWEEP) {
     const results = await runSeries(mib * 1048576, Math.max(3, Math.min(SESSIONS, 10)));
     points.push({
       payloadBytes: mib * 1048576,
-      peakRssKbP50: percentile(results.map((r) => r.peakRssKb), 0.5),
+      loadedRssKbP50: percentile(results.map((r) => r.loadedRssKb), 0.5),
       readyMsP50: round(percentile(results.map((r) => r.readyMs), 0.5)),
     });
   }
   const first = points[0];
   const last = points[points.length - 1];
   const payloadDeltaMiB = (last.payloadBytes - first.payloadBytes) / 1048576;
-  const rssDeltaMiB = (last.peakRssKbP50 - first.peakRssKbP50) / 1024;
-  const baselineRssMiB = first.peakRssKbP50 / 1024;
+  const rssDeltaMiB = (last.loadedRssKbP50 - first.loadedRssKbP50) / 1024;
+  const baselineRssMiB = first.loadedRssKbP50 / 1024;
   const report = {
     environment: {
       measuredAt: new Date().toISOString(),
@@ -163,13 +237,13 @@ if (SWEEP) {
       cpuCount: cpus().length,
       totalMemoryMb: Math.round(totalmem() / 1048576),
       sessionsPerPoint: Math.max(3, Math.min(SESSIONS, 10)),
-      note: "Peak RSS is sampled from the server child process while it holds the payload.",
+      note: "RSS is sampled once after the payload roundtrip; this is loaded RSS, not a time-sampled peak.",
     },
     memorySweep: points,
     derived: {
-      baselineRssMiB: round(baselineRssMiB),
-      rssMiBPerPayloadMiB: round(rssDeltaMiB / payloadDeltaMiB),
-      note: "rssMiBPerPayloadMiB is the multiplier a session byte quota must be multiplied by to predict peak RSS.",
+      emptySessionRssMiB: round(baselineRssMiB),
+      loadedRssMiBPerPayloadMiB: round(rssDeltaMiB / payloadDeltaMiB),
+      note: "loadedRssMiBPerPayloadMiB is the observed RSS increase per MiB of stored object data.",
     },
   };
   const output = resolve(repoRoot, JSON_OUT);
@@ -201,10 +275,28 @@ const environment = {
 const report = {
   environment,
   readyMs: summarize(results.map((r) => r.readyMs)),
+  bucketMs: summarize(results.map((r) => r.bucketMs)),
+  putMs: summarize(results.map((r) => r.putMs)),
+  firstUploadMs: summarize(results.map((r) => r.firstUploadMs)),
+  getMs: summarize(results.map((r) => r.getMs)),
+  headMs: summarize(results.map((r) => r.headMs)),
+  listMs: summarize(results.map((r) => r.listMs)),
+  copyMs: summarize(results.map((r) => r.copyMs)),
+  deleteMs: summarize(results.map((r) => r.deleteMs)),
+  multipartCreateMs: summarize(results.map((r) => r.multipartCreateMs)),
+  multipartPartOneMs: summarize(results.map((r) => r.multipartPartOneMs)),
+  multipartPartTwoMs: summarize(results.map((r) => r.multipartPartTwoMs)),
+  multipartCompleteMs: summarize(results.map((r) => r.multipartCompleteMs)),
+  multipartDeleteMs: summarize(results.map((r) => r.multipartDeleteMs)),
+  operationSuiteMs: summarize(results.map((r) => r.operationSuiteMs)),
   firstOperationMs: summarize(results.map((r) => r.firstOperationMs)),
   shutdownMs: summarize(results.map((r) => r.shutdownMs)),
   totalToFirstOperationMs: summarize(results.map((r) => r.totalToFirstOperationMs)),
-  peakRssKb: summarize(results.map((r) => r.peakRssKb)),
+  loadedRssKb: summarize(results.map((r) => r.loadedRssKb)),
+  uploadMiBPerSecondP50:
+    PAYLOAD_BYTES === 0
+      ? 0
+      : round((PAYLOAD_BYTES / 1048576) / (percentile(results.map((r) => r.putMs), 0.5) / 1000)),
 };
 
 const output = resolve(repoRoot, JSON_OUT);

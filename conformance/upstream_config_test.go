@@ -134,7 +134,7 @@ type fakeLiveObjectCleaner struct {
 	listedOptions storage.ListOptions
 }
 
-func (f *fakeLiveObjectCleaner) DeleteObject(context.Context, string, string) error {
+func (f *fakeLiveObjectCleaner) DeleteObject(context.Context, string, string, string) error {
 	f.deleteCalls++
 	return f.deleteErr
 }

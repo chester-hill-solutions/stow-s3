@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
@@ -90,38 +92,53 @@ type checkpointResult struct {
 	Excluded    []string `json:"excluded_sensitive_paths,omitempty"`
 }
 
+// workspaceVerbs maps each subcommand to its implementation.
+//
+// It is a table rather than a switch because the verb list is now fifteen long
+// and every one of them is a straight call: a switch grew the function's
+// complexity by one per verb until it crossed the quality ratchet's ceiling of
+// 15, and the ratchet was right to object, because a verb added for a new
+// feature should not cost the dispatcher a point of branching. A table also
+// makes the surface readable in one place, which is the thing a reader
+// actually wants from a command with this many verbs.
+var workspaceVerbs = map[string]func([]string) error{
+	"adopt":      adoptHandoffCommand,
+	"apply":      applyDeltaCommand,
+	"checkpoint": checkpointWorkspaceCommand,
+	"collect":    collectWorkspacesCommand,
+	"delta":      deltaWorkspaceCommand,
+	"destroy":    destroyWorkspaceCommand,
+	"diff":       diffWorkspaceCommand,
+	"export":     exportCheckpointCommand,
+	"handoff":    handoffWorkspaceCommand,
+	"import":     importCheckpointCommand,
+	"prepare":    prepareWorkspaceCommand,
+	"preview":    previewCheckpointCommand,
+	"restore":    restoreCheckpointCommand,
+	"resume":     resumeWorkspaceCommand,
+}
+
+// workspaceUsage is derived from the table rather than written out, so a verb
+// cannot be added to the dispatcher without appearing in the usage line. It
+// used to be a literal, which is how the two drifted apart before.
+func workspaceUsage() string {
+	verbs := make([]string, 0, len(workspaceVerbs))
+	for verb := range workspaceVerbs {
+		verbs = append(verbs, verb)
+	}
+	sort.Strings(verbs)
+	return "usage: stow-s3 workspace <" + strings.Join(verbs, "|") + ">"
+}
+
 func workspaceCommand(args []string) error {
 	if len(args) == 0 {
-		return errors.New("usage: stow-s3 workspace <prepare|resume|checkpoint|delta|apply|diff|restore|handoff|export|preview|import|adopt>")
+		return errors.New(workspaceUsage())
 	}
-	switch args[0] {
-	case "prepare":
-		return prepareWorkspaceCommand(args[1:])
-	case "resume":
-		return resumeWorkspaceCommand(args[1:])
-	case "handoff":
-		return handoffWorkspaceCommand(args[1:])
-	case "checkpoint":
-		return checkpointWorkspaceCommand(args[1:])
-	case "delta":
-		return deltaWorkspaceCommand(args[1:])
-	case "apply":
-		return applyDeltaCommand(args[1:])
-	case "diff":
-		return diffWorkspaceCommand(args[1:])
-	case "restore":
-		return restoreCheckpointCommand(args[1:])
-	case "export":
-		return exportCheckpointCommand(args[1:])
-	case "import":
-		return importCheckpointCommand(args[1:])
-	case "adopt":
-		return adoptHandoffCommand(args[1:])
-	case "preview":
-		return previewCheckpointCommand(args[1:])
-	default:
+	command, known := workspaceVerbs[args[0]]
+	if !known {
 		return fmt.Errorf("unknown workspace command %q", args[0])
 	}
+	return command(args[1:])
 }
 
 func prepareWorkspaceCommand(args []string) error {

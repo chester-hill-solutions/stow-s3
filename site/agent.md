@@ -16,7 +16,9 @@ directories, and explicit refs from local Git repositories. Git preparation
 uses a fresh shallow checkout of the selected commit; dirty files, older
 history, submodules, and Git LFS payloads are excluded. See
 [`docs/task-manifest.md`](../docs/task-manifest.md) for resume, checkpoint,
-diff, restore, same-machine handoff, and portable archive commands.
+diff, restore, same-machine handoff, and portable archive commands. This is
+filesystem isolation for task editing, not an OS security sandbox; direct file
+writes by an agent are not hard-limited by Stow's object API quotas.
 
 Use a scoped session when you need only disposable S3 bytes and none of these
 are true:
@@ -48,6 +50,18 @@ against the intended registry:
 ```ini
 @chester-hill-solutions:registry=https://npm.pkg.github.com
 ```
+
+GitHub Packages requires authentication for npm packages, including public
+ones. Authenticate with a GitHub personal access token (classic) that has the
+`read:packages` scope:
+
+```bash
+npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
+```
+
+Use the token as the password and keep it in your user-level npm config, not in
+the project `.npmrc`. See [GitHub's npm registry authentication
+guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
 
 Go, published and installable now:
 
@@ -113,10 +127,12 @@ not select one. The server is local-only unless you pass `--mode run-through` or
 `--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`. The startup banner states
 which you got: `upstream: not in use` means local.
 
-## The pattern you want
+## Disposable S3 fixture
 
-Start a scoped session, use a normal S3 client, let the session clean up. This
-is the shortest correct path and it is what the library is built around.
+When you only need temporary S3 objects for a test or build step, start a scoped
+session, use a normal S3 client, and let the session clean up. This pattern is
+for disposable data; use a prepared workspace when task files need to persist or
+be handed off.
 
 TypeScript:
 

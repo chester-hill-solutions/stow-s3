@@ -58,6 +58,18 @@ against the intended registry:
 @chester-hill-solutions:registry=https://npm.pkg.github.com
 ```
 
+GitHub Packages requires authentication for npm packages, including public
+ones. Authenticate with a GitHub personal access token (classic) that has the
+`read:packages` scope:
+
+```bash
+npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
+```
+
+Use the token as the password and keep it in your user-level npm config, not in
+the project `.npmrc`. See [GitHub's npm registry authentication
+guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
+
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
 ```
@@ -113,10 +125,12 @@ Reach for this when you are writing a launcher, a CI step, or anything that star
 Full contract, with a copy-pasteable launcher:
 [`docs/running-and-probing.md`](../../docs/running-and-probing.md).
 
-## The scoped session
+## Disposable S3 fixture
 
-This is the pattern to reach for by default: one call, a private server on an
-ephemeral port, a bucket already created, and cleanup on close.
+Use a scoped session when a test or build step needs temporary S3 objects: one
+call, a private server on an ephemeral port, a bucket already created, and
+cleanup on close. For coding tasks whose files must persist or be handed off,
+use the prepared-workspace flow described above.
 
 TypeScript:
 

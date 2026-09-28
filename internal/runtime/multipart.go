@@ -3,6 +3,7 @@ package runtime
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
@@ -185,7 +186,7 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 		return nil, ErrQuotaExceeded
 	}
 	meta, err := i.multipartStore.CompleteMultipartUpload(ctx, uploadID, parts)
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return nil, err
 	}
 	// One transition, from in-flight to committed: the parts' reservation is
@@ -204,7 +205,7 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	i.reconcileTargetReservation(target, true)
 	delete(i.multipart, uploadID)
 	clone := *meta
-	return &clone, nil
+	return &clone, err
 }
 
 func (i *Instance) AbortMultipartUpload(ctx context.Context, uploadID string) error {

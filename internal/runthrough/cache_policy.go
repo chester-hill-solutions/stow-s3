@@ -20,16 +20,6 @@ type cacheEntry struct {
 	bucket string
 	key    string
 	size   int64
-	// upstreamETag is the ETag the object had *upstream* when stow fetched it.
-	// The cache store computes its own ETag from the bytes, so this is the only
-	// record of which upstream state a local copy is derived from, and it is what
-	// makes a conflicting write detectable: a write asserts that upstream is
-	// still what this copy was based on.
-	//
-	// Without it the only available precondition is a fresh HeadObject at enqueue
-	// time, and that is vacuous — it reports whatever upstream holds now, so it
-	// always matches and can never detect a writer that moved on earlier.
-	upstreamETag string
 }
 
 type cacheCandidate struct {
@@ -97,34 +87,6 @@ func (a *Adapter) forgetCacheObject(bucket, key string) {
 	a.cacheMu.Lock()
 	defer a.cacheMu.Unlock()
 	delete(a.cacheEntries, cacheEntryKey(bucket, key))
-}
-
-// noteUpstreamETag records the ETag an object had upstream when stow fetched it.
-func (a *Adapter) noteUpstreamETag(bucket, key, etag string) {
-	if !a.separateCache || etag == "" {
-		return
-	}
-	a.cacheMu.Lock()
-	defer a.cacheMu.Unlock()
-	accessKey := cacheEntryKey(bucket, key)
-	entry := a.cacheEntries[accessKey]
-	entry.upstreamETag = etag
-	a.cacheEntries[accessKey] = entry
-}
-
-// observedUpstreamETag returns the ETag stow last saw upstream for this key, if
-// it has ever fetched it. The second result is false when stow has no record,
-// which is the honest answer for a key it has never read: there is no claim on
-// upstream state to defend, so no precondition is asserted and last-writer-wins
-// continues to apply for a key stow did not create from anything.
-func (a *Adapter) observedUpstreamETag(bucket, key string) (string, bool) {
-	a.cacheMu.Lock()
-	defer a.cacheMu.Unlock()
-	entry, ok := a.cacheEntries[cacheEntryKey(bucket, key)]
-	if !ok || entry.upstreamETag == "" {
-		return "", false
-	}
-	return entry.upstreamETag, true
 }
 
 func (a *Adapter) cacheEntryExpired(bucket, key string) bool {
@@ -215,12 +177,6 @@ func (a *Adapter) collectCacheCandidates(ctx context.Context) ([]cacheCandidate,
 		a.cacheEvictions.Add(1)
 	}
 
-	sort.Slice(pending, func(i, j int) bool {
-		if pending[i].at.Equal(pending[j].at) {
-			return pending[i].key < pending[j].key
-		}
-		return pending[i].at.Before(pending[j].at)
-	})
 	return pending, totalBytes, nil
 }
 

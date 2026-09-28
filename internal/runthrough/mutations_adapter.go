@@ -35,31 +35,44 @@ func (a *Adapter) DeleteObject(ctx context.Context, bucket, key string) error {
 		}
 	}
 	localErr := a.local.DeleteObject(ctx, bucket, key)
+	return a.finishDelete(ctx, bucket, key, deleteIntent{entry: prepared, version: version}, localErr)
+}
+
+type deleteIntent struct {
+	entry   OutboxEntry
+	version string
+}
+
+func (a *Adapter) finishDelete(ctx context.Context, bucket, key string, intent deleteIntent, localErr error) error {
+	prepared, version := intent.entry, intent.version
 	if localErr != nil {
 		ready := false
+		var recoveryErr error
 		if prepared.ID != "" {
-			var recoveryErr error
 			ready, recoveryErr = a.reconcilePreparedEntryLocked(ctx, prepared)
-			if recoveryErr != nil {
-				return errors.Join(localErr, recoveryErr)
-			}
+		}
+		if recoveryErr != nil {
+			return errors.Join(localErr, recoveryErr)
 		}
 		if errors.Is(localErr, storage.ErrObjectNotFound) {
 			if ready {
-				return a.completeIntentLocked(ctx, prepared)
+				return storage.CommittedError(a.completeIntentLocked(ctx, prepared))
 			}
 			return nil
+		}
+		if ready {
+			return storage.CommittedError(localErr)
 		}
 		return localErr
 	}
 	a.invalidateCache(ctx, bucket, key)
-	if action == writePropagate {
-		if _, err := a.commitPreparedIntent(prepared, version); err != nil {
-			return err
-		}
-		return a.completeIntentLocked(ctx, prepared)
+	if prepared.ID == "" {
+		return nil
 	}
-	return nil
+	if _, err := a.commitPreparedIntent(prepared, version); err != nil {
+		return storage.CommittedError(err)
+	}
+	return storage.CommittedError(a.completeIntentLocked(ctx, prepared))
 }
 
 func (a *Adapter) DeleteObjects(ctx context.Context, bucket string, keys []string) ([]string, error) {
@@ -223,17 +236,17 @@ func (a *Adapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (
 	meta, err := a.localCopy(ctx, req)
 	if err != nil {
 		if prepared.ID != "" {
-			return nil, a.reconcilePreparedAfterError(ctx, prepared, err)
+			return a.reconcilePreparedWrite(ctx, prepared, err)
 		}
 		return nil, err
 	}
 	a.invalidateCache(ctx, dstBucket, dstKey)
 	if action == writePropagate {
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
-			return meta, err
+			return meta, storage.CommittedError(err)
 		}
 		if err := a.completeIntentLocked(ctx, prepared); err != nil {
-			return meta, err
+			return meta, storage.CommittedError(err)
 		}
 	}
 	return meta, nil
@@ -292,16 +305,17 @@ func (a *Adapter) CompleteMultipartUpload(ctx context.Context, uploadID string, 
 	meta, err := a.localMultipart.CompleteMultipartUpload(ctx, uploadID, parts)
 	if err != nil {
 		if prepared.ID != "" {
-			return nil, a.reconcilePreparedAfterError(ctx, prepared, err)
+			return a.reconcilePreparedWrite(ctx, prepared, err)
 		}
 		return nil, err
 	}
+	a.invalidateCache(ctx, bucket, key)
 	if action == writePropagate {
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
-			return meta, err
+			return meta, storage.CommittedError(err)
 		}
 		if err := a.completeIntentLocked(ctx, prepared); err != nil {
-			return meta, err
+			return meta, storage.CommittedError(err)
 		}
 	}
 	return meta, nil

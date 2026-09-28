@@ -66,7 +66,7 @@ func putProbeObjects(t testing.TB, upstream *mockUpstream, n, size int) {
 	body := bytes.Repeat([]byte("x"), size)
 	for i := 0; i < n; i++ {
 		key := cacheProbeKey(i)
-		if err := upstream.PutObject(ctx, "bucket", key, bytes.NewReader(body), storage.PutOptions{}); err != nil {
+		if _, err := upstream.PutObject(ctx, "bucket", key, bytes.NewReader(body), storage.PutOptions{}); err != nil {
 			t.Fatalf("seed upstream %s: %v", key, err)
 		}
 	}

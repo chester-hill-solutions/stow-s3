@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chmod, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -7,8 +7,10 @@ import {
   adoptWorkspaceHandoff,
   applyWorkspaceDelta,
   createWorkspaceDelta,
+  destroyWorkspace,
   handoffWorkspace,
   prepareWorkspace,
+  resumeWorkspace,
   runWorkspaceCommand,
 } from "../dist/workspace.js";
 
@@ -30,6 +32,40 @@ describe("workspace CLI adapter", () => {
     await withFakeStowBinary("#!/bin/sh\nprintf '[]'\n", async () => {
       await assert.rejects(runWorkspaceCommand(["diff"]), /non-object JSON/);
     });
+  });
+
+  it("runs prepare, handoff-to-file, resume, and destroy against the native CLI", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "stow-workspace-e2e-"));
+    const registryDir = join(directory, "registry");
+    const root = join(directory, "workspace");
+    const handoffPath = join(directory, "handoff.json");
+    const manifestPath = join(directory, "task.json");
+    const prior = process.env.STOW_BIN;
+    process.env.STOW_BIN = join(process.cwd(), "../../bin/stow-s3");
+    try {
+      const inputPath = join(directory, "seed.txt");
+      await writeFile(inputPath, "seed");
+      await writeFile(
+        manifestPath,
+        JSON.stringify({ version: 1, root, working_directory: ".", registry_dir: registryDir, inputs: [{ source: inputPath, destination: "seed.txt" }] }),
+      );
+      const prepared = await prepareWorkspace(manifestPath);
+      assert.equal(typeof prepared.workspace_id, "string");
+      const handoff = await handoffWorkspace(String(prepared.workspace_id), {
+        registryDir,
+        output: handoffPath,
+      });
+      assert.deepEqual(JSON.parse(await readFile(handoffPath, "utf8")), handoff);
+      const resumed = await resumeWorkspace({ handoffPath });
+      assert.equal(resumed.workspace_id, prepared.workspace_id);
+      const destroyed = await destroyWorkspace(String(prepared.workspace_id), registryDir);
+      assert.equal(destroyed.destroyed, true);
+      await assert.rejects(stat(root));
+    } finally {
+      if (prior === undefined) delete process.env.STOW_BIN;
+      else process.env.STOW_BIN = prior;
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 });
 

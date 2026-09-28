@@ -73,16 +73,16 @@ func (m *mockUpstream) GetObject(_ context.Context, bucket, key string) (io.Read
 	return io.NopCloser(bytes.NewReader(data)), &out, nil
 }
 
-func (m *mockUpstream) PutObject(_ context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) error {
+func (m *mockUpstream) PutObject(_ context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.putCalls++
 	k := objectKey(bucket, key)
 	if err := m.putErrors[k]; err != nil {
-		return err
+		return "", err
 	}
 	if m.putErr != nil {
-		return m.putErr
+		return "", m.putErr
 	}
 	// Preconditions, because a client that does not honour them cannot be used to
 	// prove that stow detects a concurrent writer. The real S3 semantics apply:
@@ -91,19 +91,19 @@ func (m *mockUpstream) PutObject(_ context.Context, bucket, key string, body io.
 	if opts.IfMatch != "" || opts.IfNoneMatch == "*" {
 		current, exists := m.objects[k]
 		if opts.IfNoneMatch == "*" && exists {
-			return storage.ErrPreconditionFailed
+			return "", storage.ErrPreconditionFailed
 		}
 		if opts.IfMatch != "" && (!exists || !storage.ETagEqual(current.ETag, opts.IfMatch)) {
-			return storage.ErrPreconditionFailed
+			return "", storage.ErrPreconditionFailed
 		}
 	}
 	data, err := io.ReadAll(body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	etag, _, err := storagePutMeta(data)
 	if err != nil {
-		return err
+		return "", err
 	}
 	m.bodies[k] = data
 	m.objects[k] = storage.ObjectMeta{
@@ -114,15 +114,18 @@ func (m *mockUpstream) PutObject(_ context.Context, bucket, key string, body io.
 		ContentType: opts.ContentType,
 		Metadata:    opts.Metadata,
 	}
-	return nil
+	return etag, nil
 }
 
-func (m *mockUpstream) DeleteObject(_ context.Context, bucket, key string) error {
+func (m *mockUpstream) DeleteObject(_ context.Context, bucket, key, ifMatch string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.delCalls++
 	if m.delErr != nil {
 		return m.delErr
+	}
+	if meta, exists := m.objects[objectKey(bucket, key)]; exists && ifMatch != "" && !storage.ETagEqual(meta.ETag, ifMatch) {
+		return storage.ErrPreconditionFailed
 	}
 	delete(m.objects, objectKey(bucket, key))
 	delete(m.bodies, objectKey(bucket, key))
@@ -365,7 +368,7 @@ func TestAdapter_ReadThroughCacheMiss(t *testing.T) {
 	_ = local.CreateBucket(ctx, "bucket")
 
 	up := newMockUpstream()
-	_ = up.PutObject(ctx, "bucket", "k", bytes.NewReader([]byte("upstream-bytes")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "bucket", "k", bytes.NewReader([]byte("upstream-bytes")), storage.PutOptions{})
 
 	cfg := runthrough.Config{
 		Policy:     runthrough.PolicyReadThroughCache,
@@ -402,7 +405,7 @@ func TestAdapter_RevalidationSkipsUpstreamWhenDisabled(t *testing.T) {
 	_, _ = local.PutObject(ctx, "bucket", "k", bytes.NewReader([]byte("local")), storage.PutOptions{})
 
 	up := newMockUpstream()
-	_ = up.PutObject(ctx, "bucket", "k", bytes.NewReader([]byte("newer-upstream")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "bucket", "k", bytes.NewReader([]byte("newer-upstream")), storage.PutOptions{})
 
 	cfg := runthrough.Config{
 		Policy:     runthrough.PolicyReadThroughCache,
@@ -431,8 +434,8 @@ func TestAdapter_BucketFilter(t *testing.T) {
 	_ = local.CreateBucket(ctx, "blocked")
 
 	up := newMockUpstream()
-	_ = up.PutObject(ctx, "allowed", "k", bytes.NewReader([]byte("yes")), storage.PutOptions{})
-	_ = up.PutObject(ctx, "blocked", "k", bytes.NewReader([]byte("no")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "allowed", "k", bytes.NewReader([]byte("yes")), storage.PutOptions{})
+	_, _ = up.PutObject(ctx, "blocked", "k", bytes.NewReader([]byte("no")), storage.PutOptions{})
 
 	cfg := runthrough.Config{
 		Policy:     runthrough.PolicyReadThroughCache,
