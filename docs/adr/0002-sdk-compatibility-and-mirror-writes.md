@@ -1,5 +1,7 @@
 ---
-status: accepted
+---
+status: narrowed
+narrowed_by: 0005 (section 5 only)
 ---
 
 # SDK compatibility profile and mirror-writes
@@ -88,3 +90,10 @@ The 0.2.0 filesystem format uses atomic records. The old sidecar format is not m
 ## Out of scope
 
 Production S3 durability, full proxy behavior, Bun support, migration of old data, wildcard DNS/TLS, automatic upstream bucket creation, and unlisted S3 services remain out of scope.
+
+## Amendments
+
+2026-09-28 — frontmatter only. ADR 0005 narrows section 5. The body already said so
+in its own preamble, and pointed at both 0001 and 0005 by number, so the drift here
+was smaller than 0001's: the file told the truth about itself and only its status
+line was wrong.

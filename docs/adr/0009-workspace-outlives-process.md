@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -110,3 +111,7 @@ out of scope here.
   changelog entry has to say that a session's data now outlives it.
 - Resume is only meaningful for a persistent backend, so it is blocked
   behind ADR 0008 in the same way the workspace default is.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

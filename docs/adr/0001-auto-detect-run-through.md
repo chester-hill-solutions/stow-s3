@@ -1,5 +1,7 @@
 ---
-status: accepted
+---
+status: superseded
+superseded_by: 0011
 ---
 
 # Auto-detect run-through mode from environment variables
@@ -19,3 +21,10 @@ We chose auto-detect over local-default because CHS applications already configu
 - Startup must print mode, upstream endpoint (credentials redacted), write policy, and override hints on every start.
 - ADR and CONTEXT glossary must define Auto-Detect Mode, Read-Through Cache, and Upstream Configuration distinctly from Local-Only Mode.
 - Conformance tests must cover both local-only and run-through paths against AWS S3, Cloudflare R2, and custom endpoints.
+
+## Amendments
+
+2026-09-28 — frontmatter only. The decision was replaced in full by ADR 0011, which
+has said so since it was written; this ADR did not, and so it read as current. The
+body is unchanged, deliberately: ADR 0011 retained it for the reasoning, and that
+reasoning is the part worth keeping.

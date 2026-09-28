@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 supersedes: 0002 (section 5, only as to what constitutes live-write consent)
 ---
@@ -144,3 +145,7 @@ unnoticed, which is the bug this ADR exists to close.
   CI job cannot answer, and cannot be made to fail safely if it does.
 - **Drop `mirrorWrites` entirely.** Rejected. Read-through plus explicit
   propagation is a real need; only the implicit grant is the problem.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -135,3 +136,7 @@ did not catch (ADR 0005, ADR 0006).
 - Everything in `docs/agent-dx-plan.md` sections 3, 4, 10, and 16 that
   assumed an ephemeral child server by default is amended by
   `docs/agent-dx-plan.md` section 0.5.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

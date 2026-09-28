@@ -1,6 +1,7 @@
 ---
+---
 status: accepted
-relates_to: 0005 (a policy is not consent to write upstream), 0010 (an enforcement site or not a permission), 0011 (local is the default mode)
+relates_to: 0005, 0010, 0011
 ---
 
 # A run-through proxy serves the buckets it was given, not the ones upstream has
@@ -93,3 +94,7 @@ The distinguishing evidence is not in the read path. It is:
    allowed. This preserves convenience without a guess, and it is the obvious next
    step if the workaround proves tiresome. It is not built, because a learned allow-list
    is a new persistent security surface and this ADR does not need it yet.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -124,3 +125,7 @@ removed without an explicit destroy.
   spaces — are part of the key-to-path mapping and must be covered by the
   same corpus. The workspace backend is a first-class target there, not a
   later port.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

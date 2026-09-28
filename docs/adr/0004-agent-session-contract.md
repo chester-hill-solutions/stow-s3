@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -174,3 +175,7 @@ Recorded as explicit non-goals, not oversights:
   rather than by a user.
 - Anything a caller must clean up by hand is a bug in this contract, not a
   documented step.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

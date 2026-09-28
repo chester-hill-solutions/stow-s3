@@ -1,7 +1,7 @@
 ---
+---
 status: accepted
 supersedes: 0001
-date: 2026-09-27
 ---
 
 # Local-only is the default; ambient credentials do not select an upstream
@@ -65,3 +65,7 @@ not the intent — which is why they now have the same test.
 - `CONTEXT.md` gains a Mode Selection entry and a separate Live-Write Consent
   entry, because a policy that reads as a consent is the confusion this decision
   exists to remove.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

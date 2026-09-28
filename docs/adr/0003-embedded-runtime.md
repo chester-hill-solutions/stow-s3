@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -52,3 +53,7 @@ constraint ADR 0008 lifts. `pkg/stow` still exposes only `BackendMemory`, and
 `runtime.Open` still refuses any other backend without an injected store; the
 workspace backend that makes the in-process runtime the product default is
 specified in ADR 0008 and is not yet built. Everything else in this ADR stands.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -124,3 +125,7 @@ recorded in the changelog.
 - **Deprecate the option for two releases before it starts checking.** Rejected.
   The window in which it deletes a home directory is exactly the window in which
   it matters. The check ships with the deprecation.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.

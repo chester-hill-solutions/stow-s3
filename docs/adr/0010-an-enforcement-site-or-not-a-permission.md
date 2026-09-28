@@ -1,4 +1,5 @@
 ---
+---
 status: accepted
 ---
 
@@ -187,3 +188,7 @@ decides whether the repository passes is inside the repository's own gates.
   superseded by `docs/architecture/environment-implementation.md`, which absorbs
   it and adds requirement identifiers, a traceability matrix, an assumptions
   register, and a binding decision rule.
+
+## Amendments
+
+None. Recorded at acceptance and not amended since.
