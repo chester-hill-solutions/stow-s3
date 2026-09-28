@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- **The live-provider gate can be run by hand, and the release gate is one secret pair
+  from being closed.** `conformance/live-provider.sh test` could only ever succeed
+  inside the workflow that invokes it: the provider is classified in `resolve`, a
+  different process, which reports it through `$GITHUB_OUTPUT`. Outside CI that
+  variable does not exist, so the test failed with "STOW_CONFORMANCE_PROVIDER is
+  required" against fully configured credentials and an endpoint that classifies
+  cleanly. The first real run of the live matrix against Cloudflare R2 hit exactly
+  that, on the release path, where being able to reproduce the check by hand is the
+  entire point of having one.
+
+  It now derives the provider from the endpoint when it was not handed in, and refuses
+  rather than guesses: a mismatched profile, a plaintext endpoint, and a missing
+  profile are each an error, while a provider the caller named is still trusted
+  because CI supplies one from the resolve step. Five cases cover those paths, and
+  three of them fail against the pre-fix script.
+
+  The matrix passes against real R2 — `TestUpstreamRunThrough`, 0.94s, with the
+  bucket left exactly as it was found.
+
 - **Bounded the registry, and made the bound refusable rather than automatic.** Nothing
   stopped a registry growing without limit. `TTLSeconds` defaults to unlimited and
   `prune` is manual, so the only evidence of the cost was 1961 records on one machine,
