@@ -161,6 +161,15 @@ func importCheckpointCommand(args []string) error {
 		Files: checkpoint.Files, Bytes: checkpoint.Bytes, Excluded: checkpoint.Excluded,
 	})
 }
+
+// checkpointWorkspaceCommand captures a checkpoint of a workspace that another
+// process may be using right now.
+//
+// It resolves the registry and the workspace's own recorded limits, and never
+// claims the session: an agent holding the workspace is not asked to stop so the
+// work so far can be captured. The capture is the one Workspace.CreateCheckpoint
+// runs, so the exclusions, the limits, and the refusal of a tree that changed
+// mid-capture are identical either way.
 func checkpointWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace checkpoint", flag.ContinueOnError)
 	id := flags.String("id", "", "Workspace ID to checkpoint")
@@ -180,12 +189,7 @@ func checkpointWorkspaceCommand(args []string) error {
 	if err != nil {
 		return err
 	}
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, *id)
-	if err != nil {
-		return err
-	}
-	defer ws.Close()
-	checkpoint, err := ws.CreateCheckpoint(context.Background(), stow.CheckpointOptions{
+	checkpoint, err := stow.CheckpointOf(context.Background(), registry, *id, stow.CheckpointOptions{
 		ParentID: *parentID, MaxBytes: *maxBytes, MaxFiles: *maxFiles,
 		IncludeSensitiveFiles: *includeSensitive,
 	})

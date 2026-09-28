@@ -78,15 +78,20 @@ workspace is filed at the registry root, which is where every workspace that
 predates the field already is.
 
 Create an immutable snapshot with `stow-s3 workspace checkpoint --id <id>`.
-Compare two snapshots with
+Neither the checkpoint nor the handoff needs the workspace to be idle: both
+resolve the workspace from the registry and read its directory, so an agent can
+keep working while a snapshot is taken. The only command that takes the workspace
+over is `resume`. Compare two snapshots with
 `stow-s3 workspace diff --from <checkpoint-id> --to <checkpoint-id>`. Restore
 one to a new workspace with
 `stow-s3 workspace restore --checkpoint-id <checkpoint-id> --root <new-root>`.
 The handoff reference may include `--checkpoint-id` to identify the snapshot
 alongside its mutable workspace. Checkpoints live on the same machine, outside
 the workspace, and are not portable archives. Capture scans the file tree before
-and after copying and refuses detected changes; callers should stop writers
-before requesting a checkpoint. `.stow` and `.git` are excluded. Common
+and after copying and refuses detected changes, which is what makes a capture of a
+moving tree safe: a workspace an agent is actively writing may well change
+mid-capture, and then the capture is refused rather than publishing a snapshot of
+two different moments. `.stow` and `.git` are excluded. Common
 credential-looking paths are recorded as excluded unless explicitly included.
 
 Export a checkpoint for transfer with

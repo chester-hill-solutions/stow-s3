@@ -60,6 +60,10 @@ type CheckpointChange struct {
 // workspace. Stow metadata and Git internals are excluded; common credential
 // filenames are excluded unless the caller explicitly opts in. The source tree
 // is scanned before and after copying, and the operation refuses a changed tree.
+//
+// It requires the handle, and so it requires that no other process holds the
+// workspace. A caller that needs to snapshot a workspace somebody is using right
+// now has CheckpointOf, which is the same capture without the session.
 func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOptions) (CheckpointInfo, error) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -72,62 +76,14 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	if err := ctx.Err(); err != nil {
 		return CheckpointInfo{}, err
 	}
-	if options.ParentID != "" {
-		if err := validateCheckpointParent(w.registryDir, w.id, options.ParentID); err != nil {
-			return CheckpointInfo{}, err
-		}
-	}
-	before, excluded, size, err := checkpointInputs(w.dir, options)
-	if err != nil {
-		return CheckpointInfo{}, err
-	}
-	if err := w.checkCheckpointRetention(size); err != nil {
-		return CheckpointInfo{}, err
-	}
-	checkpointRoot, tempDir, err := stageCheckpointDirectory(w.registryDir)
-	if err != nil {
-		return CheckpointInfo{}, err
-	}
-	defer os.RemoveAll(tempDir)
-	if err := copyCheckpointFiles(ctx, w.dir, tempDir, before); err != nil {
-		return CheckpointInfo{}, err
-	}
-	if err := verifyCheckpointCapture(w.dir, before, excluded, options.IncludeSensitiveFiles); err != nil {
-		return CheckpointInfo{}, err
-	}
-	id, err := newCheckpointID()
-	if err != nil {
-		return CheckpointInfo{}, err
-	}
-	manifest := CheckpointManifest{
-		Version: checkpointVersion, ID: id, WorkspaceID: w.id,
-		ParentID: options.ParentID, Created: w.nowFunc()().UTC(),
-		Files: before, Excluded: excluded,
-	}
-	if err := publishCheckpoint(tempDir, checkpointRoot, id, manifest); err != nil {
-		return CheckpointInfo{}, err
-	}
-	return CheckpointInfo{ID: id, WorkspaceID: w.id, ParentID: options.ParentID, Created: manifest.Created, Files: int64(len(before)), Bytes: size, Excluded: excluded}, nil
+	return captureCheckpoint(ctx, w.captureTarget(), options)
 }
 
 // checkCheckpointRetention accounts only published checkpoints. The caller
 // holds checkpointMu through publication, so parallel captures on this handle
 // cannot both pass the same remaining capacity.
 func (w *Workspace) checkCheckpointRetention(nextBytes int64) error {
-	if w.maxCheckpointBytes == 0 && w.maxCheckpoints == 0 {
-		return nil
-	}
-	count, total, err := checkpointRetentionUsage(w.registryDir, w.id)
-	if err != nil {
-		return err
-	}
-	if w.maxCheckpoints > 0 && count >= w.maxCheckpoints {
-		return fmt.Errorf("stow: checkpoint count limit reached (%d of %d); remove a checkpoint or raise the workspace limit", count, w.maxCheckpoints)
-	}
-	if w.maxCheckpointBytes > 0 && (total > w.maxCheckpointBytes || nextBytes > w.maxCheckpointBytes-total) {
-		return fmt.Errorf("stow: checkpoint byte limit exceeded (%d existing + %d new > %d); remove a checkpoint or raise the workspace limit", total, nextBytes, w.maxCheckpointBytes)
-	}
-	return nil
+	return w.captureTarget().checkRetention(nextBytes)
 }
 
 func checkpointRetentionUsage(registryDir, workspaceID string) (int64, int64, error) {

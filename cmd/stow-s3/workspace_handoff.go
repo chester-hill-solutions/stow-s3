@@ -75,16 +75,19 @@ func handoffWorkspaceCommand(args []string) error {
 	if err != nil {
 		return err
 	}
-	// The reference records the partition as well as the directory it resolved
-	// to, so a machine adopting it files the archive under the same team the
-	// workspace belonged to rather than into whatever its own root contains.
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: resolved}, *id)
+	// A handoff names a workspace, and naming it does not require holding it. The
+	// registry entry is the whole of what is being named, so this looks the
+	// workspace up rather than resuming it: an orchestrator hands off a workspace
+	// that is still running, and resuming would fail for exactly that reason.
+	reference, err := stow.LookupWorkspace(resolved, *id)
 	if err != nil {
 		return err
 	}
-	defer ws.Close()
+	// The reference records the partition as well as the directory it resolved
+	// to, so a machine adopting it files the archive under the same team the
+	// workspace belonged to rather than into whatever its own root contains.
 	document := workspaceHandoff{
-		Version: handoffLocalVersion, WorkspaceID: ws.ID(),
+		Version: handoffLocalVersion, WorkspaceID: reference.ID,
 		CheckpointID: *checkpointID, RegistryDir: resolved, Team: selection.team,
 	}
 	if *archive != "" {
@@ -98,7 +101,7 @@ func handoffWorkspaceCommand(args []string) error {
 		document.Version = handoffPortableVersion
 		document.Archive = bound
 	} else if *checkpointID != "" {
-		if err := requireCheckpointInWorkspace(resolved, *checkpointID, ws.ID()); err != nil {
+		if err := requireCheckpointInWorkspace(resolved, *checkpointID, reference.ID); err != nil {
 			return err
 		}
 	}

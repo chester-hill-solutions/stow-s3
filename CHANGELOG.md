@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+- **A workspace can now be checkpointed while an agent is using it.** `checkpoint`
+  and `handoff` both went through `ResumeWith`, and a resume claims the session
+  lock, so the only way to ask "what has it done so far?" was to make the agent
+  stop. The answer was `stow: claim workspace: workspace is in use by a live
+  session` for as long as the agent was running — which is to say for the entire
+  time anyone would want a snapshot, and the whole reason the handoff, the
+  portable archive, and the delta exist is to move work *between* machines while it
+  is in flight.
+
+  What was actually wrong was not a missing flag but a wrong assumption about what
+  the session lock is for. It is a liveness signal: it stops a collector deleting
+  the bytes somebody is producing. It is not what makes a capture consistent. A
+  capture already scans the tree before copying and again afterwards, and refuses a
+  tree that changed in between — consistency there comes from noticing a change,
+  not from preventing one, and a workspace that a live agent is actively writing
+  will be refused rather than snapshotted as two different moments. So the capture
+  never needed the lock, and a lock it does not need is a lock that keeps the
+  answer from being had.
+
+  `CheckpointOf(ctx, registryDir, id, options)` resolves the workspace from the
+  registry and runs the *same* capture as `Workspace.CreateCheckpoint` — the same
+  exclusions, the same digest verification, the same refusal of a changed tree, and
+  the retention caps read from the registry entry rather than from a handle, so a
+  capture from outside the workspace cannot walk past a cap its owner set. It
+  writes only into the checkpoint store, never into the workspace, and it registers
+  and touches nothing. A test asserts the two entry points capture identical files
+  and identical exclusions, because a difference between them would mean the
+  external path had quietly lost a rule. `LookupWorkspace` answers "is this
+  registered, and where does it live?" for callers that only need to name a
+  workspace, which is what `handoff` now does instead of resuming it.
+
+  The retention caps are accounted from published checkpoints, so two captures that
+  both read the count before either publishes would both pass. That needed a second
+  lock, and it is deliberately not the session lock: this one answers "are two
+  captures racing?", where the session answers "is anybody using this?". A capture
+  already in progress is refused with `ErrCaptureInProgress` rather than waited
+  on, because an advisory lock taken twice in one process is two independent
+  claims and a blocking wait would wait on a lock this process is itself going to
+  hold. Where the host has no advisory lock, `CaptureLock.Held` reports false and
+  the cap is approximate by at most one checkpoint per capture in flight; that is a
+  bound on retained disk rather than a safety property, and it is exposed rather
+  than assumed.
+
+  `resume` still claims, which is the point: taking a workspace over is the one
+  operation that should have to be exclusive.
+
 - **Fixed: a delta document could not cross a machine.** `DeltaDocument.Content`
   was tagged `json:"-"`, so `EncodeDelta` wrote a document that named every
   change and carried none of the bytes. Every test applied the in-memory

@@ -133,6 +133,7 @@ saying which member lands in which phase is more useful than a promise:
 | `Destroy` | **Shipped** in Go, with the adoption guard it required | W3 |
 | `open` / `resume` selected by one argument | **Shipped** in Go, via the registry | W4 |
 | `Touch`, a registry on disk, and TTL collection | **Shipped** in Go, refusing live and adopted workspaces | W4 |
+| A checkpoint of a workspace another process is using | **Shipped** in Go, without claiming the session | — |
 | Team partitions of the registry | **Shipped** in Go, as directories rather than labels | — |
 | `Facade` | Not yet. A workspace speaks no S3 today | W5 |
 | TypeScript and Python workspace lifecycle objects | Not yet. `workspace` CLI wrappers are shipped, but they return JSON command results rather than in-process `openWorkspace` handles | Future API phase |
@@ -445,7 +446,15 @@ are the first two cases written and the first two run.
   one.
 - **Multi-writer coordination.** stow does not lock the directory. Two agents
   writing concurrently is allowed and last-writer-wins per key, which is the
-  same guarantee the record store gives.
+  same guarantee the record store gives. A capture beside a writer is a third
+  case and is not a merge: the tree is scanned again after the copy and a tree
+  that changed is refused.
+- **The session lock is exclusive, and reading a workspace does not take it.**
+  `checkpoint` and `handoff` resolve the workspace from the registry and read its
+  directory, so an agent can be working while its work is snapshotted; `resume` is
+  the operation that takes the workspace over and the one that must claim. The
+  cost of that split is that a capture is refused rather than retried when the
+  tree is moving, which is the answer a checkpoint of changing work has to give.
 - **A team is a partition, not an identity.** `Team` files a workspace under
   `<registry>/teams/<name>`, so two teams sharing a machine cannot see or sweep
   each other's entries or checkpoints. It carries no identity, no credentials, and

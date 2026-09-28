@@ -215,6 +215,16 @@ func (w *Workspace) Path(key string) (string, bool) {
 	return w.store.Path(w.bucket, key)
 }
 
+// captureTarget is this handle expressed as something a capture can read, so the
+// handle's own checkpoints and an external one run the same code.
+func (w *Workspace) captureTarget() captureTarget {
+	return captureTarget{
+		dir: w.dir, registryDir: w.registryDir, workspaceID: w.id,
+		maxCheckpointBytes: w.maxCheckpointBytes, maxCheckpoints: w.maxCheckpoints,
+		now: w.now,
+	}
+}
+
 // Close releases the handle. It is the non-destructive half of the split in
 // ADR 0009 section 3: the process and the client go away, and the bytes do not.
 //
