@@ -75,16 +75,29 @@ Python install commands below until a complete release is announced.
 
 **The npm package is distributed through GitHub Packages, not npmjs.org.** This
 organisation owns nothing on npmjs — the scope does not exist there — and a
-scope-specific registry in `.npmrc` overrides `--registry`. Once a complete
-release is announced, route the scope explicitly:
+scope-specific registry in `.npmrc` overrides `--registry`. GitHub Packages
+requires authentication to install npm packages, including public packages.
+Once a complete release is announced, configure the scope in the project
+`.npmrc`:
 
 ```ini
 # .npmrc
 @chester-hill-solutions:registry=https://npm.pkg.github.com
 ```
 
-Then `npm install @chester-hill-solutions/stow-s3` resolves against the intended
-registry. PyPI has no such configuration step.
+Then authenticate with a GitHub personal access token (classic) that has the
+`read:packages` scope. You can keep the token in your user-level npm config by
+running:
+
+```sh
+npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
+```
+
+Use your GitHub username, the token as the password, and an email address at the
+prompts. Do not commit the token to the project `.npmrc`. After authentication,
+`npm install @chester-hill-solutions/stow-s3` resolves against GitHub Packages.
+See [GitHub's npm registry authentication guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
+PyPI has no such configuration step.
 
 The Go module is published and installs today:
 

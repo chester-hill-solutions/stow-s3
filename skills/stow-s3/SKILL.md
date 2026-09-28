@@ -58,6 +58,18 @@ against the intended registry:
 @chester-hill-solutions:registry=https://npm.pkg.github.com
 ```
 
+GitHub Packages requires authentication for npm packages, including public
+ones. Authenticate with a GitHub personal access token (classic) that has the
+`read:packages` scope:
+
+```bash
+npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
+```
+
+Use the token as the password and keep it in your user-level npm config, not in
+the project `.npmrc`. See [GitHub's npm registry authentication
+guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
+
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
 ```
