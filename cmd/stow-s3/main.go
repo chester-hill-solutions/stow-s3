@@ -3,18 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"strings"
-	"syscall"
-	"time"
-
 	"github.com/chester-hill-solutions/stow-s3/internal/auth"
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/parentwatch"
@@ -25,6 +14,14 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
 	"github.com/chester-hill-solutions/stow-s3/internal/version"
+	"io"
+	"log"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"strings"
+	"syscall"
+	"time"
 )
 
 // readyDetails is what the readiness announcement needs to describe the server.
@@ -288,50 +285,22 @@ func startOutboxRetryWorker(adapter *runthrough.Adapter) (context.CancelFunc, <-
 }
 
 func serve(args []string) {
-	flags := flag.NewFlagSet("serve", flag.ExitOnError)
-	port := flags.Int("port", 9000, "HTTP listen port (0 = ephemeral)")
-	dataDir := flags.String("data-dir", ".stow", "Data directory for object storage")
-	backendFlag := flags.String("backend", "filesystem", "Storage backend (filesystem or memory)")
-	accessKey := flags.String("access-key", "", "Access key (generated if omitted)")
-	secretKey := flags.String("secret-key", "", "Secret key (generated if omitted)")
-	host := flags.String("host", "127.0.0.1", "Listen host")
-	baseHost := flags.String("base-host", "", "Host suffix for virtual-hosted-style routing")
-	allowPublicAdmin := flags.Bool("allow-public-admin", false, "Deprecated and ignored: remote admin routes now require --admin-token")
-	adminToken := flags.String("admin-token", "", "Credential for admin and metrics routes; prefer STOW_ADMIN_TOKEN so it is not visible in the process list")
-	var corsOrigins corsOriginList
-	flags.Var(&corsOrigins, "cors-origin", "Browser origin permitted to read responses; repeatable. Default permits loopback origins only")
-	modeFlag := flags.String("mode", "", "Operational mode: local or run-through. Run-through is never selected implicitly; ask for it with --mode run-through or STOW_MODE=run-through")
-	regionFlag := flags.String("region", auth.DefaultRegion, "Region the server verifies signatures against and reports in the readiness message")
-	allowLiveWrites := flags.Bool("allow-live-writes", false, "Propagate writes to upstream S3")
-	readOnly := flags.Bool("read-only", false, "Serve reads and lists only: writes, deletes, bucket changes and upstream access are refused")
-	cacheDir := flags.String("cache-dir", "", "Run-through cache directory (default: <data-dir>/cache)")
-	cacheMaxBytes := flags.Int64("cache-max-bytes", -1, "Maximum separate cache bytes (0 disables the limit; -1 uses environment)")
-	cacheMaxObjects := flags.Int64("cache-max-objects", -1, "Maximum separate cache objects (0 disables the limit; -1 uses environment)")
-	cacheTTL := flags.Duration("cache-ttl", -1, "Separate cache entry lifetime (0 disables expiry; -1 uses environment)")
-	// A bool, and it stays a bool. The obvious way to get an explicit false is a
-	// string flag, and that is a trap: `--offline` as a string consumed the next
-	// argument, so `--offline --ready-fd 3` failed with "invalid --offline
-	offline := registerOfflineFlag(flags)
-	showVersion := versionFlag(flags)
-	maxBytes := flags.Int64("max-bytes", 0, "Maximum stored object bytes enforced on every native S3 request (0 disables the limit)")
-	maxObjects := flags.Int64("max-objects", 0, "Maximum stored object count enforced on every native S3 request (0 disables the limit)")
-	readyFd := flags.Int("ready-fd", -1, "Write one machine-readable readiness object to this file descriptor instead of the STOW_READY line on stdout")
-	parentPid := flags.Int("parent-pid", 0, "Exit when this parent process dies (0 disables the watch, which is the default for a hand-run server)")
-	// The error is safe to discard: this flag set is ExitOnError, so a flag the
-	// package cannot read has already printed why and exited. See offline.go.
-	flags.Parse(args)
-	if printVersion(os.Stdout, *showVersion) {
+	opts := parseServeFlags(args)
+	// Answered before anything is built, so --version does not need a writable data
+	// directory, an authority, or an upstream to exist. See parseServeFlags.
+	if opts.showVersion {
+		printVersion(os.Stdout, true)
 		return
 	}
 	rtCfg := serveRunThroughConfig(serveConfigInput{
-		AccessKey: accessKey, SecretKey: secretKey,
-		MaxBytes: *cacheMaxBytes, MaxObjects: *cacheMaxObjects, TTL: *cacheTTL,
-		Offline: offline, Mode: *modeFlag, AdminToken: adminToken,
-		AllowLiveWrites: *allowLiveWrites, AllowPublicAdmin: *allowPublicAdmin,
-		CacheDir: *cacheDir,
+		AccessKey: &opts.accessKey, SecretKey: &opts.secretKey,
+		MaxBytes: opts.cacheMaxBytes, MaxObjects: opts.cacheMaxObjects, TTL: opts.cacheTTL,
+		Offline: opts.offline, Mode: opts.modeFlag, AdminToken: &opts.adminToken,
+		AllowLiveWrites: opts.allowLiveWrites, AllowPublicAdmin: opts.allowPublicAdmin,
+		CacheDir: opts.cacheDir,
 	})
-	mode := resolveMode(*modeFlag)
-	backend, err := parseBackend(*backendFlag)
+	mode := resolveMode(opts.modeFlag)
+	backend, err := parseBackend(opts.backendFlag)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -341,7 +310,7 @@ func serve(args []string) {
 	// on it, the runtime instance gates everything else, and both are built from
 	// this. See ADR 0010 decision 2.
 	var granted *authority.Authority
-	if *readOnly {
+	if opts.readOnly {
 		narrowed := authority.ReadOnly()
 		granted = &narrowed
 		log.Printf("read-only: writes, deletes, bucket changes and upstream access are refused")
@@ -352,7 +321,7 @@ func serve(args []string) {
 		log.Fatal(err)
 	}
 
-	localDataDir := *dataDir
+	localDataDir := opts.dataDir
 	if mode == runthrough.ModeRunThrough {
 		if rtCfg.CacheDir == "" {
 			rtCfg.CacheDir = filepath.Join(localDataDir, "cache")
@@ -367,7 +336,7 @@ func serve(args []string) {
 		log.Fatal(err)
 	}
 
-	storeLimits := nativeStorageLimits{maxBytes: *maxBytes, maxObjects: *maxObjects}
+	storeLimits := nativeStorageLimits{maxBytes: opts.maxBytes, maxObjects: opts.maxObjects}
 	boundStore, capabilities, err := bindNativeRuntimeStore(store, backend, adapter, storeLimits, granted)
 	if err != nil {
 		log.Fatal(err)
@@ -378,9 +347,9 @@ func serve(args []string) {
 	defer retryCancel()
 
 	creds := auth.Credentials{}
-	if *accessKey != "" && *secretKey != "" {
-		creds.AccessKeyID = *accessKey
-		creds.SecretAccessKey = *secretKey
+	if opts.accessKey != "" && opts.secretKey != "" {
+		creds.AccessKeyID = opts.accessKey
+		creds.SecretAccessKey = opts.secretKey
 	} else {
 		generated, err := auth.GenerateCredentials()
 		if err != nil {
@@ -389,7 +358,7 @@ func serve(args []string) {
 		creds = generated
 	}
 
-	region := strings.TrimSpace(*regionFlag)
+	region := strings.TrimSpace(opts.regionFlag)
 	if region == "" {
 		region = auth.DefaultRegion
 	}
@@ -404,18 +373,18 @@ func serve(args []string) {
 	srv, err := s3api.New(s3api.Config{
 		Store:            store,
 		Auth:             s3api.SigV4Auth(verifier, creds),
-		Host:             *host,
-		BaseHost:         strings.TrimSpace(*baseHost),
-		Port:             *port,
+		Host:             opts.host,
+		BaseHost:         strings.TrimSpace(opts.baseHost),
+		Port:             opts.port,
 		DataDir:          localDataDir,
 		Region:           region,
 		Mode:             string(mode),
 		CachePolicy:      cachePolicy,
 		WritePolicy:      writePolicy,
 		UpstreamHost:     upstreamHost,
-		AllowPublicAdmin: *allowPublicAdmin,
-		AdminToken:       *adminToken,
-		CORSOrigins:      corsOrigins,
+		AllowPublicAdmin: opts.allowPublicAdmin,
+		AdminToken:       opts.adminToken,
+		CORSOrigins:      opts.corsOrigins,
 	})
 	if err != nil {
 		log.Fatalf("create server: %v", err)
@@ -435,12 +404,12 @@ func serve(args []string) {
 		log.Fatal("server failed to bind")
 	}
 
-	if *parentPid > 0 {
-		armParentWatch(*parentPid)
+	if opts.parentPid > 0 {
+		armParentWatch(opts.parentPid)
 	}
 
 	endpoint := "http://" + addr
-	announceStartup(*readyFd, readyDetails{
+	announceStartup(opts.readyFd, readyDetails{
 		endpoint:     endpoint,
 		mode:         string(mode),
 		backend:      backend,
@@ -453,24 +422,5 @@ func serve(args []string) {
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-
-	select {
-	case sig := <-sigCh:
-		fmt.Printf("\nshutting down (%s)...\n", sig)
-		retryCancel()
-		select {
-		case <-retryDone:
-		case <-time.After(2 * time.Second):
-			log.Printf("retry worker did not stop before shutdown timeout")
-		}
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(ctx); err != nil {
-			log.Printf("shutdown error: %v", err)
-		}
-	case err := <-errCh:
-		if err != nil && err != http.ErrServerClosed {
-			log.Fatalf("serve error: %v", err)
-		}
-	}
+	awaitShutdown(srv, sigCh, errCh, retryCancel, retryDone)
 }
