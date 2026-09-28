@@ -144,8 +144,15 @@ func runPrewarm(dataDir, cacheDir, bucket string, keys []string) ([]runthrough.P
 	return entries, nil
 }
 
-// reportPrewarm prints the result and decides the exit status.
-func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmResult) error {
+// summarizePrewarm turns one entry per key into the report: the counts a caller
+// checks, and the entries behind them.
+//
+// It is separate from printing because the counting is where the decisions are, and
+// a decision inside a function that also marshals and prints is a decision nothing
+// can assert. Three outcomes, and the middle one is why they are not two: a key the
+// bucket does not have and a key the adapter refused to ask for are both "not warm",
+// and only the first is a failure.
+func summarizePrewarm(bucket string, entries []runthrough.PrewarmResult) prewarmResult {
 	out := prewarmResult{Version: 1, Bucket: bucket, Results: make([]prewarmEntry, 0, len(entries))}
 	for _, entry := range entries {
 		out.Results = append(out.Results, prewarmEntry{
@@ -161,6 +168,12 @@ func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmRes
 			out.Failed++
 		}
 	}
+	return out
+}
+
+// reportPrewarm prints the result and decides the exit status.
+func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmResult) error {
+	out := summarizePrewarm(bucket, entries)
 	encoded, err := json.MarshalIndent(out, "", "  ")
 	if err != nil {
 		return err
@@ -181,6 +194,18 @@ func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmRes
 // Duplicates are dropped rather than refused: the same key named twice by an
 // operator assembling a list is a mistake worth tolerating, and warming it twice
 // costs one fetch.
+//
+// Lines come before commas, and the order is the fix for a bug this had. Splitting on
+// commas first meant a comment containing one — "# model weights, see the runbook" —
+// was cut in half, and the half after the comma did not start with "#" and so became
+// a key. A file format that documents # as a comment marker and then warms your
+// prose is worse than no comment marker at all, because the operator trusts it.
+//
+// A comment is a line whose first non-space character is #, and only that. A key
+// containing # is a legal S3 key, so stripping from the first # anywhere in a line
+// would refuse keys that exist and warm nothing in their place. A trailing comment
+// on the same line as a key is therefore not supported, and that is the lesser evil
+// stated rather than discovered.
 func readPrewarmKeys(flagValue, file string) ([]string, error) {
 	raw := flagValue
 	if file != "" {
@@ -195,10 +220,13 @@ func readPrewarmKeys(flagValue, file string) ([]string, error) {
 	}
 	seen := map[string]bool{}
 	keys := make([]string, 0, 16)
-	for _, line := range strings.Split(raw, ",") {
-		for _, part := range strings.Split(line, "\n") {
+	for _, line := range strings.Split(raw, "\n") {
+		if trimmed := strings.TrimSpace(line); trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		for _, part := range strings.Split(line, ",") {
 			key := strings.TrimSpace(part)
-			if key == "" || strings.HasPrefix(key, "#") {
+			if key == "" {
 				continue
 			}
 			if strings.ContainsAny(key, "*?[]") {

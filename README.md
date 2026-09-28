@@ -775,7 +775,10 @@ says why. A prefix on a real bucket is a data-exfiltration shape, and the caller
 here is an agent that reads untrusted text: handed "warm everything under `logs/`"
 it would have a way to copy a bucket it was never given, and the operator who wrote
 the prefix would have no way to tell that from a harmless cache fill. Read the list
-from a file with `--keys-file`, one key per line, when the set is long.
+from a file with `--keys-file`, one key per line, when the set is long. Blank lines
+are skipped, and a line whose first non-space character is `#` is a comment. A `#`
+inside a key is a key — `builds/#1234/model.bin` is a real S3 key and is warmed as
+one — so a comment has to be on a line of its own. A repeated key is warmed once.
 
 Keys that cannot be warmed are reported individually and the rest continue — one
 missing key should not abandon a warm-up of a thousand — and the exit status is
