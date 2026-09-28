@@ -123,23 +123,52 @@ var workspaceVerbs = map[string]func([]string) error{
 // cannot be added to the dispatcher without appearing in the usage line. It
 // used to be a literal, which is how the two drifted apart before.
 func workspaceUsage() string {
-	verbs := make([]string, 0, len(workspaceVerbs))
-	for verb := range workspaceVerbs {
-		verbs = append(verbs, verb)
-	}
-	sort.Strings(verbs)
-	return "usage: stow-s3 workspace <" + strings.Join(verbs, "|") + ">"
+	return "usage: stow-s3 workspace <" + strings.Join(sortedWorkspaceVerbs(), "|") + ">"
 }
+
+// helpFlag is the set of spellings that mean "show me what I can do" rather than
+// "run a verb". They are matched before the verb table is consulted, because a
+// caller asking for help has not named a verb and the table cannot help them.
+var helpFlag = map[string]bool{"-h": true, "--h": true, "-help": true, "--help": true, "help": true}
 
 func workspaceCommand(args []string) error {
 	if len(args) == 0 {
 		return errors.New(workspaceUsage())
 	}
+	if helpFlag[args[0]] {
+		// Asking a fifteen-verb command for help is the first thing a stranger does,
+		// and answering it with `unknown workspace command "--help"` is the worst
+		// possible reply: it names the request as a mistake, and it does so without
+		// printing the list that would have answered it. `stow-s3 serve --help`
+		// prints usage and exits zero, so the same request to the two command groups
+		// behaved differently for no reason a caller could see.
+		//
+		// The usage line is derived from the verb table, so it cannot fall behind it
+		// the way a written-out list did.
+		fmt.Println(workspaceUsage())
+		for _, verb := range sortedWorkspaceVerbs() {
+			fmt.Printf("  stow-s3 workspace %s --help\n", verb)
+		}
+		return nil
+	}
 	command, known := workspaceVerbs[args[0]]
 	if !known {
-		return fmt.Errorf("unknown workspace command %q", args[0])
+		// An unknown verb is an error, but it is an error that should still say what
+		// the alternatives are. Fifteen verbs is more than anyone remembers.
+		return fmt.Errorf("unknown workspace command %q\n%s", args[0], workspaceUsage())
 	}
 	return command(args[1:])
+}
+
+// sortedWorkspaceVerbs lists the verb table in a stable order, so help output does
+// not reshuffle between runs and a reader can find a verb by scanning down.
+func sortedWorkspaceVerbs() []string {
+	verbs := make([]string, 0, len(workspaceVerbs))
+	for verb := range workspaceVerbs {
+		verbs = append(verbs, verb)
+	}
+	sort.Strings(verbs)
+	return verbs
 }
 
 func prepareWorkspaceCommand(args []string) error {

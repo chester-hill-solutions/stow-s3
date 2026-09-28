@@ -188,15 +188,15 @@ func pathWithin(root, path string) bool {
 
 // CollectResult is one workspace a sweep considered, and what it did about it.
 type CollectResult struct {
-	ID string
+	ID string `json:"id"`
 	// Dir is the workspace directory, whether or not it survived.
-	Dir string
+	Dir string `json:"dir"`
 	// Removed is true only when the bytes are gone.
-	Removed bool
+	Removed bool `json:"removed"`
 	// Reason explains a decision. "expired" means it was collected; "in-use",
 	// "adopted", "not-expired" and "no-ttl" all mean the sweep declined, and
 	// "unreadable: …" means it could not be opened and was left alone.
-	Reason string
+	Reason string `json:"reason"`
 }
 
 // Collect reclaims workspaces that are past their TTL and provably unused.
