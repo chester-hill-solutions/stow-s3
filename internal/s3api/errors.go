@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
@@ -141,7 +142,7 @@ var storageErrorCases = []storageErrorCase{
 }
 
 func mapStorageError(err error, resource string) s3Error {
-	// Two cases have to read the error rather than merely recognise it, so they
+	// Three cases have to read the error rather than merely recognise it, so they
 	// stay ahead of the table.
 	if isRequestTooLarge(err) {
 		var tooLarge *http.MaxBytesError
@@ -164,6 +165,9 @@ func mapStorageError(err error, resource string) s3Error {
 			StatusCode: http.StatusForbidden,
 		}
 	}
+	if upstreamErr := upstreamFailure(err, resource); upstreamErr != nil {
+		return *upstreamErr
+	}
 	for _, mapping := range storageErrorCases {
 		if errors.Is(err, mapping.sentinel) {
 			return s3Error{
@@ -175,6 +179,56 @@ func mapStorageError(err error, resource string) s3Error {
 		}
 	}
 	return s3Error{Code: "InternalError", Message: "internal storage error", Resource: resource, StatusCode: http.StatusInternalServerError}
+}
+
+// upstreamFailure answers for a request that failed because the upstream did.
+//
+// Before this existed, a run-through server whose upstream had gone away answered
+// every read with InternalError and "internal storage error". That is the one
+// situation this product exists to be running when, and the answer was the shape of
+// a stow bug: 500, unretryable, and a message naming stow's own storage layer
+// rather than the dependency that was not there. An agent reading a log would have
+// concluded the workspace was corrupt.
+//
+// Three cases, and the split is by who is at fault and whether waiting helps:
+//
+//   - no response at all: 503. The upstream was asked and never answered. Nothing
+//     stow did wrong, the condition is usually temporary, and it is the condition
+//     the cache exists to absorb.
+//   - a 5xx from the upstream: 503 for the same reason. The upstream is the thing
+//     that failed, and 500 would blame stow for someone else's outage.
+//   - a 4xx from the upstream: passed through. The upstream gave a real answer, and
+//     substituting a guess would replace a decision somebody made on purpose.
+func upstreamFailure(err error, resource string) *s3Error {
+	var upstream *runthrough.UpstreamError
+	if !errors.As(err, &upstream) || upstream == nil {
+		return nil
+	}
+	switch {
+	case upstream.StatusCode >= 500:
+		return &s3Error{
+			Code:     "ServiceUnavailable",
+			Message:  fmt.Sprintf("The upstream returned %d. This is not a fault in the server you are talking to", upstream.StatusCode),
+			Resource: resource, StatusCode: http.StatusServiceUnavailable,
+		}
+	case upstream.StatusCode >= 400:
+		code := upstream.Code
+		if code == "" {
+			code = "UpstreamError"
+		}
+		return &s3Error{
+			Code:     code,
+			Message:  fmt.Sprintf("The upstream refused this request with status %d", upstream.StatusCode),
+			Resource: resource, StatusCode: upstream.StatusCode,
+		}
+	case upstream.StatusCode == 0:
+		return &s3Error{
+			Code:     "ServiceUnavailable",
+			Message:  "The upstream could not be reached. This is a temporary condition and the request is safe to retry",
+			Resource: resource, StatusCode: http.StatusServiceUnavailable,
+		}
+	}
+	return nil
 }
 
 func writeXML(w http.ResponseWriter, r *http.Request, status int, v any) {

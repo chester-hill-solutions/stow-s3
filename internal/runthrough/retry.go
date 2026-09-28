@@ -44,6 +44,27 @@ func (c RetryClass) String() string {
 	}
 }
 
+// ErrUpstreamUnreachable reports that the upstream was asked and never answered:
+// no HTTP response came back at all. Connection refused, a DNS failure, a TLS
+// handshake that did not complete, a context that expired before the first byte.
+//
+// It is a distinct condition rather than a generic failure because it is the one
+// this product is built to be running when — an agent whose network went away — and
+// the answer a client gets for it decides whether the situation reads as "try again
+// in a moment" or as "this server is broken". It is also a failure to reach a
+// dependency, which is 503 and not 500, and the distinction is the whole difference
+// between an honest response and a misleading one.
+var ErrUpstreamUnreachable = errors.New("the upstream could not be reached")
+
+// Is lets errors.Is match a provider error that never received a response, so the
+// sentinel reaches the surface without every consumer having to know about the
+// concrete type. The zero StatusCode is what distinguishes it: a provider error
+// that carries a status reached the upstream and got an answer, however unwelcome
+// that answer was.
+func (e *UpstreamError) Is(target error) bool {
+	return target == ErrUpstreamUnreachable && e != nil && e.StatusCode == 0
+}
+
 // UpstreamError preserves the provider response metadata needed by the
 // outbox while retaining the original SDK error for errors.Is/errors.As.
 type UpstreamError struct {
