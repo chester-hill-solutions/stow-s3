@@ -228,10 +228,14 @@ func containsHeader(headers []string, name string) bool {
 	return false
 }
 
+// detectSignedRequest works out which signing scheme a request used.
 func detectSignedRequest(r *http.Request) (signedRequest, error) {
 	query := r.URL.Query()
 	if queryValue(query, "X-Amz-Algorithm") != "" || queryValue(query, "X-Amz-Signature") != "" {
 		return parsePresignedQuery(query)
+	}
+	if err := refuseLegacyScheme(r); err != nil {
+		return signedRequest{}, err
 	}
 
 	authHeader := r.Header.Get("Authorization")

@@ -11,19 +11,8 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-// A run-through server whose upstream has gone away used to answer every read with
-// InternalError and "internal storage error".
-//
-// That is the wrong answer in three ways at once, and it was the wrong answer in the
-// one situation this product exists to be running when. 500 says the server is
-// broken; the server is fine, its dependency is not. 500 is not the status a client
-// retries. And "internal storage error" names stow's own storage layer, so a human
-// reading a log concluded the workspace was corrupt when what had happened was that
-// the network went away — which is the event the cache exists for.
-//
-// These tests pin the replacement and, just as importantly, the boundary around it:
-// a dead upstream with a warm cache must still serve the cached copy, because a fix
-// that returned 503 in that case would have broken the actual product.
+// A dead upstream answered 500 InternalError "internal storage error": it blamed this
+// server for a dependency that was not there, and 500 is not a status a client retries.
 
 func upstreamUnreachable() error {
 	return &runthrough.UpstreamError{
@@ -32,7 +21,6 @@ func upstreamUnreachable() error {
 	}
 }
 
-// The headline case: asked and never answered.
 func TestAnUnreachableUpstreamIsTemporaryAndNotAServerFault(t *testing.T) {
 	got := mapStorageError(upstreamUnreachable(), "models/bert.bin")
 
@@ -42,8 +30,6 @@ func TestAnUnreachableUpstreamIsTemporaryAndNotAServerFault(t *testing.T) {
 	if got.Code != "ServiceUnavailable" {
 		t.Errorf("code is %q, want ServiceUnavailable: a client branches on the code and 500 invites the wrong conclusion", got.Code)
 	}
-	// The message is the part a human reads. It has to name the situation rather than
-	// stow's internals, and it has to say the request is worth repeating.
 	if got.Message == "" {
 		t.Fatal("the message is empty, so an operator reading a log learns nothing")
 	}
@@ -57,10 +43,8 @@ func TestAnUnreachableUpstreamIsTemporaryAndNotAServerFault(t *testing.T) {
 	}
 }
 
-// A 5xx from the upstream is the same class of event with a different cause, and it
-// gets the same answer for the same reason: the thing that failed is not this
-// server. Reporting 500 here would mean every upstream outage looked like a stow
-// outage, which is exactly the misattribution that makes an incident hard to start.
+// A 5xx gets the same answer for the same reason: the thing that failed is not this
+// server, and reporting 500 would make every upstream outage look like a stow one.
 func TestAnUpstreamServerErrorIsNotReportedAsThisServersFault(t *testing.T) {
 	for _, status := range []int{500, 502, 503, 504} {
 		got := mapStorageError(&runthrough.UpstreamError{
@@ -77,10 +61,8 @@ func TestAnUpstreamServerErrorIsNotReportedAsThisServersFault(t *testing.T) {
 	}
 }
 
-// A 4xx is not a failure of this server or of the connection. The upstream gave a
-// real answer, and replacing it with a guess would override a decision somebody made
-// on purpose — an AccessDenied from the upstream means the credentials are wrong, and
-// InternalError means nothing useful at all.
+// A 4xx is a real answer, and replacing it with a guess would override a decision
+// somebody made on purpose.
 func TestAnUpstreamRefusalIsPassedThroughRatherThanGuessedAt(t *testing.T) {
 	got := mapStorageError(&runthrough.UpstreamError{
 		Err:        errors.New("access denied"),
@@ -96,8 +78,6 @@ func TestAnUpstreamRefusalIsPassedThroughRatherThanGuessedAt(t *testing.T) {
 	}
 }
 
-// An upstream that refuses without naming a reason still has to be reported as a
-// refusal, so the status is the load-bearing part and a code has to be supplied.
 func TestAnUpstreamRefusalWithoutACodeStillReportsTheRefusal(t *testing.T) {
 	got := mapStorageError(&runthrough.UpstreamError{
 		Err:        errors.New("upstream said no"),
@@ -112,10 +92,9 @@ func TestAnUpstreamRefusalWithoutACodeStillReportsTheRefusal(t *testing.T) {
 	}
 }
 
-// A genuine fault in this server must still say so. The upstream mapping is keyed on
-// the error being a provider error, and widening it to "any unrecognised error" is
-// the obvious way to break the 500 that is left — so a plain internal failure is
-// checked explicitly.
+// The upstream branch inspects the error rather than matching a sentinel, so
+// widening it to any unrecognised error is the obvious way to break the 500 that is
+// left.
 func TestAFaultInThisServerIsStillAnInternalError(t *testing.T) {
 	got := mapStorageError(errors.New("a nil pointer in a handler"), "models/bert.bin")
 
@@ -127,10 +106,8 @@ func TestAFaultInThisServerIsStillAnInternalError(t *testing.T) {
 	}
 }
 
-// The sentinel is how a consumer recognises the condition without importing the
-// concrete type, so it has to match exactly the case where no response arrived. A
-// provider error carrying a status reached the upstream and got an answer, however
-// unwelcome — and that is not the same condition.
+// The sentinel matches only the no-response case: a provider error carrying a status
+// reached the upstream and got an answer, however unwelcome.
 func TestTheUnreachableSentinelMatchesOnlyTheNoResponseCase(t *testing.T) {
 	if !errors.Is(upstreamUnreachable(), runthrough.ErrUpstreamUnreachable) {
 		t.Error("an upstream error with no status does not match ErrUpstreamUnreachable")
@@ -146,10 +123,6 @@ func TestTheUnreachableSentinelMatchesOnlyTheNoResponseCase(t *testing.T) {
 	}
 }
 
-// The mapping must not shadow the storage table. A NoSuchKey from the local store is
-// still a NoSuchKey, and the upstream branch is reached first precisely because it
-// inspects the error rather than matching a sentinel — so an error that is both has
-// to come out the way the table says.
 func TestTheUpstreamMappingDoesNotShadowTheStorageTable(t *testing.T) {
 	got := mapStorageError(storage.ErrObjectNotFound, "models/bert.bin")
 
