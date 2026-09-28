@@ -24,6 +24,21 @@ import { bootIsolate, b64, unb64 } from "./wasm-isolate-host.mjs";
 // long tail of larger ones, and a handful of generated artefacts. Sizes are the
 // thing that matters, because the bridge's cost is proportional to payload and the
 // question is whether that proportionality is what an agent pays.
+//
+// The 24 entries total 597,007 bytes, and that total is the recorded figure a plan
+// is written against. **These sizes are a model, not a read of this repository.**
+// The `src/*` entries are invented. The handful that name real files — README.md,
+// CHANGELOG.md, Makefile, the two docs — carry the sizes those files had when the
+// model was written, and they are not kept in step: editing one of those documents
+// does not require editing this list, and the numbers here are not evidence about
+// the current tree.
+//
+// The exact-byte precision is a trap here. A reader seeing `docs/agent-workspace-plan.md`
+// at 28,314 bytes reasonably concludes the file is 28,314 bytes, and that this list
+// is a fixture someone has to maintain. Both readings are wrong, and the first one
+// costs a future session an afternoon of "fixing" a benchmark. Rounding these to
+// 28_000 would remove the trap, at the cost of changing a recorded total; the comment
+// is the cheaper fix and the one that does not invalidate a measurement.
 const WORKING_SET = [
   { name: "src/parser/tokenizer.go", size: 4_200 },
   { name: "src/parser/grammar.go", size: 11_800 },
