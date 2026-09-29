@@ -115,7 +115,12 @@ func (s *Store) GetObject(ctx context.Context, bucket, key string) (io.ReadClose
 	if err != nil {
 		return nil, nil, err
 	}
-	file, err := os.Open(absPath)
+	// openNoFollow rather than os.Open: resolveLocked has established that nothing here
+	// is a symlink, and the gap between that observation and the open is a window
+	// something that can write the workspace can step through. The error is mapped to
+	// absent either way, so a link swapped in after the resolve reads as a missing key
+	// rather than as a file outside the workspace.
+	file, err := openNoFollow(absPath)
 	if err != nil {
 		return nil, nil, storage.ErrObjectNotFound
 	}
@@ -317,8 +322,7 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 		if statErr != nil {
 			return nil
 		}
-		// Skipped as resolve skips it: listing what a read refuses reports a phantom.
-		if info.Mode()&os.ModeSymlink != 0 {
+		if isLink(info) {
 			return nil
 		}
 		manifestEntry, _ := s.objectIndex.entry(bucket, key)
@@ -331,20 +335,8 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 		return nil, fmt.Errorf("workspace store: list %s: %w", bucket, walkErr)
 	}
 
-	// Escaped keys live under the internal directory, so the walk above cannot
-	// see them. They come from the manifest, and an entry whose file is gone
-	// serves as absent rather than as a phantom object.
-	for key, entry := range s.objectIndex.Buckets[bucket] {
-		if entry.Form != FormEscaped {
-			continue
-		}
-		if _, known := byKey[key]; known {
-			continue
-		}
-		if _, err := os.Stat(EscapedPath(s.root, bucket, key)); err != nil {
-			continue
-		}
-		byKey[key] = *s.metaFromEntry(bucket, key, entry)
+	for key, meta := range s.escapedObjects(bucket, byKey) {
+		byKey[key] = meta
 	}
 
 	out := make([]storage.ObjectMeta, 0, len(byKey))
@@ -385,11 +377,50 @@ func (s *Store) metaFromEntry(bucket, key string, entry ManifestEntry, info ...o
 	return &meta
 }
 
+// escapedObjects returns the objects the walk in listAll cannot see.
+//
+// Escaped keys live under the internal directory, which the walk skips because the
+// walk skips everything internal. They come from the object index instead, and an entry
+// whose file is gone serves as absent rather than as a phantom object. A symlinked one
+// is absent for the same reason and not merely unmeasured: it would be listed and then
+// sniffed, and the read behind the sniff is one this package refuses everywhere else.
+//
+// It is a separate function because it is a separate question — what the index says —
+// and folding it into listAll pushed that function past its complexity ceiling for a
+// check the walk above already makes.
+func (s *Store) escapedObjects(bucket string, walked map[string]storage.ObjectMeta) map[string]storage.ObjectMeta {
+	found := map[string]storage.ObjectMeta{}
+	for key, entry := range s.objectIndex.Buckets[bucket] {
+		if entry.Form != FormEscaped {
+			continue
+		}
+		if _, alreadyWalked := walked[key]; alreadyWalked {
+			continue
+		}
+		info, err := os.Lstat(EscapedPath(s.root, bucket, key))
+		if err != nil || isLink(info) {
+			continue
+		}
+		found[key] = *s.metaFromEntry(bucket, key, entry)
+	}
+	return found
+}
+
+// isLink reports whether a stat describes a symbolic link.
+//
+// The one question every read path in this package asks before it opens anything. A
+// link is a pointer, not content, and its target is not part of the workspace, so
+// listAll must not report one and the reads behind a listing must not follow it.
+func isLink(info os.FileInfo) bool { return info.Mode()&os.ModeSymlink != 0 }
+
 // detectContentType sniffs a file's type from its first bytes, because a file
 // the host wrote has no declared content type and guessing from the extension
 // alone gets text/markdown and application/json wrong often enough to matter.
 func detectContentType(path string) string {
-	file, err := os.Open(path)
+	// The same no-follow open GetObject uses. This reads workspace bytes too — the
+	// first 512 of them — and a sniff that crosses a link is a read that crosses a
+	// link, whatever the caller does with the resulting string.
+	file, err := openNoFollow(path)
 	if err != nil {
 		return "application/octet-stream"
 	}
