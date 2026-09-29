@@ -562,7 +562,7 @@
       }
     },
     {
-      "id": "prune forgets a registry entry whose directory is gone, and leaves a present one alone",
+      "id": "prune leaves a workspace whose directory is still there, because presence is not evidence that anything is finished",
       "verb": "prune",
       "expect": {
         "count": {
@@ -604,6 +604,87 @@
           "equals": true
         }
       }
+    },
+    {
+      "id": "the caller's own directory is gone, which is the only thing prune acts on",
+      "verb": "noop",
+      "remove": "{{work}}/workspace2"
+    },
+    {
+      "id": "prune forgets stow's own record once the directory it names is gone",
+      "verb": "prune",
+      "expect": {
+        "count": {
+          "equals": 1
+        },
+        "removed": {
+          "equals": 1
+        },
+        "results[0].id": {
+          "equals": "{{ws2}}"
+        },
+        "results[0].removed": {
+          "equals": true
+        },
+        "results[0].reason": {
+          "equals": "pruned"
+        }
+      },
+      "args": {
+        "registry-dir": "{{registryA}}"
+      }
+    },
+    {
+      "id": "the adopted directory is gone too, and prune leaves the record by default",
+      "verb": "noop",
+      "remove": "{{work}}/adopted"
+    },
+    {
+      "id": "an adopted entry is the caller's only record that they adopted the project, so prune refuses it and says which case that is",
+      "verb": "prune",
+      "registry": "default",
+      "expect": {
+        "count": {
+          "equals": 1
+        },
+        "removed": {
+          "equals": 0
+        },
+        "results[0].id": {
+          "equals": "{{adopted}}"
+        },
+        "results[0].removed": {
+          "equals": false
+        },
+        "results[0].reason": {
+          "equals": "gone-adopted"
+        }
+      },
+      "team": "platform"
+    },
+    {
+      "id": "--include-adopted is what turns that refusal into a forget, and only the record goes: the directory was already gone",
+      "verb": "prune",
+      "registry": "default",
+      "includeAdopted": true,
+      "expect": {
+        "count": {
+          "equals": 1
+        },
+        "removed": {
+          "equals": 1
+        },
+        "results[0].id": {
+          "equals": "{{adopted}}"
+        },
+        "results[0].removed": {
+          "equals": true
+        },
+        "results[0].reason": {
+          "equals": "pruned-adopted"
+        }
+      },
+      "team": "platform"
     }
   ]
 }

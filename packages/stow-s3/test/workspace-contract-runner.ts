@@ -10,12 +10,13 @@
 // test that skips it — which is how both wrappers shipped the same bug.
 
 import { execFile } from "node:child_process";
-import { mkdtemp, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 
 import { resolveStowBinary } from "../src/bin.js";
+import { isolateHome } from "./workspace-contract-isolation.js";
 import {
   adoptWorkspaceHandoff,
   applyWorkspaceDelta,
@@ -65,9 +66,20 @@ export interface ContractStep {
    * typed option, and a flag that matters for one verb is easier to find here.
    */
   readonly includeAdopted?: boolean;
+  /**
+   * Fields of the document this step wrote, checked by opening it. A step that names
+   * a document and never reads it asserts only that the file appeared.
+   */
+  readonly documentFields?: Readonly<Record<string, string>>;
   readonly root?: string;
   readonly manifest?: ContractManifestSpec;
   readonly write?: readonly ContractWrite[];
+  /**
+   * Deletes a path out from under stow: the one condition a workspace is pruneable
+   * under. Without it the contract can only prove that prune leaves a present
+   * directory alone, which is not the behaviour anyone is asking about.
+   */
+  readonly remove?: string;
   readonly capture?: Readonly<Record<string, string>>;
   readonly expect?: Readonly<Record<string, ContractExpectation>>;
   readonly alsoWritten?: string;
@@ -124,14 +136,19 @@ export async function runContract(contract: Contract): Promise<ContractProblem[]
   const work = await mkdtemp(join(tmpdir(), "stow-workspace-contract-"));
   const run: Run = { work, captures: new Map([["work", work]]), problems: [] };
 
-  for (const step of contract.steps) {
-    if (run.problems.length > 0) {
-      // The steps share a registry and a work directory, so continuing past a
-      // failure reports one missing workspace as a dozen failures and buries the
-      // one that broke.
-      break;
+  const restore = await isolateHome(work);
+  try {
+    for (const step of contract.steps) {
+      if (run.problems.length > 0) {
+        // The steps share a registry and a work directory, so continuing past a
+        // failure reports one missing workspace as a dozen failures and buries the
+        // one that broke.
+        break;
+      }
+      await runStep(run, step);
     }
-    await runStep(run, step);
+  } finally {
+    await restore();
   }
   return run.problems;
 }
@@ -141,6 +158,7 @@ async function runStep(run: Run, step: ContractStep): Promise<void> {
     switch (step.verb) {
       case "noop":
         await applyWrites(run, step);
+        await removePath(run, step.remove);
         return;
       case "read":
         await judge(run, step, await readTree(substitute(run, step.root ?? "")));
@@ -325,6 +343,13 @@ async function applyWrites(run: Run, step: ContractStep): Promise<void> {
   }
 }
 
+/** Takes a directory away, so the next step sees a workspace whose files are gone. */
+async function removePath(run: Run, name: string | undefined): Promise<void> {
+  if (name === undefined) return;
+  const full = substitute(run, name);
+  await rm(isAbsolute(full) ? full : join(run.work, full), { recursive: true, force: true });
+}
+
 /** Turns a workspace root into the flat path map a "read" step asserts against. */
 async function readTree(root: string): Promise<Record<string, JsonValue>> {
   const files: Record<string, JsonValue> = {};
@@ -355,6 +380,7 @@ async function judge(run: Run, step: ContractStep, result: JsonValue): Promise<v
   if (step.alsoWritten !== undefined) {
     await judgeAlsoWritten(run, step, result);
   }
+  await judgeDocumentFields(run, step);
   const expectations = step.expect ?? {};
   for (const field of Object.keys(expectations).sort()) {
     const want = expectations[field];
@@ -381,6 +407,26 @@ async function judge(run: Run, step: ContractStep, result: JsonValue): Promise<v
 
 function substituteFor(run: Run): (text: string) => string {
   return (text: string) => substitute(run, text);
+}
+
+/** Opens the document the step wrote at the --output its verb was given. */
+async function judgeDocumentFields(run: Run, step: ContractStep): Promise<void> {
+  const wanted = step.documentFields;
+  if (wanted === undefined) return;
+  const path = step.args?.["output"];
+  if (path === undefined) throw new Error("the step names documentFields but passes no --output");
+  const document = JSON.parse(await readFile(substitute(run, path), "utf8")) as Record<string, JsonValue>;
+
+  for (const field of Object.keys(wanted).sort()) {
+    const want = substitute(run, wanted[field] ?? "");
+    const got = document[field];
+    if (got === undefined) {
+      run.problems.push({ step: step.id, field, message: "is not in the document the step wrote" });
+    } else if (String(got) !== want) {
+      const at = { step: step.id, field };
+      run.problems.push({ ...at, message: `is ${JSON.stringify(got)} in the document and the contract says ${want}` });
+    }
+  }
 }
 
 async function judgeAlsoWritten(run: Run, step: ContractStep, result: JsonValue): Promise<void> {

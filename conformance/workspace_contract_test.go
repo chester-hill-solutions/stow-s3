@@ -45,6 +45,7 @@ func TestWorkspaceContractHoldsInTheCLI(t *testing.T) {
 			step := run.resolve(step)
 			outcome := run.perform(step)
 			run.judge(step, outcome)
+			run.checkDocumentFields(step)
 		})
 	}
 }

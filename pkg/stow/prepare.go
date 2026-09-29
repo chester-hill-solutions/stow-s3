@@ -207,7 +207,7 @@ func openPreparedWorkspace(options WorkspaceOptions, root string) (*Workspace, e
 		return nil, fmt.Errorf("stow: reserve prepare destination: %w", err)
 	}
 	options.Dir = root
-	options.owned = true
+	options.owned = !options.Adopted
 	ws, err := OpenWorkspace(options)
 	if err == nil {
 		return ws, nil

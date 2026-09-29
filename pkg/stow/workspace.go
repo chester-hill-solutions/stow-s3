@@ -89,6 +89,10 @@ type WorkspaceOptions struct {
 	// partition, not a label: RegistryDir is the root and Team is a directory
 	// inside it, so the two compose.
 	Team string
+	// Adopted marks a workspace the caller is taking over rather than scratch space
+	// stow made. It is what keeps Destroy's refusal honest: a caller's project is not
+	// stow's to delete.
+	Adopted bool
 	// Now is injectable for tests.
 	Now   func() time.Time
 	owned bool
@@ -120,6 +124,7 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		TTLSeconds:     int64(options.TTL.Seconds()),
 		Now:            options.Now,
 		InitiallyOwned: options.owned,
+		Adopted:        options.Adopted,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("stow: open workspace: %w", err)

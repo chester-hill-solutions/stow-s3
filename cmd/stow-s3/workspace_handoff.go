@@ -154,8 +154,12 @@ func adoptHandoffCommand(args []string) error {
 	if err := checkHandoffIdentity(document, imported); err != nil {
 		return err
 	}
+	// Adopted, and it has to be said rather than worked out: RestoreCheckpoint
+	// materialises through the preparer, which claims every root it creates because
+	// normally stow did create it. The claim is what made `workspace destroy` delete a
+	// caller's project.
 	ws, err := stow.RestoreCheckpoint(registry, imported.ID, stow.WorkspaceOptions{
-		Dir: *root, RegistryDir: registry,
+		Dir: *root, RegistryDir: registry, Adopted: true,
 	})
 	if err != nil {
 		return err

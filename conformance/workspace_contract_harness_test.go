@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"runtime"
 	"slices"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
@@ -102,17 +103,26 @@ type contractWrite struct {
 }
 
 type contractStep struct {
-	ID          string                         `json:"id"`
-	Verb        string                         `json:"verb"`
-	Registry    string                         `json:"registry"`
-	Team        string                         `json:"team"`
-	Args        map[string]string              `json:"args"`
-	Root        string                         `json:"root"`
-	Manifest    *contractManifestSpec          `json:"manifest"`
-	Write       []contractWrite                `json:"write"`
-	Capture     map[string]string              `json:"capture"`
-	Expect      map[string]contractExpectation `json:"expect"`
-	AlsoWritten string                         `json:"alsoWritten"`
+	ID       string                `json:"id"`
+	Verb     string                `json:"verb"`
+	Registry string                `json:"registry"`
+	Team     string                `json:"team"`
+	Args     map[string]string     `json:"args"`
+	Root     string                `json:"root"`
+	Manifest *contractManifestSpec `json:"manifest"`
+	Write    []contractWrite       `json:"write"`
+	// Remove deletes a path out from under stow — the only condition a workspace is
+	// pruneable under, and without it a case file can only prove prune does nothing.
+	Remove string `json:"remove"`
+	// DocumentFields names fields of the document the step wrote, checked by opening
+	// it. Without it a step asserts only that the file appeared.
+	DocumentFields map[string]string `json:"documentFields"`
+	// IncludeAdopted is prune's opt-in to forgetting a caller's entry: the one flag
+	// whose absence turns a refusal into a deletion.
+	IncludeAdopted bool                           `json:"includeAdopted"`
+	Capture        map[string]string              `json:"capture"`
+	Expect         map[string]contractExpectation `json:"expect"`
+	AlsoWritten    string                         `json:"alsoWritten"`
 	// RenameInTransit builds a substituted document: the named change is moved to
 	// a different path, in the change list and the content map together, and the
 	// result re-encoded. It is how a document altered on the way to the receiver is
@@ -427,6 +437,15 @@ func (r *contractRun) workPath(name string) string {
 		return name
 	}
 	return filepath.Join(r.work, name)
+}
+
+func sortedDocumentFields(fields map[string]string) []string {
+	names := make([]string, 0, len(fields))
+	for name := range fields {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
 }
 
 // sortedExpectations and sortedArgs are the two maps the driver walks, each in a

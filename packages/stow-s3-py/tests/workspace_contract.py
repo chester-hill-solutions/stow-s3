@@ -17,12 +17,14 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import re
 import shutil
 import tempfile
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 # _MISSING and _parse_indexes are re-exported for the matcher tests rather than
 # used here: the runner reads declared values through _lookup_declared and never
@@ -116,13 +118,39 @@ def run_contract(contract: dict[str, Any]) -> list[Problem]:
     work = Path(tempfile.mkdtemp(prefix="stow-workspace-contract-"))
     try:
         run = Run(work=work, captures={"work": str(work)})
-        for step in contract["steps"]:
-            if run.problems:
-                break
-            _run_step(run, step)
+        with _isolated_home(work):
+            for step in contract["steps"]:
+                if run.problems:
+                    break
+                _run_step(run, step)
         return run.problems
     finally:
         shutil.rmtree(work, ignore_errors=True)
+
+
+@contextmanager
+def _isolated_home(work: Path) -> Iterator[None]:
+    """Points the default registry at this run's temporary home, then puts it back.
+
+    The wrapper spawns the binary without passing an environment, so a step naming no
+    --registry-dir resolves against the developer's own home. Why that matters is in
+    TestContractDriversIsolateTheDefaultRegistry.
+    """
+    home = work / "home"
+    (home / ".config").mkdir(parents=True, exist_ok=True)
+    names = ("HOME", "XDG_CONFIG_HOME", "APPDATA")
+    saved = {name: os.environ.get(name) for name in names}
+    os.environ["HOME"] = str(home)
+    os.environ["XDG_CONFIG_HOME"] = str(home / ".config")
+    os.environ["APPDATA"] = str(home / "AppData" / "Roaming")
+    try:
+        yield
+    finally:
+        for name, value in saved.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
 
 
 def _run_step(run: Run, step: dict[str, Any]) -> None:
@@ -130,11 +158,13 @@ def _run_step(run: Run, step: dict[str, Any]) -> None:
     try:
         if verb == "noop":
             _apply_writes(run, step)
+            _remove_path(run, step.get("remove"))
             return
         if verb == "read":
             _judge(run, step, _read_tree(run, step["root"]))
             return
         _judge(run, step, _invoke(run, step))
+        _judge_document_fields(run, step)
     except ContractError:
         raise
     except Exception as error:  # noqa: BLE001 - a refusal is an expected outcome
@@ -276,6 +306,44 @@ def _apply_writes(run: Run, step: dict[str, Any]) -> None:
         full = Path(root) / run.substitute(declared["path"])
         full.parent.mkdir(parents=True, exist_ok=True)
         full.write_text(declared["body"])
+
+
+def _judge_document_fields(run: Run, step: dict[str, Any]) -> None:
+    """Opens the document the step wrote and checks the fields it named.
+
+    The path is the --output the step passed to the verb, so the file read is the one
+    the verb claims to have written rather than one the driver found.
+    """
+    wanted = step.get("documentFields")
+    if wanted is None:
+        return
+    output = (step.get("args") or {}).get("output")
+    if output is None:
+        raise ContractError(f"step {step['id']!r} names documentFields but passes no --output")
+    document = json.loads(Path(run.substitute(output)).read_text())
+    for field in sorted(wanted):
+        want = run.substitute(wanted[field])
+        if field not in document:
+            run.problems.append(Problem(step["id"], field, "is not in the document the step wrote"))
+            continue
+        if str(document[field]) != want:
+            run.problems.append(
+                Problem(
+                    step["id"],
+                    field,
+                    f"is {document[field]!r} in the document and the contract says {want!r}",
+                )
+            )
+
+
+def _remove_path(run: Run, name: str | None) -> None:
+    """Takes a directory away, so the next step sees a workspace whose files are gone."""
+    if name is None:
+        return
+    full = Path(run.substitute(name))
+    if not full.is_absolute():
+        full = Path(run.work) / full
+    shutil.rmtree(full, ignore_errors=True)
 
 
 def _read_tree(run: Run, root: str) -> dict[str, Any]:

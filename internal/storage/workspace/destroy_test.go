@@ -161,3 +161,64 @@ func newOwnedStore(t *testing.T) (*workspace.Store, string) {
 	}
 	return store, root
 }
+
+// TestAdoptedManifestDoesNotCarryOwnership pins the rule Options.Adopted states, for
+// a root that already holds a manifest claiming stow made it. No CLI path produces
+// that state today, so it is tested here rather than through the binary.
+func TestAdoptedManifestDoesNotCarryOwnership(t *testing.T) {
+	// A root already holding a manifest that claims stow made it, which is what
+	// extracting an archive from a prepared workspace leaves behind.
+	root := t.TempDir()
+	claim := workspace.InternalPath(root, "manifest.json")
+	if err := os.MkdirAll(filepath.Dir(claim), 0o755); err != nil {
+		t.Fatalf("create the internal directory: %v", err)
+	}
+	carried := `{"version":3,"workspace_id":"ws_carried","bucket":"b","owned":true}`
+	if err := os.WriteFile(claim, []byte(carried), 0o644); err != nil {
+		t.Fatalf("write the carried manifest: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "thesis.md"), []byte("a year of work"), 0o644); err != nil {
+		t.Fatalf("write the caller's file: %v", err)
+	}
+
+	store, err := workspace.New(workspace.Options{Root: root, Bucket: bucket, Adopted: true})
+	if err != nil {
+		t.Fatalf("open the adopted workspace: %v", err)
+	}
+	defer store.Close()
+
+	if store.IsOwned() {
+		t.Error("the workspace inherited owned from a manifest written about a different directory")
+	}
+	if err := store.Destroy(); !errors.Is(err, workspace.ErrNotDestructible) {
+		t.Fatalf("Destroy on a workspace whose manifest was carried = %v, want ErrNotDestructible", err)
+	}
+	if _, err := os.Lstat(filepath.Join(root, "thesis.md")); err != nil {
+		t.Fatalf("the refusal destroyed the caller's file: %v", err)
+	}
+}
+
+// TestOwnedWorkspaceSurvivesReopening is the other half, and the reason Adopted is
+// an explicit option rather than a guess: a directory stow did create stays
+// destructible when it is opened again, or Destroy would be useless for the case it
+// exists for.
+func TestOwnedWorkspaceSurvivesReopening(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "workspace")
+	first, err := workspace.New(workspace.Options{
+		Root: root, Bucket: bucket, InitiallyOwned: true,
+	})
+	if err != nil {
+		t.Fatalf("open the first time: %v", err)
+	}
+	if err := first.Close(); err != nil {
+		t.Fatalf("close the first time: %v", err)
+	}
+	again, err := workspace.New(workspace.Options{Root: root, Bucket: bucket})
+	if err != nil {
+		t.Fatalf("reopen: %v", err)
+	}
+	defer again.Close()
+	if !again.IsOwned() {
+		t.Error("reopening a workspace stow created made it undeletable")
+	}
+}

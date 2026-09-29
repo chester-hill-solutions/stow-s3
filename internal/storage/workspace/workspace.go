@@ -59,6 +59,13 @@ type Options struct {
 	// created Root. It lets that construction path reserve a root before writing
 	// files without making a normal caller-owned directory deletable.
 	InitiallyOwned bool
+	// Adopted says the root belongs to the caller rather than to stow. Ownership is a
+	// property of a directory, so it is stated here rather than read out of a
+	// manifest, which describes the directory it was written in. No CLI path carries
+	// one into an adopted root today — adopt refuses a root that already exists, and
+	// a checkpoint archive holds files rather than a workspace manifest — so this
+	// states the rule instead of patching the one path that violated it.
+	Adopted bool
 }
 
 // New opens a workspace store rooted at options.Root.
@@ -79,7 +86,7 @@ func New(options Options) (*Store, error) {
 	// Ownership is decided before anything is created, because it is the only
 	// thing that makes Destroy safe. A directory that already existed is
 	// adopted, and an adopted workspace is never stow's to delete.
-	adopted := directoryExists(options.Root)
+	rootExisted := directoryExists(options.Root)
 	if err := os.MkdirAll(options.Root, 0o755); err != nil {
 		return nil, fmt.Errorf("workspace store: create root: %w", err)
 	}
@@ -99,7 +106,7 @@ func New(options Options) (*Store, error) {
 		folded:      map[string]string{},
 		Now:         now,
 	}
-	if err := store.establishIdentity(options, adopted, now); err != nil {
+	if err := store.establishIdentity(options, rootExisted, now); err != nil {
 		return nil, err
 	}
 	if err := store.index(); err != nil {
@@ -121,7 +128,11 @@ func New(options Options) (*Store, error) {
 // survive the reopen, or a workspace stow created would quietly become
 // undeletable the second time it was opened, and Destroy would be useless for
 // the case it exists for.
-func (s *Store) establishIdentity(options Options, adopted bool, now func() time.Time) error {
+//
+// A caller's own root cannot inherit, so the flag is read here rather than inferred
+// from the manifest: a manifest is the origin's answer to a question about a
+// different directory.
+func (s *Store) establishIdentity(options Options, rootExisted bool, now func() time.Time) error {
 	if s.manifest.WorkspaceID == "" {
 		id, err := newWorkspaceID()
 		if err != nil {
@@ -135,7 +146,8 @@ func (s *Store) establishIdentity(options Options, adopted bool, now func() time
 	if s.manifest.TTLSeconds == 0 {
 		s.manifest.TTLSeconds = options.TTLSeconds
 	}
-	s.manifest.Owned = options.InitiallyOwned || !adopted || s.manifest.Owned
+	s.manifest.Owned = !options.Adopted &&
+		(options.InitiallyOwned || !rootExisted || s.manifest.Owned)
 	s.manifest.Created = s.manifest.Created.UTC()
 	if s.manifest.Created.IsZero() {
 		s.manifest.Created = now().UTC()

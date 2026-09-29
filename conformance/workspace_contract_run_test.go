@@ -31,6 +31,7 @@ func (r *contractRun) perform(step contractStep) contractOutcome {
 	switch step.Verb {
 	case "noop":
 		r.applyWrites(step.Write)
+		r.removePath(step.Remove)
 		return contractOutcome{}
 	case "read":
 		return contractOutcome{stdout: r.readTree(step.Root)}
@@ -63,6 +64,11 @@ func (r *contractRun) argv(step contractStep) []string {
 	}
 	if step.Team != "" {
 		argv = append(argv, "--team", step.Team)
+	}
+	// The one boolean stated as a typed field: Args are strings, and "true" as a
+	// string is how a case asserts a flag that was never set.
+	if step.IncludeAdopted {
+		argv = append(argv, "--include-adopted")
 	}
 	return argv
 }
@@ -353,6 +359,50 @@ func (r *contractRun) applyWrites(writes []contractWrite) {
 		}
 		if err := os.WriteFile(full, []byte(write.Body), 0o600); err != nil {
 			r.t.Fatalf("write %q: %v", write.Path, err)
+		}
+	}
+}
+
+// removePath takes a directory away: the caller deleting their own project, which is
+// the only state in which prune acts.
+func (r *contractRun) removePath(name string) {
+	r.t.Helper()
+	if name == "" {
+		return
+	}
+	if err := os.RemoveAll(r.workPath(r.substitute(name))); err != nil {
+		r.t.Fatalf("remove %q: %v", name, err)
+	}
+}
+
+// checkDocumentFields opens the document a step wrote at the same --output the verb
+// was given, so it reads the file the verb claims to have written.
+func (r *contractRun) checkDocumentFields(step contractStep) {
+	r.t.Helper()
+	if len(step.DocumentFields) == 0 {
+		return
+	}
+	path := step.Args["output"]
+	if path == "" {
+		r.t.Fatalf("the step names documentFields but passes no --output, so there is no document to open")
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		r.t.Fatalf("the step names documentFields but its document is unreadable: %v", err)
+	}
+	var document map[string]any
+	if err := json.Unmarshal(raw, &document); err != nil {
+		r.t.Fatalf("the step's document is not JSON: %v", err)
+	}
+	for _, name := range sortedDocumentFields(step.DocumentFields) {
+		want := r.substitute(step.DocumentFields[name])
+		got, present := document[name]
+		if !present {
+			r.t.Errorf("the document the step wrote has no field %q", name)
+			continue
+		}
+		if fmt.Sprint(got) != want {
+			r.t.Errorf("the document's %q is %v and the contract says %s", name, got, want)
 		}
 	}
 }
