@@ -87,7 +87,9 @@ had to be read out of the code before it could be written down:
 - `registry: "a"` is the driver's own directory. `default` is whatever the binary
   resolves with no `--registry-dir`, isolated under a temporary home — `adopt`
   takes no `--registry-dir`, so without that the run would write into a
-  developer's real `~/.config`.
+  developer's real `~/.config`. Two of the three drivers did not, and this file
+  claimed they did. `TestContractDriversIsolateTheDefaultRegistry` now reads each
+  driver's directory rather than one file, and fails if that regresses.
 - `fail` asserts a refusal. It asserts both that the verb failed and that it said
   why, because a step expecting a refusal that gets a success means the guard the
   product relies on is not there.
@@ -98,6 +100,12 @@ had to be read out of the code before it could be written down:
   asserts the file and the returned value are the same document; omitting it
   asserts they are *different*, which is what `delta` does — it writes the
   transported document to the path and prints its own result describing it.
+
+The bullets above are the keys worth explaining in place, not the whole vocabulary —
+there are eighteen, and a partial list is how `includeAdopted` came to be declared in
+two of the three drivers while the case file passed anyway. The full field-by-field
+reference is [`docs/workspace-contract-steps.md`](../../docs/workspace-contract-steps.md),
+and a test fails when that page and the drivers disagree.
 
 ### Matchers
 

@@ -210,6 +210,12 @@ Purpose: give every caller the same vocabulary before adding a runner.
 - Establish resource accounting units and failure semantics. Stow must not advertise
   CPU, memory, disk, or network limits unless an executor can enforce and report them.
 
+**State: the vocabulary is decided; nothing is built.** ADR 0013 settles the four
+objects, the id lengths, and the rule that a retry is always a new attempt id with its
+meaning stated rather than inferred. Every other bullet is untouched, and so is every
+exit condition except the first. A reader arriving at this section from the ADR would
+otherwise reasonably conclude the contract exists in code.
+
 **Exit conditions:** schema and state machine are accepted in an ADR; Go types and CLI
 JSON are generated or contract-tested from the same definitions; invalid or unknown
 versions fail clearly; the contract specifies restart and retry behavior without

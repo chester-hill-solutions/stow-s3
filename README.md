@@ -1009,7 +1009,11 @@ cannot disagree with the engine about what a verb returns without one of them
 failing. The reason that file exists is in
 [its README](conformance/workspace/README.md); the short version is that both
 client wrappers shipped the same bug for a long time, each hidden by a test double
-that answered with a contract the production code did not have.
+that answered with a contract the production code did not have. What each key in a
+step means is in
+[the step vocabulary](docs/workspace-contract-steps.md), which is checked against the
+three drivers: `includeAdopted` once reached two of them and the case file passed
+anyway, because a field no driver reads is an error in none of the three languages.
 
 The Go version is pinned exactly, in `.go-version` and in the `toolchain` line of
 `go.mod`. The WebAssembly artifact in `packages/stow-s3/dist` is committed and

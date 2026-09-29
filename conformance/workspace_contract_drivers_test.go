@@ -11,19 +11,16 @@ import (
 )
 
 // The contract is one case file read by three drivers, and the drivers share no
-// type: a Go struct, a TypeScript interface, a Python dict. Nothing made them agree.
-// `includeAdopted` was declared in TypeScript, read by TypeScript and Python, and
-// absent from Go, so the three disagreed about what a prune step means and the case
-// file passed anyway — a field no driver reads is not an error in any of the three
-// languages. So the surfaces are compared here rather than trusted.
+// type: a Go struct, a TypeScript interface, a Python dict. Nothing made them agree,
+// and `includeAdopted` is how that showed: declared in two, read by two, absent from
+// the third, with the case file passing throughout.
 var (
 	goStepFields   = regexp.MustCompile("`json:\"([a-zA-Z]+)\"`")
 	tsStepFields   = regexp.MustCompile("readonly ([a-zA-Z]+)\\??:")
 	pyStepReadings = regexp.MustCompile(`step(?:\.get\(|\[)"([a-zA-Z]+)"`)
 )
 
-// declaredGoStepFields reads the field tags off contractStep. It is anchored on the
-// struct so a json tag elsewhere in the package cannot join the set.
+// The field tags off contractStep, anchored on the struct so a tag elsewhere cannot join.
 func declaredGoStepFields(t *testing.T) []string {
 	t.Helper()
 	body := between(t, "workspace_contract_harness_test.go",
@@ -65,8 +62,8 @@ func TestContractDriversAgreeOnTheStepSurface(t *testing.T) {
 	}
 }
 
-// TestContractCaseFileUsesOnlyKnownFields catches the other direction: a case file
-// naming a field no driver reads. The step then asserts less than it appears to.
+// TestContractCaseFileUsesOnlyKnownFields catches the other direction: a field no
+// driver reads, so the step asserts less than it appears to.
 func TestContractCaseFileUsesOnlyKnownFields(t *testing.T) {
 	raw, err := os.ReadFile(filepath.Join("workspace", "cases.json"))
 	if err != nil {
@@ -79,8 +76,7 @@ func TestContractCaseFileUsesOnlyKnownFields(t *testing.T) {
 		t.Fatalf("parse the workspace contract: %v", err)
 	}
 	known := fieldsOf(declaredGoStepFields(t))
-	// Per step, not as a set: the step id is what a reader needs to
-	// find the case.
+	// Per step, not as a set: the step id is what a reader needs.
 	for _, step := range doc.Steps {
 		for _, key := range sortedKeys(step) {
 			if !contains(known, key) {
@@ -158,19 +154,12 @@ func sortedKeys(m map[string]any) []string {
 // TestContractDriversIsolateTheDefaultRegistry is the check that should have existed
 // before the first run of a suite that lacked it.
 //
-// Two drivers call the wrapper in-process and it spawns the binary without passing an
-// environment, so a step naming no --registry-dir — which the contract does on
-// purpose, because adopt taking no --registry-dir is under test — resolves against
-// the test process's own HOME. Both suites registered workspaces in the developer's
-// real config directory on every run and then swept it: Go saw the count it should
-// and Python saw 72, and both were green. The Go driver cannot see that from inside
-// its own process, so it reads the other two. A source check is a weak instrument
-// for behaviour and the strongest available across three languages; the alternative
-// is a test that damages the registry in order to notice.
+// Two drivers call the wrapper in-process and it spawns the binary without an
+// environment, so a step naming no --registry-dir — which the contract does on purpose,
+// because adopt takes none — resolved against the developer's own config directory and
+// the scenario then swept it: Go saw the count it should, Python saw 72, both green.
 func TestContractDriversIsolateTheDefaultRegistry(t *testing.T) {
-	// Whole directories, not the two files that happened to hold the code when this
-	// was written: the isolation is a concern of its own and has already been moved
-	// out of the runner once, which a path-pinned check would have called a failure.
+	// Directories, not the files that held the code when written: it has moved once.
 	drivers := map[string]string{
 		"TypeScript": "../packages/stow-s3/test",
 		"Python":     "../packages/stow-s3-py/tests",
@@ -191,8 +180,7 @@ func TestContractDriversIsolateTheDefaultRegistry(t *testing.T) {
 }
 
 // driverSource concatenates a directory's Go, TypeScript and Python files, which is
-// the unit a driver's behaviour lives in: a driver is a directory of test helpers,
-// not one file.
+// the unit a driver's behaviour lives in: a driver is a directory, not one file.
 func driverSource(t *testing.T, dir string) string {
 	t.Helper()
 	entries, err := os.ReadDir(dir)
@@ -216,4 +204,49 @@ func driverSource(t *testing.T, dir string) string {
 		t.Fatalf("the %s contract driver directory holds no source", dir)
 	}
 	return out.String()
+}
+
+// TestContractStepVocabularyIsDocumented keeps the step vocabulary in agreement
+// with the drivers. A schema that cannot fail is a copy somebody will trust, and the
+// failure it catches — a driver quietly not implementing a field — is invisible from
+// inside any one language.
+func TestContractStepVocabularyIsDocumented(t *testing.T) {
+	raw, err := os.ReadFile(filepath.Join("..", "docs", "workspace-contract-steps.md"))
+	if err != nil {
+		t.Fatalf("read the step vocabulary: %v", err)
+	}
+	doc := string(raw)
+	for _, field := range declaredGoStepFields(t) {
+		if !strings.Contains(doc, "`"+field+"`") {
+			t.Errorf("the step field %q is declared by the drivers and documented nowhere; a reader of the case file cannot know what it does", field)
+		}
+	}
+	// And the other direction, so the page cannot accumulate fields that were removed.
+	for _, field := range documentedStepFields(doc) {
+		if !contains(declaredGoStepFields(t), field) {
+			t.Errorf("docs/workspace-contract-steps.md documents the step field %q, which no driver declares", field)
+		}
+	}
+}
+
+// The first column of the vocabulary table, the only place a backticked identifier is a name.
+func documentedStepFields(doc string) []string {
+	var out []string
+	inTable := false
+	for _, line := range strings.Split(doc, "\n") {
+		if strings.HasPrefix(line, "| Field |") {
+			inTable = true
+			continue
+		}
+		if inTable && !strings.HasPrefix(line, "|") {
+			break
+		}
+		if !inTable {
+			continue
+		}
+		if name := regexp.MustCompile("^\\|\\s*`([a-zA-Z]+)`").FindStringSubmatch(line); name != nil {
+			out = append(out, name[1])
+		}
+	}
+	return out
 }
