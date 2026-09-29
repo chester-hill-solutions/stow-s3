@@ -18,8 +18,10 @@ const measured = (coveredStatements, percentage, packages) => ({
   coveredStatements,
   percentage,
   totalStatements: 1000,
+  // Fixed rather than derived from the aggregate: a test about the aggregate should
+  // not also trip the per-package check, and a test about that says so explicitly.
   packages: packages ?? {
-    "example/pkg": { coveredStatements, totalStatements: 1000 },
+    "example/pkg": { coveredStatements: 4000, totalStatements: 1000 },
   },
 });
 
@@ -375,4 +377,84 @@ test("lowestPerPackage records each package's own weakest sample", () => {
   assert.equal(floor.coveredStatements, 400);
   assert.deepEqual(floor.packages["a/pkg"], pk(380, 500));
   assert.deepEqual(floor.packages["b/pkg"], pk(20, 500));
+});
+
+// The floor tolerance, which exists because the measurement is noisy and a floor
+// cannot be placed at or below the minimum of a distribution.
+//
+// Eight consecutive measurements of one unchanged tree gave 6810, 6810, 6811, 6811,
+// 6811, 6812, 6812, 6812, and a later run gave 6809. The source is two packages:
+// internal/runthrough moves by two statements and pkg/stow by one, because their
+// concurrency tests interleave differently. So the gate allows four and the cost is
+// named — a loss of one to four statements does not fail it, which is below the noise
+// floor of the instrument but is still a detection it no longer has.
+
+test("a fall inside the tolerance passes", () => {
+  assert.deepEqual(
+    coverageProblems(measured(4000, 65.0), measured(4004, 65.0), null, 1, 4),
+    [],
+  );
+});
+
+test("a fall beyond the tolerance fails, and the message says what was allowed", () => {
+  const problems = coverageProblems(
+    measured(4000, 65.0),
+    measured(4005, 65.0),
+    null,
+    1,
+    4,
+  );
+  assert.equal(problems.length, 1);
+  assert.match(
+    problems[0],
+    /covered statements fell: 4000 < 4005 \(allowing 4 for measurement noise\)/,
+  );
+});
+
+test("no tolerance is exact, so the default is a floor of zero", () => {
+  // The parameter defaults rather than reaching for the constant, so a caller that
+  // forgets it gets the strict behaviour instead of the slack one.
+  assert.equal(
+    coverageProblems(measured(4000, 65.0), measured(4001, 65.0), null, 1)
+      .length,
+    1,
+  );
+});
+
+test("the tolerance reaches the per-package check too", () => {
+  assert.deepEqual(
+    packageProblems(
+      { "a/pkg": pk(996, 1000) },
+      { "a/pkg": pk(1000, 1000) },
+      undefined,
+      4,
+    ),
+    [],
+  );
+  const problems = packageProblems(
+    { "a/pkg": pk(995, 1000) },
+    { "a/pkg": pk(1000, 1000) },
+    undefined,
+    4,
+  );
+  assert.equal(problems.length, 1);
+  assert.match(
+    problems[0],
+    /a\/pkg: covered statements fell: 995 < 1000 \(allowing 4\)/,
+  );
+});
+
+test("a lowered floor is still a failure regardless of tolerance", () => {
+  // The tolerance is about the measurement being noisy, not about the floor being
+  // movable. A floor that was lowered to meet a measurement is the one thing the
+  // history check exists to catch, and slack must not reach it.
+  const problems = coverageProblems(
+    measured(3800, 65.0),
+    measured(3800, 65.0),
+    measured(4000, 65.0),
+    1,
+    4,
+  );
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /stored baseline was lowered/);
 });
