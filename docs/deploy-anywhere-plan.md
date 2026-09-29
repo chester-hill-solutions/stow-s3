@@ -1,9 +1,26 @@
 # Deploy-Anywhere Plan
 
+**Planning status: superseded work order — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. Supported storage correctness and delivery work is carried into S0–S3. Runtime, cache, persistence and additional API expansion have explicit deferred dispositions.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+> **MCP scheduling update, 2026-09-29:** the local stdio adapter is now concrete work in [canonical S3](plan.md#s3-deliver-a-thin-mcp-storage-adapter-and-caller-owned-agent-integration), detailed in [the MCP integration plan](mcp-storage-integration-plan.md). Historical phase ordering below remains subordinate. Hosted MCP stays deferred.
+
+> **Scope and precedence, 2026-09-29:** [Canonical storage plan](plan.md) governs current work. This document retains technical details and dated implementation history; its older phase priorities and “current execution order” statements do not schedule work. Caller-owned execution is the active boundary.
+
 **Status (2026-09-27):** Phases 0, 1, 3, 4b, and 5 are implemented. Phase 2 is closed with a documented runtime-floor limitation: linker stripping reduces the artifact but not the 8 MiB post-boot floor. Phase 4 remains conditional on naming a persistence target. Phases 6–7 are not started. Phase 3 removes backend listing from refresh; planner cost is now benchmarked, and a more complex incremental index is deferred pending a named workload.
 **Date:** 2026-09-27
 **Baseline:** `main` at `155dff2` (follow-up changes are currently uncommitted)
-**Relationship:** additive to the accepted decisions in ADRs 0005–0011, `docs/compat-contract.md`, and `docs/workspace-contract.md`. This plan is the current execution order for the *portability and multi-writer* workstreams, and it sequences the MCP adapter that `docs/agent-workspace-plan.md` Phase 5 item 3 defers. It does not supersede that plan's workspace phases; the two run in parallel and this one is ordered first where they touch the same code.
+**Relationship:** technical detail for portability and multi-writer storage, subordinate to [the canonical storage plan](plan.md). It does not schedule a parallel execution layer or promise arbitrary edge execution. Historical phase priorities below are superseded by the canonical ordering.
 
 ## 1. Goal
 

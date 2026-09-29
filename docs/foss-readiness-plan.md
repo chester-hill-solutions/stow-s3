@@ -1,5 +1,20 @@
 # FOSS readiness plan
 
+**Planning status: superseded backlog — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. Remaining publication, upgrade diagnostics, documentation and maintenance work is carried into S0 and S2. Implemented contribution and test infrastructure is retained.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+> **Scope and evidence update, 2026-09-29:** [The canonical storage plan](plan.md) schedules this work under ADR 0014. This document supplies distribution/contribution details, not an execution-product backlog. The latest [assessment](product-assessment-2026-09-29.md) records successful local wheel/tarball installs but incomplete public delivery; its newer observations take precedence over the dated status table below.
+
 **Status:** proposed, not agreed
 **Date:** 2026-09-28
 **Scope:** what stands between this repository and being usable and contributable by
@@ -35,7 +50,7 @@ this table is current.
 | A5 ship v0.3.0 | **Blocked on the release gate** | Needs the R2 pair as `STOW_LIVE_*` secrets |
 | B1 committed write reported missing | **Done** | `TestMirrorWritesDoesNotTellTheCallerTheObjectIsMissing` |
 | B2 `mirrorWrites` never created the bucket | **Done** | `TestMirrorWritesCreatesTheBucketUpstream` |
-| B3 `serve --workspace` | **Not started — product decision** | Served workspace, or an honest refusal |
+| B3 workspace S3 facade | **Not started — included in canonical S1** | Same runtime/store as workspace; current CLI still refuses workspace backend |
 | C1 workspace backend in the matrix | **Done** | `conformance/workspace_contract_test.go` |
 | C2 two real things talking | **Done** | `conformance/runthrough_pair_test.go`, six tests |
 | D1 the four documents | **Done** | `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` |

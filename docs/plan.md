@@ -1,111 +1,198 @@
-# Stow execution plan
+# Stow storage product plan
 
-**Canonical status and ordering:** 2026-09-27. This is the single current execution plan for workspace/handoff and deploy-anywhere work. The linked specialist plans retain detailed rationale, acceptance criteria, and design notes; if their status or ordering conflicts with this document, this document governs. Historical product plans are not separate backlogs.
+**Canonical scope, status and ordering:** 2026-09-29, reconciled against `5485a36` and the recorded assessment. This is the single current implementation work order.
 
-**Parallel axis:** [`foss-readiness-plan.md`](foss-readiness-plan.md) covers installability, the conformance matrix's missing backend, and the contribution surface. It is not a competing backlog: it holds no workspace or handoff work, and where the two touch — the conformance matrix and the workspace backend — this document still governs ordering.
+**Product:** portable working storage for agents, tools, applications and tests. Stow owns data preparation, supported storage access, checkpoints, inspection, transfer and storage lifecycle. Callers own execution, agent turns and sandbox enforcement. [ADR 0014](adr/0014-storage-product-caller-owned-execution.md) records the decision.
 
-**Second parallel axis:** [`work-session-plan.md`](work-session-plan.md) covers the
-execution layer above this one — task specs, execution attempts, artifacts, executors,
-and integrations. It is the next product layer and holds no outstanding implementation
-of the work tracked below. Its E0 is this document's backlog restated as a
-precondition, so where the two describe the same work this document governs the
-ordering. It carries one rule this repository has already learned the hard way: code
-coverage is not a proxy for contract coverage, and a gate whose untested mode produces
-a silently empty baseline is worse than no gate.
+## Plan relationships
 
-The three defects it named on 2026-09-28 have all been resolved since, and the decision behind one of them is now [ADR 0012](adr/0012-run-through-serves-only-its-own-buckets.md). Read-through on an unseeded local bucket and `mirrorWrites` never creating the upstream bucket are both fixed and both pinned by `conformance/runthrough_pair_test.go`; the workspace backend is in the matrix via the workspace contract. The read-through fix is deliberately **not** applied to the bucket case — a run-through server refuses a bucket it was not given, because fetching any bucket the upstream credential can see would hand the agent the credential it is promised not to hold.
+| Document | Role |
+| --- | --- |
+| This plan | Governs implementation scope and ordering |
+| [Storage milestone](portable-agent-workspace-goal.md) | Defines the complete workflow and adoption decision |
+| [MCP storage integration](mcp-storage-integration-plan.md) | Concrete S3 integration surface and turn-checkpoint guidance; caller retains execution ownership |
+| [Pre-code discovery](pre-code-discovery-2026-09-29.md) | Source findings, proposed decisions and dependency-ordered implementation slices for the IDs below |
+| [Storage portability design](storage-portability-design.md) | S0-7/S1 contracts for facade lifetime, complete object snapshots, Git profiles and registry policy |
+| [Planning index and disposition](planning-index.md) | Complete document inventory, old-item migration map and deferred decisions |
+| Older DX, remediation, FOSS, workspace, portability and architecture plans | Superseded historical records; their remaining work is carried into the IDs below |
+| [Work-session proposal](work-session-plan.md), [isolate exploration](agent-isolate-exploration.md) | Retired proposals; execution designs require a new scope decision |
+| [Assessment](product-assessment-2026-09-29.md), [continuity pilot](agent-continuity-pilot-2026-09-29.md) | Revision-specific observations, including failures and limitations |
+| [Prior plan](history/plan-through-2026-09-28.md) | Historical implementation record; superseded ordering |
 
-## Goal
+## Goal and boundary
 
-Deliver one installable, trustworthy workflow for local S3-compatible use and prepared agent workspaces. Then use provider-backed and independent-user evidence to choose portability features. Preserve the accepted boundaries: local behavior is the default, live writes require explicit consent, workspaces are same-machine filesystem directories rather than security sandboxes, and handoffs do not carry credentials.
+Deliver one installable storage workflow: prepare files and selected object inputs, use the supported directory/S3 interfaces, checkpoint, inspect changes, move the saved state and reopen it. Validate it through both an S3 fixture use case and one thin integration with an existing agent runner.
+
+The integration may request a checkpoint after each completed turn. The caller detects the boundary and quiesces its writers; Stow captures and verifies state. Task briefs and progress can start as ordinary declared files. A checkpoint is saved data, not a Stow-owned execution attempt or proof of task success.
+
+Existing scoped S3 server sessions remain supported. No Stow agent executor, mandatory attempt framework, model/provider API, sandbox backend or hosted scheduler is required for this milestone.
+
+### How to use this plan
+
+The numbered work items below are the only active engineering queue. The milestone
+defines success and the MCP plan expands S3; neither establishes a competing order.
+Accepted [ADRs](adr/README.md), [S3 compatibility](compat-contract.md),
+[workspace](workspace-contract.md) and [preparation](task-manifest.md) contracts
+remain normative. Retiring a plan does not retire an accepted contract or an
+implemented feature. Proposed contracts must be labelled until implemented.
+
+Complete S0 before relying on the storage workflow; S1 and S2 establish the supported
+integration foundation. Release preparation and the OpenCode lifecycle spike may
+start early. S3 acceptance depends on S0–S2. S4 gathers repeat-use evidence after the
+workflow is usable. An old phase number, checkbox, version target or “next step”
+does not override this ordering.
+
+Each implementation change should name its item ID, extend the existing code path,
+and attach revision/platform-specific acceptance evidence. An uncertain old finding
+is an audit task until reproduced or closed by existing evidence, not a confirmed
+defect. Update status here rather than reopening a historical checklist.
 
 ## Current status
 
-| Workstream | Status | Remaining |
-|---|---|---|
-| Run-through correctness and multi-writer protection | Implemented locally; regression gates pass | Provider-backed validation remains open. A never-observed upstream key cannot have a prior-version precondition. |
-| Detached cache — what an agent can read offline | **Done.** `prewarm` takes an explicit key list and refuses globs; `--offline` is a hard refusal with no upstream call; `/_stow/inspect` names the cached keys with `readable` and `has_expiry` | The warm reports the settled cache, so a warm larger than the cache limit reports what survived it rather than what it fetched. |
-| Upstream-failure reporting | **Done.** A dead upstream is 503 `ServiceUnavailable`, not 500 `InternalError`; an upstream 4xx is passed through rather than guessed at | A cache miss under `--offline` still reports `NoSuchKey`, which reads as "does not exist" where the truth is "cannot ask". Deliberate, and worth revisiting. |
-| Workspace prepare, resume, checkpoint, handoff, archive, cleanup | Phases 0–4 implemented locally | Submodule/LFS materialization and broader platform symlink/race hardening; OS-level no-follow and arbitrary-writer quiescence guarantees remain open. |
-| Workspace enumeration | **Done.** `workspace list` reports every entry, quietest first, including those whose directory is gone, and names the registry it read | Nothing outstanding. The `--all` flag that hid those entries by default is gone from the CLI and both wrappers. |
-| Delta sync | Implemented for checkpoints in one registry, with CLI and TypeScript/Python transport | An opt-in document digest catches a substituted change list; provenance and authorship are not recorded. Broaden only for a demonstrated consumer. |
-| Checkpoint trigger | **Not started.** No watch, auto-checkpoint, or debounce | An agent editing files calls `workspace checkpoint` by hand. Decide the shape before building: a long-lived watcher interacts with the registry's in-use liveness check and with `Collect`. |
-| SigV2 presigned URLs | **Done.** Both forms are refused by name, naming SigV4 and how to switch | The refusal itself is unchanged and `sigv4_strictness_test.go` still guards it. |
-| `GetBucketLocation` | **Done.** Answers 200 with the element present and empty; `NoSuchBucket` for a bucket that is not there | None. |
-| Workspace retention | **Partly closed.** `workspace prune` forgets entries whose directory is gone, and `max_workspaces` refuses a prepare that would take a registry past a declared bound | A sweep is still manual and `TTLSeconds` still defaults to unlimited. The bound is declared per prepare and not persisted, so the owner of the policy sets it every time; a standing bound would need a registry-level settings file, not a field on an entry. |
-| Go/TypeScript/Python workflow | CLI and thin wrappers exist; Phase 5 partial | Published distribution, broader clean-install validation, documentation surfaces; MCP remains deferred. |
-| Workspace distribution and adoption | Phase 6 partial | Clean install/release gate, external pilot, and evidence of repeat use. |
-| WASM/runtime floor | Phase 2 closed with measured limitation | `-s -w` reduces the artifact by 118 KB (2.2%) but leaves the 8 MiB post-boot floor unchanged. A 24-file agent workload reads in ~26 ms with 0 MiB added; an isolated 1 MiB read adds 7.5 MiB. A sub-8-MiB floor needs a narrower runtime/API or another compiler/runtime. |
-| Cache eviction | Phase 3 measured; incremental index deferred | Planner cost is ~5.9 µs/8.5 KB at 40 entries and ~2.69 ms/1.93 MB at 10,000; removing a redundant sort saves three allocations but does not produce a clear timing win. Defer a more complex index until a configured target workload establishes cache depth and latency needs. |
-| Persistence backend | Conditional | Choose a concrete target before designing or implementing another backend. |
-| SSE-S3 and additional surfaces | Not started | Defer until compatibility need is established and the earlier conflict/runtime work is settled. |
+**Development candidate: 0.3.0, implemented locally on 2026-09-29.** The baseline
+assessment and pre-code discovery below are historical inputs. Current commands
+and contracts are in [portable workspace usage](portable-workspace-usage.md);
+[implementation evidence](implementation-2026-09-29.md) records validation and
+remaining gates. This candidate has not been published.
 
-The local `make test-all` and `make standards` gates pass. Live provider tests are skipped because provider configuration is unavailable. No release, clean-room package install, or external pilot has been completed.
+| Area | Implemented in this tree | Remaining acceptance |
+| --- | --- | --- |
+| S0 storage correctness | Relative handoff paths; CRC64NVME single-object uploads; metadata normalization; shared capture/cleanup locks; durable publication/reconciliation; request limits and upstream transport policy | Full local validation recorded below; second-host runtime and complete provider evidence remain distinct gates |
+| S1 coherent storage | Same-runtime facade and usage refresh; portable v2 files/logical objects/buckets/metadata; Git provenance/local-source reconstruction; standing registry policy and deletion | Large-workspace cost, transfer/RSS/concurrency characterization and second-host runtime evidence |
+| S2 distribution | Version 0.3.0, public npmjs target, exact-artifact publication retries, preflight/consumer ordering, separate AWS/R2/custom receipts | Publisher/account setup, actual publication, published anonymous installs, Linux runtime and fresh live-provider evidence |
+| S3 MCP and OpenCode | Scoped stdio adapter; persisted request keys/resolve; bounded retry/fail-closed caller for pinned OpenCode 2.0.16 | Successful real-model turn, interruption/cleanup in real execution, cross-host continuation and OpenCode-to-MCP runtime configuration |
+| S4 adoption | Deterministic native lost-reply and moved-bundle continuation test | Meaningful real-agent task and two independent teams' repeat use |
 
-**Execution state (2026-09-28):** A code-quality review of the cache and workspace work found and fixed three defects that every gate had passed, which is the point worth recording. A pre-warm reported the fetch rather than the cache — warming six keys into a cache bounded to two reported all six warm and exited 0. `workspace list` hid the unreadable entries behind a flag, so the default output of the one verb whose job is surfacing a problem did not have them. And the `--offline` flag re-parsed its own string and discarded the parse error, so an unreadable value left the network open on the flag whose job is closing it. Following that, a fourth defect surfaced from a test rather than a review: a comment containing a comma in a `--keys-file` was cut in half and the remainder was warmed as a key.
+Final local validation: **`make test-all` and `make standards` passed**, including
+race tests, all four local conformance profiles, language/WASM/caller tests and
+reproducible generated artifacts. Live-provider credentials were not supplied.
+No packages were published. See [the implementation record](implementation-2026-09-29.md).
 
-Two root causes are now structural rather than incidental. `check-coverage` is a floor ratchet, so a verb added with no tests left it satisfied; the floor has been raised and `prewarm` has tests. The contract driver's `{{...}}` resolution happened at six call sites, one of which already failed silently, and is now a single pass that cannot be skipped. A separate review finding was that a dead upstream returned 500 `InternalError` naming stow's own storage layer; it is now 503 with a message naming the upstream, verified against a SIGKILLed upstream with a real SDK client.
+### What is next
 
-The release gate is unchanged and remains the only thing between this and a release. It is also the instrument Steps 1 and 3 need, which is why it is the critical path rather than the last step.
+1. Review the locally verified candidate and measured workload limits.
+2. Run the documented OpenCode caller with a real model on a small prepared
+   workspace. Recover an interrupted turn, move an unedited bundle to Linux and
+   continue from saved notes with a fresh agent.
+3. Complete the three disposable live-provider profiles and release/account gates,
+   then publish and verify exact-version anonymous consumers.
+4. Run the S4 study before expanding into execution or sandbox infrastructure.
 
-**Execution state, later the same day (2026-09-28).** Covering `prune --include-adopted` — a flag the contract never exercised, and the contract's own step 23 was titled as though it did — turned up two defects, and the second is a data-loss bug in the test harness rather than in the product.
-
-`workspace destroy` deleted a caller's project. Measured end to end: prepare a workspace, hand off an archive of it, `adopt` that archive onto a directory stow did not create, then `destroy` the result. The directory and the caller's files were gone. The guard against precisely this already existed and said so in its refusal — "already existed, so stow adopted it. Remove it yourself if that is what you want" — and it did not fire, because `openPreparedWorkspace` set `options.owned = true` unconditionally and `RestoreCheckpoint` materialises through the preparer, so adopt claimed the root it had just extracted into. Ownership is a fact about a directory and was being asserted about one nobody had asked about. `Options.Adopted` now states it, the preparer honours it, and `establishIdentity` refuses to inherit it. The two changes are independently sufficient and both are kept: the preparer is the fix, the store guard is the rule, and reverting either alone leaves the contract green.
-
-The TypeScript and Python contract drivers registered workspaces in the developer's real `~/.config` on every run and then swept it. The Go driver has always isolated its child process and says why in a comment; the other two call the wrapper in-process, and it spawns the binary without passing an environment. The contract has steps that deliberately name no `--registry-dir`, because `adopt` takes none and that is under test, so the registry resolved to the developer's own. It stayed invisible because a registry count is only asserted on a step that checks one: the Go driver saw 1 and the Python driver saw 72, and both suites were green. Every entry involved pointed at a `/tmp` directory an earlier run of the same suite had already removed. `TestContractDriversIsolateTheDefaultRegistry` now fails if either driver stops isolating, and it reads each driver's directory rather than one file, because the isolation has already been moved out of the runner once.
-
-The root cause of the second is the first's shape: the contract's three drivers shared no type — a Go struct, a TypeScript interface, a Python dict — and nothing made them agree. `includeAdopted` existed in two and not the third. A field no driver reads is not an error in any of the three languages, so the case file passed while a `prune` step's typed field went nowhere. `documentFields` was the same failure from the other side: declared in the case file, read by nobody, on a step whose title claimed it checked the document it wrote. The three surfaces are now compared, the case file is checked against them, and the vocabulary is documented in `docs/workspace-contract-steps.md` with a test that fails when the page and the drivers disagree.
-
-**On numbers in this file.** Test counts, coverage percentages, and artifact hashes are deliberately not recorded here. They were, and they went stale silently: the progress record in `agent-workspace-plan.md` carried counts and a WASM digest that were already wrong before anyone noticed, because nothing checks a number that has been copied into prose. The authoritative values are produced by `make standards` (which includes `check-coverage`, whose recorded floor is the ratchet) and `make check-generated` (which proves the packaged artifact is reproducible). Read the number from the gate, not from a document.
+Full-copy checkpoints remain the initial implementation. Profiling removed repeated
+directory enumeration, and bounded copy/flush workers preserve durability barriers.
+Five captures measured 129 ms median for 256 files / 8 MiB and 1.74 seconds for
+4,096 files / 64 MiB after tests stopped. The larger fixture also had an 11.10-second
+first capture. Retention still costs roughly one payload copy per save. These
+results support measured workload profiles, not universal every-turn latency claims.
 
 ## Ordered work
 
-**Execution state (2026-09-27):** Local lifecycle soak is complete; Step 1 remains open for clean-room installation and release readiness. This pass rebuilt native/WASM artifacts; version/install-surface checks and npm package dry-run passed. Go workspace/storage/CLI tests, TypeScript and Python workspace wrapper tests passed. A child-process kill/resume test, archive staging/temp cleanup assertions, and a three-round/eight-workspace concurrent isolation test were added; the concurrency test passed under `-race`. A two-second TTL CLI smoke collected an expired workspace and removed its root; checkpoint removal is covered by the existing collection tests. A 24-workspace manual isolation run also passed. The WASM stripped candidate shrank from 5,404,915 to 5,286,611 bytes (2.2%) with the post-boot floor still 8 MiB; agent-shaped read overhead was 0 MiB, but an isolated 1 MiB read added 7.5 MiB. Cache planner measurements and the small allocation-only improvement are recorded below. The agent guide and skill now present ready workspaces as the persistent coding-task path and scoped S3 sessions as disposable. The CLI package needed loopback permission outside the sandbox. The shared npm cache was not writable, so it was left untouched. The Python wheel rehearsal could not run because Python 3.12 lacks the `build` module; CI's release matrix remains the wheel-build check. No release or external registry action was taken.
+### S0. Close observed storage contract defects
 
-### 1. Close the local readiness gate — local soak complete; clean install remains open
+Close reproduced failures and inherited contract gaps using existing implementations.
+Required provider checks may be skipped during local development, but unavailable
+evidence does not satisfy the release gate.
 
-- **Done locally:** lifecycle soak for parallel workspaces, process death/resume, TTL collection, checkpoint cleanup, source immutability, and absence of partial archives or leaked Git state. The concurrent isolation case passed under `-race`; see the execution record above.
-- Verify the documented install and full lifecycle outside the source checkout, without ambient configuration or a locally built binary. Publish/install npm and PyPI packages when registry setup is available; make that dependency explicit in the release checklist.
-- **Done locally:** README, site, and skill install guidance lead with the supported ready-workspace flow and state its isolation boundary.
-- Keep the release version/tag decision separate from the incomplete `v0.2.0` tag; do not treat that tag as a completed release.
+| ID | Work and acceptance |
+| --- | --- |
+| S0-1 | Fix relocated archive references, CRC64NVME default-client uploads and metadata casing. Exercise real clients and moved bundles with original sender paths unavailable. |
+| S0-2 | Verify explicit upstream bucket scope after local bucket creation, separate live-write consent, conditional conflicts, committed-local-write errors and durable outbox retry/restart. Extend the existing real-pair/runtime tests; do not reopen resolved composition defects. |
+| S0-3 | Audit supported path, symlink, replacement-race, adoption/ownership and concurrent-capture guarantees on supported hosts. Reproduce gaps before fixing them; document unenforced arbitrary filesystem writes and preserve refusal of unsafe/corrupt input. |
+| S0-4 | Close compatibility traceability gaps in the existing shared corpus: presigned flows/expiry, virtual-hosted routing, bucket/batch operations, multipart variants, negative listing tokens and conditional-copy combinations. Reuse raw-HTTP tests for protocol edges and both pinned SDK runners; map existing coverage before adding cases. |
+| S0-5 | Resolve inherited resource/transport findings: effective configurable request-body limits through CLI/readiness/wrappers; multipart staging and concurrent request bounds; explicit upstream HTTPS/insecure-endpoint policy with deliberate local test support. Record compatibility decisions before changing defaults; verify refusal and cleanup at actual enforcement points. |
+| S0-6 | Restore `make standards` without increasing debt allowances. Preserve generated-artifact, command-surface, ADR, coverage and quality checks. Retain residual `serve` decomposition and evidence-driven coverage improvements as maintenance work; do not duplicate subprocess contract tests solely to increase a percentage. |
+| S0-7 | Establish one capture/publication/cleanup contract: shared cross-process locking for handle/external paths; fail-closed unexpected lock errors; validated read-only lookup; cancellable scans/copies; durable publication with explicit commit/uncertain outcomes. Reproduce mixed capture/retention and collect/destroy races, then fix shared paths before promising reliable retries. |
 
-**Exit:** a clean environment can install, prepare, use, review, resume/export, and clean up a workspace using only documented commands and available artifacts.
+**Exit:** supported examples need no observed workaround, changed/corrupt inputs are handled predictably, and documented storage/authority promises have positive and adverse-case evidence.
 
-### 2. Finish the open P0 deploy-anywhere work
+### S1. Complete one coherent working-storage workflow
 
-- Runtime Phase 2 is closed by documenting the measured limit: linker stripping shrinks the file but not runtime memory, and no supported Go switch removes the runtime reflection/type machinery. The 24-file workload (597 KB) seeds to 12.5 MiB at 7.9× payload, reads in ~26 ms with 0 MiB additional memory, and performs six edits in ~4 ms. Keep the large-object result distinct: storing a 1 MiB object adds 4.5 MiB and reading it adds a further 7.5 MiB. A lower floor requires a narrower WASM API or a different compiler/runtime; defer until a concrete device budget justifies that cost.
-- Cache Phase 3 keeps backend listing off refresh. The synthetic planner benchmark measures ~5.9 µs/8.5 KB at 40 entries, ~26.7 µs/33 KB at 160, ~208 µs/197 KB at 1,000, and ~2.69 ms/1.93 MB at 10,000. Removing the duplicate sort reduced allocations from seven to four per call without a reliable timing gain. Defer a maintained incremental eviction index until a target cache depth and refresh p95 requirement are named; preserve current policy and reconciliation coverage.
+Complete the prepare → access → capture → inspect → transfer → reopen workflow.
+Extend the existing runtime, registry and transports; keep one shared storage implementation.
 
-**Exit:** the runtime-floor outcome is recorded against the plan's criterion. Bounded-cache cost is measured; the incremental index remains conditional on workload evidence rather than an assumed requirement.
+| ID | Work and acceptance |
+| --- | --- |
+| S1-1 | Expose an optional loopback facade by borrowing the existing runtime adapter. Drain HTTP before closing runtime/releasing liveness; synchronize lifecycle calls. Reconcile seeded/host-written usage before quota-sensitive mutations. Verify same bytes/accounting and preserve scoped session APIs. |
+| S1-2 | Implement bounded portable checkpoint v2 with logical object/bucket inventory and payloads, including escaped keys/secondary buckets excluded today. Preserve selected metadata, modes and deletions with metadata-aware capture and diff; read v1 as file-only, refuse unsupported enhanced deltas until a compatible codec exists. Follow the storage design's versioned archive/restore contract. |
+| S1-3 | Persist relative cwd and pinned Git provenance. Offer file continuation and explicit recipient-local-source Git reconstruction, preserving captured deletions; self-contained base bundles remain a focused conditional spike. Keep local parent lineage separate from adopted origin provenance; verify source immutability and destination-local identity/credentials. |
+| S1-4 | Add versioned standing registry policy outside workspace-entry enumeration. Coordinate prepare/capture/import/delta admission and deletion, count only committed state, refuse corrupt accounting and protect active/reconciling data. Specify precedence/defaults and safe explicit checkpoint deletion. No automatic eviction; collection stays caller-scheduled. |
+| S1-5 | Measure repeated full captures, transfer cost and maximum supported object size under realistic concurrency. Publish memory/disk limits and object-record overhead; storage quotas do not imply process memory ceilings. Reuse existing baselines/soak evidence and extend only for uncovered workloads. |
 
-These tasks may proceed alongside the install gate. Resolve any overlap with the workspace workflow before adding MCP or another surface.
+**Exit:** a documented directory/S3 fixture can be used, saved, moved and reopened with its declared semantics. The recipient does not need sender paths or upstream credentials for captured inputs.
 
-### 3. Validate with providers and independent users
+### S2. Deliver through supported install surfaces
 
-- Run the existing local fake-provider matrix and then a real S3-compatible scratch-provider matrix when credentials are available. Include first upload, conditional writes/conflicts, durable outbox retry/restart, multipart, and propagation timing.
-- Pilot an interrupted/resumed coding task, a repo task with fixtures, a non-Git file task, and artifact export with users outside the implementation team.
-- Record setup interventions, time to agent-ready, success/recovery, checkpoint and transfer cost, disk use, cleanup, and repeat use. Use those results to choose the next feature.
+Start release preparation alongside S0. Publish only after the applicable
+correctness/release checks pass, and verify actual published consumers afterward.
 
-**Exit:** provider behavior and product value have evidence beyond loopback and internal smoke runs.
+| ID | Work and acceptance |
+| --- | --- |
+| S2-1 | Choose a new release version and align binary, Go module, main/platform npm packages and Python wheels. Preserve existing tags including incomplete `v0.2.0`. Plan npmjs for anonymous main/platform installs; GitHub package visibility alone cannot meet this goal. Complete publisher/account setup and exact-version artifact validation. |
+| S2-2 | Prove published clean installs on macOS arm64 and Linux x64, without repository binary overrides or private registry configuration. Exercise prepare/use/checkpoint/reopen/transfer/cleanup, diagnostics and generated artifacts. Preserve other existing targets while stating their evidence level separately. |
+| S2-3 | Restructure the carried-forward release gate: preflight → artifact checks → publication → exact-version anonymous consumers → completion. Distinguish lookup failures from absent packages and verify identity on partial retries. Collect separate revision-bound AWS/R2/custom evidence; one configured endpoint cannot certify all three. |
+| S2-4 | Make install/quickstart guidance consistent across README, packages, site, skill and machine-readable pages. Verify the chosen public documentation URL or replace broken guidance. Surface dev-scale storage/memory costs, supported platforms and the execution boundary. |
+| S2-5 | Resolve legacy object-record upgrade behavior: preserve the accepted clean-break boundary, make detection actionable in diagnostics and release notes, and refuse silent data reuse. Migration requires a separate format decision. Keep implemented contribution/security/templates/dependency-update surfaces current. |
 
-### 4. Make conditional and evidence-led decisions
+#### Release acceptance carried forward from remediation R11
 
-- Name a persistence target before starting deploy-anywhere Phase 4. If no target is required by a real deployment, leave the phase conditional.
-- Complete SSE-S3 wire behavior only for demonstrated SDK compatibility needs.
-- Add MCP or other integration surfaces only when a pilot shows that the stable CLI/API contract leaves material integration work. Keep the adapter on existing operations and preserve the same permission and conflict behavior.
-- Revisit cache indexing, session defaults, and concurrency guidance with workload data rather than converting local benchmark points into product limits.
+- Record the supported contract/profile and scenario traceability, pinned Go/Node SDK
+  versions, and any explicit unsupported behavior. No required scenario silently skips.
+- Pass Go/unit/race, aggregate local conformance, supported language build/tests,
+  raw protocol/auth edges, run-through/outbox checks, `make standards`, and generated
+  artifact reproducibility at the release revision.
+- Retain isolated disposable live-provider evidence for AWS S3, Cloudflare R2 and
+  the declared custom-provider profile. The current workflow's successful configured
+  profile is not evidence for every provider; record each result/credential form and
+  verify cleanup. Use isolated test credentials, never application credentials, and
+  require short-lived/session credentials. Any provider-specific exception needs an
+  explicit recorded decision and bounded disposable scope. Expand beyond the single mirror round trip to required upstream
+  scenarios, including conflict, retry/restart and multipart. Missing required
+  credentials block that claim/gate rather than yielding a fabricated pass.
+- Check secret-safe logs/status/metrics, local credential separation, shutdown and
+  artifact contents, checksums, version/tag identity and supported install pilots.
+- Verify artifacts before publication and perform clean-consumer checks against the
+  published artifacts before declaring release completion. Keep independent repeat-use
+  evidence in S4 visible separately; a package release is not proof of product fit.
 
-## Performance evidence and implications
+This checklist replaces the old R0–R11 execution order and obsolete version targets;
+it preserves the release-quality obligations. Any change to required provider/profile
+coverage needs an explicit contract decision, not a silent skip in a historical plan.
 
-The [local performance baseline](benchmarks/2026-09-27/tool-performance-baseline.md) is a machine-specific M1 Pro, loopback, memory-backend and local-APFS measurement. Fresh S3 session first upload is 24.06 ms p50; 8 to 16 sockets add about 8% local PUT throughput while p50 latency rises about 75% and loaded RSS rises 33.5 MiB. These results do not justify a connection cap or predict provider performance.
+**Exit:** a newcomer can install and complete the storage workflow without local binary overrides or unpublished source assumptions.
 
-The baseline identifies two follow-up measurements, not automatic changes: test memory at the configured maximum object size and realistic concurrent sessions, since the 16 MiB object quota is not a memory ceiling; and measure long-lived workspace disk usage/cleanup, since root plus registry is about 3× seeded payload with two full checkpoints. Existing checkpoint count/byte caps should be exercised in the soak.
+### S3. Deliver a thin MCP storage adapter and caller-owned agent integration
 
-## Source plans and evidence
+Follow the [MCP/OpenCode integration plan](mcp-storage-integration-plan.md).
+OpenCode runs in a separate prepared workspace; callers own execution and writer
+quiescence. Preserve files, required object metadata and explicitly saved context.
+Use bounded checkpoint retries with backoff, then explicit failure; reconcile
+ambiguous publication before retrying. Agent-requested saves remain best effort.
 
-- [Agent workspace, handoff, and run-through detail](agent-workspace-plan.md)
-- [Deploy-anywhere, portability, and multi-writer detail](deploy-anywhere-plan.md)
-- [Assessment and repair follow-up](assessment-2026-09-27.md)
-- [Workspace contract](workspace-contract.md) and [S3 compatibility contract](compat-contract.md)
-- [Raw and summarized performance measurements](benchmarks/2026-09-27/tool-performance-baseline.md)
-- [Current handoff notes](handoff-2026-09-27.md)
+| ID | Work and acceptance |
+| --- | --- |
+| S3-1 | Runtime-verify the caller-controlled profile against pinned OpenCode v2.0.16: exclusive prompt admission, explicit settled wait, terminal outcome and known-writer quiescence. Hold a caller-owned workspace lifetime; ordinary cwd usage is not a liveness claim. Start with three bounded capture attempts and a required caller deadline. |
+| S3-2 | Add shared capture request identity/resolve with atomically co-published local receipts; select/pin a compatible MCP SDK/toolchain. Expose bounded scoped stdio tools and guidance over those APIs plus typed shared handoff operations. Verify replay, partial outcomes, negotiated protocol and error semantics; do not auto-retry handoff mutations initially. |
+| S3-3 | Demonstrate separate prepared workspace → completed turn → saved context → confirmed checkpoint → next prompt. Test interruption, read-only turns, concurrent writers, retry exhaustion and restart; use transferred state with fresh context on the second supported host. Full chat restoration is deferred. |
+
+**Exit:** a real MCP client uses the existing storage semantics and portable state without document edits or missing-input reconstruction. Verified caller-controlled admission, settlement and save barriers support defined every-turn saves; prompt-only agent saves are labelled best effort. The result demonstrates an integration, not an implemented Stow runner or sandbox.
+
+### S4. Validate repeat use and choose the next investment
+
+Compare the completed workflow against users' actual tools and let retained use
+determine the next investment.
+
+| ID | Work and acceptance |
+| --- | --- |
+| S4-1 | Use both a meaningful S3 fixture application and OpenCode recovery workflow. Include Git plus fixtures, non-Git data, interrupted work and transfer. Separate missing state from model/task failure. |
+| S4-2 | Run the milestone's two-independent-team repeat-use study; record setup interventions, recovery effort, cost and retained use against actual alternatives. Refresh market research before an investment decision; old landscape snapshots are evidence of their dates only. |
+| S4-3 | Decide deepen/narrow/rework from that evidence. Reconsider deferred work through the [disposition register](planning-index.md), with a named consumer need and explicit scope decision for execution or hosted services. |
+
+**Exit:** evidence beyond internal smoke tests determines expansion. Finishing S0–S3 does not automatically reactivate the deferred execution plan.
+
+## Engineering reuse and API constraints
+
+Extend `pkg/stow`, `internal/storage/workspace`, `internal/runtime`, `internal/runthrough` and existing CLI/wrappers. `CheckpointOf` already captures an externally held workspace and shares the publication path with `Workspace.CreateCheckpoint`. A turn integration does not require a second registry or scheduler.
+
+Current checkpoint/transport formats are versioned, but their readers differ: handoff documents reject unknown fields while checkpoint manifests can ignore them and lose them on a typed round trip. Optional context is not an existing public checkpoint field. Prefer ordinary captured files for the first recipe; any schema extension needs explicit old-reader behavior and round-trip coverage. Storage credentials and live-write consent remain separate from handoff data.
+
+Implementation and evidence now live in this development tree. Remaining acceptance above stays open until its specific evidence exists. The [plan alignment review](storage-plan-alignment-2026-09-29.md) preserves the earlier engineering handover.

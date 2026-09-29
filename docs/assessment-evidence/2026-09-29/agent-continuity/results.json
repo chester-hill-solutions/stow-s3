@@ -1,0 +1,88 @@
+[
+  {
+    "name": "input recovered from offline cache after upstream stopped",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "worker A pauses with saved progress",
+    "passed": true,
+    "detail": "planned pause: validated input; aggregation remains"
+  },
+  {
+    "name": "unmodified relocated handoff works",
+    "passed": false,
+    "detail": "2026/09/29 00:29:09 read handoff archive: open /private/tmp/stow-agent-continuity-r4vxviay/sender/bundle/checkpoint.tar.gz: no such file or directory"
+  },
+  {
+    "name": "adoption with explicit relative-path workaround",
+    "passed": true,
+    "detail": {
+      "workspace_id": "ws_e9cef2fcb326bb2a"
+    }
+  },
+  {
+    "name": "generated upstream and local credentials absent from adopted files",
+    "passed": true,
+    "detail": []
+  },
+  {
+    "name": "worker B finishes from adopted files",
+    "passed": true,
+    "detail": {
+      "currency": "USD",
+      "by_customer_cents": {
+        "alice": 1500,
+        "bob": 900
+      },
+      "total_cents": 2400,
+      "source_sha256": "f5222565bbfc75ff9e51bea98436bd89da53a15d2332cb8b97e51b922a551007",
+      "continued_from_saved_progress": true
+    }
+  },
+  {
+    "name": "completion diff contains only progress and report",
+    "passed": true,
+    "detail": {
+      "version": 1,
+      "changes": [
+        {
+          "path": "progress.json",
+          "kind": "changed",
+          "from": {
+            "path": "progress.json",
+            "size": 236,
+            "mode": 420,
+            "sha256": "f1320a6789ec474f6c94abb195a3a65115e356fdbf6c2678d7ae592f3001a79f"
+          },
+          "to": {
+            "path": "progress.json",
+            "size": 248,
+            "mode": 420,
+            "sha256": "6ef818ae8dc085d3a675444289a6e0dcbde6c441f4ea057eab59e180147cd5e6"
+          }
+        },
+        {
+          "path": "report.json",
+          "kind": "added",
+          "to": {
+            "path": "report.json",
+            "size": 238,
+            "mode": 420,
+            "sha256": "f5ea2869d65494d542d27fa07340720f7fa60f55002ee4b8c5482c558450bd75"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "original sender paths unavailable during continuation",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "tampered archive refused before workspace creation",
+    "passed": true,
+    "detail": "2026/09/29 00:29:09 handoff archive /private/tmp/stow-agent-continuity-r4vxviay/receiver/corrupt/checkpoint.tar.gz has digest 9058a2bcb5fe5266a667676a6cf9ec250ded0c78a451d3904c745a237a1a5427, the handoff names e7e60f2cf1f71315877b4ea624635949ac093215af0e49244a52a8a25e1d6a5c"
+  }
+]

@@ -1,5 +1,7 @@
 # Stow assessment: codebase, tool, idea, and execution
 
+> **Planning disposition, 2026-09-29:** Historical assessment and repair record. Do not reopen its findings without checking the recorded repairs and current code; current defects are in S0. See [the plan](plan.md) and [disposition register](planning-index.md).
+
 The assessment below records the state of `main` at `155dff287e4b522b80acceacd12a945d2837b37b`, after fetching and fast-forwarding from origin. Its findings are historical: the implementation follow-up at the end of this document repairs the nine reproduced defects and adds lifecycle commands. Release and adoption gaps remain.
 
 ## Judgment

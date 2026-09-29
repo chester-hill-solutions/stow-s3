@@ -32,6 +32,9 @@ type S3Client struct {
 
 // NewS3Client builds an upstream client for a custom S3-compatible endpoint.
 func NewS3Client(cfg UpstreamConfig) (*S3Client, error) {
+	if err := validateUpstreamEndpoint(cfg); err != nil {
+		return nil, err
+	}
 	region := cfg.Region
 	if region == "" {
 		region = "us-east-1"
@@ -54,6 +57,7 @@ func NewS3Client(cfg UpstreamConfig) (*S3Client, error) {
 	// nothing else. The env vars are read where they are documented; this stops the
 	// machine from having an opinion.
 	awsCfg := aws.Config{
+		HTTPClient:  confinedUpstreamClient(),
 		Region:      region,
 		Credentials: credentials.NewStaticCredentialsProvider(cfg.AccessKey, cfg.SecretKey, cfg.SessionToken),
 	}
@@ -89,7 +93,7 @@ func (c *S3Client) HeadObject(ctx context.Context, bucket, key string) (*storage
 	if err != nil {
 		return nil, mapUpstreamError(err)
 	}
-	return headOutputToMeta(bucket, key, out), nil
+	return headOutputToMeta(bucket, key, out)
 }
 
 func (c *S3Client) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
@@ -100,7 +104,11 @@ func (c *S3Client) GetObject(ctx context.Context, bucket, key string) (io.ReadCl
 	if err != nil {
 		return nil, nil, mapUpstreamError(err)
 	}
-	meta := getOutputToMeta(bucket, key, out)
+	meta, err := getOutputToMeta(bucket, key, out)
+	if err != nil {
+		out.Body.Close()
+		return nil, nil, err
+	}
 	return out.Body, meta, nil
 }
 
@@ -130,13 +138,25 @@ func (c *S3Client) PutObject(ctx context.Context, bucket, key string, body io.Re
 	if opts.IfNoneMatch != "" {
 		input.IfNoneMatch = aws.String(opts.IfNoneMatch)
 	}
-	if len(opts.Metadata) > 0 {
-		input.Metadata = opts.Metadata
+	input.Metadata, err = storage.NormalizeUserMetadata(opts.Metadata)
+	if err != nil {
+		return "", err
 	}
+	setUpstreamPutChecksum(input, opts)
+	out, err := c.s3.PutObject(ctx, input)
+	if err != nil {
+		return "", mapUpstreamError(err)
+	}
+	return normalizeETag(aws.ToString(out.ETag)), nil
+}
+
+func setUpstreamPutChecksum(input *s3.PutObjectInput, opts storage.PutOptions) {
 	if opts.ChecksumAlgorithm != "" {
 		input.ChecksumAlgorithm = types.ChecksumAlgorithm(opts.ChecksumAlgorithm)
 		if opts.ChecksumValue != "" {
 			switch opts.ChecksumAlgorithm {
+			case "CRC64NVME":
+				input.ChecksumCRC64NVME = aws.String(opts.ChecksumValue)
 			case "CRC32":
 				input.ChecksumCRC32 = aws.String(opts.ChecksumValue)
 			case "CRC32C":
@@ -148,11 +168,6 @@ func (c *S3Client) PutObject(ctx context.Context, bucket, key string, body io.Re
 			}
 		}
 	}
-	out, err := c.s3.PutObject(ctx, input)
-	if err != nil {
-		return "", mapUpstreamError(err)
-	}
-	return normalizeETag(aws.ToString(out.ETag)), nil
 }
 
 func (c *S3Client) DeleteObject(ctx context.Context, bucket, key, ifMatch string) error {
@@ -237,36 +252,54 @@ func mapUpstreamError(err error) error {
 	}
 }
 
-func headOutputToMeta(bucket, key string, out *s3.HeadObjectOutput) *storage.ObjectMeta {
+func headOutputToMeta(bucket, key string, out *s3.HeadObjectOutput) (*storage.ObjectMeta, error) {
+	metadata, err := storage.NormalizeUserMetadata(out.Metadata)
+	if err != nil {
+		return nil, err
+	}
 	meta := &storage.ObjectMeta{
 		Bucket:      bucket,
 		Key:         key,
 		Size:        aws.ToInt64(out.ContentLength),
 		ETag:        normalizeETag(aws.ToString(out.ETag)),
 		ContentType: aws.ToString(out.ContentType),
-		Metadata:    storage.CloneMetadata(out.Metadata),
+		Metadata:    metadata,
 	}
-	applyUpstreamChecksum(meta, out.ChecksumCRC32, out.ChecksumCRC32C, out.ChecksumSHA1, out.ChecksumSHA256)
+	if out.ChecksumType != types.ChecksumTypeComposite {
+		applyUpstreamChecksum(meta, []upstreamChecksum{
+			{"CRC64NVME", out.ChecksumCRC64NVME}, {"CRC32", out.ChecksumCRC32},
+			{"CRC32C", out.ChecksumCRC32C}, {"SHA1", out.ChecksumSHA1}, {"SHA256", out.ChecksumSHA256},
+		})
+	}
 	if out.LastModified != nil {
 		meta.LastModified = out.LastModified.UTC()
 	}
-	return meta
+	return meta, nil
 }
 
-func getOutputToMeta(bucket, key string, out *s3.GetObjectOutput) *storage.ObjectMeta {
+func getOutputToMeta(bucket, key string, out *s3.GetObjectOutput) (*storage.ObjectMeta, error) {
+	metadata, err := storage.NormalizeUserMetadata(out.Metadata)
+	if err != nil {
+		return nil, err
+	}
 	meta := &storage.ObjectMeta{
 		Bucket:      bucket,
 		Key:         key,
 		Size:        aws.ToInt64(out.ContentLength),
 		ETag:        normalizeETag(aws.ToString(out.ETag)),
 		ContentType: aws.ToString(out.ContentType),
-		Metadata:    storage.CloneMetadata(out.Metadata),
+		Metadata:    metadata,
 	}
-	applyUpstreamChecksum(meta, out.ChecksumCRC32, out.ChecksumCRC32C, out.ChecksumSHA1, out.ChecksumSHA256)
+	if out.ChecksumType != types.ChecksumTypeComposite {
+		applyUpstreamChecksum(meta, []upstreamChecksum{
+			{"CRC64NVME", out.ChecksumCRC64NVME}, {"CRC32", out.ChecksumCRC32},
+			{"CRC32C", out.ChecksumCRC32C}, {"SHA1", out.ChecksumSHA1}, {"SHA256", out.ChecksumSHA256},
+		})
+	}
 	if out.LastModified != nil {
 		meta.LastModified = out.LastModified.UTC()
 	}
-	return meta
+	return meta, nil
 }
 
 func objectToMeta(bucket string, obj types.Object) storage.ObjectMeta {
@@ -293,16 +326,13 @@ func normalizeETag(etag string) string {
 	return "\"" + strings.Trim(etag, "\"") + "\""
 }
 
-func applyUpstreamChecksum(meta *storage.ObjectMeta, crc32Value, crc32cValue, sha1Value, sha256Value *string) {
-	for _, candidate := range []struct {
-		algorithm string
-		value     *string
-	}{
-		{algorithm: "CRC32", value: crc32Value},
-		{algorithm: "CRC32C", value: crc32cValue},
-		{algorithm: "SHA1", value: sha1Value},
-		{algorithm: "SHA256", value: sha256Value},
-	} {
+type upstreamChecksum struct {
+	algorithm string
+	value     *string
+}
+
+func applyUpstreamChecksum(meta *storage.ObjectMeta, candidates []upstreamChecksum) {
+	for _, candidate := range candidates {
 		if candidate.value != nil && aws.ToString(candidate.value) != "" {
 			meta.ChecksumAlgorithm = candidate.algorithm
 			meta.ChecksumValue = aws.ToString(candidate.value)

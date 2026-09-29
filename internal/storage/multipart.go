@@ -61,8 +61,8 @@ func ValidateMinPartSizes(sizes []int64) error {
 // ListMultipartUploads name the algorithm the upload will publish - so a client
 // that made the request is not silently ignored. Only the verification is
 // skipped, because there is nothing for it to work with. Verifying a whole-object
-// checksum for a multipart upload means deriving the composite of the per-part
-// checksums, which is a feature this does not have and should not pretend to.
+// checksum for a multipart upload requires a separate completion contract;
+// CRC64NVME is always full-object, while other algorithms may be composite.
 func MultipartPutOptions(opts MultipartOptions) PutOptions {
 	put := PutOptions{
 		ContentType: opts.ContentType,

@@ -175,4 +175,5 @@ function appendBooleanFlag(args, name, value) {
 function isWorkspaceJSON(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+export { serveWorkspace } from "./workspace-serve.js";
 //# sourceMappingURL=workspace.js.map

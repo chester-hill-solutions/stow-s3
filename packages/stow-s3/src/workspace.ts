@@ -287,3 +287,6 @@ function appendBooleanFlag(args: string[], name: string, value: boolean | undefi
 function isWorkspaceJSON(value: unknown): value is WorkspaceJSON {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+
+export { serveWorkspace } from "./workspace-serve.js";
+export type { ServeWorkspaceOptions, ServedWorkspace } from "./workspace-serve.js";

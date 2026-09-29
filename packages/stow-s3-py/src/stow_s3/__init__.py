@@ -18,6 +18,8 @@ or build a client from any S3 library using :attr:`Session.endpoint`,
 :attr:`Session.access_key_id` and :attr:`Session.secret_access_key`.
 """
 
+from .workspace_serve import ServedWorkspace, serve_workspace
+
 from .bin import (
     BinarySource,
     ResolvedBinary,
@@ -65,9 +67,11 @@ from .workspace import (
     run_workspace_command,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
+    "ServedWorkspace",
+    "serve_workspace",
     "BinarySource",
     "DEFAULT_SESSION_MAX_BYTES",
     "DEFAULT_SESSION_MAX_OBJECTS",

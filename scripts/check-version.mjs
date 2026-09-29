@@ -44,11 +44,16 @@ export function versionProblems({ goVersion, packageVersion, pythonProjectVersio
   return problems;
 }
 
+export function registryProblems(manifest) {
+ return manifest.publishConfig?.registry === "https://registry.npmjs.org" && manifest.publishConfig?.access === "public"
+   ? [] : [`${manifest.name} must declare the public npmjs publish destination`];
+}
+
 const root = resolve(import.meta.dirname, "..");
 const goSource = readFileSync(resolve(root, "internal/version/version.go"), "utf8");
 const goVersion = goSource.match(/const Version = "([^"]+)"/)?.[1];
 const packageJson = JSON.parse(readFileSync(resolve(root, "packages/stow-s3/package.json"), "utf8"));
-const problems = [];
+const problems = registryProblems(packageJson);
 
 // The platform packages carry the native binary, so a version skew between them
 // and the main package would publish a tarball whose binary is from a different
@@ -114,6 +119,7 @@ for (const platform of PLATFORM_PACKAGES) {
     }
   }
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  problems.push(...registryProblems(manifest));
   if (manifest.name !== platform.name) {
     problems.push(`packages/${platform.dir} is named ${manifest.name}, want ${platform.name}`);
   }

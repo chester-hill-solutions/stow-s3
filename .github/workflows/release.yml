@@ -8,10 +8,6 @@ on:
 permissions:
   contents: write
   id-token: write
-  # GitHub Packages is the registry this organisation publishes to, and the
-  # built-in GITHUB_TOKEN may publish packages belonging to this repository.
-  # That is why no npm secret exists anywhere in this workflow.
-  packages: write
 
 jobs:
   test:
@@ -55,22 +51,26 @@ jobs:
 
   build:
     name: Build (${{ matrix.os }}/${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: linux
             arch: amd64
+            runner: ubuntu-24.04
             platform_tag: manylinux_2_17_x86_64
           - os: linux
             arch: arm64
+            runner: ubuntu-24.04-arm
             platform_tag: manylinux_2_17_aarch64
           - os: darwin
             arch: amd64
+            runner: macos-15-intel
             platform_tag: macosx_11_0_x86_64
           - os: darwin
             arch: arm64
+            runner: macos-15
             platform_tag: macosx_11_0_arm64
     steps:
       - name: Checkout
@@ -155,6 +155,14 @@ jobs:
           print(f"wheel carries {binaries[0]} at {oct(mode)}")
           PY
 
+      - name: Run clean wheel consumer on native host
+        run: |
+          python -m venv "$RUNNER_TEMP/wheel-consumer"
+          "$RUNNER_TEMP/wheel-consumer/bin/python" -m pip install --no-index "$RUNNER_TEMP"/wheel/*.whl
+          cp scripts/smoke-python-consumer.py "$RUNNER_TEMP/smoke-python-consumer.py"
+          cd "$RUNNER_TEMP"
+          env -u STOW_BIN -u PYTHONPATH "$RUNNER_TEMP/wheel-consumer/bin/python" smoke-python-consumer.py
+
       - name: Upload wheel
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -169,6 +177,45 @@ jobs:
           path: stow-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
           if-no-files-found: error
 
+  consumer:
+    name: Packed npm consumer (${{ matrix.target }})
+    needs: [build, test]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-amd64
+            runner: ubuntu-24.04
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: darwin-amd64
+            runner: macos-15-intel
+          - target: darwin-arm64
+            runner: macos-15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: stow-${{ matrix.target }}
+          path: dist/native
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: npm-package
+          path: dist/npm
+      - name: Install packed packages outside the checkout
+        run: |
+          node scripts/pack-platform-package.mjs "dist/native/stow-${{ matrix.target }}.tar.gz" dist/platform
+          mkdir -p "$RUNNER_TEMP/npm-consumer"
+          cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/npm-consumer/"
+          cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
+          cd "$RUNNER_TEMP/npm-consumer"
+          npm install --ignore-scripts --registry=https://registry.npmjs.org ./*.tgz
+          env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${GITHUB_REF_NAME#v}"
+
   live_gate:
     name: Live provider gate
     if: startsWith(github.ref, 'refs/tags/v')
@@ -176,31 +223,12 @@ jobs:
     with:
       dry_run: false
       provider: auto
-      # The gate is enforced by default. A release is the one place where "we did
-      # not check" has to be expensive, so a missing live configuration fails the
-      # gate instead of skipping it.
-      #
-      # This was `false`, on the reasoning that `true` made every release
-      # impossible - which is true only while STOW_LIVE_* is unset, and the cause
-      # of that is unset secrets rather than a bad flag. What `false` actually
-      # permitted was a release publishing while recording that it had not been
-      # verified against anything: the notes said SKIPPED and the release went
-      # out anyway, which is a gate whose failure mode is the default.
-      #
-      # Set the repository variable STOW_ALLOW_UNVERIFIED_RELEASE=true to
-      # downgrade this to a skip. The release notes still record the skip, so a
-      # deliberate downgrade is visible in what gets published rather than
-      # silent, and the default stays enforcing.
-      require_configured: ${{ vars.STOW_ALLOW_UNVERIFIED_RELEASE != 'true' }}
-    secrets:
-      STOW_LIVE_ENDPOINT: ${{ secrets.STOW_LIVE_ENDPOINT }}
-      STOW_LIVE_ACCESS_KEY_ID: ${{ secrets.STOW_LIVE_ACCESS_KEY_ID }}
-      STOW_LIVE_SECRET_ACCESS_KEY: ${{ secrets.STOW_LIVE_SECRET_ACCESS_KEY }}
-      STOW_LIVE_SESSION_TOKEN: ${{ secrets.STOW_LIVE_SESSION_TOKEN }}
+      require_configured: true
+    secrets: inherit
 
   release:
     name: Release
-    needs: [build, test, live_gate]
+    needs: [build, test, consumer, live_gate]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
@@ -223,21 +251,18 @@ jobs:
           name: npm-package
           path: dist/npm
 
-      # GitHub Packages, not npmjs.org. This organisation publishes every one of
-      # its packages there and owns no packages on npmjs, where this scope does
-      # not exist, so publishing to npmjs returned 404 for a package rather than
-      # an authentication error and looked like a naming problem.
-      #
-      # The token is the built-in GITHUB_TOKEN, which may publish packages
-      # belonging to this repository. That is why no npm secret is stored
-      # anywhere: there is nothing to leak, rotate, or grant to a user.
       - name: Set up Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           node-version: 24
-          registry-url: https://npm.pkg.github.com
+          registry-url: https://registry.npmjs.org
+      - name: Require release account setup
+        env:
+          NPM_READY: ${{ vars.STOW_NPM_PUBLISH_READY }}
+          PYPI_READY: ${{ vars.STOW_PUBLISH_PYPI }}
+        run: |
+          test "$NPM_READY" = true || { echo 'Configure npmjs scope ownership and OIDC/token publishing, then set STOW_NPM_PUBLISH_READY=true'; exit 1; }
+          test "$PYPI_READY" = true || { echo 'Configure the PyPI trusted publisher, then set STOW_PUBLISH_PYPI=true'; exit 1; }
       - name: Verify npm package artifact
         shell: bash
         run: |
@@ -297,45 +322,16 @@ jobs:
           done
           ls -l dist/npm-platform
 
-      # A release is the one place where "is this actually published" is a
-      # question about the world rather than about the tree, so it is the one
-      # place worth asking a registry. This is what would have caught issue #3
-      # before the install instructions shipped pointing at nothing.
-      - name: Check the documented install surface against the registries
-        run: node scripts/check-install-surface.mjs --online
-
-      # The live gate skips when no provider is configured, so the release has
-      # to say out loud whether it was verified or skipped. Publishing a release
-      # whose notes imply a live-provider check that never ran is the same class
-      # of quiet failure as a gate that cannot be satisfied at all.
-      - name: Record live-provider gate status
-        id: live
-        env:
-          STOW_LIVE_ENDPOINT: ${{ secrets.STOW_LIVE_ENDPOINT }}
-        run: |
-          set -euo pipefail
-          if [[ -n "${STOW_LIVE_ENDPOINT:-}" ]]; then
-            echo "status=verified against the configured live provider" >> "$GITHUB_OUTPUT"
-          else
-            echo "status=SKIPPED - no live provider was configured, so this release is NOT verified against one" >> "$GITHUB_OUTPUT"
-            echo "::warning title=Live provider gate skipped::No STOW_LIVE_ENDPOINT is configured, so this release was published without a live-provider check."
-          fi
-
-      - name: Publish npm package
-        # No --provenance: npm provenance attestations are generated by the
-        # registry, and only npmjs implements them. GitHub Packages does not,
-        # so the flag attests to nothing here. Provenance for these packages
-        # comes from the repository link in package.json plus the fact that the
-        # publishing workflow is the only thing with permission to write them.
-        #
-        # The script publishes one tarball at a time and skips any version the
-        # registry already has, so a re-run completes a partial release instead
-        # of failing on the packages that already landed.
-        run: node scripts/publish-if-absent.mjs ./dist/npm/*.tgz
-
-      - name: Publish platform packages
-        run: node scripts/publish-if-absent.mjs ./dist/npm-platform/*.tgz
-
+      - name: Preflight exact npm artifacts
+        run: node scripts/publish-if-absent.mjs --check ./dist/npm-platform/*.tgz ./dist/npm/*.tgz
+      - name: Download live provider receipts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: live-receipt-*
+          path: dist/live-receipts
+          merge-multiple: true
+      - name: Require executed provider evidence
+        run: node scripts/check-live-receipts.mjs dist/live-receipts "$GITHUB_SHA"
       # PyPI, by trusted publishing from this workflow's OIDC identity, so there
       # is no API token to store. Every matrix entry contributes one wheel and
       # the set must cover the four supported platforms, or a user on a missing
@@ -368,6 +364,15 @@ jobs:
           done
           ls -l dist/wheel
 
+      - name: Publish platform packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: node scripts/publish-if-absent.mjs ./dist/npm-platform/*.tgz
+      - name: Publish npm package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: node scripts/publish-if-absent.mjs ./dist/npm/*.tgz
+
       # PyPI is off until a trusted publisher is configured for this project on
       # pypi.org. A step that can never succeed is the same "designed but not
       # wired" failure the live-provider gate used to be, and because the
@@ -389,13 +394,28 @@ jobs:
 
       - name: Publish to PyPI
         if: steps.pypi.outputs.status == 'enabled'
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           packages-dir: dist/wheel
           # attestations prove the wheel came from this workflow rather than
           # from somebody with upload access, which is the whole point of using
           # trusted publishing instead of a long-lived token.
           attestations: true
+      - name: Verify exact published versions as anonymous consumers
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          version="${RELEASE_VERSION#v}"
+          mkdir -p "$RUNNER_TEMP/anonymous-consumer"
+          cp scripts/smoke-npm-consumer.mjs scripts/smoke-python-consumer.py "$RUNNER_TEMP/anonymous-consumer/"
+          cd "$RUNNER_TEMP/anonymous-consumer"
+          touch "$RUNNER_TEMP/empty-npmrc"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "${GITHUB_REF_NAME#v}"
+          python3 -m venv python-consumer
+          env -u PIP_INDEX_URL -u PIP_EXTRA_INDEX_URL python-consumer/bin/python -m pip install --index-url=https://pypi.org/simple "stow-s3==$version"
+          env -u STOW_BIN -u PYTHONPATH python-consumer/bin/python smoke-python-consumer.py
+
       - name: Checksums
         run: |
           cd dist
@@ -437,6 +457,6 @@ jobs:
             The Go, TypeScript, and shared corpus gates must pass before this tag
             is published.
 
-            Live-provider gate: ${{ steps.live.outputs.status }}
+            Live-provider gate: AWS S3, Cloudflare R2, and custom S3 receipts verified for this commit.
 
             PyPI: ${{ steps.pypi.outputs.status }}

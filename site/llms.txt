@@ -38,14 +38,13 @@ then `export STOW_BIN="$PWD/bin/stow-s3"`, then `npm install && npm run build`
 in `packages/stow-s3` (TypeScript) or `pip install -e
 "packages/stow-s3-py[boto3]"` (Python). A published package carries its own
 binary and does not need `STOW_BIN`.
-The npm package is distributed through **GitHub Packages**, not npmjs.org. Once
-a complete release is announced, add this to `.npmrc` so npm resolves the scope
-against the intended registry:
-
-```ini
-@chester-hill-solutions:registry=https://npm.pkg.github.com
-```
-
+The next candidate, **0.3.0**, targets public npmjs distribution for the main
+package and all four platform carriers. It has **not yet been published**.
+Publisher setup, live-provider gates and anonymous exact-version installation
+must pass before availability is announced. The partial 0.2.0 GitHub Packages
+release is historical; its existing artifacts remain immutable. For the new
+candidate, remove any old scope override to `npm.pkg.github.com`; it would send
+installation requests to the wrong registry.
 
 If the binary cannot be found or run, `stow-s3 doctor` reports which side is
 broken.

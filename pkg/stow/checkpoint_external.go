@@ -15,9 +15,10 @@ import (
 // Answering either by opening the workspace claims the session, which is the one
 // thing a caller that is only asking cannot do to somebody else's live work.
 type WorkspaceReference struct {
-	ID     string
-	Dir    string
-	Bucket string
+	WorkingDirectory string
+	ID               string
+	Dir              string
+	Bucket           string
 	// MaxCheckpointBytes and MaxCheckpoints are the caps a capture enforces, and
 	// they are recorded rather than derived, so a capture from outside the
 	// workspace enforces the same limits its handle would.
@@ -28,7 +29,7 @@ type WorkspaceReference struct {
 // LookupWorkspace reads one workspace's registry entry. It starts no process,
 // claims nothing, and writes nothing.
 func LookupWorkspace(registryDir, id string) (WorkspaceReference, error) {
-	registry, err := openRegistry(registryDir, "")
+	registry, err := openRegistryReadOnly(registryDir, "")
 	if err != nil {
 		return WorkspaceReference{}, err
 	}
@@ -40,7 +41,7 @@ func LookupWorkspace(registryDir, id string) (WorkspaceReference, error) {
 		return WorkspaceReference{}, fmt.Errorf("stow: no workspace with id %s", id)
 	}
 	return WorkspaceReference{
-		ID: entry.ID, Dir: entry.Dir, Bucket: entry.Bucket,
+		ID: entry.ID, Dir: entry.Dir, Bucket: entry.Bucket, WorkingDirectory: entry.WorkingDirectory,
 		MaxCheckpointBytes: entry.MaxCheckpointBytes, MaxCheckpoints: entry.MaxCheckpoints,
 	}, nil
 }
@@ -64,6 +65,10 @@ func CheckpointOf(ctx context.Context, registryDir, id string, options Checkpoin
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	registryDir, err := ResolveRegistryDir(registryDir, "")
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
 	reference, err := LookupWorkspace(registryDir, id)
 	if err != nil {
 		return CheckpointInfo{}, err
@@ -72,11 +77,15 @@ func CheckpointOf(ctx context.Context, registryDir, id string, options Checkpoin
 	// of one workspace are in flight. It is a different lock from the session for a
 	// reason: the session says "somebody is using this", and this one says "do not
 	// publish two checkpoints past the same cap".
-	lock, err := workspace.AcquireCapture(registryDir, reference.ID)
+	lock, err := workspace.AcquireMutationCapture(registryDir, reference.ID)
 	if err != nil {
 		return CheckpointInfo{}, err
 	}
 	defer lock.Release()
+	reference, err = LookupWorkspace(registryDir, id)
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
 	return captureCheckpoint(ctx, captureTarget{
 		dir: reference.Dir, registryDir: registryDir, workspaceID: reference.ID,
 		maxCheckpointBytes: reference.MaxCheckpointBytes, maxCheckpoints: reference.MaxCheckpoints,

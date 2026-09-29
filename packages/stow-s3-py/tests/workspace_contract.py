@@ -38,6 +38,7 @@ from workspace_contract_matchers import (
     _same_json,
 )
 from stow_s3 import (
+    serve_workspace,
     adopt_workspace_handoff,
     apply_workspace_delta,
     checkpoint_workspace,
@@ -224,6 +225,9 @@ def _invoke(run: Run, step: dict[str, Any]) -> Any:
             registry_dir=registry_dir,
             team=team,
         )
+    if verb == "serve":
+        with serve_workspace(args["id"], registry_dir=_registry_dir_for(run, step), team=step.get("team")) as serving:
+            return serving.ready
     if verb == "resume":
         return resume_workspace(handoff=args["handoff"])
     if verb == "list":

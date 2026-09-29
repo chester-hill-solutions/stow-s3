@@ -401,7 +401,7 @@ func DefaultWorkspaceRegistryDirForTeam(team string) (string, error) {
 // register records a workspace so a later process can resume it. A failure to
 // register is reported rather than swallowed: an unregistered workspace cannot
 // be resumed, and the caller is the only one who can decide that is acceptable.
-func (w *Workspace) register(registryDir string, ttlSeconds int64) error {
+func (w *Workspace) register(registryDir string, ttlSeconds, maxWorkspaces int64) error {
 	registry, err := openRegistry(registryDir, "")
 	if err != nil {
 		return err
@@ -409,7 +409,7 @@ func (w *Workspace) register(registryDir string, ttlSeconds int64) error {
 	w.registry = registry
 	w.registryDir = registry.Dir()
 	now := w.nowFunc()()
-	return registry.Register(workspace.Entry{
+	return registry.RegisterWithLimit(workspace.Entry{
 		ID:                 w.id,
 		Dir:                w.dir,
 		WorkingDirectory:   w.workingDirectory,
@@ -424,7 +424,7 @@ func (w *Workspace) register(registryDir string, ttlSeconds int64) error {
 		MaxCheckpointBytes: w.maxCheckpointBytes,
 		MaxCheckpoints:     w.maxCheckpoints,
 		Owned:              w.store.IsOwned(),
-	})
+	}, maxWorkspaces)
 }
 
 // Touch records that the workspace was used, which is what a TTL is measured

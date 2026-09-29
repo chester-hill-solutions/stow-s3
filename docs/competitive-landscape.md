@@ -1,5 +1,7 @@
 # Competitive landscape: local S3 emulation, self-hosted S3 servers, and the MinIO-EOL question
 
+> **Planning disposition, 2026-09-29:** Dated market research. Its recommendations and linked old priorities do not schedule work. Refresh material claims before S4 investment decisions. See [the plan](plan.md) and [disposition register](planning-index.md).
+
 **Status:** research snapshot. All external sources accessed **2026-09-25**.
 
 ## Method and evidence rules

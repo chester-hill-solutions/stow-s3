@@ -43,7 +43,15 @@ func TestWorkspaceAdoptMaterialisesAWorkspaceFromAPortableHandoff(t *testing.T) 
 	}
 	// The archive travels as the reference names it, so a relative path is what
 	// the pair is actually moved around with.
-	rewriteArchiveAsRelative(t, handoffPath, filepath.Base(archive))
+	if document.Archive.Path != filepath.Base(archive) {
+		t.Fatalf("archive path = %q", document.Archive.Path)
+	}
+	moved := filepath.Join(t.TempDir(), "bundle")
+	if err := os.Rename(pair, moved); err != nil {
+		t.Fatal(err)
+	}
+	handoffPath = filepath.Join(moved, "handoff.json")
+	t.Chdir(t.TempDir())
 
 	receiverRegistry := filepath.Join(t.TempDir(), "receiver-registry")
 	root := filepath.Join(t.TempDir(), "adopted")

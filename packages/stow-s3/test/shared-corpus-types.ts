@@ -20,6 +20,7 @@ export interface CorpusPage {
 }
 
 export interface CorpusExpectation {
+  deleted?: string[];
   status: number;
   body?: string;
   contentType?: string;
@@ -44,6 +45,13 @@ export interface CorpusExpectation {
 }
 
 export interface CorpusCase {
+ continuationToken?: string;
+ method?: string;
+ virtualHost?: boolean;
+ signingOffsetSeconds?: number;
+  multipartFailure?: string;
+  deleteKeys?: string[];
+  quiet?: boolean;
   id: string;
   operation: string;
   bucket: string;

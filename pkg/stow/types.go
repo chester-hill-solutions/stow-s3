@@ -18,9 +18,10 @@ const (
 )
 
 type Options struct {
-	Backend    Backend
-	MaxBytes   int64
-	MaxObjects int64
+	Backend             Backend
+	MaxBytes            int64
+	MaxObjects          int64
+	MaxMultipartUploads int64
 
 	// Store is where the objects live. A nil Store means the memory backend,
 	// which is what an embedded runtime has always done.
@@ -47,12 +48,13 @@ type Options struct {
 }
 
 type Capabilities struct {
-	Backend    Backend
-	MaxBytes   int64
-	MaxObjects int64
-	Persistent bool
-	Multipart  bool
-	Upstream   bool
+	Backend             Backend
+	MaxBytes            int64
+	MaxObjects          int64
+	MaxMultipartUploads int64
+	Persistent          bool
+	Multipart           bool
+	Upstream            bool
 }
 
 type Usage struct {

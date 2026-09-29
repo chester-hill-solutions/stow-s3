@@ -45,6 +45,9 @@ func (s *Store) Destroy() error {
 // assertDestructible applies both defences and explains a refusal in terms the
 // caller can act on, rather than returning a bare sentinel.
 func (s *Store) assertDestructible() error {
+	if err := s.checkRootIdentity(); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("%w: %v", ErrNotDestructible, err)
+	}
 	if !s.manifest.Owned {
 		return fmt.Errorf("%w: %s already existed, so stow adopted it. "+
 			"Remove it yourself if that is what you want", ErrNotDestructible, s.root)

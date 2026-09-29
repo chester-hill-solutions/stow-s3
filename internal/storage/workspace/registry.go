@@ -148,7 +148,11 @@ func (r *Registry) entryPath(id string) string {
 
 // Register records a workspace and returns its entry.
 func (r *Registry) Register(entry Entry) error {
-	if entry.ID == "" {
+	return r.RegisterWithLimit(entry, 0)
+}
+
+func (r *Registry) register(entry Entry) error {
+	if !ValidWorkspaceID(entry.ID) {
 		return fmt.Errorf("workspace: registry entry needs an id")
 	}
 	if entry.Created.IsZero() {
@@ -169,6 +173,9 @@ func (r *Registry) Register(entry Entry) error {
 
 // Lookup returns the entry for a session ID.
 func (r *Registry) Lookup(id string) (Entry, bool, error) {
+	if !ValidWorkspaceID(id) {
+		return Entry{}, false, fmt.Errorf("workspace: invalid workspace ID %q", id)
+	}
 	raw, err := os.ReadFile(r.entryPath(id))
 	if errors.Is(err, os.ErrNotExist) {
 		return Entry{}, false, nil
@@ -180,6 +187,9 @@ func (r *Registry) Lookup(id string) (Entry, bool, error) {
 	if err != nil {
 		return Entry{}, false, err
 	}
+	if entry.ID != id {
+		return Entry{}, false, fmt.Errorf("workspace: registry entry identity mismatch")
+	}
 	return entry, true, nil
 }
 
@@ -187,10 +197,15 @@ func (r *Registry) Lookup(id string) (Entry, bool, error) {
 // Destroy converge on the same end state: the bytes go, and so does the name
 // they were filed under.
 func (r *Registry) Forget(id string) error {
-	if err := os.Remove(r.entryPath(id)); err != nil && !errors.Is(err, os.ErrNotExist) {
+	if !ValidWorkspaceID(id) {
+		return fmt.Errorf("workspace: invalid workspace ID %q", id)
+	}
+	if err := os.Remove(r.entryPath(id)); errors.Is(err, os.ErrNotExist) {
+		return nil
+	} else if err != nil {
 		return fmt.Errorf("workspace: forget registry entry: %w", err)
 	}
-	return nil
+	return syncRegistryDirectory(r.dir)
 }
 
 // All returns every recorded workspace, ordered by ID so a sweep is
@@ -218,6 +233,9 @@ func (r *Registry) All() ([]Entry, error) {
 			// would make every workspace permanent.
 			continue
 		}
+		if entry.ID+".json" != name.Name() {
+			continue
+		}
 		entries = append(entries, entry)
 	}
 	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
@@ -229,7 +247,7 @@ func decodeEntry(raw []byte) (Entry, error) {
 	if err := json.Unmarshal(raw, &entry); err != nil {
 		return Entry{}, fmt.Errorf("workspace: decode registry entry: %w", err)
 	}
-	if entry.ID == "" {
+	if !ValidWorkspaceID(entry.ID) {
 		return Entry{}, fmt.Errorf("workspace: registry entry has no id")
 	}
 	return entry, nil
@@ -271,20 +289,10 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 		if !act {
 			continue
 		}
-		if err := reclaimWorkspace(entry); err != nil {
-			// A workspace that cannot be opened right now — a permission
-			// problem, a path that has gone — is recorded and skipped, not
-			// fatal. One bad entry must not make the rest permanent.
+		if err := r.RemoveWorkspace(entry.ID, func() error { return r.reclaimCurrent(entry.ID, now) }); err != nil {
 			out[len(out)-1].Reason = "unreadable: " + err.Error()
-			continue
 		}
-		if err := r.ForgetCheckpoints(entry.ID); err != nil {
-			out[len(out)-1].Reason = "unreadable: " + err.Error()
-			continue
-		}
-		if err := r.Forget(entry.ID); err != nil {
-			return out, err
-		}
+
 	}
 	return out, nil
 }
@@ -294,8 +302,8 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 // Not Collect with a different threshold: Collect asks whether a workspace is
 // finished with, a judgement about time and ownership that destroys directories.
 // Prune asks whether anything is there at all, which is a fact, and removes stow's
-// own records and nothing else — so it cannot delete user data, and it needs no lock
-// support because there is nothing to quiesce.
+// own records and nothing else. It shares capture exclusion so retained receipts
+// cannot disappear while another caller reconciles a checkpoint.
 //
 // Collect cannot reach these by default: a prepared workspace has no TTL and one
 // opened on a caller's directory is adopted, so both classify forever and nothing takes
@@ -315,13 +323,15 @@ func (r *Registry) Prune(includeAdopted bool) ([]Reclaim, error) {
 		if !act {
 			continue
 		}
-		if err := r.ForgetCheckpoints(entry.ID); err != nil {
+		if err := r.RemoveWorkspace(entry.ID, func() error {
+			if _, act := classifyPrunable(entry, includeAdopted); !act {
+				return fmt.Errorf("workspace: no longer prunable")
+			}
+			return nil
+		}); err != nil {
 			out[len(out)-1].Reason = "unreadable: " + err.Error()
-			continue
 		}
-		if err := r.Forget(entry.ID); err != nil {
-			return out, err
-		}
+
 	}
 	return out, nil
 }
@@ -374,10 +384,29 @@ func (r *Registry) classify(entry Entry, now time.Time) (reason string, act bool
 // through the same ownership and protected-path checks a caller gets. The
 // collector has no privilege of its own.
 func reclaimWorkspace(entry Entry) error {
+	session, err := AcquireSession(entry.Dir)
+	if err != nil {
+		return err
+	}
+	defer session.Release()
 	store, err := New(Options{Root: entry.Dir, Bucket: entry.Bucket})
 	if err != nil {
 		return err
 	}
 	defer store.Close()
 	return store.Destroy()
+}
+
+func (r *Registry) reclaimCurrent(id string, now time.Time) error {
+	entry, found, err := r.Lookup(id)
+	if err != nil {
+		return err
+	}
+	if !found {
+		return fmt.Errorf("workspace: entry disappeared before collection")
+	}
+	if reason, act := r.classify(entry, now); !act {
+		return fmt.Errorf("workspace: no longer collectable: %s", reason)
+	}
+	return reclaimWorkspace(entry)
 }

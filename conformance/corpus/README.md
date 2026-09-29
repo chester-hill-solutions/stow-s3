@@ -15,10 +15,13 @@ operation; an omitted setup bucket means the case bucket.
 
 | Operation | Request fields | Assertions |
 |-----------|----------------|------------|
+| `signedRequest` | `method`, optional `signingOffsetSeconds`, `virtualHost` | real SigV4 presigned request, status/body/error, PUT readback |
+| `bucketLifecycle` / `deleteObjects` | `deleteKeys`, optional `quiet`, setup | bucket state, batch successes, missing-key idempotence |
+| `multipartFailure` | `parts`, `multipartFailure` scenario | invalid/empty/order/ETag/size/aborted/repeated completion refusal |
 | `putGetRoundTrip` | common object fields | status, ETag, body, content type, metadata |
 | `conditionalPut` / `conditionalGet` | `ifMatch` and/or `ifNoneMatch` | status and S3 error code, or the stored result |
 | `checksumPut` | `contentMD5` or `checksumAlgorithm`/`checksumValue` | status/error code, body, and returned checksum |
-| `listObjectsV2` | `prefix`, `delimiter`, `maxKeys`, `encodingType` | ordered `expect.pages` with contents, common prefixes, key count, and truncation |
+| `listObjectsV2` | `prefix`, `delimiter`, `maxKeys`, `encodingType`, optional `continuationToken` | ordered `expect.pages` with contents, common prefixes, key count, and truncation |
 | `copyObject` | source/destination fields, optional directive and source preconditions | status/error code, ETag, destination object |
 | `multipartUpload` | `parts` (`number`, `body`, optional `repeat`) and optional upload listing | create/upload/list/complete, concatenated body, composite ETag |
 
@@ -38,3 +41,6 @@ part.
 Bucket names in the JSON are logical names. The Go runner maps them to unique
 per-case buckets so the filesystem and memory matrices remain isolated; the
 Node runner creates the same logical set in a fresh temporary data directory.
+
+The current 51-case acceptance and focused wire-test mapping is recorded in
+[compatibility coverage](../../docs/compatibility-coverage-2026-09-29.md).

@@ -1,5 +1,10 @@
 # Agent task manifest
 
+**0.3.0 development additions:** the [portable workspace contract and usage](portable-workspace-usage.md)
+specifies the implemented facade, opt-in v2 snapshots, capture-request reconciliation,
+registry policy and MCP surface. Existing v1 file checkpoints remain supported.
+
+
 `stow-s3 workspace prepare` creates a new, Stow-owned directory, copies the
 declared local inputs into it, and prints a JSON launch descriptor. A task runner
 starts its agent with the returned `working_directory` as the process cwd.
@@ -79,7 +84,8 @@ workspace is filed at the registry root, which is where every workspace that
 predates the field already is.
 
 Create an immutable snapshot with `stow-s3 workspace checkpoint --id <id>`.
-Neither the checkpoint nor the handoff needs the workspace to be idle: both
+A live owner may retain the workspace claim while capture or handoff runs. Reliable
+capture requires the caller to pause writers; both
 resolve the workspace from the registry and read its directory, so an agent can
 keep working while a snapshot is taken. The only command that takes the workspace
 over is `resume`. Compare two snapshots with
@@ -189,4 +195,6 @@ The workspace is an isolated copy for safe task editing. It is not an OS sandbox
 an agent running as the same user can still access other paths and network
 resources allowed to that process. Limits are checked during preparation and
 through Stow's object API, but ordinary file writes made directly by the agent
-are not hard-enforced by the runtime.
+are not hard-enforced by the runtime. The exploratory
+[Agent Isolate proposal](agent-isolate-exploration.md) describes the additional
+execution boundary and supervision this would require.

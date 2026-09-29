@@ -23,7 +23,7 @@ func runCorpusListObjects(corpusContext *sharedCorpusContext) {
 			IsTruncated:    testCase.Expect.IsTruncated != nil && *testCase.Expect.IsTruncated,
 		}}
 	}
-	var continuationToken *string
+	continuationToken := optionalString(testCase.ContinuationToken)
 	for index, expectedPage := range pages {
 		input := &s3.ListObjectsV2Input{
 			Bucket:            aws.String(corpusContext.bucket(testCase.Bucket)),
@@ -34,6 +34,10 @@ func runCorpusListObjects(corpusContext *sharedCorpusContext) {
 			EncodingType:      types.EncodingType(testCase.EncodingType),
 		}
 		output, err := corpusContext.env.Client.ListObjectsV2(corpusContext.ctx, input)
+		if testCase.Expect.Status >= 400 {
+			assertCorpusError(corpusContext.t, err, testCase.Expect)
+			return
+		}
 		if err != nil {
 			corpusContext.t.Fatalf("ListObjectsV2 page %d: %v", index+1, err)
 		}

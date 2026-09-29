@@ -113,7 +113,10 @@ func (s *Server) copyVerbatim(ctx context.Context, r *http.Request, req copyRequ
 // it. A head-then-read ordering would let a source that moves on in between turn
 // a refusal into a copy of a version the caller did not ask for.
 func (s *Server) replaceMetadata(ctx context.Context, r *http.Request, req copyRequest) (*storage.ObjectMeta, error) {
-	metadata := extractMetadata(r.Header)
+	metadata, err := extractMetadata(r.Header)
+	if err != nil {
+		return nil, err
+	}
 	if len(metadata) > 0 && metadataSize(metadata) > maxMetadataBytes {
 		return nil, errMetadataTooLarge
 	}

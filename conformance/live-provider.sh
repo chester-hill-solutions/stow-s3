@@ -86,22 +86,17 @@ classify_endpoint() {
 # profile_provider is the endpoint class a profile reports during a dry run,
 # before a real endpoint is known.
 profile_provider() {
-  if [[ $1 == aws-s3 ]]; then
-    printf 'aws-s3'
-  else
-    printf 'cloudflare-r2'
-  fi
+  case "$1" in
+    cloudflare-r2-custom) printf 'cloudflare-r2' ;;
+    *) printf '%s' "$1" ;;
+  esac
 }
 
-# profile_accepts keeps the profile-to-endpoint mapping in one place: the AWS
-# profile only runs against AWS, and the R2/custom profile runs against
-# anything that is not AWS.
 profile_accepts() {
-  if [[ $1 == aws-s3 ]]; then
-    [[ $2 == aws-s3 ]]
-  else
-    [[ $2 != aws-s3 ]]
-  fi
+  case "$1" in
+    cloudflare-r2-custom) [[ $2 != aws-s3 ]] ;;
+    *) [[ $1 == "$2" ]] ;;
+  esac
 }
 
 resolve() {
@@ -111,12 +106,12 @@ resolve() {
   local missing=()
 
   case "$profile" in
-    aws-s3|cloudflare-r2-custom) ;;
-    *) fail "STOW_LIVE_PROFILE must be aws-s3 or cloudflare-r2-custom" ;;
+    aws-s3|cloudflare-r2|custom|cloudflare-r2-custom) ;;
+    *) fail "STOW_LIVE_PROFILE must be aws-s3, cloudflare-r2, or custom" ;;
   esac
   case "$requested" in
-    auto|aws-s3|cloudflare-r2-custom) ;;
-    *) fail "requested provider must be auto, aws-s3, or cloudflare-r2-custom" ;;
+    auto|aws-s3|cloudflare-r2|custom|cloudflare-r2-custom) ;;
+    *) fail "requested provider must be auto, aws-s3, cloudflare-r2, or custom" ;;
   esac
   dry_run=$(parse_bool STOW_CONFORMANCE_DRY_RUN false)
   require_configured=$(parse_bool STOW_CONFORMANCE_REQUIRE_CONFIGURED false)
@@ -148,7 +143,7 @@ resolve() {
   actual=$(classify_endpoint "$STOW_ENDPOINT")
   if ! profile_accepts "$profile" "$actual"; then
     skip_profile endpoint-does-not-match-profile
-    if [[ $requested != auto ]]; then
+    if [[ $requested != auto || $require_configured == true ]]; then
       fail "the configured endpoint is $actual, which does not match the $profile profile"
     fi
     return 0

@@ -60,7 +60,7 @@ func loadSharedCorpus(t *testing.T) sharedCorpus {
 
 func supportedCorpusChecksum(algorithm string) bool {
 	switch strings.ToUpper(algorithm) {
-	case "CRC32", "CRC32C", "SHA1", "SHA256":
+	case "CRC32", "CRC32C", "CRC64NVME", "SHA1", "SHA256":
 		return true
 	default:
 		return false
@@ -76,14 +76,18 @@ func validateSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		t.Fatalf("corpus case %q has no expected status", testCase.ID)
 	}
 	validators := map[string]func(*testing.T, sharedCorpusCase){
-		"putGetRoundTrip": validateObjectCorpusCase,
-		"conditionalPut":  validateConditionalCorpusCase,
-		"conditionalGet":  validateConditionalCorpusCase,
-		"checksumPut":     validateChecksumCorpusCase,
-		"listObjectsV2":   validateListCorpusCase,
-		"copyObject":      validateCopyCorpusCase,
-		"multipartUpload": validateMultipartCorpusCase,
-		"rangeGet":        validateRangeCorpusCase,
+		"signedRequest":    validateObjectCorpusCase,
+		"multipartFailure": validateMultipartCorpusCase,
+		"bucketLifecycle":  validateBucketCorpusCase,
+		"deleteObjects":    validateBucketCorpusCase,
+		"putGetRoundTrip":  validateObjectCorpusCase,
+		"conditionalPut":   validateConditionalCorpusCase,
+		"conditionalGet":   validateConditionalCorpusCase,
+		"checksumPut":      validateChecksumCorpusCase,
+		"listObjectsV2":    validateListCorpusCase,
+		"copyObject":       validateCopyCorpusCase,
+		"multipartUpload":  validateMultipartCorpusCase,
+		"rangeGet":         validateRangeCorpusCase,
 	}
 	validator, ok := validators[testCase.Operation]
 	if !ok {
@@ -152,6 +156,10 @@ func validateRangeCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 
 func validateListCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 	t.Helper()
+	if testCase.Expect.Status >= 400 {
+		validateBucketCorpusCase(t, testCase)
+		return
+	}
 	if testCase.Bucket == "" || testCase.MaxKeys <= 0 || len(testCase.Expect.Pages) == 0 {
 		t.Fatalf("list case %q requires bucket, maxKeys, and pages", testCase.ID)
 	}
@@ -173,5 +181,12 @@ func validateMultipartCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		if part.Number < 1 || part.Number > 10000 || part.Repeat < 0 {
 			t.Fatalf("multipart case %q has invalid part", testCase.ID)
 		}
+	}
+}
+
+func validateBucketCorpusCase(t *testing.T, testCase sharedCorpusCase) {
+	t.Helper()
+	if testCase.Bucket == "" {
+		t.Fatalf("corpus case %q requires bucket", testCase.ID)
 	}
 }

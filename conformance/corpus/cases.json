@@ -507,6 +507,515 @@
         "errorCode": "InvalidRange",
         "contentRange": "bytes */20"
       }
+    },
+    {
+      "id": "metadata-case-normalizes-sdk-keys",
+      "operation": "putGetRoundTrip",
+      "bucket": "contract-meta-case",
+      "key": "object",
+      "body": "metadata",
+      "metadata": {
+        "Project": "stow",
+        "RUN-ID": "one"
+      },
+      "expect": {
+        "status": 200,
+        "body": "metadata",
+        "metadata": {
+          "project": "stow",
+          "run-id": "one"
+        }
+      }
+    },
+    {
+      "id": "checksum-crc64nvme-roundtrip",
+      "operation": "checksumPut",
+      "bucket": "contract-crc64nvme",
+      "key": "object",
+      "body": "hello world",
+      "checksumAlgorithm": "CRC64NVME",
+      "checksumValue": "jSnVw/bqjr4=",
+      "expect": {
+        "status": 200,
+        "body": "hello world",
+        "checksumAlgorithm": "CRC64NVME",
+        "checksumValue": "jSnVw/bqjr4="
+      }
+    },
+    {
+      "id": "checksum-crc32c-roundtrip",
+      "operation": "checksumPut",
+      "bucket": "contract-crc32c",
+      "key": "object",
+      "body": "hello world",
+      "checksumAlgorithm": "CRC32C",
+      "checksumValue": "yZRlqg==",
+      "expect": {
+        "status": 200,
+        "body": "hello world",
+        "checksumAlgorithm": "CRC32C",
+        "checksumValue": "yZRlqg=="
+      }
+    },
+    {
+      "id": "checksum-sha1-roundtrip",
+      "operation": "checksumPut",
+      "bucket": "contract-sha1",
+      "key": "object",
+      "body": "hello world",
+      "checksumAlgorithm": "SHA1",
+      "checksumValue": "Kq5sNclPz7QV2+lfQIuc6R7oRu0=",
+      "expect": {
+        "status": 200,
+        "body": "hello world",
+        "checksumAlgorithm": "SHA1",
+        "checksumValue": "Kq5sNclPz7QV2+lfQIuc6R7oRu0="
+      }
+    },
+    {
+      "id": "checksum-sha256-roundtrip",
+      "operation": "checksumPut",
+      "bucket": "contract-sha256",
+      "key": "object",
+      "body": "hello world",
+      "checksumAlgorithm": "SHA256",
+      "checksumValue": "uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek=",
+      "expect": {
+        "status": 200,
+        "body": "hello world",
+        "checksumAlgorithm": "SHA256",
+        "checksumValue": "uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek="
+      }
+    },
+    {
+      "id": "checksum-crc64nvme-rejects-mismatch",
+      "operation": "checksumPut",
+      "bucket": "contract-crc64nvme-bad",
+      "key": "object",
+      "body": "hello world",
+      "checksumAlgorithm": "CRC64NVME",
+      "checksumValue": "AAAAAAAAAAA=",
+      "expect": {
+        "status": 400,
+        "errorCode": "BadDigest"
+      }
+    },
+    {
+      "id": "copy-conditional-matching-etag",
+      "operation": "copyObject",
+      "bucket": "contract-copy-conditions",
+      "sourceBucket": "contract-copy-conditions",
+      "sourceKey": "source",
+      "destinationKey": "copy",
+      "setup": [
+        {
+          "key": "source",
+          "body": "source",
+          "metadata": {
+            "Project": "stow"
+          }
+        }
+      ],
+      "copySourceIfMatch": "\"36cd38f49b9afa08222c0dc9ebfe35eb\"",
+      "expect": {
+        "status": 200,
+        "body": "source",
+        "metadata": {
+          "project": "stow"
+        }
+      }
+    },
+    {
+      "id": "copy-conditional-none-match-rejects",
+      "operation": "copyObject",
+      "bucket": "contract-copy-conditions",
+      "sourceBucket": "contract-copy-conditions",
+      "sourceKey": "source",
+      "destinationKey": "copy",
+      "setup": [
+        {
+          "key": "source",
+          "body": "source",
+          "metadata": {
+            "Project": "stow"
+          }
+        }
+      ],
+      "copySourceIfNoneMatch": "\"36cd38f49b9afa08222c0dc9ebfe35eb\"",
+      "expect": {
+        "status": 412,
+        "errorCode": "PreconditionFailed"
+      }
+    },
+    {
+      "id": "copy-conditional-combined-rejects",
+      "operation": "copyObject",
+      "bucket": "contract-copy-conditions",
+      "sourceBucket": "contract-copy-conditions",
+      "sourceKey": "source",
+      "destinationKey": "copy",
+      "setup": [
+        {
+          "key": "source",
+          "body": "source",
+          "metadata": {
+            "Project": "stow"
+          }
+        }
+      ],
+      "copySourceIfMatch": "\"36cd38f49b9afa08222c0dc9ebfe35eb\"",
+      "copySourceIfNoneMatch": "\"36cd38f49b9afa08222c0dc9ebfe35eb\"",
+      "expect": {
+        "status": 412,
+        "errorCode": "PreconditionFailed"
+      }
+    },
+    {
+      "id": "copy-conditional-none-match-allows",
+      "operation": "copyObject",
+      "bucket": "contract-copy-conditions",
+      "sourceBucket": "contract-copy-conditions",
+      "sourceKey": "source",
+      "destinationKey": "copy",
+      "setup": [
+        {
+          "key": "source",
+          "body": "source",
+          "metadata": {
+            "Project": "stow"
+          }
+        }
+      ],
+      "copySourceIfNoneMatch": "\"different\"",
+      "expect": {
+        "status": 200,
+        "body": "source",
+        "metadata": {
+          "project": "stow"
+        }
+      }
+    },
+    {
+      "id": "bucket-lifecycle",
+      "operation": "bucketLifecycle",
+      "bucket": "contract-buckets",
+      "expect": {
+        "status": 204
+      }
+    },
+    {
+      "id": "bucket-delete-rejects-nonempty",
+      "operation": "bucketLifecycle",
+      "bucket": "contract-nonempty",
+      "setup": [
+        {
+          "key": "object",
+          "body": "body"
+        }
+      ],
+      "expect": {
+        "status": 409,
+        "errorCode": "BucketNotEmpty"
+      }
+    },
+    {
+      "id": "batch-delete-reports-existing-and-missing",
+      "operation": "deleteObjects",
+      "bucket": "contract-delete",
+      "deleteKeys": [
+        "existing",
+        "missing"
+      ],
+      "setup": [
+        {
+          "key": "existing",
+          "body": "body"
+        }
+      ],
+      "expect": {
+        "status": 200,
+        "deleted": [
+          "existing",
+          "missing"
+        ]
+      }
+    },
+    {
+      "id": "batch-delete-quiet-suppresses-successes",
+      "operation": "deleteObjects",
+      "bucket": "contract-delete-quiet",
+      "quiet": true,
+      "deleteKeys": [
+        "existing",
+        "missing"
+      ],
+      "setup": [
+        {
+          "key": "existing",
+          "body": "body"
+        }
+      ],
+      "expect": {
+        "status": 200,
+        "deleted": []
+      }
+    },
+    {
+      "id": "multipart-reject-empty",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "empty",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        }
+      ],
+      "expect": {
+        "status": 400,
+        "errorCode": "InvalidPart"
+      }
+    },
+    {
+      "id": "multipart-reject-duplicate",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "duplicate",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        }
+      ],
+      "expect": {
+        "status": 400,
+        "errorCode": "InvalidPart"
+      }
+    },
+    {
+      "id": "multipart-reject-unsorted",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "unsorted",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        },
+        {
+          "number": 2,
+          "body": "last"
+        }
+      ],
+      "expect": {
+        "status": 400,
+        "errorCode": "InvalidPart"
+      }
+    },
+    {
+      "id": "multipart-reject-wrong-etag",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "wrong-etag",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        }
+      ],
+      "expect": {
+        "status": 400,
+        "errorCode": "InvalidPart"
+      }
+    },
+    {
+      "id": "multipart-reject-short-nonfinal",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "short-nonfinal",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        },
+        {
+          "number": 2,
+          "body": "last"
+        }
+      ],
+      "expect": {
+        "status": 400,
+        "errorCode": "EntityTooSmall"
+      }
+    },
+    {
+      "id": "multipart-reject-aborted",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "aborted",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        }
+      ],
+      "expect": {
+        "status": 404,
+        "errorCode": "NoSuchUpload"
+      }
+    },
+    {
+      "id": "multipart-reject-repeated",
+      "operation": "multipartFailure",
+      "bucket": "bucket",
+      "key": "object",
+      "multipartFailure": "repeated",
+      "parts": [
+        {
+          "number": 1,
+          "body": "part"
+        }
+      ],
+      "expect": {
+        "status": 404,
+        "errorCode": "NoSuchUpload"
+      }
+    },
+    {
+      "id": "presigned-get",
+      "operation": "signedRequest",
+      "bucket": "bucket",
+      "key": "object",
+      "method": "GET",
+      "signingOffsetSeconds": 0,
+      "virtualHost": false,
+      "expect": {
+        "status": 200,
+        "body": "signed body"
+      },
+      "setup": [
+        {
+          "key": "object",
+          "body": "signed body"
+        }
+      ]
+    },
+    {
+      "id": "presigned-put",
+      "operation": "signedRequest",
+      "bucket": "bucket",
+      "key": "object",
+      "method": "PUT",
+      "signingOffsetSeconds": 0,
+      "virtualHost": false,
+      "expect": {
+        "status": 200,
+        "body": "signed body"
+      },
+      "body": "signed body"
+    },
+    {
+      "id": "presigned-head",
+      "operation": "signedRequest",
+      "bucket": "bucket",
+      "key": "object",
+      "method": "HEAD",
+      "signingOffsetSeconds": 0,
+      "virtualHost": false,
+      "expect": {
+        "status": 200
+      },
+      "setup": [
+        {
+          "key": "object",
+          "body": "signed body"
+        }
+      ]
+    },
+    {
+      "id": "presigned-expired",
+      "operation": "signedRequest",
+      "bucket": "bucket",
+      "key": "object",
+      "method": "GET",
+      "signingOffsetSeconds": -3600,
+      "virtualHost": false,
+      "expect": {
+        "status": 403,
+        "errorCode": "AccessDenied"
+      },
+      "setup": [
+        {
+          "key": "object",
+          "body": "signed body"
+        }
+      ]
+    },
+    {
+      "id": "presigned-future",
+      "operation": "signedRequest",
+      "bucket": "bucket",
+      "key": "object",
+      "method": "GET",
+      "signingOffsetSeconds": 3600,
+      "virtualHost": false,
+      "expect": {
+        "status": 403,
+        "errorCode": "RequestTimeTooSkewed"
+      },
+      "setup": [
+        {
+          "key": "object",
+          "body": "signed body"
+        }
+      ]
+    },
+    {
+      "id": "presigned-virtual-host",
+      "operation": "signedRequest",
+      "bucket": "bucket",
+      "key": "object",
+      "method": "GET",
+      "signingOffsetSeconds": 0,
+      "virtualHost": true,
+      "expect": {
+        "status": 200,
+        "body": "signed body"
+      },
+      "setup": [
+        {
+          "key": "object",
+          "body": "signed body"
+        }
+      ]
+    },
+    {
+      "id": "list-token-reject-overlong",
+      "operation": "listObjectsV2",
+      "bucket": "bucket",
+      "maxKeys": 100,
+      "continuationToken": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expect": {
+        "status": 400,
+        "errorCode": "InvalidArgument"
+      }
+    },
+    {
+      "id": "list-token-reject-nul",
+      "operation": "listObjectsV2",
+      "bucket": "bucket",
+      "maxKeys": 100,
+      "continuationToken": "a\u0000b",
+      "expect": {
+        "status": 400,
+        "errorCode": "InvalidArgument"
+      }
     }
   ]
 }

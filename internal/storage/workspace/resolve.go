@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
@@ -110,13 +109,6 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	// Lstat, not Stat, and a symlink is not an object: its target is not part of the
-	// workspace, so a key naming one must not serve those bytes to anything holding
-	// the workspace. The checkpoint path refused symlinks from the start, which is how
-	// the two came to disagree.
-	//
-	// Only the final component is refused. A symlinked *directory* inside the root is
-	// left alone, because adopted projects legitimately contain those.
 	info, err := os.Lstat(absPath)
 	if err != nil {
 		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
@@ -125,9 +117,17 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
 	}
 
+	checked, err := s.openRead(absPath, info)
+	if err != nil {
+		return "", nil, ManifestEntry{}, err
+	}
+	checked.Close()
 	entry, recorded := s.objectIndex.entry(bucket, key)
 	if !recorded || entry.stale(info.Size(), info.ModTime()) {
-		entry = s.derive(absPath, info)
+		entry, err = s.derive(absPath, info)
+		if err != nil {
+			return "", nil, ManifestEntry{}, err
+		}
 		entry.Form = s.formOf(bucket, key, absPath)
 		if entry.Form == FormEscaped {
 			entry.Digest = Digest(key)
@@ -162,17 +162,12 @@ func (s *Store) formOf(bucket, key, absPath string) Form {
 // inventing either would be worse than deriving them. This is a full read of
 // the file, once; the result is cached in the manifest and the read is not
 // repeated while size and modification time still match.
-func (s *Store) derive(absPath string, info os.FileInfo) ManifestEntry {
-	entry := ManifestEntry{
-		Size:        info.Size(),
-		ContentType: detectContentType(absPath),
-		Modified:    info.ModTime().UTC().Truncate(time.Second),
+func (s *Store) derive(absPath string, info os.FileInfo) (ManifestEntry, error) {
+	file, err := s.openRead(absPath, info)
+	if err != nil {
+		return ManifestEntry{}, err
 	}
-	if data, err := os.ReadFile(absPath); err == nil {
-		entry.ETag = storage.ETagForBytes(data)
-	}
-	entry.VersionID = entry.ETag
-	return entry
+	return deriveReadFile(file, info)
 }
 
 // absorb records a derived entry so the next read does not pay for it again.
@@ -181,7 +176,10 @@ func (s *Store) absorb(bucket, key, absPath string, info os.FileInfo, entry *Man
 	if hasEntry && !recorded.stale(info.Size(), info.ModTime()) {
 		return nil
 	}
-	derived := s.derive(absPath, info)
+	derived, err := s.derive(absPath, info)
+	if err != nil {
+		return err
+	}
 	if hasEntry {
 		derived.VersionID = recorded.VersionID
 		derived.ChecksumAlgorithm = recorded.ChecksumAlgorithm

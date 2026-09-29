@@ -52,27 +52,29 @@ type Config struct {
 	// DefaultMaxRequestBytes. The cap is applied at the HTTP boundary so every
 	// body read in the request path is bounded, including SigV4 payload
 	// verification, checksum validation, and multipart parts.
-	MaxRequestBytes int64
+	MaxRequestBytes       int64
+	MaxConcurrentRequests int
 }
 
 // Server is the S3-compatible HTTP server.
 type Server struct {
-	config     Config
-	store      storage.Store
-	multipart  storage.MultipartStore
-	auth       AuthFunc
-	httpServer *http.Server
-	listener   net.Listener
-	listenAddr string
-	baseHost   string
-	mu         sync.RWMutex
-	ready      chan struct{}
-	readyOnce  sync.Once
-	started    bool
-	closed     bool
-	closeOnce  sync.Once
-	closeErr   error
-	startTime  time.Time
+	requestSlots chan struct{}
+	config       Config
+	store        storage.Store
+	multipart    storage.MultipartStore
+	auth         AuthFunc
+	httpServer   *http.Server
+	listener     net.Listener
+	listenAddr   string
+	baseHost     string
+	mu           sync.RWMutex
+	ready        chan struct{}
+	readyOnce    sync.Once
+	started      bool
+	closed       bool
+	closeOnce    sync.Once
+	closeErr     error
+	startTime    time.Time
 }
 
 // New creates a Server from config. Authentication must be explicit.
@@ -93,19 +95,20 @@ func New(cfg Config) (*Server, error) {
 	if baseHost == "" {
 		baseHost = hostWithoutPort(cfg.Host)
 	}
-	if cfg.MaxRequestBytes <= 0 {
-		cfg.MaxRequestBytes = DefaultMaxRequestBytes
+	if err := normalizeRequestLimits(&cfg); err != nil {
+		return nil, err
 	}
 	authFn := cfg.Auth
 	multipart, _ := cfg.Store.(storage.MultipartStore)
 	return &Server{
-		config:    cfg,
-		store:     cfg.Store,
-		multipart: multipart,
-		auth:      authFn,
-		baseHost:  baseHost,
-		ready:     make(chan struct{}),
-		startTime: time.Now(),
+		requestSlots: make(chan struct{}, cfg.MaxConcurrentRequests),
+		config:       cfg,
+		store:        cfg.Store,
+		multipart:    multipart,
+		auth:         authFn,
+		baseHost:     baseHost,
+		ready:        make(chan struct{}),
+		startTime:    time.Now(),
 	}, nil
 }
 
@@ -160,6 +163,9 @@ func (s *Server) ListenAndServe() error {
 	return httpServer.Serve(ln)
 }
 
+// Ready closes after the listener has bound or startup has failed.
+func (s *Server) Ready() <-chan struct{} { return s.ready }
+
 // Addr returns the bound listen address (host:port).
 func (s *Server) Addr() string {
 	s.mu.RLock()
@@ -199,6 +205,10 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 // ServeHTTP implements http.Handler.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !s.admitRequest(w, r) {
+		return
+	}
+	defer func() { <-s.requestSlots }()
 	start := time.Now()
 	reqID := newRequestID()
 	ctx := withRequestID(r.Context(), reqID)

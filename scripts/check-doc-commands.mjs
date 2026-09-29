@@ -73,6 +73,9 @@ export const DOCS = [
   "docs/workspace-contract.md",
   "docs/compat-contract.md",
   "docs/browser-persistence.md",
+  "docs/portable-workspace-usage.md",
+  "examples/opencode/README.md",
+  "docs/opencode-pilot-instructions.md",
 ];
 
 // run executes the binary and returns its combined output.

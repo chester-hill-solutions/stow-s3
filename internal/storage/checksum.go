@@ -1,36 +1,52 @@
 package storage
 
 import (
+	"bytes"
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"hash"
 	"hash/crc32"
+	"hash/crc64"
+	"io"
 	"strings"
 )
 
 var crc32cTable = crc32.MakeTable(crc32.Castagnoli)
+var crc64NVMETable = crc64.MakeTable(0x9a6c9329ac4bc9b5)
 
 // ComputeChecksum returns the S3 base64 checksum for a supported algorithm.
 func ComputeChecksum(algorithm string, data []byte) (string, error) {
-	var sum []byte
-	switch strings.ToUpper(strings.TrimSpace(algorithm)) {
-	case "CRC32":
-		value := crc32.ChecksumIEEE(data)
-		sum = []byte{byte(value >> 24), byte(value >> 16), byte(value >> 8), byte(value)}
-	case "CRC32C":
-		value := crc32.Checksum(data, crc32cTable)
-		sum = []byte{byte(value >> 24), byte(value >> 16), byte(value >> 8), byte(value)}
-	case "SHA1":
-		digest := sha1.Sum(data)
-		sum = digest[:]
-	case "SHA256":
-		digest := sha256.Sum256(data)
-		sum = digest[:]
-	default:
-		return "", fmt.Errorf("unsupported checksum algorithm %q", algorithm)
+	return ComputeChecksumReader(algorithm, bytes.NewReader(data))
+}
+
+func ComputeChecksumReader(algorithm string, input io.Reader) (string, error) {
+	digest, err := NewChecksumDigest(algorithm)
+	if err != nil {
+		return "", err
 	}
-	return base64.StdEncoding.EncodeToString(sum), nil
+	if _, err := io.Copy(digest, input); err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(digest.Sum(nil)), nil
+}
+
+func NewChecksumDigest(algorithm string) (hash.Hash, error) {
+	switch NormalizeChecksumAlgorithm(algorithm) {
+	case "CRC32":
+		return crc32.NewIEEE(), nil
+	case "CRC32C":
+		return crc32.New(crc32cTable), nil
+	case "CRC64NVME":
+		return crc64.New(crc64NVMETable), nil
+	case "SHA1":
+		return sha1.New(), nil
+	case "SHA256":
+		return sha256.New(), nil
+	default:
+		return nil, fmt.Errorf("unsupported checksum algorithm %q", algorithm)
+	}
 }
 
 func NormalizeChecksumAlgorithm(algorithm string) string {

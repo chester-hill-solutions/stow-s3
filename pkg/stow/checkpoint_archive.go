@@ -14,7 +14,10 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
 const (
@@ -37,13 +40,17 @@ type CheckpointArchiveOptions struct {
 // Sensitive-looking paths are reported so callers can make an informed choice;
 // preview itself does not import or extract data and does not require opt-in.
 type CheckpointArchivePreview struct {
-	CheckpointID   string           `json:"checkpoint_id"`
-	WorkspaceID    string           `json:"workspace_id"`
-	ParentID       string           `json:"parent_checkpoint_id,omitempty"`
-	Files          []CheckpointFile `json:"files"`
-	Excluded       []string         `json:"excluded_sensitive_paths,omitempty"`
-	SensitivePaths []string         `json:"sensitive_paths,omitempty"`
-	Bytes          int64            `json:"bytes"`
+	Version        int                `json:"version"`
+	PrimaryBucket  string             `json:"primary_bucket,omitempty"`
+	Buckets        []string           `json:"buckets,omitempty"`
+	Objects        []CheckpointObject `json:"objects,omitempty"`
+	CheckpointID   string             `json:"checkpoint_id"`
+	WorkspaceID    string             `json:"workspace_id"`
+	ParentID       string             `json:"parent_checkpoint_id,omitempty"`
+	Files          []CheckpointFile   `json:"files"`
+	Excluded       []string           `json:"excluded_sensitive_paths,omitempty"`
+	SensitivePaths []string           `json:"sensitive_paths,omitempty"`
+	Bytes          int64              `json:"bytes"`
 }
 
 type checkpointArchiveHeader struct {
@@ -68,14 +75,23 @@ func ExportCheckpoint(ctx context.Context, registryDir, id string, output io.Wri
 	if err != nil {
 		return err
 	}
-	if int64(len(manifest.Files)) > archiveFileLimit(options.MaxFiles) {
+	checkpointDir, err := checkpointDirectory(registryDir, id)
+	if err != nil {
+		return err
+	}
+	lock, err := workspace.AcquireCapture(filepath.Dir(filepath.Dir(checkpointDir)), manifest.WorkspaceID)
+	if err != nil {
+		return err
+	}
+	defer lock.Release()
+	manifest, err = LoadCheckpoint(registryDir, id)
+	if err != nil {
+		return err
+	}
+	if int64(len(checkpointPayloadFiles(manifest))) > archiveFileLimit(options.MaxFiles) {
 		return fmt.Errorf("stow: checkpoint file count exceeds archive limit")
 	}
 	if err := validateArchiveSensitiveFiles(manifest, options.IncludeSensitiveFiles); err != nil {
-		return err
-	}
-	checkpointDir, err := checkpointDirectory(registryDir, id)
-	if err != nil {
 		return err
 	}
 	total := checkpointManifestBytes(manifest)
@@ -90,6 +106,7 @@ func ExportCheckpoint(ctx context.Context, registryDir, id string, output io.Wri
 // The returned paths are sorted for stable machine-readable output.
 func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options CheckpointArchiveOptions) (CheckpointArchivePreview, error) {
 	if input == nil {
+
 		return CheckpointArchivePreview{}, fmt.Errorf("stow: checkpoint archive input is required")
 	}
 	if ctx == nil {
@@ -103,7 +120,7 @@ func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options Chec
 		return CheckpointArchivePreview{}, err
 	}
 	defer gz.Close()
-	if int64(len(manifest.Files)) > archiveFileLimit(options.MaxFiles) {
+	if int64(len(checkpointPayloadFiles(manifest))) > archiveFileLimit(options.MaxFiles) {
 		return CheckpointArchivePreview{}, fmt.Errorf("stow: checkpoint file count %d exceeds preview limit %d", len(manifest.Files), archiveFileLimit(options.MaxFiles))
 	}
 	bytes := checkpointManifestBytes(manifest)
@@ -124,7 +141,14 @@ func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options Chec
 			sensitive = append(sensitive, file.Path)
 		}
 	}
+	for _, object := range manifest.Objects {
+		if sensitiveSeedPath(strings.ReplaceAll(object.Key, `\`, "/")) {
+			sensitive = append(sensitive, "s3://"+object.Bucket+"/"+object.Key)
+		}
+	}
+	sort.Strings(sensitive)
 	return CheckpointArchivePreview{
+		Version: manifest.Version, PrimaryBucket: manifest.PrimaryBucket, Buckets: manifest.Buckets, Objects: manifest.Objects,
 		CheckpointID: manifest.ID, WorkspaceID: manifest.WorkspaceID,
 		ParentID: manifest.ParentID, Files: files,
 		Excluded:       append([]string(nil), manifest.Excluded...),
@@ -133,10 +157,11 @@ func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options Chec
 }
 
 func verifyCheckpointArchiveFiles(ctx context.Context, tr *tar.Reader, manifest CheckpointManifest) error {
-	expected := make(map[string]CheckpointFile, len(manifest.Files))
-	for _, file := range manifest.Files {
-		expected["files/"+file.Path] = file
+	checks, err := checkpointChecksumDigests(manifest)
+	if err != nil {
+		return err
 	}
+	expected := checkpointPayloadFiles(manifest)
 	seen := make(map[string]struct{}, len(expected))
 	for {
 		if err := ctx.Err(); err != nil {
@@ -158,8 +183,11 @@ func verifyCheckpointArchiveFiles(ctx context.Context, tr *tar.Reader, manifest 
 		}
 		seen[header.Name] = struct{}{}
 		digest := sha256.New()
-		if _, err := io.CopyN(digest, contextReader{ctx: ctx, reader: tr}, file.Size); err != nil {
+		if _, err := io.CopyN(digest, checkpointChecksumReader(contextReader{ctx: ctx, reader: tr}, checks[header.Name]), file.Size); err != nil {
 			return fmt.Errorf("stow: read checkpoint archive file %q: %w", file.Path, err)
+		}
+		if err := verifyCheckpointChecksums(checks[header.Name]); err != nil {
+			return err
 		}
 		if hex.EncodeToString(digest.Sum(nil)) != file.SHA256 {
 			return fmt.Errorf("stow: checkpoint archive file %q failed integrity validation", file.Path)
@@ -179,10 +207,13 @@ func validateCheckpointArchiveOptions(options CheckpointArchiveOptions) error {
 }
 
 func writeCheckpointArchive(ctx context.Context, manifest CheckpointManifest, checkpointDir string, output io.Writer) error {
+	if err := verifyPortableChecksums(ctx, checkpointDir, manifest); err != nil {
+		return err
+	}
 	gz := gzip.NewWriter(output)
 	gz.Header.ModTime = time.Unix(0, 0).UTC()
 	tw := tar.NewWriter(gz)
-	writeHeader := checkpointArchiveHeader{FormatVersion: checkpointArchiveVersion, Manifest: manifest}
+	writeHeader := checkpointArchiveHeader{FormatVersion: manifest.Version, Manifest: manifest}
 	manifestBytes, err := json.Marshal(writeHeader)
 	if err != nil {
 		return fmt.Errorf("stow: encode checkpoint archive manifest: %w", err)
@@ -206,13 +237,18 @@ func writeCheckpointArchive(ctx context.Context, manifest CheckpointManifest, ch
 }
 
 func writeCheckpointArchiveFiles(ctx context.Context, tw *tar.Writer, manifest CheckpointManifest, checkpointDir string) error {
-	files := append([]CheckpointFile(nil), manifest.Files...)
-	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
-	for _, file := range files {
+	files := checkpointPayloadFiles(manifest)
+	names := make([]string, 0, len(files))
+	for name := range files {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		file := files[name]
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		path := filepath.Join(checkpointDir, "files", filepath.FromSlash(file.Path))
+		path := filepath.Join(checkpointDir, filepath.FromSlash(name))
 		pathInfo, err := os.Lstat(path)
 		if err != nil || !pathInfo.Mode().IsRegular() {
 			return fmt.Errorf("stow: checkpoint file %q failed integrity validation", file.Path)
@@ -227,7 +263,7 @@ func writeCheckpointArchiveFiles(ctx context.Context, tw *tar.Writer, manifest C
 			return fmt.Errorf("stow: checkpoint file %q changed before export", file.Path)
 		}
 		hash := sha256.New()
-		err = writeArchiveEntry(tw, "files/"+file.Path, file.Size, io.TeeReader(contextReader{ctx: ctx, reader: input}, hash))
+		err = writeArchiveEntry(tw, name, file.Size, io.TeeReader(contextReader{ctx: ctx, reader: input}, hash))
 		closeErr := input.Close()
 		if err != nil {
 			return err
@@ -244,7 +280,7 @@ func writeCheckpointArchiveFiles(ctx context.Context, tw *tar.Writer, manifest C
 
 func checkpointManifestBytes(manifest CheckpointManifest) int64 {
 	var total int64
-	for _, file := range manifest.Files {
+	for _, file := range checkpointPayloadFiles(manifest) {
 		if file.Size > int64(^uint64(0)>>1)-total {
 			return int64(^uint64(0) >> 1)
 		}
@@ -254,6 +290,11 @@ func checkpointManifestBytes(manifest CheckpointManifest) int64 {
 }
 
 func validateArchiveSensitiveFiles(manifest CheckpointManifest, include bool) error {
+	for _, object := range manifest.Objects {
+		if excludedPortableKey(object.Key, include) {
+			return fmt.Errorf("stow: checkpoint contains excluded object key %q", object.Key)
+		}
+	}
 	if include {
 		return nil
 	}

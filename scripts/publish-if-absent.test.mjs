@@ -14,9 +14,10 @@ import { test } from "node:test";
 // plan that makes the second run publish only what is missing.
 
 // The registry lookup is injected, so no case here contacts npm.
-const nothingPublished = () => false;
-const everythingPublished = () => true;
-const publishedSet = (names) => (name) => names.has(name);
+import { integrityOf, registryResult } from "./publish-if-absent.mjs";
+const nothingPublished = () => null;
+const everythingPublished = (_name, _version, tarball) => ({integrity:integrityOf(tarball)});
+const publishedSet = (names) => (name, version, tarball) => names.has(name) ? everythingPublished(name,version,tarball) : null;
 
 // A tarball is a real gzipped tar in production, so these fixtures build one with
 // tar rather than faking the reader. The script's own manifestOf is what reads it,
@@ -39,7 +40,7 @@ function tarballs() {
     mkdirSync(join(stage, "package"), { recursive: true });
     writeFileSync(
       join(stage, "package", "package.json"),
-      JSON.stringify({ name, version }),
+      JSON.stringify({ name, version, publishConfig: {registry:"https://registry.npmjs.org",access:"public"} }),
     );
     const tarball = `${stage}.tgz`;
     execFileSync("tar", ["-czf", tarball, "-C", stage, "package"]);
@@ -105,3 +106,14 @@ test("the plan preserves the order it was given", async () => {
     reversed,
   );
 });
+
+ test("only an explicit E404 means absent", () => {
+   assert.equal(registryResult({status:1,stdout:JSON.stringify({error:{code:"E404"}})}),null);
+   for (const code of ["E401","E403","E429","E500","ETIMEDOUT"]) {
+     assert.throws(()=>registryResult({status:1,stdout:JSON.stringify({error:{code}})}),new RegExp(code));
+   }
+ });
+ test("rerun refuses different bytes under the same version",async()=>{
+   const {publishPlan}=await import("./publish-if-absent.mjs");
+   assert.throws(()=>publishPlan(tarballs(),()=>({integrity:"sha512-different"})),/immutable version conflict/);
+ });

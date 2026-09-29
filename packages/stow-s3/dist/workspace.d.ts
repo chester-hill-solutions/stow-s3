@@ -111,4 +111,6 @@ export declare function diffWorkspaces(from: string, to: string, registryDir?: s
 export declare function restoreWorkspaceCheckpoint(checkpointId: string, root: string, registryDir?: string): Promise<WorkspaceJSON>;
 export declare function exportWorkspaceCheckpoint(checkpointId: string, output: string, options?: WorkspaceArchiveOptions): Promise<WorkspaceJSON>;
 export declare function importWorkspaceCheckpoint(archive: string, options?: WorkspaceArchiveOptions): Promise<WorkspaceJSON>;
+export { serveWorkspace } from "./workspace-serve.js";
+export type { ServeWorkspaceOptions, ServedWorkspace } from "./workspace-serve.js";
 //# sourceMappingURL=workspace.d.ts.map

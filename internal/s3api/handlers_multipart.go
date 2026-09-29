@@ -32,7 +32,11 @@ func initiationOptions(r *http.Request) (storage.MultipartOptions, *s3Error) {
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
-	metadata := extractMetadata(r.Header)
+	metadata, err := extractMetadata(r.Header)
+	if err != nil {
+		bad := mapStorageError(err, "")
+		return storage.MultipartOptions{}, &bad
+	}
 	if metadataSize(metadata) > maxMetadataBytes {
 		return storage.MultipartOptions{}, &s3Error{
 			Code:       "InvalidArgument",
@@ -40,7 +44,13 @@ func initiationOptions(r *http.Request) (storage.MultipartOptions, *s3Error) {
 			StatusCode: http.StatusBadRequest,
 		}
 	}
-	algorithm, value := declaredChecksum(r)
+	algorithm, value, err := checksumHeaderValues(r)
+	if err != nil {
+		return storage.MultipartOptions{}, &s3Error{Code: "InvalidArgument", Message: err.Error(), StatusCode: http.StatusBadRequest}
+	}
+	if algorithm == "CRC64NVME" {
+		return storage.MultipartOptions{}, &s3Error{Code: "NotImplemented", Message: "CRC64NVME multipart full-object checksums are not supported", StatusCode: http.StatusNotImplemented}
+	}
 	return storage.MultipartOptions{
 		ContentType:       contentType,
 		Metadata:          metadata,
@@ -120,6 +130,10 @@ func (s *Server) handleUploadPart(ctx context.Context, w http.ResponseWriter, r 
 }
 
 func (s *Server) handleCompleteMultipartUpload(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket, key, uploadID string) {
+	if r.Header.Get("x-amz-checksum-crc64nvme") != "" || r.Header.Get("x-amz-checksum-type") != "" {
+		writeError(w, r, s3Error{Code: "NotImplemented", Message: "Multipart completion checksum types are not supported", Resource: resourcePath(bucket, key), StatusCode: http.StatusNotImplemented})
+		return
+	}
 	if !s.validateMultipartRoute(ctx, w, r, routeInfo{bucket: bucket, key: key}, uploadID) {
 		return
 	}
@@ -270,7 +284,10 @@ func (s *Server) serveRange(w http.ResponseWriter, r *http.Request, rc io.ReadCl
 	// refuses the response. Verified through that SDK, not by reading it: the
 	// shared corpus case range-partial-object fails on the checksum header and
 	// passes without it. Content-Length is corrected to the range length below.
-	setRepresentationHeaders(w, meta)
+	if err := setRepresentationHeaders(w, meta); err != nil {
+		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
+		return
+	}
 	w.Header().Set("Content-Length", strconv.FormatInt(length, 10))
 	w.Header().Set("Content-Range", "bytes "+strconv.FormatInt(start, 10)+"-"+strconv.FormatInt(end, 10)+"/"+strconv.FormatInt(meta.Size, 10))
 	setCORS(w, r)

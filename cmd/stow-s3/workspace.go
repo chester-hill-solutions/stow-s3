@@ -133,6 +133,7 @@ var workspaceVerbs = map[string]func([]string) error{
 	"prune":      pruneWorkspacesCommand,
 	"restore":    restoreCheckpointCommand,
 	"resume":     resumeWorkspaceCommand,
+	"serve":      serveWorkspaceCommand,
 }
 
 // workspaceUsage is derived from the table rather than written out, so a verb

@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"sort"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
 // ApplyDelta brings a checkpoint to the state a delta describes, and returns the
@@ -30,24 +32,8 @@ func ApplyDeltaWithOptions(ctx context.Context, registryDir, baseID string, delt
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	if err := validateDeltaDocument(delta, options.IncludeSensitive); err != nil {
+	if err := validateDeltaApplication(ctx, baseID, delta, options); err != nil {
 		return CheckpointInfo{}, err
-	}
-	if err := ctx.Err(); err != nil {
-		return CheckpointInfo{}, err
-	}
-	if baseID == "" {
-		return CheckpointInfo{}, errors.New("stow: a delta needs a base checkpoint to apply to")
-	}
-
-	// Before the base is even loaded. The document is what arrived, and whether it
-	// is the document the sender published is a question about the document — asking
-	// it first means a substituted one is refused on that ground rather than on
-	// whatever the substitution happened to break, and before any staging.
-	if options.Encoded != nil {
-		if err := VerifyDeltaDigest(options.Encoded, options.ExpectSHA256); err != nil {
-			return CheckpointInfo{}, err
-		}
 	}
 
 	base, err := LoadCheckpoint(registryDir, baseID)
@@ -57,6 +43,18 @@ func ApplyDeltaWithOptions(ctx context.Context, registryDir, baseID string, delt
 	baseDir, err := checkpointDirectory(registryDir, baseID)
 	if err != nil {
 		return CheckpointInfo{}, err
+	}
+	lock, err := workspace.AcquireMutationCapture(filepath.Dir(filepath.Dir(baseDir)), base.WorkspaceID)
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
+	defer lock.Release()
+	base, err = LoadCheckpoint(registryDir, baseID)
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
+	if base.Version != checkpointVersion {
+		return CheckpointInfo{}, fmt.Errorf("stow: portable object checkpoints do not support deltas")
 	}
 	current := indexCheckpointFiles(base)
 
@@ -255,7 +253,7 @@ func publishDeltaCheckpoint(ctx context.Context, registryDir, stage string, base
 	// so the scan root is the staged files directory. Scanning the stage itself
 	// would record every path with a "files/" prefix, and the manifest would then
 	// disagree with the layout the loader expects.
-	files, excluded, totalBytes, err := scanCheckpointFiles(filepath.Join(stage, "files"), true)
+	files, excluded, totalBytes, err := scanCheckpointFilesContext(ctx, filepath.Join(stage, "files"), true)
 	if err != nil {
 		return CheckpointInfo{}, err
 	}
@@ -279,7 +277,10 @@ func publishDeltaCheckpoint(ctx context.Context, registryDir, stage string, base
 		Files:       files,
 		Excluded:    excluded,
 	}
-	if err := publishCheckpoint(stage, checkpointRoot, id, manifest); err != nil {
+	if err := checkRegistryCheckpointAdmission(registryDir, base.WorkspaceID, totalBytes); err != nil {
+		return CheckpointInfo{}, err
+	}
+	if err := publishCheckpointContext(ctx, stage, checkpointRoot, id, manifest); err != nil {
 		return CheckpointInfo{}, err
 	}
 	return CheckpointInfo{
@@ -315,5 +316,26 @@ func ReadCheckpointFile(registryDir, checkpointID, path string) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
+	lock, err := workspace.AcquireCapture(filepath.Dir(filepath.Dir(dir)), manifest.WorkspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer lock.Release()
 	return readVerifiedCheckpointFile(dir, *expected)
+}
+
+func validateDeltaApplication(ctx context.Context, baseID string, delta *DeltaDocument, options DeltaOptions) error {
+	if err := validateDeltaDocument(delta, options.IncludeSensitive); err != nil {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if baseID == "" {
+		return errors.New("stow: a delta needs a base checkpoint to apply to")
+	}
+	if options.Encoded != nil {
+		return VerifyDeltaDigest(options.Encoded, options.ExpectSHA256)
+	}
+	return nil
 }

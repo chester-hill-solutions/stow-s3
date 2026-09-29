@@ -15,6 +15,15 @@ type checkpointReference struct {
 // ForgetCheckpoints removes only checkpoint directories whose manifest names
 // this workspace. It deliberately preserves malformed or unreadable entries.
 func (r *Registry) ForgetCheckpoints(workspaceID string) error {
+	lock, err := AcquireMutationCapture(r.dir, workspaceID)
+	if err != nil {
+		return err
+	}
+	defer lock.Release()
+	return r.forgetCheckpoints(workspaceID)
+}
+
+func (r *Registry) forgetCheckpoints(workspaceID string) error {
 	root := filepath.Join(r.dir, "checkpoints")
 	entries, err := os.ReadDir(root)
 	if os.IsNotExist(err) {
@@ -45,5 +54,34 @@ func (r *Registry) ForgetCheckpoints(workspaceID string) error {
 			return fmt.Errorf("workspace: remove checkpoint %s: %w", entry.Name(), err)
 		}
 	}
-	return nil
+	return syncRegistryDirectory(root)
+}
+
+// RemoveWorkspace holds exclusion until workspace bytes, checkpoints and identity are gone.
+func (r *Registry) RemoveWorkspace(id string, remove func() error) error {
+	lock, err := AcquireMutationCapture(r.dir, id)
+	if err != nil {
+		return err
+	}
+	defer lock.Release()
+	if err := remove(); err != nil {
+		return err
+	}
+	if err := r.forgetCheckpoints(id); err != nil {
+		return err
+	}
+	return r.Forget(id)
+}
+
+// ValidWorkspaceID accepts portable identifiers without path syntax.
+func ValidWorkspaceID(id string) bool {
+	if len(id) == 0 || len(id) > 128 {
+		return false
+	}
+	for _, c := range id {
+		if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_') {
+			return false
+		}
+	}
+	return true
 }

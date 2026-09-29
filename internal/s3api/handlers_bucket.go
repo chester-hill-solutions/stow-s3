@@ -87,6 +87,10 @@ func (s *Server) handleListObjectsV2(ctx context.Context, w http.ResponseWriter,
 	prefix := q.Get("prefix")
 	delimiter := q.Get("delimiter")
 	continuation := q.Get("continuation-token")
+	if continuation != "" && storage.ValidateKey(continuation) != nil {
+		writeError(w, r, s3Error{Code: "InvalidArgument", Message: "Invalid continuation token", StatusCode: http.StatusBadRequest})
+		return
+	}
 	startAfter := q.Get("start-after")
 	encodingType := q.Get("encoding-type")
 	maxKeys := 1000
@@ -188,7 +192,11 @@ func (s *Server) handlePutObject(ctx context.Context, w http.ResponseWriter, r *
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
-	metadata := extractMetadata(r.Header)
+	metadata, err := extractMetadata(r.Header)
+	if err != nil {
+		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
+		return
+	}
 	if len(metadata) > 0 && metadataSize(metadata) > maxMetadataBytes {
 		writeError(w, r, s3Error{Code: "InvalidArgument", Message: "Metadata too large", Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
 		return
@@ -236,7 +244,10 @@ func (s *Server) handleGetObject(ctx context.Context, w http.ResponseWriter, r *
 		return
 	}
 
-	setObjectHeaders(w, meta)
+	if err := setObjectHeaders(w, meta); err != nil {
+		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
+		return
+	}
 	setCORS(w, r)
 	w.Header().Set("x-amz-request-id", requestIDFromContext(ctx))
 	w.WriteHeader(http.StatusOK)
@@ -260,7 +271,10 @@ func (s *Server) handleHeadObject(ctx context.Context, w http.ResponseWriter, r 
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
 		return
 	}
-	setObjectHeaders(w, meta)
+	if err := setObjectHeaders(w, meta); err != nil {
+		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
+		return
+	}
 	setCORS(w, r)
 	w.Header().Set("x-amz-request-id", requestIDFromContext(ctx))
 	w.WriteHeader(http.StatusOK)

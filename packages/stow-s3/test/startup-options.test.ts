@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -114,5 +115,24 @@ integration("session options", { skip: !stowBinaryAvailable() }, () => {
     const controller = new AbortController();
     controller.abort();
     await assert.rejects(() => openStow({ signal: controller.signal }), assertCancelled);
+  });
+});
+
+integration("request body limits", { skip: !stowBinaryAvailable() }, () => {
+  it("reports a configured request limit from the native server", async () => {
+    const session = await openStow({ maxRequestBytes: 1024, maxConcurrentRequests: 3 });
+    try {
+      assert.equal(session.capabilities().maxRequestBytes, 1024);
+      assert.equal(session.capabilities().maxConcurrentRequests, 3);
+      await assert.rejects(() => session.s3.send(new PutObjectCommand({ Bucket: session.bucket, Key: "oversized", Body: Buffer.alloc(1025) })),
+        (error: unknown) => error instanceof Error && error.name === "EntityTooLarge");
+    }
+    finally { await session.close(); }
+  });
+  it("rejects nonpositive and fractional explicit request limits", async () => {
+    for (const maxRequestBytes of [0, -1, 1.5]) {
+      await assert.rejects(() => startStowWithReady({ maxRequestBytes }), /positive integer/);
+      await assert.rejects(() => startStowWithReady({ maxConcurrentRequests: maxRequestBytes }), /positive integer/);
+    }
   });
 });

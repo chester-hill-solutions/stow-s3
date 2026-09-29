@@ -1,5 +1,18 @@
 # The Stow Environment Primitive
 
+**Planning status: superseded architecture proposal — 2026-09-29.**
+[The canonical storage plan](../plan.md) is the only active work order.
+[The disposition register](../planning-index.md) maps this document's old items
+to current work or explicit deferral. Accepted ADRs and current contracts govern implemented behavior. Storage composition and enforcement work is carried into S0/S1; descriptor and execution expansions are deferred.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
 **Status:** proposed
 **Date:** 2026-09-26
 **Scope:** the abstraction every Stow surface is composed from

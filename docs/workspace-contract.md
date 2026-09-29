@@ -1,5 +1,10 @@
 # Stow Workspace Contract
 
+**0.3.0 development additions:** the [portable workspace contract and usage](portable-workspace-usage.md)
+specifies the implemented facade, opt-in v2 snapshots, capture-request reconciliation,
+registry policy and MCP surface. Existing v1 file checkpoints remain supported.
+
+
 **Status:** workspace core implemented; this contract also records future language surfaces
 **Date:** 2026-09-25
 **Scope:** the default agent-facing surface defined by
@@ -407,8 +412,10 @@ no synchronization between two, because there is only one.
 
 ## 8. Conformance cases added to the corpus
 
-These run against the workspace backend through the shared corpus, not as
-hand-written expectations, per section 0.6 of `docs/agent-dx-plan.md`.
+These run against the workspace backend through the shared corpus. Keep drivers
+aligned with the checked [step vocabulary](workspace-contract-steps.md) and extend
+shared cases before changing behavior. The [canonical plan](plan.md) schedules
+remaining conformance work; the old DX plan is historical rationale.
 
 | ID | Case |
 |---|---|
@@ -469,7 +476,8 @@ are the first two cases written and the first two run.
   `ErrLockUnsupported`, and a workspace on that host is **never collectable**.
   This is a stated limitation rather than a bug worked around: reclaiming a
   workspace a live agent is using destroys the artifact it is producing, so
-  refusing is the only safe answer. `close()` and `destroy()` are unaffected, so
-  an explicit reclaim still works everywhere; only automatic TTL reclamation is
-  unavailable. Windows is a first-class release target, so this is a real gap
-  rather than a footnote.
+  refusing is the only safe answer. The current native release matrix is macOS
+  and Linux on arm64/x64. Reliable capture and rooted regular-file reads fail
+  closed on unsupported platforms; Windows workspace runtime support is not
+  certified by this candidate. Portable naming rules still reject Windows-unsafe
+  names so archives do not encode an avoidable portability hazard.

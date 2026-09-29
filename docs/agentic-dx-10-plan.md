@@ -1,5 +1,20 @@
 # Stow 10/10 Plan
 
+**Planning status: superseded roadmap — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. Remaining storage safety and conformance work is carried into S0. The old release ladder, storage rewrite and broad integration commitments are retired.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+> **Scope and precedence, 2026-09-29:** [Canonical storage plan](plan.md) governs current work. This document retains technical details and dated implementation history; its older phase priorities and “current execution order” statements do not schedule work. Caller-owned execution is the active boundary.
+
 > **Historical plan — delivery sequence superseded.** Its release targets and
 > phase ordering are no longer authoritative. The product and architecture
 > history is carried forward in [Agent DX and Python Plan](agent-dx-plan.md);

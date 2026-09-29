@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -115,12 +116,7 @@ func (s *Store) GetObject(ctx context.Context, bucket, key string) (io.ReadClose
 	if err != nil {
 		return nil, nil, err
 	}
-	// openNoFollow rather than os.Open: resolveLocked has established that nothing here
-	// is a symlink, and the gap between that observation and the open is a window
-	// something that can write the workspace can step through. The error is mapped to
-	// absent either way, so a link swapped in after the resolve reads as a missing key
-	// rather than as a file outside the workspace.
-	file, err := openNoFollow(absPath)
+	file, err := s.openRead(absPath, info)
 	if err != nil {
 		return nil, nil, storage.ErrObjectNotFound
 	}
@@ -254,7 +250,7 @@ func (s *Store) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*s
 	if err := storage.CheckCopySourceConditions(req.Options, sourceMeta); err != nil {
 		return nil, err
 	}
-	data, err := os.ReadFile(srcPath)
+	data, err := s.readFile(srcPath, info)
 	if err != nil {
 		return nil, storage.ErrObjectNotFound
 	}
@@ -298,41 +294,23 @@ func (s *Store) ListObjectsV2(ctx context.Context, bucket string, opts storage.L
 func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 	byKey := map[string]storage.ObjectMeta{}
 	root := s.bucketDir(bucket)
+	source, err := s.readRoot()
+	if err != nil {
+		return nil, err
+	}
+	defer source.Close()
+	start, err := filepath.Rel(s.root, root)
+	if err != nil {
+		return nil, err
+	}
 
-	walkErr := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
-		if err != nil {
-			return nil
-		}
-		if entry.IsDir() {
-			return nil
-		}
-		relative, relErr := filepath.Rel(root, path)
-		if relErr != nil {
-			return nil
-		}
-		relative = filepath.ToSlash(relative)
-		if IsInternal(relative) {
-			return nil
-		}
-		key, ok := KeyFromNaturalPath(relative)
-		if !ok {
-			return nil
-		}
-		info, statErr := entry.Info()
-		if statErr != nil {
-			return nil
-		}
-		if isLink(info) {
-			return nil
-		}
-		manifestEntry, _ := s.objectIndex.entry(bucket, key)
-		if meta := s.metaFromEntry(bucket, key, manifestEntry, info); meta != nil {
-			byKey[key] = *meta
-		}
-		return nil
-	})
+	collect := naturalObjectListing{store: s, bucket: bucket, start: start, source: source, byKey: byKey}
+	walkErr := fs.WalkDir(source.FS(), filepath.ToSlash(start), collect.visit)
 	if walkErr != nil {
 		return nil, fmt.Errorf("workspace store: list %s: %w", bucket, walkErr)
+	}
+	if err := source.Check(); err != nil {
+		return nil, err
 	}
 
 	for key, meta := range s.escapedObjects(bucket, byKey) {
@@ -401,6 +379,11 @@ func (s *Store) escapedObjects(bucket string, walked map[string]storage.ObjectMe
 		if err != nil || isLink(info) {
 			continue
 		}
+		file, err := s.openRead(EscapedPath(s.root, bucket, key), info)
+		if err != nil {
+			continue
+		}
+		file.Close()
 		found[key] = *s.metaFromEntry(bucket, key, entry)
 	}
 	return found

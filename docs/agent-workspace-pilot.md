@@ -1,5 +1,7 @@
 # Agent workspace local pilot
 
+> **Planning disposition, 2026-09-29:** Historical local experiment. Remaining install, recovery, transfer and independent-user validation is carried into S2–S4. See [the plan](plan.md) and [disposition register](planning-index.md).
+
 **Run date:** 2026-09-27
 **Environment:** macOS arm64, local Go CLI, warm build cache
 **Purpose:** smoke-check the documented prepare-to-artifact flow and record

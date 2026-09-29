@@ -17,15 +17,22 @@ type sharedCorpus struct {
 }
 
 type sharedCorpusCase struct {
-	ID          string                  `json:"id"`
-	Operation   string                  `json:"operation"`
-	Bucket      string                  `json:"bucket"`
-	Key         string                  `json:"key"`
-	Body        string                  `json:"body"`
-	ContentType string                  `json:"contentType"`
-	Metadata    map[string]string       `json:"metadata"`
-	Setup       []sharedCorpusObject    `json:"setup"`
-	Expect      sharedCorpusExpectation `json:"expect"`
+	ContinuationToken    string                  `json:"continuationToken"`
+	Method               string                  `json:"method"`
+	VirtualHost          bool                    `json:"virtualHost"`
+	SigningOffsetSeconds int                     `json:"signingOffsetSeconds"`
+	MultipartFailure     string                  `json:"multipartFailure"`
+	DeleteKeys           []string                `json:"deleteKeys"`
+	Quiet                bool                    `json:"quiet"`
+	ID                   string                  `json:"id"`
+	Operation            string                  `json:"operation"`
+	Bucket               string                  `json:"bucket"`
+	Key                  string                  `json:"key"`
+	Body                 string                  `json:"body"`
+	ContentType          string                  `json:"contentType"`
+	Metadata             map[string]string       `json:"metadata"`
+	Setup                []sharedCorpusObject    `json:"setup"`
+	Expect               sharedCorpusExpectation `json:"expect"`
 
 	IfNoneMatch string `json:"ifNoneMatch"`
 	IfMatch     string `json:"ifMatch"`
@@ -71,6 +78,7 @@ type sharedCorpusPart struct {
 }
 
 type sharedCorpusExpectation struct {
+	Deleted           []string          `json:"deleted"`
 	Status            int               `json:"status"`
 	Body              string            `json:"body"`
 	ContentType       string            `json:"contentType"`

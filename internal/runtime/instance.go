@@ -109,11 +109,12 @@ func (i *Instance) checkOpen() error {
 
 func (i *Instance) capabilitiesLocked() Capabilities {
 	return Capabilities{
-		Backend:    i.options.Backend,
-		MaxBytes:   i.options.MaxBytes,
-		MaxObjects: i.options.MaxObjects,
-		Persistent: i.persistent,
-		Multipart:  i.multipartStore != nil,
+		Backend:             i.options.Backend,
+		MaxBytes:            i.options.MaxBytes,
+		MaxObjects:          i.options.MaxObjects,
+		MaxMultipartUploads: i.options.MaxMultipartUploads,
+		Persistent:          i.persistent,
+		Multipart:           i.multipartStore != nil,
 	}
 }
 

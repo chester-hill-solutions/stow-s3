@@ -58,6 +58,7 @@ class StowCapabilities:
     max_bytes: int
     max_objects: int
     max_request_bytes: int
+    max_concurrent_requests: int = 0
 
 
 @dataclass(frozen=True)
@@ -144,5 +145,6 @@ def parse_ready_message(line: str) -> StowReady:
             max_bytes=int(_require_number(capabilities, "maxBytes")),
             max_objects=int(_require_number(capabilities, "maxObjects")),
             max_request_bytes=int(_require_number(capabilities, "maxRequestBytes")),
+            max_concurrent_requests=int(_require_number(capabilities, "maxConcurrentRequests")) if "maxConcurrentRequests" in capabilities else 0,
         ),
     )

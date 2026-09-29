@@ -311,3 +311,18 @@ def test_close_does_remove_a_session_created_data_dir() -> None:
         assert created.is_dir()
 
     assert not created.exists(), "close() left behind a directory it created"
+
+
+@needs_binary
+def test_configurable_request_body_limit():
+    with with_session(max_request_bytes=1024, max_concurrent_requests=3) as session:
+        assert session.capabilities.max_request_bytes == 1024
+        assert session.capabilities.max_concurrent_requests == 3
+
+
+@pytest.mark.parametrize("limit", [0, -1, 1.5, True])
+def test_invalid_request_body_limit(limit):
+    with pytest.raises(ValueError, match="positive integer"):
+        open_session(max_request_bytes=limit)
+    with pytest.raises(ValueError, match="positive integer"):
+        open_session(max_concurrent_requests=limit)

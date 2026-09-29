@@ -1,0 +1,246 @@
+TARGET check-coverage
+node scripts/check-coverage.mjs
+ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	5.934s	coverage: 58.1% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	12.445s	coverage: [no statements]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	0.330s	coverage: 66.7% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	0.665s	coverage: 84.6% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	0.572s	coverage: 93.5% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	1.018s	coverage: 64.7% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	1.046s	coverage: 80.0% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	14.256s	coverage: 73.1% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.362s	coverage: 73.6% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	2.682s	coverage: 69.1% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	21.367s	coverage: 81.0% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	6.607s	coverage: 74.3% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	17.154s	coverage: 72.2% of statements
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	20.936s	coverage: 71.4% of statements
+ok  	github.com/chester-hill-solutions/stow-s3/tools/quality	0.685s	coverage: 62.7% of statements
+Go coverage ratchet OK (71.31%, 6825/9571 statements); above the recorded floor of 6811, raise it with --baseline if the improvement is real
+  5 package(s) below the 71.31% aggregate — floors, not targets: github.com/chester-hill-solutions/stow-s3/cmd/stow-s3 58.14%, github.com/chester-hill-solutions/stow-s3/tools/quality 62.75%, github.com/chester-hill-solutions/stow-s3/internal/parentwatch 64.71%, github.com/chester-hill-solutions/stow-s3/internal/atomicfile 66.67%, github.com/chester-hill-solutions/stow-s3/internal/s3api 69.08%
+RESULT check-coverage 0
+TARGET check-version
+node scripts/check-version.mjs
+Version source OK (0.2.0); 4 platform packages in step
+RESULT check-version 0
+TARGET check-install-surface
+node scripts/check-install-surface.mjs
+Install surface OK (1/3 published, 4 docs)
+RESULT check-install-surface 0
+TARGET check-doc-commands
+node scripts/check-doc-commands.mjs
+Doc command surface OK (4 commands, 16 verbs, 49 flags, 12 documents)
+RESULT check-doc-commands 0
+TARGET check-adr-index
+node scripts/check-adr-index.mjs
+ADR index OK (13 decisions, 2 statuses in force)
+RESULT check-adr-index 0
+TARGET check-scripts
+node --test scripts/*.test.mjs
+✔ matching the floor passes (7.656167ms)
+✔ an improvement passes, and is not a reason to edit the baseline (0.175333ms)
+✔ a percentage fall within the allowance passes (0.093083ms)
+✔ a percentage fall beyond the allowance fails even when statements hold (0.142709ms)
+✔ losing covered statements fails even when the percentage holds (0.107875ms)
+✔ all three failures are reported together (0.085875ms)
+✔ a lowered stored baseline fails even when the tree meets it (0.092792ms)
+✔ a raised stored baseline passes the history check (0.075875ms)
+✔ no previous baseline skips the history check (0.074417ms)
+✔ the allowance boundary is inclusive (0.130709ms)
+✔ percentage differences are rounded to two places before comparison (5.312375ms)
+✔ statements are attributed to the package directory, not the file (0.386875ms)
+✔ a line that is not a profile line is skipped, not counted as uncovered (0.140042ms)
+✔ a profile with nothing readable yields no packages rather than zeroes (0.068417ms)
+✔ an empty profile yields no packages (0.058708ms)
+✔ the aggregate and the per-package view agree on the totals (0.0905ms)
+✔ a package losing coverage fails even when the aggregate holds (0.095333ms)
+✔ a package gaining coverage passes (0.066292ms)
+✔ a package that stopped being measured is a failure, not a skip (0.066625ms)
+✔ a new package with no recorded floor passes, and is named by the report (0.119709ms)
+✔ a lowered per-package floor fails even when the tree meets it (0.06475ms)
+✔ a baseline with no per-package floors fails rather than passing silently (0.057958ms)
+✔ thinPackages names every package below the aggregate, thinnest first (0.08225ms)
+✔ thinPackages is empty when every package is at or above the aggregate (0.069458ms)
+✔ lowestPerPackage records each package's own weakest sample (0.13025ms)
+✔ a fall inside the tolerance passes (0.056833ms)
+✔ a fall beyond the tolerance fails, and the message says what was allowed (0.059209ms)
+✔ no tolerance is exact, so the default is a floor of zero (0.767291ms)
+✔ the tolerance reaches the per-package check too (0.119542ms)
+✔ a lowered floor is still a failure regardless of tolerance (0.643209ms)
+✔ a floor lowered by less than the noise is a re-record, not a lowering (0.136125ms)
+✔ a floor lowered by more than the noise still fails (0.0635ms)
+✔ a per-package floor lowered by less than the noise is a re-record (0.054709ms)
+✔ codeSpans returns fenced blocks and inline spans, and no prose (1.415042ms)
+✔ prose is not evidence about a CLI (1.741583ms)
+✔ a path into a package directory is not an invocation (0.086708ms)
+✔ a flag inside a shell script's own error message is not an invocation (0.068459ms)
+✔ a renamed verb in a document is caught (1.150041ms)
+✔ a renamed subcommand in a document is caught (0.306083ms)
+✔ a subcommand that exists is not reported (0.119375ms)
+✔ a flag stops the verb scan (0.076083ms)
+✔ a removed flag in a document is caught (0.112791ms)
+✔ the binary's own name is not reported as an unknown command (0.136625ms)
+✔ a command with no arguments is not a problem (0.074083ms)
+✔ a flag is only judged on a line that runs the binary (0.05975ms)
+✔ an exemption is honoured (0.065667ms)
+✔ an exemption for a token that has become real is reported (0.096084ms)
+✔ an exemption that is still needed is not reported stale (0.044708ms)
+✔ every exemption carries a reason (0.057958ms)
+✔ commandSurface refuses a surface it cannot trust (8.495041ms)
+Install surface OK (1/3 published, 4 docs)
+✔ a doc with no disclaimer fails while something is unpublished (3.063125ms)
+✔ a doc with a disclaimer passes while something is unpublished (0.416292ms)
+✔ once everything is published, no disclaimer is owed (0.079084ms)
+✔ once everything is published, a disclaimer is not forbidden either (0.069791ms)
+✔ an unpublished target must still be named as unpublished when nothing else is (0.070291ms)
+✔ a published target that no doc mentions is a problem (3.490541ms)
+✔ a stale repository reference is a problem in every mode (0.647375ms)
+✔ a doc may reference the module path as a repository URL (0.167792ms)
+✔ a declared-published package that answers 401 is told what to do about it (0.209458ms)
+✔ a 401 remedy is not offered for a registry that does not use one (0.622208ms)
+✔ a matching answer is never a problem, in either direction (0.130083ms)
+✔ a genuinely reachable package declared unpublished is still a problem (0.085167ms)
+Version source OK (0.2.0); 4 platform packages in step
+✔ four agreeing versions pass (0.827041ms)
+✔ an unreadable Go version is a failure, not agreement (0.163791ms)
+✔ an unreadable pyproject version is a failure (0.078916ms)
+✔ a missing __version__ is named as missing (0.122833ms)
+✔ an npm skew is reported (0.161083ms)
+✔ a PyPI skew is reported (0.124333ms)
+✔ every disagreement is reported, not just the first (0.076833ms)
+✔ nothing found anywhere is still a failure (0.620333ms)
+✔ amd64 becomes npm's x64 (0.564375ms)
+✔ arm64 is spelled the same on both sides (0.10775ms)
+✔ every released platform maps to a package directory (1.351458ms)
+✔ an unknown architecture is refused rather than guessed (0.204583ms)
+✔ a name that does not match is refused (0.358375ms)
+✔ a traversing name cannot escape the packages directory (0.366625ms)
+✔ the go and npm architecture names are not assumed identical (0.1255ms)
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+tar: Failed to set default locale
+✔ a first run publishes everything (70.694583ms)
+✔ a second run after a complete first run publishes nothing (11.742042ms)
+✔ a partial release retries only what is missing (10.82425ms)
+✔ the plan carries the name and version read from each tarball (11.562209ms)
+✔ the plan preserves the order it was given (9.726417ms)
+✔ an unchanged set of keys passes (0.846458ms)
+✔ new debt is a regression (0.720792ms)
+✔ an improvement is stale until the baseline is lowered (0.085083ms)
+✔ a missing key on either side counts as zero (0.060125ms)
+✔ both directions are reported together (0.159334ms)
+✔ a baseline that grew against history is caught (0.0775ms)
+✔ a baseline that shrank against history is fine (0.06475ms)
+✔ no previous baseline means nothing expanded (0.053417ms)
+✔ a new metric counts as an increase from zero (0.060375ms)
+✔ a baseline raised to match new debt is caught by the history check (0.121667ms)
+✔ identical identity sets pass (0.086916ms)
+✔ a new identity is unapproved debt (0.053042ms)
+✔ a stale identity is debt that was paid and not recorded (0.050083ms)
+✔ a renamed identity is caught even though the count is unchanged (0.061209ms)
+✔ a repeated current identity is reported once (0.044375ms)
+✔ empty baselines behave (0.054125ms)
+✔ the shared list covers tools/ and scripts/ (0.449042ms)
+✔ the go list covers every Go source root in the repository (0.076667ms)
+✔ the size list covers the client packages (0.067791ms)
+✔ every root the list names exists (0.876875ms)
+✔ an agent working set reads without growing the footprint (5182.787209ms)
+✔ the fixed post-boot floor dominates a small-file workload (5169.565ms)
+agent workload: 24 files / 597007 bytes; read p50 0.84ms p95 5.74ms; seed 7.9x payload; floor 8 MiB (0.64 of footprint)
+✔ writes pay a multiple of their payload, which is why the transport stays on the list (5178.742541ms)
+✔ the wasm runtime boots and serves operations with no Node APIs present (5222.734416ms)
+✔ the bundle fits a current Cloudflare Worker with room to spare (5197.13925ms)
+✔ the base64 JSON bridge costs several times the payload, which bounds object size (5235.430166ms)
+ℹ tests 108
+ℹ suites 0
+ℹ pass 108
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15793.718417
+RESULT check-scripts 0
+TARGET check-ts-quality
+cd packages/stow-s3 && npm ci --ignore-scripts && rm -rf node_modules/@chester-hill-solutions/stow-s3-darwin-arm64 node_modules/@chester-hill-solutions/stow-s3-darwin-x64 node_modules/@chester-hill-solutions/stow-s3-linux-arm64 node_modules/@chester-hill-solutions/stow-s3-linux-x64 && npm run check:standards
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 266 packages, and audited 267 packages in 4s
+
+121 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> @chester-hill-solutions/stow-s3@0.2.0 check:standards
+> npm run typecheck && npm run lint && npm run check:lint-ratchet && npm run check:type-escapes && npm run check:dry
+
+
+> @chester-hill-solutions/stow-s3@0.2.0 typecheck
+> tsc -p tsconfig.test.json
+
+
+> @chester-hill-solutions/stow-s3@0.2.0 lint
+> eslint .
+
+
+> @chester-hill-solutions/stow-s3@0.2.0 check:lint-ratchet
+> node ../../scripts/check-lint-ratchet.mjs
+
+TypeScript lint ratchet OK (complexity=0, max-depth=0, max-params=0, max-lines-per-function=0, no-console=0, no-return-await=0, @typescript-eslint/no-explicit-any=0, @typescript-eslint/no-non-null-assertion=0, @typescript-eslint/consistent-type-imports=0, @typescript-eslint/no-unused-vars=0)
+
+> @chester-hill-solutions/stow-s3@0.2.0 check:type-escapes
+> node ../../scripts/check-type-escapes.mjs
+
+TypeScript escape ratchet OK (0 baseline entries)
+
+> @chester-hill-solutions/stow-s3@0.2.0 check:dry
+> node ../../scripts/check-dry.mjs
+
+TypeScript DRY ratchet OK (0 clones / 0 lines / 0%)
+RESULT check-ts-quality 0
+TARGET check-generated
+mkdir -p bin
+GOTOOLCHAIN=go1.24.13 GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -ldflags "-s -w" -o bin/stow-runtime.wasm ./cmd/stow-wasm
+cd packages/stow-s3 && npm ci --ignore-scripts && rm -rf node_modules/@chester-hill-solutions/stow-s3-darwin-arm64 node_modules/@chester-hill-solutions/stow-s3-darwin-x64 node_modules/@chester-hill-solutions/stow-s3-linux-arm64 node_modules/@chester-hill-solutions/stow-s3-linux-x64 && npm run build
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 266 packages, and audited 267 packages in 8s
+
+121 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> @chester-hill-solutions/stow-s3@0.2.0 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.2.0 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+node scripts/check-generated.mjs
+
+> @chester-hill-solutions/stow-s3@0.2.0 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.2.0 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+Generated package output is reproducible
+RESULT check-generated 0

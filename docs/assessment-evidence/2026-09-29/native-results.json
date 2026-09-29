@@ -1,0 +1,196 @@
+[
+  {
+    "name": "native ready",
+    "passed": true,
+    "detail": {
+      "elapsed_ms": 408.08,
+      "capabilities": {
+        "persistent": true,
+        "multipart": true,
+        "upstream": false,
+        "conditionalWrites": true,
+        "presignedUrls": true,
+        "maxBytes": 0,
+        "maxObjects": 0,
+        "maxRequestBytes": 8388608
+      }
+    }
+  },
+  {
+    "name": "default AWS CLI upload",
+    "passed": false,
+    "detail": "An error occurred (InvalidArgument) when calling the PutObject operation: unsupported checksum algorithm \"crc64nvme\""
+  },
+  {
+    "name": "AWS CLI put/get identical",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "metadata preserved",
+    "passed": false,
+    "detail": {
+      "metadata": {
+        "Purpose": "assessment"
+      },
+      "content_type": "application/x-stow-test"
+    }
+  },
+  {
+    "name": "range bytes",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "presigned get",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "tampered signature rejected",
+    "passed": true,
+    "detail": {
+      "http": 403
+    }
+  },
+  {
+    "name": "unsigned request rejected",
+    "passed": true,
+    "detail": {
+      "http": 403
+    }
+  },
+  {
+    "name": "wrong If-Match rejected",
+    "passed": true,
+    "detail": "An error occurred (PreconditionFailed) when calling the PutObject operation: At least one of the pre-conditions you specified did not hold"
+  },
+  {
+    "name": "AWS CLI high-level 12 MiB upload",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "name": "12 MiB roundtrip",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "filesystem restart persistence",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "prewarm exact key",
+    "passed": true,
+    "detail": {
+      "version": 1,
+      "bucket": "fixtures",
+      "results": [
+        {
+          "bucket": "fixtures",
+          "key": "nested/a.bin",
+          "cached": true,
+          "bytes": 65536
+        },
+        {
+          "bucket": "fixtures",
+          "key": "cached-only.bin",
+          "cached": true,
+          "bytes": 65536
+        }
+      ],
+      "warmed": 2,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "name": "run-through cached read",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "unseeded upstream bucket initially refused",
+    "passed": true,
+    "detail": "An error occurred (NoSuchBucket) when calling the GetObject operation: The specified bucket does not exist"
+  },
+  {
+    "name": "client can expand upstream bucket access via CreateBucket",
+    "passed": true,
+    "detail": {
+      "observation": "namespace bootstrap is not a fixed bucket allowlist"
+    }
+  },
+  {
+    "name": "explicit STOW_BUCKET refuses other bucket after local creation",
+    "passed": true,
+    "detail": "An error occurred (NoSuchKey) when calling the GetObject operation: The specified key does not exist"
+  },
+  {
+    "name": "default downstream write leaves upstream intact",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "offline restart retains local override",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "offline restart serves unmodified warmed bytes with upstream stopped",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "offline miss explicit",
+    "passed": true,
+    "detail": "An error occurred (NoSuchKey) when calling the GetObject operation: The specified key does not exist"
+  },
+  {
+    "name": "workspace prepare/checkpoint/diff",
+    "passed": true,
+    "detail": {
+      "version": 1,
+      "changes": [
+        {
+          "path": "result.txt",
+          "kind": "added",
+          "to": {
+            "path": "result.txt",
+            "size": 9,
+            "mode": 420,
+            "sha256": "161069badc0cc23058b13d7c068e45205f4333aa15fd78db9d68f5c9f1ae8983"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "handoff archive path form",
+    "passed": false,
+    "detail": {
+      "archive_path": "/private/tmp/stow-product-probe-diiqi4g2/transfer/snapshot.tar.gz"
+    }
+  },
+  {
+    "name": "relocated handoff adoption",
+    "passed": false,
+    "detail": "2026/09/29 00:16:15 read handoff archive: open /private/tmp/stow-product-probe-diiqi4g2/transfer/snapshot.tar.gz: no such file or directory"
+  },
+  {
+    "name": "adoption after explicitly making archive path relative",
+    "passed": true,
+    "detail": ""
+  },
+  {
+    "name": "adopted bytes",
+    "passed": true,
+    "detail": null
+  },
+  {
+    "name": "workspace HTTP facade availability",
+    "passed": false,
+    "detail": "2026/09/29 00:16:16 --backend \"workspace\" is not selectable from the CLI yet; use the embedded API"
+  }
+]

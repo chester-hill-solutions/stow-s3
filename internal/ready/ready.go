@@ -27,14 +27,16 @@ type Capabilities struct {
 	// A caller that cannot tell "unavailable on this host" from "not enabled here"
 	// will misreport what it holds, so the boundary is stated rather than left to
 	// be inferred from a boolean.
-	Persistent        bool  `json:"persistent"`
-	Multipart         bool  `json:"multipart"`
-	Upstream          bool  `json:"upstream"`
-	ConditionalWrites bool  `json:"conditionalWrites"`
-	PresignedURLs     bool  `json:"presignedUrls"`
-	MaxBytes          int64 `json:"maxBytes"`
-	MaxObjects        int64 `json:"maxObjects"`
-	MaxRequestBytes   int64 `json:"maxRequestBytes"`
+	Persistent            bool  `json:"persistent"`
+	Multipart             bool  `json:"multipart"`
+	Upstream              bool  `json:"upstream"`
+	ConditionalWrites     bool  `json:"conditionalWrites"`
+	PresignedURLs         bool  `json:"presignedUrls"`
+	MaxBytes              int64 `json:"maxBytes"`
+	MaxMultipartUploads   int64 `json:"maxMultipartUploads"`
+	MaxObjects            int64 `json:"maxObjects"`
+	MaxRequestBytes       int64 `json:"maxRequestBytes"`
+	MaxConcurrentRequests int   `json:"maxConcurrentRequests"`
 }
 
 // Message is the single object written to the ready descriptor.

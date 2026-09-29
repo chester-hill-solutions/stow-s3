@@ -91,6 +91,35 @@
       }
     },
     {
+      "id": "serve owns a persistent workspace and reports its authenticated endpoint",
+      "verb": "serve",
+      "registry": "a",
+      "args": {
+        "id": "{{ws}}",
+        "registry-dir": "{{registryA}}"
+      },
+      "expect": {
+        "workspace_id": {
+          "equals": "{{ws}}"
+        },
+        "root": {
+          "equals": "{{root}}"
+        },
+        "endpoint": {
+          "matches": "^http://127\\.0\\.0\\.1:[0-9]+$"
+        },
+        "capabilities.persistent": {
+          "equals": true
+        },
+        "capabilities.upstream": {
+          "equals": false
+        },
+        "region": {
+          "equals": "us-east-1"
+        }
+      }
+    },
+    {
       "id": "the seeded inputs are really on disk, at the destinations the manifest named",
       "verb": "read",
       "root": "{{work}}/workspace",
@@ -305,7 +334,7 @@
           "equals": "platform"
         },
         "archive.path": {
-          "equals": "{{work}}/checkpoint.tar.gz"
+          "equals": "checkpoint.tar.gz"
         },
         "archive.sha256": {
           "matches": "^[0-9a-f]{64}$"

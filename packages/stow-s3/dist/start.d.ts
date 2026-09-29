@@ -1,3 +1,4 @@
+import { type ChildProcess } from "node:child_process";
 import { type StowReady } from "./ready.js";
 import type { StartOptions, StowInstance } from "./types.js";
 export { parseReadyLine, type ReadyLine } from "./ready-reader.js";
@@ -9,6 +10,7 @@ export { parseReadyLine, type ReadyLine } from "./ready-reader.js";
  * value; check-version.mjs fails if the two drift.
  */
 export declare const SESSION_GOGC = "50";
+export declare function stopChild(child: ChildProcess, graceMs?: number, waitMs?: number): Promise<void>;
 export declare function buildChildEnv(options: StartOptions): NodeJS.ProcessEnv;
 export declare function startStow(options?: StartOptions): Promise<StowInstance>;
 export interface StowStartup {
@@ -21,4 +23,5 @@ export interface StowStartup {
     ready: StowReady;
 }
 export declare function startStowWithReady(options?: StartOptions): Promise<StowStartup>;
+export declare function assertRequestLimit(limit: number | undefined, label?: string): void;
 //# sourceMappingURL=start.d.ts.map

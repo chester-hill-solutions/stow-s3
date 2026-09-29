@@ -51,6 +51,11 @@ export interface StartOptions {
     cacheMaxObjects?: number;
     cacheTtlSeconds?: number;
     allowLiveWrites?: boolean;
+    /** Permit HTTP upstream hosts beyond literal loopback addresses. */
+    allowInsecureUpstream?: boolean;
+    /** Positive HTTP body-byte limit; omit for the native default. */
+    maxRequestBytes?: number;
+    maxConcurrentRequests?: number;
     /** Maximum stored bytes enforced on every request. Omit to leave the server unlimited. */
     maxBytes?: number;
     /** Maximum stored object count enforced on every request. Omit to leave the server unlimited. */

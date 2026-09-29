@@ -52,7 +52,7 @@ func countRegistryEntries(registryDir string) (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("stow: count registry entries: %w", err)
 	}
-	entries, err := registry.All()
+	entries, err := registry.AllStrict()
 	if err != nil {
 		return 0, fmt.Errorf("stow: count registry entries: %w", err)
 	}

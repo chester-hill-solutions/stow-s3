@@ -148,6 +148,9 @@ func (i *Instance) initializeMultipart(ctx context.Context, bucket string) error
 }
 
 func (i *Instance) initializeMultipartUpload(ctx context.Context, upload storage.MultipartUpload) error {
+	if err := i.admitMultipartUpload(); err != nil {
+		return err
+	}
 	parts, err := i.multipartStore.ListParts(ctx, upload.UploadID)
 	if err != nil {
 		return err
@@ -180,6 +183,13 @@ func (i *Instance) initializeMultipartUpload(ctx context.Context, upload storage
 	}
 	if !i.reserveTarget(target) {
 		return ErrQuotaExceeded
+	}
+	return nil
+}
+
+func (i *Instance) admitMultipartUpload() error {
+	if int64(len(i.multipart)) >= i.options.MaxMultipartUploads {
+		return fmt.Errorf("%w: maximum outstanding multipart uploads (%d) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data", ErrQuotaExceeded, i.options.MaxMultipartUploads)
 	}
 	return nil
 }

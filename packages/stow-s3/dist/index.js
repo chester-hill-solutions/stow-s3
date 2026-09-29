@@ -53,4 +53,5 @@ export const Stow = {
     },
 };
 export default Stow;
+export { serveWorkspace } from "./workspace-serve.js";
 //# sourceMappingURL=index.js.map

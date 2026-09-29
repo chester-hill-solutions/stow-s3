@@ -1,0 +1,24 @@
+GOTOOLCHAIN=go1.24.13 go vet ./...
+GOTOOLCHAIN=go1.24.13 go test -race ./...
+ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	10.486s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.676s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/tools/quality	1.853s
+GOTOOLCHAIN=go1.24.13 go run ./tools/quality
+Go quality ratchet OK (15 baseline entries)
+node scripts/check-file-size.mjs
+File-size ratchet violation
+  new oversized file: scripts/check-coverage.test.mjs:503
+make: *** [check-file-size] Error 1

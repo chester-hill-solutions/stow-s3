@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf-8"><title>Stow browser assessment</title><h1>Stow browser assessment</h1><pre id="results">Running…</pre>
+<script src="./dist/wasm_exec.js"></script>
+<script type="module">
+import {openBrowserEmbeddedStow,IndexedDbPersistenceAdapter} from './dist/browser.js';
+const results=[];const report=(name,passed,detail)=>{results.push({name,passed,detail});document.querySelector('#results').textContent=JSON.stringify(results,null,2);};
+try {
+ const go=new Go();const bytes=await(await fetch('./dist/stow-runtime.wasm')).arrayBuffer();
+ const {instance}=await WebAssembly.instantiate(bytes,go.importObject);go.run(instance);
+ for(let i=0;i<100&&!globalThis.stow;i++)await new Promise(r=>setTimeout(r,10));
+ const host={call:request=>globalThis.stow.call(request)};
+ report('real Go WASM initialized',!!globalThis.stow);
+ report('Web Locks available',!!navigator.locks);
+ const options=()=>({namespace:'assessment',persistence:new IndexedDbPersistenceAdapter({databaseName:'stow-assessment-5485a36'}),maxBytes:1000000,maxObjects:100});
+ const store=await openBrowserEmbeddedStow(host,options());
+ const previous=localStorage.getItem('stow-assessment-written');
+ if(previous){const item=await store.getObject('fixture','hello.txt');report('survives page reload',new TextDecoder().decode(item.data)==='browser-persisted');}
+ else{await store.createBucket('fixture');await store.putObject('fixture','hello.txt',new TextEncoder().encode('browser-persisted'),{contentType:'text/plain',metadata:{purpose:'browser-test'}});localStorage.setItem('stow-assessment-written','yes');report('real IndexedDB commit',true);}
+ try{const duplicate=await openBrowserEmbeddedStow(host,options());report('second owner refused',false);await duplicate.close();}catch(e){report('second owner refused',e.code==='already_open',{code:e.code});}
+ await store.close();const reopened=await openBrowserEmbeddedStow(host,options());const value=await reopened.getObject('fixture','hello.txt');
+ report('close/reopen preserves bytes',new TextDecoder().decode(value.data)==='browser-persisted');
+ report('close/reopen preserves content type and metadata',value.contentType==='text/plain'&&value.metadata?.purpose==='browser-test',value.metadata);
+ await reopened.close();report('complete',true,{reload:!!previous});
+}catch(e){report('exception',false,{message:e.message,code:e.code,stack:e.stack});}
+</script>

@@ -1,33 +1,44 @@
 # Stow
 
-A detached working environment for coding agents: a workspace of files and a
-cache of S3 data, both of which survive the machine, both of which you can verify,
-and neither of which needs a live privileged connection to use.
+Portable working storage for agents, tools, applications and tests: S3-compatible
+object storage, prepared file workspaces, and checkpoints you can inspect and
+explicitly export and adopt elsewhere.
 
-It is also an S3-compatible object store, and a good one for local development and
-tests. That part is not the interesting part, and this README leads with the other
-thing because the interesting part is what an agent can be *given*.
+Stow owns the data lifecycle. Your application or agent runner owns execution,
+turn scheduling, model access and any sandbox or resource enforcement. Local S3
+fixtures and agent working data are two uses of the same storage foundation.
 
-## The two pillars
+## Two storage surfaces
 
-**A workspace** is an isolated directory that already contains the inputs you
-declared, checkpointed immutably, diffable, and resumable on another machine.
-Fan out sixteen agents, each with its own workspace, and each one hands back a
-checkpoint you can compare.
+**An S3 service** provides common object operations through ordinary SDKs, using
+memory or filesystem storage. Scoped TypeScript and Python helpers start and
+clean up a private storage process. Run-through mode adds an optional upstream
+cache; captured data can be read offline while retained. Configure `STOW_BUCKET`
+when restricting upstream reads to one bucket. Prewarming selected keys alone
+is not a permanent online allowlist.
 
-**An S3 cache** (`stow-s3 serve --mode run-through`) keeps a local copy of object
-data, scoped to one bucket, that stays readable when the upstream is unreachable.
-Both are instances of one property: **the agent process never holds the upstream
-AWS credential.** The keys live in the stow server's environment. The agent is
-handed a local endpoint and a generated local key pair, and cannot reach anything
-it was not given. Disconnect it from the network and the workspace is still there
-and the cached data is still readable.
+**A workspace** is a real directory with declared inputs, durable identity,
+verified file or portable object checkpoints, diffs and explicit handoff/adoption.
+The embedded API and optional `workspace serve` loopback S3 facade share one runtime.
+The ordinary S3 filesystem backend has a different object-record layout.
 
-This matters more than it first appears. An agent that reads untrusted text — a
-ticked issue, a fetched page, a file from a repository it does not control — is
-being fed instructions by whoever wrote that text. Giving it a credential that
-reaches a real bucket gives those instructions somewhere to go. Stow's answer is
-that the thing the agent holds is worth nothing outside the process that made it.
+The storage service can hold upstream credentials while callers use generated
+local credentials. This does not isolate arbitrary host processes or their
+network access. Workspace/API quotas do not hard-limit direct filesystem writes.
+
+**Current development goal:** complete one installable prepare → use → checkpoint
+→ inspect → transfer → reopen workflow, then exercise it through a thin existing
+agent-runner integration. An experimental OpenCode caller gates each prompt on a confirmed save;
+real-model and cross-host pilot acceptance remain open. See the
+[canonical storage plan](docs/plan.md) and [milestone](docs/portable-agent-workspace-goal.md).
+The [planning index](docs/planning-index.md) identifies current documents and records
+where unfinished work from superseded plans now belongs.
+
+A local stdio MCP adapter exposes scoped inspection, portable checkpoint capture,
+request reconciliation, diff and optional handoff tools. Start with the
+[portable workspace guide](docs/portable-workspace-usage.md) and
+[OpenCode caller example](examples/opencode/README.md). MCP tool access alone does
+not guarantee a checkpoint after every turn; the caller owns that admission barrier.
 
 ## This is not version control
 
@@ -168,8 +179,11 @@ stow-s3 workspace diff --from cp_a4424a293103532626d4a507 \
 }
 ```
 
-To move the work to another machine, write a handoff. With `--archive` the
-document is portable and carries a checkpoint you can adopt anywhere:
+To transfer the work, write a handoff with `--archive`. The archive can be adopted
+into a new workspace on a supported destination. **Known issue at the assessed
+revision:** the writer records an absolute archive path; moving both files currently
+requires making that reference relative to the handoff document. The canonical plan
+prioritizes removing this workaround. See the [assessment](docs/product-assessment-2026-09-29.md).
 
 ```sh
 stow-s3 workspace handoff \
@@ -333,9 +347,8 @@ stow-s3 workspace prune --include-adopted
 
 `prune` forgets entries whose workspace directory **no longer exists**. It cannot
 delete your data, because everything it removes is already gone — the only things it
-touches are stow's own records, the entry and its checkpoint references. It asks for
-no age and needs no lock support, because there is nothing to judge and nothing to
-quiesce. An entry that still points at a real directory is left alone and reported
+touches are stow's own records, the entry and its checkpoint references. It asks for no age and coordinates registry/checkpoint removal with active storage
+operations. An entry that still points at a real directory is left alone and reported
 as `present`; that is `collect`'s question, not this one's.
 
 Adopted entries are kept by default, because the entry is the only remaining record
@@ -351,31 +364,13 @@ partially published the main npm package to GitHub Packages, but failed before
 publishing its platform packages. PyPI was not published. Do not use the npm or
 Python install commands below until a complete release is announced.
 
-**The npm package is distributed through GitHub Packages, not npmjs.org.** This
-organisation owns nothing on npmjs — the scope does not exist there — and a
-scope-specific registry in `.npmrc` overrides `--registry`. GitHub Packages
-requires authentication to install npm packages, including public packages.
-Once a complete release is announced, configure the scope in the project
-`.npmrc`:
-
-```ini
-# .npmrc
-@chester-hill-solutions:registry=https://npm.pkg.github.com
-```
-
-Then authenticate with a GitHub personal access token (classic) that has the
-`read:packages` scope. You can keep the token in your user-level npm config by
-running:
-
-```sh
-npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
-```
-
-Use your GitHub username, the token as the password, and an email address at the
-prompts. Do not commit the token to the project `.npmrc`. After authentication,
-`npm install @chester-hill-solutions/stow-s3` resolves against GitHub Packages.
-See [GitHub's npm registry authentication guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
-PyPI has no such configuration step.
+The next candidate, **0.3.0**, targets public npmjs distribution for the main
+package and all four platform carriers. It has **not yet been published**.
+Publisher setup, live-provider gates and anonymous exact-version installation
+must pass before availability is announced. The partial 0.2.0 GitHub Packages
+release is historical; its existing artifacts remain immutable. For the new
+candidate, remove any old scope override to `npm.pkg.github.com`; it would send
+installation requests to the wrong registry.
 
 The Go module is published and installs today:
 

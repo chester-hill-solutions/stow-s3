@@ -32,3 +32,8 @@ func unlockFile(f *os.File) error {
 
 // lockSupported reports whether this host can establish session liveness at all.
 const lockSupported = true
+
+func waitLock(f *os.File) (bool, error) {
+	err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX)
+	return err == nil, err
+}

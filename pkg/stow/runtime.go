@@ -19,10 +19,11 @@ type Runtime struct {
 // makes the embedded path composable rather than forked.
 func Open(options Options) (*Runtime, error) {
 	runtimeOptions := stowruntime.Options{
-		Backend:    stowruntime.Backend(options.Backend),
-		MaxBytes:   options.MaxBytes,
-		MaxObjects: options.MaxObjects,
-		Authority:  options.Authority,
+		Backend:             stowruntime.Backend(options.Backend),
+		MaxBytes:            options.MaxBytes,
+		MaxObjects:          options.MaxObjects,
+		MaxMultipartUploads: options.MaxMultipartUploads,
+		Authority:           options.Authority,
 	}
 
 	var (
@@ -147,12 +148,13 @@ func (r *Runtime) Authority() Authority { return r.inner.Authority() }
 func (r *Runtime) Capabilities() Capabilities {
 	capabilities := r.inner.Capabilities()
 	return Capabilities{
-		Backend:    Backend(capabilities.Backend),
-		MaxBytes:   capabilities.MaxBytes,
-		MaxObjects: capabilities.MaxObjects,
-		Persistent: capabilities.Persistent,
-		Multipart:  capabilities.Multipart,
-		Upstream:   capabilities.Upstream,
+		Backend:             Backend(capabilities.Backend),
+		MaxBytes:            capabilities.MaxBytes,
+		MaxObjects:          capabilities.MaxObjects,
+		MaxMultipartUploads: capabilities.MaxMultipartUploads,
+		Persistent:          capabilities.Persistent,
+		Multipart:           capabilities.Multipart,
+		Upstream:            capabilities.Upstream,
 	}
 }
 

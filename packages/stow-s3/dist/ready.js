@@ -78,6 +78,7 @@ export function parseReadyMessage(line) {
             maxBytes: requireNumber(capabilities, "maxBytes"),
             maxObjects: requireNumber(capabilities, "maxObjects"),
             maxRequestBytes: requireNumber(capabilities, "maxRequestBytes"),
+            maxConcurrentRequests: capabilities.maxConcurrentRequests === undefined ? 0 : requireNumber(capabilities, "maxConcurrentRequests"),
         },
     };
 }

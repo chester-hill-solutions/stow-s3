@@ -1,8 +1,23 @@
 # Stow Agent DX and Python Plan
 
+**Planning status: superseded design and delivery plan — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. Remaining correctness, limits, publication, conformance and lifecycle work is carried into S0–S4. Its revision backlogs and performance targets are historical.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+> **Scope and precedence, 2026-09-29:** [Canonical storage plan](plan.md) governs current work. This document retains technical details and dated implementation history; its older phase priorities and “current execution order” statements do not schedule work. Caller-owned execution is the active boundary.
+
 > **Plan status:** this remains product and architecture context, but its
 > implementation ordering is superseded. Use
-> [Agent Workspace, Handoff, and Run-Through Plan](agent-workspace-plan.md) for
+> [Canonical storage plan](plan.md) for
 > the current code sequence. The S3 acceptance criteria and release gate remain
 > in [Remediation Execution Plan](remediation-plan.md). The earlier
 > [Stow 10/10 Plan](agentic-dx-10-plan.md) is historical; its phase order and
@@ -11,7 +26,7 @@
 **Status:** proposed
 **Last updated:** 2026-09-27
 **Scope:** open-source package evolution for short-lived agents and developer workflows
-**Relationship to existing work:** additive to `docs/remediation-plan.md`; the remediation release remains the foundation and release gate for this work. The current execution order for run-through remediation, isolated ready-to-work workspaces, and checkpoint/handoff is in [`docs/agent-workspace-plan.md`](agent-workspace-plan.md), validated against the 2026-09-27 test run. That plan supersedes the related ordering below; this document remains the product history and architecture context.
+**Relationship to existing work:** historical product/architecture context. [The canonical storage plan](plan.md) owns current status and ordering; specialist acceptance criteria remain useful only within that scope.
 
 ## 0. Revision note and current state
 

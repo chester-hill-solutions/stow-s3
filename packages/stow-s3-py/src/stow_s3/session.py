@@ -188,13 +188,13 @@ class Session:
                     handle.close()
 
 
-def _stop_process(process: subprocess.Popen[bytes]) -> None:
+def _stop_process(process: subprocess.Popen[bytes], grace_seconds: float = STOP_GRACE_SECONDS) -> None:
     if process.poll() is not None:
         return
     with contextlib.suppress(OSError):
         process.terminate()
     try:
-        process.wait(timeout=STOP_GRACE_SECONDS)
+        process.wait(timeout=grace_seconds)
         return
     except subprocess.TimeoutExpired:
         pass
@@ -278,6 +278,8 @@ def open_session(
     max_bytes: int = DEFAULT_SESSION_MAX_BYTES,
     max_objects: int = DEFAULT_SESSION_MAX_OBJECTS,
     data_dir: str | Path | None = None,
+    max_request_bytes: int | None = None,
+    max_concurrent_requests: int | None = None,
 ) -> Session:
     """Start a server and return a session that owns it.
 
@@ -286,6 +288,10 @@ def open_session(
     """
     if max_bytes < 0 or max_objects < 0:
         raise ValueError("session limits must not be negative")
+    if max_concurrent_requests is not None and (type(max_concurrent_requests) is not int or max_concurrent_requests <= 0):
+        raise ValueError("max_concurrent_requests must be a positive integer")
+    if max_request_bytes is not None and (type(max_request_bytes) is not int or max_request_bytes <= 0):
+        raise ValueError("max_request_bytes must be a positive integer")
     binary = require_stow_binary()
     owned_dir: Path | None = None
     if data_dir is None:
@@ -298,6 +304,10 @@ def open_session(
     read_fd, write_fd = os.pipe()
     os.set_inheritable(write_fd, True)
     command = _server_args(binary.path, target, write_fd, max_bytes, max_objects)
+    if max_concurrent_requests is not None:
+        command.extend(["--max-concurrent-requests", str(max_concurrent_requests)])
+    if max_request_bytes is not None:
+        command.extend(["--max-request-bytes", str(max_request_bytes)])
     started = time.monotonic()
     # The server's own output goes to temporary files rather than pipes. A pipe
     # cannot be read without blocking until the buffer fills or the child exits,
@@ -384,9 +394,11 @@ def with_session(
     max_bytes: int = DEFAULT_SESSION_MAX_BYTES,
     max_objects: int = DEFAULT_SESSION_MAX_OBJECTS,
     data_dir: str | Path | None = None,
+    max_request_bytes: int | None = None,
+    max_concurrent_requests: int | None = None,
 ) -> Iterator[Session]:
     """Run a session for the duration of a block, then always clean up."""
-    session = open_session(max_bytes=max_bytes, max_objects=max_objects, data_dir=data_dir)
+    session = open_session(max_bytes=max_bytes, max_objects=max_objects, data_dir=data_dir, max_request_bytes=max_request_bytes, max_concurrent_requests=max_concurrent_requests)
     try:
         yield session
     finally:

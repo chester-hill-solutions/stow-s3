@@ -12,9 +12,10 @@ import (
 )
 
 type Store struct {
-	root     string
-	layout   Layout
-	manifest *Manifest
+	rootIdentity os.FileInfo
+	root         string
+	layout       Layout
+	manifest     *Manifest
 	// index is the object index, split out of the manifest because it changes per
 	// object and the manifest does not. See manifestVersion.
 	// objectIndex is the object index, split out of the manifest because it changes
@@ -90,6 +91,10 @@ func New(options Options) (*Store, error) {
 	if err := os.MkdirAll(options.Root, 0o755); err != nil {
 		return nil, fmt.Errorf("workspace store: create root: %w", err)
 	}
+	rootIdentity, err := os.Lstat(options.Root)
+	if err != nil || !rootIdentity.IsDir() {
+		return nil, fmt.Errorf("workspace: root must be a real directory")
+	}
 	if err := os.MkdirAll(InternalPath(options.Root, "keys"), 0o755); err != nil {
 		return nil, fmt.Errorf("workspace store: create internal directory: %w", err)
 	}
@@ -98,13 +103,14 @@ func New(options Options) (*Store, error) {
 		return nil, err
 	}
 	store := &Store{
-		root:        options.Root,
-		layout:      NewLayout(),
-		manifest:    manifest,
-		objectIndex: index,
-		workspace:   options.Bucket,
-		folded:      map[string]string{},
-		Now:         now,
+		rootIdentity: rootIdentity,
+		root:         options.Root,
+		layout:       NewLayout(),
+		manifest:     manifest,
+		objectIndex:  index,
+		workspace:    options.Bucket,
+		folded:       map[string]string{},
+		Now:          now,
 	}
 	if err := store.establishIdentity(options, rootExisted, now); err != nil {
 		return nil, err
@@ -204,6 +210,9 @@ func (s *Store) Close() error {
 	if s.closed {
 		return nil
 	}
+	if err := s.checkRootIdentity(); err != nil {
+		return err
+	}
 	s.closed = true
 	// Close is one of only two places identity changes, so the identity document
 	// is written here alongside the index. The other is creation.
@@ -218,7 +227,7 @@ func (s *Store) checkOpen() error {
 	if s.closed {
 		return ErrClosed
 	}
-	return nil
+	return s.checkRootIdentity()
 }
 
 func (s *Store) now() time.Time {

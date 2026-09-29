@@ -28,7 +28,7 @@ func TestPutObjectChecksumAlgorithms(t *testing.T) {
 	}
 	create("checksum-bucket")
 	body := "checksum-body"
-	for _, algorithm := range []string{"CRC32", "CRC32C", "SHA1", "SHA256"} {
+	for _, algorithm := range []string{"CRC32", "CRC32C", "CRC64NVME", "SHA1", "SHA256"} {
 		t.Run(algorithm, func(t *testing.T) {
 			value, err := storage.ComputeChecksum(algorithm, []byte(body))
 			if err != nil {
@@ -69,6 +69,7 @@ func TestPutObjectRejectsBadAndUnknownChecksums(t *testing.T) {
 		header string
 		value  string
 	}{
+		{name: "bad NVME digest", header: "x-amz-checksum-crc64nvme", value: "AAAAAAAAAAA="},
 		{name: "bad digest", header: "x-amz-checksum-crc32", value: bad},
 		{name: "unknown algorithm", header: "x-amz-checksum-sha512", value: bad},
 	} {
@@ -84,5 +85,28 @@ func TestPutObjectRejectsBadAndUnknownChecksums(t *testing.T) {
 				t.Fatalf("status = %d, want 400", resp.StatusCode)
 			}
 		})
+	}
+}
+
+func TestCRC64MultipartDeclarationIsExplicitlyUnsupported(t *testing.T) {
+	ts := newTestServer(t)
+	defer ts.Close()
+	req, _ := http.NewRequest(http.MethodPut, ts.URL+"/checksum-bucket", nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	req, _ = http.NewRequest(http.MethodPost, ts.URL+"/checksum-bucket/object?uploads", nil)
+	req.Header.Set("x-amz-checksum-algorithm", "CRC64NVME")
+	req.Header.Set("x-amz-checksum-type", "FULL_OBJECT")
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNotImplemented {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("status=%d body=%s", resp.StatusCode, body)
 	}
 }

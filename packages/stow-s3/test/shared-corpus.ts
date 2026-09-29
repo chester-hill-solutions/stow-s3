@@ -27,6 +27,9 @@ import {
 } from "@aws-sdk/client-s3";
 import { Stow, type StowInstance } from "../dist/index.js";
 import { assertFailure, assertMetadata } from "./shared-corpus-assert.js";
+import { runBucketLifecycle, runBatchDelete } from "./shared-corpus-buckets.js";
+import { runMultipartFailure } from "./shared-corpus-multipart-negative.js";
+import { runSignedRequest } from "./shared-corpus-signed.js";
 import { runRangeGet } from "./shared-corpus-range.js";
 import type {
   Corpus,
@@ -113,6 +116,18 @@ async function seedCorpus(client: S3Client, testCase: CorpusCase): Promise<void>
 
 async function runCorpusOperation(client: S3Client, testCase: CorpusCase): Promise<void> {
   switch (testCase.operation) {
+    case "signedRequest":
+      await runSignedRequest(client, testCase);
+      return;
+    case "multipartFailure":
+      await runMultipartFailure(client, testCase);
+      return;
+    case "bucketLifecycle":
+      await runBucketLifecycle(client, testCase);
+      return;
+    case "deleteObjects":
+      await runBatchDelete(client, testCase);
+      return;
     case "putGetRoundTrip":
       await runPutGetRoundTrip(client, testCase);
       return;
@@ -216,6 +231,9 @@ function applyChecksum(input: PutObjectCommandInput, testCase: CorpusCase): void
   if (!algorithm || !value) return;
   input.ChecksumAlgorithm = algorithm as PutObjectCommandInput["ChecksumAlgorithm"];
   switch (algorithm) {
+    case "CRC64NVME":
+      input.ChecksumCRC64NVME = value;
+      break;
     case "CRC32":
       input.ChecksumCRC32 = value;
       return;
@@ -234,13 +252,17 @@ function applyChecksum(input: PutObjectCommandInput, testCase: CorpusCase): void
 }
 
 async function runListObjects(client: S3Client, testCase: CorpusCase): Promise<void> {
+  if (testCase.expect.status >= 400) {
+    await assertFailure(() => client.send(new ListObjectsV2Command({ Bucket: testCase.bucket, ContinuationToken: testCase.continuationToken })), testCase.expect, testCase.id);
+    return;
+  }
   const pages = testCase.expect.pages ?? [{
     contents: testCase.expect.contents,
     commonPrefixes: testCase.expect.commonPrefixes,
     keyCount: testCase.expect.keyCount ?? 0,
     isTruncated: testCase.expect.isTruncated ?? false,
   }];
-  let continuationToken: string | undefined;
+  let continuationToken: string | undefined = testCase.continuationToken;
   for (let index = 0; index < pages.length; index += 1) {
     const expected = pages[index];
     assert.ok(expected, `missing expected list page ${index + 1}`);
@@ -423,6 +445,7 @@ function assertETag(etag: string | undefined): void {
 function assertChecksum(output: PutObjectCommandOutput, expected: CorpusExpectation): void {
   if (!expected.checksumAlgorithm) return;
   const values: Record<string, string | undefined> = {
+    CRC64NVME: output.ChecksumCRC64NVME,
     CRC32: output.ChecksumCRC32,
     CRC32C: output.ChecksumCRC32C,
     SHA1: output.ChecksumSHA1,

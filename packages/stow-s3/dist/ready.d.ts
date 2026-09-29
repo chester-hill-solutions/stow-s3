@@ -8,6 +8,7 @@ export interface StowReadyCapabilities {
     maxBytes: number;
     maxObjects: number;
     maxRequestBytes: number;
+    maxConcurrentRequests?: number;
 }
 export interface StowReady {
     protocolVersion: number;

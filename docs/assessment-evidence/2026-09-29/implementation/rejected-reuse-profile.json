@@ -1,0 +1,20 @@
+{
+  "experiment": "explicit-parent hardlink reuse with all payload fsync retained",
+  "fixture": {
+    "files": 4096,
+    "bytes": 67108864
+  },
+  "initial_capture_ms": 6057.474,
+  "reused_capture_ms": 10798.749708,
+  "reused_phases_ms": {
+    "parent_manifest": 22.667125,
+    "file_inventory": 260.575083,
+    "logical_inventory": 293.089375,
+    "link_and_validate": 4910.661084,
+    "logical_verify": 306.990458,
+    "file_verify": 225.955458,
+    "durable_publication": 4778.776792
+  },
+  "conditions": "full matrix concurrently running; regression also observed in parent chained benchmark",
+  "decision": "removed production optimization; no durability relaxation"
+}

@@ -1,8 +1,12 @@
 # Architecture decision records
 
-Thirteen decisions, in the order they were taken. This file is the index: it is where
+Fourteen decisions, in the order they were taken. This file is the index: it is where
 to look to find out **what is in force**, and each ADR's own frontmatter is where to
 look for what it decided.
+
+Implementation ordering is owned by [the canonical plan](../plan.md), under ADR
+0014. [The planning index](../planning-index.md) lists retired work orders; older
+ADR references to a plan of record retain their historical context only.
 
 An ADR is a sprint artifact. It records a decision taken at a time, against the
 evidence available then, and decisions get revised. What is forbidden is a revision
@@ -39,7 +43,8 @@ the way it is.
 | [0010](0010-an-enforcement-site-or-not-a-permission.md) | `accepted` | — | — |
 | [0011](0011-local-is-the-default-mode.md) | `accepted` | 0001 | — |
 | [0012](0012-run-through-serves-only-its-own-buckets.md) | `accepted` | — | — |
-| [0013](0013-task-session-attempt-artifact.md) | `accepted` | — | — |
+| [0013](0013-task-session-attempt-artifact.md) | `narrowed` | — | 0014 (execution ownership and prerequisites) |
+| [0014](0014-storage-product-caller-owned-execution.md) | `accepted` | — | — |
 
 ## The drift this index exists to fix
 

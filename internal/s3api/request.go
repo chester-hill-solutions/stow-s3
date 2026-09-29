@@ -117,10 +117,11 @@ func verifyContentMD5(r *http.Request, data []byte) error {
 }
 
 var checksumHeaderNames = map[string]string{
-	"CRC32":  "x-amz-checksum-crc32",
-	"CRC32C": "x-amz-checksum-crc32c",
-	"SHA1":   "x-amz-checksum-sha1",
-	"SHA256": "x-amz-checksum-sha256",
+	"CRC64NVME": "x-amz-checksum-crc64nvme",
+	"CRC32":     "x-amz-checksum-crc32",
+	"CRC32C":    "x-amz-checksum-crc32c",
+	"SHA1":      "x-amz-checksum-sha1",
+	"SHA256":    "x-amz-checksum-sha256",
 }
 
 func checksumHeaderValues(r *http.Request) (string, string, error) {
@@ -183,6 +184,12 @@ func providedChecksum(r *http.Request) (string, string, error) {
 
 func validateChecksumHeaderNames(r *http.Request) error {
 	for name := range r.Header {
+		if strings.EqualFold(name, "x-amz-checksum-type") {
+			if r.Header.Get(name) != "FULL_OBJECT" {
+				return fmt.Errorf("unsupported checksum type %q", r.Header.Get(name))
+			}
+			continue
+		}
 		if strings.EqualFold(name, "x-amz-checksum-algorithm") {
 			continue
 		}
@@ -204,43 +211,6 @@ func checksumHeaderValuesByName(name string) (string, bool) {
 		}
 	}
 	return "", false
-}
-
-// declaredChecksum returns the checksum configuration a request declares about a
-// body it is not sending, which is what a multipart initiation is.
-//
-// A multipart initiation carries no body, so the value cannot be computed here
-// and is not invented. What it can carry is an algorithm - the one the client
-// intends to use, named before the object it describes has been assembled - and
-// that is recorded as declared, so GetMultipartUpload and ListMultipartUploads
-// report it and a client that made the request is not ignored.
-//
-// It is worth being exact about what the record buys, because the obvious
-// reading of it is wrong. A declared algorithm is not a whole-object checksum
-// claim, so there is nothing for the completion to verify: no value was supplied
-// and none can be derived without computing the composite of the per-part
-// checksums, which this does not do. Presenting the declaration to the store as
-// though it were a claim is what turned `x-amz-checksum-algorithm` on
-// CreateMultipartUpload into a 500 on every completion - see
-// storage.MultipartPutOptions, which is where the distinction is now drawn.
-//
-// Dropping the declaration instead would ignore a request the client believes it
-// made, and recording it as though it had been confirmed would advertise an
-// integrity property nobody checked.
-func declaredChecksum(r *http.Request) (string, string) {
-	algorithm, value, err := providedChecksum(r)
-	if err != nil {
-		// A malformed or contradictory declaration is not carried forward. There
-		// is no body here to check it against, so there is nothing to be done with
-		// it but decline to record it.
-		return "", ""
-	}
-	if algorithm == "" {
-		if requested, reqErr := requestedChecksumAlgorithm(r); reqErr == nil {
-			algorithm = requested
-		}
-	}
-	return algorithm, value
 }
 
 func checksumFromRequest(r *http.Request, data []byte) (string, string, error) {

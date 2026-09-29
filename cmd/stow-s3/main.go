@@ -26,13 +26,15 @@ import (
 
 // readyDetails is what the readiness announcement needs to describe the server.
 type readyDetails struct {
-	endpoint     string
-	mode         string
-	backend      runtime.Backend
-	capabilities runtime.Capabilities
-	limits       nativeStorageLimits
-	creds        auth.Credentials
-	banner       string
+	maxConcurrentRequests int
+	maxRequestBytes       int64
+	endpoint              string
+	mode                  string
+	backend               runtime.Backend
+	capabilities          runtime.Capabilities
+	limits                nativeStorageLimits
+	creds                 auth.Credentials
+	banner                string
 	// region is the region the server actually verifies signatures against, so
 	// a client that honors the reported region signs correctly.
 	region string
@@ -77,14 +79,16 @@ func readyMessage(details readyDetails) ready.Message {
 			// The runtime's own answers. It used to publish a persistence claim of
 			// its own and a hardcoded multipart=true beside it, and the two agreed
 			// only because the CLI could select two backends.
-			Persistent:        details.capabilities.Persistent,
-			Multipart:         details.capabilities.Multipart,
-			Upstream:          details.mode == string(runthrough.ModeRunThrough),
-			ConditionalWrites: true,
-			PresignedURLs:     true,
-			MaxBytes:          ready.ReportedLimit(details.limits.bytes()),
-			MaxObjects:        ready.ReportedLimit(details.limits.objects()),
-			MaxRequestBytes:   s3api.DefaultMaxRequestBytes,
+			Persistent:            details.capabilities.Persistent,
+			Multipart:             details.capabilities.Multipart,
+			Upstream:              details.mode == string(runthrough.ModeRunThrough),
+			ConditionalWrites:     true,
+			PresignedURLs:         true,
+			MaxBytes:              ready.ReportedLimit(details.limits.bytes()),
+			MaxObjects:            ready.ReportedLimit(details.limits.objects()),
+			MaxMultipartUploads:   details.capabilities.MaxMultipartUploads,
+			MaxRequestBytes:       reportedRequestLimit(details.maxRequestBytes),
+			MaxConcurrentRequests: reportedConcurrencyLimit(details.maxConcurrentRequests),
 		},
 	})
 }
@@ -166,6 +170,10 @@ func main() {
 		serve(os.Args[2:])
 	case "doctor":
 		doctor(os.Args[2:])
+	case "mcp":
+		if err := mcpCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	case "workspace":
 		if err := workspaceCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
@@ -183,7 +191,7 @@ func main() {
 // usageTo takes a writer so a test can assert on it. A usage text no test can
 // read silently loses lines.
 func usageTo(out io.Writer) {
-	fmt.Fprintf(out, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n  prewarm     fetch named keys into the run-through cache so they survive the network\n\n")
+	fmt.Fprintf(out, "usage: stow-s3 <command>\n\ncommands:\n  serve       start the S3-compatible server\n  doctor      report whether this machine can run a stow-s3 session\n  workspace   prepare, resume, and hand off agent workspaces\n  mcp         expose scoped storage tools over stdio\n  prewarm     fetch named keys into the run-through cache so they survive the network\n\n")
 	// prewarm takes an explicit key list, and saying so here is the documentation
 	// that matters: a prefix would be the obvious thing to reach for, and it is a
 	// data-exfiltration shape on a bucket an agent was never given.
@@ -292,6 +300,9 @@ func serve(args []string) {
 		printVersion(os.Stdout, true)
 		return
 	}
+	if !opts.validRequestLimits() {
+		log.Fatal("max-request-bytes and max-concurrent-requests must be positive")
+	}
 	rtCfg := serveRunThroughConfig(serveConfigInput{
 		AccessKey: &opts.accessKey, SecretKey: &opts.secretKey,
 		MaxBytes: opts.cacheMaxBytes, MaxObjects: opts.cacheMaxObjects, TTL: opts.cacheTTL,
@@ -299,6 +310,7 @@ func serve(args []string) {
 		AllowLiveWrites: opts.allowLiveWrites, AllowPublicAdmin: opts.allowPublicAdmin,
 		CacheDir: opts.cacheDir,
 	})
+	rtCfg.Upstream.AllowInsecureHTTP = opts.allowInsecureUpstream
 	mode := resolveMode(opts.modeFlag)
 	backend, err := parseBackend(opts.backendFlag)
 	if err != nil {
@@ -358,10 +370,7 @@ func serve(args []string) {
 		creds = generated
 	}
 
-	region := strings.TrimSpace(opts.regionFlag)
-	if region == "" {
-		region = auth.DefaultRegion
-	}
+	region := serveRegion(opts.regionFlag)
 	verifier := auth.NewVerifier(region)
 	writePolicy := runthrough.EffectiveWritePolicy(rtCfg)
 	cachePolicy := "none"
@@ -371,20 +380,22 @@ func serve(args []string) {
 		upstreamHost = runthrough.RedactEndpoint(rtCfg.Upstream.Endpoint)
 	}
 	srv, err := s3api.New(s3api.Config{
-		Store:            store,
-		Auth:             s3api.SigV4Auth(verifier, creds),
-		Host:             opts.host,
-		BaseHost:         strings.TrimSpace(opts.baseHost),
-		Port:             opts.port,
-		DataDir:          localDataDir,
-		Region:           region,
-		Mode:             string(mode),
-		CachePolicy:      cachePolicy,
-		WritePolicy:      writePolicy,
-		UpstreamHost:     upstreamHost,
-		AllowPublicAdmin: opts.allowPublicAdmin,
-		AdminToken:       opts.adminToken,
-		CORSOrigins:      opts.corsOrigins,
+		MaxConcurrentRequests: opts.maxConcurrentRequests,
+		MaxRequestBytes:       opts.maxRequestBytes,
+		Store:                 store,
+		Auth:                  s3api.SigV4Auth(verifier, creds),
+		Host:                  opts.host,
+		BaseHost:              strings.TrimSpace(opts.baseHost),
+		Port:                  opts.port,
+		DataDir:               localDataDir,
+		Region:                region,
+		Mode:                  string(mode),
+		CachePolicy:           cachePolicy,
+		WritePolicy:           writePolicy,
+		UpstreamHost:          upstreamHost,
+		AllowPublicAdmin:      opts.allowPublicAdmin,
+		AdminToken:            opts.adminToken,
+		CORSOrigins:           opts.corsOrigins,
 	})
 	if err != nil {
 		log.Fatalf("create server: %v", err)
@@ -410,17 +421,40 @@ func serve(args []string) {
 
 	endpoint := "http://" + addr
 	announceStartup(opts.readyFd, readyDetails{
-		endpoint:     endpoint,
-		mode:         string(mode),
-		backend:      backend,
-		capabilities: capabilities,
-		limits:       storeLimits,
-		creds:        creds,
-		banner:       runthrough.StartupBanner(rtCfg, mode),
-		region:       region,
+		maxConcurrentRequests: opts.maxConcurrentRequests,
+		maxRequestBytes:       opts.maxRequestBytes,
+		endpoint:              endpoint,
+		mode:                  string(mode),
+		backend:               backend,
+		capabilities:          capabilities,
+		limits:                storeLimits,
+		creds:                 creds,
+		banner:                runthrough.StartupBanner(rtCfg, mode),
+		region:                region,
 	})
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	awaitShutdown(srv, sigCh, errCh, retryCancel, retryDone)
+}
+
+func reportedRequestLimit(limit int64) int64 {
+	if limit == 0 {
+		return s3api.DefaultMaxRequestBytes
+	}
+	return limit
+}
+
+func serveRegion(value string) string {
+	if region := strings.TrimSpace(value); region != "" {
+		return region
+	}
+	return auth.DefaultRegion
+}
+
+func reportedConcurrencyLimit(limit int) int {
+	if limit <= 0 {
+		return s3api.DefaultMaxConcurrentRequests
+	}
+	return limit
 }

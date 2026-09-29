@@ -1,6 +1,31 @@
 # Changelog
 
-## Unreleased
+## Unreleased — 0.3.0 development candidate
+
+- Added portable v2 checkpoints for files, logical S3 objects, empty buckets,
+  metadata, relative working directory and Git provenance. Existing file-only v1
+  remains readable; enhanced deltas are explicitly refused.
+- Added replayable checkpoint request keys and resolution, shared cross-process
+  capture/cleanup locks, cancellation and durable publication acknowledgement.
+- Added the shared workspace S3 facade, native `workspace serve`, TypeScript and
+  Python lifetime wrappers, host-write usage refresh, standing registry policy
+  and safe explicit checkpoint deletion.
+- Added scoped local stdio MCP tools and an experimental caller for OpenCode
+  2.0.16, with exclusive prompt admission, bounded save retries and reconciliation.
+- Fixed moved handoff references, CRC64NVME single-object uploads and metadata
+  casing. Added rooted reads, explicit request limits and HTTPS upstream policy.
+- Prepared public npmjs/PyPI release gates and exact-artifact retry checks.
+  **Not published.** Fresh AWS, R2 and custom-provider receipts, clean published
+  consumers and cross-host real-agent evidence remain required.
+- Requires Go 1.25.6 for the pinned MCP SDK. No sandbox or process-isolation claim.
+  See [usage](docs/portable-workspace-usage.md) and
+  [implementation evidence](docs/implementation-2026-09-29.md), including full-copy
+  capture costs and remaining limits.
+
+### Earlier development history
+
+The entries below record earlier work and its then-current evidence. Release
+status and outstanding gates are governed by [the current plan](docs/plan.md).
 
 - **`serve` opens on what it does.** The command was 187 lines with twenty-two flag
   declarations in front of the wiring, and complexity 31 against a ceiling of 15. The

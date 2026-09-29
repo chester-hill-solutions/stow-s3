@@ -23,7 +23,7 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
+	if err := i.checkMutationLocked(ctx); err != nil {
 		return Object{}, err
 	}
 
@@ -161,7 +161,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
+	if err := i.checkMutationLocked(ctx); err != nil {
 		return nil, err
 	}
 	if err := storage.ValidateBucketName(bucket); err != nil {
@@ -232,7 +232,7 @@ func (i *Instance) DeleteObject(ctx context.Context, bucket, key string) error {
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
+	if err := i.checkMutationLocked(ctx); err != nil {
 		return err
 	}
 	return i.deleteObjectLocked(ctx, bucket, key)
@@ -265,7 +265,7 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
+	if err := i.checkMutationLocked(ctx); err != nil {
 		return Object{}, err
 	}
 	// The size of the source, for the quota check, and the conditions to apply if

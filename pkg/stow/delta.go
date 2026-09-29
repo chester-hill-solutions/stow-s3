@@ -7,9 +7,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
 // A delta is the difference between two known points, expressed as a versioned
@@ -187,11 +190,28 @@ func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, opti
 	if err != nil {
 		return nil, err
 	}
+	if base.Version != checkpointVersion || target.Version != checkpointVersion {
+		return nil, fmt.Errorf("stow: delta transport does not support portable object checkpoints")
+	}
 	if base.WorkspaceID != target.WorkspaceID {
 		return nil, fmt.Errorf("stow: delta crosses workspaces: %q and %q", base.WorkspaceID, target.WorkspaceID)
 	}
 
 	targetDir, err := checkpointDirectory(registryDir, targetID)
+	if err != nil {
+		return nil, err
+	}
+
+	lock, err := workspace.AcquireCapture(filepath.Dir(filepath.Dir(targetDir)), base.WorkspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer lock.Release()
+	base, err = LoadCheckpoint(registryDir, baseID)
+	if err != nil {
+		return nil, err
+	}
+	target, err = LoadCheckpoint(registryDir, targetID)
 	if err != nil {
 		return nil, err
 	}

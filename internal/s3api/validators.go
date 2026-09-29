@@ -27,9 +27,12 @@ func setChecksumHeader(w http.ResponseWriter, meta *storage.ObjectMeta) {
 
 // setObjectHeaders emits the headers for a response whose body is the whole
 // object.
-func setObjectHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
-	setRepresentationHeaders(w, meta)
+func setObjectHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) error {
+	if err := setRepresentationHeaders(w, meta); err != nil {
+		return err
+	}
 	setChecksumHeader(w, meta)
+	return nil
 }
 
 // setRepresentationHeaders emits everything that describes the object itself
@@ -43,7 +46,11 @@ func setObjectHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
 // answer that is telling the truth. That is the same reason a 304 does not carry
 // one, and it is why this is a separate function rather than a flag: the two
 // callers differ in which headers they owe, and the difference is the bug.
-func setRepresentationHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
+func setRepresentationHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) error {
+	metadata, err := storage.NormalizeUserMetadata(meta.Metadata)
+	if err != nil {
+		return err
+	}
 	if meta.ContentType != "" {
 		w.Header().Set("Content-Type", meta.ContentType)
 	} else {
@@ -51,9 +58,10 @@ func setRepresentationHeaders(w http.ResponseWriter, meta *storage.ObjectMeta) {
 	}
 	w.Header().Set("Content-Length", strconv.FormatInt(meta.Size, 10))
 	setValidators(w, meta)
-	for k, v := range meta.Metadata {
-		w.Header().Set(k, v)
+	for k, v := range metadata {
+		w.Header()["x-amz-meta-"+k] = []string{v}
 	}
+	return nil
 }
 
 // setValidators emits the caching validators and nothing else.
@@ -71,18 +79,26 @@ func setValidators(w http.ResponseWriter, meta *storage.ObjectMeta) {
 	w.Header().Set("Last-Modified", meta.LastModified.UTC().Format(http.TimeFormat))
 }
 
-func extractMetadata(h http.Header) map[string]string {
+func extractMetadata(h http.Header) (map[string]string, error) {
 	out := make(map[string]string)
 	for k, vals := range h {
-		lower := strings.ToLower(k)
-		if strings.HasPrefix(lower, "x-amz-meta-") {
-			out[k] = vals[0]
+		if !strings.HasPrefix(strings.ToLower(k), "x-amz-meta-") {
+			continue
+		}
+		for _, value := range vals {
+			if previous, exists := out[k]; exists && previous != value {
+				return nil, storage.ErrInvalidMetadata
+			}
+			out[k] = value
 		}
 	}
-	if len(out) == 0 {
-		return nil
+	if _, err := storage.NormalizeUserMetadata(out); err != nil {
+		return nil, err
 	}
-	return out
+	if len(out) == 0 {
+		return nil, nil
+	}
+	return out, nil
 }
 
 func metadataSize(m map[string]string) int {

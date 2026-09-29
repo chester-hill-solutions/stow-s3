@@ -116,8 +116,8 @@ test("a declared-published package that answers 401 is told what to do about it"
   const problems = reachabilityProblems({ ...npm, published: true }, false, "HTTP 401");
   assert.equal(problems.length, 2, "the mismatch and the remedy are both owed");
   assert.match(problems[1], /401/);
-  assert.match(problems[1], /private/);
-  assert.match(problems[1], /same commit/);
+  assert.match(problems[1], /public npmjs/);
+  assert.match(problems[1], /before claiming/);
 });
 
 test("a 401 remedy is not offered for a registry that does not use one", () => {

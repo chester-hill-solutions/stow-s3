@@ -14,3 +14,5 @@ func unlockFile(_ *os.File) error { return ErrLockUnsupported }
 // lockSupported is false, and the collector reports it rather than silently
 // skipping workspaces it cannot reason about.
 const lockSupported = false
+
+func waitLock(_ *os.File) (bool, error) { return false, ErrLockUnsupported }

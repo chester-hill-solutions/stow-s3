@@ -22,7 +22,7 @@ var contractRegistryDirFlags = map[string]bool{
 	"adopt": true, "apply": true, "checkpoint": true, "collect": true,
 	"delta": true, "destroy": true, "diff": true, "export": true,
 	"handoff": true, "import": true, "list": true, "prune": true,
-	"restore": true, "resume": true,
+	"restore": true, "resume": true, "serve": true,
 }
 
 // workspaceVerbPattern reads the verb list out of the binary's own usage line, so

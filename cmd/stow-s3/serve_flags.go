@@ -5,33 +5,37 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/auth"
+	"github.com/chester-hill-solutions/stow-s3/internal/s3api"
 )
 
 type serveFlags struct {
-	port             int
-	dataDir          string
-	backendFlag      string
-	accessKey        string
-	secretKey        string
-	host             string
-	baseHost         string
-	allowPublicAdmin bool
-	adminToken       string
-	modeFlag         string
-	regionFlag       string
-	allowLiveWrites  bool
-	readOnly         bool
-	cacheDir         string
-	cacheMaxBytes    int64
-	cacheMaxObjects  int64
-	cacheTTL         time.Duration
-	offline          *offlineFlag
-	showVersion      bool
-	maxBytes         int64
-	maxObjects       int64
-	readyFd          int
-	parentPid        int
-	corsOrigins      corsOriginList
+	maxConcurrentRequests int
+	maxRequestBytes       int64
+	allowInsecureUpstream bool
+	port                  int
+	dataDir               string
+	backendFlag           string
+	accessKey             string
+	secretKey             string
+	host                  string
+	baseHost              string
+	allowPublicAdmin      bool
+	adminToken            string
+	modeFlag              string
+	regionFlag            string
+	allowLiveWrites       bool
+	readOnly              bool
+	cacheDir              string
+	cacheMaxBytes         int64
+	cacheMaxObjects       int64
+	cacheTTL              time.Duration
+	offline               *offlineFlag
+	showVersion           bool
+	maxBytes              int64
+	maxObjects            int64
+	readyFd               int
+	parentPid             int
+	corsOrigins           corsOriginList
 }
 
 // parseServeFlags declares every flag serve accepts and returns what was asked for.
@@ -45,6 +49,9 @@ type serveFlags struct {
 // ExitOnError, so a flag the package cannot read has already printed why and exited.
 func parseServeFlags(args []string) serveFlags {
 	flags := flag.NewFlagSet("serve", flag.ExitOnError)
+	maxConcurrentRequests := flags.Int("max-concurrent-requests", s3api.DefaultMaxConcurrentRequests, "Maximum concurrent HTTP requests; excess receive 503")
+	maxRequestBytes := flags.Int64("max-request-bytes", s3api.DefaultMaxRequestBytes, "Maximum HTTP request body bytes; must be positive")
+	allowInsecureUpstream := flags.Bool("allow-insecure-upstream", false, "Permit HTTP upstream endpoints beyond literal loopback addresses")
 	port := flags.Int("port", 9000, "HTTP listen port (0 = ephemeral)")
 	dataDir := flags.String("data-dir", ".stow", "Data directory for object storage")
 	backendFlag := flags.String("backend", "filesystem", "Storage backend (filesystem or memory)")
@@ -77,6 +84,7 @@ func parseServeFlags(args []string) serveFlags {
 	// package cannot read has already printed why and exited. See offline.go.
 	flags.Parse(args)
 	return serveFlags{
+		maxConcurrentRequests: *maxConcurrentRequests, maxRequestBytes: *maxRequestBytes, allowInsecureUpstream: *allowInsecureUpstream,
 		port:             *port,
 		dataDir:          *dataDir,
 		backendFlag:      *backendFlag,
@@ -102,4 +110,8 @@ func parseServeFlags(args []string) serveFlags {
 		parentPid:        *parentPid,
 		corsOrigins:      corsOrigins,
 	}
+}
+
+func (options serveFlags) validRequestLimits() bool {
+	return options.maxRequestBytes > 0 && options.maxConcurrentRequests > 0
 }

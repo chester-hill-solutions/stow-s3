@@ -48,6 +48,21 @@ func TestLiveProviderResolve(t *testing.T) {
 			want: liveProviderResolution{active: "true", provider: "cloudflare-r2", reason: "configured"},
 		},
 		{
+			name: "distinct r2 profile runs only R2",
+			env:  withEnv(withEnv(awsConfig, "STOW_ENDPOINT", "https://account.r2.cloudflarestorage.com"), "STOW_LIVE_PROFILE", "cloudflare-r2"),
+			want: liveProviderResolution{active: "true", provider: "cloudflare-r2", reason: "configured"},
+		},
+		{
+			name: "distinct custom profile runs custom",
+			env:  withEnv(withEnv(awsConfig, "STOW_ENDPOINT", "https://minio.internal:9000"), "STOW_LIVE_PROFILE", "custom"),
+			want: liveProviderResolution{active: "true", provider: "custom", reason: "configured"},
+		},
+		{
+			name:    "required R2 profile cannot substitute custom endpoint",
+			env:     withEnv(withEnv(withEnv(awsConfig, "STOW_ENDPOINT", "https://minio.internal:9000"), "STOW_LIVE_PROFILE", "cloudflare-r2"), "STOW_CONFORMANCE_REQUIRE_CONFIGURED", "true"),
+			wantErr: true,
+		},
+		{
 			name: "custom endpoint with a port runs as custom",
 			env: withEnv(withEnv(awsConfig, "STOW_ENDPOINT", "https://minio.internal:9000"),
 				"STOW_LIVE_PROFILE", "cloudflare-r2-custom"),

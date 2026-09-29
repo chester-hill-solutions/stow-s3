@@ -8,9 +8,8 @@ is not. A ``py3-none-any`` wheel carrying a Linux binary would install happily o
 an Apple Silicon Mac and then fail with an exec format error at run time, which
 is a far worse failure than being unable to install at all.
 
-The release matrix cross-compiles all four binaries from ubuntu, so the build
-machine is never the target machine and the inferred tag is always wrong. This
-builds the wheel and then retags it for the platform it was actually built for.
+The release matrix runs on each target platform and smoke-tests its wheel. This
+builds the wheel and applies the explicit platform tag for its bundled binary.
 
 The archive is rewritten rather than renamed, because the tag is recorded in two
 places: the filename and the ``Tag:`` field in ``.dist-info/WHEEL``. Renaming

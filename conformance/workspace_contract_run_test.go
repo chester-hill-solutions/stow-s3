@@ -37,6 +37,8 @@ func (r *contractRun) perform(step contractStep) contractOutcome {
 		return contractOutcome{stdout: r.readTree(step.Root)}
 	case "prepare":
 		return r.performPrepare(step)
+	case "serve":
+		return r.performServe(step)
 	default:
 		return r.performVerb(step)
 	}

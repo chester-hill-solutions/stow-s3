@@ -1,25 +1,32 @@
 package stow
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/rooted"
 )
 
 const checkpointVersion = 1
 
 type CheckpointOptions struct {
-	ParentID              string
-	MaxBytes              int64
-	MaxFiles              int64
-	IncludeSensitiveFiles bool
+	PortableObjects       bool   `json:"portable_objects,omitempty"`
+	ParentID              string `json:"parent_id,omitempty"`
+	MaxBytes              int64  `json:"max_bytes,omitempty"`
+	MaxFiles              int64  `json:"max_files,omitempty"`
+	IncludeSensitiveFiles bool   `json:"include_sensitive_files,omitempty"`
 }
 
 type CheckpointFile struct {
@@ -30,23 +37,31 @@ type CheckpointFile struct {
 }
 
 type CheckpointManifest struct {
-	Version     int              `json:"version"`
-	ID          string           `json:"id"`
-	WorkspaceID string           `json:"workspace_id"`
-	ParentID    string           `json:"parent_id,omitempty"`
-	Created     time.Time        `json:"created"`
-	Files       []CheckpointFile `json:"files"`
-	Excluded    []string         `json:"excluded,omitempty"`
+	Provenance       *CheckpointProvenance `json:"provenance,omitempty"`
+	PrimaryBucket    string                `json:"primary_bucket,omitempty"`
+	Buckets          []string              `json:"buckets,omitempty"`
+	Objects          []CheckpointObject    `json:"objects,omitempty"`
+	Payloads         []CheckpointFile      `json:"payloads,omitempty"`
+	WorkingDirectory string                `json:"working_directory,omitempty"`
+	Version          int                   `json:"version"`
+	ID               string                `json:"id"`
+	WorkspaceID      string                `json:"workspace_id"`
+	ParentID         string                `json:"parent_id,omitempty"`
+	Created          time.Time             `json:"created"`
+	Files            []CheckpointFile      `json:"files"`
+	Excluded         []string              `json:"excluded,omitempty"`
 }
 
 type CheckpointInfo struct {
-	ID          string
-	WorkspaceID string
-	ParentID    string
-	Created     time.Time
-	Files       int64
-	Bytes       int64
-	Excluded    []string
+	Version     int       `json:"version,omitempty"`
+	Objects     int64     `json:"objects,omitempty"`
+	ID          string    `json:"id"`
+	WorkspaceID string    `json:"workspace_id"`
+	ParentID    string    `json:"parent_id"`
+	Created     time.Time `json:"created"`
+	Files       int64     `json:"files"`
+	Bytes       int64     `json:"bytes"`
+	Excluded    []string  `json:"excluded"`
 }
 
 type CheckpointChange struct {
@@ -65,14 +80,19 @@ type CheckpointChange struct {
 // workspace. A caller that needs to snapshot a workspace somebody is using right
 // now has CheckpointOf, which is the same capture without the session.
 func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOptions) (CheckpointInfo, error) {
+	w.lifecycleMu.Lock()
+	defer w.lifecycleMu.Unlock()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	if err := w.assertOpen(); err != nil {
+	if w.closed || w.closing {
+		return CheckpointInfo{}, ErrClosed
+	}
+	lock, err := workspace.AcquireMutationCapture(w.registryDir, w.id)
+	if err != nil {
 		return CheckpointInfo{}, err
 	}
-	w.checkpointMu.Lock()
-	defer w.checkpointMu.Unlock()
+	defer lock.Release()
 	if err := ctx.Err(); err != nil {
 		return CheckpointInfo{}, err
 	}
@@ -80,7 +100,7 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 }
 
 // checkCheckpointRetention accounts only published checkpoints. The caller
-// holds checkpointMu through publication, so parallel captures on this handle
+// holds the capture gate through publication, so parallel captures
 // cannot both pass the same remaining capacity.
 func (w *Workspace) checkCheckpointRetention(nextBytes int64) error {
 	return w.captureTarget().checkRetention(nextBytes)
@@ -96,7 +116,7 @@ func checkpointRetentionUsage(registryDir, workspaceID string) (int64, int64, er
 	}
 	var count, total int64
 	for _, entry := range entries {
-		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".checkpoint-") {
+		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".checkpoint-") || strings.HasPrefix(entry.Name(), ".import-") {
 			continue
 		}
 		manifest, err := LoadCheckpoint(registryDir, entry.Name())
@@ -110,7 +130,7 @@ func checkpointRetentionUsage(registryDir, workspaceID string) (int64, int64, er
 			return 0, 0, fmt.Errorf("stow: checkpoint count accounting overflow")
 		}
 		count++
-		for _, file := range manifest.Files {
+		for _, file := range checkpointPayloadFiles(manifest) {
 			if file.Size < 0 || total > int64(^uint64(0)>>1)-file.Size {
 				return 0, 0, fmt.Errorf("stow: checkpoint byte accounting overflow")
 			}
@@ -120,19 +140,19 @@ func checkpointRetentionUsage(registryDir, workspaceID string) (int64, int64, er
 	return count, total, nil
 }
 
-func checkpointInputs(root string, options CheckpointOptions) ([]CheckpointFile, []string, int64, error) {
+func checkpointInputs(ctx context.Context, root *rooted.Root, options CheckpointOptions) ([]CheckpointFile, []string, int64, error) {
 	if options.MaxBytes < 0 || options.MaxFiles < 0 {
 		return nil, nil, 0, fmt.Errorf("stow: checkpoint limits must not be negative")
 	}
-	files, excluded, size, err := scanCheckpointFiles(root, options.IncludeSensitiveFiles)
+	files, excluded, size, err := scanCheckpointRoot(ctx, root, options.IncludeSensitiveFiles)
 	if err != nil {
 		return nil, nil, 0, err
 	}
 	if options.MaxFiles > 0 && int64(len(files)) > options.MaxFiles {
-		return nil, nil, 0, fmt.Errorf("stow: checkpoint files %d exceed limit %d", len(files), options.MaxFiles)
+		return nil, nil, 0, checkpointFailure("capacity_exceeded", "scan", "not_committed", fmt.Errorf("checkpoint files %d exceed limit %d", len(files), options.MaxFiles))
 	}
 	if options.MaxBytes > 0 && size > options.MaxBytes {
-		return nil, nil, 0, fmt.Errorf("stow: checkpoint bytes %d exceed limit %d", size, options.MaxBytes)
+		return nil, nil, 0, checkpointFailure("capacity_exceeded", "scan", "not_committed", fmt.Errorf("checkpoint bytes %d exceed limit %d", size, options.MaxBytes))
 	}
 	return files, excluded, size, nil
 }
@@ -149,27 +169,13 @@ func stageCheckpointDirectory(registryDir string) (string, string, error) {
 	return checkpointRoot, tempDir, nil
 }
 
-func verifyCheckpointCapture(root string, expected []CheckpointFile, excluded []string, includeSensitive bool) error {
-	actual, actualExcluded, _, err := scanCheckpointFiles(root, includeSensitive)
+func verifyCheckpointCapture(ctx context.Context, root *rooted.Root, expected []CheckpointFile, excluded []string, includeSensitive bool) error {
+	actual, actualExcluded, _, err := scanCheckpointRoot(ctx, root, includeSensitive)
 	if err != nil {
 		return err
 	}
 	if !sameCheckpointFiles(expected, actual) || !sameStrings(excluded, actualExcluded) {
-		return fmt.Errorf("stow: workspace changed during checkpoint capture")
-	}
-	return nil
-}
-
-func publishCheckpoint(tempDir, checkpointRoot, id string, manifest CheckpointManifest) error {
-	data, err := json.MarshalIndent(manifest, "", "  ")
-	if err != nil {
-		return fmt.Errorf("stow: encode checkpoint: %w", err)
-	}
-	if err := os.WriteFile(filepath.Join(tempDir, "manifest.json"), append(data, '\n'), 0o600); err != nil {
-		return fmt.Errorf("stow: write checkpoint manifest: %w", err)
-	}
-	if err := os.Rename(tempDir, filepath.Join(checkpointRoot, id)); err != nil {
-		return fmt.Errorf("stow: publish checkpoint: %w", err)
+		return checkpointFailure("workspace_changed", "verify", "not_committed", fmt.Errorf("workspace changed during checkpoint capture"))
 	}
 	return nil
 }
@@ -222,15 +228,28 @@ func LoadCheckpoint(registryDir, id string) (CheckpointManifest, error) {
 	if err != nil {
 		return CheckpointManifest{}, err
 	}
-	data, err := os.ReadFile(filepath.Join(path, "manifest.json"))
+	input, err := os.Open(filepath.Join(path, "manifest.json"))
+	if err != nil {
+		return CheckpointManifest{}, err
+	}
+	defer input.Close()
+	data, err := io.ReadAll(io.LimitReader(input, maxCheckpointManifestSize+1))
+	if len(data) > maxCheckpointManifestSize {
+		return CheckpointManifest{}, fmt.Errorf("stow: checkpoint manifest exceeds size limit")
+	}
 	if err != nil {
 		return CheckpointManifest{}, fmt.Errorf("stow: read checkpoint %s: %w", id, err)
 	}
 	var manifest CheckpointManifest
-	if err := json.Unmarshal(data, &manifest); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&manifest); err != nil {
 		return CheckpointManifest{}, fmt.Errorf("stow: decode checkpoint %s: %w", id, err)
 	}
-	if manifest.Version != checkpointVersion || manifest.ID != id {
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		return CheckpointManifest{}, fmt.Errorf("stow: trailing checkpoint manifest data")
+	}
+	if !supportedCheckpointVersion(manifest.Version) || manifest.ID != id {
 		return CheckpointManifest{}, fmt.Errorf("stow: checkpoint %s has an unsupported or mismatched manifest", id)
 	}
 	if err := validateCheckpointManifest(manifest); err != nil {
@@ -240,7 +259,13 @@ func LoadCheckpoint(registryDir, id string) (CheckpointManifest, error) {
 }
 
 func validateCheckpointManifest(manifest CheckpointManifest) error {
-	if manifest.WorkspaceID == "" {
+	if !supportedCheckpointVersion(manifest.Version) {
+		return fmt.Errorf("stow: unsupported checkpoint version")
+	}
+	if err := validatePortableManifest(manifest); err != nil {
+		return err
+	}
+	if !workspace.ValidWorkspaceID(manifest.WorkspaceID) {
 		return fmt.Errorf("stow: checkpoint manifest has no workspace ID")
 	}
 	seen := make(map[string]struct{}, len(manifest.Files))
@@ -306,7 +331,7 @@ func validPortablePathSegment(segment string) bool {
 }
 
 func validCheckpointFileMetadata(file CheckpointFile) bool {
-	if file.Size < 0 || len(file.SHA256) != 64 {
+	if file.Size < 0 || len(file.SHA256) != 64 || file.Mode > 0o777 {
 		return false
 	}
 	_, err := hex.DecodeString(file.SHA256)
@@ -321,6 +346,9 @@ func CompareCheckpoints(registryDir, fromID, toID string) ([]CheckpointChange, e
 	to, err := LoadCheckpoint(registryDir, toID)
 	if err != nil {
 		return nil, err
+	}
+	if from.Version != checkpointVersion || to.Version != checkpointVersion {
+		return nil, fmt.Errorf("stow: use ComparePortableCheckpoints for portable object checkpoints")
 	}
 	return diffCheckpointFiles(from.Files, to.Files), nil
 }
@@ -363,50 +391,6 @@ func diffCheckpointFiles(from, to []CheckpointFile) []CheckpointChange {
 		}
 	}
 	return changes
-}
-
-func RestoreCheckpoint(registryDir, id string, options WorkspaceOptions) (*Workspace, error) {
-	manifest, err := LoadCheckpoint(registryDir, id)
-	if err != nil {
-		return nil, err
-	}
-	checkpointDir, err := checkpointDirectory(registryDir, id)
-	if err != nil {
-		return nil, err
-	}
-	inputs := make([]WorkspaceInput, 0, len(manifest.Files))
-	for _, file := range manifest.Files {
-		if _, err := safeDestination(options.Dir, file.Path); err != nil {
-			return nil, fmt.Errorf("stow: unsafe path in checkpoint: %w", err)
-		}
-		source := filepath.Join(checkpointDir, "files", filepath.FromSlash(file.Path))
-		digest, size, err := digestFile(source)
-		if err != nil || digest != file.SHA256 || size != file.Size {
-			return nil, fmt.Errorf("stow: checkpoint file %q failed integrity validation", file.Path)
-		}
-		inputs = append(inputs, WorkspaceInput{
-			Source:      source,
-			Destination: file.Path,
-		})
-	}
-	if len(inputs) == 0 {
-		root, err := validatePrepareRoot(options.Dir)
-		if err != nil {
-			return nil, err
-		}
-		if options.Authority == nil {
-			localAuthority := ReadWrite()
-			options.Authority = &localAuthority
-		}
-		return openPreparedWorkspace(options, root)
-	}
-	prepared, err := PrepareWorkspace(PrepareOptions{
-		WorkspaceOptions: options, Inputs: inputs, IncludeSensitiveInputs: true,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return prepared.Workspace, nil
 }
 
 func checkpointDirectory(registryDir, id string) (string, error) {

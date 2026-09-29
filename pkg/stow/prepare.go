@@ -45,15 +45,7 @@ type PrepareOptions struct {
 	Inputs                 []WorkspaceInput     `json:"inputs,omitempty"`
 	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
 	IncludeSensitiveInputs bool                 `json:"include_sensitive_inputs,omitempty"`
-	// MaxWorkspaces refuses this prepare when the registry already holds that many
-	// workspaces. Zero means unlimited, which is the default: a bound nobody asked
-	// for is a bound that fails a legitimate task.
-	//
-	// Unlike MaxCheckpoints, which is recorded on the workspace it bounds, this is
-	// not persisted. The registry is what is being bounded, so storing the cap on any
-	// one entry would make it a property of a workspace rather than of the policy
-	// that declared it, and a caller that forgets the field on the next prepare would
-	// get no bound — which is the unbounded registry this exists to prevent.
+	// MaxWorkspaces narrows the standing registry cap for this prepare; zero adds no call-specific cap.
 	MaxWorkspaces int64 `json:"max_workspaces,omitempty"`
 }
 
@@ -69,11 +61,7 @@ type WorkspaceTaskManifest struct {
 	MaxObjects         int64                `json:"max_objects,omitempty"`
 	MaxCheckpointBytes int64                `json:"max_checkpoint_bytes,omitempty"`
 	MaxCheckpoints     int64                `json:"max_checkpoints,omitempty"`
-	// MaxWorkspaces bounds how many workspaces this registry may hold. Zero means
-	// unlimited. It is declared per prepare rather than stored on the registry,
-	// because the thing being bounded is the registry and the thing declaring the
-	// policy is the caller: a bound that lived only in the registry would be written
-	// once by whoever found the problem and read by nobody.
+	// MaxWorkspaces narrows the standing registry cap; zero adds no call-specific cap.
 	MaxWorkspaces int64 `json:"max_workspaces,omitempty"`
 	TTLSeconds    int64 `json:"ttl_seconds,omitempty"`
 	// Team files the workspace under one team's partition of the registry. On a
@@ -151,6 +139,7 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 		localAuthority := ReadWrite()
 		options.Authority = &localAuthority
 	}
+	options.WorkspaceOptions.maxRegistryWorkspaces = options.MaxWorkspaces
 	ws, err := openPreparedWorkspace(options.WorkspaceOptions, root)
 	if err != nil {
 		return nil, err
@@ -171,6 +160,12 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 		return nil, err
 	}
 	if err := checkSeedLimits(ws, bytes, objects); err != nil {
+		return nil, err
+	}
+	if err := ws.Runtime.inner.RefreshUsage(context.Background()); err != nil {
+		return nil, err
+	}
+	if err := persistPreparedProvenance(root, repositories); err != nil {
 		return nil, err
 	}
 	baseIdentity, err := workspaceFingerprint(root)

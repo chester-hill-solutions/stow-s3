@@ -22,8 +22,9 @@ const (
 	// ask for a workspace without saying where it is.
 	BackendWorkspace Backend = "workspace"
 
-	DefaultMaxBytes   int64 = 64 << 20
-	DefaultMaxObjects int64 = 10_000
+	DefaultMaxBytes            int64 = 64 << 20
+	DefaultMaxObjects          int64 = 10_000
+	DefaultMaxMultipartUploads int64 = 1024
 
 	// UnlimitedBytes and UnlimitedObjects disable quota enforcement. The
 	// embedded profile applies DefaultMaxBytes/DefaultMaxObjects; a long-lived
@@ -83,7 +84,7 @@ func normalizeOptions(options Options, boundStore bool) (Options, error) {
 	} else if options.Backend != BackendMemory {
 		return Options{}, ErrUnsupportedBackend
 	}
-	if options.MaxBytes < 0 || options.MaxObjects < 0 {
+	if options.MaxBytes < 0 || options.MaxObjects < 0 || options.MaxMultipartUploads < 0 {
 		return Options{}, fmt.Errorf("runtime quotas must not be negative")
 	}
 	if options.MaxBytes == 0 {
@@ -92,13 +93,17 @@ func normalizeOptions(options Options, boundStore bool) (Options, error) {
 	if options.MaxObjects == 0 {
 		options.MaxObjects = DefaultMaxObjects
 	}
+	if options.MaxMultipartUploads == 0 {
+		options.MaxMultipartUploads = DefaultMaxMultipartUploads
+	}
 	return options, nil
 }
 
 type Options struct {
-	Backend    Backend
-	MaxBytes   int64
-	MaxObjects int64
+	Backend             Backend
+	MaxBytes            int64
+	MaxObjects          int64
+	MaxMultipartUploads int64
 
 	// Authority is what this environment permits. It is enforced here, below
 	// every interface, so that S3 and a native caller cannot be granted
@@ -113,12 +118,13 @@ type Options struct {
 }
 
 type Capabilities struct {
-	Backend    Backend
-	MaxBytes   int64
-	MaxObjects int64
-	Persistent bool
-	Multipart  bool
-	Upstream   bool
+	Backend             Backend
+	MaxBytes            int64
+	MaxObjects          int64
+	MaxMultipartUploads int64
+	Persistent          bool
+	Multipart           bool
+	Upstream            bool
 }
 
 type Usage struct {

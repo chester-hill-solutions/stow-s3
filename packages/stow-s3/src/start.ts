@@ -26,7 +26,7 @@ const STARTUP_TIMEOUT_MS = 10_000;
 const STOP_GRACE_PERIOD_MS = 5_000;
 const STOP_WAIT_PERIOD_MS = 10_000;
 
-async function stopChild(child: ChildProcess): Promise<void> {
+export async function stopChild(child: ChildProcess, graceMs = STOP_GRACE_PERIOD_MS, waitMs = STOP_WAIT_PERIOD_MS): Promise<void> {
   if (
     child.exitCode !== null ||
     child.signalCode !== null ||
@@ -74,7 +74,7 @@ async function stopChild(child: ChildProcess): Promise<void> {
       } catch (error) {
         finish(error instanceof Error ? error : new Error(String(error)));
       }
-    }, STOP_GRACE_PERIOD_MS);
+    }, graceMs);
     const deadlineTimer = setTimeout(() => {
       try {
         child.kill("SIGKILL");
@@ -82,7 +82,7 @@ async function stopChild(child: ChildProcess): Promise<void> {
         // The timeout error below is the useful diagnostic for the caller.
       }
       finish(new Error("timed out waiting for stow child to exit"));
-    }, STOP_WAIT_PERIOD_MS);
+    }, waitMs);
 
     child.once("exit", onExit);
     child.once("close", onClose);
@@ -159,6 +159,7 @@ function buildServeArgs(
   if (options.cacheTtlSeconds !== undefined) {
     args.push("--cache-ttl", `${options.cacheTtlSeconds}s`);
   }
+  appendTransportLimits(args, options);
   if (options.allowLiveWrites) {
     args.push("--allow-live-writes");
   }
@@ -272,6 +273,8 @@ function resolveStartableBinary(): string {
 }
 
 export async function startStowWithReady(options: StartOptions = {}): Promise<StowStartup> {
+  assertRequestLimit(options.maxRequestBytes);
+  assertRequestLimit(options.maxConcurrentRequests, "maxConcurrentRequests");
   assertUsableStartupLimits(options);
   const dataDir = options.dataDir ?? ".stow";
   const port = options.port ?? 0;
@@ -321,4 +324,16 @@ export async function startStowWithReady(options: StartOptions = {}): Promise<St
   } finally {
     options.signal?.removeEventListener("abort", onAbort);
   }
+}
+
+export function assertRequestLimit(limit: number | undefined, label = "maxRequestBytes"): void {
+  if (limit !== undefined && (!Number.isSafeInteger(limit) || limit <= 0)) {
+    throw new StowProtocolError("internal", `${label} must be a positive integer`);
+  }
+}
+
+function appendTransportLimits(args: string[], options: StartOptions): void {
+  if (options.allowInsecureUpstream) args.push("--allow-insecure-upstream");
+  if (options.maxConcurrentRequests !== undefined) args.push("--max-concurrent-requests", String(options.maxConcurrentRequests));
+  if (options.maxRequestBytes !== undefined) args.push("--max-request-bytes", String(options.maxRequestBytes));
 }

@@ -28,7 +28,7 @@ make test-conformance # the shared S3 contract, across every backend
 make test-all         # Go, conformance, TypeScript, Python, WASM
 ```
 
-You need Go 1.24.13 (see `.go-version`; `make` pins it via `GOTOOLCHAIN`),
+You need Go 1.25.6 (see `.go-version`; `make` pins it via `GOTOOLCHAIN`),
 Node 20 or newer for the TypeScript and WASM suites, and Python 3.10 or newer
 for the client suite. `make test-python` bootstraps its own virtualenv.
 

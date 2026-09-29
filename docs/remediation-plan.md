@@ -1,5 +1,18 @@
 # Stow 0.2.0 Remediation Execution Plan
 
+**Planning status: superseded execution plan — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. Applicable contract and release requirements are carried into S0 and S2, including the current release checklist. The old R0–R11 sequence and version targets are obsolete.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
 **Status:** agreed execution plan
 **Baseline:** `main` at `63c8a3a`
 **Release target:** `0.2.0`

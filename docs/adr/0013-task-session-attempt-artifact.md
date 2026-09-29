@@ -1,11 +1,15 @@
 ---
 ---
-status: accepted
-decision_digest: cd06bc5411c3fbe9
+status: narrowed
+narrowed_by: 0014
+amended: 2026-09-29
+decision_digest: 6ea536364b26dfcd
 relates_to: 0004, 0007, 0009, 0010
 ---
 
 # Task specification, session, attempt, and artifact are four objects
+
+**Scope narrowed, 2026-09-29:** [ADR 0014](0014-storage-product-caller-owned-execution.md) keeps the conceptual distinctions below but defers Stow-owned execution schemas, attempt identities/state machines, supervisors and mandatory attempt history. They are not prerequisites for storage or caller-triggered checkpoints. The original execution design is retained below for reference; implementing it requires a new product decision. The current input-preparation manifest remains distinct from this proposed execution TaskSpec.
 
 This ADR fixes the vocabulary the execution layer in
 [`work-session-plan.md`](../work-session-plan.md) E1 is built on. It exists because
@@ -176,4 +180,4 @@ one that was retried after it.
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+- 2026-09-29: Narrowed by ADR 0014 after the user selected portable working storage with caller-owned execution. Retained design vocabulary; deferred Stow execution obligations and removed them as prerequisites for checkpoint integrations.

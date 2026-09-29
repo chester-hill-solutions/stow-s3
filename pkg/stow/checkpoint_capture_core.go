@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/rooted"
 )
 
-// captureTarget is the workspace a capture reads, resolved already.
-//
-// It is a value rather than a *Workspace because a capture does not need a handle
-// and must not require one. Everything a capture touches is the directory (read)
-// and the checkpoint store (written); the session lock is none of those, and
-// holding it is what made a live workspace impossible to snapshot.
 type captureTarget struct {
+	receipt     *checkpointReceipt
 	dir         string
 	registryDir string
 	workspaceID string
@@ -32,17 +29,6 @@ func (t captureTarget) clock() func() time.Time {
 	return time.Now
 }
 
-// captureCheckpoint is the whole of a checkpoint: scan, copy, verify, publish.
-//
-// Both entry points run exactly this, so a snapshot taken from outside a live
-// session and one taken from the handle that owns the session are the same
-// operation with the same refusals. The only difference between them is who
-// resolved the target and who held the capture lock while it ran.
-//
-// The tree is scanned before the copy and again after it, and a tree that changed
-// in between is refused. That is what makes capturing a live workspace safe, and
-// it is why no lock is needed to make the bytes consistent: consistency here comes
-// from noticing a change, not from preventing one.
 func captureCheckpoint(ctx context.Context, target captureTarget, options CheckpointOptions) (CheckpointInfo, error) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -50,12 +36,23 @@ func captureCheckpoint(ctx context.Context, target captureTarget, options Checkp
 	if err := ctx.Err(); err != nil {
 		return CheckpointInfo{}, err
 	}
-	if options.ParentID != "" {
-		if err := validateCheckpointParent(target.registryDir, target.workspaceID, options.ParentID); err != nil {
-			return CheckpointInfo{}, err
-		}
+	if err := target.validateParent(options.ParentID); err != nil {
+		return CheckpointInfo{}, err
 	}
-	before, excluded, size, err := checkpointInputs(target.dir, options)
+	source, err := rooted.Open(target.dir)
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
+	defer source.Close()
+	before, excluded, size, err := checkpointInputs(ctx, source, options)
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
+	portable, err := preparePortableCapture(ctx, target, options, before)
+	if err != nil {
+		return CheckpointInfo{}, err
+	}
+	size, err = portableCaptureSize(before, portable, options)
 	if err != nil {
 		return CheckpointInfo{}, err
 	}
@@ -67,34 +64,34 @@ func captureCheckpoint(ctx context.Context, target captureTarget, options Checkp
 		return CheckpointInfo{}, err
 	}
 	defer os.RemoveAll(tempDir)
-	if err := copyCheckpointFiles(ctx, target.dir, tempDir, before); err != nil {
+	if err := copyCheckpointFiles(ctx, source, tempDir, before); err != nil {
 		return CheckpointInfo{}, err
 	}
-	if err := verifyCheckpointCapture(target.dir, before, excluded, options.IncludeSensitiveFiles); err != nil {
-		return CheckpointInfo{}, err
-	}
-	id, err := newCheckpointID()
+	manifest, err := target.stageManifest(tempDir, before, excluded, options)
 	if err != nil {
 		return CheckpointInfo{}, err
 	}
-	manifest := CheckpointManifest{
-		Version: checkpointVersion, ID: id, WorkspaceID: target.workspaceID,
-		ParentID: options.ParentID, Created: target.clock()().UTC(),
-		Files: before, Excluded: excluded,
+	if err := finishPortableCapture(ctx, target, tempDir, portable, &manifest); err != nil {
+		return CheckpointInfo{}, err
 	}
-	if err := publishCheckpoint(tempDir, checkpointRoot, id, manifest); err != nil {
+	if err := verifyCheckpointCapture(ctx, source, before, excluded, options.IncludeSensitiveFiles); err != nil {
+		return CheckpointInfo{}, err
+	}
+	if err := publishCheckpointContext(ctx, tempDir, checkpointRoot, manifest.ID, manifest); err != nil {
 		return CheckpointInfo{}, err
 	}
 	return CheckpointInfo{
-		ID: id, WorkspaceID: target.workspaceID, ParentID: options.ParentID,
-		Created: manifest.Created, Files: int64(len(before)), Bytes: size, Excluded: excluded,
+		Version: manifest.Version, Objects: int64(len(manifest.Objects)),
+		ID: manifest.ID, WorkspaceID: target.workspaceID, ParentID: options.ParentID,
+		Created: manifest.Created, Files: int64(len(before)), Bytes: size, Excluded: manifest.Excluded,
 	}, nil
 }
 
-// checkRetention accounts only published checkpoints, and the caller holds
-// something that excludes a second capture of this workspace: on a handle that is
-// checkpointMu, and from outside a session it is the capture lock.
+// checkRetention runs under the workspace capture gate.
 func (t captureTarget) checkRetention(nextBytes int64) error {
+	if err := checkRegistryCheckpointAdmission(t.registryDir, t.workspaceID, nextBytes); err != nil {
+		return err
+	}
 	return checkCheckpointRetention(t.registryDir, t.workspaceID, t.maxCheckpointBytes, t.maxCheckpoints, nextBytes)
 }
 
@@ -110,10 +107,35 @@ func checkCheckpointRetention(registryDir, workspaceID string, maxBytes, maxCoun
 		return err
 	}
 	if maxCount > 0 && count >= maxCount {
-		return fmt.Errorf("stow: checkpoint count limit reached (%d of %d); remove a checkpoint or raise the workspace limit", count, maxCount)
+		return checkpointFailure("capacity_exceeded", "admit", "not_committed", fmt.Errorf("checkpoint count limit reached (%d of %d); remove a checkpoint or raise the workspace limit", count, maxCount))
 	}
 	if maxBytes > 0 && (total > maxBytes || nextBytes > maxBytes-total) {
-		return fmt.Errorf("stow: checkpoint byte limit exceeded (%d existing + %d new > %d); remove a checkpoint or raise the workspace limit", total, nextBytes, maxBytes)
+		return checkpointFailure("capacity_exceeded", "admit", "not_committed", fmt.Errorf("checkpoint byte limit exceeded (%d existing + %d new > %d); remove a checkpoint or raise the workspace limit", total, nextBytes, maxBytes))
+	}
+	return nil
+}
+
+func (t captureTarget) stageManifest(stage string, files []CheckpointFile, excluded []string, options CheckpointOptions) (CheckpointManifest, error) {
+	id, err := newCheckpointID()
+	if err != nil {
+		return CheckpointManifest{}, err
+	}
+	if t.receipt != nil {
+		id = t.receipt.CheckpointID
+	}
+	if err := writeCheckpointReceipt(stage, t.receipt); err != nil {
+		return CheckpointManifest{}, err
+	}
+	return CheckpointManifest{Version: checkpointVersion, ID: id, WorkspaceID: t.workspaceID,
+		ParentID: options.ParentID, Created: t.clock()().UTC(), Files: files, Excluded: excluded}, nil
+}
+
+func (t captureTarget) validateParent(parentID string) error {
+	if parentID == "" {
+		return nil
+	}
+	if err := validateCheckpointParent(t.registryDir, t.workspaceID, parentID); err != nil {
+		return checkpointFailure("invalid_parent", "validate", "not_committed", err)
 	}
 	return nil
 }

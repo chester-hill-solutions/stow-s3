@@ -1,6 +1,29 @@
+# Work-session execution proposal — deferred
+
+**Planning status: retired execution proposal — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. E0 storage obligations are carried into S0–S2. E1–E5, TaskSpec/Attempt execution ownership and a Stow executor remain deferred under ADR 0014.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+**Current status (2026-09-29): deferred; outside the active storage product scope.** [ADR 0014](adr/0014-storage-product-caller-owned-execution.md) narrows ADR 0013 and removes E1–E5 as automatic next steps. [The canonical plan](plan.md) governs all implementation ordering.
+
+Callers own execution, turn scheduling, tool processes and sandbox enforcement. Stow owns preparation, supported storage access, capture, inspection, transfer and cleanup. A thin caller-triggered checkpoint integration needs no Stow executor, execution TaskSpec or attempt registry. Existing native S3 child-server ownership remains supported.
+
+Storage correctness items formerly grouped under E0 are scheduled in the canonical storage plan. E1–E5 remain a historical design and require a new explicit product decision before implementation. Their acceptance criteria and the prior precedence statements below are not current instructions.
+
+## Historical proposal and rationale
+
 # Stow work-session primitive: engineering plan
 
-**Status:** accepted as the next product layer. Parallel axis, like
+**Historical status:** originally accepted as the next product layer. Parallel axis, like
 [`foss-readiness-plan.md`](foss-readiness-plan.md). It does not replace
 [`plan.md`](plan.md), which remains authoritative for the workspace, run-through,
 cache, and portability work already in flight.

@@ -20,6 +20,14 @@ func runSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 	corpusContext := newSharedCorpusContext(t, testCase)
 	seedCorpusSetup(t, corpusContext)
 	switch testCase.Operation {
+	case "signedRequest":
+		runCorpusSignedRequest(corpusContext)
+	case "multipartFailure":
+		runCorpusMultipartFailure(corpusContext)
+	case "bucketLifecycle":
+		runCorpusBucketLifecycle(corpusContext)
+	case "deleteObjects":
+		runCorpusBatchDelete(corpusContext)
 	case "putGetRoundTrip":
 		runCorpusPutGetRoundTrip(corpusContext)
 	case "conditionalPut":
@@ -147,6 +155,8 @@ func applyCorpusChecksum(input *s3.PutObjectInput, testCase sharedCorpusCase) {
 	value := testCase.ChecksumValue
 	input.ChecksumAlgorithm = types.ChecksumAlgorithm(algorithm)
 	switch algorithm {
+	case "CRC64NVME":
+		input.ChecksumCRC64NVME = aws.String(value)
 	case "CRC32":
 		input.ChecksumCRC32 = aws.String(value)
 	case "CRC32C":
@@ -221,6 +231,8 @@ func assertCorpusChecksum(t *testing.T, output *s3.PutObjectOutput, expected sha
 	}
 	var got string
 	switch strings.ToUpper(expected.ChecksumAlgorithm) {
+	case "CRC64NVME":
+		got = aws.ToString(output.ChecksumCRC64NVME)
 	case "CRC32":
 		got = aws.ToString(output.ChecksumCRC32)
 	case "CRC32C":

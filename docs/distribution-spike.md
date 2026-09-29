@@ -1,5 +1,7 @@
 # Distribution spike: can a clean install start a Stow session?
 
+> **Planning disposition, 2026-09-29:** Completed historical experiment. Its initial install result and next steps describe the original run; current public-delivery work is S2. See [the plan](plan.md) and [disposition register](planning-index.md).
+
 **Status:** complete
 **Date:** 2026-09-25
 **Answers:** the npm distribution question in `docs/agent-dx-plan.md` phase 0, plus

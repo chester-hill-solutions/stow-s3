@@ -1,6 +1,21 @@
 # Stow Environment — Implementation Specification
 
-**Status:** active
+**Planning status: superseded implementation work order — 2026-09-29.**
+[The canonical storage plan](../plan.md) is the only active work order.
+[The disposition register](../planning-index.md) maps this document's old items
+to current work or explicit deferral. Completed corrections remain implemented; historical red/status tables are not current defects. Remaining storage work is carried into S0/S1; per-caller authority redesign is deferred.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+> **Scope and precedence, 2026-09-29:** [Canonical storage plan](../plan.md) governs current work. This document retains technical details and dated implementation history; its older phase priorities and “current execution order” statements do not schedule work. Caller-owned execution is the active boundary.
+
+**Status:** technical specification; work scheduling is subordinate to the canonical storage plan
 **Date:** 2026-09-26
 **Baseline:** `main` at `1982104`
 **Governs:** the implementation of

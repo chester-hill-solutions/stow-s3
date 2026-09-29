@@ -1,3 +1,4 @@
+import { serveForContract } from "./workspace-contract-serving.js";
 // Runs conformance/workspace/cases.json through the TypeScript wrapper.
 //
 // The case file is the contract. This module is a driver for it and nothing more:
@@ -231,6 +232,8 @@ async function invoke(run: Run, step: ContractStep): Promise<JsonValue> {
         registryDir: registryDirFor(run, step, registryDir),
         team,
       });
+    case "serve":
+      return serveForContract(required("id"), registryDirFor(run, step, registryDir), team);
     case "resume":
       return resumeWorkspace({ handoffPath: required("handoff") });
     case "list":

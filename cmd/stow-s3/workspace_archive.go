@@ -178,6 +178,10 @@ func checkpointWorkspaceCommand(args []string) error {
 	maxBytes := flags.Int64("max-bytes", 0, "Checkpoint byte cap (0 uses no separate cap)")
 	maxFiles := flags.Int64("max-files", 0, "Checkpoint file cap (0 uses no separate cap)")
 	includeSensitive := flags.Bool("include-sensitive", false, "Include common credential-looking filenames")
+	requestKey := flags.String("request-key", "", "Persisted capture request key for safe reconciliation")
+	resolve := flags.Bool("resolve", false, "Resolve an existing request without capturing")
+	timeout := flags.Duration("timeout", 0, "Capture deadline; required with --request-key")
+	portable := flags.Bool("portable", false, "Include logical buckets, objects and metadata")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -189,10 +193,11 @@ func checkpointWorkspaceCommand(args []string) error {
 	if err != nil {
 		return err
 	}
-	checkpoint, err := stow.CheckpointOf(context.Background(), registry, *id, stow.CheckpointOptions{
-		ParentID: *parentID, MaxBytes: *maxBytes, MaxFiles: *maxFiles,
-		IncludeSensitiveFiles: *includeSensitive,
-	})
+	options := stow.CheckpointOptions{ParentID: *parentID, MaxBytes: *maxBytes, MaxFiles: *maxFiles, IncludeSensitiveFiles: *includeSensitive, PortableObjects: *portable}
+	if *requestKey != "" || *resolve {
+		return checkpointRequestCommand(registry, *id, checkpointRequestFlags{Key: *requestKey, Resolve: *resolve, Timeout: *timeout, Options: options})
+	}
+	checkpoint, err := stow.CheckpointOf(context.Background(), registry, *id, options)
 	if err != nil {
 		return err
 	}

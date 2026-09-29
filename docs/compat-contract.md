@@ -36,7 +36,20 @@ Local mutations commit before upstream propagation. A durable per-key outbox sto
 
 ### 0.5 Conditional operations and checksums
 
-The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional writes, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, SHA-1, and SHA-256. Header names, encodings, response headers, multipart behavior, and error codes are normative in the shared corpus; unknown checksum algorithms fail clearly.
+The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional writes, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Header names, encodings, response headers, multipart behavior, and error codes are normative in the shared corpus; unknown checksum algorithms fail clearly.
+
+CRC64NVME is supported for single-object PUT and full-object GET/HEAD, including
+upstream read/write conversion. The checksum is the base64 encoding of the
+big-endian NVMe CRC64 value; known vectors and the installed AWS CLI default-upload
+profile cover its variant. A mismatching value fails with `400 BadDigest`.
+Partial (`206`) and unchanged (`304`) responses omit whole-object checksum headers.
+
+CRC64NVME multipart initiation returns `501 NotImplemented`; completion requests
+carrying CRC64NVME or an explicit checksum type are also refused. Multipart
+full-object/composite checksum completion is not implemented. A part checksum may
+be checked independently, but that does not establish a completed-object checksum.
+Upstream composite checksums are not relabeled as full-object checksums in the
+local cache. Existing multipart ETag behavior remains supported.
 
 Conditional **writes** and conditional **reads** do not fail the same way, and conflating them is a divergence from S3 that this contract previously carried:
 
@@ -91,6 +104,14 @@ All S3 operations use **AWS Signature Version 4 (SigV4)** unless served via a **
 - **Content-Length:** Required on PUT; enforced. Mismatch between declared length and body: `400 Bad Request`.
 - **ETag:** Strong validator; quoted hex MD5 for single-part objects; multipart ETag format per S3 (`{md5}-{partCount}`).
 - **x-amz-meta-*:** Arbitrary user metadata keys (case-insensitive key normalization per S3). Returned on GET/HEAD. Max 2 KB total user metadata per object (enforce `400` if exceeded).
+- **Metadata adapters:** HTTP metadata is emitted with lowercase `x-amz-meta-`
+  names; SDK maps expose lowercase bare user keys such as `project`. Existing
+  persisted/embedded maps using full prefixed header names remain readable through
+  the compatibility normalizer. Upstream writes convert these names to SDK keys,
+  avoiding accidental double prefixes. Conflicting case/prefix aliases are refused;
+  the adapter never chooses a value based on map iteration order. Invalid names and
+  CR/LF values are refused. PUT/HEAD/GET, COPY/REPLACE, multipart completion, reopen,
+  and upstream-cache-offline paths have real SDK regression coverage.
 - **Range requests:** `GET` with `Range: bytes={start}-{end}` returns `206 Partial Content` with `Content-Range` header. An end past the last byte is **clamped to the last byte**, not refused — `416` is for a range that cannot be satisfied at all, which means a start at or past the size, an end before its start, or an unparseable spec. Refusals answer `416 Range Not Satisfiable` with `Content-Range: bytes */{size}`. The distinction matters in both directions: refusing a clamped end breaks resumable clients, and clamping a start turns a `416` into a silently short `206`.
 
 **CopyObject constraints (v1):**
@@ -488,3 +509,75 @@ Non-S3 HTTP routes for observability and debugging. **No SigV4 required** (local
 - The 0.2.0 pre-1.0 release may contain documented breaking behavior as specified by ADR 0002; the stable `@chester-hill-solutions/stow-s3` 1.x boundary is reserved for the first non-breaking stable contract.
 - New operations may be added in minor versions if marked **experimental** in changelog first.
 - Conformance test suite in repo MUST reference this file by path and commit SHA in CI logs.
+
+## Appendix C — Request and upstream transport boundaries (0.3.0)
+
+Native `serve` and `workspace serve` accept `--max-request-bytes`. Omitting the
+flag retains the 8 MiB default; an explicit value must be a positive integer.
+Zero and negative overrides are rejected before serving. The native readiness
+capability `maxRequestBytes`, and workspace readiness field `max_request_bytes`,
+report the actual configured limit. TypeScript startup/session/workspace helpers
+accept `maxRequestBytes`; Python session/workspace helpers accept
+`max_request_bytes`. The Go workspace facade has `FacadeWithOptions` and
+`WorkspaceFacadeOptions.MaxRequestBytes` (zero means the Go option was omitted).
+
+The limit applies to bytes read from the HTTP request body, before SigV4 payload
+verification, checksum validation and object/multipart handling. HTTP transfer
+framing is removed by the HTTP server; an AWS signed-chunked encoding inside the
+body counts toward this bound. It is a per-request bound, including each multipart
+part, independent of stored-data quotas. Oversized bodies return the S3
+`EntityTooLarge` error. The limit does not provide process-memory isolation.
+
+Upstream endpoints must use HTTPS. HTTP is permitted by default only for literal
+loopback IP addresses (including IPv6 `::1`). DNS names such as `localhost` require
+an explicit opt-in even when they resolve to loopback. Operators can use
+`--allow-insecure-upstream`; TypeScript startup exposes `allowInsecureUpstream`.
+The internal Go upstream configuration exposes `AllowInsecureHTTP`. Opt-in permits
+HTTP transport for the selected endpoint; it does not grant upstream writes.
+URLs containing user information or fragments, relative URLs, and other schemes
+are rejected before creating the credential-bearing upstream client.
+
+The upstream HTTP client follows only 307/308 redirects within the original
+request origin (scheme, host and port), with a ten-request redirect bound.
+Cross-origin redirects, including HTTPS-to-HTTP redirects, are refused before a
+request reaches the destination. This preserves signed method/body handling and
+prevents a redirect from forwarding authorization or session-token headers to
+another origin. Existing write consent, bucket scope and offline rules still
+apply independently.
+
+Native `serve` and `workspace serve` also bound active HTTP handlers to **16** by
+default, configurable with positive `--max-concurrent-requests`. The Go server
+config and workspace facade options expose `MaxConcurrentRequests` (zero selects
+16). Admission precedes body buffering and authentication; excess requests fail
+with S3 `SlowDown`, HTTP 503, and `Retry-After: 1`. Native readiness reports
+`maxConcurrentRequests`; workspace facade readiness reports
+`max_concurrent_requests`. Clients should retry with backoff. This bounds active
+handlers, not accepted TCP connections or total process memory.
+
+For workspace runtime sessions, staged multipart part bytes share `MaxBytes`
+accounting with committed objects, including reconciliation on reopen. Upload
+initiation also has a separate **1,024 outstanding upload session** default,
+counting every upload even for the same or an existing target. Go runtime and
+workspace options expose `MaxMultipartUploads` (zero selects 1,024; negative is
+invalid). Successful abort/completion frees a slot; failed operations retain it.
+Opening existing data above the cap returns a quota error and preserves all
+uploads. Go capabilities, native readiness (`maxMultipartUploads`), and workspace
+facade readiness (`max_multipart_uploads`) report the effective cap. The native
+server's unlimited byte/object storage profile remains unlimited unless explicit
+storage quotas are configured; its upload count still defaults to 1,024. Neither
+request limit replaces storage quotas or bounds operating-system memory.
+
+Workspace file reads and checkpoint input scans/copies pin an `os.OpenRoot`
+directory, refuse symbolic-link components and root identity replacement, and
+bound captured bytes to the measured file size plus one change-detection byte.
+Host writers must still be quiescent for a consistent capture. This read-side
+confinement is not an OS sandbox: inherited path-based workspace mutations and
+metadata publication require a trusted, cooperative host filesystem.
+
+### Local listing token bounds
+
+Nonempty `continuation-token` values must be valid UTF-8, at most 1024 bytes,
+and contain no NUL; invalid values return `400 InvalidArgument`. Current tokens
+are lexical key markers, not authenticated query-bound provider tokens. Clients
+should replay returned tokens. The [acceptance coverage map](compatibility-coverage-2026-09-29.md)
+records shared SDK cases and focused raw protocol evidence.

@@ -55,12 +55,13 @@ func newAddressingProbe(t *testing.T) *addressingProbe {
 func (p *addressingProbe) config(t *testing.T, addressing runthrough.Addressing) *runthrough.S3Client {
 	t.Helper()
 	client, err := runthrough.NewS3Client(runthrough.UpstreamConfig{
-		Endpoint:   p.url,
-		AccessKey:  "AKIAEXAMPLE",
-		SecretKey:  "secret",
-		Region:     "us-east-1",
-		Bucket:     "photos",
-		Addressing: addressing,
+		Endpoint:          p.url,
+		AllowInsecureHTTP: true,
+		AccessKey:         "AKIAEXAMPLE",
+		SecretKey:         "secret",
+		Region:            "us-east-1",
+		Bucket:            "photos",
+		Addressing:        addressing,
 	})
 	if err != nil {
 		t.Fatalf("NewS3Client: %v", err)
@@ -165,11 +166,12 @@ func TestBothStylesAreSignedForTheConfiguredRegion(t *testing.T) {
 			}
 
 			client, err := runthrough.NewS3Client(runthrough.UpstreamConfig{
-				Endpoint:   "http://endpoint.localhost:" + port,
-				AccessKey:  "AKIAEXAMPLE",
-				SecretKey:  "secret",
-				Region:     "eu-west-2",
-				Addressing: testCase.addressing,
+				Endpoint:          "http://endpoint.localhost:" + port,
+				AllowInsecureHTTP: true,
+				AccessKey:         "AKIAEXAMPLE",
+				SecretKey:         "secret",
+				Region:            "eu-west-2",
+				Addressing:        testCase.addressing,
 			})
 			if err != nil {
 				t.Fatalf("NewS3Client: %v", err)

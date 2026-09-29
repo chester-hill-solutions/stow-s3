@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       dry_run:
-        description: Validate both matrix profiles without contacting a provider
+        description: Validate all provider profiles without contacting a provider
         required: false
         type: boolean
         default: false
@@ -34,7 +34,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Validate both matrix profiles without contacting a provider
+        description: Validate all provider profiles without contacting a provider
         required: true
         type: boolean
         default: false
@@ -46,7 +46,8 @@ on:
         options:
           - auto
           - aws-s3
-          - cloudflare-r2-custom
+          - cloudflare-r2
+          - custom
       require_configured:
         description: Fail instead of skipping when live configuration is missing
         required: true
@@ -67,14 +68,17 @@ jobs:
     name: ${{ matrix.label }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: ${{ matrix.provider }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - provider: aws-s3
             label: Live / AWS S3
-          - provider: cloudflare-r2-custom
-            label: Live / Cloudflare R2 or custom S3
+          - provider: cloudflare-r2
+            label: Live / Cloudflare R2
+          - provider: custom
+            label: Live / custom S3
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -136,3 +140,27 @@ jobs:
           else
             printf 'Live provider %s did not complete: %s.\n' "$PROVIDER" "${TEST_OUTCOME:-not-run}"
           fi
+
+      - name: Write provider receipt
+        if: always()
+        env:
+          PROFILE: ${{ matrix.provider }}
+          PROVIDER: ${{ steps.provider.outputs.provider }}
+          ACTIVE: ${{ steps.provider.outputs.active }}
+          TEST_OUTCOME: ${{ steps.live.outcome }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
+        run: |
+          mkdir -p receipts
+          node - <<'JS'
+          const {writeFileSync}=require('node:fs');
+          const e=process.env;
+          const verified=e.ACTIVE==='true' && e.TEST_OUTCOME==='success' && e.DRY_RUN!=='true' && e.PROFILE===e.PROVIDER;
+          writeFileSync(`receipts/${e.PROFILE}.json`,JSON.stringify({profile:e.PROFILE,provider:e.PROVIDER,status:verified?'verified':'unverified',commit:e.GITHUB_SHA,run:e.GITHUB_RUN_ID,attempt:e.GITHUB_RUN_ATTEMPT}));
+          JS
+      - name: Upload provider receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: live-receipt-${{ matrix.provider }}
+          path: receipts/*.json
+          if-no-files-found: error

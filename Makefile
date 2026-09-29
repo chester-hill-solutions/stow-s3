@@ -1,4 +1,4 @@
-.PHONY: build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated benchmark
+.PHONY: test-agent build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -72,7 +72,10 @@ test-wasm: build-wasm
 	$(NPM_INSTALL) && npm run build
 	node --test wasm/runtime.test.mjs
 
-test-all: build test test-race test-conformance test-node test-python test-wasm
+test-agent: build
+	node --test examples/opencode/*.test.mjs
+
+test-all: build test test-race test-conformance test-node test-python test-wasm test-agent
 
 lint:
 	$(PINNED_GO) vet ./...

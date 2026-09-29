@@ -14,6 +14,7 @@ export interface StowSessionCapabilities {
     maxBytes: number;
     maxObjects: number;
     maxRequestBytes: number;
+    maxConcurrentRequests: number;
     protocolVersion: number;
     binaryVersion: string;
 }
@@ -44,6 +45,8 @@ export interface StowSession {
     close(): Promise<void>;
 }
 export interface EphemeralStowOptions {
+    readonly maxRequestBytes?: number;
+    maxConcurrentRequests?: number;
     readonly maxBytes?: number;
     readonly maxObjects?: number;
     /** Override the generated bucket name. */

@@ -1,11 +1,24 @@
 # Agent Workspace, Handoff, and Run-Through Plan
 
+**Planning status: superseded work order — 2026-09-29.**
+[The canonical storage plan](plan.md) is the only active work order.
+[The disposition register](planning-index.md) maps this document's old items
+to current work or explicit deferral. Remaining path, portable-state, distribution and pilot work is carried into S0–S4. MCP is now scheduled explicitly through the OpenCode integration.
+
+The entire original body below is retained as history. Its statuses, unchecked
+boxes, release gates, API sketches, priorities and instructions to start work are
+not current instructions. Accepted ADRs and implemented contracts remain in force.
+
+---
+
+## Historical document (frozen)
+
+> **Scope and precedence, 2026-09-29:** [Canonical storage plan](plan.md) governs current work. This document retains technical details and dated implementation history; its older phase priorities and “current execution order” statements do not schedule work. Caller-owned execution is the active boundary.
+
 **Status:** Phases 0–4 are implemented locally; Phases 5–6 are partial. Reconciled with `main` at `155dff287e4b522b80acceacd12a945d2837b37b` and the uncommitted 2026-09-27 repair follow-up below.
 **Date:** 2026-09-27
 **Scope:** remediate production run-through composition; prepare isolated, pre-seeded agent workspaces; checkpoint and hand off their results.
-**Relationship:** additive to the accepted decisions in ADRs 0005–0011 and `docs/workspace-contract.md`. This is the current execution order for these workstreams and supersedes the related backlog ordering in `docs/agent-dx-plan.md` §0.11/§10.1 and the phase ordering in `docs/agentic-dx-10-plan.md`. Those older plans remain product history and architecture context; they are not parallel implementation specifications.
-
-**Sequencing against the deploy-anywhere work:** [`Deploy-Anywhere Plan`](deploy-anywhere-plan.md) is the current execution order for portability, multi-writer safety, and the read-through cache, and it runs in parallel with this one. Where the two touch the same code it is ordered first. Its Phase 1 (concurrent-write detection on propagation) and Phase 3 (incremental cache eviction) are P0 and precede this plan's Phase 5 item 3. The MCP stdio adapter is **pushed, not dropped**: an adapter built over propagation that silently overwrites another writer would be a faster route to that failure rather than a use of the product.
+**Relationship:** technical detail subordinate to [the canonical storage plan](plan.md). The dated status and rationale below remain evidence, not an independent backlog. Portability, cache and workspace work share the canonical ordering; MCP and other integrations remain conditional on demonstrated need.
 
 ## 1. Plan validation summary
 

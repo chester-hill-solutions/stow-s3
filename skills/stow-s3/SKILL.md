@@ -43,6 +43,22 @@ behaviour you care about, a plain in-memory fake is less machinery. Stow is
 worth it when the code exercises the SDK itself — signing, multipart, range
 reads, error shapes.
 
+## Checkpoints for agent work (0.3.0 development tree)
+
+Prepare a separate workspace and hold it with `workspace serve` while the agent
+works. Before saving, stop known writers and write objective, progress and next
+steps into ordinary workspace files. Use `workspace checkpoint --portable` with
+a persisted random `--request-key` and a positive `--timeout`. Only report a save
+when its outcome is `committed`; after an uncertain reply, reuse the same options
+with `--resolve`. Retry only transient failures with bounded backoff, then report
+failure and the last confirmed checkpoint. Do not rerun a prompt as a storage retry.
+
+The local `mcp` command exposes the same storage operations within configured
+workspace/transfer scope. Agent-requested saves are best effort. A host controller
+must own prompt admission to guarantee its chosen turn boundary. Full chat state,
+process memory, credentials and external side effects are outside a checkpoint.
+See the portable workspace guide and experimental OpenCode example in the repository.
+
 ## Install
 
 **The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release
@@ -51,25 +67,13 @@ publishing its platform packages. PyPI was not published. Do not try those
 install commands first. The Go module is published and is the shortest working
 path.
 
-The npm package is distributed through **GitHub Packages**, not npmjs.org. Once
-a complete release is announced, add this to `.npmrc` so npm resolves the scope
-against the intended registry:
-
-```ini
-@chester-hill-solutions:registry=https://npm.pkg.github.com
-```
-
-GitHub Packages requires authentication for npm packages, including public
-ones. Authenticate with a GitHub personal access token (classic) that has the
-`read:packages` scope:
-
-```bash
-npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
-```
-
-Use the token as the password and keep it in your user-level npm config, not in
-the project `.npmrc`. See [GitHub's npm registry authentication
-guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
+The next candidate, **0.3.0**, targets public npmjs distribution for the main
+package and all four platform carriers. It has **not yet been published**.
+Publisher setup, live-provider gates and anonymous exact-version installation
+must pass before availability is announced. The partial 0.2.0 GitHub Packages
+release is historical; its existing artifacts remain immutable. For the new
+candidate, remove any old scope override to `npm.pkg.github.com`; it would send
+installation requests to the wrong registry.
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now

@@ -15,6 +15,7 @@ export interface StowReadyCapabilities {
   maxBytes: number;
   maxObjects: number;
   maxRequestBytes: number;
+  maxConcurrentRequests?: number;
 }
 
 export interface StowReady {
@@ -120,6 +121,7 @@ export function parseReadyMessage(line: string): StowReady {
       maxBytes: requireNumber(capabilities, "maxBytes"),
       maxObjects: requireNumber(capabilities, "maxObjects"),
       maxRequestBytes: requireNumber(capabilities, "maxRequestBytes"),
+      maxConcurrentRequests: capabilities.maxConcurrentRequests === undefined ? 0 : requireNumber(capabilities, "maxConcurrentRequests"),
     },
   };
 }

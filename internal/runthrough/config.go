@@ -28,11 +28,12 @@ const (
 
 // UpstreamConfig holds credentials and endpoint for upstream S3-compatible storage.
 type UpstreamConfig struct {
-	Endpoint     string
-	AccessKey    string
-	SecretKey    string
-	SessionToken string
-	Region       string
+	AllowInsecureHTTP bool
+	Endpoint          string
+	AccessKey         string
+	SecretKey         string
+	SessionToken      string
+	Region            string
 	// Bucket optionally restricts upstream access to a single bucket name.
 	Bucket string
 	// Addressing is how requests name their bucket. The zero value is

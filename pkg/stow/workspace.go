@@ -24,6 +24,8 @@ import (
 // workspace outlives the process that opened it (ADR 0009), and removal is an
 // explicit Destroy.
 type Workspace struct {
+	lifecycleMu sync.Mutex
+	facade      *workspaceServer
 	*Runtime
 
 	dir                string
@@ -36,8 +38,8 @@ type Workspace struct {
 	registryDir        string
 	maxCheckpointBytes int64
 	maxCheckpoints     int64
-	checkpointMu       sync.Mutex
 	now                func() time.Time
+	closing            bool
 	closed             bool
 	destroyed          bool
 }
@@ -47,6 +49,7 @@ type Workspace struct {
 // Dir is the only required field, and it is required on purpose: a workspace is
 // a place, not a container of opaque bytes.
 type WorkspaceOptions struct {
+	maxRegistryWorkspaces int64
 	// Dir is the workspace directory. It is created if absent, and adopted with
 	// whatever it already holds if not, so pointing a workspace at a directory a
 	// caller is already working in is the normal case rather than a special one.
@@ -58,8 +61,9 @@ type WorkspaceOptions struct {
 	// MaxBytes and MaxObjects bound the workspace. Zero takes the runtime
 	// defaults, so a workspace is bounded unless a caller deliberately lifts
 	// the bound.
-	MaxBytes   int64
-	MaxObjects int64
+	MaxBytes            int64
+	MaxObjects          int64
+	MaxMultipartUploads int64
 	// MaxCheckpointBytes and MaxCheckpoints bound the total payload bytes and
 	// number of retained checkpoints for this workspace. Zero means unlimited.
 	// A cap rejects a new checkpoint; it never evicts an older one.
@@ -131,10 +135,11 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	}
 
 	instance, err := runtime.OpenWithStore(runtime.Options{
-		Backend:    runtime.BackendWorkspace,
-		MaxBytes:   options.MaxBytes,
-		MaxObjects: options.MaxObjects,
-		Authority:  options.Authority,
+		Backend:             runtime.BackendWorkspace,
+		MaxBytes:            options.MaxBytes,
+		MaxObjects:          options.MaxObjects,
+		MaxMultipartUploads: options.MaxMultipartUploads,
+		Authority:           options.Authority,
 	}, store, nil)
 	if err != nil {
 		_ = store.Close()
@@ -187,7 +192,7 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		_ = ws.Close()
 		return nil, err
 	}
-	if err := ws.register(registryDir, int64(options.TTL.Seconds())); err != nil {
+	if err := ws.register(registryDir, int64(options.TTL.Seconds()), options.maxRegistryWorkspaces); err != nil {
 		_ = ws.Close()
 		return nil, err
 	}
@@ -237,24 +242,17 @@ func (w *Workspace) captureTarget() captureTarget {
 // It also releases the session lock, which is what makes the workspace
 // collectable again. Closing twice is not an error.
 func (w *Workspace) Close() error {
-	if w.closed {
-		return nil
-	}
-	w.closed = true
-	var firstErr error
-	if err := w.session.Release(); err != nil {
-		firstErr = err
-	}
-	if err := w.Runtime.Close(); err != nil && firstErr == nil {
-		firstErr = err
-	}
-	return firstErr
+	w.lifecycleMu.Lock()
+	defer w.lifecycleMu.Unlock()
+	return w.closeLocked()
 }
 
 // assertOpen refuses work on a closed handle, so a lifecycle mistake is a named
 // error rather than a confusing failure from underneath.
 func (w *Workspace) assertOpen() error {
-	if w.closed {
+	w.lifecycleMu.Lock()
+	defer w.lifecycleMu.Unlock()
+	if w.closed || w.closing {
 		return ErrClosed
 	}
 	return nil
@@ -270,22 +268,28 @@ func (w *Workspace) assertOpen() error {
 //
 // A workspace that is already gone is not an error: destroy is idempotent.
 func (w *Workspace) Destroy(ctx context.Context) error {
+	w.lifecycleMu.Lock()
+	defer w.lifecycleMu.Unlock()
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if err := w.store.Destroy(); err != nil {
+	remove := func() error {
+		if w.store.IsOwned() {
+			if err := w.closeRuntimeLocked(); err != nil {
+				return err
+			}
+		}
+		return w.store.Destroy()
+	}
+	if w.registry != nil {
+		if err := w.registry.RemoveWorkspace(w.id, remove); err != nil {
+			return err
+		}
+	} else if err := remove(); err != nil {
 		return err
 	}
 	w.destroyed = true
-	// The bytes are gone, so the name they were filed under must go too, or the
-	// registry accumulates entries that resolve to nothing.
-	if w.registry != nil {
-		if err := w.registry.ForgetCheckpoints(w.id); err != nil {
-			return err
-		}
-		return w.registry.Forget(w.id)
-	}
-	return nil
+	return w.closeLocked()
 }
 
 // generatedBucketName returns a bucket name unlikely to collide with another

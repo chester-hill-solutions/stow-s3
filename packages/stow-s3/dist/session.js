@@ -51,6 +51,8 @@ export async function openStow(options = {}) {
             mode: "local",
             backend: "memory",
             dataDir,
+            maxRequestBytes: options.maxRequestBytes,
+            maxConcurrentRequests: options.maxConcurrentRequests,
             maxBytes: options.maxBytes ?? DEFAULT_SESSION_MAX_BYTES,
             maxObjects: options.maxObjects ?? DEFAULT_SESSION_MAX_OBJECTS,
             isolatedEnvironment: true,
@@ -145,6 +147,7 @@ class Session {
             maxBytes: this.ready.capabilities.maxBytes,
             maxObjects: this.ready.capabilities.maxObjects,
             maxRequestBytes: this.ready.capabilities.maxRequestBytes,
+            maxConcurrentRequests: this.ready.capabilities.maxConcurrentRequests ?? 0,
             protocolVersion: this.ready.protocolVersion,
             binaryVersion: this.ready.binaryVersion,
         };

@@ -27,6 +27,7 @@ export interface StowSessionCapabilities {
   maxBytes: number;
   maxObjects: number;
   maxRequestBytes: number;
+  maxConcurrentRequests: number;
   protocolVersion: number;
   binaryVersion: string;
 }
@@ -59,6 +60,8 @@ export interface StowSession {
 }
 
 export interface EphemeralStowOptions {
+  readonly maxRequestBytes?: number;
+  maxConcurrentRequests?: number;
   readonly maxBytes?: number;
   readonly maxObjects?: number;
   /** Override the generated bucket name. */
@@ -116,6 +119,8 @@ export async function openStow(options: EphemeralStowOptions = {}): Promise<Stow
       mode: "local",
       backend: "memory",
       dataDir,
+      maxRequestBytes: options.maxRequestBytes,
+      maxConcurrentRequests: options.maxConcurrentRequests,
       maxBytes: options.maxBytes ?? DEFAULT_SESSION_MAX_BYTES,
       maxObjects: options.maxObjects ?? DEFAULT_SESSION_MAX_OBJECTS,
       isolatedEnvironment: true,
@@ -228,6 +233,7 @@ class Session implements StowSession {
       maxBytes: this.ready.capabilities.maxBytes,
       maxObjects: this.ready.capabilities.maxObjects,
       maxRequestBytes: this.ready.capabilities.maxRequestBytes,
+      maxConcurrentRequests: this.ready.capabilities.maxConcurrentRequests ?? 0,
       protocolVersion: this.ready.protocolVersion,
       binaryVersion: this.ready.binaryVersion,
     };

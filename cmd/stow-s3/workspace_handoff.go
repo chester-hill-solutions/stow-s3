@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -41,21 +39,9 @@ const (
 
 // handoffArchive is a checkpoint archive a handoff can name, with the digest that
 // binds it to the document.
-type handoffArchive struct {
-	Path   string `json:"path"`
-	SHA256 string `json:"sha256"`
-	Bytes  int64  `json:"bytes"`
-	Files  int64  `json:"files"`
-}
+type handoffArchive = stow.HandoffArchive
 
-type workspaceHandoff struct {
-	Version      int             `json:"version"`
-	WorkspaceID  string          `json:"workspace_id"`
-	CheckpointID string          `json:"checkpoint_id,omitempty"`
-	RegistryDir  string          `json:"registry_dir,omitempty"`
-	Team         string          `json:"team,omitempty"`
-	Archive      *handoffArchive `json:"archive,omitempty"`
-}
+type workspaceHandoff = stow.Handoff
 
 func handoffWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace handoff", flag.ContinueOnError)
@@ -90,6 +76,11 @@ func handoffWorkspaceCommand(args []string) error {
 		Version: handoffLocalVersion, WorkspaceID: reference.ID,
 		CheckpointID: *checkpointID, RegistryDir: resolved, Team: selection.team,
 	}
+	if *checkpointID != "" {
+		if err := requireCheckpointInWorkspace(resolved, *checkpointID, reference.ID); err != nil {
+			return err
+		}
+	}
 	if *archive != "" {
 		if *checkpointID == "" {
 			return errors.New("workspace handoff --archive requires --checkpoint-id")
@@ -98,12 +89,18 @@ func handoffWorkspaceCommand(args []string) error {
 		if err != nil {
 			return err
 		}
+		if *output != "" {
+			base, err := filepath.Abs(filepath.Dir(*output))
+			if err != nil {
+				return err
+			}
+			bound.Path, err = filepath.Rel(base, bound.Path)
+			if err != nil {
+				return err
+			}
+		}
 		document.Version = handoffPortableVersion
 		document.Archive = bound
-	} else if *checkpointID != "" {
-		if err := requireCheckpointInWorkspace(resolved, *checkpointID, reference.ID); err != nil {
-			return err
-		}
 	}
 	return writeWorkspaceJSONTo(*output, document)
 }
@@ -203,22 +200,7 @@ func checkTeamAgreement(documentTeam, flagTeam string) error {
 // available before anything is written, and the import is what verifies every
 // file against the manifest inside the archive.
 func importHandoffArchive(handoffPath, registryDir string, document workspaceHandoff, options stow.CheckpointArchiveOptions) (stow.CheckpointInfo, error) {
-	if document.Archive == nil {
-		return stow.CheckpointInfo{}, errors.New("this handoff is a same-machine reference with no archive; export one and hand it off with --archive")
-	}
-	archivePath, err := resolveHandoffArchive(handoffPath, document.Archive.Path)
-	if err != nil {
-		return stow.CheckpointInfo{}, err
-	}
-	if err := verifyHandoffArchive(archivePath, document.Archive); err != nil {
-		return stow.CheckpointInfo{}, err
-	}
-	archive, err := os.Open(archivePath)
-	if err != nil {
-		return stow.CheckpointInfo{}, err
-	}
-	defer archive.Close()
-	return stow.ImportCheckpoint(context.Background(), registryDir, archive, options)
+	return stow.ImportHandoff(context.Background(), handoffPath, registryDir, document, options)
 }
 
 // checkHandoffIdentity refuses a document whose names disagree with the bytes it
@@ -277,6 +259,10 @@ func verifyHandoffArchive(path string, bound *handoffArchive) error {
 		return fmt.Errorf("read handoff archive: %w", err)
 	}
 	defer file.Close()
+	return verifyHandoffReader(file, path, bound)
+}
+
+func verifyHandoffReader(file io.Reader, path string, bound *handoffArchive) error {
 	digest := sha256.New()
 	size, err := io.Copy(digest, file)
 	if err != nil {
@@ -312,41 +298,8 @@ func resolveHandoffArchive(handoffPath, archive string) (string, error) {
 // task manifest: unknown fields and trailing values are refused, because a
 // document that carries a field nobody implements is a document nobody is
 // checking.
-func readHandoffDocument(path string) (workspaceHandoff, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return workspaceHandoff{}, err
-	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	var document workspaceHandoff
-	if err := decoder.Decode(&document); err != nil {
-		return document, fmt.Errorf("decode handoff reference: %w", err)
-	}
-	if err := decoder.Decode(&struct{}{}); err != io.EOF {
-		return document, errors.New("handoff reference must contain exactly one JSON value")
-	}
-	if err := validateHandoff(document); err != nil {
-		return document, err
-	}
-	return document, nil
-}
-
-func validateHandoff(document workspaceHandoff) error {
-	if document.Version != handoffLocalVersion && document.Version != handoffPortableVersion {
-		return fmt.Errorf("unsupported handoff reference version %d", document.Version)
-	}
-	if document.WorkspaceID == "" {
-		return errors.New("invalid handoff reference: no workspace id")
-	}
-	if document.Version == handoffLocalVersion && document.RegistryDir == "" {
-		return errors.New("invalid handoff reference: no registry directory")
-	}
-	if document.Archive != nil && document.Archive.SHA256 == "" {
-		return errors.New("invalid handoff reference: the archive has no digest")
-	}
-	return nil
-}
+func readHandoffDocument(path string) (workspaceHandoff, error) { return stow.ReadHandoff(path) }
+func validateHandoff(document workspaceHandoff) error           { return stow.ValidateHandoff(document) }
 
 func requireCheckpointInWorkspace(registryDir, checkpointID, workspaceID string) error {
 	manifest, err := stow.LoadCheckpoint(registryDir, checkpointID)

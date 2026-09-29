@@ -146,3 +146,6 @@ export const Stow = {
 };
 
 export default Stow;
+
+export { serveWorkspace } from "./workspace-serve.js";
+export type { ServeWorkspaceOptions, ServedWorkspace } from "./workspace-serve.js";
