@@ -110,8 +110,18 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	info, err := os.Stat(absPath)
+	// Lstat, not Stat, and a symlink is not an object: its target is not part of the
+	// workspace, so a key naming one must not serve those bytes to anything holding
+	// the workspace. The checkpoint path refused symlinks from the start, which is how
+	// the two came to disagree.
+	//
+	// Only the final component is refused. A symlinked *directory* inside the root is
+	// left alone, because adopted projects legitimately contain those.
+	info, err := os.Lstat(absPath)
 	if err != nil {
+		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
 		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
 	}
 

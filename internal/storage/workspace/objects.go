@@ -317,6 +317,10 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 		if statErr != nil {
 			return nil
 		}
+		// Skipped as resolve skips it: listing what a read refuses reports a phantom.
+		if info.Mode()&os.ModeSymlink != 0 {
+			return nil
+		}
 		manifestEntry, _ := s.objectIndex.entry(bucket, key)
 		if meta := s.metaFromEntry(bucket, key, manifestEntry, info); meta != nil {
 			byKey[key] = *meta
