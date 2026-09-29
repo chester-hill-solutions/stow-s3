@@ -44,7 +44,7 @@ this table is current.
 | D4 delete `EnvironmentPromote` | **Already done before this plan** | Refused by name in `internal/authority/authority.go`; only the refusal record remains |
 | D5 legacy data directory | **Open decision** | — |
 | E1 split `serve` | **Done, partially** | Complexity 31 → 22 against a ceiling of 15. The shutdown sequence moved the number; the flag block moved no complexity and is worth keeping for readability. `cmd/stow-s3/shutdown.go`, `serve_flags.go` |
-| E2 aim the coverage ratchet at behaviour | **Not started** | The floor is still a single aggregate. Four packages sit under it, worst first: `cmd/stow-s3` at 56.4%, `tools/quality` 62.7%, `internal/atomicfile` 66.7%, `internal/s3api` 69.1% — read the numbers from `make check-coverage` |
+| E2 aim the coverage ratchet at behaviour | **Mechanism done; floors are low** | The gate now holds a per-package statement floor for all 14 packages, so a package can no longer be gutted while a well-tested one holds the aggregate up. Floors are recorded at what each package reaches, so they freeze what is true rather than what would be nice: `cmd/stow-s3` is floored at 56.4% and the gate names every package below the aggregate on each run. What is left is raising them, and `cmd/stow-s3` is the one to raise |
 | E3 object record layout cost | **Not started** | — |
 | F1 README restructure | **Not started** | — |
 | F2 agent-facing documents | **Not started** | Partly overtaken: the cache section was added to the skill |
