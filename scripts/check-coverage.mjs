@@ -72,7 +72,12 @@ const FLOOR_TOLERANCE = 4;
 
 const repoRoot = resolve(import.meta.dirname, "..");
 const baselinePath = resolve(repoRoot, "scripts/baselines/go-coverage.json");
-const profilePath = resolve(repoRoot, ".cache/go-coverage.out");
+// The profile is per-process, not a fixed path. Two concurrent invocations wrote the
+// same file and read each other's partial output: one run measured 4103 statements
+// across four packages against a floor of 6811 and fourteen, and every package read as
+// "in the baseline but not in this measurement". Nothing about the tree had changed, and
+// the failure was not reproducible on its own — it needed a second run beside it.
+const profilePath = resolve(repoRoot, `.cache/go-coverage-${process.pid}.out`);
 
 // The gate runs only when this file is the entry point. The unit tests import the
 // functions below, and while the run sat at module scope a failing gate called
