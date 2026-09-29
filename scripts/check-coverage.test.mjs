@@ -458,3 +458,45 @@ test("a lowered floor is still a failure regardless of tolerance", () => {
   assert.equal(problems.length, 1);
   assert.match(problems[0], /stored baseline was lowered/);
 });
+
+// The history checks take the same tolerance as the measurement check, for the same
+// reason and symmetrically. A floor recorded from a noisy sample can land below the
+// stored one, and refusing that would mean --baseline could produce a tree that fails
+// its own next run — on the history check rather than on coverage. "Lowered" therefore
+// means lowered by more than the noise, on both sides, and a real lowering is still
+// several orders of magnitude larger than four statements.
+
+test("a floor lowered by less than the noise is a re-record, not a lowering", () => {
+  const problems = coverageProblems(
+    measured(4000, 65.0),
+    measured(3999, 65.0),
+    measured(4002, 65.0),
+    1,
+    4,
+  );
+  assert.deepEqual(problems, []);
+});
+
+test("a floor lowered by more than the noise still fails", () => {
+  const problems = coverageProblems(
+    measured(3900, 65.0),
+    measured(3900, 65.0),
+    measured(4000, 65.0),
+    1,
+    4,
+  );
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /stored baseline was lowered: 3900 < 4000/);
+});
+
+test("a per-package floor lowered by less than the noise is a re-record", () => {
+  assert.deepEqual(
+    packageProblems(
+      { "a/pkg": pk(999, 1000) },
+      { "a/pkg": pk(1000, 1000) },
+      { "a/pkg": pk(1002, 1000) },
+      4,
+    ),
+    [],
+  );
+});

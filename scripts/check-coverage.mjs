@@ -135,6 +135,7 @@ function main() {
     baseline,
     previous,
     MAX_PERCENTAGE_DROP,
+    FLOOR_TOLERANCE,
   );
 
   if (problems.length > 0) {
@@ -253,7 +254,10 @@ export function coverageProblems(
   // interleave differently, so failing on an improvement would make the gate flap
   // on scheduling rather than on coverage. Record a real improvement deliberately
   // with --baseline, which is where the judgement belongs.
-  if (previous && baseline.coveredStatements < previous.coveredStatements) {
+  if (
+    previous &&
+    baseline.coveredStatements < previous.coveredStatements - floorTolerance
+  ) {
     problems.push(
       `the stored baseline was lowered: ${baseline.coveredStatements} < ${previous.coveredStatements}`,
     );
@@ -263,6 +267,7 @@ export function coverageProblems(
       measured.packages,
       baseline.packages,
       previous?.packages,
+      floorTolerance,
     ),
   );
   return problems;
@@ -320,7 +325,8 @@ export function packageProblems(
     if (
       previous !== undefined &&
       previous[name] !== undefined &&
-      floor.coveredStatements < previous[name].coveredStatements
+      floor.coveredStatements <
+        previous[name].coveredStatements - floorTolerance
     ) {
       problems.push(
         `${name}: the stored floor was lowered: ${floor.coveredStatements} < ${previous[name].coveredStatements}`,
