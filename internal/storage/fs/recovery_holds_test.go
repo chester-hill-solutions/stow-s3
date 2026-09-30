@@ -18,6 +18,10 @@ func holdStore(t *testing.T, dir string) *FilesystemStore {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if !store.SupportsRecoveryHolds() {
+		_ = store.Close()
+		t.Skip("durable recovery holds require Darwin or Linux")
+	}
 	t.Cleanup(func() { _ = store.Close() })
 	return store
 }
@@ -67,8 +71,7 @@ func TestRecoveryHoldBlocksMutationUntilRelease(t *testing.T) {
 	if err := store.DeleteObject(ctx, "reports", "result"); !errors.Is(err, storage.ErrRecoveryHeld) {
 		t.Fatalf("held deletion = %v", err)
 	}
-	// A batch is refused the same way, and says nothing about the rest: a caller
-	// retrying the whole batch must not delete the keys around the held one.
+	// A batch is refused the same way, and says nothing about the rest.
 	deleted, err := store.DeleteObjects(ctx, "reports", []string{"other", "result"})
 	if !errors.Is(err, storage.ErrRecoveryHeld) || len(deleted) != 1 {
 		t.Fatalf("held batch deletion = %v, %v", deleted, err)
@@ -81,7 +84,7 @@ func TestRecoveryHoldBlocksMutationUntilRelease(t *testing.T) {
 	}
 }
 
-// Every write of the object is refused, not only the unconditional ones.
+// Every write of the object is refused, not just the unconditional ones.
 func assertHeldCompletionAndCopyRefused(t *testing.T, store *FilesystemStore) {
 	t.Helper()
 	ctx := context.Background()
@@ -159,8 +162,7 @@ func TestRecoveryHoldIdentityIsEnforced(t *testing.T) {
 	if err := store.ReleaseRecoveryHold(ctx, "absent", "consumer"); !errors.Is(err, storage.ErrRecoveryHoldNotFound) {
 		t.Fatalf("unknown hold = %v", err)
 	}
-	// Re-arming is the consumer saying it still needs the bytes: the hold comes
-	// back rather than a conflict with its own past release.
+	// Re-arming brings the hold back rather than conflicting with its own release.
 	if err := beginHold(t, store, "delivery", "consumer", pin(t, store, "reports", "result")); err != nil {
 		t.Fatalf("re-armed begin: %v", err)
 	}
@@ -218,9 +220,8 @@ func manyObjects(object storage.ObjectResource) []storage.ObjectResource {
 	return objects
 }
 
-// A journal nobody can read is not treated as no holds: deletes and overwrites
-// proceeding on an unverified record is how the bytes a hold exists to keep are
-// lost.
+// A journal nobody can read is not read as no holds: a deletion proceeding on
+// an unverified record is how the bytes a hold exists to keep are lost.
 func TestRecoveryHoldRefusesUnreadableState(t *testing.T) {
 	ctx := context.Background()
 	dir := filepath.Join(t.TempDir(), "store")

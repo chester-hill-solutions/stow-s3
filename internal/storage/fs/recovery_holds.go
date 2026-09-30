@@ -134,7 +134,7 @@ func (s *FilesystemStore) ReleaseRecoveryHold(_ context.Context, id, owner strin
 }
 
 // observedRecoveryHolds refuses a hold whose references no longer describe the
-// store: one that does not match what it claims to pin protects nothing.
+// store: one that does not match what it claims to pin protects nothing at all.
 func (s *FilesystemStore) observedRecoveryHolds(entry recoveryHoldEntry) error {
 	for _, reference := range entry.References {
 		if err := s.observedRecoveryHold(reference); err != nil {
@@ -162,8 +162,7 @@ func (s *FilesystemStore) observedRecoveryHold(reference recoveryHoldReference) 
 }
 
 // checkRecoveryHoldsLocked refuses a mutation of any pinned object. Reads are
-// unaffected: the point of a hold is that the bytes survive, not that they are
-// hidden.
+// unaffected: a hold keeps bytes from being replaced, not from being read.
 func (s *FilesystemStore) checkRecoveryHoldsLocked(bucket string, keys ...string) error {
 	journal, err := s.readRecoveryHolds()
 	if err != nil {
@@ -222,9 +221,9 @@ func newRecoveryHold(options storage.RecoveryHoldOptions) (recoveryHoldEntry, er
 	return entry, nil
 }
 
-// normalizeRecoveryReferences sorts the pinned objects so two callers naming
-// the same set in different orders produce one meaning, and refuses a hold that
-// claims one object twice and looks like two protections.
+// normalizeRecoveryReferences sorts the pinned objects so two callers naming the
+// same set in different orders produce one meaning, and refuses a hold claiming
+// one object twice and looking like two protections.
 func normalizeRecoveryReferences(entry *recoveryHoldEntry) error {
 	sort.Slice(entry.References, func(i, j int) bool {
 		return entry.References[i].Bucket+"\x00"+entry.References[i].Key < entry.References[j].Bucket+"\x00"+entry.References[j].Key

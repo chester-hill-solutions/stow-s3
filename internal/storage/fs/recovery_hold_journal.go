@@ -16,8 +16,7 @@ import (
 )
 
 // readRecoveryHolds returns the recorded holds, or an empty journal for a store
-// that never took one. An unreadable journal is an error, not an empty result:
-// ignoring it would delete the bytes the holds exist to keep.
+// that never took one. An unreadable journal is an error, not an empty result.
 func (s *FilesystemStore) readRecoveryHolds() (recoveryHoldJournal, error) {
 	empty := recoveryHoldJournal{Version: 1, Holds: []recoveryHoldEntry{}}
 	path := s.recoveryHoldPath()
@@ -125,6 +124,16 @@ func (s *FilesystemStore) writeRecoveryHolds(journal recoveryHoldJournal) error 
 	if err := atomicfile.Write(s.recoveryHoldPath(), data, 0o600); err != nil {
 		return err
 	}
+	return s.syncRecoveryAncestors()
+}
+
+// syncRecoveryAncestors is guarded like every other directory sync here:
+// Windows refuses to open a directory for Sync, and the atomic write above is
+// what protects the journal where that is not available.
+func (s *FilesystemStore) syncRecoveryAncestors() error {
+	if !s.SupportsRecoveryHolds() {
+		return nil
+	}
 	return syncSaveAncestors(s.dataDir)
 }
 
@@ -137,8 +146,8 @@ func (s *FilesystemStore) validateRecoveryIdentity(expected string) error {
 }
 
 // initializeRecoveryHolds writes the journal and its identity marker together.
-// The marker makes a missing journal detectable: without one, a deleted journal
-// looks like a store that never took a hold.
+// The marker makes a missing journal detectable rather than indistinguishable
+// from a store that never took a hold.
 func (s *FilesystemStore) initializeRecoveryHolds() (string, error) {
 	var random [16]byte
 	if _, err := rand.Read(random[:]); err != nil {
@@ -154,5 +163,5 @@ func (s *FilesystemStore) initializeRecoveryHolds() (string, error) {
 	if err := atomicfile.Write(s.recoveryHoldIdentityPath(), []byte(identity), 0o600); err != nil {
 		return "", errors.Join(storage.ErrInvalidRecoveryHold, err)
 	}
-	return identity, syncSaveAncestors(s.dataDir)
+	return identity, s.syncRecoveryAncestors()
 }
