@@ -4,10 +4,27 @@ on:
   push:
     tags:
       - "v*"
+  # A rehearsal runs the whole pipeline and stops before anything is published.
+  # The release job below executes only for a tag, and a tag publishes to npm
+  # before a human gets to look at it, so the alternative to rehearsing is
+  # discovering the problem at the publish step. The version is an explicit
+  # input because a branch name is not a version.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to rehearse, e.g. 0.3.0. Must match packages/stow-s3/package.json."
+        required: true
+        type: string
 
 permissions:
   contents: write
   id-token: write
+
+env:
+  # github.ref_name is the tag on a release, so stripping the leading v gives the
+  # version that every artifact has to agree on. A rehearsal runs on a branch,
+  # where the ref name is not a version at all, hence the input above.
+  RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
 
 jobs:
   test:
@@ -223,23 +240,30 @@ jobs:
           cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
           cd "$RUNNER_TEMP/npm-consumer"
           npm install --ignore-scripts --registry=https://registry.npmjs.org ./*.tgz
-          env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${GITHUB_REF_NAME#v}"
+          env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${RELEASE_VERSION#v}"
 
   live_gate:
     name: Live provider gate
-    if: startsWith(github.ref, 'refs/tags/v')
+    # A tag runs it for real, because a release may claim live-provider evidence.
+    # A rehearsal runs it dry and does not require credentials, so the wiring is
+    # checked without a bucket and without depending on secrets being present.
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/live.yml
     with:
-      dry_run: false
+      dry_run: ${{ !(startsWith(github.ref, 'refs/tags/v')) }}
       provider: auto
-      require_configured: true
+      require_configured: ${{ startsWith(github.ref, 'refs/tags/v') }}
     secrets: inherit
 
   release:
-    name: Release
+    name: Release${{ github.event_name == 'workflow_dispatch' && ' rehearsal (publishes nothing)' || '' }}
     needs: [build, test, consumer, live_gate]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    # A rehearsal runs this same job and stops at every step that would publish.
+    # It is one job rather than a copy so the rehearsed path cannot drift from the
+    # shipped one: a step added here is in the rehearsal automatically, and
+    # anything that publishes has to carry an explicit condition saying so.
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     steps:
       # This job runs scripts out of the tree, not just artifacts. Packing the
       # platform packages calls scripts/pack-platform-package.mjs, and the
@@ -265,13 +289,17 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+      # npm is required; PyPI is not. The step further down named "Record PyPI
+      # publishing status" is written for PyPI being off — it records the skip and
+      # prints a warning in the release notes — so requiring it here made that
+      # step unreachable and turned an optional target into a release blocker.
+      # docs/foss-readiness-plan.md A3 tracks configuring the trusted publisher,
+      # and until that is done this gate must not be what stops a release.
       - name: Require release account setup
         env:
           NPM_READY: ${{ vars.STOW_NPM_PUBLISH_READY }}
-          PYPI_READY: ${{ vars.STOW_PUBLISH_PYPI }}
         run: |
           test "$NPM_READY" = true || { echo 'Configure npmjs scope ownership and OIDC/token publishing, then set STOW_NPM_PUBLISH_READY=true'; exit 1; }
-          test "$PYPI_READY" = true || { echo 'Configure the PyPI trusted publisher, then set STOW_PUBLISH_PYPI=true'; exit 1; }
       - name: Verify npm package artifact
         shell: bash
         run: |
@@ -290,7 +318,7 @@ jobs:
             if (metadata.name !== "@chester-hill-solutions/stow-s3" || metadata.version !== expectedVersion) {
               throw new Error(`Unexpected npm package metadata: ${metadata.name}@${metadata.version}`);
             }
-          ' "$package_metadata" "${GITHUB_REF_NAME#v}"
+          ' "$package_metadata" "${RELEASE_VERSION#v}"
           tar -tzf "$package_file" > "$RUNNER_TEMP/npm-package-files.txt"
           grep -Fxq package/dist/stow-runtime.wasm "$RUNNER_TEMP/npm-package-files.txt"
           grep -Fxq package/dist/wasm_exec.js "$RUNNER_TEMP/npm-package-files.txt"
@@ -304,7 +332,7 @@ jobs:
         run: |
           set -euo pipefail
           shopt -s nullglob
-          expected_version="${GITHUB_REF_NAME#v}"
+          expected_version="${RELEASE_VERSION#v}"
           for archive in dist/stow-*.tar.gz; do
             node scripts/pack-platform-package.mjs "$archive" dist/npm-platform
           done
@@ -339,7 +367,11 @@ jobs:
           pattern: live-receipt-*
           path: dist/live-receipts
           merge-multiple: true
+      # Tag-only: a rehearsal's live gate runs dry, and a dry run cannot produce a
+      # verified receipt, so this check would fail for a reason that is not a
+      # defect. It is exactly the evidence a real release has to supply.
       - name: Require executed provider evidence
+        if: startsWith(github.ref, 'refs/tags/v')
         run: node scripts/check-live-receipts.mjs dist/live-receipts "$GITHUB_SHA"
       # PyPI, by trusted publishing from this workflow's OIDC identity, so there
       # is no API token to store. Every matrix entry contributes one wheel and
@@ -373,11 +405,14 @@ jobs:
           done
           ls -l dist/wheel
 
+      # Everything from here to the end of the job publishes. Each step says so.
       - name: Publish platform packages
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node scripts/publish-if-absent.mjs ./dist/npm-platform/*.tgz
       - name: Publish npm package
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node scripts/publish-if-absent.mjs ./dist/npm/*.tgz
@@ -402,7 +437,7 @@ jobs:
           fi
 
       - name: Publish to PyPI
-        if: steps.pypi.outputs.status == 'enabled'
+        if: startsWith(github.ref, 'refs/tags/v') && steps.pypi.outputs.status == 'enabled'
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           packages-dir: dist/wheel
@@ -410,9 +445,10 @@ jobs:
           # from somebody with upload access, which is the whole point of using
           # trusted publishing instead of a long-lived token.
           attestations: true
+      # Tag-only: this installs the version back from the registries, so it can
+      # only pass once the publish steps above have actually run.
       - name: Verify exact published versions as anonymous consumers
-        env:
-          RELEASE_VERSION: ${{ github.ref_name }}
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           version="${RELEASE_VERSION#v}"
           mkdir -p "$RUNNER_TEMP/anonymous-consumer"
@@ -420,7 +456,7 @@ jobs:
           cd "$RUNNER_TEMP/anonymous-consumer"
           touch "$RUNNER_TEMP/empty-npmrc"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
-          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "${GITHUB_REF_NAME#v}"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "$version"
           python3 -m venv python-consumer
           env -u PIP_INDEX_URL -u PIP_EXTRA_INDEX_URL python-consumer/bin/python -m pip install --index-url=https://pypi.org/simple "stow-s3==$version"
           env -u STOW_BIN -u PYTHONPATH python-consumer/bin/python smoke-python-consumer.py
@@ -432,6 +468,7 @@ jobs:
           cat SHA256SUMS.txt
 
       - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         with:
           files: |
@@ -469,3 +506,22 @@ jobs:
             Live-provider gate: AWS S3, Cloudflare R2, and custom S3 receipts verified for this commit.
 
             PyPI: ${{ steps.pypi.outputs.status }}
+
+      # A green run of this job on a tag means every step above passed. A green run
+      # on workflow_dispatch means the same, minus the publishing, and this line
+      # says so in the log rather than leaving the two to be confused: the steps
+      # that publish, that verify what was published, and that need live-provider
+      # evidence are all conditioned on a tag, and a rehearsal skips them.
+      - name: State what this run did and did not do
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cat <<'MSG'
+          ::notice title=Rehearsal only::This run published nothing. npm, PyPI and the
+          GitHub Release were not touched, and no live-provider evidence was
+          required, because a dry run cannot produce a verified receipt. What it
+          did verify: the build, standards and generated-output gates, the four
+          platform builds and wheels, the packed npm consumer on each target, the
+          npm and wheel artifact contents, the publish preflight, and the checksum
+          manifest. Cutting a tag runs the same job with those steps enabled.
+          MSG
+
