@@ -21,10 +21,18 @@ function digestTree(directory) {
   return hash.digest("hex");
 }
 
-const first = digestTree(outputRoot);
+// The first digest has to be taken before anything regenerates dist, or it is a
+// digest of a fresh build and the comparison below becomes a build against
+// itself — which passes for a committed artifact that no source produces. That
+// is not hypothetical: it is what let two commits land with a stale
+// stow-runtime.wasm, and the check said "reproducible" while they did.
+const committed = digestTree(outputRoot);
 execFileSync("npm", ["run", "build"], { cwd: packageRoot, stdio: "inherit" });
-const second = digestTree(outputRoot);
-if (first !== second) {
-  throw new Error("generated TypeScript package output changed between identical builds");
+const rebuilt = digestTree(outputRoot);
+if (committed !== rebuilt) {
+  throw new Error(
+    "the committed generated output does not match a fresh build of this tree; " +
+      "regenerate it and commit the result, or find out what changed",
+  );
 }
-console.log("Generated package output is reproducible");
+console.log("Generated package output matches a fresh build of this tree");

@@ -96,7 +96,7 @@ lint:
 	$(PINNED_GO) vet ./...
 
 check-generated: build-wasm
-	$(NPM_INSTALL) && npm run build
+	$(NPM_INSTALL)
 	node scripts/check-generated.mjs
 
 format-check:

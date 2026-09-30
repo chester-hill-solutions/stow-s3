@@ -86,7 +86,7 @@ The TypeScript escape ratchet additionally records `as any`, double casts, expli
 
 Generated `packages/stow-s3/dist` is checked into the repository for release reproducibility, but it is excluded from lint and duplication scans. The build is cleaned and regenerated, and CI fails if the checked-in output differs.
 
-The check that fails is the corpus jobs' `git diff --exit-code -- packages/stow-s3/dist`, not `make check-generated`. The local target digests `dist`, rebuilds, and digests again, and the first digest is already taken after the rebuild has copied the new binary over the committed one, so it cannot see a committed artifact that is stale or was built on a different host. It checks that the build is reproducible from itself. Treat a green `make check-generated` as saying nothing about whether the committed artifact is current, and see [CONTRIBUTING](../CONTRIBUTING.md) for what to do when it is not.
+`make check-generated` compares the committed `dist` against a fresh build of the tree, so a committed artifact that the current source does not produce fails it. It is not a check that the build is repeatable from itself, which is what it was for a while: the target ran the build before the comparison, so the two digests were both of fresh output and a stale artifact passed. The corpus jobs' `git diff --exit-code -- packages/stow-s3/dist` is the same comparison and stays as an independent second opinion. See [CONTRIBUTING](../CONTRIBUTING.md).
 
 ## CI
 

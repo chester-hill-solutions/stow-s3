@@ -37,31 +37,29 @@ race suite, the maintainability ratchets, the coverage floor, the version and
 install-surface gates, the documentation gates, the script tests, the TypeScript
 standards, and the generated-output check. Run it before you open a pull request.
 
-One caveat, and it is the thing most likely to surprise you: CI runs
-`make standards` *and* one check the local target cannot make. The three
-TypeScript corpus jobs regenerate the package output and then run
-`git diff --exit-code -- packages/stow-s3/dist`, and that diff is the only thing
-comparing the committed WASM artifact against a fresh build. `make
-check-generated` cannot do it: it digests `dist`, rebuilds, and digests again,
-and the first digest is already taken after `npm run build` has copied the newly
-built binary over the committed one. It proves the build is idempotent, not that
-the committed bytes are current. A stale artifact passes every local gate and
-fails three required checks.
+One caveat, and it is the thing most likely to surprise you: the committed WASM
+artifact has to match a fresh build, and if your change reaches `pkg/stow` — which
+most Go changes do — it will not, until you regenerate and commit it. The WASM
+runtime links 14 packages of this tree, including `internal/rooted`,
+`internal/storage/workspace`, `internal/storage/fs` and `internal/capacity`, so
+almost any Go change moves that binary.
 
-So if your change reaches `pkg/stow` — which most Go changes do — the committed
-`packages/stow-s3/dist/stow-runtime.wasm` is stale, and nothing local will tell
-you. The WASM runtime links 14 packages of this tree, including
-`internal/rooted`, `internal/storage/workspace`, `internal/storage/fs` and
-`internal/capacity`, so almost any Go change moves that binary. And the build is
-**not** byte-reproducible across host OS: same Go version, same `make build-wasm`,
-same `-trimpath`, but darwin/arm64 and linux/amd64 emit different bytes. The
-committed artifact has to be a Linux build, and a macOS developer cannot produce
-one at all.
+`make check-generated` is what tells you, and it runs as part of `make standards`.
+It compares the committed `packages/stow-s3/dist` against a fresh build of the
+tree, so a stale artifact fails locally, on CI, and in the release job. The build
+is byte-reproducible across hosts — the same Go version and the same
+`make build-wasm` produce the same bytes on macOS and on Linux — so a macOS
+checkout can regenerate and commit the artifact, and there is no platform rule to
+remember.
 
-Until that is settled, regenerating it means building on a Linux runner and
-committing the result. A throwaway pull request whose only job is
-`make build-wasm` on `ubuntu-latest` is the cheapest way. Do not commit a macOS
-build to quiet the diff — it fails the same check, and for the same reason.
+It is worth knowing how that gate was broken once, because the failure was silent
+and shipped twice. The target ran `npm run build` *before* the script that
+compares, so the script's first digest was a digest of a fresh build and it
+compared a build against itself: a committed artifact that no source produced
+still passed, and the message said "reproducible". Only CI's separate
+`git diff --exit-code -- packages/stow-s3/dist` noticed. If you ever change that
+target, check that it still fails when you deliberately install a stale artifact
+— a check you have never seen fail is not known to work.
 
 ## The ratchets, and what they mean for your diff
 
