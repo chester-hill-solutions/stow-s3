@@ -24,10 +24,16 @@ disposable and delete themselves when closed.
 
 ## Install
 
-The npm and PyPI install surfaces are **not yet usable**. The `v0.2.0` release
-partially published the main npm package to GitHub Packages, but failed before
-publishing its platform packages. PyPI was not published. The Go module is
-published.
+The npm and PyPI install surfaces are **not yet announced as usable**. The
+`v0.2.0` release published the main package and all four platform carriers to
+public npmjs, then failed before the GitHub Release, so there is no release page
+and no `SHA256SUMS.txt` to verify a download against, and PyPI was not published.
+A clean install of `0.2.0` from npm has not been verified end to end. The Go
+module is published.
+
+Platforms: Linux and macOS, on x64 and arm64. There is no Windows build, and the
+workspace backend needs an advisory file lock that Windows does not provide, so
+it refuses there rather than guessing. On Windows, use WSL.
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
@@ -38,13 +44,12 @@ then `export STOW_BIN="$PWD/bin/stow-s3"`, then `npm install && npm run build`
 in `packages/stow-s3` (TypeScript) or `pip install -e
 "packages/stow-s3-py[boto3]"` (Python). A published package carries its own
 binary and does not need `STOW_BIN`.
-The next candidate, **0.3.0**, targets public npmjs distribution for the main
-package and all four platform carriers. It has **not yet been published**.
-Publisher setup, live-provider gates and anonymous exact-version installation
-must pass before availability is announced. The partial 0.2.0 GitHub Packages
-release is historical; its existing artifacts remain immutable. For the new
-candidate, remove any old scope override to `npm.pkg.github.com`; it would send
-installation requests to the wrong registry.
+The next candidate, **0.3.0**, targets the same public npmjs distribution and has
+**not yet been published**. Publisher setup, live-provider gates and anonymous
+exact-version installation must pass before availability is announced. Published
+npm versions are immutable. For the new candidate, remove any old scope override
+to `npm.pkg.github.com`; it would send installation requests to the wrong
+registry.
 
 If the binary cannot be found or run, `stow-s3 doctor` reports which side is
 broken.

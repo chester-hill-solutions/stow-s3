@@ -53,19 +53,25 @@ See the portable workspace guide and experimental OpenCode example in the reposi
 
 ## Install
 
-**The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release
-partially published the main npm package to GitHub Packages, but failed before
-publishing its platform packages. PyPI was not published. Do not spend a turn
+**The npm and PyPI install surfaces are not yet announced as usable.** The
+`v0.2.0` release published the main package and all four platform carriers to
+public npmjs, then failed before the GitHub Release, so there is no release page
+and no `SHA256SUMS.txt` to verify a download against, and PyPI was not published.
+A clean install of `0.2.0` from npm has not been verified end to end, which is
+the reason to wait rather than a claim that it is broken. Do not spend a turn
 trying those install commands until a complete release is announced. The Go
 module *is* published and is the shortest path today.
 
-The next candidate, **0.3.0**, targets public npmjs distribution for the main
-package and all four platform carriers. It has **not yet been published**.
-Publisher setup, live-provider gates and anonymous exact-version installation
-must pass before availability is announced. The partial 0.2.0 GitHub Packages
-release is historical; its existing artifacts remain immutable. For the new
-candidate, remove any old scope override to `npm.pkg.github.com`; it would send
-installation requests to the wrong registry.
+**Platforms: Linux and macOS, on x64 and arm64.** There is no Windows build, and
+the workspace backend needs an advisory file lock that Windows does not provide,
+so it refuses there rather than guessing. On Windows, use WSL.
+
+The next candidate, **0.3.0**, targets the same public npmjs distribution and has
+**not yet been published**. Publisher setup, live-provider gates and anonymous
+exact-version installation must pass before availability is announced. Published
+npm versions are immutable. For the new candidate, remove any old scope override
+to `npm.pkg.github.com`; it would send installation requests to the wrong
+registry.
 
 Go, published and installable now:
 
