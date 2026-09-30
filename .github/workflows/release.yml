@@ -289,17 +289,37 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-      # npm is required; PyPI is not. The step further down named "Record PyPI
-      # publishing status" is written for PyPI being off — it records the skip and
-      # prints a warning in the release notes — so requiring it here made that
-      # step unreachable and turned an optional target into a release blocker.
-      # docs/foss-readiness-plan.md A3 tracks configuring the trusted publisher,
-      # and until that is done this gate must not be what stops a release.
+      # npm is required to publish; PyPI is not. The step further down named
+      # "Record PyPI publishing status" is written for PyPI being off — it records
+      # the skip and prints a warning in the release notes — so requiring it here
+      # made that step unreachable and turned an optional target into a release
+      # blocker. docs/foss-readiness-plan.md A3 tracks configuring the trusted
+      # publisher, and until that is done this gate must not be what stops a
+      # release.
+      #
+      # A rehearsal reports an unready account and carries on, because the point
+      # of a rehearsal is to validate everything after this step, and stopping
+      # here would leave the tail unexercised for a reason that is a settings
+      # change rather than a defect. A tagged release still refuses to publish.
       - name: Require release account setup
+        id: account
         env:
           NPM_READY: ${{ vars.STOW_NPM_PUBLISH_READY }}
+          REHEARSING: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          test "$NPM_READY" = true || { echo 'Configure npmjs scope ownership and OIDC/token publishing, then set STOW_NPM_PUBLISH_READY=true'; exit 1; }
+          set -euo pipefail
+          if [[ "$NPM_READY" == "true" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          message='Configure npmjs scope ownership and OIDC/token publishing, then set STOW_NPM_PUBLISH_READY=true'
+          if [[ "$REHEARSING" == "true" ]]; then
+            echo "::warning title=Release account not ready::$message A rehearsal reports this and continues; a tagged release stops here."
+          else
+            echo "$message" >&2
+            exit 1
+          fi
       - name: Verify npm package artifact
         shell: bash
         run: |
@@ -514,14 +534,22 @@ jobs:
       # evidence are all conditioned on a tag, and a rehearsal skips them.
       - name: State what this run did and did not do
         if: github.event_name == 'workflow_dispatch'
+        env:
+          ACCOUNT_READY: ${{ steps.account.outputs.ready }}
         run: |
-          cat <<'MSG'
-          ::notice title=Rehearsal only::This run published nothing. npm, PyPI and the
-          GitHub Release were not touched, and no live-provider evidence was
-          required, because a dry run cannot produce a verified receipt. What it
-          did verify: the build, standards and generated-output gates, the four
-          platform builds and wheels, the packed npm consumer on each target, the
-          npm and wheel artifact contents, the publish preflight, and the checksum
-          manifest. Cutting a tag runs the same job with those steps enabled.
-          MSG
+          if [[ "$ACCOUNT_READY" == "true" ]]; then
+            account="STOW_NPM_PUBLISH_READY is set."
+          else
+            account="STOW_NPM_PUBLISH_READY is NOT set, so a tagged release would stop at the account gate before publishing anything."
+          fi
+          {
+            echo "::notice title=Rehearsal only::This run published nothing. npm, PyPI and the"
+            echo "GitHub Release were not touched, and no live-provider evidence was"
+            echo "required, because a dry run cannot produce a verified receipt. What it"
+            echo "did verify: the build, standards and generated-output gates, the four"
+            echo "platform builds and wheels, the packed npm consumer on each target, the"
+            echo "npm and wheel artifact contents, the publish preflight, and the checksum"
+            echo "manifest. Cutting a tag runs the same job with the publishing steps"
+            echo "enabled. Note: $account"
+          } >> "$GITHUB_STEP_SUMMARY"
 
