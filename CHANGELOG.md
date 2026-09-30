@@ -2,6 +2,20 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- Fixed the workspace store reporting "no such object" for every read on a host
+  that cannot open a regular file without following a link. `internal/rooted`
+  returns a stated refusal on such a host; the read path turned it into a missing
+  object and the listing walk dropped the file, so a workspace read as empty and
+  its objects as deleted. Both now surface the refusal, and `rooted.Supported()`
+  lets a caller ask in advance. No behaviour changes on a host that can open
+  safely; Windows workspace runtime remains uncertified, as
+  `docs/workspace-contract.md` records.
+- The Windows filesystem CI job now tests what Windows supports. It runs
+  `internal/storage/fs` in full and skips `internal/storage/workspace`, naming the
+  missing capability, instead of asserting a support the contract declines; the
+  job was failing for that reason before this change. The remaining Windows
+  failures are unchanged and pre-existing.
+
 - Exposed existing conditional object writes through public Go and WASM/TypeScript
   embedded options. Stale content-ETag and expected-absence checks refuse without
   replacing stored bytes. Older bridges and undeclared custom stores refuse

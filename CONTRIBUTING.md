@@ -35,8 +35,33 @@ for the client suite. `make test-python` bootstraps its own virtualenv.
 `make standards` is the gate. It is the whole check list — formatting, vet, the
 race suite, the maintainability ratchets, the coverage floor, the version and
 install-surface gates, the documentation gates, the script tests, the TypeScript
-standards, and the generated-output check. Run it before you open a pull
-request; CI runs exactly that target.
+standards, and the generated-output check. Run it before you open a pull request.
+
+One caveat, and it is the thing most likely to surprise you: CI runs
+`make standards` *and* one check the local target cannot make. The three
+TypeScript corpus jobs regenerate the package output and then run
+`git diff --exit-code -- packages/stow-s3/dist`, and that diff is the only thing
+comparing the committed WASM artifact against a fresh build. `make
+check-generated` cannot do it: it digests `dist`, rebuilds, and digests again,
+and the first digest is already taken after `npm run build` has copied the newly
+built binary over the committed one. It proves the build is idempotent, not that
+the committed bytes are current. A stale artifact passes every local gate and
+fails three required checks.
+
+So if your change reaches `pkg/stow` — which most Go changes do — the committed
+`packages/stow-s3/dist/stow-runtime.wasm` is stale, and nothing local will tell
+you. The WASM runtime links 14 packages of this tree, including
+`internal/rooted`, `internal/storage/workspace`, `internal/storage/fs` and
+`internal/capacity`, so almost any Go change moves that binary. And the build is
+**not** byte-reproducible across host OS: same Go version, same `make build-wasm`,
+same `-trimpath`, but darwin/arm64 and linux/amd64 emit different bytes. The
+committed artifact has to be a Linux build, and a macOS developer cannot produce
+one at all.
+
+Until that is settled, regenerating it means building on a Linux runner and
+committing the result. A throwaway pull request whose only job is
+`make build-wasm` on `ubuntu-latest` is the cheapest way. Do not commit a macOS
+build to quiet the diff — it fails the same check, and for the same reason.
 
 ## The ratchets, and what they mean for your diff
 
