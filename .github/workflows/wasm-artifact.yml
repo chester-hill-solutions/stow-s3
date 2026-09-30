@@ -1,0 +1,28 @@
+name: Wasm artifact (throwaway)
+
+# Temporary: produces the GOOS=js GOARCH=wasm artifact on a Linux runner so it
+# can be committed. The build is not byte-reproducible across host OS, so a
+# developer on macOS cannot produce the committed artifact. This file exists
+# only on this branch and never reaches main.
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: .go-version
+      - name: Build the WASM artifact on Linux
+        run: make build-wasm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wasm-linux
+          path: bin/stow-runtime.wasm
