@@ -17,6 +17,7 @@ function fixture(overrides = {}) {
     storage,
     quiesce: overrides.quiesce ?? (async () => { calls.push("quiesce"); }),
     writeProgress: async () => { calls.push("progress"); },
+    snapshot: overrides.snapshot,
   });
   return { controller, calls, state: () => state };
 }
@@ -76,6 +77,50 @@ test("failed execution is saved but further work requires explicit decision", as
   const f = fixture({ agent: { execute: async () => ({ outcome: "failed" }) } });
   assert.equal((await f.controller.turn("work")).phase, "saved");
   await assert.rejects(f.controller.turn("next"), /execution failed/);
+});
+
+test("successful no-op is saved with review evidence and closes admission", async () => {
+  const f = fixture({ snapshot: async () => ({ "repo/notes.md": "unchanged" }) });
+  const result = await f.controller.turn("append a summary");
+  assert.equal(result.phase, "saved");
+  assert.equal(result.terminal, "succeeded");
+  assert.equal(result.reviewRequired, true);
+  assert.deepEqual(result.changes, { added: [], modified: [], deleted: [] });
+  assert.ok(f.calls.includes("progress"));
+  await assert.rejects(f.controller.turn("next"), /explicit caller review/);
+  assert.equal(f.calls.filter(x => x === "execute").length, 1);
+});
+
+test("task changes are measured after quiescence and before caller progress", async () => {
+  let snapshots = 0;
+  const f = fixture({ snapshot: async () => {
+    snapshots++;
+    if (snapshots === 2) {
+      assert.ok(f.calls.includes("quiesce"));
+      assert.ok(!f.calls.includes("progress"));
+    }
+    return { "repo/notes.md": snapshots === 1 ? "before" : "after" };
+  } });
+  const result = await f.controller.turn("append a summary");
+  assert.equal(result.reviewRequired, false);
+  assert.deepEqual(result.changes.modified, ["repo/notes.md"]);
+});
+
+test("no-op evidence survives lost capture replies and receipt-only recovery", async () => {
+  let committed = false;
+  const f = fixture({ snapshot: async () => ({}), storage: {
+    resolve: async () => {
+      if (committed) throw new Error("reply unavailable");
+      return { outcome: "not_found" };
+    },
+    capture: async () => { committed = true; throw new Error("lost reply"); },
+  } });
+  await assert.rejects(f.controller.turn("work"), /Could not establish/);
+  f.controller.storage.resolve = async () => ({ outcome: "committed", checkpoint: { id: "original" } });
+  const recovered = await f.controller.recover();
+  assert.equal(recovered.lastCheckpointID, "original");
+  assert.equal(recovered.reviewRequired, true);
+  await assert.rejects(f.controller.turn("next"), /explicit caller review/);
 });
 
 test("unknown execution and untracked writers cannot be called saved", async () => {

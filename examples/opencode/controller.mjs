@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
+import { workspaceChanges } from "./workspace-files.mjs";
 
 export class SaveFailure extends Error {
   constructor(message, details = {}) {
@@ -46,9 +47,9 @@ export async function saveWithRetry(storage, request, { signal, attempts = 3, ra
 
 export class TurnController {
   #busy = false;
-  constructor({ store, agent, storage, quiesce, writeProgress, deadlineMs }) {
+  constructor({ store, agent, storage, quiesce, writeProgress, snapshot, deadlineMs }) {
     if (!Number.isFinite(deadlineMs) || deadlineMs <= 0) throw new Error("a positive save deadline is required");
-    Object.assign(this, { store, agent, storage, quiesce, writeProgress, deadlineMs });
+    Object.assign(this, { store, agent, storage, quiesce, writeProgress, snapshot, deadlineMs });
   }
 
   async turn(prompt, { signal = new AbortController().signal } = {}) {
@@ -57,17 +58,22 @@ export class TurnController {
     try {
       const previous = await this.store.load();
       if (previous && previous.phase !== "saved") throw new Error("previous turn needs explicit recovery; admission is closed");
+      if (previous?.reviewRequired) throw new Error("previous turn changed no task files; explicit caller review required");
       if (previous?.terminal !== "succeeded") {
         if (previous) throw new Error("previous execution failed; explicit caller decision required");
       }
       const intent = { version: 1, phase: "running", prompt, turnID: randomUUID(), lastCheckpointID: previous?.lastCheckpointID };
       await this.store.save(intent);
+      const before = await this.snapshot?.(signal);
       const terminal = await this.agent.execute(prompt, intent.turnID, signal);
       if (!["succeeded", "failed", "interrupted"].includes(terminal.outcome)) throw new Error("missing terminal execution outcome");
       await this.quiesce(signal);
-      await this.writeProgress({ prompt, terminal, previous: intent.lastCheckpointID });
+      const changes = before === undefined ? undefined : workspaceChanges(before, await this.snapshot(signal));
+      const reviewRequired = terminal.outcome === "succeeded" && changes !== undefined &&
+        changes.added.length + changes.modified.length + changes.deleted.length === 0;
+      await this.writeProgress({ prompt, terminal, previous: intent.lastCheckpointID, changes, reviewRequired });
       const request = { key: randomUUID(), parent: intent.lastCheckpointID };
-      const pending = { ...intent, phase: "saving", terminal: terminal.outcome, sessionID: terminal.sessionID, messageID: terminal.messageID, request };
+      const pending = { ...intent, phase: "saving", terminal: terminal.outcome, sessionID: terminal.sessionID, messageID: terminal.messageID, changes, reviewRequired, request };
       await this.store.save(pending);
       const deadline = AbortSignal.any([signal, AbortSignal.timeout(this.deadlineMs)]);
       const saved = await saveWithRetry(this.storage, request, { signal: deadline });

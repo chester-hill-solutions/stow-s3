@@ -245,15 +245,9 @@ func Defined() []Operation {
 // unless it is added here with a reason, so the gap is a decision on record
 // rather than an omission.
 //
-// The set is a floor, not a target. Each entry below is work already specified;
-// see docs/architecture/environment-implementation.md R-101 and ADR 0010.
-//
-//   - EnvironmentDestroy is enforced by M1.3, which is reopened: its criteria were
-//     closed as met while three of four failed and the fourth was vacuous, because
-//     the principal-to-authority translator the criterion assumed does not exist.
-//   - EnvironmentPromote is not implemented at all. It is deleted rather than
-//     wired until M4.3, because a permission for an operation with no
-//     implementation is a claim about behaviour that does not exist.
+// EnvironmentDestroy is checked by Workspace.Destroy before lifecycle or
+// registry mutation. EnvironmentPromote remains exported for compatibility,
+// but has no operation to enforce; its disposition remains an explicit gap.
 //
 // UpstreamRead and UpstreamWrite were in this list until the run-through adapter
 // started consulting the authority on reads, writes and the retry funnel, and they
@@ -265,8 +259,7 @@ func Defined() []Operation {
 // internal/runthrough/authority_gate_test.go; what was wrong was this file's
 // description of it.
 var Ungated = map[Operation]string{
-	EnvironmentDestroy: "M1.3 is reopened; enforced there, not here",
-	EnvironmentPromote: "M4.3. Deleted rather than wired until it has an implementation",
+	EnvironmentPromote: "No promotion operation is implemented; exported compatibility vocabulary grants no behavior",
 }
 
 // UngatedOperations lists the defined operations with no enforcement site, in the

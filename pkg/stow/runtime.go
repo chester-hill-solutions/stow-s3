@@ -9,7 +9,8 @@ import (
 )
 
 type Runtime struct {
-	inner *stowruntime.Instance
+	inner                        *stowruntime.Instance
+	conditionalWritesUnsupported bool
 }
 
 // Open returns a runtime over the store named by options.
@@ -47,7 +48,10 @@ func Open(options Options) (*Runtime, error) {
 	if err != nil {
 		return nil, mapError(err)
 	}
-	return &Runtime{inner: instance}, nil
+	return &Runtime{
+		inner:                        instance,
+		conditionalWritesUnsupported: options.Store != nil && !supportsConditionalWrites(options.Store),
+	}, nil
 }
 
 func (r *Runtime) CreateBucket(ctx context.Context, name string) error {
@@ -74,6 +78,8 @@ func (r *Runtime) PutObject(ctx context.Context, bucket, key string, data []byte
 	object, err := r.inner.PutObject(ctx, bucket, key, data, stowruntime.PutOptions{
 		ContentType: options.ContentType,
 		Metadata:    storage.CloneMetadata(options.Metadata),
+		IfMatch:     options.IfMatch,
+		IfNoneMatch: options.IfNoneMatch,
 	})
 	if err != nil {
 		return Object{}, mapError(err)
@@ -145,6 +151,8 @@ func (r *Runtime) Usage() Usage {
 // Authority reports what this environment permits.
 func (r *Runtime) Authority() Authority { return r.inner.Authority() }
 
+func (r *Runtime) SupportsConditionalWrites() bool { return !r.conditionalWritesUnsupported }
+
 func (r *Runtime) Capabilities() Capabilities {
 	capabilities := r.inner.Capabilities()
 	return Capabilities{
@@ -155,6 +163,10 @@ func (r *Runtime) Capabilities() Capabilities {
 		Persistent:          capabilities.Persistent,
 		Multipart:           capabilities.Multipart,
 		Upstream:            capabilities.Upstream,
+		ConditionalWrites:   r.SupportsConditionalWrites(),
+		GuardedSaves:        r.SupportsGuardedSaves(),
+		DurableSaveRequests: r.SupportsDurableSaveRequests(),
+		RecoveryHolds:       r.SupportsRecoveryHolds(),
 	}
 }
 
@@ -183,6 +195,8 @@ func mapError(err error) error {
 		return ErrInvalidBucket
 	case errors.Is(err, storage.ErrInvalidKey):
 		return ErrInvalidKey
+	case errors.Is(err, storage.ErrPreconditionFailed):
+		return ErrPreconditionFailed
 	default:
 		return err
 	}

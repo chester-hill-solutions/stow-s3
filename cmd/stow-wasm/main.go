@@ -25,6 +25,8 @@ type request struct {
 	Data              string            `json:"data"`
 	ContentType       string            `json:"contentType"`
 	Metadata          map[string]string `json:"metadata"`
+	IfMatch           string            `json:"ifMatch"`
+	IfNoneMatch       string            `json:"ifNoneMatch"`
 	List              stow.ListOptions  `json:"list"`
 	SourceBucket      string            `json:"sourceBucket"`
 	SourceKey         string            `json:"sourceKey"`
@@ -50,12 +52,13 @@ type openResult struct {
 }
 
 type capabilitiesResult struct {
-	Backend    stow.Backend `json:"backend"`
-	MaxBytes   int64        `json:"maxBytes"`
-	MaxObjects int64        `json:"maxObjects"`
-	Persistent bool         `json:"persistent"`
-	Multipart  bool         `json:"multipart"`
-	Upstream   bool         `json:"upstream"`
+	Backend           stow.Backend `json:"backend"`
+	MaxBytes          int64        `json:"maxBytes"`
+	MaxObjects        int64        `json:"maxObjects"`
+	Persistent        bool         `json:"persistent"`
+	Multipart         bool         `json:"multipart"`
+	Upstream          bool         `json:"upstream"`
+	ConditionalWrites bool         `json:"conditionalWrites"`
 }
 
 type objectResult struct {
@@ -160,12 +163,13 @@ func openRuntime(req request) (json.RawMessage, error) {
 
 func capabilities(value stow.Capabilities) capabilitiesResult {
 	return capabilitiesResult{
-		Backend:    value.Backend,
-		MaxBytes:   value.MaxBytes,
-		MaxObjects: value.MaxObjects,
-		Persistent: value.Persistent,
-		Multipart:  value.Multipart,
-		Upstream:   value.Upstream,
+		Backend:           value.Backend,
+		MaxBytes:          value.MaxBytes,
+		MaxObjects:        value.MaxObjects,
+		Persistent:        value.Persistent,
+		Multipart:         value.Multipart,
+		Upstream:          value.Upstream,
+		ConditionalWrites: value.ConditionalWrites,
 	}
 }
 
@@ -196,6 +200,10 @@ func errorResponse(err error) response {
 		code = "invalid_bucket"
 	case errors.Is(err, stow.ErrInvalidKey):
 		code = "invalid_key"
+	case errors.Is(err, stow.ErrPreconditionFailed):
+		code = "precondition_failed"
+	case errors.Is(err, stow.ErrConditionalWritesUnsupported):
+		code = "conditional_write_unsupported"
 	}
 	return failure(code, err.Error())
 }

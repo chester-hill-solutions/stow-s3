@@ -57,6 +57,9 @@ func (s *FilesystemStore) CreateMultipartUpload(_ context.Context, bucket, key s
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return nil, err
+	}
 
 	if _, err := os.Stat(s.bucketDir(bucket)); os.IsNotExist(err) {
 		return nil, storage.ErrBucketNotFound
@@ -104,6 +107,9 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return nil, err
+	}
 
 	dir := s.multipartDir(uploadID)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -132,6 +138,9 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return nil, err
+	}
 
 	dir := s.multipartDir(uploadID)
 	manifest, err := readMultipartManifest(dir)
@@ -199,6 +208,11 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		ChecksumValue:     meta.ChecksumValue,
 		LastModified:      meta.LastModified,
 	}
+	// A completion publishes the object like any other write, so a held object
+	// refuses it before assembly rather than after.
+	if err := s.checkRecoveryHoldsLocked(manifest.Bucket, manifest.Key); err != nil {
+		return nil, err
+	}
 	if err := s.writeObject(manifest.Bucket, manifest.Key, record); err != nil {
 		return nil, err
 	}
@@ -251,6 +265,9 @@ func (s *FilesystemStore) ListMultipartUploads(_ context.Context, bucket string,
 func (s *FilesystemStore) AbortMultipartUpload(_ context.Context, uploadID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return err
+	}
 
 	dir := s.multipartDir(uploadID)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {

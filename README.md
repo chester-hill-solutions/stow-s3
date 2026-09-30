@@ -20,7 +20,11 @@ is not a permanent online allowlist.
 **A workspace** is a real directory with declared inputs, durable identity,
 verified file or portable object checkpoints, diffs and explicit handoff/adoption.
 The embedded API and optional `workspace serve` loopback S3 facade share one runtime.
-The ordinary S3 filesystem backend has a different object-record layout.
+The ordinary S3 filesystem backend has a different object-record layout. Native
+Go callers can also use [guarded reads/saves and retained filesystem receipts](docs/portable-workspace-usage.md#managed-saves-in-native-storage)
+to refuse stale edits and resolve a lost reply after reopening an owned store.
+Agents can use the same core through the fixed-bucket
+[native object MCP profile](docs/portable-workspace-usage.md#native-object-mcp).
 
 The storage service can hold upstream credentials while callers use generated
 local credentials. This does not isolate arbitrary host processes or their
@@ -29,8 +33,9 @@ network access. Workspace/API quotas do not hard-limit direct filesystem writes.
 **Current development goal:** complete one installable prepare → use → checkpoint
 → inspect → transfer → reopen workflow, then exercise it through a thin existing
 agent-runner integration. An experimental OpenCode caller gates each prompt on a confirmed save;
-real-model and cross-host pilot acceptance remain open. See the
-[canonical storage plan](docs/plan.md) and [milestone](docs/portable-agent-workspace-goal.md).
+local meaningful real-model continuation has passed; real interruption, second-host
+and Linux acceptance remain open. See the [consolidated storage plan](docs/storage-foundation-plan.md)
+and [later model evidence](docs/opencode-receiver-remediation-2026-09-29.md).
 The [planning index](docs/planning-index.md) identifies current documents and records
 where unfinished work from superseded plans now belongs.
 
@@ -39,6 +44,11 @@ request reconciliation, diff and optional handoff tools. Start with the
 [portable workspace guide](docs/portable-workspace-usage.md) and
 [OpenCode caller example](examples/opencode/README.md). MCP tool access alone does
 not guarantee a checkpoint after every turn; the caller owns that admission barrier.
+
+The [multiplayer lab](examples/multiplayer-prototype/README.md) explores three agents
+sharing a directory, selective file-change reports and checkpoint recovery. Run
+`make multiplayer` for the offline demo or `make multiplayer-real` for the local
+OpenCode model. This is a throwaway caller experiment above the storage primitive.
 
 ## This is not version control
 
@@ -179,11 +189,11 @@ stow-s3 workspace diff --from cp_a4424a293103532626d4a507 \
 }
 ```
 
-To transfer the work, write a handoff with `--archive`. The archive can be adopted
-into a new workspace on a supported destination. **Known issue at the assessed
-revision:** the writer records an absolute archive path; moving both files currently
-requires making that reference relative to the handoff document. The canonical plan
-prioritizes removing this workaround. See the [assessment](docs/product-assessment-2026-09-29.md).
+To transfer the work, write a handoff with `--archive`. The file-output handoff
+records its archive reference relative to the document; move both unchanged and
+adopt into a new workspace on a supported destination. The earlier relocation
+workaround is fixed in the development tree. See [current usage](docs/portable-workspace-usage.md)
+and [implementation evidence](docs/implementation-2026-09-29.md).
 
 ```sh
 stow-s3 workspace handoff \

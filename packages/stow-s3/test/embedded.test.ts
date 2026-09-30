@@ -23,6 +23,7 @@ class FakeHost implements EmbeddedHost {
             persistent: false,
             multipart: false,
             upstream: false,
+            conditionalWrites: true,
           },
         });
       case "getObject":
@@ -75,7 +76,11 @@ describe("EmbeddedStow", () => {
     stow.putObject("assets", "hello.txt", new TextEncoder().encode("hello"), {
       contentType: "text/plain",
       metadata: { owner: "test" },
+      ifMatch: '"original"',
+      ifNoneMatch: '"excluded"',
     });
+    assert.equal(host.requests[2]?.ifMatch, '"original"');
+    assert.equal(host.requests[2]?.ifNoneMatch, '"excluded"');
     const object = stow.getObject("assets", "hello.txt");
     assert.deepEqual(object.data, new TextEncoder().encode("hello"));
     assert.equal(object.metadata?.owner, "test");
@@ -87,6 +92,26 @@ describe("EmbeddedStow", () => {
     stow.close();
     stow.close();
     assert.throws(() => stow.getObject("assets", "hello.txt"), EmbeddedStowError);
+  });
+
+  it("refuses write conditions on an older host without sending a write", () => {
+    const requests: Record<string, unknown>[] = [];
+    const host: EmbeddedHost = {
+      call: (request) => {
+        requests.push(JSON.parse(request) as Record<string, unknown>);
+        return response({ handle: 7, capabilities: {} });
+      },
+    };
+    const stow = EmbeddedStow.open(host);
+    for (const options of [{ ifMatch: "old" }, { ifNoneMatch: "*" }]) {
+      assert.throws(
+        () => stow.putObject("assets", "hello.txt", new Uint8Array(), options),
+        (error: unknown) => hasCode(error, "conditional_write_unsupported"),
+      );
+    }
+    assert.equal(requests.length, 1);
+    stow.putObject("assets", "hello.txt", new Uint8Array());
+    assert.equal(requests.length, 2);
   });
 
   it("rejects protocol version mismatches", () => {

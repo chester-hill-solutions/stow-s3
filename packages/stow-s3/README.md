@@ -64,8 +64,19 @@ const embedded = EmbeddedStow.open(wasmHost, { maxBytes: 10_000_000 });
 embedded.createBucket("assets");
 embedded.putObject("assets", "hello.txt", new TextEncoder().encode("hello"));
 const object = embedded.getObject("assets", "hello.txt");
+embedded.putObject("assets", "hello.txt", new TextEncoder().encode("edited"), {
+  ifMatch: object.etag,
+});
 embedded.close();
 ```
+
+Conditional writes can use `ifMatch: object.etag` to refuse a stale content save or
+`ifNoneMatch: "*"` to create only when absent. A refused condition throws
+`EmbeddedStowError` with code `precondition_failed` and preserves the stored object.
+Omitted/empty conditions keep unconditional behavior. These are content-ETag checks,
+not checks of metadata, complete revision history or the inputs used to produce data.
+The bridge advertises `capabilities().conditionalWrites`; conditional requests to an
+older host without this capability refuse with `conditional_write_unsupported`.
 
 The Node package includes the tested WASM asset and a ready-made host loader:
 

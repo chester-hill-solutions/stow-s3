@@ -2,6 +2,23 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- Exposed existing conditional object writes through public Go and WASM/TypeScript
+  embedded options. Stale content-ETag and expected-absence checks refuse without
+  replacing stored bytes. Older bridges and undeclared custom stores refuse
+  conditional requests instead of silently ignoring them.
+- Added native memory and owned macOS/Linux filesystem managed read/save with
+  resource-bound observations, generation/content/metadata comparison, explicit
+  absence/replacement and effect outcomes. Filesystem request keys retain bounded
+  receipts for lost-reply/reopen resolution and pause mutations on unresolved
+  publication. Workspace/custom stores and in-process wrappers remain unqualified; resource
+  ACLs and declared-input readiness remain planned.
+- Added a separate native object MCP profile with guarded reads, keyed saves,
+  retained resolution and observation release. The host fixes the bucket and
+  authority; expiring observations and bounded calls/payloads preserve core save
+  outcomes. Existing workspace MCP tools keep their profile.
+- Fixed owned workspace deletion bypassing `EnvironmentDestroy`, including after
+  Close. Restricted handles preserve their workspace; failed constructor rollback
+  still removes only the unfinished workspace it created.
 - Added portable v2 checkpoints for files, logical S3 objects, empty buckets,
   metadata, relative working directory and Git provenance. Existing file-only v1
   remains readable; enhanced deltas are explicitly refused.

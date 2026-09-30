@@ -42,7 +42,7 @@ func RestoreCheckpoint(registryDir, id string, options WorkspaceOptions) (*Works
 	}
 	if manifest.Version == portableCheckpointVersion {
 		if err := checkSeedLimits(restored, checkpointManifestBytes(manifest), int64(len(manifest.Objects))); err != nil {
-			_ = restored.Destroy(context.Background())
+			_ = restored.discardUncommitted()
 			return nil, err
 		}
 		err = restorePortableObjects(restored, directory, manifest)
@@ -50,7 +50,7 @@ func RestoreCheckpoint(registryDir, id string, options WorkspaceOptions) (*Works
 		err = restoreCheckpointModes(restored, manifest)
 	}
 	if err != nil {
-		_ = restored.Destroy(context.Background())
+		_ = restored.discardUncommitted()
 		return nil, err
 	}
 	return restored, nil

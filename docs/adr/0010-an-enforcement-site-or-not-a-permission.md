@@ -1,7 +1,7 @@
 ---
----
 status: accepted
-decision_digest: fd14bf057a343e4d
+amended: 2026-09-29
+decision_digest: 52083046bc13d413
 ---
 
 # A permission that is not checked is not a permission
@@ -10,7 +10,9 @@ This ADR records that milestone M1.3 was closed on incomplete acceptance
 criteria, reopens it, and decides two questions it left open: what to do about
 the four `authority.Operation` values that are defined, exported, and consulted
 nowhere, and whether `pkg/stow` keeps a pluggable-store seam that has no
-implementor.
+implementor at the time of acceptance. Sections 4–5 were revised on
+2026-09-29 against the retained API and conditional-write evidence; the enforcement
+decisions remain in force.
 
 It does not change ADR 0002, ADR 0003, or ADR 0005. It makes ADR 0005's consent
 boundary enforceable, which is the thing ADR 0005 assumed and the code did not
@@ -133,30 +135,49 @@ permission set that can grow without anyone noticing is the disease. The
 refusal matrix becomes one table driving both the runtime and S3 test suites,
 which are today two hand-maintained copies.
 
-### 4. `pkg/stow` has no pluggable store
+### 4. `pkg/stow` retains a qualified pluggable store
 
-`Options.Store`, `stow.Store`, and `storeAdapter` are removed, with roughly 200
-lines of `pkg/stow/store.go`. The public API keeps `Open(Options{…})` and
-`OpenWorkspace`.
+**Amended 2026-09-29.** Keep `Options.Store`, `stow.Store` and `storeAdapter`.
+The current API already exposes the seam. A public `Runtime` implements it, and
+[conditional-write tests](../../pkg/stow/conditional_put_test.go) exercise a
+supplied runtime through the adapter, including stale-write refusal, expected
+absence and competing writers. Removal is no longer the best response to the
+original fidelity concern.
 
-The seam has no implementor. Its only production consumer is the wasm bridge,
-where a JSON-decoded `stow.Options` cannot populate a Go interface field — so the
-one surface that would want a pluggable store cannot reach it. And the adapter is
-lossy where the internal one is faithful: it forwards two of six `PutOptions`
-fields, so conditional writes and checksums are inexpressible through the public
-embedded API while the S3 surface has 370 lines of tests for them. It answers
-`HeadBucket` by scanning every bucket, because the public interface has no
-`HeadBucket` — a cost imposed by a missing method rather than by the operation.
+Qualification is per operation and coordination profile. A custom store must
+positively declare `ConditionalWriteStore.SupportsConditionalWrites()` before
+conditional puts are forwarded. An undeclared store refuses conditional writes
+before consuming the body; ordinary unconditional calls remain compatible.
+Multipart retains its separate complete optional interface. A declaration is an
+implementor's obligation, not proof of durability, cross-process coordination,
+resource ACLs or managed version guards.
 
-Keeping a pluggable store is a reasonable thing to want. It is not reasonable to
-want it *and* ship it unimplemented, lossy, and quadratic on a live route.
+The original objections still bound what this seam promises. JSON-decoded WASM
+options cannot inject a Go interface. The public adapter does not expose the full
+internal checksum/list vocabulary, and `HeadBucket` scans `ListBuckets`; there is
+no O(1) claim. Content ETags do not guard metadata-only changes or replacement
+history. New stronger operations must have enforced refusal and separate evidence;
+they cannot infer qualification from a backend label or conditional-write support.
+The [shared admission contract](../storage-admission-contract.md) defines those
+boundaries before guarded/scoped work extends them.
 
-### 5. Removing the seam is a breaking change and is versioned as one
+At initial acceptance, removal was selected because the seam had no identified
+implementor and silently lost conditional/checksum options. That historical
+rationale is retained here; positive capability refusal and a tested implementor
+now provide a compatible remedy for conditional writes. Other gaps remain explicit.
 
-Conditional writes, checksums, `Delimiter`, `StartAfter`, and O(1) `HeadBucket`
-become unreachable through `pkg/stow` rather than silently absent. A caller
-depending on any of them gets a compile error, which is the correct outcome, but
-it is a major-version change for the module and the changelog says so.
+### 5. Compatibility follows actual changes to the seam
+
+**Amended 2026-09-29.** The removal and corresponding major-version change from
+the original decision are withdrawn. Existing `Store` implementations remain valid
+for legacy operations; no mandatory method is added to qualify them for a stronger
+operation. Additive optional interfaces and capability fields must refuse unsupported
+requests rather than silently weaken them. Legacy unconditional S3/public puts keep
+their existing meaning.
+
+If a later change removes a public symbol or adds a required interface method,
+record and version that actual breaking change at that time. Retaining this seam
+neither repairs every adapter gap nor certifies all S3 semantics.
 
 ### 6. The verification substrate is a prerequisite, not a follow-up
 
@@ -192,4 +213,9 @@ decides whether the repository passes is inside the repository's own gates.
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+- 2026-09-29: Revised sections 4–5 to retain the existing custom-store seam with
+  per-operation qualification and explicit unsupported refusal. The public Runtime
+  implementor and conditional adapter tests provide the evidence missing at original
+  acceptance. Withdrawn the planned removal/major-version change; sections 1–3 and 6
+  retain their enforcement decisions. Corrected the duplicate frontmatter delimiter.
+  W01 in the consolidated plan owns the shared admission contract.

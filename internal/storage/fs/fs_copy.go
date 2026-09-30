@@ -36,6 +36,9 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return nil, err
+	}
 
 	if err := s.requireBucket(req.SourceBucket); err != nil {
 		return nil, err
@@ -69,6 +72,11 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 		ChecksumAlgorithm: record.ChecksumAlgorithm,
 		ChecksumValue:     record.ChecksumValue,
 		LastModified:      time.Now().UTC(),
+	}
+	// The destination of a copy is an object write, so a hold on it refuses the
+	// copy rather than letting other bytes take its place.
+	if err := s.checkRecoveryHoldsLocked(req.DestBucket, req.DestKey); err != nil {
+		return nil, err
 	}
 	if err := s.writeObject(req.DestBucket, req.DestKey, copied); err != nil {
 		return nil, err

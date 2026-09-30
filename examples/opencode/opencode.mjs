@@ -1,8 +1,8 @@
 export class OpenCodeAgent {
-  constructor({ endpoint, password, model, directory, sessionStore, fetchImpl = fetch }) {
+  constructor({ endpoint, password, model, directory, progressPath = "STOW_PROGRESS.json", notesPath = "STOW_NOTES.md", title = "Stow checkpoint pilot", permissions, onAdmitted, sessionStore, fetchImpl = fetch }) {
     const url = new URL(endpoint);
     if (!["127.0.0.1", "[::1]"].includes(url.hostname) || url.protocol !== "http:" || url.username || url.password) throw new Error("pilot requires a dedicated loopback OpenCode endpoint");
-    Object.assign(this, { endpoint: url.origin, password, model, directory, sessionStore, fetchImpl });
+    Object.assign(this, { endpoint: url.origin, password, model, directory, progressPath, notesPath, title, permissions, onAdmitted, sessionStore, fetchImpl });
   }
 
   async request(path, method, body, signal) {
@@ -22,8 +22,8 @@ export class OpenCodeAgent {
     const existing = await this.sessionStore.load();
     if (existing) return existing.id;
     const created = await this.request("/api/session", "POST", {
-      title: "Stow checkpoint pilot", location: { directory: this.directory }, model: this.model,
-      permissions: [{ action: "*", resource: "*", effect: "deny" },
+      title: this.title, location: { directory: this.directory }, model: this.model,
+      permissions: this.permissions ?? [{ action: "*", resource: "*", effect: "deny" },
         ...["read", "edit", "write", "glob", "grep"].map(action => ({ action, resource: "*", effect: "allow" }))],
     }, signal);
     if (typeof created?.data?.id !== "string") throw new Error("OpenCode did not create a session");
@@ -36,9 +36,10 @@ export class OpenCodeAgent {
     const messageID = `msg_${turnID.replaceAll("-", "")}`;
     const admitted = await this.request(`/api/session/${sessionID}/prompt`, "POST", {
       id: messageID,
-      text: `${prompt}\n\nRead STOW_NOTES.md if present. Before finishing, write progress and remaining work to STOW_NOTES.md. Use file tools only; do not start processes, background work or subagents.`,
+      text: `${prompt}\n\nRead ${this.notesPath} and ${this.progressPath} if present. Before finishing, write progress and remaining work to ${this.notesPath}. Use file tools only; do not start processes, background work or subagents.`,
     }, signal);
     if (admitted?.data?.id !== messageID) throw new Error("OpenCode admission identity mismatch");
+    await this.onAdmitted?.({ sessionID, messageID, created: admitted.data.time?.created });
     await this.request(`/api/experimental/session/${sessionID}/wait`, "POST", undefined, signal);
     const terminal = await this.request(`/api/session/${sessionID}`, "GET", undefined, signal);
     const value = terminal?.data;

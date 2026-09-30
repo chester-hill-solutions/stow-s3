@@ -107,7 +107,7 @@ func discardOnFailure(resultErr error, ws *Workspace, committed *bool) error {
 		return resultErr
 	}
 	closeErr := ws.Close()
-	destroyErr := ws.Destroy(context.Background())
+	destroyErr := ws.discardUncommitted()
 	if closeErr != nil || destroyErr != nil {
 		return fmt.Errorf("%w (cleanup close: %v; cleanup destroy: %v)", resultErr, closeErr, destroyErr)
 	}

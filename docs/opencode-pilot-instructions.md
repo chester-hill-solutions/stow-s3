@@ -29,6 +29,10 @@ INSTALL
   or report the installation blocker. Do not bypass the version check.
 - Obtain the provider/model and environment credential for the isolated caller.
   Its dedicated HOME/XDG directories do not inherit the current OpenCode login.
+  For Zen use providerID "opencode", an unprefixed model id and OPENCODE_API_KEY.
+  Follow the README's dedicated provider-config/catalog/auth paths when needed.
+  Other OPENCODE_* runtime/config overrides are stripped. Use fresh caller state
+  after upgrading the example; preserve prior failed state for diagnosis.
   Ask for missing access, including a Linux host, without exposing secrets.
 
 RUN
@@ -39,11 +43,18 @@ must use the documented file-only profile.
 Prepare a disposable workspace outside this repo with a small CSV and task brief.
 Keep registry and caller state outside the workspace. Use the README's manifest,
 caller.json and prompt-file instructions.
+Confirm Stow returns the intended working_directory; the caller must start its
+OpenCode process and session there, including when task files live under repo/.
 
 Turn 1: inspect the data, write an initial analysis and remaining work in
 STOW_NOTES.md. Confirm checkpoint publication before admitting turn 2.
 Turn 2: improve the analysis and save again. Independently verify the results and
 checkpoint contents; saved state does not prove the task result is correct.
+Check the returned task-file changes and independently hash the requested outputs.
+A successful no-op must save with reviewRequired: true, exit 2, and block another
+prompt. Caller-written STOW_PROGRESS.json must not count as agent work.
+Run the opt-in real-model regression using STOW_REAL_MODEL_CONFIG and
+make test-agent-real. A skipped model test does not satisfy this gate.
 
 RECOVER
 Use controlled fault injection to lose a successful capture reply. Show recovery
@@ -53,7 +64,8 @@ writers stopped before recovery/cleanup; preserve unresolved state for diagnosis
 
 TRANSFER
 Export an unedited handoff bundle. On Linux, install/build the same Stow commit
-and the matching Linux OpenCode executable. Adopt into a fresh registry and start
+and the matching Linux OpenCode executable. Adopt into a fresh registry with a
+root that does not exist (create only its parent), then start
 an agent with no prior chat. Have it read saved notes/progress and finish the task.
 Verify it needs no sender filesystem paths or sender storage credentials.
 If Linux access is unavailable, report this stage blocked, not locally simulated.

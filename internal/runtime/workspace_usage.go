@@ -5,18 +5,18 @@ import (
 	"math"
 )
 
-// RefreshUsage reconciles direct workspace writes while excluding runtime mutations.
+// RefreshUsage reconciles managed persistent records while excluding runtime mutations.
 func (i *Instance) RefreshUsage(ctx context.Context) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkOpen(); err != nil {
 		return err
 	}
-	return i.refreshWorkspaceUsageLocked(ctx)
+	return i.refreshPersistentUsageLocked(ctx)
 }
 
-func (i *Instance) refreshWorkspaceUsageLocked(ctx context.Context) error {
-	if i.options.Backend != BackendWorkspace {
+func (i *Instance) refreshPersistentUsageLocked(ctx context.Context) error {
+	if i.options.Backend != BackendWorkspace && !(i.options.Backend == BackendFilesystem && i.saveRequestsLocked()) {
 		return nil
 	}
 	options := i.options
@@ -38,5 +38,5 @@ func (i *Instance) checkMutationLocked(ctx context.Context) error {
 	if err := i.checkOpen(); err != nil {
 		return err
 	}
-	return i.refreshWorkspaceUsageLocked(ctx)
+	return i.refreshPersistentUsageLocked(ctx)
 }

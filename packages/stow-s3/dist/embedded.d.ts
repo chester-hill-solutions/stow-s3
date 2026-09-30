@@ -28,6 +28,8 @@ export interface EmbeddedCapabilities {
     persistent: boolean;
     multipart: boolean;
     upstream: boolean;
+    /** Absent on older bridges, which cannot safely accept write conditions. */
+    conditionalWrites?: boolean;
 }
 export interface EmbeddedUsage {
     bytes: number;
@@ -50,6 +52,10 @@ export interface EmbeddedObject {
 export interface EmbeddedPutOptions {
     contentType?: string;
     metadata?: Record<string, string>;
+    /** Save only while the object's content ETag matches; empty means unset. */
+    ifMatch?: string;
+    /** Use "*" to create only when absent; empty means unset. */
+    ifNoneMatch?: string;
 }
 export interface EmbeddedListOptions {
     prefix?: string;

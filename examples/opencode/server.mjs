@@ -6,9 +6,13 @@ import { stopChild } from "../../packages/stow-s3/dist/start.js";
 export async function startOpenCode({ binary, stateDir, directory, signal }) {
   const env = { ...process.env };
   for (const name of Object.keys(env)) {
-    if (name.startsWith("OPENCODE_")) delete env[name];
+    // Keep the Zen provider credential; strip ambient OpenCode runtime/config
+    // overrides so this remains a dedicated caller-controlled process.
+    if (name.startsWith("OPENCODE_") && name !== "OPENCODE_API_KEY") delete env[name];
   }
-  const paths = { HOME: "home", XDG_DATA_HOME: "data", XDG_CONFIG_HOME: "config", XDG_CACHE_HOME: "cache", XDG_STATE_HOME: "state" };
+  // Align HOME and XDG so provider setup has one location even when a pinned
+  // build resolves some paths directly from HOME.
+  const paths = { HOME: "home", XDG_DATA_HOME: "home/.local/share", XDG_CONFIG_HOME: "home/.config", XDG_CACHE_HOME: "home/.cache", XDG_STATE_HOME: "home/.local/state" };
   for (const [name, leaf] of Object.entries(paths)) {
     env[name] = join(stateDir, "opencode", leaf);
     await mkdir(env[name], { recursive: true, mode: 0o700 });

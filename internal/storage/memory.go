@@ -174,6 +174,9 @@ func (s *MemoryStore) PutObject(_ context.Context, bucket, key string, body io.R
 	if err := CheckWritePreconditions(opts, existing); err != nil {
 		return nil, err
 	}
+	if err := checkMemoryGuard(opts.Guard, b.objects[key]); err != nil {
+		return nil, err
+	}
 	versionID, err := NewRecordVersion()
 	if err != nil {
 		return nil, err

@@ -24,6 +24,9 @@ func (r *Registry) ForgetCheckpoints(workspaceID string) error {
 }
 
 func (r *Registry) forgetCheckpoints(workspaceID string) error {
+	if err := r.CheckWorkspaceRecoveryHolds(workspaceID); err != nil {
+		return err
+	}
 	root := filepath.Join(r.dir, "checkpoints")
 	entries, err := os.ReadDir(root)
 	if os.IsNotExist(err) {
@@ -64,13 +67,16 @@ func (r *Registry) RemoveWorkspace(id string, remove func() error) error {
 		return err
 	}
 	defer lock.Release()
+	if err := r.CheckWorkspaceRecoveryHolds(id); err != nil {
+		return err
+	}
 	if err := remove(); err != nil {
 		return err
 	}
 	if err := r.forgetCheckpoints(id); err != nil {
 		return err
 	}
-	return r.Forget(id)
+	return r.forget(id)
 }
 
 // ValidWorkspaceID accepts portable identifiers without path syntax.

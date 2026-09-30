@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	storage "github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -14,6 +15,8 @@ const objectRecordVersion = 1
 type objectRecord struct {
 	Version       int    `json:"version"`
 	RecordVersion string `json:"record_version,omitempty"`
+	SaveRequest   string `json:"save_request,omitempty"`
+	SaveMeaning   string `json:"save_meaning,omitempty"`
 	// Key is set for digest-addressed records, whose pathname cannot be
 	// reversed into the original key. Legacy flat and sharded records omit it.
 	Key               string            `json:"key,omitempty"`
@@ -27,6 +30,13 @@ type objectRecord struct {
 }
 
 func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) error {
+	if err := s.settleSaveLocked(); err != nil {
+		return err
+	}
+	return s.writeObjectRaw(bucket, key, record)
+}
+
+func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord) error {
 	path := s.objectPath(bucket, key)
 	if s.isBoundedObjectPath(bucket, path) {
 		if existing, err := readObjectRecord(path); err == nil && existing.Key != key {
@@ -38,7 +48,13 @@ func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) e
 	} else {
 		record.Key = ""
 	}
-	return writeObjectRecord(path, record)
+	if err := writeObjectRecord(path, record); err != nil {
+		return err
+	}
+	if s.SupportsGuardedWrites() {
+		return syncSaveAncestors(filepath.Dir(path))
+	}
+	return nil
 }
 
 func (s *FilesystemStore) readObject(bucket, key string) (objectRecord, error) {

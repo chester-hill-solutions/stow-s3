@@ -8,8 +8,19 @@ Stow owns preparation, storage access, workspace identity, checkpoints, inspecti
 transfer, retention and cleanup. Callers own execution, agent turns, quiescing writers,
 model access and sandbox enforcement. A turn-boundary adapter may request a checkpoint;
 Stow does not need an executor or attempt framework to provide that operation.
+Durable workspace notifications are an accepted core extension under
+[ADR 0015](docs/adr/0015-durable-workspace-notifications.md): Stow will detect workspace
+file changes and retain reports, parent-path subscriptions and acknowledgements, with
+optional explicitly configured webhook delivery. Callers track agent reads and choose
+readiness and reactions. The
+notification API is planned, not shipped.
+Resource-scoped ACLs and authenticated encrypted object/cache persistence are accepted
+core additions under [ADR 0016](docs/adr/0016-scoped-access-encrypted-cache.md), with
+native, Cloudflare Workers and Railway qualification planned. Hosts supply keys and
+persistence; ordinary working directories remain plaintext. These APIs/profiles are
+proposed, not implemented or certified.
 [ADR 0014](docs/adr/0014-storage-product-caller-owned-execution.md) records this scope;
-[the canonical plan](docs/plan.md) schedules it. The [planning index](docs/planning-index.md)
+[the consolidated plan](docs/storage-foundation-plan.md) schedules it. The [planning index](docs/planning-index.md)
 records retired plans and the disposition of their remaining work.
 
 Scoped S3 sessions own a temporary storage server. Durable workspaces outlive a handle.
@@ -100,3 +111,83 @@ An explicit, named-destination move of a workspace to a real bucket. Never a sid
 ### Handoff Reference
 
 A value that names a workspace — its session ID and the capability to open it — rather than a credential. Distinct from the in-process-tree environment mapping, which does carry the generated secret key.
+
+### Recovery State
+
+Saved progress and pending storage or notification operations that accompany captured data so unfinished work can be reconciled and continued. It does not itself authorize those operations.
+
+### Recovery Activation
+
+An explicit decision to continue selected imported pending operations using the destination's current permissions. Receiving saved data is distinct from activating recovery.
+
+### Confirmed Takeover
+
+A transfer of responsibility for selected pending external operations after the source relinquishes it or shared ownership prevents the source from continuing. An unreachable source alone does not establish a takeover.
+
+### Recovery Set
+
+The data and saved records required to reconcile or continue selected unfinished operations. It is distinct from all contents of the workspace that originally held the work.
+
+### Recovery Protection
+
+A retention obligation that keeps a required recovery set available until its operations complete or are explicitly discarded. Ordinary expiry does not end this obligation.
+
+### Recovery Reserve
+
+Managed storage capacity held for recording completion, acknowledgement and cleanup of admitted work. It is distinct from the capacity needed to store transfer payloads.
+
+### Storage Namespace
+
+A trusted project or customer boundary grouping Stow resources for access policy and capacity accounting. It is supplied by the host's identity integration rather than established by a caller-provided label.
+
+### Namespace Budget
+
+The storage allowance for a storage namespace's managed working data, checkpoints and unfinished operations, including its recovery reserve. It is subject to the host's overall capacity limit.
+
+### Scoped Checkpoint
+
+A saved snapshot of an explicitly selected, authorized portion of a workspace, with completeness described within that declared scope. It does not represent the entire workspace or grant access to it.
+
+### Partial Recovery
+
+Recovery of verified, permitted data in which blocked pending operations and their dependents remain inactive while independent operations can be explicitly activated. It does not establish that the entire saved work has resumed.
+
+### Ready Report
+
+A caller's assertion that output at an identified immutable saved version is ready for use. It is distinct from an observation that mutable workspace content changed.
+
+### Change Detail
+
+An optional bounded comparison accompanying a ready report, describing changes between identified saved versions. It may contain a complete text diff or a changed-lines report and is not itself the saved output.
+
+### Comparison Base
+
+The saved version against which a ready report's output is compared, normally the previous ready version of the same output and scope. It is distinct from a recipient's last acknowledged version.
+
+### Delivery Acceptance
+
+A consumer's durable receipt of a notification, which ends delivery retries once recorded. It does not establish that the consumer has secured the referenced output.
+
+### Artifact Release
+
+A consumer's explicit acknowledgement that it has secured the saved output or no longer needs Stow's retained copy. It ends that consumer's retention obligation without ending other consumers' or operations' protections.
+
+### Namespace Key Lifecycle
+
+The independently managed active, rotated and revoked encryption-key versions for a storage namespace's protected data. It is distinct from the host provider that holds keys for one or more namespaces.
+
+### Recipient-Encrypted Handoff
+
+A scoped saved-data and recovery bundle explicitly encrypted for an authorized recipient's own keys. It is distinct from sharing the source's storage keys or granting permission to activate pending operations.
+
+### Recovery-Key Backup
+
+An explicitly prepared encrypted backup readable through a separately held recovery key when the original host or key provider is unavailable. It is distinct from storing the private recovery key inside the backup.
+
+### Guarded Save
+
+A managed save admitted only when its resource still matches the caller's expected read identity or expected absence. A stale expectation produces a conflict requiring the caller's next decision.
+
+### Input Basis
+
+The caller-declared resource versions used to produce an output. It distinguishes a readiness claim checked against current inputs from intentional use of a historical snapshot, without implying a complete record of reads.

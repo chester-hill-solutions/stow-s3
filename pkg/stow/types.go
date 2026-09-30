@@ -8,7 +8,8 @@ import (
 type Backend string
 
 const (
-	BackendMemory Backend = "memory"
+	BackendMemory     Backend = "memory"
+	BackendFilesystem Backend = "filesystem"
 	// BackendWorkspace is a directory a caller is working in, whose objects are
 	// real files. It is reported by Workspace.Capabilities and is reachable only
 	// through OpenWorkspace, never through Open: a workspace needs a directory,
@@ -23,16 +24,8 @@ type Options struct {
 	MaxObjects          int64
 	MaxMultipartUploads int64
 
-	// Store is where the objects live. A nil Store means the memory backend,
-	// which is what an embedded runtime has always done.
-	//
-	// Supplying one is what makes this composable: the architecture's claim that
-	// a different store is a one-line change was false of the public API until
-	// this field existed, because a filesystem or workspace runtime had to be
-	// reached through a second constructor. Set Backend to match the store — a
-	// Store on its own does not say whether it is durable, and the two answers
-	// are not the same: a caller that asked for durable bytes must not be handed
-	// volatile ones.
+	// Store supplies object storage; nil selects the built-in backend. Backend names
+	// describe the store but do not establish durability or optional capabilities.
 	Store Store
 
 	// Authority is what this environment permits, enforced below every
@@ -55,6 +48,10 @@ type Capabilities struct {
 	Persistent          bool
 	Multipart           bool
 	Upstream            bool
+	ConditionalWrites   bool
+	GuardedSaves        bool
+	DurableSaveRequests bool
+	RecoveryHolds       bool
 }
 
 type Usage struct {
@@ -87,6 +84,10 @@ type ObjectPage struct {
 type PutOptions struct {
 	ContentType string
 	Metadata    map[string]string
+	// Conditional writes use existing ETags; IfNoneMatch "*" requires absence.
+	// Supplied Stores opt in through ConditionalWriteStore.
+	IfMatch     string
+	IfNoneMatch string
 }
 
 type ListOptions struct {

@@ -70,9 +70,27 @@ by Stow's local pilot tests.
 
 The caller isolates OpenCode's HOME/XDG directories. An existing interactive
 OpenCode login is therefore not automatically available. Supply an explicit
-provider/model and the provider's documented environment credential to the caller
-process. Never put credentials in a prompt, fixture, notes, checkpoint or report.
-Ask for missing model access without printing existing credential values.
+provider/model and the provider's environment credential to the caller process.
+For Zen, use provider ID `opencode`, an unprefixed model ID such as `gpt-5-nano`,
+and `OPENCODE_API_KEY`. That named credential is forwarded; all other `OPENCODE_*`
+variables are removed so ambient runtime/config overrides do not enter this
+dedicated process. Other providers' environment credentials remain inherited.
+Never put credentials in a prompt, fixture, notes, checkpoint or report.
+
+HOME is `<stateDir>/opencode/home`. XDG data, config, cache and state are aligned
+with that home's `.local/share`, `.config`, `.cache` and `.local/state` directories.
+Provider configuration belongs at
+`<stateDir>/opencode/home/.config/opencode/opencode.jsonc`. If using a dedicated
+legacy `auth.json` instead of an environment credential, provision it at
+`<stateDir>/opencode/home/.local/share/opencode/auth.json`, with mode 600.
+Keep both outside the workspace. The caller does not import an interactive login.
+
+The receiving-host pilot also needed a matching model catalog at
+`<stateDir>/opencode/home/.cache/opencode/models.json` and an explicit provider
+configuration with its endpoint. Provision these for that binary when needed;
+an empty catalog or a double-prefixed model ID does not establish model access.
+Use a fresh caller state directory after upgrading this example: earlier runs
+used separate XDG directories. Retain failed state for diagnosis.
 
 ## Prepare and run
 
@@ -104,21 +122,43 @@ Create a caller configuration outside the workspace:
 }
 ```
 
-Supply model access through the caller's environment. Credentials are not included
-in the configuration, progress file or checkpoint. OpenCode gets its own home,
-configuration and data directories beneath `stateDir`; the example does not copy
-credentials from another OpenCode installation. The 30-second save deadline above
-is an example choice, not a measured universal default.
+Supply model access using the environment or dedicated files described above.
+Credentials are not included in the caller configuration, progress file or
+checkpoint. The 30-second save deadline above is an example choice, not a measured
+universal default.
 
 ```sh
 node examples/opencode/run.mjs caller.json prompt.txt
 ```
 
-The caller requests `STOW_NOTES.md` from the agent and writes `STOW_PROGRESS.json`
-with the prompt and terminal outcome. These ordinary files travel with the
-checkpoint. Full conversation restoration is not promised. On another host,
-adopt the handoff, create a new caller configuration for that workspace, and ask
-its agent to read those files before continuing.
+The caller starts OpenCode and creates its session in Stow's returned absolute
+`working_directory`. For a manifest with `working_directory: "repo"`, the agent
+works in `<root>/repo`, where it reads and writes `STOW_NOTES.md`. The caller writes
+`STOW_PROGRESS.json` at the workspace root and tells the agent its relative path
+(`../STOW_PROGRESS.json` in this example). Both files travel with the checkpoint.
+Full conversation restoration is not promised.
+
+On another host, adopt into a root that **does not exist**; only its parent may
+be created beforehand:
+
+```sh
+received_root="$HOME/stow-received"
+mkdir -p "$(dirname "$received_root")"
+./bin/stow-s3 workspace adopt --handoff /absolute/path/bundle/handoff.json \
+  --root "$received_root" --registry-dir /absolute/path/receiver-registry
+```
+
+Create a new caller configuration using the returned workspace ID and local
+registry, then ask its agent to continue from the saved notes and progress.
+
+The caller compares task file content and modes before execution and after
+quiescence, before writing its own progress. Results and progress include `changes`
+with `added`, `modified` and `deleted` workspace-relative paths. The scan ignores
+root `STOW_PROGRESS.json`, root `.stow` and Git internals, and uses the configured
+file/byte bounds. A successful turn with no task file change saves its checkpoint
+with `reviewRequired: true`, returns exit code **2**, and blocks further prompts
+until an explicit caller decision. Failed/interrupted saved turns also exit 2.
+File changes alone do not prove the requested task was completed correctly.
 
 ## Failure and recovery
 
@@ -134,8 +174,9 @@ node examples/opencode/run.mjs caller.json --recover
 Recovery only reconciles an existing capture; it cannot rerun an uncertain model
 prompt or silently save a later tree as the original turn. If no capture was
 started, or its retained receipt is absent, the caller must inspect the work and
-make an explicit recovery decision. A failed agent execution can have a successfully
-saved checkpoint; further work still requires an explicit caller decision. To
+make an explicit recovery decision. A failed agent execution or a successful no-op
+can have a successfully saved checkpoint; further work still requires an explicit
+caller decision. To
 start a deliberately new session, retain the old state directory for diagnosis
 and use a new state directory in a new configuration. After a crash, remove a
 stale `admission.lock` only after confirming its owner and OpenCode process stopped.
@@ -145,15 +186,55 @@ background writers. MCP tool calls by an agent are a separate best-effort mode.
 
 ## Evidence and tests
 
-`make test-agent` runs controller/adapter tests plus a native transfer test. The
+`make test-agent` runs controller/adapter tests plus native transfer tests. The
 native test simulates a lost reply, relocates an unedited bundle, removes the
 sender's test data, adopts into a fresh registry and continues a deterministic
-fixture. It runs on one host and uses no model.
+fixture. Another test runs the full caller against an OpenCode protocol fixture,
+adopts files under `repo/` after removing sender data, verifies both process/session
+directories, and checks saved no-op review and closed admission. These tests run
+on one host and use no model.
+
+`make test-agent` also discovers the opt-in real-model test, skipping it explicitly
+unless `STOW_REAL_MODEL_CONFIG` is set. To run the model gate, supply a profile
+outside the workspace containing `opencodeBinary`, `model`, `deadlineMs`,
+`maxBytes` and `maxFiles`, as in the caller configuration above. Optional
+`providerConfigPath` and `modelCatalogPath` select dedicated setup files to copy
+into the test's fresh isolated home; environment credentials are inherited using
+the rules above. The test supplies its own disposable workspace, registry, caller
+state and source-built Stow binary.
+
+For example (the credential stays in the caller environment):
+
+```json
+{
+  "opencodeBinary": "/absolute/path/opencode",
+  "model": { "providerID": "opencode", "id": "gpt-5-nano" },
+  "deadlineMs": 30000,
+  "maxBytes": 1048576,
+  "maxFiles": 100
+}
+```
+
+```sh
+STOW_REAL_MODEL_CONFIG=/absolute/path/model-profile.json make test-agent-real
+```
+
+This makes a provider call. It adopts a bundle containing a CSV and sender notes
+with the sender tree/registry removed, asks a fresh agent to write a result and
+append a marked handoff summary, independently checks the numbers and notes, and
+restores the saved checkpoint to verify those exact artifacts. Failed test state
+is retained outside the workspace for diagnosis. The required target fails on a
+missing profile; a skipped optional test is not a real-model pass.
 
 A separate local probe exercised the installed OpenCode 2.0.16 admission, wait,
 failed terminal outcome and file-only quiescence path with a nonexistent provider.
-Successful real-model continuation and a second physical host still require a
-pilot with model access. The example remains experimental until those pass.
+The receiving-host pilot verified adoption/integrity but exposed a wrong-directory
+successful no-op. After this fix, the local real-model gate passed with
+`opencode/space-bunny-free`, independently verifying the task outputs and restored
+checkpoint artifacts after removing sender data. Continuation on a second physical
+host, Linux runtime and real interruption/cleanup still require a pilot. The
+example remains experimental until those pass. See the
+[remediation record](../../docs/opencode-receiver-remediation-2026-09-29.md).
 
 ## Coordinating agent instructions
 

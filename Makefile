@@ -1,4 +1,4 @@
-.PHONY: test-agent build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated benchmark
+.PHONY: multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -74,6 +74,21 @@ test-wasm: build-wasm
 
 test-agent: build
 	node --test examples/opencode/*.test.mjs
+
+# Provider calls require an explicit caller profile; missing access cannot pass.
+test-agent-real: build
+	STOW_REQUIRE_REAL_MODEL=1 node --test examples/opencode/real-model.test.mjs
+
+# Throwaway caller-owned collaboration experiment, outside the storage API.
+multiplayer: build
+	node examples/multiplayer-prototype/run.mjs
+
+multiplayer-real: build
+	node examples/multiplayer-prototype/run.mjs --real
+
+multiplayer-check: build
+	node examples/multiplayer-prototype/run.mjs --headless
+	node examples/multiplayer-prototype/run.mjs --headless --interrupt-designer
 
 test-all: build test test-race test-conformance test-node test-python test-wasm test-agent
 

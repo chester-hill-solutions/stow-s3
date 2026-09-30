@@ -10,27 +10,8 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-// Store is where an environment's objects live.
-//
-// It exists so that Open is not limited to the memory backend. Until this
-// interface there was exactly one thing you could do with an embedded runtime —
-// open the memory one — and a filesystem or workspace runtime had to be reached
-// through a second constructor, which is the fork this removes. The architecture
-// calls for changing one line to get a different store:
-//
-//	Store: Filesystem(path)
-//
-// and that was not true of the public API. It is now.
-//
-// The surface is the object model and nothing else. It is deliberately not the
-// internal storage contract: no HTTP-shaped vocabulary, no io.Reader bodies, no
-// multipart. A caller supplying storage should not have to import an internal
-// package to do it, and should not have to implement nine multipart methods for
-// a store that will never serve one.
-//
-// Multipart is therefore an OPTIONAL interface, below. A store that implements
-// MultipartStore gets multipart; one that does not is told so through the
-// environment's capabilities rather than by failing an upload partway through.
+// Store supplies object storage to Open. Multipart and conditional writes require
+// separate optional interfaces; the backend label does not qualify those operations.
 type Store interface {
 	CreateBucket(ctx context.Context, name string) error
 	DeleteBucket(ctx context.Context, name string) error
@@ -45,6 +26,16 @@ type Store interface {
 	// Close releases the store. The runtime calls it when the environment is
 	// closed, so a store is closed exactly once regardless of who owns it.
 	Close() error
+}
+
+// ConditionalWriteStore opts into atomic IfMatch/IfNoneMatch enforcement.
+type ConditionalWriteStore interface {
+	SupportsConditionalWrites() bool
+}
+
+func supportsConditionalWrites(store Store) bool {
+	conditional, ok := store.(ConditionalWriteStore)
+	return ok && conditional.SupportsConditionalWrites()
 }
 
 // MultipartStore is the optional extension: a store that can stream an object
@@ -147,18 +138,8 @@ func (a *storeAdapter) DeleteBucket(ctx context.Context, name string) error {
 	return translate(a.store.DeleteBucket(ctx, name))
 }
 
-// translate maps the public sentinels onto the internal ones.
-//
-// A store that returns "no such key" as a fresh error looks exactly like a store
-// reporting a fault, and the runtime cannot tell them apart: its quota
-// pre-check asks for an object's size before writing it, and treats a miss as
-// zero and anything else as a failure. So the whole first write to a supplied
-// store fails for a reason that has nothing to do with writing.
-//
-// The translation is here rather than demanded of the caller because a caller
-// implementing Store should not have to know that internal/storage has sentinels
-// at all. The public vocabulary is the documented one: return ErrBucketNotFound
-// or ErrObjectNotFound from pkg/stow, and anything else is treated as a fault.
+// translate maps public sentinels onto internal ones, preserving missing-object
+// and conditional-write failures for runtime accounting and protocol handling.
 func translate(err error) error {
 	switch {
 	case err == nil:
@@ -175,6 +156,8 @@ func translate(err error) error {
 		return storage.ErrInvalidBucketName
 	case errors.Is(err, ErrInvalidKey):
 		return storage.ErrInvalidKey
+	case errors.Is(err, ErrPreconditionFailed):
+		return storage.ErrPreconditionFailed
 	default:
 		return err
 	}
@@ -209,6 +192,9 @@ func (a *storeAdapter) HeadBucket(ctx context.Context, name string) (*storage.Bu
 }
 
 func (a *storeAdapter) PutObject(ctx context.Context, bucket, key string, body io.Reader, options storage.PutOptions) (*storage.ObjectMeta, error) {
+	if (options.IfMatch != "" || options.IfNoneMatch != "") && !supportsConditionalWrites(a.store) {
+		return nil, ErrConditionalWritesUnsupported
+	}
 	data, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
@@ -216,6 +202,8 @@ func (a *storeAdapter) PutObject(ctx context.Context, bucket, key string, body i
 	object, err := a.store.PutObject(ctx, bucket, key, data, PutOptions{
 		ContentType: options.ContentType,
 		Metadata:    storage.CloneMetadata(options.Metadata),
+		IfMatch:     options.IfMatch,
+		IfNoneMatch: options.IfNoneMatch,
 	})
 	if err != nil {
 		return nil, translate(err)

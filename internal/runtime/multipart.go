@@ -22,7 +22,7 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 	if err := i.checkMultipartOpen(); err != nil {
 		return nil, err
 	}
-	if err := i.refreshWorkspaceUsageLocked(ctx); err != nil {
+	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
 		return nil, err
 	}
 	if err := i.admitMultipartUpload(); err != nil {
@@ -90,7 +90,7 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 	if err := i.checkMultipartOpen(); err != nil {
 		return nil, err
 	}
-	if err := i.refreshWorkspaceUsageLocked(ctx); err != nil {
+	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
 		return nil, err
 	}
 	usage, ok := i.multipart[uploadID]
@@ -154,7 +154,7 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if err := i.checkMultipartOpen(); err != nil {
 		return nil, err
 	}
-	if err := i.refreshWorkspaceUsageLocked(ctx); err != nil {
+	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
 		return nil, err
 	}
 	uploadUsage, ok := i.multipart[uploadID]
@@ -232,7 +232,7 @@ func (i *Instance) AbortMultipartUpload(ctx context.Context, uploadID string) er
 	if err := i.checkMultipartOpen(); err != nil {
 		return err
 	}
-	if err := i.refreshWorkspaceUsageLocked(ctx); err != nil {
+	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
 		return err
 	}
 	usage, ok := i.multipart[uploadID]

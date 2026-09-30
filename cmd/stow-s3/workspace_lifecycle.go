@@ -18,12 +18,7 @@ func destroyWorkspaceCommand(args []string) error {
 	if *id == "" {
 		return errors.New("workspace destroy requires --id")
 	}
-	ws, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: *registry}, *id)
-	if err != nil {
-		return err
-	}
-	defer ws.Close()
-	if err := ws.Destroy(context.Background()); err != nil {
+	if err := stow.DestroyRegisteredWorkspace(context.Background(), *registry, *id); err != nil {
 		return err
 	}
 	return writeWorkspaceJSON(struct {

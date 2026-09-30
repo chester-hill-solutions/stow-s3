@@ -51,6 +51,9 @@ export class EmbeddedStow {
         return result.buckets;
     }
     putObject(bucket, key, data, options = {}) {
+        if ((options.ifMatch || options.ifNoneMatch) && this.runtimeCapabilities.conditionalWrites !== true) {
+            throw new EmbeddedStowError("conditional_write_unsupported", "host does not support conditional writes");
+        }
         const result = this.invoke({
             op: "putObject",
             bucket,
@@ -58,6 +61,8 @@ export class EmbeddedStow {
             data: bytesToBase64(data),
             contentType: options.contentType,
             metadata: options.metadata,
+            ifMatch: options.ifMatch,
+            ifNoneMatch: options.ifNoneMatch,
         });
         return fromBridgeObject(result);
     }

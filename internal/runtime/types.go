@@ -158,6 +158,8 @@ type PutOptions struct {
 	ChecksumValue     string
 	IfMatch           string
 	IfNoneMatch       string
+	guard             *storage.WriteGuard
+	requestKey        string
 }
 
 type ObjectPage struct {

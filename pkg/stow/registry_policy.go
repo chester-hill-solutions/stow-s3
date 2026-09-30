@@ -129,6 +129,13 @@ func DeleteCheckpoint(ctx context.Context, registryDir, id string) error {
 	if _, err := LoadCheckpoint(registryDir, id); err != nil {
 		return err
 	}
+	registry, err := openRegistryReadOnly(registryDir, "")
+	if err != nil {
+		return err
+	}
+	if err := registry.CheckCheckpointRecoveryHolds(id); err != nil {
+		return err
+	}
 	if err := checkCheckpointDescendants(registryDir, id); err != nil {
 		return err
 	}

@@ -1,5 +1,7 @@
 # Storage product plan alignment
 
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. This earlier review/order is superseded. Preserve its dated findings as history; the new plan owns current status and acceptance. Former checklists, phase numbers and next steps below do not schedule work.
+
 ## 1. Plan validation summary
 
 **Verdict: Adjusted; storage scope aligned.** The user selected portable working

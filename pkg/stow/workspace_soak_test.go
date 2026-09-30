@@ -60,6 +60,7 @@ func createSoakWorkspaceTasks(t *testing.T, roundDir string, round, width int) [
 
 func prepareSoakWorkspaces(t *testing.T, tasks []soakWorkspaceTask, registry string, prepared []*stow.PreparedWorkspace) {
 	t.Helper()
+	granted := stow.ReadWrite().With(stow.EnvironmentDestroy)
 	prepareErrors := make([]error, len(tasks))
 	var workers sync.WaitGroup
 	for index, item := range tasks {
@@ -67,7 +68,7 @@ func prepareSoakWorkspaces(t *testing.T, tasks []soakWorkspaceTask, registry str
 		go func() {
 			defer workers.Done()
 			prepared[index], prepareErrors[index] = stow.PrepareWorkspace(stow.PrepareOptions{
-				WorkspaceOptions: stow.WorkspaceOptions{Dir: item.root, RegistryDir: registry},
+				WorkspaceOptions: stow.WorkspaceOptions{Dir: item.root, RegistryDir: registry, Authority: &granted},
 				Inputs:           []stow.WorkspaceInput{{Source: item.source, Destination: "marker.txt"}},
 			})
 		}()

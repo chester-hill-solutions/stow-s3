@@ -1,5 +1,7 @@
 # Pre-code discovery and engineering handover
 
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Historical source findings and P01–P16 handover are reconciled with later baseline implementation; they do not reopen completed defects. Former checklists, phase numbers and next steps below do not schedule work.
+
 > Historical pre-code record. Implementation followed on the same date; see
 > [current evidence](implementation-2026-09-29.md) and [the canonical plan](plan.md).
 > The findings and "not performed" statements below describe the discovery pass.

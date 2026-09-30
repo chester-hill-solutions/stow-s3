@@ -27,16 +27,35 @@ test("EmbeddedStow drives the real memory runtime", async () => {
   let embedded;
   try {
     embedded = EmbeddedStow.open(host, { maxBytes: 10, maxObjects: 2 });
+    assert.equal(embedded.capabilities().conditionalWrites, true);
     embedded.createBucket("assets");
     const put = embedded.putObject(
       "assets",
       "hello.txt",
       new TextEncoder().encode("hello"),
+      { ifNoneMatch: "*" },
     );
     assert.equal(put.size, 5);
 
     const got = embedded.getObject("assets", "hello.txt");
     assert.deepEqual(got.data, new TextEncoder().encode("hello"));
+    const otherRead = embedded.getObject("assets", "hello.txt");
+    embedded.putObject("assets", "hello.txt", new TextEncoder().encode("world"), {
+      ifMatch: `"${got.etag}"`,
+    });
+    for (const [key, options] of [
+      ["hello.txt", { ifMatch: otherRead.etag }],
+      ["hello.txt", { ifNoneMatch: "*" }],
+      ["missing.txt", { ifMatch: otherRead.etag }],
+    ]) {
+      assert.throws(
+        () => embedded.putObject("assets", key, new TextEncoder().encode("stale"), options),
+        (error) => error instanceof EmbeddedStowError && error.code === "precondition_failed",
+      );
+    }
+    assert.deepEqual(embedded.getObject("assets", "hello.txt").data, new TextEncoder().encode("world"));
+    assert.deepEqual(embedded.usage(), { bytes: 5, objects: 1 });
+    embedded.putObject("assets", "hello.txt", new TextEncoder().encode("hello"));
     const listed = embedded.listObjects("assets", { limit: 1 });
     assert.equal(listed.truncated, false);
     assert.deepEqual(listed.objects.map((object) => object.key), ["hello.txt"]);

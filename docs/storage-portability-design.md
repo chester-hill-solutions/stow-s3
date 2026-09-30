@@ -1,5 +1,7 @@
 # Storage portability: design rationale
 
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Baseline design is implemented locally; scoped extensions are W05. Retain illustrative pre-code shapes as rationale and use current usage/evidence for actual behavior. Former checklists, phase numbers and next steps below do not schedule work.
+
 **Status:** design implemented in the local 0.3.0 candidate on 2026-09-29, with
 remaining acceptance tracked by [the canonical plan](plan.md). The text below
 preserves pre-code reasoning and illustrative shapes. For actual names, defaults,

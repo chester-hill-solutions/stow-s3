@@ -1,5 +1,7 @@
 # Portable working storage: implementation evidence
 
+> **Evidence chronology:** this baseline record predates the [later successful local real-model continuation](opencode-receiver-remediation-2026-09-29.md) and [conditional-write slice](guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite). Its no-model/open-gate statements describe that earlier run. Current reconciled status is in the [consolidated plan](storage-foundation-plan.md); interruption/second-host/Linux and release/adoption gates remain open. Original test counts/hashes are not refreshed by consolidation.
+
 **Date:** 2026-09-29. **Candidate:** unpublished 0.3.0 development tree based on
 `5485a3640dbeeb368324d7e2a223bc17d7d23fc5` (see current Git history for exact base).
 Local runtime evidence is macOS arm64; Linux amd64 also compiles, without a Linux runtime claim. This report supplements the
@@ -126,3 +128,44 @@ Durability acknowledgement remains intact; a larger timeout is not a performance
 
 See [usage](portable-workspace-usage.md) and the
 [OpenCode example](../examples/opencode/README.md) for runnable entry points.
+
+
+## Foundation execution follow-up on 2026-09-29
+
+This addendum records the current uncommitted development tree on macOS arm64,
+following [W01/W02/W04](storage-foundation-plan.md). It does not refresh the earlier
+aggregate receipts or certify Linux, a second host, live providers or publication.
+
+- W01's decision/contract gate is complete: ADR 0010 §§4–5 visibly retain the
+  qualified custom-store seam, and [shared admission](storage-admission-contract.md)
+  defines identity, scope, comparison, effect/reason and profile boundaries.
+- The native memory managed-save slice adds `ReadForSave`, opaque exact-instance/
+  resource conditions, observed absence, explicit replacement, `SaveObject` and
+  effect outcomes. Generation/content/metadata/checksum comparison happens inside
+  the memory publication lock. Workspace/filesystem/custom adapters refuse.
+- Tests cover metadata-only and same-byte replacement, A→B→A, reset/recreation,
+  wrong bindings, concurrent writers, authority, quota, cancellation, closure and
+  multipart reservations. A paused-body test proves store comparison follows a
+  concurrent mutation; post-effect fault tests distinguish unknown from committed.
+  This is volatile single-runtime storage with no retained save receipt or ACL claim.
+- The legacy destroy bypass was reproduced on disposable restricted workspaces,
+  including after Close, then fixed before lifecycle or registry mutation. Private
+  constructor rollback preserves cleanup of newly created unfinished roots.
+- The first full gate caught CLI/soak cleanup relying on the old bypass. Explicit
+  host administration now uses `DestroyRegisteredWorkspace`, preserving capture
+  exclusion, live/adopted/protected-path refusal and durable identity checks, without
+  widening issued handles or rewriting actor policy. Disposable soak fixtures
+  explicitly request destroy authority. The compatibility regressions are repaired.
+
+Verification passed: focused Go races; `make standards` with existing installed
+npm dependencies reused; all four local `make test-conformance` profiles; 29 focused
+TypeScript embedded/browser/WASM-host and shared workspace tests; and 17 Python
+shared workspace tests. The real WASM runtime checks also passed. Native and WASM
+assets were rebuilt; generated package
+output was verified reproducible. No ratchet baseline was raised.
+
+A temporary Go cache and approved disposable local test-server access were used
+for the stable-tree verification.
+W02 persistent receipts/real managed-save consumers and W04 resource/background ACLs
+remain open. Ambient host administrative paths are outside restricted actor grants;
+`EnvironmentPromote` remains unused public vocabulary pending compatibility disposition.

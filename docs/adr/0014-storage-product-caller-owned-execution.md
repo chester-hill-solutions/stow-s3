@@ -1,6 +1,6 @@
 ---
 status: accepted
-decision_digest: 5396d8d5652eaa38
+decision_digest: d854ab40054f3815
 amended: 2026-09-29
 relates_to: 0004, 0007, 0008, 0009, 0010, 0013
 ---
@@ -62,15 +62,17 @@ by a demonstrated consumer need.
 
 ### Scope and ordering
 
-`docs/plan.md` is the single implementation work order. The storage milestone is
-defined in `docs/portable-agent-workspace-goal.md`; specialist documents contribute
-technical details but do not schedule parallel product expansions.
+`docs/storage-foundation-plan.md` is the single implementation work order, including
+the product milestone and foundation acceptance. `docs/plan.md` preserves the old
+entry point/anchors as a routing page. Specialist documents contribute retained
+design rationale but do not schedule parallel product expansions.
 
 The planning inventory and carry-forward register live in `docs/planning-index.md`.
 This scheduling decision supersedes older references to a “plan of record,”
 including ADR 0010's reference to the environment implementation plan. Retiring
 those work orders leaves their accepted enforcement and storage decisions in force;
-their remaining obligations are tracked by the current plan's S0–S4 item IDs.
+their remaining obligations are tracked by the current plan's W01–W22 items, with
+an explicit disposition map for all earlier S0–S4 IDs.
 
 The active work is storage correctness and compatibility, coherent directory/S3
 access, portable state, installability, and evidence from a thin caller-owned agent
@@ -96,3 +98,7 @@ API are outside the current plan. Arbitrary edge execution is not a storage clai
 - 2026-09-29: Reconciled all repository planning queues into the canonical plan;
   clarified that older scheduling references are historical while accepted
   enforcement/storage decisions remain in force.
+- 2026-09-29: At the user's request, consolidated the baseline, accepted foundation
+  extensions and remaining acceptance into docs/storage-foundation-plan.md. Retained
+  docs/plan.md as a routing page and old S0–S4 traceability; no storage/execution
+  boundary or implemented API changes follow from this scheduling amendment.

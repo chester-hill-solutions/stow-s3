@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/capacity"
 	storage "github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -22,17 +23,37 @@ const legacyMetaSuffix = ".stowmeta"
 // FilesystemStore persists object records on disk with atomic writes.
 // Each object is stored as one JSON record containing its bytes and metadata.
 type FilesystemStore struct {
-	dataDir   string
-	lockPath  string
-	lockID    string
-	mu        sync.RWMutex
-	closeOnce sync.Once
+	dataDir        string
+	lockPath       string
+	lockID         string
+	mu             sync.RWMutex
+	closeOnce      sync.Once
+	saves          saveState
+	saveFault      func(string) error
+	namespace      *capacity.Namespace
+	capacityActive bool
 }
 
 var _ storage.Store = (*FilesystemStore)(nil)
 
 // NewFilesystemStore creates a filesystem-backed store rooted at dataDir.
 func NewFilesystemStore(dataDir string) (*FilesystemStore, error) {
+	return newFilesystemStore(dataDir, nil)
+}
+
+func NewFilesystemStoreWithNamespace(dataDir string, namespace *capacity.Namespace) (*FilesystemStore, error) {
+	if namespace == nil {
+		return nil, capacity.ErrInvalid
+	}
+	return newFilesystemStore(dataDir, namespace)
+}
+
+func newFilesystemStore(dataDir string, namespace *capacity.Namespace) (*FilesystemStore, error) {
+	if namespace == nil {
+		if _, err := os.Lstat(filepath.Join(dataDir, ".capacity-binding.json")); !os.IsNotExist(err) {
+			return nil, capacity.ErrConflict
+		}
+	}
 	if err := os.MkdirAll(filepath.Join(dataDir, "buckets"), 0o755); err != nil {
 		return nil, err
 	}
@@ -52,8 +73,21 @@ func NewFilesystemStore(dataDir string) (*FilesystemStore, error) {
 	warnLegacyLayout(dataDir)
 	// Recorded last: the marker asserts stow has finished initializing the
 	// directory, so a client that sees it may treat the directory as resettable.
+	store := &FilesystemStore{dataDir: dataDir, lockPath: lockPath, lockID: lockID}
+	if store.SupportsGuardedWrites() {
+		if err := store.initializeSaves(); err != nil {
+			_ = releaseStoreLock(lockPath, lockID)
+			return nil, err
+		}
+	}
 	writeOwnerMarker(dataDir)
-	return &FilesystemStore{dataDir: dataDir, lockPath: lockPath, lockID: lockID}, nil
+	if namespace != nil {
+		if err := store.BindNamespace(namespace); err != nil {
+			_ = store.Close()
+			return nil, err
+		}
+	}
+	return store, nil
 }
 
 func removeStaleTemps(dataDir string) error {
@@ -177,6 +211,9 @@ func (s *FilesystemStore) CreateBucket(_ context.Context, name string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return err
+	}
 
 	dir := s.bucketDir(name)
 	if _, err := os.Stat(dir); err == nil {
@@ -195,6 +232,9 @@ func (s *FilesystemStore) DeleteBucket(_ context.Context, name string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return err
+	}
 
 	dir := s.bucketDir(name)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -258,64 +298,6 @@ func (s *FilesystemStore) ListBuckets(_ context.Context) ([]storage.BucketInfo, 
 	return out, nil
 }
 
-func (s *FilesystemStore) PutObject(_ context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (*storage.ObjectMeta, error) {
-	if err := storage.ValidateBucketName(bucket); err != nil {
-		return nil, err
-	}
-	if err := storage.ValidateKey(key); err != nil {
-		return nil, err
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if _, err := os.Stat(s.bucketDir(bucket)); os.IsNotExist(err) {
-		return nil, storage.ErrBucketNotFound
-	}
-	objPath := s.objectPath(bucket, key)
-	var existing *storage.ObjectMeta
-	if _, statErr := os.Stat(objPath); statErr == nil {
-		record, readErr := s.readObject(bucket, key)
-		if readErr != nil {
-			return nil, readErr
-		}
-		existingMeta := record.meta(bucket, key)
-		existing = &existingMeta
-	} else if !os.IsNotExist(statErr) {
-		return nil, statErr
-	}
-	if err := storage.CheckWritePreconditions(opts, existing); err != nil {
-		return nil, err
-	}
-
-	etag, data, err := storage.ETagForReader(body)
-	if err != nil {
-		return nil, err
-	}
-	if err := storage.VerifyChecksum(opts, data); err != nil {
-		return nil, err
-	}
-	recordVersion, err := storage.NewRecordVersion()
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now().UTC()
-	record := objectRecord{
-		RecordVersion:     recordVersion,
-		Data:              data,
-		ContentType:       opts.ContentType,
-		Metadata:          storage.CloneMetadata(opts.Metadata),
-		ETag:              etag,
-		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
-		ChecksumValue:     opts.ChecksumValue,
-		LastModified:      now,
-	}
-	if err := s.writeObject(bucket, key, record); err != nil {
-		return nil, err
-	}
-	meta := record.meta(bucket, key)
-	return &meta, nil
-}
-
 func (s *FilesystemStore) GetObject(_ context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
 	if err := storage.ValidateBucketName(bucket); err != nil {
 		return nil, nil, err
@@ -373,8 +355,14 @@ func (s *FilesystemStore) DeleteObject(_ context.Context, bucket, key string) er
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return err
+	}
 
 	if err := s.requireBucket(bucket); err != nil {
+		return err
+	}
+	if err := s.checkRecoveryHoldsLocked(bucket, key); err != nil {
 		return err
 	}
 	objPath := s.objectPath(bucket, key)
@@ -394,6 +382,9 @@ func (s *FilesystemStore) DeleteObjects(_ context.Context, bucket string, keys [
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.settleSaveLocked(); err != nil {
+		return nil, err
+	}
 
 	if err := s.requireBucket(bucket); err != nil {
 		return nil, err
@@ -402,6 +393,9 @@ func (s *FilesystemStore) DeleteObjects(_ context.Context, bucket string, keys [
 	var deleted []string
 	for _, key := range keys {
 		if err := storage.ValidateKey(key); err != nil {
+			return deleted, err
+		}
+		if err := s.checkRecoveryHoldsLocked(bucket, key); err != nil {
 			return deleted, err
 		}
 		objPath := s.objectPath(bucket, key)

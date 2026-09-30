@@ -14,6 +14,7 @@ import (
 )
 
 type CheckpointRequest struct {
+	Hold    *CheckpointHold   `json:"hold,omitempty"`
 	Key     string            `json:"request_key"`
 	Options CheckpointOptions `json:"options"`
 }
@@ -70,6 +71,9 @@ func checkpointRequestOperation(ctx context.Context, registryDir, workspaceID st
 	}
 	result, err := resolveCheckpointReceipt(ctx, registryDir, receipt)
 	if err != nil || result.Outcome == "committed" || !create {
+		if err == nil && result.Outcome == "committed" {
+			err = reconcileCheckpointHold(registryDir, receipt, request.Hold)
+		}
 		return result, err
 	}
 	target := captureTarget{
@@ -77,7 +81,7 @@ func checkpointRequestOperation(ctx context.Context, registryDir, workspaceID st
 		maxCheckpointBytes: reference.MaxCheckpointBytes, maxCheckpoints: reference.MaxCheckpoints,
 		receipt: &receipt,
 	}
-	info, err := captureCheckpoint(ctx, target, request.Options)
+	info, err := captureWithRecoveryHold(ctx, target, request)
 	if err != nil {
 		return CheckpointResult{}, classifyCheckpointError("capture", err)
 	}
@@ -92,7 +96,7 @@ func newCheckpointReceipt(workspaceID string, request CheckpointRequest) (checkp
 		return checkpointReceipt{}, fmt.Errorf("invalid checkpoint options")
 	}
 	requestHash := sha256.Sum256([]byte("stow-checkpoint-request-v1\x00" + workspaceID + "\x00" + request.Key))
-	options, err := json.Marshal(request.Options)
+	options, err := checkpointRequestMeaning(request)
 	if err != nil {
 		return checkpointReceipt{}, err
 	}
@@ -100,6 +104,21 @@ func newCheckpointReceipt(workspaceID string, request CheckpointRequest) (checkp
 	digest := hex.EncodeToString(requestHash[:])
 	return checkpointReceipt{Version: 1, CheckpointID: "cp_" + digest[:24], WorkspaceID: workspaceID,
 		RequestDigest: digest, OptionsDigest: hex.EncodeToString(optionsHash[:])}, nil
+}
+
+func checkpointRequestMeaning(request CheckpointRequest) ([]byte, error) {
+	if request.Hold == nil {
+		return json.Marshal(request.Options)
+	}
+	hold := *request.Hold
+	if !workspace.ValidWorkspaceID(hold.ID) || !workspace.ValidWorkspaceID(hold.Owner) {
+		return nil, fmt.Errorf("invalid capture recovery hold")
+	}
+	hold.ExpiresAt = hold.ExpiresAt.UTC()
+	return json.Marshal(struct {
+		Options CheckpointOptions `json:"options"`
+		Hold    CheckpointHold    `json:"hold"`
+	}{request.Options, hold})
 }
 
 func writeCheckpointReceipt(dir string, receipt *checkpointReceipt) error {

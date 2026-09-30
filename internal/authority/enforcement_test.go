@@ -72,10 +72,8 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 
 // enforcementMethods are the method names that count as consulting an authority.
 //
-// There are exactly two, and both are the chokepoint rather than a convention:
-// Authority.Allows is the predicate the whole package is built to make true, and
-// check is the runtime's wrapper that turns a refusal into an error. Anything
-// reaching a decision about an operation goes through one of them.
+// Authority.Allows is the predicate, Authority.Check turns its refusal into an
+// error, and check is the runtime wrapper. All are enforcement chokepoints.
 //
 // This set used to hold only "check", and the scan therefore reported UpstreamRead
 // and UpstreamWrite as unenforced after the run-through adapter had started gating
@@ -89,7 +87,7 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 // Narrowing to a named set is deliberate. Matching any call that merely mentions an
 // operation would also match a log statement or a slice, and would let a real gap
 // pass as enforced.
-var enforcementMethods = map[string]bool{"check": true, "Allows": true}
+var enforcementMethods = map[string]bool{"check": true, "Allows": true, "Check": true}
 
 // checkSitesInFile records every call of the form <recv>.m(authority.Op) in one
 // file, where m is one of enforcementMethods.
@@ -177,9 +175,8 @@ func TestEveryDefinedOperationIsEnforcedOrDeclaredUngated(t *testing.T) {
 }
 
 // The ungated list is the whole of what is known-unenforced, so it is worth
-// stating its size rather than letting it drift upward unnoticed. It is a floor:
-// M1.3 enforces EnvironmentDestroy and M4.3 removes EnvironmentPromote, at which
-// point this number changes and the change is a thing somebody decided.
+// stating its size rather than letting it drift upward unnoticed. Destroy is
+// gated; Promote has no implementation and remains a compatibility decision.
 func TestUngatedListIsTheKnownGap(t *testing.T) {
 	enforced := enforcedOperations(t)
 
@@ -188,7 +185,7 @@ func TestUngatedListIsTheKnownGap(t *testing.T) {
 		actual = append(actual, string(op))
 	}
 
-	want := []string{"environment.destroy", "environment.promote"}
+	want := []string{"environment.promote"}
 	if strings.Join(actual, ",") != strings.Join(want, ",") {
 		t.Fatalf("ungated operations = %v, want %v\n"+
 			"If a check site landed, remove the entry. If enforcement is still owed, the\n"+

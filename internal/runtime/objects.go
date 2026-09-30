@@ -26,6 +26,10 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 	if err := i.checkMutationLocked(ctx); err != nil {
 		return Object{}, err
 	}
+	return i.putObjectLocked(ctx, bucket, key, data, options)
+}
+
+func (i *Instance) putObjectLocked(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error) {
 
 	oldSize, exists, err := i.objectSize(ctx, bucket, key)
 	if err != nil {
@@ -49,6 +53,8 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 		ChecksumValue:     options.ChecksumValue,
 		IfMatch:           options.IfMatch,
 		IfNoneMatch:       options.IfNoneMatch,
+		Guard:             options.guard,
+		RequestKey:        options.requestKey,
 	})
 	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return Object{}, err

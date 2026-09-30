@@ -6,13 +6,14 @@ import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-function agentWithResponses(responses) {
+function agentWithResponses(responses, options = {}) {
   let stored;
   const calls = [];
   const agent = new OpenCodeAgent({
     endpoint: "http://127.0.0.1:9999", password: "test", model: { providerID: "test", id: "test" }, directory: "/work",
     sessionStore: { load: async () => stored, save: async value => { stored = value; } },
     fetchImpl: async (url, options) => { calls.push({ url, options }); return responses.shift(); },
+    ...options,
   });
   return { agent, calls };
 }
@@ -31,6 +32,26 @@ test("OpenCode waits and checks terminal outcome, not prompt acknowledgement", a
   assert.match(calls[3].url, /api\/session\/ses_test$/);
   const permissions = JSON.parse(calls[0].options.body).permissions;
   assert.deepEqual(permissions[0], { action: "*", resource: "*", effect: "deny" });
+});
+
+test("shared-workspace participants retain scoped permissions and separate progress", async () => {
+  const admissions = [];
+  const permissions = [{ action: "*", resource: "*", effect: "deny" }, { action: "edit", resource: "site/index.html", effect: "allow" }];
+  const { agent, calls } = agentWithResponses([
+    response({ data: { id: "ses_designer" } }),
+    response({ data: { id: "msg_turn", time: { created: 10 } } }),
+    new Response(null, { status: 204 }),
+    response({ data: { outcome: "succeeded", time: { idle: 11 } } }),
+  ], { title: "Designer", notesPath: "collaboration/notes/designer.md", progressPath: "collaboration/progress/designer.json",
+    permissions, onAdmitted: value => admissions.push(value) });
+  await agent.execute("apply report", "turn", new AbortController().signal);
+  const session = JSON.parse(calls[0].options.body);
+  assert.deepEqual(session.permissions, permissions);
+  assert.equal(session.title, "Designer");
+  const prompt = JSON.parse(calls[1].options.body).text;
+  assert.match(prompt, /collaboration\/notes\/designer\.md/);
+  assert.match(prompt, /collaboration\/progress\/designer\.json/);
+  assert.deepEqual(admissions, [{ sessionID: "ses_designer", messageID: "msg_turn", created: 10 }]);
 });
 
 test("stale outcome cannot close a new turn", async () => {

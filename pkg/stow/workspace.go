@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
@@ -267,12 +268,29 @@ func (w *Workspace) assertOpen() error {
 // and not stow's to delete. A refusal leaves the workspace intact and usable.
 //
 // A workspace that is already gone is not an error: destroy is idempotent.
+// The handle must permit EnvironmentDestroy, including after it is closed.
 func (w *Workspace) Destroy(ctx context.Context) error {
 	w.lifecycleMu.Lock()
 	defer w.lifecycleMu.Unlock()
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	if err := w.Runtime.Authority().Check(authority.EnvironmentDestroy); err != nil {
+		return err
+	}
+	return w.destroyLocked()
+}
+
+// discardUncommitted rolls back a constructor's newly created workspace before
+// it is returned to a caller. It shares ownership and exclusion checks with
+// Destroy, but cleanup does not consume the authority granted to the caller.
+func (w *Workspace) discardUncommitted() error {
+	w.lifecycleMu.Lock()
+	defer w.lifecycleMu.Unlock()
+	return w.destroyLocked()
+}
+
+func (w *Workspace) destroyLocked() error {
 	remove := func() error {
 		if w.store.IsOwned() {
 			if err := w.closeRuntimeLocked(); err != nil {

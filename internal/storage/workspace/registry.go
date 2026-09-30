@@ -197,6 +197,18 @@ func (r *Registry) Lookup(id string) (Entry, bool, error) {
 // Destroy converge on the same end state: the bytes go, and so does the name
 // they were filed under.
 func (r *Registry) Forget(id string) error {
+	lock, err := AcquireMutation(r.dir)
+	if err != nil {
+		return err
+	}
+	defer lock.Release()
+	return r.forget(id)
+}
+
+func (r *Registry) forget(id string) error {
+	if err := r.CheckWorkspaceRecoveryHolds(id); err != nil {
+		return err
+	}
 	if !ValidWorkspaceID(id) {
 		return fmt.Errorf("workspace: invalid workspace ID %q", id)
 	}

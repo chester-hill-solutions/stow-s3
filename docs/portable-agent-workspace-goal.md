@@ -1,5 +1,7 @@
 # Product goal: portable working storage for agents and tools
 
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Product workflow and definition of done are consolidated into the new plan, including W19/W21/W22. The milestone body is retained rationale, not another schedule. Former checklists, phase numbers and next steps below do not schedule work.
+
 **Status:** current storage milestone, aligned 2026-09-29. [The canonical plan](plan.md) owns implementation order; [ADR 0014](adr/0014-storage-product-caller-owned-execution.md) owns the product boundary. Earlier runner-oriented wording is superseded.
 
 This document defines success for S0–S4; it is not an independent backlog. The

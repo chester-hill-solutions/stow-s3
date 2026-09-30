@@ -58,6 +58,8 @@ func handlePutObject(ctx context.Context, instance *stow.Runtime, req request) (
 	object, err := instance.PutObject(ctx, req.Bucket, req.Key, data, stow.PutOptions{
 		ContentType: req.ContentType,
 		Metadata:    req.Metadata,
+		IfMatch:     req.IfMatch,
+		IfNoneMatch: req.IfNoneMatch,
 	})
 	if err != nil {
 		return nil, err

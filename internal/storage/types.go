@@ -32,6 +32,8 @@ type PutOptions struct {
 	ChecksumValue     string
 	IfMatch           string
 	IfNoneMatch       string
+	Guard             *WriteGuard
+	RequestKey        string
 }
 
 // ListOptions configures object listing.

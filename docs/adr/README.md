@@ -1,10 +1,10 @@
 # Architecture decision records
 
-Fourteen decisions, in the order they were taken. This file is the index: it is where
+Sixteen decisions, in the order they were taken. This file is the index: it is where
 to look to find out **what is in force**, and each ADR's own frontmatter is where to
 look for what it decided.
 
-Implementation ordering is owned by [the canonical plan](../plan.md), under ADR
+Implementation ordering is owned by [the consolidated plan](../storage-foundation-plan.md), under ADR
 0014. [The planning index](../planning-index.md) lists retired work orders; older
 ADR references to a plan of record retain their historical context only.
 
@@ -40,11 +40,13 @@ the way it is.
 | [0007](0007-workspace-is-the-default.md) | `accepted` | — | — |
 | [0008](0008-workspace-backend-real-files.md) | `accepted` | — | — |
 | [0009](0009-workspace-outlives-process.md) | `accepted` | — | — |
-| [0010](0010-an-enforcement-site-or-not-a-permission.md) | `accepted` | — | — |
+| [0010](0010-an-enforcement-site-or-not-a-permission.md) | `accepted` (amended 2026-09-29: qualified Store retained) | — | — |
 | [0011](0011-local-is-the-default-mode.md) | `accepted` | 0001 | — |
 | [0012](0012-run-through-serves-only-its-own-buckets.md) | `accepted` | — | — |
 | [0013](0013-task-session-attempt-artifact.md) | `narrowed` | — | 0014 (execution ownership and prerequisites) |
 | [0014](0014-storage-product-caller-owned-execution.md) | `accepted` | — | — |
+| [0015](0015-durable-workspace-notifications.md) | `accepted` | — | — |
+| [0016](0016-scoped-access-encrypted-cache.md) | `accepted` | — | — |
 
 ## The drift this index exists to fix
 

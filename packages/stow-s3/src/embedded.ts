@@ -31,6 +31,8 @@ export interface EmbeddedCapabilities {
   persistent: boolean;
   multipart: boolean;
   upstream: boolean;
+  /** Absent on older bridges, which cannot safely accept write conditions. */
+  conditionalWrites?: boolean;
 }
 
 export interface EmbeddedUsage {
@@ -57,6 +59,10 @@ export interface EmbeddedObject {
 export interface EmbeddedPutOptions {
   contentType?: string;
   metadata?: Record<string, string>;
+  /** Save only while the object's content ETag matches; empty means unset. */
+  ifMatch?: string;
+  /** Use "*" to create only when absent; empty means unset. */
+  ifNoneMatch?: string;
 }
 
 export interface EmbeddedListOptions {
@@ -152,6 +158,12 @@ export class EmbeddedStow {
     data: Uint8Array,
     options: EmbeddedPutOptions = {},
   ): EmbeddedObject {
+    if ((options.ifMatch || options.ifNoneMatch) && this.runtimeCapabilities.conditionalWrites !== true) {
+      throw new EmbeddedStowError(
+        "conditional_write_unsupported",
+        "host does not support conditional writes",
+      );
+    }
     const result = this.invoke<BridgeObject>({
       op: "putObject",
       bucket,
@@ -159,6 +171,8 @@ export class EmbeddedStow {
       data: bytesToBase64(data),
       contentType: options.contentType,
       metadata: options.metadata,
+      ifMatch: options.ifMatch,
+      ifNoneMatch: options.ifNoneMatch,
     });
     return fromBridgeObject(result);
   }

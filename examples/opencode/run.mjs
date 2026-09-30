@@ -1,5 +1,5 @@
-import { readFile } from "node:fs/promises";
-import { resolve, join } from "node:path";
+import { readFile, realpath } from "node:fs/promises";
+import { resolve, join, relative } from "node:path";
 import { createHash } from "node:crypto";
 import { serveWorkspace } from "../../packages/stow-s3/dist/workspace.js";
 import { TurnController } from "./controller.mjs";
@@ -8,6 +8,7 @@ import { jsonStore, atomicJSON, acquireCallerState } from "./local-store.mjs";
 import { startOpenCode } from "./server.mjs";
 import { nativeStorage } from "./native-storage.mjs";
 import { shutdownPilot } from "./shutdown.mjs";
+import { agentDirectory, snapshotWorkspace } from "./workspace-files.mjs";
 
 async function main() {
   const [configPath, promptPath] = process.argv.slice(2);
@@ -30,21 +31,26 @@ async function main() {
   process.once("SIGINT", cancel);
   process.once("SIGTERM", cancel);
   try {
-    const root = holder.ready.root;
+    const root = await realpath(holder.ready.root);
     release = await acquireCallerState(config.stateDir, root);
     const identity = createHash("sha256").update(JSON.stringify(config)).digest("hex");
     let agent;
     if (promptPath !== "--recover") {
-      server = await startOpenCode({ binary: config.opencodeBinary, stateDir: resolve(config.stateDir), directory: root, signal: abort.signal });
-      agent = new OpenCodeAgent({ ...config, endpoint: server.endpoint, password: server.password, directory: root, sessionStore: jsonStore(join(config.stateDir, "agent.json"), identity) });
+      const directory = await agentDirectory(holder.ready);
+      server = await startOpenCode({ binary: config.opencodeBinary, stateDir: resolve(config.stateDir), directory, signal: abort.signal });
+      agent = new OpenCodeAgent({ ...config, endpoint: server.endpoint, password: server.password, directory,
+        progressPath: relative(directory, join(root, "STOW_PROGRESS.json")),
+        sessionStore: jsonStore(join(config.stateDir, "agent.json"), identity) });
     }
     const controller = new TurnController({
       store: jsonStore(join(config.stateDir, "turn.json"), identity), agent, storage: nativeStorage(config),
       quiesce: signal => agent.quiesce(signal), deadlineMs: config.deadlineMs,
       writeProgress: progress => atomicJSON(join(root, "STOW_PROGRESS.json"), progress),
+      snapshot: signal => snapshotWorkspace(root, { ...config, signal }),
     });
     const result = promptPath === "--recover" ? await controller.recover({ signal: abort.signal }) : await controller.turn(await readFile(promptPath, "utf8"), { signal: abort.signal });
     process.stdout.write(JSON.stringify(result) + "\n");
+    if (result.reviewRequired || result.terminal !== "succeeded") process.exitCode = 2;
   } catch (error) {
     failure = error;
     throw error;

@@ -93,7 +93,7 @@ one transitions exactly once, the parts' reservation becoming the object.
 | `ws.Path(key) (string, bool)` | Where a key lives, for a host that wants the path without an S3 round trip. `false` when the key is absent. |
 | `ws.Facade() (*Facade, error)` | The opt-in loopback S3 endpoint, bound to this same instance. Idempotent. |
 | `ws.Close() error` | Releases the client and any endpoint. **Does not delete data.** |
-| `ws.Destroy(ctx) error` | Deletes the workspace. Explicit, never implied. |
+| `ws.Destroy(ctx) error` | Deletes an owned workspace only when the handle permits `EnvironmentDestroy`, including after Close. Adopted directories still refuse. |
 
 ### 1.2 TypeScript
 
@@ -122,7 +122,9 @@ changelog rather than discovered.
 - `open` and `resume` are the same function; `sessionId` selects.
 - `close` is idempotent and terminal for the *handle*. Later operations reject
   with `workspace_closed`.
-- `destroy` is idempotent and succeeds on an already-destroyed workspace.
+- An authorized native `Destroy` is idempotent on an already-destroyed workspace.
+  Restricted handles refuse before closing or deleting anything, including after Close.
+  Host-backed wrapper deletion uses the explicit administrative CLI boundary below.
 - Neither call is implicit. There is no path by which closing a handle deletes
   bytes, and no path by which a workspace reaches an upstream.
 
@@ -140,7 +142,7 @@ saying which member lands in which phase is more useful than a promise:
 | `Touch`, a registry on disk, and TTL collection | **Shipped** in Go, refusing live and adopted workspaces | W4 |
 | A checkpoint of a workspace another process is using | **Shipped** in Go, without claiming the session | — |
 | Team partitions of the registry | **Shipped** in Go, as directories rather than labels | — |
-| `Facade` | Not yet. A workspace speaks no S3 today | W5 |
+| `Facade` | Implemented in Go: same-runtime loopback facade | W5 (historical phase) |
 | TypeScript and Python workspace lifecycle objects | Not yet. `workspace` CLI wrappers are shipped, but they return JSON command results rather than in-process `openWorkspace` handles | Future API phase |
 | A workspace on a host with no filesystem | **Not possible, and not planned.** This contract describes a real directory; a host without one cannot provide it | — |
 
@@ -182,6 +184,14 @@ removing an existing one; zero leaves that cap unlimited.
 Portable archive paths and prepared input paths reject platform-reserved names.
 `workspace preview --archive` verifies archive contents and reports included
 and sensitive-looking paths before an import; it does not extract files.
+Native handle destruction consults its resolved authority. The CLI's explicit
+`workspace destroy` is instead ambient host registry administration, like collection
+and checkpoint deletion: it does not inherit or widen a previously issued actor
+handle. The host controls access to those commands and registry paths. Resource ACLs
+for administrative/background operations remain unimplemented in the protected profile.
+Constructor rollback may remove a newly created unfinished workspace before returning
+it; this does not grant destruction to a successfully returned restricted handle.
+
 Destroying a workspace removes its associated checkpoints. TTL collection also
 removes those checkpoints after it has safely reclaimed an eligible
 Stow-owned workspace; adopted or live workspaces and their checkpoints remain.
@@ -403,7 +413,7 @@ no synchronization between two, because there is only one.
 - Idempotent: two calls return the same endpoint.
 - The endpoint is loopback with generated credentials, and the credentials
   never appear in a log or on stdout.
-- `close()` stops the endpoint. `destroy()` deletes the data.
+- `close()` stops the endpoint. Authorized destruction deletes owned data.
 - A facade's port is never exposed to anything but loopback, and a workspace
   never propagates a write upstream. A workspace that reached an upstream would
   be a live write with no opt-in, which ADR 0005 and ADR 0009 both forbid.
@@ -429,7 +439,7 @@ remaining conformance work; the old DX plan is historical rationale.
 | WS-08 | Opening a directory with pre-existing files exposes them without an import step |
 | WS-09 | A corrupt manifest refuses the open and deletes nothing |
 | WS-10 | A manifest written by a newer version is refused, not downgraded |
-| WS-11 | `close()` leaves every file in place; `destroy()` leaves nothing |
+| WS-11 | `close()` leaves every file in place; authorized owned destruction leaves nothing; a restricted native handle preserves all bytes |
 | WS-12 | A workspace over a full disk or an over-quota write fails without corrupting the manifest |
 | WS-13 | Windows reserved device names, trailing dots, and trailing spaces all take the escaped form |
 | WS-14 | The quota a host sets is the quota enforced, including a `MaxRequestBytes` the host raised |
