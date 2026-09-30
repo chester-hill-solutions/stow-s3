@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"errors"
 	"io/fs"
 	"path/filepath"
 
@@ -46,6 +47,13 @@ func (l *naturalObjectListing) visit(path string, entry fs.DirEntry, err error) 
 	}
 	file, err := l.source.OpenRegularFile(path)
 	if err != nil {
+		// A file this host cannot open safely is omitted, since a listing including
+		// it would describe bytes nothing verified. A host that cannot do the open
+		// at all is the other case, and must not read as an empty workspace: that
+		// is how a caller concludes its work was deleted.
+		if errors.Is(err, rooted.ErrUnsupported) {
+			return err
+		}
 		return nil
 	}
 	file.Close()

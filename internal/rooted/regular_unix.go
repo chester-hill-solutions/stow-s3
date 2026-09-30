@@ -8,6 +8,9 @@ import (
 	"syscall"
 )
 
+// O_NOFOLLOW is what makes the refusal and the open one operation.
+const safeRegularOpenSupported = true
+
 func openRegularFile(root *os.Root, relative string) (*os.File, error) {
 	file, err := root.OpenFile(relative, os.O_RDONLY|syscall.O_NONBLOCK, 0)
 	if err != nil {

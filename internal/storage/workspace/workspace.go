@@ -16,8 +16,6 @@ type Store struct {
 	root         string
 	layout       Layout
 	manifest     *Manifest
-	// index is the object index, split out of the manifest because it changes per
-	// object and the manifest does not. See manifestVersion.
 	// objectIndex is the object index, split out of the manifest because it changes
 	// per object and the manifest does not. See manifestVersion.
 	objectIndex *Index
@@ -161,8 +159,6 @@ func (s *Store) establishIdentity(options Options, rootExisted bool, now func() 
 	return nil
 }
 
-// Now is the store's clock, replaceable in tests.
-
 func newWorkspaceID() (string, error) {
 	var id [8]byte
 	if _, err := rand.Read(id[:]); err != nil {
@@ -198,11 +194,6 @@ func (s *Store) Path(bucket, key string) (string, bool) {
 	}
 	return absPath, true
 }
-
-// bucketDir returns the directory a bucket's objects live in. The workspace
-// bucket is the root itself; anything else is namespaced under the internal
-// directory, which is what lets a caller have a second bucket without the
-// workspace bucket ceasing to be the working directory.
 
 func (s *Store) Close() error {
 	s.mu.Lock()

@@ -52,8 +52,6 @@ type Session struct {
 	path string
 }
 
-// LockSupported reports whether this host can establish session liveness. Where
-// it cannot, workspaces are never collectable rather than collected on a guess.
 func LockSupported() bool { return lockSupported }
 
 // AcquireSession takes the liveness lock for a workspace root.

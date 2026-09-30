@@ -68,8 +68,16 @@ jobs:
           go-version-file: .go-version
           cache: true
 
+      # -v because a whole package can skip: internal/storage/workspace needs
+      # an atomic regular-file open and an advisory file lock, and Windows has
+      # neither today, so it reports why and runs nothing. Without -v that line
+      # is swallowed, and a lane that silently stops testing a package is the
+      # failure mode this job exists to catch. Do not remove the skip by making
+      # these tests pass on an uncertified host; see docs/workspace-contract.md
+      # section 6, and the job's green run on windows is not evidence the
+      # workspace backend works there.
       - name: Test filesystem and workspace backends
-        run: go test ./internal/storage/fs ./internal/storage/workspace
+        run: go test -v ./internal/storage/fs ./internal/storage/workspace
 
   conformance:
     name: Conformance

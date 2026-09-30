@@ -3,6 +3,7 @@ package workspace
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,7 +30,7 @@ func (s *Store) readRoot() (*rooted.Root, error) {
 func (s *Store) openRead(path string, expected os.FileInfo) (*os.File, error) {
 	root, err := s.readRoot()
 	if err != nil {
-		return nil, storage.ErrObjectNotFound
+		return nil, err
 	}
 	defer root.Close()
 	relative, err := filepath.Rel(s.root, path)
@@ -38,6 +39,11 @@ func (s *Store) openRead(path string, expected os.FileInfo) (*os.File, error) {
 	}
 	file, err := root.OpenRegularFile(relative)
 	if err != nil {
+		// A host that cannot open safely has not answered the question, and
+		// absence is the guess that loses data.
+		if errors.Is(err, rooted.ErrUnsupported) {
+			return nil, err
+		}
 		return nil, storage.ErrObjectNotFound
 	}
 	actual, err := file.Stat()

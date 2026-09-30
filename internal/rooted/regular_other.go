@@ -2,11 +2,13 @@
 
 package rooted
 
-import (
-	"fmt"
-	"os"
-)
+import "os"
 
+// Without O_NOFOLLOW there is no atomic way to refuse a link and open the file.
+const safeRegularOpenSupported = false
+
+// openRegularFile refuses rather than opening a path it cannot prove is not a
+// link, which is what lets Supported() mean anything.
 func openRegularFile(*os.Root, string) (*os.File, error) {
-	return nil, fmt.Errorf("rooted: safe regular-file opening is unsupported on this platform")
+	return nil, ErrUnsupported
 }

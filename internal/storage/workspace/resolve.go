@@ -99,11 +99,6 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 // entry that has gone stale. Reaching resolve from there would take the lock a
 // second time on the same goroutine and hang, along with every other goroutine
 // waiting behind it - including Close.
-//
-// This is the same split as putLocked, and it was missing here. The hazard was
-// already known when putLocked was separated out for multipart completion, which
-// holds the lock for the same reason; the ordinary write was simply not converted
-// when it grew the same peek.
 func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	absPath, err := s.locate(bucket, key)
 	if err != nil {

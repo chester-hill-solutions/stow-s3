@@ -11,6 +11,10 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
+// bucketDir returns the directory a bucket's objects live in. The workspace bucket is
+// the root itself; anything else is namespaced under the internal directory, which is
+// what lets a caller have a second bucket without the workspace bucket ceasing to be
+// the working directory.
 func (s *Store) bucketDir(bucket string) string {
 	if bucket == s.manifest.Bucket {
 		return s.root

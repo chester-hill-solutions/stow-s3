@@ -491,3 +491,19 @@ are the first two cases written and the first two run.
   closed on unsupported platforms; Windows workspace runtime support is not
   certified by this candidate. Portable naming rules still reject Windows-unsafe
   names so archives do not encode an avoidable portability hazard.
+- **Failing closed means refusing, and refusing is not the same as claiming the
+  object is absent.** `internal/rooted` reports `ErrUnsupported` on a host with
+  no `O_NOFOLLOW`, and both the read path and the listing surface that error
+  rather than translating it to "not found" or to an empty listing. The
+  distinction is the whole answer available to a caller: an empty listing and a
+  workspace whose objects cannot be opened look identical otherwise, and the
+  second is how a caller concludes its work has been deleted.
+- **The Windows CI lane tests what Windows supports.** The
+  `Filesystem tests (windows-latest)` job runs `internal/storage/fs` in full and
+  `internal/storage/workspace` not at all: that package's `TestMain` skips,
+  naming the missing capability, when the host has neither a safe regular-file
+  open nor an advisory lock. It is written against those capability predicates
+  rather than a `GOOS` check, so a host that gains either runs the package
+  unchanged, and the job passes `-v` so the skip is visible in the log rather
+  than a silently untested package. A green Windows lane is not evidence the
+  workspace backend works there; it is evidence the lane stopped claiming so.

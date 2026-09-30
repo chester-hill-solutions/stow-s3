@@ -1,12 +1,20 @@
 package rooted
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+// ErrUnsupported reports a host that cannot open a regular file without following a
+// symbolic link, atomically. Reporting absence instead is the answer guaranteed wrong.
+var ErrUnsupported = errors.New("rooted: safe regular-file opening is unsupported on this platform")
+
+// Supported reports whether this host can do that open.
+func Supported() bool { return safeRegularOpenSupported }
 
 // Root pins a directory identity and refuses symbolic links in paths it reads.
 type Root struct {
