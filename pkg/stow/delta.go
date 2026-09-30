@@ -138,11 +138,10 @@ type DeltaOptions struct {
 // check it is being applied where it thinks it is, and carries the content for
 // every added or changed path.
 //
-// Content is on the wire as base64 values under its own name. It used to be
-// excluded from the encoding, which left every delta describable and none of them
-// applicable: the document a caller wrote to a file held no bytes, and applying
-// it failed on the first added or changed path. A delta's reason to exist is that
-// it can be carried somewhere, so the encoding carries it.
+// Content is on the wire as base64 values under its own name. Excluding it
+// leaves every delta describable and none applicable: the document a caller wrote
+// to a file holds no bytes, and applying it fails on the first changed path. A
+// delta's reason to exist is that it can be carried somewhere.
 type DeltaDocument struct {
 	Version          int               `json:"version"`
 	BaseID           string            `json:"base_id"`

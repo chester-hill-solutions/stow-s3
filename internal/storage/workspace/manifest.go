@@ -12,25 +12,22 @@ import (
 )
 
 // manifestVersion is the only on-disk layout this build implements. A file written
-// by a newer revision is refused rather than migrated on read: the outbox already
-// established that rule for durable files, and a manifest that silently downgrades
-// loses exactly the entries it could not understand.
+// by a newer revision is refused rather than migrated on read, as the outbox
+// already established for durable files: a manifest that silently downgrades loses
+// exactly the entries it could not understand.
 //
-// Version 2 splits the document. Version 1 held identity and the object index in
-// one file, so adopting one host-written object rewrote the whole workspace's
-// metadata. Identity changes once per workspace and the index per object, so they
-// are separate files with separate write paths. Version 3 namespaces the escaped
-// form by bucket, because an escaped key used to resolve to one file across two
-// buckets and they read, wrote and deleted over each other.
+// Identity and the object index are separate files with separate write paths,
+// because identity changes once per workspace and the index per object. The
+// escaped form is namespaced by bucket, since an escaped key must not resolve to
+// one file across two buckets.
 //
-// Version 1 and version 2 workspaces are refused rather than migrated, and
-// refusing beats opening them. Version 1's checksums, ETags and metadata would
-// have to be carried into index.json by a rewrite interruptible with the index as
-// the only copy, and treating a missing index as empty discards them silently.
-// Version 2's manifest is still valid but its escaped objects sit at a path this
-// build does not look at, so opening it would resolve every escaped key to absent
-// while the file stayed on disk — the total-loss reading ErrManifestCorrupt calls
-// worse than losing bytes.
+// Version 1 and 2 workspaces are refused rather than migrated, and refusing beats
+// opening them. Version 1's checksums, ETags and metadata would have to be carried
+// into index.json by a rewrite interruptible with the index as the only copy, and
+// treating a missing index as empty discards them silently. Version 2's manifest is
+// still valid but its escaped objects sit at a path this build does not look at, so
+// opening it would resolve every escaped key to absent while the file stayed on
+// disk — the total-loss reading ErrManifestCorrupt calls worse than losing bytes.
 const manifestVersion = 3
 
 // ErrManifestCorrupt is returned when a manifest exists and cannot be trusted.
@@ -44,10 +41,6 @@ var ErrManifestCorrupt = errors.New("workspace manifest is corrupt")
 // Manifest is the identity document at a workspace root: which workspace this is,
 // which bucket it serves, when it was created, how long it lives, and whether stow
 // owns the directory.
-//
-// It used to carry the object index too. That is index.json now, because the two
-// change at completely different rates and writing them together made every object
-// adoption rewrite the workspace's identity.
 //
 // It is not the source of truth for existence: an entry pointing at a missing file
 // serves as absent, and a file with no entry exists. Losing either document
@@ -190,12 +183,6 @@ func (m *Manifest) saveIdentity() error {
 }
 
 // writeFileAtomic delegates to internal/atomicfile.
-//
-// It used to be a second implementation of the same thing, and a weaker one: it
-// renamed without syncing the parent directory, so every workspace object and
-// manifest write could be lost to a power cut that the filesystem backend
-// survived. It also chmod'ed the temporary file after the sync and after the
-// close, leaving a window in which the file was on disk with the wrong mode.
 //
 // All five callers in this package go through here, so the guarantee is now
 // shared rather than per-file.

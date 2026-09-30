@@ -20,11 +20,10 @@ func (s *MemoryStore) CopyObject(ctx context.Context, srcBucket, srcKey, dstBuck
 // CopyObjectCond copies from one captured source version, under one lock.
 //
 // The capture and the commit happen together, which is what makes the copy a
-// single transaction rather than a read followed by a write. It used to be
-// GetObject then PutObject: each took the store lock in turn, so between them
-// any other writer could replace the source, and the bytes that arrived at the
-// destination were then paired with metadata read before them — a body from one
-// version of an object and a content type and user metadata from another.
+// single transaction rather than a read followed by a write. Taking the lock in
+// turn instead lets a writer replace the source in between, so the bytes that
+// arrive at the destination are paired with metadata read before them — a body
+// from one version of an object and a content type from another.
 //
 // A stored buffer is never modified in place — a write publishes a new one — so
 // the captured slice is immutable and the destination can share it instead of

@@ -139,11 +139,9 @@ func TestCacheRefreshesWithoutALimitDoNotListTheCache(t *testing.T) {
 // all. Eviction is planned from the adapter's own index, so the cost of a refresh
 // no longer scales with how full the cache is.
 //
-// This test used to assert the opposite. It counted refreshes x depth — 1600 rows
-// for 40 refreshes at depth 40, 6400 at depth 160 — and failed when the count did
-// not grow with depth. The fix made the count zero, so the test failed, which is
-// the intended direction: the property worth pinning is that planning reads
-// nothing from the store, not that it reads a predictable amount.
+// The property worth pinning is that planning reads nothing from the store, not
+// that it reads a predictable amount — so the assertion is zero, and a count that
+// grows with depth is the failure.
 func TestLimitedCacheRefreshesDoNotWalkTheCache(t *testing.T) {
 	const batch = 40
 	const limit = 1 << 30

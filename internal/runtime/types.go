@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -40,6 +41,10 @@ var (
 	ErrUnsupportedBackend       = errors.New("unsupported runtime backend")
 	ErrInvalidListLimit         = errors.New("runtime list limit must not be negative")
 	ErrExternalResetUnsupported = errors.New("runtime reset is unsupported for an externally managed store")
+	// ErrResourceUnresolved is for an operation addressed by a handle whose
+	// resource this instance cannot establish. It only ever appears when a
+	// policy is in force, because without one there is nothing to evaluate.
+	ErrResourceUnresolved = errors.New("runtime cannot resolve the resource this operation addresses")
 
 	// The store said so, not the runtime: MultipartStore is optional, and the
 	// absence has one vocabulary wherever it is discovered.
@@ -115,6 +120,17 @@ type Options struct {
 	// nothing. The pointer is what makes those two states distinguishable — a
 	// bare Authority cannot tell "unset" from "explicitly empty".
 	Authority *authority.Authority
+
+	// Policy narrows Authority to the resources a selector covers, so a caller
+	// with full authority can still be confined to part of a bucket. It is
+	// intersected with Authority rather than replacing it: a policy cannot grant
+	// what the environment does not have, and one written wider than the
+	// environment is refused at open rather than clipped silently.
+	//
+	// A nil pointer means no policy is consulted, which is what an Instance opened
+	// without one has always done, so adding the field changes no existing
+	// behaviour. See docs/storage-admission-contract.md.
+	Policy *policy.Set
 }
 
 type Capabilities struct {

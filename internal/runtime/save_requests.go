@@ -53,7 +53,7 @@ func (i *Instance) ResolveSave(ctx context.Context, bucket, key, requestKey stri
 	if err := i.checkContext(ctx); err != nil {
 		return unknown, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
+	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
 		return unknown, err
 	}
 	i.mu.Lock()

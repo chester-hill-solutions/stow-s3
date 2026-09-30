@@ -234,13 +234,11 @@ func (a *Adapter) ReconcileCacheIndex(ctx context.Context) error { return a.reco
 // both directions: it drops entries for objects the store no longer has, and it
 // adds entries for objects the store has and the index has never seen.
 //
-// The second half is what decides whether a restart is safe. The cache lives in
-// a directory and this index lives in memory, so a server coming up over an
-// existing cache directory holds bytes it knows nothing about. Every eviction
-// plan is computed from the index and nothing else, so an index starting empty
-// computes the cache total from objects written since startup alone, a byte
-// limit the operator set is enforced against that, and the cache then grows past
-// its bound with nothing to indicate it.
+// The second half is what decides whether a restart is safe: the cache lives in a
+// directory and this index in memory, so a server coming up over an existing cache
+// holds bytes it knows nothing about. Every eviction plan is computed from the
+// index alone, so an index starting empty measures the cache by what was written
+// since startup, and a byte limit the operator set is enforced against that.
 //
 // A discovered object is recorded with the store's own LastModified as its access
 // time, because that is evidence about the bytes rather than a guess: the

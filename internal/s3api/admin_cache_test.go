@@ -128,12 +128,10 @@ func TestInspectSaysWhichCachedKeysAreReadable(t *testing.T) {
 // has_expiry is the boolean beside a zero timestamp, and it is here because
 // `omitempty` does not omit a zero time.Time.
 //
-// So before it, every entry with no lifetime serialised as
-// "expires_at": "0001-01-01T00:00:00Z". An agent reading that could not tell a
-// cache entry that never expires from one that expired at the beginning of time,
-// and the field it could branch on did not exist. The same shape as has_ttl beside
-// expires_in_seconds, for the same reason: a zero that means two things is not a
-// value.
+// An agent reading a serialised zero could not tell a cache entry that never
+// expires from one that expired at the beginning of time. The same shape as
+// has_ttl beside expires_in_seconds, for the same reason: a zero that means two
+// things is not a value.
 func TestInspectSaysWhetherACachedKeyHasALifetimeAtAll(t *testing.T) {
 	expiring := time.Now().Add(time.Hour).Round(time.Second)
 	payload := inspect(t, listingStore([]runthrough.CachedObject{

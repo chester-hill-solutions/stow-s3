@@ -96,9 +96,8 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 // It exists because the lock is not reentrant and the write path has to look at an
 // object while holding it: PutObject peeks to evaluate its preconditions before it
 // knows what it is overwriting, and that peek may need to re-derive and persist an
-// entry that has gone stale. Reaching resolve from there would take the lock a
-// second time on the same goroutine and hang, along with every other goroutine
-// waiting behind it - including Close.
+// entry that has gone stale. Reaching resolve from there takes the lock a second
+// time on the same goroutine and hangs every goroutine behind it, Close included.
 func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	absPath, err := s.locate(bucket, key)
 	if err != nil {

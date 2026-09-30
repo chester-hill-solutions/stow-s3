@@ -307,12 +307,10 @@ var contractCapturePattern = regexp.MustCompile(`\{\{([a-zA-Z0-9_]+)\}\}`)
 // it, so a reference nothing captured is a broken case file rather than a silently
 // empty argument.
 //
-// It is one pass, and doing it once is the point. Resolution used to happen wherever
-// a resolved value was wanted, and one of six call sites already forgot: the registry
-// directory was read from the raw arguments, so a step was pointed at a directory
-// literally named "{{registryA}}" and `collect` reported an empty registry rather
-// than an error. A pass that cannot be skipped deletes that class of bug instead of
-// documenting it.
+// It is one pass that cannot be skipped, which is the point: resolving wherever a
+// resolved value was wanted left a call site reading the raw arguments, pointing a
+// step at a directory literally named "{{registryA}}" and reporting an empty
+// registry rather than an error.
 //
 // It also covers the expectations, which is not a convenience. A step that expects
 // "the root the manifest named" is stating a fact about the contract, and comparing

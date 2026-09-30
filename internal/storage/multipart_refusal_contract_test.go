@@ -91,11 +91,10 @@ func TestStoreEnforcesTheMinimumPartSize(t *testing.T) {
 // client intends to use. An initiation carries no body, so no value comes with
 // it, and the record is a declaration rather than a claim about the object.
 //
-// It used to be handed to the store as though it were a claim, and
-// VerifyChecksum rightly refuses an algorithm with no value - so every
-// completion of an upload that named one failed, in all three backends, with an
-// error the S3 surface has no mapping for. The client's answer was 500
-// InternalError and the SDK retried it three times.
+// Handing it to the store as though it were a claim is what this pins against:
+// VerifyChecksum rightly refuses an algorithm with no value, so every completion
+// of an upload that named one failed, in all three backends, with an error the S3
+// surface has no mapping for.
 //
 // This is here rather than in the fidelity file because that is how it presented:
 // a completion that cannot happen at all. The declaration still has to be

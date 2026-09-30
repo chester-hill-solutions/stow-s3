@@ -21,19 +21,13 @@ const maxPresignedExpirySeconds = 604800
 // The presigned authentication parameters, read one name at a time and each
 // exactly once.
 //
-// This used to be a case-insensitive scan that returned the first match, so
-// X-Amz-Date and x-amz-date were the same parameter and whichever the map
-// happened to yield first was the one used. That is a real ambiguity rather than
-// a cosmetic one, because the signed query and the values consumed here are
-// parsed from the same string: a query that carried a differently-cased duplicate
-// could be signed as one parameter and read as another, and a request could carry
-// two signatures and be checked against whichever one the scan reached first.
-//
-// So the rule here is one deterministic interpretation: the parameter names are
-// exact, and a name that appears more than once — or that appears under a
-// different case than the one stow reads — is refused. Failing closed is the only
-// safe answer, because the alternative is choosing between two claims and having
-// no way to tell which one the client meant.
+// The names are exact: a name appearing more than once, or under a different case
+// than the one stow reads, is refused. That is a real ambiguity rather than a
+// cosmetic one, because the signed query and the values consumed here are parsed
+// from the same string — a differently-cased duplicate could be signed as one
+// parameter and read as another. Failing closed is the only safe answer, since
+// the alternative is choosing between two claims with no way to tell which the
+// client meant.
 //
 // The canonical query string is built separately, and its duplicate handling is
 // unchanged: ordinary repeated query parameters are a normal part of a request and

@@ -14,7 +14,7 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, object(bucket, key)); err != nil {
 		return nil, err
 	}
 	i.mu.Lock()
@@ -58,12 +58,12 @@ func (i *Instance) GetMultipartUpload(ctx context.Context, uploadID string) (*st
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
-		return nil, err
-	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkMultipartOpen(); err != nil {
+		return nil, err
+	}
+	if err := i.checkUpload(authority.ObjectRead, uploadID); err != nil {
 		return nil, err
 	}
 	upload, err := i.multipartStore.GetMultipartUpload(ctx, uploadID)
@@ -78,9 +78,6 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
-		return nil, err
-	}
 	data, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
@@ -88,6 +85,9 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkMultipartOpen(); err != nil {
+		return nil, err
+	}
+	if err := i.checkUpload(authority.ObjectWrite, uploadID); err != nil {
 		return nil, err
 	}
 	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
@@ -116,12 +116,12 @@ func (i *Instance) ListPartsPage(ctx context.Context, uploadID string, opts stor
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
-		return nil, err
-	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkMultipartOpen(); err != nil {
+		return nil, err
+	}
+	if err := i.checkUpload(authority.ObjectRead, uploadID); err != nil {
 		return nil, err
 	}
 	if lister, ok := i.store.(interface {
@@ -146,12 +146,12 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
-		return nil, err
-	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkMultipartOpen(); err != nil {
+		return nil, err
+	}
+	if err := i.checkUpload(authority.ObjectWrite, uploadID); err != nil {
 		return nil, err
 	}
 	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
@@ -184,10 +184,10 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	// A completion holds the parts and assembles a second copy of the same bytes
 	// before the object is published, so for the length of this call the bounded
 	// state is every committed object, every in-flight part, and the buffer
-	// being assembled. That last term is the completion reservation, and it is
-	// what used to be missing: the store transiently held the object twice while
-	// the advertised ceiling counted it once, so a memory-backed session could
-	// exceed the bound it publishes by one object per in-flight completion.
+	// being assembled. That last term is the completion reservation, and without
+	// it the store transiently held the object twice while the advertised ceiling
+	// counted it once, so a session could exceed the bound it publishes by one
+	// object per in-flight completion.
 	//
 	// The check precedes the store call, so a completion that cannot fit is
 	// refused before anything is assembled and reserves nothing. A completion
@@ -224,12 +224,12 @@ func (i *Instance) AbortMultipartUpload(ctx context.Context, uploadID string) er
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
-		return err
-	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkMultipartOpen(); err != nil {
+		return err
+	}
+	if err := i.checkUpload(authority.ObjectWrite, uploadID); err != nil {
 		return err
 	}
 	if err := i.refreshPersistentUsageLocked(ctx); err != nil {
@@ -255,12 +255,12 @@ func (i *Instance) ListParts(ctx context.Context, uploadID string) ([]storage.Pa
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
-		return nil, err
-	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	if err := i.checkMultipartOpen(); err != nil {
+		return nil, err
+	}
+	if err := i.checkUpload(authority.ObjectRead, uploadID); err != nil {
 		return nil, err
 	}
 	parts, err := i.multipartStore.ListParts(ctx, uploadID)
@@ -274,7 +274,7 @@ func (i *Instance) ValidateMultipartUpload(ctx context.Context, uploadID, bucket
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
+	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -289,7 +289,7 @@ func (i *Instance) ListMultipartUploads(ctx context.Context, bucket string, opts
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectList); err != nil {
+	if err := i.checkResource(authority.ObjectList, object(bucket, opts.Prefix)); err != nil {
 		return nil, err
 	}
 	i.mu.Lock()

@@ -185,13 +185,6 @@ func uploadPartsTo(t *testing.T, ts *httptest.Server, ref objectRef, uploadID st
 
 // A failure to complete is reported, not absorbed.
 //
-// The completion handler used to call ListParts to build the map it used to
-// enforce S3's 5 MiB minimum on non-final parts, and it discarded the error. An
-// empty map made every lookup miss, so the size check passed for every part and
-// a client could complete an upload made of 1-byte parts - the one thing that
-// check exists to prevent. The failure was invisible: the request carried on to
-// CompleteMultipartUpload and reported success.
-//
 // The size check is now the store's, so this asserts the property that survives
 // the move: whatever the store says about a completion is what the client is
 // told, and a store that breaks is a 500 rather than a success.

@@ -75,19 +75,28 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 // Authority.Allows is the predicate, Authority.Check turns its refusal into an
 // error, and check is the runtime wrapper. All are enforcement chokepoints.
 //
-// This set used to hold only "check", and the scan therefore reported UpstreamRead
-// and UpstreamWrite as unenforced after the run-through adapter had started gating
-// on them with Allows. That is worse than a missed detection, because the test
-// demands an entry in Ungated for anything it cannot see: the scan did not just
-// fail to notice the enforcement, it required the code to go on claiming in
-// Ungated that a permission was described and not granted. A detector whose blind
-// spot makes the documentation wrong is not a safe detector, so the fix is to widen
-// it to the real chokepoint rather than to add the operations back by hand.
-//
 // Narrowing to a named set is deliberate. Matching any call that merely mentions an
 // operation would also match a log statement or a slice, and would let a real gap
 // pass as enforced.
-var enforcementMethods = map[string]bool{"check": true, "Allows": true, "Check": true}
+//
+// This set has had to widen twice, each time because a new gate spelling was added
+// and the scan could not see it: once when the run-through adapter began gating on
+// Allows, and once when the runtime gained checkResource and checkUpload. Both
+// blind spots were worse than a missed detection, because the test demands an
+// entry in Ungated for anything it cannot see — so the scan required the code to
+// go on claiming that a permission was described and not granted.
+//
+// A detector whose blind spot decides what the documentation claims is not a safe
+// detector, so the fix in both cases was to widen the detector to the real
+// chokepoint, never to re-declare an enforced operation in Ungated to make the
+// scan agree.
+var enforcementMethods = map[string]bool{
+	"check":         true,
+	"checkResource": true,
+	"checkUpload":   true,
+	"Allows":        true,
+	"Check":         true,
+}
 
 // checkSitesInFile records every call of the form <recv>.m(authority.Op) in one
 // file, where m is one of enforcementMethods.

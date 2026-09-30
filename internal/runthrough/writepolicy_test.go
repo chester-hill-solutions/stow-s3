@@ -91,10 +91,9 @@ func TestConfigFromEnvExplicitFalseOptOutStaysLocal(t *testing.T) {
 // the startup banner reports and the same one the adapter gates on — so the two
 // cannot drift apart without a test here failing.
 //
-// The regression this is here for: a `.env` copied from a staging machine
-// arrives with STOW_POLICY=mirrorWrites and credentials for a shared bucket, and
-// the policy used to be read as the consent. It is a routing choice; the consent
-// is separate and has to be given.
+// The regression this is here for: a `.env` copied from a staging machine arrives
+// with STOW_POLICY=mirrorWrites and credentials for a shared bucket, and the
+// policy read as the consent. It is a routing choice; the consent is separate.
 func TestRunThroughWithMirrorWritesIsNotPermissionToMutateUpstream(t *testing.T) {
 	os.Clearenv()
 	t.Setenv("STOW_ENDPOINT", "https://upstream.example")

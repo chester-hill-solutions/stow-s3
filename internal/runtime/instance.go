@@ -2,11 +2,18 @@ package runtime
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
+
+// namespace names the one namespace a runtime instance serves. A policy naming
+// another matches nothing, which is the safe direction: naming this one's
+// namespace cannot reach a selector written for a different environment.
+const namespace = "runtime"
 
 type Instance struct {
 	mu               sync.Mutex
@@ -15,6 +22,8 @@ type Instance struct {
 	resetStore       func() (storage.Store, error)
 	options          Options
 	authority        authority.Authority
+	policy           *policy.Set
+	policyErr        error
 	usage            Usage
 	multipart        map[string]multipartUsage
 	multipartTargets map[string]int
@@ -61,6 +70,18 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 	if options.Authority != nil {
 		granted = *options.Authority
 	}
+	// Validated here so the answer cannot depend on which operation asked, and
+	// held as an error rather than discarded so a widening policy refuses.
+	var narrow *policy.Set
+	var policyErr error
+	if options.Policy != nil {
+		validated, err := policy.New(*options.Policy, granted)
+		if err != nil {
+			policyErr = err
+		} else {
+			narrow = &validated
+		}
+	}
 	multipart, _ := store.(storage.MultipartStore)
 	return &Instance{
 		store:            store,
@@ -68,6 +89,8 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 		resetStore:       resetStore,
 		options:          options,
 		authority:        granted,
+		policy:           narrow,
+		policyErr:        policyErr,
 		multipart:        make(map[string]multipartUsage),
 		multipartTargets: make(map[string]int),
 		reservedTargets:  make(map[string]struct{}),
@@ -75,9 +98,34 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 	}
 }
 
-// check is the single authorization point. Every public operation calls it
-// before it touches anything, which is what makes the answer independent of
-// which interface asked.
+// checkUpload is checkResource for an operation addressed by upload ID.
+//
+// The resource comes from this instance's own record rather than from the store,
+// because the store's answer would have to be read before authorization to know
+// what to authorize, and authorization comes first. An upload this instance
+// cannot resolve therefore has no established resource, which without a policy
+// is the old behaviour and with one is refused: a policy that cannot be
+// evaluated must not fall back to allow, or the handle-based operations become
+// the one path around every selector.
+//
+// Reads i.multipart, so it must be called under i.mu.
+func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
+	if i.policy == nil && i.policyErr == nil {
+		return i.authority.Check(op)
+	}
+	usage, ok := i.multipart[uploadID]
+	if !ok {
+		return fmt.Errorf("%w: upload %q", ErrResourceUnresolved, uploadID)
+	}
+	return i.checkResource(op, object(usage.upload.Bucket, usage.upload.Key))
+}
+
+// check is the authorization point for operations that name no resource: the
+// environment's own lifecycle and the bucket namespace. A policy's selectors are
+// matched against resources and there is nothing here to match.
+//
+// An object operation must call checkResource instead; a test fails if one reaches
+// for this, because a policy never consulted is not a narrower policy.
 //
 // Close is deliberately not routed through here. Refusing to release a handle
 // would leak the process, the temporary directory and the in-flight multipart
@@ -85,6 +133,28 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 // for tearing an environment down on purpose, and that is gated.
 func (i *Instance) check(op authority.Operation) error {
 	return i.authority.Check(op)
+}
+
+// checkResource is check for an operation on a named resource, and it is where a
+// policy is consulted. A nil policy means no policy, so this is check and the
+// answer is unchanged. A policy that failed validation refuses here rather than
+// being skipped, because the author wrote one believing it was in force and the
+// alternative is silently answering with the wider set.
+func (i *Instance) checkResource(op authority.Operation, res policy.Resource) error {
+	if i.policyErr != nil {
+		return i.policyErr
+	}
+	if i.policy == nil {
+		return i.authority.Check(op)
+	}
+	return i.policy.Allows(i.authority, res, op)
+}
+
+// object is the resource an object operation is decided on. The key is the
+// locator verbatim, unnormalized: a selector that normalized would grant or
+// withhold a permission on a key the author never wrote.
+func object(bucket, key string) policy.Resource {
+	return policy.Resource{Namespace: namespace, Collection: bucket, Kind: policy.KindObject, Locator: key}
 }
 
 // Authority reports what this environment permits, so an interface can narrow

@@ -16,11 +16,10 @@ import (
 // the directory is synced. The Windows implementation is a no-op, because Windows
 // refuses FlushFileBuffers on a directory handle and journals the entry itself.
 //
-// Every workspace test failed on the windows-latest runner before this split, all
-// with "sync parent directory ...: Access is denied", so the workspace backend
-// could not persist at all on a first-class release target. This test is what
-// notices if the Windows arm ever starts reporting an error again — and it is the
-// only test in the repository that can fail on that platform for this reason.
+// This test is what notices if the Windows arm ever starts reporting an error
+// again, and it is the only test in the repository that can fail on that platform
+// for this reason: the workspace backend could not persist at all while the arm
+// reported an error.
 //
 // It asserts the *contract* rather than the mechanism: a successful write must
 // succeed, and the bytes must be there. A test that only checked "no error" would

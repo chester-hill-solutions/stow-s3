@@ -209,14 +209,9 @@ func mapStorageError(err error, resource string) s3Error {
 
 // upstreamFailure answers for a request that failed because the upstream did.
 //
-// Before this existed, a run-through server whose upstream had gone away answered
-// every read with InternalError and "internal storage error". That is the one
-// situation this product exists to be running when, and the answer was the shape of
-// a stow bug: 500, unretryable, and a message naming stow's own storage layer
-// rather than the dependency that was not there. An agent reading a log would have
-// concluded the workspace was corrupt.
-//
-// Three cases, and the split is by who is at fault and whether waiting helps:
+// The split is by who is at fault and whether waiting helps. Answering a vanished
+// upstream as a stow storage fault is the one situation this product exists to be
+// running in, and 500 with "internal storage error" reads as a corrupt workspace.
 //
 //   - no response at all: 503. The upstream was asked and never answered. Nothing
 //     stow did wrong, the condition is usually temporary, and it is the condition

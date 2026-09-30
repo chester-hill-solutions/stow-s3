@@ -313,17 +313,13 @@ func ParsePolicy(raw string) (Policy, bool) {
 // DetectMode returns the operational mode, and local is what it returns unless
 // something asks for run-through by name.
 //
-// It used to return run-through whenever the upstream environment resolved, so a
-// developer's ambient AWS_* variables were enough to make stow reach a live
-// provider. That is the wrong direction for a default: the variables exist for
-// every other tool on the machine, a CI runner usually has them, and the
-// consequence of being wrong is stow reading and writing someone else's bucket.
-// Being wrong in the other direction costs a command-line flag.
-//
-// So the invariant is one line: no explicit request, no upstream. Ambient
+// The invariant is one line: no explicit request, no upstream. Ambient
 // credentials decide how an explicitly requested upstream is *authenticated*;
-// they do not decide whether one is used. STOW_MODE=run-through (or the --mode
-// flag, which is the same decision at a different layer) is the request.
+// they do not decide whether one is used, because a developer's AWS_* variables
+// and a CI runner's are both enough to make stow reach a live provider, and being
+// wrong that way reads and writes someone else's bucket. Being wrong the other
+// way costs a command-line flag. STOW_MODE=run-through (or the --mode flag, the
+// same decision at another layer) is the request.
 func DetectMode() Mode {
 	switch strings.ToLower(strings.TrimSpace(os.Getenv("STOW_MODE"))) {
 	case "run-through", "runthrough":

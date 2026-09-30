@@ -333,15 +333,13 @@ func requireSessionLocks(t *testing.T) {
 // TestUnsupportedLocksRefuseCollection runs on every host, and is the only test
 // that covers what stow does where liveness cannot be established.
 //
-// Before this existed, a host without advisory locks simply failed every
-// collection test, which read as a broken port rather than a stated limitation.
 // The invariant worth asserting is the destructive one: nothing is deleted, and
-// the caller is told why.
+// the caller is told why. Without it a host that lacks locks simply fails every
+// collection test, which reads as a broken port rather than a stated limitation.
 //
 // On a host that *does* have locks the opposite is correct — an expired,
 // unlocked workspace is collected — so the destructive assertions are scoped to
-// the unsupported case. Writing them unconditionally made this test fail on
-// Linux, which is the check that it is asserting something.
+// the unsupported case.
 func TestUnsupportedLocksRefuseCollection(t *testing.T) {
 	registry := registryIn(t)
 	id, root := registerOwned(t, registry, time.Hour)

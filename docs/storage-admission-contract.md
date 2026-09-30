@@ -167,8 +167,67 @@ rather than choices, and each is worth stating where a reader will meet it:
 
 Not yet implemented, and therefore not yet claimed: persistence of a policy
 revision and its freshness deadline; enforcement outside the object path
-(multipart continuation, checkpoints, background retries); scoped enumeration
+(checkpoints, background retries, run-through propagation); scoped enumeration
 counts; and any handling of a saved version selector.
+
+### Where the runtime enforces this
+
+`internal/runtime` consults a policy at one point per operation, and the shape of
+that point is the enforcement.
+
+`Options.Policy` is a `*policy.Set`, and a nil pointer means no policy is
+consulted — the same shape and the same reason as `Options.Authority`, so an
+`Instance` opened without one behaves exactly as it did before the field existed.
+The policy is validated against the environment authority once, at open, rather
+than at each check site, so the answer cannot depend on which operation asked. A
+policy that turns out to be wider than its environment is **refused, not
+clipped**: every operation fails with `policy.ErrWidening`. Clipping it silently
+would leave the author believing a permission was in force when it is not.
+
+Three check functions, and the distinction between them is the contract:
+
+- `checkResource(op, resource)` — an operation on a named object. Every object
+  operation goes through this.
+- `checkUpload(op, uploadID)` — an operation addressed by a multipart handle. The
+  resource is resolved from the instance's own record of the upload, *not* from
+  the store, because the store's answer would have to be read before
+  authorization in order to know what to authorize, and authorization comes
+  first. An upload the instance cannot resolve has no established resource:
+  without a policy that is the pre-policy behaviour, and with one it is refused
+  as `ErrResourceUnresolved`, because a policy that cannot be evaluated must not
+  fall back to allow — that would make the handle-based operations the one path
+  around every selector.
+- `check(op)` — operations that name no resource: the environment's lifecycle and
+  the bucket namespace. There is nothing for a selector to match, so it consults
+  the environment authority only.
+
+`TestObjectChecksNameAResource` fails if an operation on an object reaches for
+`check` instead of the other two. A policy that is never consulted is not a
+narrower policy, and the failure mode of wiring only the obvious sites is that
+the ones nobody thought about keep permitting everything.
+
+Four consequences of enforcing per resource that are worth stating, because each
+was a design decision rather than an implementation detail:
+
+- **A copy is authorized on both ends, and the source is not optional.** A copy
+  reads its source and publishes the bytes at a destination the caller chose, so
+  checking only the destination let a write-only caller copy content out of the
+  environment. The source is checked first, being the read that can disclose.
+- **A list is authorized on the caller's own prefix.** That is sound only because
+  the results are inside it: the store is asked for that prefix and nothing else,
+  so authorizing the prefix authorizes the results. A grant covering `public/`
+  therefore permits a list scoped to it and refuses the same list unscoped.
+  Filtering a broad list down to a grant is the open half of enumeration and is
+  not done here.
+- **A batch delete authorizes each key, and a refusal leaves the batch
+  unapplied.** Deleting the permitted keys and refusing the rest would be a
+  partial answer to a question the caller asked as one.
+- **A recovery hold needs both read and write on every object it covers.** A hold
+  exists to stop those objects changing, and naming them is itself a disclosure.
+  `ReleaseObjectRecoveryHold` names no objects, so under a policy it falls back to
+  the environment authority rather than releasing: releasing is the irreversible
+  direction, and a hold this instance cannot attribute is not evidence the caller
+  may release it.
 
 Retries and adoption recheck current destination policy; retained old grants are
 provenance, not authorization. For initial coordinated profiles, a policy revision

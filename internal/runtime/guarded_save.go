@@ -61,7 +61,7 @@ func (i *Instance) ReadForSave(ctx context.Context, bucket, key string) (Object,
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, SaveCondition{}, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
+	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
 		return Object{}, SaveCondition{}, err
 	}
 	if !i.SupportsGuardedSaves() {
@@ -88,7 +88,7 @@ func (i *Instance) SaveObject(ctx context.Context, bucket, key string, data []by
 	if options.RequestKey != "" {
 		refused.Outcome = SaveUnknown
 	}
-	if err := i.checkSaveAuthority(ctx, options.RequestKey); err != nil {
+	if err := i.checkSaveAuthority(ctx, bucket, key, options.RequestKey); err != nil {
 		return refused, err
 	}
 	i.mu.Lock()
@@ -109,15 +109,18 @@ func (i *Instance) SaveObject(ctx context.Context, bucket, key string, data []by
 	return SaveResult{Object: object, Outcome: saveOutcome(err)}, err
 }
 
-func (i *Instance) checkSaveAuthority(ctx context.Context, requestKey string) error {
+// checkSaveAuthority is the write side of a save, plus the read that a durable
+// request adds: resolving a saved request discloses the receipt, so it is
+// authorized on the same object the save would write.
+func (i *Instance) checkSaveAuthority(ctx context.Context, bucket, key, requestKey string) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, object(bucket, key)); err != nil {
 		return err
 	}
 	if requestKey != "" {
-		return i.check(authority.ObjectRead)
+		return i.checkResource(authority.ObjectRead, object(bucket, key))
 	}
 	return nil
 }

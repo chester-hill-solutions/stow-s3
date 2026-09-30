@@ -1,12 +1,10 @@
 // Package atomicfile writes a file so that a reader sees either the old contents
 // or the new ones, and so that a write which reports success survives a crash.
 //
-// Two functions in this repository had this shape and offered different
-// guarantees. The filesystem backend synced the parent directory after rename and
-// discarded both the open and the sync error, so a failed sync reported success;
-// the workspace manifest renamed with no directory sync at all, which is not
-// durable until the directory entry is synced. One implementation means one
-// guarantee, and the guarantee includes the errors.
+// One implementation means one guarantee, and the guarantee includes the errors:
+// a caller that renames without syncing the parent directory is not durable until
+// the directory entry is synced, and a caller that discards the sync error reports
+// success for a write that may be lost.
 package atomicfile
 
 import (

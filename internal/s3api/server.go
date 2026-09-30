@@ -335,10 +335,6 @@ func isLoopbackRequest(r *http.Request) bool {
 //     path. When no token is configured they are simply not reachable, which is
 //     the "disable admin routes when the token is absent" behavior.
 //
-// AllowPublicAdmin no longer participates. It used to be the only gate, which
-// meant the flag turned "authenticated" into "unauthenticated" rather than the
-// other way round.
-//
 // A rejection is 404 rather than 403 so the route's existence is not advertised
 // to a caller that could not use it.
 func (s *Server) authorizeAdmin(w http.ResponseWriter, r *http.Request) bool {

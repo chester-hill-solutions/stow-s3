@@ -23,12 +23,11 @@ func (s *recordingStore) PutObject(ctx context.Context, bucket, key string, body
 // TestRuntimeNeverExposesCallerBytesToTheStore pins the safety property that
 // lets the runtime skip its defensive copy of a caller's buffer.
 //
-// The runtime used to copy the body before calling the store, which was
-// redundant because every store copies too. Removing the copy is only safe while
-// the runtime cannot hand the store something that exposes those bytes: if it
-// ever passed a reader implementing storage.ByteReader, a store that adopted
-// those bytes would retain the caller's buffer, and a caller reusing that buffer
-// would silently corrupt a stored object.
+// Skipping the runtime's defensive copy of the body is only safe while the runtime
+// cannot hand the store something that exposes those bytes: if it ever passed a
+// reader implementing storage.ByteReader, a store that adopted those bytes would
+// retain the caller's buffer, and a caller reusing that buffer would silently
+// corrupt a stored object.
 //
 // The guarantee is currently incidental, resting on bytes.Reader not having a
 // Bytes method. This test makes it explicit, so a later optimisation that

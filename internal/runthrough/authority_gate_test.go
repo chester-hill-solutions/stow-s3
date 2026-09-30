@@ -15,11 +15,6 @@ import (
 // without the environment's grant permitting it, and the grant - not a
 // configuration flag - is what answers.
 //
-// Before this the authority was not consulted anywhere in this package. Writes were
-// gated by Policy × AllowLiveWrites, and RetryPending bypassed even that while
-// running from the per-second worker and the admin retry route, both outside the
-// runtime instance.
-//
 // The counts are on the provider, not on the error. A refusal that looks like a
 // successful read is the failure mode, so every case asserts what did not happen.
 
@@ -173,12 +168,10 @@ func TestAllowLiveWritesFalseStillWithholdsPropagation(t *testing.T) {
 	}
 }
 
-// R-201's specific finding. The grant is checked in the shared propagation funnel,
-// so draining the outbox is not a way around it - which matters because the
-// retry worker and the admin route are both outside anything that checked.
 // R-201's specific finding: RetryPending bypassed even decideUpstreamWrite, and
 // runs from the per-second worker and the admin retry route, both outside the
-// runtime instance.
+// runtime instance. The grant is checked in the shared propagation funnel now, so
+// draining the outbox is not a way around it.
 //
 // The entry is seeded into the outbox directly rather than produced by a write.
 // That is the shape of the original bug - an entry exists, and the paths that

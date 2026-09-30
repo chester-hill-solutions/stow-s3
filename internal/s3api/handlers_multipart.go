@@ -148,25 +148,17 @@ func (s *Server) handleCompleteMultipartUpload(ctx context.Context, w http.Respo
 		parts = append(parts, storage.PartInfo{PartNumber: p.PartNumber, ETag: "\"" + etag + "\""})
 	}
 
-	// The minimum part size is the store's rule, not this layer's, and that is a
-	// change of where the answer comes from rather than of what it is.
+	// The minimum part size is the store's rule, not this layer's, and the store
+	// validates the stored sizes of the exact parts being completed before it
+	// assembles anything. Asking the store what its parts were and trusting the
+	// answer is not enough: a part missing from the listing is skipped rather than
+	// refused, so the one case that must never pass is the one the check is blind
+	// to.
 	//
-	// It used to be enforced here, from a ListParts call this layer made: it
-	// built a map of part numbers to sizes, and for each part below the highest
-	// one named in the request it looked the size up and refused if it was small.
-	// Two things were wrong with that. It asked the store what its parts were and
-	// then trusted the answer without checking that the parts it was about to
-	// assemble were the parts it had asked about. And a part missing from the
-	// listing — because it was never uploaded, or the listing failed — was skipped
-	// rather than refused, so the one case that must never pass was the one case
-	// the check was blind to.
-	//
-	// Every backend now validates the stored sizes of the exact parts being
-	// completed, before it assembles anything, and reports ErrEntityTooSmall,
-	// which mapStorageError renders as S3's EntityTooSmall. A client gets the
-	// same answer whichever store is underneath, and a store used directly —
-	// through the embedded API, or the workspace — enforces the same rule instead
-	// of accepting what the S3 layer would have refused.
+	// ErrEntityTooSmall is what it reports, which mapStorageError renders as S3's
+	// EntityTooSmall. A client gets the same answer whichever store is underneath,
+	// and a store used directly enforces the same rule instead of accepting what
+	// the S3 layer would have refused.
 	meta, err := s.multipart.CompleteMultipartUpload(ctx, uploadID, parts)
 	if err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))

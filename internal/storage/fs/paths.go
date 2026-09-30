@@ -57,21 +57,18 @@ func objectRelPath(key string) string {
 // objects directory, as individual segments.
 //
 // Hex doubles a key's length in bytes, so a key longer than 127 bytes cannot fit
-// in a single path component: it failed with ENAMETOOLONG even though
-// storage.ValidateKey accepts up to 1024, and the caller saw a 500 for a key it
-// was entitled to send. Those keys are split across shard directories, each
-// holding one chunk of the same reversible encoding, so the joined name still
-// decodes to exactly the original key.
+// in a single path component — ENAMETOOLONG, where storage.ValidateKey accepts up
+// to 1024. Those keys are split across shard directories, each holding one chunk
+// of the same reversible encoding, so the joined name still decodes to exactly
+// the original key.
 //
 // Every segment but the last is a shard directory and carries shardPrefix. The
 // last is the record file and does not, so a path can always be classified into
 // "descend" or "this is the object" without stat-ing anything.
 //
-// A key that fits stays flat. That keeps every existing data directory readable,
-// because only long keys were ever affected and they were never successfully
-// written, so no stored object depends on the sharded layout. It also means the
-// prefix is only ever seen on keys that failed to write before this change, so
-// introducing it cannot orphan a stored object.
+// A key that fits stays flat, so no stored object depends on the sharded layout
+// and introducing it cannot orphan one: only long keys were ever affected, and
+// they had never written successfully.
 func objectRelSegments(key string) []string {
 	encoded := objectRelPath(key)
 	if len(encoded) <= maxNameComponent {

@@ -18,7 +18,7 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, object(bucket, key)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -76,7 +76,7 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
+	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -100,7 +100,7 @@ func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, 
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
+	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -119,7 +119,7 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 	if err := i.checkContext(ctx); err != nil {
 		return ObjectPage{}, err
 	}
-	if err := i.check(authority.ObjectList); err != nil {
+	if err := i.checkResource(authority.ObjectList, object(bucket, options.Prefix)); err != nil {
 		return ObjectPage{}, err
 	}
 	if options.Limit < 0 {
@@ -162,8 +162,14 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.check(authority.ObjectDelete); err != nil {
-		return nil, err
+	// Each key is authorized on its own: a batch is a convenience, not a single
+	// wider permission, and one unauthorized key must not be deleted alongside
+	// the rest. Checked before any of them is touched, so a refusal leaves the
+	// batch unapplied rather than partly applied.
+	for _, key := range keys {
+		if err := i.checkResource(authority.ObjectDelete, object(bucket, key)); err != nil {
+			return nil, err
+		}
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -233,7 +239,7 @@ func (i *Instance) DeleteObject(ctx context.Context, bucket, key string) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.ObjectDelete); err != nil {
+	if err := i.checkResource(authority.ObjectDelete, object(bucket, key)); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -266,7 +272,15 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.check(authority.ObjectWrite); err != nil {
+	// Both ends, and the source is not optional: a copy reads the source and
+	// discloses its bytes at a destination the caller chose, so checking only the
+	// destination lets a write-only caller copy content out — the store reads the
+	// source and the guard sees a permitted write. The source goes first, being
+	// the read that can disclose.
+	if err := i.checkResource(authority.ObjectRead, object(req.SourceBucket, req.SourceKey)); err != nil {
+		return Object{}, err
+	}
+	if err := i.checkResource(authority.ObjectWrite, object(req.DestBucket, req.DestKey)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -280,10 +294,8 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	if err != nil {
 		return Object{}, err
 	}
-	if !i.storeCopyChecksConditions() {
-		if err := storage.CheckCopySourceConditions(req.Options, sourceMeta); err != nil {
-			return Object{}, err
-		}
+	if err := i.checkCopySourceConditions(req, sourceMeta); err != nil {
+		return Object{}, err
 	}
 	oldSize, exists, err := i.objectSize(ctx, req.DestBucket, req.DestKey)
 	if err != nil {
@@ -312,6 +324,17 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	}
 	i.reconcileTargetReservation(target, true)
 	return objectFromMeta(meta, nil), err
+}
+
+// checkCopySourceConditions applies the copy's source conditions when the store
+// cannot, and is a no-op when it can. Split out of the copy so the conditions
+// are one decision rather than a branch inside a function already carrying the
+// resource, quota and accounting steps.
+func (i *Instance) checkCopySourceConditions(req storage.CopyRequest, sourceMeta *storage.ObjectMeta) error {
+	if i.storeCopyChecksConditions() {
+		return nil
+	}
+	return storage.CheckCopySourceConditions(req.Options, sourceMeta)
 }
 
 // storeCopy performs the copy through whichever capability the store offers, so

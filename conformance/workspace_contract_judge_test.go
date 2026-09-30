@@ -54,9 +54,8 @@ func (r *contractRun) judgeRefusal(step contractStep, out contractOutcome) {
 // right relationship to what the verb returned.
 //
 // For a verb that writes the document itself, the file and the returned value must
-// be the same thing — that is the regression which motivated this file, stated once:
-// both client wrappers used to decode stdout for `handoff --output`, so asking for
-// a path produced a JSON parse error and the caller never got the document it had
+// be the same thing — the regression which motivated this file, where asking for a
+// path produced a JSON parse error and the caller never got the document it had
 // just asked for. For a verb that writes a document *and* prints a result, the two
 // are different documents and comparing them would be wrong.
 func (r *contractRun) judgeAlsoWritten(step contractStep, out contractOutcome) {

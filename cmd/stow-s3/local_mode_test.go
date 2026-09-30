@@ -139,9 +139,8 @@ func request(t *testing.T, base, method, path, body string) *http.Response {
 // Local is the default, and ambient credentials do not change that.
 //
 // The hazard: a developer's shell, or a CI runner, has AWS credentials exported
-// for every other tool on the machine. DetectMode used to read those and select
-// run-through, so whether stow reached a live provider depended on the machine's
-// environment rather than on anything the user asked for.
+// for every other tool on the machine, so whether stow reaches a live provider
+// must depend on what the user asked for, not on the machine's environment.
 //
 // The invariant is one line: no explicit run-through request, no upstream. Two
 // things are asserted, because the hazard is only real if both are true — the

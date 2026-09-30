@@ -23,9 +23,8 @@ func (s *FilesystemStore) CopyObject(ctx context.Context, srcBucket, srcKey, dst
 // CopyObjectCond copies from one captured source record, under one lock.
 //
 // The read and the write happen together, which is what makes this a single
-// transaction. It used to be GetObject then PutObject, and each of those took
-// the store lock separately — so a source overwritten in between was copied as
-// the bytes of one version carrying the metadata of another.
+// transaction. Taking the lock separately instead lets a source overwritten in
+// between be copied as the bytes of one version carrying the metadata of another.
 //
 // The conditions are evaluated against the record being copied, under that same
 // lock, so a condition naming a version the source has moved on from refuses the

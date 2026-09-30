@@ -19,10 +19,9 @@ import (
 // parse real arguments and then run the real resolver against a real config.
 //
 // They go through registerOfflineFlag and applyOfflineFlag rather than a hand-rolled
-// bool, because the hand-rolled one is what the tests used to do and it tested a
-// different program: the previous implementation read the flag back with flags.Visit
-// and re-parsed its string, and every test here passed while that could silently
-// leave the network open on an unreadable value.
+// bool, because a hand-rolled one tests a different program: reading the flag back
+// with flags.Visit and re-parsing its string can silently leave the network open on
+// an unreadable value.
 
 func parseOffline(t *testing.T, args ...string) (*runthrough.Config, error) {
 	t.Helper()
@@ -96,11 +95,10 @@ func TestOfflineFlagDoesNotEatTheNextArgument(t *testing.T) {
 
 // A value that is not a bool never becomes a config.
 //
-// This is the regression. The flag used to be read back with flags.Visit and
-// re-parsed from its string, and the re-parse's error was discarded — so a value the
-// resolver could not read left the config at false, and the network stayed open on
-// the flag whose only job is closing it. Two things now prevent that state, and both
-// are needed. The flag package parses the value, so an unreadable one is a parse
+// This is the regression: reading the flag back with flags.Visit and re-parsing
+// its string, discarding the re-parse's error, left the config at false on a value
+// the resolver could not read — and the network stayed open on the flag whose only
+// job is closing it. Two things now prevent that state, and both are needed. The flag package parses the value, so an unreadable one is a parse
 // error; and serve's flag set is ExitOnError, so a parse error has already printed
 // why and exited before the config exists. The assertion below is the first of the
 // two — the second is a property of the flag set, and it is why the discarded error

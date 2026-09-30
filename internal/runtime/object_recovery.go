@@ -25,7 +25,7 @@ func (i *Instance) SupportsRecoveryHolds() bool {
 }
 
 func (i *Instance) BeginObjectRecoveryHold(ctx context.Context, options ObjectRecoveryHoldOptions) error {
-	if err := i.checkRecoveryAuthority(ctx); err != nil {
+	if err := i.checkRecoveryAuthority(ctx, options.Objects); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -60,7 +60,7 @@ func (i *Instance) recoveryReferences(refs []ObjectRecoveryReference) ([]storage
 }
 
 func (i *Instance) ReleaseObjectRecoveryHold(ctx context.Context, id, owner string) error {
-	if err := i.checkRecoveryAuthority(ctx); err != nil {
+	if err := i.checkRecoveryAuthority(ctx, nil); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -75,12 +75,35 @@ func (i *Instance) ReleaseObjectRecoveryHold(ctx context.Context, id, owner stri
 	return store.ReleaseRecoveryHold(ctx, id, owner)
 }
 
-func (i *Instance) checkRecoveryAuthority(ctx context.Context) error {
+// checkRecoveryAuthority is checkResource for a hold over a set of objects.
+//
+// A hold needs both halves on every object it covers: the write, because a hold
+// exists to stop those objects changing, and the read because naming them is a
+// disclosure about which objects a caller believes are worth protecting.
+//
+// refs may be empty, which is what ReleaseObjectRecoveryHold passes. There is
+// then no resource to match, so it falls back to the environment authority, which
+// is also the pre-policy behaviour. Under a policy an unattributable hold is left
+// alone rather than released: releasing is the irreversible direction, and an
+// unattributable hold is not evidence the caller may release it.
+func (i *Instance) checkRecoveryAuthority(ctx context.Context, refs []ObjectRecoveryReference) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.ObjectRead); err != nil {
-		return err
+	if len(refs) == 0 {
+		if err := i.check(authority.ObjectRead); err != nil {
+			return err
+		}
+		return i.check(authority.ObjectWrite)
 	}
-	return i.check(authority.ObjectWrite)
+	for _, ref := range refs {
+		res := object(ref.Bucket, ref.Key)
+		if err := i.checkResource(authority.ObjectRead, res); err != nil {
+			return err
+		}
+		if err := i.checkResource(authority.ObjectWrite, res); err != nil {
+			return err
+		}
+	}
+	return nil
 }

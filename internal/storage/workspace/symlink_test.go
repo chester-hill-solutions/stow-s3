@@ -18,10 +18,9 @@ import (
 // requires a nested ordinary file to be listed and readable at its true size.
 //
 // Adopted projects contain symlinks — a dotfile repository is mostly symlinks — so
-// this is the ordinary case. Before it was refused, a key naming one was listed as
-// an object, HeadObject reported it present, and GetObject returned the target's
-// bytes to anything able to reach the workspace's S3 surface, which includes the
-// loopback endpoint. The checkpoint path refused symlinks already, so capture and
+// this is the ordinary case. Refusing one is what keeps GetObject from returning a
+// target's bytes to anything able to reach the workspace's S3 surface, which
+// includes the loopback endpoint. The checkpoint path refused symlinks already, so capture and
 // read disagreed about what the workspace contains.
 func TestASymlinkedKeyIsNotAnObject(t *testing.T) {
 	const bucket = "stow-symlink-bucket"

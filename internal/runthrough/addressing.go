@@ -4,12 +4,6 @@ import "strings"
 
 // Addressing is how a request names its bucket: in the path, or in the host.
 //
-// The upstream client used to be built with path-style unconditionally, so a
-// provider that only serves virtual-hosted addressing could not be reached at
-// all. The failure was a DNS lookup for "bucket.endpoint.example" with nothing in
-// stow's output to explain it, and the only workaround was an endpoint that
-// happened to work either way.
-//
 // Path-style stays the default. It is the style every S3-compatible endpoint
 // accepts, the style the local server and the AWS SDKs use by default, and the
 // one that works with a bucket name containing characters a hostname cannot

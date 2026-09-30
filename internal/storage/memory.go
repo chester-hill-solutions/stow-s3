@@ -129,18 +129,13 @@ func (s *MemoryStore) PutObject(_ context.Context, bucket, key string, body io.R
 	}
 	// The bucket is checked before the body is read, not after.
 	//
-	// Reading it means materializing the whole request and hashing it, and it
-	// used to happen before the store lock was taken so that the preconditions
-	// could be checked against committed state under it. So an impossible
-	// request — a body for a bucket that does not exist — was fully read,
-	// hashed and copied before anyone said no, with the whole store locked for
-	// the duration and every other caller waiting on it.
+	// Reading it means materializing the whole request and hashing it, so an
+	// impossible one is refused before paying for a body nobody wanted.
 	//
-	// The check here is a fast refusal, not the answer: the bucket can be
-	// deleted between this line and the commit, so the commit revalidates it
-	// under the lock. That is what makes a bucket deleted mid-request still
-	// produce the correct failure rather than an object in a bucket that is
-	// gone.
+	// This is a fast refusal, not the answer: the bucket can be deleted between
+	// this line and the commit, so the commit revalidates it under the lock. That
+	// is what makes a bucket deleted mid-request still fail correctly rather than
+	// leave an object in a bucket that is gone.
 	s.mu.RLock()
 	_, bucketExists := s.buckets[bucket]
 	s.mu.RUnlock()

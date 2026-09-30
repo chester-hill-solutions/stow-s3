@@ -318,11 +318,10 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 // cannot disappear while another caller reconciles a checkpoint.
 //
 // Collect cannot reach these by default: a prepared workspace has no TTL and one
-// opened on a caller's directory is adopted, so both classify forever and nothing takes
-// them out. includeAdopted covers the second. It is off by default because the entry
-// is the only record the caller has that they adopted the project, and it is offered
-// because the directory is already gone — only the record is at stake, and a registry
-// can otherwise grow until a listing is mostly records for directories that are not.
+// opened on a caller's directory is adopted, so both classify forever. includeAdopted
+// covers the second, off by default because the entry is the only record the caller
+// has that they adopted the project — and it is offered because the directory is
+// already gone, so only the record is at stake.
 func (r *Registry) Prune(includeAdopted bool) ([]Reclaim, error) {
 	entries, err := r.All()
 	if err != nil {

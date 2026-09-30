@@ -284,8 +284,8 @@ type PruneOptions struct {
 //
 // It exists because Collect cannot reach them, and by default never will: a prepared
 // workspace has no TTL and one opened on a caller's directory is adopted, so both
-// classify forever, and nothing takes them out. So a registry accumulates records
-// pointing at directories that were deleted, and every listing is mostly those.
+// classify forever. A registry then accumulates records pointing at deleted
+// directories, and every listing is mostly those.
 //
 // It removes stow's own records and nothing else.
 func Prune(options PruneOptions) ([]PruneResult, error) {
