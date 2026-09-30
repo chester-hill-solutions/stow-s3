@@ -59,7 +59,15 @@ export function main(argv) {
   for (const step of publishPlan(tarballs, isPublished)) {
     console.log(`${checkOnly ? "preflight" : step.action} ${step.name}@${step.version}`);
     if (checkOnly || step.action === "skip") continue;
-    execFileSync("npm", ["publish", "--ignore-scripts", "--access", "public", "--provenance", ...registryFlags(step.name), step.tarball], { stdio: "inherit" });
+    // No --provenance: npm rejects it here with EUSAGE, which is how the v0.2.0
+    // release died at this step. The flag was removed from the inline publish
+    // commands in release.yml and came back when those were replaced by this
+    // script, and nothing noticed until a tag was cut. This project does not
+    // publish provenance. If it is ever wanted it needs wiring and verifying
+    // deliberately: the note left with the original removal calls it a GitHub
+    // Packages limitation, and this registry is npmjs, so it does not describe
+    // this setup.
+    execFileSync("npm", ["publish", "--ignore-scripts", "--access", "public", ...registryFlags(step.name), step.tarball], { stdio: "inherit" });
     const receipt = isPublished(step.name, step.version);
     if (receipt?.integrity !== step.integrity) throw new Error(`published integrity not confirmed for ${step.name}@${step.version}`);
   }

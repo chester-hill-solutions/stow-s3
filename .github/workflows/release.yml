@@ -36,7 +36,16 @@ jobs:
           make build
           make standards
       - name: Verify generated output
-        run: make check-generated
+        run: |
+          make check-generated
+          # The diff is the only check here that can see the committed artifact.
+          # make check-generated digests dist after the rebuild has already copied
+          # a fresh build over the committed one, so it proves the build is
+          # idempotent, not that the committed bytes are current — a stale or
+          # host-built stow-runtime.wasm passes it. The corpus jobs in ci.yml make
+          # the same comparison and this is the same build, so this is the check
+          # that keeps the wrong bytes out of a published tarball.
+          git diff --exit-code -- packages/stow-s3/dist
       - name: Pack verified npm package
         working-directory: packages/stow-s3
         run: |
