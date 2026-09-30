@@ -135,6 +135,23 @@ func (a Authority) IsSupersetOf(b Authority) bool {
 	return a.Mask&b.Mask == b.Mask
 }
 
+// Intersect returns the operations both a and b permit.
+//
+// It is here rather than in each caller because both ways of spelling it at the
+// call site are wrong in a direction that only shows up under a policy. With
+// only adds, so intersecting by adding to either side widens the result instead
+// of narrowing it; Without applied to the wrong side withholds from the wrong
+// set. One implementation, one test, and the same reason IsSupersetOf is here.
+func (a Authority) Intersect(b Authority) Authority {
+	var mask uint32
+	for _, bit := range operationBits {
+		if a.Mask&bit != 0 && b.Mask&bit != 0 {
+			mask |= bit
+		}
+	}
+	return Authority{Mask: mask}
+}
+
 // Operations lists what is permitted, sorted, for a descriptor or a diagnostic.
 // Sorted so the output is stable: an unordered list makes a capability payload
 // differ between two runs of the same program.
@@ -249,15 +266,8 @@ func Defined() []Operation {
 // registry mutation. EnvironmentPromote remains exported for compatibility,
 // but has no operation to enforce; its disposition remains an explicit gap.
 //
-// UpstreamRead and UpstreamWrite were in this list until the run-through adapter
-// started consulting the authority on reads, writes and the retry funnel, and they
-// stayed after it did. The enforcement test could not see the change, because its
-// scan matched a method named check and the adapter gates with Authority.Allows —
-// so the test not only failed to notice the enforcement, it required the code to go
-// on claiming in this map that a permission was described and not granted. The scan
-// now recognises both forms. Behaviour was always covered by
-// internal/runthrough/authority_gate_test.go; what was wrong was this file's
-// description of it.
+// The enforcement test recognises a gate written as either check(op) or
+// Allows(op), so a caller may enforce in either style without going unrecorded.
 var Ungated = map[Operation]string{
 	EnvironmentPromote: "No promotion operation is implemented; exported compatibility vocabulary grants no behavior",
 }

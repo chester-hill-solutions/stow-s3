@@ -11,36 +11,26 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
 )
 
-// manifestVersion is the only on-disk manifest layout this build implements. A
-// file written by a newer revision is refused rather than migrated on read: the
-// outbox already established that rule for durable files, and a manifest that
-// silently downgrades loses exactly the entries it could not understand.
+// manifestVersion is the only on-disk layout this build implements. A file written
+// by a newer revision is refused rather than migrated on read: the outbox already
+// established that rule for durable files, and a manifest that silently downgrades
+// loses exactly the entries it could not understand.
 //
 // Version 2 splits the document. Version 1 held identity and the object index in
 // one file, so adopting one host-written object rewrote the whole workspace's
-// metadata: 20 HEADs produced 20 full rewrites, each serialising a document that
-// grew as it went. Identity changes once per workspace and the index changes per
-// object, so they are separate files with separate write paths.
+// metadata. Identity changes once per workspace and the index per object, so they
+// are separate files with separate write paths. Version 3 namespaces the escaped
+// form by bucket, because an escaped key used to resolve to one file across two
+// buckets and they read, wrote and deleted over each other.
 //
-// A version 1 workspace is refused rather than migrated. Its recorded checksums,
-// ETags and metadata would have to be carried into index.json by a rewrite that
-// can be interrupted with the index as the only copy, and the alternative -
-// treating a missing index as empty - discards them silently. Neither is worth it
-// for a store whose contents are disposable and whose owner is usually mid-task.
-//
-// Version 3 namespaces the escaped form by bucket. An escaped key used to be stored
-// at a digest of the key alone, so the same key in two buckets resolved to one file
-// and the buckets read, wrote and deleted over each other. The fix moved those
-// files, and that is what forces the version rather than the other way round.
-//
-// A version 2 workspace is refused for the same reason version 1 is, and it is worth
-// being explicit about why refusing beats opening it. Its manifest is still valid -
-// the path was always derived from the key, never recorded - but its escaped objects
-// now sit at a path this build does not look at. Opening it would make every
-// escaped key resolve to absent while its file stayed on disk, which is the
-// total-loss reading that ErrManifestCorrupt's own comment calls the one thing
-// worse than losing bytes. A clear refusal is the only safe answer. Version 2 was
-// never released, so what this costs is a developer's local workspace.
+// Version 1 and version 2 workspaces are refused rather than migrated, and
+// refusing beats opening them. Version 1's checksums, ETags and metadata would
+// have to be carried into index.json by a rewrite interruptible with the index as
+// the only copy, and treating a missing index as empty discards them silently.
+// Version 2's manifest is still valid but its escaped objects sit at a path this
+// build does not look at, so opening it would resolve every escaped key to absent
+// while the file stayed on disk — the total-loss reading ErrManifestCorrupt calls
+// worse than losing bytes.
 const manifestVersion = 3
 
 // ErrManifestCorrupt is returned when a manifest exists and cannot be trusted.

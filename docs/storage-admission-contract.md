@@ -139,6 +139,37 @@ results with permission-safe pagination/counts. Scoped artifact completeness mea
 complete within its declared scope; absence outside that scope cannot authorize
 deletion during restore.
 
+### Implementing a scope
+
+`internal/policy` implements the sections above. Four things in it are traps
+rather than choices, and each is worth stating where a reader will meet it:
+
+- **The two prefix semantics are not interchangeable.** An object key prefix `a`
+  covers `abc`, because that is what an S3 prefix has always meant. A workspace
+  subtree `a` covers `a/b` and not `ab`, because `ab` is a different directory.
+  A prefix that silently widened into a subtree would grant a permission to a
+  path nobody selected, so a selector carries its own kind and never matches the
+  other one even when the locator text is identical.
+- **Effective access is an intersection, and the obvious spellings of it are
+  wrong.** `Authority.With` only adds, so intersecting by adding the policy's
+  operations to the environment *widens* the result; applying `Without` to the
+  wrong side withholds from the wrong set. `authority.Intersect` is the one
+  implementation, for the same reason `IsSupersetOf` is one implementation.
+- **An allow entry's mask is built from `None`, not `All`.** `All().With(x)` is
+  still every operation, so an allow entry written that way grants everything
+  its selector covers — a widening that is invisible in review because the call
+  reads like "allow these".
+- **An expired policy is neither a grant nor a denial.** Denying it would let an
+  expired cache read as a permission decision; allowing it would extend a
+  permission past its lifetime because the bytes were still cached. It is
+  reported as unknown, distinctly, because those three answers need different
+  responses from a caller.
+
+Not yet implemented, and therefore not yet claimed: persistence of a policy
+revision and its freshness deadline; enforcement outside the object path
+(multipart continuation, checkpoints, background retries); scoped enumeration
+counts; and any handling of a saved version selector.
+
 Retries and adoption recheck current destination policy; retained old grants are
 provenance, not authorization. For initial coordinated profiles, a policy revision
 change and mutation admission share the relevant gate: revocation effective before

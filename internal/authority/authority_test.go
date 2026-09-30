@@ -64,6 +64,28 @@ func TestAttenuationIsOneWay(t *testing.T) {
 	}
 }
 
+func TestIntersectIsTheNarrowerOfTheTwo(t *testing.T) {
+	readOnly := authority.ReadOnly()
+	// Add an operation the read-only set withholds, so the two sides differ and
+	// a With-based intersection would visibly widen rather than quietly match.
+	wide := readOnly.With(authority.UpstreamRead)
+	both := readOnly.Intersect(wide)
+	if !both.IsSupersetOf(readOnly) || both.Allows(authority.UpstreamRead) {
+		t.Errorf("intersection gained an operation neither narrowing side should add: %s", both)
+	}
+	if both != readOnly {
+		t.Errorf("intersecting with a superset = %s, want the narrower set %s", both, readOnly)
+	}
+	if got := readOnly.Intersect(authority.None()); got != authority.None() {
+		t.Errorf("intersecting with none = %s, want none", got)
+	}
+	// Order must not matter, or a caller could get a different answer by
+	// swapping the two sides.
+	if wide.Intersect(readOnly) != both {
+		t.Error("intersection depends on which side is the receiver")
+	}
+}
+
 func TestCheckNamesTheRefusedOperation(t *testing.T) {
 	err := authority.None().Check(authority.EnvironmentDestroy)
 	if err == nil {

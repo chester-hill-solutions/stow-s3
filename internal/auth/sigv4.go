@@ -155,24 +155,14 @@ func parseCredentialScope(raw string) (credentialScope, error) {
 // parseSignedHeaders reads the SignedHeaders list strictly, or refuses it.
 //
 // The list is the client's statement of which headers it covered, and the
-// signature is computed over a canonical request that names exactly those. Every
-// leniency in here is therefore a way to authenticate a request against a set of
-// headers the client did not actually commit to — which this used to have four of:
-//
-//   - empty entries were dropped, so "host;;x-amz-date" became the same list as
-//     "host;x-amz-date". A client that emitted a stray separator, or one whose
-//     list was assembled from a filter that produced nothing for a header, got a
-//     request accepted against a list it never wrote.
-//   - entries were trimmed and lowercased, so "host; X-Amz-Date" and
-//     "host;x-amz-date" were the same list, and a header named in a different
-//     case than the one on the wire was quietly accepted.
-//   - duplicates were kept, so "host;host" named the same header twice, and the
-//     canonical request carried it twice while the request carried it once.
-//   - the list was sorted, so the order the client wrote was discarded. Ordering
-//     is not cosmetic here: the canonical request embeds the list verbatim, so
-//     sorting locally and not in the signature would make the two disagree — and
-//     a list that is silently reordered is a list whose text is no longer the
-//     client's.
+// signature is computed over a canonical request naming exactly those. Every
+// leniency here is a way to authenticate a request against headers the client did
+// not commit to, so all four of these are refused: empty entries, which would make
+// "host;;x-amz-date" the same list as "host;x-amz-date"; trimming and lowercasing,
+// so a header named in a different case than the one on the wire is accepted;
+// duplicates, so the canonical request carries a header twice where the request
+// carries it once; and sorting, since the canonical request embeds the list
+// verbatim and a list silently reordered is no longer the client's text.
 //
 // AWS's own signer emits lower-case, semicolon-separated, ascending and
 // duplicate-free, so a conforming client is unaffected by refusing anything else.

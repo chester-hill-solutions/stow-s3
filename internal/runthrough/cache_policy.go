@@ -234,26 +234,20 @@ func (a *Adapter) ReconcileCacheIndex(ctx context.Context) error { return a.reco
 // both directions: it drops entries for objects the store no longer has, and it
 // adds entries for objects the store has and the index has never seen.
 //
-// The second half is the one that decides whether a restart is safe. The cache
-// lives in a directory and this index lives in memory, so a server that comes
-// up over an existing cache directory holds bytes it knows nothing about. Every
-// eviction plan is computed from the index and from nothing else, so an index
-// that starts empty computes the cache total from the objects written since
-// startup alone, and a byte limit the operator set is then enforced against
-// that. The cache then grows past the bound with nothing to indicate it.
+// The second half is what decides whether a restart is safe. The cache lives in
+// a directory and this index lives in memory, so a server coming up over an
+// existing cache directory holds bytes it knows nothing about. Every eviction
+// plan is computed from the index and nothing else, so an index starting empty
+// computes the cache total from objects written since startup alone, a byte
+// limit the operator set is enforced against that, and the cache then grows past
+// its bound with nothing to indicate it.
 //
-// This function used to prune only. Pruning is the half that matters when the
-// assumption holds and the index is complete, and it is the half its own comment
-// described, so the gap was invisible until the index was not complete — which
-// is precisely the restart case it claimed to cover.
-//
-// A discovered object is recorded with the store's own LastModified as its
-// access time, because that is real evidence about the bytes rather than a
-// guess. Using the discovery time instead would make every pre-restart object
-// look freshly used, so the objects most overdue for eviction would be the ones
-// eviction spared. Its expiry is left unset, which is what touchCache does for
-// an object whose TTL has not started, and it starts on the next read rather
-// than wiping the cache on every restart.
+// A discovered object is recorded with the store's own LastModified as its access
+// time, because that is evidence about the bytes rather than a guess: the
+// discovery time would make every pre-restart object look freshly used, so the
+// objects most overdue for eviction would be the ones eviction spared. Its expiry
+// is left unset, which is what touchCache does for an object whose TTL has not
+// started, and it starts on the next read rather than wiping the cache on restart.
 func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 	buckets, err := a.cache.ListBuckets(ctx)
 	if err != nil {

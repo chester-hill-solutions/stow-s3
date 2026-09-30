@@ -34,22 +34,18 @@ type Store interface {
 	// CopyObject publishes the destination key from exactly one version of the
 	// source.
 	//
-	// "One version" is the whole contract, and it is what makes a copy usable:
-	// the bytes and the metadata copied always describe the same object, so a
-	// copy taken while the source is being overwritten is one complete version
-	// rather than a body from one write and a content type from another. A copy
-	// composed of a read and a later write can only promise that if nothing
-	// changed in between, which is a promise about timing rather than about the
-	// result.
+	// "One version" is the whole contract, and it is what makes a copy usable: the
+	// bytes and the metadata copied always describe the same object, so a copy taken
+	// while the source is being overwritten is one complete version rather than a
+	// body from one write and a content type from another. A copy composed of a read
+	// and a later write can only promise that if nothing changed in between, which
+	// is a promise about timing rather than about the result.
 	//
-	// The version is chosen when the copy runs, so a source that is deleted
-	// first may fail with ErrObjectNotFound and a source that is overwritten
-	// first yields the newer complete version. Copying a key onto itself is
-	// allowed and publishes a new version of it.
-	//
-	// The destination's own preconditions are not consulted: a copy overwrites.
-	// Source preconditions, when a caller has them, are ConditionalCopyStore's
-	// business.
+	// The version is chosen when the copy runs, so a source deleted first may fail
+	// with ErrObjectNotFound and a source overwritten first yields the newer complete
+	// version. Copying a key onto itself publishes a new version of it. The
+	// destination's own preconditions are not consulted: a copy overwrites. Source
+	// preconditions are ConditionalCopyStore's business.
 	CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*ObjectMeta, error)
 	ListObjectsV2(ctx context.Context, bucket string, opts ListOptions) (*ListResult, error)
 
