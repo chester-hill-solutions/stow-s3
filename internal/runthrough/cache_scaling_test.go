@@ -31,10 +31,9 @@ const cacheProbeBody = 64
 // cache, so a measured read starts from a cache of known depth rather than
 // filling one.
 //
-// The warm-up matters: an earlier version of this test seeded only upstream, so
-// both measured batches filled an empty cache and did identical work. The ratio
-// came out at 0.90x and looked like proof there was no scan at all, when in fact
-// the two arms were the same experiment.
+// The warm-up matters: seeding only upstream makes both measured batches fill an
+// empty cache and do identical work, and the ratio then reads as proof there is
+// no scan when in fact the two arms are the same experiment.
 func seedCachingAdapter(t testing.TB, cacheMaxBytes int64, n int) (*runthrough.Adapter, *countingStore, *mockUpstream) {
 	t.Helper()
 	ctx := context.Background()

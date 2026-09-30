@@ -98,12 +98,13 @@ func TestProtectedReasonSeesThroughRelativePaths(t *testing.T) {
 // ancestor of /home/alice2.
 func TestIsAncestorOrSelf(t *testing.T) {
 	// The cases go through resolvePath, which is what both production call sites
-	// do, and they are built from the platform's own separator. Hard-coded POSIX
-	// literals were used here first and this test failed on windows-latest, where
-	// "/a" is not a native path and the separator is not "/". The production code
-	// was right: destroy.go always calls isAncestorOrSelf with resolvePath
-	// results, and a function that stops deletion reaching an ancestor of the
-	// working directory has no business being handed a path it cannot parse.
+	// do, and they are built from the platform's own separator. A hard-coded POSIX
+	// literal is not a native path on windows-latest, where the separator is not
+	// "/", and such a case fails on the platform rather than on the behaviour. The
+	// production code is right either way: destroy.go always calls isAncestorOrSelf
+	// with resolvePath results, and a function that stops deletion reaching an
+	// ancestor of the working directory has no business being handed a path it
+	// cannot parse.
 	sep := string(filepath.Separator)
 	root := filepath.VolumeName(t.TempDir()) + sep
 	a := filepath.Join(root, "a")

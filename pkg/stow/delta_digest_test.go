@@ -12,19 +12,16 @@ import (
 // A delta document's own digests cover its content and nothing else. Each changed
 // path carries the sha256 of its bytes, and a receiver checks those, so the bytes
 // cannot be swapped. Nothing in the document binds the change list itself — the
-// path a change names, its kind, and the from/to metadata — to the sender's intent.
-//
-// The consequence is not subtle and is not a theoretical one: take a document that
-// adds "notes.txt", rename the addition to "planted.sh" in the change and in the
-// content map together, and the document is entirely self-consistent. The content
-// digest still matches the bytes it carries, and the precondition passes because
-// "planted.sh" is absent from the target. Apply writes the payload under a
-// destination the sender never chose, and reports success.
+// The consequence is not subtle: take a document that adds "notes.txt", rename the
+// addition to "planted.sh" in the change and in the content map together, and the
+// document is entirely self-consistent. The content digest still matches the bytes it
+// carries, and the precondition passes because "planted.sh" is absent from the target.
+// Apply writes the payload under a destination the sender never chose, and reports
+// success.
 //
 // The fix is the check the handoff archive path already had. `delta` reports the
-// document's digest; the receiver hands it back and apply refuses a document that
-// does not hash to it. These tests hold that line from both directions — a
-// substitution is caught, and an unaltered document is not.
+// document's digest; the receiver hands it back and apply refuses a document that does
+// not hash to it. These tests hold that line from both directions.
 
 func TestADeltaWithARenamedDestinationIsRefusedOnTheDocumentDigest(t *testing.T) {
 	document := readFixtureDelta(t)
@@ -35,8 +32,8 @@ func TestADeltaWithARenamedDestinationIsRefusedOnTheDocumentDigest(t *testing.T)
 	altered := encodeFixtureDelta(t, document)
 
 	// Precondition: the rename is invisible to every check the document makes
-	// about itself. If this ever stops holding, the substitution is no longer the
-	// thing this test is about and the fix below is testing the wrong thing.
+	// about itself. If this stops holding, the substitution is no longer the thing
+	// this test is about and the fix below is testing the wrong thing.
 	if renamed == nil {
 		t.Fatal("the fixture does not add notes.txt, so the substitution cannot be built")
 	}

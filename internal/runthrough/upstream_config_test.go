@@ -16,22 +16,14 @@ import (
 //
 // UpstreamConfig is assembled by envFirst over a fixed list of STOW_*, S3_* and
 // AWS_* names, and that is the whole of what the documentation says reaches the
-// upstream client. It was then handed to config.LoadDefaultConfig, which resolves
-// the entire default AWS chain on top: ~/.aws/config, ~/.aws/credentials, SSO,
+// upstream client. It must not also reach config.LoadDefaultConfig, which resolves
+// the default AWS chain on top: ~/.aws/config, ~/.aws/credentials, SSO,
 // web-identity token files, and the EC2 instance metadata provider.
 //
-// Most of that turned out to be harmless, and it is worth being exact about which.
-// Region and endpoint are both set explicitly, and they win: a shared config
-// declaring a different region still produced a client signing for us-east-1, and
-// s3_use_accelerate_endpoint in the shared config did not redirect the request away
-// from the configured endpoint. Both of those are asserted below as invariants,
-// because they are the kind of thing a future change to the client options could
-// quietly undo.
-//
-// What is not harmless is that the chain is read at all. Naming a profile stow
-// never asked for made client construction fail outright, so whether stow could
-// reach upstream storage at all depended on the machine's AWS configuration. That
-// is the defect, and it is the one the fix is verified by.
+// Most of that chain is inert — region and endpoint are set explicitly and win, and
+// both are asserted below as invariants — but reading it is not: naming a profile
+// stow never asked for makes client construction fail, so whether stow can reach
+// upstream storage at all depends on the machine's AWS configuration.
 
 // scopeRegion pulls the region out of an Authorization header's credential scope,
 // which SigV4 spells <access-key>/<date>/<region>/s3/aws4_request inside the

@@ -49,9 +49,9 @@ func getHeader(t *testing.T, url string, header, value string) *http.Response {
 	return resp
 }
 
-// AllowPublicAdmin used to be the only gate, so passing it exposed the outbox
-// retry and discard actions to any client that could reach the port, with no
-// credential. It is now ignored: a boolean cannot be the thing that authorizes.
+// AllowPublicAdmin is ignored: a boolean cannot be the thing that authorizes, and
+// honouring one exposed the outbox retry and discard actions to any client that
+// could reach the port.
 func TestAllowPublicAdminAloneGrantsNothing(t *testing.T) {
 	// httptest serves on loopback, so the remote case is dispatched synthetically
 	// with a non-loopback RemoteAddr: that is the only thing the flag used to change.

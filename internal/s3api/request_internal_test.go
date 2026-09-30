@@ -33,8 +33,8 @@ func TestEnforceContentLengthAcceptsAMatchingBody(t *testing.T) {
 
 // TestRequestBodyReadsTheSocketOnlyOnce is the property the read-once change
 // exists for. Every consumer in this package needs the whole body, and each one
-// used to make its own full-size copy, which is where the measured per-MiB
-// memory amplification came from.
+// making its own full-size copy is where measured per-MiB memory amplification
+// comes from.
 func TestRequestBodyReadsTheSocketOnlyOnce(t *testing.T) {
 	req := withBodyCache(httptest.NewRequest("PUT", "/bucket/key", strings.NewReader("payload")))
 	body, err := requestBody(req)

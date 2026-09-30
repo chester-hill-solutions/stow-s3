@@ -9,24 +9,17 @@ import (
 	"syscall"
 )
 
-// Watch arms a kqueue EVFILT_PROC filter with NOTE_EXIT, which watches the
-// process identity rather than a pid number so pid reuse cannot trigger a false
-// exit, and blocks a goroutine on the kqueue for the life of the process.
+// Watch arms a kqueue EVFILT_PROC filter with NOTE_EXIT, which watches the process
+// identity rather than a pid number so pid reuse cannot trigger a false exit, and
+// blocks a goroutine on the kqueue for the life of the process.
 //
-// The descriptor is deliberately never closed. kqueue filters are scoped to the
-// open descriptor, so closing it removes every filter registered against it. An
-// earlier version registered the filter and then closed the descriptor as it
-// returned, with no goroutine ever waiting on it, and separately read
-// kevent()'s return value as a count of registered changes when it is a count
-// of delivered events. Either defect alone is fatal, and both were present at
-// once: the descriptor was dropped and the registration was reported as failed,
-// so the watch was never armed on macOS at all. Nothing about the filter
-// survives the descriptor, so the descriptor has to outlive this function.
+// The descriptor is deliberately never closed, and kevent() returns delivered
+// events rather than registered changes. docs/CODE_STANDARDS.md has why both
+// matter and what they cost when they are wrong.
 //
-// When the parent exits the goroutine raises SIGTERM on this process. That is
-// the same disposition prctl(PR_SET_PDEATHSIG) produces on Linux, so both
-// platforms terminate identically whatever the server's own signal handling is,
-// and neither depends on a polling loop that could be missed.
+// When the parent exits the goroutine raises SIGTERM on this process, the same
+// disposition prctl(PR_SET_PDEATHSIG) produces on Linux, so both platforms
+// terminate identically whatever the server's own signal handling is.
 func Watch(request Requested) error {
 	if err := request.Validate(); err != nil {
 		return err

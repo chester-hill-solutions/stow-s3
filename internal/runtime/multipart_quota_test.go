@@ -44,8 +44,8 @@ func boundedInstance(t *testing.T, maxBytes, maxObjects int64) *Instance {
 // parts and builds a second copy of the same bytes before publishing, so a
 // session that could fit the object in its budget could not fit the completion —
 // and the store went ahead and built it anyway. Peak is asserted here rather than
-// the object alone because the object alone is what the old accounting checked,
-// and it is the wrong question: the question is what the process holds.
+// the object alone, because the object alone is the wrong question: the question
+// is what the process holds.
 func TestCompletionReservesTheBufferItAssembles(t *testing.T) {
 	ctx := context.Background()
 	const objectSize = 4

@@ -21,10 +21,10 @@ import (
 // full `bytes <first>-<last>/<size>` string also pins the total, which is the
 // part a truncated or over-long read reports wrongly most often.
 //
-// An unsatisfiable request is a different shape. The SDK surfaces 416 as an
-// error rather than a GetObjectOutput, so the expectation is checked through
-// assertCorpusError, and the `bytes */<size>` form is asserted separately
-// because it is the one place the server reports the total on a refusal.
+// An unsatisfiable request is a different shape: the SDK surfaces 416 as an error
+// rather than a GetObjectOutput, so the expectation is checked through
+// assertCorpusError, and the `bytes */<size>` form is asserted separately because it
+// is the one place the server reports the total on a refusal.
 func runCorpusRangeGet(corpusContext *sharedCorpusContext) {
 	corpusContext.t.Helper()
 	testCase := corpusContext.testCase

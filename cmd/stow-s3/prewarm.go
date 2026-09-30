@@ -205,17 +205,15 @@ func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmRes
 // operator assembling a list is a mistake worth tolerating, and warming it twice
 // costs one fetch.
 //
-// Lines come before commas, and the order is the fix for a bug this had. Splitting on
-// commas first meant a comment containing one — "# model weights, see the runbook" —
-// was cut in half, and the half after the comma did not start with "#" and so became
-// a key. A file format that documents # as a comment marker and then warms your
-// prose is worse than no comment marker at all, because the operator trusts it.
+// Lines come before commas: splitting on commas first cuts a comment containing
+// one — "# model weights, see the runbook" — in half, and the half after the comma
+// does not start with "#" and so becomes a key. A format that documents # as a
+// comment marker and then warms your prose is worse than no marker at all.
 //
 // A comment is a line whose first non-space character is #, and only that. A key
-// containing # is a legal S3 key, so stripping from the first # anywhere in a line
-// would refuse keys that exist and warm nothing in their place. A trailing comment
-// on the same line as a key is therefore not supported, and that is the lesser evil
-// stated rather than discovered.
+// containing # is legal, so stripping from the first # anywhere in a line would
+// refuse keys that exist and warm nothing in their place. A trailing comment beside
+// a key is therefore unsupported, and that is the lesser evil stated.
 func readPrewarmKeys(flagValue, file string) ([]string, error) {
 	raw := flagValue
 	if file != "" {

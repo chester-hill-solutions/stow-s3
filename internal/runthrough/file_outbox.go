@@ -88,10 +88,9 @@ func decodeOutboxState(data []byte) (outboxState, error) {
 	return outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken}, nil
 }
 
-// migrateOutboxAttempts records that entries from a pre-version writer were
-// already attempted, so the next claim reconciles them against upstream before
-// propagating again. The old format kept an attempt count but no marker saying
-// whether the attempt may have reached upstream.
+// migrateOutboxAttempts marks entries written by a format that kept an attempt count
+// but no marker of whether the attempt reached upstream, so the next claim reconciles
+// them against upstream before propagating again.
 func migrateOutboxAttempts(entries map[string]OutboxEntry) {
 	for id, entry := range entries {
 		if !entry.Attempted && entry.Attempts > 0 {

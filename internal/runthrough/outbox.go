@@ -18,17 +18,15 @@ var (
 	// ErrUpstreamConflict reports that the upstream object changed after stow
 	// decided to write it, so the write was refused rather than applied.
 	//
-	// It is a distinct error from a transport failure because a caller has to be
-	// able to tell them apart: a precondition failure cannot succeed on a retry,
-	// so the entry is terminal and somebody has to decide what should win. Before
-	// this existed, propagateWrite compared the upstream ETag only to decide
-	// whether a previous attempt had already landed, and overwrote upstream
-	// whenever they differed — so two writers sharing a key silently lost one
-	// side's object with nothing reported to either.
+	// It is a distinct error from a transport failure because a caller has to tell
+	// them apart: a precondition failure cannot succeed on a retry, so the entry is
+	// terminal and somebody has to decide what should win. Without it, propagateWrite
+	// compared the upstream ETag only to decide whether a previous attempt had
+	// landed, and overwrote upstream whenever they differed — so two writers sharing
+	// a key silently lost one side's object with nothing reported to either.
 	//
-	// The refusal is deliberately not a merge. stow's local store stays
-	// authoritative for the caller's own read, and the conflict is surfaced for a
-	// decision rather than resolved by picking a winner.
+	// The refusal is deliberately not a merge. stow's local store stays authoritative
+	// for the caller's own read, and the conflict is surfaced rather than resolved.
 	ErrUpstreamConflict         = errors.New("upstream object was changed by another writer")
 	ErrUpstreamStateUnknown     = errors.New("upstream state could not be observed; propagation is refused")
 	ErrOutboxPreparedUnresolved = errors.New("outbox prepared intent cannot be reconciled")

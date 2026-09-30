@@ -226,16 +226,13 @@ func repoRoot() string {
 // session shipped a verb whose report was wrong and a file that was half comment with
 // every gate green throughout.
 //
-// Both are measured because neither is sufficient on its own. The ratio is
-// repo-wide and weighted by line count, so it cannot be satisfied by deleting code —
-// but across 55,000 scanned lines it is stored as an integer, and four added
-// comments move it by zero. The count is exact, so one line is enough to fail — but
-// deleting uncommented code would satisfy it. A change has to either delete comments
-// or delete code, and both are visible in a diff.
+// Both are measured because neither is sufficient alone. The ratio is repo-wide and
+// weighted by line count, so deleting code cannot satisfy it, but across 55,000 scanned
+// lines it is stored as an integer and four added comments move it by zero. The count
+// is exact, so one line fails, but deleting uncommented code would satisfy it.
 //
-// A per-file ceiling was the obvious alternative to both and is worse: it punishes
-// the file that most needs explaining, and it is defeated outright by splitting a
-// file in two.
+// A per-file ceiling is worse than both: it punishes the file that most needs
+// explaining, and splitting a file in two defeats it.
 const (
 	commentLinesRule = "comment-lines"
 	commentRatioRule = "comment-ratio"
@@ -365,18 +362,13 @@ func (c *checker) checkLiterals(fn *ast.FuncDecl) {
 // The `any` rule is scoped to non-test code, and the scope is load-bearing rather
 // than convenient. `any` is a defect where a value crosses a boundary a type could
 // have described: it is where a lost assertion becomes a silent wrong answer. In a
-// test that has to compare values it does not know the shape of — the workspace
-// contract's matcher walks whatever a verb printed — there is no boundary to type
-// and no assertion to lose, so the rule has nothing to protect there.
+// test that has to compare values it does not know the shape of there is no
+// boundary to type and no assertion to lose, so the rule has nothing to protect.
 //
-// Applying it to tests anyway had a cost that was paid in the worst currency
-// available. A conformance matcher written without `any` cannot decode into a value
-// tree, so it compares raw JSON with a hand-rolled canonicaliser: 177 lines of
-// object/array/number walkers and five shape-specific encoders, written and then
-// pinned by tests, all to keep a counter at five. The ratchet was satisfied and the
-// code was substantially worse, which is the trade this rule must never force. The
-// recorded count is unchanged by a fix elsewhere, so the loosening costs the gate
-// nothing: `any` in production code is still a new violation and still fails.
+// Forcing it on tests anyway makes a conformance matcher compare raw JSON with a
+// hand-rolled canonicaliser, satisfying the ratchet while the code gets worse. The
+// recorded count is unchanged by a fix elsewhere, so the gate still fails on `any`
+// in production code.
 func (c *checker) checkEscapes(file *ast.File) {
 	location := filepath.ToSlash(c.path)
 	ast.Inspect(file, func(node ast.Node) bool {

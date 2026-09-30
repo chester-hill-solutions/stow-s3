@@ -167,22 +167,16 @@ func mapStorageError(err error, resource string) s3Error {
 		}
 	}
 	// Ahead of the upstream table and the storage table both, because this error
-	// carries a cause that one of them will match and the cause is the wrong
-	// answer.
+	// carries a cause that one of them will match and the cause is the wrong answer.
 	//
 	// ErrMutationCommitted says the object was written to the authoritative local
 	// store and a later step failed. Its cause is then whatever that step hit —
-	// commonly ErrObjectNotFound, because the upstream did not have the bucket —
-	// and the storage table maps that to a 404 NoSuchKey. So the server told a
-	// caller that the object does not exist while having just written it, and the
-	// two statements contradict each other. A caller that believed the 404 and
-	// read the key back would find it; a caller that retried would never succeed,
-	// because nothing about the next attempt changes.
+	// commonly ErrObjectNotFound, because the upstream did not have the bucket — and
+	// the storage table maps that to a 404 NoSuchKey. So the server would tell a
+	// caller the object does not exist while having just written it.
 	//
 	// 5xx is the honest class: the local state is committed and the propagation is
-	// unfinished, so a retry of the same body is safe and the outbox is still
-	// trying. The cause is not repeated in the message, for the same reason the
-	// upstream table does not repeat it.
+	// unfinished, so a retry of the same body is safe and the outbox is still trying.
 	if errors.Is(err, storage.ErrMutationCommitted) {
 		return s3Error{
 			Code:       "InternalError",

@@ -73,15 +73,13 @@ func DefaultRegistryDir() (string, error) {
 //
 // It is a partition of the directory rather than a field on the entry, and that
 // choice is the whole point. A label recorded on an entry is a label: `All` would
-// still return every team's workspaces, a sweep would still consider them, and
-// two teams sharing a runner would still be one namespace with extra steps. A
-// partition is enforced by the filesystem, so a team cannot be resumed, collected,
-// or checkpointed from outside its own root, and no code path has to remember to
-// check.
+// still return every team's workspaces, a sweep would still consider them, and two
+// teams sharing a runner would still be one namespace with extra steps. A partition
+// is enforced by the filesystem, so a team cannot be resumed, collected, or
+// checkpointed from outside its own root, and no code path has to remember to check.
 //
-// The root registry is unaffected. Its entries sit beside the `teams` directory,
-// which `All` already skips because it ignores subdirectories, so a machine that
-// never names a team behaves exactly as it did.
+// The root registry is unaffected: its entries sit beside the `teams` directory, which
+// `All` already skips because it ignores subdirectories.
 func TeamRegistryDir(base, team string) (string, error) {
 	if base == "" {
 		var err error

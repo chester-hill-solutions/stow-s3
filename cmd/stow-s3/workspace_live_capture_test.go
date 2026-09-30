@@ -11,10 +11,10 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
 )
 
-// The workflow this change exists for: an agent is working in a workspace, and
-// something outside it takes a snapshot and writes a handoff reference without the
-// agent being interrupted. Both commands used to resume the workspace, which meant
-// both failed with "workspace is in use" for as long as the agent was running.
+// The workflow: an agent is working in a workspace, and something outside it takes
+// a snapshot and writes a handoff reference without the agent being interrupted.
+// Neither command may resume the workspace, or both fail with "workspace is in
+// use" for as long as the agent is running.
 func TestCheckpointAndHandoffWorkWhileAnAgentHoldsTheWorkspace(t *testing.T) {
 	registry := filepath.Join(t.TempDir(), "registry")
 	root := filepath.Join(t.TempDir(), "task")

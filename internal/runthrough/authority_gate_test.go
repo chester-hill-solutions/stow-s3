@@ -127,9 +127,8 @@ func TestWithholdingUpstreamWriteLeavesReadsAlone(t *testing.T) {
 //
 // This uses a durable outbox, and that is not incidental: MemoryOutbox reports
 // Durable() == false, so a mirror-writes propagation is refused with
-// ErrDurableOutboxRequired before any grant is consulted. An earlier version of
-// this case used the memory outbox and passed for that reason rather than the one
-// it claimed.
+// ErrDurableOutboxRequired before any grant is consulted, and a case using it
+// passes for that reason rather than the one it claims.
 func TestTheFullGrantStillPropagatesAndReadsThrough(t *testing.T) {
 	granted := authority.All()
 	adapter, upstream := adapterForDurable(t, runthrough.Config{}, &granted)
@@ -168,16 +167,15 @@ func TestAllowLiveWritesFalseStillWithholdsPropagation(t *testing.T) {
 	}
 }
 
-// R-201's specific finding: RetryPending bypassed even decideUpstreamWrite, and
-// runs from the per-second worker and the admin retry route, both outside the
-// runtime instance. The grant is checked in the shared propagation funnel now, so
-// draining the outbox is not a way around it.
+// R-201's finding: RetryPending bypassed even decideUpstreamWrite, and runs from
+// the per-second worker and the admin retry route, both outside the runtime
+// instance. Draining the outbox must not be a way around the grant, so it is
+// checked in the shared propagation funnel.
 //
-// The entry is seeded into the outbox directly rather than produced by a write.
-// That is the shape of the original bug - an entry exists, and the paths that
-// drain it are outside anything that checked - and seeding it is the only way to
-// reach it now that the grant is resolved once at construction, so the enqueue and
-// the retry can no longer disagree.
+// The entry is seeded into the outbox directly rather than produced by a write:
+// an entry exists, and the paths that drain it are outside anything that checked.
+// That is the only way to reach this now that the grant is resolved once at
+// construction, so the enqueue and the retry cannot disagree.
 func TestRetryPendingCannotBypassTheGrant(t *testing.T) {
 	ctx := context.Background()
 	local := storage.NewMemoryStore()

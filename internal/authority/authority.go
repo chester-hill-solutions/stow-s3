@@ -1,17 +1,14 @@
 // Package authority answers one question: is a named operation permitted?
 //
 // It exists because authorization was happening at the wrong layer. SigV4
-// authenticates a caller to the S3 interface, which means anything reaching a
-// store by another route — the embedded API in pkg/stow, the WASM runtime, the
-// workspace filesystem — had no authorization at all. That is not a bypass to
-// be closed later; there was nothing there to bypass.
+// authenticates a caller to the S3 interface, which means anything reaching a store by
+// another route — the embedded API in pkg/stow, the WASM runtime, the workspace
+// filesystem — had no authorization at all. That is not a bypass to be closed later;
+// there was nothing there to bypass.
 //
-// The rule this package is built to make true:
-//
-//	Allowed(op) == Environment.Authority.Allows(op)
-//
-// enforced once, below every interface, so S3 and native cannot disagree about
-// what a caller may do. An adapter may narrow authority by choosing a smaller
+// The rule this package is built to make true: Allowed(op) ==
+// Environment.Authority.Allows(op), enforced once below every interface, so S3 and
+// native cannot disagree. An adapter may narrow authority by choosing a smaller
 // value; it may never widen it.
 package authority
 
@@ -253,21 +250,15 @@ func Defined() []Operation {
 
 // Ungated names the operations that are defined but not checked anywhere, each
 // with the reason it is not yet wired.
+// An operation nobody enforces is a permission that is described and not granted,
+// which is the shape a false claim of enforcement takes: the set is closed, the
+// constant is exported, and a caller narrowing an Authority appears to withhold
+// something the code never consults. A new Operation with no check site fails the
+// enforcement test unless it is added here with a reason, so the gap is a decision
+// on record rather than an omission.
 //
-// An operation nobody enforces is a permission that is described and not
-// granted, which is the shape a false claim of enforcement takes: the set is
-// closed, the constant is exported, and a caller narrowing an Authority appears
-// to withhold something the code never consults. Enumerating them is what makes
-// that visible — a new Operation with no check site fails the enforcement test
-// unless it is added here with a reason, so the gap is a decision on record
-// rather than an omission.
-//
-// EnvironmentDestroy is checked by Workspace.Destroy before lifecycle or
-// registry mutation. EnvironmentPromote remains exported for compatibility,
-// but has no operation to enforce; its disposition remains an explicit gap.
-//
-// The enforcement test recognises a gate written as either check(op) or
-// Allows(op), so a caller may enforce in either style without going unrecorded.
+// EnvironmentDestroy is checked by Workspace.Destroy before lifecycle or registry
+// mutation. EnvironmentPromote has no operation to enforce.
 var Ungated = map[Operation]string{
 	EnvironmentPromote: "No promotion operation is implemented; exported compatibility vocabulary grants no behavior",
 }

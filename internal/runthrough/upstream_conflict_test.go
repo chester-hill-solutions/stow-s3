@@ -204,11 +204,9 @@ func TestAFreshKeyPropagatesWhenUpstreamStillLacksIt(t *testing.T) {
 // of an agent writing a new file. Asserted so the boundary cannot widen by
 // accident: a change that made every write conflict would fail here.
 //
-// An earlier version of this file tested a concurrent create, by writing
-// upstream between the enqueue and the propagation. That gap does not exist:
-// propagation is inline, so the write had already landed before the test could
-// create the key. The case is unreachable through this API rather than merely
-// unproven, and the reachability is the finding.
+// A concurrent create is not tested here because it is unreachable through this
+// API rather than merely unproven: propagation is inline, so a write has already
+// landed before anything could create the key. The reachability is the finding.
 func TestAKeyWithNoProvenancePropagatesWithoutAPrecondition(t *testing.T) {
 	ctx := context.Background()
 	local := storage.NewMemoryStore()

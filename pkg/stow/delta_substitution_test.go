@@ -20,9 +20,9 @@ import (
 // precondition is satisfied. The result is a published checkpoint holding a file
 // the sender never named.
 //
-// The first test pins that this used to work, so a future change that quietly
-// removes the vulnerability cannot also remove the description of it. The second
-// pins that the digest stops it.
+// The first test pins that the substitution is possible at all, so a change that
+// quietly removes the vulnerability cannot also remove the description of it. The
+// second pins that the digest stops it.
 
 // TestRegressionARenamedDestinationUsedToApply records the defect this fix closes.
 //

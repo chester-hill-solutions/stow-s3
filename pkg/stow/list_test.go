@@ -231,10 +231,10 @@ func TestListKeepsTeamsApart(t *testing.T) {
 
 // A listing names the directory it read. It is the only thing that makes a report
 // of one checkable, and it is not the pair that was passed in: those differ
-// whenever a team was given, because the team is composed into the path. The CLI
-// used to resolve the directory a second time to put in its output, and fell back
-// to the unresolved pair when that failed — so the one field saying where the
-// entries came from was the one field that could name a directory nobody opened.
+// whenever a team was given, because the team is composed into the path. So the
+// directory is resolved once, here, and never re-derived — otherwise the one field
+// saying where the entries came from is the one field that can name a directory
+// nobody opened.
 func TestListReportsTheRegistryItActuallyRead(t *testing.T) {
 	registry := t.TempDir()
 	base := t.TempDir()

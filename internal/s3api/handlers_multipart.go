@@ -23,10 +23,9 @@ func (s *Server) validateMultipartRoute(ctx context.Context, w http.ResponseWrit
 
 // initiationOptions reads the object properties an upload fixes at initiation.
 //
-// These are the same properties handlePutObject reads, read from the same
-// headers, and they are passed to the store rather than dropped: a completion
-// cannot know them later, because nothing else records them. An upload
-// initiated with a content type used to complete into an object with none.
+// These are the same properties handlePutObject reads, from the same headers, and
+// they are passed to the store rather than dropped: a completion cannot know them
+// later, because nothing else records them.
 func initiationOptions(r *http.Request) (storage.MultipartOptions, *s3Error) {
 	contentType := r.Header.Get("Content-Type")
 	if contentType == "" {
@@ -90,7 +89,8 @@ func (s *Server) handleUploadPart(ctx context.Context, w http.ResponseWriter, r 
 	}
 
 	// Read the body once and share it with every check below, for the same
-	// reason as PutObject: each check used to make its own full-size copy.
+	// reason as PutObject: each check making its own full-size copy is what
+	// amplifies memory per request.
 	body, bodyErr := requestBody(r)
 	if bodyErr != nil {
 		writeError(w, r, bodyReadError(bodyErr, resourcePath(bucket, key), s.config.MaxRequestBytes))

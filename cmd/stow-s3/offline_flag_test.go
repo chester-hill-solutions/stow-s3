@@ -11,17 +11,11 @@ import (
 // false contradicts it. STOW_OFFLINE is a safety property, so an operator whose
 // shell exports it needs a way to say no on one command, and a flag that ignored the
 // environment would take that away.
-//
 // It stays a bool flag rather than becoming a string to carry the third state,
 // because a string flag eats the next argument: `--offline --ready-fd 3` failed
 // with `invalid --offline "--ready-fd"`. That is the kind of breakage a launcher
 // finds and a unit test written against the helper never would, so the tests below
-// parse real arguments and then run the real resolver against a real config.
-//
-// They go through registerOfflineFlag and applyOfflineFlag rather than a hand-rolled
-// bool, because a hand-rolled one tests a different program: reading the flag back
-// with flags.Visit and re-parsing its string can silently leave the network open on
-// an unreadable value.
+// parse real arguments and run the real resolver against a real config.
 
 func parseOffline(t *testing.T, args ...string) (*runthrough.Config, error) {
 	t.Helper()

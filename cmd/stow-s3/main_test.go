@@ -110,12 +110,10 @@ func TestParseBackend(t *testing.T) {
 	}
 }
 
-// The readiness payload used to publish a persistence claim of its own and a
-// hardcoded multipart=true beside it. Both happened to agree with the runtime
-// only because the CLI could select two backends, so nothing caught it.
-//
-// This is the check that would have caught it: the payload must report the
-// runtime's capabilities, unchanged, for every backend this command can select.
+// The readiness payload must report the runtime's capabilities unchanged, for
+// every backend this command can select. A payload that published a persistence
+// claim of its own would agree with the runtime only by coincidence, and nothing
+// else would notice.
 func TestReadinessCapabilitiesAreTheRuntimes(t *testing.T) {
 	for _, backend := range []runtime.Backend{runtime.BackendMemory, runtime.BackendFilesystem} {
 		store := openLocalStore(backend, t.TempDir())

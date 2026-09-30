@@ -165,10 +165,50 @@ rather than choices, and each is worth stating where a reader will meet it:
   reported as unknown, distinctly, because those three answers need different
   responses from a caller.
 
-Not yet implemented, and therefore not yet claimed: persistence of a policy
-revision and its freshness deadline; enforcement outside the object path
-(checkpoints, background retries, run-through propagation); scoped enumeration
-counts; and any handling of a saved version selector.
+### Persisting a revision
+
+`internal/policy` holds the record and the format; `internal/policystore` holds
+the file. The split is forced, not tidiness: `internal/policy` is inside the
+embedded runtime's dependency closure, which a test asserts must not link the
+filesystem. A decision model that can read a file is a decision model whose
+answers depend on a filesystem, and a WASM or embedded host has none.
+
+A `Record` is a `Set` plus the three things a `Set` cannot carry: a host-issued
+revision identity, a sequence that orders it against other revisions, and an
+absolute deadline. The deadline is absolute rather than a lifetime for a direct
+reason — a stored TTL is re-based on every load, so a process that restarts
+inside the freshness window silently extends the permission past it, once per
+restart, and nothing in the record shows it.
+
+Four things in it are traps:
+
+- **An absent record and a damaged one are different answers.** `ErrNoRecord` is
+  a decision: run with the environment's own authority. `ErrRecordDamaged` is a
+  policy whose answer is unknown, and answering that with the environment's
+  authority hands back every permission the damaged policy was withholding.
+  One error value for both would make the second read as the first.
+- **The seal covers the deadline.** Without an integrity digest over the whole
+  record, a truncated or edited file still decodes, and the failures that look
+  safest are the dangerous ones: losing a deny entry narrows a grant, which
+  reads as a refusal, while losing the deadline reads as a permission that never
+  expires. The digest is over the canonical encoding, so a record that was never
+  tampered with still fails if a field is.
+- **Entries name operations; they do not carry a mask.** An `Authority` is a bit
+  position, so adding an `Operation` renumbers it and a record written before
+  that would decode to a different set of permissions afterwards. Names also make
+  an operation this build does not define drop out on the way in, which is the
+  safe direction, and going through `Set.Add` keeps that one rule rather than two.
+- **A revision is replaced, never rolled back.** `Persist` takes the sequence the
+  caller based its decision on and refuses with `ErrRecordSuperseded` if the
+  stored record is not that one, under a file lock, so read-decide-write is a
+  critical section. Without it, a revocation that lost a race to a re-grant would
+  be silently undone and neither host would know it had lost.
+
+Not yet implemented, and therefore not yet claimed: enforcement outside the object
+path (checkpoints, background retries, run-through propagation); scoped enumeration
+counts; any handling of a saved version selector; and consulting a revision
+*per operation* rather than at open, so a revocation takes effect without a
+restart.
 
 ### Where the runtime enforces this
 

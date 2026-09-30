@@ -46,23 +46,12 @@ func ValidateMinPartSizes(sizes []int64) error {
 // checksum for the object it is assembling has made the same claim a single
 // write would, about the same bytes, and it is checked the same way.
 //
-// A checksum *algorithm* on its own is not a claim, and this is where that
-// matters. An initiation carries no body, so the only thing it can supply is an
-// algorithm: the algorithm the client intends to use, named before the object it
-// describes exists. There is no value to check, and VerifyChecksum rightly
-// refuses an algorithm without one - publishing a body whose checksum was never
-// computed as though it had been verified is exactly the failure that rule
-// exists to prevent. Handing it a bare algorithm therefore turned every
-// completion of an upload that named one into an error the S3 surface cannot
-// map, so `x-amz-checksum-algorithm` on CreateMultipartUpload answered 500
-// InternalError and the SDK retried it three times.
-//
-// The declaration is still carried and still reported - GetMultipartUpload and
-// ListMultipartUploads name the algorithm the upload will publish - so a client
-// that made the request is not silently ignored. Only the verification is
-// skipped, because there is nothing for it to work with. Verifying a whole-object
-// checksum for a multipart upload requires a separate completion contract;
-// CRC64NVME is always full-object, while other algorithms may be composite.
+// A checksum *algorithm* on its own is not a claim, and this is where that matters.
+// An initiation carries no body, so the only thing it can supply is the algorithm
+// the client intends to use, named before the object it describes exists. There is
+// no value to check, and VerifyChecksum rightly refuses an algorithm without one:
+// publishing a body whose checksum was never computed as though it had been
+// verified is exactly the failure that rule exists to prevent.
 func MultipartPutOptions(opts MultipartOptions) PutOptions {
 	put := PutOptions{
 		ContentType: opts.ContentType,

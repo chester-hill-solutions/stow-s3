@@ -56,19 +56,13 @@ func objectRelPath(key string) string {
 // objectRelSegments returns an object's record path relative to the bucket's
 // objects directory, as individual segments.
 //
-// Hex doubles a key's length in bytes, so a key longer than 127 bytes cannot fit
-// in a single path component — ENAMETOOLONG, where storage.ValidateKey accepts up
-// to 1024. Those keys are split across shard directories, each holding one chunk
-// of the same reversible encoding, so the joined name still decodes to exactly
-// the original key.
+// Hex doubles a key's length in bytes, so a key longer than 127 bytes cannot fit in
+// a single path component — ENAMETOOLONG, where storage.ValidateKey accepts up to
+// 1024. Those keys are split across shard directories, each holding one chunk of the
+// same reversible encoding, so the joined name still decodes to the original key.
 //
-// Every segment but the last is a shard directory and carries shardPrefix. The
-// last is the record file and does not, so a path can always be classified into
-// "descend" or "this is the object" without stat-ing anything.
-//
-// A key that fits stays flat, so no stored object depends on the sharded layout
-// and introducing it cannot orphan one: only long keys were ever affected, and
-// they had never written successfully.
+// Every segment but the last is a shard directory and carries shardPrefix, so a path
+// can always be classified into "descend" or "this is the object" without stat-ing.
 func objectRelSegments(key string) []string {
 	encoded := objectRelPath(key)
 	if len(encoded) <= maxNameComponent {

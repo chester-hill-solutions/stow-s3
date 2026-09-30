@@ -87,22 +87,9 @@ func registerOfflineFlag(flags *flag.FlagSet) *offlineFlag {
 // A plain *bool cannot express the thing this flag has to express. STOW_OFFLINE is
 // a safety property, so an operator whose shell exports it needs a way to say no on
 // one command, and that means an absent flag and `--offline=false` have to be
-// distinguishable. Reading the flag package's own record of which flags were set is
-// one way to tell them apart; a custom flag.Value is the other, and it is the one
-// used here because it also removes the second parse.
-//
-// The previous version read the flag back with flags.Visit and re-parsed
-// f.Value.String() with strconv.ParseBool. That re-parse can fail, and it failed
-// silently: a value it could not read left the config at false, so the network
-// stayed open on a flag whose whole purpose is closing it.
-//
-// Nothing can reach that state now, and it takes two things rather than one. The
-// flag package parses the value, so a value it cannot parse never becomes a config.
-// And serve's flag set is ExitOnError, so the parse error has already printed why
-// and exited the process before a config exists at all — which is also why serve
-// discards the error from flags.Parse, and why discarding it is safe there rather
-// than merely convenient. An operator who mistypes --offline gets a command that
-// tells them, not a server that quietly left the network open.
+// distinguishable. A custom flag.Value records both in one place, and keeps the
+// flag from being read back and re-parsed; docs/CODE_STANDARDS.md says what that
+// second parse costs when it fails.
 type offlineFlag struct {
 	value bool
 	given bool

@@ -11,11 +11,6 @@ import (
 
 // The platform contract for the parent-directory sync.
 //
-// The unix implementation fsyncs the directory after a rename, because on POSIX
-// the rename is atomic but the directory entry recording it is not durable until
-// the directory is synced. The Windows implementation is a no-op, because Windows
-// refuses FlushFileBuffers on a directory handle and journals the entry itself.
-//
 // This test is what notices if the Windows arm ever starts reporting an error
 // again, and it is the only test in the repository that can fail on that platform
 // for this reason: the workspace backend could not persist at all while the arm

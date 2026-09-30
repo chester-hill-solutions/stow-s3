@@ -38,9 +38,8 @@ type Config struct {
 	// empty, those routes are reachable only from loopback, and the destructive
 	// outbox routes are not reachable at all.
 	//
-	// This exists because AllowPublicAdmin was a bare boolean, which made
-	// exposing the outbox retry and discard actions on a network interface an
-	// unauthenticated act rather than a privileged one.
+	// A boolean cannot be what authorizes: honouring one exposed the outbox retry and
+	// discard actions on a network interface to any client that could reach the port.
 	AdminToken string
 	// AllowPublicAdmin is retained for source compatibility and no longer
 	// grants access by itself. Remote admin routes require AdminToken. The
@@ -327,16 +326,14 @@ func isLoopbackRequest(r *http.Request) bool {
 // The rule has two levels, and the distinction is the point:
 //
 //   - Read-only routes (health, status, inspect, metrics) are reachable from
-//     loopback without a credential, which is what stow doctor and a local
-//     shell both rely on, and from anywhere with the admin token.
+//     loopback without a credential, which is what stow doctor and a local shell
+//     rely on, and from anywhere with the admin token.
 //   - Destructive routes (outbox retry and discard) always require the token,
-//     including on loopback. They change what is propagated to a live provider,
-//     so a stray local process should not be able to trigger them by guessing a
-//     path. When no token is configured they are simply not reachable, which is
-//     the "disable admin routes when the token is absent" behavior.
+//     including on loopback: they change what is propagated to a live provider, so
+//     a stray local process should not trigger them by guessing a path.
 //
-// A rejection is 404 rather than 403 so the route's existence is not advertised
-// to a caller that could not use it.
+// A rejection is 404 rather than 403 so the route's existence is not advertised to
+// a caller that could not use it.
 func (s *Server) authorizeAdmin(w http.ResponseWriter, r *http.Request) bool {
 	if s.adminTokenMatches(r) {
 		return true

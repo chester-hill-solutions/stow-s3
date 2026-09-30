@@ -15,21 +15,18 @@ import (
 )
 
 // A handoff is how one workspace's next step is named to another process. There
-// are two answers to "on what machine", and version 1 could only express one of
-// them.
+// are two answers to "on what machine", and version 1 could only express one.
 //
-// Version 1 was a same-machine reference: a workspace ID and the registry
-// directory holding it. It is still exactly that, and resume still reads it. But
-// a reference to a local directory is meaningless to the machine that receives
-// it, so handing work to another runner meant the caller exporting an archive by
-// hand and telling the receiver to import it — two steps, no binding between the
-// reference and the bytes, and nothing to check that the archive is the one the
-// reference names.
+// Version 1 is a same-machine reference: a workspace ID and the registry directory
+// holding it. It is still exactly that, and resume still reads it. But a reference
+// to a local directory is meaningless to the machine that receives it, so handing
+// work to another runner means exporting an archive by hand and telling the
+// receiver to import it — two steps, no binding between the reference and the
+// bytes, and nothing to check that the archive is the one the reference names.
 //
-// Version 2 adds an archive to the same document: the checkpoint's bytes, and
-// their digest, travel with the reference that names them. The receiver verifies
-// the digest, imports the archive (which verifies every file against its own
-// manifest), and restores. One document, two integrity checks, one command.
+// Version 2 adds the archive to the same document: the bytes and their digest
+// travel with the reference naming them. The receiver verifies the digest, imports
+// the archive, and restores. One document, two integrity checks, one command.
 const (
 	// handoffLocalVersion is the same-machine reference: an ID and a registry.
 	handoffLocalVersion = 1

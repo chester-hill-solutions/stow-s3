@@ -67,10 +67,8 @@ func isKnownBackend(backend Backend) bool {
 // It is the capability a host asks about, and it is why the two persistent
 // backends need a store supplied rather than constructed from Options.
 //
-// It is deliberately unexported. It used to be exported so a host publishing a
-// readiness payload could answer the same question, and the reason it no longer
-// needs to be is that the host is handed runtime.Capabilities instead of
-// re-deriving them.
+// It is deliberately unexported: a host is handed runtime.Capabilities rather
+// than re-deriving the answer, and a second derivation is a second opinion.
 func isPersistentBackend(backend Backend) bool {
 	return backend == BackendFilesystem || backend == BackendWorkspace
 }

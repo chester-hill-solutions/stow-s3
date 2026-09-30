@@ -88,6 +88,47 @@ Generated `packages/stow-s3/dist` is checked into the repository for release rep
 
 `make check-generated` compares the committed `dist` against a fresh build of the tree, so a committed artifact that the current source does not produce fails it. It is not a check that the build is repeatable from itself, which is what it was for a while: the target ran the build before the comparison, so the two digests were both of fresh output and a stale artifact passed. The corpus jobs' `git diff --exit-code -- packages/stow-s3/dist` is the same comparison and stays as an independent second opinion. See [CONTRIBUTING](../CONTRIBUTING.md).
 
+## Platform rationale held here rather than in the code
+
+Long platform and gate arguments live here so the code carries the rule and this
+document carries the reasoning. Each was originally a comment block; the comment
+line ratchet (`comment-lines`, see [Ratchet policy](#ratchet-policy)) makes prose
+in `.go` the most expensive place in the repository to keep anything.
+
+- **Windows parent-directory sync.** `atomicfile.syncDir` is a no-op on Windows,
+  and that is the platform's answer rather than a gap. `os.Open` on a directory
+  succeeds and `File.Sync` then calls `FlushFileBuffers` on the handle, which
+  Windows refuses for a directory with `ERROR_ACCESS_DENIED`; while the arm
+  reported that error, every workspace test failed at manifest write, so the
+  workspace backend could not persist at all. The durability argument differs
+  rather than being skipped: on POSIX a rename is atomic but the directory entry
+  recording it is not durable until the directory is fsynced; on Windows the
+  rename goes through `MoveFileEx`, the filesystem journals directory metadata,
+  and there is no supported way to flush a directory handle. A caller needing
+  more there must `FlushFileBuffers` the file handle before the rename, which is a
+  different design. Reporting an error is worse than silence — every write would
+  fail where the write is in fact fine.
+- **kqueue process watching.** A `kqueue` filter is scoped to the open
+  descriptor, so closing the descriptor removes every filter registered against
+  it and nothing about the filter survives it. Closing it on return, with no
+  goroutine ever waiting on the kqueue, is what leaves a macOS watch unarmed while
+  every layer above reports success. `kevent()` also returns a count of delivered
+  events, not of registered changes.
+- **The `--offline` flag is not read back.** Reading a flag after the fact and
+  re-parsing its string can fail, and it fails silently: a value that cannot be
+  read leaves the config at `false`, so the network stays open on a flag whose
+  whole purpose is closing it. Two things prevent that state. The flag package
+  parses the value, so an unparseable one never becomes a config; and `serve`'s
+  flag set is `ExitOnError`, so the parse error has printed why and exited before
+  a config exists — which is why `serve` discards the error from `flags.Parse` and
+  why discarding it is safe rather than merely convenient.
+- **Negative SigV4 cases carry the whole signed header set.** With a shorter
+  list, a repairing verifier produces one missing a required header, and the
+  ordinary "the date and the content hash must be signed" rule refuses the request
+  for a reason that has nothing to do with strictness. Such a case passes whether
+  or not the parser is strict, which is how a suite of fifteen negative cases can
+  be entirely green against the behaviour it is meant to pin.
+
 ## CI
 
 `make standards` is the local equivalent of the required CI quality job. The release workflow must run the same command after dependency installation. A quality failure is never converted into a warning-only job.

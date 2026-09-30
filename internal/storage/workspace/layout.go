@@ -55,21 +55,15 @@ const (
 
 // NewLayout returns the layout for a workspace.
 //
-// The rules below are the *union* of what every supported host filesystem
-// accepts, not an intersection of what this one happens to do. Three payoffs,
-// and the third is the one that decided it:
+// The rules below are the *union* of what every supported host filesystem accepts,
+// not an intersection of what this one happens to do. Three payoffs, and the third
+// decided it: a key Windows cannot spell is escaped on Linux too, so a manifest
+// written on one host means the same thing on another; the Windows rules become
+// testable on Linux CI, and a host-conditional rule is an untested rule; and it
+// deletes a conditional — no windowsRules field, no runtime.GOOS branch, no second
+// path to keep in step with the first.
 //
-//   - A key Windows cannot spell is escaped on Linux too, so a manifest written
-//     on one host means the same thing on another. ADR 0009 section 6 scopes a
-//     workspace to one machine, but "portable enough not to surprise" is
-//     cheaper than an explicit non-portable rule nobody reads.
-//   - The Windows rules become testable on Linux CI, which is where most
-//     changes are tested. A host-conditional rule is an untested rule.
-//   - It deletes a conditional: no windowsRules field, no runtime.GOOS branch,
-//     and no second code path to keep in step with the first.
-//
-// The cost is that a handful of pathological keys lose their pretty path on
-// Linux. Nobody's agent creates `what?.txt` on purpose.
+// The cost is that a few pathological keys lose their pretty path on Linux.
 func NewLayout() Layout {
 	return Layout{}
 }
@@ -201,17 +195,15 @@ func NaturalPath(root, key string) string {
 // limit for a key of any supported length.
 //
 // The bucket is part of the path, as a directory of its own, and it has to be. A
-// digest of the key alone gave the same key in two buckets one physical file: a
-// write in either bucket overwrote the other's object, a read returned the other
-// bucket's bytes, and a delete in one bucket removed an object belonging to a
-// bucket the caller never named. Natural keys were never affected, because their
-// path already runs through the bucket's directory - which is why a workspace
-// holding only ordinary keys never showed it.
+// digest of the key alone gives the same key in two buckets one physical file: a
+// write in either bucket overwrites the other's object, a read returns the other
+// bucket's bytes, and a delete removes an object belonging to a bucket the caller
+// never named. Natural keys are never affected, since their path already runs
+// through the bucket's directory.
 //
-// The bucket is hashed rather than used as a directory name so the directory stays
-// within the component limit whatever the bucket is called, and so a bucket name
-// can never collide with stow's own bookkeeping the way a key that resolves to
-// .stow/keys/... would.
+// The bucket is hashed rather than named, so the directory stays within the component
+// limit whatever the bucket is called, and a bucket name can never collide with stow's
+// own bookkeeping the way a key resolving to .stow/keys/... does.
 func EscapedPath(root, bucket, key string) string {
 	return filepath.Join(root, internalDir, "keys", Digest(bucket), Digest(key))
 }

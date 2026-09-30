@@ -76,9 +76,9 @@ func readyMessage(details readyDetails) ready.Message {
 		Backend:       string(details.backend),
 		BinaryVersion: version.Version,
 		Capabilities: ready.Capabilities{
-			// The runtime's own answers. It used to publish a persistence claim of
-			// its own and a hardcoded multipart=true beside it, and the two agreed
-			// only because the CLI could select two backends.
+			// The runtime's own answers, not a re-derivation: a capability
+			// published here and a capability the runtime reports are two facts
+			// that have to agree, and only one of them is measured.
 			Persistent:            details.capabilities.Persistent,
 			Multipart:             details.capabilities.Multipart,
 			Upstream:              details.mode == string(runthrough.ModeRunThrough),
@@ -93,12 +93,9 @@ func readyMessage(details readyDetails) ready.Message {
 	})
 }
 
-// parseBackend is the one place the --backend flag becomes a typed backend.
-//
-// It used to be a bare string compared against "filesystem" and "memory" in
-// four places, which meant the persistence claim published in the readiness
-// payload was a fourth opinion rather than the runtime's. An unrecognised value
-// is refused here, once, instead of at whichever consumer happened to notice.
+// parseBackend is the one place the --backend flag becomes a typed backend, so an
+// unrecognised value is refused here rather than at whichever consumer happened
+// to notice it.
 func parseBackend(value string) (runtime.Backend, error) {
 	switch backend := runtime.Backend(strings.ToLower(strings.TrimSpace(value))); backend {
 	case runtime.BackendMemory, runtime.BackendFilesystem:
@@ -241,8 +238,8 @@ func applyCacheLimits(config *runthrough.Config, maxBytes, maxObjects int64, ttl
 // The flag is the explicit request and it wins; an empty flag means nothing was
 // asked for, and DetectMode's answer is local unless the environment named
 // run-through. An empty default rather than "auto" is deliberate: "auto" would
-// suggest that something else can select run-through, and the thing that used to
-// select it was the machine's ambient AWS configuration.
+// suggest that something else can select run-through, and what does is the
+// machine's ambient AWS configuration.
 func resolveMode(flagValue string) runthrough.Mode {
 	switch strings.ToLower(strings.TrimSpace(flagValue)) {
 	case "local":

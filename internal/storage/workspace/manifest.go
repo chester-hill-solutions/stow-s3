@@ -12,22 +12,20 @@ import (
 )
 
 // manifestVersion is the only on-disk layout this build implements. A file written
-// by a newer revision is refused rather than migrated on read, as the outbox
-// already established for durable files: a manifest that silently downgrades loses
-// exactly the entries it could not understand.
+// by a newer revision is refused rather than migrated on read: a manifest that
+// silently downgrades loses exactly the entries it could not understand.
 //
-// Identity and the object index are separate files with separate write paths,
-// because identity changes once per workspace and the index per object. The
-// escaped form is namespaced by bucket, since an escaped key must not resolve to
-// one file across two buckets.
+// Identity and the object index are separate files with separate write paths, because
+// identity changes once per workspace and the index per object. The escaped form is
+// namespaced by bucket, since an escaped key must not resolve to one file across two
+// buckets.
 //
-// Version 1 and 2 workspaces are refused rather than migrated, and refusing beats
-// opening them. Version 1's checksums, ETags and metadata would have to be carried
-// into index.json by a rewrite interruptible with the index as the only copy, and
-// treating a missing index as empty discards them silently. Version 2's manifest is
-// still valid but its escaped objects sit at a path this build does not look at, so
-// opening it would resolve every escaped key to absent while the file stayed on
-// disk — the total-loss reading ErrManifestCorrupt calls worse than losing bytes.
+// Version 1 and 2 are refused rather than migrated, and refusing beats opening them.
+// Version 1's checksums, ETags and metadata would have to be carried into index.json by
+// a rewrite interruptible with the index as the only copy, and treating a missing index
+// as empty discards them silently. Version 2's manifest is valid but its escaped objects
+// sit at a path this build does not look at, so opening it would resolve every escaped
+// key to absent while the file stayed on disk.
 const manifestVersion = 3
 
 // ErrManifestCorrupt is returned when a manifest exists and cannot be trusted.

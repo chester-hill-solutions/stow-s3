@@ -81,8 +81,8 @@ func TestTheBoundCountsRecordsWhoseDirectoriesAreGone(t *testing.T) {
 	}
 }
 
-// prepareBounded fails the test if the prepare is refused, so a helper used to fill
-// a partition to its limit cannot quietly stop filling it.
+// prepareBounded fails the test if the prepare is refused, so a helper meant to
+// fill a partition to its limit cannot quietly stop filling it.
 func prepareBounded(t *testing.T, registry, team string, max int64) *stow.PreparedWorkspace {
 	t.Helper()
 	dir := filepath.Join(t.TempDir(), "ws")

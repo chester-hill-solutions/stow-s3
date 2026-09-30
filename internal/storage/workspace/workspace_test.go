@@ -164,8 +164,7 @@ func TestAwkwardKeysAreStoredInTheEscapedForm(t *testing.T) {
 			}
 			// EscapedPath rather than a hand-built path, so this asserts the
 			// behaviour instead of a layout that has to be edited here every time
-			// the layout changes. It did exactly that: when the bucket became part
-			// of the escaped path, this test failed on a path it had hardcoded
+			// the layout changes — and a hardcoded path fails on the layout change
 			// rather than on a real defect.
 			escaped := workspace.EscapedPath(root, bucket, key)
 			if _, err := os.Lstat(escaped); err != nil {

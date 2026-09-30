@@ -24,19 +24,17 @@ func escapeKeyPath(key string) string {
 
 // A key that needs encoding must be signable by a real SDK.
 //
-// This case exists because it did not, and the gap was invisible. Every key in the
-// conformance corpus was made of characters that survive encoding unchanged, and the
-// two hand-written signers in internal/auth build the canonical URI from
-// r.URL.EscapedPath() - the same double-encoding the server does. So the server and
-// its tests agreed with each other and neither agreed with AWS.
+// The gap this covers was invisible. Every key in the conformance corpus was made of
+// characters that survive encoding unchanged, and the two hand-written signers in
+// internal/auth build the canonical URI from r.URL.EscapedPath() — the same
+// double-encoding the server does. So the server and its tests agreed with each other
+// and neither agreed with AWS.
 //
-// The real SDK is the only independent signer in the repository, which makes this
-// the test that can catch a signing bug the other signers cannot.
-//
-// The cases are the ones a caller actually types: a space, a percent sign, a plus,
-// and a non-ASCII character. A plus is the sharp one - in a path it is a literal
-// plus, not an encoded space, so an implementation that reuses the query-string
-// rules rewrites "a+b" as "a b" and signs a different object than the one it reads.
+// The real SDK is the only independent signer in the repository, which makes this the
+// test that can catch a signing bug the other signers cannot. The cases are the ones a
+// caller actually types: a space, a percent sign, a plus, and a non-ASCII character. A
+// plus is the sharp one — in a path it is a literal plus, not an encoded space, so an
+// implementation reusing query-string rules signs a different object than it reads.
 func TestKeysNeedingEncodingAreSignable(t *testing.T) {
 	env := newTestEnv(t)
 	ctx := context.Background()

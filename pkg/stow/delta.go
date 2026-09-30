@@ -21,16 +21,13 @@ import (
 // The checkpoint diff already computed added/changed/deleted by comparing two
 // captures. That is a *report* — it names what differs and hashes both sides, but
 // carries no bytes, so it cannot change anything. Promoting it to a document that
-// can be applied is what turns "here is what changed" into "here is the change",
-// which is the thing that makes exchanging a working set between an agent and a
-// device cost what the difference costs rather than what the tree costs.
+// can be applied turns "here is what changed" into "here is the change", which is
+// what makes exchanging a working set cost the difference rather than the tree.
 //
-// The conflict rule is the same one run-through propagation uses, deliberately. A
-// delta says "this file was A and is now B", so applying it to a target whose copy
-// of that file is neither A nor B is applying one writer's intent to a state that
-// does not exist. That is a precondition failure, refused rather than merged, and
-// it must not acquire a second vocabulary: the mechanism is identical and so is
-// the refusal.
+// The conflict rule is the one run-through propagation uses, deliberately: a delta
+// saying "this file was A and is now B", applied to a target whose copy is neither
+// A nor B, applies one writer's intent to a state that does not exist. Refused
+// rather than merged, and it must not acquire a second vocabulary.
 
 // DeltaVersion is the delta document's format version. A receiver refuses a
 // version it does not speak rather than guessing at the fields.
@@ -90,18 +87,17 @@ var ErrDeltaTooLarge = errors.New("delta document is larger than the format allo
 // ErrDeltaDigestMismatch reports that a delta document does not hash to the
 // digest the sender published for it.
 //
-// The per-file digests inside a document cover content bytes only. Nothing in the
-// document itself binds the change list — the paths, the kinds, and the from/to
-// metadata — to the sender's intent, so a document altered in transit can carry a
-// valid content digest for a path the sender never named. Measured: renaming an
-// added file from "notes.txt" to "planted.sh", in the change and in the content
-// map together, produced a document that applied cleanly.
+// The per-file digests inside a document cover content bytes only. Nothing binds the
+// change list — the paths, the kinds, the from/to metadata — to the sender's intent,
+// so a document altered in transit can carry a valid content digest for a path the
+// sender never named. Renaming an added file from "notes.txt" to "planted.sh", in the
+// change and in the content map together, produces a document that applies cleanly.
 //
-// This is the check the handoff archive path already had and the delta path did
-// not: `delta` reports the document's digest, and the receiver compares against it
-// before anything is written. It is separate from a conflict because the document
-// is self-consistent and the target may well be fine — the disagreement is between
-// the document and the sender, and retrying cannot resolve it.
+// This is the check the handoff archive path already had and the delta path did not:
+// `delta` reports the document's digest, and the receiver compares against it before
+// anything is written. It is separate from a conflict because the document is
+// self-consistent and the target may well be fine — the disagreement is between the
+// document and the sender, and retrying cannot resolve it.
 var ErrDeltaDigestMismatch = errors.New("delta document does not match the digest the sender published")
 
 // DeltaOptions bounds the work a delta may describe. Zero takes the defaults,
@@ -118,13 +114,11 @@ type DeltaOptions struct {
 	// the sender published for it. When both are set, the document is refused
 	// unless the bytes hash to that digest, before any precondition is checked and
 	// before anything is staged.
-	//
 	// A *DeltaDocument has already been parsed, so the bytes that produced it are
-	// not recoverable: re-encoding a struct would hash a document this build
-	// happened to produce rather than the one that arrived, and a digest over that
-	// would pass for any alteration that survives a round trip. That is why the
-	// bytes are carried alongside rather than recomputed. VerifyDeltaDigest is the
-	// same check for a caller that wants it on its own.
+	// not recoverable: re-encoding a struct would hash a document this build happened
+	// to produce rather than the one that arrived, and a digest over that would pass
+	// for any alteration surviving a round trip. That is why the bytes are carried
+	// alongside rather than recomputed.
 	//
 	// It is optional because a receiver with no trusted copy of the digest cannot
 	// invent one, and demanding it would make every apply impossible rather than

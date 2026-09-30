@@ -284,9 +284,9 @@ func parseIndexes(tail string) []int {
 // sides as float64, so a contract that says 2 and an engine that says 2.0 agree,
 // which is the reformat rule applied to the one case where the text differs.
 //
-// A fragment that is not JSON is a disagreement. An expectation is read from the
-// case file and a result from a verb the driver has already parsed, so neither can
-// reach here unparsed, and the one way to be wrong here is to pass.
+// A fragment that is not JSON is a disagreement. An expectation is read from the case
+// file and a result from a verb the driver has already parsed, so neither can reach here
+// unparsed.
 func sameJSON(want, got json.RawMessage) bool {
 	var wantValue, gotValue any
 	if json.Unmarshal(want, &wantValue) != nil || json.Unmarshal(got, &gotValue) != nil {

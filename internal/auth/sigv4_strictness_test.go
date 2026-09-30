@@ -203,23 +203,15 @@ func TestMalformedSignedHeadersAreRefused(t *testing.T) {
 	now := time.Now().UTC().Truncate(time.Second)
 
 	// Every case keeps the whole header set the request actually carries — host,
-	// x-amz-date and x-amz-content-sha256 — so that a verifier which repairs the
-	// list ends up with a list the client could legitimately have signed, and the
-	// refusal can only come from the list itself.
+	// x-amz-date and x-amz-content-sha256 — so a verifier which repairs the list
+	// ends up with one the client could legitimately have signed, and the refusal
+	// can only come from the list itself. docs/CODE_STANDARDS.md explains why a
+	// shorter list makes all of this vacuous.
 	//
-	// That matters: with a shorter list, a repairing verifier produces one missing
-	// a required header, and the ordinary "the date and the content hash must be
-	// signed" rule refuses the request for a reason that has nothing to do with
-	// strictness. Such a case passes whether or not the parser is strict, which is
-	// how a suite of fifteen negative cases can be entirely green against the
-	// behaviour it is meant to pin.
-	//
-	// Verified by loosening the parser and watching which cases fall: the empty
-	// entries, both duplicates, both upper-case spellings and both orderings fail
-	// without the rule. The four that still pass do so for reasons of their own —
-	// a name that is not a field name cannot be found on the request, and a list
-	// without `host` is refused before the signature is computed — and are kept
-	// because a stricter parser is not the only thing that should refuse them.
+	// Verified by loosening the parser: the empty entries, both duplicates, both
+	// upper-case spellings and both orderings fall without the rule. The four that
+	// still pass do so for reasons of their own — a name that is not a field name
+	// cannot be found, and a list without `host` is refused before signing.
 	cases := []struct {
 		name          string
 		signedHeaders string

@@ -27,22 +27,18 @@ import (
 // adapter against a hand-written stub. The run-through adapter's job is to be
 // correct about a *pair* — a local store and a real S3 server on the other side —
 // and that is the only category of behaviour the rest of the suite structurally
-// cannot reach. Both defects these tests were written for were found by hand, by
-// running the product against itself:
+// cannot reach. Both defects these tests were written for were found by hand:
 //
 //   - a read-through fetch of a key that exists only upstream failed with
-//     NoSuchBucket, because the local store is consulted first and a bucket
-//     missing from it is reported as a missing bucket rather than as a miss;
+//     NoSuchBucket, because the local store is consulted first and a bucket missing
+//     from it is reported as a missing bucket rather than as a miss;
 //   - under mirrorWrites, a bucket created through the client never reached the
-//     upstream, so the first object write to it propagated into an upstream that
-//     had never heard of the bucket and went terminal with not_found.
+//     upstream, so the first write to it went terminal with not_found.
 //
-// Neither could have been caught where it was written. The adapter's tests use
-// stubUpstream, which is an implementation of the Client interface and therefore
-// cannot express a real server's answer about a bucket. So the upstream here is
-// a real s3api.Server with real SigV4, reached by the real AWS SDK, and the
-// client under test is a second real s3api.Server whose store is the run-through
-// adapter.
+// Neither could have been caught where it was written, because stubUpstream cannot
+// express a real server's answer about a bucket. So the upstream here is a real
+// s3api.Server with real SigV4 reached by the real AWS SDK, and the client under
+// test is a second real s3api.Server whose store is the run-through adapter.
 
 // pair is two live servers and the clients that talk to each of them.
 type pair struct {
@@ -185,13 +181,9 @@ func readThrough(t *testing.T, client *s3.Client, bucket, key string) string {
 // operator gives a client its buckets by creating them locally; the client cannot
 // acquire one by asking.
 //
-// The first draft of this file asserted the opposite — that a key living only
-// upstream should be readable — and it failed. internal/runthrough already had
-// tests for the refusal, including one asserting the upstream is not contacted.
-// The mistake was reading a designed refusal as an unhandled edge case because
-// the error code (NoSuchBucket) is not obviously "you were not given this".
-//
 // So this asserts both halves: the refusal, and the absence of an upstream call.
+// Reading a designed refusal as an unhandled edge case is easy, because the error
+// code (NoSuchBucket) is not obviously "you were not given this".
 func TestTheLocalStoreIsTheNamespace(t *testing.T) {
 	ctx := context.Background()
 	p := startPair(t, runthrough.Config{Policy: runthrough.PolicyReadThroughCache, Revalidate: true})
@@ -306,24 +298,17 @@ func TestMirrorWritesDoesNotTellTheCallerTheObjectIsMissing(t *testing.T) {
 }
 
 // TestMirrorWritesCreatesTheBucketUpstream is the other half, and it is skipped
-// rather than asserted because the fix is a public API decision rather than an
-// implementation detail.
+// rather than asserted because the fix is a public API decision.
 //
-// CreateBucket routes to the local store and nowhere else, so a bucket made
-// through a run-through client never exists upstream and every write to it goes
-// terminal with a not-found. Propagating it means either reusing UpstreamWrite —
-// which contradicts the model's own rule that creating a namespace "is not an
-// object operation and does not inherit its permissions"
-// (internal/authority/authority.go) — or adding an operation to a deliberately
-// closed set, which changes what a caller can narrow an Authority against.
+// CreateBucket routes to the local store and nowhere else, so a bucket made through
+// a run-through client never exists upstream and every write to it goes terminal
+// with a not-found. Propagating it means either reusing UpstreamWrite — which
+// contradicts the model's own rule that creating a namespace does not inherit object
+// permissions (internal/authority/authority.go) — or adding an operation to a
+// deliberately closed set.
 //
-// Creating the bucket upstream is a working answer today. The gap is that nothing
-// states it. The test is left here so the skip is visible in the test output
-// rather than only in a document, and so whoever takes the decision has the
-// reproduction already written.
-//
-// To enable it: propagate CreateBucket under whichever grant the decision names,
-// add that operation to authority.Operation, remove the skip.
+// To enable it: propagate CreateBucket under whichever grant the decision names, add
+// that operation to authority.Operation, remove the skip.
 func TestMirrorWritesCreatesTheBucketUpstream(t *testing.T) {
 	t.Skip("needs an authority decision: bucket-creation consent is not derivable from UpstreamWrite (see the comment above)")
 

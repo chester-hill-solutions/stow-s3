@@ -48,9 +48,9 @@ func supportsConditionalWrites(store Store) bool {
 //
 // It is the WHOLE surface, not just the write half. The runtime reconciles
 // in-flight uploads when it opens, so a store claiming multipart has to be able
-// to answer "what is in flight?" as well as "start one". An earlier version of
-// this interface had only the write half and the adapter answered the read half
-// with empty results, which is a lie the moment a caller asks.
+// to answer "what is in flight?" as well as "start one". An interface with only
+// the write half leaves the adapter answering the read half with empty results,
+// which is a lie the moment a caller asks.
 type MultipartStore interface {
 	// The write half.
 	//

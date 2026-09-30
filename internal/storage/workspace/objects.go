@@ -214,14 +214,10 @@ func (s *Store) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, ds
 	})
 }
 
-// CopyObjectCond captures the source and publishes the destination under one
-// lock, and evaluates the conditions against the version it captured.
-//
-// The read and the write used to be separate calls, each taking the lock in
-// turn, so a source overwritten in between was copied as the bytes of one
-// version with the metadata of another. Here the source file and its manifest
-// entry are read together, and the conditions are checked against that entry
-// before the destination is written.
+// CopyObjectCond captures the source and publishes the destination under one lock, and
+// evaluates the conditions against the version it captured. The read and the write
+// share one lock, so a source overwritten in between cannot be copied as the bytes of
+// one version with the metadata of another.
 func (s *Store) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err

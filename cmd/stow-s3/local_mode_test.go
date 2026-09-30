@@ -40,7 +40,7 @@ func (r *upstreamRecorder) requireUntouched(t *testing.T, step string) {
 	}
 }
 
-// setHazardousEnv reproduces the environment that used to make stow reach a live
+// setHazardousEnv reproduces the environment that makes stow able to reach a live
 // provider on its own: a .env copied from a staging machine, and the AWS_*
 // variables a CI runner or a developer shell has for every other tool.
 func setHazardousEnv(t *testing.T, endpoint string) {
@@ -262,9 +262,9 @@ func TestExplicitLocalModeIsStillLocal(t *testing.T) {
 }
 
 // buildStore must not build an upstream client in local mode even when the
-// configuration is the most aggressive the tool accepts, which now includes live
-// write consent — the one thing that used to be the only thing standing between
-// this configuration and a live write.
+// configuration is the most aggressive the tool accepts, which includes live
+// write consent — the one thing standing between this configuration and a live
+// write.
 func TestBuildStoreIgnoresUpstreamConfigInLocalMode(t *testing.T) {
 	setHazardousEnv(t, "https://upstream.example")
 	t.Setenv("STOW_ALLOW_LIVE_WRITES", "true")

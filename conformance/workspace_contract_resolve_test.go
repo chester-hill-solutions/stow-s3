@@ -96,10 +96,11 @@ func aStepThatNamesEveryField(t *testing.T, work string) contractStep {
 	}
 }
 
-// Resolve has to reach every field. It used to happen at each place a resolved value
-// was wanted, and one of those places did not: the registry directory was read from
-// the raw arguments, so a step was pointed at a directory literally named
-// "{{registryA}}" and `collect` reported an empty registry rather than an error.
+// Resolve has to reach every field, and it has to be the one place it happens. A
+// field read from the raw arguments instead is a field that can reach a consumer
+// unresolved: the registry directory is the one that bites, since a step pointed at
+// a directory literally named "{{registryA}}" makes `collect` report an empty
+// registry rather than an error.
 func TestResolveLeavesNoReferenceInAnyFieldOfAStep(t *testing.T) {
 	run := newResolveRun(t)
 	step := aStepThatNamesEveryField(t, run.work)

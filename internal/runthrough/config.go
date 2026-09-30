@@ -85,16 +85,12 @@ type Config struct {
 	// is a miss, and the cache is served as-is with no revalidation.
 	//
 	// The distinction matters because the stale-if-error fallback already covers the
-	// case this is for — an upstream that cannot be reached falls back to the cached
-	// copy. That fallback is a consequence of error handling, so it cannot be
-	// asserted, proven, audited, or cost-bounded: nothing states that the network was
-	// not touched, and a hung upstream turns every read into a timeout. Setting
-	// Offline makes the guarantee checkable. The credential-safety claim is only
-	// worth something if it is provable, and this is what makes it provable.
-	//
-	// It also bounds cost. A read that would have gone to the upstream is a
-	// synchronous network call inside a request, and an agent running a thousand of
-	// them against a dead endpoint pays for the failure a thousand times.
+	// case this is for, and that fallback is a consequence of error handling, so it
+	// cannot be asserted, proven, audited or cost-bounded: nothing states the network
+	// was not touched, and a hung upstream turns every read into a timeout. Setting
+	// Offline makes the guarantee checkable, and it bounds cost: a read that would
+	// have gone upstream is a network call inside a request, and an agent running a
+	// thousand of them against a dead endpoint pays for the failure a thousand times.
 	Offline bool
 }
 

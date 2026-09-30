@@ -41,7 +41,7 @@ func TestEffectiveWritePolicy(t *testing.T) {
 }
 
 // The regression this policy exists for: STOW_POLICY=mirrorWrites arriving from
-// an inherited .env, next to credentials for a shared bucket, used to turn
+// an inherited .env, next to credentials for a shared bucket, must not turn
 // AllowLiveWrites on by itself. That is a silent write to someone else's data.
 func TestConfigFromEnvMirrorWritesAloneDoesNotAllowLiveWrites(t *testing.T) {
 	os.Clearenv()

@@ -298,14 +298,11 @@ func TestCompleteMultipartUploadMinimumPartSizeAtTheWire(t *testing.T) {
 	}
 }
 
-// The properties fixed at initiation reach the completed object.
-//
-// A Content-Type and user metadata given to CreateMultipartUpload used to be
-// dropped on the floor: the storage model kept only the upload ID, the bucket,
-// the key and the initiation time, so completion had nothing to build the
-// object's metadata from and published an object with neither. A client that
-// uploaded a JSON document with a content type and read it back over HeadObject
-// was told it was application/octet-stream with no metadata at all.
+// The properties fixed at initiation reach the completed object. Completion
+// builds the object's metadata from what initiation recorded, so a Content-Type
+// or user metadata given there and absent here means the completion path is
+// reading something other than the initiation record — a client that uploaded a
+// JSON document would read back application/octet-stream with no metadata.
 func TestCompletedObjectKeepsTheInitiationProperties(t *testing.T) {
 	ts := newStoreServer(t, storage.NewMemoryStore())
 	createBucketOverWire(t, ts, "uploads")

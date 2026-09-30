@@ -72,24 +72,19 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 
 // enforcementMethods are the method names that count as consulting an authority.
 //
-// Authority.Allows is the predicate, Authority.Check turns its refusal into an
-// error, and check is the runtime wrapper. All are enforcement chokepoints.
+// Authority.Allows is the predicate, Authority.Check turns its refusal into an error,
+// and check is the runtime wrapper. Narrowing to a named set is deliberate: matching
+// any call that merely mentions an operation would also match a log statement or a
+// slice, and would let a real gap pass as enforced.
 //
-// Narrowing to a named set is deliberate. Matching any call that merely mentions an
-// operation would also match a log statement or a slice, and would let a real gap
-// pass as enforced.
-//
-// This set has had to widen twice, each time because a new gate spelling was added
-// and the scan could not see it: once when the run-through adapter began gating on
-// Allows, and once when the runtime gained checkResource and checkUpload. Both
-// blind spots were worse than a missed detection, because the test demands an
-// entry in Ungated for anything it cannot see — so the scan required the code to
-// go on claiming that a permission was described and not granted.
-//
-// A detector whose blind spot decides what the documentation claims is not a safe
-// detector, so the fix in both cases was to widen the detector to the real
-// chokepoint, never to re-declare an enforced operation in Ungated to make the
-// scan agree.
+// This set has had to widen twice, each time because a new gate spelling was added and
+// the scan could not see it: once when the run-through adapter began gating on Allows,
+// and once when the runtime gained checkResource and checkUpload. Both blind spots were
+// worse than a missed detection, because the test then demands an Ungated entry for an
+// operation that is enforced — so the code goes on claiming that a permission is
+// described and not granted. The fix in both cases was to widen the detector to the real
+// chokepoint, never to re-declare an enforced operation in Ungated to make the scan
+// agree.
 var enforcementMethods = map[string]bool{
 	"check":         true,
 	"checkResource": true,

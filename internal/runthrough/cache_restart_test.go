@@ -14,17 +14,14 @@ import (
 // two do not survive a restart together. A restarted server therefore comes up
 // holding cache objects on disk and an index that has never heard of them.
 //
-// That is not an accounting curiosity. collectCacheCandidates plans eviction
-// from the index and from nothing else, so an index that does not know about the
-// objects already cached computes a cache total from the objects written since
-// startup. A byte limit the operator set is then enforced against that total,
-// and the cache grows past the bound with nothing to indicate it — which is the
-// failure mode ReconcileCacheIndex's own comment says the index is not allowed
-// to have.
+// That is not an accounting curiosity. collectCacheCandidates plans eviction from
+// the index and nothing else, so an index that does not know about the objects
+// already cached computes a cache total from what was written since startup, and
+// the operator's byte limit is enforced against that. The cache then grows past
+// the bound with nothing to indicate it.
 //
-// So this is a restart, modelled the only way it can be modelled in process: one
-// cache store shared by two adapters, the second constructed over a store the
-// first already filled.
+// So this is a restart, modelled the only way it can be in process: one cache store
+// shared by two adapters, the second over a store the first filled.
 func TestARestartedServerRebuildsTheEvictionIndexFromTheCacheOnDisk(t *testing.T) {
 	ctx := context.Background()
 	const objects = 40
