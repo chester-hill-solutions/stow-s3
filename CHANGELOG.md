@@ -2,6 +2,44 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- The Go quality gate could be raised to approve a regression. `tools/quality`
+  was both the scanner and the gate, and its history check compared the *scan*
+  against the parent baseline rather than the *committed baseline* against the
+  parent — so raising the floor left both sides of that comparison unchanged and it
+  passed, while a comment on the function claimed this was "the check that makes a
+  baseline impossible to grow quietly". An unrecorded improvement was invisible for
+  the same reason: the floor was only ever compared one way. This is the failure
+  `scripts/ratchet.mjs` opens by naming, a decision with one correct answer written
+  down more than once by hand, and the hand-written copy is where it was got wrong.
+  `tools/quality` is now a scanner (`--json` for a gate to apply a policy to) and
+  `scripts/check-go-quality.mjs` applies `compareKeys`, `expandedKeys` and
+  `compareIdentities` like the other five ratchets. A raised floor is now refused
+  with the reason, and `--write-baseline` re-measures rather than trusting the
+  committed file, so a real regression cannot be laundered through the maintenance
+  action.
+- The comment budget now covers non-test Go only, and `comment-ratio` is reported
+  rather than ratcheted. Test prose and production prose are different claims, and
+  one budget made them compete: half of it was test prose, so a slice that
+  documented its tests properly had to fund them by deleting documentation from
+  shipped code it never touched. The ratio is a density, so it has no floor —
+  removing dead code raised it and the gate called that new debt, failing the exact
+  cleanup the ratchet exists to encourage. The exact comment-line count is the
+  floor, and it is now measured over the code that ships.
+- The Stow site led with "S3 without the cloud" for a project whose centre of
+  gravity is agent workspaces and portable checkpoints, and nothing checked it:
+  `check-install-surface` covers the four documents an agent reads and not
+  `index.html`, so the page a person lands on was ungated. It now leads with the
+  workspace lifecycle, with the S3 surface kept and its limits stated. Four claims
+  on it were wrong and are fixed — a Go install line that was not a module path, a
+  Go snippet that did not compile, a social card naming a package that does not
+  exist, and sizes and quotas the build had moved past.
+- The workspace is now a resource a policy can decide about. `Destroy` consulted
+  the environment only, so a policy could not deny it however it was written, and
+  the workspace selector kind was defined, persisted and matched by no enforcement
+  point anywhere. A policy refusal is now a distinct error from an environment
+  refusal, because the latter's message names the environment as the thing that
+  refused and reports a grant that never existed.
+
 - Fixed the workspace store reporting "no such object" for every read on a host
   that cannot open a regular file without following a link. `internal/rooted`
   returns a stated refusal on such a host; the read path turned it into a missing

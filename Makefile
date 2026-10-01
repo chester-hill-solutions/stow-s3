@@ -103,7 +103,7 @@ format-check:
 	@test -z "$$(gofmt -l $$(find cmd internal conformance tools pkg -name '*.go' -type f))" || (gofmt -l $$(find cmd internal conformance tools pkg -name '*.go' -type f); exit 1)
 
 check-go-quality:
-	$(PINNED_GO) run ./tools/quality
+	node scripts/check-go-quality.mjs
 
 check-ts-quality:
 	$(NPM_INSTALL) && npm run check:standards

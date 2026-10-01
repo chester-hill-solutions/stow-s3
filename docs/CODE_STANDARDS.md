@@ -48,7 +48,27 @@ npm run check:dry
 - CI checks out full history (`fetch-depth: 0`) and compares against the explicit parent/merge-base; a shallow checkout is a hard failure, never a skipped ratchet.
 - Inline suppressions are themselves counted where the check can detect them. A suppression requires a precise explanation and does not reset the ratchet.
 - Existing test fixtures and generated output are excluded only when their exclusion is documented in the check configuration.
-- The Go comment budget (`comment-lines`, `comment-ratio`) covers **non-test Go only**. Test files are excluded from the comment budget alone; the `any` rule was already scoped away from tests before this, and every other structural rule — complexity, parameter count, function length, file size — still applies to them. A test comment says what a test proves; a production comment says why the system is shaped as it is; counting them in one budget made them compete, and half the budget was test prose, so documenting a test properly had to be funded by deleting documentation from unrelated shipped code. Test files remain held to the coverage ratchet, `gofmt` and `go vet`.
+- `tools/quality` is a **scanner**, not a gate. It measures and prints (`--json` for a
+  consumer); `scripts/check-go-quality.mjs` applies `compareKeys`, `expandedKeys` and
+  `compareIdentities` from `scripts/ratchet.mjs`, like the other five ratchets. It was both
+  once, and its private copy of the history check compared the *scan* against the parent
+  baseline rather than the *committed baseline* against the parent, so raising the floor
+  passed and an unrecorded improvement was invisible, while a comment on that function
+  claimed the opposite. The scanner refuses nothing, which is why a caller can review a
+  verdict rather than infer one.
+- The Go comment budget covers **non-test Go only**, and only `comment-lines` is
+  ratcheted. `comment-ratio` is still reported but is not a floor: it is a density, so
+  removing code raises it, and a two-sided ratchet on a density fails the cleanup it
+  should encourage. Test files are excluded from the comment budget alone; the `any`
+  rule was already scoped away from tests before this, and every other structural rule
+  — complexity, parameter count, function length, file size — still applies to them. A
+  test comment says what a test proves; a production comment says why the system is
+  shaped as it is; counting them in one budget made them compete, and half the budget
+  was test prose, so documenting a test properly had to be funded by deleting
+  documentation from unrelated shipped code. Test files remain held to the coverage
+  ratchet, `gofmt` and `go vet`.
+  still reported but is not a floor: it is a density, so removing code raises it, and a
+  two-sided ratchet on a density fails the cleanup it should encourage. Test files are excluded from the comment budget alone; the `any` rule was already scoped away from tests before this, and every other structural rule — complexity, parameter count, function length, file size — still applies to them. A test comment says what a test proves; a production comment says why the system is shaped as it is; counting them in one budget made them compete, and half the budget was test prose, so documenting a test properly had to be funded by deleting documentation from unrelated shipped code. Test files remain held to the coverage ratchet, `gofmt` and `go vet`.
 
 ## Go standards
 

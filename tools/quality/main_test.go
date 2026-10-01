@@ -1,154 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-// The ratchet is the gate every other gate is trusted because of, and it had no
-// test of its own: the comparison lived inside main, so there was nothing to
-// call and nothing to assert. The three times it fired during one afternoon —
-// complexity 4 > 3, max-params 10 > 8, and a new oversized file — were all
-// caught by the code, and none of them by a test that would have noticed if the
-// code had stopped working.
-//
-// The four behaviours below are the ones the gate exists to provide. Each is a
-// way it can be wrong in the direction that matters: a gate that has silently
-// stopped rejecting new debt is worse than no gate, because the debt is still
-// being described as baselined.
-
-func reportOf(counts map[string]int, identities ...string) report {
-	out := report{Version: baselineVersion, Counts: counts}
-	for _, identity := range identities {
-		out.Violations = append(out.Violations, violation{Rule: "complexity", Identity: identity, Message: "recorded"})
-	}
-	return out
-}
-
-func TestRatchetAcceptsAnUnchangedTree(t *testing.T) {
-	baseline := reportOf(map[string]int{"complexity": 2}, "a.go:one#1", "a.go:two#1")
-	if problems := ratchetProblems(baseline, baseline); len(problems) != 0 {
-		t.Fatalf("an unchanged tree reported %v", problems)
-	}
-	if problems := countIncreases(baseline, baseline); len(problems) != 0 {
-		t.Fatalf("an unchanged tree reported an increase: %v", problems)
-	}
-}
-
-// A new identity is unapproved debt. This is the check that fired twice during
-// the session that produced this file.
-func TestRatchetRejectsANewIdentity(t *testing.T) {
-	baseline := reportOf(map[string]int{"complexity": 1}, "a.go:one#1")
-	current := reportOf(map[string]int{"complexity": 2}, "a.go:one#1", "a.go:newcomer#1")
-
-	problems := ratchetProblems(current, baseline)
-	if len(problems) != 1 {
-		t.Fatalf("problems = %v, want exactly the new identity", problems)
-	}
-	if !strings.Contains(problems[0], "a.go:newcomer#1") || !strings.HasPrefix(problems[0], "new: ") {
-		t.Errorf("problem = %q, want it to name the new identity", problems[0])
-	}
-}
-
-// A stale identity is debt that was paid and not recorded. It fails so the
-// baseline has to be lowered, which is the only mechanism by which the ratchet
-// ever gets stricter.
-func TestRatchetRejectsAStaleIdentity(t *testing.T) {
-	baseline := reportOf(map[string]int{"complexity": 2}, "a.go:one#1", "a.go:fixed#1")
-	current := reportOf(map[string]int{"complexity": 1}, "a.go:one#1")
-
-	problems := ratchetProblems(current, baseline)
-	if len(problems) != 1 {
-		t.Fatalf("problems = %v, want exactly the stale identity", problems)
-	}
-	if !strings.Contains(problems[0], "a.go:fixed#1") || !strings.HasPrefix(problems[0], "stale: ") {
-		t.Errorf("problem = %q, want it to name the stale identity", problems[0])
-	}
-}
-
-// Both at once is the ordinary case when unrelated work lands together, and the
-// report has to carry both rather than stopping at the first.
-func TestRatchetReportsNewAndStaleTogether(t *testing.T) {
-	baseline := reportOf(map[string]int{"complexity": 2}, "a.go:kept#1", "a.go:paid#1")
-	current := reportOf(map[string]int{"complexity": 2}, "a.go:kept#1", "a.go:added#1")
-
-	problems := ratchetProblems(current, baseline)
-	if len(problems) != 2 {
-		t.Fatalf("problems = %v, want the new and the stale identity", problems)
-	}
-}
-
-// The count check is what stops a violation being renamed to shed its baseline
-// entry. Identity matching alone would see one new and one stale and an
-// unchanged total; only the count notices that the rule did not get better.
-func TestCountCheckCatchesARenamedViolation(t *testing.T) {
-	previous := reportOf(map[string]int{"complexity": 1}, "a.go:before#1")
-	// Same total, different identity: the violation was renamed rather than fixed.
-	current := reportOf(map[string]int{"complexity": 1}, "a.go:after#1")
-
-	if problems := countIncreases(current, previous); len(problems) != 0 {
-		t.Fatalf("a rename is not a count increase, got %v", problems)
-	}
-	// The ratchet still rejects it, on identity grounds, which is the point.
-	if problems := ratchetProblems(current, previous); len(problems) == 0 {
-		t.Error("a renamed violation was accepted")
-	}
-}
-
-func TestCountCheckRejectsAnIncrease(t *testing.T) {
-	previous := reportOf(map[string]int{"complexity": 1, "max-params": 2}, "a.go:one#1")
-	current := reportOf(map[string]int{"complexity": 1, "max-params": 3}, "a.go:one#1")
-
-	problems := countIncreases(current, previous)
-	if len(problems) != 1 {
-		t.Fatalf("problems = %v, want the max-params increase", problems)
-	}
-	if !strings.Contains(problems[0], "max-params") || !strings.Contains(problems[0], "3 > 2") {
-		t.Errorf("problem = %q, want it to name the rule and both counts", problems[0])
-	}
-}
-
-// A rule previous never recorded counts as an increase from zero, so introducing
-// a new metric is a visible event rather than a free addition.
-func TestCountCheckTreatsAnUnknownRuleAsAnIncrease(t *testing.T) {
-	previous := reportOf(map[string]int{"complexity": 1})
-	current := reportOf(map[string]int{"complexity": 1, "any": 1})
-
-	problems := countIncreases(current, previous)
-	if len(problems) != 1 || !strings.Contains(problems[0], "any (1 > 0)") {
-		t.Fatalf("problems = %v, want a new rule counted from zero", problems)
-	}
-}
-
-// An improvement is not an increase. A rule that went down must pass, or fixing
-// debt would fail the gate.
-func TestCountCheckAcceptsAnImprovement(t *testing.T) {
-	previous := reportOf(map[string]int{"complexity": 3, "any": 2})
-	current := reportOf(map[string]int{"complexity": 1})
-
-	if problems := countIncreases(current, previous); len(problems) != 0 {
-		t.Fatalf("a reduction reported %v", problems)
-	}
-}
-
-// Order is not a decision. Two violations of the same rule must not make the
-// report depend on map iteration order, or the same tree fails differently on
-// different runs.
-func TestCountCheckIsDeterministic(t *testing.T) {
-	previous := reportOf(map[string]int{"a": 0, "b": 0, "c": 0, "d": 0, "e": 0})
-	current := reportOf(map[string]int{"a": 1, "b": 1, "c": 1, "d": 1, "e": 1})
-
-	first := strings.Join(countIncreases(current, previous), "\n")
-	for i := 0; i < 20; i++ {
-		if got := strings.Join(countIncreases(current, previous), "\n"); got != first {
-			t.Fatalf("report order varies between runs:\n%s\n---\n%s", first, got)
-		}
-	}
-}
+// The scan: does it measure what it claims to, over the tree the gate scans. These
+// predate the split of the scanner from the gate and are unchanged by it.
 
 // The scan has to see the same code the gate runs over. A rule that never fires
 // is indistinguishable from a rule that has been satisfied, so each metric is
@@ -352,30 +214,212 @@ func TestCommentBudgetCountsNonTestGoOnly(t *testing.T) {
 	}
 }
 
-// The checked-in baseline must describe the tree it is checked into. A stale
-// entry here is not a style problem: it is the gate reporting a debt that no
-// longer exists, which is the signal that lowers the floor.
-func TestCheckedInBaselineMatchesTheTree(t *testing.T) {
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git is not available")
-	}
-	t.Chdir(filepath.Join("..", ".."))
-	data, err := os.ReadFile(filepath.Join("scripts", "baselines", "go-quality.json"))
-	if err != nil {
-		t.Fatalf("read baseline: %v", err)
-	}
-	var baseline report
-	if err := json.Unmarshal(data, &baseline); err != nil {
-		t.Fatalf("decode baseline: %v", err)
-	}
-	if baseline.Version != baselineVersion {
-		t.Fatalf("baseline version = %d, want %d", baseline.Version, baselineVersion)
-	}
-	current, err := scan()
-	if err != nil {
-		t.Fatalf("scan: %v", err)
-	}
-	if problems := ratchetProblems(current, baseline); len(problems) > 0 {
-		t.Errorf("the checked-in baseline does not match the tree: %v", problems)
+// The tool's whole user-facing surface - the flags, the JSON contract a gate reads,
+// and the baseline write - is here. It had no coverage at all, which the
+// per-package coverage floor reported the moment the ratchet policy tests went with
+// the policy they tested.
+//
+// The JSON shape is the load-bearing part: scripts/check-go-quality.mjs parses it,
+// so a field renamed here is a gate reading undefined rather than a compile error
+// anywhere. That is why the shape is asserted against a decoded value rather than a
+// substring.
+
+func fixedReport() report {
+	return report{
+		Version: baselineVersion,
+		Violations: []violation{
+			{Rule: "complexity", Identity: "a.go:one#1", Message: "too complex"},
+			{Rule: "max-params", Identity: "a.go:two#1", Message: "too many"},
+		},
+		Counts: map[string]int{"complexity": 2, "any": 5},
 	}
 }
+
+func fixedScanner() func() (report, error) {
+	return func() (report, error) { return fixedReport(), nil }
+}
+
+func TestJSONOutputIsTheShapeTheGateReads(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"-json"}, &stdout, &stderr, fixedScanner()); code != 0 {
+		t.Fatalf("code = %d, stderr = %s", code, stderr.String())
+	}
+
+	var decoded struct {
+		Version    int `json:"version"`
+		Violations []struct {
+			Rule     string `json:"rule"`
+			Identity string `json:"identity"`
+			Message  string `json:"message"`
+		} `json:"violations"`
+		Counts map[string]int `json:"counts"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &decoded); err != nil {
+		t.Fatalf("the gate's parse of this output would fail: %v\n%s", err, stdout.String())
+	}
+	if decoded.Version != baselineVersion {
+		t.Errorf("version = %d, want %d", decoded.Version, baselineVersion)
+	}
+	if len(decoded.Violations) != 2 {
+		t.Fatalf("violations = %d, want 2", len(decoded.Violations))
+	}
+	if decoded.Violations[0].Identity != "a.go:one#1" || decoded.Violations[0].Rule != "complexity" {
+		t.Errorf("first violation = %+v, want rule and identity preserved", decoded.Violations[0])
+	}
+	if decoded.Counts["any"] != 5 {
+		t.Errorf("counts = %v, want the scanner's own numbers", decoded.Counts)
+	}
+}
+
+func TestJSONOutputEndsWithExactlyOneDocument(t *testing.T) {
+	// Two documents on stdout would be read as one malformed document by a gate
+	// that pipes it, and the failure would look like a scan problem rather than an
+	// encoding one.
+	var stdout, stderr bytes.Buffer
+	run([]string{"-json"}, &stdout, &stderr, fixedScanner())
+	decoder := json.NewDecoder(bytes.NewReader(stdout.Bytes()))
+	var first report
+	if err := decoder.Decode(&first); err != nil {
+		t.Fatalf("first decode: %v", err)
+	}
+	var second report
+	if err := decoder.Decode(&second); err == nil {
+		t.Error("a second document followed the first; a gate reading this would see a concatenated stream")
+	}
+}
+
+func TestTheSummaryReportsAndDoesNotJudge(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	code := run(nil, &stdout, &stderr, fixedScanner())
+	if code != 0 {
+		t.Fatalf("code = %d, want 0: a scanner that fails here is a gate again", code)
+	}
+	out := stdout.String()
+	for _, want := range []string{
+		"complexity: a.go:one#1 (too complex)",
+		"max-params: a.go:two#1 (too many)",
+		"Go quality report: 2 violations",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("summary is missing %q:\n%s", want, out)
+		}
+	}
+}
+
+func TestTheSummaryOrdersItsCountsSoTwoRunsAgree(t *testing.T) {
+	// Iterating a map to build a line makes the same tree print differently on
+	// different runs, which is a diff nobody can read and a CI log that looks like a
+	// change when nothing changed.
+	first := summaryOf(t)
+	for i := 0; i < 50; i++ {
+		if got := summaryOf(t); got != first {
+			t.Fatalf("the summary varies between runs:\n%s\n---\n%s", first, got)
+		}
+	}
+	if !strings.Contains(first, "any=5, complexity=2") {
+		t.Errorf("summary = %q, want the counts in sorted order", first)
+	}
+}
+
+func summaryOf(t *testing.T) string {
+	t.Helper()
+	var stdout, stderr bytes.Buffer
+	run(nil, &stdout, &stderr, fixedScanner())
+	return stdout.String()
+}
+
+func TestWritingTheBaselineCreatesItsDirectory(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "nested", "deeper", "go-quality.json")
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"-write-baseline", "-baseline", path}, &stdout, &stderr, fixedScanner()); code != 0 {
+		t.Fatalf("code = %d, stderr = %s", code, stderr.String())
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("the baseline was not written where it was asked for: %v", err)
+	}
+	var written report
+	if err := json.Unmarshal(data, &written); err != nil {
+		t.Fatalf("the written baseline is not a report: %v", err)
+	}
+	if len(written.Violations) != 2 || written.Counts["any"] != 5 {
+		t.Errorf("written baseline = %+v, want the scanned report", written)
+	}
+	if !strings.HasSuffix(string(data), "\n") {
+		t.Error("the written baseline does not end in a newline, so the next write shows a two-line diff")
+	}
+}
+
+func TestWritingTheBaselineOverAnUnwritablePathIsAFailureNotASilentSkip(t *testing.T) {
+	// A maintenance action that reports success without writing leaves a baseline
+	// describing code that no longer exists, which is the stale floor the coverage
+	// ratchet complains about.
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "not-a-directory"), []byte("x"), 0o644); err != nil {
+		t.Fatalf("fixture: %v", err)
+	}
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"-write-baseline", "-baseline", filepath.Join(dir, "not-a-directory", "b.json")}, &stdout, &stderr, fixedScanner())
+	if code == 0 {
+		t.Fatal("code = 0, want a failure when the baseline cannot be written")
+	}
+	if stderr.Len() == 0 {
+		t.Error("a failure said nothing about why")
+	}
+}
+
+func TestAFailedScanIsReportedAndNotSwallowed(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	boom := func() (report, error) { return report{}, errScan }
+	code := run(nil, &stdout, &stderr, boom)
+	if code != 2 {
+		t.Fatalf("code = %d, want 2: a scan failure is not a pass", code)
+	}
+	if !strings.Contains(stderr.String(), errScan.Error()) {
+		t.Errorf("stderr = %q, want the scan's own reason", stderr.String())
+	}
+	if stdout.Len() != 0 {
+		t.Errorf("stdout = %q, want nothing printed when the scan failed", stdout.String())
+	}
+}
+
+func TestAFailedScanIsNotPrintedAsAReportEvenWithJSONAsked(t *testing.T) {
+	// The failure path has to come before the output path, or a gate reading JSON
+	// gets an empty document and reports a tree with no violations.
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"-json"}, &stdout, &stderr, func() (report, error) { return report{}, errScan }); code != 2 {
+		t.Fatalf("code = %d, want 2", code)
+	}
+	if stdout.Len() != 0 {
+		t.Errorf("stdout = %q, want no document emitted for a failed scan", stdout.String())
+	}
+}
+
+func TestAnUnknownFlagIsAFailure(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"-nonsense"}, &stdout, &stderr, fixedScanner()); code == 0 {
+		t.Fatal("code = 0, want a failure for a flag that does not exist")
+	}
+}
+
+func TestTheDefaultScanIsTheTree(t *testing.T) {
+	// run's nil scanner is measure, and measure is the tree rather than a fixture.
+	// A default that quietly scanned nothing would make every other case here pass
+	// while the tool reported an empty repository.
+	got, err := measure()
+	if err != nil {
+		t.Fatalf("measure: %v", err)
+	}
+	if len(got.Violations) == 0 {
+		t.Error("the default scan found no violations, so it is not scanning the tree")
+	}
+	if len(got.Counts) == 0 {
+		t.Error("the default scan reported no counts at all")
+	}
+}
+
+var errScan = errString("the scan failed")
+
+type errString string
+
+func (e errString) Error() string { return string(e) }

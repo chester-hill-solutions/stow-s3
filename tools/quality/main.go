@@ -1,4 +1,8 @@
-// Command quality records and checks ratcheted Go maintainability metrics.
+// Command quality records the ratcheted Go maintainability metrics for a tree.
+//
+// It is a scanner. Whether a report is acceptable is a ratchet decision, and that
+// decision lives once, in scripts/ratchet.mjs, applied by
+// scripts/check-go-quality.mjs. This tool measures and prints.
 package main
 
 import (
@@ -8,8 +12,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -29,145 +33,91 @@ type report struct {
 	Counts     map[string]int `json:"counts"`
 }
 
-func main() {
+// main prints the report and decides nothing: comparing a report to a baseline, and a
+// baseline to its own history, is the ratchet policy, which lives once in
+// scripts/ratchet.mjs and is applied by scripts/check-go-quality.mjs. This tool used to
+// hold its own copy of those comparisons and got the history check wrong, so raising the
+// floor passed; see docs/CODE_STANDARDS.md. main is a shim over run, so the flags and the
+// JSON contract a gate reads are reachable from a test.
+func main() { os.Exit(run(os.Args[1:], os.Stdout, os.Stderr, nil)) }
+
+// run is the tool. It returns the exit code rather than exiting, so every path is
+// reachable from a test. A nil scan means measure the tree.
+func run(args []string, stdout, stderr io.Writer, scan func() (report, error)) int {
+	flags := flag.NewFlagSet("quality", flag.ContinueOnError)
+	flags.SetOutput(stderr)
 	var writeBaseline bool
+	var asJSON bool
 	var baselinePath string
-	flag.BoolVar(&writeBaseline, "write-baseline", false, "write the current quality baseline")
-	flag.StringVar(&baselinePath, "baseline", filepath.Join("scripts", "baselines", "go-quality.json"), "baseline path")
-	flag.Parse()
+	flags.BoolVar(&writeBaseline, "write-baseline", false, "write the current report as the baseline")
+	flags.BoolVar(&asJSON, "json", false, "print the report as JSON, for a gate to apply a policy to")
+	flags.StringVar(&baselinePath, "baseline", filepath.Join("scripts", "baselines", "go-quality.json"), "baseline path, for -write-baseline")
+	if err := flags.Parse(args); err != nil {
+		return 2
+	}
+	if scan == nil {
+		scan = measure
+	}
 
 	current, err := scan()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
+		fmt.Fprintln(stderr, err)
+		return 2
+	}
+
+	if asJSON {
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(current); err != nil {
+			fmt.Fprintln(stderr, err)
+			return 2
+		}
+		return 0
 	}
 
 	if writeBaseline {
-		data, err := json.MarshalIndent(current, "", "  ")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(2)
+		if err := writeBaselineFile(baselinePath, current); err != nil {
+			fmt.Fprintln(stderr, err)
+			return 2
 		}
-		if err := os.MkdirAll(filepath.Dir(baselinePath), 0o755); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(2)
-		}
-		if err := os.WriteFile(baselinePath, append(data, '\n'), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(2)
-		}
-		fmt.Printf("Wrote %s (%d violations)\n", baselinePath, len(current.Violations))
-		return
+		fmt.Fprintf(stdout, "Wrote %s (%d violations)\n", baselinePath, len(current.Violations))
+		return 0
 	}
 
-	baselineBytes, err := os.ReadFile(baselinePath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "quality baseline %s is missing: %v\n", baselinePath, err)
-		os.Exit(2)
-	}
-	var baseline report
-	if err := json.Unmarshal(baselineBytes, &baseline); err != nil {
-		fmt.Fprintf(os.Stderr, "decode quality baseline: %v\n", err)
-		os.Exit(2)
-	}
-	if baseline.Version != baselineVersion {
-		fmt.Fprintf(os.Stderr, "unsupported quality baseline version %d\n", baseline.Version)
-		os.Exit(2)
-	}
-
-	if previous, ok := previousBaseline(baselinePath); ok {
-		if problems := countIncreases(current, previous); len(problems) > 0 {
-			for _, problem := range problems {
-				fmt.Fprintln(os.Stderr, problem)
-			}
-			os.Exit(1)
-		}
-	}
-
-	if problems := ratchetProblems(current, baseline); len(problems) > 0 {
-		fmt.Fprintln(os.Stderr, "Go quality ratchet violation")
-		for _, problem := range problems {
-			fmt.Fprintln(os.Stderr, problem)
-		}
-		fmt.Fprintln(os.Stderr, "Fix the violation; regenerate the baseline only after intentional debt reduction.")
-		os.Exit(1)
-	}
-	fmt.Printf("Go quality ratchet OK (%d baseline entries)\n", len(current.Violations))
-}
-
-// countIncreases reports the rules whose violation count rose against a previous
-// report. A rule that current no longer has is not an increase, and one that
-// previous never had counts as an increase from zero.
-//
-// This is the check that makes a baseline impossible to grow quietly: identities
-// are matched exactly, so a violation can be renamed to shed its entry, but the
-// per-rule totals still catch it.
-func countIncreases(current, previous report) []string {
-	var problems []string
-	for rule, count := range current.Counts {
-		if count > previous.Counts[rule] {
-			problems = append(problems, fmt.Sprintf("quality baseline increased: %s (%d > %d)", rule, count, previous.Counts[rule]))
-		}
-	}
-	sort.Strings(problems)
-	return problems
-}
-
-// ratchetProblems reports every identity that is new since the baseline and
-// every baseline entry that is now stale. Both are failures: a new identity is
-// unapproved debt, and a stale one is debt that was paid and not recorded, which
-// is what forces the baseline down after a fix.
-func ratchetProblems(current, baseline report) []string {
-	allowed := make(map[string]struct{}, len(baseline.Violations))
-	for _, item := range baseline.Violations {
-		allowed[item.Identity] = struct{}{}
-	}
-	actual := make(map[string]struct{}, len(current.Violations))
-	var problems []string
+	// The summary reports, and does not pass or fail. A scanner that exits non-zero
+	// for a reason the caller cannot see is a gate whose verdict cannot be reviewed,
+	// and this tool no longer owns a verdict at all.
 	for _, item := range current.Violations {
-		actual[item.Identity] = struct{}{}
-		if _, ok := allowed[item.Identity]; !ok {
-			problems = append(problems, fmt.Sprintf("new: %s (%s)", item.Identity, item.Message))
-		}
+		fmt.Fprintf(stdout, "%s: %s (%s)\n", item.Rule, item.Identity, item.Message)
 	}
-	for _, item := range baseline.Violations {
-		if _, ok := actual[item.Identity]; !ok {
-			problems = append(problems, "stale: "+item.Identity)
-		}
+	rules := make([]string, 0, len(current.Counts))
+	for rule := range current.Counts {
+		rules = append(rules, rule)
 	}
-	sort.Strings(problems)
-	return problems
+	sort.Strings(rules)
+	parts := make([]string, 0, len(rules))
+	for _, rule := range rules {
+		parts = append(parts, fmt.Sprintf("%s=%d", rule, current.Counts[rule]))
+	}
+	fmt.Fprintf(stdout, "Go quality report: %d violations, %s\n", len(current.Violations), strings.Join(parts, ", "))
+	return 0
 }
 
-func previousBaseline(path string) (report, bool) {
-	ref := strings.TrimSpace(os.Getenv("STOW_BASELINE_REF"))
-	if ref == "" {
-		ref = "HEAD^"
-	}
-	if _, err := exec.Command("git", "rev-parse", "--verify", ref).Output(); err != nil {
-		fmt.Fprintf(os.Stderr, "cannot resolve ratchet base %s; check out full history or set STOW_BASELINE_REF\\n", ref)
-		os.Exit(2)
-	}
-	command := exec.Command("git", "show", ref+":"+filepath.ToSlash(path))
-	data, err := command.Output()
+// writeBaselineFile creates the baseline and its directory.
+func writeBaselineFile(path string, current report) error {
+	data, err := json.MarshalIndent(current, "", "  ")
 	if err != nil {
-		return report{}, false
+		return err
 	}
-	var previous report
-	if json.Unmarshal(data, &previous) != nil || previous.Version != baselineVersion {
-		return report{}, false
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
 	}
-	return previous, true
+	return os.WriteFile(path, append(data, '\n'), 0o644)
 }
 
-// scan is where the tree comes from, so a test can point the same analysis at a
-// fixture instead of at the repository. A fixture inside the repository would be
-// scanned by the gate itself and would need a baseline entry of its own, which is
-// a debt recorded in order to test the thing that records debt.
-//
-// The root list is shared with the file-size ratchet through
-// config/scan-roots.json. They each had their own and they disagreed: tools/ and
-// scripts/ were in neither, so the code that checks the code was itself unchecked.
+// measure is the real scan, so run's default is a value.
+func measure() (report, error) { return scan() }
+
 func scan() (report, error) {
 	roots, err := scanRootsFromConfig()
 	if err != nil {
@@ -194,7 +144,12 @@ func scanRootsFromConfig() ([]string, error) {
 	if len(config.Go) == 0 {
 		return nil, fmt.Errorf("%s lists no go roots", path)
 	}
-	return config.Go, nil
+	// Resolved against the repo root; bare names were walked against the caller's cwd.
+	roots := make([]string, 0, len(config.Go))
+	for _, root := range config.Go {
+		roots = append(roots, filepath.Join(repoRoot(), root))
+	}
+	return roots, nil
 }
 
 // repoRoot is the directory containing go.mod, found by walking up from the
@@ -293,9 +248,8 @@ func scanRoots(roots []string) (report, error) {
 			return report{}, err
 		}
 	}
-	// Counts, not Violations: there is no per-site thing to record, and countIncreases
-	// is the check that matters. Any increase fails, the same contract the `any` count
-	// has.
+	// Counts, not Violations: there is no per-site thing to record. Whether an increase
+	// fails is the gate's decision, not the scanner's.
 	if lines.total > 0 {
 		result.Counts[commentLinesRule] = lines.comment
 		result.Counts[commentRatioRule] = lines.comment * 10000 / lines.total
@@ -322,6 +276,17 @@ type checker struct {
 	testFile bool
 }
 
+// relativeTo turns a scanned path into an identity a baseline can hold. Roots resolve
+// against the repo root, so an absolute path would name the checkout, not the code.
+func (c *checker) relativeTo(path string) string {
+	slashed := filepath.ToSlash(path)
+	root := filepath.ToSlash(repoRoot())
+	if root != "." && strings.HasPrefix(slashed, root+"/") {
+		return strings.TrimPrefix(slashed, root+"/")
+	}
+	return slashed
+}
+
 func (c *checker) add(rule, identity, message string) {
 	occurrenceKey := rule + "\x00" + identity
 	c.seen[occurrenceKey]++
@@ -338,7 +303,7 @@ func (c *checker) checkFunction(name string, body *ast.BlockStmt, params *ast.Fi
 	lines := end - start + 1
 	complexity := cyclomaticComplexity(body)
 	paramCount := parameterCount(params)
-	base := fmt.Sprintf("%s:%s", filepath.ToSlash(c.path), name)
+	base := fmt.Sprintf("%s:%s", c.relativeTo(c.path), name)
 	if lines > 200 {
 		c.add("function-lines", base, fmt.Sprintf("function %s has %d lines (maximum 200)", name, lines))
 	}
@@ -384,16 +349,16 @@ func (c *checker) checkLiterals(fn *ast.FuncDecl) {
 // recorded count is unchanged by a fix elsewhere, so the gate still fails on `any` in
 // production code.
 func (c *checker) checkEscapes(file *ast.File) {
-	location := filepath.ToSlash(c.path)
+	location := c.relativeTo(c.path)
 	ast.Inspect(file, func(node ast.Node) bool {
 		switch typed := node.(type) {
 		case *ast.Ident:
 			if typed.Name == "any" && !c.testFile {
-				c.add("any", location, "use of any")
+				c.add("any", c.relativeTo(location), "use of any")
 			}
 		case *ast.CallExpr:
 			if ident, ok := typed.Fun.(*ast.Ident); ok && ident.Name == "panic" {
-				c.add("panic", location, "panic call")
+				c.add("panic", c.relativeTo(location), "panic call")
 			}
 		}
 		return true
