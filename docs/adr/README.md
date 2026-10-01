@@ -40,7 +40,7 @@ the way it is.
 | [0007](0007-workspace-is-the-default.md) | `accepted` | — | — |
 | [0008](0008-workspace-backend-real-files.md) | `accepted` | — | — |
 | [0009](0009-workspace-outlives-process.md) | `accepted` | — | — |
-| [0010](0010-an-enforcement-site-or-not-a-permission.md) | `accepted` (amended 2026-09-29: qualified Store retained) | — | — |
+| [0010](0010-an-enforcement-site-or-not-a-permission.md) | `accepted` (amended 2026-10-01: enforcement decision gains a machine-checked third category) | — | — |
 | [0011](0011-local-is-the-default-mode.md) | `accepted` | 0001 | — |
 | [0012](0012-run-through-serves-only-its-own-buckets.md) | `accepted` | — | — |
 | [0013](0013-task-session-attempt-artifact.md) | `narrowed` | — | 0014 (execution ownership and prerequisites) |

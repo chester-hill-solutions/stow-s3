@@ -1,7 +1,7 @@
 ---
 status: accepted
-amended: 2026-09-29
-decision_digest: 52083046bc13d413
+amended: 2026-10-01
+decision_digest: f563828e5c06a8d6
 ---
 
 # A permission that is not checked is not a permission
@@ -126,9 +126,42 @@ rather than producing one with a write.
 
 ### 3. The anti-recurrence test is part of the definition
 
-A test asserts that **every** operation in `authority.Defined()` is either
-enforced at a chokepoint or documented as deliberately ungated, with the
-justification at the definition. Adding a decorative permission fails the suite.
+A test asserts that **every** operation in `authority.Defined()` is enforced at a
+chokepoint, documented as deliberately ungated, or recorded with the site that
+enforces it elsewhere — with the justification in the definition for the ungated
+case and in `authority.EnforcedElsewhere` for the third. Adding a decorative
+permission fails the suite.
+
+**Amended 2026-10-01.** The original decision was binary, and it had a third answer
+it could not express. `workspace.capture` is enforced in `pkg/stow`, by
+`Workspace.CreateCheckpoint`, because a workspace is a resource
+`internal/runtime` has no verb for — the reach test derives its table from
+`authority.Defined()` and lives in `internal/runtime`, so it has nothing to invoke.
+The two available answers were both wrong: an `Ungated` entry would have asserted
+the operation was unenforced while it was enforced, which is the exact false claim
+this ADR exists to make impossible, and inventing a runtime verb for the sake of a
+test would have put a permission where the enforcement is not.
+
+So there are now three categories, and the third is machine-checked rather than
+asserted: `authority.EnforcedElsewhere` names the enforcing site, and
+`TestEnforcedElsewhereNamesASiteThatConsultsTheOperation` requires the file to exist
+and to contain a call of the shape the enforcement scan already recognises. A named
+site is a claim about a file the checking package cannot otherwise see, so an
+unchecked claim would be a hole with a comment over it. The policy reach test
+separately requires every recorded operation to appear in its own table, so the two
+lists cannot drift.
+
+The set is now thirteen operations, having been twelve when this ADR was written.
+Of the four that were ungated at acceptance, three are enforced; `Ungated` retains
+only `environment.promote`, which is not implemented. The historical findings above
+are left as written: they record what was true when the decision was taken, and
+rewriting them would falsify the reason for the decision.
+
+One thing this ADR's anti-recurrence test does not do, and should not be claimed to:
+it proves an operation has a gate, not that the gate is reached. That is the
+separate refusal matrix, and the deliberate breaks that check each enforcement site
+fails its own case when the check is removed or pointed at a different operation are
+what make a gate's presence evidence rather than an absence of complaints.
 
 This is the actual fix. The four missing enforcement sites are a symptom; a
 permission set that can grow without anyone noticing is the disease. The
@@ -219,3 +252,12 @@ decides whether the repository passes is inside the repository's own gates.
   acceptance. Withdrawn the planned removal/major-version change; sections 1–3 and 6
   retain their enforcement decisions. Corrected the duplicate frontmatter delimiter.
   W01 in the consolidated plan owns the shared admission contract.
+- 2026-10-01: Amended section 3. The enforcement decision was binary — enforced at a
+  chokepoint or documented as ungated — and `workspace.capture` needed a third answer,
+  because it is enforced by `pkg/stow` where the reach test in `internal/runtime` has
+  no verb to invoke. Added `authority.EnforcedElsewhere` as a machine-checked record
+  of the enforcing site, rather than an `Ungated` entry that would have claimed the
+  operation unenforced while it is enforced. The operation set is thirteen, not the
+  twelve recorded in the problem statement above, and three of the four ungated
+  operations are now enforced; `environment.promote` remains and is unimplemented.
+  Sections 1–2 and 4–6 retain their decisions. Checkpoint authorization is W04.

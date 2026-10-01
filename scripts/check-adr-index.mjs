@@ -198,7 +198,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const text = readFileSync(path, "utf8");
       const digest = decisionDigest(text);
       if (adr.decisionDigest === digest) continue;
-      const next = text.replace(/^(status:.*)$/m, `$1\ndecision_digest: ${digest}`);
+      // Replace the digest in place, or insert it when the frontmatter has none.
+      // Inserting unconditionally meant a second amendment produced a second
+      // decision_digest key, and the YAML parser then read the stale one, so
+      // re-digesting an ADR that had already been amended reported "updated" and
+      // changed nothing that mattered. Only a first amendment could ever work.
+      const next = /^decision_digest:.*$/m.test(text)
+        ? text.replace(/^decision_digest:.*$/m, `decision_digest: ${digest}`)
+        : text.replace(/^(status:.*)$/m, `$1\ndecision_digest: ${digest}`);
       if (next === text) continue;
       writeFileSync(path, next);
       console.log(`  ${adr.file}: ${adr.decisionDigest ?? "(none)"} -> ${digest}`);
