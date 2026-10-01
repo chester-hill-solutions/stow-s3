@@ -1,6 +1,6 @@
 ---
 status: accepted
-decision_digest: 1a80bf721b32dcba
+decision_digest: 8678bbce2c449c3e
 amended: 2026-10-01
 relates_to: 0004, 0007, 0013, 0014, 0017
 ---
@@ -55,7 +55,7 @@ turn detection, execution credentials and cancellation.
 
 The Agentbox deployment on the personal Cloudflare account is independent of this
 decision and is not evidence for it. The evidence is the spike recorded in the
-Ingress repository at `docs/snapshot-spike-report.md`.
+Ingress repository at `docs/snapshot-spike-report.md` and `docs/loop-spike-report.md`.
 
 ## Consequences
 
@@ -70,13 +70,19 @@ supplies only the environment, which is the split ADR 0017 already described for
 the Workers profile. Executing an agent inside a container is the case ADR 0017
 left unstated.
 
+A later run closed that loop: an agent inside a container with no public internet
+wrote real files, committed, and pushed to Artifacts through the intercept, and the
+commit and its contents were read back by an unrelated client. The gate observed the
+full git conversation including the `git-receive-pack` write.
+
 Not established by the evidence: cost at roster scale, durability across
-deployment, whether a real agent harness runs in the container, and whether git
-inside the container can reach Artifacts to close the loop from snapshot to pushed
-commit. Each is open work, not a qualification of this decision.
+deployment, whether a real agent harness runs in the container rather than only git,
+and whether credentials can be injected at the gate so an agent holds none at all.
+Each is open work, not a qualification of this decision.
 
 ## Amendments
 
-- 2026-10-01: Accepted from measured spike results. Amends ADR 0014's execution
+- 2026-10-01: Accepted from measured spike results, then amended the same day after
+  the loop test closed and the Artifacts round trip was verified out-of-band. Amends ADR 0014's execution
   clause only; its storage clause is unchanged. Relates to ADR 0017, which
   described the Durable Object and container split without stating this case.
