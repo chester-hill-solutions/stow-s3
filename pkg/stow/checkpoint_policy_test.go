@@ -2,6 +2,7 @@ package stow_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -147,5 +148,96 @@ func TestACaptureDenialLeavesNoCheckpointBehind(t *testing.T) {
 	}
 	if len(entries) != 0 {
 		t.Errorf("a refused capture published %d checkpoint(s) for workspace %s", len(entries), id)
+	}
+}
+
+// CheckpointOf opens no runtime, so it has no authority to decide with; these cases
+// pin that naming the principal changes the answer, and that the legacy entry point
+// still refuses nothing.
+
+func externalCapturePolicy(t *testing.T, effect policy.Effect) (*stow.Workspace, string, string) {
+	t.Helper()
+	ws, id, registry := captureWorkspace(t, func(*policy.Set, string) {})
+	var set policy.Set
+	set.Revision = "rev-external-capture"
+	captureWholeWorkspace(&set, id, effect, authority.WorkspaceCapture)
+	return ws, id, registry
+}
+
+func TestAnExternalCaptureIsRefusedByAPolicy(t *testing.T) {
+	_, id, registry := externalCapturePolicy(t, policy.Deny)
+	var set policy.Set
+	set.Revision = "rev-external-capture"
+	captureWholeWorkspace(&set, id, policy.Deny, authority.WorkspaceCapture)
+
+	_, err := stow.CheckpointOfAuthorized(context.Background(), registry, id,
+		stow.CheckpointOptions{}, stow.CapturePrincipal{Environment: authority.All(), Policy: policy.Fixed(&set)})
+	if err == nil {
+		t.Fatal("CheckpointOfAuthorized captured a workspace a policy denies capturing")
+	}
+	if !strings.Contains(err.Error(), "policy in force") {
+		t.Errorf("CheckpointOfAuthorized = %v, want a refusal naming the policy", err)
+	}
+}
+
+func TestTheSameExternalPolicyWithAllowCaptures(t *testing.T) {
+	_, id, registry := externalCapturePolicy(t, policy.Allow)
+	var set policy.Set
+	set.Revision = "rev-external-capture"
+	captureWholeWorkspace(&set, id, policy.Allow, authority.WorkspaceCapture)
+
+	if _, err := stow.CheckpointOfAuthorized(context.Background(), registry, id,
+		stow.CheckpointOptions{}, stow.CapturePrincipal{Environment: authority.All(), Policy: policy.Fixed(&set)}); err != nil {
+		t.Errorf("CheckpointOfAuthorized = %v under a policy that allows it", err)
+	}
+}
+
+func TestAnExternalCaptureStillNeedsTheEnvironmentGrant(t *testing.T) {
+	_, id, registry := externalCapturePolicy(t, policy.Allow)
+	var set policy.Set
+	set.Revision = "rev-external-capture"
+	captureWholeWorkspace(&set, id, policy.Allow, authority.WorkspaceCapture)
+
+	readOnly := authority.ReadOnly()
+	_, err := stow.CheckpointOfAuthorized(context.Background(), registry, id,
+		stow.CheckpointOptions{}, stow.CapturePrincipal{Environment: readOnly, Policy: policy.Fixed(&set)})
+	if err == nil {
+		t.Fatal("CheckpointOfAuthorized captured under a read-only environment because a policy allowed it")
+	}
+	if strings.Contains(err.Error(), "policy in force") {
+		t.Errorf("CheckpointOfAuthorized = %v, want the environment named as what refused", err)
+	}
+}
+
+func TestALegacyExternalCaptureIsUnboundAndSaysSo(t *testing.T) {
+	// CheckpointOf passes authority.All() and no policy, which is what preserves its
+	// behaviour; this asserts the consequence, so the delegation cannot quietly become
+	// a gate and callers relying on it are not surprised.
+	ws, id, registry := externalCapturePolicy(t, policy.Deny)
+	if err := os.WriteFile(filepath.Join(ws.Dir(), "note.md"), []byte("work"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	if _, err := stow.CheckpointOf(context.Background(), registry, id, stow.CheckpointOptions{}); err != nil {
+		t.Errorf("CheckpointOf = %v, want the unbound legacy path to capture regardless of any policy", err)
+	}
+}
+
+func TestASourceThatCannotSayIsNotARefusal(t *testing.T) {
+	// A caller handed "you may not" during an outage cannot tell it was "I do not
+	// know", so a source error is returned as itself rather than as a refusal.
+	_, id, registry := externalCapturePolicy(t, policy.Allow)
+	unreadable := policy.Source(func() (policy.Set, error) {
+		return policy.Set{}, errors.New("registry unreachable")
+	})
+	_, err := stow.CheckpointOfAuthorized(context.Background(), registry, id,
+		stow.CheckpointOptions{}, stow.CapturePrincipal{Environment: authority.All(), Policy: unreadable})
+	if err == nil {
+		t.Fatal("CheckpointOfAuthorized captured with a source that could not answer")
+	}
+	if !strings.Contains(err.Error(), "registry unreachable") {
+		t.Errorf("CheckpointOfAuthorized = %v, want the source's own error", err)
+	}
+	if policy.IsRefusal(err) {
+		t.Errorf("CheckpointOfAuthorized = %v, and a source that cannot answer must not look like a refusal", err)
 	}
 }

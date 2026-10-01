@@ -227,10 +227,53 @@ comment over it unless something verifies it, so something does. The reach test
 asserts that every recorded operation also appears in its own table, so the two cannot
 drift.
 
-Not yet threaded: `stow.CheckpointOf` and the CLI archive verbs remain unbound, because
-they are package-level functions over a registry directory and have no principal to
-decide as. That is recorded rather than papered over with a check that consults
-nothing.
+### Threading a principal into the out-of-session capture
+
+`Workspace.CreateCheckpoint` was the easy half, because it holds a `Runtime` and so has
+an authority. `stow.CheckpointOf` opens no runtime on purpose — that is the whole
+operation, since claiming the session is exactly what an orchestrator must not do — so
+it has no authority to read off one and no principal to decide as. Threading a policy
+here therefore meant naming the principal rather than inferring it.
+
+`CapturePrincipal` carries the two: `Environment` and `Policy`, a nil `Policy` meaning
+no policy as everywhere else. `CheckpointOfAuthorized` consults them on the workspace
+root before the capture lock. `CheckpointOf` keeps its signature and delegates with
+`authority.All()` and no policy, which is what preserves its behaviour, and a test
+asserts that consequence so the delegation cannot quietly become a gate.
+
+That delegation is the honest reading and worth being explicit about: **the legacy
+entry point refuses nothing.** Widening it to refuse would have been a breaking change
+to a published API dressed as a security fix, and quietly tightening a flag's behaviour
+is the failure mode this document keeps recording.
+
+The CLI closes the loop. `workspace checkpoint --policy <path>` loads a persisted
+revision through `policystore` and reads it **per decision**, not once at startup, so a
+revocation is in force when it is issued rather than when the process began. Without
+the flag the verb consults nothing, which is tested against a policy denying capture
+that is present on disk and simply not named.
+
+### The deny case cannot distinguish a check from no check
+
+Three separate enforcement points produced the same finding, and it is worth recording
+as a property of the design rather than an accident of one slice. If a policy denies
+`workspace.capture`, then a check for *any other* operation is still refused, because
+default denial spans kinds and operations. So:
+
+| test | a correct check | no check / wrong operation |
+|---|---|---|
+| deny capture | refuses | **refuses** |
+| allow capture | captures | refuses |
+
+The deny case passes either way. Only the allow case tells a real check from no check —
+and an allow-nothing policy is the least natural test to reach for, so a suite written
+from the obvious example passes with the gate deleted. Every allow case in this work is
+paired with a deny case for this reason, and each was confirmed by deliberately pointing
+a check at a different operation.
+
+A related asymmetry on the out-of-session path: a `Source` that cannot answer returns
+its own error rather than a refusal, so an outage is not reported as a permission
+decision. A caller handed "you may not" during an incident will treat it as a
+revocation.
 
 ### The workspace as a resource
 
