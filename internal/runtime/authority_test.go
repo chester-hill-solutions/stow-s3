@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
@@ -38,10 +39,13 @@ func openWith(t *testing.T, granted authority.Authority) *runtime.Instance {
 	return instance
 }
 
+// denied reports whether err is a refusal at all, from either source. A policy
+// refusal and an environment refusal used to be the same type; they are distinct
+// now, so a test that means one of them has to say so.
 func denied(t *testing.T, err error) bool {
 	t.Helper()
 	var refused *authority.ErrNotAuthorized
-	return errors.As(err, &refused)
+	return errors.As(err, &refused) || policy.IsRefusal(err)
 }
 
 // The default must not have changed. An Instance opened without an Authority

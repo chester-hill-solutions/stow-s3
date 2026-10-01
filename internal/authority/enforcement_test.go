@@ -70,16 +70,16 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 
 // enforcementMethods are the method names that count as consulting an authority.
 //
-// Authority.Allows is the predicate, Authority.Check turns its refusal into an error,
-// and check is the runtime wrapper. Narrowing to a named set is deliberate: matching any
-// call that merely mentions an operation would also match a log statement.
+// Authority.Allows is the predicate, Authority.Check turns its refusal into an error, and
+// check is the runtime wrapper. Narrowing to a named set is deliberate: matching any call
+// that merely mentions an operation would also match a log statement.
 //
-// This set has had to widen three times, each time because a gate spelling the scan
-// could not see was added: the adapter gating on Allows, the runtime gaining
-// checkResource and checkUpload, and the bucket operations moving to checkCollection
-// and checkGranted — a rename, not a new operation, which is why a rename has teeth
-// here. Each blind spot was worse than a missed detection, because the test then
-// demands an Ungated entry for an operation that is enforced.
+// This set has widened three times, each time because a gate spelling the scan could not
+// see was added: the adapter gating on Allows, the runtime gaining checkResource and
+// checkUpload, and the bucket operations moving to checkCollection and checkGranted — a
+// rename, not a new operation, which is why a rename has teeth here. Each blind spot was
+// worse than a missed detection, because the test then demands an Ungated entry for an
+// operation that is enforced.
 var enforcementMethods = map[string]bool{
 	"check":           true,
 	"checkGranted":    true,

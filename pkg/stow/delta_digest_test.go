@@ -9,21 +9,16 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
 )
 
-// A delta document's own digests cover its content and nothing else. Each changed
-// path carries the sha256 of its bytes, and a receiver checks those, so the bytes
-// cannot be swapped. Nothing binds the change list — the paths, the kinds, the
-// from/to metadata — to the sender's intent.
+// A delta document's own digests cover its content and nothing else. Each changed path
+// carries the sha256 of its bytes, so the bytes cannot be swapped, but nothing binds
+// the change list - the paths, kinds and from/to metadata - to the sender's intent.
 //
-// The consequence is not subtle: take a document that adds "notes.txt", rename the
-// addition to "planted.sh" in the change and in the content map together, and the
-// document is entirely self-consistent. The content digest still matches the bytes it
-// carries, and the precondition passes because "planted.sh" is absent from the target.
-// Apply writes the payload under a destination the sender never chose, and reports
-// success.
-//
-// The fix is the check the handoff archive path already had. `delta` reports the
-// document's digest; the receiver hands it back and apply refuses a document that does
-// not hash to it. These tests hold that line from both directions.
+// So a document adding "notes.txt" can be rewritten to "planted.sh" in the change and
+// the content map together and remain entirely self-consentistent: the digest still
+// matches the bytes it carries, and the precondition passes because "planted.sh" is
+// absent. Apply then writes the payload under a destination the sender never chose and
+// reports success. The fix is the check the handoff archive path already had - the
+// receiver hands back the digest the sender reported and apply refuses a mismatch.
 
 func TestADeltaWithARenamedDestinationIsRefusedOnTheDocumentDigest(t *testing.T) {
 	document := readFixtureDelta(t)

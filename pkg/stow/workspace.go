@@ -9,21 +9,19 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
-// Workspace is a bounded artifact workspace: a real directory a caller works
-// in, and a bucket over the same bytes. It is the default surface described in
-// ADR 0007, and its contract is docs/workspace-contract.md.
+// Workspace is a bounded artifact workspace: a real directory a caller works in, and
+// a bucket over the same bytes. It is the default surface described in ADR 0007, and
+// its contract is docs/workspace-contract.md. The embedded *Runtime supplies the object
+// operations, so quotas and accounting have one choke point and a workspace is not a
+// second implementation of PutObject.
 //
-// The embedded *Runtime supplies the object operations, so quotas and
-// accounting have exactly one choke point and a workspace is not a second
-// implementation of PutObject.
-//
-// Closing a workspace releases the handle. It does not delete anything: a
-// workspace outlives the process that opened it (ADR 0009), and removal is an
-// explicit Destroy.
+// Closing releases the handle and deletes nothing: a workspace outlives the process
+// that opened it (ADR 0009), and removal is an explicit Destroy.
 type Workspace struct {
 	lifecycleMu sync.Mutex
 	facade      *workspaceServer
@@ -78,6 +76,11 @@ type WorkspaceOptions struct {
 	//	readOnly := stow.ReadOnly()
 	//	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Authority: &readOnly})
 	Authority *Authority
+	// Policy narrows Authority per resource, which for a workspace is the registered
+	// workspace itself - its Destroy, and eventually its captures. A nil value means no
+	// policy is consulted, which is what a workspace has always done. It is a
+	// policy.Source, so a revocation takes effect without a reopen.
+	Policy policy.Source
 	// TTL is the collection window the workspace records for itself. A collector
 	// reclaims a workspace that is past its TTL and whose session is gone; see
 	// Collect. The collector is not automatic, so a caller that wants the window
@@ -88,11 +91,10 @@ type WorkspaceOptions struct {
 	// default under the user's configuration directory. Tests set it so they
 	// never touch a real one.
 	RegistryDir string
-	// Team files this workspace under one team's partition of the registry, so
-	// two teams sharing a machine — two jobs on one CI runner, say — never see
-	// each other's workspaces, checkpoints, or sweeps. It is a directory
-	// partition, not a label: RegistryDir is the root and Team is a directory
-	// inside it, so the two compose.
+	// Team files this workspace under one team's partition of the registry, so two teams
+	// sharing a machine — two jobs on one CI runner, say — never see each other's
+	// workspaces, checkpoints, or sweeps. It is a directory partition, not a label:
+	// RegistryDir is the root and Team is a directory inside it, so the two compose.
 	Team string
 	// Adopted marks a workspace the caller is taking over rather than scratch space
 	// stow made. It is what keeps Destroy's refusal honest: a caller's project is not
@@ -105,12 +107,11 @@ type WorkspaceOptions struct {
 
 // OpenWorkspace opens a workspace rooted at options.Dir.
 //
-// It starts no process, opens no listener, and reads no ambient environment, so
-// there is nothing to clean up on a crash beyond the caller's own exit and
-// nothing for a host to leak credentials for. Where a client cannot embed the
-// runtime, the scoped S3 session in the TypeScript and Python packages remains
-// the supported alternative; see ADR 0007 section 3 for why Python is the
-// exception.
+// It starts no process, opens no listener, and reads no ambient environment, so there is
+// nothing to clean up on a crash and nothing for a host to leak credentials for. Where a
+// client cannot embed the runtime, the scoped S3 session in the TypeScript and Python
+// packages remains the supported alternative; see ADR 0007 section 3 for why Python is
+// the exception.
 func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	if options.Dir == "" {
 		return nil, fmt.Errorf("stow: workspace Dir is required")
@@ -141,16 +142,16 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		MaxObjects:          options.MaxObjects,
 		MaxMultipartUploads: options.MaxMultipartUploads,
 		Authority:           options.Authority,
+		Policy:              options.Policy,
 	}, store, nil)
 	if err != nil {
 		_ = store.Close()
 		return nil, fmt.Errorf("stow: open workspace: %w", err)
 	}
 
-	// A live session holds an advisory lock for as long as this handle exists.
-	// It is what lets a collector establish that nobody is using the workspace
-	// rather than guess, and the kernel releases it even if this process is
-	// killed outright.
+	// A live session holds an advisory lock for as long as this handle exists, which is
+	// what lets a collector establish that nobody is using the workspace rather than
+	// guess, and the kernel releases it even if this process is killed outright.
 	session, err := workspace.AcquireSession(store.Root())
 	if err != nil {
 		_ = store.Close()
@@ -169,25 +170,21 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	ws.now = options.Now
 	ws.maxCheckpointBytes = options.MaxCheckpointBytes
 	ws.maxCheckpoints = options.MaxCheckpoints
-	// The workspace bucket is bootstrapped through the store rather than through
-	// the runtime, because it is a construction step and not a caller operation.
-	// The runtime carries the authority the caller asked for, so routing this
-	// through it would evaluate the grant against the act of issuing it - and a
-	// read-only authority, which withholds bucket.create, could not open a
-	// workspace at all.
-	//
-	// The store returns early for the workspace bucket, so this materialises
-	// nothing; it only keeps the grant from being consulted about a bucket the
-	// workspace is made of. Widening ReadOnly instead would hand a read-only
-	// workspace the ability to create buckets it has no use for.
+	// The workspace bucket is bootstrapped through the store rather than the runtime,
+	// because it is a construction step and not a caller operation. The runtime carries
+	// the authority the caller asked for, so routing this through it would evaluate the
+	// grant against the act of issuing it, and a read-only authority - which withholds
+	// bucket.create - could not open a workspace at all. The store returns early for
+	// this bucket, so it materialises nothing; it only keeps the grant from being
+	// consulted about a bucket the workspace is made of.
 	if err := store.CreateBucket(context.Background(), ws.bucket); err != nil {
 		_ = ws.Close()
 		return nil, fmt.Errorf("stow: create workspace bucket: %w", err)
 	}
-	// The registry directory is resolved once, here, and the resolved path is what
-	// gets recorded. Resolving it per consumer would let the workspace's own entry
-	// and a later resume disagree about which partition this workspace belongs to,
-	// and a disagreement about a namespace is not recoverable by retrying.
+	// The registry directory is resolved once, here, and the resolved path is what gets
+	// recorded. Resolving it per consumer would let the workspace's own entry and a later
+	// resume disagree about which partition this belongs to, and a disagreement about a
+	// namespace is not recoverable by retrying.
 	registryDir, err := ResolveRegistryDir(options.RegistryDir, options.Team)
 	if err != nil {
 		_ = ws.Close()
@@ -259,23 +256,28 @@ func (w *Workspace) assertOpen() error {
 	return nil
 }
 
-// Destroy removes the workspace directory, and only if stow created it.
-//
-// This is the explicit half of the lifecycle split in ADR 0009 section 3:
-// Close releases the handle, Destroy removes the bytes. A workspace stow
-// *adopted* — one pointed at a directory the caller already had, which is the
-// documented way to use one — is refused, because its contents are the caller's
-// and not stow's to delete. A refusal leaves the workspace intact and usable.
-//
-// A workspace that is already gone is not an error: destroy is idempotent.
-// The handle must permit EnvironmentDestroy, including after it is closed.
+// Destroy removes the workspace directory, and only if stow created it. This is the
+// explicit half of the lifecycle split in ADR 0009 section 3: Close releases the
+// handle, Destroy removes the bytes. A workspace stow *adopted* — one pointed at a
+// directory the caller already had, which is the documented way to use one — is
+// refused, because its contents are the caller's and not stow's to delete, and a
+// refusal leaves it intact and usable. A workspace that is already gone is not an
+// error: destroy is idempotent. The handle must permit EnvironmentDestroy, closed or
+// not.
 func (w *Workspace) Destroy(ctx context.Context) error {
 	w.lifecycleMu.Lock()
 	defer w.lifecycleMu.Unlock()
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	// The environment answers whether destroying is permitted at all and the policy
+	// answers whether this workspace is: a caller may be granted destroy over every
+	// workspace and denied it for this one. The resource is the root, so a subtree
+	// selector does not match and the destroy is refused rather than narrowed.
 	if err := w.Runtime.Authority().Check(authority.EnvironmentDestroy); err != nil {
+		return err
+	}
+	if err := w.Runtime.Authorize(authority.EnvironmentDestroy, policy.Workspace(w.id, "")); err != nil {
 		return err
 	}
 	return w.destroyLocked()

@@ -11,9 +11,9 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-// A policy entry naming an operation the runtime does not route through a check
-// does nothing, silently — a deny an author wrote and that does not apply, which is
-// worse than one they never wrote.
+// A policy entry naming an operation the runtime does not route through a check does
+// nothing, silently — a deny an author wrote and that does not apply, which is worse than
+// one they never wrote.
 //
 // It happened once: a policy denying bucket.create over an object selector was ignored,
 // because check() consulted the environment only. No test failed, because
@@ -110,13 +110,8 @@ func TestEveryOperationReachesThePolicy(t *testing.T) {
 	}
 }
 
-// assertPolicyIsTheRefusal requires the verb to be refused because of the policy
-// and not the environment. Full authority is the environment here, so an
-// environment refusal cannot be mistaken for a policy one — which is what makes the
-// reason part of the assertion rather than decoration.
-//
-// The deny is written over an object prefix, the shape that was ignored: the
-// selector matches nothing about a bucket, and the entry still has to take effect.
+// assertPolicyIsTheRefusal requires the verb to be refused by the policy rather than by
+// the environment, so a test cannot pass on a refusal from the wrong source.
 func assertPolicyIsTheRefusal(t *testing.T, op authority.Operation, perform func(context.Context, *runtime.Instance) error) {
 	t.Helper()
 	instance, closeIt := openReach(t, denying(op))
@@ -125,8 +120,7 @@ func assertPolicyIsTheRefusal(t *testing.T, op authority.Operation, perform func
 	if err == nil {
 		t.Fatalf("%s was permitted by a policy that denies it", op)
 	}
-	var denied *authority.ErrNotAuthorized
-	if !errors.As(err, &denied) || denied.Operation != op {
+	if !policy.IsRefusal(err) {
 		t.Fatalf("%s was refused as %v, which does not name the policy's denial", op, err)
 	}
 }
@@ -140,8 +134,7 @@ func assertSilenceLeavesTheAnswerAlone(t *testing.T, op authority.Operation, per
 	instance, closeIt := openReach(t, silentAbout(op))
 	defer closeIt()
 	err := perform(context.Background(), instance)
-	var denied *authority.ErrNotAuthorized
-	if errors.As(err, &denied) && denied.Operation == op {
+	if policy.IsRefusal(err) {
 		t.Fatalf("a policy silent about %s denied it anyway: %v", op, err)
 	}
 	if errors.Is(err, policy.ErrWidening) {
@@ -227,3 +220,7 @@ func TestAWideningPolicyRefusesEveryOperationNotJustTheOnesOnAResource(t *testin
 		}
 	}
 }
+
+// The environment's refusal and the policy's used to be the same type, so telling
+// them apart meant reading the message. These use policy.IsRefusal; a security
+// decision should not depend on prose.

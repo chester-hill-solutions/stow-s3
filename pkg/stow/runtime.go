@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	stowruntime "github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
@@ -34,13 +36,12 @@ func Open(options Options) (*Runtime, error) {
 	if options.Store == nil {
 		instance, err = stowruntime.Open(runtimeOptions)
 	} else {
-		// Reset is not offered for a supplied store. It would have to rebuild
-		// something the caller owns, and "empty the caller's storage" is not a
-		// reasonable thing to do to a directory somebody handed you.
+		// Reset is not offered for a supplied store: it would have to rebuild something the
+		// caller owns, and "empty the caller's storage" is not a reasonable thing to do to a
+		// directory somebody handed you.
 		//
-		// Whether the store can serve multipart is not passed here: adaptStore
-		// returns a value that implements the internal MultipartStore only when
-		// the caller's does, and the runtime discovers that by asking.
+		// Whether the store can serve multipart is not passed here: adaptStore returns a
+		// value implementing the internal MultipartStore only when the caller's does.
 		instance, err = stowruntime.OpenWithStore(
 			runtimeOptions, adaptStore(options.Store), nil,
 		)
@@ -133,6 +134,13 @@ func (r *Runtime) CopyObject(ctx context.Context, sourceBucket, sourceKey, desti
 		return Object{}, mapError(err)
 	}
 	return objectOf(object), nil
+}
+
+// Authorize is the decision for one operation on one resource this Runtime's verbs
+// do not cover. Delegating keeps the revision lookup and the effective-access rule in
+// one place.
+func (r *Runtime) Authorize(op authority.Operation, res policy.Resource) error {
+	return r.inner.Authorize(op, res)
 }
 
 func (r *Runtime) Reset(ctx context.Context) error {

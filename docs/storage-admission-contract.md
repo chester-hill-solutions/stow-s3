@@ -165,6 +165,60 @@ rather than choices, and each is worth stating where a reader will meet it:
   reported as unknown, distinctly, because those three answers need different
   responses from a caller.
 
+### The workspace as a resource
+
+A workspace is a registered resource with its own lifecycle, and it is the one
+resource `internal/runtime` has no verb for — the verb lives in `pkg/stow`, which
+owns the directory. So the runtime's policy could not reach it, and `Destroy`
+consulted the environment only: a policy could not deny it however it was written.
+
+`Instance.Authorize` is the seam. It is exported rather than left to each caller
+because resolving the current revision and deciding is the part that must have one
+implementation — a second answer to "is this permitted here" is the shape this
+repository keeps finding, and it is found in the enforcement point rather than in the
+caller. `policy.Workspace(id, path)` names the resource, and the runtime is asked
+about it the same way it is asked about an object.
+
+Three things about the workspace selector are worth stating, and each was found by
+a test failing for a reason that was not the intended one.
+
+**A selector with no locator is the collection as a whole.** `Exact: ""` and
+`Prefix: ""` are indistinguishable in a literal, and reading them as "matches
+nothing" makes a whole workspace unnameable — the only way to say "this workspace"
+does not exist. It also made the deny in the test pass for the wrong reason: with
+nothing matching, default denial refused the destroy, and the test read that as the
+deny working. A gate that passes because the wrong thing refuses is the failure
+this repository keeps meeting, and it is the reason the allow case is in the suite.
+
+**Default denial spans kinds, and that is not a bug.** A policy written about object
+keys refuses to destroy a workspace, because it grants nothing for that. That looks
+like a defect — attaching an object policy quietly made a workspace undestroyable —
+and the tempting fix is to let a policy constrain only the kinds it names. That fix
+is a widening: a policy mentioning no object entries would then grant every object
+operation, and the test that caught it is `TestAPolicyNamingNoKindGrantsNothingAtAll`.
+Refusal is the safe direction, the contract asks for it, and the fix belongs to the
+assumption rather than the rule.
+
+**A policy is a complete statement, not a patch.** A policy naming one workspace
+denies destroy for every workspace it does not name, and the way to permit another
+is an explicit allow. "Deny this one" and "deny this one and permit everything else"
+are different statements, and only the second is a policy. The first version of
+that test asserted the opposite and the code was right.
+
+Two limits are recorded rather than fixed.
+
+- **A subtree grant does not permit a whole-workspace destroy.** The root is not
+  inside the subtree, so the selector does not match and the destroy is refused.
+  Narrowing an irreversible operation to part of its target is not something that
+  can be done safely, and the contract asks for scoped capture separately.
+- **Capturing a workspace has no operation to be denied with.** `CreateCheckpoint`
+  consults nothing, and adding a `workspace.capture` permission is a vocabulary
+  change that ADR 0010 requires an enforced operation and refusal coverage for. The
+  workspace ID is also generated, so a policy cannot be written against one before
+  the workspace exists — a host opens, learns the registered identity, and writes
+  the policy after. That sequence is what the tests here do, because it is the only
+  one a host can actually perform.
+
 ### A revision in force, rather than a revision at open
 
 `Options.Policy` is a `policy.Source`, consulted on each decision rather than read

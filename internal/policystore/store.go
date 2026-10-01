@@ -21,13 +21,12 @@ import (
 
 // Store is the durable home of the current policy revision.
 //
-// Exclusion is the reason this is a type rather than a bare file write. A
-// revision is replaced by reading the current one, deciding, and writing the
-// result, and two hosts doing that concurrently would otherwise both read the
-// same sequence and both write — so a revocation and a re-grant could land in
-// either order and the loser would not know it had lost. The lock makes
-// read-decide-write a critical section; the sequence check inside it turns "we
-// raced" into a refusal rather than a silent overwrite.
+// Exclusion is the reason this is a type rather than a bare file write. A revision is
+// replaced by reading the current one, deciding, and writing the result, and two hosts
+// doing that concurrently would both read the same sequence and both write — so a
+// revocation and a re-grant could land in either order and the loser would not know it
+// had lost. The lock makes read-decide-write a critical section, and the sequence check
+// inside it turns "we raced" into a refusal rather than a silent overwrite.
 type Store struct {
 	path string
 	// now is the clock revisions are stamped and read against, held so a test can
@@ -82,16 +81,13 @@ func (s *Store) Policy(env authority.Authority) (policy.Set, error) {
 	return record.Policy(s.now)
 }
 
-// Persist writes next as the successor of the stored record, and returns what it
-// wrote.
-//
-// expected is the sequence the caller based its decision on, read from Current.
-// It is checked against the stored record while the lock is held, so a caller
-// working from a revision that has since been replaced is refused instead of
-// overwriting it: revisions are not commutative, and a revocation that loses a
-// race to a re-grant is the failure this exists to prevent.
-//
-// The refusal is policy.ErrRecordSuperseded and the stored record is untouched.
+// Persist writes next as the successor of the stored record, and returns what it wrote.
+// expected is the sequence the caller based its decision on, read from Current, and it
+// is checked against the stored record while the lock is held, so a caller working from
+// a revision that has since been replaced is refused instead of overwriting it:
+// revisions are not commutative, and a revocation that loses a race to a re-grant is the
+// failure this exists to prevent. The refusal is policy.ErrRecordSuperseded and the stored
+// record is untouched.
 func (s *Store) Persist(next policy.Record, expected uint64) (policy.Record, error) {
 	lock, err := atomicfile.Acquire(s.lockPath())
 	if err != nil {

@@ -12,16 +12,15 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 )
 
-// recordVersion is the on-disk shape this package writes and the newest it
-// reads. A file declaring anything else is refused rather than interpreted with
-// today's field meanings, which is the difference between failing loudly and
-// silently dropping the entries it did not recognise.
+// recordVersion is the on-disk shape this package writes and the newest it reads. A file
+// declaring anything else is refused rather than interpreted with today's field meanings,
+// which is the difference between failing loudly and silently dropping entries it did not
+// recognise.
 const recordVersion = 1
 
-// MaxRecordBytes bounds what is read from a policy file. A policy is a bounded
-// set of selectors; a file far larger than any legitimate one is not a policy
-// this reader should try to interpret. The reader of a stored record lives in
-// another package, so the bound is exported for it to apply before parsing.
+// MaxRecordBytes bounds what is read from a policy file. A policy is a bounded set of
+// selectors, so a file far larger than any legitimate one is not one this reader should
+// try to interpret. The reader lives in another package, hence the export.
 const MaxRecordBytes = 4 << 20
 
 var (
@@ -33,16 +32,15 @@ var (
 	// stand behind: bad JSON, a wrong version, or a failing integrity seal.
 	ErrRecordDamaged = errors.New("policy record is damaged")
 
-	// ErrRecordSuperseded reports a write that lost a race, or tried to move the
-	// record backwards. A policy is replaced, never rolled back: an older
-	// revision written last would silently re-grant what a newer one revoked.
+	// ErrRecordSuperseded reports a write that lost a race, or tried to move the record
+	// backwards. A policy is replaced, never rolled back: an older revision written last
+	// would silently re-grant what a newer one revoked.
 	ErrRecordSuperseded = errors.New("policy revision was superseded or moved backwards")
 
-	// ErrDeadlineInThePast reports a revision whose freshness deadline is at or
-	// before the moment it would be issued. It is refused rather than stored,
-	// because a stored revision that can only read as stale is a revocation
-	// nobody asked for: the answer would be "unknown" where the author meant
-	// "denied", and those need different responses from a caller.
+	// ErrDeadlineInThePast reports a revision whose freshness deadline is at or before
+	// the moment it would be issued. It is refused rather than stored, because a stored
+	// revision that can only read as stale is a revocation nobody asked for: "unknown"
+	// where the author meant "denied".
 	ErrDeadlineInThePast = errors.New("policy revision expires at or before it is issued")
 )
 
@@ -56,18 +54,16 @@ type Record struct {
 	Issued   time.Time     `json:"issued"`
 	Expires  time.Time     `json:"expires"`
 	Entries  []recordEntry `json:"entries"`
-	// Integrity seals everything above it, and is verified on load. Without it a
-	// truncated or edited file reads as *some* policy, and the direction that
-	// looks safe is the wrong one: losing an entry narrows a grant, which reads
-	// as a denial, while losing a deadline reads as a permission that never
-	// expires.
+	// Integrity seals everything above it, and is verified on load. Without it a truncated
+	// or edited file reads as *some* policy, and the direction that looks safe is the
+	// wrong one: losing an entry narrows a grant, which reads as a denial, while losing a
+	// deadline reads as a permission that never expires.
 	Integrity string `json:"integrity"`
 }
 
-// recordEntry is one persisted selector. It names operations rather than
-// carrying an Authority mask, because a mask is a bit position: adding an
-// Operation would renumber it, and a record written before that would decode to
-// a different set of permissions afterwards.
+// recordEntry is one persisted selector. It names operations rather than carrying an
+// Authority mask, because a mask is a bit position: adding an Operation would renumber
+// it, and a record written before that would decode to different permissions.
 type recordEntry struct {
 	Namespace  string                `json:"namespace"`
 	Collection string                `json:"collection"`
@@ -78,11 +74,9 @@ type recordEntry struct {
 	Operations []authority.Operation `json:"operations"`
 }
 
-// FromSet is the durable form of a policy. The environment is required, so a
-// policy cannot be persisted wider than the environment it will be applied to:
-// without that check a widening record sits on disk looking authoritative until
-// each reader re-derives the mistake, rather than being refused once where it
-// was written.
+// FromSet is the durable form of a policy. The environment is required, so a policy cannot
+// be persisted wider than the one it will be applied to: without that check a widening
+// record sits on disk looking authoritative until each reader re-derives the mistake.
 func FromSet(s Set, sequence uint64, issued time.Time, env authority.Authority) (Record, error) {
 	validated, err := New(s, env)
 	if err != nil {
@@ -142,14 +136,14 @@ func (r Record) Policy(now func() time.Time) (Set, error) {
 	return set, nil
 }
 
-// Expired reports whether this revision has passed its freshness deadline. It is
-// the same test Authorize makes, separated so a caller deciding whether to
-// consult a revision at all need not invent a resource to ask about.
+// Expired reports whether this revision has passed its freshness deadline - the same
+// test Authorize makes, separated so a caller deciding whether to consult a revision at
+// all need not invent a resource to ask about.
 func (r Record) Expired(now time.Time) bool { return !r.Expires.IsZero() && now.After(r.Expires) }
 
-// canonical is the record with its entries in one total order, so two records
-// meaning the same thing seal identically. Without it, re-persisting one policy in
-// a different Add order reads as a change.
+// canonical is the record with its entries in one total order, so two records meaning
+// the same thing seal identically. Without it, re-persisting one policy in a different
+// Add order reads as a change.
 func (r Record) canonical() Record {
 	out := r
 	out.Entries = append([]recordEntry(nil), r.Entries...)
@@ -159,9 +153,9 @@ func (r Record) canonical() Record {
 	return out
 }
 
-// entryOrder is a total order over entries. Operations are deliberately absent
-// from it: Authority.Operations already returns them sorted, and two entries
-// differing only in their operation list order equal here and stay stable.
+// entryOrder is a total order over entries. Operations are deliberately absent:
+// Authority.Operations already returns them sorted, so two entries differing only in
+// their operation order compare equal here and stay stable.
 func entryOrder(e recordEntry) string {
 	return e.Namespace + "\x00" + e.Collection + "\x00" + string(e.Kind) + "\x00" + e.Exact + "\x00" + e.Prefix + "\x00" + string(e.Effect)
 }
@@ -194,9 +188,9 @@ func (r Record) Encode() ([]byte, error) {
 	return json.Marshal(sealed)
 }
 
-// Decode reads a stored record. A file longer than any policy could be is
-// refused before it is parsed, and an empty one is ErrNoRecord rather than a
-// decode failure, because the two mean opposite things to a caller.
+// Decode reads a stored record. A file longer than any policy could be is refused
+// before it is parsed, and an empty one is ErrNoRecord rather than a decode failure,
+// because the two mean opposite things to a caller.
 func Decode(data []byte) (Record, error) {
 	if len(data) == 0 {
 		return Record{}, ErrNoRecord

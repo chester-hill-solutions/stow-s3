@@ -3,25 +3,20 @@ package policy
 import "time"
 
 // Source is the policy in force, read when a decision is made rather than when the
-// environment was opened, so a revocation is effective when it is issued.
+// environment was opened, so a revocation is effective when it is issued. Its error
+// means an answer that is unknown rather than absent, reported as unknown rather than
+// resolved into a decision: "you may not" and "I do not know" need different responses.
 //
-// It is a function type rather than an interface because nil is the answer the
-// caller already has for "no policy", and an interface would make a nil *Set mean
-// something else.
-//
-// The error is for an answer that is unknown rather than absent, and is reported as
-// unknown rather than resolved into a decision: "you may not" and "I do not know" need
-// different responses from a caller.
-//
-// **A Source must be cheap and must not block** — it is consulted on every operation,
-// and on the multipart paths while the instance mutex is held. A host whose policy
-// lives on disk wraps it in something stating how stale the answer may be; that is the
-// contract's "maximum stale-policy interval".
+// It is a function type rather than an interface because nil is the answer the caller
+// already has for "no policy". **A Source must be cheap and must not block** - it is
+// consulted on every operation and on the multipart paths with the instance mutex held,
+// so a host whose policy lives on disk wraps it in something stating how stale the
+// answer may be.
 type Source func() (Set, error)
 
-// Fixed is the Source for a policy that does not change while the Instance is open. It
-// is named so a call site says which it means: a fixed policy and a live one answer the
-// same question, and a reader of an Options literal has no other way to tell.
+// Fixed is the Source for a policy that does not change while the Instance is open.
+// It is named so a call site says which it means, since both kinds answer the same
+// question and a reader of an Options literal has no other way to tell.
 func Fixed(s *Set) Source {
 	return func() (Set, error) {
 		if s == nil {

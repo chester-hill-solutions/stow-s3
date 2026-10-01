@@ -21,14 +21,12 @@ const (
 	KindWorkspace Kind = "workspace"
 )
 
-// LocalNamespace is the namespace one stow process serves, and the one its policies
-// are written against.
-//
-// It is a constant rather than a literal in each enforcement point because there are
-// two — internal/runtime and internal/runthrough — gating the same objects. Two
-// literals that have to agree fail silently in the worst direction: a policy naming
-// one namespace matches nothing in the other, so the retry worker propagates the
-// writes the policy was written to stop.
+// LocalNamespace is the namespace one stow process serves, and the one its policies are
+// written against. It is a constant rather than a literal at each of the two
+// enforcement points — internal/runtime and internal/runthrough — gating the same
+// objects, because two literals that have to agree fail silently in the worst
+// direction: a policy naming one namespace matches nothing in the other, so the retry
+// worker propagates the writes the policy was written to stop.
 const LocalNamespace = "runtime"
 
 // Object is the resource an object operation is decided on. The key is the locator
@@ -74,7 +72,10 @@ func (s Selector) matches(r Resource) bool {
 		return s.Exact == r.Locator
 	}
 	if s.Prefix == "" {
-		return false
+		// No locator at all is the collection as a whole, not a selector that matches
+		// nothing: the two are indistinguishable in a literal, and the second reading
+		// makes a whole workspace unnameable.
+		return true
 	}
 	if s.Kind == KindObject {
 		return strings.HasPrefix(r.Locator, s.Prefix)
@@ -167,14 +168,14 @@ func (s Set) Authorize(env authority.Authority, r Resource, op authority.Operati
 		}
 		if e.effect == Deny {
 			if e.permitted.Allows(op) {
-				return authority.None(), &authority.ErrNotAuthorized{Operation: op, Authority: permitted}
+				return authority.None(), denied{op: op, permitted: env}
 			}
 			continue
 		}
 		permitted = permitted.With(e.permitted.Operations()...)
 	}
 	if !permitted.Allows(op) {
-		return authority.None(), &authority.ErrNotAuthorized{Operation: op, Authority: permitted}
+		return authority.None(), denied{op: op, permitted: env}
 	}
 	// Intersect, not With: With would add the policy's operations to the
 	// environment, the one direction a policy may never move authority in.
@@ -187,16 +188,19 @@ func (s Set) Allows(env authority.Authority, r Resource, op authority.Operation)
 	return err
 }
 
-// Denies reports whether an entry withholds op, for an operation naming no resource
-// locator. It is the only way a policy reaches such an operation, and the asymmetry
-// with Authorize is the point: a deny is honoured wherever it can be attributed.
+// Deny returns a refusal when an entry withholds op, for an operation naming no resource
+// locator, and nil when none does. It is the only way a policy reaches such an
+// operation, and the asymmetry with Authorize is the point: a deny is honoured wherever
+// it can be attributed, and an allow needs a resource. A key prefix is not
+// attributable - an entry over `public/` says nothing about whether a bucket may be
+// created - so a collection is matched when the operation names one and any when it
+// does not, because Reset names no bucket and a deny scoped to a collection that could
+// never apply is the same failure as one never written.
 //
-// A key prefix is not attributable — an entry over `public/` says nothing about
-// whether a bucket may be created. A collection is matched when the operation names
-// one and matches any when it does not, because Reset names no bucket and a deny
-// scoped to one collection that could never apply is the same failure as one never
-// written.
-func (s Set) Denies(namespace, collection string, op authority.Operation) bool {
+// It returns the error rather than a bool because the refusal is a policy's, and a
+// caller building its own reaches for the environment's type - whose message says the
+// environment refused and reports a narrowed grant that never existed.
+func (s Set) Deny(env authority.Authority, namespace, collection string, op authority.Operation) error {
 	for _, e := range s.entries {
 		if e.namespace != namespace {
 			continue
@@ -205,10 +209,10 @@ func (s Set) Denies(namespace, collection string, op authority.Operation) bool {
 			continue
 		}
 		if e.effect == Deny && e.permitted.Allows(op) {
-			return true
+			return denied{op: op, permitted: env}
 		}
 	}
-	return false
+	return nil
 }
 
 // Selectors lists what the policy covers, sorted, for a diagnostic.
@@ -219,4 +223,27 @@ func (s Set) Selectors() []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+// denied is a policy refusal. It is distinct from authority.ErrNotAuthorized because
+// that one's message names the environment as the thing that refused, which for a
+// policy denial is false: a caller reading "not permitted by this environment
+// (granted: none)" while its environment grants everything is being told something
+// untrue, and which of the two to fix is what such a caller needs to know.
+type denied struct {
+	op        authority.Operation
+	permitted authority.Authority
+}
+
+// IsRefusal reports whether err is a policy's refusal rather than the
+// environment's. The two used to be the same type, so telling them apart meant
+// reading the message, and a security decision should not depend on prose.
+func IsRefusal(err error) bool {
+	_, ok := err.(denied)
+	return ok
+}
+
+func (d denied) Error() string {
+	return fmt.Sprintf("operation %q is not permitted by the policy in force (environment grants: %s)",
+		d.op, d.permitted)
 }
