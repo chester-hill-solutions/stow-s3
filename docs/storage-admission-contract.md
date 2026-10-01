@@ -165,6 +165,47 @@ rather than choices, and each is worth stating where a reader will meet it:
   reported as unknown, distinctly, because those three answers need different
   responses from a caller.
 
+### Reaching upstream under a policy
+
+The run-through adapter is the second enforcement point, and it exists because the
+first one cannot cover it. `internal/runtime` gates an operation as the caller asks
+for it; the propagation funnel does not run there. A per-second worker and the admin
+retry route both drain the outbox, and a write that was admitted under a grant which
+has since been withdrawn is exactly the case they present — which the contract
+already called out as "retained old grants are provenance, not authorization".
+
+So `runthrough.Config.ResourcePolicy` is consulted on both reaches, and the two are
+kept separate rather than folded into the existing helper:
+
+- **`upstreamReachable(bucket)`** answers whether the upstream is usable for a
+  bucket: a provider is configured, the read grant is present, the bucket is the one
+  pinned. It has no resource in it, so it asks no policy. Its callers are a
+  scheduling pre-filter and a bookkeeping write, and neither is a reach.
+- **`upstreamEnabled(bucket, key)`** is that plus the policy, and it is the read-side
+  chokepoint. The key is a parameter because a policy decides per object and a bucket
+  is not an object; a listing passes its prefix, which is what the runtime
+  authorizes a list on too.
+- **The propagation funnel** asks the policy itself, on the entry, rather than
+  trusting the check the write path made when it enqueued.
+
+The split is not tidiness, and it was found by a deliberate break. Folding the
+policy into `upstreamReachable` puts one check on the propagation path twice, and
+because the pre-filter runs first it answers for the funnel: deleting the funnel's
+copy leaves every test green. That is the two-mechanisms-one-question shape ADR 0010
+exists to remove, arriving through a change that looked like it removed one.
+
+Two further decisions belong here rather than in the code.
+
+**A denied propagation leaves the entry pending.** Refusing to propagate is not a
+failure of the entry, and marking it terminal would discard a write the operator may
+yet authorise.
+
+**`DeleteObjects` narrows the batch rather than refusing it.** The grant is one
+decision for the call; a policy is per object. A denied key is not propagated and the
+rest are, because the local delete is authoritative either way and refusing the whole
+batch over one denied key would leave a permitted key undelivered upstream for no
+reason the caller can act on.
+
 ### Persisting a revision
 
 `internal/policy` holds the record and the format; `internal/policystore` holds

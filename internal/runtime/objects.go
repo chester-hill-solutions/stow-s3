@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -18,7 +19,7 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.checkResource(authority.ObjectWrite, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, policy.Object(bucket, key)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -76,7 +77,7 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -100,7 +101,7 @@ func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, 
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
-	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()
@@ -119,7 +120,7 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 	if err := i.checkContext(ctx); err != nil {
 		return ObjectPage{}, err
 	}
-	if err := i.checkResource(authority.ObjectList, object(bucket, options.Prefix)); err != nil {
+	if err := i.checkResource(authority.ObjectList, policy.Object(bucket, options.Prefix)); err != nil {
 		return ObjectPage{}, err
 	}
 	if options.Limit < 0 {
@@ -167,7 +168,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 	// the rest. Checked before any of them is touched, so a refusal leaves the
 	// batch unapplied rather than partly applied.
 	for _, key := range keys {
-		if err := i.checkResource(authority.ObjectDelete, object(bucket, key)); err != nil {
+		if err := i.checkResource(authority.ObjectDelete, policy.Object(bucket, key)); err != nil {
 			return nil, err
 		}
 	}
@@ -239,7 +240,7 @@ func (i *Instance) DeleteObject(ctx context.Context, bucket, key string) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.checkResource(authority.ObjectDelete, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectDelete, policy.Object(bucket, key)); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -277,10 +278,10 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	// destination lets a write-only caller copy content out — the store reads the
 	// source and the guard sees a permitted write. The source goes first, being
 	// the read that can disclose.
-	if err := i.checkResource(authority.ObjectRead, object(req.SourceBucket, req.SourceKey)); err != nil {
+	if err := i.checkResource(authority.ObjectRead, policy.Object(req.SourceBucket, req.SourceKey)); err != nil {
 		return Object{}, err
 	}
-	if err := i.checkResource(authority.ObjectWrite, object(req.DestBucket, req.DestKey)); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, policy.Object(req.DestBucket, req.DestKey)); err != nil {
 		return Object{}, err
 	}
 	i.mu.Lock()

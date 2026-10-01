@@ -230,15 +230,14 @@ func (a *Adapter) collectCacheCandidates(ctx context.Context) ([]cacheCandidate,
 // enforcing its limits against an index that starts empty.
 func (a *Adapter) ReconcileCacheIndex(ctx context.Context) error { return a.reconcileCacheIndex(ctx) }
 
-// reconcileCacheIndex brings the index into agreement with the cache store in
-// both directions: it drops entries for objects the store no longer has, and it
-// adds entries for objects the store has and the index has never seen.
+// reconcileCacheIndex brings the index into agreement with the cache store in both
+// directions: it drops entries for objects the store no longer has, and it adds
+// entries for objects the store has and the index has never seen.
 //
 // The second half is what decides whether a restart is safe: the cache lives in a
 // directory and this index in memory, so a server coming up over an existing cache
-// holds bytes it knows nothing about. Every eviction plan is computed from the index
-// alone, so an index starting empty measures the cache by what was written since
-// startup, and the operator's byte limit is enforced against that.
+// holds bytes it knows nothing about, and every eviction plan is computed from the
+// index alone.
 func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 	buckets, err := a.cache.ListBuckets(ctx)
 	if err != nil {

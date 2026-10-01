@@ -56,7 +56,7 @@ func (a *Adapter) saveUpstreamState(bucket, key string, value UpstreamState) err
 }
 
 func (a *Adapter) recordUpstreamState(ctx context.Context, entry *OutboxEntry) error {
-	if !a.upstreamEnabled(entry.Bucket) {
+	if !a.upstreamReachable(entry.Bucket) {
 		return nil
 	}
 	provider, ok := a.outbox.(provenanceOutbox)

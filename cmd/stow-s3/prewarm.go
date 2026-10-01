@@ -17,16 +17,13 @@ import (
 // prewarm fetches a named set of keys into the run-through cache, so they are
 // readable with the network gone.
 //
-// It is a verb rather than a flag on `serve` because the setup it performs is a
-// one-off an operator or an orchestrator runs before cutting an agent off, and
-// because a long-lived server that pre-warmed on demand would be a server quietly
-// reaching for the network at a moment nobody chose.
+// It is a verb rather than a flag on `serve` because the setup is a one-off an
+// operator runs before cutting an agent off, and a long-lived server that pre-warmed
+// on demand would reach for the network at a moment nobody chose.
 //
-// The key list is explicit and never a prefix. That is the decision this verb
-// exists to get right: a prefix on a real bucket is a data-exfiltration shape, and
-// the caller here is an agent that reads untrusted text. "Warm everything under
-// logs/" is a way to copy a bucket the agent was never given, and the operator who
-// wrote the prefix would have no way to tell that from a harmless cache fill.
+// The key list is explicit and never a prefix: a prefix on a real bucket is a
+// data-exfiltration shape, and the caller reads untrusted text. "Warm everything
+// under logs/" is a way to copy a bucket the agent was never given.
 type prewarmResult struct {
 	Version int            `json:"version"`
 	Bucket  string         `json:"bucket"`

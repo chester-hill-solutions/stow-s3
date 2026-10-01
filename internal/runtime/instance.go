@@ -10,11 +10,6 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-// namespace names the one namespace a runtime instance serves. A policy naming
-// another matches nothing, which is the safe direction: naming this one's
-// namespace cannot reach a selector written for a different environment.
-const namespace = "runtime"
-
 type Instance struct {
 	mu               sync.Mutex
 	store            storage.Store
@@ -117,7 +112,7 @@ func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
 	if !ok {
 		return fmt.Errorf("%w: upload %q", ErrResourceUnresolved, uploadID)
 	}
-	return i.checkResource(op, object(usage.upload.Bucket, usage.upload.Key))
+	return i.checkResource(op, policy.Object(usage.upload.Bucket, usage.upload.Key))
 }
 
 // check is the authorization point for operations that name neither a resource nor
@@ -150,7 +145,7 @@ func (i *Instance) checkGranted(op authority.Operation, collection string) error
 	if err := i.authority.Check(op); err != nil {
 		return err
 	}
-	if i.policy == nil || !i.policy.Denies(namespace, collection, op) {
+	if i.policy == nil || !i.policy.Denies(policy.LocalNamespace, collection, op) {
 		return nil
 	}
 	return &authority.ErrNotAuthorized{Operation: op, Authority: i.authority.Without(op)}
@@ -169,13 +164,6 @@ func (i *Instance) checkResource(op authority.Operation, res policy.Resource) er
 		return i.authority.Check(op)
 	}
 	return i.policy.Allows(i.authority, res, op)
-}
-
-// object is the resource an object operation is decided on. The key is the
-// locator verbatim, unnormalized: a selector that normalized would grant or
-// withhold a permission on a key the author never wrote.
-func object(bucket, key string) policy.Resource {
-	return policy.Resource{Namespace: namespace, Collection: bucket, Kind: policy.KindObject, Locator: key}
 }
 
 // Authority reports what this environment permits, so an interface can narrow

@@ -13,17 +13,14 @@ import (
 
 // A second writer's update must not be silently overwritten by propagation.
 //
-// This is the defect. propagateWrite checked only that the *local* version still
-// matched its outbox entry, and used the upstream ETag comparison purely as a
-// crash-dedup test — if the ETags differed it concluded the write had not landed
-// and overwrote upstream. So for an agent and a device sharing keys, a device
-// write followed by an agent write lost the device's object with nothing reported
-// to either party.
+// This is the defect. propagateWrite checked only that the *local* version still matched
+// its outbox entry, and used the upstream ETag comparison purely as a crash-dedup test:
+// if the ETags differed it concluded the write had not landed and overwrote upstream.
+// So a device write followed by an agent write lost the device's object.
 //
-// The fix is a precondition rather than a comparison: record what upstream held
-// when the write was enqueued, and require it to still hold at propagation. Where
-// upstream held nothing, the requirement is that it still holds nothing, which is
-// If-None-Match "*" and catches the concurrent-create race as well.
+// The fix is a precondition rather than a comparison: record what upstream held when
+// the write was enqueued and require it to still hold. Where upstream held nothing,
+// that requirement is If-None-Match "*", which catches the concurrent-create race.
 
 // conflictUpstream is an upstream that a second writer has already moved on from.
 func conflictUpstream(t *testing.T, ctx context.Context, body string) *mockUpstream {

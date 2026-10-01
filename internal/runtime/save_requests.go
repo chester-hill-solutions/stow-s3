@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -53,7 +54,7 @@ func (i *Instance) ResolveSave(ctx context.Context, bucket, key, requestKey stri
 	if err := i.checkContext(ctx); err != nil {
 		return unknown, err
 	}
-	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
 		return unknown, err
 	}
 	i.mu.Lock()

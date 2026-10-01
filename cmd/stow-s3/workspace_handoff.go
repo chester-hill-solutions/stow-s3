@@ -18,11 +18,10 @@ import (
 // are two answers to "on what machine", and version 1 could only express one.
 //
 // Version 1 is a same-machine reference: a workspace ID and the registry directory
-// holding it. It is still exactly that, and resume still reads it. But a reference
-// to a local directory is meaningless to the machine that receives it, so handing
-// work to another runner means exporting an archive by hand and telling the
-// receiver to import it — two steps, no binding between the reference and the
-// bytes, and nothing to check that the archive is the one the reference names.
+// holding it. It is still exactly that, and resume still reads it. But a reference to
+// a local directory is meaningless to the machine that receives it, so handing work to
+// another runner means exporting an archive by hand and telling the receiver to import
+// it — two steps, and nothing to check that the archive is the one the reference names.
 //
 // Version 2 adds the archive to the same document: the bytes and their digest
 // travel with the reference naming them. The receiver verifies the digest, imports

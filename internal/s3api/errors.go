@@ -204,14 +204,13 @@ func mapStorageError(err error, resource string) s3Error {
 // upstreamFailure answers for a request that failed because the upstream did.
 //
 // The split is by who is at fault and whether waiting helps. Answering a vanished
-// upstream as a stow storage fault is the one situation this product exists to be
-// running in, and 500 with "internal storage error" reads as a corrupt workspace.
+// upstream as a stow storage fault is the one situation this product exists to run
+// in, and 500 with "internal storage error" reads as a corrupt workspace.
 //
-//   - no response at all: 503. The upstream was asked and never answered. Nothing
-//     stow did wrong, the condition is usually temporary, and it is the condition
-//     the cache exists to absorb.
-//   - a 5xx from the upstream: 503 for the same reason. The upstream is the thing
-//     that failed, and 500 would blame stow for someone else's outage.
+//   - no response at all: 503. The upstream was asked and never answered, which is
+//     usually temporary and is the condition the cache exists to absorb.
+//   - a 5xx from the upstream: 503 for the same reason. 500 would blame stow for
+//     someone else's outage.
 //   - a 4xx from the upstream: passed through. The upstream gave a real answer, and
 //     substituting a guess would replace a decision somebody made on purpose.
 func upstreamFailure(err error, resource string) *s3Error {

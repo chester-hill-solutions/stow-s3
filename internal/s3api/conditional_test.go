@@ -303,15 +303,13 @@ func TestGetWithAStaleETagReturnsTheBody(t *testing.T) {
 // describes one.
 //
 // This was caught by the TypeScript client, not here: aws-sdk-js validates
-// x-amz-checksum-* against the body it received, a 304 has none, so it hashed
-// the empty body and reported
+// x-amz-checksum-* against the body it received, a 304 has none, so it reported
 //
 //	Checksum mismatch: expected "L3JwhQ==" but received "AAAAAA=="
 //
-// on a response that was telling the truth. Content-Length is the same mistake -
-// it claims a length for bytes that are not being sent. The Go SDK did not
-// object, which is why a Go-only run of the corpus stayed green and the shared
-// one did not.
+// on a response that was telling the truth. Content-Length is the same mistake: it
+// claims a length for bytes that are not being sent. The Go SDK did not object, which
+// is why a Go-only corpus run stayed green and the shared one did not.
 func TestNotModifiedCarriesValidatorsAndNoRepresentationMetadata(t *testing.T) {
 	server := conditionalServer(t)
 

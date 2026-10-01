@@ -93,20 +93,14 @@ func TestPresignedGetPut(t *testing.T) {
 	}
 }
 
-// A presigned URL is refused when its signing time is far ahead of the server's
-// clock, at the wire and with a real SDK's signature.
+// A presigned URL is refused when its signing time is far ahead of the server's clock,
+// at the wire and with a real SDK's signature.
 //
-// The signing time is inside the URL, so it is the client's to choose, and the
-// URL's own expiry is derived from it: a URL signed for a date next year expires
-// next year, so an expiry check alone never noticed. Internal auth covers the
-// verifier's side of this; what is asserted here is that the property holds
-// through a genuine SigV4 signature, because a signature over a future-dated
-// request is computed from that same future date and has to be refused on the
-// date rather than on the signature.
-//
-// The signing time is moved rather than the server's clock, because a
-// determinate result is worth more than a real one: the skew is 15 minutes, so
-// the shift has to be comfortably larger than that to mean anything.
+// The signing time is inside the URL, so it is the client's to choose, and the URL's
+// own expiry is derived from it: a URL signed for a date next year expires next year, so
+// an expiry check alone never noticed. What is asserted here is that the property holds
+// through a genuine SigV4 signature, which must be refused on the date, not the
+// signature.
 func TestPresignedURLIsRefusedFarBeforeItsSigningTime(t *testing.T) {
 	env := newTestEnv(t)
 	ctx := context.Background()

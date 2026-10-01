@@ -25,16 +25,13 @@ type cacheEvictionsProvider interface {
 // cacheListingProvider is a store that can name the objects it is holding.
 //
 // The counters an inspection already reports — hits, misses, evictions — say that
-// caching is happening and nothing about what is cached. An agent that has been cut
-// off from the network needs the second thing, and there is no way to derive it
-// from the first: a cache can be 100% hit rate and hold nothing the agent asked
-// for.
+// caching is happening and nothing about what is cached. An agent cut off from the
+// network needs the second thing, and it cannot be derived from the first: a cache
+// can be 100% hit rate and hold nothing the agent asked for.
 //
 // The type is runthrough's rather than one declared here because this file already
-// imports that package for OutboxEntry, and a second struct describing the same
-// cached objects would mean two definitions of one thing to keep in step. What the
-// inspection actually says is a separate type, cachedInspectEntry, for the reason
-// its own comment gives.
+// imports that package, and a second struct describing the same cached objects would
+// mean two definitions of one thing to keep in step.
 type cacheListingProvider interface {
 	CachedObjects() []runthrough.CachedObject
 }

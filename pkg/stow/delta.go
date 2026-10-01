@@ -15,8 +15,8 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
-// A delta is the difference between two known points, expressed as a versioned
-// document that can bring a third point to the second.
+// A delta is the difference between two known points, as a versioned document that
+// can bring a third point to the second.
 //
 // The checkpoint diff already computed added/changed/deleted by comparing two
 // captures. That is a *report* — it names what differs and hashes both sides, but
@@ -88,16 +88,15 @@ var ErrDeltaTooLarge = errors.New("delta document is larger than the format allo
 // digest the sender published for it.
 //
 // The per-file digests inside a document cover content bytes only. Nothing binds the
-// change list — the paths, the kinds, the from/to metadata — to the sender's intent,
-// so a document altered in transit can carry a valid content digest for a path the
-// sender never named. Renaming an added file from "notes.txt" to "planted.sh", in the
-// change and in the content map together, produces a document that applies cleanly.
+// change list — the paths, the kinds, the from/to metadata — to the sender's intent, so
+// a document altered in transit can carry a valid content digest for a path the sender
+// never named. Renaming an added file from "notes.txt" to "planted.sh" in both the
+// change and the content map produces a document that applies cleanly.
 //
-// This is the check the handoff archive path already had and the delta path did not:
-// `delta` reports the document's digest, and the receiver compares against it before
-// anything is written. It is separate from a conflict because the document is
-// self-consistent and the target may well be fine — the disagreement is between the
-// document and the sender, and retrying cannot resolve it.
+// This is the check the handoff archive path already had and the delta path did not.
+// It is separate from a conflict because the document is self-consistent and the
+// target may well be fine — the disagreement is between the document and the sender,
+// and retrying cannot resolve it.
 var ErrDeltaDigestMismatch = errors.New("delta document does not match the digest the sender published")
 
 // DeltaOptions bounds the work a delta may describe. Zero takes the defaults,
@@ -111,19 +110,16 @@ type DeltaOptions struct {
 	// carry the same bytes an archive can.
 	IncludeSensitive bool
 	// Encoded is the document exactly as it travelled, and ExpectSHA256 the digest
-	// the sender published for it. When both are set, the document is refused
-	// unless the bytes hash to that digest, before any precondition is checked and
-	// before anything is staged.
-	// A *DeltaDocument has already been parsed, so the bytes that produced it are
-	// not recoverable: re-encoding a struct would hash a document this build happened
-	// to produce rather than the one that arrived, and a digest over that would pass
-	// for any alteration surviving a round trip. That is why the bytes are carried
-	// alongside rather than recomputed.
+	// the sender published for it. When both are set, the document is refused unless
+	// the bytes hash to that digest, before any precondition is checked.
+	//
+	// A *DeltaDocument has already been parsed, so the bytes that produced it are not
+	// recoverable: re-encoding would hash a document this build produced rather than
+	// the one that arrived.
 	//
 	// It is optional because a receiver with no trusted copy of the digest cannot
 	// invent one, and demanding it would make every apply impossible rather than
-	// safe. A receiver that *can* compare should: the digest is the only thing that
-	// covers the change list rather than the content.
+	// safe.
 	Encoded      []byte
 	ExpectSHA256 string
 }

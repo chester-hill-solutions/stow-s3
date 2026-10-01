@@ -21,6 +21,23 @@ const (
 	KindWorkspace Kind = "workspace"
 )
 
+// LocalNamespace is the namespace one stow process serves, and the one its policies
+// are written against.
+//
+// It is a constant rather than a literal in each enforcement point because there are
+// two — internal/runtime and internal/runthrough — gating the same objects. Two
+// literals that have to agree fail silently in the worst direction: a policy naming
+// one namespace matches nothing in the other, so the retry worker propagates the
+// writes the policy was written to stop.
+const LocalNamespace = "runtime"
+
+// Object is the resource an object operation is decided on. The key is the locator
+// verbatim, unnormalized: a selector that normalized would grant or withhold a
+// permission on a key the author never wrote.
+func Object(bucket, key string) Resource {
+	return Resource{Namespace: LocalNamespace, Collection: bucket, Kind: KindObject, Locator: key}
+}
+
 // Resource is the contract's typed identity. It names what is checked: it grants
 // nothing and asserts nothing about existence.
 type Resource struct {

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -30,7 +31,12 @@ type Adapter struct {
 	// from the caller's Authority and the AllowLiveWrites attenuation. Every
 	// upstream decision consults this and nothing else, so there is one mechanism
 	// rather than two kept in step. See ADR 0010 decision 2.
-	authority         authority.Authority
+	authority authority.Authority
+	// resourcePolicy narrows authority per object, and policyErr holds a policy
+	// that failed validation. Both are read only through allows, so there is one
+	// mechanism rather than two kept in step.
+	resourcePolicy    *policy.Set
+	policyErr         error
 	local             storage.Store
 	localMultipart    storage.MultipartStore
 	cache             storage.Store
@@ -80,11 +86,27 @@ func NewWithOutbox(cfg Config, local, cache storage.Store, upstream Client, outb
 	if provider, ok := outbox.(DurableOutbox); ok {
 		durable = provider.Durable()
 	}
+	// Validated once, here, so the answer cannot depend on which reach asked, and
+	// held as an error rather than discarded so a widening policy refuses instead of
+	// silently answering with the wider environment.
+	granted := cfg.effectiveAuthority()
+	var narrow *policy.Set
+	var policyErr error
+	if cfg.ResourcePolicy != nil {
+		validated, err := policy.New(*cfg.ResourcePolicy, granted)
+		if err != nil {
+			policyErr = err
+		} else {
+			narrow = &validated
+		}
+	}
 	coordinated, _ := outbox.(CoordinatedOutbox)
 	localMultipart, _ := local.(storage.MultipartStore)
 	return &Adapter{
 		cfg:               cfg,
-		authority:         cfg.effectiveAuthority(),
+		authority:         granted,
+		resourcePolicy:    narrow,
+		policyErr:         policyErr,
 		local:             local,
 		localMultipart:    localMultipart,
 		cache:             cache,
@@ -187,25 +209,40 @@ func (a *Adapter) DiscardOutboxEntry(id string) error {
 	return fmt.Errorf("outbox entry %q not found", id)
 }
 
-// upstreamEnabled reports whether a request for this bucket may reach the
-// upstream provider at all.
-//
-// It is the read-side chokepoint: HeadObject, GetObject, and the revalidation
-// walk all consult it before touching a.upstream, so gating reads here rather
-// than at each call site is what makes "no code path reaches upstream without the
-// grant" a property of the code rather than a claim about it. The write side has
-// its own decision, because a write has three outcomes rather than two.
-func (a *Adapter) upstreamEnabled(bucket string) bool {
+// upstreamReachable reports whether the upstream is usable for this bucket at all.
+// It asks no policy: a policy decides per object and a bucket is not an object, and
+// folding the two together put one check on the propagation path twice. See
+// "Reaching upstream under a policy" in docs/storage-admission-contract.md.
+func (a *Adapter) upstreamReachable(bucket string) bool {
 	if a.upstream == nil {
 		return false
 	}
 	if !a.authority.Allows(authority.UpstreamRead) {
 		return false
 	}
-	if a.cfg.Upstream.Bucket == "" {
-		return true
+	return a.cfg.Upstream.Bucket == "" || a.cfg.Upstream.Bucket == bucket
+}
+
+// upstreamEnabled is upstreamReachable plus the policy, and it is the read-side
+// chokepoint: HeadObject, GetObject, and the revalidation walk all consult it
+// before touching a.upstream, so gating reads here rather than at each call site
+// is what makes "no code path reaches upstream without a permission" a property of
+// the code rather than a claim about it. The write side has its own decision,
+// because a write has three outcomes rather than two.
+func (a *Adapter) upstreamEnabled(bucket, key string) bool {
+	return a.upstreamReachable(bucket) && a.allows(authority.UpstreamRead, bucket, key) == nil
+}
+
+// allows is the policy's answer, and the only place the adapter asks one. A policy
+// that failed validation refuses every reach.
+func (a *Adapter) allows(op authority.Operation, bucket, key string) error {
+	if a.policyErr != nil {
+		return a.policyErr
 	}
-	return a.cfg.Upstream.Bucket == bucket
+	if a.resourcePolicy == nil {
+		return nil
+	}
+	return a.resourcePolicy.Allows(a.authority, policy.Object(bucket, key), op)
 }
 
 // decideUpstreamWrite collapses Policy × AllowLiveWrites into one action.
@@ -216,8 +253,8 @@ func (a *Adapter) requireDurableOutbox(action writeAction) error {
 	return nil
 }
 
-func (a *Adapter) decideUpstreamWrite(bucket string) writeAction {
-	if !a.upstreamEnabled(bucket) {
+func (a *Adapter) decideUpstreamWrite(bucket, key string) writeAction {
+	if !a.upstreamEnabled(bucket, key) {
 		return writeSkip
 	}
 	// The grant answers first and on its own. An operation the environment was not
@@ -273,7 +310,7 @@ func (a *Adapter) ListBuckets(ctx context.Context) ([]storage.BucketInfo, error)
 }
 
 func (a *Adapter) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (*storage.ObjectMeta, error) {
-	action := a.decideUpstreamWrite(bucket)
+	action := a.decideUpstreamWrite(bucket, key)
 	if action == writeError {
 		return nil, ErrLiveWritesDisabled
 	}
@@ -333,7 +370,7 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 		// With separate stores, local writes are authoritative and must not be
 		// replaced by an upstream revalidation. The legacy single-store mode
 		// retains its historical revalidation behavior for compatibility.
-		if a.separateCache || a.cfg.Offline || !a.upstreamEnabled(bucket) || !a.cfg.Revalidate {
+		if a.separateCache || a.cfg.Offline || !a.upstreamEnabled(bucket, key) || !a.cfg.Revalidate {
 			return a.openLocal(ctx, bucket, key, localMeta, needBody)
 		}
 		return a.revalidateCachedObject(ctx, bucket, key, localMeta, needBody)
@@ -344,7 +381,7 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 	if !errors.Is(localErr, storage.ErrObjectNotFound) {
 		return nil, nil, localErr
 	}
-	if !a.upstreamEnabled(bucket) {
+	if !a.upstreamEnabled(bucket, key) {
 		return nil, nil, storage.ErrObjectNotFound
 	}
 	return a.resolveCachedObject(ctx, bucket, key, needBody)
@@ -400,7 +437,7 @@ func (a *Adapter) ListObjectsV2(ctx context.Context, bucket string, opts storage
 	if err != nil {
 		return nil, err
 	}
-	if !a.upstreamEnabled(bucket) {
+	if !a.upstreamEnabled(bucket, opts.Prefix) {
 		cacheItems, cacheErr := a.listCacheItems(ctx, bucket, opts.Prefix)
 		if cacheErr != nil {
 			return nil, cacheErr

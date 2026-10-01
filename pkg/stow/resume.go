@@ -201,18 +201,14 @@ type CollectResult struct {
 
 // Collect reclaims workspaces that are past their TTL and provably unused.
 //
-// The two refusals are the point. A workspace a live session holds is never
-// removed, because it is a working directory and deleting it destroys the
-// artifact in progress. A workspace stow *adopted* is never removed, because it
-// is a caller's own project and no unattended sweep may delete one — that check
-// comes before the age check for exactly that reason.
+// The two refusals are the point. A workspace a live session holds is never removed,
+// because it is a working directory and deleting it destroys the artifact in progress.
+// A workspace stow *adopted* is never removed, because it is a caller's own project and
+// no unattended sweep may delete one — that check comes before the age check.
 //
 // It reports every decision, not only the removals, because "nothing was
 // collected" and "three were skipped because they are in use" are different
 // answers and a caller diagnosing a leaked workspace has to tell them apart.
-//
-// Collect is a no-op with an explanatory error on a host that cannot establish
-// liveness, rather than guessing.
 func Collect(options CollectOptions) ([]CollectResult, error) {
 	registry, err := openRegistry(options.RegistryDir, options.Team)
 	if err != nil {

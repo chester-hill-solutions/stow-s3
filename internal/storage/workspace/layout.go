@@ -190,20 +190,18 @@ func NaturalPath(root, key string) string {
 	return filepath.Join(append([]string{root}, strings.Split(key, "/")...)...)
 }
 
-// EscapedPath returns the absolute path a key occupies when it is stored escaped.
-// The file name is a digest, so the path is within every filesystem's component
-// limit for a key of any supported length.
+// EscapedPath returns the absolute path a key occupies when it is stored escaped. The
+// file name is a digest, so the path is within every filesystem's component limit.
 //
-// The bucket is part of the path, as a directory of its own, and it has to be. A
-// digest of the key alone gives the same key in two buckets one physical file: a
-// write in either bucket overwrites the other's object, a read returns the other
-// bucket's bytes, and a delete removes an object belonging to a bucket the caller
-// never named. Natural keys are never affected, since their path already runs
-// through the bucket's directory.
+// The bucket is part of the path, as a directory of its own, and it has to be. A digest
+// of the key alone gives the same key in two buckets one physical file: a write in
+// either bucket overwrites the other's object and a read returns the other bucket's
+// bytes. Natural keys are never affected, since their path already runs through the
+// bucket's directory.
 //
 // The bucket is hashed rather than named, so the directory stays within the component
-// limit whatever the bucket is called, and a bucket name can never collide with stow's
-// own bookkeeping the way a key resolving to .stow/keys/... does.
+// limit whatever the bucket is called, and a bucket name cannot collide with stow's
+// own bookkeeping.
 func EscapedPath(root, bucket, key string) string {
 	return filepath.Join(root, internalDir, "keys", Digest(bucket), Digest(key))
 }

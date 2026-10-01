@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 )
 
 // Mode describes whether stow runs local-only or with an upstream adapter.
@@ -66,14 +67,19 @@ type Config struct {
 	// caller and handed to both this adapter and the runtime instance, so the two
 	// cannot disagree about what was granted. See ADR 0010 decision 2.
 	Authority *authority.Authority
-	// AllowLiveWrites is an attenuation input, read exactly once when the adapter
-	// is built. It is not consulted at any decision point: it is folded into the
-	// effective authority there, and the gate consults only the result.
+	// AllowLiveWrites is an attenuation input, read exactly once when the adapter is
+	// built and folded into the effective authority there. The gate consults only the
+	// result, never this field.
 	//
-	// That is the whole of decision 2. When the two were read at the decision -
-	// AllowLiveWrites here and Authority there - they were two mechanisms answering
-	// the same question, kept in step by hand, and either could be changed without
-	// the other.
+	// That is the whole of decision 2: two mechanisms answering one question, kept in
+	// step by hand.
+	// ResourcePolicy narrows Authority per object, and is consulted on every reach this
+	// adapter makes. It exists because the propagation funnel runs outside the runtime
+	// instance, so without it the retry worker and the admin retry route consult the
+	// environment alone. Refused rather than clipped, as in the runtime. A nil pointer
+	// means no policy, which is what this adapter has always done.
+
+	ResourcePolicy         *policy.Set
 	AllowLiveWrites        bool
 	Revalidate             bool
 	CacheDir               string

@@ -226,7 +226,7 @@ func (a *Adapter) completeIntentLocked(ctx context.Context, entry OutboxEntry) e
 func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry OutboxEntry, respectSchedule bool) error {
 	pending := a.orderingEntries()
 	current, ok := findPendingEntry(a.outbox.Pending(), entry.ID)
-	if !ok || current.Terminal || (respectSchedule && !current.NextAttempt.IsZero() && current.NextAttempt.After(time.Now())) || !isFirstPendingForKey(pending, current) {
+	if !ok || !dueForPropagation(current, pending, respectSchedule) {
 		return nil
 	}
 	// The grant is checked here, in the one funnel every propagation goes through,
@@ -239,6 +239,12 @@ func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry Ou
 	// failure of the entry, and marking it terminal would discard a write the
 	// operator may yet authorise.
 	if !a.authority.Allows(authority.UpstreamWrite) {
+		return nil
+	}
+	// The policy is asked here, on the entry, and not only on the path that enqueued
+	// it: a write admitted under a grant that has since been withdrawn is provenance,
+	// not authorization.
+	if err := a.allows(authority.UpstreamWrite, current.Bucket, current.Key); err != nil {
 		return nil
 	}
 	claim, err := a.claimPropagation(current)
@@ -330,6 +336,19 @@ func (a *Adapter) RecoverPrepared(ctx context.Context) error {
 	return firstErr
 }
 
+// dueForPropagation is the scheduling half of the funnel: pending, due, and first
+// for its key. Kept apart from the permission half because they answer different
+// questions.
+func dueForPropagation(current OutboxEntry, pending []OutboxEntry, respectSchedule bool) bool {
+	if current.Terminal {
+		return false
+	}
+	if respectSchedule && !current.NextAttempt.IsZero() && current.NextAttempt.After(time.Now()) {
+		return false
+	}
+	return isFirstPendingForKey(pending, current)
+}
+
 func (a *Adapter) rejectPreparedKey(bucket, key string) error {
 	entries, err := a.preparedEntriesWithError()
 	if err != nil {
@@ -376,7 +395,7 @@ func (a *Adapter) retryEntry(ctx context.Context, entry OutboxEntry, now time.Ti
 	if !ok {
 		return false, nil
 	}
-	if !a.upstreamEnabled(current.Bucket) || current.Terminal || !outboxEntryDue(current, now) || !isFirstPendingForKey(pending, current) {
+	if !a.upstreamReachable(current.Bucket) || current.Terminal || !outboxEntryDue(current, now) || !isFirstPendingForKey(pending, current) {
 		return true, nil
 	}
 	if err := a.completeIntentLocked(ctx, current); err != nil {

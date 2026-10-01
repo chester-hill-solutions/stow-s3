@@ -51,15 +51,13 @@ func LookupWorkspace(registryDir, id string) (WorkspaceReference, error) {
 //
 // This is the operation an orchestrator needs and could not perform: an agent holds
 // the workspace, and the answer to "what has it done so far?" must not require the
-// agent to stop. So this does not claim the session, does not register or touch
-// anything, and writes only into the checkpoint store — never into the workspace. The
-// capture is the same one Workspace.CreateCheckpoint runs, with the same exclusions,
-// the same limits from the registry entry, and the same refusal of a tree that changed
-// while it was being read.
+// agent to stop. So this does not claim the session, does not touch anything, and
+// writes only into the checkpoint store. The capture is the same one
+// Workspace.CreateCheckpoint runs, with the same exclusions and limits.
 //
 // A tree a live agent is actively writing may well change mid-capture, and then this
-// refuses rather than publishing a snapshot of two different moments. That refusal is
-// the correct answer, and it is the one a checkpoint of moving work always has.
+// refuses rather than publishing a snapshot of two different moments — the correct
+// answer, and the one a checkpoint of moving work always has.
 func CheckpointOf(ctx context.Context, registryDir, id string, options CheckpointOptions) (CheckpointInfo, error) {
 	if ctx == nil {
 		ctx = context.Background()

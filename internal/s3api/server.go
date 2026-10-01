@@ -325,12 +325,11 @@ func isLoopbackRequest(r *http.Request) bool {
 //
 // The rule has two levels, and the distinction is the point:
 //
-//   - Read-only routes (health, status, inspect, metrics) are reachable from
-//     loopback without a credential, which is what stow doctor and a local shell
-//     rely on, and from anywhere with the admin token.
-//   - Destructive routes (outbox retry and discard) always require the token,
-//     including on loopback: they change what is propagated to a live provider, so
-//     a stray local process should not trigger them by guessing a path.
+//   - Read-only routes (health, status, inspect, metrics) are reachable from loopback
+//     without a credential, which is what stow doctor and a local shell rely on, and
+//     from anywhere with the admin token.
+//   - Destructive routes (outbox retry and discard) always require the token, including
+//     on loopback: they change what is propagated to a live provider.
 //
 // A rejection is 404 rather than 403 so the route's existence is not advertised to
 // a caller that could not use it.

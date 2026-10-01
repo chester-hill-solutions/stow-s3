@@ -5,11 +5,12 @@ import (
 	"errors"
 	"io"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
 func (a *Adapter) DeleteObject(ctx context.Context, bucket, key string) error {
-	action := a.decideUpstreamWrite(bucket)
+	action := a.decideUpstreamWrite(bucket, key)
 	if action == writeError {
 		return ErrLiveWritesDisabled
 	}
@@ -76,7 +77,17 @@ func (a *Adapter) finishDelete(ctx context.Context, bucket, key string, intent d
 }
 
 func (a *Adapter) DeleteObjects(ctx context.Context, bucket string, keys []string) ([]string, error) {
-	action := a.decideUpstreamWrite(bucket)
+	// The grant is one decision for the call and a policy is per object, so the batch
+	// is narrowed before anything is prepared.
+
+	action := a.decideUpstreamWrite(bucket, firstKey(keys))
+	propagated := keys
+	if action == writePropagate {
+		propagated = a.permittedKeys(bucket, keys)
+		if len(propagated) == 0 {
+			action = writeSkip
+		}
+	}
 	if action == writeError {
 		return nil, ErrLiveWritesDisabled
 	}
@@ -85,24 +96,8 @@ func (a *Adapter) DeleteObjects(ctx context.Context, bucket string, keys []strin
 	}
 	var prepared []OutboxEntry
 	if action == writePropagate {
-		identities := make([]string, 0, len(keys))
-		seen := make(map[string]struct{}, len(keys))
-		for _, key := range keys {
-			if _, ok := seen[key]; ok {
-				continue
-			}
-			seen[key] = struct{}{}
-			identities = append(identities, outboxIdentity(bucket, key))
-		}
-		unlock := a.outboxLocks.lockMany(identities)
-		defer unlock()
-		for _, key := range keys {
-			if err := a.rejectPreparedKey(bucket, key); err != nil {
-				return nil, err
-			}
-		}
 		var err error
-		prepared, err = a.prepareDeleteIntents(ctx, bucket, keys)
+		prepared, err = a.prepareDeleteBatch(ctx, bucket, propagated)
 		if err != nil {
 			return nil, err
 		}
@@ -126,6 +121,29 @@ func (a *Adapter) DeleteObjects(ctx context.Context, bucket string, keys []strin
 		return deleted, err
 	}
 	return deleted, a.propagateIntents(ctx, entries)
+}
+
+// prepareDeleteBatch takes the outbox locks for the whole batch, checks none of it is
+// already prepared, and prepares it — split out so the locks are held across the whole
+// preparation.
+func (a *Adapter) prepareDeleteBatch(ctx context.Context, bucket string, keys []string) ([]OutboxEntry, error) {
+	identities := make([]string, 0, len(keys))
+	seen := make(map[string]struct{}, len(keys))
+	for _, key := range keys {
+		if _, ok := seen[key]; ok {
+			continue
+		}
+		seen[key] = struct{}{}
+		identities = append(identities, outboxIdentity(bucket, key))
+	}
+	unlock := a.outboxLocks.lockMany(identities)
+	defer unlock()
+	for _, key := range keys {
+		if err := a.rejectPreparedKey(bucket, key); err != nil {
+			return nil, err
+		}
+	}
+	return a.prepareDeleteIntents(ctx, bucket, keys)
 }
 
 func (a *Adapter) prepareDeleteIntents(ctx context.Context, bucket string, keys []string) ([]OutboxEntry, error) {
@@ -209,7 +227,7 @@ func (a *Adapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, 
 func (a *Adapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	srcBucket, srcKey := req.SourceBucket, req.SourceKey
 	dstBucket, dstKey := req.DestBucket, req.DestKey
-	action := a.decideUpstreamWrite(dstBucket)
+	action := a.decideUpstreamWrite(dstBucket, req.DestKey)
 	if action == writeError {
 		return nil, ErrLiveWritesDisabled
 	}
@@ -278,7 +296,7 @@ func (a *Adapter) CompleteMultipartUpload(ctx context.Context, uploadID string, 
 		return nil, err
 	}
 	bucket, key := upload.Bucket, upload.Key
-	action := a.decideUpstreamWrite(bucket)
+	action := a.decideUpstreamWrite(bucket, key)
 	if action == writeError {
 		return nil, ErrLiveWritesDisabled
 	}
@@ -327,4 +345,28 @@ func (a *Adapter) multipartTarget(ctx context.Context, uploadID string) (string,
 		return "", err
 	}
 	return upload.Bucket, nil
+}
+
+// firstKey is the locator a call-level write decision is made on. Only the grant's
+// answer is call-level, so naming one key cannot widen the batch.
+func firstKey(keys []string) string {
+	if len(keys) == 0 {
+		return ""
+	}
+	return keys[0]
+}
+
+// permittedKeys narrows a batch to the keys a policy does not withhold, preserving
+// order and duplicates because the caller is told what was deleted.
+func (a *Adapter) permittedKeys(bucket string, keys []string) []string {
+	if a.resourcePolicy == nil && a.policyErr == nil {
+		return keys
+	}
+	out := make([]string, 0, len(keys))
+	for _, key := range keys {
+		if a.allows(authority.UpstreamWrite, bucket, key) == nil {
+			out = append(out, key)
+		}
+	}
+	return out
 }

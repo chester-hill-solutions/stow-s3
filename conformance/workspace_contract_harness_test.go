@@ -302,20 +302,18 @@ func (r *contractRun) substitute(text string) string {
 
 var contractCapturePattern = regexp.MustCompile(`\{\{([a-zA-Z0-9_]+)\}\}`)
 
-// resolve returns the step with every {{...}} reference replaced by the value the
-// named capture holds. A step that arrives resolved has no unresolved text left in
-// it, so a reference nothing captured is a broken case file rather than a silently
-// empty argument.
+// resolve returns the step with every {{...}} reference replaced by the value the named
+// capture holds, so a reference nothing captured is a broken case file rather than a
+// silently empty argument.
 //
 // It is one pass that cannot be skipped, which is the point: resolving wherever a
 // resolved value was wanted left a call site reading the raw arguments, pointing a
 // step at a directory literally named "{{registryA}}" and reporting an empty
 // registry rather than an error.
 //
-// It also covers the expectations, which is not a convenience. A step that expects
-// "the root the manifest named" is stating a fact about the contract, and comparing
-// that against the literal text {{work}}/workspace fails on the substitution rather
-// than on the property the step is about.
+// It also covers the expectations. A step that expects "the root the manifest
+// named" is stating a fact about the contract, and comparing that against the
+// literal text {{work}}/workspace fails on the substitution, not the property.
 func (r *contractRun) resolve(step contractStep) contractStep {
 	step.Args = r.resolveArgs(step, step.Args)
 	step.Root = r.resolveText(step, "root", step.Root)

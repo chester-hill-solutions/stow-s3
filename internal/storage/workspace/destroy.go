@@ -17,17 +17,10 @@ var ErrNotDestructible = errors.New("workspace is not one stow created")
 
 // Destroy removes a workspace directory stow created, and nothing else.
 //
-// This is the operation ADR 0009 requires to be explicit, and the reason the
-// manifest records ownership at all: a workspace is *designed* to be pointed at
-// a directory the caller already has, so "this directory contains a stow
-// manifest" is not evidence that its contents belong to stow. Adopting a
-// project and then deleting it would be the worst bug this package could have.
-//
-// Two layers have to agree, and they are deliberately redundant. Ownership is the
-// primary defence, the only statement about who made the directory. The protected-path
-// check is the backstop, and it still holds when a workspace was created inside a
-// directory that later became a developer's home, or when a caller guesses a path
-// another stow process once used.
+// This is the operation ADR 0009 requires to be explicit, and the reason the manifest
+// records ownership at all: a workspace is *designed* to be pointed at a directory the
+// caller already has, so "this directory contains a stow manifest" is not evidence
+// that its contents belong to stow.
 func (s *Store) Destroy() error {
 	if err := s.assertDestructible(); err != nil {
 		return err

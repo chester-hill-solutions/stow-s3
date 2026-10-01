@@ -26,19 +26,7 @@ import (
 // Every other test here exercises one store, one server, or one adapter against a
 // hand-written stub. The run-through adapter's job is to be correct about a *pair* —
 // a local store and a real S3 server — and that is the only category the rest of the
-// suite structurally cannot reach. Both defects these tests were written for were
-// found by hand:
-//
-//   - a read-through fetch of a key that exists only upstream failed with
-//     NoSuchBucket, because the local store is consulted first and a bucket missing
-//     from it is reported as a missing bucket rather than as a miss;
-//   - under mirrorWrites, a bucket created through the client never reached the
-//     upstream, so the first write to it went terminal with not_found.
-//
-// Neither could have been caught where it was written, because stubUpstream cannot
-// express a real server's answer about a bucket. So the upstream here is a real
-// s3api.Server with real SigV4 reached by the real AWS SDK, and the client under test
-// is a second real s3api.Server whose store is the run-through adapter.
+// suite structurally cannot reach.
 
 // pair is two live servers and the clients that talk to each of them.
 type pair struct {
@@ -173,13 +161,10 @@ func readThrough(t *testing.T, client *s3.Client, bucket, key string) string {
 // TestTheLocalStoreIsTheNamespace pins the property that is easy to mistake for
 // a bug, and that this suite's first draft did.
 //
-// A read of a bucket the local store has not been given is refused, and the
-// upstream is never asked about it. That is deliberate, and it is the security
-// property of the whole run-through arrangement: a client holds one endpoint and
-// one key pair, so if the server would read through for any bucket name it were
-// handed, a caller could reach any bucket on the provider by guessing. The
-// operator gives a client its buckets by creating them locally; the client cannot
-// acquire one by asking.
+// A read of a bucket the local store has not been given is refused, and the upstream
+// is never asked about it. That is the security property of the whole run-through
+// arrangement: a client holds one endpoint and one key pair, so reading through for any
+// bucket name it were handed would let a caller reach any bucket on the provider.
 //
 // So this asserts both halves: the refusal, and the absence of an upstream call.
 // Reading a designed refusal as an unhandled edge case is easy, because the error
@@ -261,12 +246,11 @@ func TestReadThroughCachesAKeyInsideALocalBucket(t *testing.T) {
 // bucket-propagation problem that is a plain error-mapping defect rather than a
 // policy question.
 //
-// The local write is authoritative and it succeeds. The propagation to the
-// upstream then fails, because the upstream has never heard of the bucket. That
-// failure arrives as storage.CommittedError, whose cause is the upstream's
-// not-found — and the storage error table maps not-found to a 404 NoSuchKey. So the
-// server reported that the object did not exist immediately after writing it. A
-// caller that read the key back would find it; a caller that retried on the 404
+// The local write is authoritative and it succeeds. The propagation to the upstream
+// then fails, because the upstream has never heard of the bucket. That failure arrives
+// as storage.CommittedError, whose cause is the upstream's not-found — and the storage
+// error table maps not-found to a 404 NoSuchKey, so the server reported that the
+// object did not exist immediately after writing it. A caller that retried on the 404
 // would never succeed, because nothing about the next attempt differs.
 //
 // The caller now gets success, the local object is there, and the propagation

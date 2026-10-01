@@ -15,10 +15,10 @@ import (
 // does nothing, silently — a deny an author wrote and that does not apply, which is
 // worse than one they never wrote.
 //
-// It happened once: a policy denying bucket.create over an object selector was
-// ignored, because check() consulted the environment only. No test failed, because
+// It happened once: a policy denying bucket.create over an object selector was ignored,
+// because check() consulted the environment only. No test failed, because
 // TestObjectChecksNameAResource checks a different thing — that object operations reach
-// for the resource-scoped check — and says nothing about the rest.
+// the resource-scoped check — and says nothing about the rest.
 func TestEveryOperationReachesThePolicy(t *testing.T) {
 	// Each case performs the verb that carries one denied operation, so the
 	// assertion is about the whole path. resourceScoped marks the operations a

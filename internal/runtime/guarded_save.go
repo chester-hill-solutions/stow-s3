@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -61,7 +62,7 @@ func (i *Instance) ReadForSave(ctx context.Context, bucket, key string) (Object,
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, SaveCondition{}, err
 	}
-	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
 		return Object{}, SaveCondition{}, err
 	}
 	if !i.SupportsGuardedSaves() {
@@ -116,11 +117,11 @@ func (i *Instance) checkSaveAuthority(ctx context.Context, bucket, key, requestK
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.checkResource(authority.ObjectWrite, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, policy.Object(bucket, key)); err != nil {
 		return err
 	}
 	if requestKey != "" {
-		return i.checkResource(authority.ObjectRead, object(bucket, key))
+		return i.checkResource(authority.ObjectRead, policy.Object(bucket, key))
 	}
 	return nil
 }

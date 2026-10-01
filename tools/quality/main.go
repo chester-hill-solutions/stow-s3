@@ -220,18 +220,14 @@ func repoRoot() string {
 // so they can only go down.
 //
 // They exist because every other rule here measures something countable, and comment
-// volume was the one maintainability cost with no gate on it. The coverage ratchet
-// has the same blind spot in the other direction: it fails when covered statements
-// decrease, so a whole verb added with no tests leaves it satisfied. Between them, a
-// session shipped a verb whose report was wrong and a file that was half comment with
-// every gate green throughout.
+// volume was the one maintainability cost with no gate on it. The coverage ratchet has
+// the same blind spot in the other direction: it fails when covered statements
+// decrease, so a whole verb added with no tests leaves it satisfied.
 //
-// Both are measured because neither is sufficient alone. The ratio is repo-wide and
-// weighted by line count, so deleting code cannot satisfy it, but across 55,000 scanned
-// lines it is stored as an integer and four added comments move it by zero. The count
-// is exact, so one line fails, but deleting uncommented code would satisfy it. A
-// per-file ceiling is worse than both: it punishes the file that most needs
-// explaining, and splitting a file in two defeats it.
+// Both are measured because neither is sufficient alone. The ratio cannot be satisfied
+// by deleting code, but across 55,000 scanned lines it is an integer and four added
+// comments move it by zero. The count is exact, so one line fails, but deleting
+// uncommented code would satisfy it. A per-file ceiling is worse than both.
 const (
 	commentLinesRule = "comment-lines"
 	commentRatioRule = "comment-ratio"

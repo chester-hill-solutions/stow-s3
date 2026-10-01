@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -97,7 +98,7 @@ func (i *Instance) checkRecoveryAuthority(ctx context.Context, refs []ObjectReco
 		return i.check(authority.ObjectWrite)
 	}
 	for _, ref := range refs {
-		res := object(ref.Bucket, ref.Key)
+		res := policy.Object(ref.Bucket, ref.Key)
 		if err := i.checkResource(authority.ObjectRead, res); err != nil {
 			return err
 		}

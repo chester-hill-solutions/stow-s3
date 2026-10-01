@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -14,7 +15,7 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.checkResource(authority.ObjectWrite, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectWrite, policy.Object(bucket, key)); err != nil {
 		return nil, err
 	}
 	i.mu.Lock()
@@ -274,7 +275,7 @@ func (i *Instance) ValidateMultipartUpload(ctx context.Context, uploadID, bucket
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.checkResource(authority.ObjectRead, object(bucket, key)); err != nil {
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -289,7 +290,7 @@ func (i *Instance) ListMultipartUploads(ctx context.Context, bucket string, opts
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := i.checkResource(authority.ObjectList, object(bucket, opts.Prefix)); err != nil {
+	if err := i.checkResource(authority.ObjectList, policy.Object(bucket, opts.Prefix)); err != nil {
 		return nil, err
 	}
 	i.mu.Lock()
