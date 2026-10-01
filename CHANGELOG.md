@@ -2,6 +2,19 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- The Go coverage ratchet is now up to date, and the rule for keeping it that way is
+  written down. `check-coverage --baseline` writes whichever machine ran it, and coverage
+  is platform-dependent: `internal/parentwatch` covers 22 statements on macOS and 10 on
+  Linux, and the aggregate differs by a comparable margin. A floor recorded on one platform
+  fails the other, and because a stored floor may not be lowered, the wrong value cannot be
+  corrected by reverting it — it has to be set down to the strictest platform's number.
+  Eleven package floors are higher than they were, and six that the baseline had never
+  recorded — `resumable-transfer`, `capacity`, `mcpstorage`, `policy`, `policystore` and
+  `rooted` — are counted at all. The recorded aggregate percentage fell from 71.33% to
+  71.13%, which is not a loosening: it is those six entering the mean for the first time,
+  and they are the less-covered ones. A baseline that excluded them described a tree with
+  six holes in it.
+
 - A listing disclosed keys the policy denied enumerating. `ListObjects` consulted the
   policy once, on the prefix the caller asked for, and returned every key the store listed.
   A per-key deny could not be honoured, and not because of a defect in the matcher: a

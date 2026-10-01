@@ -48,6 +48,14 @@ npm run check:dry
 - CI checks out full history (`fetch-depth: 0`) and compares against the explicit parent/merge-base; a shallow checkout is a hard failure, never a skipped ratchet.
 - Inline suppressions are themselves counted where the check can detect them. A suppression requires a precise explanation and does not reset the ratchet.
 - Existing test fixtures and generated output are excluded only when their exclusion is documented in the check configuration.
+- The coverage baseline is **the strictest platform's measurement**, not the machine that
+  last regenerated it. `--baseline` writes whichever machine ran it, and coverage is
+  platform-dependent: `internal/parentwatch` covers 22 statements on macOS and 10 on Linux,
+  and the aggregate differs by a comparable margin. A floor recorded on macOS therefore
+  fails the Linux job, and because a stored floor may not be lowered, the wrong value
+  cannot be corrected by reverting it — it has to be set down to the strictest platform's
+  number, which is what the recorded floors are. Read the Linux job's coverage lines before
+  regenerating, not only the local run.
 - `tools/quality` is a **scanner**, not a gate. It measures and prints (`--json` for a
   consumer); `scripts/check-go-quality.mjs` applies `compareKeys`, `expandedKeys` and
   `compareIdentities` from `scripts/ratchet.mjs`, like the other five ratchets. It was both
