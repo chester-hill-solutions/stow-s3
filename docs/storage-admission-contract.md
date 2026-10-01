@@ -270,6 +270,24 @@ from the obvious example passes with the gate deleted. Every allow case in this 
 paired with a deny case for this reason, and each was confirmed by deliberately pointing
 a check at a different operation.
 
+This was not only a property of the new cases. Pointing `GetObject`'s check at
+`object.write` instead of `object.read` produced **zero** failures in
+`TestEveryOperationReachesThePolicy` — the systematic matrix was as blind as any single
+test, and only an unrelated test about S3 prefix semantics caught it. So the reach test
+now runs both halves for every operation: a policy denying the operation, and a policy
+granting *only* it. The second half refuses every other operation by default denial, so
+a verb checking the wrong one is refused and the case fails naming the operation. Between
+them there is no way to pass by checking the wrong thing, and the failure message says
+which operation the verb asked for instead.
+
+Seeding the fixture for the allow half had to move onto the store rather than through a
+runtime verb: the policy governs the runtime, so seeding through it needs `object.write`
+and `bucket.create` granted, which is exactly what the half withholds. The deny cases
+never noticed, because an explicit denial refuses before the store is consulted. Each
+verb also needs the fixture its own operation implies — creating a bucket that already
+exists fails, and deleting one that is not empty fails — so the seed is chosen per
+operation.
+
 A related asymmetry on the out-of-session path: a `Source` that cannot answer returns
 its own error rather than a refusal, so an outage is not reported as a permission
 decision. A caller handed "you may not" during an incident will treat it as a
