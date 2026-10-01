@@ -19,13 +19,6 @@ import (
 // identity changes once per workspace and the index per object. The escaped form is
 // namespaced by bucket, since an escaped key must not resolve to one file across two
 // buckets.
-//
-// Version 1 and 2 are refused rather than migrated, and refusing beats opening them.
-// Version 1's checksums, ETags and metadata would have to be carried into index.json by
-// a rewrite interruptible with the index as the only copy, and treating a missing index
-// as empty discards them silently. Version 2's manifest is valid but its escaped objects
-// sit at a path this build does not look at, so opening it would resolve every escaped
-// key to absent while the file stayed on disk.
 const manifestVersion = 3
 
 // ErrManifestCorrupt is returned when a manifest exists and cannot be trusted.

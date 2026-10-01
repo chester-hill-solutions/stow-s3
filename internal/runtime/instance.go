@@ -120,19 +120,40 @@ func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
 	return i.checkResource(op, object(usage.upload.Bucket, usage.upload.Key))
 }
 
-// check is the authorization point for operations that name no resource: the
-// environment's own lifecycle and the bucket namespace. A policy's selectors are
-// matched against resources and there is nothing here to match.
+// check is the authorization point for operations that name neither a resource nor
+// a collection: the environment's own lifecycle, and listing the namespace.
 //
-// An object operation must call checkResource instead; a test fails if one reaches
-// for this, because a policy never consulted is not a narrower policy.
-//
-// Close is deliberately not routed through here. Refusing to release a handle
-// would leak the process, the temporary directory and the in-flight multipart
-// state, so disposal is always permitted; EnvironmentDestroy is the operation
-// for tearing an environment down on purpose, and that is gated.
+// It consults the policy twice over, and both are the fix for a deny that was written
+// and did not apply. A policy that failed validation is refused here too, not only on
+// the resource path, because a widening policy means the author believed a permission
+// was in force and it is not. And an entry that withholds the operation is honoured,
+// because Reset names no bucket for a selector to match.
 func (i *Instance) check(op authority.Operation) error {
-	return i.authority.Check(op)
+	if i.policyErr != nil {
+		return i.policyErr
+	}
+	return i.checkGranted(op, "")
+}
+
+// checkCollection is check for an operation that names a collection but no
+// resource, so a deny is scoped to that collection. See policy.Set.Denies.
+func (i *Instance) checkCollection(op authority.Operation, collection string) error {
+	if i.policyErr != nil {
+		return i.policyErr
+	}
+	return i.checkGranted(op, collection)
+}
+
+// checkGranted is the answer both of the above give: the environment's, unless a
+// policy entry withholds the operation. A deny is all a policy can say here.
+func (i *Instance) checkGranted(op authority.Operation, collection string) error {
+	if err := i.authority.Check(op); err != nil {
+		return err
+	}
+	if i.policy == nil || !i.policy.Denies(namespace, collection, op) {
+		return nil
+	}
+	return &authority.ErrNotAuthorized{Operation: op, Authority: i.authority.Without(op)}
 }
 
 // checkResource is check for an operation on a named resource, and it is where a

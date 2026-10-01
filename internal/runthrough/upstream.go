@@ -45,15 +45,14 @@ func NewS3Client(cfg UpstreamConfig) (*S3Client, error) {
 	// LoadDefaultConfig resolves the entire default AWS chain on top of whatever it
 	// is given: ~/.aws/config, ~/.aws/credentials, SSO, web-identity token files, and
 	// the EC2 instance metadata provider. Region and credentials are both overridden
-	// below and the endpoint is set on the client, so most of that chain is inert: a
+	// below and the endpoint is set on the client, so most of that chain is inert — a
 	// shared config declaring another region still signs for us-east-1, and
 	// s3_use_accelerate_endpoint does not redirect the request. Both are asserted as
 	// invariants in upstream_config_test.go.
 	//
 	// Reading the chain is not inert. Naming a profile stow never asked for makes this
 	// function fail, so whether stow can reach upstream storage at all depends on the
-	// machine's AWS configuration, and UpstreamConfig is documented as coming from a
-	// fixed list of STOW_*/S3_*/AWS_* environment variables and nothing else.
+	// machine's AWS configuration.
 	awsCfg := aws.Config{
 		HTTPClient:  confinedUpstreamClient(),
 		Region:      region,

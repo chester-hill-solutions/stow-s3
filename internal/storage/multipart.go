@@ -42,16 +42,14 @@ func ValidateMinPartSizes(sizes []int64) error {
 // options they describe.
 //
 // It is for the one thing a completion needs them as PutOptions rather than as
-// MultipartOptions: verifying an integrity claim. A client that supplied a
-// checksum for the object it is assembling has made the same claim a single
-// write would, about the same bytes, and it is checked the same way.
+// MultipartOptions: verifying an integrity claim. A client that supplied a checksum
+// for the object it is assembling has made the same claim a single write would, about
+// the same bytes, and it is checked the same way.
 //
-// A checksum *algorithm* on its own is not a claim, and this is where that matters.
-// An initiation carries no body, so the only thing it can supply is the algorithm
-// the client intends to use, named before the object it describes exists. There is
-// no value to check, and VerifyChecksum rightly refuses an algorithm without one:
-// publishing a body whose checksum was never computed as though it had been
-// verified is exactly the failure that rule exists to prevent.
+// A checksum *algorithm* alone is not a claim. An initiation carries no body, so the
+// only thing it can supply is the algorithm the client intends to use, named before the
+// object exists. There is no value to check, and VerifyChecksum rightly refuses an
+// algorithm without one.
 func MultipartPutOptions(opts MultipartOptions) PutOptions {
 	put := PutOptions{
 		ContentType: opts.ContentType,

@@ -77,20 +77,20 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 // any call that merely mentions an operation would also match a log statement or a
 // slice, and would let a real gap pass as enforced.
 //
-// This set has had to widen twice, each time because a new gate spelling was added and
-// the scan could not see it: once when the run-through adapter began gating on Allows,
-// and once when the runtime gained checkResource and checkUpload. Both blind spots were
-// worse than a missed detection, because the test then demands an Ungated entry for an
-// operation that is enforced — so the code goes on claiming that a permission is
-// described and not granted. The fix in both cases was to widen the detector to the real
-// chokepoint, never to re-declare an enforced operation in Ungated to make the scan
-// agree.
+// This set has had to widen three times, each time because a gate spelling the scan
+// could not see was added: the adapter gating on Allows, the runtime gaining
+// checkResource and checkUpload, and the bucket operations moving to checkCollection
+// and checkGranted — a rename, not a new operation, which is why a rename has teeth
+// here. Each blind spot was worse than a missed detection, because the test then
+// demands an Ungated entry for an operation that is enforced.
 var enforcementMethods = map[string]bool{
-	"check":         true,
-	"checkResource": true,
-	"checkUpload":   true,
-	"Allows":        true,
-	"Check":         true,
+	"check":           true,
+	"checkGranted":    true,
+	"checkCollection": true,
+	"checkResource":   true,
+	"checkUpload":     true,
+	"Allows":          true,
+	"Check":           true,
 }
 
 // checkSitesInFile records every call of the form <recv>.m(authority.Op) in one

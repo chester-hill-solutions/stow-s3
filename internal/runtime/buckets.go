@@ -15,7 +15,7 @@ func (i *Instance) HeadBucket(ctx context.Context, name string) (Bucket, error) 
 	if err := i.checkContext(ctx); err != nil {
 		return Bucket{}, err
 	}
-	if err := i.check(authority.BucketList); err != nil {
+	if err := i.checkCollection(authority.BucketList, name); err != nil {
 		return Bucket{}, err
 	}
 	i.mu.Lock()
@@ -34,7 +34,7 @@ func (i *Instance) CreateBucket(ctx context.Context, name string) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.BucketCreate); err != nil {
+	if err := i.checkCollection(authority.BucketCreate, name); err != nil {
 		return err
 	}
 	i.mu.Lock()
@@ -49,7 +49,7 @@ func (i *Instance) DeleteBucket(ctx context.Context, name string) error {
 	if err := i.checkContext(ctx); err != nil {
 		return err
 	}
-	if err := i.check(authority.BucketDelete); err != nil {
+	if err := i.checkCollection(authority.BucketDelete, name); err != nil {
 		return err
 	}
 	i.mu.Lock()

@@ -12,19 +12,13 @@ import (
 
 // runCorpusRangeGet reads part of an object the setup seeded.
 //
-// The range is written into the corpus as the header a client would send, and
-// the answer is checked on three independent surfaces: the status, the bytes,
-// and the whole Content-Range value. Status and body together are what a client
-// actually reads, and they are not sufficient on their own: a server can return
-// the right bytes for a range it mis-parsed, and it can return a correct
-// Content-Range beside a body assembled from the wrong offset. Asserting the
-// full `bytes <first>-<last>/<size>` string also pins the total, which is the
-// part a truncated or over-long read reports wrongly most often.
-//
-// An unsatisfiable request is a different shape: the SDK surfaces 416 as an error
-// rather than a GetObjectOutput, so the expectation is checked through
-// assertCorpusError, and the `bytes */<size>` form is asserted separately because it
-// is the one place the server reports the total on a refusal.
+// The range is written into the corpus as the header a client would send, and the
+// answer is checked on three surfaces: status, bytes, and the whole Content-Range.
+// Status and body together are what a client reads, and they are not sufficient: a
+// server can return the right bytes for a range it mis-parsed, or a correct
+// Content-Range beside a body from the wrong offset. Asserting the full
+// `bytes <first>-<last>/<size>` string also pins the total, the part a truncated read
+// reports wrongly most often.
 func runCorpusRangeGet(corpusContext *sharedCorpusContext) {
 	corpusContext.t.Helper()
 	testCase := corpusContext.testCase

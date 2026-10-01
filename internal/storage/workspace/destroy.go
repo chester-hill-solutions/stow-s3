@@ -23,11 +23,10 @@ var ErrNotDestructible = errors.New("workspace is not one stow created")
 // manifest" is not evidence that its contents belong to stow. Adopting a
 // project and then deleting it would be the worst bug this package could have.
 //
-// Two layers have to agree, and they are deliberately redundant. Ownership is
-// the primary defence, because it is the only statement about who made the
-// directory. The protected-path check is the backstop, and it is the layer that
-// still holds when a workspace was created inside a directory that later became
-// a developer's home or working directory, or when a caller guesses a path
+// Two layers have to agree, and they are deliberately redundant. Ownership is the
+// primary defence, the only statement about who made the directory. The protected-path
+// check is the backstop, and it still holds when a workspace was created inside a
+// directory that later became a developer's home, or when a caller guesses a path
 // another stow process once used.
 func (s *Store) Destroy() error {
 	if err := s.assertDestructible(); err != nil {

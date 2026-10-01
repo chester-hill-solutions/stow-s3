@@ -335,18 +335,15 @@ func validatePresignedTime(r *http.Request, sr signedRequest, requestTime, now t
 	}
 	// The far edge of the window, not only the near one.
 	//
-	// A presigned URL is valid from its signing time until its expiry, and the
-	// signing time is inside the URL — so a client can put any time it likes
-	// there, including one far in the future, and produce a URL that is valid for
-	// a very long time. The expiry check alone never noticed: with the signing
-	// time in the future, "now is after the expiry" is false for years.
+	// A presigned URL is valid from its signing time until its expiry, and the signing
+	// time is inside the URL — so a client can put any time it likes there and produce
+	// a URL valid for a very long time. The expiry check alone never noticed: with the
+	// signing time in the future, "now is after the expiry" is false for years.
 	//
-	// An ordinary signed request has no such freedom, because its date is a
-	// header the client cannot choose freely without invalidating the signature —
-	// and stow checks that header's skew in both directions. A presigned URL
-	// carried the same freedom without the same check, which is the asymmetry
-	// this closes: both now bound how far the request's own clock may be from the
-	// server's, by the verifier's configured allowance.
+	// An ordinary signed request has no such freedom, because its date is a header the
+	// client cannot choose freely without invalidating the signature, and stow checks
+	// that header's skew in both directions. Both are now bounded by the verifier's
+	// configured allowance.
 	if requestTime.After(now.Add(maxSkew)) {
 		return authError("RequestTimeTooSkewed", "request time skew too large")
 	}

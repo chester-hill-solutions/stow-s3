@@ -127,15 +127,10 @@ func New(options Options) (*Store, error) {
 //
 // Ownership is set once, by whoever made the directory, and then preserved. A
 // directory stow creates right now is owned, full stop. A directory that already
-// existed is only owned if the manifest already said so — which happens when stow
-// created it on an earlier run and this is a reopen. The distinction has to
-// survive the reopen, or a workspace stow created would quietly become
-// undeletable the second time it was opened, and Destroy would be useless for
-// the case it exists for.
-//
-// A caller's own root cannot inherit, so the flag is read here rather than inferred
-// from the manifest: a manifest is the origin's answer to a question about a
-// different directory.
+// existed is only owned if the manifest already said so, which happens when stow
+// created it on an earlier run and this is a reopen. The distinction has to survive
+// the reopen, or a workspace stow created would quietly become undeletable the second
+// time it was opened.
 func (s *Store) establishIdentity(options Options, rootExisted bool, now func() time.Time) error {
 	if s.manifest.WorkspaceID == "" {
 		id, err := newWorkspaceID()

@@ -239,11 +239,6 @@ func (a *Adapter) ReconcileCacheIndex(ctx context.Context) error { return a.reco
 // holds bytes it knows nothing about. Every eviction plan is computed from the index
 // alone, so an index starting empty measures the cache by what was written since
 // startup, and the operator's byte limit is enforced against that.
-//
-// A discovered object is recorded with the store's own LastModified as its access time,
-// because that is evidence about the bytes rather than a guess: the discovery time
-// would make every pre-restart object look freshly used, so the objects most overdue
-// for eviction would be the ones eviction spared.
 func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 	buckets, err := a.cache.ListBuckets(ctx)
 	if err != nil {

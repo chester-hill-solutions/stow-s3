@@ -23,11 +23,11 @@ import (
 
 // Two instances, talking to each other.
 //
-// Every other test in this repository exercises one store, or one server, or one
-// adapter against a hand-written stub. The run-through adapter's job is to be
-// correct about a *pair* — a local store and a real S3 server on the other side —
-// and that is the only category of behaviour the rest of the suite structurally
-// cannot reach. Both defects these tests were written for were found by hand:
+// Every other test here exercises one store, one server, or one adapter against a
+// hand-written stub. The run-through adapter's job is to be correct about a *pair* —
+// a local store and a real S3 server — and that is the only category the rest of the
+// suite structurally cannot reach. Both defects these tests were written for were
+// found by hand:
 //
 //   - a read-through fetch of a key that exists only upstream failed with
 //     NoSuchBucket, because the local store is consulted first and a bucket missing
@@ -37,8 +37,8 @@ import (
 //
 // Neither could have been caught where it was written, because stubUpstream cannot
 // express a real server's answer about a bucket. So the upstream here is a real
-// s3api.Server with real SigV4 reached by the real AWS SDK, and the client under
-// test is a second real s3api.Server whose store is the run-through adapter.
+// s3api.Server with real SigV4 reached by the real AWS SDK, and the client under test
+// is a second real s3api.Server whose store is the run-through adapter.
 
 // pair is two live servers and the clients that talk to each of them.
 type pair struct {

@@ -229,9 +229,8 @@ func repoRoot() string {
 // Both are measured because neither is sufficient alone. The ratio is repo-wide and
 // weighted by line count, so deleting code cannot satisfy it, but across 55,000 scanned
 // lines it is stored as an integer and four added comments move it by zero. The count
-// is exact, so one line fails, but deleting uncommented code would satisfy it.
-//
-// A per-file ceiling is worse than both: it punishes the file that most needs
+// is exact, so one line fails, but deleting uncommented code would satisfy it. A
+// per-file ceiling is worse than both: it punishes the file that most needs
 // explaining, and splitting a file in two defeats it.
 const (
 	commentLinesRule = "comment-lines"

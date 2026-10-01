@@ -87,18 +87,15 @@ func TestStoreEnforcesTheMinimumPartSize(t *testing.T) {
 
 // A checksum algorithm named at initiation must not make the completion fail.
 //
-// x-amz-checksum-algorithm on CreateMultipartUpload names the algorithm the
-// client intends to use. An initiation carries no body, so no value comes with
-// it, and the record is a declaration rather than a claim about the object.
+// x-amz-checksum-algorithm on CreateMultipartUpload names the algorithm the client
+// intends to use. An initiation carries no body, so no value comes with it, and the
+// record is a declaration rather than a claim about the object. Handing it to the store
+// as though it were a claim is what this pins against: VerifyChecksum rightly refuses
+// an algorithm with no value, so every completion of an upload that named one failed,
+// in all three backends, with an error the S3 surface has no mapping for.
 //
-// Handing it to the store as though it were a claim is what this pins against:
-// VerifyChecksum rightly refuses an algorithm with no value, so every completion
-// of an upload that named one failed, in all three backends, with an error the S3
-// surface has no mapping for.
-//
-// This is here rather than in the fidelity file because that is how it presented:
-// a completion that cannot happen at all. The declaration still has to be
-// recorded, so the second half asserts the algorithm survives on the upload.
+// This is here rather than in the fidelity file because that is how it presented —
+// a completion that cannot happen at all.
 func TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithm(t *testing.T) {
 	withStores(t, func(t *testing.T, store storage.Store) {
 		ctx := context.Background()

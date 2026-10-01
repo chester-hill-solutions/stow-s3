@@ -262,6 +262,24 @@ was a design decision rather than an implementation detail:
 - **A batch delete authorizes each key, and a refusal leaves the batch
   unapplied.** Deleting the permitted keys and refusing the rest would be a
   partial answer to a question the caller asked as one.
+- **An operation that names no resource is still answered by the policy.** A
+  selector cannot match a bucket creation, but a deny entry that withholds
+  `bucket.create` is honoured anyway, and an entry that withholds
+  `environment.reset` is honoured even though Reset names no collection to
+  scope it to. The asymmetry is deliberate: a deny is honoured wherever it can
+  be attributed, and an allow needs a resource to be scoped to. Where the policy
+  is silent the environment answers, which is what keeps a policy about object
+  keys from also narrowing a namespace it never mentioned. Ignoring the deny
+  instead would make a written refusal decorative, which is the more dangerous
+  direction — the entry is in the file, the file is the contract, and the call
+  would succeed anyway.
+
+  `TestEveryOperationReachesThePolicy` in `internal/runtime` is the gate, and its
+  table is derived from `authority.Defined()` so an operation with no case fails
+  rather than waiting to be found. The gate it complements,
+  `TestObjectChecksNameAResource`, asks a different question and could not have
+  caught either half: it checks that object operations reach the *resource*
+  check, and says nothing about the operations that do not.
 - **A recovery hold needs both read and write on every object it covers.** A hold
   exists to stop those objects changing, and naming them is itself a disclosure.
   `ReleaseObjectRecoveryHold` names no objects, so under a policy it falls back to

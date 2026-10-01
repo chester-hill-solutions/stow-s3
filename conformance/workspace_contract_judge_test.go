@@ -278,15 +278,10 @@ func parseIndexes(tail string) []int {
 // and not in meaning.
 //
 // Decoding both sides and comparing the values is the whole implementation, and it
-// suits this matcher: the values are arbitrary — a verb's output is whatever that
-// verb chose to print — so there is no shape to hand-write a comparison for. It
-// replaced a hand-written canonicaliser of seventy-odd lines. Numbers land on both
-// sides as float64, so a contract that says 2 and an engine that says 2.0 agree,
-// which is the reformat rule applied to the one case where the text differs.
-//
-// A fragment that is not JSON is a disagreement. An expectation is read from the case
-// file and a result from a verb the driver has already parsed, so neither can reach here
-// unparsed.
+// suits this matcher: the values are arbitrary — a verb's output is whatever that verb
+// chose to print — so there is no shape to hand-write a comparison for. Numbers land
+// on both sides as float64, so a contract that says 2 and an engine that says 2.0
+// agree, which is the reformat rule applied to the one case where the text differs.
 func sameJSON(want, got json.RawMessage) bool {
 	var wantValue, gotValue any
 	if json.Unmarshal(want, &wantValue) != nil || json.Unmarshal(got, &gotValue) != nil {

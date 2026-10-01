@@ -201,19 +201,8 @@ func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmRes
 // readPrewarmKeys reads the key list from the flag or the file, and refuses
 // anything that is not a plain key.
 //
-// Duplicates are dropped rather than refused: the same key named twice by an
-// operator assembling a list is a mistake worth tolerating, and warming it twice
-// costs one fetch.
-//
-// Lines come before commas: splitting on commas first cuts a comment containing
-// one — "# model weights, see the runbook" — in half, and the half after the comma
-// does not start with "#" and so becomes a key. A format that documents # as a
-// comment marker and then warms your prose is worse than no marker at all.
-//
-// A comment is a line whose first non-space character is #, and only that. A key
-// containing # is legal, so stripping from the first # anywhere in a line would
-// refuse keys that exist and warm nothing in their place. A trailing comment beside
-// a key is therefore unsupported, and that is the lesser evil stated.
+// Duplicates are dropped rather than refused: the same key named twice is a mistake
+// worth tolerating, and warming it twice costs one fetch.
 func readPrewarmKeys(flagValue, file string) ([]string, error) {
 	raw := flagValue
 	if file != "" {

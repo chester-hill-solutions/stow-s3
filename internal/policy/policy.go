@@ -170,6 +170,31 @@ func (s Set) Allows(env authority.Authority, r Resource, op authority.Operation)
 	return err
 }
 
+// Denies reports whether an entry withholds op, for an operation naming no resource
+// locator. It is the only way a policy reaches such an operation, and the asymmetry
+// with Authorize is the point: a deny is honoured wherever it can be attributed, and
+// an allow needs a resource to be scoped to.
+//
+// A key prefix is not attributable — an entry over `public/` says nothing about
+// whether a bucket may be created. A collection is matched when the operation names
+// one and matches any when it does not, because Reset names no bucket and a deny
+// scoped to one collection that could never apply is the same failure as one never
+// written.
+func (s Set) Denies(namespace, collection string, op authority.Operation) bool {
+	for _, e := range s.entries {
+		if e.namespace != namespace {
+			continue
+		}
+		if collection != "" && e.collection != collection {
+			continue
+		}
+		if e.effect == Deny && e.permitted.Allows(op) {
+			return true
+		}
+	}
+	return false
+}
+
 // Selectors lists what the policy covers, sorted, for a diagnostic.
 func (s Set) Selectors() []string {
 	out := make([]string, 0, len(s.entries))

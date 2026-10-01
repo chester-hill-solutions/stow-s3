@@ -21,17 +21,15 @@ const maxPresignedExpirySeconds = 604800
 // The presigned authentication parameters, read one name at a time and each
 // exactly once.
 //
-// The names are exact: a name appearing more than once, or under a different case
-// than the one stow reads, is refused. That is a real ambiguity rather than a
-// cosmetic one, because the signed query and the values consumed here are parsed
-// from the same string — a differently-cased duplicate could be signed as one
-// parameter and read as another. Failing closed is the only safe answer, since
-// the alternative is choosing between two claims with no way to tell which the
-// client meant.
+// The names are exact: a name appearing more than once, or under a different case than
+// the one stow reads, is refused. That is a real ambiguity, because the signed query
+// and the values consumed here are parsed from the same string — a differently-cased
+// duplicate could be signed as one parameter and read as another, and failing closed is
+// the only safe answer.
 //
-// The canonical query string is built separately, and its duplicate handling is
-// unchanged: ordinary repeated query parameters are a normal part of a request and
-// AWS canonicalizes them by sorting, so that behaviour is not touched here.
+// The canonical query string is built separately and its duplicate handling is
+// unchanged: repeated query parameters are normal in a request and AWS canonicalizes
+// them by sorting.
 func parsePresignedQuery(query url.Values) (signedRequest, error) {
 	algorithm, err := requiredAuthQueryValue(query, "X-Amz-Algorithm", "missing presigned auth parameters")
 	if err != nil {
