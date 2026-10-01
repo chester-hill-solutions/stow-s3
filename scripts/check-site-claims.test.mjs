@@ -17,7 +17,7 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { test } from "node:test";
 
-import { asText, siteClaimProblems, QUOTAS, SIZE_CLAIMS } from "./check-site-claims.mjs";
+import { asText, siteClaimProblems, QUOTAS, RELEASE_TARGETS, SIZE_CLAIMS } from "./check-site-claims.mjs";
 
 const WASM = "packages/stow-s3/dist/stow-runtime.wasm";
 
@@ -26,7 +26,7 @@ const WASM = "packages/stow-s3/dist/stow-runtime.wasm";
 const cleanIndex = `
   <h1>Working storage an agent can hand off.</h1>
   <ul class="proof">
-    <li><b>11.7 MB</b><span>single binary</span></li>
+    <li><b>12.7 MB max</b><span>single binary, every platform</span></li>
     <li><b>5.8 MB</b><span>runtime</span></li>
   </ul>
   <p>Defaults are <strong>64 MiB</strong> and <strong>10,000 objects</strong>.</p>
@@ -41,7 +41,7 @@ const cleanIndex = `
 const cleanEcosystem = `<span class="installline"><b>5.8 MB</b> runtime</span>`;
 
 const sizes = new Map([
-  ["bin/stow-s3", 11.7],
+  ["bin/stow-s3", 12.66],
   ["packages/stow-s3/dist/stow-runtime.wasm", 5.83],
 ]);
 
@@ -124,10 +124,10 @@ test("a package name that is not published is reported, on any site file", () =>
 });
 
 test("a size claim is checked against the build, not trusted", () => {
-  const broken = cleanIndex.replace("11.7 MB", "10.6 MB");
+  const broken = cleanIndex.replace("12.7 MB max", "10.6 MB max");
   const problems = siteClaimProblems({ text: site(broken), sizes });
   assert.equal(problems.length, 1);
-  assert.match(problems[0], /claims 10\.6 MB where bin\/stow-s3 is 11\.7 MB/);
+  assert.match(problems[0], /claims 10\.6 MB where bin\/stow-s3 is 12\.7 MB/);
 });
 
 test("a build that was not produced is not a failure", () => {
@@ -179,5 +179,26 @@ test("every size claim names a build path that exists in the tree", () => {
       exists || produced.has(claim.build),
       `${claim.file} measures ${claim.build}, which is neither present nor a known build output`,
     );
+  }
+});
+
+// Dropping the word "max" from the page used to switch the claim off: the pattern
+// required it, a pattern that does not match is skipped, and a per-platform number
+// went back in unchecked. The gate was green while checking nothing.
+test("editing the page's wording cannot stop the size claim being checked", () => {
+  const reworded = cleanIndex.replace("12.7 MB max", "11.7 MB");
+  const problems = siteClaimProblems({ text: site(reworded), sizes });
+  assert.equal(problems.length, 1, JSON.stringify(problems));
+  assert.match(problems[0], /claims 11\.7 MB/);
+});
+
+// The measurement was platform-dependent, which is why it claimed 11.7 MB while a
+// linux/amd64 user downloaded 12.4 MB. Narrowing the targets to the one platform the
+// claim was written on would restore exactly that defect silently.
+test("the size claim is measured across every published platform", () => {
+  assert.equal(RELEASE_TARGETS.length, 4);
+  assert.deepEqual([...new Set(RELEASE_TARGETS.map((t) => t.split("/")[0]))].sort(), ["darwin", "linux"]);
+  for (const target of RELEASE_TARGETS) {
+    assert.match(target, /^(linux|darwin)\/(amd64|arm64)$/, `${target} is not a release target`);
   }
 });

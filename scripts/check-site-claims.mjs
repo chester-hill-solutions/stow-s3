@@ -27,8 +27,10 @@
 // someone wraps half the command in a <b>, which is how a gate learns to be
 // ignored.
 
-import { readFileSync, existsSync, statSync } from "node:fs";
+import { readFileSync, existsSync, statSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { spawnSync } from "node:child_process";
 
 export const SITE_TEXT_FILES = [
   "site/index.html",
@@ -70,8 +72,21 @@ const WASM = "packages/stow-s3/dist/stow-runtime.wasm";
 
 // The size claims, each naming where its number comes from. A number that drifts
 // silently is worse than no number, because it reads as a measurement.
+// The four platforms a release publishes. The native binary's size differs by a
+// megabyte across them, so a claim measured from whichever one the gate happened to
+// run is a claim about the machine, not about the project: "11.7 MB" was true only
+// for darwin/arm64, the platform the claim was written on, while a linux/amd64 user
+// downloaded 12.4 MB. The page therefore states the largest, and the gate measures
+// the largest, which is the only reading that cannot be false for somebody.
+export const RELEASE_TARGETS = ["linux/amd64", "linux/arm64", "darwin/amd64", "darwin/arm64"];
+
 export const SIZE_CLAIMS = [
-  { file: "site/index.html", pattern: /(\d+(?:\.\d+)?) MB\s*single binary/, build: "bin/stow-s3" },
+  // "max" is optional in the pattern on purpose. Required, it turns editing the page's
+  // wording into a way to stop the gate checking the page: dropping the word stopped the
+  // pattern matching, and a non-matching claim is skipped, so a per-platform number went
+  // back in unchecked. Matching both shapes means the number is always compared; the page
+  // still has to be honest about which number it is.
+  { file: "site/index.html", pattern: /(\d+(?:\.\d+)?) MB(?: max)?\s*single binary/, build: "bin/stow-s3" },
   { file: "site/index.html", pattern: /(\d+(?:\.\d+)?) MB (?:runtime|WASM runtime)/, build: WASM },
   { file: "site/launch/05-ecosystem.html", pattern: /(\d+(?:\.\d+)?) MB (?:runtime|WASM runtime)/, build: WASM },
 ];
@@ -92,6 +107,43 @@ export const asText = (markup) =>
     .replace(/&quot;/g, '"')
     .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
     .replace(/\s+/g, " ");
+
+// largestPublishedBinary cross-compiles every platform a release publishes and
+// returns the biggest one in megabytes, or undefined when the tree cannot be built
+// (no toolchain, or a target this machine cannot reach). Undefined rather than zero,
+// because an unmeasured claim is skipped by siteClaimProblems and a zero would be a
+// claim that the binary is empty.
+export function largestPublishedBinary(repoRoot) {
+  const dir = mkdtempSync(join(tmpdir(), "stow-sizes-"));
+  try {
+    let largest = 0;
+    let measured = 0;
+    for (const target of RELEASE_TARGETS) {
+      const slash = target.indexOf("/");
+      const env = { ...process.env, GOOS: target.slice(0, slash), GOARCH: target.slice(slash + 1) };
+      const out = join(dir, target.replace("/", "-"));
+      // Two argv entries, not one: there is no shell here to split "-s -w" out of
+      // its quotes, and go rejects a flag value that still carries them.
+      const built = spawnSync("go", ["build", "-trimpath", "-ldflags", "-s -w", "-o", out, "./cmd/stow-s3"], {
+        cwd: repoRoot, env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
+      });
+      if (built.status !== 0 || !existsSync(out)) continue;
+      largest = Math.max(largest, statSync(out).size / 1048576);
+      measured += 1;
+    }
+    // Fewer than every target means a partial measurement, and the largest of a
+    // subset understates the whole. Reporting that as a pass is the failure this
+    // gate exists to prevent.
+    if (measured < RELEASE_TARGETS.length) {
+      throw new Error(
+        `measured ${measured} of ${RELEASE_TARGETS.length} release targets; the largest binary would be a claim about a subset, which is how this gate printed "Site claims OK" having measured none of them`,
+      );
+    }
+    return largest;
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
 
 // siteClaimProblems is the whole gate. `text` maps a site file to its markup-stripped
 // text; `sizes` maps a build path to its size in megabytes. A build that was not
@@ -123,7 +175,10 @@ export function siteClaimProblems({ text, sizes }) {
     const match = body.match(claim.pattern);
     if (!match) continue;
     const claimed = Number(match[1]);
-    if (Math.abs(claimed - actual) > 0.1) {
+    // Both sides rounded to one decimal, because one is stated on the page and the
+    // other is a measurement of 13 million bytes. Comparing a page's number against a
+    // full-precision one made the boundary depend on which side of .05 the build fell.
+    if (Math.abs(claimed - Number(actual.toFixed(1))) > 0.1) {
       problems.push(`${claim.file} claims ${claimed} MB where ${claim.build} is ${actual.toFixed(1)} MB`);
     }
   }
@@ -155,6 +210,12 @@ export function run({ repoRoot }) {
   }
   const sizes = new Map();
   for (const build of new Set(SIZE_CLAIMS.map((claim) => claim.build))) {
+    if (build === "bin/stow-s3") {
+      // Measured by cross-compiling every published target and keeping the largest,
+      // so the answer does not depend on which machine ran the gate.
+      sizes.set(build, largestPublishedBinary(repoRoot));
+      continue;
+    }
     const path = join(repoRoot, build);
     if (!existsSync(path)) continue;
     sizes.set(build, statSync(path).size / 1048576);
