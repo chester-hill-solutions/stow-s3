@@ -26,15 +26,13 @@ func NewStoreAdapter(instance *Instance) (*StoreAdapter, error) {
 	return &StoreAdapter{instance: instance}, nil
 }
 
-// OpenWithStore binds store to a new runtime instance. The returned Instance
-// takes ownership of store: Close closes it exactly once. If resetStore is
-// non-nil, Reset closes the current store and replaces it with the store
-// returned by that function; otherwise Reset returns
-// ErrExternalResetUnsupported without mutating the bound store.
+// OpenWithStore binds store to a new runtime instance, which takes ownership: Close
+// closes it exactly once. A non-nil resetStore lets Reset replace the bound store;
+// without one, Reset returns ErrExternalResetUnsupported rather than mutating it.
 //
-// Open remains the public embedded-runtime constructor and always creates a
-// memory store. OpenWithStore is the internal compatibility seam used by the
-// native server to retain a filesystem or run-through backing store.
+// Open remains the public embedded-runtime constructor and always creates a memory
+// store. OpenWithStore is the internal seam the native server uses to retain a
+// filesystem or run-through backing store.
 func OpenWithStore(options Options, store storage.Store, resetStore func() (storage.Store, error)) (*Instance, error) {
 	if store == nil {
 		return nil, errors.New("runtime: store is required")

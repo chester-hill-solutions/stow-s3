@@ -165,6 +165,36 @@ rather than choices, and each is worth stating where a reader will meet it:
   reported as unknown, distinctly, because those three answers need different
   responses from a caller.
 
+### Enumeration, and why the decision is per key
+
+Enumeration returned every key the store listed. The policy was consulted once, on the
+prefix the caller asked for, and a per-key deny could not be honoured — not because of a
+defect in the matcher, but structurally: a listing asks about a *prefix*, and
+`public/secret` is not `public/secret/`, so an exact selector naming one key never matches
+the resource a list is decided on. A policy denying enumeration of a key could be written,
+validated and persisted, and did nothing. Worse, a caller who named the denied key *as the
+prefix* was permitted, because the allow above it matched and the deny structurally could
+not.
+
+A listing is now filtered per key, and `KeyCount` counts what was returned rather than
+what the store holds — a count the caller cannot account for is itself a disclosure, since
+it says how much exists that this caller was not shown. `CommonPrefixes` are filtered the
+same way, because a denied subtree disclosed as a bare name is the same leak. Truncation
+and the cursors stay as the store reported them, so a page that lost keys is short rather
+than silently complete.
+
+The decision is `object.list`, matching S3: a caller holding list but not read still
+enumerates, and a caller denied list does not learn that a key exists. The policy is
+resolved once per listing rather than per key, because deciding per key through
+`checkResource` re-validates the whole policy for every key on a page of up to a thousand.
+
+Filtering is the right answer for enumeration and refusal is the right answer for a
+protected exact request, and the contract already draws that line: an artifact request
+refuses when any required member is unauthorized and is never silently filtered, while
+enumeration returns only authorized results. A caller denied a key sees it as absent, which
+is indistinguishable from it not existing — that indistinguishability is the property, not
+an accident of it.
+
 ### The workspace as a resource
 
 A workspace is a registered resource with its own lifecycle, and it is the one
@@ -334,7 +364,7 @@ Four things in it are traps:
   be silently undone and neither host would know it had lost.
 
 Not yet implemented, and therefore not yet claimed: checkpoint capture, which has
-no operation to be denied with; and scoped enumeration counts.
+no operation to be denied with.
 
 **A saved-version selector is not implementable as written, and adding one would
 repeat a defect already removed.** `Resource` carries a `Version` field and

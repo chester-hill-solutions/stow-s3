@@ -45,8 +45,8 @@ func (i *Instance) putObjectLocked(ctx context.Context, bucket, key string, data
 	}
 	target := objectTarget(bucket, key)
 	_, targetReserved := i.reservedTargets[target]
-	// Not copied: every store copies the body through ETagForReader, so a copy
-	// here was a redundant allocation. See storage.ByteReader for the ownership rule.
+	// Not copied: every store copies the body through ETagForReader, so a copy here was
+	// a redundant allocation. See storage.ByteReader for the ownership rule.
 	meta, err := i.store.PutObject(ctx, bucket, key, bytes.NewReader(data), storage.PutOptions{
 		ContentType:       options.ContentType,
 		Metadata:          storage.CloneMetadata(options.Metadata),
@@ -116,6 +116,38 @@ func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, 
 	return objectFromMeta(meta, nil), nil
 }
 
+// listScope is the set of keys one listing may disclose; a nil scope permits
+// everything, so a deployment without a policy lists as it did before. The decision is
+// per key: a listing asks about a prefix, and `public/secret` is not `public/secret/`.
+type listScope struct {
+	set    *policy.Set
+	env    authority.Authority
+	bucket string
+}
+
+// newListScope resolves the policy for one listing, failing rather than disclosing.
+func (i *Instance) newListScope(bucket string) (listScope, error) {
+	if i.policy == nil {
+		return listScope{}, nil
+	}
+	if err := i.authority.Check(authority.ObjectList); err != nil {
+		return listScope{}, err
+	}
+	set, err := i.currentPolicy()
+	if err != nil {
+		return listScope{}, err
+	}
+	return listScope{set: set, env: i.authority, bucket: bucket}, nil
+}
+
+// allows reports whether one key may be disclosed, on object.list to match S3.
+func (s listScope) allows(key string) bool {
+	if s.set == nil {
+		return true
+	}
+	return s.set.Allows(s.env, policy.Object(s.bucket, key), authority.ObjectList) == nil
+}
+
 func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error) {
 	if err := i.checkContext(ctx); err != nil {
 		return ObjectPage{}, err
@@ -135,6 +167,13 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 	if limit == 0 {
 		limit = 1000
 	}
+	// Resolved once; checkResource would re-validate per key.
+
+	scope, err := i.newListScope(bucket)
+	if err != nil {
+		return ObjectPage{}, err
+	}
+
 	result, err := i.store.ListObjectsV2(ctx, bucket, storage.ListOptions{
 		Prefix:            options.Prefix,
 		Delimiter:         options.Delimiter,
@@ -147,15 +186,27 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 	}
 	objects := make([]Object, 0, len(result.Objects))
 	for _, meta := range result.Objects {
+		if !scope.allows(meta.Key) {
+			continue
+		}
 		objects = append(objects, objectFromMeta(&meta, nil))
 	}
+	prefixes := make([]string, 0, len(result.CommonPrefixes))
+	for _, prefix := range result.CommonPrefixes {
+		if scope.allows(prefix) {
+			prefixes = append(prefixes, prefix)
+		}
+	}
+	// The count is of what was returned, not of what the store holds: a count the caller
+	// cannot account for is itself a disclosure. Truncated and the cursors stay as the
+	// store reported them, so a filtered page is still short rather than complete.
 	return ObjectPage{
 		Objects:        objects,
-		CommonPrefixes: append([]string(nil), result.CommonPrefixes...),
+		CommonPrefixes: prefixes,
 		Truncated:      result.IsTruncated,
 		Cursor:         result.ContinuationToken,
 		NextCursor:     result.NextContinuationToken,
-		KeyCount:       result.KeyCount,
+		KeyCount:       len(objects),
 	}, nil
 }
 
@@ -260,23 +311,21 @@ func (i *Instance) CopyObject(ctx context.Context, sourceBucket, sourceKey, dest
 	})
 }
 
-// CopyObjectCond copies with the source conditions evaluated on the version the
-// store copies.
+// CopyObjectCond copies with the source conditions evaluated on the version the store
+// copies.
 //
-// The conditions and the bytes come from one capture inside the store, which is
-// the whole point: a caller naming an ETag is asking for that version, and a copy
-// that re-reads the source after the check can publish a different one. When the
-// store cannot evaluate them, they are checked here against the version this
-// observed and the copy still happens — coherent, but a weaker guarantee, which
-// storage.ConditionalCopyStore documents.
+// The conditions and the bytes come from one capture inside the store: a caller naming
+// an ETag is asking for that version, and a copy that re-read the source after the
+// check could publish a different one. When the store cannot evaluate them they are
+// checked here against the version this observed, and the copy still happens — a weaker
+// guarantee, which storage.ConditionalCopyStore documents.
 func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (Object, error) {
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
 	}
 	// Both ends, and the source is not optional: a copy reads the source and
 	// discloses its bytes at a destination the caller chose, so checking only the
-	// destination lets a write-only caller copy content out — the store reads the
-	// source and the guard sees a permitted write. The source goes first, being
+	// destination lets a write-only caller copy content out. The source goes first, being
 	// the read that can disclose.
 	if err := i.checkResource(authority.ObjectRead, policy.Object(req.SourceBucket, req.SourceKey)); err != nil {
 		return Object{}, err

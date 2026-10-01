@@ -2,6 +2,18 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- A listing disclosed keys the policy denied enumerating. `ListObjects` consulted the
+  policy once, on the prefix the caller asked for, and returned every key the store listed.
+  A per-key deny could not be honoured, and not because of a defect in the matcher: a
+  listing asks about a prefix, and `public/secret` is not `public/secret/`, so an exact
+  selector naming one key never matches the resource a list is decided on. A policy denying
+  enumeration of a key was written, validated and persisted, and did nothing - and a caller
+  who named the denied key as the prefix was permitted outright. Listings are now filtered
+  per key, common prefixes are filtered too, and `KeyCount` counts what was returned rather
+  than what the store holds, because a count the caller cannot account for is itself a
+  disclosure. The decision is `object.list`, matching S3, and the policy is resolved once
+  per listing rather than per key.
+
 - Saved-version selectors are not implementable as written, and the plan now says so
   instead of listing them as open. `Resource` carries a `Version` field nothing sets
   and `Selector` cannot name one, because there is nothing to name: `storage.Store`

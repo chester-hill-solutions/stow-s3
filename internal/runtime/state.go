@@ -89,11 +89,10 @@ func (i *Instance) initializeBucket(ctx context.Context, bucket string) error {
 	if err := i.initializeObjects(ctx, bucket); err != nil {
 		return err
 	}
-	// Reconciliation is skipped for a store that cannot serve multipart. It used
-	// to run unconditionally, so such a store could not be OPENED as soon as it
-	// held a bucket: the capability gated the operations and not the
-	// initialization. An empty store hid it, because the failing case needs a
-	// bucket and a fresh store has none.
+	// Reconciliation is skipped for a store that cannot serve multipart. It used to run
+	// unconditionally, so such a store could not be OPENED once it held a bucket: the
+	// capability gated the operations and not the initialization. An empty store hid it,
+	// because the failing case needs a bucket and a fresh store has none.
 	if i.multipartStore == nil {
 		return nil
 	}

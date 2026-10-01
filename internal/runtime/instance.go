@@ -46,9 +46,8 @@ func Open(options Options) (*Instance, error) {
 	// Initialized for the same reason OpenWithStore initializes, and the asymmetry was a
 	// landmine rather than a live defect: normalizeOptions above rejects every backend but
 	// memory, so this walk currently finds nothing. It matters the day Open accepts a
-	// store that can arrive populated, because starting usage at zero against existing
-	// objects makes MaxBytes and MaxObjects unenforceable rather than merely unenforced,
-	// and skips the open-time ErrQuotaExceeded check.
+	// populated store, because starting usage at zero against existing objects makes
+	// MaxBytes and MaxObjects unenforceable, and skips the open-time ErrQuotaExceeded.
 	if err := instance.initialize(context.Background()); err != nil {
 		return nil, err
 	}
@@ -83,9 +82,8 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 // The resource comes from this instance's own record rather than the store, because the
 // store's answer would have to be read before authorization to know what to authorize. An
 // upload this instance cannot resolve therefore has no established resource, which without
-// a policy is the old behaviour and with one is refused: a policy that cannot be evaluated
-// must not fall back to allow. Reads i.multipart, so it must be called under i.mu, and a
-// policy source is consulted here, which is why Source must not block.
+// a policy is the old behaviour and with one is refused. Reads i.multipart, so it must be
+// called under i.mu, which is why Source must not block.
 func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
 	if i.policy == nil {
 		return i.authority.Check(op)
@@ -116,12 +114,11 @@ func (i *Instance) currentPolicy() (*policy.Set, error) {
 }
 
 // check is the authorization point for operations that name neither a resource nor a
-// collection: the environment's own lifecycle, and listing the namespace. It consults
-// the policy twice over, and both fix a deny that was written and did not apply. A
-// policy that failed validation is refused here too, because a widening policy means
-// the author believed a permission was in force and it is not. And an entry that
-// withholds the operation is honoured, because Reset names no bucket for a selector to
-// match.
+// collection: the environment's own lifecycle, and listing the namespace. It consults the
+// policy twice over, and both fix a deny that was written and did not apply. A policy that
+// failed validation is refused, because a widening policy means the author believed a
+// permission was in force and it is not. And an entry withholding the operation is
+// honoured, because Reset names no bucket for a selector to match.
 func (i *Instance) check(op authority.Operation) error {
 	set, err := i.currentPolicy()
 	if err != nil {
@@ -155,11 +152,10 @@ func (i *Instance) granted(set *policy.Set, op authority.Operation, collection s
 	return set.Deny(i.authority, policy.LocalNamespace, collection, op)
 }
 
-// checkResource is check for an operation on a named resource, and it is where a
-// policy is consulted. A nil policy means no policy, so this is check and the answer is
+// checkResource is check for an operation on a named resource, and it is where a policy
+// is consulted. A nil policy means no policy, so this is check and the answer is
 // unchanged. A policy that failed validation refuses here rather than being skipped: the
-// author wrote one believing it was in force, and the alternative is answering silently
-// with the wider set.
+// author wrote one believing it was in force, and the alternative is answering silently.
 func (i *Instance) checkResource(op authority.Operation, res policy.Resource) error {
 	if i.policy == nil {
 		return i.authority.Check(op)
