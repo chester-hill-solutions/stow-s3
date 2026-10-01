@@ -3,8 +3,8 @@
 > **Transferred to the standalone Agent Collaboration repository on 2026-09-29.**
 > The retained body below is dated handover/review history, not Stow's active backlog.
 > Current scope, implementation status and evidence live in the
-> [collaboration plan](../../agent-collaboration/docs/plan.md) and
-> [capability record](../../agent-collaboration/docs/CAPABILITIES.md).
+> [collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md) and
+> [capability record](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/CAPABILITIES.md).
 > Stow remains an optional public storage integration. No remote repository has been created.
 
 **Date:** 2026-09-29. **Status:** planned separation; no new repository created.

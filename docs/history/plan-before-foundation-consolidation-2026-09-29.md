@@ -231,9 +231,9 @@ No packages were published. See [the implementation record](../implementation-20
 ### Collaboration product transferred to its own repository
 
 The explicitly authorized RT exploration now lives in the standalone local
-[Agent Collaboration repository](../../../agent-collaboration/README.md). Its
-[plan](../../../agent-collaboration/docs/plan.md) owns RT scope/order/status; the
-[capability record](../../../agent-collaboration/docs/CAPABILITIES.md) separates
+[Agent Collaboration repository](https://github.com/chester-hill-solutions/gangcode/blob/main/README.md). Its
+[plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md) owns RT scope/order/status; the
+[capability record](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/CAPABILITIES.md) separates
 deterministic foundation, native diagnostic outcomes and outstanding realtime gates.
 
 Stow retains the historical multiplayer prototype and dated review/handover records.

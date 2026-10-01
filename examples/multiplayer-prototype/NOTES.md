@@ -94,4 +94,4 @@ remains dated evidence of its earlier ownership-based model; it does not impleme
 the new experience. The latest RT-0 starts with continuous native activity/file
 observation and shadow decisions; RT-1 tests useful awareness and bounded steering
 before conditional guarded-editor expansion. Native observation does not prevent stale
-writes. Current RT work lives in the [standalone collaboration repository](../../../agent-collaboration/docs/plan.md). This example remains historical evidence.
+writes. Current RT work lives in the [standalone collaboration repository](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md). This example remains historical evidence.

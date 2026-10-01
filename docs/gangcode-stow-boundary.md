@@ -4,7 +4,7 @@
 current development source and GangCode's standalone repository. This is an
 ownership and integration reference, not another implementation queue or a claim
 that planned capabilities have shipped. Stow's [consolidated plan](storage-foundation-plan.md)
-and [GangCode's plan](../../agent-collaboration/docs/plan.md) retain their work orders.
+and [GangCode's plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md) retain their work orders.
 
 **Stow owns the durable, authorized storage facts and their delivery. GangCode owns
 what those facts mean for people and agents, and how they coordinate their work.**
