@@ -225,9 +225,25 @@ func repoRoot() string {
 // decrease, so a whole verb added with no tests leaves it satisfied.
 //
 // Both are measured because neither is sufficient alone. The ratio cannot be satisfied
-// by deleting code, but across 55,000 scanned lines it is an integer and four added
+// by deleting code, but across 35,000 scanned lines it is an integer and four added
 // comments move it by zero. The count is exact, so one line fails, but deleting
 // uncommented code would satisfy it. A per-file ceiling is worse than both.
+//
+// The budget covers non-test Go only. Test prose and production prose are different
+// claims: a test comment says what a test proves, and a production comment says why the
+// system is shaped as it is. Counting them in one budget made them compete, and the
+// competition ran the wrong way. Half the budget was test prose, so a slice that
+// documented its tests properly had to fund them by deleting documentation from code it
+// never touched — writing about why a policy denies a workspace destroy cost the
+// two-level admin rule out of internal/s3api and the upstream status mapping out of
+// internal/s3api/errors.go. That made prose in shipped code the cheapest thing in the
+// repository to delete, which is the opposite of what this ratchet is for.
+//
+// Nothing is lost. Test files are held to the coverage ratchet, to gofmt and vet, to the
+// per-file size ceiling and to every structural rule here bar `any`, which was already
+// scoped away from them. A test whose comment is doing the explaining is worth reading
+// either way. What is lost is the pressure to keep a shipped file under a number partly
+// set by a test it has nothing to do with.
 const (
 	commentLinesRule = "comment-lines"
 	commentRatioRule = "comment-ratio"
@@ -267,7 +283,12 @@ func scanRoots(roots []string) (report, error) {
 			if entry.IsDir() || !strings.HasSuffix(path, ".go") {
 				return nil
 			}
-			lines.add(path)
+			// Test files are scanned for every structural rule and excluded from the
+			// comment budget alone. See commentLinesRule for why the two are counted
+			// apart.
+			if !strings.HasSuffix(path, "_test.go") {
+				lines.add(path)
+			}
 			return scanFile(path, &result, seen)
 		}); err != nil {
 			return report{}, err

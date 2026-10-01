@@ -48,6 +48,7 @@ npm run check:dry
 - CI checks out full history (`fetch-depth: 0`) and compares against the explicit parent/merge-base; a shallow checkout is a hard failure, never a skipped ratchet.
 - Inline suppressions are themselves counted where the check can detect them. A suppression requires a precise explanation and does not reset the ratchet.
 - Existing test fixtures and generated output are excluded only when their exclusion is documented in the check configuration.
+- The Go comment budget (`comment-lines`, `comment-ratio`) covers **non-test Go only**. Test files are excluded from the comment budget alone; the `any` rule was already scoped away from tests before this, and every other structural rule — complexity, parameter count, function length, file size — still applies to them. A test comment says what a test proves; a production comment says why the system is shaped as it is; counting them in one budget made them compete, and half the budget was test prose, so documenting a test properly had to be funded by deleting documentation from unrelated shipped code. Test files remain held to the coverage ratchet, `gofmt` and `go vet`.
 
 ## Go standards
 
@@ -93,7 +94,7 @@ Generated `packages/stow-s3/dist` is checked into the repository for release rep
 Long platform and gate arguments live here so the code carries the rule and this
 document carries the reasoning. Each was originally a comment block; the comment
 line ratchet (`comment-lines`, see [Ratchet policy](#ratchet-policy)) makes prose
-in `.go` the most expensive place in the repository to keep anything.
+in shipped `.go` the most expensive place in the repository to keep anything.
 
 - **Windows parent-directory sync.** `atomicfile.syncDir` is a no-op on Windows,
   and that is the platform's answer rather than a gap. `os.Open` on a directory

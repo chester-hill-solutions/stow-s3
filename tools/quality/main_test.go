@@ -287,6 +287,71 @@ func TestScanIsQuietOnCleanCode(t *testing.T) {
 	}
 }
 
+// The comment budget covers non-test Go alone, and this is what holds that. It
+// is a test about scope rather than about a number, so it cannot be satisfied by
+// editing the baseline: adding comment lines to a _test.go must move neither
+// count, and adding one to a production file must move both.
+//
+// The failure this guards against is a ratchet that stopped measuring the code it
+// was written for. Test prose was half the budget, so a slice that documented its
+// tests properly had to delete documentation from shipped code it never touched.
+func TestCommentBudgetCountsNonTestGoOnly(t *testing.T) {
+	dir := t.TempDir()
+	root := filepath.Join(dir, "internal", "scoped")
+	if err := os.MkdirAll(root, 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	production := "package scoped\n\n" +
+		"// A line of production prose.\n" +
+		"func kept() int { return 1 }\n"
+	if err := os.WriteFile(filepath.Join(root, "kept.go"), []byte(production), 0o644); err != nil {
+		t.Fatalf("write production: %v", err)
+	}
+
+	measure := func() (comment, ratio int) {
+		t.Helper()
+		result, err := scanRoots([]string{filepath.Join(dir, "internal")})
+		if err != nil {
+			t.Fatalf("scan: %v", err)
+		}
+		return result.Counts[commentLinesRule], result.Counts[commentRatioRule]
+	}
+
+	beforeComment, beforeRatio := measure()
+	if beforeComment != 1 {
+		t.Fatalf("comment-lines = %d, want the single production comment", beforeComment)
+	}
+	if beforeRatio == 0 {
+		t.Fatal("comment-ratio = 0, so the ratio is not being computed at all")
+	}
+
+	// A test file full of prose moves neither count. It is still scanned for the
+	// structural rules, which is the half of the scope that matters.
+	tests := "package scoped\n\n" +
+		"// A line of test prose.\n" +
+		"// Another, because a test explaining what it proves is the point.\n" +
+		"// A third.\n" +
+		"func kept() int { return 1 }\n"
+	if err := os.WriteFile(filepath.Join(root, "kept_test.go"), []byte(tests), 0o644); err != nil {
+		t.Fatalf("write test: %v", err)
+	}
+	if got, _ := measure(); got != beforeComment {
+		t.Errorf("comment-lines = %d after adding test prose, want it unchanged at %d", got, beforeComment)
+	}
+
+	// And prose in shipped code still costs what it always did.
+	if err := os.WriteFile(filepath.Join(root, "kept.go"), []byte(production+"// More production prose.\n"), 0o644); err != nil {
+		t.Fatalf("rewrite production: %v", err)
+	}
+	gotComment, gotRatio := measure()
+	if gotComment != beforeComment+1 {
+		t.Errorf("comment-lines = %d after adding production prose, want %d", gotComment, beforeComment+1)
+	}
+	if gotRatio <= beforeRatio {
+		t.Errorf("comment-ratio = %d after adding production prose, want it above %d", gotRatio, beforeRatio)
+	}
+}
+
 // The checked-in baseline must describe the tree it is checked into. A stale
 // entry here is not a style problem: it is the gate reporting a debt that no
 // longer exists, which is the signal that lowers the floor.
