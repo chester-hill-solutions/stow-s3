@@ -93,6 +93,13 @@ API are outside the current plan. Arbitrary edge execution is not a storage clai
 
 ## Amendments
 
+- 2026-10-01: Execution clause amended by
+  [ADR 0018](0018-snapshot-isolation-enforced-egress.md). A caller may now supply an
+  execution environment in which delegated agents run, when that environment is what
+  makes coordination enforceable: snapshot isolation so no two agents hold the same
+  bytes, and an egress gate that may refuse a write. This is a boundary on how a
+  caller may isolate an agent, not a claim on execution. The storage clause above is
+  unchanged, and the list of caller-owned responsibilities is unchanged.
 - 2026-09-29: Accepted from the user's explicit storage-first product decision;
   narrows ADR 0013's execution obligations and defers the work-session proposal.
 - 2026-09-29: Reconciled all repository planning queues into the canonical plan;

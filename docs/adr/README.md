@@ -44,10 +44,11 @@ the way it is.
 | [0011](0011-local-is-the-default-mode.md) | `accepted` | 0001 | — |
 | [0012](0012-run-through-serves-only-its-own-buckets.md) | `accepted` | — | — |
 | [0013](0013-task-session-attempt-artifact.md) | `narrowed` | — | 0014 (execution ownership and prerequisites) |
-| [0014](0014-storage-product-caller-owned-execution.md) | `accepted` | — | — |
+| [0014](0014-storage-product-caller-owned-execution.md) | `accepted` (amended 2026-10-01: execution clause) | — | — |
 | [0015](0015-durable-workspace-notifications.md) | `accepted` | — | — |
 | [0016](0016-scoped-access-encrypted-cache.md) | `accepted` | — | — |
 | [0017](0017-workers-profile-qualifies-platform-objects.md) | `proposed` | — | — |
+| [0018](0018-snapshot-isolation-enforced-egress.md) | `accepted` | — | — |
 
 ## The drift this index exists to fix
 
