@@ -50,6 +50,17 @@ under test is worse than no gate, because it is green.
 I cannot fix this: `orgs/chester-hill-solutions/packages/…` returns 404 for me, so I
 have no org admin. See [#28](https://github.com/chester-hill-solutions/stow/issues/28).
 
+**This is now blocked automatically.** `scripts/check-publish-visibility.mjs` requests
+each package with no credentials and refuses the release if the registry demands them.
+It runs *before* the publish steps, because visibility belongs to a package and not to a
+release: publishing 0.3.0 would not change the answer, and checking afterwards could only
+fail a job that had already published. Today it reports all five as private and exits 1,
+so a tag cut before the packages are made public stops there rather than at the publish
+step.
+
+A rehearsal does not run it, because a rehearsal runs on a branch and this only has
+anything to say about a tag.
+
 The three ways out, and why the first:
 
 | | what it takes | consequence |

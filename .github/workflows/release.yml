@@ -416,6 +416,19 @@ jobs:
           done
           ls -l dist/wheel
 
+      # Before anything publishes, and before this step rather than after it: the
+      # 0.2.0 release published five packages that a stranger could not install, and
+      # nothing noticed, because every step that touched them carried a token and the
+      # local consumer was installed from a tarball rather than from the registry.
+      #
+      # Visibility belongs to a package and not to a release, so publishing 0.3.0
+      # would not fix it. Placing the check here makes it advice; after the publish it
+      # would only be able to fail a job that has already published, which is the
+      # half-done release this workflow already avoids at the PyPI step.
+      - name: Refuse to publish what nobody can install
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: node scripts/check-publish-visibility.mjs
+
       # Everything from here to the end of the job publishes. Each step says so.
       - name: Publish platform packages
         if: startsWith(github.ref, 'refs/tags/v')
