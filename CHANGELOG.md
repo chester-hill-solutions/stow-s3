@@ -2,6 +2,17 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- Saved-version selectors are not implementable as written, and the plan now says so
+  instead of listing them as open. `Resource` carries a `Version` field nothing sets
+  and `Selector` cannot name one, because there is nothing to name: `storage.Store`
+  has no versioned read, the public `pkg/stow.Object` exposes an `ETag` and no version
+  identifier, the S3 surface refuses `versionId`, and two writes to one key leave the
+  first unreadable. A selector naming a saved version could never match, which is the
+  `KindWorkspace` shape - defined, persisted, matched, and built by no enforcement
+  point - and that was removed rather than wired up. The contract's version language
+  is about retained historical content, and the only such content Stow holds is a
+  checkpoint, so this was the same question as checkpoint authorization all along.
+
 - The Go quality gate could be raised to approve a regression. `tools/quality`
   was both the scanner and the gate, and its history check compared the *scan*
   against the parent baseline rather than the *committed baseline* against the

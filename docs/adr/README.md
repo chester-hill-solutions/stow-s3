@@ -1,6 +1,6 @@
 # Architecture decision records
 
-Sixteen decisions, in the order they were taken. This file is the index: it is where
+Seventeen decisions, in the order they were taken. This file is the index: it is where
 to look to find out **what is in force**, and each ADR's own frontmatter is where to
 look for what it decided.
 
@@ -47,6 +47,7 @@ the way it is.
 | [0014](0014-storage-product-caller-owned-execution.md) | `accepted` | — | — |
 | [0015](0015-durable-workspace-notifications.md) | `accepted` | — | — |
 | [0016](0016-scoped-access-encrypted-cache.md) | `accepted` | — | — |
+| [0017](0017-workers-profile-qualifies-platform-objects.md) | `proposed` | — | — |
 
 ## The drift this index exists to fix
 

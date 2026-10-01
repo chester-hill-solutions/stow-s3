@@ -334,8 +334,32 @@ Four things in it are traps:
   be silently undone and neither host would know it had lost.
 
 Not yet implemented, and therefore not yet claimed: checkpoint capture, which has
-no operation to be denied with; scoped enumeration counts; and any handling of a
-saved version selector.
+no operation to be denied with; and scoped enumeration counts.
+
+**A saved-version selector is not implementable as written, and adding one would
+repeat a defect already removed.** `Resource` carries a `Version` field and
+nothing sets it. `Selector` has no way to name one. And there is nothing to name:
+`storage.Store` has no versioned read — `GetObject` takes a bucket and a key and
+nothing else — the public `pkg/stow.Object` exposes an `ETag` and no version
+identifier at all, and the S3 surface answers `versionId` with
+`InvalidArgument: versionId is not supported`. History is not retained: two writes
+to one key leave the second readable and the first gone, which a workspace write
+check confirms directly.
+
+So a selector naming a saved version could never match, because no operation
+produces a resource that names one. That is the `KindWorkspace` shape exactly — a
+selector that is defined, persisted, matched, and built by no enforcement point —
+and it was removed rather than wired up. A version selector added now would be
+creating that dead selector rather than connecting an existing one, which is
+strictly worse.
+
+What the contract's "versions are selected explicitly when historical content is
+involved" is actually about is retained historical content, and the only retained
+historical content Stow has is a **checkpoint**: a sealed, hashed, durable snapshot
+of a workspace that `diff`, `export` and `restore` read afterwards. Checkpoint
+content is selected by checkpoint ID, which the contract already treats as not
+being permission. So the version question and the checkpoint question are one
+question, and it is the checkpoint operation that does not yet exist.
 
 Two items were on this list and are now done, and are named here because a list
 that keeps claiming shipped enforcement is unimplemented is a list nobody can
