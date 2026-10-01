@@ -333,11 +333,27 @@ Four things in it are traps:
   critical section. Without it, a revocation that lost a race to a re-grant would
   be silently undone and neither host would know it had lost.
 
-Not yet implemented, and therefore not yet claimed: enforcement outside the object
-path (checkpoints, background retries, run-through propagation); scoped enumeration
-counts; any handling of a saved version selector; and consulting a revision
-*per operation* rather than at open, so a revocation takes effect without a
-restart.
+Not yet implemented, and therefore not yet claimed: checkpoint capture, which has
+no operation to be denied with; scoped enumeration counts; and any handling of a
+saved version selector.
+
+Two items were on this list and are now done, and are named here because a list
+that keeps claiming shipped enforcement is unimplemented is a list nobody can
+trust. A revision *is* consulted per operation, through `policy.Source`, so a
+revocation is effective when it is issued rather than when the process restarts.
+And run-through propagation *is* enforced, at two points: `upstreamEnabled` on
+the read side, which every upstream read passes through, and the outbox funnel on
+the write side, which asks per entry rather than only on the path that enqueued
+it. Prewarm and provenance recording reach upstream through those chokepoints
+rather than around them.
+
+Background retries are enforced at the same funnel, and that was checked rather
+than assumed: every call site that touches `a.upstream` was enumerated, and each
+one is downstream of either `upstreamEnabled` or `decideUpstreamWrite`. A path
+that reaches upstream with a routing check but no permission check would be a
+bypass, and the one candidate — `recordUpstreamState`, which checks
+`upstreamReachable` and not the policy — is reached only from intent enqueue,
+which is itself guarded by `decideUpstreamWrite`.
 
 ### Where the runtime enforces this
 

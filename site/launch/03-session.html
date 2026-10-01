@@ -5,31 +5,35 @@
     <link rel="stylesheet" href="card.css" />
   </head>
   <body>
-    <!-- 03 Scoped storage. The lifecycle is the product; show the whole arc. -->
+    <!-- 03 The workspace lifecycle. Five explicit verbs, and the lifecycle is
+         the product rather than a convenience wrapper around a bucket. -->
     <div class="card">
-      <div class="wordmark"><span class="box"></span><span>STOW <b>S3</b></span></div>
+      <div class="wordmark"><span class="box"></span><span>STOW</span></div>
 
-      <h1 class="mt">One call.<br /><em>Private S3.</em></h1>
+      <h1 class="mt" style="font-size: 140px">
+        Prepare, work, checkpoint,<br /><em>diff, hand off.</em>
+      </h1>
 
-      <div class="steps">
-        <div class="call">withStow()</div>
+      <div class="steps" style="margin-top: 78px">
+        <div class="step">prepare</div>
         <div class="chev">&#10230;</div>
-        <div class="step">start</div>
+        <div class="step on">work</div>
         <div class="chev">&#10230;</div>
-        <div class="step on">bucket</div>
+        <div class="step on">checkpoint</div>
         <div class="chev">&#10230;</div>
-        <div class="step on">your code</div>
+        <div class="step">diff</div>
         <div class="chev">&#10230;</div>
-        <div class="step">cleanup</div>
+        <div class="step">export</div>
       </div>
 
-      <p class="sub" style="max-width: 60ch; font-size: 40px; margin-top: 62px">
-        The server and its data are gone before the call returns. It cannot
-        inherit your cloud configuration.
+      <p class="sub" style="max-width: 62ch; font-size: 38px; margin-top: 58px">
+        Every checkpoint carries a path, a size, a mode and a SHA-256 per file.
+        The diff is computed from those hashes, so it says what the agent actually
+        changed rather than what you hoped it changed.
       </p>
 
       <div class="foot">
-        <span class="tag">TypeScript &middot; Python</span>
+        <span class="tag">Nothing is retained implicitly</span>
         <span class="url">github.com/chester-hill-solutions/stow-s3</span>
       </div>
     </div>

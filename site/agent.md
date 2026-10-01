@@ -1,10 +1,10 @@
-# Stow S3 — agent instructions
+# Stow — agent instructions
 
-You are reading this because someone pointed you at Stow S3, an S3-compatible
-object store and task workspace that runs on the local machine. It speaks real
-S3 over HTTP with SigV4. For coding tasks, Stow can prepare an isolated working
-directory from declared local inputs; for disposable S3 tests, a scoped session
-cleans itself up on close.
+You are reading this because someone pointed you at Stow, a local object store
+and task workspace. Its centre of gravity is the workspace: a real directory with
+a durable identity, verified checkpoints, and a handoff you can hand to another
+host. It also speaks real S3 over HTTP with SigV4, for the part of a job that is
+genuinely a disposable S3 test.
 
 ## When to reach for it
 
@@ -35,7 +35,7 @@ Typical uses: a test that uploads and downloads, a build step that passes an
 artifact between stages, an agent that needs scratch space, or a fixture that
 would otherwise need a live bucket.
 
-## Checkpoints for agent work (0.3.0 development tree)
+## Checkpoints and handoff for agent work (0.3.0 development tree)
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent
 works. Before saving, stop known writers and write objective, progress and next

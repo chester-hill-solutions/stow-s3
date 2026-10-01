@@ -1,13 +1,14 @@
-# Stow S3
+# Stow
 
-> S3 without the cloud. A tiny, open-source S3-compatible object store for
-> development, tests, CI, and agents.
+> Working storage an agent can hand off. A real directory with a durable identity
+> and verified checkpoints — and an S3-compatible store for tests and CI.
 
 Stow is an Apache 2.0 S3-compatible object store and filesystem workspace that
 runs on the local machine. It speaks real S3 over HTTP with SigV4, so existing
-SDK code works unchanged. Coding agents can start in a persistent isolated
-workspace prepared from declared local inputs; scoped S3 sessions remain
-disposable and delete themselves when closed.
+SDK code works unchanged. An agent can start in a persistent isolated workspace
+prepared from declared local inputs, checkpoint it, diff what changed, and hand
+the checkpoint to another host; scoped S3 sessions remain disposable and delete
+themselves when closed.
 
 ## Start here
 

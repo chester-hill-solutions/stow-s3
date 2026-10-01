@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stow S3 — S3 without the cloud</title>
+    <title>Stow — working storage an agent can hand off</title>
     <meta
       name="description"
-      content="Stow is a tiny, open-source S3-compatible object store for development, tests, CI, and agents. Run it locally, use the S3 clients you already know, and throw it away when you're done."
+      content="Stow gives an agent a real directory with a durable identity and verified checkpoints. Checkpoint it, diff what changed, hand it to another host, and adopt it there. An S3-compatible store for tests and CI comes with it."
     />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Stow S3 — S3 without the cloud" />
+    <meta property="og:title" content="Stow — working storage an agent can hand off" />
     <meta
       property="og:description"
-      content="A tiny, open-source S3-compatible object store for development, tests, CI, and agents. No AWS account. No infrastructure."
+      content="A real directory with a durable identity, verified checkpoints, and a diff that says what an agent actually changed. An S3-compatible store for tests and CI comes with it."
     />
     <meta property="og:image" content="/images/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -34,12 +34,12 @@
     <div class="shell">
       <header class="masthead">
         <a href="/" aria-label="Stow home">
-          <img src="/assets/wordmark.svg" alt="Stow S3" width="186" height="28" />
+          <img src="/assets/wordmark.svg" alt="Stow" width="186" height="28" />
         </a>
         <nav aria-label="Primary">
           <a href="#problem">Why</a>
-          <a href="#session">Sessions</a>
-          <a href="#surfaces">Languages</a>
+          <a href="#workspace">Workspaces</a>
+          <a href="#surfaces">S3</a>
           <a
             href="https://github.com/chester-hill-solutions/stow-s3"
             rel="noreferrer noopener"
@@ -54,15 +54,17 @@
           <p class="eyebrow">Free &middot; Open source &middot; Apache 2.0</p>
 
           <div class="hero-main">
-            <h1>S3 <em>without the cloud.</em></h1>
+            <h1>Working storage an agent can <em>hand off.</em></h1>
             <p class="lede">
-              A tiny, open-source object store that speaks Amazon S3, for
-              development, tests, CI, and agents. Run it locally, use the S3
-              clients you already know, and throw it away when you're done.
+              Stow gives an agent a real directory with a durable identity and
+              verified checkpoints. When the run ends — or a different agent picks
+              it up — the checkpoint says exactly what changed, and you decide
+              where it lands. An S3-compatible store for tests and CI comes with
+              it.
             </p>
 
             <div class="cta">
-              <a class="btn btn-primary" href="#session">Get started</a>
+              <a class="btn btn-primary" href="#workspace">See the lifecycle</a>
               <a
                 class="btn btn-ghost"
                 href="https://github.com/chester-hill-solutions/stow-s3"
@@ -77,9 +79,6 @@
           </div>
 
           <div class="hero-side">
-            <!-- The install line below is the launch's first promise. It only
-                 resolves once @chester-hill-solutions/stow-s3 is published to npm; see the launch
-                 checklist in docs/ before this page goes live. -->
             <div class="install">
               <span class="prompt" aria-hidden="true">$</span>
               <code id="install-cmd">npm install @chester-hill-solutions/stow-s3</code>
@@ -87,12 +86,12 @@
             </div>
 
             <p class="reassure">
-              No AWS account. No infrastructure. Use the S3 clients you already
-              know.
+              No AWS account. No infrastructure. No credentials to rotate. Not
+              production storage, and it does not pretend to be a sandbox.
             </p>
 
             <ul class="proof">
-              <li><b>10.6 MB</b><span>single binary</span></li>
+              <li><b>11.7 MB</b><span>single binary</span></li>
               <li><b>0</b><span>cloud services</span></li>
               <li><b>4</b><span>language surfaces</span></li>
               <li class="proof-note">
@@ -103,142 +102,161 @@
         </section>
 
         <!-- Real output from the real binary, captured from
-             `./bin/stow-s3 serve --port 0 --backend memory`. -->
-        <div class="term" role="figure" aria-label="Terminal output from stow serve">
+             `stow-s3 workspace checkpoint` against a prepared workspace. -->
+        <div class="term" role="figure" aria-label="A workspace checkpoint between two points">
           <div class="term-bar">
             <span class="dot" aria-hidden="true"></span>
-            <span>stow serve --port 0 --backend memory</span>
+            <span>what the agent left behind</span>
             <span class="spacer"></span>
-            <span>local mode</span>
-          </div>
-          <pre><span class="p">$ </span><b>stow serve --port 0 --backend memory</b>
-stow mode: local
-  cache policy: none
-  write policy: local-only
-stow listening on <span class="s">http://127.0.0.1:34781</span> (mode=local)
-STOW_READY endpoint=http://127.0.0.1:34781 access_key=… mode=local
-<span class="c"># credentials are printed for a hand-run server only; a session
-# receives them over a file descriptor instead.</span></pre
-          >
-        </div>
-
-        <!-- ------------------------------------------------- agent handoff -->
-        <div class="term" role="figure" aria-label="Agent instructions summary">
-          <div class="term-bar">
-            <span class="dot" aria-hidden="true"></span>
-            <span>For coding agents</span>
-            <span class="spacer"></span>
-            <button type="button" data-copy="#agent-brief" class="term-copy">
+            <button type="button" data-copy="#checkpoint-brief" class="term-copy">
               Copy
             </button>
           </div>
-          <pre id="agent-brief"><span class="c"># Stow S3</span>
-Local S3-compatible object store. Apache 2.0. <span class="k">Not</span> production storage.
+          <pre id="checkpoint-brief"><span class="c"># Stow</span>
+Working storage an agent can hand off. Apache 2.0. <span class="k">Not</span> production storage.
 
-<span class="k">install</span>  npm install @chester-hill-solutions/stow-s3 @aws-sdk/client-s3
-<span class="k">run</span>      await withStow(async ({ s3, bucket }) =&gt; { <span class="c">/* normal S3 calls */</span> })
-<span class="k">verify</span>   npx stow-doctor
-<span class="k">read</span>     <b>https://stow.chesterhillsolutions.ca/agent.md</b>
-<span class="k">source</span>   github.com/chester-hill-solutions/stow-s3
+<span class="k">prepare</span>  stow-s3 workspace prepare --manifest task.json
+<span class="k">work</span>      <span class="c"># the agent writes into root/</span>
+<span class="k">checkpoint</span> stow-s3 workspace checkpoint --id ws_84845327e66e83fd
+<span class="k">diff</span>      stow-s3 workspace diff --from cp_5fac&hellip; --to cp_b19c&hellip;
+<span class="k">hand off</span>  stow-s3 workspace export --checkpoint-id cp_5fac&hellip; --output run.tar
+<span class="k">elsewhere</span>  stow-s3 workspace adopt --handoff run.json
+<span class="k">read</span>      <b>https://stow.chesterhillsolutions.ca/agent.md</b>
 
-<span class="c"># Fetching this page with Accept: text/markdown returns agent.md
-# instead of HTML, and /llms.txt is an index of both.</span></pre>
+<span class="c"># S3 for tests and CI, no AWS account:
+# https://stow.chesterhillsolutions.ca/agent.md#s3</span></pre>
         </div>
 
         <!-- ------------------------------------------------------------- 01 -->
         <section class="section" id="problem">
           <span class="num">01</span>
-          <h2>You shouldn't need AWS to test S3.</h2>
+          <h2>An agent's working state is the one thing you can't get back.</h2>
           <p>
-            Your application writes to S3, so now your test suite needs a bucket.
-            The usual choices are a real cloud bucket, a mock that only implements
-            the three calls this one test happens to make, or a container heavier
-            than the thing you're testing.
+            The run produced something. A report, a patch, a dataset, a
+            half-finished refactor. Then the job ended, and it went into the
+            runner's scratch directory, which is not a place you can come back to.
           </p>
           <p>
-            <strong>Stow is the fourth option.</strong> A real S3 API, on your own
-            machine, that costs nothing and leaves no trace. If your code can talk
-            to S3, it can talk to Stow — same SDK, same SigV4, same
-            <code>PutObject</code>.
+            The usual alternatives are worse than losing it. Point the agent at a
+            cloud bucket and you have handed an agent's intermediate output to
+            someone else's account, with their retention policy and their blast
+            radius. Keep it on the runner's disk and it disappears with the job.
+            Neither gives you a way to ask <em>what actually changed</em>, because
+            neither records anything.
+          </p>
+          <p>
+            <strong>Stow records it.</strong> The workspace is a real directory
+            with a durable identity that outlives the process that made it, and a
+            checkpoint is a sealed manifest of what was inside — every path, its
+            size, its mode, its SHA-256.
           </p>
 
           <div class="stat-row">
             <div>
-              <b>&mdash;</b>
-              <span>no credentials to rotate</span>
+              <b>sha256</b>
+              <span>per file, per checkpoint</span>
             </div>
             <div>
-              <b>1</b>
-              <span>process to start</span>
+              <b>durable</b>
+              <span>identity outlives the process</span>
             </div>
             <div>
-              <b>&infin;</b>
-              <span>buckets, thrown away after</span>
+              <b>you decide</b>
+              <span>where the checkpoint lands</span>
             </div>
           </div>
         </section>
 
         <!-- ------------------------------------------------------------- 02 -->
-        <section class="section" id="session">
+        <section class="section" id="workspace">
           <span class="num">02</span>
-          <h2>One call. Private S3.</h2>
+          <h2>Prepare, work, checkpoint, diff, hand off.</h2>
           <p>
-            A session is the shortest path from nothing to a working S3 client. It
-            starts a private server on an ephemeral port, creates a bucket, waits
-            until the server reports itself ready, and hands back a client already
-            pointed at it. On close it stops the server and deletes the data
-            directory.
+            Five verbs, all of them explicit. Nothing is retained implicitly, and
+            nothing leaves the machine unless you ask it to.
           </p>
 
-          <div class="term" role="figure" aria-label="TypeScript example using withStow">
+          <div class="term" role="figure" aria-label="Preparing a workspace">
             <div class="term-bar">
               <span class="dot" aria-hidden="true"></span>
-              <span>test/s3.test.ts</span>
+              <span>stow-s3 workspace prepare</span>
               <span class="spacer"></span>
-              <span>TypeScript</span>
+              <span>declares the inputs</span>
             </div>
-            <pre><span class="k">import</span> { PutObjectCommand, GetObjectCommand } <span class="k">from</span> <span class="s">"@aws-sdk/client-s3"</span>;
-<span class="k">import</span> { withStow } <span class="k">from</span> <span class="s">"@chester-hill-solutions/stow-s3"</span>;
+            <pre><span class="c"># task.json — inputs name a source and a destination inside the workspace</span>
+{ "version": 1, "root": "<span class="s">/srv/run/ws</span>",
+  "inputs": [{ "source": "<span class="s">./report.md</span>", "destination": "report.md" }] }
 
-<span class="k">await</span> withStow(<span class="k">async</span> ({ s3, bucket }) =&gt; {
-  <span class="k">await</span> s3.<span class="k">send</span>(<span class="k">new</span> <span class="s">PutObjectCommand</span>({
-    Bucket: bucket,
-    Key: <span class="s">"input.json"</span>,
-    Body: <span class="s">'{"task":"summarize"}'</span>,
-  }));
-
-  <span class="k">const</span> got = <span class="k">await</span> s3.<span class="k">send</span>(<span class="k">new</span> <span class="s">GetObjectCommand</span>({ Bucket: bucket, Key: <span class="s">"input.json"</span> }));
-  <span class="k">await</span> got.Body.transformToString();
-});
-<span class="c">// the server and its data are gone by the time this resolves</span></pre
+$ stow-s3 workspace prepare --manifest task.json
+{
+  <span class="k">"workspace_id"</span>: <span class="s">"ws_84845327e66e83fd"</span>,
+  <span class="k">"root"</span>: <span class="s">"/srv/run/ws"</span>,
+  <span class="k">"bucket"</span>: <span class="s">"stow-workspace-a2231176545311e8"</span>,
+  <span class="k">"seeded_objects"</span>: 1,
+  <span class="k">"base_identity"</span>: <span class="s">"sha256:964580fcc01265bd…"</span>,
+  <span class="k">"capabilities"</span>: { <span class="k">"backend"</span>: <span class="s">"workspace"</span>, <span class="k">"max_bytes"</span>: 67108864, <span class="k">"max_objects"</span>: 10000,
+                   <span class="k">"persistent"</span>: true, <span class="k">"multipart"</span>: true },
+  <span class="k">"authority"</span>: [<span class="s">"object.read"</span>, <span class="s">"object.write"</span>, <span class="s">"object.delete"</span>, <span class="s">"object.list"</span>, <span class="s">"bucket.*"</span>, <span class="s">"environment.reset"</span>]
+}</pre
           >
-        </div>
+          </div>
 
           <p>
-            Four guarantees matter when something else is running the test
-            suite, and the server enforces all of them:
+            The capability block is reported, not promised. Limits and the
+            authority actually granted come back from the server, so a caller reads
+            them rather than assuming them.
           </p>
+
+          <div class="term" role="figure" aria-label="Diffing two checkpoints">
+            <div class="term-bar">
+              <span class="dot" aria-hidden="true"></span>
+              <span>stow-s3 workspace diff</span>
+              <span class="spacer"></span>
+              <span>what the agent changed</span>
+            </div>
+            <pre>$ stow-s3 workspace diff --from cp_5fac28a6&hellip; --to cp_b19c02e4&hellip; --registry-dir ./registry
+{
+  <span class="k">"changes"</span>: [
+    {
+      <span class="k">"path"</span>: <span class="s">"report.md"</span>, <span class="k">"kind"</span>: <span class="s">"changed"</span>,
+      <span class="k">"from"</span>: { <span class="k">"size"</span>: 28, <span class="k">"mode"</span>: 420,
+                <span class="k">"sha256"</span>: <span class="s">"8568539c13e1dd98…"</span> },
+      <span class="k">"to"</span>:   { <span class="k">"size"</span>: 45, <span class="k">"mode"</span>: 420,
+                <span class="k">"sha256"</span>: <span class="s">"23270d02488298ea…"</span> }
+    }
+  ]
+}</pre
+          >
+          </div>
 
           <div class="scope">
             <div class="yes">
-              <h3>A session cannot</h3>
+              <h3>A checkpoint travels</h3>
               <ul>
-                <li>Inherit your cloud config</li>
-                <li>Outlive your process</li>
-                <li>Report a limit it hasn't checked</li>
-                <li>Grow past 16 MiB / 1,000 objects</li>
+                <li>Files with modes and SHA-256 hashes</li>
+                <li>Logical buckets and object bytes, portably</li>
+                <li>Content type, user metadata, checksums</li>
+                <li>Declared Git provenance, detached</li>
+                <li>Relative working directory</li>
               </ul>
             </div>
-            <div class="yes">
-              <h3>It does</h3>
+            <div class="no">
+              <h3>It does not</h3>
               <ul>
-                <li>Strip STOW_*, S3_*, AWS_* first</li>
-                <li>Exit if its parent dies, killed or not</li>
-                <li>Read capabilities off the server</li>
-                <li>Enforce limits server-side, every request</li>
+                <li>Private <code>.stow</code> state or credentials</li>
+                <li>Your <code>.git</code> or process memory</li>
+                <li>Anything outside the workspace root</li>
+                <li>Effects outside the filesystem</li>
+                <li>Original object version IDs, guaranteed</li>
               </ul>
             </div>
           </div>
+
+          <p>
+            A checkpoint is not a permission and not a handle. Handing one over does
+            not grant authority: adoption on the far side is a separate decision, by
+            you, about a directory that now belongs to someone else's run.
+          </p>
         </section>
 
         <!-- ------------------------------------------------------------- 03 -->
@@ -246,9 +264,9 @@ Local S3-compatible object store. Apache 2.0. <span class="k">Not</span> product
           <span class="num">03</span>
           <h2>S3 where you need it.</h2>
           <p>
-            The protocol is the same everywhere. What changes is how you reach it:
-            four language surfaces, three storage modes, and the S3 clients you
-            already have.
+            The same binary speaks Amazon S3, for the part of your work that is
+            genuinely a test. Four language surfaces, three storage modes, and the
+            S3 clients you already have. No AWS account anywhere in it.
           </p>
 
           <ul class="grid">
@@ -268,18 +286,21 @@ Stow.<span class="k">connect</span>(endpoint)</pre>
             </li>
             <li class="card">
               <h3>Go</h3>
-              <span class="installline"><b>go get</b> /pkg/stow</span>
+              <span class="installline"
+                ><b>go get</b>
+                github.com/chester-hill-solutions/stow-s3/pkg/stow</span
+              >
               <pre>rt, _ := stow.<span class="k">Open</span>(
   stow.Options{
-    Backend: memory,
+    Backend: stow.BackendMemory,
   },
 )
 <span class="c">// no listener, no creds</span></pre>
             </li>
             <li class="card">
               <h3>WebAssembly</h3>
-              <span class="installline"><b>3.7 MB</b> runtime</span>
-              <pre>const host = <span class="k">await</span>
+              <span class="installline"><b>5.8 MB</b> runtime</span>
+              <pre><span class="k">const</span> host = <span class="k">await</span>
   loadNodeWasmHost();
 EmbeddedStow.<span class="k">open</span>(host);
 s.putObject(b, k, data)
@@ -292,7 +313,9 @@ s.putObject(b, k, data)
             <strong>memory</strong> for throwaway work,
             <strong>filesystem</strong> when data has to survive a restart, and
             <strong>run-through</strong> when you want a local S3 in front of an
-            upstream bucket you already have.
+            upstream bucket you already have. Defaults are
+            <strong>64 MiB</strong> and <strong>10,000 objects</strong>, reported
+            in the capability block rather than assumed.
           </p>
 
           <div class="scope">
@@ -308,29 +331,37 @@ s.putObject(b, k, data)
                 <li>Multipart uploads</li>
                 <li>Presigned requests</li>
                 <li>SigV4 authentication</li>
+                <li>Scoped access control per operation</li>
               </ul>
             </div>
             <div class="no">
               <h3>Not implemented</h3>
               <ul>
-                <li>Versioning</li>
+                <li>Object versioning, and <code>versionId</code> is refused</li>
                 <li>ACLs and bucket policies</li>
-                <li>Lifecycle rules</li>
-                <li>Replication</li>
-                <li>Event notifications</li>
-                <li>Object tagging and lock</li>
+                <li>Lifecycle rules and replication</li>
+                <li>Event notifications, tagging, object lock</li>
                 <li>S3 Select</li>
                 <li>KMS-backed encryption</li>
               </ul>
             </div>
           </div>
+
+          <p>
+            And the limit worth stating plainly: <strong>Stow is not a
+            sandbox.</strong> It owns a data directory and an S3 API. It does not
+            isolate arbitrary host processes or their network access, and workspace
+            quotas do not hard-limit writes made straight to the filesystem.
+          </p>
         </section>
 
         <section class="finale">
-          <h2>Give your tests a bucket. Not your AWS account.</h2>
+          <h2>Portable because you decided where it goes.</h2>
           <p>
-            It is free, it is Apache 2.0, and it is one binary. If it breaks,
-            the issue tracker is the fastest way to tell me.
+            Not because the runner happened to survive, and not because somebody
+            else's bucket happened to keep it. It is free, it is Apache 2.0, and it
+            is one binary. If it breaks, the issue tracker is the fastest way to
+            tell me.
           </p>
           <div class="cta">
             <a
@@ -351,12 +382,12 @@ s.putObject(b, k, data)
 
       <footer>
         <p class="trademark">
-          Stow S3 is an independent project. It is not affiliated with,
-          endorsed by, or sponsored by Amazon Web Services. Amazon S3, AWS, and
-          S3 are trademarks of Amazon.com, Inc. or its affiliates, used here to
-          describe compatibility.
+          Stow is an independent project. It is not affiliated with, endorsed by,
+          or sponsored by Amazon Web Services. Amazon S3, AWS, and S3 are
+          trademarks of Amazon.com, Inc. or its affiliates, used here to describe
+          compatibility.
         </p>
-        <span class="org">Stow S3 &mdash; a Chester Hill Solutions project</span>
+        <span class="org">Stow &mdash; a Chester Hill Solutions project</span>
         <nav aria-label="Footer">
           <a
             href="https://github.com/chester-hill-solutions/stow-s3"

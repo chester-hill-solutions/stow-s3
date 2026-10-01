@@ -142,6 +142,9 @@ check-version:
 # default run is offline and deterministic so it is safe as a required check;
 # --online resolves each published target against its registry and belongs in
 # the release path, where the network is already a dependency.
+check-site-claims:
+	node scripts/check-site-claims.mjs
+
 check-install-surface:
 	node scripts/check-install-surface.mjs
 
@@ -165,4 +168,4 @@ check-adr-index:
 check-scripts:
 	node --test scripts/*.test.mjs
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts check-ts-quality check-generated
+standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-scripts check-ts-quality check-generated

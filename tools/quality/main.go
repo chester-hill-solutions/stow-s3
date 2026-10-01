@@ -241,9 +241,8 @@ func repoRoot() string {
 //
 // Nothing is lost. Test files are held to the coverage ratchet, to gofmt and vet, to the
 // per-file size ceiling and to every structural rule here bar `any`, which was already
-// scoped away from them. A test whose comment is doing the explaining is worth reading
-// either way. What is lost is the pressure to keep a shipped file under a number partly
-// set by a test it has nothing to do with.
+// scoped away. What is lost is only the pressure to keep a shipped file under a number
+// set partly by a test it has nothing to do with.
 const (
 	commentLinesRule = "comment-lines"
 	commentRatioRule = "comment-ratio"

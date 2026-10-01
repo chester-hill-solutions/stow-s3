@@ -5,45 +5,48 @@
     <link rel="stylesheet" href="card.css" />
   </head>
   <body>
-    <!-- 02 The problem. The crossed-out node is the whole argument. -->
+    <!-- 02 The problem. The two dead ends on the right are the whole argument:
+         scratch that does not survive, and a bucket that is not yours. -->
     <div class="card">
-      <div class="wordmark"><span class="box"></span><span>STOW <b>S3</b></span></div>
+      <div class="wordmark"><span class="box"></span><span>STOW</span></div>
 
-      <h1 class="mt-lg">Your test needs S3.<br />It doesn't need <em>AWS.</em></h1>
+      <h1 class="mt-lg" style="font-size: 128px">
+        The run ended.<br />The work is in <em>scratch.</em>
+      </h1>
 
       <div class="flow">
         <div class="node">
-          <small>your code</small>
-          Your App
-        </div>
-        <div class="arrow">&#10230;</div>
-        <div class="node hero-node">
-          <small>local</small>
-          Stow S3
+          <small>the agent</small>
+          Your Run
         </div>
         <div class="arrow">&#10230;</div>
         <div class="node">
-          <small>or</small>
-          Memory / Filesystem
+          <small>gone with the job</small>
+          Runner Scratch
+        </div>
+        <div class="arrow">&#10230;</div>
+        <div class="node">
+          <small>or someone else's</small>
+          A Cloud Bucket
         </div>
       </div>
 
       <div class="mt-lg" style="display: flex; gap: 26px; flex-wrap: wrap">
         <span class="clients" style="margin: 0">
           <span style="text-decoration: line-through; text-decoration-thickness: 3px"
-            >no AWS account</span
+            >nothing to inspect</span
           >
           <span style="text-decoration: line-through; text-decoration-thickness: 3px"
-            >no bucket to create</span
+            >no record of what changed</span
           >
           <span style="text-decoration: line-through; text-decoration-thickness: 3px"
-            >no credentials to leak</span
+            >no way to pick it up elsewhere</span
           >
         </span>
       </div>
 
       <div class="foot">
-        <span class="tag">one binary &middot; 10.6 MB</span>
+        <span class="tag">The artifact outlives the process, or it does not</span>
         <span class="url">github.com/chester-hill-solutions/stow-s3</span>
       </div>
     </div>

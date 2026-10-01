@@ -89,6 +89,34 @@ Generated `packages/stow-s3/dist` is checked into the repository for release rep
 
 `make check-generated` compares the committed `dist` against a fresh build of the tree, so a committed artifact that the current source does not produce fails it. It is not a check that the build is repeatable from itself, which is what it was for a while: the target ran the build before the comparison, so the two digests were both of fresh output and a stale artifact passed. The corpus jobs' `git diff --exit-code -- packages/stow-s3/dist` is the same comparison and stays as an independent second opinion. See [CONTRIBUTING](../CONTRIBUTING.md).
 
+## The site is gated on its claims, not on its prose
+
+`scripts/check-site-claims.mjs` checks `site/index.html`, the six launch cards,
+`agent.md` and `llms.txt` for claims that can be compared against the tree: the
+install commands each prints, four short forms that do not resolve
+(`go get /pkg/stow`, `go get pkg/stow`, `Backend: memory`, `@chs/stow`), the
+binary and WASM sizes against the built artefacts, and the default quotas against
+`internal/runtime/types.go`.
+
+It exists because all four of those were wrong while every other gate stayed
+green. `check-install-surface` covers the four documents an agent reads and did not
+cover `index.html`, so the page a person lands on was the one surface nothing
+checked — and it told readers to run a Go command that resolves to nothing, showed
+a Go snippet that does not compile, and told them the social card to install a
+package name that does not exist.
+
+What the gate deliberately does not do is judge the writing. The page was a
+generation out of date in positioning, selling an S3 test-fixture product for a
+project whose centre of gravity is agent workspaces and portable checkpoints, and
+no amount of substring matching catches that. A gate that cannot see the change
+under test is worse than no gate, because it is green, so this one checks only what
+it can actually see and says so.
+
+`scripts/check-site-claims.test.mjs` tests the decision against fixtures rather
+than only running it. That is not ceremony: the first version of the gate collapsed
+only spaces, so a deliberately reintroduced `go get /pkg/stow` — wrapped across a
+newline, as the real line is — went unreported, and the running check was green.
+
 ## Platform rationale held here rather than in the code
 
 Long platform and gate arguments live here so the code carries the rule and this
