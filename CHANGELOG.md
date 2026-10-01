@@ -2,6 +2,71 @@
 
 ## Unreleased — 0.3.0 development candidate
 
+- A checkpoint capture is now a policy decision. `workspace.capture` is a new
+  operation rather than a reuse of `object.read`, because a capture copies the
+  workspace's bytes into a durable artefact that can be exported and adopted on
+  another host, so it changes state even though it discloses nothing a reader could not
+  already read; `ReadOnly` withholds it for that reason. It is asked on the workspace
+  root before the capture lock, so a refusal costs nothing and holds nothing.
+  Previously no policy could deny capturing a workspace at all, which was the operation
+  a deployment most wanted to refuse — the checkpoint surface is where an orchestrator
+  asks what an agent has done.
+- The out-of-session capture now names its principal rather than inferring one.
+  `stow.CheckpointOf` opens no runtime on purpose, since claiming the session is what an
+  orchestrator must not do, so it has no authority to decide with.
+  `stow.CapturePrincipal{Environment, Policy}` carries both and
+  `stow.CheckpointOfAuthorized` consults them before the capture lock.
+  `stow.CheckpointOf` keeps its signature by delegating with `authority.All()` and no
+  policy, **so it still refuses nothing**; a test asserts that consequence so the
+  delegation cannot quietly become a gate. Widening a published API's behaviour while
+  calling it a security fix would have been a breaking change in disguise.
+- `stow-s3 workspace checkpoint --policy <path>` loads a persisted revision through
+  `policystore` and reads it per decision, so a revocation is in force when it is issued
+  rather than when the process began. Without the flag the verb consults nothing, tested
+  against a denying policy present on disk and simply not named. A `policy.Source` that
+  cannot answer returns its own error rather than a refusal, so an outage is not reported
+  as a permission decision.
+- `authority.EnforcedElsewhere` records operations enforced outside `internal/runtime`
+  with the site that enforces each, and a test checks every entry really consults the
+  operation. It exists because a test cannot assert what it cannot reach: the policy reach
+  test derives its table from `authority.Defined()` and lives in `internal/runtime`, which
+  has no verb for an operation belonging to a caller of the runtime. Declaring such an
+  operation ungated would have asserted it was unenforced while it was enforced, which is
+  the one false claim the ratchet exists to make impossible. ADR 0010 §3 is amended to
+  record the third category.
+- **A release nobody can install is now refused before it publishes.**
+  `scripts/check-publish-visibility.mjs` requests each package with no credentials and
+  fails the release if the registry demands them. The 0.2.0 release published five
+  packages that answer 401 unauthenticated and reported success, because every step that
+  touched them carried a token and the local consumer was installed from a tarball rather
+  than from the registry. The check runs before the publish steps, because visibility
+  belongs to a package and not to a release: publishing 0.3.0 would not change the answer,
+  and afterwards the only thing it could do is fail a job that had already published.
+  Today it reports all five as private, so a tag cut before they are made public stops
+  here. See [release readiness](docs/release-readiness-0.3.0.md).
+- Fixed a size claim on the site that was true only for the platform it was written on.
+  The four published binaries are 11.50, 11.75, 12.39 and 12.66 MB, so the page's 11.7 MB
+  understated what most users download, and `check-site-claims` measured whichever binary
+  the gate ran on — green on macOS, failing on Linux, which is how it survived a rehearsal.
+  The page now states a bound (`12.7 MB max, every platform`) and the gate cross-compiles
+  all four targets in ~6s. Two blind spots in the same gate are closed: editing the page's
+  wording no longer switches the claim off, and a measurement that was attempted and
+  failed is a failure rather than a silently skipped check.
+- Fixed `check-adr-index --write-digests`, which inserted a `decision_digest` line instead
+  of replacing one, so the second amendment of any ADR produced a duplicate YAML key that
+  the parser read as stale. It printed `updated` and changed nothing. No ADR had been
+  amended twice, so it had never fired.
+- Updated aws-sdk-go-v2, `@aws-sdk/client-s3`, typescript-eslint, `globals`, and
+  `actions/checkout`/`setup-go`. Three needed more than the bump: two had a
+  `package.json`/`package-lock.json` pair that `npm ci` refused, and the Go bump changes
+  what is embedded in the WASM, so the committed artifact was rebuilt.
+- **A deny test cannot tell a working check from no check.** With `workspace.capture`
+  denied, a check for *any other* operation is still refused by default denial, so the deny
+  case passes with the gate deleted; only the allow case separates them, and an
+  allow-nothing policy is the least natural test to reach for. This held at three separate
+  enforcement points in a row and is why every allow case here is paired with a deny case.
+  Each was confirmed by deliberately pointing a check at a different operation.
+
 - The Go coverage ratchet is now up to date, and the rule for keeping it that way is
   written down. `check-coverage --baseline` writes whichever machine ran it, and coverage
   is platform-dependent: `internal/parentwatch` covers 22 statements on macOS and 10 on
