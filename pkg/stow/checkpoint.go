@@ -16,6 +16,8 @@ import (
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/rooted"
 )
 
@@ -88,6 +90,12 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	if w.closed || w.closing {
 		return CheckpointInfo{}, ErrClosed
 	}
+	// Asked before the capture lock, so a refusal costs nothing. The resource is the
+	// root: a capture is of the whole workspace or of a subtree, and the latter is a
+	// different operation with its own contract.
+	if err := w.Runtime.Authorize(authority.WorkspaceCapture, policy.Workspace(w.id, "")); err != nil {
+		return CheckpointInfo{}, err
+	}
 	lock, err := workspace.AcquireMutationCapture(w.registryDir, w.id)
 	if err != nil {
 		return CheckpointInfo{}, err
@@ -99,9 +107,8 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	return captureCheckpoint(ctx, w.captureTarget(), options)
 }
 
-// checkCheckpointRetention accounts only published checkpoints. The caller
-// holds the capture gate through publication, so parallel captures
-// cannot both pass the same remaining capacity.
+// checkCheckpointRetention accounts only published checkpoints, which the capture gate
+// makes exclusive: parallel captures cannot both pass the same remaining capacity.
 func (w *Workspace) checkCheckpointRetention(nextBytes int64) error {
 	return w.captureTarget().checkRetention(nextBytes)
 }

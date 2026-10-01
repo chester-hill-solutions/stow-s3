@@ -195,6 +195,43 @@ enumeration returns only authorized results. A caller denied a key sees it as ab
 is indistinguishable from it not existing — that indistinguishability is the property, not
 an accident of it.
 
+### Capturing a workspace, and an operation a reach test cannot reach
+
+A capture was unconsultable. `Workspace.Destroy` consults a policy and
+`workspace.capture` did not exist, so a policy could not deny capturing a workspace
+at all — and the checkpoint surface is where an orchestrator asks what an agent has
+done, so it is exactly the operation a deployment most wants to be able to refuse.
+
+`workspace.capture` is a new operation rather than a reuse of `object.read`, because a
+capture is not a read: it copies the workspace's bytes into a durable artefact that
+can be exported and adopted on another host, so it changes state even though it
+discloses nothing a reader could not already read. `ReadOnly` withholds it for that
+reason. It is asked on the workspace root, before the capture lock, so a refusal costs
+nothing and holds nothing; a capture of a subtree is a different operation with its own
+contract, as with destroy.
+
+Enforcing it in `pkg/stow` rather than `internal/runtime` created a problem worth
+recording, because the fix is the interesting part. The policy reach test derives its
+table from `authority.Defined()` and lives in `internal/runtime`, and it had no way to
+reach a verb belonging to a caller of the runtime: the workspace is a resource
+`internal/runtime` has no verb for. Its two honest answers were to add an `Ungated`
+entry — which would have said the operation is unenforced while it is enforced, the one
+answer this ratchet exists to make impossible — or to record where it is enforced
+instead.
+
+So `authority.EnforcedElsewhere` names those operations and the site that enforces
+each, and `TestEnforcedElsewhereNamesASiteThatConsultsTheOperation` checks every entry:
+the file must exist and must contain a call of the shape the enforcement scan already
+recognises. A claim about a file this package cannot otherwise see is a hole with a
+comment over it unless something verifies it, so something does. The reach test
+asserts that every recorded operation also appears in its own table, so the two cannot
+drift.
+
+Not yet threaded: `stow.CheckpointOf` and the CLI archive verbs remain unbound, because
+they are package-level functions over a registry directory and have no principal to
+decide as. That is recorded rather than papered over with a check that consults
+nothing.
+
 ### The workspace as a resource
 
 A workspace is a registered resource with its own lifecycle, and it is the one

@@ -17,33 +17,34 @@ import (
 	"sort"
 )
 
-// Operation is a single permission. The set is deliberately small and closed:
-// every entry corresponds to something a caller can observe or change, so an
-// unlisted action is denied rather than allowed by omission.
+// Operation is a single permission. The set is deliberately small and closed, so an
+// action nobody named is denied rather than allowed by omission.
 type Operation string
 
 const (
-	// Object data.
+	// Object data, the namespace it lives in, and reaching past it.
 	ObjectRead   Operation = "object.read"
 	ObjectWrite  Operation = "object.write"
 	ObjectDelete Operation = "object.delete"
 	ObjectList   Operation = "object.list"
 
-	// The namespace itself. A bucket is a name in a namespace, so creating and
-	// deleting one is not an object operation and does not inherit its
-	// permissions.
+	// The namespace itself. A bucket is a name in a namespace, so creating and deleting
+	// one is not an object operation and does not inherit its permissions.
 	BucketCreate Operation = "bucket.create"
 	BucketDelete Operation = "bucket.delete"
 	BucketList   Operation = "bucket.list"
 
-	// Lifecycle of the whole environment.
+	// Lifecycle of the whole environment, and of one workspace inside it.
 	EnvironmentReset   Operation = "environment.reset"
 	EnvironmentDestroy Operation = "environment.destroy"
 	EnvironmentPromote Operation = "environment.promote"
 
-	// Reaching a related object store. Separate from the local permissions on
-	// purpose: a caller that can write locally has not thereby been granted
-	// authority to change someone else's data.
+	// Capturing a workspace into a checkpoint. Not object.read: a capture copies the
+	// workspace's bytes into a durable, exportable artefact, so it changes state.
+	WorkspaceCapture Operation = "workspace.capture"
+
+	// Reaching a related object store. Separate from the local permissions: a caller that
+	// can write locally has not thereby been granted authority over someone else's data.
 	UpstreamRead  Operation = "upstream.read"
 	UpstreamWrite Operation = "upstream.write"
 )
@@ -65,15 +66,15 @@ func All() Authority { return Authority{Mask: all} }
 // None permits nothing.
 func None() Authority { return Authority{0} }
 
-// ReadOnly permits reading and listing, and nothing that changes state or
-// reaches outside the environment. Upstream reads are withheld too: a read-only
-// capability is about this environment, and reaching a related object store is a
-// separate grant.
+// ReadOnly permits reading and listing, and nothing that changes state or reaches
+// outside the environment. Upstream reads are withheld too: a read-only capability is
+// about this environment, and reaching a related object store is a separate grant.
 func ReadOnly() Authority {
 	return All().Without(
 		ObjectWrite, ObjectDelete,
 		BucketCreate, BucketDelete,
 		EnvironmentReset, EnvironmentDestroy, EnvironmentPromote,
+		WorkspaceCapture,
 		UpstreamRead, UpstreamWrite,
 	)
 }
@@ -149,9 +150,9 @@ func (a Authority) Intersect(b Authority) Authority {
 	return Authority{Mask: mask}
 }
 
-// Operations lists what is permitted, sorted, for a descriptor or a diagnostic.
-// Sorted so the output is stable: an unordered list makes a capability payload
-// differ between two runs of the same program.
+// Operations lists what is permitted, sorted, for a descriptor or a diagnostic. Sorted
+// so the output is stable: an unordered list makes a capability payload differ between
+// two runs of the same program.
 func (a Authority) Operations() []Operation {
 	out := make([]Operation, 0, len(operationBits))
 	for op := range operationBits {
@@ -182,10 +183,9 @@ func (a Authority) String() string {
 	return string(out)
 }
 
-// ErrNotAuthorized is returned for a refused operation. It is deliberately not
-// an S3 error code: which code an interface renders it as is that interface's
-// business, and the whole point of enforcing here is that the answer does not
-// depend on which interface asked.
+// ErrNotAuthorized is returned for a refused operation. Deliberately not an S3 error
+// code: which code an interface renders it as is that interface's business, and the
+// point of enforcing here is that the answer does not depend on who asked.
 type ErrNotAuthorized struct {
 	Operation Operation
 	Authority Authority
@@ -197,8 +197,8 @@ func (e *ErrNotAuthorized) Error() string {
 }
 
 // Check returns *ErrNotAuthorized when op is not permitted. Callers use it as
-// `if err := i.check(op); err != nil { return err }` at the top of each
-// operation, which keeps the refusal and the operation name adjacent.
+// `if err := i.check(op); err != nil { return err }` at the top of each operation,
+// keeping the refusal and the operation name adjacent.
 func (a Authority) Check(op Operation) error {
 	if a.Allows(op) {
 		return nil
@@ -211,6 +211,7 @@ var operationBits = func() map[Operation]uint32 {
 		ObjectRead, ObjectWrite, ObjectDelete, ObjectList,
 		BucketCreate, BucketDelete, BucketList,
 		EnvironmentReset, EnvironmentDestroy, EnvironmentPromote,
+		WorkspaceCapture,
 		UpstreamRead, UpstreamWrite,
 	}
 	m := make(map[Operation]uint32, len(ops))
@@ -220,9 +221,8 @@ var operationBits = func() map[Operation]uint32 {
 	return m
 }()
 
-// all is every bit in the set, derived from the list above rather than written
-// out, so adding an Operation cannot leave All() quietly narrower than the set
-// of things there are permissions for.
+// all is every bit in the set, derived from the list above rather than written out, so
+// adding an Operation cannot leave All() narrower than what there are permissions for.
 var all = func() (mask uint32) {
 	for _, bit := range operationBits {
 		mask |= bit
@@ -248,9 +248,15 @@ func Defined() []Operation {
 	return out
 }
 
-// Ungated names the operations that are defined but not checked anywhere, each
-// with the reason it is not yet wired.
-// An operation nobody enforces is a permission that is described and not granted,
+// EnforcedElsewhere names the operations enforced outside internal/runtime, each with
+// the site that enforces it. Each entry is checked, not trusted; see
+// docs/storage-admission-contract.md for why a reach test cannot cover these.
+var EnforcedElsewhere = map[Operation]string{
+	WorkspaceCapture: "pkg/stow/checkpoint.go:CreateCheckpoint",
+}
+
+// Ungated names the operations defined but not checked anywhere, with the reason.
+// An operation nobody enforces is a permission described and not granted,
 // which is the shape a false claim of enforcement takes: the set is closed, the
 // constant is exported, and a caller narrowing an Authority appears to withhold
 // something the code never consults. A new Operation with no check site fails the
