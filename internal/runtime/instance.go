@@ -81,9 +81,9 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 //
 // The resource comes from this instance's own record rather than the store, because the
 // store's answer would have to be read before authorization to know what to authorize. An
-// upload this instance cannot resolve therefore has no established resource, which without
-// a policy is the old behaviour and with one is refused. Reads i.multipart, so it must be
-// called under i.mu, which is why Source must not block.
+// upload this instance cannot resolve therefore has no established resource, which with a
+// policy is refused. Reads i.multipart, so it must be called under i.mu, which is why
+// Source must not block.
 func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
 	if i.policy == nil {
 		return i.authority.Check(op)
@@ -127,8 +127,7 @@ func (i *Instance) check(op authority.Operation) error {
 	return i.granted(set, op, "")
 }
 
-// checkCollection is check for an operation naming a collection but no resource, so a
-// deny is scoped to that collection. See policy.Set.Deny.
+// checkCollection is check for an operation naming a collection but no resource. See Set.Deny.
 func (i *Instance) checkCollection(op authority.Operation, collection string) error {
 	set, err := i.currentPolicy()
 	if err != nil {

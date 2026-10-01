@@ -45,8 +45,7 @@ func (i *Instance) putObjectLocked(ctx context.Context, bucket, key string, data
 	}
 	target := objectTarget(bucket, key)
 	_, targetReserved := i.reservedTargets[target]
-	// Not copied: every store copies the body through ETagForReader, so a copy here was
-	// a redundant allocation. See storage.ByteReader for the ownership rule.
+	// Not copied: every store copies the body through ETagForReader. See ByteReader.
 	meta, err := i.store.PutObject(ctx, bucket, key, bytes.NewReader(data), storage.PutOptions{
 		ContentType:       options.ContentType,
 		Metadata:          storage.CloneMetadata(options.Metadata),
@@ -116,9 +115,9 @@ func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, 
 	return objectFromMeta(meta, nil), nil
 }
 
-// listScope is the set of keys one listing may disclose; a nil scope permits
-// everything, so a deployment without a policy lists as it did before. The decision is
-// per key: a listing asks about a prefix, and `public/secret` is not `public/secret/`.
+// listScope is the set of keys one listing may disclose; a nil scope permits everything, so
+// a policy-free deployment is unchanged. The decision is per key: a listing asks for a
+// prefix, and `public/secret` is not `public/secret/`.
 type listScope struct {
 	set    *policy.Set
 	env    authority.Authority
@@ -198,15 +197,17 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 		}
 	}
 	// The count is of what was returned, not of what the store holds: a count the caller
-	// cannot account for is itself a disclosure. Truncated and the cursors stay as the
-	// store reported them, so a filtered page is still short rather than complete.
+	// cannot account for is itself a disclosure. Both kinds are counted, which is S3's
+	// arithmetic: a delimiter page with no keys and two prefixes reports 2, not 0.
+	// Truncation and the cursors stay as the store reported, so a filtered page is short
+	// rather than silently complete.
 	return ObjectPage{
 		Objects:        objects,
 		CommonPrefixes: prefixes,
 		Truncated:      result.IsTruncated,
 		Cursor:         result.ContinuationToken,
 		NextCursor:     result.NextContinuationToken,
-		KeyCount:       len(objects),
+		KeyCount:       len(objects) + len(prefixes),
 	}, nil
 }
 
@@ -338,8 +339,8 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	if err := i.checkMutationLocked(ctx); err != nil {
 		return Object{}, err
 	}
-	// The size of the source, for the quota check, and the conditions to apply if
-	// the store cannot. Both are answers about a version the caller may then race.
+	// The source size for the quota check, and the conditions if the store cannot evaluate
+	// them. Both answer about a version the caller may then race.
 	sourceMeta, err := i.store.HeadObject(ctx, req.SourceBucket, req.SourceKey)
 	if err != nil {
 		return Object{}, err

@@ -179,6 +179,38 @@ func contains(keys []string, want string) bool {
 	return false
 }
 
+func TestTheCountCoversRolledUpPrefixesToo(t *testing.T) {
+	// The half a non-delimiter test cannot see. S3 counts returned *entries*, so a
+	// delimiter page with no keys and two rolled-up prefixes reports 2, not 0. The
+	// first version of the filtering used the key count alone and the shared corpus
+	// failed it, which is the corpus earning its place as the independent second
+	// opinion; this case keeps the arithmetic pinned on both shapes.
+	instance := enumInstance(t, func(set *policy.Set) {
+		set.Add(policy.LocalNamespace, enumBucket,
+			policy.Selector{Kind: policy.KindObject, Prefix: "public/"},
+			policy.Allow, authority.ObjectRead, authority.ObjectList)
+	}, map[string]string{
+		"root.txt":   "root",
+		"public/a/1": "a",
+		"public/b/1": "b",
+	})
+
+	page, err := instance.ListObjects(context.Background(), enumBucket,
+		runtime.ListOptions{Prefix: "public/", Delimiter: "/"})
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if len(page.Objects) != 0 {
+		t.Fatalf("listed keys %v, want none: every key is under a rolled-up prefix", listed(page))
+	}
+	if len(page.CommonPrefixes) != 2 {
+		t.Fatalf("CommonPrefixes = %v, want two", page.CommonPrefixes)
+	}
+	if page.KeyCount != 2 {
+		t.Errorf("KeyCount = %d, want 2: the count is returned entries, keys plus prefixes", page.KeyCount)
+	}
+}
+
 func TestACommonPrefixIsAlsoFiltered(t *testing.T) {
 	// With a delimiter the store answers with prefixes rather than keys, and a
 	// filtered-keys-only change would have disclosed a denied subtree as a name.
