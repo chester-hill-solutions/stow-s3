@@ -86,8 +86,45 @@ var enforcementMethods = map[string]bool{
 	"checkCollection": true,
 	"checkResource":   true,
 	"checkUpload":     true,
-	"Allows":          true,
-	"Check":           true,
+	// Authorize is the seam the workspace facade uses for a resource the runtime has no
+	// verb for, so a call to it is an enforcement site like any other.
+	"Authorize": true,
+	"Allows":    true,
+	"Check":     true,
+}
+
+// TestEnforcedElsewhereNamesASiteThatConsultsTheOperation is the guard that makes
+// EnforcedElsewhere safe: a named site is a claim about a file this package cannot
+// otherwise see, so an unchecked claim is a hole with a comment over it. It asserts
+// the file exists and contains a call of the shape the enforcement scan recognises.
+func TestEnforcedElsewhereNamesASiteThatConsultsTheOperation(t *testing.T) {
+	if len(authority.EnforcedElsewhere) == 0 {
+		t.Fatal("authority.EnforcedElsewhere is empty, so an operation enforced outside this package has nowhere to be recorded")
+	}
+	byName := operationByConstName(t)
+	for op, site := range authority.EnforcedElsewhere {
+		file, fn, ok := strings.Cut(site, ":")
+		if !ok {
+			t.Errorf("%s is recorded as enforced at %q, which names no function", op, site)
+			continue
+		}
+		path := filepath.Join("..", "..", file)
+		if _, err := os.Stat(path); err != nil {
+			t.Errorf("%s is recorded as enforced at %s, which does not exist: %v", op, site, err)
+			continue
+		}
+		found := map[authority.Operation]bool{}
+		if err := checkSitesInFile(path, byName, found); err != nil {
+			t.Errorf("%s: parse %s: %v", op, site, err)
+			continue
+		}
+		if !found[op] {
+			t.Errorf("%s is recorded as enforced at %s, which does not consult it", op, site)
+		}
+		if fn == "" {
+			t.Errorf("%s is recorded as enforced at %s, which names no function", op, site)
+		}
+	}
 }
 
 // checkSitesInFile records every call of the form <recv>.m(authority.Op) in one

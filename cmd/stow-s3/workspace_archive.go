@@ -9,6 +9,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
+	"github.com/chester-hill-solutions/stow-s3/internal/policystore"
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
 )
 
@@ -165,11 +168,9 @@ func importCheckpointCommand(args []string) error {
 // checkpointWorkspaceCommand captures a checkpoint of a workspace that another
 // process may be using right now.
 //
-// It resolves the registry and the workspace's own recorded limits, and never
-// claims the session: an agent holding the workspace is not asked to stop so the
-// work so far can be captured. The capture is the one Workspace.CreateCheckpoint
-// runs, so the exclusions, the limits, and the refusal of a tree that changed
-// mid-capture are identical either way.
+// It resolves the registry and the workspace's own recorded limits, and never claims
+// the session: an agent holding the workspace is not asked to stop so the work so far
+// can be captured.
 func checkpointWorkspaceCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace checkpoint", flag.ContinueOnError)
 	id := flags.String("id", "", "Workspace ID to checkpoint")
@@ -182,6 +183,7 @@ func checkpointWorkspaceCommand(args []string) error {
 	resolve := flags.Bool("resolve", false, "Resolve an existing request without capturing")
 	timeout := flags.Duration("timeout", 0, "Capture deadline; required with --request-key")
 	portable := flags.Bool("portable", false, "Include logical buckets, objects and metadata")
+	policyPath := flags.String("policy", "", "Persisted policy revision to decide the capture by (empty consults no policy)")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -197,7 +199,11 @@ func checkpointWorkspaceCommand(args []string) error {
 	if *requestKey != "" || *resolve {
 		return checkpointRequestCommand(registry, *id, checkpointRequestFlags{Key: *requestKey, Resolve: *resolve, Timeout: *timeout, Options: options})
 	}
-	checkpoint, err := stow.CheckpointOf(context.Background(), registry, *id, options)
+	principal, err := capturePrincipal(*policyPath)
+	if err != nil {
+		return err
+	}
+	checkpoint, err := stow.CheckpointOfAuthorized(context.Background(), registry, *id, options, principal)
 	if err != nil {
 		return err
 	}
@@ -206,6 +212,22 @@ func checkpointWorkspaceCommand(args []string) error {
 		ParentID: checkpoint.ParentID, Created: checkpoint.Created.Format(time.RFC3339Nano),
 		Files: checkpoint.Files, Bytes: checkpoint.Bytes, Excluded: checkpoint.Excluded,
 	})
+}
+
+// capturePrincipal is the principal an out-of-session capture is decided by. The store
+// is read per decision, so a revocation is in force when issued, not when the process
+// began.
+func capturePrincipal(policyPath string) (stow.CapturePrincipal, error) {
+	principal := stow.CapturePrincipal{Environment: authority.All()}
+	if policyPath == "" {
+		return principal, nil
+	}
+	store, err := policystore.Open(policyPath)
+	if err != nil {
+		return principal, err
+	}
+	principal.Policy = func() (policy.Set, error) { return store.Policy(authority.All()) }
+	return principal, nil
 }
 
 func diffWorkspaceCommand(args []string) error {

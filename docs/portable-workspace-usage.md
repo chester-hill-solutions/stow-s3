@@ -161,7 +161,13 @@ stow-s3 workspace checkpoint --id WORKSPACE_ID --registry-dir /absolute/registry
   --max-bytes 1073741824 --max-files 100000
 ```
 
-Persist the key and exact options before calling. Pause all writers first. Use
+Persist the key and exact options before calling. Pause all writers first.
+
+This verb consults no policy unless you pass `--policy /path/to/revision.json`, which
+loads a persisted revision and decides the capture by it. The revision is read per
+decision, so a revocation takes effect when it is issued rather than when the process
+started. Without the flag the capture is decided by the environment only, and a policy
+denying capture sits on disk unread. Use
 `--resolve` with the same arguments after an uncertain reply; it creates no new
 checkpoint. The response carries `version`, `result` and a typed `error` on failure.
 Success is `result.outcome=committed`, with `result.checkpoint.id`. Inspect the

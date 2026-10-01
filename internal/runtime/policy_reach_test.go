@@ -70,11 +70,22 @@ func TestEveryOperationReachesThePolicy(t *testing.T) {
 	// Operations no runtime verb carries, each recording where it is enforced:
 	// "not here" and "nowhere" are different facts and only the reason separates
 	// them.
+	// Every operation in authority.EnforcedElsewhere must appear here too, so the
+	// machine-checked list cannot be used without this table knowing. The two answer
+	// different questions: that one names a site and proves it consults the operation,
+	// while this map also carries operations enforced nowhere.
 	elsewhere := map[authority.Operation]string{
 		authority.EnvironmentDestroy: "enforced by workspace.Destroy before lifecycle or registry mutation; see authority.Ungated",
 		authority.EnvironmentPromote: "no operation is implemented; see authority.Ungated",
 		authority.UpstreamRead:       "enforced by the run-through adapter at its upstream chokepoint, not by the runtime",
 		authority.UpstreamWrite:      "enforced by the run-through adapter at its propagation funnel, not by the runtime",
+		authority.WorkspaceCapture:   "enforced by workspace.CreateCheckpoint; site checked by authority.EnforcedElsewhere",
+	}
+	for op := range authority.EnforcedElsewhere {
+		if _, listed := elsewhere[op]; !listed {
+			t.Errorf("%s is recorded in authority.EnforcedElsewhere but this table does not know it, "+
+				"so nothing here would notice if that record became wrong", op)
+		}
 	}
 	for op := range cases {
 		if _, excused := elsewhere[op]; excused {
@@ -221,6 +232,5 @@ func TestAWideningPolicyRefusesEveryOperationNotJustTheOnesOnAResource(t *testin
 	}
 }
 
-// The environment's refusal and the policy's used to be the same type, so telling
-// them apart meant reading the message. These use policy.IsRefusal; a security
-// decision should not depend on prose.
+// The environment's refusal and the policy's used to be the same type, so telling them
+// apart meant reading the message. These use policy.IsRefusal.
