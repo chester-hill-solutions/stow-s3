@@ -246,12 +246,11 @@ func TestReadThroughCachesAKeyInsideALocalBucket(t *testing.T) {
 // bucket-propagation problem that is a plain error-mapping defect rather than a
 // policy question.
 //
-// The local write is authoritative and it succeeds. The propagation to the upstream
-// then fails, because the upstream has never heard of the bucket. That failure arrives
-// as storage.CommittedError, whose cause is the upstream's not-found — and the storage
-// error table maps not-found to a 404 NoSuchKey, so the server reported that the
-// object did not exist immediately after writing it. A caller that retried on the 404
-// would never succeed, because nothing about the next attempt differs.
+// The local write is authoritative and it succeeds. The propagation then fails,
+// because the upstream has never heard of the bucket. That failure arrives as
+// storage.CommittedError, whose cause is the upstream's not-found — and the storage error
+// table maps not-found to a 404 NoSuchKey, so the server reported that the object did
+// not exist immediately after writing it.
 //
 // The caller now gets success, the local object is there, and the propagation
 // failure is visible where it can be acted on: the outbox, and /_stow/inspect.

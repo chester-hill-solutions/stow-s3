@@ -354,16 +354,15 @@ func (c *checker) checkLiterals(fn *ast.FuncDecl) {
 
 // checkEscapes reports the two type and safety escape hatches: `any` and `panic`.
 //
-// The `any` rule is scoped to non-test code, and the scope is load-bearing rather
-// than convenient. `any` is a defect where a value crosses a boundary a type could
-// have described: it is where a lost assertion becomes a silent wrong answer. In a
-// test that has to compare values it does not know the shape of there is no
-// boundary to type and no assertion to lose, so the rule has nothing to protect.
+// The `any` rule is scoped to non-test code, and the scope is load-bearing rather than
+// convenient. `any` is a defect where a value crosses a boundary a type could have
+// described: it is where a lost assertion becomes a silent wrong answer. In a test
+// comparing values of an unknown shape there is no boundary to type.
 //
 // Forcing it on tests anyway makes a conformance matcher compare raw JSON with a
 // hand-rolled canonicaliser, satisfying the ratchet while the code gets worse. The
-// recorded count is unchanged by a fix elsewhere, so the gate still fails on `any`
-// in production code.
+// recorded count is unchanged by a fix elsewhere, so the gate still fails on `any` in
+// production code.
 func (c *checker) checkEscapes(file *ast.File) {
 	location := filepath.ToSlash(c.path)
 	ast.Inspect(file, func(node ast.Node) bool {

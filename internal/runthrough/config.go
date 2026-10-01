@@ -71,8 +71,7 @@ type Config struct {
 	// built and folded into the effective authority there. The gate consults only the
 	// result, never this field.
 	//
-	// That is the whole of decision 2: two mechanisms answering one question, kept in
-	// step by hand.
+	// That is decision 2: two mechanisms answering one question, kept in step by hand.
 	// ResourcePolicy narrows Authority per object, and is consulted on every reach this
 	// adapter makes. It exists because the propagation funnel runs outside the runtime
 	// instance, so without it the retry worker and the admin retry route consult the

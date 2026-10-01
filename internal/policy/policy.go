@@ -189,8 +189,7 @@ func (s Set) Allows(env authority.Authority, r Resource, op authority.Operation)
 
 // Denies reports whether an entry withholds op, for an operation naming no resource
 // locator. It is the only way a policy reaches such an operation, and the asymmetry
-// with Authorize is the point: a deny is honoured wherever it can be attributed, and
-// an allow needs a resource to be scoped to.
+// with Authorize is the point: a deny is honoured wherever it can be attributed.
 //
 // A key prefix is not attributable — an entry over `public/` says nothing about
 // whether a bucket may be created. A collection is matched when the operation names

@@ -15,10 +15,9 @@ import (
 // by a newer revision is refused rather than migrated on read: a manifest that
 // silently downgrades loses exactly the entries it could not understand.
 //
-// Identity and the object index are separate files with separate write paths, because
-// identity changes once per workspace and the index per object. The escaped form is
-// namespaced by bucket, since an escaped key must not resolve to one file across two
-// buckets.
+// Identity and the object index are separate files, because identity changes once per
+// workspace and the index per object. The escaped form is namespaced by bucket, since an
+// escaped key must not resolve to one file across two buckets.
 const manifestVersion = 3
 
 // ErrManifestCorrupt is returned when a manifest exists and cannot be trusted.

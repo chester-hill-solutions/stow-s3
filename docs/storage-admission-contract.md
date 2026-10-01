@@ -165,6 +165,40 @@ rather than choices, and each is worth stating where a reader will meet it:
   reported as unknown, distinctly, because those three answers need different
   responses from a caller.
 
+### A revision in force, rather than a revision at open
+
+`Options.Policy` is a `policy.Source`, consulted on each decision rather than read
+once. It is a **function type** and not an interface for one reason: nil is the
+answer the caller already has for "no policy", and an interface makes a nil
+`*policy.Set` — which is not nil, because it carries a type — mean something else.
+That difference is invisible at a call site and decisive at runtime, so `policy.Fixed`
+names the fixed case and a nil `*Set` reaching it yields the empty set, which denies
+everything. A typed nil failing open would be a permission nobody narrowed.
+
+Two consequences follow from resolving per decision, and both are the point.
+
+**Validation moves with it.** A revision is checked against the environment when it is
+*read*, not when the environment was opened, because a later revision can be wider
+than the one before it. `ErrWidening` is therefore reported by the operation, and
+every operation reports it — which means the policy has to be resolved *before* the
+environment is consulted, or a widening policy on a bucket operation would report
+the environment's reason instead of the policy's. That ordering was got wrong once
+and the widening test from the earlier slice caught it.
+
+**An unknown answer is not a decision.** A source that cannot say returns its own
+error, and the operation reports it rather than resolving it into a refusal. "You may
+not" and "I do not know" need different responses from a caller, and a caller handed
+the first during an outage cannot tell that it was the second. A stale revision is
+the same case and already says so: `ErrStalePolicy`.
+
+`Source` must be cheap and must not block, because the multipart paths consult it
+while the instance mutex is held. A host whose policy lives on disk is expected to
+wrap it in something that states how stale the answer may be — that wrapper is where
+the contract's "maximum stale-policy interval" is written down, and it is the bound
+a revocation takes to take effect. `policy.Expiring` is the shape of that for a
+deadline rather than a document: it shortens and never lengthens, because a policy
+that could extend its own lifetime by being asked again would never expire.
+
 ### Reaching upstream under a policy
 
 The run-through adapter is the second enforcement point, and it exists because the

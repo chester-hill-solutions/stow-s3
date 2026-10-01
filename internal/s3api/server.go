@@ -331,8 +331,8 @@ func isLoopbackRequest(r *http.Request) bool {
 //   - Destructive routes (outbox retry and discard) always require the token, including
 //     on loopback: they change what is propagated to a live provider.
 //
-// A rejection is 404 rather than 403 so the route's existence is not advertised to
-// a caller that could not use it.
+// A rejection is 404 rather than 403 so the route's existence is not advertised to a
+// caller that could not use it.
 func (s *Server) authorizeAdmin(w http.ResponseWriter, r *http.Request) bool {
 	if s.adminTokenMatches(r) {
 		return true

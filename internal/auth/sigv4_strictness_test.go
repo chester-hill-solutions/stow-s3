@@ -312,11 +312,10 @@ func TestASignedHeaderAbsentFromTheRequestIsRefused(t *testing.T) {
 // sent as "X-Amz-Meta-Foo". Refusing that would be a false negative against a
 // conforming signer.
 //
-// This is the counterpart to the strict cases above, and it is here because they
-// are easy to over-apply: the list's spelling is checked exactly, the request's
-// is matched as HTTP says it should be. A request signed over a list that names
-// a header it does not carry is still refused, for the signature rather than the
-// spelling.
+// This is the counterpart to the strict cases above, and here because they are
+// easy to over-apply: the list's spelling is checked exactly, the request's is
+// matched as HTTP says it should be. A request signed over a list naming a header
+// it does not carry is still refused, for the signature rather than the spelling.
 func TestASignedHeaderIsFoundWhateverCaseTheRequestUsed(t *testing.T) {
 	creds := strictCreds
 	now := time.Now().UTC().Truncate(time.Second)

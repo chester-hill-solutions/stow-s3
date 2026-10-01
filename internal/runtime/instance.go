@@ -17,8 +17,7 @@ type Instance struct {
 	resetStore       func() (storage.Store, error)
 	options          Options
 	authority        authority.Authority
-	policy           *policy.Set
-	policyErr        error
+	policy           policy.Source
 	usage            Usage
 	multipart        map[string]multipartUsage
 	multipartTargets map[string]int
@@ -65,18 +64,9 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 	if options.Authority != nil {
 		granted = *options.Authority
 	}
-	// Validated here so the answer cannot depend on which operation asked, and
-	// held as an error rather than discarded so a widening policy refuses.
-	var narrow *policy.Set
-	var policyErr error
-	if options.Policy != nil {
-		validated, err := policy.New(*options.Policy, granted)
-		if err != nil {
-			policyErr = err
-		} else {
-			narrow = &validated
-		}
-	}
+	// Not resolved here. A policy read once at open could only change by restarting
+	// the process, so a revocation was effective when somebody restarted rather than
+	// when it was issued.
 	multipart, _ := store.(storage.MultipartStore)
 	return &Instance{
 		store:            store,
@@ -84,8 +74,7 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 		resetStore:       resetStore,
 		options:          options,
 		authority:        granted,
-		policy:           narrow,
-		policyErr:        policyErr,
+		policy:           options.Policy,
 		multipart:        make(map[string]multipartUsage),
 		multipartTargets: make(map[string]int),
 		reservedTargets:  make(map[string]struct{}),
@@ -95,17 +84,16 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 
 // checkUpload is checkResource for an operation addressed by upload ID.
 //
-// The resource comes from this instance's own record rather than from the store,
-// because the store's answer would have to be read before authorization to know
-// what to authorize, and authorization comes first. An upload this instance
-// cannot resolve therefore has no established resource, which without a policy
-// is the old behaviour and with one is refused: a policy that cannot be
-// evaluated must not fall back to allow, or the handle-based operations become
-// the one path around every selector.
+// The resource comes from this instance's own record rather than the store, because
+// the store's answer would have to be read before authorization to know what to
+// authorize. An upload this instance cannot resolve therefore has no established
+// resource, which without a policy is the old behaviour and with one is refused: a
+// policy that cannot be evaluated must not fall back to allow.
 //
-// Reads i.multipart, so it must be called under i.mu.
+// Reads i.multipart, so it must be called under i.mu. A policy source is consulted
+// here too, which is why Source must not block.
 func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
-	if i.policy == nil && i.policyErr == nil {
+	if i.policy == nil {
 		return i.authority.Check(op)
 	}
 	usage, ok := i.multipart[uploadID]
@@ -115,37 +103,61 @@ func (i *Instance) checkUpload(op authority.Operation, uploadID string) error {
 	return i.checkResource(op, policy.Object(usage.upload.Bucket, usage.upload.Key))
 }
 
+// currentPolicy is the revision in force, validated against the environment it is
+// read under — a later revision can be wider than the one before it, so validation
+// is per decision too. A nil result means no policy is configured.
+func (i *Instance) currentPolicy() (*policy.Set, error) {
+	if i.policy == nil {
+		return nil, nil
+	}
+	set, err := i.policy()
+	if err != nil {
+		return nil, err
+	}
+	validated, err := policy.New(set, i.authority)
+	if err != nil {
+		return nil, err
+	}
+	return &validated, nil
+}
+
 // check is the authorization point for operations that name neither a resource nor
 // a collection: the environment's own lifecycle, and listing the namespace.
 //
-// It consults the policy twice over, and both are the fix for a deny that was written
-// and did not apply. A policy that failed validation is refused here too, not only on
-// the resource path, because a widening policy means the author believed a permission
-// was in force and it is not. And an entry that withholds the operation is honoured,
-// because Reset names no bucket for a selector to match.
+// It consults the policy twice over, and both fix a deny that was written and did
+// not apply. A policy that failed validation is refused here too, because a widening
+// policy means the author believed a permission was in force and it is not. And an
+// entry that withholds the operation is honoured, because Reset names no bucket for
+// a selector to match.
 func (i *Instance) check(op authority.Operation) error {
-	if i.policyErr != nil {
-		return i.policyErr
+	set, err := i.currentPolicy()
+	if err != nil {
+		return err
 	}
-	return i.checkGranted(op, "")
+	return i.granted(set, op, "")
 }
 
 // checkCollection is check for an operation that names a collection but no
 // resource, so a deny is scoped to that collection. See policy.Set.Denies.
 func (i *Instance) checkCollection(op authority.Operation, collection string) error {
-	if i.policyErr != nil {
-		return i.policyErr
+	set, err := i.currentPolicy()
+	if err != nil {
+		return err
 	}
-	return i.checkGranted(op, collection)
+	return i.granted(set, op, collection)
 }
 
 // checkGranted is the answer both of the above give: the environment's, unless a
 // policy entry withholds the operation. A deny is all a policy can say here.
-func (i *Instance) checkGranted(op authority.Operation, collection string) error {
+// granted answers for an already-resolved policy. It takes the set because the
+// caller must resolve it before the environment is consulted: a widening policy
+// refuses with ErrWidening, and checking the environment first would report the
+// environment's reason instead.
+func (i *Instance) granted(set *policy.Set, op authority.Operation, collection string) error {
 	if err := i.authority.Check(op); err != nil {
 		return err
 	}
-	if i.policy == nil || !i.policy.Denies(policy.LocalNamespace, collection, op) {
+	if set == nil || !set.Denies(policy.LocalNamespace, collection, op) {
 		return nil
 	}
 	return &authority.ErrNotAuthorized{Operation: op, Authority: i.authority.Without(op)}
@@ -157,13 +169,14 @@ func (i *Instance) checkGranted(op authority.Operation, collection string) error
 // being skipped, because the author wrote one believing it was in force and the
 // alternative is silently answering with the wider set.
 func (i *Instance) checkResource(op authority.Operation, res policy.Resource) error {
-	if i.policyErr != nil {
-		return i.policyErr
-	}
 	if i.policy == nil {
 		return i.authority.Check(op)
 	}
-	return i.policy.Allows(i.authority, res, op)
+	set, err := i.currentPolicy()
+	if err != nil {
+		return err
+	}
+	return set.Allows(i.authority, res, op)
 }
 
 // Authority reports what this environment permits, so an interface can narrow

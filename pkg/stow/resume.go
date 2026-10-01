@@ -202,9 +202,9 @@ type CollectResult struct {
 // Collect reclaims workspaces that are past their TTL and provably unused.
 //
 // The two refusals are the point. A workspace a live session holds is never removed,
-// because it is a working directory and deleting it destroys the artifact in progress.
-// A workspace stow *adopted* is never removed, because it is a caller's own project and
-// no unattended sweep may delete one — that check comes before the age check.
+// because it is a working directory and deleting it destroys the artifact in progress. A
+// workspace stow *adopted* is never removed: it is a caller's own project and no
+// unattended sweep may delete one.
 //
 // It reports every decision, not only the removals, because "nothing was
 // collected" and "three were skipped because they are in use" are different

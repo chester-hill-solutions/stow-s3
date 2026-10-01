@@ -72,14 +72,12 @@ func DefaultRegistryDir() (string, error) {
 // and nothing of anybody else's.
 //
 // It is a partition of the directory rather than a field on the entry, and that
-// choice is the whole point. A label recorded on an entry is a label: `All` would
-// still return every team's workspaces, a sweep would still consider them, and two
-// teams sharing a runner would still be one namespace with extra steps. A partition
-// is enforced by the filesystem, so a team cannot be resumed, collected, or
-// checkpointed from outside its own root, and no code path has to remember to check.
+// choice is the whole point. A label on an entry is a label: `All` would still return
+// every team's workspaces, a sweep would still consider them, and two teams sharing a
+// runner would still be one namespace with extra steps. A partition is enforced by the
+// filesystem, so no code path has to remember to check.
 //
-// The root registry is unaffected: its entries sit beside the `teams` directory, which
-// `All` already skips because it ignores subdirectories.
+// The root registry is unaffected: its entries sit beside the `teams` directory.
 func TeamRegistryDir(base, team string) (string, error) {
 	if base == "" {
 		var err error
@@ -309,17 +307,15 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 
 // Prune forgets entries whose workspace directory no longer exists.
 //
-// Not Collect with a different threshold: Collect asks whether a workspace is
-// finished with, a judgement about time and ownership that destroys directories.
-// Prune asks whether anything is there at all, which is a fact, and removes stow's
-// own records and nothing else. It shares capture exclusion so retained receipts
-// cannot disappear while another caller reconciles a checkpoint.
+// Not Collect with a different threshold: Collect asks whether a workspace is finished
+// with, a judgement about time and ownership that destroys directories. Prune asks
+// whether anything is there at all, which is a fact, and removes stow's own records. It
+// shares capture exclusion so retained receipts cannot disappear under a reconcile.
 //
 // Collect cannot reach these by default: a prepared workspace has no TTL and one
 // opened on a caller's directory is adopted, so both classify forever. includeAdopted
-// covers the second, off by default because the entry is the only record the caller
-// has that they adopted the project — and it is offered because the directory is
-// already gone, so only the record is at stake.
+// covers the second, off by default because the entry is the only record the caller has
+// that they adopted the project.
 func (r *Registry) Prune(includeAdopted bool) ([]Reclaim, error) {
 	entries, err := r.All()
 	if err != nil {

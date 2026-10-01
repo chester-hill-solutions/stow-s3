@@ -198,8 +198,8 @@ func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmRes
 // readPrewarmKeys reads the key list from the flag or the file, and refuses
 // anything that is not a plain key.
 //
-// Duplicates are dropped rather than refused: the same key named twice is a mistake
-// worth tolerating, and warming it twice costs one fetch.
+// Duplicates are dropped rather than refused: the same key named twice costs one
+// extra fetch and is a mistake worth tolerating.
 func readPrewarmKeys(flagValue, file string) ([]string, error) {
 	raw := flagValue
 	if file != "" {

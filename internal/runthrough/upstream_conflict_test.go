@@ -194,12 +194,10 @@ func TestAFreshKeyPropagatesWhenUpstreamStillLacksIt(t *testing.T) {
 // The boundary: a key stow has never read has no provenance to defend, so the
 // write propagates and last-writer-wins continues to apply.
 //
-// This is stated rather than left implicit, because it is the honest limit of
-// what conflict detection can claim. stow can only detect that upstream moved
-// away from a state *it* observed. For a key it created without reading
-// anything there is no such state, and refusing would break the ordinary case
-// of an agent writing a new file. Asserted so the boundary cannot widen by
-// accident: a change that made every write conflict would fail here.
+// This is the honest limit of what conflict detection can claim. stow can only detect
+// that upstream moved away from a state *it* observed, and for a key it created
+// without reading anything there is no such state. Asserted so the boundary cannot
+// widen by accident: a change that made every write conflict would fail here.
 //
 // A concurrent create is not tested here because it is unreachable through this
 // API rather than merely unproven: propagation is inline, so a write has already

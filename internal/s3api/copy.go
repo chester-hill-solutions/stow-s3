@@ -74,11 +74,10 @@ func mapCopyError(err error, resource string) s3Error {
 // copyVerbatim publishes the destination from one version of the source, with
 // the source's own metadata.
 //
-// When the request carries source conditions, they are handed to the store so
-// that the version it copies is the version they were checked against. Checking
-// them here first would leave a window in which the source changes, and the copy
-// would then publish a version the caller never asked about and never saw — the
-// one outcome a conditional copy exists to prevent.
+// When the request carries source conditions, they are handed to the store so the
+// version it copies is the version they were checked against. Checking them here first
+// would leave a window in which the source changes, and the copy would publish a
+// version the caller never asked about.
 //
 // A store that cannot evaluate conditions still produces a coherent copy, and the
 // conditions are still enforced against a version this request observed. That is

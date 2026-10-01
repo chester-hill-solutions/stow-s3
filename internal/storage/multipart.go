@@ -46,10 +46,9 @@ func ValidateMinPartSizes(sizes []int64) error {
 // for the object it is assembling has made the same claim a single write would, about
 // the same bytes, and it is checked the same way.
 //
-// A checksum *algorithm* alone is not a claim. An initiation carries no body, so the
-// only thing it can supply is the algorithm the client intends to use, named before the
-// object exists. There is no value to check, and VerifyChecksum rightly refuses an
-// algorithm without one.
+// A checksum *algorithm* alone is not a claim. An initiation carries no body, so it can
+// supply only the algorithm the client intends to use, named before the object exists.
+// There is no value to check, and VerifyChecksum rightly refuses one without it.
 func MultipartPutOptions(opts MultipartOptions) PutOptions {
 	put := PutOptions{
 		ContentType: opts.ContentType,

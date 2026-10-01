@@ -311,9 +311,9 @@ var contractCapturePattern = regexp.MustCompile(`\{\{([a-zA-Z0-9_]+)\}\}`)
 // step at a directory literally named "{{registryA}}" and reporting an empty
 // registry rather than an error.
 //
-// It also covers the expectations. A step that expects "the root the manifest
-// named" is stating a fact about the contract, and comparing that against the
-// literal text {{work}}/workspace fails on the substitution, not the property.
+// It also covers the expectations. A step that expects "the root the manifest named" is
+// stating a fact about the contract, and comparing that against the literal
+// {{work}}/workspace fails on the substitution, not the property.
 func (r *contractRun) resolve(step contractStep) contractStep {
 	step.Args = r.resolveArgs(step, step.Args)
 	step.Root = r.resolveText(step, "root", step.Root)

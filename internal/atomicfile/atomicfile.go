@@ -21,10 +21,8 @@ import (
 // can be on disk while the directory entry naming it is not.
 //
 // Every error is returned. A caller that cannot be told the write did not happen
-// cannot decide what to do about it, and the common response — retry, or carry on
-// — is wrong in both directions.
-//
-// The parent directory is created if missing, so callers do not each have to.
+// cannot decide what to do about it, and the common response — retry, or carry on — is
+// wrong in both directions. The parent directory is created if missing.
 func Write(path string, data []byte, perm os.FileMode) error {
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0o755); err != nil {

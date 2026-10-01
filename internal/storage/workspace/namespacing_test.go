@@ -22,8 +22,8 @@ import (
 //
 // None of that needs a contrived key. "../escape.txt" is non-natural because of the
 // ".." segment, and it is the shape of key a caller reaches for when a path is
-// assembled from a prefix the caller does not control. The natural-key path was
-// never affected, which is why a workspace with only ordinary keys never showed it.
+// assembled from a prefix it does not control. The natural-key path was never
+// affected, which is why a workspace with only ordinary keys never showed it.
 func TestEscapedKeysAreNamespacedByBucket(t *testing.T) {
 	const (
 		first  = "one"

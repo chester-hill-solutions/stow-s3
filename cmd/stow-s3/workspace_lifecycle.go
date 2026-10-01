@@ -33,13 +33,10 @@ func destroyWorkspaceCommand(args []string) error {
 // It reports the quiet ones first and marks the ones whose directory is gone,
 // because those are the two things a list is for.
 //
-// Every entry is reported, including the ones that are not readable: an entry
-// whose directory has been deleted is what a crashed or hand-cleaned run leaves
-// behind, and it is the single thing a list is most worth finding. A flag to ask
-// for it would mean the default output does not have it, and a caller who does
-// not know the flag does not know the entry exists. Readable is on every summary,
-// so dropping the broken ones is one line in whatever language the caller is
-// written in.
+// Every entry is reported, including the ones that are not readable: an entry whose
+// directory has been deleted is what a crashed run leaves behind, and it is the single
+// thing a list is most worth finding. Readable is on every summary, so dropping the
+// broken ones is one line in whatever language the caller is written in.
 func listWorkspacesCommand(args []string) error {
 	flags := flag.NewFlagSet("workspace list", flag.ContinueOnError)
 	registry := flags.String("registry-dir", "", "Workspace registry directory")

@@ -230,13 +230,10 @@ const maxCachedKeyLimit = 10000
 // It is declared here rather than reusing runthrough.CachedObject, and the JSON tags
 // are here rather than on that type, so the store layer carries no HTTP concern. The
 // fields happen to be the same today. They are separate because an inspection is
-// allowed to answer a question the store has no opinion about, and it already does:
-// a cache entry with no lifetime has a zero expiry, and `omitempty` does not omit a
-// zero time.Time, so an agent reading expires_at saw 0001-01-01 and had no way to
-// tell "expires at the beginning of time" from "never expires". HasExpiry is the
-// same shape WorkspaceSummary uses for has_ttl, for the same reason: a zero that
-// means two things is not a value, and the boolean beside it is what a caller
-// branches on.
+// allowed to answer a question the store has no opinion about: `omitempty` does not
+// omit a zero time.Time, so an agent reading expires_at saw 0001-01-01 with no way to
+// tell "expires at the beginning of time" from "never expires". HasExpiry is the shape
+// WorkspaceSummary uses for has_ttl: a zero that means two things is not a value.
 type cachedInspectEntry struct {
 	Bucket    string    `json:"bucket"`
 	Key       string    `json:"key"`

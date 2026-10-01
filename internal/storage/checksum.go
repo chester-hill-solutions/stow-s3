@@ -57,10 +57,9 @@ func NormalizeChecksumAlgorithm(algorithm string) string {
 // supplied for, and returns ErrChecksumMismatch when they disagree.
 //
 // It is package-level rather than a method on one store because verifying an
-// integrity claim is part of the object model, and it had ended up implemented
-// in exactly one of the three stores: workspace verified, memory and filesystem
-// stored the algorithm and value verbatim and accepted a corrupt body. The
-// contract test that now covers this is why that cannot recur silently.
+// integrity claim is part of the object model, and it had ended up implemented in
+// exactly one of the three stores: workspace verified, memory and filesystem
+// stored the value verbatim and accepted a corrupt body.
 //
 // A caller who supplies neither an algorithm nor a value has made no claim, so
 // there is nothing to verify. Supplying one without the other is an error

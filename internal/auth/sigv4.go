@@ -156,15 +156,13 @@ func parseCredentialScope(raw string) (credentialScope, error) {
 //
 // The list is the client's statement of which headers it covered, and the signature
 // is computed over a canonical request naming exactly those. Every leniency here
-// authenticates a request against headers the client did not commit to, so all
-// four are refused: empty entries, which make "host;;x-amz-date" the same list as
-// "host;x-amz-date"; trimming and lowercasing, so a header named in a different
-// case than the one on the wire is accepted; duplicates, so the canonical request
-// carries a header twice where the request carries it once; and sorting, since
-// the canonical request embeds the list verbatim.
+// authenticates a request against headers the client did not commit to, so all four
+// are refused: empty entries, which make "host;;x-amz-date" the same list as
+// "host;x-amz-date"; trimming and lowercasing; duplicates; and sorting, since the
+// canonical request embeds the list verbatim.
 //
 // AWS's own signer emits lower-case, semicolon-separated, ascending and
-// duplicate-free, so a conforming client is unaffected by refusing anything else.
+// duplicate-free, so a conforming client is unaffected.
 func parseSignedHeaders(raw string) ([]string, error) {
 	if raw == "" {
 		return nil, authError("AccessDenied", "malformed SignedHeaders")

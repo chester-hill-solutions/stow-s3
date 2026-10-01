@@ -123,12 +123,12 @@ type Options struct {
 	// with full authority can still be confined to part of a bucket. It is
 	// intersected with Authority rather than replacing it: a policy cannot grant
 	// what the environment does not have, and one written wider than the
-	// environment is refused at open rather than clipped silently.
+	// environment is refused rather than clipped silently.
 	//
-	// A nil pointer means no policy is consulted, which is what an Instance opened
-	// without one has always done, so adding the field changes no existing
-	// behaviour. See docs/storage-admission-contract.md.
-	Policy *policy.Set
+	// It is a policy.Source, consulted per decision rather than read once. Use
+	// policy.Fixed for a policy that does not change. A nil value means no policy is
+	// consulted, which is what an Instance opened without one has always done.
+	Policy policy.Source
 }
 
 type Capabilities struct {

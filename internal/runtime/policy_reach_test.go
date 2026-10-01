@@ -182,7 +182,7 @@ func openReach(t *testing.T, p reachPolicy) (*runtime.Instance, func()) {
 	}
 	instance, err := runtime.OpenWithStore(runtime.Options{
 		Backend: runtime.BackendMemory,
-		Policy:  &set,
+		Policy:  policy.Fixed(&set),
 	}, store, func() (storage.Store, error) { return storage.NewMemoryStore(), nil })
 	if err != nil {
 		t.Fatalf("open: %v", err)
@@ -196,10 +196,9 @@ func openReach(t *testing.T, p reachPolicy) (*runtime.Instance, func()) {
 
 // A widening policy refuses every operation, which the contract says in those
 // words. It did not: check() consulted the environment only, so an Instance opened
-// with a wider policy refused every object operation with ErrWidening while Reset
-// and the bucket half of the namespace carried on under the environment. The answer
-// was still safe — an environment that withholds an operation withholds it whatever
-// the policy says — but the reason a caller saw differed by verb.
+// with a wider policy refused every object operation with ErrWidening while Reset and
+// the bucket half of the namespace carried on under the environment. The answer was
+// still safe, but the reason a caller saw differed by verb.
 func TestAWideningPolicyRefusesEveryOperationNotJustTheOnesOnAResource(t *testing.T) {
 	readOnly := authority.ReadOnly()
 	store := storage.NewMemoryStore()
@@ -210,7 +209,7 @@ func TestAWideningPolicyRefusesEveryOperationNotJustTheOnesOnAResource(t *testin
 	instance, err := runtime.OpenWithStore(runtime.Options{
 		Backend:   runtime.BackendMemory,
 		Authority: &readOnly,
-		Policy:    &set,
+		Policy:    policy.Fixed(&set),
 	}, store, func() (storage.Store, error) { return storage.NewMemoryStore(), nil })
 	if err != nil {
 		t.Fatalf("open: %v", err)

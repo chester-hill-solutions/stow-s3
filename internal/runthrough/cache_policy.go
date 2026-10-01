@@ -167,16 +167,13 @@ func (a *Adapter) evictCache(ctx context.Context) error {
 // collectCacheCandidates plans eviction from the index, not from the store.
 //
 // The previous version listed every bucket, paginated every object, and issued a
-// HeadObject per object to recover the access time and size. That made a single
-// changed-object refresh cost a store round trip for every cached object, so a
-// cache of N objects took N round trips each time anything in it changed — which
-// is most of a session. The index already holds access time, expiry and, now,
-// size, so the same plan costs one pass over a map.
+// HeadObject per object to recover the access time and size, so a cache of N objects
+// took N round trips each time anything in it changed. The index already holds access
+// time, expiry and size, so the same plan costs one pass over a map.
 //
-// What this gives up is discovery of cache objects with no index entry. Every path
-// that populates the cache calls trackCacheObject, so the index is complete for
-// objects stow wrote; reconcileCacheIndex exists to rebuild it from the store when
-// that assumption is worth checking rather than trusting.
+// What this gives up is discovery of cache objects with no index entry. Every path that
+// populates the cache calls trackCacheObject, and reconcileCacheIndex rebuilds the index
+// when that assumption is worth checking.
 func (a *Adapter) collectCacheCandidates(ctx context.Context) ([]cacheCandidate, int64, error) {
 	now := time.Now()
 
@@ -281,17 +278,13 @@ func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 
 	// Then apply the limits, once, to what was just discovered.
 	//
-	// Eviction is otherwise reached from exactly one place: trackCacheObject,
-	// which only runs when this process writes to the cache. A server that came
-	// up over a cache already larger than its bound, and then only reads, never
-	// evicts and never converges. That is not a hypothetical shape: a detached
-	// session spends its life reading, so "reads do not enforce the limit" is
-	// "the limit does not hold while offline".
+	// Eviction is otherwise reached from exactly one place: trackCacheObject, which
+	// only runs when this process writes to the cache. A server that came up over a
+	// cache already larger than its bound and then only reads never evicts and never
+	// converges, and a detached session spends its life reading.
 	//
-	// This runs once at startup rather than on every read, because the
-	// alternative is an eviction re-plan per request, which is the walk
-	// TestLimitedCacheRefreshesDoNotWalkTheCache exists to keep out of the
-	// refresh path.
+	// This runs once at startup rather than per read, because the alternative is an
+	// eviction re-plan per request.
 	return a.evictCache(ctx)
 }
 

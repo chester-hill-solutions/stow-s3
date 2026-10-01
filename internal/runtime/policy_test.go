@@ -44,7 +44,7 @@ func openPolicy(t *testing.T, build func(*policy.Set)) *runtime.Instance {
 	build(&set)
 	instance, err := runtime.OpenWithStore(runtime.Options{
 		Backend: runtime.BackendMemory,
-		Policy:  &set,
+		Policy:  policy.Fixed(&set),
 	}, store, nil)
 	if err != nil {
 		t.Fatalf("open: %v", err)
@@ -193,7 +193,7 @@ func TestAPolicyWiderThanTheEnvironmentRefusesEverything(t *testing.T) {
 	instance, err := runtime.OpenWithStore(runtime.Options{
 		Backend:   runtime.BackendMemory,
 		Authority: &readOnly,
-		Policy:    &set,
+		Policy:    policy.Fixed(&set),
 	}, store, nil)
 	if err != nil {
 		t.Fatalf("open: %v", err)

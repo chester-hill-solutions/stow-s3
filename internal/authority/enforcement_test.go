@@ -17,15 +17,13 @@ import (
 // ungated with a reason.
 //
 // Four of the twelve were in the second state and nobody knew, because the set is
-// closed and the constants are exported: a caller narrowing an Authority appears
-// to withhold something the code never consults. The gate metrics cannot see it —
-// there is no line of code to be too long or too complex — which is why it needed
-// a test rather than a lint rule.
+// closed and the constants are exported: a caller narrowing an Authority appears to
+// withhold something the code never consults. The gate metrics cannot see it, which
+// is why it needed a test rather than a lint rule.
 //
 // The check is by source scan rather than by a hand-maintained list, so it cannot
-// drift from what the code does. A hand-written "these are enforced" list would
-// be a fourth copy of the same fact, which is the failure this repository has
-// already hit six times.
+// drift from what the code does. A hand-written "these are enforced" list would be a
+// fourth copy of the same fact.
 
 // operationByConstName maps each exported constant's Go name to the Operation it
 // denotes. A check site reads check(authority.BucketCreate), so the source scan
@@ -73,9 +71,8 @@ func operationByConstName(t *testing.T) map[string]authority.Operation {
 // enforcementMethods are the method names that count as consulting an authority.
 //
 // Authority.Allows is the predicate, Authority.Check turns its refusal into an error,
-// and check is the runtime wrapper. Narrowing to a named set is deliberate: matching
-// any call that merely mentions an operation would also match a log statement or a
-// slice, and would let a real gap pass as enforced.
+// and check is the runtime wrapper. Narrowing to a named set is deliberate: matching any
+// call that merely mentions an operation would also match a log statement.
 //
 // This set has had to widen three times, each time because a gate spelling the scan
 // could not see was added: the adapter gating on Allows, the runtime gaining

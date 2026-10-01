@@ -20,10 +20,9 @@ import (
 // evictCache returns early when MaxBytes, MaxObjects and TTL are all zero.
 //
 // The limits are what change the cost, which is worth knowing before recommending
-// cache settings for a host with a constrained link. This measures the shape
-// rather than asserting it: the ratio between two equal-length batches at
-// different cache depths distinguishes linear from quadratic without depending on
-// the machine's speed.
+// cache settings for a host with a constrained link. This measures the shape: the
+// ratio between two equal-length batches at different depths distinguishes linear
+// from quadratic without depending on the machine's speed.
 
 const cacheProbeBody = 64
 

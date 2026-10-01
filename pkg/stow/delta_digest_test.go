@@ -11,7 +11,9 @@ import (
 
 // A delta document's own digests cover its content and nothing else. Each changed
 // path carries the sha256 of its bytes, and a receiver checks those, so the bytes
-// cannot be swapped. Nothing in the document binds the change list itself — the
+// cannot be swapped. Nothing binds the change list — the paths, the kinds, the
+// from/to metadata — to the sender's intent.
+//
 // The consequence is not subtle: take a document that adds "notes.txt", rename the
 // addition to "planted.sh" in the change and in the content map together, and the
 // document is entirely self-consistent. The content digest still matches the bytes it

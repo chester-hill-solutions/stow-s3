@@ -41,10 +41,9 @@ func supportsConditionalWrites(store Store) bool {
 // MultipartStore is the optional extension: a store that can stream an object
 // larger than memory.
 //
-// It is separate from Store because multipart is how one protocol happens to do
-// that. Requiring it would put that shape into the object model, which is the
-// coupling the architecture document's store section exists to name — so a store
-// that will never serve a large object implements nine fewer methods.
+// It is separate from Store because multipart is how one protocol happens to do that.
+// Requiring it would put that shape into the object model, which is the coupling the
+// architecture document's store section exists to name.
 //
 // It is the WHOLE surface, not just the write half. The runtime reconciles
 // in-flight uploads when it opens, so a store claiming multipart has to be able
