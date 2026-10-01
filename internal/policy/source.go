@@ -8,7 +8,7 @@ import "time"
 // resolved into a decision: "you may not" and "I do not know" need different responses.
 //
 // It is a function type rather than an interface because nil is the answer the caller
-// already has for "no policy". **A Source must be cheap and must not block** - it is
+// already has for "no policy". **A Source must be cheap and must not block** — it is
 // consulted on every operation and on the multipart paths with the instance mutex held,
 // so a host whose policy lives on disk wraps it in something stating how stale the
 // answer may be.

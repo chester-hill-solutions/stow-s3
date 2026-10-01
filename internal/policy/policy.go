@@ -192,13 +192,13 @@ func (s Set) Allows(env authority.Authority, r Resource, op authority.Operation)
 // locator, and nil when none does. It is the only way a policy reaches such an
 // operation, and the asymmetry with Authorize is the point: a deny is honoured wherever
 // it can be attributed, and an allow needs a resource. A key prefix is not
-// attributable - an entry over `public/` says nothing about whether a bucket may be
-// created - so a collection is matched when the operation names one and any when it
+// attributable — an entry over `public/` says nothing about whether a bucket may be
+// created — so a collection is matched when the operation names one and any when it
 // does not, because Reset names no bucket and a deny scoped to a collection that could
 // never apply is the same failure as one never written.
 //
 // It returns the error rather than a bool because the refusal is a policy's, and a
-// caller building its own reaches for the environment's type - whose message says the
+// caller building its own reaches for the environment's type — whose message says the
 // environment refused and reports a narrowed grant that never existed.
 func (s Set) Deny(env authority.Authority, namespace, collection string, op authority.Operation) error {
 	for _, e := range s.entries {

@@ -178,7 +178,7 @@ func (i *Instance) Authority() authority.Authority {
 }
 
 // Authorize is the decision for one operation on one resource, for a caller owning
-// a resource this Instance has no verb for - the workspace facade, whose Destroy was
+// a resource this Instance has no verb for — the workspace facade, whose Destroy was
 // consulting the environment only. It is exported rather than left to each caller
 // because resolving the revision and deciding must have one implementation.
 func (i *Instance) Authorize(op authority.Operation, res policy.Resource) error {

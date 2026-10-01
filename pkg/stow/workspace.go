@@ -77,7 +77,7 @@ type WorkspaceOptions struct {
 	//	ws, err := stow.OpenWorkspace(stow.WorkspaceOptions{Authority: &readOnly})
 	Authority *Authority
 	// Policy narrows Authority per resource, which for a workspace is the registered
-	// workspace itself - its Destroy, and eventually its captures. A nil value means no
+	// workspace itself — its Destroy, and eventually its captures. A nil value means no
 	// policy is consulted, which is what a workspace has always done. It is a
 	// policy.Source, so a revocation takes effect without a reopen.
 	Policy policy.Source
@@ -173,8 +173,8 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	// The workspace bucket is bootstrapped through the store rather than the runtime,
 	// because it is a construction step and not a caller operation. The runtime carries
 	// the authority the caller asked for, so routing this through it would evaluate the
-	// grant against the act of issuing it, and a read-only authority - which withholds
-	// bucket.create - could not open a workspace at all. The store returns early for
+	// grant against the act of issuing it, and a read-only authority — which withholds
+	// bucket.create — could not open a workspace at all. The store returns early for
 	// this bucket, so it materialises nothing; it only keeps the grant from being
 	// consulted about a bucket the workspace is made of.
 	if err := store.CreateBucket(context.Background(), ws.bucket); err != nil {
