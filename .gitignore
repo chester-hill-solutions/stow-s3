@@ -7,6 +7,10 @@
 *.dylib
 # Native binaries staged into the platform packages for packing
 /packages/stow-*/bin/
+# A `go build ./tools/...` from the repository root writes the quality scanner here,
+# named after its package. It was committed once by accident and every local build
+# overwrote the tracked file, so nothing about it belonged in version control.
+/quality
 
 # Go test artifacts
 *.test
