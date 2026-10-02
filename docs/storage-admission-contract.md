@@ -270,6 +270,48 @@ from the obvious example passes with the gate deleted. Every allow case in this 
 paired with a deny case for this reason, and each was confirmed by deliberately pointing
 a check at a different operation.
 
+### The refusal matrix, run rather than remembered
+
+`scripts/refusal-matrix.mjs` mutates every enforcement site to consult an operation no
+policy grants, and reports the site proven only when the refusal suite then fails **and
+names that operation**. The mutation is a sentinel rather than a deletion, because
+deleting a call site also breaks compilation whenever it leaves an import unused, which
+reads like a failure but proves nothing about reach.
+
+Measured on 2026-10-02 across 36 sites: **14 are reached by a policy naming the operation,
+16 are reached only as far as the environment, and 6 are not reached at all.** That is the
+honest answer to "is every gate proven", and it is worse than the reach test's existence
+suggests.
+
+The middle group is the one worth being careful about. Those sites *do* fail the suite when
+mutated, but because the environment refuses an operation it does not know, which is its
+documented fail-closed behaviour. That proves the site is executed on the path; it does
+**not** prove a policy reaches it, because the tests exercising those paths install no
+policy. Reporting them as proven would have been the same overstatement this document keeps
+correcting, so the script distinguishes the two and calls the weaker one `weak`.
+
+The six unreached are a real gap:
+
+| site | operation |
+|---|---|
+| `internal/runtime/object_recovery.go:95` | `object.read` |
+| `internal/runtime/object_recovery.go:98` | `object.write` |
+| `internal/runtime/object_recovery.go:102` | `object.read` |
+| `internal/runtime/object_recovery.go:105` | `object.write` |
+| `internal/runtime/multipart.go:67` | `object.read` |
+| `internal/runtime/multipart.go:278` | `object.read` |
+
+The `object_recovery.go` four are the reconciliation paths that run only when a store call
+has already failed, so no test reaches them with a policy in force. Two multipart read
+paths are likewise unexercised under one. Closing them means writing the tests, not
+adjusting the matrix: the script is deliberately not part of `make standards`, because it
+edits source files and so cannot share a working tree with anything else.
+
+A separate scan reports enforcement calls no mutation covers, so the matrix cannot quietly
+claim completeness it does not have. It found one - the environment grant in
+`CheckpointOfAuthorized`, which is the only gate when no policy is in force - and that site
+is now in the list.
+
 This was not only a property of the new cases. Pointing `GetObject`'s check at
 `object.write` instead of `object.read` produced **zero** failures in
 `TestEveryOperationReachesThePolicy` — the systematic matrix was as blind as any single
