@@ -230,7 +230,7 @@ jobs:
           cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/npm-consumer/"
           cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
           cd "$RUNNER_TEMP/npm-consumer"
-          npm install --ignore-scripts --registry=https://npm.pkg.github.com --@chester-hill-solutions:registry=https://npm.pkg.github.com ./*.tgz
+          npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com ./*.tgz
           env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${RELEASE_VERSION#v}"
 
   live_gate:
@@ -479,7 +479,7 @@ jobs:
           cp scripts/smoke-npm-consumer.mjs scripts/smoke-python-consumer.py "$RUNNER_TEMP/anonymous-consumer/"
           cd "$RUNNER_TEMP/anonymous-consumer"
           touch "$RUNNER_TEMP/empty-npmrc"
-          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://npm.pkg.github.com --@chester-hill-solutions:registry=https://npm.pkg.github.com --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "$version"
           python3 -m venv python-consumer
           env -u PIP_INDEX_URL -u PIP_EXTRA_INDEX_URL python-consumer/bin/python -m pip install --index-url=https://pypi.org/simple "stow-s3==$version"

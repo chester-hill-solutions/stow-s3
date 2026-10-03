@@ -93,6 +93,32 @@ The repository has no variables at all. The workflow already handles this correc
 it warns and continues on a rehearsal, and stops on a tag. So this is the account
 setup, not a defect.
 
+## A release on GitHub Packages needs two registries, not one
+
+Retargeting exposed this and the rehearsal caught it: setting `--registry` to GitHub
+Packages sent **every** dependency lookup there, including third-party ones, and GitHub
+Packages does not mirror npmjs. All four packed-consumer jobs failed with
+
+```
+npm error 404 Not Found - GET https://npm.pkg.github.com/@aws-sdk%2fclient-s3
+  - npm package "client-s3" does not exist under owner "aws-sdk"
+```
+
+`--registry` sets the default for all package names, so it cannot express "our packages
+come from here and everything else comes from npmjs". The working configuration is both:
+
+```
+--registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com
+```
+
+`publishConfig.registry` still names GitHub Packages, because that is where `npm publish`
+sends the tarball. `setup-node`'s `registry-url` also names GitHub Packages, for the
+credentials it writes. Only the *install* steps need the default left on npmjs.
+
+So a consumer of this package needs the same two-registry configuration, which is the
+cost the plan's exit criterion could not survive, and why the install instructions carry
+the scope binding rather than a registry change.
+
 ## What is verified about the product itself
 
 Audited against the tree on 2026-10-01, because one claim on the front page had been
