@@ -471,16 +471,24 @@ jobs:
           attestations: true
       # Tag-only: this installs the version back from the registries, so it can
       # only pass once the publish steps above have actually run.
-      - name: Verify exact published versions as anonymous consumers
+      - name: Verify exact published npm versions as anonymous consumers
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           version="${RELEASE_VERSION#v}"
-          mkdir -p "$RUNNER_TEMP/anonymous-consumer"
-          cp scripts/smoke-npm-consumer.mjs scripts/smoke-python-consumer.py "$RUNNER_TEMP/anonymous-consumer/"
-          cd "$RUNNER_TEMP/anonymous-consumer"
+          mkdir -p "$RUNNER_TEMP/anonymous-npm-consumer"
+          cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/anonymous-npm-consumer/"
+          cd "$RUNNER_TEMP/anonymous-npm-consumer"
           touch "$RUNNER_TEMP/empty-npmrc"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "$version"
+
+      - name: Verify exact published PyPI version as anonymous consumer
+        if: startsWith(github.ref, 'refs/tags/v') && steps.pypi.outputs.status == 'enabled'
+        run: |
+          version="${RELEASE_VERSION#v}"
+          mkdir -p "$RUNNER_TEMP/anonymous-python-consumer"
+          cp scripts/smoke-python-consumer.py "$RUNNER_TEMP/anonymous-python-consumer/"
+          cd "$RUNNER_TEMP/anonymous-python-consumer"
           python3 -m venv python-consumer
           env -u PIP_INDEX_URL -u PIP_EXTRA_INDEX_URL python-consumer/bin/python -m pip install --index-url=https://pypi.org/simple "stow-s3==$version"
           env -u STOW_BIN -u PYTHONPATH python-consumer/bin/python smoke-python-consumer.py
