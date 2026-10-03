@@ -20,7 +20,7 @@
 //
 // npm availability is checked anonymously at npmjs; publishing is a separate operation.
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 
@@ -154,11 +154,27 @@ for (const doc of DOCS) {
   problems.push(...docProblems(SURFACE, doc, readFileSync(full, "utf8")));
 }
 
+// publishRegistry is where the release publishes, read from the package it publishes.
+// It is not configurable on purpose: a flag would let the check be pointed somewhere the
+// release does not go, which is the mistake being removed.
+export function publishRegistry(repoRoot = resolve(import.meta.dirname, "..")) {
+  const manifest = JSON.parse(readFileSync(join(repoRoot, "packages/stow-s3/package.json"), "utf8"));
+  const registry = manifest.publishConfig?.registry;
+  if (!registry) throw new Error("packages/stow-s3/package.json has no publishConfig.registry, so the install-surface check cannot know where to look");
+  return registry;
+}
+
 if (process.argv.includes("--online")) {
+  // The registry comes from the manifest's own publishConfig rather than being written
+  // here. Hardcoding npmjs meant that after the release moved to GitHub Packages this
+  // check asked npmjs about packages that are not there, so it would report the whole
+  // npm surface as unreachable - a false failure caused by the gate looking in the wrong
+  // place, which is the failure this repository has now paid for three times.
+  const npmRegistry = publishRegistry();
   const checks = [
     ...SURFACE.filter((e) => e.ecosystem === "npm").map((e) => ({
       ...e,
-      url: `https://registry.npmjs.org/${encodeURIComponent(e.name)}`,
+      url: `${npmRegistry}/${encodeURIComponent(e.name)}`,
     })),
     ...SURFACE.filter((e) => e.ecosystem === "pypi").map((e) => ({
       ...e,

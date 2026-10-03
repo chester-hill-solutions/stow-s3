@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { test } from "node:test";
 
-import { docProblems, reachabilityProblems, SURFACE } from "./check-install-surface.mjs";
+import { docProblems, publishRegistry, reachabilityProblems, SURFACE } from "./check-install-surface.mjs";
 
 // A surface where everything is published. This is the state the repository is
 // heading toward and the one the gate had never been asked about.
@@ -140,4 +142,15 @@ test("a genuinely reachable package declared unpublished is still a problem", ()
   assert.equal(problems.length, 1);
   assert.match(problems[0], /reachable \(HTTP 200\)/);
   assert.match(problems[0], /published=false/);
+});
+
+// The registry has to be the one the release publishes to, read from the manifest rather
+// than written here. Hardcoding npmjs made this check ask npmjs about packages that live
+// on GitHub Packages, so after the retarget it would have reported the entire npm surface
+// as unreachable.
+test("the online check looks where the release publishes", () => {
+  const registry = publishRegistry();
+  const manifest = JSON.parse(readFileSync(join(resolve(import.meta.dirname, ".."), "packages/stow-s3/package.json"), "utf8"));
+  assert.equal(registry, manifest.publishConfig.registry);
+  assert.notEqual(registry, "https://registry.npmjs.org", "a hardcoded npmjs registry is what this replaced");
 });
