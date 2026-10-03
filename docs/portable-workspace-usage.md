@@ -163,6 +163,10 @@ to reapply the body. A retirement API would need caller acknowledgement of the
 replay window, terminal-only eligibility, recovery-hold checks and a durable
 tombstone; no automatic retirement or outcome override is provided.
 
+The [receipt lifecycle proposal](receipt-retirement-proposal.md) specifies the
+archive ordering, replay behavior, bounded admission and decision required before
+adding retirement.
+
 Arbitrary host edits, directory copies, shared-host fencing, pre-enrollment ABA
 history and physical power-loss qualification are outside this profile. Admission
 refreshes authoritative object/multipart accounting by scanning the store; workload
