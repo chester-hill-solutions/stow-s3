@@ -1,7 +1,7 @@
 import { build } from 'esbuild';
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { gzipSync } from 'node:zlib';
+import { execFileSync } from 'node:child_process';
 const root = fileURLToPath(new URL('.', import.meta.url));
 const result = await build({ absWorkingDir: root, entryPoints: ['src/app.ts'], bundle: true, minify: true, format: 'esm', platform: 'browser', target: 'es2022', write: false, outfile: 'app.js', metafile: true });
 const script = result.outputFiles.find(file => file.path.endsWith('.js')).text.replaceAll('</script', '<\\/script');
@@ -20,7 +20,10 @@ const notices = [...packages].sort().map(path => {
 }).join('\n');
 const html = readFileSync(`${root}src/index.html`, 'utf8').replace('<!-- SDK_STYLE -->', `<style>${style}</style>`)
   .replace('<!-- SDK_SCRIPT -->', `<script type="module">${script}</script><!-- Bundled dependency notices\n${notices.replaceAll('-->', '-- >')}\n-->`);
-const compressed = gzipSync(html, { level: 9 });
+const compressed = execFileSync('go', ['run', './tools/mcp-browser-pack'], {
+  cwd: `${root}../..`, input: html, maxBuffer: 4 << 20,
+  env: { ...process.env, GOTOOLCHAIN: `go${readFileSync(`${root}../../.go-version`, 'utf8').trim()}` },
+});
 const license = readFileSync(`${root}../../LICENSE`, 'utf8');
 if (process.argv.includes('--check')) {
   if (!readFileSync(`${root}../../internal/mcpstorage/browser.html.gz`).equals(compressed)) throw new Error('Browser HTML differs from a fresh build. Run npm run build.');

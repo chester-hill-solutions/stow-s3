@@ -64,7 +64,8 @@ and server registration; this package does not deploy one.
 ## Build and verify the UI
 
 Node is needed only to develop/build the UI or run the optional configuration
-helper. Dependencies are pinned and locked. The gzip artifact is deterministic
+helper. Dependencies are pinned and locked. The UI build also uses the repository's
+pinned Go toolchain for compression, independent of Node's zlib version. The gzip artifact is deterministic
 and embedded by Go; the MCP resource serves normal HTML with no network assets.
 Bundled dependency license texts are included in the HTML and plugin package.
 
