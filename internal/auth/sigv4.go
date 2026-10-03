@@ -263,6 +263,9 @@ func verifySignedRequest(r *http.Request, creds Credentials, region string, maxS
 	if err := validateCredentialScope(r, sr, creds, region); err != nil {
 		return err
 	}
+	if err := validateAmzHeaders(r, sr); err != nil {
+		return err
+	}
 	if err := validateRequestTime(r, sr, maxSkew, now); err != nil {
 		return err
 	}
@@ -278,6 +281,16 @@ func verifySignedRequest(r *http.Request, creds Credentials, region string, maxS
 	// case, which is not a signature anyone computed.
 	if !hmac.Equal([]byte(sr.signature), []byte(expected)) {
 		return authError("SignatureDoesNotMatch", "signature mismatch")
+	}
+	return nil
+}
+
+func validateAmzHeaders(r *http.Request, sr signedRequest) error {
+	for name := range r.Header {
+		name = strings.ToLower(name)
+		if strings.HasPrefix(name, "x-amz-") && !containsHeader(sr.signedHeaders, name) {
+			return authError("AccessDenied", "%s must be signed", name)
+		}
 	}
 	return nil
 }
