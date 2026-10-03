@@ -116,12 +116,14 @@ func (m *mockUpstream) PutObject(_ context.Context, bucket, key string, body io.
 	}
 	m.bodies[k] = data
 	m.objects[k] = storage.ObjectMeta{
-		Bucket:      bucket,
-		Key:         key,
-		Size:        int64(len(data)),
-		ETag:        etag,
-		ContentType: opts.ContentType,
-		Metadata:    opts.Metadata,
+		Bucket:            bucket,
+		Key:               key,
+		Size:              int64(len(data)),
+		ETag:              etag,
+		ContentType:       opts.ContentType,
+		Metadata:          opts.Metadata,
+		ChecksumAlgorithm: opts.ChecksumAlgorithm,
+		ChecksumValue:     opts.ChecksumValue,
 	}
 	return etag, nil
 }
