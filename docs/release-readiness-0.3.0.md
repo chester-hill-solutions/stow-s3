@@ -1,7 +1,9 @@
 # Release readiness for 0.3.0
 
-Verified 2026-10-01. Everything here is a measurement, not a plan; where a step is
-yours, it says so and says why I cannot do it.
+Superseded by the [2026-10-03 verification checkpoint](release-verification-2026-10-03.md)
+for current gates and user actions. The account/visibility conclusions below are
+historical: unauthenticated HTTP 401 does not establish private visibility on the
+GitHub npm registry, which documents authentication for public packages too.
 
 ## The pipeline is proven
 
