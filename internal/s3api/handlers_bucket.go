@@ -229,6 +229,7 @@ func (s *Server) handleGetObject(ctx context.Context, w http.ResponseWriter, r *
 			// Validators only. A 304 has no body, so the representation
 			// metadata that describes one must not be sent with it.
 			setValidators(w, meta)
+			setCORS(w, r)
 			w.WriteHeader(http.StatusNotModified)
 			return
 		}
@@ -263,6 +264,7 @@ func (s *Server) handleHeadObject(ctx context.Context, w http.ResponseWriter, r 
 			// Validators only. A 304 has no body, so the representation
 			// metadata that describes one must not be sent with it.
 			setValidators(w, meta)
+			setCORS(w, r)
 			w.WriteHeader(http.StatusNotModified)
 			return
 		}
@@ -327,6 +329,10 @@ func (s *Server) handleDeleteObjects(ctx context.Context, w http.ResponseWriter,
 // handleCopyObject dispatches a copy to the path its metadata directive names.
 // The paths themselves are in copy.go.
 func (s *Server) handleCopyObject(ctx context.Context, w http.ResponseWriter, r *http.Request, dstBucket, dstKey, copySource string) {
+	if r.Header.Get("If-Match") != "" || r.Header.Get("If-None-Match") != "" {
+		writeError(w, r, s3Error{Code: "NotImplemented", Message: "Copy destination conditions are not supported", StatusCode: http.StatusNotImplemented})
+		return
+	}
 	srcBucket, srcKey, err := parseCopySource(copySource)
 	if err != nil {
 		writeError(w, r, s3Error{Code: "InvalidArgument", Message: err.Error(), Resource: resourcePath(dstBucket, dstKey), StatusCode: http.StatusBadRequest})
