@@ -222,7 +222,11 @@ func (s *outboxState) commitPrepared(id, owner string, token uint64, version str
 		}
 		return OutboxEntry{}, fmt.Errorf("outbox prepared entry %q not found", id)
 	}
-	if entry.PreparedOwner != owner || entry.PreparedToken != token || !entry.PreparedUntil.After(time.Now().UTC()) {
+	// The deadline gates crash recovery; it does not revoke this fencing token.
+	// A live owner can finish a slow local mutation, and recovery can commit the
+	// expired intent after proving its owner is dead. New prepares stay blocked
+	// until this intent is resolved, so expiry alone cannot authorize a new writer.
+	if entry.PreparedOwner != owner || entry.PreparedToken != token {
 		return OutboxEntry{}, ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)

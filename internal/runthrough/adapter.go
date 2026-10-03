@@ -214,6 +214,10 @@ func (a *Adapter) DiscardOutboxEntry(id string) error {
 // folding the two together put one check on the propagation path twice. See
 // "Reaching upstream under a policy" in docs/storage-admission-contract.md.
 func (a *Adapter) upstreamReachable(bucket string) bool {
+	return !a.cfg.Offline && a.upstreamPermitted(bucket)
+}
+
+func (a *Adapter) upstreamPermitted(bucket string) bool {
 	if a.upstream == nil {
 		return false
 	}
@@ -223,12 +227,9 @@ func (a *Adapter) upstreamReachable(bucket string) bool {
 	return a.cfg.Upstream.Bucket == "" || a.cfg.Upstream.Bucket == bucket
 }
 
-// upstreamEnabled is upstreamReachable plus the policy, and it is the read-side
-// chokepoint: HeadObject, GetObject, and the revalidation walk all consult it
-// before touching a.upstream, so gating reads here rather than at each call site
-// is what makes "no code path reaches upstream without a permission" a property of
-// the code rather than a claim about it. The write side has its own decision,
-// because a write has three outcomes rather than two.
+// upstreamEnabled combines online reachability and the per-object read policy.
+// Cached reads check upstreamPermitted separately so offline can still serve
+// authorized cached bytes. Live observation, listing and writes use this gate.
 func (a *Adapter) upstreamEnabled(bucket, key string) bool {
 	return a.upstreamReachable(bucket) && a.allows(authority.UpstreamRead, bucket, key) == nil
 }
@@ -381,7 +382,7 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 	if !errors.Is(localErr, storage.ErrObjectNotFound) {
 		return nil, nil, localErr
 	}
-	if !a.upstreamEnabled(bucket, key) {
+	if !a.upstreamPermitted(bucket) || a.allows(authority.UpstreamRead, bucket, key) != nil {
 		return nil, nil, storage.ErrObjectNotFound
 	}
 	return a.resolveCachedObject(ctx, bucket, key, needBody)

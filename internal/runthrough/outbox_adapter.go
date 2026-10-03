@@ -229,16 +229,9 @@ func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry Ou
 	if !ok || !dueForPropagation(current, pending, respectSchedule) {
 		return nil
 	}
-	// The grant is checked here, in the one funnel every propagation goes through,
-	// rather than at each caller. The write path already gated before enqueuing; this
-	// stops the *other* two ways in — the per-second retry worker and the admin retry
-	// route — which is where R-201 found propagation reaching upstream without ever
-	// consulting a permission.
-	//
-	// The entry is left pending rather than failed. Refusing to propagate is not a
-	// failure of the entry, and marking it terminal would discard a write the
-	// operator may yet authorise.
-	if !a.authority.Allows(authority.UpstreamWrite) {
+	// Gate immediate propagation and both retry paths on current reachability and
+	// authority. A withheld grant or offline host leaves the intent pending.
+	if !a.upstreamReachable(current.Bucket) || !a.authority.Allows(authority.UpstreamWrite) {
 		return nil
 	}
 	// The policy is asked here, on the entry, and not only on the path that enqueued

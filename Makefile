@@ -1,4 +1,4 @@
-.PHONY: multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated benchmark
+.PHONY: multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -168,4 +168,12 @@ check-adr-index:
 check-scripts:
 	node --test scripts/*.test.mjs
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-scripts check-ts-quality check-generated
+check-mcp-browser:
+	$(NPM_INSTALL)
+	npm ci --ignore-scripts --prefix extensions/stow
+	npm run check --prefix extensions/stow
+	cd extensions/stow && node ../../packages/stow-s3/node_modules/eslint/bin/eslint.js src/ *.mjs test/ --max-warnings=0
+	npm test --prefix extensions/stow
+	node extensions/stow/build.mjs --check
+
+standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-scripts check-ts-quality check-generated check-mcp-browser

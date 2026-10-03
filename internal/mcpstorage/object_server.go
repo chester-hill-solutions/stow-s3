@@ -21,6 +21,7 @@ type ObjectConfig struct {
 	MaxBytes, MaxObjects            int64
 	MaxObjectBytes, MaxObservations int
 	CreateBucket, ReadOnly          bool
+	Browser                         bool
 }
 
 type objectObservation struct {
@@ -58,6 +59,9 @@ func NewObjects(config ObjectConfig) (*ObjectServer, error) {
 	}
 	host.Server = mcp.NewServer(&mcp.Implementation{Name: "stow-objects", Version: "1"}, &mcp.ServerOptions{Instructions: objectGuide})
 	host.addTools()
+	if config.Browser {
+		host.addBrowser()
+	}
 	return host, nil
 }
 

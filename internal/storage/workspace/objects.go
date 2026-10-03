@@ -65,10 +65,15 @@ func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader,
 	}
 
 	absPath, form := s.pathFor(bucket, key)
-	if err := writeFileAtomic(absPath, data); err != nil {
+	if err := s.writeAtomic(absPath, data); err != nil {
 		return nil, fmt.Errorf("workspace store: write %s: %w", key, err)
 	}
-	info, err := os.Stat(absPath)
+	written, err := s.openRead(absPath, nil)
+	if err != nil {
+		return nil, fmt.Errorf("workspace store: open written %s: %w", key, err)
+	}
+	info, err := written.Stat()
+	written.Close()
 	if err != nil {
 		return nil, fmt.Errorf("workspace store: stat written %s: %w", key, err)
 	}
@@ -172,7 +177,7 @@ func (s *Store) DeleteObject(ctx context.Context, bucket, key string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.Remove(absPath); err != nil {
+	if err := s.removeConfined(absPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return storage.ErrObjectNotFound
 		}
@@ -420,11 +425,7 @@ func (s *Store) pruneEmptyParents(bucket, absPath string) {
 		if dir == root {
 			return
 		}
-		entries, err := os.ReadDir(dir)
-		if err != nil || len(entries) > 0 {
-			return
-		}
-		if err := os.Remove(dir); err != nil {
+		if err := s.removeConfined(dir); err != nil {
 			return
 		}
 	}

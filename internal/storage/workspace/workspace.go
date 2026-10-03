@@ -100,6 +100,7 @@ func New(options Options) (*Store, error) {
 	if err != nil {
 		return nil, err
 	}
+	manifest.rootIdentity, index.rootIdentity = rootIdentity, rootIdentity
 	store := &Store{
 		rootIdentity: rootIdentity,
 		root:         options.Root,

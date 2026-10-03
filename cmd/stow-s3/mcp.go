@@ -67,6 +67,7 @@ func registerMCPFlags(flags *flag.FlagSet) *mcpCommandOptions {
 	flags.IntVar(&options.objects.MaxObservations, "max-observations", 256, "Maximum retained observations, up to 256 (object mode)")
 	flags.BoolVar(&options.objects.CreateBucket, "create-bucket", false, "Explicitly create the configured bucket if absent (object mode)")
 	flags.BoolVar(&options.objects.ReadOnly, "read-only", false, "Refuse object saves and bucket creation (object mode)")
+	flags.BoolVar(&options.objects.Browser, "browser", false, "Enable the read-only MCP App browser and resource mentions (object mode)")
 	return options
 }
 
@@ -74,7 +75,7 @@ func validateMCPMode(flags *flag.FlagSet) (bool, error) {
 	visited := make(map[string]bool)
 	flags.Visit(func(item *flag.Flag) { visited[item.Name] = true })
 	objectMode := visited["object-dir"] || visited["bucket"]
-	disallowed := []string{"object-dir", "bucket", "max-objects", "max-object-bytes", "max-observations", "create-bucket", "read-only"}
+	disallowed := []string{"object-dir", "bucket", "max-objects", "max-object-bytes", "max-observations", "create-bucket", "read-only", "browser"}
 	if objectMode {
 		disallowed = []string{"registry-dir", "workspace-id", "max-files", "export-root", "adopt-root", "timeout"}
 	}
