@@ -26,6 +26,9 @@ to refuse stale edits and resolve a lost reply after reopening an owned store.
 Agents can use the same core through the fixed-bucket
 [native object MCP profile](docs/portable-workspace-usage.md#native-object-mcp).
 
+The optional [MCP bucket browser and plugin](extensions/stow/README.md) adds a
+scoped read-only UI, resource previews and composer references to that server.
+
 The storage service can hold upstream credentials while callers use generated
 local credentials. This does not isolate arbitrary host processes or their
 network access. Workspace/API quotas do not hard-limit direct filesystem writes.

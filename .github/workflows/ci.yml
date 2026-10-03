@@ -232,7 +232,9 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: packages/stow-s3/package-lock.json
+          cache-dependency-path: |
+            packages/stow-s3/package-lock.json
+            extensions/stow/package-lock.json
       - name: Run standards gate
         run: make standards
 

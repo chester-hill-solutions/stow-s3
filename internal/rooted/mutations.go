@@ -10,9 +10,8 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
 )
 
-// mutationParents refuses existing ancestor links. Every filesystem operation
-// still uses os.Root: checks describe our no-link policy, while the root handle
-// enforces confinement even if an ancestor changes after the check.
+// mutationParents refuses existing ancestor links; os.Root enforces confinement
+// even if an ancestor changes after the check.
 func (r *Root) mutationParents(relative string, create bool) error {
 	if !Supported() {
 		return ErrUnsupported

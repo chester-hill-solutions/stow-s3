@@ -29,7 +29,7 @@ func TestMCPRejectsMixedStorageModesBeforeOpening(t *testing.T) {
 func TestMCPRejectsObjectFlagsOnWorkspaceMode(t *testing.T) {
 	for _, args := range [][]string{
 		{"--max-objects", "10000"}, {"--max-object-bytes", "65536"},
-		{"--max-observations", "256"}, {"--create-bucket=false"}, {"--read-only=false"},
+		{"--max-observations", "256"}, {"--create-bucket=false"}, {"--read-only=false"}, {"--browser=false"},
 	} {
 		t.Run(args[0], func(t *testing.T) {
 			prefix := []string{"--registry-dir", t.TempDir(), "--workspace-id", "missing", "--timeout", "1s"}
@@ -66,7 +66,7 @@ func TestMCPObjectBoundsAndSelectionValidateBeforeOpen(t *testing.T) {
 func TestMCPHelpListsBothStorageProfiles(t *testing.T) {
 	flags := flag.NewFlagSet("test-mcp", flag.ContinueOnError)
 	registerMCPFlags(flags)
-	for _, name := range []string{"registry-dir", "workspace-id", "timeout", "object-dir", "bucket", "max-objects", "max-object-bytes", "max-observations", "create-bucket", "read-only"} {
+	for _, name := range []string{"registry-dir", "workspace-id", "timeout", "object-dir", "bucket", "max-objects", "max-object-bytes", "max-observations", "create-bucket", "read-only", "browser"} {
 		if flags.Lookup(name) == nil {
 			t.Fatalf("help missing --%s", name)
 		}
