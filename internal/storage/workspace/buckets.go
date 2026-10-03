@@ -108,10 +108,13 @@ func keysOf(set map[string]bool) []string {
 	return out
 }
 
-// pathFor decides where a key is written. A key is stored at its own path when
-// the layout allows it and no case-insensitively equal path is already taken;
-// otherwise it is escaped to a digest under the internal directory.
+// pathFor preserves a recorded escaped form; otherwise it chooses a natural
+// path when the layout permits it and no case-insensitively equal path is taken.
 func (s *Store) pathFor(bucket, key string) (string, Form) {
+	// Changing an escaped form leaves stale bytes that can resurrect after deletion.
+	if entry, ok := s.objectIndex.entry(bucket, key); ok && entry.Form == FormEscaped {
+		return EscapedPath(s.root, bucket, key), FormEscaped
+	}
 	if s.layout.IsNatural(key) {
 		owner, taken := s.folded[foldKey(bucket, key)]
 		_, _, caseCollision := exactNaturalPath(s.bucketDir(bucket), key)

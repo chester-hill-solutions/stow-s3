@@ -204,8 +204,8 @@ func checkPreconditions(h http.Header, meta *storage.ObjectMeta, prefix string, 
 		if err != nil {
 			return storage.ErrPreconditionFailed
 		}
-		if !meta.LastModified.After(when) {
-			return storage.ErrPreconditionFailed
+		if !meta.LastModified.Truncate(time.Second).After(when) {
+			return noneMatchError
 		}
 	}
 	if raw := h.Get(prefix + "If-Unmodified-Since"); raw != "" {
@@ -213,7 +213,7 @@ func checkPreconditions(h http.Header, meta *storage.ObjectMeta, prefix string, 
 		if err != nil {
 			return storage.ErrPreconditionFailed
 		}
-		if meta.LastModified.After(when) {
+		if meta.LastModified.Truncate(time.Second).After(when) {
 			return storage.ErrPreconditionFailed
 		}
 	}

@@ -3,6 +3,7 @@ package auth
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -42,6 +43,9 @@ func (v *Verifier) Authenticate(r *http.Request, creds Credentials) error {
 
 // AuthenticateAt validates the request at the provided reference time.
 func (v *Verifier) AuthenticateAt(r *http.Request, creds Credentials, now time.Time) error {
+	if _, err := url.ParseQuery(r.URL.RawQuery); err != nil {
+		return authError("AccessDenied", "malformed query string")
+	}
 	if creds.AccessKeyID == "" || creds.SecretAccessKey == "" {
 		return authError("AccessDenied", "server credentials are not configured")
 	}

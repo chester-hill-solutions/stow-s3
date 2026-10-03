@@ -231,13 +231,18 @@ func (s *Server) handleListParts(ctx context.Context, w http.ResponseWriter, r *
 	if !s.validateMultipartRoute(ctx, w, r, routeInfo{bucket: bucket, key: key}, uploadID) {
 		return
 	}
-	parts, err := s.multipart.ListParts(ctx, uploadID)
+	opts, err := listPartsOptions(r.URL.Query())
+	if err != nil {
+		writeError(w, r, s3Error{Code: "InvalidArgument", Message: err.Error(), Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
+		return
+	}
+	page, err := s.listPartsPage(ctx, uploadID, opts)
 	if err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
 		return
 	}
-	entries := make([]partEntry, 0, len(parts))
-	for _, p := range parts {
+	entries := make([]partEntry, 0, len(page.Parts))
+	for _, p := range page.Parts {
 		entries = append(entries, partEntry{
 			PartNumber:   p.PartNumber,
 			LastModified: formatTime(p.LastModified),
@@ -246,11 +251,14 @@ func (s *Server) handleListParts(ctx context.Context, w http.ResponseWriter, r *
 		})
 	}
 	writeXML(w, r, http.StatusOK, listPartsResult{
-		Bucket:   bucket,
-		Key:      key,
-		UploadID: uploadID,
-		MaxParts: 1000,
-		Parts:    entries,
+		Bucket:               bucket,
+		Key:                  key,
+		UploadID:             uploadID,
+		MaxParts:             page.MaxParts,
+		PartNumberMarker:     page.PartNumberMarker,
+		NextPartNumberMarker: page.NextPartNumberMarker,
+		IsTruncated:          page.IsTruncated,
+		Parts:                entries,
 	})
 }
 
@@ -287,53 +295,3 @@ func (s *Server) serveRange(w http.ResponseWriter, r *http.Request, rc io.ReadCl
 	w.WriteHeader(http.StatusPartialContent)
 	_, _ = io.CopyN(w, rc, length)
 }
-
-func parseRange(hdr string, size int64) (start, end int64, err error) {
-	if !strings.HasPrefix(hdr, "bytes=") {
-		return 0, 0, errInvalidRange
-	}
-	spec := strings.TrimPrefix(hdr, "bytes=")
-	if strings.HasPrefix(spec, "-") {
-		// suffix range: last N bytes
-		n, err := strconv.ParseInt(spec[1:], 10, 64)
-		if err != nil || n <= 0 {
-			return 0, 0, errInvalidRange
-		}
-		if n > size {
-			n = size
-		}
-		return size - n, size - 1, nil
-	}
-	parts := strings.SplitN(spec, "-", 2)
-	s, err := strconv.ParseInt(parts[0], 10, 64)
-	if err != nil {
-		return 0, 0, errInvalidRange
-	}
-	var e int64
-	if parts[1] == "" {
-		e = size - 1
-	} else {
-		e, err = strconv.ParseInt(parts[1], 10, 64)
-		if err != nil {
-			return 0, 0, errInvalidRange
-		}
-	}
-	if s < 0 || s >= size || e < s {
-		return 0, 0, errInvalidRange
-	}
-	// An end past the last byte is clamped, not refused. A recipient must treat an
-	// unsatisfiable end as the last byte, and clients that ask for "the rest of
-	// this" routinely name an offset they inferred rather than measured. Only a
-	// range that *begins* past the end is unsatisfiable, which the check above
-	// rejects.
-	if e >= size {
-		e = size - 1
-	}
-	return s, e, nil
-}
-
-var errInvalidRange = &rangeError{}
-
-type rangeError struct{}
-
-func (e *rangeError) Error() string { return "invalid range" }

@@ -50,7 +50,8 @@ type Manifest struct {
 	// is the caller's business.
 	Owned bool `json:"owned"`
 
-	path string
+	path         string
+	rootIdentity os.FileInfo
 }
 
 // Index is the object index: what stow knows about each key it has seen. It is
@@ -60,7 +61,8 @@ type Index struct {
 	Version int                                 `json:"version"`
 	Buckets map[string]map[string]ManifestEntry `json:"buckets"`
 
-	path string
+	path         string
+	rootIdentity os.FileInfo
 }
 
 // ManifestEntry records what stow knows about one object. A missing entry is
@@ -159,7 +161,7 @@ func (i *Index) save() error {
 	if err != nil {
 		return fmt.Errorf("encode workspace index: %w", err)
 	}
-	return writeFileAtomic(i.path, append(raw, '\n'))
+	return writeDocumentAtomic(i.path, append(raw, '\n'), i.rootIdentity)
 }
 
 // saveIdentity writes the identity document. It is on the cold path: creation,
@@ -169,7 +171,7 @@ func (m *Manifest) saveIdentity() error {
 	if err != nil {
 		return fmt.Errorf("encode workspace manifest: %w", err)
 	}
-	return writeFileAtomic(m.path, append(raw, '\n'))
+	return writeDocumentAtomic(m.path, append(raw, '\n'), m.rootIdentity)
 }
 
 // writeFileAtomic delegates to internal/atomicfile.

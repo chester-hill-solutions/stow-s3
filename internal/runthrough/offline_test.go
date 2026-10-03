@@ -227,3 +227,52 @@ func TestUnsetOfflineLeavesTheDefaultAlone(t *testing.T) {
 		t.Error("an unset STOW_OFFLINE selected offline")
 	}
 }
+
+func TestOfflineListAndLiveWritesNeverCallProvider(t *testing.T) {
+	h := newOfflineHarness(t, true, true)
+	outbox, err := runthrough.NewFileOutbox(t.TempDir() + "/outbox.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outbox.Close()
+	h.adapter = runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true, Offline: true}, h.local, h.cache, h.up, outbox)
+	before := h.up.calls()
+	if _, err := h.adapter.ListObjectsV2(h.ctx, "bucket", storage.ListOptions{}); err != nil {
+		t.Error(err)
+	}
+	if _, err := h.adapter.PutObject(h.ctx, "bucket", "new", bytes.NewReader([]byte("local")), storage.PutOptions{}); err != nil {
+		t.Error(err)
+	}
+	if err := h.adapter.DeleteObject(h.ctx, "bucket", "new"); err != nil {
+		t.Error(err)
+	}
+	if h.up.calls() != before {
+		t.Fatalf("offline touched provider %d times", h.up.calls()-before)
+	}
+}
+
+func TestOfflineRetryLeavesIntentPendingWithoutProviderCall(t *testing.T) {
+	h := newOfflineHarness(t, true, true)
+	outbox, err := runthrough.NewFileOutbox(t.TempDir() + "/outbox.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outbox.Close()
+	meta, err := h.local.PutObject(h.ctx, "bucket", "queued", bytes.NewReader([]byte("local")), storage.PutOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "queued", Version: meta.VersionID, UpstreamAbsent: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true, Offline: true}, h.local, h.cache, h.up, outbox)
+	before := h.up.calls()
+	if err := adapter.RetryPending(h.ctx); err != nil {
+		t.Fatal(err)
+	}
+	pending := outbox.Pending()
+	if h.up.calls() != before || len(pending) != 1 || pending[0].ID != entry.ID || pending[0].Attempted {
+		t.Fatalf("offline retry: calls=%d pending=%+v", h.up.calls()-before, pending)
+	}
+}

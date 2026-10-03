@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -218,6 +219,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// including the error and XML helpers, applies the same allowlist.
 	r = withCORSOrigins(r, s.config.CORSOrigins)
 	rw := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+
+	if _, err := url.ParseQuery(r.URL.RawQuery); err != nil {
+		writeError(rw, r, s3Error{Code: "InvalidArgument", Message: "Malformed query string", StatusCode: http.StatusBadRequest})
+		s.logRequest(r, rw.status, time.Since(start))
+		return
+	}
 
 	if handleCORSPreflight(rw, r) {
 		s.logRequest(r, rw.status, time.Since(start))
