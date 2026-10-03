@@ -48,13 +48,25 @@ func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord
 	} else {
 		record.Key = ""
 	}
-	if err := writeObjectRecord(path, record); err != nil {
+	if err := s.writeRecord(path, record); err != nil {
 		return err
 	}
 	if s.SupportsGuardedWrites() {
 		return syncSaveAncestors(filepath.Dir(path))
 	}
 	return nil
+}
+
+func (s *FilesystemStore) writeRecord(path string, record objectRecord) error {
+	if s.saves.pending != nil {
+		return writeObjectRecord(path, record)
+	}
+	record.Version = objectRecordVersion
+	data, err := json.Marshal(record)
+	if err != nil {
+		return err
+	}
+	return s.writeCapacityFile(path, data)
 }
 
 func (s *FilesystemStore) readObject(bucket, key string) (objectRecord, error) {
