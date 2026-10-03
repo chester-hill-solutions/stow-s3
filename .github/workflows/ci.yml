@@ -101,6 +101,9 @@ jobs:
       - name: Conformance
         run: make test-conformance
 
+      - name: Dogfood native persisted storage
+        run: go run ./examples/storage-dogfood
+
   node:
     name: TypeScript package and shared corpus
     runs-on: ubuntu-latest
