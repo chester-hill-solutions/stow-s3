@@ -13,12 +13,21 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-func publicationNamespace(t *testing.T) *capacity.Namespace {
+func publicationHost(t *testing.T) *capacity.Host {
 	t.Helper()
+	if !(&FilesystemStore{}).SupportsGuardedWrites() {
+		t.Skip("namespace capacity admission requires Darwin or Linux")
+	}
 	host, err := capacity.Open(capacity.HostOptions{Dir: filepath.Join(t.TempDir(), "host"), MaxBytes: 5 << 20})
 	if err != nil {
 		t.Fatal(err)
 	}
+	return host
+}
+
+func publicationNamespace(t *testing.T) *capacity.Namespace {
+	t.Helper()
+	host := publicationHost(t)
 	namespace, err := host.Bind(capacity.NamespaceOptions{ID: "project", MaxBytes: 4 << 20, RecoveryReserveBytes: 1 << 20})
 	if err != nil {
 		t.Fatal(err)
@@ -115,10 +124,7 @@ func TestOrdinaryOverwriteAndReopenChargeOneRecord(t *testing.T) {
 }
 
 func TestOrdinaryWritesRespectSharedHostBudget(t *testing.T) {
-	host, err := capacity.Open(capacity.HostOptions{Dir: filepath.Join(t.TempDir(), "host"), MaxBytes: 5 << 20})
-	if err != nil {
-		t.Fatal(err)
-	}
+	host := publicationHost(t)
 	var stores []*FilesystemStore
 	for _, id := range []string{"first", "second"} {
 		namespace, err := host.Bind(capacity.NamespaceOptions{ID: id, MaxBytes: 4 << 20, RecoveryReserveBytes: 1 << 20})
