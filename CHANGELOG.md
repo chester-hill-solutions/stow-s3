@@ -34,6 +34,15 @@
   operation ungated would have asserted it was unenforced while it was enforced, which is
   the one false claim the ratchet exists to make impossible. ADR 0010 §3 is amended to
   record the third category.
+- - The release targets GitHub Packages rather than npmjs. Every manifest's
+  `publishConfig` now names `npm.pkg.github.com`, `publish-if-absent.mjs` and the
+  workflow's registry settings follow, and the install instructions carry the
+  `@chester-hill-solutions:registry` binding that a scoped GitHub package requires.
+  `access: public` is gone, because GitHub reads visibility from a package setting and
+  the manifest was asserting something the registry never read. **The cost is real: a
+  consumer now needs one extra `npm config set` line**, which npmjs would not have
+  required, and `check-site-claims` had been *enforcing* the bare install command that
+  does not work without the binding. It now requires both.
 - **A release nobody can install is now refused before it publishes.**
   `scripts/check-publish-visibility.mjs` requests each package with no credentials and
   fails the release if the registry demands them. The 0.2.0 release published five

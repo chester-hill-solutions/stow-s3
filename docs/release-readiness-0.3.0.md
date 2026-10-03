@@ -50,6 +50,24 @@ under test is worse than no gate, because it is green.
 I cannot fix this: `orgs/chester-hill-solutions/packages/…` returns 404 for me, so I
 have no org admin. See [#28](https://github.com/chester-hill-solutions/stow/issues/28).
 
+**Registry corrected 2026-10-03.** The measurements above are against
+`npm.pkg.github.com`, which is where the private copies are and is now the chosen
+registry — but they were originally read as though it were the registry the release
+publishes to, and that was wrong. The committed `publishConfig` said
+`registry.npmjs.org`, so the evidence was about a registry the pipeline did not use, and
+a second conclusion drawn from it ("nothing has been published") was about npmjs rather
+than about the packages. The 401s are real; the inference drawn from them was not.
+
+`docs/agent-dx-plan.md` had already recorded this trap on 2026-09-25: a local `.npmrc`
+bound the scope to GitHub Packages, so `npm view` reported `0.2.0` for a package absent
+from npmjs, and that false positive happened "during this very work". Worth re-reading
+before asking whether something is published, by any means.
+
+The manifests, `publish-if-absent.mjs` and the release workflow have been retargeted to
+`npm.pkg.github.com`, and the install instructions now carry the scope binding that
+GitHub Packages requires. `access: public` is gone: GitHub takes visibility from a
+package setting, so asserting it in a manifest asserted something the registry never reads.
+
 **This is now blocked automatically.** `scripts/check-publish-visibility.mjs` requests
 each package with no credentials and refuses the release if the registry demands them.
 It runs *before* the publish steps, because visibility belongs to a package and not to a

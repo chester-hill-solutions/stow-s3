@@ -1222,6 +1222,27 @@ Phase A.
 both work on a machine with no account, no card, and no registry configuration,
 on every platform in the support matrix, with the binary inside.
 
+**This exit criterion cannot be met on the registry chosen for npm.** Publishing to
+GitHub Packages, decided 2026-10-03, makes the registry binding mandatory rather than
+optional: a scoped package is routed by `@chester-hill-solutions:registry`, which npm
+defaults to npmjs, so the bare install command resolves against the wrong registry and
+finds nothing. "No account, no card" still holds - GitHub Packages needs no card and
+public packages need no credentials to read - but "no registry configuration" does not,
+and cannot.
+
+So the honest exit is now two commands rather than one, and the plan records the change
+rather than the criterion standing:
+
+```sh
+npm config set @chester-hill-solutions:registry https://npm.pkg.github.com
+npm install @chester-hill-solutions/stow-s3
+```
+
+The alternative was publishing to npmjs, which needs no binding and keeps this criterion
+intact, at the cost of the distribution staying inside GitHub. That trade is the reason
+this is recorded: the criterion here predates the registry decision and was written
+against npmjs.
+
 The work splits by who owns it, and the split matters:
 
 | Item | Owner | Why it is not an engineering task |

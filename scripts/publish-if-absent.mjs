@@ -5,12 +5,16 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
-export const REGISTRY = "https://registry.npmjs.org";
+export const REGISTRY = "https://npm.pkg.github.com";
 
 export function manifestOf(tarball) {
   const manifest = JSON.parse(execFileSync("tar", ["-xzOf", tarball, "package/package.json"], { encoding: "utf8" }));
   if (!manifest.name || !manifest.version) throw new Error(`${tarball} has no name or version`);
-  if (manifest.publishConfig?.registry !== REGISTRY || manifest.publishConfig?.access !== "public") throw new Error(`${tarball} does not target public npmjs`);
+  // GitHub Packages takes its visibility from a package setting, so `access` is gone from
+// the manifests and asserting it here would refuse every tarball. The registry is the
+// whole of the check: publishing to the wrong one is the failure that matters, because
+// the package then lands where the documented install does not look.
+  if (manifest.publishConfig?.registry !== REGISTRY) throw new Error(`${tarball} does not target ${REGISTRY}`);
   return manifest;
 }
 

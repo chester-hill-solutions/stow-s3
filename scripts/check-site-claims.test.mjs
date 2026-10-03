@@ -26,6 +26,7 @@ const WASM = "packages/stow-s3/dist/stow-runtime.wasm";
 const cleanIndex = `
   <h1>Working storage an agent can hand off.</h1>
   <ul class="proof">
+    <code id="scope-cmd">npm config set @chester-hill-solutions:registry https://npm.pkg.github.com</code>
     <li><b>12.7 MB max</b><span>single binary, every platform</span></li>
     <li><b>5.8 MB</b><span>runtime</span></li>
   </ul>
@@ -201,4 +202,15 @@ test("the size claim is measured across every published platform", () => {
   for (const target of RELEASE_TARGETS) {
     assert.match(target, /^(linux|darwin)\/(amd64|arm64)$/, `${target} is not a release target`);
   }
+});
+
+// The gate once required only the bare install, while the registry binding was
+// mandatory and missing - so it enforced a command that does not work. Both are
+// required now, and this is the case that says so: a page with the install and no
+// binding is the exact shape that shipped.
+test("an install without the scope binding is reported", () => {
+  const unbound = cleanIndex.replace("npm config set @chester-hill-solutions:registry https://npm.pkg.github.com", "");
+  const problems = siteClaimProblems({ text: site(unbound), sizes });
+  assert.equal(problems.length, 1, JSON.stringify(problems));
+  assert.match(problems[0], /registry configuration|scope|registry/);
 });

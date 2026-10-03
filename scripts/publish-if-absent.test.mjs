@@ -40,7 +40,7 @@ function tarballs() {
     mkdirSync(join(stage, "package"), { recursive: true });
     writeFileSync(
       join(stage, "package", "package.json"),
-      JSON.stringify({ name, version, publishConfig: {registry:"https://registry.npmjs.org",access:"public"} }),
+      JSON.stringify({ name, version, publishConfig: {registry:"https://npm.pkg.github.com"} }),
     );
     const tarball = `${stage}.tgz`;
     execFileSync("tar", ["-czf", tarball, "-C", stage, "package"]);

@@ -46,8 +46,16 @@ export const SITE_TEXT_FILES = [
 // install the published package, so demanding the npm line there would be demanding
 // something it is right not to say. check-install-surface already owns the
 // per-document rule; this owns the site-wide one.
+// Both lines are required. A scoped package on GitHub Packages is routed by the scope
+// binding, so `npm install @chester-hill-solutions/stow-s3` on its own resolves against
+// npmjs and finds nothing - and the gate used to require exactly that string while the
+// page shipped it as the headline install, so it was enforcing a command that does not
+// work. Requiring the binding makes the two inseparable again.
+export const SCOPE_REGISTRY = "npm config set @chester-hill-solutions:registry https://npm.pkg.github.com";
+
 export const REQUIRED_COMMANDS = [
   "npm install @chester-hill-solutions/stow-s3",
+  SCOPE_REGISTRY,
   "go get github.com/chester-hill-solutions/stow-s3/pkg/stow",
 ];
 
