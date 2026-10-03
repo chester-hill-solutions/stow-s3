@@ -1,8 +1,13 @@
 package stow
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
 
 var (
+	ErrMutationCommitted            = storage.ErrMutationCommitted
 	ErrBucketNotFound               = errors.New("stow: bucket not found")
 	ErrBucketExists                 = errors.New("stow: bucket already exists")
 	ErrBucketNotEmpty               = errors.New("stow: bucket is not empty")

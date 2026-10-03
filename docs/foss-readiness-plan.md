@@ -289,8 +289,8 @@ succeed, because nothing about the next attempt differs.
 That error mapping was the fixable half, and it is fixed: `ErrMutationCommitted`
 is now checked ahead of both the upstream table and the storage table in
 `internal/s3api/errors.go`, so a committed write reports 5xx with a message saying
-the write is local and a retry is safe, rather than a 404 denying the object
-exists. The cause is not repeated in the message, for the same reason the upstream
+the mutation completed locally and the outcome needs verification before retry,
+rather than a 404 denying the object exists. The cause is not repeated in the message, for the same reason the upstream
 table does not repeat it.
 
 The propagation half is **not** fixed and should not be without a decision.

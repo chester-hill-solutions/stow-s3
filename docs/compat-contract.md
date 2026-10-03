@@ -591,3 +591,22 @@ and contain no NUL; invalid values return `400 InvalidArgument`. Current tokens
 are lexical key markers, not authenticated query-bound provider tokens. Clients
 should replay returned tokens. The [acceptance coverage map](compatibility-coverage-2026-09-29.md)
 records shared SDK cases and focused raw protocol evidence.
+
+Resource-policy listings paginate permitted objects and prefixes before choosing
+their lexical continuation marker. Backend cursors and denied names stay internal;
+truncation describes further permitted entries. A page may scan multiple backend
+pages, with cancellation checked between calls. Policy-free listings retain their
+backend pagination behavior.
+
+### Committed local publication errors
+
+A workspace PUT that successfully publishes content but cannot persist its object
+index returns a committed-mutation error, not a refusal. The native SDK exposes
+`ErrMutationCommitted`, returns the known object identity with that error and
+accounts for the committed bytes. HTTP returns `500 InternalError`, asking the
+caller to verify the outcome before retrying. The object file and metadata index
+are separate publications: this response does not promise rollback or crash-safe
+metadata recovery. Stop writers and preserve both files before repairing an index
+obstruction. A live handle retains the intended metadata and can persist it on a
+successful close after repair; reopening an invalid index fails closed. If that
+handle was lost, current bytes alone cannot reconstruct all original metadata.
