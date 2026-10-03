@@ -144,15 +144,11 @@ func (s *Store) HeadObject(ctx context.Context, bucket, key string) (*storage.Ob
 		return nil, err
 	}
 
-	absPath, info, entry, err := s.resolve(bucket, key)
+	_, info, entry, err := s.resolve(bucket, key)
 	if err != nil {
 		return nil, err
 	}
-	meta := s.metaFromEntry(bucket, key, entry, info)
-	if err := s.absorb(bucket, key, absPath, info, &entry); err != nil {
-		return nil, err
-	}
-	return meta, nil
+	return s.metaFromEntry(bucket, key, entry, info), nil
 }
 
 // DeleteObject removes an object's file and forgets it.

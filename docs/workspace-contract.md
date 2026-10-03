@@ -354,9 +354,12 @@ Rules:
 
 ### 4.1 Staleness
 
-A manifest records size and modification time. When either no longer matches
-the file, the entry is stale: size, modification time, and content type are
-re-derived from the file and the ETag is recomputed on read. The manifest is
+A manifest records size and modification time. Reads and write preconditions
+also hash the current bytes, so a same-size edit within one timestamp tick or an
+edit preserving the timestamp changes the ETag. Changed content gets a new
+content identity and drops stale declared checksums and metadata; unchanged
+content retains its recorded identity and declarations. This costs a file read
+when resolving metadata. The manifest is
 updated opportunistically.
 
 This is accepted rather than engineered away, per ADR 0008 section 5: an

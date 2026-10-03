@@ -115,21 +115,20 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	checked.Close()
+	derived, err := deriveReadFile(checked, info)
+	if err != nil {
+		return "", nil, ManifestEntry{}, err
+	}
 	entry, recorded := s.objectIndex.entry(bucket, key)
-	if !recorded || entry.stale(info.Size(), info.ModTime()) {
-		entry, err = s.derive(absPath, info)
-		if err != nil {
-			return "", nil, ManifestEntry{}, err
+	if !recorded || entry.ETag != derived.ETag || entry.stale(info.Size(), info.ModTime()) {
+		if recorded && entry.ETag == derived.ETag {
+			entry.Size, entry.Modified = derived.Size, derived.Modified
+		} else {
+			entry = derived
 		}
 		entry.Form = s.formOf(bucket, key, absPath)
 		if entry.Form == FormEscaped {
 			entry.Digest = Digest(key)
-		}
-		// Reuse the recorded version so that re-reading an unchanged file keeps
-		// reporting the same version rather than minting one per call.
-		if prior, had := s.objectIndex.entry(bucket, key); had {
-			entry.VersionID = prior.VersionID
 		}
 		if err := s.recordLocked(bucket, key, entry); err != nil {
 			return "", nil, ManifestEntry{}, err
@@ -146,45 +145,6 @@ func (s *Store) formOf(bucket, key, absPath string) Form {
 		return FormNatural
 	}
 	return FormEscaped
-}
-
-// derive builds a manifest entry for a file from the file itself: its size and
-// modification time from the filesystem, its type from its first bytes, and its
-// ETag from its content.
-//
-// A host-written file has no declared content type and no recorded ETag, and
-// inventing either would be worse than deriving them. This is a full read of
-// the file, once; the result is cached in the manifest and the read is not
-// repeated while size and modification time still match.
-func (s *Store) derive(absPath string, info os.FileInfo) (ManifestEntry, error) {
-	file, err := s.openRead(absPath, info)
-	if err != nil {
-		return ManifestEntry{}, err
-	}
-	return deriveReadFile(file, info)
-}
-
-// absorb records a derived entry so the next read does not pay for it again.
-func (s *Store) absorb(bucket, key, absPath string, info os.FileInfo, entry *ManifestEntry) error {
-	recorded, hasEntry := s.objectIndex.entry(bucket, key)
-	if hasEntry && !recorded.stale(info.Size(), info.ModTime()) {
-		return nil
-	}
-	derived, err := s.derive(absPath, info)
-	if err != nil {
-		return err
-	}
-	if hasEntry {
-		derived.VersionID = recorded.VersionID
-		derived.ChecksumAlgorithm = recorded.ChecksumAlgorithm
-		derived.ChecksumValue = recorded.ChecksumValue
-	}
-	derived.Form = s.formOf(bucket, key, absPath)
-	if derived.Form == FormEscaped {
-		derived.Digest = Digest(key)
-	}
-	*entry = derived
-	return s.record(bucket, key, derived)
 }
 
 // record writes an entry to the manifest and the case-folded index, and persists.
