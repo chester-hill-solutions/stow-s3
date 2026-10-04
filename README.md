@@ -780,6 +780,10 @@ with `STOW_CACHE_TTL`. The limits are re-applied on startup rather than only on
 writes, because the cache directory outlives the process: a server that only ever
 reads would otherwise drift past its cap indefinitely.
 
+TTL is measured from the retained cache record's publication time. Reopening
+does not restart that deadline; entries without a verifiable publication time
+expire when a positive TTL is configured.
+
 ### Working with the network gone
 
 `--offline` makes the guarantee checkable rather than merely true. Without it, a

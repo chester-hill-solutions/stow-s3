@@ -82,10 +82,10 @@ func (r *Runtime) PutObject(ctx context.Context, bucket, key string, data []byte
 		IfMatch:     options.IfMatch,
 		IfNoneMatch: options.IfNoneMatch,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return Object{}, mapError(err)
 	}
-	return objectOf(object), nil
+	return objectOf(object), mapError(err)
 }
 
 func (r *Runtime) GetObject(ctx context.Context, bucket, key string) (Object, error) {
@@ -183,6 +183,8 @@ func mapError(err error) error {
 		return nil
 	}
 	switch {
+	case errors.Is(err, storage.ErrMutationCommitted):
+		return err
 	case errors.Is(err, stowruntime.ErrClosed):
 		return ErrClosed
 	case errors.Is(err, stowruntime.ErrQuotaExceeded):

@@ -24,6 +24,10 @@ Bucket names use 3–63 characters from `[a-z0-9._-]`. This local extension perm
 
 Header authentication may use the SDK-compatible `Date` header when `X-Amz-Date` is absent, provided the selected date header is in `SignedHeaders` and the signature validates. Presigned URLs still require `X-Amz-Date`. Presigned methods are GET, PUT, and HEAD; `X-Amz-Expires` must be in `1..604800`.
 
+Every supplied `x-amz-*` header must appear in `SignedHeaders`, including copy
+source, source conditions, user metadata and checksum headers. Adding an unsigned
+copy-source header to a presigned PUT cannot change the authenticated operation.
+
 Authentication material is read as the client wrote it, not repaired into a form the verifier prefers. A `SignedHeaders` list that is not in canonical form, an `Authorization` header carrying a repeated or unrecognized component, and an authentication query parameter that appears twice or under another spelling are each refused (`403`) rather than normalized. The accepted grammar and the reasons are in §4.1 and §4.2; this is a narrowing of what is accepted, deliberately, and it is inside the contract's own "Safety invariants" clause rather than undocumented Amazon strictness — the canonical forms in question are the SigV4 specification, not an Amazon service behaviour, and the refusals make the verifier's input match the signature's input.
 
 The shared corpus must cover missing/malformed auth, both date forms, wrong secret, skew, expired presigns, 604800, 604801, unsupported methods, and anonymous requests.
@@ -32,11 +36,17 @@ The shared corpus must cover missing/malformed auth, both date forms, wrong secr
 
 The public policies are `readThroughCache` and `mirrorWrites`; `local` is a mode, not a policy. `readThroughCache` writes locally unless the separate live-write flag is enabled. `mirrorWrites` explicitly enables propagation and emits a loud startup warning. The legacy `proxy` policy is rejected with a migration error.
 
-Local mutations commit before upstream propagation. A durable per-key outbox stores an immutable versioned reference, retries transient failures with bounded backoff, coordinates file-backed workers with expiring claims, and retains deterministic failures for inspection. An entry that was already attempted is reconciled against upstream before it is re-propagated: a put whose upstream ETag matches the immutable local version, or a delete whose object is already absent, is acknowledged without a second upstream mutation. A crash remains at-least-once only when upstream cannot be read during recovery or the object was replaced by another writer. Durable outbox files carry a schema version; a file written by a newer revision is rejected at open, and unversioned files migrate. Admin retry/discard actions are loopback-only.
+Local mutations commit before upstream propagation. A durable per-key outbox stores an immutable versioned reference, retries transient failures with bounded backoff, coordinates file-backed workers with expiring claims, and retains deterministic failures for inspection. An entry that was already attempted is reconciled against upstream before it is re-propagated: a put whose upstream ETag, content type, user metadata and requested checksum match the immutable local version, or a delete whose object is already absent, is acknowledged without a second upstream mutation. A crash remains at-least-once only when upstream cannot be read during recovery or the object was replaced by another writer. Durable outbox files carry a schema version; a file written by a newer revision is rejected at open, and unversioned files migrate. Admin retry/discard actions are loopback-only.
 
 ### 0.5 Conditional operations and checksums
 
-The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional writes, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Header names, encodings, response headers, multipart behavior, and error codes are normative in the shared corpus; unknown checksum algorithms fail clearly.
+The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional PUTs, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Header names, encodings, response headers, multipart behavior, and error codes are normative in the shared corpus; unknown checksum algorithms fail clearly.
+
+COPY supports source conditions. Destination `If-Match` and `If-None-Match`
+conditions return `501 NotImplemented` before mutation; atomic destination
+comparison is not exposed by the current copy-store interface. GET/HEAD apply
+ETag conditions before their corresponding date conditions, and 304 responses
+retain the configured CORS headers without an object body or checksum.
 
 CRC64NVME is supported for single-object PUT and full-object GET/HEAD, including
 upstream read/write conversion. The checksum is the base64 encoding of the
@@ -581,3 +591,22 @@ and contain no NUL; invalid values return `400 InvalidArgument`. Current tokens
 are lexical key markers, not authenticated query-bound provider tokens. Clients
 should replay returned tokens. The [acceptance coverage map](compatibility-coverage-2026-09-29.md)
 records shared SDK cases and focused raw protocol evidence.
+
+Resource-policy listings paginate permitted objects and prefixes before choosing
+their lexical continuation marker. Backend cursors and denied names stay internal;
+truncation describes further permitted entries. A page may scan multiple backend
+pages, with cancellation checked between calls. Policy-free listings retain their
+backend pagination behavior.
+
+### Committed local publication errors
+
+A workspace PUT that successfully publishes content but cannot persist its object
+index returns a committed-mutation error, not a refusal. The native SDK exposes
+`ErrMutationCommitted`, returns the known object identity with that error and
+accounts for the committed bytes. HTTP returns `500 InternalError`, asking the
+caller to verify the outcome before retrying. The object file and metadata index
+are separate publications: this response does not promise rollback or crash-safe
+metadata recovery. Stop writers and preserve both files before repairing an index
+obstruction. A live handle retains the intended metadata and can persist it on a
+successful close after repair; reopening an invalid index fails closed. If that
+handle was lost, current bytes alone cannot reconstruct all original metadata.

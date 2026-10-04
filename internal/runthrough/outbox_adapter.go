@@ -147,7 +147,7 @@ func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconci
 			if remote == nil {
 				return errors.New("upstream head returned no object metadata")
 			}
-			if storage.ETagEqual(remote.ETag, meta.ETag) {
+			if samePropagatedObject(remote, meta) {
 				return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{ETag: remote.ETag})
 			}
 		} else if !errors.Is(err, storage.ErrObjectNotFound) {
@@ -155,8 +155,10 @@ func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconci
 		}
 	}
 	etag, err := a.upstream.PutObject(ctx, entry.Bucket, entry.Key, rc, storage.PutOptions{
-		ContentType: meta.ContentType,
-		Metadata:    meta.Metadata,
+		ContentType:       meta.ContentType,
+		Metadata:          meta.Metadata,
+		ChecksumAlgorithm: meta.ChecksumAlgorithm,
+		ChecksumValue:     meta.ChecksumValue,
 		// The precondition recorded at enqueue. Absent upstream is asserted with
 		// If-None-Match "*" rather than left unguarded, because a key created
 		// between enqueue and propagation has no ETag for If-Match to compare.
@@ -427,9 +429,13 @@ func (a *Adapter) reconcilePreparedEntryLocked(ctx context.Context, entry Outbox
 		_, err = a.commitPreparedIntent(entry, currentVersion)
 		return true, err
 	case OutboxDelete:
+		previousVersion := entry.PreviousVersion
+		if previousVersion == "" {
+			previousVersion = entry.Version
+		}
 		meta, err := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
 		if err == nil {
-			if entry.Version != "" && objectVersion(meta) == entry.Version {
+			if previousVersion != "" && objectVersion(meta) == previousVersion {
 				return false, a.discardPreparedIntent(entry)
 			}
 			return false, ErrOutboxPreparedUnresolved
@@ -437,7 +443,7 @@ func (a *Adapter) reconcilePreparedEntryLocked(ctx context.Context, entry Outbox
 		if !errors.Is(err, storage.ErrObjectNotFound) {
 			return false, err
 		}
-		_, err = a.commitPreparedIntent(entry, entry.Version)
+		_, err = a.commitPreparedIntent(entry, previousVersion)
 		return true, err
 	default:
 		return false, ErrOutboxPreparedUnresolved

@@ -173,13 +173,14 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 		return ObjectPage{}, err
 	}
 
-	result, err := i.store.ListObjectsV2(ctx, bucket, storage.ListOptions{
+	query := storage.ListOptions{
 		Prefix:            options.Prefix,
 		Delimiter:         options.Delimiter,
 		ContinuationToken: options.Cursor,
 		MaxKeys:           limit,
 		StartAfter:        options.StartAfter,
-	})
+	}
+	result, err := i.listObjectsScoped(ctx, scope, bucket, query)
 	if err != nil {
 		return ObjectPage{}, err
 	}
@@ -199,8 +200,6 @@ func (i *Instance) ListObjects(ctx context.Context, bucket string, options ListO
 	// The count is of what was returned, not of what the store holds: a count the caller
 	// cannot account for is itself a disclosure. Both kinds are counted, which is S3's
 	// arithmetic: a delimiter page with no keys and two prefixes reports 2, not 0.
-	// Truncation and the cursors stay as the store reported, so a filtered page is short
-	// rather than silently complete.
 	return ObjectPage{
 		Objects:        objects,
 		CommonPrefixes: prefixes,

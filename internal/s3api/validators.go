@@ -193,29 +193,32 @@ func checkPreconditions(h http.Header, meta *storage.ObjectMeta, prefix string, 
 		noneMatchError = errNotModified
 	}
 
-	if match := h.Get(prefix + "If-Match"); match != "" && !etagHeaderMatchesStrong(match, meta.ETag) {
-		return storage.ErrPreconditionFailed
-	}
-	if noneMatch := h.Get(prefix + "If-None-Match"); noneMatch != "" && etagHeaderMatchesWeak(noneMatch, meta.ETag) {
-		return noneMatchError
-	}
-	if raw := h.Get(prefix + "If-Modified-Since"); raw != "" {
-		when, err := time.Parse(http.TimeFormat, raw)
-		if err != nil {
+	if match := h.Get(prefix + "If-Match"); match != "" {
+		if !etagHeaderMatchesStrong(match, meta.ETag) {
 			return storage.ErrPreconditionFailed
 		}
-		if !meta.LastModified.Truncate(time.Second).After(when) {
+	} else if err := checkDateCondition(h.Get(prefix+"If-Unmodified-Since"), meta, false, storage.ErrPreconditionFailed); err != nil {
+		return err
+	}
+	if noneMatch := h.Get(prefix + "If-None-Match"); noneMatch != "" {
+		if etagHeaderMatchesWeak(noneMatch, meta.ETag) {
 			return noneMatchError
 		}
+		return nil
 	}
-	if raw := h.Get(prefix + "If-Unmodified-Since"); raw != "" {
-		when, err := time.Parse(http.TimeFormat, raw)
-		if err != nil {
-			return storage.ErrPreconditionFailed
-		}
-		if meta.LastModified.Truncate(time.Second).After(when) {
-			return storage.ErrPreconditionFailed
-		}
+	return checkDateCondition(h.Get(prefix+"If-Modified-Since"), meta, true, noneMatchError)
+}
+
+func checkDateCondition(raw string, meta *storage.ObjectMeta, modified bool, refusal error) error {
+	if raw == "" {
+		return nil
+	}
+	when, err := time.Parse(http.TimeFormat, raw)
+	if err != nil {
+		return storage.ErrPreconditionFailed
+	}
+	if meta.LastModified.Truncate(time.Second).After(when) != modified {
+		return refusal
 	}
 	return nil
 }

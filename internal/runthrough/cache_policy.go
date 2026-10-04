@@ -264,11 +264,16 @@ func (a *Adapter) reconcileCacheIndex(ctx context.Context) error {
 			continue
 		}
 		accessed := object.LastModified
+		expires := time.Time{}
+		if a.cfg.Cache.TTL > 0 {
+			expires = accessed.Add(a.cfg.Cache.TTL)
+		}
 		if accessed.IsZero() {
 			accessed = time.Now()
 		}
 		a.cacheEntries[accessKey] = cacheEntry{
 			accessedAt: accessed,
+			expiresAt:  expires,
 			bucket:     object.Bucket,
 			key:        object.Key,
 			size:       object.Size,

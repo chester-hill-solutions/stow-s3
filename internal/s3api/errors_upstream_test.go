@@ -21,6 +21,16 @@ func upstreamUnreachable() error {
 	}
 }
 
+func TestCommittedFailureRequiresVerificationBeforeRetry(t *testing.T) {
+	got := mapStorageError(storage.CommittedError(storage.ErrObjectNotFound), "bucket/key")
+	if got.StatusCode != http.StatusInternalServerError || got.Code != "InternalError" {
+		t.Fatalf("committed failure mapped to underlying refusal: %+v", got)
+	}
+	if strings.Contains(got.Message, "retry is safe") || !strings.Contains(got.Message, "verify") {
+		t.Fatalf("committed failure encouraged unverified retry: %q", got.Message)
+	}
+}
+
 func TestAnUnreachableUpstreamIsTemporaryAndNotAServerFault(t *testing.T) {
 	got := mapStorageError(upstreamUnreachable(), "models/bert.bin")
 

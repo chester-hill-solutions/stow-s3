@@ -96,7 +96,7 @@ func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader,
 	}
 	s.objectIndex.setEntry(bucket, key, entry)
 	if err := s.objectIndex.save(); err != nil {
-		return nil, err
+		return s.metaFromEntry(bucket, key, entry), storage.CommittedError(err)
 	}
 	return s.metaFromEntry(bucket, key, entry), nil
 }
@@ -144,15 +144,11 @@ func (s *Store) HeadObject(ctx context.Context, bucket, key string) (*storage.Ob
 		return nil, err
 	}
 
-	absPath, info, entry, err := s.resolve(bucket, key)
+	_, info, entry, err := s.resolve(bucket, key)
 	if err != nil {
 		return nil, err
 	}
-	meta := s.metaFromEntry(bucket, key, entry, info)
-	if err := s.absorb(bucket, key, absPath, info, &entry); err != nil {
-		return nil, err
-	}
-	return meta, nil
+	return s.metaFromEntry(bucket, key, entry, info), nil
 }
 
 // DeleteObject removes an object's file and forgets it.

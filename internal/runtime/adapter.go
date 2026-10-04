@@ -102,10 +102,10 @@ func (a *StoreAdapter) PutObject(ctx context.Context, bucket, key string, body i
 		IfMatch:           opts.IfMatch,
 		IfNoneMatch:       opts.IfNoneMatch,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return nil, err
 	}
-	return objectMeta(&object), nil
+	return objectMeta(&object), err
 }
 
 func (a *StoreAdapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {

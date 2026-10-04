@@ -175,12 +175,11 @@ func mapStorageError(err error, resource string) s3Error {
 	// the storage table maps that to a 404 NoSuchKey. So the server would tell a
 	// caller the object does not exist while having just written it.
 	//
-	// 5xx is the honest class: the local state is committed and the propagation is
-	// unfinished, so a retry of the same body is safe and the outbox is still trying.
+	// A committed effect requires outcome verification before another mutation.
 	if errors.Is(err, storage.ErrMutationCommitted) {
 		return s3Error{
 			Code:       "InternalError",
-			Message:    "The write is committed locally but a follow-up step failed; the object is readable and a retry is safe",
+			Message:    "The local mutation completed but a follow-up step failed; verify the outcome before retrying",
 			Resource:   resource,
 			StatusCode: http.StatusInternalServerError,
 		}

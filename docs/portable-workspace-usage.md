@@ -147,6 +147,26 @@ Retention is bounded to 1024 terminal entries, 8 MiB of encoded bookkeeping
 admission, 64 KiB per entry and one pending slot. New keyed saves refuse when
 retention is full; required evidence is not automatically expired. This is a
 logical reserve, not preallocated disk space. Files and receipts are plaintext.
+
+Before reaching either retention bound, start a fresh store generation at a new
+directory and retain the old directory for receipt resolution. Carry forward only
+verified current objects through the object API, without copying store identities
+or journals; request keys remain associated with their original store. Budget for
+retained evidence and migration staging: rotation does not reclaim receipt space.
+Do not delete receipts or reuse a pending request key in the new generation to
+make an unknown effect look like a fresh operation.
+
+An unresolved `publishing` entry remains blocked if the recorded publication
+cannot be verified. Preserve its journal and object record, stop writers and resolve
+the original request before proceeding. Resolution is observation, not permission
+to reapply the body. A retirement API would need caller acknowledgement of the
+replay window, terminal-only eligibility, recovery-hold checks and a durable
+tombstone; no automatic retirement or outcome override is provided.
+
+The [receipt lifecycle proposal](receipt-retirement-proposal.md) specifies the
+archive ordering, replay behavior, bounded admission and decision required before
+adding retirement.
+
 Arbitrary host edits, directory copies, shared-host fencing, pre-enrollment ABA
 history and physical power-loss qualification are outside this profile. Admission
 refreshes authoritative object/multipart accounting by scanning the store; workload

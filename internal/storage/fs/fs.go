@@ -369,7 +369,7 @@ func (s *FilesystemStore) DeleteObject(_ context.Context, bucket, key string) er
 	if _, err := os.Stat(objPath); os.IsNotExist(err) {
 		return storage.ErrObjectNotFound
 	}
-	if err := os.Remove(objPath); err != nil {
+	if err := s.removeCapacityPath(objPath); err != nil {
 		return err
 	}
 	s.pruneEmptyShards(bucket, objPath)
@@ -402,7 +402,7 @@ func (s *FilesystemStore) DeleteObjects(_ context.Context, bucket string, keys [
 		// A key that was not there is still confirmed: S3 deletes idempotently
 		// and reports it as deleted rather than as an error.
 		if _, err := os.Stat(objPath); err == nil {
-			if err := os.Remove(objPath); err != nil {
+			if err := s.removeCapacityPath(objPath); err != nil {
 				return deleted, err
 			}
 			s.pruneEmptyShards(bucket, objPath)
