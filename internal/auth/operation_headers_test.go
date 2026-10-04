@@ -40,3 +40,36 @@ func TestHeaderAuthenticationRejectsUnsignedCopySource(t *testing.T) {
 		t.Fatal("unsigned copy source authenticated")
 	}
 }
+
+func TestHeaderPayloadHashMayBeOmittedFromSignedHeaders(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Second)
+	for _, payloadHash := range []string{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "UNSIGNED-PAYLOAD"} {
+		t.Run(payloadHash, func(t *testing.T) {
+			req := httptestRequest(t, http.MethodPut, "http://127.0.0.1:9000/demo/key", strings.NewReader(""))
+			req.Header.Set("X-Amz-Date", now.Format("20060102T150405Z"))
+			req.Header.Set("X-Amz-Content-Sha256", payloadHash)
+			newHeaderSigner(req, strictCreds, "us-east-1", payloadHash).withSignedList("host;x-amz-date").sign(t)
+			if err := auth.NewVerifier("us-east-1").AuthenticateAt(req, strictCreds, now); err != nil {
+				t.Fatalf("canonical payload hash already authenticates header value: %v", err)
+			}
+			otherHash := "UNSIGNED-PAYLOAD"
+			if payloadHash == otherHash {
+				otherHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+			}
+			req.Header.Set("X-Amz-Content-Sha256", otherHash)
+			if err := auth.NewVerifier("us-east-1").AuthenticateAt(req, strictCreds, now); err == nil {
+				t.Fatal("tampered canonical payload hash authenticated")
+			}
+		})
+	}
+}
+
+func TestPresignedPayloadHashHeaderStillRequiresSigning(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Second)
+	url := signPresignedURL(t, http.MethodPut, "http://127.0.0.1:9000/demo/key", strictCreds, "us-east-1", now, 300, nil)
+	req := httptestRequest(t, http.MethodPut, url, nil)
+	req.Header.Set("X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD")
+	if err := auth.NewVerifier("us-east-1").AuthenticateAt(req, strictCreds, now); err == nil {
+		t.Fatal("presigned payload hash header was implicitly exempted")
+	}
+}

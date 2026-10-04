@@ -288,6 +288,9 @@ func verifySignedRequest(r *http.Request, creds Credentials, region string, maxS
 func validateAmzHeaders(r *http.Request, sr signedRequest) error {
 	for name := range r.Header {
 		name = strings.ToLower(name)
+		if name == "x-amz-content-sha256" && !sr.presigned {
+			continue
+		}
 		if strings.HasPrefix(name, "x-amz-") && !containsHeader(sr.signedHeaders, name) {
 			return authError("AccessDenied", "%s must be signed", name)
 		}
@@ -315,9 +318,6 @@ func validateCredentialScope(r *http.Request, sr signedRequest, creds Credential
 		}
 		if !containsHeader(sr.signedHeaders, dateHeader) {
 			return authError("AccessDenied", "date must be signed")
-		}
-		if headerValue(r.Header, "X-Amz-Content-Sha256") != "" && !containsHeader(sr.signedHeaders, "x-amz-content-sha256") {
-			return authError("AccessDenied", "x-amz-content-sha256 must be signed")
 		}
 	}
 	if !strings.HasPrefix(sr.amzDate, sr.credential.dateStamp) {
