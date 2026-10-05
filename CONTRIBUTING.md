@@ -30,7 +30,9 @@ make test-all         # Go, conformance, TypeScript, Python, WASM
 
 You need Go 1.25.6 (see `.go-version`; `make` pins it via `GOTOOLCHAIN`),
 Node 20 or newer for the TypeScript and WASM suites, and Python 3.10 or newer
-for the client suite. `make test-python` bootstraps its own virtualenv.
+for the client suite. ESLint 10 requires Node 20.19+, 22.13+, or 24+ for
+development checks; the published client still supports Node 20 or newer.
+`make test-python` bootstraps its own virtualenv.
 
 `make standards` is the gate. It is the whole check list — formatting, vet, the
 race suite, the maintainability ratchets, the coverage floor, the version and
