@@ -171,6 +171,7 @@ export async function withStow<T>(
       throw new AggregateError(
         [callbackError, cleanupError],
         "the session callback and its cleanup both failed",
+        { cause: cleanupError },
       );
     }
     throw callbackError;
