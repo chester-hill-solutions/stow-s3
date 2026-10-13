@@ -112,6 +112,7 @@ A 409 retains the uncertain attempt, rather than reporting a definitive conflict
   remote change feeds, automatic merge, cross-device history or atomic multi-file undo.
 - Browser storage can be evicted. Applications must handle storage errors and provide export or backup as needed.
 
+<!-- repo-only:start -->
 Unit tests cover commit, retention, sync recovery and S3 request signing.
 Chromium CI tests use real WASM, IndexedDB and Web Locks.
 The large project workload and live Railway tests run separately.
@@ -168,3 +169,4 @@ environment, using encrypted `STOW_LIVE_ENDPOINT`, `STOW_LIVE_ACCESS_KEY_ID` and
 Railway testing-bucket credentials and permits deployments only from `main`.
 The manual workflow is available from `main`.
 See the [recorded Railway run](assessment-evidence/2026-10-12/railway-browser.json) for local test results.
+<!-- repo-only:end -->

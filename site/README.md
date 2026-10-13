@@ -24,6 +24,17 @@ to the current API contracts. Add new public guides to `docs.mjs`; the build
 rewrites links between published sources into site routes and supplies navigation,
 heading anchors, tables of contents and a sitemap.
 
+Publish user guides and API references only. Keep ADRs, plans, test reports and
+contributor instructions in the repository. In shared Markdown, surround
+repository commentary with `<!-- repo-only:start -->` and `<!-- repo-only:end -->`
+on separate lines. The site removes these blocks before rendering or generating
+the table of contents. Unbalanced markers fail the build.
+
+Update API references with `node scripts/generate-api-reference.mjs` after
+installing the TypeScript package dependencies. `make check-api-reference` checks
+that every saved declaration still matches the current public exports. Edit
+behavior notes in `api-notes.mjs`; keep generated declarations unchanged.
+
 For deployment from a published branch awaiting merge, set
 `STOW_SITE_SOURCE_REVISION` to its full pushed commit SHA. The source links then
 point to that revision rather than to files not yet present on `main`.

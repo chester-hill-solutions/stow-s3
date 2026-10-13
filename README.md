@@ -33,6 +33,7 @@ Stow can keep upstream credentials separate from local credentials.
 It does not restrict other host processes or their network access.
 Storage quotas do not limit files written directly by those processes.
 
+<!-- repo-only:start -->
 The [storage plan](docs/storage-foundation-plan.md) tracks unfinished work.
 The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpoint before each prompt.
 Real interruption, second-host and Linux acceptance tests remain open.
@@ -40,7 +41,7 @@ MCP tool access alone does not ensure a checkpoint after every turn.
 
 The [multiplayer lab](examples/multiplayer-prototype/README.md) is an experimental caller.
 Run `make multiplayer` for the offline demo or `make multiplayer-real` for the local OpenCode model.
-
+<!-- repo-only:end -->
 ## Checkpoints and editing history
 
 Native workspace deltas compare checkpoints in one workspace and verify the
@@ -299,10 +300,11 @@ Removal coordinates with active storage operations.
 ## Install
 
 **Use a source checkout for TypeScript and Python.** The 0.3.0 candidate is unpublished.
+<!-- repo-only:start -->
 The 0.2.0 npm packages were uploaded, but the release failed before publishing a GitHub Release or checksum file.
 PyPI publication and clean npm installation have not been verified.
 See the [release checkpoint](docs/release-verification-2026-10-03.md) for details.
-
+<!-- repo-only:end -->
 Native package targets are Linux and macOS on x64 and arm64. Use WSL on Windows.
 Remove old `npm.pkg.github.com` scope overrides before using a future public npm release.
 
@@ -647,8 +649,11 @@ exist is not an error, so resetting before a first run is fine.
 
 `cleanSlate` is a deprecated alias with identical checks. A data directory
 created before this check existed has no marker, so its first reset is refused;
-nothing is deleted. See
-[ADR 0006](docs/adr/0006-owned-data-directory-reset.md).
+nothing is deleted.
+
+<!-- repo-only:start -->
+See [ADR 0006](docs/adr/0006-owned-data-directory-reset.md).
+<!-- repo-only:end -->
 
 ## Running on another host
 
@@ -708,6 +713,7 @@ Name the origins you need instead:
 for it by name. Responses always carry `Vary: Origin`, without which a cache can
 serve one origin's allow header to another.
 
+<!-- repo-only:start -->
 ## Development
 
 Run the complete local checks:
@@ -748,7 +754,7 @@ native CLI. To capture the workspace CLI's high-water RSS separately, run
 recorded machine-specific baseline and raw JSON are in
 `docs/benchmarks/2026-09-27/`; the older session memory experiments remain in
 `docs/benchmarks/session-baseline.md`.
-
+<!-- repo-only:end -->
 ## License
 
 Apache License 2.0.

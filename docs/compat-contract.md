@@ -1,21 +1,25 @@
-# Stow v1 S3 Compatibility Contract
+# S3 HTTP API
 
-This contract defines Stow's native S3 behavior. Implementations and tests MUST follow it.
+Stow supports the native S3 operations and limits listed below.
 Unlisted behavior is unsupported unless marked provider-tolerant, such as SDK headers that Stow ignores.
 
 **Scope:** local S3-compatible storage with a Go server and client wrappers.
 
 **Non-goals (v1):** Versioning, Object Lock, ACLs, bucket policies, IAM, KMS/SSE, lifecycle rules, replication, notifications, S3 Select, batch operations.
 
-## 0. 0.2.0 SDK compatibility amendments
+## 0. SDK compatibility profile
 
+<!-- repo-only:start -->
 This section is normative for the 0.2.0 remediation release and is linked by `docs/adr/0002-sdk-compatibility-and-mirror-writes.md`. It amends the original v1 contract where the two differ.
+<!-- repo-only:end -->
 
 ### 0.1 Compatibility profile
 
 The supported external profile is the version-pinned AWS SDK v3 (Node) and AWS SDK for Go v2. Stow accepts the safe union of behavior observable through those SDKs. It does not require undocumented Amazon-service strictness. Benign unknown headers are ignored; semantic markers for unsupported operations fail before they can fall through to a supported operation.
 
+<!-- repo-only:start -->
 Raw HTTP tests cover authentication, routing, safety, malformed input, and protocol edges. Every shared conformance scenario must run through both SDK runners and both storage backends.
+<!-- repo-only:end -->
 
 ### 0.2 Naming and path decoding
 
@@ -33,7 +37,9 @@ Stow validates authentication material without rewriting it.
 Noncanonical `SignedHeaders`, repeated or unknown `Authorization` components, and duplicate or differently spelled authentication query parameters return `403`.
 Sections 4.1 and 4.2 define the accepted grammar.
 
+<!-- repo-only:start -->
 The shared corpus must cover missing/malformed auth, both date forms, wrong secret, skew, expired presigns, 604800, 604801, unsupported methods, and anonymous requests.
+<!-- repo-only:end -->
 
 ### 0.4 Policies and propagation
 
@@ -56,7 +62,11 @@ Retry and discard routes always require the admin token, including on loopback.
 
 ### 0.5 Conditional operations and checksums
 
-The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional PUTs, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Header names, encodings, response headers, multipart behavior, and error codes are normative in the shared corpus; unknown checksum algorithms fail clearly.
+The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional PUTs, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Unknown checksum algorithms return an error.
+
+<!-- repo-only:start -->
+Header names, encodings, response headers, multipart behavior and error codes are normative in the shared corpus.
+<!-- repo-only:end -->
 
 COPY supports source conditions. Destination `If-Match` and `If-None-Match`
 conditions return `501 NotImplemented` before mutation; atomic destination
@@ -90,11 +100,19 @@ Conditional writes and reads return different statuses:
 
 A matching `If-None-Match` read returns `304` without a body or S3 error code.
 SDKs may report different local error names: Go reports `NotModified`; the TypeScript SDK reports `Unknown`.
+<!-- repo-only:start -->
 The shared corpus checks status only, because those names are not wire properties.
+<!-- repo-only:end -->
 
 ### 0.6 Backends and versioning
 
-Filesystem is the default. Memory is an explicitly selected ephemeral backend with the same behavioral contract. The old sidecar format is not migrated; startup warns and continues with the new atomic format. The package is 0.2.0 while the package remains pre-1.0; the existing major-version rule is amended as recorded in ADR 0002. The npm version, binary version, and status version use one source.
+Filesystem is the default. Memory is temporary storage with the same supported behavior.
+The old sidecar format is not migrated; startup warns and uses the atomic format.
+
+<!-- repo-only:start -->
+The 0.2.0 pre-1.0 version rule is recorded in ADR 0002.
+The npm, binary and status versions use one source.
+<!-- repo-only:end -->
 
 ---
 
@@ -210,6 +228,7 @@ Bucket-specific CORS XML configuration APIs are **out of scope**; CORS is a fixe
 
 ---
 
+<!-- repo-only:start -->
 ## 2. SDK Flows to Test (Conformance Suite)
 
 Each flow below MUST pass against the local endpoint using the pinned AWS SDK v3 (`@aws-sdk/client-s3`) and AWS SDK for Go v2 runners, with `endpoint`, `forcePathStyle` / virtual-hosted toggles, and stow-issued local dev credentials. The shared corpus is the source of truth; the two runners must agree on the safe union of SDK-observable behavior.
@@ -315,7 +334,7 @@ Run PutObject + GetObject with:
 Both MUST succeed on the same bucket/object.
 
 ---
-
+<!-- repo-only:end -->
 ## 3. URL Style Support
 
 | Style | Request form | v1 support |
@@ -419,7 +438,9 @@ Every response MUST include `x-amz-request-id` header matching `RequestId` in bo
 Enable run-through with `--mode run-through` or `STOW_MODE=run-through` and configured upstream credentials.
 Environment precedence is `STOW_*` > `S3_*` > `AWS_*`.
 Credentials alone do not change local mode. `STOW_MODE=local` forces local-only storage.
+<!-- repo-only:start -->
 See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001.
+<!-- repo-only:end -->
 
 ### 6.1 Policies
 
@@ -429,7 +450,11 @@ See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001
 | **readThroughCache** | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
 | **mirrorWrites** | Same read-through behavior | Local first; upstream requires live-write consent and durable outbox; startup warning required |
 
-A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local. See `docs/adr/0005-live-write-requires-explicit-consent.md`.
+A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local.
+
+<!-- repo-only:start -->
+See `docs/adr/0005-live-write-requires-explicit-consent.md`.
+<!-- repo-only:end -->
 
 ### 6.2 Read-Through Cache Semantics
 
@@ -486,6 +511,7 @@ On every `Stow.start()`, log to stdout (and expose via `/_stow/status`):
 - Write policy: `local-only` | `allowLiveWrites` | `mirrorWrites`
 - Override hints: `STOW_MODE=local` forces local; in local mode, how to ask for run-through (`--mode run-through` or `STOW_MODE=run-through`); `allowLiveWrites` flag
 
+<!-- repo-only:start -->
 ### 6.4 Conformance Tests (Run-Through)
 
 Required manual/CI scenarios (against AWS S3, Cloudflare R2, or custom endpoint):
@@ -500,7 +526,7 @@ Required manual/CI scenarios (against AWS S3, Cloudflare R2, or custom endpoint)
 8. A paged merged listing fetches a bounded window per page rather than the full prefix set from each source. Assert against the upstream mock's call count and requested `max-keys`, so the O(n)-per-page behaviour cannot return. Keys are written across both sources so the assertion cannot pass by accident on a single-source listing.
 
 ---
-
+<!-- repo-only:end -->
 ## 7. Admin Routes
 
 Admin routes use separate authentication from SigV4.
@@ -541,12 +567,13 @@ Unauthorized requests return `404`. Without a configured token, outbox mutations
 
 ---
 
+<!-- repo-only:start -->
 ## Appendix B — Versioning This Contract
 
 - The 0.2.0 pre-1.0 release may contain documented breaking behavior as specified by ADR 0002; the stable `@chester-hill-solutions/stow-s3` 1.x boundary is reserved for the first non-breaking stable contract.
 - New operations may be added in minor versions if marked **experimental** in changelog first.
 - Conformance test suite in repo MUST reference this file by path and commit SHA in CI logs.
-
+<!-- repo-only:end -->
 ## Appendix C — Request and upstream transport boundaries (0.3.0)
 
 Native `serve` and `workspace serve` accept `--max-request-bytes`. Omitting the
@@ -616,8 +643,11 @@ metadata publication require a trusted, cooperative host filesystem.
 Nonempty `continuation-token` values must be valid UTF-8, at most 1024 bytes,
 and contain no NUL; invalid values return `400 InvalidArgument`. Current tokens
 are lexical key markers, not authenticated query-bound provider tokens. Clients
-should replay returned tokens. The [acceptance coverage map](compatibility-coverage-2026-09-29.md)
-records shared SDK cases and focused raw protocol evidence.
+should replay returned tokens.
+
+<!-- repo-only:start -->
+The [acceptance coverage map](compatibility-coverage-2026-09-29.md) records SDK and raw protocol tests.
+<!-- repo-only:end -->
 
 Resource-policy listings paginate permitted objects and prefixes before choosing
 their lexical continuation marker. Backend cursors and denied names stay internal;

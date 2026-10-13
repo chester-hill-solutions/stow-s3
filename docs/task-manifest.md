@@ -179,4 +179,6 @@ Both wrap the native CLI and return its JSON results.
 A workspace is a separate copy for task editing. It is not an OS sandbox.
 An agent can access other paths and network resources permitted to its process.
 Limits apply during preparation and Stow API operations; they do not prevent direct filesystem writes.
+<!-- repo-only:start -->
 See the [Agent Isolate proposal](history/plans/agent-isolate-exploration.md) for a possible execution boundary.
+<!-- repo-only:end -->

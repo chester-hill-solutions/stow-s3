@@ -18,7 +18,9 @@ export STOW_BIN="$PWD/bin/stow-s3"
 Use `STOW_BIN` for the native process APIs.
 Embedded WASM APIs use the built package assets.
 Future releases target public npm; remove old `npm.pkg.github.com` scope overrides.
+<!-- repo-only:start -->
 See the [release checkpoint](../../docs/release-verification-2026-10-03.md) for availability.
+<!-- repo-only:end -->
 
 ## Usage
 
@@ -119,12 +121,17 @@ const summary = await withStow(async (session) => {
 ```
 
 - Source checkouts use `STOW_BIN`. A platform package can supply the binary in a published distribution.
+<!-- repo-only:start -->
   See the [release checkpoint](../../docs/release-verification-2026-10-03.md) before using registry installation.
+<!-- repo-only:end -->
 - `STOW_*`, `S3_*`, and `AWS_*` are stripped from the child environment, so
   ambient cloud configuration cannot turn a local session into a run-through one.
-- Defaults are 16 MiB and 1,000 objects, sized from the measured memory profile in
-  [`docs/benchmarks/session-baseline.md`](../../docs/benchmarks/session-baseline.md).
-  Override with `maxBytes` and `maxObjects`.
+- Defaults are 16 MiB and 1,000 objects. Override with `maxBytes` and `maxObjects`.
+
+<!-- repo-only:start -->
+See the [session measurements](../../docs/benchmarks/session-baseline.md) for the default budget.
+<!-- repo-only:end -->
+
 - `capabilities()` reports what the server is actually enforcing, parsed from the
   versioned readiness message. A limit of `0` means the server reported no limit.
 - `handoff()` returns a fresh five-key environment mapping for a child process. It
@@ -214,6 +221,7 @@ stow serve --data-dir .dev-bucket --port 9000
 2. `bin/stow-s3` relative to the monorepo root (when developing in-repo)
 3. `stow` on `PATH`
 
+<!-- repo-only:start -->
 ## Development
 
 ```sh
@@ -224,8 +232,7 @@ npm test
 ```
 
 The package test suite includes lifecycle and shared-corpus coverage. Run `make build` before `npm test` when working from the monorepo.
-
-
+<!-- repo-only:end -->
 ## Large browser projects and persistent workers
 
 `/project` exports `BrowserProject`, `ContentStore` and `IndexedDbContentAdapter`.
@@ -233,4 +240,8 @@ It supports shared chunks, atomic revisions, bounded range reads and conditional
 `/worker` exports `AsyncEmbeddedStow`.
 `/browser-wasm` provides `loadBrowserPersistentWasmHost` for durable host storage.
 
-See [project usage and guarantees](../../docs/browser-project-storage.md), [worker APIs](../../docs/browser-worker-runtime.md) and [the 1 GiB qualification receipt](../../docs/benchmarks/browser-project-2026-10-12.json). These APIs are available in the source checkout.
+Use the [project guide](../../docs/browser-project-storage.md) or [worker guide](../../docs/browser-worker-runtime.md) to get started.
+
+<!-- repo-only:start -->
+See the [1 GiB test record](../../docs/benchmarks/browser-project-2026-10-12.json).
+<!-- repo-only:end -->

@@ -2,7 +2,9 @@
 
 The native object MCP tools wrap [guarded filesystem saves](portable-workspace-usage.md#filesystem-save-receipts-and-recovery).
 They support read-for-save, keyed save, resolution, observation release and capability inspection.
+<!-- repo-only:start -->
 The [dated test record](implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
+<!-- repo-only:end -->
 
 ## Owned profile
 
@@ -53,7 +55,7 @@ MCP schema, transport or cancellation failures without a valid effect envelope d
 not establish absence of a previous effect. Callers treat those as unknown for a
 keyed save and resolve before starting another mutation.
 
-## Bounds and evidence
+## Limits
 
 The profile limits decoded tool object bodies to 64 KiB, observations to 256, admitted
 tool calls to eight, tool names to 128 bytes, raw tool arguments to 256 KiB, and encoded full tool results
@@ -71,8 +73,10 @@ The filesystem backend may materialize records while checking their size. Object
 body limits describe adapter payloads, not streaming storage or physical disk
 preallocation. No limit silently changes the save's core outcome.
 
+<!-- repo-only:start -->
 Local verification covers the real SDK and built binary, schema/selector refusals,
 stale and absence/replacement saves, same-key replay, reopen resolution, read-only
 refusal, token expiry/release/capacity, payload/result limits and owned shutdown.
 A discarded reply followed by reopen is synthetic recovery evidence, not an
 executed power-loss test or two real downstream consumer integrations.
+<!-- repo-only:end -->

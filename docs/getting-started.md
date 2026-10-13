@@ -27,7 +27,9 @@ go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
 Use a source checkout for the unpublished 0.3.0 TypeScript and Python clients.
+<!-- repo-only:start -->
 See the [release checkpoint](release-verification-2026-10-03.md) for package availability.
+<!-- repo-only:end -->
 
 ## Choose your storage surface
 

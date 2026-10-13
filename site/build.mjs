@@ -1,8 +1,8 @@
-import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Marked } from "marked";
-import { decisionPages, pages } from "./docs.mjs";
+import { pages } from "./docs.mjs";
 
 const site = dirname(fileURLToPath(import.meta.url));
 const root = resolve(site, "..");
@@ -15,6 +15,28 @@ const sourceBase = `${repository}/blob/${revision}`;
 export function escapeHtml(text) {
   return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+}
+
+export function publicMarkdown(markdown) {
+  let omitted = false;
+  let fence;
+  const lines = [];
+  for (const line of markdown.split("\n")) {
+    const boundary = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (boundary) {
+      if (!fence) fence = boundary[1];
+      else if (boundary[1][0] === fence[0] && boundary[1].length >= fence.length && !boundary[2].trim()) fence = undefined;
+    }
+    if (!fence && line.trim() === "<!-- repo-only:start -->") {
+      if (omitted) throw new Error("Nested repo-only block");
+      omitted = true;
+    } else if (!fence && line.trim() === "<!-- repo-only:end -->") {
+      if (!omitted) throw new Error("Unexpected repo-only block end");
+      omitted = false;
+    } else if (!omitted) lines.push(line);
+  }
+  if (omitted) throw new Error("Unclosed repo-only block");
+  return lines.join("\n");
 }
 
 export function headingSlug(text) {
@@ -61,7 +83,7 @@ export function renderMarkdown(markdown, page, manifest) {
     },
     html({ text }) { return escapeHtml(text); },
   } });
-  const body = parser.parse(markdown.replace(/^---\n[\s\S]*?\n---\n/, ""));
+  const body = parser.parse(publicMarkdown(markdown).replace(/^---\n[\s\S]*?\n---\n/, ""));
   return { body, headings };
 }
 
@@ -90,7 +112,7 @@ export function renderPage(page, markdown, manifest) {
 }
 
 export async function buildSite(destination = output) {
-  const manifest = [...pages, ...decisionPages(await readdir(join(root, "docs/adr")))];
+  const manifest = pages;
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
   for (const name of ["assets", "images", "launch", "index.html", "agent.md", "llms.txt", "_headers"]) {

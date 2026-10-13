@@ -62,6 +62,7 @@ register a public plugin. Alternatively, edit a copy of `plugin/mcp.json` manual
 Remote classic ChatGPT integrations require a separately authorized transport
 and server registration; this package does not deploy one.
 
+<!-- repo-only:start -->
 ## Build and verify the UI
 
 Use Node to build the UI or run the configuration helper.
@@ -83,3 +84,4 @@ scope, Unicode keys, preview bounds and absence of save observations. UI host
 fixtures cover initial-result handling, plain-text rendering, prefix/cursor
 paging, explicit attachments, composer removals, unsupported capabilities and
 late preview responses. They do not establish live ChatGPT host compatibility.
+<!-- repo-only:end -->

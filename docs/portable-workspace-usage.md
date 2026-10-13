@@ -4,7 +4,9 @@ Use native workspaces for file editing, checkpoints, capture recovery, S3 access
 These APIs are available in the development checkout; the 0.3.0 packages are unpublished.
 Native package targets are macOS and Linux on arm64/x64.
 Windows workspace capture is unsupported by the current rooted-read implementation.
+<!-- repo-only:start -->
 See the [plan](plan.md) for remaining release tests.
+<!-- repo-only:end -->
 
 ## Workspace lifetime and S3
 
@@ -49,7 +51,9 @@ These checks compare content ETags, not metadata or every intervening revision.
 They do not coordinate arbitrary host writers or provide a committed-write replay
 receipt after a lost response. Use managed saves below when metadata changes must also invalidate an observation.
 Filesystem receipts support bounded recovery.
+<!-- repo-only:start -->
 Wrapper support and declared-input checks remain open in [W02/W09](storage-foundation-plan.md).
+<!-- repo-only:end -->
 
 ## Managed saves in native storage
 
@@ -92,9 +96,11 @@ Tokens are native values bound to the open runtime, cannot be serialized for a
 bridge, and do not confer permission. Workspace and custom public stores refuse
 with `ErrGuardedSavesUnsupported`, including stores qualified for ETag conditions.
 The native object MCP profile below wraps these managed saves. WASM, in-process
-TypeScript and S3 have no managed-save API in this slice. Resource ACLs and
-declared-input publication remain target work in the
-[shared contract](storage-admission-contract.md).
+TypeScript and S3 have no managed-save API.
+
+<!-- repo-only:start -->
+Resource ACLs and declared-input publication remain target work in the [shared contract](storage-admission-contract.md).
+<!-- repo-only:end -->
 
 ### Filesystem save receipts and recovery
 
@@ -160,15 +166,20 @@ to reapply the body. A retirement API would need caller acknowledgement of the
 replay window, terminal-only eligibility, recovery-hold checks and a durable
 tombstone; no automatic retirement or outcome override is provided.
 
+<!-- repo-only:start -->
 The [receipt lifecycle proposal](receipt-retirement-proposal.md) specifies the
 archive ordering, replay behavior, bounded admission and decision required before
 adding retirement.
+<!-- repo-only:end -->
 
 Arbitrary host edits, directory copies, shared-host fencing, pre-enrollment ABA
 history and physical power-loss qualification are outside this profile. Admission
 refreshes authoritative object/multipart accounting by scanning the store; workload
-costs still need measurement. Local evidence is recorded in
-[the implementation receipt](implementation-2026-09-30.md).
+costs still need measurement.
+
+<!-- repo-only:start -->
+Local evidence is recorded in [the implementation receipt](implementation-2026-09-30.md).
+<!-- repo-only:end -->
 
 ## Portable capture and reconciliation
 
@@ -288,7 +299,7 @@ to 256 KiB. Hosts can narrow
 body/observation limits with `--max-object-bytes` and `--max-observations`. Stdio
 requests have a 1 MiB line limit. These payload limits do not imply an RSS ceiling
 or streaming filesystem decoding. See the [object MCP contract](object-mcp-contract.md)
-for scope, result semantics and evidence. This is a native object-record profile;
+for tool arguments, results and limits. This is a native object-record profile;
 resource ACLs, encrypted storage and workspace-host-edit coordination remain open.
 
 ## Local MCP
@@ -312,12 +323,19 @@ failure information. Stdio stdout contains protocol only. The workflow guide is
 available at `stow://guides/checkpoints/v1`. The official Go MCP SDK is pinned at
 1.8.0, using Go 1.25.6. Closing the connection does not destroy storage.
 
-Reliable turn saves require a host admission barrier. The
-[OpenCode example](../examples/opencode/README.md) implements the first experimental
-caller profile. An agent choosing to call the MCP save tool remains best effort.
+To ensure a save between turns, the host must require a confirmed save before admitting another prompt.
+An agent choosing when to call a save tool cannot guarantee this boundary.
+
+<!-- repo-only:start -->
+The [OpenCode example](../examples/opencode/README.md) implements an experimental caller.
+<!-- repo-only:end -->
 
 ## Cost and scope
 
+Captures store full payload copies. Retaining five checkpoints costs roughly five copies plus manifests.
+Measure your working set before choosing a capture deadline.
+
+<!-- repo-only:start -->
 Captures currently store full payload copies. With tests stopped on the local
 macOS arm64 host, five-run measurements were:
 
@@ -335,8 +353,11 @@ A tested parent-file sharing experiment was removed because it slowed saves on t
 Measure the actual working set before turn-by-turn use and choose a bounded
 deadline accordingly. Transfer time, peak RSS and a second host remain separate
 checks. These measurements are not service-level promises.
-
+<!-- repo-only:end -->
 Per-request body limits and storage quotas do not imply a process memory ceiling.
 Stow's filesystem checks protect supported storage operations; arbitrary processes
-with host access remain outside this boundary. See [implementation evidence](implementation-2026-09-29.md)
-for exact validation and outstanding resource limits.
+with host access remain outside this boundary.
+
+<!-- repo-only:start -->
+See [implementation evidence](implementation-2026-09-29.md) for validation and outstanding limits.
+<!-- repo-only:end -->

@@ -176,6 +176,7 @@ Migration preserves the source and its cursor.
 Resolve an uncertain source sync through the original file-history API before migrating.
 Reading the legacy stages temporarily incurs that profile's full-replay memory cost.
 
+<!-- repo-only:start -->
 ## Qualification
 
 [The recorded Chromium workload](benchmarks/browser-project-2026-10-12.json) stages 1 GiB of deterministic incompressible assets, retains an initial revision plus 100 document edits, reopens and reads a small asset range:
@@ -190,3 +191,4 @@ Reading the legacy stages temporarily incurs that profile's full-replay memory c
 The persistent Chromium profile stored approximately 1.01 GiB in IndexedDB. An ephemeral Chromium context hit the browser's own quota with this incompressible dataset. The benchmark exercises the JavaScript project facade without instantiating WASM. Its Chrome heap sample is coarse JavaScript-only evidence and excludes native allocations; it is not a total-memory measurement. Separate real-worker tests verify the persistent Go runtime and bounded streams.
 
 Run the normal browser suite with `npm run test:browser`. Run the opt-in large workload with `STOW_LARGE_PROJECT=1 npm run test:browser` (temporary persistent Chromium profile). The large workload is intentionally excluded from ordinary CI timing gates. See [the execution record](browser-project-plan.md) and [worker details](browser-worker-runtime.md).
+<!-- repo-only:end -->

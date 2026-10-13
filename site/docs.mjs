@@ -8,7 +8,6 @@ export const pages = [
   { route: "/docs/task-manifests/", title: "Task manifests", source: "docs/task-manifest.md", group: "Native storage" },
   { route: "/docs/run-through/", title: "Run-through cache", source: "docs/run-through.md", group: "Native storage" },
   { route: "/docs/outbox/", title: "Durable outbox", source: "docs/outbox.md", group: "Native storage" },
-  { route: "/docs/s3-compatibility/", title: "S3 compatibility", source: "docs/compat-contract.md", group: "Native storage" },
   { route: "/docs/server/", title: "Running a server", source: "docs/running-and-probing.md", group: "Native storage" },
   { route: "/docs/mcp/", title: "Native object MCP", source: "docs/object-mcp-contract.md", group: "Native storage" },
   { route: "/docs/mcp-browser/", title: "MCP bucket browser", source: "extensions/stow/README.md", group: "Native storage" },
@@ -17,17 +16,11 @@ export const pages = [
   { route: "/docs/browser-workers/", title: "Workers and streams", source: "docs/browser-worker-runtime.md", group: "Browser storage" },
   { route: "/docs/browser-persistence/", title: "IndexedDB persistence", source: "docs/browser-persistence.md", group: "Browser storage" },
   { route: "/docs/browser-editor/", title: "Browser editor demo", source: "examples/browser-editor/README.md", group: "Browser storage" },
-  { route: "/docs/decisions/", title: "Architecture decisions", source: "docs/adr/README.md", group: "Development" },
-  { route: "/docs/contributing/", title: "Contributing", source: "CONTRIBUTING.md", group: "Development" },
-  { route: "/docs/standards/", title: "Code standards", source: "docs/CODE_STANDARDS.md", group: "Development" },
+  { route: "/docs/api/", title: "API index", source: "docs/api/README.md", group: "API reference" },
+  ...Object.values(apiNotes).map(({ slug, title }) => ({ route: `/docs/api/${slug}/`, title, source: `docs/api/${slug}.md`, group: "API reference" })),
+  { route: "/docs/api/go/", title: "Go API", source: "docs/api/go.md", group: "API reference" },
+  { route: "/docs/api/python/", title: "Python API", source: "docs/api/python.md", group: "API reference" },
+  { route: "/docs/api/mcp/", title: "MCP API", source: "docs/api/mcp.md", group: "API reference" },
+  { route: "/docs/s3-compatibility/", title: "S3 HTTP API", source: "docs/compat-contract.md", group: "API reference" },
 ];
-
-export function decisionPages(files) {
-  return files.filter((name) => /^\d{4}-.*\.md$/.test(name)).sort().map((name) => ({
-    route: `/docs/decisions/${name.slice(0, 4)}/`,
-    title: `ADR ${name.slice(0, 4)}`,
-    source: `docs/adr/${name}`,
-    group: "Decision record",
-    hidden: true,
-  }));
-}
+import { apiNotes } from "./api-notes.mjs";

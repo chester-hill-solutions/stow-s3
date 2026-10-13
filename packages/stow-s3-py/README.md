@@ -15,7 +15,9 @@ python3 -m pip install -e 'packages/stow-s3-py[boto3]'
 
 `boto3` is optional. Omit the extra if you supply another S3 client.
 Use `STOW_BIN` to select the built native server.
+<!-- repo-only:start -->
 See the [release checkpoint](../../docs/release-verification-2026-10-03.md) for package availability.
+<!-- repo-only:end -->
 
 ## Use
 
@@ -46,7 +48,9 @@ with with_session(max_bytes=1024 * 1024, max_objects=10) as session:
 ```
 
 Defaults are 16 MiB and 1,000 objects.
+<!-- repo-only:start -->
 See the [session measurements](../../docs/benchmarks/session-baseline.md).
+<!-- repo-only:end -->
 
 ## Without boto3
 

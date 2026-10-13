@@ -173,6 +173,12 @@ check-site:
 	npm run build --prefix site
 	npm test --prefix site
 
+check-api-reference:
+	$(NPM_INSTALL)
+	node scripts/generate-api-reference.mjs --check
+
+.PHONY: check-api-reference
+
 check-doc-links: check-site
 	node scripts/check-doc-links.mjs
 
@@ -191,4 +197,4 @@ check-mcp-browser:
 	npm test --prefix extensions/stow
 	node extensions/stow/build.mjs --check
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-doc-links check-scripts check-ts-quality check-generated check-mcp-browser
+standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser

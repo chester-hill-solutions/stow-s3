@@ -134,4 +134,8 @@ Local data is authoritative. Upstream propagation requires all of these:
 `STOW_POLICY=mirrorWrites` selects routing policy; it does not authorize upstream writes.
 Without live-write consent, writes stay local.
 An explicit `STOW_ALLOW_LIVE_WRITES=false` also prevents propagation.
-See [ADR 0005](adr/0005-live-write-requires-explicit-consent.md) and the [outbox guide](outbox.md).
+See the [outbox guide](outbox.md) for retries and conflict recovery.
+
+<!-- repo-only:start -->
+See [ADR 0005](adr/0005-live-write-requires-explicit-consent.md).
+<!-- repo-only:end -->

@@ -1,7 +1,9 @@
 # Running and probing a Stow server
 
 Use this guide to start a server, read its endpoint and credentials, and check readiness.
+<!-- repo-only:start -->
 Tests in `internal/s3api/probe_contract_test.go` and `cmd/stow-s3/probe_contract_test.go` verify the protocol behavior.
+<!-- repo-only:end -->
 
 ## Start a server
 
@@ -135,8 +137,10 @@ a `/_stow/health` round trip.
 ## See also
 
 - [`docs/task-manifest.md`](task-manifest.md) — the agent workspace lifecycle.
+<!-- repo-only:start -->
 - [`docs/workspace-contract.md`](workspace-contract.md) — what a workspace is and
   which host can provide one.
+<!-- repo-only:end -->
 - [`docs/compat-contract.md`](compat-contract.md) — the S3 surface, including what
   is deliberately not implemented.
 - [README](../README.md) — the full reference.

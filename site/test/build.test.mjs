@@ -3,8 +3,16 @@ import { mkdtemp, readFile, rm, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { buildSite, renderMarkdown, rewriteLink } from "../build.mjs";
+import { buildSite, publicMarkdown, renderMarkdown, rewriteLink } from "../build.mjs";
 import { pages } from "../docs.mjs";
+
+test("public guides omit repository commentary, retain code examples and reject broken markers", () => {
+  const input = "Visible\n<!-- repo-only:start -->\n## ADRs\nPrivate\n<!-- repo-only:end -->\n```md\n<!-- repo-only:start -->\n```\nEnd";
+  assert.equal(publicMarkdown(input), "Visible\n```md\n<!-- repo-only:start -->\n```\nEnd");
+  assert.throws(() => publicMarkdown("<!-- repo-only:start -->\nforgotten"), /Unclosed/);
+  assert.throws(() => publicMarkdown("<!-- repo-only:end -->"), /Unexpected/);
+  assert.throws(() => publicMarkdown("<!-- repo-only:start -->\n<!-- repo-only:start -->"), /Nested/);
+});
 
 test("published guides render examples and turn repo documentation links into site routes", () => {
   const page = pages.find((entry) => entry.source === "docs/outbox.md");
@@ -21,12 +29,19 @@ test("public output contains complete guides and excludes build tools, source fi
   const output = await mkdtemp(join(tmpdir(), "stow-site-build-"));
   t.after(() => rm(output, { recursive: true, force: true }));
   const manifest = await buildSite(output);
+  assert.equal(manifest.some((page) => page.route.startsWith("/docs/decisions/")), false);
+  for (const route of ["docs/decisions", "docs/contributing", "docs/standards"]) {
+    await assert.rejects(access(join(output, route)));
+  }
   for (const page of manifest) {
     const html = await readFile(join(output, page.route, "index.html"), "utf8");
     assert.match(html, /<main id="main"/);
     assert.match(html, /<h1 /);
     assert.match(html, /aria-label="Documentation"/);
     assert.match(html, /rel="canonical"/);
+    assert.doesNotMatch(html, /Architecture decisions|repo-only:|docs\/adr\/|W02\/W09/);
+    assert.doesNotMatch(html, /href="[^"]*\/(?:history|adr|assessment-evidence|benchmarks)\//);
+    assert.doesNotMatch(html, /href="[^"]*\/(?:storage-foundation-plan|planning-index|implementation-\d|release-verification-\d)/);
   }
   for (const name of ["serve.py", "build.mjs", "package.json", "wrangler.jsonc", ".env"]) {
     await assert.rejects(access(join(output, name)));

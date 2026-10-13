@@ -1,0 +1,3326 @@
+# Go API
+
+Import `github.com/chester-hill-solutions/stow-s3/pkg/stow`. Use Runtime for objects and Workspace for editable directories and checkpoints.
+
+## Defaults and limits
+
+| Setting | Value |
+| --- | --- |
+| Open | Memory when no Store is supplied |
+| MaxBytes / MaxObjects | Zero means unlimited |
+| MaxMultipartUploads | Zero selects 1,024; negative values are invalid |
+| Authority | nil permits all operations; ReadWrite excludes upstream and destruction |
+| ListOptions.Limit | Zero selects 1,000 objects per page; negative values are invalid |
+| CheckpointArchiveOptions | Defaults to 1 GiB / 100,000 files |
+
+## Behavior
+
+- Pass a context to operations for cancellation.
+- Check Capabilities before optional operations.
+- ETag conditions compare content; ReadForSave/SaveObject also detect managed metadata and generation changes.
+- Save results distinguish SaveCommitted, SaveNotCommitted and SaveUnknown.
+- Persist request keys before durable saves or captures.
+- Resolve uncertain results before retrying.
+- Close preserves durable data; Destroy is a separate authorized operation.
+- Workspace embeds Runtime and inherits its object methods.
+- Store extensions advertise conditional, staged, streaming, range and multipart support independently.
+
+## Errors
+
+- Use errors.Is for sentinel errors and errors.As for structured errors.
+- ErrPreconditionFailed and ErrSaveConflict preserve current data.
+- ErrMutationCommitted means content was published despite a later index error; inspect the returned object before retrying.
+- ErrSaveRequestUnknown and SaveUnknown require resolution.
+- ErrQuotaExceeded bounds managed storage, not process memory or direct host writes.
+
+## Example
+
+```go
+runtime, err := stow.Open(stow.Options{MaxBytes: 16 << 20, MaxObjects: 1000})
+if err != nil { return err }
+defer runtime.Close()
+ctx := context.Background()
+if err := runtime.CreateBucket(ctx, "files"); err != nil { return err }
+object, err := runtime.PutObject(ctx, "files", "note.txt", []byte("hello"), stow.PutOptions{ContentType: "text/plain"})
+if err != nil { return err }
+_ = object
+```
+
+## Symbols
+
+[AddRecoveryHold](#addrecoveryhold) · [AdoptHandoff](#adopthandoff) · [AdoptHandoffArchive](#adopthandoffarchive) · [AllowAll](#allowall) · [AllowNone](#allownone) · [ApplyDelta](#applydelta) · [ApplyDeltaWithOptions](#applydeltawithoptions) · [Authority](#authority) · [Backend](#backend) · [BackendFilesystem](#backendfilesystem) · [BackendHost](#backendhost) · [BackendMemory](#backendmemory) · [BackendWorkspace](#backendworkspace) · [Bucket](#bucket) · [BucketCreate](#bucketcreate) · [BucketDelete](#bucketdelete) · [BucketList](#bucketlist) · [Capabilities](#capabilities) · [CapacityHost](#capacityhost) · [CapacityHostOptions](#capacityhostoptions) · [CapacityNamespace](#capacitynamespace) · [CapacityNamespaceOptions](#capacitynamespaceoptions) · [CapacitySnapshot](#capacitysnapshot) · [CaptureCheckpoint](#capturecheckpoint) · [CapturePrincipal](#captureprincipal) · [CheckpointArchiveOptions](#checkpointarchiveoptions) · [CheckpointArchivePreview](#checkpointarchivepreview) · [CheckpointBucketChange](#checkpointbucketchange) · [CheckpointChange](#checkpointchange) · [CheckpointError](#checkpointerror) · [CheckpointFile](#checkpointfile) · [CheckpointHold](#checkpointhold) · [CheckpointInfo](#checkpointinfo) · [CheckpointManifest](#checkpointmanifest) · [CheckpointObject](#checkpointobject) · [CheckpointObjectChange](#checkpointobjectchange) · [CheckpointOf](#checkpointof) · [CheckpointOfAuthorized](#checkpointofauthorized) · [CheckpointOptions](#checkpointoptions) · [CheckpointProvenance](#checkpointprovenance) · [CheckpointRepository](#checkpointrepository) · [CheckpointRequest](#checkpointrequest) · [CheckpointResult](#checkpointresult) · [Collect](#collect) · [CollectOptions](#collectoptions) · [CollectResult](#collectresult) · [CompareCheckpoints](#comparecheckpoints) · [ComparePortableCheckpoints](#compareportablecheckpoints) · [ConditionalWriteStore](#conditionalwritestore) · [CopyStore](#copystore) · [CreateDelta](#createdelta) · [DecodeDelta](#decodedelta) · [DefaultWorkspaceRegistryDir](#defaultworkspaceregistrydir) · [DefaultWorkspaceRegistryDirForTeam](#defaultworkspaceregistrydirforteam) · [DeleteCheckpoint](#deletecheckpoint) · [DeltaChange](#deltachange) · [DeltaChangeAdded](#deltachangeadded) · [DeltaChangeChanged](#deltachangechanged) · [DeltaChangeDeleted](#deltachangedeleted) · [DeltaDocument](#deltadocument) · [DeltaDocumentDigest](#deltadocumentdigest) · [DeltaOptions](#deltaoptions) · [DeltaVersion](#deltaversion) · [DestroyRegisteredWorkspace](#destroyregisteredworkspace) · [DiscardRecoveryHold](#discardrecoveryhold) · [EncodeDelta](#encodedelta) · [EnvironmentDestroy](#environmentdestroy) · [EnvironmentPromote](#environmentpromote) · [EnvironmentReset](#environmentreset) · [ErrBucketExists](#errbucketexists) · [ErrBucketNotEmpty](#errbucketnotempty) · [ErrBucketNotFound](#errbucketnotfound) · [ErrCapacityConflict](#errcapacityconflict) · [ErrCapacityFull](#errcapacityfull) · [ErrCapacityInvalid](#errcapacityinvalid) · [ErrCapacityUnknown](#errcapacityunknown) · [ErrClosed](#errclosed) · [ErrConditionalWritesUnsupported](#errconditionalwritesunsupported) · [ErrDeltaConflict](#errdeltaconflict) · [ErrDeltaDigestMismatch](#errdeltadigestmismatch) · [ErrDeltaTooLarge](#errdeltatoolarge) · [ErrDeltaVersionUnsupported](#errdeltaversionunsupported) · [ErrGuardedSavesUnsupported](#errguardedsavesunsupported) · [ErrInvalidBucket](#errinvalidbucket) · [ErrInvalidKey](#errinvalidkey) · [ErrInvalidListLimit](#errinvalidlistlimit) · [ErrInvalidRecoveryHold](#errinvalidrecoveryhold) · [ErrInvalidSaveCondition](#errinvalidsavecondition) · [ErrInvalidSaveRequest](#errinvalidsaverequest) · [ErrMutationCommitted](#errmutationcommitted) · [ErrNotAuthorized](#errnotauthorized) · [ErrObjectNotFound](#errobjectnotfound) · [ErrPreconditionFailed](#errpreconditionfailed) · [ErrQuotaExceeded](#errquotaexceeded) · [ErrRecoveryHeld](#errrecoveryheld) · [ErrRecoveryHoldConflict](#errrecoveryholdconflict) · [ErrRecoveryHoldCorrupt](#errrecoveryholdcorrupt) · [ErrRecoveryHoldFull](#errrecoveryholdfull) · [ErrRecoveryHoldNotFound](#errrecoveryholdnotfound) · [ErrRecoveryHoldsUnsupported](#errrecoveryholdsunsupported) · [ErrSaveConflict](#errsaveconflict) · [ErrSaveRequestConflict](#errsaverequestconflict) · [ErrSaveRequestFull](#errsaverequestfull) · [ErrSaveRequestNotCommitted](#errsaverequestnotcommitted) · [ErrSaveRequestNotFound](#errsaverequestnotfound) · [ErrSaveRequestsUnsupported](#errsaverequestsunsupported) · [ErrSaveRequestUnknown](#errsaverequestunknown) · [ErrUnsupportedBackend](#errunsupportedbackend) · [ExportCheckpoint](#exportcheckpoint) · [ExportHandoff](#exporthandoff) · [FilesystemOptions](#filesystemoptions) · [GetRegistryPolicy](#getregistrypolicy) · [GitRepositoryInput](#gitrepositoryinput) · [Handoff](#handoff) · [HandoffArchive](#handoffarchive) · [HandoffError](#handofferror) · [HandoffExportOptions](#handoffexportoptions) · [ImportCheckpoint](#importcheckpoint) · [ImportHandoff](#importhandoff) · [List](#list) · [ListOptions](#listoptions) · [ListRecoveryHolds](#listrecoveryholds) · [ListWorkspacesOptions](#listworkspacesoptions) · [LoadCheckpoint](#loadcheckpoint) · [LookupWorkspace](#lookupworkspace) · [MaxDeltaBytes](#maxdeltabytes) · [MaxRecoveryHoldBytes](#maxrecoveryholdbytes) · [MaxRecoveryHoldPeakBytes](#maxrecoveryholdpeakbytes) · [MaxRecoveryHolds](#maxrecoveryholds) · [MaxRecoveryReferences](#maxrecoveryreferences) · [MultipartOptions](#multipartoptions) · [MultipartStore](#multipartstore) · [MultipartUpload](#multipartupload) · [Object](#object) · [ObjectDelete](#objectdelete) · [ObjectList](#objectlist) · [ObjectPage](#objectpage) · [ObjectRange](#objectrange) · [ObjectRead](#objectread) · [ObjectRecoveryHoldOptions](#objectrecoveryholdoptions) · [ObjectRecoveryReference](#objectrecoveryreference) · [ObjectWrite](#objectwrite) · [Open](#open) · [OpenCapacityHost](#opencapacityhost) · [OpenFilesystem](#openfilesystem) · [OpenWorkspace](#openworkspace) · [Operation](#operation) · [Options](#options) · [Part](#part) · [PortableCheckpointDiff](#portablecheckpointdiff) · [PreparedRepository](#preparedrepository) · [PreparedWorkspace](#preparedworkspace) · [PrepareOptions](#prepareoptions) · [PrepareWorkspace](#prepareworkspace) · [PreviewCheckpointArchive](#previewcheckpointarchive) · [Prune](#prune) · [PruneOptions](#pruneoptions) · [PruneResult](#pruneresult) · [PutOptions](#putoptions) · [RangeStore](#rangestore) · [ReadCheckpointFile](#readcheckpointfile) · [ReadHandoff](#readhandoff) · [ReadHandoffReader](#readhandoffreader) · [ReadOnly](#readonly) · [ReadWrite](#readwrite) · [RecoveryHold](#recoveryhold) · [RecoveryHoldPage](#recoveryholdpage) · [RecoveryHoldQuery](#recoveryholdquery) · [RecoveryHoldRequest](#recoveryholdrequest) · [RecoveryReference](#recoveryreference) · [RegistryPolicy](#registrypolicy) · [ReleaseRecoveryHold](#releaserecoveryhold) · [ReplacementCondition](#replacementcondition) · [ResolveCheckpoint](#resolvecheckpoint) · [ResolveRegistryDir](#resolveregistrydir) · [RestoreCheckpoint](#restorecheckpoint) · [RestoreCheckpointWithGit](#restorecheckpointwithgit) · [Resume](#resume) · [ResumeIn](#resumein) · [ResumeWith](#resumewith) · [Runtime](#runtime) · [SaveCommitted](#savecommitted) · [SaveCondition](#savecondition) · [SaveNotCommitted](#savenotcommitted) · [SaveOptions](#saveoptions) · [SaveOutcome](#saveoutcome) · [SaveResult](#saveresult) · [SaveUnknown](#saveunknown) · [SetRegistryPolicy](#setregistrypolicy) · [StagedObject](#stagedobject) · [StagedWriteStore](#stagedwritestore) · [Store](#store) · [StreamingStore](#streamingstore) · [StreamingWriteStore](#streamingwritestore) · [StreamPutOptions](#streamputoptions) · [UpstreamRead](#upstreamread) · [UpstreamWrite](#upstreamwrite) · [Usage](#usage) · [ValidateHandoff](#validatehandoff) · [VerifyDeltaDigest](#verifydeltadigest) · [Workspace](#workspace) · [WorkspaceFacade](#workspacefacade) · [WorkspaceFacadeOptions](#workspacefacadeoptions) · [WorkspaceInput](#workspaceinput) · [WorkspaceListing](#workspacelisting) · [WorkspaceOptions](#workspaceoptions) · [WorkspaceReference](#workspacereference) · [WorkspaceSummary](#workspacesummary) · [WorkspaceTaskManifest](#workspacetaskmanifest)
+
+## AddRecoveryHold
+
+AddRecoveryHold is host administration over a trusted registry, not a grant from Owner.
+
+```go
+func AddRecoveryHold(ctx context.Context, registryDir string, request RecoveryHoldRequest) (RecoveryHold, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `request` | `RecoveryHoldRequest` | Yes | — |  |
+
+Returns: `RecoveryHold, error`.
+
+## AdoptHandoff
+
+AdoptHandoff returns imported checkpoint information even if restoration fails.
+
+```go
+func AdoptHandoff(ctx context.Context, path string, options WorkspaceOptions, archiveOptions CheckpointArchiveOptions) (*Workspace, CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `path` | `string` | Yes | — |  |
+| `options` | `WorkspaceOptions` | Yes | — |  |
+| `archiveOptions` | `CheckpointArchiveOptions` | Yes | — |  |
+
+Returns: `*Workspace, CheckpointInfo, error`.
+
+## AdoptHandoffArchive
+
+AdoptHandoffArchive consumes the checked document and opened archive without reopening paths.
+
+```go
+func AdoptHandoffArchive(ctx context.Context, document Handoff, archive *os.File, options WorkspaceOptions, archiveOptions CheckpointArchiveOptions) (*Workspace, CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `document` | `Handoff` | Yes | — |  |
+| `archive` | `*os.File` | Yes | — | Path to a portable checkpoint archive. |
+| `options` | `WorkspaceOptions` | Yes | — |  |
+| `archiveOptions` | `CheckpointArchiveOptions` | Yes | — |  |
+
+Returns: `*Workspace, CheckpointInfo, error`.
+
+## AllowAll
+
+AllowAll returns an Authority that permits every operation.
+
+```go
+func AllowAll() Authority
+```
+
+## AllowNone
+
+AllowNone returns an Authority that permits nothing.
+
+```go
+func AllowNone() Authority
+```
+
+## ApplyDelta
+
+ApplyDelta brings a checkpoint to the state a delta describes, and returns the new checkpoint.
+
+```go
+func ApplyDelta(ctx context.Context, registryDir, baseID string, delta *DeltaDocument) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `baseID` | `string` | Yes | — |  |
+| `delta` | `*DeltaDocument` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+## ApplyDeltaWithOptions
+
+ApplyDeltaWithOptions applies a transported delta when the receiver explicitly consents to carrying sensitive-looking paths as well as the sender's consent.
+
+```go
+func ApplyDeltaWithOptions(ctx context.Context, registryDir, baseID string, delta *DeltaDocument, options DeltaOptions) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `baseID` | `string` | Yes | — |  |
+| `delta` | `*DeltaDocument` | Yes | — |  |
+| `options` | `DeltaOptions` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+## Authority
+
+Authority is a set of permitted operations.
+
+```go
+type Authority struct{ Mask uint32 }
+```
+
+### Authority.Allows
+
+Allows reports whether op is permitted.
+
+```go
+func (a Authority) Allows(op Operation) bool
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `op` | `Operation` | Yes | — |  |
+
+Returns: `bool`.
+
+### Authority.Check
+
+Check returns *ErrNotAuthorized when op is not permitted.
+
+```go
+func (a Authority) Check(op Operation) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `op` | `Operation` | Yes | — |  |
+
+Returns: `error`.
+
+### Authority.Intersect
+
+Intersect returns the operations both a and b permit.
+
+```go
+func (a Authority) Intersect(b Authority) Authority
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `b` | `Authority` | Yes | — |  |
+
+Returns: `Authority`.
+
+### Authority.IsSupersetOf
+
+IsSupersetOf reports whether a permits everything b permits.
+
+```go
+func (a Authority) IsSupersetOf(b Authority) bool
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `b` | `Authority` | Yes | — |  |
+
+Returns: `bool`.
+
+### Authority.Operations
+
+Operations lists what is permitted, sorted, for a descriptor or a diagnostic.
+
+```go
+func (a Authority) Operations() []Operation
+```
+
+Returns: `[]Operation`.
+
+### Authority.String
+
+String renders the permitted set, for an error message or a log line.
+
+```go
+func (a Authority) String() string
+```
+
+Returns: `string`.
+
+### Authority.With
+
+With returns a copy that additionally permits the given operations.
+
+```go
+func (a Authority) With(ops ...Operation) Authority
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ops` | `...Operation` | Yes | — |  |
+
+Returns: `Authority`.
+
+### Authority.Without
+
+Without returns a copy that no longer permits the given operations.
+
+```go
+func (a Authority) Without(ops ...Operation) Authority
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ops` | `...Operation` | Yes | — |  |
+
+Returns: `Authority`.
+
+## Backend
+
+
+
+```go
+type Backend string
+```
+
+## BackendFilesystem
+
+
+
+```go
+const BackendFilesystem Backend = "filesystem"
+```
+
+## BackendHost
+
+
+
+```go
+const BackendHost Backend = "host"
+```
+
+## BackendMemory
+
+
+
+```go
+const BackendMemory Backend = "memory"
+```
+
+## BackendWorkspace
+
+
+
+```go
+const BackendWorkspace Backend = "workspace"
+```
+
+## Bucket
+
+
+
+```go
+type Bucket struct {
+	Name		string
+	CreationDate	time.Time
+}
+```
+
+## BucketCreate
+
+
+
+```go
+const BucketCreate = authority.BucketCreate
+```
+
+## BucketDelete
+
+
+
+```go
+const BucketDelete = authority.BucketDelete
+```
+
+## BucketList
+
+
+
+```go
+const BucketList = authority.BucketList
+```
+
+## Capabilities
+
+Return the operations and limits supported by this handle.
+
+```go
+type Capabilities struct {
+	Backend			Backend
+	MaxBytes		int64
+	MaxObjects		int64
+	MaxMultipartUploads	int64
+	Persistent		bool
+	Multipart		bool
+	Upstream		bool
+	ConditionalWrites	bool
+	GuardedSaves		bool
+	DurableSaveRequests	bool
+	RecoveryHolds		bool
+}
+```
+
+## CapacityHost
+
+CapacityHost configures trusted namespace budgets; it does not authenticate callers.
+
+```go
+type CapacityHost struct {
+	// contains filtered or unexported fields
+}
+```
+
+### CapacityHost.BindNamespace
+
+
+
+```go
+func (h *CapacityHost) BindNamespace(options CapacityNamespaceOptions) (*CapacityNamespace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `CapacityNamespaceOptions` | Yes | — |  |
+
+Returns: `*CapacityNamespace, error`.
+
+## CapacityHostOptions
+
+
+
+```go
+type CapacityHostOptions struct {
+	Dir		string
+	MaxBytes	int64
+	MaxNamespaces	int
+}
+```
+
+## CapacityNamespace
+
+
+
+```go
+type CapacityNamespace struct {
+	// contains filtered or unexported fields
+}
+```
+
+### CapacityNamespace.Snapshot
+
+
+
+```go
+func (n *CapacityNamespace) Snapshot(ctx context.Context) (CapacitySnapshot, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+
+Returns: `CapacitySnapshot, error`.
+
+## CapacityNamespaceOptions
+
+
+
+```go
+type CapacityNamespaceOptions struct {
+	ID	string
+	MaxBytes,
+	RecoveryReserveBytes	int64
+	MaxOperations, MaxDependencies	int
+}
+```
+
+## CapacitySnapshot
+
+
+
+```go
+type CapacitySnapshot struct {
+	PayloadBytes, RecoveryBytes, ReservedRecoveryBytes, PendingBytes	int64
+	Operations								int
+}
+```
+
+## CaptureCheckpoint
+
+Capture paused writers with a persisted unique request key. Replay retained results before admitting a new capture.
+
+```go
+func CaptureCheckpoint(ctx context.Context, registryDir, workspaceID string, request CheckpointRequest) (CheckpointResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `workspaceID` | `string` | Yes | — |  |
+| `request` | `CheckpointRequest` | Yes | — |  |
+
+Returns: `CheckpointResult, error`.
+
+## CapturePrincipal
+
+CapturePrincipal is what a capture from outside the workspace is decided by.
+
+```go
+type CapturePrincipal struct {
+	Environment	authority.Authority
+	Policy		policy.Source
+}
+```
+
+## CheckpointArchiveOptions
+
+CheckpointArchiveOptions bounds archive work.
+
+```go
+type CheckpointArchiveOptions struct {
+	MaxBytes		int64
+	MaxFiles		int64
+	IncludeSensitiveFiles	bool
+}
+```
+
+## CheckpointArchivePreview
+
+CheckpointArchivePreview describes the verified contents of an archive.
+
+```go
+type CheckpointArchivePreview struct {
+	Version		int			`json:"version"`
+	PrimaryBucket	string			`json:"primary_bucket,omitempty"`
+	Buckets		[]string		`json:"buckets,omitempty"`
+	Objects		[]CheckpointObject	`json:"objects,omitempty"`
+	CheckpointID	string			`json:"checkpoint_id"`
+	WorkspaceID	string			`json:"workspace_id"`
+	ParentID	string			`json:"parent_checkpoint_id,omitempty"`
+	Files		[]CheckpointFile	`json:"files"`
+	Excluded	[]string		`json:"excluded_sensitive_paths,omitempty"`
+	SensitivePaths	[]string		`json:"sensitive_paths,omitempty"`
+	Bytes		int64			`json:"bytes"`
+}
+```
+
+## CheckpointBucketChange
+
+
+
+```go
+type CheckpointBucketChange struct {
+	Bucket	string	`json:"bucket"`
+	Kind	string	`json:"kind"`
+}
+```
+
+## CheckpointChange
+
+
+
+```go
+type CheckpointChange struct {
+	Path	string		`json:"path"`
+	Kind	string		`json:"kind"`
+	From	*CheckpointFile	`json:"from,omitempty"`
+	To	*CheckpointFile	`json:"to,omitempty"`
+}
+```
+
+## CheckpointError
+
+
+
+```go
+type CheckpointError struct {
+	Code		string	`json:"code"`
+	Phase		string	`json:"phase"`
+	Attempts	int	`json:"attempts"`
+	Retryable	bool	`json:"retryable"`
+	Outcome		string	`json:"outcome"`
+	Err		error	`json:"-"`
+}
+```
+
+### CheckpointError.Error
+
+
+
+```go
+func (e *CheckpointError) Error() string
+```
+
+Returns: `string`.
+
+### CheckpointError.Unwrap
+
+
+
+```go
+func (e *CheckpointError) Unwrap() error
+```
+
+Returns: `error`.
+
+## CheckpointFile
+
+
+
+```go
+type CheckpointFile struct {
+	Path	string	`json:"path"`
+	Size	int64	`json:"size"`
+	Mode	uint32	`json:"mode"`
+	SHA256	string	`json:"sha256"`
+}
+```
+
+## CheckpointHold
+
+
+
+```go
+type CheckpointHold struct {
+	ID		string		`json:"id"`
+	Owner		string		`json:"owner"`
+	ExpiresAt	time.Time	`json:"expires_at,omitempty"`
+}
+```
+
+## CheckpointInfo
+
+
+
+```go
+type CheckpointInfo struct {
+	Version		int		`json:"version,omitempty"`
+	Objects		int64		`json:"objects,omitempty"`
+	ID		string		`json:"id"`
+	WorkspaceID	string		`json:"workspace_id"`
+	ParentID	string		`json:"parent_id"`
+	Created		time.Time	`json:"created"`
+	Files		int64		`json:"files"`
+	Bytes		int64		`json:"bytes"`
+	Excluded	[]string	`json:"excluded"`
+}
+```
+
+## CheckpointManifest
+
+
+
+```go
+type CheckpointManifest struct {
+	Provenance		*CheckpointProvenance	`json:"provenance,omitempty"`
+	PrimaryBucket		string			`json:"primary_bucket,omitempty"`
+	Buckets			[]string		`json:"buckets,omitempty"`
+	Objects			[]CheckpointObject	`json:"objects,omitempty"`
+	Payloads		[]CheckpointFile	`json:"payloads,omitempty"`
+	WorkingDirectory	string			`json:"working_directory,omitempty"`
+	Version			int			`json:"version"`
+	ID			string			`json:"id"`
+	WorkspaceID		string			`json:"workspace_id"`
+	ParentID		string			`json:"parent_id,omitempty"`
+	Created			time.Time		`json:"created"`
+	Files			[]CheckpointFile	`json:"files"`
+	Excluded		[]string		`json:"excluded,omitempty"`
+}
+```
+
+## CheckpointObject
+
+CheckpointObject describes logical object state, independent of backend paths.
+
+```go
+type CheckpointObject struct {
+	Bucket			string			`json:"bucket"`
+	Key			string			`json:"key"`
+	Payload			string			`json:"payload"`
+	Size			int64			`json:"size"`
+	SHA256			string			`json:"sha256"`
+	ContentType		string			`json:"content_type"`
+	Metadata		map[string]string	`json:"metadata,omitempty"`
+	ChecksumAlgorithm	string			`json:"checksum_algorithm,omitempty"`
+	ChecksumValue		string			`json:"checksum_value,omitempty"`
+	ChecksumType		string			`json:"checksum_type,omitempty"`
+}
+```
+
+## CheckpointObjectChange
+
+
+
+```go
+type CheckpointObjectChange struct {
+	Bucket	string			`json:"bucket"`
+	Key	string			`json:"key"`
+	Kind	string			`json:"kind"`
+	From	*CheckpointObject	`json:"from,omitempty"`
+	To	*CheckpointObject	`json:"to,omitempty"`
+}
+```
+
+## CheckpointOf
+
+CheckpointOf captures a checkpoint of a workspace that another process may be using right now: the operation an orchestrator needs and could not perform, since the answer to "what has it done so far?" must not require the agent to stop.
+
+```go
+func CheckpointOf(ctx context.Context, registryDir, id string, options CheckpointOptions) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `options` | `CheckpointOptions` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+## CheckpointOfAuthorized
+
+CheckpointOfAuthorized is CheckpointOf with its principal named.
+
+```go
+func CheckpointOfAuthorized(ctx context.Context, registryDir, id string, options CheckpointOptions, principal CapturePrincipal) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `options` | `CheckpointOptions` | Yes | — |  |
+| `principal` | `CapturePrincipal` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+## CheckpointOptions
+
+
+
+```go
+type CheckpointOptions struct {
+	PortableObjects		bool	`json:"portable_objects,omitempty"`
+	ParentID		string	`json:"parent_id,omitempty"`
+	MaxBytes		int64	`json:"max_bytes,omitempty"`
+	MaxFiles		int64	`json:"max_files,omitempty"`
+	IncludeSensitiveFiles	bool	`json:"include_sensitive_files,omitempty"`
+}
+```
+
+## CheckpointProvenance
+
+
+
+```go
+type CheckpointProvenance struct {
+	Repositories		[]CheckpointRepository	`json:"repositories,omitempty"`
+	OriginCheckpointID	string			`json:"origin_checkpoint_id,omitempty"`
+}
+```
+
+## CheckpointRepository
+
+
+
+```go
+type CheckpointRepository struct {
+	Destination	string	`json:"destination"`
+	Commit		string	`json:"commit"`
+	SourceLabel	string	`json:"source_label,omitempty"`
+}
+```
+
+## CheckpointRequest
+
+
+
+```go
+type CheckpointRequest struct {
+	Hold	*CheckpointHold		`json:"hold,omitempty"`
+	Key	string			`json:"request_key"`
+	Options	CheckpointOptions	`json:"options"`
+}
+```
+
+## CheckpointResult
+
+
+
+```go
+type CheckpointResult struct {
+	Checkpoint	CheckpointInfo	`json:"checkpoint"`
+	Replayed	bool		`json:"replayed"`
+	Outcome		string		`json:"outcome"`
+}
+```
+
+## Collect
+
+Collect reclaims workspaces that are past their TTL and provably unused.
+
+```go
+func Collect(options CollectOptions) ([]CollectResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `CollectOptions` | Yes | — |  |
+
+Returns: `[]CollectResult, error`.
+
+## CollectOptions
+
+CollectOptions configures a sweep.
+
+```go
+type CollectOptions struct {
+	RegistryDir	string
+
+	Team	string
+
+	Now	func() time.Time
+}
+```
+
+## CollectResult
+
+CollectResult is one workspace a sweep considered, and what it did about it.
+
+```go
+type CollectResult struct {
+	ID	string	`json:"id"`
+
+	Dir	string	`json:"dir"`
+
+	Removed	bool	`json:"removed"`
+
+	Reason	string	`json:"reason"`
+}
+```
+
+## CompareCheckpoints
+
+
+
+```go
+func CompareCheckpoints(registryDir, fromID, toID string) ([]CheckpointChange, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `fromID` | `string` | Yes | — |  |
+| `toID` | `string` | Yes | — |  |
+
+Returns: `[]CheckpointChange, error`.
+
+## ComparePortableCheckpoints
+
+
+
+```go
+func ComparePortableCheckpoints(registryDir, fromID, toID string) (PortableCheckpointDiff, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `fromID` | `string` | Yes | — |  |
+| `toID` | `string` | Yes | — |  |
+
+Returns: `PortableCheckpointDiff, error`.
+
+## ConditionalWriteStore
+
+ConditionalWriteStore opts into atomic IfMatch/IfNoneMatch enforcement.
+
+```go
+type ConditionalWriteStore interface {
+	SupportsConditionalWrites() bool
+}
+```
+
+## CopyStore
+
+
+
+```go
+type CopyStore interface {
+	CopyObject(context.Context, string, string, string, string) (Object, error)
+}
+```
+
+## CreateDelta
+
+CreateDelta describes the difference between two checkpoints in one registry.
+
+```go
+func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, options DeltaOptions) (*DeltaDocument, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `baseID` | `string` | Yes | — |  |
+| `targetID` | `string` | Yes | — |  |
+| `options` | `DeltaOptions` | Yes | — |  |
+
+Returns: `*DeltaDocument, error`.
+
+## DecodeDelta
+
+DecodeDelta parses a transported delta.
+
+```go
+func DecodeDelta(raw []byte) (*DeltaDocument, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `raw` | `[]byte` | Yes | — |  |
+
+Returns: `*DeltaDocument, error`.
+
+## DefaultWorkspaceRegistryDir
+
+DefaultWorkspaceRegistryDir reports where this host stores local workspace references.
+
+```go
+func DefaultWorkspaceRegistryDir() (string, error)
+```
+
+## DefaultWorkspaceRegistryDirForTeam
+
+DefaultWorkspaceRegistryDirForTeam reports where a named team's workspace references live on this host.
+
+```go
+func DefaultWorkspaceRegistryDirForTeam(team string) (string, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `team` | `string` | Yes | — | Registry team partition; it is not an authorization identity. |
+
+Returns: `string, error`.
+
+## DeleteCheckpoint
+
+DeleteCheckpoint removes a retained checkpoint and its local replay receipt.
+
+```go
+func DeleteCheckpoint(ctx context.Context, registryDir, id string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `error`.
+
+## DeltaChange
+
+DeltaChange is one path's difference.
+
+```go
+type DeltaChange struct {
+	Path	string		`json:"path"`
+	Kind	string		`json:"kind"`
+	From	*CheckpointFile	`json:"from,omitempty"`
+	To	*CheckpointFile	`json:"to,omitempty"`
+}
+```
+
+## DeltaChangeAdded
+
+Change kinds, matching what the checkpoint diff already emits.
+
+```go
+const DeltaChangeAdded = "added"
+```
+
+## DeltaChangeChanged
+
+Change kinds, matching what the checkpoint diff already emits.
+
+```go
+const DeltaChangeChanged = "changed"
+```
+
+## DeltaChangeDeleted
+
+Change kinds, matching what the checkpoint diff already emits.
+
+```go
+const DeltaChangeDeleted = "deleted"
+```
+
+## DeltaDocument
+
+DeltaDocument is the transferable form.
+
+```go
+type DeltaDocument struct {
+	Version			int			`json:"version"`
+	BaseID			string			`json:"base_id"`
+	TargetID		string			`json:"target_id"`
+	Created			time.Time		`json:"created"`
+	Changes			[]DeltaChange		`json:"changes"`
+	Files			int64			`json:"files"`
+	Bytes			int64			`json:"bytes"`
+	Content			map[string][]byte	`json:"content,omitempty"`
+	IncludeSensitive	bool			`json:"include_sensitive,omitempty"`
+}
+```
+
+## DeltaDocumentDigest
+
+DeltaDocumentDigest is the digest a sender publishes for a document and a receiver checks it against.
+
+```go
+func DeltaDocumentDigest(encoded []byte) string
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `encoded` | `[]byte` | Yes | — |  |
+
+Returns: `string`.
+
+## DeltaOptions
+
+DeltaOptions bounds the work a delta may describe.
+
+```go
+type DeltaOptions struct {
+	MaxBytes	int64
+	MaxFiles	int64
+
+	IncludeSensitive	bool
+
+	Encoded		[]byte
+	ExpectSHA256	string
+}
+```
+
+## DeltaVersion
+
+DeltaVersion is the delta document's format version.
+
+```go
+const DeltaVersion = 1
+```
+
+## DestroyRegisteredWorkspace
+
+DestroyRegisteredWorkspace is an explicit host-administrative operation over a trusted registry.
+
+```go
+func DestroyRegisteredWorkspace(ctx context.Context, registryDir, id string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `error`.
+
+## DiscardRecoveryHold
+
+
+
+```go
+func DiscardRecoveryHold(ctx context.Context, registryDir, id, owner string) (RecoveryHold, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `owner` | `string` | Yes | — |  |
+
+Returns: `RecoveryHold, error`.
+
+## EncodeDelta
+
+EncodeDelta serializes a delta, including its content, for transport.
+
+```go
+func EncodeDelta(delta *DeltaDocument) ([]byte, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `delta` | `*DeltaDocument` | Yes | — |  |
+
+Returns: `[]byte, error`.
+
+## EnvironmentDestroy
+
+
+
+```go
+const EnvironmentDestroy = authority.EnvironmentDestroy
+```
+
+## EnvironmentPromote
+
+
+
+```go
+const EnvironmentPromote = authority.EnvironmentPromote
+```
+
+## EnvironmentReset
+
+
+
+```go
+const EnvironmentReset = authority.EnvironmentReset
+```
+
+## ErrBucketExists
+
+
+
+```go
+var ErrBucketExists = errors.New("stow: bucket already exists")
+```
+
+## ErrBucketNotEmpty
+
+
+
+```go
+var ErrBucketNotEmpty = errors.New("stow: bucket is not empty")
+```
+
+## ErrBucketNotFound
+
+
+
+```go
+var ErrBucketNotFound = errors.New("stow: bucket not found")
+```
+
+## ErrCapacityConflict
+
+
+
+```go
+var ErrCapacityConflict = capacity.ErrConflict
+```
+
+## ErrCapacityFull
+
+
+
+```go
+var ErrCapacityFull = capacity.ErrFull
+```
+
+## ErrCapacityInvalid
+
+
+
+```go
+var ErrCapacityInvalid = capacity.ErrInvalid
+```
+
+## ErrCapacityUnknown
+
+
+
+```go
+var ErrCapacityUnknown = capacity.ErrUnknown
+```
+
+## ErrClosed
+
+
+
+```go
+var ErrClosed = errors.New("stow: runtime is closed")
+```
+
+## ErrConditionalWritesUnsupported
+
+
+
+```go
+var ErrConditionalWritesUnsupported = errors.New("stow: conditional writes unsupported")
+```
+
+## ErrDeltaConflict
+
+ErrDeltaConflict reports that a delta could not be applied because the target is not where the delta was written to be applied.
+
+```go
+var ErrDeltaConflict = errors.New("delta target has diverged from the delta's base")
+```
+
+## ErrDeltaDigestMismatch
+
+ErrDeltaDigestMismatch reports that a delta document does not hash to the digest the sender published for it.
+
+```go
+var ErrDeltaDigestMismatch = errors.New("delta document does not match the digest the sender published")
+```
+
+## ErrDeltaTooLarge
+
+ErrDeltaTooLarge reports a delta document whose content is over MaxDeltaBytes.
+
+```go
+var ErrDeltaTooLarge = errors.New("delta document is larger than the format allows")
+```
+
+## ErrDeltaVersionUnsupported
+
+ErrDeltaVersionUnsupported reports a delta whose format version this build does not speak.
+
+```go
+var ErrDeltaVersionUnsupported = errors.New("delta document version is not supported")
+```
+
+## ErrGuardedSavesUnsupported
+
+
+
+```go
+var ErrGuardedSavesUnsupported = errors.New("stow: guarded saves unsupported")
+```
+
+## ErrInvalidBucket
+
+
+
+```go
+var ErrInvalidBucket = errors.New("stow: invalid bucket name")
+```
+
+## ErrInvalidKey
+
+
+
+```go
+var ErrInvalidKey = errors.New("stow: invalid object key")
+```
+
+## ErrInvalidListLimit
+
+
+
+```go
+var ErrInvalidListLimit = errors.New("stow: list limit must not be negative")
+```
+
+## ErrInvalidRecoveryHold
+
+
+
+```go
+var ErrInvalidRecoveryHold = storage.ErrInvalidRecoveryHold
+```
+
+## ErrInvalidSaveCondition
+
+
+
+```go
+var ErrInvalidSaveCondition = errors.New("stow: invalid guarded save condition")
+```
+
+## ErrInvalidSaveRequest
+
+
+
+```go
+var ErrInvalidSaveRequest = errors.New("stow: invalid save request")
+```
+
+## ErrMutationCommitted
+
+
+
+```go
+var ErrMutationCommitted = storage.ErrMutationCommitted
+```
+
+## ErrNotAuthorized
+
+ErrNotAuthorized is returned for a refused operation.
+
+```go
+type ErrNotAuthorized struct {
+	Operation	Operation
+	Authority	Authority
+}
+```
+
+### ErrNotAuthorized.Error
+
+
+
+```go
+func (e *ErrNotAuthorized) Error() string
+```
+
+Returns: `string`.
+
+## ErrObjectNotFound
+
+
+
+```go
+var ErrObjectNotFound = errors.New("stow: object not found")
+```
+
+## ErrPreconditionFailed
+
+
+
+```go
+var ErrPreconditionFailed = errors.New("stow: precondition failed")
+```
+
+## ErrQuotaExceeded
+
+
+
+```go
+var ErrQuotaExceeded = errors.New("stow: runtime quota exceeded")
+```
+
+## ErrRecoveryHeld
+
+
+
+```go
+var ErrRecoveryHeld = storage.ErrRecoveryHeld
+```
+
+## ErrRecoveryHoldConflict
+
+
+
+```go
+var ErrRecoveryHoldConflict = workspace.ErrRecoveryHoldConflict
+```
+
+## ErrRecoveryHoldCorrupt
+
+
+
+```go
+var ErrRecoveryHoldCorrupt = workspace.ErrRecoveryHoldCorrupt
+```
+
+## ErrRecoveryHoldFull
+
+
+
+```go
+var ErrRecoveryHoldFull = workspace.ErrRecoveryHoldFull
+```
+
+## ErrRecoveryHoldNotFound
+
+
+
+```go
+var ErrRecoveryHoldNotFound = workspace.ErrRecoveryHoldNotFound
+```
+
+## ErrRecoveryHoldsUnsupported
+
+
+
+```go
+var ErrRecoveryHoldsUnsupported = storage.ErrRecoveryHoldsUnsupported
+```
+
+## ErrSaveConflict
+
+
+
+```go
+var ErrSaveConflict = errors.New("stow: guarded save conflicts with current object")
+```
+
+## ErrSaveRequestConflict
+
+
+
+```go
+var ErrSaveRequestConflict = errors.New("stow: save request key has different meaning")
+```
+
+## ErrSaveRequestFull
+
+
+
+```go
+var ErrSaveRequestFull = errors.New("stow: save request retention full")
+```
+
+## ErrSaveRequestNotCommitted
+
+
+
+```go
+var ErrSaveRequestNotCommitted = errors.New("stow: save request was not committed")
+```
+
+## ErrSaveRequestNotFound
+
+
+
+```go
+var ErrSaveRequestNotFound = errors.New("stow: save request receipt not found")
+```
+
+## ErrSaveRequestsUnsupported
+
+
+
+```go
+var ErrSaveRequestsUnsupported = errors.New("stow: durable save requests unsupported")
+```
+
+## ErrSaveRequestUnknown
+
+
+
+```go
+var ErrSaveRequestUnknown = errors.New("stow: save request effect unknown")
+```
+
+## ErrUnsupportedBackend
+
+
+
+```go
+var ErrUnsupportedBackend = errors.New("stow: unsupported runtime backend")
+```
+
+## ExportCheckpoint
+
+ExportCheckpoint writes a portable gzip-compressed tar archive.
+
+```go
+func ExportCheckpoint(ctx context.Context, registryDir, id string, output io.Writer, options CheckpointArchiveOptions) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `output` | `io.Writer` | Yes | — | Destination path for the transfer document or archive. |
+| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+
+Returns: `error`.
+
+## ExportHandoff
+
+ExportHandoff creates a new directory containing a self-contained portable bundle.
+
+```go
+func ExportHandoff(ctx context.Context, options HandoffExportOptions) (Handoff, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `options` | `HandoffExportOptions` | Yes | — |  |
+
+Returns: `Handoff, error`.
+
+## FilesystemOptions
+
+
+
+```go
+type FilesystemOptions struct {
+	Dir		string
+	Options		Options
+	Namespace	*CapacityNamespace
+}
+```
+
+## GetRegistryPolicy
+
+
+
+```go
+func GetRegistryPolicy(registryDir string) (RegistryPolicy, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+
+Returns: `RegistryPolicy, error`.
+
+## GitRepositoryInput
+
+GitRepositoryInput fetches one local repository commit into a fresh shallow repository and checks it out detached.
+
+```go
+type GitRepositoryInput struct {
+	Source		string	`json:"source"`
+	Destination	string	`json:"destination"`
+	Ref		string	`json:"ref"`
+}
+```
+
+## Handoff
+
+
+
+```go
+type Handoff struct {
+	Version		int		`json:"version"`
+	WorkspaceID	string		`json:"workspace_id"`
+	CheckpointID	string		`json:"checkpoint_id,omitempty"`
+	RegistryDir	string		`json:"registry_dir,omitempty"`
+	Team		string		`json:"team,omitempty"`
+	Archive		*HandoffArchive	`json:"archive,omitempty"`
+}
+```
+
+## HandoffArchive
+
+
+
+```go
+type HandoffArchive struct {
+	Path	string	`json:"path"`
+	SHA256	string	`json:"sha256"`
+	Bytes	int64	`json:"bytes"`
+	Files	int64	`json:"files"`
+}
+```
+
+## HandoffError
+
+
+
+```go
+type HandoffError struct {
+	BundleDir	string
+	Outcome		string
+	Err		error
+}
+```
+
+### HandoffError.Error
+
+
+
+```go
+func (e *HandoffError) Error() string
+```
+
+Returns: `string`.
+
+### HandoffError.Unwrap
+
+
+
+```go
+func (e *HandoffError) Unwrap() error
+```
+
+Returns: `error`.
+
+## HandoffExportOptions
+
+
+
+```go
+type HandoffExportOptions struct {
+	RegistryDir	string
+	WorkspaceID	string
+	CheckpointID	string
+	BundleDir	string
+	ArchiveOptions	CheckpointArchiveOptions
+}
+```
+
+## ImportCheckpoint
+
+ImportCheckpoint validates a portable checkpoint archive in a private staging directory and atomically publishes it only after every path and digest passes.
+
+```go
+func ImportCheckpoint(ctx context.Context, registryDir string, input io.Reader, options CheckpointArchiveOptions) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `input` | `io.Reader` | Yes | — |  |
+| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+## ImportHandoff
+
+ImportHandoff verifies identity and a private copy of the received archive before import.
+
+```go
+func ImportHandoff(ctx context.Context, path, registryDir string, document Handoff, options CheckpointArchiveOptions) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `path` | `string` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `document` | `Handoff` | Yes | — |  |
+| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+## List
+
+List returns the workspaces this machine knows about, quietest first.
+
+```go
+func List(options ListWorkspacesOptions) (WorkspaceListing, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `ListWorkspacesOptions` | Yes | — |  |
+
+Returns: `WorkspaceListing, error`.
+
+## ListOptions
+
+
+
+```go
+type ListOptions struct {
+	Prefix	string
+	Cursor	string
+	Limit	int
+}
+```
+
+## ListRecoveryHolds
+
+
+
+```go
+func ListRecoveryHolds(ctx context.Context, registryDir string, query RecoveryHoldQuery) (RecoveryHoldPage, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `query` | `RecoveryHoldQuery` | Yes | — |  |
+
+Returns: `RecoveryHoldPage, error`.
+
+## ListWorkspacesOptions
+
+ListWorkspacesOptions bounds a workspace listing.
+
+```go
+type ListWorkspacesOptions struct {
+	RegistryDir	string
+	Team		string
+
+	Now	time.Time
+}
+```
+
+## LoadCheckpoint
+
+
+
+```go
+func LoadCheckpoint(registryDir, id string) (CheckpointManifest, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `CheckpointManifest, error`.
+
+## LookupWorkspace
+
+LookupWorkspace reads one workspace's registry entry: no process, no claims, no writes.
+
+```go
+func LookupWorkspace(registryDir, id string) (WorkspaceReference, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `WorkspaceReference, error`.
+
+## MaxDeltaBytes
+
+MaxDeltaBytes is the largest content a delta document may declare, on the way out and on the way in.
+
+```go
+const MaxDeltaBytes int64 = 16 << 20
+```
+
+## MaxRecoveryHoldBytes
+
+
+
+```go
+const MaxRecoveryHoldBytes = workspace.MaxRecoveryHoldBytes
+```
+
+## MaxRecoveryHoldPeakBytes
+
+
+
+```go
+const MaxRecoveryHoldPeakBytes = workspace.MaxRecoveryHoldPeakBytes
+```
+
+## MaxRecoveryHolds
+
+
+
+```go
+const MaxRecoveryHolds = workspace.MaxRecoveryHolds
+```
+
+## MaxRecoveryReferences
+
+
+
+```go
+const MaxRecoveryReferences = workspace.MaxRecoveryReferences
+```
+
+## MultipartOptions
+
+MultipartOptions are the object properties a multipart upload fixes at initiation.
+
+```go
+type MultipartOptions struct {
+	ContentType	string
+	Metadata	map[string]string
+}
+```
+
+## MultipartStore
+
+MultipartStore is the optional extension: a store that can stream an object larger than memory.
+
+```go
+type MultipartStore interface {
+	CreateMultipartUpload(ctx context.Context, bucket, key string, options MultipartOptions) (MultipartUpload, error)
+	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
+	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
+	AbortMultipartUpload(ctx context.Context, uploadID string) error
+
+	GetMultipartUpload(ctx context.Context, uploadID string) (MultipartUpload, error)
+	ListParts(ctx context.Context, uploadID string) ([]Part, error)
+	ListMultipartUploads(ctx context.Context, bucket string) ([]MultipartUpload, error)
+}
+```
+
+## MultipartUpload
+
+MultipartUpload is an in-flight upload.
+
+```go
+type MultipartUpload struct {
+	UploadID	string
+	Bucket		string
+	Key		string
+	Initiated	time.Time
+	ContentType	string
+	Metadata	map[string]string
+}
+```
+
+## Object
+
+
+
+```go
+type Object struct {
+	Bucket		string
+	Key		string
+	Data		[]byte
+	Size		int64
+	ETag		string
+	ContentType	string
+	Metadata	map[string]string
+	LastModified	time.Time
+}
+```
+
+## ObjectDelete
+
+
+
+```go
+const ObjectDelete = authority.ObjectDelete
+```
+
+## ObjectList
+
+
+
+```go
+const ObjectList = authority.ObjectList
+```
+
+## ObjectPage
+
+
+
+```go
+type ObjectPage struct {
+	Objects		[]Object
+	Truncated	bool
+	NextCursor	string
+}
+```
+
+## ObjectRange
+
+
+
+```go
+type ObjectRange struct {
+	Offset	int64
+	Length	int64
+}
+```
+
+## ObjectRead
+
+
+
+```go
+const ObjectRead = authority.ObjectRead
+```
+
+## ObjectRecoveryHoldOptions
+
+
+
+```go
+type ObjectRecoveryHoldOptions struct {
+	ID, Owner	string
+	Objects		[]ObjectRecoveryReference
+}
+```
+
+## ObjectRecoveryReference
+
+
+
+```go
+type ObjectRecoveryReference struct {
+	Bucket, Key	string
+	Condition	SaveCondition
+}
+```
+
+## ObjectWrite
+
+
+
+```go
+const ObjectWrite = authority.ObjectWrite
+```
+
+## Open
+
+Open a handle. Retain it until operations finish, then close it.
+
+```go
+func Open(options Options) (*Runtime, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `Options` | Yes | — |  |
+
+Returns: `*Runtime, error`.
+
+## OpenCapacityHost
+
+
+
+```go
+func OpenCapacityHost(options CapacityHostOptions) (*CapacityHost, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `CapacityHostOptions` | Yes | — |  |
+
+Returns: `*CapacityHost, error`.
+
+## OpenFilesystem
+
+OpenFilesystem owns one exclusively locked durable directory; Reset is unavailable.
+
+```go
+func OpenFilesystem(options FilesystemOptions) (*Runtime, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `FilesystemOptions` | Yes | — |  |
+
+Returns: `*Runtime, error`.
+
+## OpenWorkspace
+
+OpenWorkspace opens a workspace rooted at options.Dir.
+
+```go
+func OpenWorkspace(options WorkspaceOptions) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `WorkspaceOptions` | Yes | — |  |
+
+Returns: `*Workspace, error`.
+
+## Operation
+
+Operation is a single permission.
+
+```go
+type Operation string
+```
+
+## Options
+
+
+
+```go
+type Options struct {
+	Backend			Backend
+	MaxBytes		int64
+	MaxObjects		int64
+	MaxMultipartUploads	int64
+
+	Store	Store
+
+	Authority	*Authority
+}
+```
+
+## Part
+
+Part is one uploaded piece of a multipart upload.
+
+```go
+type Part struct {
+	PartNumber	int
+	ETag		string
+	Size		int64
+}
+```
+
+## PortableCheckpointDiff
+
+
+
+```go
+type PortableCheckpointDiff struct {
+	Version	int				`json:"version"`
+	Files	[]CheckpointChange		`json:"files"`
+	Buckets	[]CheckpointBucketChange	`json:"buckets"`
+	Objects	[]CheckpointObjectChange	`json:"objects"`
+}
+```
+
+## PreparedRepository
+
+PreparedRepository records the immutable revision selected for one input.
+
+```go
+type PreparedRepository struct {
+	Source		string	`json:"source"`
+	Destination	string	`json:"destination"`
+	Ref		string	`json:"ref"`
+	Commit		string	`json:"commit"`
+}
+```
+
+## PreparedWorkspace
+
+PreparedWorkspace is the ready-to-launch result.
+
+```go
+type PreparedWorkspace struct {
+	Workspace		*Workspace
+	WorkingDirectory	string
+	SeededBytes		int64
+	SeededObjects		int64
+	BaseIdentity		string
+	Repositories		[]PreparedRepository
+
+	RegistryEntries	int64
+
+	MaxWorkspaces	int64
+}
+```
+
+## PrepareOptions
+
+PrepareOptions describes a local, deterministic workspace seed.
+
+```go
+type PrepareOptions struct {
+	WorkspaceOptions
+	WorkingDirectory	string			`json:"working_directory,omitempty"`
+	Inputs			[]WorkspaceInput	`json:"inputs,omitempty"`
+	Repositories		[]GitRepositoryInput	`json:"repositories,omitempty"`
+	IncludeSensitiveInputs	bool			`json:"include_sensitive_inputs,omitempty"`
+
+	MaxWorkspaces	int64	`json:"max_workspaces,omitempty"`
+}
+```
+
+## PrepareWorkspace
+
+PrepareWorkspace creates a Stow-owned workspace, stages declared local files and selected Git refs, checks the seed against effective runtime limits, then returns the directory an agent can use.
+
+```go
+func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `PrepareOptions` | Yes | — |  |
+
+Returns: `*PreparedWorkspace, error`.
+
+## PreviewCheckpointArchive
+
+PreviewCheckpointArchive validates archive structure, file paths, limits, content digests, and the gzip trailer without extracting or publishing files.
+
+```go
+func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options CheckpointArchiveOptions) (CheckpointArchivePreview, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `input` | `io.Reader` | Yes | — |  |
+| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+
+Returns: `CheckpointArchivePreview, error`.
+
+## Prune
+
+Prune removes registry entries whose workspace directory no longer exists.
+
+```go
+func Prune(options PruneOptions) ([]PruneResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `PruneOptions` | Yes | — |  |
+
+Returns: `[]PruneResult, error`.
+
+## PruneOptions
+
+PruneOptions bounds a prune.
+
+```go
+type PruneOptions struct {
+	RegistryDir	string
+	Team		string
+
+	IncludeAdopted	bool
+}
+```
+
+## PruneResult
+
+PruneResult is one registry entry prune considered, and what it did about it.
+
+```go
+type PruneResult struct {
+	ID	string	`json:"id"`
+	Dir	string	`json:"dir"`
+
+	Removed	bool	`json:"removed"`
+
+	Reason	string	`json:"reason"`
+}
+```
+
+## PutOptions
+
+
+
+```go
+type PutOptions struct {
+	ContentType	string
+	Metadata	map[string]string
+
+	IfMatch		string
+	IfNoneMatch	string
+}
+```
+
+## RangeStore
+
+
+
+```go
+type RangeStore interface {
+	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser, Object, error)
+}
+```
+
+## ReadCheckpointFile
+
+ReadCheckpointFile reads one file's bytes out of a published checkpoint, verifying the digest the manifest recorded.
+
+```go
+func ReadCheckpointFile(registryDir, checkpointID, path string) ([]byte, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `checkpointID` | `string` | Yes | — |  |
+| `path` | `string` | Yes | — |  |
+
+Returns: `[]byte, error`.
+
+## ReadHandoff
+
+
+
+```go
+func ReadHandoff(path string) (Handoff, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `path` | `string` | Yes | — |  |
+
+Returns: `Handoff, error`.
+
+## ReadHandoffReader
+
+
+
+```go
+func ReadHandoffReader(reader io.Reader) (Handoff, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `reader` | `io.Reader` | Yes | — |  |
+
+Returns: `Handoff, error`.
+
+## ReadOnly
+
+ReadOnly returns an Authority that can read and list but change nothing.
+
+```go
+func ReadOnly() Authority
+```
+
+## ReadWrite
+
+ReadWrite returns an Authority for local work with no reach outside the environment.
+
+```go
+func ReadWrite() Authority
+```
+
+## RecoveryHold
+
+
+
+```go
+type RecoveryHold struct {
+	RecoveryHoldRequest
+	Meaning		string		`json:"meaning"`
+	State		string		`json:"state"`
+	Created		time.Time	`json:"created"`
+	FinishedAt	time.Time	`json:"finished_at,omitempty"`
+}
+```
+
+## RecoveryHoldPage
+
+
+
+```go
+type RecoveryHoldPage struct {
+	Holds		[]RecoveryHold	`json:"holds"`
+	NextCursor	string		`json:"next_cursor,omitempty"`
+	ReservedBytes	int64		`json:"reserved_bytes"`
+
+	PeakReservedBytes	int64	`json:"peak_reserved_bytes"`
+}
+```
+
+## RecoveryHoldQuery
+
+
+
+```go
+type RecoveryHoldQuery struct {
+	Cursor		string
+	Limit		int
+	WorkspaceID	string
+	IncludeFinished	bool
+}
+```
+
+## RecoveryHoldRequest
+
+
+
+```go
+type RecoveryHoldRequest struct {
+	ID		string			`json:"id"`
+	Owner		string			`json:"owner"`
+	References	[]RecoveryReference	`json:"references"`
+	ExpiresAt	time.Time		`json:"expires_at,omitempty"`
+}
+```
+
+## RecoveryReference
+
+
+
+```go
+type RecoveryReference struct {
+	WorkspaceID	string	`json:"workspace_id"`
+	CheckpointID	string	`json:"checkpoint_id,omitempty"`
+}
+```
+
+## RegistryPolicy
+
+
+
+```go
+type RegistryPolicy struct {
+	Version			int	`json:"version"`
+	MaxWorkspaces		int64	`json:"max_workspaces"`
+	MaxCheckpoints		int64	`json:"max_checkpoints"`
+	MaxCheckpointBytes	int64	`json:"max_checkpoint_bytes"`
+}
+```
+
+### RegistryPolicy.Validate
+
+
+
+```go
+func (p RegistryPolicy) Validate() error
+```
+
+Returns: `error`.
+
+## ReleaseRecoveryHold
+
+
+
+```go
+func ReleaseRecoveryHold(ctx context.Context, registryDir, id, owner string) (RecoveryHold, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `owner` | `string` | Yes | — |  |
+
+Returns: `RecoveryHold, error`.
+
+## ReplacementCondition
+
+Request unconditional replacement while preserving authorization and quota checks.
+
+```go
+func ReplacementCondition() SaveCondition
+```
+
+## ResolveCheckpoint
+
+Resolve an existing capture request without making another checkpoint.
+
+```go
+func ResolveCheckpoint(ctx context.Context, registryDir, workspaceID string, request CheckpointRequest) (CheckpointResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `workspaceID` | `string` | Yes | — |  |
+| `request` | `CheckpointRequest` | Yes | — |  |
+
+Returns: `CheckpointResult, error`.
+
+## ResolveRegistryDir
+
+ResolveRegistryDir is the one rule for where a workspace's metadata lives.
+
+```go
+func ResolveRegistryDir(dir, team string) (string, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `dir` | `string` | Yes | — |  |
+| `team` | `string` | Yes | — | Registry team partition; it is not an authorization identity. |
+
+Returns: `string, error`.
+
+## RestoreCheckpoint
+
+
+
+```go
+func RestoreCheckpoint(registryDir, id string, options WorkspaceOptions) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `options` | `WorkspaceOptions` | Yes | — |  |
+
+Returns: `*Workspace, error`.
+
+## RestoreCheckpointWithGit
+
+RestoreCheckpointWithGit rebuilds repository metadata from explicit local sources.
+
+```go
+func RestoreCheckpointWithGit(registryDir, id string, options WorkspaceOptions, sources []GitRepositoryInput) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `options` | `WorkspaceOptions` | Yes | — |  |
+| `sources` | `[]GitRepositoryInput` | Yes | — |  |
+
+Returns: `*Workspace, error`.
+
+## Resume
+
+Resume reopens a workspace by the identity it was given when it was created.
+
+```go
+func Resume(id string) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `*Workspace, error`.
+
+## ResumeIn
+
+ResumeIn is Resume against a chosen registry.
+
+```go
+func ResumeIn(registryDir, id string) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `*Workspace, error`.
+
+## ResumeWith
+
+ResumeWith is Resume with options, chiefly so the registry location and the clock can be chosen.
+
+```go
+func ResumeWith(options WorkspaceOptions, id string) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `WorkspaceOptions` | Yes | — |  |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `*Workspace, error`.
+
+## Runtime
+
+
+
+```go
+type Runtime struct {
+	// contains filtered or unexported fields
+}
+```
+
+### Runtime.Authority
+
+Authority reports what this environment permits.
+
+```go
+func (r *Runtime) Authority() Authority
+```
+
+Returns: `Authority`.
+
+### Runtime.Authorize
+
+Authorize is the decision for one operation on one resource this Runtime's verbs do not cover.
+
+```go
+func (r *Runtime) Authorize(op authority.Operation, res policy.Resource) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `op` | `authority.Operation` | Yes | — |  |
+| `res` | `policy.Resource` | Yes | — |  |
+
+Returns: `error`.
+
+### Runtime.BeginObjectRecoveryHold
+
+BeginObjectRecoveryHold protects observed bytes by refusing their mutation until release.
+
+```go
+func (r *Runtime) BeginObjectRecoveryHold(ctx context.Context, options ObjectRecoveryHoldOptions) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `options` | `ObjectRecoveryHoldOptions` | Yes | — |  |
+
+Returns: `error`.
+
+### Runtime.Capabilities
+
+Return the operations and limits supported by this handle.
+
+```go
+func (r *Runtime) Capabilities() Capabilities
+```
+
+Returns: `Capabilities`.
+
+### Runtime.Close
+
+Release this handle. Do not submit new operations after closing it.
+
+```go
+func (r *Runtime) Close() error
+```
+
+Returns: `error`.
+
+### Runtime.CopyObject
+
+Copy source bytes and metadata to the destination object.
+
+```go
+func (r *Runtime) CopyObject(ctx context.Context, sourceBucket, sourceKey, destinationBucket, destinationKey string) (Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `sourceBucket` | `string` | Yes | — |  |
+| `sourceKey` | `string` | Yes | — |  |
+| `destinationBucket` | `string` | Yes | — |  |
+| `destinationKey` | `string` | Yes | — |  |
+
+Returns: `Object, error`.
+
+### Runtime.CreateBucket
+
+Create the named bucket before storing objects.
+
+```go
+func (r *Runtime) CreateBucket(ctx context.Context, name string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `name` | `string` | Yes | — |  |
+
+Returns: `error`.
+
+### Runtime.DeleteBucket
+
+Remove an empty bucket; a nonempty bucket is refused.
+
+```go
+func (r *Runtime) DeleteBucket(ctx context.Context, name string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `name` | `string` | Yes | — |  |
+
+Returns: `error`.
+
+### Runtime.DeleteObject
+
+Delete the selected object; deleting a missing object is idempotent.
+
+```go
+func (r *Runtime) DeleteObject(ctx context.Context, bucket, key string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `error`.
+
+### Runtime.GetObject
+
+Return complete object bytes and metadata.
+
+```go
+func (r *Runtime) GetObject(ctx context.Context, bucket, key string) (Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `Object, error`.
+
+### Runtime.HeadObject
+
+Return object metadata without reading the body into the result.
+
+```go
+func (r *Runtime) HeadObject(ctx context.Context, bucket, key string) (Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `Object, error`.
+
+### Runtime.ListBuckets
+
+Return the buckets visible to the handle.
+
+```go
+func (r *Runtime) ListBuckets(ctx context.Context) ([]Bucket, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+
+Returns: `[]Bucket, error`.
+
+### Runtime.ListObjects
+
+Return one page. Pass nextCursor to continue when truncated is true.
+
+```go
+func (r *Runtime) ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `options` | `ListOptions` | Yes | — |  |
+
+Returns: `ObjectPage, error`.
+
+### Runtime.OpenObject
+
+
+
+```go
+func (r *Runtime) OpenObject(ctx context.Context, bucket, key string) (io.ReadCloser, Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `io.ReadCloser, Object, error`.
+
+### Runtime.OpenObjectRange
+
+
+
+```go
+func (r *Runtime) OpenObjectRange(ctx context.Context, bucket, key string, span ObjectRange) (io.ReadCloser, Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `span` | `ObjectRange` | Yes | — |  |
+
+Returns: `io.ReadCloser, Object, error`.
+
+### Runtime.PutObject
+
+Store complete bytes and metadata, subject to write conditions and quotas.
+
+```go
+func (r *Runtime) PutObject(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `[]byte` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `PutOptions` | Yes | — |  |
+
+Returns: `Object, error`.
+
+### Runtime.PutObjectStream
+
+Stage exactly options.size bytes and atomically publish after validation.
+
+```go
+func (r *Runtime) PutObjectStream(ctx context.Context, bucket, key string, body io.Reader, options StreamPutOptions) (Object, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `body` | `io.Reader` | Yes | — | Complete object payload for the selected native SDK helper. |
+| `options` | `StreamPutOptions` | Yes | — |  |
+
+Returns: `Object, error`.
+
+### Runtime.ReadForSave
+
+Read bytes and metadata with an opaque condition, including observed absence. The condition grants no permission.
+
+```go
+func (r *Runtime) ReadForSave(ctx context.Context, bucket, key string) (Object, SaveCondition, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `Object, SaveCondition, error`.
+
+### Runtime.ReleaseObjectRecoveryHold
+
+
+
+```go
+func (r *Runtime) ReleaseObjectRecoveryHold(ctx context.Context, id, owner string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+| `owner` | `string` | Yes | — |  |
+
+Returns: `error`.
+
+### Runtime.Reset
+
+Clear storage state where the backend supports reset.
+
+```go
+func (r *Runtime) Reset(ctx context.Context) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+
+Returns: `error`.
+
+### Runtime.ResolveSave
+
+Resolve the original request key without starting another save. Missing evidence leaves the effect unknown.
+
+```go
+func (r *Runtime) ResolveSave(ctx context.Context, bucket, key, requestKey string) (SaveResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `requestKey` | `string` | Yes | — | Unique persisted request identity for capture or save recovery. |
+
+Returns: `SaveResult, error`.
+
+### Runtime.SaveObject
+
+Compare the observation at publication. Inspect Outcome even when an error is returned. Qualified filesystem stores retain keyed receipts.
+
+```go
+func (r *Runtime) SaveObject(ctx context.Context, bucket, key string, data []byte, options SaveOptions) (SaveResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `[]byte` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `SaveOptions` | Yes | — |  |
+
+Returns: `SaveResult, error`.
+
+### Runtime.SupportsConditionalWrites
+
+
+
+```go
+func (r *Runtime) SupportsConditionalWrites() bool
+```
+
+Returns: `bool`.
+
+### Runtime.SupportsDurableSaveRequests
+
+
+
+```go
+func (r *Runtime) SupportsDurableSaveRequests() bool
+```
+
+Returns: `bool`.
+
+### Runtime.SupportsGuardedSaves
+
+
+
+```go
+func (r *Runtime) SupportsGuardedSaves() bool
+```
+
+Returns: `bool`.
+
+### Runtime.SupportsRecoveryHolds
+
+
+
+```go
+func (r *Runtime) SupportsRecoveryHolds() bool
+```
+
+Returns: `bool`.
+
+### Runtime.Usage
+
+Return current storage accounting.
+
+```go
+func (r *Runtime) Usage() Usage
+```
+
+Returns: `Usage`.
+
+## SaveCommitted
+
+
+
+```go
+const SaveCommitted = stowruntime.SaveCommitted
+```
+
+## SaveCondition
+
+SaveCondition is opaque and valid only for its issuing runtime and resource.
+
+```go
+type SaveCondition struct {
+	// contains filtered or unexported fields
+}
+```
+
+### SaveCondition.ObservedAbsence
+
+
+
+```go
+func (c SaveCondition) ObservedAbsence() bool
+```
+
+Returns: `bool`.
+
+## SaveNotCommitted
+
+
+
+```go
+const SaveNotCommitted = stowruntime.SaveNotCommitted
+```
+
+## SaveOptions
+
+
+
+```go
+type SaveOptions struct {
+	Condition	SaveCondition
+	PutOptions	PutOptions
+	RequestKey	string
+}
+```
+
+## SaveOutcome
+
+
+
+```go
+type SaveOutcome string
+```
+
+## SaveResult
+
+
+
+```go
+type SaveResult struct {
+	Object		Object
+	Outcome		SaveOutcome
+	Replayed	bool
+}
+```
+
+## SaveUnknown
+
+
+
+```go
+const SaveUnknown = stowruntime.SaveUnknown
+```
+
+## SetRegistryPolicy
+
+SetRegistryPolicy persists standing limits; zero is unlimited.
+
+```go
+func SetRegistryPolicy(registryDir string, policy RegistryPolicy) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
+| `policy` | `RegistryPolicy` | Yes | — |  |
+
+Returns: `error`.
+
+## StagedObject
+
+
+
+```go
+type StagedObject interface {
+	Commit(context.Context) (Object, error)
+	Abort(context.Context) error
+}
+```
+
+## StagedWriteStore
+
+
+
+```go
+type StagedWriteStore interface {
+	StageObject(context.Context, string, string, io.Reader, PutOptions) (StagedObject, error)
+}
+```
+
+## Store
+
+Store supplies object storage to Open.
+
+```go
+type Store interface {
+	CreateBucket(ctx context.Context, name string) error
+	DeleteBucket(ctx context.Context, name string) error
+	ListBuckets(ctx context.Context) ([]Bucket, error)
+
+	PutObject(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
+	GetObject(ctx context.Context, bucket, key string) (Object, error)
+	HeadObject(ctx context.Context, bucket, key string) (Object, error)
+	DeleteObject(ctx context.Context, bucket, key string) error
+	ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error)
+
+	Close() error
+}
+```
+
+## StreamingStore
+
+
+
+```go
+type StreamingStore interface {
+	OpenObject(context.Context, string, string) (io.ReadCloser, Object, error)
+}
+```
+
+## StreamingWriteStore
+
+
+
+```go
+type StreamingWriteStore interface {
+	PutObjectStream(context.Context, string, string, io.Reader, PutOptions) (Object, error)
+}
+```
+
+## StreamPutOptions
+
+
+
+```go
+type StreamPutOptions struct {
+	Size	int64
+	PutOptions
+}
+```
+
+## UpstreamRead
+
+
+
+```go
+const UpstreamRead = authority.UpstreamRead
+```
+
+## UpstreamWrite
+
+
+
+```go
+const UpstreamWrite = authority.UpstreamWrite
+```
+
+## Usage
+
+Return current storage accounting.
+
+```go
+type Usage struct {
+	Bytes	int64
+	Objects	int64
+}
+```
+
+## ValidateHandoff
+
+
+
+```go
+func ValidateHandoff(document Handoff) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `document` | `Handoff` | Yes | — |  |
+
+Returns: `error`.
+
+## VerifyDeltaDigest
+
+VerifyDeltaDigest refuses a document that does not hash to what the sender said it hashes to.
+
+```go
+func VerifyDeltaDigest(encoded []byte, expected string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `encoded` | `[]byte` | Yes | — |  |
+| `expected` | `string` | Yes | — |  |
+
+Returns: `error`.
+
+## Workspace
+
+Workspace is a bounded artifact workspace: a real directory a caller works in, and a bucket over the same bytes.
+
+```go
+type Workspace struct {
+	*Runtime
+	// contains filtered or unexported fields
+}
+```
+
+### Workspace.Bucket
+
+Bucket is the bucket over the workspace's bytes.
+
+```go
+func (w *Workspace) Bucket() string
+```
+
+Returns: `string`.
+
+### Workspace.Close
+
+Release this handle. Do not submit new operations after closing it.
+
+```go
+func (w *Workspace) Close() error
+```
+
+Returns: `error`.
+
+### Workspace.CreateCheckpoint
+
+CreateCheckpoint captures immutable project files outside the mutable workspace.
+
+```go
+func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOptions) (CheckpointInfo, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+| `options` | `CheckpointOptions` | Yes | — |  |
+
+Returns: `CheckpointInfo, error`.
+
+### Workspace.Destroy
+
+Delete only an eligible owned workspace with EnvironmentDestroy authority. Adopted and protected directories are refused.
+
+```go
+func (w *Workspace) Destroy(ctx context.Context) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+
+Returns: `error`.
+
+### Workspace.Dir
+
+Dir is the absolute workspace directory, stable for the workspace's life.
+
+```go
+func (w *Workspace) Dir() string
+```
+
+Returns: `string`.
+
+### Workspace.Facade
+
+Start or reuse a loopback S3 endpoint over this workspace's runtime.
+
+```go
+func (w *Workspace) Facade() (*WorkspaceFacade, error)
+```
+
+Returns: `*WorkspaceFacade, error`.
+
+### Workspace.FacadeWithOptions
+
+Start the workspace S3 facade with explicit request and concurrency limits.
+
+```go
+func (w *Workspace) FacadeWithOptions(options WorkspaceFacadeOptions) (*WorkspaceFacade, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `WorkspaceFacadeOptions` | Yes | — |  |
+
+Returns: `*WorkspaceFacade, error`.
+
+### Workspace.ID
+
+ID is the workspace's durable identity, which outlives this handle.
+
+```go
+func (w *Workspace) ID() string
+```
+
+Returns: `string`.
+
+### Workspace.MaxCheckpointBytes
+
+MaxCheckpointBytes is the cumulative payload-byte cap for retained checkpoints; zero means unlimited.
+
+```go
+func (w *Workspace) MaxCheckpointBytes() int64
+```
+
+Returns: `int64`.
+
+### Workspace.MaxCheckpoints
+
+MaxCheckpoints is the retained checkpoint count cap; zero means unlimited.
+
+```go
+func (w *Workspace) MaxCheckpoints() int64
+```
+
+Returns: `int64`.
+
+### Workspace.Path
+
+Path returns where a key's bytes live, and whether they are there.
+
+```go
+func (w *Workspace) Path(key string) (string, bool)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `string, bool`.
+
+### Workspace.RefreshUsage
+
+Reconcile direct filesystem writes at a quiescent boundary before quota-sensitive operations.
+
+```go
+func (w *Workspace) RefreshUsage(ctx context.Context) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — |  |
+
+Returns: `error`.
+
+### Workspace.Touch
+
+Touch records that the workspace was used, which is what a TTL is measured from.
+
+```go
+func (w *Workspace) Touch() error
+```
+
+Returns: `error`.
+
+### Workspace.WorkingDirectory
+
+WorkingDirectory is the directory an external task runner should use as its current working directory.
+
+```go
+func (w *Workspace) WorkingDirectory() string
+```
+
+Returns: `string`.
+
+## WorkspaceFacade
+
+WorkspaceFacade describes the loopback S3 endpoint owned by a Workspace.
+
+```go
+type WorkspaceFacade struct {
+	MaxMultipartUploads	int64	`json:"max_multipart_uploads"`
+	MaxConcurrentRequests	int	`json:"max_concurrent_requests"`
+	MaxRequestBytes		int64	`json:"max_request_bytes"`
+	Endpoint		string	`json:"endpoint"`
+	Region			string	`json:"region"`
+	AccessKeyID		string	`json:"access_key_id"`
+	SecretAccessKey		string	`json:"secret_access_key"`
+}
+```
+
+## WorkspaceFacadeOptions
+
+Facade starts one authenticated loopback server sharing this workspace's runtime.
+
+```go
+type WorkspaceFacadeOptions struct {
+	MaxRequestBytes		int64
+	MaxConcurrentRequests	int
+}
+```
+
+## WorkspaceInput
+
+WorkspaceInput copies one local file or directory into a prepared workspace.
+
+```go
+type WorkspaceInput struct {
+	Source		string	`json:"source"`
+	Destination	string	`json:"destination"`
+}
+```
+
+## WorkspaceListing
+
+WorkspaceListing is what a listing resolved to: the registry it actually read, and what that registry holds.
+
+```go
+type WorkspaceListing struct {
+	Registry	string
+
+	Team	string
+
+	Workspaces	[]WorkspaceSummary
+}
+```
+
+## WorkspaceOptions
+
+WorkspaceOptions configures a workspace.
+
+```go
+type WorkspaceOptions struct {
+	Dir	string
+
+	Bucket	string
+
+	MaxBytes		int64
+	MaxObjects		int64
+	MaxMultipartUploads	int64
+
+	MaxCheckpointBytes	int64
+	MaxCheckpoints		int64
+
+	Authority	*Authority
+
+	Policy	policy.Source
+
+	TTL	time.Duration
+
+	RegistryDir	string
+
+	Team	string
+
+	Adopted	bool
+
+	Now	func() time.Time
+	// contains filtered or unexported fields
+}
+```
+
+## WorkspaceReference
+
+WorkspaceReference is what the registry records about a workspace, read without opening it.
+
+```go
+type WorkspaceReference struct {
+	WorkingDirectory	string
+	ID			string
+	Dir			string
+	Bucket			string
+
+	MaxCheckpointBytes	int64
+	MaxCheckpoints		int64
+}
+```
+
+## WorkspaceSummary
+
+WorkspaceSummary is one workspace as a caller can see it without resuming it.
+
+```go
+type WorkspaceSummary struct {
+	ID	string	`json:"id"`
+	Dir	string	`json:"dir"`
+	Bucket	string	`json:"bucket"`
+	Created	string	`json:"created"`
+
+	LastUsed	string	`json:"last_used"`
+
+	AgeSeconds	int64	`json:"age_seconds"`
+	IdleSeconds	int64	`json:"idle_seconds"`
+	TTLSeconds	int64	`json:"ttl_seconds"`
+
+	ExpiresInSeconds	int64	`json:"expires_in_seconds"`
+	HasTTL			bool	`json:"has_ttl"`
+	Owned			bool	`json:"owned"`
+
+	Readable	bool	`json:"readable"`
+}
+```
+
+## WorkspaceTaskManifest
+
+WorkspaceTaskManifest is the versioned JSON input accepted by workspace preparation tools.
+
+```go
+type WorkspaceTaskManifest struct {
+	Version			int			`json:"version"`
+	Root			string			`json:"root"`
+	WorkingDirectory	string			`json:"working_directory,omitempty"`
+	Inputs			[]WorkspaceInput	`json:"inputs,omitempty"`
+	Repositories		[]GitRepositoryInput	`json:"repositories,omitempty"`
+	MaxBytes		int64			`json:"max_bytes,omitempty"`
+	MaxObjects		int64			`json:"max_objects,omitempty"`
+	MaxCheckpointBytes	int64			`json:"max_checkpoint_bytes,omitempty"`
+	MaxCheckpoints		int64			`json:"max_checkpoints,omitempty"`
+
+	MaxWorkspaces	int64	`json:"max_workspaces,omitempty"`
+	TTLSeconds	int64	`json:"ttl_seconds,omitempty"`
+
+	Team			string	`json:"team,omitempty"`
+	RegistryDir		string	`json:"registry_dir,omitempty"`
+	Bucket			string	`json:"bucket,omitempty"`
+	IncludeSensitiveInputs	bool	`json:"include_sensitive_inputs,omitempty"`
+}
+```

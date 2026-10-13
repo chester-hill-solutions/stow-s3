@@ -64,10 +64,11 @@ Apply them in one transaction and reject stale writers.
 - This profile buffers whole objects and replays the namespace into memory. It does not support streaming uploads.
   Use [persistent workers](browser-worker-runtime.md) for bounded streams.
 
+<!-- repo-only:start -->
 Unit tests cover the coordinator with a fake host and transactional adapter.
 [Chromium tests](../packages/stow-s3/scripts/browser-tests/storage.spec.mjs) cover real IndexedDB commits,
 transaction rollback, WASM quotas, reload and Web Locks ownership.
-
+<!-- repo-only:end -->
 `writeBatch()` commits related object puts/deletes in one transaction and rolls
 back the whole batch on either a WASM operation failure or a persistence failure.
 The [file history API](browser-file-history.md) uses this batch operation.
