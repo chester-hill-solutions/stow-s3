@@ -25,7 +25,8 @@ updates:
           - patch
     labels: ["dependencies"]
 
-  # Two npm trees. The root one is the TypeScript client; the platform carrier
+  # The TypeScript client and independent app/site tools have separate lockfiles.
+  # The platform carrier
   # packages are published from the same build and their manifests are checked by
   # scripts/check-version.mjs, so a change to one of those needs that gate to move
   # in the same commit.
@@ -39,6 +40,20 @@ updates:
 
   - package-ecosystem: pip
     directory: /packages/stow-s3-py
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    labels: ["dependencies"]
+
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    labels: ["dependencies"]
+
+  - package-ecosystem: npm
+    directory: /extensions/stow
     schedule:
       interval: monthly
     open-pull-requests-limit: 2

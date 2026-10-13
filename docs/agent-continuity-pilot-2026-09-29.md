@@ -134,4 +134,4 @@ Evidence is in `assessment-evidence/2026-09-29/agent-continuity/`:
 
 The harness prints each observation and always writes results in its cleanup block. Inspect the JSON assertions; its process exit status alone is not a pass/fail summary. It uses synthetic data and leaves evidence in a unique temporary directory. It does not access a live cloud provider.
 
-Related: [product assessment](product-assessment-2026-09-29.md), [agent isolate exploration](agent-isolate-exploration.md).
+Related: [product assessment](product-assessment-2026-09-29.md), [agent isolate exploration](history/plans/agent-isolate-exploration.md).

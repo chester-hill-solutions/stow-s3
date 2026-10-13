@@ -110,7 +110,7 @@ not under a controlled hardware laboratory. Five retained large captures referen
 344,910,614 bytes, with no sharing or compression guarantee.
 
 Raw measurements and the rejected sharing experiment are in
-[the implementation receipts](assessment-evidence/2026-09-29/implementation/).
+[the implementation receipts](assessment-evidence/2026-09-29/implementation).
 Durability acknowledgement remains intact; a larger timeout is not a performance fix.
 
 ## Open gates and limits

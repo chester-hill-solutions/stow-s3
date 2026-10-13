@@ -34,7 +34,7 @@ A local, S3-compatible HTTP endpoint intended for development and automated test
 
 ### Embedded Runtime
 
-A direct in-process object runtime with a small lifecycle interface (`open`, object/bucket operations, quotas, `reset`, and `close`). The first profile is memory-only. The S3 HTTP service is an optional compatibility adapter, not the runtime's primary interface. The `js/wasm` bridge exposes the same runtime through a JSON/base64 host protocol.
+A direct in-process object runtime with a small lifecycle interface (`open`, object/bucket operations, quotas, `reset`, and `close`). The first profile is memory-only. The S3 HTTP service is an optional compatibility adapter, not the runtime's primary interface. The `js/wasm` bridge supports binary payloads and retains the JSON/base64 protocol for compatibility; browser workers add asynchronous host persistence and bounded streams.
 
 ### Run-Through Adapter
 
@@ -66,7 +66,7 @@ The one mechanism that authorizes stow to mutate a live upstream, given separate
 
 ### Write Outbox
 
-A durable, per-key ordered record of upstream propagation intents. A prepared write-ahead entry is reconciled against the immutable committed local object version before propagation; file-backed workers coordinate attempts with expiring per-entry claims and a filesystem lock. An already-attempted entry is reconciled against upstream before it is re-propagated, so a crash between upstream success and acknowledgement is normally acknowledged instead of duplicated. Transient failures are retried, and prepared/active entries support loopback-only inspection and retry/discard actions. Outbox files carry a schema version: newer files are rejected, unversioned files migrate, and all writers sharing a file must run the same revision.
+A durable, per-key ordered record of upstream propagation intents. A prepared write-ahead entry is reconciled against the immutable committed local object version before propagation; file-backed workers coordinate attempts with expiring per-entry claims and a filesystem lock. An already-attempted entry is reconciled against upstream before it is re-propagated, so a confirmed ETag, content-type, metadata and requested-checksum match can acknowledge a lost reply without another mutation. Transient failures retry with bounded backoff; conflicts and unknown upstream baselines stop propagation. Retry/discard actions require the admin token, including on loopback. Outbox files carry a schema version: newer files are rejected, unversioned files migrate, and all writers sharing a file must run the same revision.
 
 ### Persisted Backend
 

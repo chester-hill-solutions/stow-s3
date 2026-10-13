@@ -1,7 +1,7 @@
 ---
 status: proposed
-decision_digest: e8dbec3fde9cb430
-amended: 2026-10-01
+decision_digest: 4ff9409b2c5ad522
+amended: 2026-10-12
 relates_to: 0008, 0009, 0010, 0014, 0016
 ---
 
@@ -36,7 +36,7 @@ Workers profile bidding for that role would lose it. The profile is also not yet
 implementable: KV Instant is private beta behind a 1 MB namespace, 10,000 pair and
 one-write-per-second-per-namespace limit, Artifacts requires Workers Paid, and the free
 Workers CPU allowance of 10 ms is already recorded as insufficient for the measured
-33.5 ms read pass in [deploy-anywhere-plan](../deploy-anywhere-plan.md).
+33.5 ms read pass in [deploy-anywhere-plan](../history/plans/deploy-anywhere-plan.md).
 
 ## Decision
 
@@ -112,3 +112,4 @@ hosted Stow identity or control plane is added.
 - 2026-10-01: Proposed from the 2026-09-30 and 2026-10-01 Cloudflare platform releases.
   No prior amendment; the status stays `proposed` until the user accepts the direction and
   until each mapping has evidence.
+- 2026-10-12: Update links after retiring old work orders into the history directory. The decision is unchanged.

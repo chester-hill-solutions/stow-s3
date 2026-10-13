@@ -15,9 +15,9 @@ not current instructions. Accepted ADRs and implemented contracts remain in forc
 
 **Canonical status and ordering:** 2026-09-27. This is the single current execution plan for workspace/handoff and deploy-anywhere work. The linked specialist plans retain detailed rationale, acceptance criteria, and design notes; if their status or ordering conflicts with this document, this document governs. Historical product plans are not separate backlogs.
 
-**Parallel axis:** [`foss-readiness-plan.md`](../foss-readiness-plan.md) covers installability, the conformance matrix's missing backend, and the contribution surface. It is not a competing backlog: it holds no workspace or handoff work, and where the two touch — the conformance matrix and the workspace backend — this document still governs ordering.
+**Parallel axis:** [`foss-readiness-plan.md`](plans/foss-readiness-plan.md) covers installability, the conformance matrix's missing backend, and the contribution surface. It is not a competing backlog: it holds no workspace or handoff work, and where the two touch — the conformance matrix and the workspace backend — this document still governs ordering.
 
-**Second parallel axis:** [`work-session-plan.md`](../work-session-plan.md) covers the
+**Second parallel axis:** [`work-session-plan.md`](plans/work-session-plan.md) covers the
 execution layer above this one — task specs, execution attempts, artifacts, executors,
 and integrations. It is the next product layer and holds no outstanding implementation
 of the work tracked below. Its E0 is this document's backlog restated as a
@@ -116,9 +116,9 @@ The baseline identifies two follow-up measurements, not automatic changes: test 
 
 ## Source plans and evidence
 
-- [Agent workspace, handoff, and run-through detail](../agent-workspace-plan.md)
-- [Deploy-anywhere, portability, and multi-writer detail](../deploy-anywhere-plan.md)
-- [Assessment and repair follow-up](../assessment-2026-09-27.md)
+- [Agent workspace, handoff, and run-through detail](plans/agent-workspace-plan.md)
+- [Deploy-anywhere, portability, and multi-writer detail](plans/deploy-anywhere-plan.md)
+- [Assessment and repair follow-up](experiments/assessment-2026-09-27.md)
 - [Workspace contract](../workspace-contract.md) and [S3 compatibility contract](../compat-contract.md)
 - [Raw and summarized performance measurements](../benchmarks/2026-09-27/tool-performance-baseline.md)
-- [Current handoff notes](../handoff-2026-09-27.md)
+- [Current handoff notes](experiments/handoff-2026-09-27.md)
