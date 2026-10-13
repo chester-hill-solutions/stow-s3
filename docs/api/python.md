@@ -70,12 +70,12 @@ def adopt_workspace_handoff(handoff: str, root: str, *, registry_dir: str | None
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `handoff` | `str` | Yes | — |  |
-| `root` | `str` | Yes | — |  |
-| `registry_dir` | `str \| None` | No | None |  |
+| `root` | `str` | Yes | — | New workspace directory; its parent must already exist. |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
-| `max_bytes` | `int \| None` | No | None |  |
-| `max_files` | `int \| None` | No | None |  |
-| `include_sensitive` | `bool` | No | False |  |
+| `max_bytes` | `int \| None` | No | None | Maximum managed object bytes; zero means unlimited. |
+| `max_files` | `int \| None` | No | None | Maximum files accepted by the archive operation. |
+| `include_sensitive` | `bool` | No | False | Explicitly permit paths rejected by the sensitive-filename filter. |
 
 Returns: `WorkspaceJSON`.
 
@@ -89,10 +89,10 @@ def apply_workspace_delta(delta: str, *, base: str, expect_sha256: str | None=No
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `delta` | `str` | Yes | — |  |
+| `delta` | `str` | Yes | — | Verified change document to encode or apply. |
 | `base` | `str` | Yes | — |  |
 | `expect_sha256` | `str \| None` | No | None |  |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
 
 Returns: `WorkspaceJSON`.
@@ -134,12 +134,12 @@ def checkpoint_workspace(id: str, *, registry_dir: str | None=None, team: str | 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `id` | `str` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
-| `parent` | `str \| None` | No | None |  |
-| `max_bytes` | `int \| None` | No | None |  |
-| `max_files` | `int \| None` | No | None |  |
-| `include_sensitive` | `bool` | No | False |  |
+| `parent` | `str \| None` | No | None | Optional parent checkpoint identity. |
+| `max_bytes` | `int \| None` | No | None | Maximum managed object bytes; zero means unlimited. |
+| `max_files` | `int \| None` | No | None | Maximum files accepted by the archive operation. |
+| `include_sensitive` | `bool` | No | False | Explicitly permit paths rejected by the sensitive-filename filter. |
 
 Returns: `WorkspaceJSON`.
 
@@ -153,7 +153,7 @@ def collect_workspaces(*, registry_dir: str | None=None) -> WorkspaceJSON:
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 
 Returns: `WorkspaceJSON`.
 
@@ -170,11 +170,11 @@ def create_workspace_delta(*, from_id: str, to_id: str, output: str, registry_di
 | `from_id` | `str` | Yes | — |  |
 | `to_id` | `str` | Yes | — |  |
 | `output` | `str` | Yes | — | Destination path for the transfer document or archive. |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
-| `max_bytes` | `int \| None` | No | None |  |
-| `max_files` | `int \| None` | No | None |  |
-| `include_sensitive` | `bool` | No | False |  |
+| `max_bytes` | `int \| None` | No | None | Maximum managed object bytes; zero means unlimited. |
+| `max_files` | `int \| None` | No | None | Maximum files accepted by the archive operation. |
+| `include_sensitive` | `bool` | No | False | Explicitly permit paths rejected by the sensitive-filename filter. |
 
 Returns: `WorkspaceJSON`.
 
@@ -219,7 +219,7 @@ def destroy_workspace(id: str, *, registry_dir: str | None=None) -> WorkspaceJSO
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `id` | `str` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 
 Returns: `WorkspaceJSON`.
 
@@ -235,7 +235,7 @@ def diff_workspaces(from_id: str, to_id: str, *, registry_dir: str | None=None, 
 | --- | --- | --- | --- | --- |
 | `from_id` | `str` | Yes | — |  |
 | `to_id` | `str` | Yes | — |  |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
 
 Returns: `WorkspaceJSON`.
@@ -250,12 +250,12 @@ def export_workspace_checkpoint(checkpoint_id: str, output: str, *, registry_dir
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `checkpoint_id` | `str` | Yes | — |  |
+| `checkpoint_id` | `str` | Yes | — | Immutable checkpoint identity. |
 | `output` | `str` | Yes | — | Destination path for the transfer document or archive. |
-| `registry_dir` | `str \| None` | No | None |  |
-| `max_bytes` | `int \| None` | No | None |  |
-| `max_files` | `int \| None` | No | None |  |
-| `include_sensitive` | `bool` | No | False |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
+| `max_bytes` | `int \| None` | No | None | Maximum managed object bytes; zero means unlimited. |
+| `max_files` | `int \| None` | No | None | Maximum files accepted by the archive operation. |
+| `include_sensitive` | `bool` | No | False | Explicitly permit paths rejected by the sensitive-filename filter. |
 
 Returns: `WorkspaceJSON`.
 
@@ -270,9 +270,9 @@ def handoff_workspace(id: str, *, registry_dir: str | None=None, team: str | Non
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `id` | `str` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
-| `checkpoint_id` | `str \| None` | No | None |  |
+| `checkpoint_id` | `str \| None` | No | None | Immutable checkpoint identity. |
 | `archive` | `str \| None` | No | None | Path to a portable checkpoint archive. |
 | `output` | `str \| None` | No | None | Destination path for the transfer document or archive. |
 
@@ -289,10 +289,10 @@ def import_workspace_checkpoint(archive: str, *, registry_dir: str | None=None, 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `archive` | `str` | Yes | — | Path to a portable checkpoint archive. |
-| `registry_dir` | `str \| None` | No | None |  |
-| `max_bytes` | `int \| None` | No | None |  |
-| `max_files` | `int \| None` | No | None |  |
-| `include_sensitive` | `bool` | No | False |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
+| `max_bytes` | `int \| None` | No | None | Maximum managed object bytes; zero means unlimited. |
+| `max_files` | `int \| None` | No | None | Maximum files accepted by the archive operation. |
+| `include_sensitive` | `bool` | No | False | Explicitly permit paths rejected by the sensitive-filename filter. |
 
 Returns: `WorkspaceJSON`.
 
@@ -306,11 +306,11 @@ def open_session(*, max_bytes: int=DEFAULT_SESSION_MAX_BYTES, max_objects: int=D
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `max_bytes` | `int` | No | DEFAULT_SESSION_MAX_BYTES |  |
-| `max_objects` | `int` | No | DEFAULT_SESSION_MAX_OBJECTS |  |
-| `data_dir` | `str \| Path \| None` | No | None |  |
-| `max_request_bytes` | `int \| None` | No | None |  |
-| `max_concurrent_requests` | `int \| None` | No | None |  |
+| `max_bytes` | `int` | No | DEFAULT_SESSION_MAX_BYTES | Maximum managed object bytes; zero means unlimited. |
+| `max_objects` | `int` | No | DEFAULT_SESSION_MAX_OBJECTS | Maximum object count; zero means unlimited. |
+| `data_dir` | `str \| Path \| None` | No | None | Native data directory. A supplied session directory is preserved on close. |
+| `max_request_bytes` | `int \| None` | No | None | Positive HTTP request-body byte limit; native default is 8 MiB. |
+| `max_concurrent_requests` | `int \| None` | No | None | Positive active HTTP handler limit; native default is 16. |
 
 Returns: `Session`.
 
@@ -324,7 +324,7 @@ def parse_ready_message(line: str) -> StowReady:
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `line` | `str` | Yes | — |  |
+| `line` | `str` | Yes | — | One JSON or legacy readiness record to decode. |
 
 Returns: `StowReady`.
 
@@ -338,7 +338,7 @@ def prepare_workspace(manifest_path: str) -> WorkspaceJSON:
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `manifest_path` | `str` | Yes | — |  |
+| `manifest_path` | `str` | Yes | — | Path to the task manifest used to prepare a workspace. |
 
 Returns: `WorkspaceJSON`.
 
@@ -352,9 +352,9 @@ def prune_workspaces(*, registry_dir: str | None=None, team: str | None=None, in
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
-| `include_adopted` | `bool` | No | False |  |
+| `include_adopted` | `bool` | No | False | Permit pruning records for already-missing adopted directories. |
 
 Returns: `WorkspaceJSON`.
 
@@ -425,9 +425,9 @@ def restore_workspace_checkpoint(checkpoint_id: str, root: str, *, registry_dir:
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `checkpoint_id` | `str` | Yes | — |  |
-| `root` | `str` | Yes | — |  |
-| `registry_dir` | `str \| None` | No | None |  |
+| `checkpoint_id` | `str` | Yes | — | Immutable checkpoint identity. |
+| `root` | `str` | Yes | — | New workspace directory; its parent must already exist. |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
 
 Returns: `WorkspaceJSON`.
@@ -444,7 +444,7 @@ def resume_workspace(*, id: str | None=None, handoff: str | None=None, registry_
 | --- | --- | --- | --- | --- |
 | `id` | `str \| None` | No | None | Stable identity of this workspace, file stage, revision or immutable record. |
 | `handoff` | `str \| None` | No | None |  |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 
 Returns: `WorkspaceJSON`.
 
@@ -473,13 +473,13 @@ def serve_workspace(workspace_id: str, *, registry_dir: str | None=None, team: s
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `workspace_id` | `str` | Yes | — |  |
-| `registry_dir` | `str \| None` | No | None |  |
+| `registry_dir` | `str \| None` | No | None | Native registry directory for workspace metadata. |
 | `team` | `str \| None` | No | None | Registry team partition; it is not an authorization identity. |
-| `max_bytes` | `int \| None` | No | None |  |
-| `max_objects` | `int \| None` | No | None |  |
+| `max_bytes` | `int \| None` | No | None | Maximum managed object bytes; zero means unlimited. |
+| `max_objects` | `int \| None` | No | None | Maximum object count; zero means unlimited. |
 | `timeout` | `float` | No | 15.0 |  |
-| `max_request_bytes` | `int \| None` | No | None |  |
-| `max_concurrent_requests` | `int \| None` | No | None |  |
+| `max_request_bytes` | `int \| None` | No | None | Positive HTTP request-body byte limit; native default is 8 MiB. |
+| `max_concurrent_requests` | `int \| None` | No | None | Positive active HTTP handler limit; native default is 16. |
 
 Returns: `ServedWorkspace`.
 
@@ -682,7 +682,7 @@ def __init__(self, code: str, message: str) -> None:
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `str` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `str` | Yes | — |  |
+| `message` | `str` | Yes | — | Human-readable error message. |
 
 Returns: `None`.
 
@@ -713,11 +713,11 @@ def with_session(*, max_bytes: int=DEFAULT_SESSION_MAX_BYTES, max_objects: int=D
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `max_bytes` | `int` | No | DEFAULT_SESSION_MAX_BYTES |  |
-| `max_objects` | `int` | No | DEFAULT_SESSION_MAX_OBJECTS |  |
-| `data_dir` | `str \| Path \| None` | No | None |  |
-| `max_request_bytes` | `int \| None` | No | None |  |
-| `max_concurrent_requests` | `int \| None` | No | None |  |
+| `max_bytes` | `int` | No | DEFAULT_SESSION_MAX_BYTES | Maximum managed object bytes; zero means unlimited. |
+| `max_objects` | `int` | No | DEFAULT_SESSION_MAX_OBJECTS | Maximum object count; zero means unlimited. |
+| `data_dir` | `str \| Path \| None` | No | None | Native data directory. A supplied session directory is preserved on close. |
+| `max_request_bytes` | `int \| None` | No | None | Positive HTTP request-body byte limit; native default is 8 MiB. |
+| `max_concurrent_requests` | `int \| None` | No | None | Positive active HTTP handler limit; native default is 16. |
 
 Returns: `Iterator[Session]`.
 

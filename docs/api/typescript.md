@@ -73,7 +73,7 @@ checkpointWorkspace(options: WorkspaceCheckpointOptions): Promise<Readonly<Recor
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceCheckpointOptions` | Yes | — |  |
+| `options` | `WorkspaceCheckpointOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -117,7 +117,7 @@ start(options?: StartOptions | undefined): Promise<StowInstance>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `StartOptions \| undefined` | No | — |  |
+| `options` | `StartOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<StowInstance>`.
 
@@ -131,7 +131,7 @@ connect(options: AwsSdkV3ConfigOptions): StowConnection
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `AwsSdkV3ConfigOptions` | Yes | — |  |
+| `options` | `AwsSdkV3ConfigOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `StowConnection`.
 
@@ -145,7 +145,7 @@ awsSdkV3Config(options: StowInstance | AwsSdkV3ConfigOptions): S3ClientConfig
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `StowInstance \| AwsSdkV3ConfigOptions` | Yes | — |  |
+| `options` | `StowInstance \| AwsSdkV3ConfigOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `S3ClientConfig`.
 
@@ -218,7 +218,7 @@ interface EmbeddedBucket {
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | No |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
 | `creationDate` | `string \| undefined` | Yes |  |
 
 ## EmbeddedCapabilities
@@ -412,7 +412,7 @@ open(host: EmbeddedHost, options?: EmbeddedStowOptions): EmbeddedStow
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `host` | `EmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `EmbeddedStowOptions` | No | {} |  |
+| `options` | `EmbeddedStowOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `EmbeddedStow`.
 
@@ -487,7 +487,7 @@ putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, option
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `EmbeddedPutOptions` | No | {} |  |
+| `options` | `EmbeddedPutOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `EmbeddedObject`.
 
@@ -532,7 +532,7 @@ listObjects(bucket: string, options?: EmbeddedListOptions): EmbeddedObjectPage
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
-| `options` | `EmbeddedListOptions` | No | {} |  |
+| `options` | `EmbeddedListOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `EmbeddedObjectPage`.
 
@@ -561,10 +561,10 @@ copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, d
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `sourceBucket` | `string` | Yes | — |  |
-| `sourceKey` | `string` | Yes | — |  |
-| `destinationBucket` | `string` | Yes | — |  |
-| `destinationKey` | `string` | Yes | — |  |
+| `sourceBucket` | `string` | Yes | — | Bucket containing the source object. |
+| `sourceKey` | `string` | Yes | — | Source object key. |
+| `destinationBucket` | `string` | Yes | — | Bucket that receives the copy. |
+| `destinationKey` | `string` | Yes | — | Object key that receives the copy. |
 
 Returns: `EmbeddedObject`.
 
@@ -602,10 +602,10 @@ class EmbeddedStowError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `string` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### EmbeddedStowError.constructor
 
@@ -618,7 +618,7 @@ constructor(code: string, message: string)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `string` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `string` | Yes | — |  |
+| `message` | `string` | Yes | — | Human-readable error message. |
 
 Returns: `EmbeddedStowError`.
 
@@ -694,7 +694,7 @@ exportWorkspaceCheckpoint(checkpointId: string, output: string, options?: Worksp
 | --- | --- | --- | --- | --- |
 | `checkpointId` | `string` | Yes | — | Immutable checkpoint identity. |
 | `output` | `string` | Yes | — | Destination path for the transfer document or archive. |
-| `options` | `WorkspaceArchiveOptions` | No | {} |  |
+| `options` | `WorkspaceArchiveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -709,7 +709,7 @@ handoffWorkspace(id: string, options?: { readonly registryDir?: string | undefin
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly checkpointId?: string \| undefined; readonly archive?: string \| undefined; readonly output?: string \| undefined; }` | No | {} |  |
+| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly checkpointId?: string \| undefined; readonly archive?: string \| undefined; readonly output?: string \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -724,7 +724,7 @@ importWorkspaceCheckpoint(archive: string, options?: WorkspaceArchiveOptions): P
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `archive` | `string` | Yes | — | Path to a portable checkpoint archive. |
-| `options` | `WorkspaceArchiveOptions` | No | {} |  |
+| `options` | `WorkspaceArchiveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -823,7 +823,7 @@ openStow(options?: EphemeralStowOptions): Promise<StowSession>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `EphemeralStowOptions` | No | {} |  |
+| `options` | `EphemeralStowOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<StowSession>`.
 
@@ -837,7 +837,7 @@ parseReadyLine(line: string): ReadyLine | null
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `line` | `string` | Yes | — |  |
+| `line` | `string` | Yes | — | One JSON or legacy readiness record to decode. |
 
 Returns: `ReadyLine | null`.
 
@@ -851,7 +851,7 @@ parseReadyMessage(line: string): StowReady
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `line` | `string` | Yes | — |  |
+| `line` | `string` | Yes | — | One JSON or legacy readiness record to decode. |
 
 Returns: `StowReady`.
 
@@ -879,7 +879,7 @@ pruneWorkspaces(options?: { readonly registryDir?: string | undefined; readonly 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly includeAdopted?: boolean \| undefined; }` | No | {} |  |
+| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly includeAdopted?: boolean \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -945,7 +945,7 @@ restoreWorkspaceCheckpoint(checkpointId: string, root: string, registryDir?: str
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `checkpointId` | `string` | Yes | — | Immutable checkpoint identity. |
-| `root` | `string` | Yes | — |  |
+| `root` | `string` | Yes | — | New workspace directory; its parent must already exist. |
 | `registryDir` | `string \| undefined` | No | — | Native registry directory for workspace metadata. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
@@ -960,7 +960,7 @@ resumeWorkspace(options: ResumeWorkspaceOptions): Promise<Readonly<Record<string
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `ResumeWorkspaceOptions` | Yes | — |  |
+| `options` | `ResumeWorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -1031,7 +1031,7 @@ serveWorkspace(options: ServeWorkspaceOptions): Promise<ServedWorkspace>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `ServeWorkspaceOptions` | Yes | — |  |
+| `options` | `ServeWorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ServedWorkspace>`.
 
@@ -1149,7 +1149,7 @@ start(options?: StartOptions | undefined): Promise<StowInstance>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `StartOptions \| undefined` | No | — |  |
+| `options` | `StartOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<StowInstance>`.
 
@@ -1163,7 +1163,7 @@ connect(options: AwsSdkV3ConfigOptions): StowConnection
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `AwsSdkV3ConfigOptions` | Yes | — |  |
+| `options` | `AwsSdkV3ConfigOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `StowConnection`.
 
@@ -1177,7 +1177,7 @@ awsSdkV3Config(options: StowInstance | AwsSdkV3ConfigOptions): S3ClientConfig
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `StowInstance \| AwsSdkV3ConfigOptions` | Yes | — |  |
+| `options` | `StowInstance \| AwsSdkV3ConfigOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `S3ClientConfig`.
 
@@ -1216,10 +1216,10 @@ class StowBinaryNotFoundError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `"binary_not_found"` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### StowBinaryNotFoundError.constructor
 
@@ -1343,7 +1343,7 @@ createBucket(name: string): Promise<void>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 
 Returns: `Promise<void>`.
 
@@ -1357,7 +1357,7 @@ emptyBucket(name: string): Promise<void>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 
 Returns: `Promise<void>`.
 
@@ -1374,7 +1374,7 @@ putFixture(bucket: string, key: string, body: any, options?: PutFixtureOptions |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `body` | `any` | Yes | — | Complete object payload for the selected native SDK helper. |
-| `options` | `PutFixtureOptions \| undefined` | No | — |  |
+| `options` | `PutFixtureOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<void>`.
 
@@ -1416,10 +1416,10 @@ class StowOwnershipError  extends Error {
 | --- | --- | --- | --- |
 | `code` | `"ownership"` | No | Structured error code; inspect the code rather than matching message text. |
 | `dataDir` | `string` | No | Native data directory. A supplied session directory is preserved on close. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### StowOwnershipError.constructor
 
@@ -1450,10 +1450,10 @@ class StowProtocolError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `StowErrorCode` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### StowProtocolError.constructor
 
@@ -1466,7 +1466,7 @@ constructor(code: StowErrorCode, message: string)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `StowErrorCode` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `string` | Yes | — |  |
+| `message` | `string` | Yes | — | Human-readable error message. |
 
 Returns: `StowProtocolError`.
 
@@ -1673,8 +1673,8 @@ withStow<T>(use: (session: StowSession) => T | Promise<T>, options?: EphemeralSt
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `use` | `(session: StowSession) => T \| Promise<T>` | Yes | — |  |
-| `options` | `EphemeralStowOptions` | No | {} |  |
+| `use` | `(session: StowSession) => T \| Promise<T>` | Yes | — | Session callback; its result is returned after cleanup. |
+| `options` | `EphemeralStowOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<T>`.
 
@@ -1721,7 +1721,7 @@ interface WorkspaceCheckpointOptions {
 | `id` | `string` | No | Stable identity of this workspace, file stage, revision or immutable record. |
 | `registryDir` | `string \| undefined` | Yes | Native registry directory for workspace metadata. |
 | `team` | `string \| undefined` | Yes | Registry team partition; it is not an authorization identity. |
-| `parent` | `string \| undefined` | Yes |  |
+| `parent` | `string \| undefined` | Yes | Optional parent checkpoint identity. |
 | `maxBytes` | `number \| undefined` | Yes | Maximum managed object bytes; zero means unlimited. |
 | `maxFiles` | `number \| undefined` | Yes | Maximum files accepted by the archive operation. |
 | `includeSensitive` | `boolean \| undefined` | Yes | Explicitly permit paths rejected by the sensitive-filename filter. |

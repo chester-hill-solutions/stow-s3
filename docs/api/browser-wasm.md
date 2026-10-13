@@ -97,7 +97,7 @@ constructor(worker: Worker, options?: WorkerHostOptions)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `worker` | `Worker` | Yes | — |  |
-| `options` | `WorkerHostOptions` | No | {} |  |
+| `options` | `WorkerHostOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `BrowserWorkerEmbeddedHost`.
 
@@ -138,7 +138,7 @@ loadBrowserPersistentWasmHost(options?: BrowserWorkerHostOptions): BrowserWorker
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `BrowserWorkerHostOptions` | No | {} |  |
+| `options` | `BrowserWorkerHostOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `BrowserWorkerEmbeddedHost`.
 
@@ -152,7 +152,7 @@ loadBrowserWasmBridge(options?: BrowserWasmOptions): Promise<BrowserWasmBridge>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `BrowserWasmOptions` | No | {} |  |
+| `options` | `BrowserWasmOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<BrowserWasmBridge>`.
 
@@ -166,6 +166,6 @@ loadBrowserWasmHost(options?: BrowserWorkerHostOptions): BrowserWorkerEmbeddedHo
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `BrowserWorkerHostOptions` | No | {} |  |
+| `options` | `BrowserWorkerHostOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `BrowserWorkerEmbeddedHost`.

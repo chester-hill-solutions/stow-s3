@@ -52,7 +52,7 @@ adoptWorkspaceHandoff(options: WorkspaceAdoptOptions): Promise<Readonly<Record<s
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceAdoptOptions` | Yes | — |  |
+| `options` | `WorkspaceAdoptOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -66,7 +66,7 @@ applyWorkspaceDelta(options: WorkspaceApplyOptions): Promise<Readonly<Record<str
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceApplyOptions` | Yes | — |  |
+| `options` | `WorkspaceApplyOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -80,7 +80,7 @@ checkpointWorkspace(options: WorkspaceCheckpointOptions): Promise<Readonly<Recor
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceCheckpointOptions` | Yes | — |  |
+| `options` | `WorkspaceCheckpointOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -108,7 +108,7 @@ createWorkspaceDelta(options: WorkspaceDeltaOptions): Promise<Readonly<Record<st
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceDeltaOptions` | Yes | — |  |
+| `options` | `WorkspaceDeltaOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -170,7 +170,7 @@ exportWorkspaceCheckpoint(checkpointId: string, output: string, options?: Worksp
 | --- | --- | --- | --- | --- |
 | `checkpointId` | `string` | Yes | — | Immutable checkpoint identity. |
 | `output` | `string` | Yes | — | Destination path for the transfer document or archive. |
-| `options` | `WorkspaceArchiveOptions` | No | {} |  |
+| `options` | `WorkspaceArchiveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -185,7 +185,7 @@ handoffWorkspace(id: string, options?: { readonly registryDir?: string | undefin
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly checkpointId?: string \| undefined; readonly archive?: string \| undefined; readonly output?: string \| undefined; }` | No | {} |  |
+| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly checkpointId?: string \| undefined; readonly archive?: string \| undefined; readonly output?: string \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -200,7 +200,7 @@ importWorkspaceCheckpoint(archive: string, options?: WorkspaceArchiveOptions): P
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `archive` | `string` | Yes | — | Path to a portable checkpoint archive. |
-| `options` | `WorkspaceArchiveOptions` | No | {} |  |
+| `options` | `WorkspaceArchiveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -214,7 +214,7 @@ listWorkspaces(options?: { readonly registryDir?: string | undefined; readonly t
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; }` | No | {} |  |
+| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -242,7 +242,7 @@ pruneWorkspaces(options?: { readonly registryDir?: string | undefined; readonly 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly includeAdopted?: boolean \| undefined; }` | No | {} |  |
+| `options` | `{ readonly registryDir?: string \| undefined; readonly team?: string \| undefined; readonly includeAdopted?: boolean \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -257,7 +257,7 @@ restoreWorkspaceCheckpoint(checkpointId: string, root: string, registryDir?: str
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `checkpointId` | `string` | Yes | — | Immutable checkpoint identity. |
-| `root` | `string` | Yes | — |  |
+| `root` | `string` | Yes | — | New workspace directory; its parent must already exist. |
 | `registryDir` | `string \| undefined` | No | — | Native registry directory for workspace metadata. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
@@ -272,7 +272,7 @@ resumeWorkspace(options: ResumeWorkspaceOptions): Promise<Readonly<Record<string
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `ResumeWorkspaceOptions` | Yes | — |  |
+| `options` | `ResumeWorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<Readonly<Record<string, unknown>>>`.
 
@@ -343,7 +343,7 @@ serveWorkspace(options: ServeWorkspaceOptions): Promise<ServedWorkspace>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `ServeWorkspaceOptions` | Yes | — |  |
+| `options` | `ServeWorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ServedWorkspace>`.
 
@@ -391,7 +391,7 @@ interface WorkspaceAdoptOptions  extends WorkspaceArchiveOptions {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `handoffPath` | `string` | No | Path to a same-machine or portable handoff document. |
-| `root` | `string` | No |  |
+| `root` | `string` | No | New workspace directory; its parent must already exist. |
 | `registryDir` | `string \| undefined` | Yes | Native registry directory for workspace metadata. |
 | `team` | `string \| undefined` | Yes | Registry team partition; it is not an authorization identity. |
 | `maxBytes` | `number \| undefined` | Yes | Maximum managed object bytes; zero means unlimited. |
@@ -412,7 +412,7 @@ interface WorkspaceApplyOptions  extends WorkspaceArchiveOptions {
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `delta` | `string` | No |  |
+| `delta` | `string` | No | Verified change document to encode or apply. |
 | `base` | `string` | No |  |
 | `expectSHA256` | `string \| undefined` | Yes | The digest `createWorkspaceDelta` reported for the document. |
 | `registryDir` | `string \| undefined` | Yes | Native registry directory for workspace metadata. |
@@ -464,7 +464,7 @@ interface WorkspaceCheckpointOptions {
 | `id` | `string` | No | Stable identity of this workspace, file stage, revision or immutable record. |
 | `registryDir` | `string \| undefined` | Yes | Native registry directory for workspace metadata. |
 | `team` | `string \| undefined` | Yes | Registry team partition; it is not an authorization identity. |
-| `parent` | `string \| undefined` | Yes |  |
+| `parent` | `string \| undefined` | Yes | Optional parent checkpoint identity. |
 | `maxBytes` | `number \| undefined` | Yes | Maximum managed object bytes; zero means unlimited. |
 | `maxFiles` | `number \| undefined` | Yes | Maximum files accepted by the archive operation. |
 | `includeSensitive` | `boolean \| undefined` | Yes | Explicitly permit paths rejected by the sensitive-filename filter. |

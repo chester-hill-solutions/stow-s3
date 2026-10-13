@@ -60,7 +60,7 @@ func AddRecoveryHold(ctx context.Context, registryDir string, request RecoveryHo
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `request` | `RecoveryHoldRequest` | Yes | — |  |
 
@@ -76,9 +76,9 @@ func AdoptHandoff(ctx context.Context, path string, options WorkspaceOptions, ar
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `path` | `string` | Yes | — |  |
-| `options` | `WorkspaceOptions` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 | `archiveOptions` | `CheckpointArchiveOptions` | Yes | — |  |
 
 Returns: `*Workspace, CheckpointInfo, error`.
@@ -93,10 +93,10 @@ func AdoptHandoffArchive(ctx context.Context, document Handoff, archive *os.File
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `document` | `Handoff` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `document` | `Handoff` | Yes | — | Versioned handoff or delta document. |
 | `archive` | `*os.File` | Yes | — | Path to a portable checkpoint archive. |
-| `options` | `WorkspaceOptions` | Yes | — |  |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 | `archiveOptions` | `CheckpointArchiveOptions` | Yes | — |  |
 
 Returns: `*Workspace, CheckpointInfo, error`.
@@ -127,10 +127,10 @@ func ApplyDelta(ctx context.Context, registryDir, baseID string, delta *DeltaDoc
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
-| `baseID` | `string` | Yes | — |  |
-| `delta` | `*DeltaDocument` | Yes | — |  |
+| `baseID` | `string` | Yes | — | Checkpoint identity that must match the delta's named base. |
+| `delta` | `*DeltaDocument` | Yes | — | Verified change document to encode or apply. |
 
 Returns: `CheckpointInfo, error`.
 
@@ -144,11 +144,11 @@ func ApplyDeltaWithOptions(ctx context.Context, registryDir, baseID string, delt
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
-| `baseID` | `string` | Yes | — |  |
-| `delta` | `*DeltaDocument` | Yes | — |  |
-| `options` | `DeltaOptions` | Yes | — |  |
+| `baseID` | `string` | Yes | — | Checkpoint identity that must match the delta's named base. |
+| `delta` | `*DeltaDocument` | Yes | — | Verified change document to encode or apply. |
+| `options` | `DeltaOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `CheckpointInfo, error`.
 
@@ -170,7 +170,7 @@ func (a Authority) Allows(op Operation) bool
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `op` | `Operation` | Yes | — |  |
+| `op` | `Operation` | Yes | — | Operation whose permission is being checked. |
 
 Returns: `bool`.
 
@@ -184,7 +184,7 @@ func (a Authority) Check(op Operation) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `op` | `Operation` | Yes | — |  |
+| `op` | `Operation` | Yes | — | Operation whose permission is being checked. |
 
 Returns: `error`.
 
@@ -379,7 +379,7 @@ func (h *CapacityHost) BindNamespace(options CapacityNamespaceOptions) (*Capacit
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `CapacityNamespaceOptions` | Yes | — |  |
+| `options` | `CapacityNamespaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*CapacityNamespace, error`.
 
@@ -415,7 +415,7 @@ func (n *CapacityNamespace) Snapshot(ctx context.Context) (CapacitySnapshot, err
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 
 Returns: `CapacitySnapshot, error`.
 
@@ -453,7 +453,7 @@ func CaptureCheckpoint(ctx context.Context, registryDir, workspaceID string, req
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `workspaceID` | `string` | Yes | — |  |
 | `request` | `CheckpointRequest` | Yes | — |  |
@@ -670,10 +670,10 @@ func CheckpointOf(ctx context.Context, registryDir, id string, options Checkpoin
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `options` | `CheckpointOptions` | Yes | — |  |
+| `options` | `CheckpointOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `CheckpointInfo, error`.
 
@@ -687,10 +687,10 @@ func CheckpointOfAuthorized(ctx context.Context, registryDir, id string, options
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `options` | `CheckpointOptions` | Yes | — |  |
+| `options` | `CheckpointOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 | `principal` | `CapturePrincipal` | Yes | — |  |
 
 Returns: `CheckpointInfo, error`.
@@ -766,7 +766,7 @@ func Collect(options CollectOptions) ([]CollectResult, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `CollectOptions` | Yes | — |  |
+| `options` | `CollectOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `[]CollectResult, error`.
 
@@ -862,11 +862,11 @@ func CreateDelta(ctx context.Context, registryDir, baseID, targetID string, opti
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
-| `baseID` | `string` | Yes | — |  |
+| `baseID` | `string` | Yes | — | Checkpoint identity that must match the delta's named base. |
 | `targetID` | `string` | Yes | — |  |
-| `options` | `DeltaOptions` | Yes | — |  |
+| `options` | `DeltaOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*DeltaDocument, error`.
 
@@ -916,7 +916,7 @@ func DeleteCheckpoint(ctx context.Context, registryDir, id string) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
 
@@ -1025,7 +1025,7 @@ func DestroyRegisteredWorkspace(ctx context.Context, registryDir, id string) err
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
 
@@ -1041,10 +1041,10 @@ func DiscardRecoveryHold(ctx context.Context, registryDir, id, owner string) (Re
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `owner` | `string` | Yes | — |  |
+| `owner` | `string` | Yes | — | Identity that owns the durable recovery hold. |
 
 Returns: `RecoveryHold, error`.
 
@@ -1058,7 +1058,7 @@ func EncodeDelta(delta *DeltaDocument) ([]byte, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `delta` | `*DeltaDocument` | Yes | — |  |
+| `delta` | `*DeltaDocument` | Yes | — | Verified change document to encode or apply. |
 
 Returns: `[]byte, error`.
 
@@ -1421,11 +1421,11 @@ func ExportCheckpoint(ctx context.Context, registryDir, id string, output io.Wri
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
 | `output` | `io.Writer` | Yes | — | Destination path for the transfer document or archive. |
-| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+| `options` | `CheckpointArchiveOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `error`.
 
@@ -1439,8 +1439,8 @@ func ExportHandoff(ctx context.Context, options HandoffExportOptions) (Handoff, 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `options` | `HandoffExportOptions` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `options` | `HandoffExportOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Handoff, error`.
 
@@ -1566,10 +1566,10 @@ func ImportCheckpoint(ctx context.Context, registryDir string, input io.Reader, 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `input` | `io.Reader` | Yes | — |  |
-| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+| `options` | `CheckpointArchiveOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `CheckpointInfo, error`.
 
@@ -1583,11 +1583,11 @@ func ImportHandoff(ctx context.Context, path, registryDir string, document Hando
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `path` | `string` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
-| `document` | `Handoff` | Yes | — |  |
-| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+| `document` | `Handoff` | Yes | — | Versioned handoff or delta document. |
+| `options` | `CheckpointArchiveOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `CheckpointInfo, error`.
 
@@ -1601,7 +1601,7 @@ func List(options ListWorkspacesOptions) (WorkspaceListing, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `ListWorkspacesOptions` | Yes | — |  |
+| `options` | `ListWorkspacesOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `WorkspaceListing, error`.
 
@@ -1627,7 +1627,7 @@ func ListRecoveryHolds(ctx context.Context, registryDir string, query RecoveryHo
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `query` | `RecoveryHoldQuery` | Yes | — |  |
 
@@ -1863,7 +1863,7 @@ func Open(options Options) (*Runtime, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `Options` | Yes | — |  |
+| `options` | `Options` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*Runtime, error`.
 
@@ -1877,7 +1877,7 @@ func OpenCapacityHost(options CapacityHostOptions) (*CapacityHost, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `CapacityHostOptions` | Yes | — |  |
+| `options` | `CapacityHostOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*CapacityHost, error`.
 
@@ -1891,7 +1891,7 @@ func OpenFilesystem(options FilesystemOptions) (*Runtime, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `FilesystemOptions` | Yes | — |  |
+| `options` | `FilesystemOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*Runtime, error`.
 
@@ -1905,7 +1905,7 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceOptions` | Yes | — |  |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*Workspace, error`.
 
@@ -2017,7 +2017,7 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `PrepareOptions` | Yes | — |  |
+| `options` | `PrepareOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*PreparedWorkspace, error`.
 
@@ -2031,9 +2031,9 @@ func PreviewCheckpointArchive(ctx context.Context, input io.Reader, options Chec
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `input` | `io.Reader` | Yes | — |  |
-| `options` | `CheckpointArchiveOptions` | Yes | — |  |
+| `options` | `CheckpointArchiveOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `CheckpointArchivePreview, error`.
 
@@ -2047,7 +2047,7 @@ func Prune(options PruneOptions) ([]PruneResult, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `PruneOptions` | Yes | — |  |
+| `options` | `PruneOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `[]PruneResult, error`.
 
@@ -2115,7 +2115,7 @@ func ReadCheckpointFile(registryDir, checkpointID, path string) ([]byte, error)
 | --- | --- | --- | --- | --- |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `checkpointID` | `string` | Yes | — |  |
-| `path` | `string` | Yes | — |  |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
 
 Returns: `[]byte, error`.
 
@@ -2129,7 +2129,7 @@ func ReadHandoff(path string) (Handoff, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `path` | `string` | Yes | — |  |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
 
 Returns: `Handoff, error`.
 
@@ -2261,10 +2261,10 @@ func ReleaseRecoveryHold(ctx context.Context, registryDir, id, owner string) (Re
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `owner` | `string` | Yes | — |  |
+| `owner` | `string` | Yes | — | Identity that owns the durable recovery hold. |
 
 Returns: `RecoveryHold, error`.
 
@@ -2286,7 +2286,7 @@ func ResolveCheckpoint(ctx context.Context, registryDir, workspaceID string, req
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `workspaceID` | `string` | Yes | — |  |
 | `request` | `CheckpointRequest` | Yes | — |  |
@@ -2320,7 +2320,7 @@ func RestoreCheckpoint(registryDir, id string, options WorkspaceOptions) (*Works
 | --- | --- | --- | --- | --- |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `options` | `WorkspaceOptions` | Yes | — |  |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*Workspace, error`.
 
@@ -2336,7 +2336,7 @@ func RestoreCheckpointWithGit(registryDir, id string, options WorkspaceOptions, 
 | --- | --- | --- | --- | --- |
 | `registryDir` | `string` | Yes | — | Native registry directory for workspace metadata. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `options` | `WorkspaceOptions` | Yes | — |  |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 | `sources` | `[]GitRepositoryInput` | Yes | — |  |
 
 Returns: `*Workspace, error`.
@@ -2380,7 +2380,7 @@ func ResumeWith(options WorkspaceOptions, id string) (*Workspace, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceOptions` | Yes | — |  |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
 
 Returns: `*Workspace, error`.
@@ -2415,7 +2415,7 @@ func (r *Runtime) Authorize(op authority.Operation, res policy.Resource) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `op` | `authority.Operation` | Yes | — |  |
+| `op` | `authority.Operation` | Yes | — | Operation whose permission is being checked. |
 | `res` | `policy.Resource` | Yes | — |  |
 
 Returns: `error`.
@@ -2430,8 +2430,8 @@ func (r *Runtime) BeginObjectRecoveryHold(ctx context.Context, options ObjectRec
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `options` | `ObjectRecoveryHoldOptions` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `options` | `ObjectRecoveryHoldOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `error`.
 
@@ -2465,11 +2465,11 @@ func (r *Runtime) CopyObject(ctx context.Context, sourceBucket, sourceKey, desti
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `sourceBucket` | `string` | Yes | — |  |
-| `sourceKey` | `string` | Yes | — |  |
-| `destinationBucket` | `string` | Yes | — |  |
-| `destinationKey` | `string` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `sourceBucket` | `string` | Yes | — | Bucket containing the source object. |
+| `sourceKey` | `string` | Yes | — | Source object key. |
+| `destinationBucket` | `string` | Yes | — | Bucket that receives the copy. |
+| `destinationKey` | `string` | Yes | — | Object key that receives the copy. |
 
 Returns: `Object, error`.
 
@@ -2483,8 +2483,8 @@ func (r *Runtime) CreateBucket(ctx context.Context, name string) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `name` | `string` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 
 Returns: `error`.
 
@@ -2498,8 +2498,8 @@ func (r *Runtime) DeleteBucket(ctx context.Context, name string) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `name` | `string` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 
 Returns: `error`.
 
@@ -2513,7 +2513,7 @@ func (r *Runtime) DeleteObject(ctx context.Context, bucket, key string) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 
@@ -2529,7 +2529,7 @@ func (r *Runtime) GetObject(ctx context.Context, bucket, key string) (Object, er
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 
@@ -2545,7 +2545,7 @@ func (r *Runtime) HeadObject(ctx context.Context, bucket, key string) (Object, e
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 
@@ -2561,7 +2561,7 @@ func (r *Runtime) ListBuckets(ctx context.Context) ([]Bucket, error)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 
 Returns: `[]Bucket, error`.
 
@@ -2575,9 +2575,9 @@ func (r *Runtime) ListObjects(ctx context.Context, bucket string, options ListOp
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
-| `options` | `ListOptions` | Yes | — |  |
+| `options` | `ListOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `ObjectPage, error`.
 
@@ -2591,7 +2591,7 @@ func (r *Runtime) OpenObject(ctx context.Context, bucket, key string) (io.ReadCl
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 
@@ -2607,7 +2607,7 @@ func (r *Runtime) OpenObjectRange(ctx context.Context, bucket, key string, span 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `span` | `ObjectRange` | Yes | — |  |
@@ -2624,11 +2624,11 @@ func (r *Runtime) PutObject(ctx context.Context, bucket, key string, data []byte
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `[]byte` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `PutOptions` | Yes | — |  |
+| `options` | `PutOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Object, error`.
 
@@ -2642,11 +2642,11 @@ func (r *Runtime) PutObjectStream(ctx context.Context, bucket, key string, body 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `body` | `io.Reader` | Yes | — | Complete object payload for the selected native SDK helper. |
-| `options` | `StreamPutOptions` | Yes | — |  |
+| `options` | `StreamPutOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Object, error`.
 
@@ -2660,7 +2660,7 @@ func (r *Runtime) ReadForSave(ctx context.Context, bucket, key string) (Object, 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 
@@ -2676,9 +2676,9 @@ func (r *Runtime) ReleaseObjectRecoveryHold(ctx context.Context, id, owner strin
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
-| `owner` | `string` | Yes | — |  |
+| `owner` | `string` | Yes | — | Identity that owns the durable recovery hold. |
 
 Returns: `error`.
 
@@ -2692,7 +2692,7 @@ func (r *Runtime) Reset(ctx context.Context) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 
 Returns: `error`.
 
@@ -2706,7 +2706,7 @@ func (r *Runtime) ResolveSave(ctx context.Context, bucket, key, requestKey strin
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `requestKey` | `string` | Yes | — | Unique persisted request identity for capture or save recovery. |
@@ -2723,11 +2723,11 @@ func (r *Runtime) SaveObject(ctx context.Context, bucket, key string, data []byt
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `[]byte` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `SaveOptions` | Yes | — |  |
+| `options` | `SaveOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `SaveResult, error`.
 
@@ -2981,7 +2981,7 @@ func ValidateHandoff(document Handoff) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `document` | `Handoff` | Yes | — |  |
+| `document` | `Handoff` | Yes | — | Versioned handoff or delta document. |
 
 Returns: `error`.
 
@@ -3041,8 +3041,8 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
-| `options` | `CheckpointOptions` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `options` | `CheckpointOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `CheckpointInfo, error`.
 
@@ -3056,7 +3056,7 @@ func (w *Workspace) Destroy(ctx context.Context) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 
 Returns: `error`.
 
@@ -3090,7 +3090,7 @@ func (w *Workspace) FacadeWithOptions(options WorkspaceFacadeOptions) (*Workspac
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkspaceFacadeOptions` | Yes | — |  |
+| `options` | `WorkspaceFacadeOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*WorkspaceFacade, error`.
 
@@ -3148,7 +3148,7 @@ func (w *Workspace) RefreshUsage(ctx context.Context) error
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `ctx` | `context.Context` | Yes | — |  |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
 
 Returns: `error`.
 

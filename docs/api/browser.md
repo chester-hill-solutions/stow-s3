@@ -95,7 +95,7 @@ open(host: EmbeddedHost, options: PersistentEmbeddedStowOptions): Promise<Browse
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `host` | `EmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `PersistentEmbeddedStowOptions` | Yes | — |  |
+| `options` | `PersistentEmbeddedStowOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<BrowserEmbeddedStow>`.
 
@@ -112,7 +112,7 @@ create(host: EmbeddedHost, adapter: PersistenceAdapter, namespace: string, optio
 | `host` | `EmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
 | `adapter` | `PersistenceAdapter` | Yes | — | Content persistence adapter; its namespace must be open before operations. |
 | `namespace` | `string` | Yes | — | Nonempty local persistence namespace; ownership is exclusive. |
-| `options` | `EmbeddedStowOptions` | No | {} |  |
+| `options` | `EmbeddedStowOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<BrowserEmbeddedStow>`.
 
@@ -187,7 +187,7 @@ putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, option
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `EmbeddedPutOptions` | No | {} |  |
+| `options` | `EmbeddedPutOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObject>`.
 
@@ -232,7 +232,7 @@ listObjects(bucket: string, options?: EmbeddedListOptions): Promise<EmbeddedObje
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
-| `options` | `EmbeddedListOptions` | No | {} |  |
+| `options` | `EmbeddedListOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObjectPage>`.
 
@@ -275,10 +275,10 @@ copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, d
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `sourceBucket` | `string` | Yes | — |  |
-| `sourceKey` | `string` | Yes | — |  |
-| `destinationBucket` | `string` | Yes | — |  |
-| `destinationKey` | `string` | Yes | — |  |
+| `sourceBucket` | `string` | Yes | — | Bucket containing the source object. |
+| `sourceKey` | `string` | Yes | — | Source object key. |
+| `destinationBucket` | `string` | Yes | — | Bucket that receives the copy. |
+| `destinationKey` | `string` | Yes | — | Object key that receives the copy. |
 
 Returns: `Promise<EmbeddedObject>`.
 
@@ -332,7 +332,7 @@ open(store: BrowserEmbeddedStow, options: BrowserFileHistoryOptions): Promise<Br
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `store` | `BrowserEmbeddedStow` | Yes | — | Open underlying object or content store supplied by the application. |
-| `options` | `BrowserFileHistoryOptions` | Yes | — |  |
+| `options` | `BrowserFileHistoryOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<BrowserFileHistory>`.
 
@@ -362,7 +362,7 @@ save(key: string, data: Uint8Array<ArrayBufferLike>, options?: FileSaveOptions):
 | --- | --- | --- | --- | --- |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `FileSaveOptions` | No | {} |  |
+| `options` | `FileSaveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<FileReadResult>`.
 
@@ -378,7 +378,7 @@ saveReceipt(key: string, data: Uint8Array<ArrayBufferLike>, options?: FileSaveOp
 | --- | --- | --- | --- | --- |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `FileSaveOptions` | No | {} |  |
+| `options` | `FileSaveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<FileSaveReceipt>`.
 
@@ -407,7 +407,7 @@ exportRetained(key: string, visit: (version: FileVersion, bytes: Uint8Array<Arra
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
-| `visit` | `(version: FileVersion, bytes: Uint8Array<ArrayBufferLike>, history: FileHistoryExport) => Promise<void>` | Yes | — |  |
+| `visit` | `(version: FileVersion, bytes: Uint8Array<ArrayBufferLike>, history: FileHistoryExport) => Promise<void>` | Yes | — | Callback invoked for each retained stage during export. |
 
 Returns: `Promise<FileHistoryExport>`.
 
@@ -519,10 +519,10 @@ class BrowserPersistenceError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `BrowserPersistenceErrorCode` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### BrowserPersistenceError.constructor
 
@@ -535,7 +535,7 @@ constructor(code: BrowserPersistenceErrorCode, message: string)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `BrowserPersistenceErrorCode` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `string` | Yes | — |  |
+| `message` | `string` | Yes | — | Human-readable error message. |
 
 Returns: `BrowserPersistenceError`.
 
@@ -583,10 +583,10 @@ class FileHistoryError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `FileHistoryErrorCode` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### FileHistoryError.constructor
 
@@ -599,7 +599,7 @@ constructor(code: FileHistoryErrorCode, message: string)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `FileHistoryErrorCode` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `string` | Yes | — |  |
+| `message` | `string` | Yes | — | Human-readable error message. |
 
 Returns: `FileHistoryError`.
 
@@ -748,7 +748,7 @@ constructor(options?: IndexedDbPersistenceAdapterOptions)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `IndexedDbPersistenceAdapterOptions` | No | {} |  |
+| `options` | `IndexedDbPersistenceAdapterOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `IndexedDbPersistenceAdapter`.
 
@@ -792,7 +792,7 @@ commit(namespace: string, expectedGeneration: number, changes: PersistenceChange
 | --- | --- | --- | --- | --- |
 | `namespace` | `string` | Yes | — | Nonempty local persistence namespace; ownership is exclusive. |
 | `expectedGeneration` | `number` | Yes | — | Generation that must still match when publishing. |
-| `changes` | `PersistenceChange[]` | Yes | — |  |
+| `changes` | `PersistenceChange[]` | Yes | — | File puts, deletes and fixed-length range replacements to publish together. |
 
 Returns: `Promise<number>`.
 
@@ -867,8 +867,8 @@ request(name: string, options: { mode: "exclusive"; ifAvailable?: boolean | unde
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
-| `options` | `{ mode: "exclusive"; ifAvailable?: boolean \| undefined; }` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
+| `options` | `{ mode: "exclusive"; ifAvailable?: boolean \| undefined; }` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 | `callback` | `(lock: unknown) => Promise<void>` | Yes | — |  |
 
 Returns: `Promise<void>`.
@@ -928,7 +928,7 @@ putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, option
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `SyncRemoteWrite` | Yes | — |  |
+| `options` | `SyncRemoteWrite` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<{ etag: string; }>`.
 
@@ -943,7 +943,7 @@ openBrowserEmbeddedStow(host: EmbeddedHost, options: PersistentEmbeddedStowOptio
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `host` | `EmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `PersistentEmbeddedStowOptions` | Yes | — |  |
+| `options` | `PersistentEmbeddedStowOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<BrowserEmbeddedStow>`.
 
@@ -1001,7 +1001,7 @@ commit(namespace: string, expectedGeneration: number, changes: PersistenceChange
 | --- | --- | --- | --- | --- |
 | `namespace` | `string` | Yes | — | Nonempty local persistence namespace; ownership is exclusive. |
 | `expectedGeneration` | `number` | Yes | — | Generation that must still match when publishing. |
-| `changes` | `PersistenceChange[]` | Yes | — |  |
+| `changes` | `PersistenceChange[]` | Yes | — | File puts, deletes and fixed-length range replacements to publish together. |
 
 Returns: `Promise<number>`.
 

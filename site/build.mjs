@@ -102,7 +102,7 @@ export function renderPage(page, markdown, manifest) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(page.title)} · Stow docs</title><meta name="description" content="${escapeHtml(page.title)}: Stow storage documentation, API examples and guarantees.">
 <link rel="canonical" href="https://stow.chesterhillsolutions.ca${page.route}">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/stow.css?v=20261012-docs"><link rel="stylesheet" href="/assets/docs.css?v=20261012">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/stow.css?v=20261012-docs"><link rel="stylesheet" href="/assets/docs.css?v=20261012-api">
 </head><body><a class="skip" href="#main">Skip to content</a><div class="docs-shell">
 <header class="masthead"><a href="/" aria-label="Stow home"><img src="/assets/wordmark.svg" alt="Stow S3" width="186" height="28"></a><nav aria-label="Primary"><a href="/">Overview</a><a href="/docs/" aria-current="page">Docs</a><a href="${repository}">GitHub</a></nav></header>
 <div class="docs-layout"><aside class="docs-sidebar"><details open><summary>Documentation</summary><nav aria-label="Documentation">${navigation(page, manifest)}</nav></details></aside>

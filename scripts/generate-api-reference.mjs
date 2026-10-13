@@ -10,7 +10,7 @@ process.chdir(root);
 const tableCell = (text) => String(text ?? "").replaceAll("|", "\\|").replaceAll("\n", " ");
 const slug = (name) => name.toLowerCase().replaceAll(/[^\p{L}\p{N}_\s-]/gu, "").replaceAll(/\s/g, "-");
 const code = (language, text) => `\n\`\`\`${language}\n${text.trim()}\n\`\`\`\n`;
-const parameterMeaning = (p) => p.name === "metadata" && p.type === "string" ? "Serialized binary-bridge request or response metadata." : fieldNotes[p.name] ?? "";
+const parameterMeaning = (p) => p.name === "metadata" && p.type === "string" ? "Serialized binary-bridge request or response metadata." : fieldNotes[p.name] ?? fieldNotes[p.name.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())] ?? "";
 const methods = {
   ReadForSave: "Read bytes and metadata with an opaque condition, including observed absence. The condition grants no permission.",
   SaveObject: "Compare the observation at publication. Inspect Outcome even when an error is returned. Qualified filesystem stores retain keyed receipts.",

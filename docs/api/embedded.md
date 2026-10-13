@@ -132,7 +132,7 @@ interface EmbeddedBucket {
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | No |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
 | `creationDate` | `string \| undefined` | Yes |  |
 
 ## EmbeddedCapabilities
@@ -326,7 +326,7 @@ open(host: EmbeddedHost, options?: EmbeddedStowOptions): EmbeddedStow
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `host` | `EmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `EmbeddedStowOptions` | No | {} |  |
+| `options` | `EmbeddedStowOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `EmbeddedStow`.
 
@@ -401,7 +401,7 @@ putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, option
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `EmbeddedPutOptions` | No | {} |  |
+| `options` | `EmbeddedPutOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `EmbeddedObject`.
 
@@ -446,7 +446,7 @@ listObjects(bucket: string, options?: EmbeddedListOptions): EmbeddedObjectPage
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
-| `options` | `EmbeddedListOptions` | No | {} |  |
+| `options` | `EmbeddedListOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `EmbeddedObjectPage`.
 
@@ -475,10 +475,10 @@ copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, d
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `sourceBucket` | `string` | Yes | — |  |
-| `sourceKey` | `string` | Yes | — |  |
-| `destinationBucket` | `string` | Yes | — |  |
-| `destinationKey` | `string` | Yes | — |  |
+| `sourceBucket` | `string` | Yes | — | Bucket containing the source object. |
+| `sourceKey` | `string` | Yes | — | Source object key. |
+| `destinationBucket` | `string` | Yes | — | Bucket that receives the copy. |
+| `destinationKey` | `string` | Yes | — | Object key that receives the copy. |
 
 Returns: `EmbeddedObject`.
 
@@ -516,10 +516,10 @@ class EmbeddedStowError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `string` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### EmbeddedStowError.constructor
 
@@ -532,7 +532,7 @@ constructor(code: string, message: string)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `string` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `string` | Yes | — |  |
+| `message` | `string` | Yes | — | Human-readable error message. |
 
 Returns: `EmbeddedStowError`.
 

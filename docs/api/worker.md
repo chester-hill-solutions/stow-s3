@@ -74,7 +74,7 @@ callBinary(metadata: string, data?: Uint8Array<ArrayBufferLike> | undefined, opt
 | --- | --- | --- | --- | --- |
 | `metadata` | `string` | Yes | — | Serialized binary-bridge request or response metadata. |
 | `data` | `Uint8Array<ArrayBufferLike> \| undefined` | No | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `WorkerCallOptions \| undefined` | No | — |  |
+| `options` | `WorkerCallOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedBinaryResponse>`.
 
@@ -124,7 +124,7 @@ open(host: AsyncEmbeddedHost, options?: EmbeddedStowOptions): Promise<AsyncEmbed
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `host` | `AsyncEmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `EmbeddedStowOptions` | No | {} |  |
+| `options` | `EmbeddedStowOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<AsyncEmbeddedStow>`.
 
@@ -139,7 +139,7 @@ openPersistent(host: AsyncEmbeddedHost, options: PersistentAsyncEmbeddedOptions)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `host` | `AsyncEmbeddedHost` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `PersistentAsyncEmbeddedOptions` | Yes | — |  |
+| `options` | `PersistentAsyncEmbeddedOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<AsyncEmbeddedStow>`.
 
@@ -213,7 +213,7 @@ usage(options?: WorkerCallOptions | undefined): Promise<EmbeddedUsage>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `WorkerCallOptions \| undefined` | No | — |  |
+| `options` | `WorkerCallOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedUsage>`.
 
@@ -293,7 +293,7 @@ putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, option
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `EmbeddedPutOptions` | No | {} |  |
+| `options` | `EmbeddedPutOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 | `call` | `WorkerCallOptions \| undefined` | No | — |  |
 
 Returns: `Promise<EmbeddedObject>`.
@@ -310,7 +310,7 @@ getObject(bucket: string, key: string, options?: WorkerCallOptions | undefined):
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
-| `options` | `WorkerCallOptions \| undefined` | No | — |  |
+| `options` | `WorkerCallOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObject>`.
 
@@ -327,7 +327,7 @@ getObjectRange(bucket: string, key: string, range: { offset: number; length: num
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `range` | `{ offset: number; length: number; }` | Yes | — |  |
-| `options` | `WorkerCallOptions \| undefined` | No | — |  |
+| `options` | `WorkerCallOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObject>`.
 
@@ -344,7 +344,7 @@ putObjectStream(bucket: string, key: string, source: Uint8Array<ArrayBufferLike>
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `source` | `Uint8Array<ArrayBufferLike> \| AsyncIterable<Uint8Array<ArrayBufferLike>>` | Yes | — | Complete bytes or an asynchronous sequence of bounded byte chunks. |
-| `options` | `EmbeddedStreamPutOptions` | Yes | — |  |
+| `options` | `EmbeddedStreamPutOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObject>`.
 
@@ -360,7 +360,7 @@ getObjectStream(bucket: string, key: string, options?: { signal?: AbortSignal | 
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
-| `options` | `{ signal?: AbortSignal \| undefined; }` | No | {} |  |
+| `options` | `{ signal?: AbortSignal \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObjectStream>`.
 
@@ -404,10 +404,10 @@ copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, d
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `sourceBucket` | `string` | Yes | — |  |
-| `sourceKey` | `string` | Yes | — |  |
-| `destinationBucket` | `string` | Yes | — |  |
-| `destinationKey` | `string` | Yes | — |  |
+| `sourceBucket` | `string` | Yes | — | Bucket containing the source object. |
+| `sourceKey` | `string` | Yes | — | Source object key. |
+| `destinationBucket` | `string` | Yes | — | Bucket that receives the copy. |
+| `destinationKey` | `string` | Yes | — | Object key that receives the copy. |
 
 Returns: `Promise<EmbeddedObject>`.
 
@@ -589,7 +589,7 @@ serveEmbeddedWorker(endpoint: WorkerEndpoint, host: Promise<EmbeddedHost | Async
 | --- | --- | --- | --- | --- |
 | `endpoint` | `WorkerEndpoint` | Yes | — | S3 service URL, including scheme and port. |
 | `host` | `Promise<EmbeddedHost \| AsyncEmbeddedHost>` | Yes | — | Bind address; native default is 127.0.0.1. |
-| `options` | `WorkerHostOptions` | No | {} |  |
+| `options` | `WorkerHostOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `() => void`.
 
@@ -632,7 +632,7 @@ constructor(endpoint: WorkerEndpoint, options?: WorkerHostOptions)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `endpoint` | `WorkerEndpoint` | Yes | — | S3 service URL, including scheme and port. |
-| `options` | `WorkerHostOptions` | No | {} |  |
+| `options` | `WorkerHostOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `WorkerEmbeddedHost`.
 
@@ -648,7 +648,7 @@ callBinary(metadata: string, data?: Uint8Array<ArrayBufferLike> | undefined, opt
 | --- | --- | --- | --- | --- |
 | `metadata` | `string` | Yes | — | Serialized binary-bridge request or response metadata. |
 | `data` | `Uint8Array<ArrayBufferLike> \| undefined` | No | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `WorkerCallOptions` | No | {} |  |
+| `options` | `WorkerCallOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedBinaryResponse>`.
 
@@ -684,7 +684,7 @@ postMessage(message: unknown, transfer?: Transferable[] | undefined): void
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `message` | `unknown` | Yes | — |  |
+| `message` | `unknown` | Yes | — | Human-readable error message. |
 | `transfer` | `Transferable[] \| undefined` | No | — | Detach the whole input ArrayBuffer instead of copying; defaults to false. |
 
 Returns: `void`.

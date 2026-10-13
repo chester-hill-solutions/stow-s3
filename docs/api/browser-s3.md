@@ -108,6 +108,6 @@ putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, option
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
 | `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
-| `options` | `SyncRemoteWrite` | Yes | — |  |
+| `options` | `SyncRemoteWrite` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<{ etag: string; }>`.

@@ -89,7 +89,7 @@ open(store: ContentStore, options: BrowserProjectOptions): Promise<BrowserProjec
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `store` | `ContentStore` | Yes | — | Open underlying object or content store supplied by the application. |
-| `options` | `BrowserProjectOptions` | Yes | — |  |
+| `options` | `BrowserProjectOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<BrowserProject>`.
 
@@ -123,8 +123,8 @@ commit(changes: ProjectChange[], options?: ProjectCommitOptions): Promise<Projec
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `changes` | `ProjectChange[]` | Yes | — |  |
-| `options` | `ProjectCommitOptions` | No | {} |  |
+| `changes` | `ProjectChange[]` | Yes | — | File puts, deletes and fixed-length range replacements to publish together. |
+| `options` | `ProjectCommitOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ProjectStatus>`.
 
@@ -153,8 +153,8 @@ readRange(key: string, start: number, end: number): Promise<Uint8Array<ArrayBuff
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
-| `start` | `number` | Yes | — |  |
-| `end` | `number` | Yes | — |  |
+| `start` | `number` | Yes | — | Inclusive zero-based byte offset. |
+| `end` | `number` | Yes | — | Exclusive byte offset. |
 
 Returns: `Promise<Uint8Array<ArrayBufferLike>>`.
 
@@ -169,7 +169,7 @@ stream(key: string, options?: { signal?: AbortSignal | undefined; }): AsyncItera
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
-| `options` | `{ signal?: AbortSignal \| undefined; }` | No | {} |  |
+| `options` | `{ signal?: AbortSignal \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `AsyncIterable<Uint8Array<ArrayBufferLike>>`.
 
@@ -203,7 +203,7 @@ checkout(revisionId: string): Promise<ProjectStatus>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `revisionId` | `string` | Yes | — |  |
+| `revisionId` | `string` | Yes | — | Identity of a retained project revision to select. |
 
 Returns: `Promise<ProjectStatus>`.
 
@@ -217,7 +217,7 @@ migrationProgress(token: string): Promise<string | undefined>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `token` | `string` | Yes | — |  |
+| `token` | `string` | Yes | — | Opaque identity returned by the corresponding observation or migration operation. |
 
 Returns: `Promise<string | undefined>`.
 
@@ -312,7 +312,7 @@ getHead(name: string): Promise<ContentHead>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 
 Returns: `Promise<ContentHead>`.
 
@@ -340,7 +340,7 @@ listRecords(options?: { after?: string | undefined; limit?: number | undefined; 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ after?: string \| undefined; limit?: number \| undefined; } \| undefined` | No | — |  |
+| `options` | `{ after?: string \| undefined; limit?: number \| undefined; } \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ContentPage>`.
 
@@ -422,9 +422,9 @@ protect(name: string, recordIds: string[], options?: { lifetime?: "handle" | "du
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 | `recordIds` | `string[]` | Yes | — | Records protected from garbage collection. |
-| `options` | `{ lifetime?: "handle" \| "durable" \| undefined; } \| undefined` | No | — |  |
+| `options` | `{ lifetime?: "handle" \| "durable" \| undefined; } \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<void>`.
 
@@ -448,7 +448,7 @@ collect(options?: { retainRecordIds?: string[] | undefined; } | undefined): Prom
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ retainRecordIds?: string[] \| undefined; } \| undefined` | No | — |  |
+| `options` | `{ retainRecordIds?: string[] \| undefined; } \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ContentUsage>`.
 
@@ -502,7 +502,7 @@ interface ContentHead {
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | No |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
 | `generation` | `number` | No | Committed storage generation used to detect stale publication. |
 | `recordId` | `string \| null` | No | Immutable record selected by a head; null means no selected record. |
 
@@ -535,7 +535,7 @@ constructor(store: ContentStore, options?: { name?: string | undefined; maxStrea
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `store` | `ContentStore` | Yes | — | Open underlying object or content store supplied by the application. |
-| `options` | `{ name?: string \| undefined; maxStreams?: number \| undefined; }` | No | {} |  |
+| `options` | `{ name?: string \| undefined; maxStreams?: number \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `ContentObjectHost`.
 
@@ -598,7 +598,7 @@ interface ContentProtection {
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | No |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
 | `recordIds` | `string[]` | No | Records protected from garbage collection. |
 | `lifetime` | `"handle" \| "durable"` | No | Protection lifetime: handle-bound or durable across reopen. |
 
@@ -706,7 +706,7 @@ constructor(adapter: ContentAdapter, options?: ContentStoreOptions)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `adapter` | `ContentAdapter` | Yes | — | Content persistence adapter; its namespace must be open before operations. |
-| `options` | `ContentStoreOptions` | No | {} |  |
+| `options` | `ContentStoreOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `ContentStore`.
 
@@ -721,7 +721,7 @@ stage(input: Uint8Array<ArrayBufferLike> | AsyncIterable<Uint8Array<ArrayBufferL
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `input` | `Uint8Array<ArrayBufferLike> \| AsyncIterable<Uint8Array<ArrayBufferLike>>` | Yes | — |  |
-| `options` | `ContentStageOptions` | No | {} |  |
+| `options` | `ContentStageOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<StagedContent>`.
 
@@ -736,7 +736,7 @@ stream(content: ContentReference, options?: { start?: number | undefined; end?: 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `content` | `ContentReference` | Yes | — | Immutable content reference for this file or staged result. |
-| `options` | `{ start?: number \| undefined; end?: number \| undefined; signal?: AbortSignal \| undefined; }` | No | {} |  |
+| `options` | `{ start?: number \| undefined; end?: number \| undefined; signal?: AbortSignal \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `AsyncIterable<Uint8Array<ArrayBufferLike>>`.
 
@@ -751,8 +751,8 @@ readRange(content: ContentReference, start?: number, end?: number): Promise<Uint
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `content` | `ContentReference` | Yes | — | Immutable content reference for this file or staged result. |
-| `start` | `number` | No | 0 |  |
-| `end` | `number` | No | content.size |  |
+| `start` | `number` | No | 0 | Inclusive zero-based byte offset. |
+| `end` | `number` | No | content.size | Exclusive byte offset. |
 
 Returns: `Promise<Uint8Array<ArrayBufferLike>>`.
 
@@ -848,7 +848,7 @@ constructor(options?: IndexedDbContentOptions)
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `IndexedDbContentOptions` | No | {} |  |
+| `options` | `IndexedDbContentOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `IndexedDbContentAdapter`.
 
@@ -876,7 +876,7 @@ getHead(name: string): Promise<ContentHead>
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 
 Returns: `Promise<ContentHead>`.
 
@@ -904,7 +904,7 @@ listRecords(options?: { after?: string | undefined; limit?: number | undefined; 
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ after?: string \| undefined; limit?: number \| undefined; }` | No | {} |  |
+| `options` | `{ after?: string \| undefined; limit?: number \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ContentPage>`.
 
@@ -996,9 +996,9 @@ protect(name: string, recordIds: string[], options?: { lifetime?: "handle" | "du
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `name` | `string` | Yes | — |  |
+| `name` | `string` | Yes | — | Name identifying this bucket, head, protection or error class. |
 | `recordIds` | `string[]` | Yes | — | Records protected from garbage collection. |
-| `options` | `{ lifetime?: "handle" \| "durable" \| undefined; }` | No | {} |  |
+| `options` | `{ lifetime?: "handle" \| "durable" \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<void>`.
 
@@ -1012,7 +1012,7 @@ collect(options?: { retainRecordIds?: string[] | undefined; }): Promise<ContentU
 
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| `options` | `{ retainRecordIds?: string[] \| undefined; }` | No | {} |  |
+| `options` | `{ retainRecordIds?: string[] \| undefined; }` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<ContentUsage>`.
 
@@ -1125,10 +1125,10 @@ class ProjectError  extends Error {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `code` | `ProjectErrorCode` | No | Structured error code; inspect the code rather than matching message text. |
-| `name` | `string` | No |  |
-| `message` | `string` | No |  |
-| `stack` | `string \| undefined` | Yes |  |
-| `cause` | `unknown` | Yes |  |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
 
 ### ProjectError.constructor
 
@@ -1141,7 +1141,7 @@ constructor(code: ProjectErrorCode, message: string)
 | Parameter | Type | Required | Default | Meaning |
 | --- | --- | --- | --- | --- |
 | `code` | `ProjectErrorCode` | Yes | — | Structured error code; inspect the code rather than matching message text. |
-| `message` | `string` | Yes | — |  |
+| `message` | `string` | Yes | — | Human-readable error message. |
 
 Returns: `ProjectError`.
 
