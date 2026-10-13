@@ -1,7 +1,7 @@
 ---
----
 status: accepted
-decision_digest: 9232fb24252fbd75
+amended: 2026-10-12
+decision_digest: 2cf8847363076fe3
 ---
 
 # Agent session contract
@@ -17,11 +17,11 @@ the S3 session profile, not for the product default.
 This ADR records the contract that the TypeScript and Python session APIs
 implement. It exists so that the two language packages cannot drift apart while
 the agent-facing surface is built, and so that the decisions made in
-`docs/agent-dx-plan.md` phase 0 are written down rather than re-argued per
+`docs/history/plans/agent-dx-plan.md` phase 0 are written down rather than re-argued per
 implementation.
 
 Measurements referenced here are from `docs/benchmarks/session-baseline.md`.
-Distribution measurements are from `docs/distribution-spike.md`.
+Distribution measurements are from `docs/history/experiments/distribution-spike.md`.
 
 ## Context
 
@@ -179,4 +179,5 @@ Recorded as explicit non-goals, not oversights:
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+
+- 2026-10-12: Update links after retiring old work orders into the history directory. The decision is unchanged.

@@ -196,5 +196,5 @@ an agent running as the same user can still access other paths and network
 resources allowed to that process. Limits are checked during preparation and
 through Stow's object API, but ordinary file writes made directly by the agent
 are not hard-enforced by the runtime. The exploratory
-[Agent Isolate proposal](agent-isolate-exploration.md) describes the additional
+[Agent Isolate proposal](history/plans/agent-isolate-exploration.md) describes the additional
 execution boundary and supervision this would require.

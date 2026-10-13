@@ -1,5 +1,4 @@
 ---
----
 status: accepted
 decision_digest: b69df69577387f6f
 ---

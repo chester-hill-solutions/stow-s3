@@ -4,6 +4,12 @@ TypeScript client for the [stow](https://github.com/chester-hill-solutions/stow-
 
 ## Install
 
+This checkout is the unpublished 0.3.0 development candidate. Build from the
+repository with `make build build-wasm`, then
+`npm ci --ignore-scripts --omit=optional --prefix packages/stow-s3` and
+`npm run build --prefix packages/stow-s3`. The registry instructions below apply
+to published versions and do not certify this candidate's availability.
+
 This package is hosted on GitHub Packages. That registry requires authentication
 for npm packages, including public ones. Configure the scope in your project
 `.npmrc`:
@@ -128,7 +134,7 @@ const summary = await withStow(async (session) => {
 
 - The native binary is installed automatically as a platform optional package, so
   a plain `npm install` works with no `PATH` setup. Measured in
-  [`docs/distribution-spike.md`](../../docs/distribution-spike.md).
+  [`docs/history/experiments/distribution-spike.md`](../../docs/history/experiments/distribution-spike.md).
 - `STOW_*`, `S3_*`, and `AWS_*` are stripped from the child environment, so
   ambient cloud configuration cannot turn a local session into a run-through one.
 - Defaults are 16 MiB and 1,000 objects, sized from the measured memory profile in

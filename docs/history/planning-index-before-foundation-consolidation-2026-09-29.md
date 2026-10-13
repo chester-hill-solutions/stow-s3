@@ -13,12 +13,12 @@ no release has been certified.
 
 1. [Canonical storage plan](../plan.md): the only engineering scope/order/status queue,
    with stable S0–S4 item IDs and the current release acceptance checklist.
-2. [Product milestone](../portable-agent-workspace-goal.md): workflow and adoption criteria.
-3. [MCP/OpenCode integration](../mcp-storage-integration-plan.md): S3 technical detail.
+2. [Product milestone](plans/portable-agent-workspace-goal.md): workflow and adoption criteria.
+3. [MCP/OpenCode integration](plans/mcp-storage-integration-plan.md): S3 technical detail.
 4. [Portable workspace usage](../portable-workspace-usage.md): concrete development API and examples.
 5. [Implementation evidence](../implementation-2026-09-29.md): checks, costs and open gates.
 6. [ADR index](../adr/README.md): decisions in force, especially ADR 0014's storage boundary.
-7. [Realtime multiplayer experiment](../realtime-multiplayer-plan.md): proposed caller-layer
+7. [Realtime multiplayer experiment](collaboration/realtime-multiplayer-plan.md): proposed caller-layer
    historical RT handover; active collaboration scope/status moved to its standalone repository.
 
 The milestone and MCP document expand the canonical plan; they do not schedule
@@ -33,39 +33,39 @@ authority are frozen historical text. Follow the destination below instead.
 | [implementation-2026-09-29.md](../implementation-2026-09-29.md) | **Implementation evidence.** Local tests, performance and remaining release/pilot gates. |
 | [compatibility-coverage-2026-09-29.md](../compatibility-coverage-2026-09-29.md) | **Coverage map.** Shared SDK and focused protocol scenarios with explicit unsupported boundaries. |
 | [plan.md](../plan.md) | **Active work order.** S0 correctness, S1 coherent storage, S2 delivery, S3 MCP/OpenCode, S4 evidence. |
-| [portable-agent-workspace-goal.md](../portable-agent-workspace-goal.md) | **Active milestone.** Storage workflow and repeat-use decision. |
-| [mcp-storage-integration-plan.md](../mcp-storage-integration-plan.md) | **Active detail.** Expands S3, including separate workspace, selected context and bounded retry/failure. |
+| [portable-agent-workspace-goal.md](plans/portable-agent-workspace-goal.md) | **Active milestone.** Storage workflow and repeat-use decision. |
+| [mcp-storage-integration-plan.md](plans/mcp-storage-integration-plan.md) | **Active detail.** Expands S3, including separate workspace, selected context and bounded retry/failure. |
 | [resumable-transfer-plan.md](../resumable-transfer-plan.md) | **Proposed validation detail.** Expands S0-4/S1-5/S4-1 with multipart upload/range download continuation and a consumer pilot; new code depends on reproduced gaps. |
 | [portable-recovery-plan.md](../portable-recovery-plan.md) | **Accepted direction; proposed contract.** S1-9 extends saved data with selected transfer progress and pending storage/notification operations, destination authorization and explicit activation. Confirmed takeover is the default for external operations; the confirmation mechanism remains open. Current checkpoint adoption does not carry these operations. |
 | [guarded-storage-plan.md](../guarded-storage-plan.md) | **In progress.** S1-10's public Go/WASM/TypeScript conditional-write prerequisite is implemented locally with explicit support and typed refusal. Guarded read/edit/save defaults and declared-input ready-publication checks remain proposed. Legacy/S3 behavior and caller filesystem coordination stay explicit. |
-| [foundation-review-2026-09-29.md](../foundation-review-2026-09-29.md) | **Review record.** Consolidates accepted extension dependencies, delegated engineering defaults and qualification gaps across working storage. Canonical IDs retain scheduling authority; no additional user decision is pending. |
+| [foundation-review-2026-09-29.md](plans/foundation-review-2026-09-29.md) | **Review record.** Consolidates accepted extension dependencies, delegated engineering defaults and qualification gaps across working storage. Canonical IDs retain scheduling authority; no additional user decision is pending. |
 | [workspace-notifications-plan.md](../workspace-notifications-plan.md) | **Active implementation detail.** Accepted core capability under ADR 0015; automatic file change detection first, parent-path subscriptions, durable delivery, optional signed webhooks and complementary explicit reports in S1-6. Same-workspace restart first; notification portability is a separate follow-up. |
 | [protected-cache-plan.md](../protected-cache-plan.md) | **Active implementation detail.** Accepted ACL/encryption direction under ADR 0016; scoped access in S1-7, encrypted persistence in S1-8 and native/Workers/Railway evidence in S4-4. Proposed contracts; no implementation/deployment certification. |
-| [task-resumability-plan.md](../task-resumability-plan.md) | **Superseded interpretation.** Agent-task proposal retained as history after the user clarified upload/download resumability; no independent work queue. |
+| [task-resumability-plan.md](plans/task-resumability-plan.md) | **Superseded interpretation.** Agent-task proposal retained as history after the user clarified upload/download resumability; no independent work queue. |
 | [storage-portability-design.md](../storage-portability-design.md) | **Design rationale.** Expands S0-7/S1; concrete implemented APIs and limits are in portable-workspace-usage.md. |
-| [pre-code-discovery-2026-09-29.md](../pre-code-discovery-2026-09-29.md) | **Discovery/handover record.** Verified source observations, proposed choices and slices mapped to canonical IDs; new findings require runtime regressions. |
-| [storage-plan-alignment-2026-09-29.md](../storage-plan-alignment-2026-09-29.md) | **Review record.** Explains consolidation and engineering handover; use plan IDs for status. |
-| [realtime-multiplayer-plan.md](../realtime-multiplayer-plan.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
-| [realtime-multiplayer-engineering.md](../realtime-multiplayer-engineering.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
-| [realtime-multiplayer-plan-review.md](../realtime-multiplayer-plan-review.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
-| [realtime-repository-boundary.md](../realtime-repository-boundary.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
-| [realtime-collaboration-evaluation.md](../realtime-collaboration-evaluation.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
-| [remediation-plan.md](../remediation-plan.md) | **Superseded.** R0–R11 sequence/version targets retired; contract acceptance and release requirements carried to S0 and S2. |
-| [agent-dx-plan.md](../agent-dx-plan.md) | **Superseded.** Revision backlogs, timings and sketches preserved as history; remaining storage/distribution work mapped below. |
-| [agentic-dx-10-plan.md](../agentic-dx-10-plan.md) | **Superseded.** Old version ladder, storage rewrite and broad integration commitments retired. |
-| [agent-workspace-plan.md](../agent-workspace-plan.md) | **Superseded.** Preparation/capture implementation record retained; residuals in S0–S4. |
-| [deploy-anywhere-plan.md](../deploy-anywhere-plan.md) | **Superseded.** Measurements retained; runtime/cache/persistence expansion conditional below. MCP now explicitly scheduled in S3. |
-| [foss-readiness-plan.md](../foss-readiness-plan.md) | **Superseded.** Completed contribution work retained; release/docs/maintenance residuals in S0/S2. |
-| [architecture/stow-environment.md](../architecture/stow-environment.md) | **Superseded proposal.** Reuse/composition rationale preserved. ADRs and implemented contracts govern; its roadmap has no authority. |
-| [architecture/environment-implementation.md](../architecture/environment-implementation.md) | **Superseded work order.** Completed requirements and stale intermediate tables retained as history; unapproved authority redesign deferred. |
-| [work-session-plan.md](../work-session-plan.md) | **Retired execution proposal.** E0 storage work carried forward; E1–E5 deferred under ADR 0014. |
-| [agent-isolate-exploration.md](../agent-isolate-exploration.md) | **Retired exploration.** No sandbox or runner commitment. Requires an explicit scope decision to reactivate. |
-| [driver-facade-plan-status.md](../driver-facade-plan-status.md) | **Retired design record.** Custom S3 client remains rejected; surviving corpus work in S0-4. |
+| [pre-code-discovery-2026-09-29.md](plans/pre-code-discovery-2026-09-29.md) | **Discovery/handover record.** Verified source observations, proposed choices and slices mapped to canonical IDs; new findings require runtime regressions. |
+| [storage-plan-alignment-2026-09-29.md](plans/storage-plan-alignment-2026-09-29.md) | **Review record.** Explains consolidation and engineering handover; use plan IDs for status. |
+| [realtime-multiplayer-plan.md](collaboration/realtime-multiplayer-plan.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
+| [realtime-multiplayer-engineering.md](collaboration/realtime-multiplayer-engineering.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
+| [realtime-multiplayer-plan-review.md](collaboration/realtime-multiplayer-plan-review.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
+| [realtime-repository-boundary.md](collaboration/realtime-repository-boundary.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
+| [realtime-collaboration-evaluation.md](collaboration/realtime-collaboration-evaluation.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
+| [remediation-plan.md](plans/remediation-plan.md) | **Superseded.** R0–R11 sequence/version targets retired; contract acceptance and release requirements carried to S0 and S2. |
+| [agent-dx-plan.md](plans/agent-dx-plan.md) | **Superseded.** Revision backlogs, timings and sketches preserved as history; remaining storage/distribution work mapped below. |
+| [agentic-dx-10-plan.md](plans/agentic-dx-10-plan.md) | **Superseded.** Old version ladder, storage rewrite and broad integration commitments retired. |
+| [agent-workspace-plan.md](plans/agent-workspace-plan.md) | **Superseded.** Preparation/capture implementation record retained; residuals in S0–S4. |
+| [deploy-anywhere-plan.md](plans/deploy-anywhere-plan.md) | **Superseded.** Measurements retained; runtime/cache/persistence expansion conditional below. MCP now explicitly scheduled in S3. |
+| [foss-readiness-plan.md](plans/foss-readiness-plan.md) | **Superseded.** Completed contribution work retained; release/docs/maintenance residuals in S0/S2. |
+| [architecture/stow-environment.md](architecture/stow-environment.md) | **Superseded proposal.** Reuse/composition rationale preserved. ADRs and implemented contracts govern; its roadmap has no authority. |
+| [architecture/environment-implementation.md](architecture/environment-implementation.md) | **Superseded work order.** Completed requirements and stale intermediate tables retained as history; unapproved authority redesign deferred. |
+| [work-session-plan.md](plans/work-session-plan.md) | **Retired execution proposal.** E0 storage work carried forward; E1–E5 deferred under ADR 0014. |
+| [agent-isolate-exploration.md](plans/agent-isolate-exploration.md) | **Retired exploration.** No sandbox or runner commitment. Requires an explicit scope decision to reactivate. |
+| [driver-facade-plan-status.md](plans/driver-facade-plan-status.md) | **Retired design record.** Custom S3 client remains rejected; surviving corpus work in S0-4. |
 | [history/plan-through-2026-09-28.md](plan-through-2026-09-28.md) | **Historical snapshot.** Superseded queue; measurements and implementation evidence retained. |
-| [handoff-2026-09-27.md](../handoff-2026-09-27.md) | **Obsolete handoff.** Never use it as instructions to resume current work. |
-| [distribution-spike.md](../distribution-spike.md) | **Historical experiment.** Packaging feasibility and old failures retained; current delivery work S2. |
-| [assessment-2026-09-27.md](../assessment-2026-09-27.md) | **Historical assessment.** Includes subsequent repair record; findings are not automatically reopened. |
-| [agent-workspace-pilot.md](../agent-workspace-pilot.md) | **Historical local pilot.** Remaining clean-install/cross-host/real-user proof lives in S2–S4. |
+| [handoff-2026-09-27.md](experiments/handoff-2026-09-27.md) | **Obsolete handoff.** Never use it as instructions to resume current work. |
+| [distribution-spike.md](experiments/distribution-spike.md) | **Historical experiment.** Packaging feasibility and old failures retained; current delivery work S2. |
+| [assessment-2026-09-27.md](experiments/assessment-2026-09-27.md) | **Historical assessment.** Includes subsequent repair record; findings are not automatically reopened. |
+| [agent-workspace-pilot.md](experiments/agent-workspace-pilot.md) | **Historical local pilot.** Remaining clean-install/cross-host/real-user proof lives in S2–S4. |
 | [competitive-landscape.md](../competitive-landscape.md) | **Dated research.** Recommendations do not schedule work; refresh material claims for S4 decisions. |
 | [product-assessment-2026-09-29.md](../product-assessment-2026-09-29.md) | **Dated assessment.** Current baseline evidence and limitations; actions owned by S0–S4. |
 | [agent-continuity-pilot-2026-09-29.md](../agent-continuity-pilot-2026-09-29.md) | **Dated experiment.** Synthetic same-host continuity, not real-agent or cross-host proof. |

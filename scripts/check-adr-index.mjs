@@ -1,21 +1,5 @@
-// ADR index and lifecycle gate.
-//
-// An ADR is a sprint artifact: it records a decision taken at a time, and decisions
-// get revised. Two things then go wrong, and both have happened here.
-//
-// The first is that a decision is revised and the ADR that recorded it is not. ADR
-// 0011 superseded ADR 0001 in full, and ADR 0001's own frontmatter still read
-// `status: accepted` with no mention of it — so a reader who opened 0001 had no way
-// to know it was no longer in force. The supersession was discoverable only by
-// reading 0011.
-//
-// The second is that an ADR which has been amended is indistinguishable from one that
-// has never been touched. Thirteen files all reading `status: accepted` tells a reader
-// nothing about which decisions survived contact with implementation.
-//
-// This gate makes the index the single place a reader looks, and it makes the two
-// drift cases fail. It does not prevent an ADR from being edited — that is the point
-// of a sprint artifact — it requires the edit to be recorded.
+// Validate active decision metadata, index status and retirement relationships.
+// Removed records retain immutable Git sources in the retirement register.
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve, basename } from "node:path";
@@ -29,16 +13,14 @@ const indexPath = resolve(adrDir, "README.md");
 // is a status that does not carry information.
 const STATUSES = new Set(["accepted", "narrowed", "superseded", "proposed", "rejected"]);
 
-// A status that is not in force still has a reason to exist on disk, and the reason is
-// the reasoning. A superseded ADR is not deleted; it is filed with a pointer to what
-// replaced it, so the reasoning behind a decision nobody would make today is still
-// reachable.
+// Accepted and narrowed decisions govern the current design.
 const IN_FORCE = new Set(["accepted", "narrowed"]);
+const retiredPath = resolve(adrDir, "retired.json");
 
 export function parseAdr(text, file) {
   const frontmatter = {};
   if (text.startsWith("---\n")) {
-    const end = text.indexOf("\n---\n", 4);
+    const end = text.indexOf("\n---\n", 3);
     if (end === -1) {
       return { file, error: "the frontmatter block is opened with --- and never closed" };
     }
@@ -71,7 +53,7 @@ export function parseAdr(text, file) {
 // including them would make the digest change on every amendment even when the
 // decision itself did not — which is the distinction the digest exists to draw.
 function decisionText(text) {
-  const body = text.startsWith("---\n") ? text.slice(text.indexOf("\n---\n", 4) + 5) : text;
+  const body = text.startsWith("---\n") ? text.slice(text.indexOf("\n---\n", 3) + 5) : text;
   return body.split(/^##\s+Amendments\s*$/m)[0].trim();
 }
 
@@ -93,9 +75,29 @@ function adrsOf() {
     .map((name) => parseAdr(readFileSync(resolve(adrDir, name), "utf8"), name));
 }
 
-export function adrProblems(adrs, indexText) {
+export function adrProblems(adrs, indexText, retired = []) {
   const problems = [];
   const byId = new Map(adrs.map((adr) => [adr.id, adr]));
+  const retiredById = new Map(retired.map((entry) => [entry.id, entry]));
+  if (retiredById.size !== retired.length) problems.push("retired.json contains duplicate decision IDs");
+  for (const entry of retired) {
+    if (!/^\d{4}$/.test(entry.id) || byId.has(entry.id)) {
+      problems.push(`retired.json: ${entry.id} must name a removed decision`);
+    }
+    const replacement = byId.get(entry.supersededBy);
+    if (!replacement || !IN_FORCE.has(replacement.status)) {
+      problems.push(`retired.json: ${entry.id} needs an in-force replacement`);
+    }
+    if (!entry.reason || !/^https:\/\/github\.com\/chester-hill-solutions\/stow-s3\/blob\/[a-f0-9]{40}\/docs\/adr\/\d{4}-[^/]+\.md$/.test(entry.source ?? "")) {
+      problems.push(`retired.json: ${entry.id} needs a reason and a Git source link`);
+    }
+    if (replacement && /^(\d{4})/.exec(replacement.supersedes ?? "")?.[1] !== entry.id) {
+      problems.push(`retired.json: ${entry.id}'s replacement must declare supersedes: ${entry.id}`);
+    }
+    if (indexText !== undefined && !indexText.includes(`| ${entry.id} |`)) {
+      problems.push(`retired decision ${entry.id} is not listed in docs/adr/README.md`);
+    }
+  }
 
   for (const adr of adrs) {
     if (adr.error) {
@@ -151,7 +153,7 @@ export function adrProblems(adrs, indexText) {
         problems.push(`${adr.file}: ${field} does not name an ADR by number`);
         continue;
       }
-      if (!byId.has(target)) {
+      if (!byId.has(target) && !(field === "supersedes" && retiredById.has(target))) {
         problems.push(`${adr.file}: ${field} names ADR ${target}, which does not exist`);
       }
     }
@@ -225,17 +227,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1);
   }
 
-  const problems = adrProblems(adrs, indexText);
-
-  // decisionText is the prose an amendment would change: the body, with the frontmatter
-// and the Amendments section removed. Those two are where a change is *recorded*, so
-// including them would make this check fail on the commit that does the recording —
-// which is the first reconciliation's whole problem, and the reason it could not
-// otherwise be landed.
-function decisionText(text) {
-  const body = text.startsWith("---\n") ? text.slice(text.indexOf("\n---\n", 4) + 5) : text;
-  return body.split(/^##\s+Amendments\s*$/m)[0].trim();
-}
+  const retired = JSON.parse(readFileSync(retiredPath, "utf8"));
+  const problems = adrProblems(adrs, indexText, retired);
 
   if (problems.length > 0) {
     console.error("ADR index and lifecycle do not agree:\n");

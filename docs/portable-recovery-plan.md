@@ -207,7 +207,7 @@ Imported delivery history is evidence, not permission to send to an old endpoint
 ## Engineering contracts to qualify
 
 These are implementation/evidence gates to resolve against the owning code paths,
-not routine approval questions for the user. The [foundation review](foundation-review-2026-09-29.md)
+not routine approval questions for the user. The [foundation review](history/plans/foundation-review-2026-09-29.md)
 sets dependency order and conservative defaults.
 
 - Evidence and mechanism for confirmed responsibility transfer, including source
