@@ -394,10 +394,13 @@ s.putObject(b, k, data)
             </div>
             <div>
               <dt>Durable upstream write outbox</dt>
-              <dd>When live writes are enabled, native run-through records propagation
-                intents in a durable outbox. It retries transient failures and reconciles
-                attempted writes after a restart.
-                <a href="https://github.com/chester-hill-solutions/stow-s3#run-through-mode-the-offline-cache">Run-through and outbox behavior</a></dd>
+              <dd>Native run-through saves locally before sending a write upstream.
+                With live writes enabled, a durable outbox preserves the exact version
+                and retries transient failures with bounded backoff. Changed remote
+                objects stop propagation and leave your local data available.
+                Recovery checks the remote ETag, content type, metadata, and requested
+                checksum before acknowledging a write whose reply was lost.
+                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/compat-contract.md#62-read-through-cache-semantics">Outbox guarantees and recovery limits</a></dd>
             </div>
           </dl>
 

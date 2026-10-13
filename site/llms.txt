@@ -13,6 +13,12 @@ prewarming, cache limits, TTL, and explicit offline operation. WASM enables
 embedding in compatible hosts; edge platform integrations need qualification.
 Stow owns storage; the host owns execution and sandbox enforcement.
 
+Native live writes commit locally before propagation through a durable outbox.
+The outbox preserves the exact version, retries transient failures with bounded
+backoff, and stops on remote conflicts or an unknown upstream baseline. Recovery
+checks the remote ETag, content type, metadata, and requested checksum before
+acknowledging an attempted write. Retry and discard require the admin token.
+
 ## Start here
 
 - [Browser file history and sync](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-file-history.md):
@@ -21,6 +27,8 @@ Stow owns storage; the host owns execution and sandbox enforcement.
   run `make browser-editor` from a built source checkout.
 - [Native read-through cache](https://github.com/chester-hill-solutions/stow-s3#run-through-mode-the-offline-cache):
   cache reads, prewarm exact keys, and work offline.
+- [Durable outbox contract](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/compat-contract.md#62-read-through-cache-semantics):
+  local-first writes, conditional propagation, retries, and crash recovery.
 
 - [Agent instructions](/agent.md): install commands, the prepared workspace
   flow for coding tasks, and the scoped-session pattern for disposable S3.

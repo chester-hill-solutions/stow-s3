@@ -49,6 +49,17 @@ keys, and serves local/cached bytes without upstream calls in explicit offline
 mode. WASM makes the object engine embeddable in compatible hosts; do not infer
 qualified edge-platform support from that portability alone.
 
+With live writes enabled, native run-through commits locally first and records
+the exact version in a durable outbox. Transient failures retry with bounded
+backoff. A changed upstream object or an unknown upstream baseline stops
+propagation; local bytes remain available, and the caller decides how to resolve
+the conflict. Recovery acknowledges an attempted write only after the remote
+ETag, content type, user metadata, and requested checksum match that version;
+an already absent object confirms a delete. Recovery can still require another
+conditional attempt, so do not assume exactly-once delivery. Outbox retry and
+discard routes require the admin token, including on loopback. See the
+[run-through contract](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/compat-contract.md#62-read-through-cache-semantics).
+
 ## Checkpoints and handoff for agent work (0.3.0 development tree)
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent
