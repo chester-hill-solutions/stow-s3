@@ -13,6 +13,7 @@ import (
 type Instance struct {
 	mu               sync.Mutex
 	store            storage.Store
+	storeEpoch       uint64
 	multipartStore   storage.MultipartStore
 	resetStore       func() (storage.Store, error)
 	options          Options
@@ -241,6 +242,7 @@ func (i *Instance) Reset(ctx context.Context) error {
 		return err
 	}
 	i.store = next
+	i.storeEpoch++
 	// Re-derived: the store just closed is the one multipartStore pointed at.
 	i.multipartStore, _ = next.(storage.MultipartStore)
 	i.usage = Usage{}

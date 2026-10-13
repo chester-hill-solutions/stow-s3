@@ -2,7 +2,7 @@
 
 **Status:** recorded
 **Date:** 2026-09-25
-**Purpose:** give the targets in `docs/agent-dx-plan.md` section 11 a measured
+**Purpose:** give the targets in `docs/history/plans/agent-dx-plan.md` section 11 a measured
 starting point, and size the default session quotas from data.
 
 Reproduce with:

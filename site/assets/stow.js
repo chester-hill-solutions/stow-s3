@@ -20,7 +20,7 @@
     button.addEventListener("click", function () {
       var text = target.textContent.trim();
       var done = function (ok) {
-        button.textContent = ok ? "Copied" : "Press " + text.length + " keys";
+        button.textContent = ok ? "Copied" : "Select & copy";
         button.setAttribute("data-copied", ok ? "1" : "0");
         clearTimeout(reset);
         reset = setTimeout(function () {

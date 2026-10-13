@@ -1,4 +1,5 @@
 export const EMBEDDED_PROTOCOL_VERSION = 1;
+export const EMBEDDED_BINARY_PROTOCOL_VERSION = 2;
 const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 export class EmbeddedStowError extends Error {
     code;
@@ -58,12 +59,12 @@ export class EmbeddedStow {
             op: "putObject",
             bucket,
             key,
-            data: bytesToBase64(data),
+            data: this.host.callBinary === undefined ? bytesToBase64(data) : undefined,
             contentType: options.contentType,
             metadata: options.metadata,
             ifMatch: options.ifMatch,
             ifNoneMatch: options.ifNoneMatch,
-        });
+        }, data);
         return fromBridgeObject(result);
     }
     getObject(bucket, key) {
@@ -106,13 +107,13 @@ export class EmbeddedStow {
         this.invoke({ op: "close" });
         this.closed = true;
     }
-    invoke(request) {
+    invoke(request, data) {
         this.ensureOpen();
         return invoke(this.host, {
             version: EMBEDDED_PROTOCOL_VERSION,
             ...request,
             handle: this.runtimeHandle,
-        });
+        }, data);
     }
     ensureOpen() {
         if (this.closed) {
@@ -120,19 +121,32 @@ export class EmbeddedStow {
         }
     }
 }
-function invoke(host, request) {
+function invoke(host, request, data) {
+    const version = host.callBinary === undefined ? EMBEDDED_PROTOCOL_VERSION : EMBEDDED_BINARY_PROTOCOL_VERSION;
     let parsed;
+    let payload;
     try {
-        parsed = JSON.parse(host.call(JSON.stringify(request)));
+        const metadata = JSON.stringify({ ...request, version });
+        if (host.callBinary === undefined) {
+            parsed = JSON.parse(host.call(metadata));
+        }
+        else {
+            const result = host.callBinary(metadata, data);
+            parsed = JSON.parse(result.metadata);
+            payload = result.data;
+        }
     }
     catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         throw new EmbeddedStowError("host_error", `embedded host call failed: ${message}`);
     }
+    return decodeEmbeddedResponse(parsed, version, payload);
+}
+export function decodeEmbeddedResponse(parsed, version, payload) {
     if (!isRecord(parsed) || typeof parsed.version !== "number" || typeof parsed.ok !== "boolean") {
         throw new EmbeddedStowError("protocol", "embedded host returned an invalid response");
     }
-    if (parsed.version !== EMBEDDED_PROTOCOL_VERSION) {
+    if (parsed.version !== version) {
         throw new EmbeddedStowError("protocol_version", `unsupported embedded protocol version ${parsed.version}`);
     }
     if (!parsed.ok) {
@@ -143,15 +157,21 @@ function invoke(host, request) {
         }
         throw new EmbeddedStowError(parsed.error.code, parsed.error.message);
     }
+    if (payload !== undefined) {
+        if (!(payload instanceof Uint8Array) || !isRecord(parsed.result)) {
+            throw new EmbeddedStowError("protocol", "embedded host returned an invalid binary payload");
+        }
+        parsed.result.data = payload;
+    }
     return parsed.result;
 }
 function isRecord(value) {
     return typeof value === "object" && value !== null;
 }
-function fromBridgeObject(object) {
+export function fromBridgeObject(object) {
     return {
         ...object,
-        data: object.data === undefined ? undefined : base64ToBytes(object.data),
+        data: typeof object.data === "string" ? base64ToBytes(object.data) : object.data,
     };
 }
 function bytesToBase64(bytes) {

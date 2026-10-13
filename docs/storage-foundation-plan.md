@@ -361,3 +361,8 @@ own repo; optional public Stow integration does not make Stow its execution owne
 7. Treat publication, deployment, provider mutations and consumer integrations as concrete
    later work with their applicable authorization/evidence. This reconciliation performs
    none of them and does not reopen settled interview choices.
+
+
+## Browser project storage extension on 2026-10-12
+
+The authorized browser remediation extends the embedded profile under [ADR 0019](adr/0019-browser-project-content.md): asynchronous host-backed objects, binary/chunk transport, lazy durable content, atomic project history and conditional manifest publication. [Usage and limits](browser-project-storage.md), [execution status](browser-project-plan.md), and [large-workload evidence](benchmarks/browser-project-2026-10-12.json) record this slice. It does not change the remaining notification, encryption or deployment qualifications in W01–W22.

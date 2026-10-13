@@ -85,7 +85,7 @@ test("the wasm runtime boots and serves operations with no Node APIs present", a
   assert.equal(result.usage.objects, 201, "expected one large object plus 200 small ones");
   assert.equal(result.usage.bytes, 1024 * 1024 + 200 * 5, "stored bytes do not match what was written");
 
-  assert.deepEqual(result.stowKeys, ["call", "exit"], "the published global changed shape");
+  assert.deepEqual(result.stowKeys, ["call", "callBinary", "callBinaryAsync", "exit", "openHost"], "the published global changed shape");
   assert.equal(result.goRunSettled.settled, true, "the runtime did not shut down when exit() was called");
 });
 

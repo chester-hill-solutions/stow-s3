@@ -1,7 +1,7 @@
 ---
 status: accepted
-amended: 2026-10-01
-decision_digest: f563828e5c06a8d6
+amended: 2026-10-12
+decision_digest: 47ef07fbfde8e975
 ---
 
 # A permission that is not checked is not a permission
@@ -240,7 +240,7 @@ decides whether the repository passes is inside the repository's own gates.
   acceptance criteria are mechanical, which is the condition that let this
   happen.
 - **The plan of record moves.** `docs/architecture/environment-plan.md` is
-  superseded by `docs/architecture/environment-implementation.md`, which absorbs
+  superseded by `docs/history/architecture/environment-implementation.md`, which absorbs
   it and adds requirement identifiers, a traceability matrix, an assumptions
   register, and a binding decision rule.
 
@@ -261,3 +261,5 @@ decides whether the repository passes is inside the repository's own gates.
   twelve recorded in the problem statement above, and three of the four ungated
   operations are now enforced; `environment.promote` remains and is unimplemented.
   Sections 1–2 and 4–6 retain their decisions. Checkpoint authorization is W04.
+
+- 2026-10-12: Update references to archived architecture proposals. The decision is unchanged.

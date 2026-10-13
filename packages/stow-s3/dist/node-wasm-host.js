@@ -16,6 +16,7 @@ export async function loadNodeWasmHost() {
     const go = new GoConstructor();
     const wasmBytes = await readFile(new URL("./stow-runtime.wasm", import.meta.url));
     const { instance } = await webAssembly.instantiate(wasmBytes, go.importObject);
+    Reflect.deleteProperty(runtimeGlobal, "stow");
     const runPromise = go.run(instance);
     for (let attempt = 0; attempt < 100 && runtimeGlobal.stow === undefined; attempt += 1) {
         await delay(1);
@@ -24,9 +25,22 @@ export async function loadNodeWasmHost() {
     if (bridge === undefined) {
         throw new Error("Stow WASM runtime did not initialize");
     }
+    const binaryCall = bridge.callBinary?.bind(bridge);
     let closed = false;
     return {
         call: (request) => bridge.call(request),
+        callBinary: binaryCall === undefined ? undefined :
+            (metadata, data = new Uint8Array()) => binaryCall(metadata, data),
+        callBinaryAsync: async (metadata, data = new Uint8Array()) => {
+            if (bridge.callBinaryAsync === undefined)
+                throw new Error("host does not support asynchronous binary calls");
+            return bridge.callBinaryAsync(metadata, data);
+        },
+        openHost: async (metadata, store) => {
+            if (bridge.openHost === undefined)
+                throw new Error("host does not support host-backed storage");
+            return bridge.openHost(metadata, store);
+        },
         close: async () => {
             if (closed) {
                 return;
@@ -34,6 +48,9 @@ export async function loadNodeWasmHost() {
             closed = true;
             bridge.exit();
             await runPromise;
+            for (const timeout of go._scheduledTimeouts.values())
+                clearTimeout(timeout);
+            go._scheduledTimeouts.clear();
         },
     };
 }

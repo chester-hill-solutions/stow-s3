@@ -5,7 +5,7 @@
 **Status:** proposed validation and consumer integration, 2026-09-29. This
 expands S0-4, S1-5 and S4-1 in the [canonical plan](plan.md). The user clarified
 that resumability means continuing interrupted file transfers. The earlier
-[task continuation plan](task-resumability-plan.md) is retained as superseded
+[task continuation plan](history/plans/task-resumability-plan.md) is retained as superseded
 conversation history and does not schedule work.
 
 The goal is to interrupt a file upload or download, restart the client, and

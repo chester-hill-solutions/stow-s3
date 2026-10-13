@@ -1,5 +1,5 @@
 import { type EmbeddedBucket, type EmbeddedCapabilities, type EmbeddedHost, type EmbeddedListOptions, type EmbeddedObject, type EmbeddedObjectPage, type EmbeddedPutOptions, type EmbeddedStowOptions, type EmbeddedUsage } from "./embedded.js";
-import { type PersistenceAdapter, type PersistentEmbeddedStowOptions } from "./browser-types.js";
+import { type BrowserObjectMutation, type PersistenceAdapter, type PersistentEmbeddedStowOptions } from "./browser-types.js";
 export declare class BrowserEmbeddedStow {
     private readonly embedded;
     private readonly adapter;
@@ -22,6 +22,8 @@ export declare class BrowserEmbeddedStow {
     headObject(bucket: string, key: string): Promise<EmbeddedObject>;
     listObjects(bucket: string, options?: EmbeddedListOptions): Promise<EmbeddedObjectPage>;
     deleteObject(bucket: string, key: string): Promise<void>;
+    /** Atomically save related objects (for example, a revision and its history record). */
+    writeBatch(mutations: BrowserObjectMutation[]): Promise<void>;
     copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, destinationKey: string): Promise<EmbeddedObject>;
     reset(): Promise<void>;
     close(): Promise<void>;

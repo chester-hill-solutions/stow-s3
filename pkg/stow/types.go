@@ -10,6 +10,7 @@ type Backend string
 const (
 	BackendMemory     Backend = "memory"
 	BackendFilesystem Backend = "filesystem"
+	BackendHost       Backend = "host"
 	// BackendWorkspace is a directory a caller is working in, whose objects are
 	// real files. It is reported by Workspace.Capabilities and is reachable only
 	// through OpenWorkspace, never through Open: a workspace needs a directory,

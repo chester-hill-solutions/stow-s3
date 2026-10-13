@@ -1,109 +1,75 @@
 # Contributing
 
-Thanks for considering it. This is a small project with one maintainer, so the
-bar for a merged change is mostly about being reviewable rather than about
-cleverness.
+Keep changes focused and reviewable. Check the issue tracker for existing work,
+and discuss substantial behavior changes before implementation. Read the
+[documentation index](docs/README.md), [domain terms](CONTEXT.md) and
+[architecture decisions](docs/adr/README.md) before changing a storage contract.
 
-## Before you start
+## Build and test
 
-- **Open an issue first for anything larger than a bug fix.** A design that
-  arrives as a patch is much harder to steer than one that arrives as a
-  question, and the reason a change looks surprising is usually a decision that
-  was made for a reason nobody wrote down.
-- **Check whether the behaviour is already specified.** `docs/adr/` records
-  decisions that were settled deliberately, sometimes at a cost. If your change
-  contradicts one, say so in the issue rather than in the diff — the ADR is
-  usually wrong in an interesting way and worth revisiting properly.
-- **Read the issue tracker before filing.** Thirty issues exist and twenty-eight
-  are closed; some of what looks new has been considered and rejected with a
-  reason.
+Go is pinned in `.go-version`; `make` selects that toolchain. Use Node 20 or newer
+for the client and site, and Python 3.10 or newer for the Python client.
 
-## Building and testing
-
-```bash
-make build            # the native binary, built the way the release builds it
-make test             # the Go suite
-make test-race        # what CI runs
-make test-conformance # the shared S3 contract, across every backend
-make test-all         # Go, conformance, TypeScript, Python, WASM
+```sh
+make build build-wasm
+make test
+make test-race
+make test-conformance
+make test-all
+make standards
 ```
 
-You need Go 1.25.6 (see `.go-version`; `make` pins it via `GOTOOLCHAIN`),
-Node 20 or newer for the TypeScript and WASM suites, and Python 3.10 or newer
-for the client suite. ESLint 10 requires Node 20.19+, 22.13+, or 24+ for
-development checks; the published client still supports Node 20 or newer.
-`make test-python` bootstraps its own virtualenv.
+`make test-all` covers the native server, shared conformance corpus, TypeScript,
+Python, WASM and caller examples. `make standards` is the required gate: it checks
+formatting, vet, race safety, quality ratchets, coverage, documented commands,
+installation claims, ADR lifecycle, documentation links, site pages and generated
+artifacts. Browser changes also need `make test-browser`; install Chromium with
+`npx playwright install chromium` in `packages/stow-s3` first.
 
-`make standards` is the gate. It is the whole check list — formatting, vet, the
-race suite, the maintainability ratchets, the coverage floor, the version and
-install-surface gates, the documentation gates, the script tests, the TypeScript
-standards, and the generated-output check. Run it before you open a pull request.
+Live Railway qualification is separate and writes only disposable test prefixes.
+Use the manual `railway-browser` workflow or the documented local runner in
+[the browser guide](docs/browser-file-history.md#repeatable-browser-and-railway-tests).
 
-One caveat, and it is the thing most likely to surprise you: the committed WASM
-artifact has to match a fresh build, and if your change reaches `pkg/stow` — which
-most Go changes do — it will not, until you regenerate and commit it. The WASM
-runtime links 14 packages of this tree, including `internal/rooted`,
-`internal/storage/workspace`, `internal/storage/fs` and `internal/capacity`, so
-almost any Go change moves that binary.
+## Generated output
 
-`make check-generated` is what tells you, and it runs as part of `make standards`.
-It compares the committed `packages/stow-s3/dist` against a fresh build of the
-tree, so a stale artifact fails locally, on CI, and in the release job. The build
-is byte-reproducible across hosts — the same Go version and the same
-`make build-wasm` produce the same bytes on macOS and on Linux — so a macOS
-checkout can regenerate and commit the artifact, and there is no platform rule to
-remember.
+The TypeScript package's `dist` directory and bundled WASM are deliberately
+tracked. After changing linked Go or TypeScript source, rebuild and commit the
+matching output:
 
-It is worth knowing how that gate was broken once, because the failure was silent
-and shipped twice. The target ran `npm run build` *before* the script that
-compares, so the script's first digest was a digest of a fresh build and it
-compared a build against itself: a committed artifact that no source produced
-still passed, and the message said "reproducible". Only CI's separate
-`git diff --exit-code -- packages/stow-s3/dist` noticed. If you ever change that
-target, check that it still fails when you deliberately install a stale artifact
-— a check you have never seen fail is not known to work.
+```sh
+make build-wasm
+npm run build --prefix packages/stow-s3
+make check-generated
+```
 
-## The ratchets, and what they mean for your diff
+The check compares the saved output with a fresh build. Rebuilding before taking
+that comparison's first digest would hide a stale artifact.
 
-`make standards` includes gates that fail when a number gets worse. They are
-ratchets, not thresholds, and three of them will shape your change:
+Site HTML is generated from Markdown into ignored `site/.build/`. Commit the
+source, route manifest, assets and lockfile; do not commit build output, local
+previews, private configuration or credentials. See [site deployment](site/README.md).
 
-- **Comment volume.** `scripts/baselines/go-quality.json` fails on an *increase*
-  in comment lines and comment ratio. The project is deliberately cutting prose.
-  When you need a comment, keep the contract or the invariant and delete the
-  paragraph explaining what the code used to do. A useful test: if your comment
-  would still make sense to someone reading the code before the change, it is
-  probably history rather than contract.
-- **Complexity, parameter count, and `any`.** New violations fail. Do not fix one
-  by editing the baseline — the tool says to regenerate only after intentional
-  debt reduction, and adding an entry is the opposite. Split the function.
-- **Coverage.** The floor is the count of *covered statements*, not the
-  percentage, because adding well-tested code with defensive error branches
-  legitimately lowers a percentage. Add tests for behaviour, not for lines.
+## Standards and documentation
 
-There is a documentation gate that runs the built binary and checks that every
-command, verb, and flag named in the ten declared documents exists
-(`scripts/check-doc-commands.mjs`). If you rename anything on the CLI, that gate
-tells you which documents still name the old spelling.
+The [code standards](docs/CODE_STANDARDS.md) define the ratchets. New debt fails,
+and removed debt requires shrinking its recorded baseline. Do not raise a
+baseline to admit a regression. Go comment volume counts production comment
+lines; comment ratio is reported, not ratcheted. Coverage uses covered-statement
+floors and a bounded percentage-drop check.
 
-## Commit and pull request shape
+For docs-only changes, run `make check-doc-links check-adr-index check-doc-commands`
+and `make check-scripts`. Keep current API guides separate from dated evidence and
+retired plans. Move historical designs under `docs/history/` and repair their
+incoming and outgoing links. Only remove an ADR after its replacement is in force;
+record its number and original Git source in `docs/adr/retired.json`.
 
-- One logical change per pull request. The release workflow builds a binary from
-  a tag, so a mixed diff is hard to review and harder to revert.
-- Write the commit message for the person who has to revert your change at 3am:
-  what broke, what moved, and anything a future reader would otherwise have to
-  reconstruct from `git blame`.
-- Say what you verified and how. "Ran `make standards`" is useful; "should work"
-  is not.
-- If your change alters observable S3 behaviour, say whether it moves a client
-  toward or away from real AWS. Fidelity to the real service is a design goal,
-  and a deviation needs a reason someone can check.
+## Pull requests
 
-## Adding a workspace verb
+Use one logical change per pull request and state what changed, why and how it
+was verified. Describe any change to observable S3 behavior against the shared
+compatibility contract. Follow the repository's PR and required-check rules;
+maintainer access is not a reason to bypass them.
 
-The verb list is a table in `cmd/stow-s3/workspace.go`, not a switch, and the
-usage line is derived from it. Add the entry, register the TypeScript and Python
-wrappers, and add a step to `conformance/workspace/cases.json` — that case file
-is read by three independent drivers (Go, TypeScript, Python), and a driver that
-grew a private copy of it would be asserting its own beliefs instead of the
-shared contract.
+Workspace verbs are registered in `cmd/stow-s3/workspace.go`. Add corresponding
+TypeScript and Python wrappers and a shared case in
+`conformance/workspace/cases.json`; the independent drivers verify one contract.

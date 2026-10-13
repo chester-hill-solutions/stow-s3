@@ -20,7 +20,7 @@ The immediate work is closing compatibility and delivery gaps. The fetched READM
 
 The primary checkout was behind origin and contained ongoing documentation work. It was preserved. Tests ran in an app-managed worktree at `/Users/ladmin/.codex/worktrees/stow-product-assessment/stow`. This report adds documentation and evidence only; the findings have not been fixed.
 
-The assessment combined source and contract review, repository gates, independent native/AWS CLI exercises, fresh local package installs, real browser execution, and current first-party competitor research. Historical findings in `docs/assessment-2026-09-27.md` are explicitly historical and include subsequent repairs; they are not restated as current defects.
+The assessment combined source and contract review, repository gates, independent native/AWS CLI exercises, fresh local package installs, real browser execution, and current first-party competitor research. Historical findings in `docs/history/experiments/assessment-2026-09-27.md` are explicitly historical and include subsequent repairs; they are not restated as current defects.
 
 Host: macOS 14.5, arm64; pinned Go 1.24.13; Node 25.9.0; repository Python suite on Python 3.10.11; fresh wheel consumer on Python 3.12; installed AWS CLI 2.27.1. Test data was synthetic. Native upstream/cache tests used two local Stow processes, not AWS or R2.
 
