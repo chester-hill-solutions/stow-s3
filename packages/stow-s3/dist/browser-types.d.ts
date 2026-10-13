@@ -1,4 +1,4 @@
-import type { EmbeddedBucket, EmbeddedObject, EmbeddedStowOptions } from "./embedded.js";
+import type { EmbeddedBucket, EmbeddedObject, EmbeddedPutOptions, EmbeddedStowOptions } from "./embedded.js";
 export declare const BROWSER_PERSISTENCE_FORMAT_VERSION: 1;
 export type BrowserPersistenceErrorCode = "persistence_unsupported" | "persistence_denied" | "already_open" | "persistence_error" | "persistence_corrupt" | "quota_exceeded" | "closed";
 export declare class BrowserPersistenceError extends Error {
@@ -41,6 +41,18 @@ export interface PersistentEmbeddedStowOptions extends EmbeddedStowOptions {
     namespace: string;
     persistence: PersistenceAdapter;
 }
+/** All changes in a batch commit together, including failures in the WASM runtime. */
+export type BrowserObjectMutation = {
+    type: "put";
+    bucket: string;
+    key: string;
+    data: Uint8Array;
+    options?: EmbeddedPutOptions;
+} | {
+    type: "delete";
+    bucket: string;
+    key: string;
+};
 export interface IndexedDbPersistenceAdapterOptions {
     indexedDB?: IDBFactory;
     databaseName?: string;

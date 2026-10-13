@@ -1,13 +1,13 @@
 ---
----
 status: narrowed
-decision_digest: 12be5d1637825ad3
+amended: 2026-10-12
+decision_digest: 210305836eddb75f
 narrowed_by: 0005 (section 5 only)
 ---
 
 # SDK compatibility profile and mirror-writes
 
-This ADR was originally written as an extension of [ADR 0001: Auto-detect run-through mode](0001-auto-detect-run-through.md). [ADR 0011](0011-local-is-the-default-mode.md) later superseded ADR 0001 in full, including its mode-selection decision. The remaining compatibility decisions in this ADR continue to apply except where a later ADR narrows them; in particular, see [ADR 0005](0005-live-write-requires-explicit-consent.md) for live-write consent.
+This ADR was originally written as an extension of [ADR 0001: Auto-detect run-through mode](README.md#retired-decisions). [ADR 0011](0011-local-is-the-default-mode.md) later superseded ADR 0001 in full, including its mode-selection decision. The remaining compatibility decisions in this ADR continue to apply except where a later ADR narrows them; in particular, see [ADR 0005](0005-live-write-requires-explicit-consent.md) for live-write consent.
 
 ## Context
 
@@ -98,3 +98,5 @@ Production S3 durability, full proxy behavior, Bun support, migration of old dat
 in its own preamble, and pointed at both 0001 and 0005 by number, so the drift here
 was smaller than 0001's: the file told the truth about itself and only its status
 line was wrong.
+
+- 2026-10-12: Replace the deleted ADR 0001 link with the retired register. Compatibility and live-write decisions are unchanged.

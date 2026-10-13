@@ -1,0 +1,33 @@
+export const pages = [
+  { route: "/docs/", title: "Documentation", source: "docs/README.md", group: "Start here" },
+  { route: "/docs/getting-started/", title: "Getting started", source: "docs/getting-started.md", group: "Start here" },
+  { route: "/docs/reference/", title: "Full reference", source: "README.md", group: "Start here" },
+  { route: "/docs/typescript/", title: "TypeScript client", source: "packages/stow-s3/README.md", group: "Start here" },
+  { route: "/docs/python/", title: "Python client", source: "packages/stow-s3-py/README.md", group: "Start here" },
+  { route: "/docs/workspaces/", title: "Workspace guide", source: "docs/portable-workspace-usage.md", group: "Native storage" },
+  { route: "/docs/task-manifests/", title: "Task manifests", source: "docs/task-manifest.md", group: "Native storage" },
+  { route: "/docs/run-through/", title: "Run-through cache", source: "docs/run-through.md", group: "Native storage" },
+  { route: "/docs/outbox/", title: "Durable outbox", source: "docs/outbox.md", group: "Native storage" },
+  { route: "/docs/s3-compatibility/", title: "S3 compatibility", source: "docs/compat-contract.md", group: "Native storage" },
+  { route: "/docs/server/", title: "Running a server", source: "docs/running-and-probing.md", group: "Native storage" },
+  { route: "/docs/mcp/", title: "Native object MCP", source: "docs/object-mcp-contract.md", group: "Native storage" },
+  { route: "/docs/mcp-browser/", title: "MCP bucket browser", source: "extensions/stow/README.md", group: "Native storage" },
+  { route: "/docs/browser-file-history/", title: "File history and sync", source: "docs/browser-file-history.md", group: "Browser storage" },
+  { route: "/docs/browser-projects/", title: "Project revisions", source: "docs/browser-project-storage.md", group: "Browser storage" },
+  { route: "/docs/browser-workers/", title: "Workers and streams", source: "docs/browser-worker-runtime.md", group: "Browser storage" },
+  { route: "/docs/browser-persistence/", title: "IndexedDB persistence", source: "docs/browser-persistence.md", group: "Browser storage" },
+  { route: "/docs/browser-editor/", title: "Browser editor demo", source: "examples/browser-editor/README.md", group: "Browser storage" },
+  { route: "/docs/decisions/", title: "Architecture decisions", source: "docs/adr/README.md", group: "Development" },
+  { route: "/docs/contributing/", title: "Contributing", source: "CONTRIBUTING.md", group: "Development" },
+  { route: "/docs/standards/", title: "Code standards", source: "docs/CODE_STANDARDS.md", group: "Development" },
+];
+
+export function decisionPages(files) {
+  return files.filter((name) => /^\d{4}-.*\.md$/.test(name)).sort().map((name) => ({
+    route: `/docs/decisions/${name.slice(0, 4)}/`,
+    title: `ADR ${name.slice(0, 4)}`,
+    source: `docs/adr/${name}`,
+    group: "Decision record",
+    hidden: true,
+  }));
+}

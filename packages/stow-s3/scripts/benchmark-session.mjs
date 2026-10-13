@@ -104,6 +104,7 @@ async function runSession(payloadBytes) {
         `payload of ${payloadBytes} bytes exceeds the per-request body limit. ` +
           "Use --sweep, which stays under the limit, or raise the server limit " +
           "deliberately rather than assuming an unbounded request.",
+        { cause: error },
       );
     }
     throw error;

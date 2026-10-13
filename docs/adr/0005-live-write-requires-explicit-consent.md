@@ -1,5 +1,4 @@
 ---
----
 status: accepted
 decision_digest: 1a7736e67ab94072
 supersedes: 0002 (section 5, only as to what constitutes live-write consent)

@@ -32,44 +32,7 @@ func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byt
 
 func (i *Instance) putObjectLocked(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error) {
 
-	oldSize, exists, err := i.objectSize(ctx, bucket, key)
-	if err != nil {
-		return Object{}, err
-	}
-	requestedSize := int64(len(data))
-	if !exists && !i.objectQuotaFits(objectTarget(bucket, key), 1) {
-		return Object{}, ErrQuotaExceeded
-	}
-	if !i.bytesQuotaFits(oldSize, requestedSize) {
-		return Object{}, ErrQuotaExceeded
-	}
-	target := objectTarget(bucket, key)
-	_, targetReserved := i.reservedTargets[target]
-	// Not copied: every store copies the body through ETagForReader. See ByteReader.
-	meta, err := i.store.PutObject(ctx, bucket, key, bytes.NewReader(data), storage.PutOptions{
-		ContentType:       options.ContentType,
-		Metadata:          storage.CloneMetadata(options.Metadata),
-		ChecksumAlgorithm: options.ChecksumAlgorithm,
-		ChecksumValue:     options.ChecksumValue,
-		IfMatch:           options.IfMatch,
-		IfNoneMatch:       options.IfNoneMatch,
-		Guard:             options.guard,
-		RequestKey:        options.requestKey,
-	})
-	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
-		return Object{}, err
-	}
-	if exists {
-		i.usage.Bytes -= oldSize
-	} else {
-		i.usage.Objects++
-	}
-	i.usage.Bytes += int64(len(data))
-	if targetReserved {
-		i.consumeTargetReservation(target)
-	}
-	i.reconcileTargetReservation(target, true)
-	return objectFromMeta(meta, nil), err
+	return i.putObjectReaderLocked(ctx, stagedWriteRequest{bucket: bucket, key: key, body: bytes.NewReader(data), size: int64(len(data)), options: options})
 }
 
 func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, error) {

@@ -1,0 +1,93 @@
+name: Railway browser qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      allow_disposable_writes:
+        description: Allow unique test-prefix writes and temporary localhost CORS in the testing bucket
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: railway-browser-qualification
+  cancel-in-progress: false
+
+jobs:
+  browser:
+    name: Browser / Railway S3
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: railway-browser
+    steps:
+      - name: Require explicit live-test consent
+        env:
+          ALLOW: ${{ inputs.allow_disposable_writes }}
+        run: test "$ALLOW" = true
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: .go-version
+          cache: true
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: packages/stow-s3/package-lock.json
+      - name: Build artifacts
+        run: make build build-wasm
+      - name: Install dependencies
+        run: npm ci --omit=optional
+        working-directory: packages/stow-s3
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: packages/stow-s3
+      - name: Create private testing-bucket configuration
+        env:
+          ENDPOINT: ${{ secrets.STOW_LIVE_ENDPOINT }}
+          ACCESS_KEY_ID: ${{ secrets.STOW_LIVE_ACCESS_KEY_ID }}
+          SECRET_ACCESS_KEY: ${{ secrets.STOW_LIVE_SECRET_ACCESS_KEY }}
+          SESSION_TOKEN: ${{ secrets.STOW_LIVE_SESSION_TOKEN }}
+          BUCKET: ${{ vars.STOW_LIVE_BUCKET }}
+          REGION: ${{ vars.STOW_LIVE_REGION }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          required = ['ENDPOINT', 'ACCESS_KEY_ID', 'SECRET_ACCESS_KEY', 'BUCKET']
+          if any(not os.environ.get(key) for key in required):
+              raise SystemExit('Live Railway configuration is incomplete; qualification cannot run.')
+          path = os.path.join(os.environ['RUNNER_TEMP'], 'stow-browser-credentials.json')
+          config = dict(endpoint=os.environ['ENDPOINT'], bucketName=os.environ['BUCKET'],
+                        accessKeyId=os.environ['ACCESS_KEY_ID'], secretAccessKey=os.environ['SECRET_ACCESS_KEY'],
+                        sessionToken=os.environ.get('SESSION_TOKEN') or None,
+                        region=os.environ.get('REGION') or 'auto', urlStyle='virtual-host')
+          fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+          with os.fdopen(fd, 'w') as out:
+              json.dump(config, out)
+          PY
+      - name: Build package
+        run: npm run build
+        working-directory: packages/stow-s3
+      - name: Test browser persistence and direct Railway requests
+        env:
+          STOW_BROWSER_REMOTE_CONFIG: ${{ runner.temp }}/stow-browser-credentials.json
+        run: npm run test:browser:railway
+        working-directory: packages/stow-s3
+      - name: Remove private configuration
+        if: always()
+        run: rm -f "$RUNNER_TEMP/stow-browser-credentials.json"
+      - name: Upload qualification receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: railway-browser-qualification
+          path: |
+            .cache/browser-test-results
+            .cache/browser-live-receipts
+          if-no-files-found: error

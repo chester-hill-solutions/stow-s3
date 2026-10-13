@@ -74,6 +74,9 @@ export const DOCS = [
   "docs/compat-contract.md",
   "docs/browser-persistence.md",
   "docs/portable-workspace-usage.md",
+  "docs/getting-started.md",
+  "docs/run-through.md",
+  "docs/outbox.md",
   "examples/opencode/README.md",
   "docs/opencode-pilot-instructions.md",
 ];

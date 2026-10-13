@@ -178,6 +178,30 @@ describe("stow session", session, () => {
     );
   });
 
+  it("preserves both errors and the cleanup cause when callback and cleanup fail", async () => {
+    const callbackError = new Error("callback failed");
+    const cleanupError = new Error("cleanup failed");
+    let dataDir = "";
+    await assert.rejects(
+      withStow(async (env) => {
+        dataDir = env.dataDir;
+        const destroy = env.s3.destroy.bind(env.s3);
+        env.s3.destroy = () => {
+          destroy();
+          throw cleanupError;
+        };
+        throw callbackError;
+      }),
+      (error: unknown) => {
+        assert.ok(error instanceof AggregateError);
+        assert.deepEqual(error.errors, [callbackError, cleanupError]);
+        assert.equal(error.cause, cleanupError);
+        return true;
+      },
+    );
+    await assert.rejects(access(dataDir), { code: "ENOENT" });
+  });
+
   it("removes the session directory it created", async () => {
     let dataDir = "";
     await withStow(async (env) => {

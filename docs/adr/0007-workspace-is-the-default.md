@@ -1,13 +1,13 @@
 ---
----
 status: accepted
-decision_digest: 5c21a54c68397ba5
+amended: 2026-10-12
+decision_digest: 9eb3a270c7e513d0
 ---
 
 # The workspace is the default; S3 is an opt-in facade
 
 This ADR changes the default agent-facing surface. It supersedes ADR 0004
-section 1 ("the default promise") and `docs/agent-dx-plan.md` section 4.1
+section 1 ("the default promise") and `docs/history/plans/agent-dx-plan.md` section 4.1
 ("Default implementation: managed child S3 endpoint") for the default path
 only. ADR 0004 continues to govern the child-process session, which stays
 supported and unchanged.
@@ -81,7 +81,7 @@ that cost is deferred, not assumed, and the packaging work it implies
 (per-platform extension wheels) is a separate decision.
 
 The consequence to state plainly: the cost target in
-`docs/agent-dx-plan.md` section 11 is a target for the embedded path. It must
+`docs/history/plans/agent-dx-plan.md` section 11 is a target for the embedded path. It must
 not be quoted as a general session cost.
 
 ### 4. The public in-process runtime needs a persistent backend before any of this is usable
@@ -134,10 +134,11 @@ did not catch (ADR 0005, ADR 0006).
 - A workspace that speaks S3 and a workspace that does not are the same
   object store, not two stores with a synchronization problem. Any design
   that gives the facade its own storage is rejected.
-- Everything in `docs/agent-dx-plan.md` sections 3, 4, 10, and 16 that
+- Everything in `docs/history/plans/agent-dx-plan.md` sections 3, 4, 10, and 16 that
   assumed an ephemeral child server by default is amended by
-  `docs/agent-dx-plan.md` section 0.5.
+  `docs/history/plans/agent-dx-plan.md` section 0.5.
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+
+- 2026-10-12: Update links after retiring old work orders into the history directory. The decision is unchanged.

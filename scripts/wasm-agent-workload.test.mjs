@@ -55,7 +55,8 @@ test("an agent working set reads without growing the footprint", async () => {
   // The harness must still be an isolate. A measurement from a realm that had
   // Node available would not be about the thing the plan is deciding.
   assert.deepEqual(result.nodeApisVisible, [], "the workload ran with Node APIs visible");
-  assert.equal(result.hostFunctionCount, 22, "the host surface changed");
+  // The binary bridge adds syscall/js.copyBytesToGo and copyBytesToJS.
+  assert.equal(result.hostFunctionCount, 24, "the host surface changed");
 
   // The workload has to be big enough for the ratio to mean something.
   assert.ok(result.workload.files >= 20, "the working set is too small to conclude anything");

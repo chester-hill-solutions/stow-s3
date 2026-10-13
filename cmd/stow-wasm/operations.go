@@ -12,19 +12,27 @@ import (
 )
 
 var operationHandlers = map[string]handler{
-	"createBucket": handleCreateBucket,
-	"deleteBucket": handleDeleteBucket,
-	"listBuckets":  handleListBuckets,
-	"putObject":    handlePutObject,
-	"getObject":    handleGetObject,
-	"headObject":   handleHeadObject,
-	"listObjects":  handleListObjects,
-	"deleteObject": handleDeleteObject,
-	"copyObject":   handleCopyObject,
-	"reset":        handleReset,
-	"close":        handleClose,
-	"usage":        handleUsage,
-	"capabilities": handleCapabilities,
+	"createBucket":      handleCreateBucket,
+	"deleteBucket":      handleDeleteBucket,
+	"listBuckets":       handleListBuckets,
+	"putObject":         handlePutObject,
+	"getObject":         handleGetObject,
+	"getObjectRange":    handleGetObjectRange,
+	"openObjectRead":    handleOpenObjectRead,
+	"readObjectChunk":   handleReadObjectChunk,
+	"closeObjectRead":   handleCloseObjectRead,
+	"openObjectWrite":   handleOpenObjectWrite,
+	"writeObjectChunk":  handleWriteObjectChunk,
+	"commitObjectWrite": handleCommitObjectWrite,
+	"abortObjectWrite":  handleAbortObjectWrite,
+	"headObject":        handleHeadObject,
+	"listObjects":       handleListObjects,
+	"deleteObject":      handleDeleteObject,
+	"copyObject":        handleCopyObject,
+	"reset":             handleReset,
+	"close":             handleClose,
+	"usage":             handleUsage,
+	"capabilities":      handleCapabilities,
 }
 
 func handleCreateBucket(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
@@ -51,9 +59,13 @@ func handleListBuckets(ctx context.Context, instance *stow.Runtime, _ request) (
 }
 
 func handlePutObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
-	data, err := base64.StdEncoding.DecodeString(req.Data)
-	if err != nil {
-		return nil, fmt.Errorf("decode object data: %w", err)
+	data := req.binaryData
+	if req.binaryOutput == nil {
+		var err error
+		data, err = base64.StdEncoding.DecodeString(req.Data)
+		if err != nil {
+			return nil, fmt.Errorf("decode object data: %w", err)
+		}
 	}
 	object, err := instance.PutObject(ctx, req.Bucket, req.Key, data, stow.PutOptions{
 		ContentType: req.ContentType,
@@ -64,7 +76,7 @@ func handlePutObject(ctx context.Context, instance *stow.Runtime, req request) (
 	if err != nil {
 		return nil, err
 	}
-	return marshalResult(objectResultOf(object))
+	return marshalObjectResult(object, req)
 }
 
 func handleGetObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
@@ -72,7 +84,7 @@ func handleGetObject(ctx context.Context, instance *stow.Runtime, req request) (
 	if err != nil {
 		return nil, err
 	}
-	return marshalResult(objectResultOf(object))
+	return marshalObjectResult(object, req)
 }
 
 func handleHeadObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
@@ -80,7 +92,7 @@ func handleHeadObject(ctx context.Context, instance *stow.Runtime, req request) 
 	if err != nil {
 		return nil, err
 	}
-	return marshalResult(objectResultOf(object))
+	return marshalObjectResult(object, req)
 }
 
 func handleListObjects(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
@@ -116,7 +128,7 @@ func handleCopyObject(ctx context.Context, instance *stow.Runtime, req request) 
 	if err != nil {
 		return nil, err
 	}
-	return marshalResult(objectResultOf(object))
+	return marshalObjectResult(object, req)
 }
 
 func handleReset(ctx context.Context, instance *stow.Runtime, _ request) (json.RawMessage, error) {
@@ -124,8 +136,12 @@ func handleReset(ctx context.Context, instance *stow.Runtime, _ request) (json.R
 }
 
 func handleClose(_ context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
+	closeRuntimeStreams(req.Handle)
 	err := instance.Close()
+	state.Lock()
 	delete(state.instances, req.Handle)
+	state.Unlock()
+	releaseRuntimeStreamHandle(req.Handle)
 	return nil, err
 }
 
@@ -149,4 +165,16 @@ func objectResultOf(object stow.Object) objectResult {
 		Metadata:     object.Metadata,
 		LastModified: object.LastModified.UTC().Format("2006-01-02T15:04:05.000Z"),
 	}
+}
+
+func marshalObjectResult(object stow.Object, req request) (json.RawMessage, error) {
+	if req.binaryOutput == nil {
+		return marshalResult(objectResultOf(object))
+	}
+	*req.binaryOutput = object.Data
+	if req.Op == "getObject" && object.Data == nil {
+		*req.binaryOutput = []byte{}
+	}
+	object.Data = nil
+	return marshalResult(objectResultOf(object))
 }

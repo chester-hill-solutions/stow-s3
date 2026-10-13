@@ -75,8 +75,6 @@ npm run check:dry
   was test prose, so documenting a test properly had to be funded by deleting
   documentation from unrelated shipped code. Test files remain held to the coverage
   ratchet, `gofmt` and `go vet`.
-  still reported but is not a floor: it is a density, so removing code raises it, and a
-  two-sided ratchet on a density fails the cleanup it should encourage. Test files are excluded from the comment budget alone; the `any` rule was already scoped away from tests before this, and every other structural rule — complexity, parameter count, function length, file size — still applies to them. A test comment says what a test proves; a production comment says why the system is shaped as it is; counting them in one budget made them compete, and half the budget was test prose, so documenting a test properly had to be funded by deleting documentation from unrelated shipped code. Test files remain held to the coverage ratchet, `gofmt` and `go vet`.
 
 ## Go standards
 
