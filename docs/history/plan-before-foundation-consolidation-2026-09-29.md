@@ -12,21 +12,21 @@
 | Document | Role |
 | --- | --- |
 | This plan | Governs implementation scope and ordering |
-| [Storage milestone](../portable-agent-workspace-goal.md) | Defines the complete workflow and adoption decision |
-| [MCP storage integration](../mcp-storage-integration-plan.md) | Concrete S3 integration surface and turn-checkpoint guidance; caller retains execution ownership |
+| [Storage milestone](plans/portable-agent-workspace-goal.md) | Defines the complete workflow and adoption decision |
+| [MCP storage integration](plans/mcp-storage-integration-plan.md) | Concrete S3 integration surface and turn-checkpoint guidance; caller retains execution ownership |
 | [Resumable transfer detail](../resumable-transfer-plan.md) | Proposed S0-4/S1-5/S4-1 validation of multipart upload and range download continuation, followed by consumer integration; code changes follow reproduced gaps |
 | [Portable recovery](../portable-recovery-plan.md) | Accepted data-plus-recovery-state direction; proposed S1-9 contract for cross-host continuation with explicit destination activation |
 | [Guarded storage](../guarded-storage-plan.md) | Accepted guarded saves and optional declared-input checks at ready publication; proposed S1-10 extension of existing conditional writes into public Go/CLI/embedded surfaces |
-| [Foundation review](../foundation-review-2026-09-29.md) | Dependency order, delegated engineering defaults and qualification gaps for the accepted storage extensions; no separate queue |
+| [Foundation review](plans/foundation-review-2026-09-29.md) | Dependency order, delegated engineering defaults and qualification gaps for the accepted storage extensions; no separate queue |
 | [Workspace notifications](../workspace-notifications-plan.md) | Accepted core capability under ADR 0015; proposed contract and implementation slices for S1-6 |
 | [Protected cache](../protected-cache-plan.md) | Accepted ACL/encryption direction under ADR 0016; proposed access/encryption contracts for S1-7/S1-8 and native, Workers and Railway evidence in S4-4 |
-| [Pre-code discovery](../pre-code-discovery-2026-09-29.md) | Source findings, proposed decisions and dependency-ordered implementation slices for the IDs below |
+| [Pre-code discovery](plans/pre-code-discovery-2026-09-29.md) | Source findings, proposed decisions and dependency-ordered implementation slices for the IDs below |
 | [Storage portability design](../storage-portability-design.md) | S0-7/S1 contracts for facade lifetime, complete object snapshots, Git profiles and registry policy |
 | [Planning index and disposition](../planning-index.md) | Complete document inventory, old-item migration map and deferred decisions |
 | Older DX, remediation, FOSS, workspace, portability and architecture plans | Superseded historical records; their remaining work is carried into the IDs below |
-| [Work-session proposal](../work-session-plan.md), [isolate exploration](../agent-isolate-exploration.md) | Retired proposals; execution designs require a new scope decision |
+| [Work-session proposal](plans/work-session-plan.md), [isolate exploration](plans/agent-isolate-exploration.md) | Retired proposals; execution designs require a new scope decision |
 | [Assessment](../product-assessment-2026-09-29.md), [continuity pilot](../agent-continuity-pilot-2026-09-29.md) | Revision-specific observations, including failures and limitations |
-| [Realtime multiplayer experiment](../realtime-multiplayer-plan.md) | Transferred historical RT handover; standalone collaboration repository owns current scope/status |
+| [Realtime multiplayer experiment](collaboration/realtime-multiplayer-plan.md) | Transferred historical RT handover; standalone collaboration repository owns current scope/status |
 | [Prior plan](plan-through-2026-09-28.md) | Historical implementation record; superseded ordering |
 
 ## Goal and boundary
@@ -157,7 +157,7 @@ defect. Update status here rather than reopening a historical checklist.
 
 ### Dependency order for the accepted foundation extensions
 
-The [foundation review](../foundation-review-2026-09-29.md) consolidates the interview's
+The [foundation review](plans/foundation-review-2026-09-29.md) consolidates the interview's
 remaining gaps. Resolve routine engineering choices from existing contracts and
 qualification evidence; no further user decision is pending. Broader contracts remain
 proposed; implemented extension slices are labelled separately from baseline evidence.
@@ -209,7 +209,7 @@ portable reports. Its [notes](../../examples/multiplayer-prototype/NOTES.md) are
 evidence. The user then rejected file claims as the product model and specified
 simultaneous shared-file editing, presence/last cursor as the first join message,
 live steer/queue/interrupt controls and low room latency. These refinements are planned
-in the [realtime experiment](../realtime-multiplayer-plan.md); they are not implemented
+in the [realtime experiment](collaboration/realtime-multiplayer-plan.md); they are not implemented
 by the first demo. Collaboration remains above Stow's storage interface under ADR 0014.
 
 Final local validation: **`make test-all` and `make standards` passed**, including
@@ -333,7 +333,7 @@ coverage needs an explicit contract decision, not a silent skip in a historical 
 
 ### S3. Deliver a thin MCP storage adapter and caller-owned agent integration
 
-Follow the [MCP/OpenCode integration plan](../mcp-storage-integration-plan.md).
+Follow the [MCP/OpenCode integration plan](plans/mcp-storage-integration-plan.md).
 OpenCode runs in a separate prepared workspace; callers own execution and writer
 quiescence. Preserve files, required object metadata and explicitly saved context.
 Use bounded checkpoint retries with backoff, then explicit failure; reconcile
@@ -375,4 +375,4 @@ Extend `pkg/stow`, `internal/storage/workspace`, `internal/runtime`, `internal/r
 
 Current checkpoint/transport formats are versioned, but their readers differ: handoff documents reject unknown fields while checkpoint manifests can ignore them and lose them on a typed round trip. Optional context is not an existing public checkpoint field. Prefer ordinary captured files for the first recipe; any schema extension needs explicit old-reader behavior and round-trip coverage. Storage credentials and live-write consent remain separate from handoff data.
 
-Implementation and evidence now live in this development tree. Remaining acceptance above stays open until its specific evidence exists. The [plan alignment review](../storage-plan-alignment-2026-09-29.md) preserves the earlier engineering handover.
+Implementation and evidence now live in this development tree. Remaining acceptance above stays open until its specific evidence exists. The [plan alignment review](plans/storage-plan-alignment-2026-09-29.md) preserves the earlier engineering handover.

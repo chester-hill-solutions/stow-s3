@@ -8,6 +8,11 @@ touches a real bucket, and nothing is left running between tests.
 
 ## Install
 
+This checkout is the unpublished 0.3.0 development candidate. Build the native
+binary with `make build`, then install the editable client from the repository
+root with `python3 -m pip install -e 'packages/stow-s3-py[boto3]'`. The wheel
+instructions below describe published distributions, not this candidate.
+
 ```sh
 pip install stow-s3
 ```

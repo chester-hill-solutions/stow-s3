@@ -119,12 +119,16 @@ type storeWithMultipart struct {
 // optional half is discovered by the runtime rather than declared to it.
 func adaptStore(store Store) storage.Store {
 	adapter := &storeAdapter{store: store}
+	var adapted storage.Store = adapter
+	if stager, ok := store.(StagedWriteStore); ok {
+		adapted = &storeWithStaging{Store: adapter, adapter: adapter, stager: stager}
+	}
 	multi, ok := store.(MultipartStore)
 	if !ok {
-		return adapter
+		return adapted
 	}
 	return &storeWithMultipart{
-		Store:          adapter,
+		Store:          adapted,
 		MultipartStore: multipartAdapter{multi: multi},
 	}
 }
@@ -194,6 +198,15 @@ func (a *storeAdapter) PutObject(ctx context.Context, bucket, key string, body i
 	if (options.IfMatch != "" || options.IfNoneMatch != "") && !supportsConditionalWrites(a.store) {
 		return nil, ErrConditionalWritesUnsupported
 	}
+	if streamed, ok := a.store.(StreamingWriteStore); ok {
+		object, err := streamed.PutObjectStream(ctx, bucket, key, body, PutOptions{
+			ContentType: options.ContentType,
+			Metadata:    storage.CloneMetadata(options.Metadata),
+			IfMatch:     options.IfMatch,
+			IfNoneMatch: options.IfNoneMatch,
+		})
+		return objectMetaOf(object), translate(err)
+	}
 	data, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
@@ -211,6 +224,10 @@ func (a *storeAdapter) PutObject(ctx context.Context, bucket, key string, body i
 }
 
 func (a *storeAdapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	if streamed, ok := a.store.(StreamingStore); ok {
+		reader, object, err := streamed.OpenObject(ctx, bucket, key)
+		return reader, objectMetaOf(object), translate(err)
+	}
 	object, err := a.store.GetObject(ctx, bucket, key)
 	if err != nil {
 		return nil, nil, translate(err)
@@ -270,6 +287,10 @@ func (a *storeAdapter) DeleteObjects(ctx context.Context, bucket string, keys []
 }
 
 func (a *storeAdapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*storage.ObjectMeta, error) {
+	if copier, ok := a.store.(CopyStore); ok {
+		object, err := copier.CopyObject(ctx, srcBucket, srcKey, dstBucket, dstKey)
+		return objectMetaOf(object), translate(err)
+	}
 	source, err := a.store.GetObject(ctx, srcBucket, srcKey)
 	if err != nil {
 		return nil, translate(err)

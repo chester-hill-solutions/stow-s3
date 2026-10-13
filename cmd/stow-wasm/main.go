@@ -16,18 +16,25 @@ import (
 const protocolVersion = 1
 
 type request struct {
-	Version           int               `json:"version"`
-	Op                string            `json:"op"`
-	Handle            int               `json:"handle"`
-	Options           stow.Options      `json:"options"`
-	Bucket            string            `json:"bucket"`
-	Key               string            `json:"key"`
-	Data              string            `json:"data"`
+	Version           int          `json:"version"`
+	Op                string       `json:"op"`
+	Handle            int          `json:"handle"`
+	Options           stow.Options `json:"options"`
+	Bucket            string       `json:"bucket"`
+	Key               string       `json:"key"`
+	Data              string       `json:"data"`
+	binaryData        []byte
+	binaryOutput      *[]byte
+	async             bool
 	ContentType       string            `json:"contentType"`
 	Metadata          map[string]string `json:"metadata"`
 	IfMatch           string            `json:"ifMatch"`
 	IfNoneMatch       string            `json:"ifNoneMatch"`
 	List              stow.ListOptions  `json:"list"`
+	Range             stow.ObjectRange  `json:"range"`
+	Token             string            `json:"token"`
+	Length            int               `json:"length"`
+	Size              *int64            `json:"size"`
 	SourceBucket      string            `json:"sourceBucket"`
 	SourceKey         string            `json:"sourceKey"`
 	DestinationBucket string            `json:"destinationBucket"`
@@ -111,7 +118,10 @@ func main() {
 		return nil
 	})
 	callFunc := js.FuncOf(call)
-	js.Global().Set("stow", js.ValueOf(map[string]interface{}{"call": callFunc, "exit": exitFunc}))
+	binaryFunc := js.FuncOf(callBinary)
+	asyncFunc := js.FuncOf(callBinaryAsync)
+	openHostFunc := js.FuncOf(openHost)
+	js.Global().Set("stow", js.ValueOf(map[string]interface{}{"call": callFunc, "callBinary": binaryFunc, "callBinaryAsync": asyncFunc, "openHost": openHostFunc, "exit": exitFunc}))
 	<-exit
 }
 
@@ -134,12 +144,15 @@ func call(_ js.Value, args []js.Value) interface{} {
 }
 
 func dispatch(req request) (json.RawMessage, error) {
-	state.Lock()
-	defer state.Unlock()
 	if req.Op == "open" {
 		return openRuntime(req)
 	}
+	if !req.async && isHostHandle(req.Handle) {
+		return nil, fmt.Errorf("host-backed runtime requires asynchronous calls")
+	}
+	state.Lock()
 	instance, ok := state.instances[req.Handle]
+	state.Unlock()
 	if !ok {
 		return nil, fmt.Errorf("runtime handle %d is not open", req.Handle)
 	}
@@ -155,6 +168,8 @@ func openRuntime(req request) (json.RawMessage, error) {
 	if err != nil {
 		return nil, err
 	}
+	state.Lock()
+	defer state.Unlock()
 	handle := state.next
 	state.next++
 	state.instances[handle] = instance

@@ -35,5 +35,5 @@ were read from temporary storage, not vendored into Stow.
 The installed OpenCode binary reported `2.0.16`; `serve --help` confirmed a
 headless server, loopback/ephemeral-port options and `--pure` (no external plugins).
 Both commands used temporary XDG data/config/cache/state paths. No model session
-or checkpoint integration was run. See [the discovery report](../../pre-code-discovery-2026-09-29.md)
+or checkpoint integration was run. See [the discovery report](../../history/plans/pre-code-discovery-2026-09-29.md)
 for static findings and the distinction from earlier executed probes.

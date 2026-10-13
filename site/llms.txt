@@ -1,25 +1,43 @@
 # Stow
 
-> Working storage an agent can hand off. A real directory with a durable identity
-> and verified checkpoints — and an S3-compatible store for tests and CI.
+> An object store you can embed. Run it in Go or WebAssembly, with a native S3
+> endpoint for existing SDKs.
 
-Stow is an Apache 2.0 S3-compatible object store and filesystem workspace that
-runs on the local machine. It speaks real S3 over HTTP with SigV4, so existing
-SDK code works unchanged. An agent can start in a persistent isolated workspace
-prepared from declared local inputs, checkpoint it, diff what changed, and hand
-the checkpoint to another host; scoped S3 sessions remain disposable and delete
-themselves when closed.
+Stow is an Apache 2.0 object engine with native S3 HTTP compatibility and a
+WebAssembly profile. Prepared filesystem workspaces support checkpoints,
+comparison, and portable handoff. The browser profile offers IndexedDB
+persistence, retained file stages, undo/redo, and explicit conditional sync
+through host-supplied networking. Embedded Go and Node WASM runtimes need no
+HTTP listener. Native run-through mode adds an S3 read-through cache with
+prewarming, cache limits, TTL, and explicit offline operation. WASM enables
+embedding in compatible hosts; edge platform integrations need qualification.
+Stow owns storage; the host owns execution and sandbox enforcement.
+
+Native live writes commit locally before propagation through a durable outbox.
+The outbox preserves the exact version, retries transient failures with bounded
+backoff, and stops on remote conflicts or an unknown upstream baseline. Recovery
+checks the remote ETag, content type, metadata, and requested checksum before
+acknowledging an attempted write. Retry and discard require the admin token.
 
 ## Start here
 
+- [Browser file history and sync](/docs/browser-file-history/):
+  local commit, undo/redo, conditional writes, recovery, and limits.
+- [Real browser editor demo](/docs/browser-editor/):
+  run `make browser-editor` from a built source checkout.
+- [Native read-through cache](/docs/run-through/):
+  cache reads, prewarm exact keys, and work offline.
+- [Durable outbox contract](/docs/s3-compatibility/#62-read-through-cache-semantics):
+  local-first writes, conditional propagation, retries, and crash recovery.
+
 - [Agent instructions](/agent.md): install commands, the prepared workspace
   flow for coding tasks, and the scoped-session pattern for disposable S3.
-- [Running and probing a server](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/running-and-probing.md):
+- [Running and probing a server](/docs/server/):
   how to start `stow-s3` yourself, read the endpoint and credentials it actually
   got, probe `/_stow/health`, and avoid the port and mode traps. Read this before
   writing a launcher.
-- [Task manifest guide](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/task-manifest.md): manifest fields, lifecycle, checkpoints, archives, and isolation limits.
-- [README on GitHub](https://github.com/chester-hill-solutions/stow-s3):
+- [Task manifest guide](/docs/task-manifests/): manifest fields, lifecycle, checkpoints, archives, and isolation limits.
+- [Full reference](/docs/reference/):
   the full reference, including the CLI, the Go runtime, and the WebAssembly
   profile.
 

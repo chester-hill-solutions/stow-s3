@@ -888,7 +888,7 @@ marketed as such.
 
 **Added 2026-09-25.** Part 1 (sections 1–9) covers the storage-emulation set and
 is unchanged. This part covers the *agent workspace* market, which is the
-category the product direction in `docs/agent-dx-plan.md` section 0.5 targets,
+category the product direction in `docs/history/plans/agent-dx-plan.md` section 0.5 targets,
 and it revises the strategic reading in section 8.
 
 ## 10.0 Method for Part 2, and its evidence grades
@@ -946,7 +946,7 @@ AWS's own agent-runtime product now attaches both this and a network filesystem,
 with a documented split placing "generated artifacts" on the object side.
 
 **Why it matters anyway.** If true, the product thesis in
-`docs/agent-dx-plan.md` section 0.5 — one call gives an agent a workspace that is
+`docs/history/plans/agent-dx-plan.md` section 0.5 — one call gives an agent a workspace that is
 already its working directory, and the same bytes are reachable through S3 — was
 published by AWS first, at exabyte scale. That does not invalidate the direction.
 It does mean the *concept* stopped being a differentiator, and it makes reading
@@ -1126,7 +1126,7 @@ What is left is narrow and specific:
 
 That is a distribution claim, not a feature claim. It is won or lost entirely on
 whether installation works, which makes the account-side unblock in
-`docs/agent-dx-plan.md` section 10.1 the precondition for the whole strategy
+`docs/history/plans/agent-dx-plan.md` section 10.1 the precondition for the whole strategy
 rather than a packaging chore.
 
 ## 10.6 Verify before betting on it

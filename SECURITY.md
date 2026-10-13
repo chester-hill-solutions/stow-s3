@@ -40,7 +40,7 @@ code you have not reviewed.
 Writes that reach a real provider require explicit consent and are off by
 default. A run-through server propagates nothing upstream unless both a policy
 and `STOW_ALLOW_LIVE_WRITES` are set — see
-[`docs/adr/0005-explicit-live-write-consent.md`](docs/adr/0005-explicit-live-write-consent.md).
+[`docs/adr/0005-live-write-requires-explicit-consent.md`](docs/adr/0005-live-write-requires-explicit-consent.md).
 
 ## Supported versions
 

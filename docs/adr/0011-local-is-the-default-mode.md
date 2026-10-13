@@ -1,15 +1,15 @@
 ---
----
 status: accepted
-decision_digest: 680558581a41b952
+amended: 2026-10-12
+decision_digest: 42a2974ac46ce8a7
 supersedes: 0001
 ---
 
 # Local-only is the default; ambient credentials do not select an upstream
 
-**Supersedes ADR 0001** in full. ADR 0001 is retained unchanged so the reasoning it
-was accepted on stays auditable; this record is the amendment the 0.2.0 plan
-required rather than an edit to accepted history.
+**Supersedes ADR 0001** in full. Its obsolete auto-detection decision is removed
+from the active collection; the [retired register](README.md#retired-decisions)
+links the original record in Git history.
 
 ## The invariant
 
@@ -69,4 +69,4 @@ not the intent — which is why they now have the same test.
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+- 2026-10-12: Point the retired ADR 0001 reference at its Git record. The local-mode invariant is unchanged.

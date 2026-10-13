@@ -60,7 +60,7 @@ publishes to, and that was wrong. The committed `publishConfig` said
 a second conclusion drawn from it ("nothing has been published") was about npmjs rather
 than about the packages. The 401s are real; the inference drawn from them was not.
 
-`docs/agent-dx-plan.md` had already recorded this trap on 2026-09-25: a local `.npmrc`
+`docs/history/plans/agent-dx-plan.md` had already recorded this trap on 2026-09-25: a local `.npmrc`
 bound the scope to GitHub Packages, so `npm view` reported `0.2.0` for a package absent
 from npmjs, and that false positive happened "during this very work". Worth re-reading
 before asking whether something is published, by any means.

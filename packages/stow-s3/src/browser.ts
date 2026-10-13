@@ -4,6 +4,7 @@ export {
 } from "./browser-types.js";
 export type {
   BrowserPersistenceErrorCode,
+  BrowserObjectMutation,
   DeleteBucketChange,
   DeleteObjectChange,
   IndexedDbPersistenceAdapterOptions,
@@ -20,3 +21,19 @@ export {
   BrowserEmbeddedStow,
   openBrowserEmbeddedStow,
 } from "./persistent-embedded.js";
+export { BrowserFileHistory } from "./file-history.js";
+export { FileHistoryError } from "./file-history-types.js";
+export type {
+  BrowserFileHistoryOptions,
+  FileHistoryErrorCode,
+  FileHistoryStatus,
+  FileReadResult,
+  FileSaveOptions,
+  FileSaveReceipt,
+  FileHistoryExport,
+  FileVersion,
+  ObjectSyncRemote,
+  RemoteObjectBasis,
+  SyncRemoteObject,
+  SyncRemoteWrite,
+} from "./file-history-types.js";

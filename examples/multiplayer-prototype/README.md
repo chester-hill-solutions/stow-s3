@@ -89,8 +89,8 @@ prototype after the product model is decided.
 
 The user subsequently chose shared live editing without file claims: agents know who
 is present, what they are doing and their last read/edit locations, and adapt to relevant
-peer/dependency changes. See the [product plan](../../docs/realtime-multiplayer-plan.md)
-and [engineering detail](../../docs/realtime-multiplayer-engineering.md). This prototype
+peer/dependency changes. See the [product plan](../../docs/history/collaboration/realtime-multiplayer-plan.md)
+and [engineering detail](../../docs/history/collaboration/realtime-multiplayer-engineering.md). This prototype
 remains dated evidence of its earlier ownership-based model; it does not implement
 the new experience. The latest RT-0 starts with continuous native activity/file
 observation and shadow decisions; RT-1 tests useful awareness and bounded steering

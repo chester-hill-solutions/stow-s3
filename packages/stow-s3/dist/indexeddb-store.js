@@ -1,23 +1,18 @@
+import { openIndexedDatabase } from "./indexeddb-lifecycle.js";
 import { BrowserPersistenceError, BROWSER_PERSISTENCE_FORMAT_VERSION, } from "./browser-types.js";
 const INDEXED_DB_VERSION = 1;
 export function openDatabase(factory, databaseName, manifestStoreName, bucketStoreName, objectStoreName) {
     if (factory === undefined) {
         throw new BrowserPersistenceError("persistence_unsupported", "IndexedDB is not available in this host");
     }
-    return new Promise((resolve, reject) => {
-        const request = factory.open(databaseName, INDEXED_DB_VERSION);
-        request.onupgradeneeded = () => {
-            const database = request.result;
+    return openIndexedDatabase(factory, {
+        name: databaseName, version: INDEXED_DB_VERSION,
+        failedMessage: "IndexedDB open failed", blockedMessage: "IndexedDB open was blocked",
+        upgrade: (database) => {
             ensureStore(database, manifestStoreName, "namespace");
             ensureStore(database, bucketStoreName, ["namespace", "name"]);
             ensureStore(database, objectStoreName, ["namespace", "bucket", "key"]);
-        };
-        request.onsuccess = () => {
-            request.result.onversionchange = () => request.result.close();
-            resolve(request.result);
-        };
-        request.onerror = () => reject(request.error ?? new Error("IndexedDB open failed"));
-        request.onblocked = () => reject(new BrowserPersistenceError("persistence_denied", "IndexedDB open was blocked"));
+        },
     });
 }
 function ensureStore(database, name, keyPath) {
@@ -29,8 +24,8 @@ export function readNamespace(database, namespace, stores) {
     return new Promise((resolve, reject) => {
         const transaction = database.transaction([stores.manifest, stores.buckets, stores.objects], "readonly");
         const manifestRequest = transaction.objectStore(stores.manifest).get(namespace);
-        const bucketRequest = transaction.objectStore(stores.buckets).getAll();
-        const objectRequest = transaction.objectStore(stores.objects).getAll();
+        const bucketRequest = transaction.objectStore(stores.buckets).getAll(prefixRange(namespace));
+        const objectRequest = transaction.objectStore(stores.objects).getAll(prefixRange(namespace));
         let manifest;
         let buckets;
         let objects;
@@ -99,7 +94,7 @@ function applyChange(change, namespace, bucketStore, objectStore) {
             break;
         case "deleteBucket":
             bucketStore.delete([namespace, change.bucket]);
-            deleteNamespaceObjects(objectStore, namespace, (record) => record.bucket === change.bucket);
+            objectStore.delete(prefixRange(namespace, change.bucket));
             break;
         case "putObject":
             objectStore.put({ namespace, ...change.object });
@@ -189,36 +184,18 @@ function manifestGeneration(value) {
     return value.generation;
 }
 function deleteNamespaceBuckets(store, namespace) {
-    const request = store.getAll();
-    request.onsuccess = () => {
-        for (const record of request.result) {
-            if (recordNamespace(record) === namespace) {
-                const value = asRecord(record);
-                if (typeof value.name === "string") {
-                    store.delete([namespace, value.name]);
-                }
-            }
-        }
-    };
+    store.delete(prefixRange(namespace));
 }
-function deleteNamespaceObjects(store, namespace, predicate = () => true) {
-    const request = store.getAll();
-    request.onsuccess = () => {
-        for (const record of request.result) {
-            if (recordNamespace(record) === namespace && predicate(asRecord(record))) {
-                const value = asRecord(record);
-                if (typeof value.bucket === "string" && typeof value.key === "string") {
-                    store.delete([namespace, value.bucket, value.key]);
-                }
-            }
-        }
-    };
+function deleteNamespaceObjects(store, namespace) {
+    store.delete(prefixRange(namespace));
+}
+function prefixRange(...prefix) {
+    // Array keys sort after string keys, enclosing every string suffix without
+    // reading payloads from neighboring namespaces or buckets.
+    return IDBKeyRange.bound(prefix, [...prefix, []]);
 }
 function recordNamespace(value) {
     return isRecord(value) ? value.namespace : undefined;
-}
-function asRecord(value) {
-    return isRecord(value) ? value : {};
 }
 function isRecord(value) {
     return typeof value === "object" && value !== null;
