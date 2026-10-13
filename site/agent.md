@@ -40,8 +40,8 @@ would otherwise need a live bucket.
 Browser file history uses the WASM object engine and IndexedDB, with retained
 stages, undo/redo, and explicit current-file sync. Host applications supply
 credentials and networking; this profile does not start an HTTP S3 server in
-the browser. Start with the [browser contract](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-file-history.md)
-and the [runnable editor](https://github.com/chester-hill-solutions/stow-s3/tree/main/examples/browser-editor).
+the browser. Start with the [browser contract](/docs/browser-file-history/)
+and the [runnable editor](/docs/browser-editor/).
 The website walkthrough is a simulation; the editor runs real WASM and S3.
 
 The native run-through adapter caches upstream reads, supports prewarming exact
@@ -58,7 +58,7 @@ ETag, content type, user metadata, and requested checksum match that version;
 an already absent object confirms a delete. Recovery can still require another
 conditional attempt, so do not assume exactly-once delivery. Outbox retry and
 discard routes require the admin token, including on loopback. See the
-[run-through contract](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/compat-contract.md#62-read-through-cache-semantics).
+[run-through contract](/docs/s3-compatibility/#62-read-through-cache-semantics).
 
 ## Checkpoints and handoff for agent work (0.3.0 development tree)
 

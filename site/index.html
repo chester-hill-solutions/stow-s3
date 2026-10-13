@@ -21,11 +21,11 @@
     <meta property="og:url" content="https://stow.chesterhillsolutions.ca/" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/assets/favicon.svg?v=20261012-logo" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/stow.css?v=20261012-2" />
     <!-- Agent clients: these two make the same instructions discoverable
          without content negotiation, so a plain static host still works. -->
-    <link rel="alternate" type="text/markdown" href="/agent.md" title="Agent instructions" />
+    <link rel="alternate" type="text/markdown" href="https://github.com/chester-hill-solutions/stow-s3/blob/main/agent.md" title="Agent instructions" />
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
   </head>
   <body>
@@ -34,19 +34,12 @@
     <div class="shell">
       <header class="masthead">
         <a href="/" aria-label="Stow home">
-          <img src="/assets/wordmark.svg" alt="Stow S3" width="186" height="28" />
+          <img src="/assets/wordmark.svg?v=20261012-logo" alt="Stow S3" width="186" height="28" />
         </a>
         <nav aria-label="Primary">
-          <a href="#problem">Why</a>
-          <a href="#browser">Browser</a>
-          <a href="#workspace">Agents</a>
-          <a href="#testing">Tests</a>
-          <a href="#edge">Edge</a>
-          <a
-            href="https://github.com/chester-hill-solutions/stow-s3"
-            rel="noreferrer noopener"
-            >GitHub</a
-          >
+          <a href="/" aria-current="page">Overview</a>
+          <a href="/docs/">Docs</a>
+          <a href="https://github.com/chester-hill-solutions/stow-s3" rel="noreferrer noopener">GitHub</a>
         </nav>
       </header>
 
@@ -60,8 +53,8 @@
               keep browser edits offline, isolate test data, or cache objects beside your application.</p>
             <div class="cta">
               <a class="btn btn-primary" href="#demo">Try the sync walkthrough</a>
-              <a class="btn btn-ghost" href="https://github.com/chester-hill-solutions/stow-s3#readme"
-                rel="noreferrer noopener">Read the README</a>
+              <a class="btn btn-ghost" href="/docs/"
+                rel="noreferrer noopener">Read the docs</a>
             </div>
           </div>
           <aside class="hero-side" aria-label="Storage lifecycle">
@@ -176,12 +169,12 @@ Save an edit, then sync it to the simulated remote.</textarea>
               <p>WASM, IndexedDB, offline reload, undo/redo, explicit sync, and remote conflicts.
                 A private local S3 fixture supplies the remote.</p></div>
             <div class="install"><code id="demo-cmd">make browser-editor</code><button type="button" data-copy="#demo-cmd">Copy</button></div>
-            <a href="https://github.com/chester-hill-solutions/stow-s3/tree/main/examples/browser-editor">Demo setup &amp; walkthrough &rarr;</a>
+            <a href="/docs/browser-editor/">Demo setup &amp; walkthrough &rarr;</a>
           </div>
           <p class="scope-note">Each retained stage stores the full file bytes, so allow
             room for history in your byte budget. Browsers can evict local storage.
             Sync detects remote conflicts; your app decides how to resolve them.
-            <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-file-history.md">File history limits and recovery.</a></p>
+            <a href="/docs/browser-file-history/">File history limits and recovery.</a></p>
         </section>
 
         <!-- ------------------------------------------------------------- 02 -->
@@ -252,7 +245,7 @@ stow-s3 workspace <span class="k">diff</span> --from BASE_CHECKPOINT --to NEW_CH
             storage and verified checkpoints; it does not isolate host processes
             or network access. Direct filesystem writes are not hard-limited by
             object API quotas.
-            <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/portable-workspace-usage.md">Read the portable workspace guide.</a>
+            <a href="/docs/workspaces/">Read the portable workspace guide.</a>
           </p>
         </section>
 
@@ -280,7 +273,7 @@ stow-s3 workspace <span class="k">diff</span> --from BASE_CHECKPOINT --to NEW_CH
           </div>
           <p>Use the direct object API for embedded tests. Use the HTTP facade when
             the test needs standard S3 SDK requests and SigV4.
-            <a href="https://github.com/chester-hill-solutions/stow-s3#quick-start-a-scoped-session">See the scoped-session example.</a></p>
+            <a href="/docs/reference/#quick-start-a-scoped-session">See the scoped-session example.</a></p>
         </section>
 
         <section class="section" id="edge">
@@ -300,7 +293,7 @@ stow-s3 workspace <span class="k">diff</span> --from BASE_CHECKPOINT --to NEW_CH
           </div>
           <p>Select run-through explicitly. Offline mode makes no upstream calls;
             reads use local or cached bytes. Live upstream writes require separate consent.
-            <a href="https://github.com/chester-hill-solutions/stow-s3#run-through-mode-the-offline-cache">Read the cache and run-through guide.</a></p>
+            <a href="/docs/run-through/">Read the cache and run-through guide.</a></p>
         </section>
 
         <!-- ------------------------------------------------------------- 03 -->
@@ -378,19 +371,19 @@ s.putObject(b, k, data)
               <dt>Portable workspace checkpoints</dt>
               <dd>Capture file bytes, modes, and SHA-256 hashes. Compare checkpoints,
                 restore files, or export verified data for another host.
-                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/portable-workspace-usage.md">Checkpoint and transfer APIs</a></dd>
+                <a href="/docs/workspaces/">Checkpoint and transfer APIs</a></dd>
             </div>
             <div>
               <dt>Browser project history</dt>
               <dd>Commit several files as one revision and undo or redo the project.
                 Revisions share unchanged content chunks; reads load payloads on demand.
-                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-project-storage.md">Project storage and sync</a></dd>
+                <a href="/docs/browser-projects/">Project storage and sync</a></dd>
             </div>
             <div>
               <dt>Persistent workers and streams</dt>
               <dd>Read ranges or stream larger objects through a WASM worker.
                 Inspect interrupted uploads, release abandoned stages, and collect unused content.
-                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-worker-runtime.md">Worker storage and recovery</a></dd>
+                <a href="/docs/browser-workers/">Worker storage and recovery</a></dd>
             </div>
             <div>
               <dt>Durable upstream write outbox</dt>
@@ -400,7 +393,7 @@ s.putObject(b, k, data)
                 objects stop propagation and leave your local data available.
                 Recovery checks the remote ETag, content type, metadata, and requested
                 checksum before acknowledging a write whose reply was lost.
-                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/compat-contract.md#62-read-through-cache-semantics">Outbox guarantees and recovery limits</a></dd>
+                <a href="/docs/outbox/">Outbox guarantees and recovery limits</a></dd>
             </div>
           </dl>
 
@@ -449,9 +442,9 @@ s.putObject(b, k, data)
           <div class="cta">
             <a
               class="btn btn-primary"
-              href="https://github.com/chester-hill-solutions/stow-s3#readme"
+              href="/docs/"
               rel="noreferrer noopener"
-              >Read the README</a
+              >Read the docs</a
             >
             <a
               class="btn btn-ghost"

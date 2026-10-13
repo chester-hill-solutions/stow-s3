@@ -1,4 +1,4 @@
-.PHONY: test-browser browser-editor multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated check-mcp-browser benchmark
+.PHONY: test-browser browser-editor multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -168,6 +168,14 @@ check-doc-commands:
 check-adr-index:
 	node scripts/check-adr-index.mjs
 
+check-site:
+	npm ci --ignore-scripts --prefix site
+	npm run build --prefix site
+	npm test --prefix site
+
+check-doc-links: check-site
+	node scripts/check-doc-links.mjs
+
 # The gates under scripts/ are code, and a gate with no test is a gate whose
 # rules are never exercised in the modes they claim to handle. check-install-surface
 # shipped a rule that only misbehaved once every package was published, and the
@@ -183,4 +191,4 @@ check-mcp-browser:
 	npm test --prefix extensions/stow
 	node extensions/stow/build.mjs --check
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-scripts check-ts-quality check-generated check-mcp-browser
+standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-doc-links check-scripts check-ts-quality check-generated check-mcp-browser
