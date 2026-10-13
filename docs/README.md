@@ -1,8 +1,7 @@
 # Stow documentation
 
-Start with the guide for the storage surface your application uses. The
-[README](../README.md) is the full product reference; [CONTEXT](../CONTEXT.md)
-defines the repository's terms.
+Choose a guide for your application. The [full reference](../README.md) covers the product.
+[CONTEXT](../CONTEXT.md) defines development terms.
 
 ## Getting started
 
@@ -46,8 +45,7 @@ defines the repository's terms.
 
 ## Evidence and history
 
-[History](history/README.md) contains retired work orders and experiments.
-[Assessment receipts](assessment-evidence/2026-09-29/README.md),
-[Railway browser qualification](assessment-evidence/2026-10-12/railway-browser.json)
-and [benchmarks](benchmarks/session-baseline.md) have their own dates and scope.
-They do not turn a proposal or an untested host into a supported feature.
+[History](history/README.md) contains retired plans and experiments.
+For dated test results, see the [assessment records](assessment-evidence/2026-09-29/README.md),
+[Railway browser tests](assessment-evidence/2026-10-12/railway-browser.json)
+and [benchmarks](benchmarks/session-baseline.md).

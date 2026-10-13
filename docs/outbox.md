@@ -1,58 +1,52 @@
 # Durable upstream write outbox
 
-The native run-through adapter commits a supported mutation locally before
-propagating it to an S3-compatible upstream. A durable per-key outbox records
-the exact local object version and captured upstream state. This is separate
-from the browser APIs' explicit file and project sync.
+The native run-through adapter commits a mutation locally, then sends it to the upstream.
+A durable outbox records the local object version and the upstream state used for its write condition.
+Browser file and project sync use separate APIs.
 
 ## Enable propagation deliberately
 
-Run-through mode selects the upstream. Live-write consent separately permits
-mutations. A `mirrorWrites` routing policy does not supply that consent.
-
-Use `--mode run-through` with configured upstream credentials, and opt into
-mutations with `--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`.
+Configure upstream credentials and use `--mode run-through`.
+Enable writes with `--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`.
+`mirrorWrites` routing policy does not enable writes.
 See the [run-through guide](run-through.md) for configuration and offline reads.
 
 ## Local commit and remote conditions
 
-A prepared intent is reconciled with the committed local version before it
-becomes eligible for propagation. Failed local mutations do not leave a write
-that may later reach the provider. Entries for one key are processed in order;
-file-backed workers coordinate through expiring claims and a filesystem lock.
+An outbox intent can propagate only after Stow confirms its local commit.
+A failed local mutation cannot produce a later upstream write.
+Stow processes entries for each key in order.
+Filesystem workers use expiring claims and a filesystem lock to coordinate.
 
-Propagation uses the upstream validator captured from read provenance or an
-observation made before preparing the local mutation. A confirmed missing key
-uses an expected-absence condition. If the upstream changed, propagation stops
-with a terminal conflict. If an upstream baseline cannot be established, the
-local mutation still commits, but unsafe propagation is refused.
+The write condition uses the upstream validator captured during a read or before the local mutation.
+A confirmed missing key uses an expected-absence condition.
+If the upstream changes, propagation stops with a terminal conflict.
+If Stow cannot establish a baseline, the local mutation commits but does not propagate.
 
-Local data remains available. A conflict needs a new caller decision; retrying
-the same precondition cannot resolve it.
+Local data stays available. Resolve a conflict by choosing what to publish;
+retrying the same condition cannot resolve it.
 
 ## Retry and lost replies
 
-Transient failures retry with bounded backoff. Deterministic failures remain
-available for inspection rather than being retried indefinitely.
+Transient failures retry with bounded backoff. Deterministic failures remain available for inspection.
 
-An attempted put is acknowledged during recovery only when the upstream ETag,
-content type, normalized user metadata and requested checksum match the immutable
-local version. Matching bytes alone are insufficient for a metadata change.
-An attempted delete is acknowledged when the upstream object is already absent.
+After a lost put reply, recovery compares the upstream object with the recorded local version.
+Its ETag, content type, normalized user metadata and requested checksum must match.
+Matching bytes alone do not confirm a metadata change.
+A delete is confirmed when the upstream object is absent.
 
-If recovery cannot establish that state, another conditional attempt may be
-needed. This is not an exactly-once delivery guarantee. A newer local version
-does not silently replace the version recorded by the original intent.
+If recovery cannot confirm the result, Stow may make another conditional attempt.
+Delivery is not guaranteed to occur exactly once.
+A newer local version does not replace the version recorded by the original intent.
 
 ## Inspection and intervention
 
-`/_stow/inspect` reports object and upload state. The
-`/_stow/outbox/retry` and `/_stow/outbox/discard` routes change live propagation
-and always require the configured admin token, including on loopback. With no
-admin token, those mutation routes are unavailable.
+`/_stow/inspect` reports object and upload state.
+`/_stow/outbox/retry` and `/_stow/outbox/discard` change propagation.
+Both require the configured admin token, including on loopback.
+Without an admin token, these mutation routes are unavailable.
 
-Outbox files have a schema version. Newer schemas are refused at open;
-unversioned files migrate. All writers sharing one outbox must use the same
-revision. See the [compatibility contract](compat-contract.md#62-read-through-cache-semantics)
-for the normative propagation behavior, and the
-[server reference](../README.md#admin-and-metrics-routes) for admin authentication.
+Outbox files have a schema version. Stow rejects newer schemas and migrates unversioned files.
+All writers sharing an outbox must use the same revision.
+See the [compatibility contract](compat-contract.md#62-read-through-cache-semantics) for propagation rules
+and the [server reference](../README.md#admin-and-metrics-routes) for authentication.

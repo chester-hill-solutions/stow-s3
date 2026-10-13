@@ -1,19 +1,11 @@
 # Running and probing a Stow server
 
-This is the contract for driving `stow-s3` from a script, a launcher, or a test
-harness: how to start a server, how to learn the endpoint and credentials it
-actually got, how to confirm it is up, and what its defaults will not do to you.
-
-It exists because each of those has an answer that is not the obvious one. Every
-*behaviour* described here is asserted by a test — the route table in
-`internal/s3api/probe_contract_test.go`, the process-level claims in
-`cmd/stow-s3/probe_contract_test.go` — so if the behaviour changes, a test fails
-rather than this document quietly becoming wrong. The advice is not asserted,
-because advice is not behaviour.
+Use this guide to start a server, read its endpoint and credentials, and check readiness.
+Tests in `internal/s3api/probe_contract_test.go` and `cmd/stow-s3/probe_contract_test.go` verify the protocol behavior.
 
 ## Start a server
 
-Three shapes, in the order you probably want them:
+Choose how to manage the server:
 
 | Shape | Use when | Credentials |
 |---|---|---|
@@ -21,17 +13,16 @@ Three shapes, in the order you probably want them:
 | `stow-s3 serve --port 0` | A server you start and stop yourself | generated unless you pass them |
 | `stow-s3 serve --port 9000` | A fixed port you need | generated unless you pass them |
 
-`--port` is a **request, not a promise**. `0` asks the operating system for an
-ephemeral port, and any port can be taken, so the bound address is whatever the
-server reports after it listens. Credentials are likewise generated when you do
-not supply `--access-key` / `--secret-key` (or `STOW_LOCAL_ACCESS_KEY_ID` /
-`STOW_LOCAL_SECRET_ACCESS_KEY`). Never hardcode either value: hardcoding the port
-reports a server ready while it listens somewhere else, and hardcoding keys
-reports a server that will reject every request.
+`--port 0` asks the OS for an ephemeral port.
+Read the bound endpoint from readiness output. A requested fixed port can be unavailable.
+
+Credentials are generated unless you supply `--access-key` and `--secret-key`,
+or `STOW_LOCAL_ACCESS_KEY_ID` and `STOW_LOCAL_SECRET_ACCESS_KEY`.
+Use the reported credentials in your client.
 
 ## Learn the endpoint and the credentials
 
-There are two channels, and they are not interchangeable.
+Use the versioned readiness channel for launchers. The legacy stdout line is available for manual use.
 
 **The versioned channel (use this).** Pass `--ready-fd <n>` and the server writes
 exactly one JSON object to that inherited descriptor instead of printing
@@ -45,10 +36,8 @@ credentials to stdout:
  "maxObjects":0,"maxRequestBytes":8388608}}
 ```
 
-`endpoint` is the address the server actually bound. `capabilities` is what the
-server is enforcing, not what the client assumed. A limit of `0` means no limit,
-never "unlimited" in the sense of unknown. Reject a `protocolVersion` you do not
-know rather than parsing it anyway.
+`endpoint` is the bound address. `capabilities` reports enforced limits; zero means no configured limit.
+Reject unknown `protocolVersion` values.
 
 **The legacy line.** With no `--ready-fd`, the server prints one line to stdout:
 
@@ -56,17 +45,12 @@ know rather than parsing it anyway.
 STOW_READY endpoint=http://127.0.0.1:39115 access_key=... secret_key=... mode=local
 ```
 
-It is a human-readable fallback, and reading it is a parsing decision you own. It
-is also easy to satisfy by accident: the tokens `stow` and `STOW_READY` appear in
-unrelated output, and Debian ships an unrelated `stow` package manager that prints
-to stdout. Resolve the binary by absolute path and check `binaryVersion` (the
-versioned channel) or the `mode=` field before you trust a grep.
+Parse the legacy line only if your launcher explicitly supports it.
+Resolve the binary by absolute path to avoid the unrelated GNU Stow package manager.
+Validate `binaryVersion` on the versioned channel or `mode=` on the legacy line.
 
-**Do not cache readiness across processes.** Anything you write to disk can
-outlive the process that wrote it, and the next run will cheerfully reuse a
-"ready" record for a server that is gone. The descriptor is anonymous and is
-closed when the process exits, so a per-run pipe cannot have this problem — which
-is the reason to prefer it over a file.
+Read a fresh readiness record for each process. Do not reuse files from earlier runs.
+A per-run pipe avoids stale files and closes when the process exits.
 
 ## Confirm it is up
 
@@ -78,36 +62,25 @@ curl -sf "$endpoint/_stow/status"     # mode, policies, version, uptime, bucket 
 curl -sf "$endpoint/_stow/metrics"    # Prometheus text
 ```
 
-`/_stow/status` is the better probe of the two, because it reports `mode`,
-`write_policy`, `version`, and `uptime_sec` — the fields worth asserting on, and a
-low uptime on a port you expected to be long-lived means the process was reaped
-and replaced.
+Use `/_stow/status` to check `mode`, `write_policy`, `version` and `uptime_sec`.
 
-**Which routes need a credential.** The four read-only routes above answer with no
-token from loopback, and require `STOW_ADMIN_TOKEN` (sent as `X-Stow-Admin`) from
-any other address — which includes another container and another host. The two
-`/_stow/outbox/*` routes change what is propagated to a live provider and always
-require the token, including on loopback. A request without a valid token gets
-`404`, not `403`, so the route is not advertised.
+Read-only diagnostics, including `/_stow/inspect`, need no token on loopback.
+From other addresses, send the configured `STOW_ADMIN_TOKEN` as `X-Stow-Admin`.
+The two outbox mutation routes require that token on every address, including loopback.
+Unauthorized requests return `404`.
 
-**`/health` is not the health endpoint.** Every path outside `/_stow/` is an S3
-path, and an unsigned request to one is refused with `403 AccessDenied` before the
-route is even considered. A `403` on `/health` means the request was unsigned,
-not that the server is unhealthy. This is the same answer real S3 gives, and it is
-correct.
+`/health` is an S3 path, not a health probe.
+An unsigned request returns `403 AccessDenied`; this does not indicate server health.
 
 ## What the defaults will not do
 
-`stow-s3 serve` binds `127.0.0.1` unless you pass `--host`. A server that is not on
-loopback is not reachable from another machine or another container.
+`stow-s3 serve` binds `127.0.0.1` by default.
+Pass `--host` to accept connections through another interface.
 
-The server runs in **local mode by default**, and no combination of ambient
-environment variables changes that. `STOW_ENDPOINT`, `STOW_ACCESS_KEY_ID`, and
-`STOW_SECRET_ACCESS_KEY` describe an upstream; they do not select one. Run-through
-mode requires naming it, with `--mode run-through` or `STOW_MODE=run-through`, and
-propagating writes upstream requires a second, separate opt-in
-(`--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`). The startup banner states
-which of these you got:
+Local mode is the default. Upstream credentials alone do not enable run-through mode.
+Use `--mode run-through` or `STOW_MODE=run-through` to select an upstream.
+Enable writes separately with `--allow-live-writes` or `STOW_ALLOW_LIVE_WRITES=true`.
+The startup banner reports the effective settings:
 
 ```
 stow mode: local
@@ -116,24 +89,16 @@ stow mode: local
   upstream: not in use; run-through requires --mode run-through or STOW_MODE=run-through
 ```
 
-In run-through mode that last line becomes an `override:` note, which is how you
-tell the two situations apart: `upstream: not in use` means local, and an
-`override:` line means an upstream *is* in use. A `mirrorWrites` policy without the
-live-writes opt-in keeps every write local and says so in the banner.
-
-Pin `--mode local` if you want the server to say so explicitly rather than by
-default. It is worth doing in CI, where the environment is not yours.
+In local mode, the banner says `upstream: not in use`.
+Run-through mode reports an `override:` note.
+A `mirrorWrites` policy without live-write consent keeps writes local and reports this in the banner.
+Set `--mode local` explicitly in launchers that require local-only storage.
 
 ## Platform support
 
-Release artifacts are published for `linux` and `darwin`, on `amd64` and `arm64`.
-There is no Windows build, and adding one is more than a row in the release matrix:
-the workspace backend requires an advisory file lock to establish that nobody else
-is using a workspace, and Go's standard library only offers one on Unix, so on
-Windows `stow.OpenWorkspace` refuses rather than guessing. That follows from the
-lock being required rather than optional, and no test here can observe it, because
-every CI platform this runs on has the lock. The S3 server itself has no such
-requirement. On Windows, use WSL.
+Native package targets are Linux and macOS on amd64 and arm64.
+Workspaces require a supported advisory file lock and refuse unsupported hosts.
+The S3 server has no workspace-lock requirement. Use WSL on Windows for the workspace workflow.
 
 ## A launcher that does all of this correctly
 
@@ -142,7 +107,8 @@ requirement. On Windows, use WSL.
 set -euo pipefail
 STOW_BIN="${STOW_BIN:?set STOW_BIN to the stow-s3 binary}"
 
-# Descriptor 3 is a pipe this script reads; the server never sees a path.
+# Use a new temporary file for this run; the server writes through descriptor 3.
+umask 077
 ready=$(mktemp); exec 3>"$ready"
 "$STOW_BIN" serve --port 0 --mode local --data-dir "$PWD/.stow" --ready-fd 3 &
 server=$!
@@ -157,7 +123,7 @@ export AWS_ACCESS_KEY_ID=$(python3 -c 'import json,sys; print(json.load(open(sys
 export AWS_SECRET_ACCESS_KEY=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["secretAccessKey"])' "$ready")
 export AWS_REGION=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["region"])' "$ready")
 
-# Confirm before declaring the server up, and assert the mode you expect.
+# Confirm the server answers before continuing.
 curl -sf "$endpoint/_stow/status" >/dev/null || { echo "not serving" >&2; exit 1; }
 ```
 
@@ -173,4 +139,4 @@ a `/_stow/health` round trip.
   which host can provide one.
 - [`docs/compat-contract.md`](compat-contract.md) — the S3 surface, including what
   is deliberately not implemented.
-- `README.md` — the full reference.
+- [README](../README.md) — the full reference.

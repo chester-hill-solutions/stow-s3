@@ -1,11 +1,10 @@
 # Portable workspace usage
 
-The development tree adds portable object checkpoints, replayable capture requests,
-a shared workspace S3 facade, local MCP tools and an experimental OpenCode caller.
-The native package targets are macOS and Linux on arm64/x64; this local run
-verifies macOS arm64. Windows workspace runtime is not supported by the current
-rooted-read/capture implementation. These additions have not yet been published. See [the plan](plan.md) for release
-and pilot gates.
+Use native workspaces for file editing, checkpoints, capture recovery, S3 access and local MCP tools.
+These APIs are available in the development checkout; the 0.3.0 packages are unpublished.
+Native package targets are macOS and Linux on arm64/x64.
+Windows workspace capture is unsupported by the current rooted-read implementation.
+See the [plan](plan.md) for remaining release tests.
 
 ## Workspace lifetime and S3
 
@@ -32,8 +31,7 @@ these handles preserves the workspace. A second owner is refused.
 
 ## Conditional object saves
 
-Public Go `PutOptions` now exposes `IfMatch` and `IfNoneMatch` through the existing
-runtime/store write gate. Use the ETag from a read for `IfMatch`, or `IfNoneMatch: "*"`
+Go `PutOptions` supports `IfMatch` and `IfNoneMatch` at the runtime/store write gate. Use the ETag from a read for `IfMatch`, or `IfNoneMatch: "*"`
 for creation only when absent. A mismatch returns `ErrPreconditionFailed` without
 replacing current bytes. Empty conditions retain unconditional writes.
 
@@ -49,14 +47,13 @@ refuses conditions against older hosts that do not advertise support.
 
 These checks compare content ETags, not metadata or every intervening revision.
 They do not coordinate arbitrary host writers or provide a committed-write replay
-receipt after a lost response. A stronger native managed-save interface is described below. Native filesystem
-receipts support bounded recovery; wrapper consumers and declared-input readiness
-checks remain open in [W02/W09](storage-foundation-plan.md).
+receipt after a lost response. Use managed saves below when metadata changes must also invalidate an observation.
+Filesystem receipts support bounded recovery.
+Wrapper support and declared-input checks remain open in [W02/W09](storage-foundation-plan.md).
 
 ## Managed saves in native storage
 
-The development Go API adds `Runtime.ReadForSave` and `Runtime.SaveObject` for
-built-in memory storage and the owned filesystem profile below. Check
+Use `Runtime.ReadForSave` and `Runtime.SaveObject` with built-in memory storage or the owned filesystem profile below. Check
 `Capabilities().GuardedSaves` before using them.
 An observation includes an opaque `SaveCondition` bound to that runtime and exact
 bucket/key. Saving compares the managed record generation, content and logical
@@ -183,16 +180,17 @@ stow-s3 workspace checkpoint --id WORKSPACE_ID --registry-dir /absolute/registry
 
 Persist the key and exact options before calling. Pause all writers first.
 
-This verb consults no policy unless you pass `--policy /path/to/revision.json`, which
-loads a persisted revision and decides the capture by it. The revision is read per
-decision, so a revocation takes effect when it is issued rather than when the process
-started. Without the flag the capture is decided by the environment only, and a policy
-denying capture sits on disk unread. Use
-`--resolve` with the same arguments after an uncertain reply; it creates no new
-checkpoint. The response carries `version`, `result` and a typed `error` on failure.
-Success is `result.outcome=committed`, with `result.checkpoint.id`. Inspect the
-exit status as well as the JSON. Scope/options conflicts and permanent failures
-must not be retried as new captures. Receipts remain valid only while retained.
+Pass `--policy /path/to/revision.json` to apply a stored capture policy.
+Without it, capture uses the environment's permissions only.
+Stow rereads the policy for each decision, so later revocation can take effect.
+
+After an uncertain reply, use `--resolve` with the same arguments.
+Resolution creates no new checkpoint.
+The response includes `version`, `result` and a typed `error` on failure.
+Success has `result.outcome=committed` and `result.checkpoint.id`.
+Check the exit status as well as JSON.
+Do not retry option conflicts or permanent failures as new captures.
+Receipts remain valid only while retained.
 
 The shared Go APIs are `CaptureCheckpoint` and `ResolveCheckpoint`, with
 `CheckpointRequest{Key, Options}`. `CheckpointOptions.PortableObjects=true` selects
@@ -328,13 +326,11 @@ macOS arm64 host, five-run measurements were:
 | 256 files / 8 MiB | 129 ms | 124–185 ms |
 | 4,096 files / 64 MiB | 1.74 s | 1.53–11.10 s |
 
-The large run included an 11.10-second first capture; a median is not a latency
-bound. The earlier ~31-second result was dominated by repeated directory scans,
-which have been removed. Capture now uses at most eight copy workers and sixteen
-file flushes, and waits for each barrier before verifying/publishing. All content
-and mutation checks remain. Retaining five checkpoints still costs roughly five
-payload copies plus manifests. A tested parent-file sharing experiment was removed
-because it made saves slower on this filesystem.
+The large run included an 11.10-second first capture. The median is not a latency bound.
+Capture uses at most eight copy workers and sixteen file flushes.
+It waits for each barrier before verification and publication.
+Five retained checkpoints cost roughly five payload copies plus manifests.
+A tested parent-file sharing experiment was removed because it slowed saves on this filesystem.
 
 Measure the actual working set before turn-by-turn use and choose a bounded
 deadline accordingly. Transfer time, peak RSS and a second host remain separate

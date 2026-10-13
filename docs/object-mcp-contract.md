@@ -1,10 +1,8 @@
 # Native object MCP contract
 
-**W02 increment, 2026-09-30.** Implemented; local verification is recorded in the
-[dated receipt](implementation-2026-09-30.md#native-object-mcp-wrapper-addendum).
-This is a reference for the [consolidated plan](storage-foundation-plan.md), not a
-second work queue. It wraps the [qualified native filesystem save core](portable-workspace-usage.md#filesystem-save-receipts-and-recovery)
-for MCP callers. The existing workspace/checkpoint MCP profile keeps its contract.
+The native object MCP tools wrap [guarded filesystem saves](portable-workspace-usage.md#filesystem-save-receipts-and-recovery).
+They support read-for-save, keyed save, resolution, observation release and capability inspection.
+The [dated test record](implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
 
 ## Owned profile
 
@@ -19,9 +17,8 @@ This profile uses object records, not the editable workspace directory/manifest
 format. It does not qualify arbitrary host edits, shared-host ownership, resource
 ACLs, encryption or historical object-body retention. The host owns process access
 and caller identity; a fixed bucket selector is not a general resource ACL system.
-The MCP SDK negotiates its existing JSON-RPC protocol. The future generated
-Protobuf content-journal envelope remains W08; this adapter adds no new WASM wire
-protocol or independent object model.
+The MCP SDK negotiates the JSON-RPC protocol.
+This adapter does not add a WASM protocol or a separate object model.
 
 ## Read, save and resolution
 
@@ -36,14 +33,13 @@ save. Legacy conditions and caller-supplied bucket/path selectors are refused.
 Before calling save, the caller persists a unique request key and the intended
 resource, data and options. Save requires that key. Repeating a live request keeps
 its original token and complete meaning; core replay returns the original result
-without overwriting later contents. A changed meaning refuses. The caller releases
+without overwriting later contents. A retry with different data, resource, guard or options is rejected. The caller releases
 the token when it no longer needs it. Release affects only an observation, never
 object data, receipts or retention.
 
 Tokens expire after 15 minutes and are reaped on access. They do not survive server
 close/reopen. After an uncertain reply or restart, call resolution with the original
-object key and request key. It does not retry an intended body. Missing evidence is
-unknown. A fresh read is a new observation, not proof that the original save failed.
+object key and request key. It does not retry an intended body. A missing receipt means the outcome is unknown. A fresh read is a new observation, not proof that the original save failed.
 Receipts retain metadata; a later ordinary fetch returns current bytes.
 
 The object tools use an independent version-1 result envelope. The effect outcome

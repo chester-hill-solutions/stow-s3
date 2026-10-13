@@ -1,9 +1,9 @@
 # Architecture decisions
 
-This index distinguishes decisions in force from proposals. Accepted and narrowed
-records govern design; acceptance does not certify that every API is implemented.
-Use the [usage guides](../README.md) for supported behavior and the
-[consolidated plan](../storage-foundation-plan.md) for remaining work.
+Accepted and narrowed records govern design. Proposed records do not.
+An accepted design can still have unfinished implementation.
+Use the [usage guides](../README.md) for supported APIs and the
+[storage plan](../storage-foundation-plan.md) for remaining work.
 
 ## Current records
 
