@@ -41,21 +41,11 @@ export const SITE_TEXT_FILES = [
   ),
 ];
 
-// Each command the site must be able to print, checked across the site rather than
-// per file. agent.md deliberately tells you to build from a checkout rather than to
-// install the published package, so demanding the npm line there would be demanding
-// something it is right not to say. check-install-surface already owns the
-// per-document rule; this owns the site-wide one.
-// Both lines are required. A scoped package on GitHub Packages is routed by the scope
-// binding, so `npm install @chester-hill-solutions/stow-s3` on its own resolves against
-// npmjs and finds nothing - and the gate used to require exactly that string while the
-// page shipped it as the headline install, so it was enforcing a command that does not
-// work. Requiring the binding makes the two inseparable again.
-export const SCOPE_REGISTRY = "npm config set @chester-hill-solutions:registry https://npm.pkg.github.com";
-
+// The site should offer the supported paths today: the published Go module
+// and a source checkout. npm/PyPI availability is tracked by the install-surface
+// gate; an old registry binding must not be required to make the page pass.
 export const REQUIRED_COMMANDS = [
-  "npm install @chester-hill-solutions/stow-s3",
-  SCOPE_REGISTRY,
+  "git clone https://github.com/chester-hill-solutions/stow-s3",
   "go get github.com/chester-hill-solutions/stow-s3/pkg/stow",
 ];
 

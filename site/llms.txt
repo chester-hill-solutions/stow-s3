@@ -1,16 +1,26 @@
 # Stow
 
-> Working storage an agent can hand off. A real directory with a durable identity
-> and verified checkpoints — and an S3-compatible store for tests and CI.
+> An object store you can embed. Run it in Go or WebAssembly, with a native S3
+> endpoint for existing SDKs.
 
-Stow is an Apache 2.0 S3-compatible object store and filesystem workspace that
-runs on the local machine. It speaks real S3 over HTTP with SigV4, so existing
-SDK code works unchanged. An agent can start in a persistent isolated workspace
-prepared from declared local inputs, checkpoint it, diff what changed, and hand
-the checkpoint to another host; scoped S3 sessions remain disposable and delete
-themselves when closed.
+Stow is an Apache 2.0 object engine with native S3 HTTP compatibility and a
+WebAssembly profile. Prepared filesystem workspaces support checkpoints,
+comparison, and portable handoff. The browser profile offers IndexedDB
+persistence, retained file stages, undo/redo, and explicit conditional sync
+through host-supplied networking. Embedded Go and Node WASM runtimes need no
+HTTP listener. Native run-through mode adds an S3 read-through cache with
+prewarming, cache limits, TTL, and explicit offline operation. WASM enables
+embedding in compatible hosts; edge platform integrations need qualification.
+Stow owns storage; the host owns execution and sandbox enforcement.
 
 ## Start here
+
+- [Browser file history and sync](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-file-history.md):
+  local commit, undo/redo, conditional writes, recovery, and limits.
+- [Real browser editor demo](https://github.com/chester-hill-solutions/stow-s3/tree/main/examples/browser-editor):
+  run `make browser-editor` from a built source checkout.
+- [Native read-through cache](https://github.com/chester-hill-solutions/stow-s3#run-through-mode-the-offline-cache):
+  cache reads, prewarm exact keys, and work offline.
 
 - [Agent instructions](/agent.md): install commands, the prepared workspace
   flow for coding tasks, and the scoped-session pattern for disposable S3.

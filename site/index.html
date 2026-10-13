@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stow — working storage an agent can hand off</title>
+    <title>Stow: an object store you can embed</title>
     <meta
       name="description"
-      content="Stow gives an agent a real directory with a durable identity and verified checkpoints. Checkpoint it, diff what changed, hand it to another host, and adopt it there. An S3-compatible store for tests and CI comes with it."
+      content="Run Stow's object engine in Go or WebAssembly. Checkpoint agent workspaces, edit browser files offline, isolate test data, or cache S3 reads near your application."
     />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Stow — working storage an agent can hand off" />
+    <meta property="og:title" content="Stow: an object store you can embed" />
     <meta
       property="og:description"
-      content="A real directory with a durable identity, verified checkpoints, and a diff that says what an agent actually changed. An S3-compatible store for tests and CI comes with it."
+      content="Run an object engine in Go or WebAssembly, with a native S3 endpoint for existing SDKs. Agent checkpoints, offline browser edits, isolated tests, and caching."
     />
     <meta property="og:image" content="/images/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/assets/stow.css" />
+    <link rel="stylesheet" href="/assets/stow.css?v=20261012-2" />
     <!-- Agent clients: these two make the same instructions discoverable
          without content negotiation, so a plain static host still works. -->
     <link rel="alternate" type="text/markdown" href="/agent.md" title="Agent instructions" />
@@ -38,8 +38,10 @@
         </a>
         <nav aria-label="Primary">
           <a href="#problem">Why</a>
-          <a href="#workspace">Workspaces</a>
-          <a href="#surfaces">S3</a>
+          <a href="#browser">Browser</a>
+          <a href="#workspace">Agents</a>
+          <a href="#testing">Tests</a>
+          <a href="#edge">Edge</a>
           <a
             href="https://github.com/chester-hill-solutions/stow-s3"
             rel="noreferrer noopener"
@@ -49,167 +51,157 @@
       </header>
 
       <main id="main">
-        <!-- ------------------------------------------------------------ hero -->
         <section class="hero">
-          <p class="eyebrow">Free &middot; Open source &middot; Apache 2.0</p>
-
+          <p class="eyebrow"><span>Go + WebAssembly</span><span>Apache 2.0</span></p>
           <div class="hero-main">
-            <h1>Working storage an agent can <em>hand off.</em></h1>
-            <p class="lede">
-              Stow gives an agent a real directory with a durable identity and
-              verified checkpoints. When the run ends — or a different agent picks
-              it up — the checkpoint says exactly what changed, and you decide
-              where it lands. An S3-compatible store for tests and CI comes with
-              it.
-            </p>
-
+            <h1>An object store<br /><em>you can embed.</em></h1>
+            <p class="lede">Stow runs an object engine in Go or WebAssembly, with a native
+              S3 endpoint for existing SDKs. Use it to checkpoint an agent's files,
+              keep browser edits offline, isolate test data, or cache objects beside your application.</p>
             <div class="cta">
-              <a class="btn btn-primary" href="#workspace">See the lifecycle</a>
-              <a
-                class="btn btn-ghost"
-                href="https://github.com/chester-hill-solutions/stow-s3"
-                rel="noreferrer noopener"
-                ><span class="star" aria-hidden="true">&#9733;</span> GitHub<span
-                  data-stars
-                  hidden
-                ></span
-                ></a
-              >
+              <a class="btn btn-primary" href="#demo">Try the sync walkthrough</a>
+              <a class="btn btn-ghost" href="https://github.com/chester-hill-solutions/stow-s3#readme"
+                rel="noreferrer noopener">Read the README</a>
             </div>
           </div>
-
-          <div class="hero-side">
-            <div class="install">
-              <span class="prompt" aria-hidden="true">$</span>
-              <code id="scope-cmd">npm config set @chester-hill-solutions:registry https://npm.pkg.github.com</code>
+          <aside class="hero-side" aria-label="Storage lifecycle">
+            <div class="lifecycle">
+              <p class="eyebrow">Save locally before you publish</p>
+              <ol>
+                <li><span>01</span><div><b>Read and write</b><small>Work with local files, objects, or test fixtures.</small></div></li>
+                <li><span>02</span><div><b>Save a version</b><small>Capture a workspace checkpoint or browser file stage.</small></div></li>
+                <li><span>03</span><div><b>Sync or hand off</b><small>Publish a file or transfer a checkpoint when you request it.</small></div></li>
+              </ol>
+              <p class="reassure">Stow starts in local mode. Configure an upstream when you need one.</p>
             </div>
-            <div class="installline">
-              <code id="install-cmd">npm install @chester-hill-solutions/stow-s3</code>
-              <button type="button" data-copy="#install-cmd">Copy</button>
-            </div>
-
-            <p class="reassure">
-              No AWS account. No infrastructure. No credentials to rotate. Not
-              production storage, and it does not pretend to be a sandbox.
-            </p>
-
-            <ul class="proof">
-              <li><b>12.9 MB max</b><span>single binary, every platform</span></li>
-              <li><b>0</b><span>cloud services</span></li>
-              <li><b>4</b><span>language surfaces</span></li>
-              <li class="proof-note">
-                <b>no credentials to rotate</b><span>ephemeral keys per session</span>
-              </li>
-            </ul>
-          </div>
+          </aside>
         </section>
 
-        <!-- Real output from the real binary, captured from
-             `stow-s3 workspace checkpoint` against a prepared workspace. -->
-        <div class="term" role="figure" aria-label="A workspace checkpoint between two points">
-          <div class="term-bar">
-            <span class="dot" aria-hidden="true"></span>
-            <span>what the agent left behind</span>
-            <span class="spacer"></span>
-            <button type="button" data-copy="#checkpoint-brief" class="term-copy">
-              Copy
-            </button>
-          </div>
-          <pre id="checkpoint-brief"><span class="c"># Stow</span>
-Working storage an agent can hand off. Apache 2.0. <span class="k">Not</span> production storage.
-
-<span class="k">prepare</span>  stow-s3 workspace prepare --manifest task.json
-<span class="k">work</span>      <span class="c"># the agent writes into root/</span>
-<span class="k">checkpoint</span> stow-s3 workspace checkpoint --id ws_84845327e66e83fd
-<span class="k">diff</span>      stow-s3 workspace diff --from cp_5fac&hellip; --to cp_b19c&hellip;
-<span class="k">hand off</span>  stow-s3 workspace export --checkpoint-id cp_5fac&hellip; --output run.tar
-<span class="k">elsewhere</span>  stow-s3 workspace adopt --handoff run.json
-<span class="k">read</span>      <b>https://stow.chesterhillsolutions.ca/agent.md</b>
-
-<span class="c"># S3 for tests and CI, no AWS account:
-# https://stow.chesterhillsolutions.ca/agent.md#s3</span></pre>
-        </div>
-
-        <!-- ------------------------------------------------------------- 01 -->
         <section class="section" id="problem">
-          <span class="num">01</span>
-          <h2>An agent's working state is the one thing you can't get back.</h2>
-          <p>
-            The run produced something. A report, a patch, a dataset, a
-            half-finished refactor. Then the job ended, and it went into the
-            runner's scratch directory, which is not a place you can come back to.
-          </p>
-          <p>
-            The usual alternatives are worse than losing it. Point the agent at a
-            cloud bucket and you have handed an agent's intermediate output to
-            someone else's account, with their retention policy and their blast
-            radius. Keep it on the runner's disk and it disappears with the job.
-            Neither gives you a way to ask <em>what actually changed</em>, because
-            neither records anything.
-          </p>
-          <p>
-            <strong>Stow records it.</strong> The workspace is a real directory
-            with a durable identity that outlives the process that made it, and a
-            checkpoint is a sealed manifest of what was inside — every path, its
-            size, its mode, its SHA-256.
-          </p>
+          <span class="num">01 / Why Stow</span>
+          <h2>Choose storage for the job you're running.</h2>
+          <p>An agent's working files need to survive a handoff. A browser editor
+            needs to save without a connection. Test data usually needs to disappear
+            when the test ends. Stow supports each of these through a different API.</p>
+          <ul class="grid four-grid pillars">
+            <li class="card">
+              <span class="eyebrow">Agent workspaces</span>
+              <h3>Checkpoint a run before handing it off.</h3>
+              <p>Prepare declared inputs, checkpoint outputs, compare changes, and
+                hand verified working files to the next host.</p>
+              <a href="#workspace">Workspace lifecycle &rarr;</a>
+            </li>
+            <li class="card">
+              <span class="eyebrow">Offline browser apps</span>
+              <h3>Edit a file without a connection.</h3>
+              <p>Save edits and undo history in IndexedDB. Sync a selected file
+                stage through your app's S3 transport when the connection returns.</p>
+              <a href="#browser">Browser file history &rarr;</a>
+            </li>
+            <li class="card">
+              <span class="eyebrow">Tests &amp; CI</span>
+              <h3>Start with a fresh object store.</h3>
+              <p>Use an in-process object runtime for direct tests or a disposable
+                S3 endpoint for SDK integration tests. No cloud account required.</p>
+              <a href="#testing">In-process test example &rarr;</a>
+            </li>
+            <li class="card">
+              <span class="eyebrow">Edge storage &amp; caching</span>
+              <h3>Cache objects beside application code.</h3>
+              <p>Embed the WASM object engine beside your application, or put
+                Stow's native read-through cache in front of an S3-compatible upstream.</p>
+              <a href="#edge">WASM hosts and S3 caching &rarr;</a>
+            </li>
+          </ul>
+        </section>
 
-          <div class="stat-row">
-            <div>
-              <b>sha256</b>
-              <span>per file, per checkpoint</span>
-            </div>
-            <div>
-              <b>durable</b>
-              <span>identity outlives the process</span>
-            </div>
-            <div>
-              <b>you decide</b>
-              <span>where the checkpoint lands</span>
-            </div>
+        <section class="section" id="browser">
+          <span class="num">02 / Offline browser apps</span>
+          <h2>Undo still works offline.</h2>
+          <p>Stow's WebAssembly engine stores browser file edits in IndexedDB.
+            It saves each stage with the history cursor, so undo and redo still
+            work after a reload. Saving a local stage makes no network request.</p>
+          <div class="browser-flow" aria-label="Browser storage flow">
+            <div><b>Your app</b><span>Edit, save, undo, redo</span></div>
+            <span aria-hidden="true">&rarr;</span>
+            <div><b>WASM + IndexedDB</b><span>Local bytes and retained stages</span></div>
+            <span aria-hidden="true">&rarr;</span>
+            <div><b>Explicit sync</b><span>Conditional PUT to your remote</span></div>
           </div>
+          <p>Sync publishes the selected file stage. If a remote writer changed the
+            object, Stow reports a conflict and retains your local history.
+            Your application supplies credentials and networking through an S3 SDK
+            transport or an authenticated proxy.</p>
+          <div class="walkthrough" id="demo" data-demo hidden>
+            <div class="demo-heading">
+              <div><h3>Edit offline, then sync a saved stage</h3>
+                <p>This is a simulation: data stays in this tab, and reload clears it.
+                  Run the demo below to try WASM, IndexedDB, and S3.</p></div>
+              <button class="btn btn-ghost" type="button" id="demo-reset">Reset</button>
+            </div>
+            <ol class="demo-steps">
+              <li>Switch offline.</li><li>Edit and save a stage.</li><li>Undo or redo.</li><li>Reconnect, then sync.</li>
+            </ol>
+            <div class="demo-toolbar">
+              <label class="offline-switch"><input type="checkbox" id="demo-offline" /> Work offline</label>
+              <label class="upload-label" for="demo-upload">Open a text file <span>(up to 16 KiB)</span></label>
+              <input type="file" id="demo-upload" accept=".txt,.md,.json,.csv,text/*,application/json" />
+            </div>
+            <div class="demo-panels">
+              <div class="demo-local">
+                <label for="demo-editor"><span id="demo-filename">notes.md</span> <small>Local working copy</small></label>
+                <textarea id="demo-editor" rows="7" spellcheck="false"># notes.md
+
+Save an edit, then sync it to the simulated remote.</textarea>
+                <div class="demo-actions">
+                  <button class="btn btn-primary" type="button" id="demo-save">Save stage</button>
+                  <button class="btn btn-ghost" type="button" id="demo-undo">Undo</button>
+                  <button class="btn btn-ghost" type="button" id="demo-redo">Redo</button>
+                </div>
+                <p class="demo-detail" id="demo-history">1 retained stage</p>
+              </div>
+              <div class="demo-remote">
+                <h4>Simulated remote object</h4>
+                <pre id="demo-remote-content"></pre>
+                <div class="outbox"><span>Pending file</span><b id="demo-pending">0</b></div>
+                <button class="btn btn-primary" type="button" id="demo-sync">Sync selected stage</button>
+                <p class="demo-detail">After reconnecting, choose Sync to publish the selected stage.</p>
+              </div>
+            </div>
+            <p class="demo-message" id="demo-message" role="status" aria-live="polite">The initial stage matches the simulated remote.</p>
+          </div>
+          <noscript><p>The interactive walkthrough needs JavaScript. The real browser demo is available from the source checkout below.</p></noscript>
+          <div class="demo-real">
+            <div><h3>Run the real browser demo</h3>
+              <p>WASM, IndexedDB, offline reload, undo/redo, explicit sync, and remote conflicts.
+                A private local S3 fixture supplies the remote.</p></div>
+            <div class="install"><code id="demo-cmd">make browser-editor</code><button type="button" data-copy="#demo-cmd">Copy</button></div>
+            <a href="https://github.com/chester-hill-solutions/stow-s3/tree/main/examples/browser-editor">Demo setup &amp; walkthrough &rarr;</a>
+          </div>
+          <p class="scope-note">Each retained stage stores the full file bytes, so allow
+            room for history in your byte budget. Browsers can evict local storage.
+            Sync detects remote conflicts; your app decides how to resolve them.
+            <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-file-history.md">File history limits and recovery.</a></p>
         </section>
 
         <!-- ------------------------------------------------------------- 02 -->
         <section class="section" id="workspace">
-          <span class="num">02</span>
-          <h2>Prepare, work, checkpoint, diff, hand off.</h2>
+          <span class="num">03 / AI agent workspaces</span>
+          <h2>Hand off the files, with a record of what changed.</h2>
           <p>
-            Five verbs, all of them explicit. Nothing is retained implicitly, and
-            nothing leaves the machine unless you ask it to.
+            Give each run a real working directory prepared from declared inputs.
+            Checkpoint it before a handoff, inspect what changed, and adopt verified
+            files on another host. Workspace identity outlives the process that opened it.
           </p>
 
-          <div class="term" role="figure" aria-label="Preparing a workspace">
-            <div class="term-bar">
-              <span class="dot" aria-hidden="true"></span>
-              <span>stow-s3 workspace prepare</span>
-              <span class="spacer"></span>
-              <span>declares the inputs</span>
-            </div>
-            <pre><span class="c"># task.json — inputs name a source and a destination inside the workspace</span>
-{ "version": 1, "root": "<span class="s">/srv/run/ws</span>",
-  "inputs": [{ "source": "<span class="s">./report.md</span>", "destination": "report.md" }] }
-
-$ stow-s3 workspace prepare --manifest task.json
-{
-  <span class="k">"workspace_id"</span>: <span class="s">"ws_84845327e66e83fd"</span>,
-  <span class="k">"root"</span>: <span class="s">"/srv/run/ws"</span>,
-  <span class="k">"bucket"</span>: <span class="s">"stow-workspace-a2231176545311e8"</span>,
-  <span class="k">"seeded_objects"</span>: 1,
-  <span class="k">"base_identity"</span>: <span class="s">"sha256:964580fcc01265bd…"</span>,
-  <span class="k">"capabilities"</span>: { <span class="k">"backend"</span>: <span class="s">"workspace"</span>, <span class="k">"max_bytes"</span>: 67108864, <span class="k">"max_objects"</span>: 10000,
-                   <span class="k">"persistent"</span>: true, <span class="k">"multipart"</span>: true },
-  <span class="k">"authority"</span>: [<span class="s">"object.read"</span>, <span class="s">"object.write"</span>, <span class="s">"object.delete"</span>, <span class="s">"object.list"</span>, <span class="s">"bucket.*"</span>, <span class="s">"environment.reset"</span>]
-}</pre
-          >
+          <div class="term" role="figure" aria-label="Workspace lifecycle commands">
+            <div class="term-bar"><span class="dot" aria-hidden="true"></span><span>From task inputs to a portable checkpoint</span></div>
+            <pre><span class="c"># Declare local inputs and a workspace root in task.json</span>
+stow-s3 workspace <span class="k">prepare</span> --manifest task.json
+<span class="c"># Run your agent, then quiesce writers before capturing the files</span>
+stow-s3 workspace <span class="k">checkpoint</span> --id WORKSPACE_ID
+stow-s3 workspace <span class="k">diff</span> --from BASE_CHECKPOINT --to NEW_CHECKPOINT</pre>
           </div>
-
-          <p>
-            The capability block is reported, not promised. Limits and the
-            authority actually granted come back from the server, so a caller reads
-            them rather than assuming them.
-          </p>
-
           <div class="term" role="figure" aria-label="Diffing two checkpoints">
             <div class="term-bar">
               <span class="dot" aria-hidden="true"></span>
@@ -234,55 +226,110 @@ $ stow-s3 workspace prepare --manifest task.json
 
           <div class="scope">
             <div class="yes">
-              <h3>A checkpoint travels</h3>
+              <h3>Included in a checkpoint</h3>
               <ul>
                 <li>Files with modes and SHA-256 hashes</li>
-                <li>Logical buckets and object bytes, portably</li>
+                <li>Logical buckets and object bytes</li>
                 <li>Content type, user metadata, checksums</li>
-                <li>Declared Git provenance, detached</li>
+                <li>Declared Git source and commit</li>
                 <li>Relative working directory</li>
               </ul>
             </div>
             <div class="no">
-              <h3>It does not</h3>
+              <h3>Outside the checkpoint</h3>
               <ul>
                 <li>Private <code>.stow</code> state or credentials</li>
                 <li>Your <code>.git</code> or process memory</li>
                 <li>Anything outside the workspace root</li>
                 <li>Effects outside the filesystem</li>
-                <li>Original object version IDs, guaranteed</li>
+                <li>Original object version IDs are not guaranteed</li>
               </ul>
             </div>
           </div>
 
           <p>
-            A checkpoint is not a permission and not a handle. Handing one over does
-            not grant authority: adoption on the far side is a separate decision, by
-            you, about a directory that now belongs to someone else's run.
+            Your host owns agent execution and sandbox enforcement. Stow owns working
+            storage and verified checkpoints; it does not isolate host processes
+            or network access. Direct filesystem writes are not hard-limited by
+            object API quotas.
+            <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/portable-workspace-usage.md">Read the portable workspace guide.</a>
           </p>
+        </section>
+
+        <section class="section" id="testing">
+          <span class="num">04 / Tests &amp; CI</span>
+          <h2>Open an object store inside your test.</h2>
+          <p>For direct object tests, open the engine in your process without an HTTP
+            listener or cloud credentials. For SDK integration tests, use a scoped
+            session with its own S3 endpoint and automatic cleanup.</p>
+          <div class="term" role="figure" aria-label="In-process WebAssembly object storage in Node">
+            <div class="term-bar"><span class="dot" aria-hidden="true"></span><span>In-process Node + WASM &middot; from a source checkout</span></div>
+            <pre><span class="k">import</span> { EmbeddedStow } <span class="k">from</span> <span class="s">"@chester-hill-solutions/stow-s3/embedded"</span>;
+<span class="k">import</span> { loadNodeWasmHost } <span class="k">from</span> <span class="s">"@chester-hill-solutions/stow-s3/node-wasm"</span>;
+
+<span class="k">const</span> host = <span class="k">await</span> loadNodeWasmHost();
+<span class="k">const</span> store = EmbeddedStow.open(host);
+<span class="k">try</span> {
+  store.createBucket(<span class="s">"fixtures"</span>);
+  store.putObject(<span class="s">"fixtures"</span>, <span class="s">"hello.txt"</span>, <span class="k">new</span> TextEncoder().encode(<span class="s">"hello"</span>));
+  <span class="c">// Run assertions against a fresh, private object store.</span>
+} <span class="k">finally</span> {
+  store.close();
+  <span class="k">await</span> host.close();
+}</pre>
+          </div>
+          <p>Use the direct object API for embedded tests. Use the HTTP facade when
+            the test needs standard S3 SDK requests and SigV4.
+            <a href="https://github.com/chester-hill-solutions/stow-s3#quick-start-a-scoped-session">See the scoped-session example.</a></p>
+        </section>
+
+        <section class="section" id="edge">
+          <span class="num">05 / Storage at the edge</span>
+          <h2>Cache S3 reads near your application.</h2>
+          <p>The object engine compiles to WebAssembly, so a compatible host can run
+            it alongside application code. The host supplies persistence and network
+            access. Edge platform integrations need testing on the host you intend to use.</p>
+          <p>For an S3 read-through cache, use native run-through mode. Stow fetches
+            missing objects from your upstream and can revalidate cached reads.
+            If the upstream has a transient failure, it can serve a stale cached copy.
+            Upstream data never replaces a local write.</p>
+          <div class="stat-row">
+            <div><b>Read through</b><span>Fetch missing objects from your upstream</span></div>
+            <div><b>Prewarm</b><span>Fetch named keys before going offline</span></div>
+            <div><b>Bound the cache</b><span>Byte limits, object limits, and TTL</span></div>
+          </div>
+          <p>Select run-through explicitly. Offline mode makes no upstream calls;
+            reads use local or cached bytes. Live upstream writes require separate consent.
+            <a href="https://github.com/chester-hill-solutions/stow-s3#run-through-mode-the-offline-cache">Read the cache and run-through guide.</a></p>
         </section>
 
         <!-- ------------------------------------------------------------- 03 -->
         <section class="section" id="surfaces">
-          <span class="num">03</span>
-          <h2>S3 where you need it.</h2>
+          <span class="num">06 / APIs &amp; compatibility</span>
+          <h2>Call the engine directly or use an S3 SDK.</h2>
           <p>
-            The same binary speaks Amazon S3, for the part of your work that is
-            genuinely a test. Four language surfaces, three storage modes, and the
-            S3 clients you already have. No AWS account anywhere in it.
+            Use Go directly, embed the WASM engine, or point an existing SDK at the
+            native S3 endpoint. The browser API stores objects locally and uses
+            your app's transport for remote sync. It does not run an HTTP S3 server.
           </p>
 
-          <ul class="grid">
+          <ul class="grid four-grid api-cards">
             <li class="card">
               <h3>TypeScript</h3>
-              <span class="installline"><b>npm</b> @chester-hill-solutions/stow-s3</span>
+              <span class="installline"><b>source checkout</b> TypeScript client</span>
+              <p>Use the AWS SDK with disposable sessions or a persistent native
+                server. Workspace helpers add preparation, checkpoints, diff,
+                and portable transfer.</p>
               <pre><span class="k">await</span> withStow(cb)
 Stow.<span class="k">start</span>(opts)
 Stow.<span class="k">connect</span>(endpoint)</pre>
             </li>
             <li class="card">
               <h3>Python</h3>
-              <span class="installline"><b>pip</b> stow-s3[boto3]</span>
+              <span class="installline"><b>source checkout</b> Python client</span>
+              <p>Run boto3 against a scoped session with byte and object limits
+                and automatic cleanup. Prepare, resume, checkpoint, and restore
+                workspaces through the Python helpers.</p>
               <pre><span class="k">with</span> with_session() <span class="k">as</span> s:
     s.s3_client()
     s.new_bucket_name()</pre>
@@ -293,6 +340,9 @@ Stow.<span class="k">connect</span>(endpoint)</pre>
                 ><b>go get</b>
                 github.com/chester-hill-solutions/stow-s3/pkg/stow</span
               >
+              <p>Call bucket and object operations in-process. Set quotas,
+                check write conditions, retain metadata and checksums, or
+                connect a host store with streaming reads and writes.</p>
               <pre>rt, _ := stow.<span class="k">Open</span>(
   stow.Options{
     Backend: stow.BackendMemory,
@@ -302,39 +352,70 @@ Stow.<span class="k">connect</span>(endpoint)</pre>
             </li>
             <li class="card">
               <h3>WebAssembly</h3>
-              <span class="installline"><b>5.8 MB</b> runtime</span>
+              <span class="installline"><b>6.1 MB</b> runtime</span>
+              <p>Embed the engine in Node or run it in a browser worker.
+                Browser hosts support IndexedDB persistence, object streams,
+                bounded caches, and limits on queued requests.</p>
               <pre><span class="k">const</span> host = <span class="k">await</span>
   loadNodeWasmHost();
-EmbeddedStow.<span class="k">open</span>(host);
+<span class="k">const</span> s = EmbeddedStow.<span class="k">open</span>(host);
 s.putObject(b, k, data)
 <span class="c">// node and browser</span></pre>
             </li>
           </ul>
 
           <p>
-            Storage is selectable per server:
-            <strong>memory</strong> for throwaway work,
-            <strong>filesystem</strong> when data has to survive a restart, and
-            <strong>run-through</strong> when you want a local S3 in front of an
-            upstream bucket you already have. Defaults are
-            <strong>64 MiB</strong> and <strong>10,000 objects</strong>, reported
-            in the capability block rather than assumed.
+            Select <strong>memory</strong> for throwaway work or
+            <strong>filesystem</strong> when data has to survive a restart.
+            Opt into <strong>run-through</strong> mode to put a native local
+            S3 cache in front of an upstream bucket. Defaults are
+            <strong>64 MiB</strong> and <strong>10,000 objects</strong>.
+            Read the returned capability block for the limits your instance actually uses.
           </p>
+
+          <dl class="feature-details" aria-label="Storage features in the development tree">
+            <div>
+              <dt>Portable workspace checkpoints</dt>
+              <dd>Capture file bytes, modes, and SHA-256 hashes. Compare checkpoints,
+                restore files, or export verified data for another host.
+                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/portable-workspace-usage.md">Checkpoint and transfer APIs</a></dd>
+            </div>
+            <div>
+              <dt>Browser project history</dt>
+              <dd>Commit several files as one revision and undo or redo the project.
+                Revisions share unchanged content chunks; reads load payloads on demand.
+                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-project-storage.md">Project storage and sync</a></dd>
+            </div>
+            <div>
+              <dt>Persistent workers and streams</dt>
+              <dd>Read ranges or stream larger objects through a WASM worker.
+                Inspect interrupted uploads, release abandoned stages, and collect unused content.
+                <a href="https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-worker-runtime.md">Worker storage and recovery</a></dd>
+            </div>
+            <div>
+              <dt>Durable upstream write outbox</dt>
+              <dd>When live writes are enabled, native run-through records propagation
+                intents in a durable outbox. It retries transient failures and reconciles
+                attempted writes after a restart.
+                <a href="https://github.com/chester-hill-solutions/stow-s3#run-through-mode-the-offline-cache">Run-through and outbox behavior</a></dd>
+            </div>
+          </dl>
 
           <div class="scope">
             <div class="yes">
-              <h3>Implemented</h3>
+              <h3>Native S3 support</h3>
               <ul>
                 <li>Buckets: create, list, inspect, delete</li>
                 <li>Objects: put, get, head, copy, delete</li>
                 <li>List with prefixes and pagination</li>
                 <li>Range reads</li>
                 <li>Conditional reads and writes</li>
-                <li>MD5, CRC32, CRC32C, SHA-1, SHA-256</li>
+                <li>MD5, CRC32, CRC32C, CRC64NVME, SHA-1, SHA-256</li>
                 <li>Multipart uploads</li>
                 <li>Presigned requests</li>
                 <li>SigV4 authentication</li>
-                <li>Scoped access control per operation</li>
+                <li>Object content types and user metadata</li>
+                <li>Health, inspection, and metrics endpoints</li>
               </ul>
             </div>
             <div class="no">
@@ -351,21 +432,17 @@ s.putObject(b, k, data)
           </div>
 
           <p>
-            And the limit worth stating plainly: <strong>Stow is not a
-            sandbox.</strong> It owns a data directory and an S3 API. It does not
-            isolate arbitrary host processes or their network access, and workspace
-            quotas do not hard-limit writes made straight to the filesystem.
+            The native service is for development and controlled private deployments.
+            Stow is not production object storage.
           </p>
         </section>
 
         <section class="finale">
-          <h2>Portable because you decided where it goes.</h2>
-          <p>
-            Not because the runner happened to survive, and not because somebody
-            else's bucket happened to keep it. It is free, it is Apache 2.0, and it
-            is one binary. If it breaks, the issue tracker is the fastest way to
-            tell me.
-          </p>
+          <h2>Build Stow from source.</h2>
+          <p>Stow is free and open source. The Go module is available now;
+            TypeScript, Python, and the browser demos run from a source checkout.
+            The 0.3.0 candidate is not yet published to npm or PyPI.</p>
+          <div class="install"><code id="install-cmd">git clone https://github.com/chester-hill-solutions/stow-s3</code><button type="button" data-copy="#install-cmd">Copy</button></div>
           <div class="cta">
             <a
               class="btn btn-primary"
@@ -377,7 +454,7 @@ s.putObject(b, k, data)
               class="btn btn-ghost"
               href="https://github.com/chester-hill-solutions/stow-s3/issues"
               rel="noreferrer noopener"
-              >Report something</a
+              >Report a bug</a
             >
           </div>
         </section>
@@ -390,7 +467,7 @@ s.putObject(b, k, data)
           trademarks of Amazon.com, Inc. or its affiliates, used here to describe
           compatibility.
         </p>
-        <span class="org">Stow S3 &mdash; a Chester Hill Solutions project</span>
+        <span class="org">Stow S3, a Chester Hill Solutions project</span>
         <nav aria-label="Footer">
           <a
             href="https://github.com/chester-hill-solutions/stow-s3"
@@ -409,6 +486,7 @@ s.putObject(b, k, data)
       </footer>
     </div>
 
-    <script src="/assets/stow.js" defer></script>
+    <script src="/assets/stow.js?v=20261012" defer></script>
+    <script src="/assets/sync-demo.js?v=20261012" defer></script>
   </body>
 </html>

@@ -26,7 +26,7 @@ const WASM = "packages/stow-s3/dist/stow-runtime.wasm";
 const cleanIndex = `
   <h1>Working storage an agent can hand off.</h1>
   <ul class="proof">
-    <code id="scope-cmd">npm config set @chester-hill-solutions:registry https://npm.pkg.github.com</code>
+    <code id="scope-cmd">git clone https://github.com/chester-hill-solutions/stow-s3</code>
     <li><b>12.7 MB max</b><span>single binary, every platform</span></li>
     <li><b>5.8 MB</b><span>runtime</span></li>
   </ul>
@@ -155,7 +155,7 @@ test("the superseded quota is reported and the current one demanded", () => {
 });
 
 test("an install command missing from every file is reported once", () => {
-  const text = site(cleanIndex.replace(/npm install @chester-hill-solutions\/stow-s3/, "install it"));
+  const text = site(cleanIndex.replace("git clone https://github.com/chester-hill-solutions/stow-s3", "get the source"));
   const problems = siteClaimProblems({ text, sizes });
   assert.equal(problems.filter((p) => /no site file prints/.test(p)).length, 1);
 });
@@ -204,13 +204,14 @@ test("the size claim is measured across every published platform", () => {
   }
 });
 
-// The gate once required only the bare install, while the registry binding was
-// mandatory and missing - so it enforced a command that does not work. Both are
-// required now, and this is the case that says so: a page with the install and no
-// binding is the exact shape that shipped.
-test("an install without the scope binding is reported", () => {
-  const unbound = cleanIndex.replace("npm config set @chester-hill-solutions:registry https://npm.pkg.github.com", "");
-  const problems = siteClaimProblems({ text: site(unbound), sizes });
+test("source checkout is required while package installation is not the supported path", () => {
+  const missing = cleanIndex.replace("git clone https://github.com/chester-hill-solutions/stow-s3", "");
+  const problems = siteClaimProblems({ text: site(missing), sizes });
   assert.equal(problems.length, 1, JSON.stringify(problems));
-  assert.match(problems[0], /registry configuration|scope|registry/);
+  assert.match(problems[0], /git clone/);
+});
+
+test("the page can omit unpublished npm install instructions and the old registry binding", () => {
+  const sourceOnly = cleanIndex.replace("npm install @chester-hill-solutions/stow-s3", "");
+  assert.deepEqual(siteClaimProblems({ text: site(sourceOnly), sizes }), []);
 });

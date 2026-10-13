@@ -1,10 +1,10 @@
-# Stow — agent instructions
+# Stow: agent instructions
 
-You are reading this because someone pointed you at Stow, a local object store
-and task workspace. Its centre of gravity is the workspace: a real directory with
-a durable identity, verified checkpoints, and a handoff you can hand to another
-host. It also speaks real S3 over HTTP with SigV4, for the part of a job that is
-genuinely a disposable S3 test.
+Stow exposes a native S3-compatible HTTP endpoint and an embedded object engine
+in Go and WebAssembly. Use prepared workspaces to checkpoint and transfer an
+agent's files, browser file history to save edits offline, or scoped S3 sessions
+for disposable test data. Native run-through mode caches reads from an upstream
+bucket. The host owns execution and sandbox enforcement.
 
 ## When to reach for it
 
@@ -34,6 +34,20 @@ or safely collected.
 Typical uses: a test that uploads and downloads, a build step that passes an
 artifact between stages, an agent that needs scratch space, or a fixture that
 would otherwise need a live bucket.
+
+## Browser and cache integrations
+
+Browser file history uses the WASM object engine and IndexedDB, with retained
+stages, undo/redo, and explicit current-file sync. Host applications supply
+credentials and networking; this profile does not start an HTTP S3 server in
+the browser. Start with the [browser contract](https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-file-history.md)
+and the [runnable editor](https://github.com/chester-hill-solutions/stow-s3/tree/main/examples/browser-editor).
+The website walkthrough is a simulation; the editor runs real WASM and S3.
+
+The native run-through adapter caches upstream reads, supports prewarming exact
+keys, and serves local/cached bytes without upstream calls in explicit offline
+mode. WASM makes the object engine embeddable in compatible hosts; do not infer
+qualified edge-platform support from that portability alone.
 
 ## Checkpoints and handoff for agent work (0.3.0 development tree)
 
@@ -119,15 +133,15 @@ are not guessable:
   whatever the server reports. Credentials are generated unless you pass them. Pass
   `--ready-fd 3` and the server writes a JSON readiness record to that descriptor
   carrying the endpoint it actually bound, its region, its credentials, and its
-  capabilities — and the descriptor dies with the process, so nothing on disk can
+  capabilities. The descriptor dies with the process, so nothing on disk can
   outlive a server the way a cached "ready" file does.
 
 ```bash
 ./bin/stow-s3 serve --port 0 --mode local --data-dir "$PWD/.stow" --ready-fd 3
 ```
 
-The full contract — both readiness channels and their traps, the probe routes, what
-the defaults will not do, and platform support — is in
+The full contract covers both readiness channels and their traps, the probe routes,
+default behavior, and platform support. Read
 [`docs/running-and-probing.md`](../docs/running-and-probing.md). Every claim in it
 is asserted by a test.
 
