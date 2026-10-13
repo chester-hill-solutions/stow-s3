@@ -39,7 +39,12 @@ test("Web Locks excludes a competing tab and releases ownership when its page ex
   const namespace = testKey(); await openHarness(page, { namespace });
   const second = await context.newPage();
   expect(await openHarness(second, { namespace })).toBe("already_open");
+  const ownerLocks = await page.evaluate(async () => (await navigator.locks.query()).held.map((lock) => lock.name));
+  expect(ownerLocks).toHaveLength(1);
   await page.close();
+  // Closing the page can precede the browser process releasing its Web Lock.
+  await expect.poll(() => second.evaluate(async (names) =>
+    (await navigator.locks.query()).held.some((lock) => names.includes(lock.name)), ownerLocks)).toBe(false);
   await second.evaluate(() => window.qa.open());
   expect(await second.evaluate(() => window.qa.ready)).toBe(true);
 });
