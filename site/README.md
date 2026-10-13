@@ -24,6 +24,18 @@ to the current API contracts. Add new public guides to `docs.mjs`; the build
 rewrites links between published sources into site routes and supplies navigation,
 heading anchors, tables of contents and a sitemap.
 
+The [redesign brief](redesign-plan.md) and its reference image are repository-only.
+Shared brand styles live in `assets/theme.css`; homepage layout lives in
+`assets/stow.css`, and documentation layout lives in `assets/docs.css`.
+Both surfaces use the same header, wordmark and color tokens. Launch graphics
+are authored in `launch/` and rendered into `images/`.
+
+Code examples use build-time highlighting in `code.mjs`, with a shared editor
+theme in `assets/code.css` and copy controls in `assets/code.js`. Homepage
+snippets declare `data-language`; documentation uses fenced-code languages.
+Line-number gutters stay outside the copied source. Unknown languages render
+as escaped plain text.
+
 Publish user guides and API references only. Keep ADRs, plans, test reports and
 contributor instructions in the repository. In shared Markdown, surround
 repository commentary with `<!-- repo-only:start -->` and `<!-- repo-only:end -->`

@@ -8,11 +8,10 @@ The server holds upstream credentials. Applications use local credentials to acc
 Cached data remains readable when the upstream is unavailable, while the cache retains it.
 
 ```sh
+STOW_ENDPOINT=https://s3.example.com STOW_BUCKET=datasets \
 stow-s3 serve --mode run-through \
   --data-dir /srv/agent-data \
-  --cache-dir /srv/agent-cache \
-  --upstream-endpoint https://s3.example.com \
-  --upstream-bucket datasets
+  --cache-dir /srv/agent-cache
 ```
 
 Keep the cache and data directories separate. The cache contains upstream copies;
@@ -29,7 +28,7 @@ An uncached key that cannot be fetched returns an error.
 
 Set byte and object limits with `--cache-max-bytes` and `--cache-max-objects`, or
 `STOW_CACHE_MAX_BYTES` and `STOW_CACHE_MAX_OBJECTS`.
-Set entry lifetime with `STOW_CACHE_TTL`. Stow reapplies limits on startup.
+Set entry lifetime with `--cache-ttl` or `STOW_CACHE_TTL`. Stow reapplies limits on startup.
 
 TTL starts at the cache record's publication time. Reopening does not extend it.
 With a positive TTL, an entry without a verifiable publication time expires.

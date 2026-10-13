@@ -1,23 +1,27 @@
+/* Documentation uses the shared brand without landing-page layout rules. */
 .docs-shell { max-width: 1480px; margin: 0 auto; padding: 0 32px; }
 .docs-layout { display: grid; grid-template-columns: 215px minmax(0, 780px) 190px; gap: 38px; padding: 48px 0 80px; align-items: start; }
 .docs-sidebar, .doc-toc { position: sticky; top: 28px; max-height: calc(100dvh - 56px); overflow: auto; font-size: 13px; line-height: 1.5; }
-.docs-sidebar summary { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 24px; color: var(--text-2); cursor: pointer; min-height: 30px; }
+.doc-toc { overflow-wrap: anywhere; }
+.docs-sidebar summary { font: 12px var(--mono); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 18px; color: var(--text-2); min-height: 44px; display: flex; align-items: center; }
 .doc-nav-group { margin-bottom: 24px; }
-.doc-nav-group p, .doc-toc p { color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 9px; }
-.doc-nav-group ul, .doc-toc ul { list-style: none; padding: 0; }
-.doc-nav-group a, .doc-toc a { display: block; padding: 5px 0; color: var(--text-2); text-decoration: none; }
-.doc-nav-group a:hover, .doc-toc a:hover, .doc-nav-group a[aria-current] { color: var(--accent); }
+.doc-nav-group p, .doc-toc p { color: var(--text-3); font: 11px/1.6 var(--mono); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 9px; }
+.doc-nav-group ul, .doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-nav-group a, .doc-toc a { display: flex; align-items: center; min-height: 44px; padding: 8px 0; color: var(--text-2); text-decoration: none; }
+.doc-nav-group a:hover, .doc-toc a:hover, .doc-nav-group a[aria-current] { color: var(--accent); text-decoration: underline; }
+.doc-nav-group a[aria-current] { font-weight: 600; }
 .doc-content { min-width: 0; line-height: 1.8; font-size: 15px; overflow-wrap: anywhere; }
-.doc-content > h1 { font-size: clamp(30px, 4vw, 48px); line-height: 1.2; letter-spacing: -.035em; margin: 20px 0 30px; }
-.doc-content h2 { font-size: 24px; line-height: 1.35; margin: 48px 0 18px; padding-top: 12px; scroll-margin-top: 20px; }
-.doc-content h3 { font-size: 18px; line-height: 1.45; margin: 30px 0 12px; scroll-margin-top: 20px; }
+.doc-content > h1 { font-size: clamp(30px, 4vw, 48px); line-height: 1.15; letter-spacing: -.05em; margin: 20px 0 30px; }
+.doc-content h2 { font-size: 26px; line-height: 1.25; letter-spacing: -.03em; margin: 48px 0 18px; padding-top: 12px; scroll-margin-top: 20px; }
+.doc-content h3 { font-size: 19px; line-height: 1.4; letter-spacing: -.02em; margin: 30px 0 12px; scroll-margin-top: 20px; }
 .doc-content p, .doc-content ul, .doc-content ol { margin-bottom: 20px; }
 .doc-content ul, .doc-content ol { padding-left: 24px; }
 .doc-content li { margin-bottom: 7px; }
 .doc-content a { color: var(--accent); text-underline-offset: 4px; }
-.doc-content code { font-size: .9em; background: var(--ink-2); padding: 2px 5px; border-radius: 4px; }
-.doc-content pre { background: var(--ink-1); border: 1px solid var(--line); border-radius: 9px; padding: 20px; overflow: auto; margin: 24px 0; font-size: 13px; line-height: 1.65; overflow-wrap: normal; }
+.doc-content code { font-size: .9em; background: var(--ink-2); padding: 2px 5px; border-radius: 3px; }
+.doc-content pre { background: var(--code-bg); color: var(--code-text); border: 1px solid #36483b; border-radius: 5px; padding: 20px; overflow: auto; margin: 24px 0; font-size: 12px; line-height: 1.75; overflow-wrap: normal; }
 .doc-content pre code { background: none; padding: 0; font-size: inherit; }
+.doc-content pre a { color: #cadd97; }
 .doc-content blockquote { margin: 24px 0; padding: 16px 20px; border-left: 2px solid var(--accent); background: var(--ink-1); color: var(--text-2); }
 .doc-content blockquote p:last-child { margin-bottom: 0; }
 .doc-content table { display: block; width: 100%; overflow: auto; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
@@ -25,8 +29,29 @@
 .doc-content th { background: var(--ink-1); white-space: nowrap; }
 .doc-content td { overflow-wrap: normal; }
 .doc-content hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
-.doc-meta { display: flex; justify-content: space-between; gap: 20px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); }
-.doc-meta a { color: var(--text-2); text-decoration: none; }
+.doc-meta { display: flex; align-items: center; justify-content: space-between; gap: 20px; font: 11px var(--mono); color: var(--text-3); }
+.doc-meta a { color: var(--text-2); display: inline-flex; align-items: center; min-height: 44px; }
 .doc-footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--text-3); font-size: 12px; }
-@media (max-width: 1180px) { .docs-layout { grid-template-columns: 200px minmax(0, 780px); gap: 30px; } .doc-toc { display: none; } }
-@media (max-width: 760px) { .docs-shell { padding: 0 20px; } .docs-layout { display: block; padding-top: 28px; } .docs-sidebar { position: static; max-height: none; overflow: visible; padding-bottom: 24px; margin-bottom: 28px; border-bottom: 1px solid var(--line); } .docs-sidebar nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } .docs-sidebar summary { margin-bottom: 18px; } .doc-nav-group { margin: 0; } .doc-content { font-size: 14px; } .doc-content pre { padding: 14px; } }
+.doc-footer a { display: inline-flex; align-items: center; min-height: 44px; }
+.doc-content pre:focus-visible { outline-color: #c8df85; }
+@media (max-width: 1180px) {
+  .docs-layout { grid-template-columns: 200px minmax(0, 780px); gap: 30px; }
+  .doc-toc { display: none; }
+}
+@media (max-width: 760px) {
+  .docs-shell { padding: 0 20px; }
+  .docs-layout { display: block; padding-top: 28px; }
+  .docs-sidebar { position: static; max-height: none; overflow: visible; padding-bottom: 20px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .docs-sidebar nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .docs-sidebar summary { margin-bottom: 0; justify-content: space-between; }
+  .docs-sidebar summary::after { content: "+"; font-size: 20px; }
+  .docs-sidebar details[open] summary::after { content: "−"; }
+  .docs-sidebar details[open] summary { margin-bottom: 18px; }
+  .doc-nav-group { margin: 0; }
+  .doc-content { font-size: 14px; }
+  .doc-content pre { padding: 14px; }
+}
+@media (max-width: 390px) {
+  .docs-sidebar nav { grid-template-columns: 1fr; }
+  .doc-meta { flex-wrap: wrap; gap: 0; }
+}

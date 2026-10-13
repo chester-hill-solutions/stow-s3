@@ -66,6 +66,69 @@ Uncommitted files, untracked files, older history, submodules and Git LFS payloa
 Repository checkouts accept regular files only. Symbolic links are rejected.
 Sensitive paths in the selected tree also require `include_sensitive_inputs: true`.
 
+### From a GitHub URL
+
+Use this flow to give a coding agent a disposable checkout. Git fetches the
+repository; Stow prepares a separate task copy from the local source. Repository
+`source` fields currently accept local repositories, rather than remote URLs.
+
+In a fresh working directory, replace the GitHub URL and branch with your own:
+
+```sh
+mkdir -p tasks
+git clone --depth 1 --branch main https://github.com/your-org/your-repo.git source-repo
+```
+
+Save this as `task.json` beside `source-repo`. The task starts from the source
+clone's `HEAD`, which Stow resolves to a commit and reports in the preparation
+result. Its checkout is detached and has no source remote.
+
+```json
+{
+  "version": 1,
+  "root": "./tasks/task-42",
+  "working_directory": "repo",
+  "repositories": [
+    { "source": "./source-repo", "destination": "repo", "ref": "HEAD" }
+  ],
+  "ttl_seconds": 3600,
+  "registry_dir": "./stow-registry"
+}
+```
+
+Prepare it, then run your agent in the returned `working_directory`:
+
+```sh
+stow-s3 workspace prepare --manifest task.json
+```
+
+For this manifest, that directory is `tasks/task-42/repo`. Your host chooses the
+agent command and its process permissions. Replace `<workspace-id>` below with
+the ID returned by preparation, and pause writers before checkpointing:
+
+```sh
+stow-s3 workspace checkpoint --id <workspace-id> --registry-dir ./stow-registry
+```
+
+Export any result you need to keep before disposing of the task. The
+[handoff guide](#transfer-archives) explains portable checkpoint archives.
+Explicit cleanup removes the owned task workspace and its retained checkpoints:
+
+```sh
+stow-s3 workspace destroy --id <workspace-id> --registry-dir ./stow-registry
+```
+
+Alternatively, after the one-hour TTL, run collection to remove eligible expired
+workspaces. Expiry alone does not delete them, and collection preserves active
+or otherwise ineligible workspaces:
+
+```sh
+stow-s3 workspace collect --registry-dir ./stow-registry
+```
+
+The original `source-repo` clone remains available for the next task. Stow's
+workspace cleanup does not remove it.
+
 ## Preparation result and teams
 
 Preparation checks seeded bytes and file count, including shallow Git metadata, against workspace limits.
