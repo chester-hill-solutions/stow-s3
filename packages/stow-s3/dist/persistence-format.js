@@ -42,8 +42,10 @@ export function normalizeSnapshot(value, fallbackGeneration = 0) {
     };
 }
 export function applyChanges(snapshot, changes) {
+    // Snapshot records are privately owned after normalization. Reuse unchanged
+    // records; normalize only incoming changes before admitting their buffers.
     const buckets = new Map(snapshot.buckets.map((bucket) => [bucket.name, { ...bucket }]));
-    const objects = new Map(snapshot.objects.map((object) => [objectKey(object.bucket, object.key), normalizeObject(object)]));
+    const objects = new Map(snapshot.objects.map((object) => [objectKey(object.bucket, object.key), object]));
     for (const rawChange of changes) {
         const change = normalizeChange(rawChange);
         switch (change.type) {
@@ -55,7 +57,7 @@ export function applyChanges(snapshot, changes) {
                 deleteBucketObjects(objects, change.bucket);
                 break;
             case "putObject":
-                objects.set(objectKey(change.object.bucket, change.object.key), normalizeObject(change.object));
+                objects.set(objectKey(change.object.bucket, change.object.key), change.object);
                 break;
             case "deleteObject":
                 objects.delete(objectKey(change.bucket, change.key));

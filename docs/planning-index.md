@@ -27,6 +27,7 @@ and deferred boundary together. Existing contracts and ADRs remain normative.
 | Document | Current disposition |
 | --- | --- |
 | [storage-foundation-plan.md](storage-foundation-plan.md) | **Sole active work order.** Baseline, W01–W22, dependencies, acceptance and legacy traceability. |
+| [browser-project-plan.md](browser-project-plan.md) | **Execution record for the authorized browser extension.** Ordering remains linked from the canonical plan; usage is [browser-project-storage.md](browser-project-storage.md), decision ADR 0019. |
 | [gangcode-stow-boundary.md](gangcode-stow-boundary.md) | **Ownership/integration reference.** Storage facts and durable delivery belong to Stow; agent meaning, context and coordination belong to GangCode. No independent queue. |
 | [plan.md](plan.md) | **Routing page.** Preserves old entry point/anchors; no separate queue. |
 | [portable-workspace-usage.md](portable-workspace-usage.md) | **Current usage.** Concrete supported development APIs, commands and limits. |

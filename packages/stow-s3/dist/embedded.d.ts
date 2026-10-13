@@ -1,13 +1,20 @@
 export declare const EMBEDDED_PROTOCOL_VERSION = 1;
+export declare const EMBEDDED_BINARY_PROTOCOL_VERSION = 2;
+export interface EmbeddedBinaryResponse {
+    metadata: string;
+    data?: Uint8Array;
+}
 export interface EmbeddedHost {
     call(request: string): string;
+    /** Binary calls preserve caller ownership; returned bytes belong to the caller. */
+    callBinary?(metadata: string, data?: Uint8Array): EmbeddedBinaryResponse;
 }
 export interface EmbeddedStowOptions {
     maxBytes?: number;
     maxObjects?: number;
 }
 export interface EmbeddedCapabilities {
-    backend: "memory" | "indexeddb";
+    backend: "memory" | "indexeddb" | "host";
     maxBytes: number;
     maxObjects: number;
     /**
@@ -30,6 +37,8 @@ export interface EmbeddedCapabilities {
     upstream: boolean;
     /** Absent on older bridges, which cannot safely accept write conditions. */
     conditionalWrites?: boolean;
+    /** Caller-owned maintenance operations offered by the ready-made persistent worker. */
+    hostMaintenance?: boolean;
 }
 export interface EmbeddedUsage {
     bytes: number;
@@ -67,6 +76,9 @@ export interface EmbeddedObjectPage {
     truncated: boolean;
     nextCursor?: string;
 }
+export interface BridgeObject extends Omit<EmbeddedObject, "data"> {
+    data?: string | Uint8Array;
+}
 export declare class EmbeddedStowError extends Error {
     readonly code: string;
     constructor(code: string, message: string);
@@ -95,4 +107,6 @@ export declare class EmbeddedStow {
     private invoke;
     private ensureOpen;
 }
+export declare function decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array): T;
+export declare function fromBridgeObject(object: BridgeObject): EmbeddedObject;
 //# sourceMappingURL=embedded.d.ts.map

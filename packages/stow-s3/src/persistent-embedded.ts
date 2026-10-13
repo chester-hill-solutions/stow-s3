@@ -12,6 +12,7 @@ import {
 } from "./embedded.js";
 import {
   BrowserPersistenceError,
+  type BrowserObjectMutation,
   type PersistenceAdapter,
   type PersistenceSnapshot,
   type PersistenceChange,
@@ -24,6 +25,7 @@ import {
   normalizeSnapshot,
   replaySnapshot,
 } from "./snapshot-replay.js";
+import { normalizeChange } from "./persistence-format.js";
 import {
   normalizePersistenceError,
   restoreSnapshot,
@@ -151,11 +153,13 @@ export class BrowserEmbeddedStow {
     data: Uint8Array,
     options: EmbeddedPutOptions = {},
   ): Promise<EmbeddedObject> {
+    const capturedData = new Uint8Array(data);
+    const capturedOptions = { ...options, metadata: { ...options.metadata } };
     return this.enqueue(() => this.persistMutation(
-      () => this.embedded.putObject(bucket, key, data, options),
+      () => this.embedded.putObject(bucket, key, capturedData, capturedOptions),
       (object) => [{
         type: "putObject",
-        object: this.completeObject(bucket, key, object),
+        object: { ...object, bucket, key, data: capturedData },
       }],
     ));
   }
@@ -180,6 +184,31 @@ export class BrowserEmbeddedStow {
       },
       () => [{ type: "deleteObject", bucket, key }],
     ));
+  }
+
+  /** Atomically save related objects (for example, a revision and its history record). */
+  writeBatch(mutations: BrowserObjectMutation[]): Promise<void> {
+    const captured = mutations.map((mutation) => mutation.type === "delete"
+      ? { ...mutation }
+      : {
+        ...mutation,
+        data: new Uint8Array(mutation.data),
+        options: { ...mutation.options, metadata: { ...mutation.options?.metadata } },
+      });
+    return this.enqueue(async () => {
+      await this.persistMutation(
+        () => captured.map((mutation): PersistenceChange => {
+          const { bucket, key } = mutation;
+          if (mutation.type === "delete") {
+            this.embedded.deleteObject(bucket, key);
+            return { type: "deleteObject", bucket, key };
+          }
+          const object = this.embedded.putObject(bucket, key, mutation.data, mutation.options);
+          return { type: "putObject", object: { ...object, bucket, key, data: mutation.data } };
+        }),
+        (changes) => changes,
+      );
+    });
   }
 
   copyObject(
@@ -235,15 +264,15 @@ export class BrowserEmbeddedStow {
     mutate: () => T,
     changesForResult: (result: T) => PersistenceChange[],
   ): Promise<T> {
-    const result = mutate();
     let nextSnapshot: PersistenceSnapshot;
     try {
+      const result = mutate();
       const changes = changesForResult(result);
       nextSnapshot = applyChanges(this.durableSnapshot, changes);
       const generation = await this.adapter.commit(
         this.namespace,
         this.durableSnapshot.generation,
-        changes,
+        changes.map(normalizeChange),
       );
       validateGeneration(generation);
       this.durableSnapshot = { ...nextSnapshot, generation };

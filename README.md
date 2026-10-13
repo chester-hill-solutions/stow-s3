@@ -76,6 +76,8 @@ designed to stop you.
 - A run-through cache: local data with an upstream behind it, usable offline.
 - A Go runtime for in-process, memory-backed storage.
 - A WebAssembly runtime for Node.js and browser integrations.
+- [Browser file history](docs/browser-file-history.md) with persisted undo/redo stages,
+  read-through access, and explicit conditional sync to S3-compatible storage.
 - Filesystem persistence for data that must survive a process restart.
 - SigV4 authentication for the S3 endpoint.
 - `stow doctor`, a diagnostic that reports both the client and server sides of an
@@ -677,6 +679,8 @@ func main() {
 ```
 
 ## Node.js, WebAssembly, and browser profiles
+
+[Browser project storage](docs/browser-project-storage.md) adds lazy content, shared asset history, atomic multi-file revisions and explicit project sync. [Persistent WASM workers](docs/browser-worker-runtime.md) expose the shared object runtime with bounded binary streams.
 
 The Node.js WebAssembly profile provides an in-memory object runtime without an HTTP server:
 

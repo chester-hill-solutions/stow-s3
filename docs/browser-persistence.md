@@ -76,3 +76,9 @@ one transaction and reject stale writers.
 - The object store key path is `["namespace", "bucket", "key"]`, so one database
   can hold several namespaces rather than requiring one database per namespace.
 - Streaming uploads are unsupported; the host bridge still buffers whole objects.
+
+`writeBatch()` commits related object puts/deletes in one transaction and rolls
+back the whole batch on either a WASM operation failure or a persistence failure.
+This underpins the additive [browser file history and sync facade](browser-file-history.md).
+The [editor example](../examples/browser-editor/README.md) exercises real WASM,
+IndexedDB, reload recovery, offline access and explicit sync to a native S3 fixture.

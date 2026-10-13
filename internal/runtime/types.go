@@ -15,6 +15,7 @@ type Backend string
 const (
 	BackendMemory     Backend = "memory"
 	BackendFilesystem Backend = "filesystem"
+	BackendHost       Backend = "host"
 	// BackendWorkspace is a directory a caller is working in, whose objects are
 	// real files. Like the filesystem backend it is persistent, and like the
 	// filesystem backend it requires a store to be supplied by the caller: a
@@ -56,7 +57,7 @@ var (
 // who asked for durable bytes must not be handed volatile ones.
 func isKnownBackend(backend Backend) bool {
 	switch backend {
-	case BackendMemory, BackendFilesystem, BackendWorkspace:
+	case BackendMemory, BackendFilesystem, BackendWorkspace, BackendHost:
 		return true
 	default:
 		return false
@@ -70,7 +71,7 @@ func isKnownBackend(backend Backend) bool {
 // It is deliberately unexported: a host is handed runtime.Capabilities rather
 // than re-deriving the answer, and a second derivation is a second opinion.
 func isPersistentBackend(backend Backend) bool {
-	return backend == BackendFilesystem || backend == BackendWorkspace
+	return backend == BackendFilesystem || backend == BackendWorkspace || backend == BackendHost
 }
 
 // normalizeOptions validates a backend choice and applies the quota defaults.

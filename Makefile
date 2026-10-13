@@ -1,4 +1,4 @@
-.PHONY: multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated check-mcp-browser benchmark
+.PHONY: test-browser browser-editor multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -74,6 +74,13 @@ test-wasm: build-wasm
 
 test-agent: build
 	node --test examples/opencode/*.test.mjs
+
+browser-editor: build build-wasm
+	$(NPM_INSTALL) && npm run build
+	node examples/browser-editor/serve.mjs
+
+test-browser: build build-wasm
+	$(NPM_INSTALL) && npm run test:browser
 
 # Provider calls require an explicit caller profile; missing access cannot pass.
 test-agent-real: build

@@ -204,6 +204,13 @@ stable persistence error codes rather than falling back to memory-only state.
 The existing `EmbeddedStow` and `@chester-hill-solutions/stow-s3/node-wasm` contracts remain
 unchanged.
 
+`BrowserFileHistory` layers retained file stages and explicit remote sync over
+this profile. Undo/redo and pending sync receipts survive reopen; remote writes
+use an expected ETag or expected absence, and conflicts retain local edits.
+`S3ObjectSyncRemote` is available from the separate `./browser-s3` entry point.
+See [the API and limits](../../docs/browser-file-history.md), or run
+`make browser-editor` from the repository root for the offline editor demo.
+
 CLI equivalent:
 
 ```sh
@@ -226,3 +233,10 @@ npm test
 ```
 
 The package test suite includes lifecycle and shared-corpus coverage. Run `make build` before `npm test` when working from the monorepo.
+
+
+## Large browser projects and persistent workers
+
+The additive `/project` entry point exports `BrowserProject`, `ContentStore` and `IndexedDbContentAdapter` for lazy file/asset persistence, shared immutable chunks, atomic project revisions, bounded range reads and explicit conditional manifest sync. `/worker` exports `AsyncEmbeddedStow`; `/browser-wasm` supplies `loadBrowserPersistentWasmHost` for the same Go object runtime over durable host storage. Existing entry points remain compatible.
+
+See [project usage and guarantees](../../docs/browser-project-storage.md), [worker APIs](../../docs/browser-worker-runtime.md) and [the 1 GiB qualification receipt](../../docs/benchmarks/browser-project-2026-10-12.json). These are development-tree additions, not a publication claim.

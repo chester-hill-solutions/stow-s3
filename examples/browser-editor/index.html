@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stow · A draft that stays with you</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header><a class="brand" href="/">stow<span> / browser lab</span></a><span class="pill" id="offline-ready">Preparing offline access</span></header>
+  <main>
+    <div class="intro"><p class="eyebrow">LOCAL FIRST. YOUR STORAGE.</p><h1>A draft that<br>stays with you.</h1><p>Edit here. Keep your stages. Publish when you’re ready.</p></div>
+    <section class="workspace" aria-label="File editor">
+      <div class="toolbar"><div><span class="file-dot"></span><strong>notes.md</strong></div><label><input type="checkbox" id="offline"> Work offline</label></div>
+      <div class="panes">
+        <div class="document"><label class="sr-only" for="editor">File contents</label><textarea id="editor" spellcheck="false" disabled placeholder="Opening your draft…"></textarea><div class="document-footer"><span id="local-status" role="status">Loading storage…</span><span id="bytes"></span></div></div>
+        <aside><div class="history-heading"><h2>Saved stages</h2><span id="stage-count">0</span></div><p class="aside-note">Undo and redo stay with this browser, even after a reload.</p><div class="history-actions"><button id="undo" disabled>↶ Undo</button><button id="redo" disabled>↷ Redo</button></div><ol id="history"></ol></aside>
+      </div>
+      <div class="sync-bar"><div><strong id="sync-status">Opening file</strong><p id="sync-detail">Your draft saves to this device first.</p></div><button class="primary" id="sync" disabled>Sync current stage ↑</button></div>
+    </section>
+    <div id="message" role="status" hidden></div>
+    <div id="conflict-actions" hidden><button id="adopt">Use remote version</button><p>Your retained local edits stay available through Undo.</p></div>
+    <details><summary>Try a remote conflict</summary><p>Save an edit locally, simulate another writer, then sync. Stow will retain your edit and report the conflict.</p><button id="other-edit">Simulate another writer</button></details>
+    <p class="footnote">Go WASM · IndexedDB · explicit S3 sync<br>Browser stages persist. The demo uses disposable remote test data.</p>
+  </main>
+  <script src="/runtime/wasm_exec.js"></script><script type="module" src="/app.mjs"></script>
+</body>
+</html>
