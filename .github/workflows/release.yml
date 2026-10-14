@@ -41,7 +41,7 @@ jobs:
           go-version-file: .go-version
           cache: true
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
@@ -60,7 +60,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/npm-package"
           npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/npm-package"
       - name: Upload verified npm package
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: npm-package
           path: ${{ runner.temp }}/npm-package/*.tgz
@@ -181,14 +181,14 @@ jobs:
           env -u STOW_BIN -u PYTHONPATH "$RUNNER_TEMP/wheel-consumer/bin/python" smoke-python-consumer.py
 
       - name: Upload wheel
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: wheel-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ runner.temp }}/wheel/*.whl
           if-no-files-found: error
 
       - name: Upload artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: stow-${{ matrix.os }}-${{ matrix.arch }}
           path: stow-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
@@ -212,14 +212,14 @@ jobs:
             runner: macos-15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: stow-${{ matrix.target }}
           path: dist/native
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: npm-package
           path: dist/npm
@@ -264,19 +264,19 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Download native artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: "stow-*"
           path: dist
           merge-multiple: true
       - name: Download verified npm package
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: npm-package
           path: dist/npm
 
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           registry-url: https://npm.pkg.github.com
@@ -373,7 +373,7 @@ jobs:
       - name: Preflight exact npm artifacts
         run: node scripts/publish-if-absent.mjs --check ./dist/npm-platform/*.tgz ./dist/npm/*.tgz
       - name: Download live provider receipts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: live-receipt-*
           path: dist/live-receipts
@@ -389,7 +389,7 @@ jobs:
       # the set must cover the four supported platforms, or a user on a missing
       # one gets "no matching distribution" instead of an install.
       - name: Download wheels
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: "wheel-*"
           path: dist/wheel
