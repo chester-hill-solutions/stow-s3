@@ -3,7 +3,6 @@ package runtime
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
@@ -41,17 +40,10 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 		return nil, ErrQuotaExceeded
 	}
 	upload, err := i.multipartStore.CreateMultipartUpload(ctx, bucket, key, opts)
-	if err != nil {
+	if !i.finishUpload(upload, exists, err) {
 		return nil, err
 	}
 	clone := storage.CloneMultipartUpload(*upload)
-	i.multipart[upload.UploadID] = multipartUsage{upload: clone, parts: make(map[int]int64)}
-	i.addMultipartTarget(target)
-	if needsObjectSlot {
-		// The check above passed under this lock, so the reservation is
-		// guaranteed; declining it here would leave the upload uncounted.
-		i.reserveTarget(target)
-	}
 	return &clone, nil
 }
 
@@ -99,16 +91,13 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 		return nil, storage.ErrUploadNotFound
 	}
 	oldSize := usage.parts[partNumber]
-	if !i.bytesWithinQuota(oldSize, int64(len(data))) {
+	if !i.bytesQuotaFits(oldSize, int64(len(data))) {
 		return nil, ErrQuotaExceeded
 	}
 	part, err := i.multipartStore.UploadPart(ctx, uploadID, partNumber, bytes.NewReader(data))
-	if err != nil {
+	if !i.finishPart(uploadID, part, err) {
 		return nil, err
 	}
-	usage.parts[partNumber] = part.Size
-	i.multipart[uploadID] = usage
-	i.reservedBytes += part.Size - oldSize
 	clone := *part
 	return &clone, nil
 }
@@ -166,57 +155,13 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if err != nil {
 		return nil, err
 	}
-	// completedBytes is what the object will weigh: the selected parts, in the
-	// order they will be concatenated.
-	var completedBytes int64
-	for _, part := range parts {
-		completedBytes += uploadUsage.parts[part.PartNumber]
-	}
-	target := objectTarget(uploadUsage.upload.Bucket, uploadUsage.upload.Key)
-	if !exists && !i.objectQuotaFits(target, 1) {
-		return nil, ErrQuotaExceeded
-	}
-	// The parts of an upload in flight are already reserved, so the only
-	// accounting question left is whether the completion itself fits.
-	uploadReservation := uploadUsage.bytes()
-	if uploadReservation > i.reservedBytes {
-		return nil, ErrQuotaExceeded
-	}
-	// A completion holds the parts and assembles a second copy of the same bytes
-	// before the object is published, so for the length of this call the bounded
-	// state is every committed object, every in-flight part, and the buffer
-	// being assembled. That last term is the completion reservation, and without
-	// it the store transiently held the object twice while the advertised ceiling
-	// counted it once, so a session could exceed the bound it publishes by one
-	// object per in-flight completion.
-	//
-	// The check precedes the store call, so a completion that cannot fit is
-	// refused before anything is assembled and reserves nothing. A completion
-	// that fails afterwards leaves the upload's own reservation in place, which
-	// is correct: the upload is still in flight and still holding its parts.
-	peak := i.usage.Bytes - oldSize + i.reservedBytes + completedBytes
-	if peak > i.options.MaxBytes {
-		return nil, ErrQuotaExceeded
-	}
-	meta, err := i.multipartStore.CompleteMultipartUpload(ctx, uploadID, parts)
-	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
+	if err := i.admitCompletion(uploadID, parts, oldSize, exists); err != nil {
 		return nil, err
 	}
-	// One transition, from in-flight to committed: the parts' reservation is
-	// released and the object's bytes are counted, so the same bytes are never
-	// counted twice and never dropped. This is the only place the two states
-	// meet, which is what makes "exactly once" a property rather than a hope.
-	if exists {
-		i.usage.Bytes -= oldSize
-	} else {
-		i.usage.Objects++
+	meta, err := i.multipartStore.CompleteMultipartUpload(ctx, uploadID, parts)
+	if !i.finishCompletion(uploadID, oldSize, meta, exists, err) {
+		return nil, err
 	}
-	i.usage.Bytes += meta.Size
-	i.reservedBytes -= uploadReservation
-	i.removeMultipartTarget(target)
-	i.consumeTargetReservation(target)
-	i.reconcileTargetReservation(target, true)
-	delete(i.multipart, uploadID)
 	clone := *meta
 	return &clone, err
 }
@@ -240,16 +185,13 @@ func (i *Instance) AbortMultipartUpload(ctx context.Context, uploadID string) er
 	if !ok {
 		return storage.ErrUploadNotFound
 	}
-	if err := i.multipartStore.AbortMultipartUpload(ctx, uploadID); err != nil {
+	_, exists, err := i.objectSize(ctx, usage.upload.Bucket, usage.upload.Key)
+	if err != nil {
 		return err
 	}
-	i.reservedBytes -= usage.bytes()
-	target := objectTarget(usage.upload.Bucket, usage.upload.Key)
-	i.removeMultipartTarget(target)
-	i.consumeTargetReservation(target)
-	i.reconcileTargetReservation(target, false)
-	delete(i.multipart, uploadID)
-	return nil
+	err = i.multipartStore.AbortMultipartUpload(ctx, uploadID)
+	i.finishAbort(uploadID, exists, err)
+	return err
 }
 
 func (i *Instance) ListParts(ctx context.Context, uploadID string) ([]storage.PartInfo, error) {
@@ -320,8 +262,4 @@ func (i *Instance) checkMultipartOpen() error {
 		return ErrMultipartUnsupported
 	}
 	return i.checkOpen()
-}
-
-func (i *Instance) bytesWithinQuota(oldSize, newSize int64) bool {
-	return i.usage.Bytes+i.reservedBytes-oldSize+newSize <= i.options.MaxBytes
 }

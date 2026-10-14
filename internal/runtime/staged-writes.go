@@ -2,7 +2,6 @@ package runtime
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 
@@ -32,8 +31,7 @@ func (i *Instance) putStagedObject(ctx context.Context, staged storage.StagedWri
 	defer func() {
 		i.mu.Lock()
 		if i.storeEpoch == write.epoch {
-			i.reservedBytes -= reservation.bytes
-			i.reservedObjects -= reservation.objects
+			i.releaseStaged(reservation)
 		}
 		i.mu.Unlock()
 	}()
@@ -50,8 +48,7 @@ func (i *Instance) putStagedObject(ctx context.Context, staged storage.StagedWri
 	if i.storeEpoch != write.epoch {
 		return Object{}, fmt.Errorf("runtime store changed while object was staged")
 	}
-	i.reservedBytes -= reservation.bytes
-	i.reservedObjects -= reservation.objects
+	i.releaseStaged(reservation)
 	reservation = streamReservation{}
 	if err := i.checkMutationLocked(ctx); err != nil {
 		return Object{}, err
@@ -64,23 +61,14 @@ func (i *Instance) putStagedObject(ctx context.Context, staged storage.StagedWri
 		return Object{}, err
 	}
 	meta, err := pending.Commit(ctx)
-	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
+	if !i.finishPut(objectTarget(write.bucket, write.key), oldSize, write.size, exists, err) {
 		return Object{}, err
 	}
-	if exists {
-		i.usage.Bytes -= oldSize
-	} else {
-		i.usage.Objects++
-	}
-	i.usage.Bytes += write.size
-	target := objectTarget(write.bucket, write.key)
-	i.consumeTargetReservation(target)
-	i.reconcileTargetReservation(target, true)
 	return objectFromMeta(meta, nil), err
 }
 
 func streamStorageOptions(options PutOptions) storage.PutOptions {
-	return storage.PutOptions{ContentType: options.ContentType, Metadata: storage.CloneMetadata(options.Metadata), ChecksumAlgorithm: options.ChecksumAlgorithm, ChecksumValue: options.ChecksumValue, IfMatch: options.IfMatch, IfNoneMatch: options.IfNoneMatch, Guard: options.guard, RequestKey: options.requestKey}
+	return storage.PutOptions{ComputeChecksum: options.computeChecksum, ContentType: options.ContentType, Metadata: storage.CloneMetadata(options.Metadata), ChecksumAlgorithm: options.ChecksumAlgorithm, ChecksumValue: options.ChecksumValue, IfMatch: options.IfMatch, IfNoneMatch: options.IfNoneMatch, Guard: options.guard, RequestKey: options.requestKey}
 }
 
 func (i *Instance) checkStreamQuotaLocked(ctx context.Context, write stagedWriteRequest) (int64, bool, error) {
@@ -115,7 +103,6 @@ func (i *Instance) reserveStreamLocked(ctx context.Context, write stagedWriteReq
 	if !exists && !i.hasTargetReservation(objectTarget(write.bucket, write.key)) {
 		reservation.objects = 1
 	}
-	i.reservedBytes += reservation.bytes
-	i.reservedObjects += reservation.objects
+	i.reserveStaged(reservation)
 	return reservation, nil
 }

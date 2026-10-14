@@ -82,3 +82,29 @@ func VerifyChecksum(opts PutOptions, data []byte) error {
 	}
 	return nil
 }
+
+func ResolvePutChecksum(opts PutOptions, data []byte) (PutOptions, error) {
+	if !opts.ComputeChecksum {
+		opts.ChecksumAlgorithm = NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm)
+		return opts, VerifyChecksum(opts, data)
+	}
+	algorithm := NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm)
+	if algorithm == "" {
+		if opts.ChecksumValue != "" {
+			return opts, fmt.Errorf("checksum value requires an algorithm")
+		}
+		opts.ChecksumAlgorithm = ""
+		opts.ComputeChecksum = false
+		return opts, nil
+	}
+	computed, err := ComputeChecksum(algorithm, data)
+	if err != nil {
+		return opts, err
+	}
+	if opts.ChecksumValue != "" && opts.ChecksumValue != computed {
+		return opts, ErrChecksumMismatch
+	}
+	opts.ChecksumAlgorithm, opts.ChecksumValue = algorithm, computed
+	opts.ComputeChecksum = false
+	return opts, nil
+}

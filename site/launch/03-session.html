@@ -2,13 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <title>Stow workspace lifecycle</title>
     <link rel="stylesheet" href="card.css" />
   </head>
   <body>
     <!-- 03 The workspace lifecycle. Five explicit verbs, and the lifecycle is
          the product rather than a convenience wrapper around a bucket. -->
     <div class="card">
-      <div class="wordmark"><span class="box"></span><span>STOW <b>S3</b></span></div>
+      <div class="wordmark"><span class="box"></span><span>stow</span></div>
 
       <h1 class="mt" style="font-size: 140px">
         Prepare, work, checkpoint,<br /><em>diff, hand off.</em>
@@ -27,13 +28,13 @@
       </div>
 
       <p class="sub" style="max-width: 62ch; font-size: 38px; margin-top: 58px">
-        Every checkpoint carries a path, a size, a mode and a SHA-256 per file.
+        Each captured file has a path, a size, a mode and a SHA-256 hash.
         The diff is computed from those hashes, so it says what the agent actually
         changed rather than what you hoped it changed.
       </p>
 
       <div class="foot">
-        <span class="tag">Nothing is retained implicitly</span>
+        <span class="tag">Capture checkpoints when your application requests them</span>
         <span class="url">github.com/chester-hill-solutions/stow-s3</span>
       </div>
     </div>

@@ -1,19 +1,15 @@
 package stow
 
-import (
-	"errors"
-
-	"github.com/chester-hill-solutions/stow-s3/internal/storage"
-)
+import "github.com/chester-hill-solutions/stow-s3/internal/embedded"
 
 var (
-	ErrMutationCommitted            = storage.ErrMutationCommitted
-	ErrBucketNotFound               = errors.New("stow: bucket not found")
-	ErrBucketExists                 = errors.New("stow: bucket already exists")
-	ErrBucketNotEmpty               = errors.New("stow: bucket is not empty")
-	ErrObjectNotFound               = errors.New("stow: object not found")
-	ErrInvalidBucket                = errors.New("stow: invalid bucket name")
-	ErrInvalidKey                   = errors.New("stow: invalid object key")
-	ErrPreconditionFailed           = errors.New("stow: precondition failed")
-	ErrConditionalWritesUnsupported = errors.New("stow: conditional writes unsupported")
+	ErrMutationCommitted            = embedded.ErrMutationCommitted
+	ErrBucketNotFound               = embedded.ErrBucketNotFound
+	ErrBucketExists                 = embedded.ErrBucketExists
+	ErrBucketNotEmpty               = embedded.ErrBucketNotEmpty
+	ErrObjectNotFound               = embedded.ErrObjectNotFound
+	ErrInvalidBucket                = embedded.ErrInvalidBucket
+	ErrInvalidKey                   = embedded.ErrInvalidKey
+	ErrPreconditionFailed           = embedded.ErrPreconditionFailed
+	ErrConditionalWritesUnsupported = embedded.ErrConditionalWritesUnsupported
 )

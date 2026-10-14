@@ -16,18 +16,7 @@ import (
 // answer the same whether a caller arrived over S3 or in process.
 
 func (i *Instance) PutObject(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error) {
-	if err := i.checkContext(ctx); err != nil {
-		return Object{}, err
-	}
-	if err := i.checkResource(authority.ObjectWrite, policy.Object(bucket, key)); err != nil {
-		return Object{}, err
-	}
-	i.mu.Lock()
-	defer i.mu.Unlock()
-	if err := i.checkMutationLocked(ctx); err != nil {
-		return Object{}, err
-	}
-	return i.putObjectLocked(ctx, bucket, key, data, options)
+	return i.PutObjectStream(ctx, bucket, key, bytes.NewReader(data), StreamPutOptions{Size: int64(len(data)), PutOptions: options})
 }
 
 func (i *Instance) putObjectLocked(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error) {
@@ -36,27 +25,25 @@ func (i *Instance) putObjectLocked(ctx context.Context, bucket, key string, data
 }
 
 func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, error) {
-	if err := i.checkContext(ctx); err != nil {
-		return Object{}, err
-	}
-	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
-		return Object{}, err
-	}
-	i.mu.Lock()
-	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
-		return Object{}, err
-	}
-	reader, meta, err := i.store.GetObject(ctx, bucket, key)
+	reader, object, err := i.OpenObject(ctx, bucket, key)
 	if err != nil {
 		return Object{}, err
 	}
 	defer reader.Close()
-	data, err := io.ReadAll(reader)
+	size := object.Size
+	if size < 0 {
+		size = 0
+	}
+	if size > 32<<20 {
+		size = 32 << 20
+	}
+	buffer := bytes.NewBuffer(make([]byte, 0, int(size)))
+	_, err = io.Copy(buffer, reader)
 	if err != nil {
 		return Object{}, err
 	}
-	return objectFromMeta(meta, data), nil
+	object.Data = buffer.Bytes()
+	return object, nil
 }
 
 func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, error) {
@@ -213,21 +200,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 		}
 	}
 	deleted, err := i.store.DeleteObjects(ctx, bucket, keys)
-	for _, key := range deleted {
-		size, existed := sizes[key]
-		if !existed {
-			// Confirmed as deleted because it was not there. There is no object
-			// to account for, and decrementing anyway would let a caller inflate
-			// its own quota by deleting keys that never existed.
-			continue
-		}
-		delete(sizes, key)
-		i.usage.Bytes -= size
-		i.usage.Objects--
-		target := objectTarget(bucket, key)
-		i.consumeTargetReservation(target)
-		i.reconcileTargetReservation(target, false)
-	}
+	i.finishDeletes(bucket, deleted, sizes, err)
 	return deleted, err
 }
 
@@ -237,16 +210,7 @@ func (i *Instance) deleteObjectLocked(ctx context.Context, bucket, key string) e
 		return err
 	}
 	err = i.store.DeleteObject(ctx, bucket, key)
-	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
-		return err
-	}
-	if exists {
-		i.usage.Bytes -= size
-		i.usage.Objects--
-	}
-	target := objectTarget(bucket, key)
-	i.consumeTargetReservation(target)
-	i.reconcileTargetReservation(target, false)
+	i.finishDelete(objectTarget(bucket, key), size, exists, err)
 	return err
 }
 
@@ -321,21 +285,10 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	if !i.bytesQuotaFits(oldSize, sourceMeta.Size) {
 		return Object{}, ErrQuotaExceeded
 	}
-	_, targetReserved := i.reservedTargets[target]
 	meta, err := i.storeCopy(ctx, req)
-	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
+	if !i.finishStoredPut(target, oldSize, meta, exists, err) {
 		return Object{}, err
 	}
-	if exists {
-		i.usage.Bytes -= oldSize
-	} else {
-		i.usage.Objects++
-	}
-	i.usage.Bytes += meta.Size
-	if targetReserved {
-		i.consumeTargetReservation(target)
-	}
-	i.reconcileTargetReservation(target, true)
 	return objectFromMeta(meta, nil), err
 }
 
@@ -372,7 +325,11 @@ func objectTarget(bucket, key string) string {
 }
 
 func (i *Instance) objectSize(ctx context.Context, bucket, key string) (int64, bool, error) {
-	meta, err := i.quotaStore().HeadObject(ctx, bucket, key)
+	return storedObjectSize(ctx, i.quotaStore(), bucket, key)
+}
+
+func storedObjectSize(ctx context.Context, store storage.Store, bucket, key string) (int64, bool, error) {
+	meta, err := store.HeadObject(ctx, bucket, key)
 	if err == nil {
 		return meta.Size, true, nil
 	}

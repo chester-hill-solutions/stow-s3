@@ -3,9 +3,10 @@ package fs
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
+	"math"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	storage "github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -14,7 +15,7 @@ import (
 type objectListWalk struct {
 	prefix   string
 	segments []string
-	items    *[]storage.ObjectMeta
+	collect  func(storage.ObjectMeta) error
 }
 
 func (s *FilesystemStore) ListObjectsV2(_ context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
@@ -28,14 +29,17 @@ func (s *FilesystemStore) ListObjectsV2(_ context.Context, bucket string, opts s
 		return nil, storage.ErrBucketNotFound
 	}
 	items := make([]storage.ObjectMeta, 0)
-	if err := s.walkObjects(bucket, opts.Prefix, s.objectsDir(bucket), nil, &items); err != nil {
+	walk := objectListWalk{prefix: opts.Prefix, collect: func(meta storage.ObjectMeta) error {
+		items = append(items, meta)
+		return nil
+	}}
+	if err := s.walkObjects(bucket, s.objectsDir(bucket), walk); err != nil {
 		return nil, err
 	}
-	sort.Slice(items, func(i, j int) bool { return items[i].Key < items[j].Key })
 	return storage.PaginateObjects(items, opts), nil
 }
 
-func (s *FilesystemStore) walkObjects(bucket, prefix, dir string, segments []string, items *[]storage.ObjectMeta) error {
+func (s *FilesystemStore) walkObjects(bucket, dir string, walk objectListWalk) error {
 	entries, err := os.ReadDir(dir)
 	if os.IsNotExist(err) {
 		return nil
@@ -46,11 +50,12 @@ func (s *FilesystemStore) walkObjects(bucket, prefix, dir string, segments []str
 	for _, entry := range entries {
 		entryPath := filepath.Join(dir, entry.Name())
 		if entry.IsDir() {
-			if !isListDirectory(entry.Name(), segments) {
+			if !isListDirectory(entry.Name(), walk.segments) {
 				continue
 			}
-			child := append(append(make([]string, 0, len(segments)+1), segments...), entry.Name())
-			if err := s.walkObjects(bucket, prefix, entryPath, child, items); err != nil {
+			child := walk
+			child.segments = append(append(make([]string, 0, len(walk.segments)+1), walk.segments...), entry.Name())
+			if err := s.walkObjects(bucket, entryPath, child); err != nil {
 				return err
 			}
 			continue
@@ -58,7 +63,7 @@ func (s *FilesystemStore) walkObjects(bucket, prefix, dir string, segments []str
 		if strings.HasSuffix(entry.Name(), legacyMetaSuffix) {
 			continue
 		}
-		if err := s.appendListedObject(bucket, objectListWalk{prefix: prefix, segments: segments, items: items}, entry.Name(), entryPath); err != nil {
+		if err := s.appendListedObject(bucket, walk, entry.Name(), entryPath); err != nil {
 			return err
 		}
 	}
@@ -76,7 +81,7 @@ func isListDirectory(name string, segments []string) bool {
 }
 
 func (s *FilesystemStore) appendListedObject(bucket string, walk objectListWalk, name, path string) error {
-	record, err := readObjectRecord(path)
+	record, err := readObjectHeader(path)
 	if err != nil {
 		return err
 	}
@@ -84,8 +89,7 @@ func (s *FilesystemStore) appendListedObject(bucket string, walk objectListWalk,
 	if !ok || !strings.HasPrefix(key, walk.prefix) {
 		return nil
 	}
-	*walk.items = append(*walk.items, record.meta(bucket, key))
-	return nil
+	return walk.collect(record.meta(bucket, key))
 }
 
 func keyFromListedRecord(record objectRecord, segments []string, name string) (string, bool) {
@@ -118,4 +122,29 @@ func sameSegments(left, right []string) bool {
 		}
 	}
 	return true
+}
+
+func (s *FilesystemStore) ScanObjectUsage(ctx context.Context, bucket string) (storage.ObjectUsage, error) {
+	if err := storage.ValidateBucketName(bucket); err != nil {
+		return storage.ObjectUsage{}, err
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if err := s.requireBucket(bucket); err != nil {
+		return storage.ObjectUsage{}, err
+	}
+	var usage storage.ObjectUsage
+	walk := objectListWalk{collect: func(meta storage.ObjectMeta) error {
+		if ctx != nil && ctx.Err() != nil {
+			return ctx.Err()
+		}
+		if meta.Size < 0 || usage.Bytes > math.MaxInt64-meta.Size {
+			return fmt.Errorf("invalid object usage")
+		}
+		usage.Bytes += meta.Size
+		usage.Objects++
+		return nil
+	}}
+	err := s.walkObjects(bucket, s.objectsDir(bucket), walk)
+	return usage, err
 }

@@ -272,10 +272,15 @@ func (s *Server) serveRange(w http.ResponseWriter, r *http.Request, rc io.ReadCl
 	}
 	length := end - start + 1
 
+	var offsetErr error
 	if seeker, ok := rc.(io.ReadSeeker); ok {
-		_, _ = seeker.Seek(start, io.SeekStart)
+		_, offsetErr = seeker.Seek(start, io.SeekStart)
 	} else {
-		_, _ = io.CopyN(io.Discard, rc, start)
+		_, offsetErr = io.CopyN(io.Discard, rc, start)
+	}
+	if offsetErr != nil {
+		writeError(w, r, mapStorageError(offsetErr, resourcePath(bucket, key)))
+		return
 	}
 
 	// Representation headers but not the whole-object checksum. A 206 carries a

@@ -57,11 +57,29 @@ baseline to admit a regression. Go comment volume counts production comment
 lines; comment ratio is reported, not ratcheted. Coverage uses covered-statement
 floors and a bounded percentage-drop check.
 
-For docs-only changes, run `make check-doc-links check-adr-index check-doc-commands`
-and `make check-scripts`. Keep current API guides separate from dated evidence and
+For documentation changes, run `make check-doc-links check-adr-index check-doc-commands`
+and `make check-api-reference check-scripts`. Keep current API guides separate from dated evidence and
 retired plans. Move historical designs under `docs/history/` and repair their
 incoming and outgoing links. Only remove an ADR after its replacement is in force;
 record its number and original Git source in `docs/adr/retired.json`.
+
+## Documentation style
+
+Use the clear-writing principles of [Simplified Technical English](https://en.wikipedia.org/wiki/Simplified_Technical_English).
+This repository does not claim full ASD-STE100 compliance.
+
+- Lead with the task or behavior. Put development history in dated records.
+- Use active voice and name the actor: the application, server, adapter or provider.
+- Give one instruction per sentence and one topic per paragraph.
+- Aim for at most 20 words in instructions and 25 in descriptions.
+  Split longer sentences when their meaning remains clear.
+- Use the same term for the same concept. Define unfamiliar terms on first use.
+- Preserve API identifiers, commands, units, limits and error codes exactly.
+- State conditions and failure behavior. Do not replace precise guarantees with broad claims.
+- Remove filler, slogans, rhetorical contrasts and repeated explanations.
+- Use numbered steps for procedures and tables for comparable options.
+
+Read edits against the code and contract. Check links and rendered pages after changing headings.
 
 ## Pull requests
 

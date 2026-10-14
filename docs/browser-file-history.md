@@ -1,10 +1,10 @@
 # Browser file history and explicit sync
 
-`BrowserFileHistory`, exported from `@chester-hill-solutions/stow-s3/browser`,
-adds retained file stages and remote object sync over `BrowserEmbeddedStow`.
-It uses the existing WASM object engine and persistence coordinator. It does
-not start an HTTP S3 server in the browser or expose the full native run-through
-adapter. Host applications supply networking and credentials.
+`BrowserFileHistory` retains file stages, supports undo/redo, and syncs to remote object storage.
+It uses `BrowserEmbeddedStow` for WASM storage and durable commits.
+A stage is a saved version of one file.
+Your application supplies networking and credentials.
+The browser API does not run an HTTP S3 server.
 
 ## Opening and editing
 
@@ -31,100 +31,91 @@ const status = await files.sync("notes.md");
 // status.pending is false only after the selected version is confirmed remotely.
 ```
 
-`read()` returns cached bytes without a network request. A miss explicitly
-fetches the remote object and records its ETag as the base for future writes.
-`save()` never contacts the remote. A new offline-created file assumes expected
-remote absence; synchronization conflicts if that key already exists remotely.
+`read()` returns local bytes without a network request.
+On a miss, it fetches the remote object and records its ETag for later writes.
+`save()` makes no network request. A new offline file expects the remote key to be absent.
+Sync reports a conflict if that key already exists.
 
-`read`, `save`, `undo`, `redo`, and `adoptRemote` return `{ data, version, status }`.
-`status` and `sync` return `FileHistoryStatus`: retained versions, current version
-ID, pending state, undo/redo availability, confirmed remote ETag, and whether a
-write requires reconciliation. The app owns its dirty input buffer and must
-await the save promise before reporting a local edit as saved.
+`read`, `save`, `undo`, `redo` and `adoptRemote` return `{ data, version, status }`.
+`status` and `sync` return `FileHistoryStatus`, which includes:
 
-`maxVersions` defaults to 50 and must be at least 2. A save after undo starts a
-new linear branch, releasing the abandoned redo stages. Old stages beyond the
-limit are released. Labels name ordinary stages; they do not pin them against
-retention. Undo/redo moves the persisted cursor and makes the selected stage
-pending when it differs from the last confirmed remote stage.
+- retained versions and the selected version ID;
+- pending sync state and undo/redo availability;
+- the confirmed remote ETag;
+- whether an uncertain write needs reconciliation.
+
+Wait for the save promise before marking an edit as saved.
+The application owns unsaved input buffers.
+
+`maxVersions` defaults to 50 and must be at least 2.
+A save after undo removes the redo branch. Stages beyond the retention limit are released.
+Labels do not prevent removal. Undo/redo persists the selected stage and marks it pending
+if it differs from the last confirmed remote stage.
 
 ## Commit and recovery contract
 
-The revision bytes, history cursor, retention changes and state record commit
-in one `BrowserEmbeddedStow.writeBatch()` transaction. WASM quota failures and
-IndexedDB failures restore the prior committed state. No save resolves on an
-in-memory change alone. History records are versioned and validated on load;
-missing or malformed local history fails instead of fetching over local edits.
+`BrowserEmbeddedStow.writeBatch()` commits the stage bytes, cursor, retention changes and state record in one transaction.
+WASM quota or IndexedDB failures restore the previous committed state.
+A save resolves only after the durable commit.
+Invalid or missing history records cause an error; Stow does not fetch remote data over local edits.
 
-Sync first records a durable attempt with the selected immutable revision,
-expected remote identity and a random receipt. The transport enforces `If-Match`
-for existing files or `If-None-Match: *` for new files. The remote result is then
-acknowledged locally in a separate commit. S3 writes carry the receipt in reserved
-`stow-save-id` object metadata.
+Before uploading, sync persists the selected revision, remote condition and a random receipt.
+It uses `If-Match` for existing files or `If-None-Match: *` for new files.
+S3 writes include the receipt in reserved `stow-save-id` metadata.
+After remote success, a separate local commit records the acknowledgement.
 
-If the connection or local acknowledgement is lost after remote success, the
-next sync compares the remote receipt, bytes, content type and application
-metadata with the attempted revision. Matching writes are acknowledged without
-uploading again. Otherwise the original conditional write is retried. Unknown
-failures retain the attempt; a definitive precondition failure reports a conflict.
-A pruned attempted revision stays protected until reconciliation. If a later
-local stage exists, sync reconciles the earlier attempt before publishing the
-current stage. Unattempted intermediate edits are coalesced.
+A lost remote reply or failed local acknowledgement leaves an uncertain attempt.
+The next sync compares the remote receipt, bytes, content type and application metadata with that attempt.
+If they match, it acknowledges the write without another upload.
+Otherwise, it retries the original conditional write.
+Unknown failures retain the attempt. A definitive precondition failure reports a conflict.
 
-On `FileHistoryError` with code `conflict`, local stages remain available.
-`adoptRemote()` explicitly makes the current remote bytes a new confirmed stage.
-Undo can return to a retained local edit; a subsequent sync then conditionally
-publishes it against the newly observed remote ETag. An uncertain attempt must be
-reconciled with `sync()` before adoption. A deleted remote file cannot currently
-be adopted as a deletion; the app should retain/export its local data.
+An attempted revision remains protected if retention removes it from ordinary history.
+Sync resolves that attempt before uploading a later stage.
+Sync skips intermediate stages that have not been attempted.
 
-Operations are FIFO across history facades sharing a store and history bucket.
-The facade does not own the store or WASM host: await operations, then close those
-resources through their existing APIs. Do not edit its dedicated history bucket
-outside the facade, or change a namespace's intended remote endpoint/account.
+A `FileHistoryError` with code `conflict` preserves local stages.
+Call `adoptRemote()` to add the current remote bytes as a confirmed stage.
+Undo can then select a retained local edit. Its next sync uses the newly observed remote ETag.
+Resolve an uncertain attempt with `sync()` before adoption.
+Remote deletions cannot currently be adopted; retain or export local data.
+
+Operations run in arrival order across history instances sharing a store and history bucket.
+Wait for operations, then close the store and WASM host through their own APIs.
+Do not edit the dedicated history bucket outside this API.
+Keep the namespace's remote endpoint and account configuration stable.
 
 ## Host integration
 
-The core browser entry point has no AWS SDK dependency. Implement `ObjectSyncRemote`
-for an authenticated host proxy or use `S3ObjectSyncRemote` with a configured
-`S3Client`. Credentials, endpoint selection, expiration, request timeouts, and
-authorization are caller-owned. Providers must actually enforce atomic conditional
-PUT; a HEAD followed by an unconditional PUT cannot fulfill this contract.
+The core browser entry point has no AWS SDK dependency.
+Implement `ObjectSyncRemote` for your proxy, or use `S3ObjectSyncRemote` with a configured `S3Client`.
+Your application controls credentials, endpoint, expiration, timeouts and authorization.
+The provider must enforce conditional PUT atomically.
+A HEAD request followed by an unconditional PUT is insufficient.
 
-For direct browser S3 access, configure CORS for GET/PUT and the SDK's request
-headers, including conditional headers and receipt metadata. Expose `ETag` and
-`x-amz-meta-stow-save-id` and application metadata response headers needed for
-reconciliation. Use scoped credentials;
-the demo instead keeps fixture credentials behind a same-origin local proxy.
-The transport reserves `stow-save-id` case-insensitively. A 403 is not treated as
-a missing object, and a 409 retains the uncertain attempt rather than being
-misreported as a definitive conflict.
+For direct S3 access, configure CORS for GET/PUT and all SDK request headers.
+Include conditional headers and receipt metadata.
+Expose `ETag`, `x-amz-meta-stow-save-id` and the application metadata headers used for recovery.
+Use scoped credentials. The demo keeps fixture credentials behind a local same-origin proxy.
+
+The transport reserves `stow-save-id`, regardless of letter case.
+A 403 is an access failure, not a missing object.
+A 409 retains the uncertain attempt, rather than reporting a definitive conflict.
 
 ## Limits of this first slice
 
-- Full bytes are retained per stage. The existing bridge buffers and replays the
-  complete local namespace in memory. Use this for modest text files and bounded
-  artifacts; streaming, edit deltas and large media need separate work.
-- History and receipts count toward the store's byte/object quotas. Configure
-  capacity for retained stages, state records and one protected attempted revision
-  per file. `maxVersions` bounds each file's history, not the number of files.
-- The scope is read-through and explicit current-file PUT. No automatic background
-  uploads, file deletion sync, complete bucket mirroring, remote change feed,
-  automatic merge, cross-device history, or atomic multi-file undo is provided.
-- Browser storage remains subject to the browser's retention policy and user
-  clearing. An IndexedDB commit is distinct from a confirmed remote save. Hosts
-  can request persistent storage and display/export pending work.
-- A network operation currently holds the history queue. Configure bounded
-  request timeouts; concurrent editing during long syncs needs further scheduling.
-- Multi-tab ownership inherits the persistence adapter's Web Locks requirement.
-  Use hosts with Web Locks for cross-context exclusion.
+- Each stage retains the full file. The bridge buffers and replays the complete namespace in memory.
+  Use this profile for small files. For shared assets and streams, use [project storage](browser-project-storage.md).
+- History and receipts count toward byte/object quotas. Reserve space for stages, state records and one protected attempt per file.
+  `maxVersions` limits stages per file, not the number of files.
+- Sync uploads the current file. It does not provide background uploads, deletion sync, bucket mirroring,
+  remote change feeds, automatic merge, cross-device history or atomic multi-file undo.
+- Browser storage can be evicted. Applications must handle storage errors and provide export or backup as needed.
 
-Tests exercise real Go WASM with an injectable transaction store and remote
-transport, including failed commits, quota rollback, lost replies, restart
-reconciliation, pruning and conflicts. S3 transport tests exercise actual SDK
-serialization/signing. The runnable editor supplies manual real-browser coverage;
-The browser contract now has a Chromium CI gate and a live Railway qualification
-runner. The large project workload is a separate opt-in qualification.
+<!-- repo-only:start -->
+Unit tests cover commit, retention, sync recovery and S3 request signing.
+Chromium CI tests use real WASM, IndexedDB and Web Locks.
+The large project workload and live Railway tests run separately.
 
 ## Repeatable browser and Railway tests
 
@@ -158,9 +149,7 @@ under that prefix are removed; cleanup reads the prefix back to verify it is emp
 
 Direct tests temporarily add a CORS rule for `http://127.0.0.1:4180`, with explicit
 conditional/metadata headers and exposed ETag/receipt fields. Railway requires a
-positive CORS cache age. Configuration readback alone did not consistently prove
-that object responses had adopted the policy, so the runner verifies actual
-OPTIONS and PUT responses before starting Chromium. It removes its own rule
+positive CORS cache age. The runner verifies OPTIONS and PUT responses before starting Chromium. It removes its own rule
 afterward, preserves unrelated rules, and waits for removal to appear on readback.
 Credentials are removed even when qualification fails. Live traces are disabled
 and signed URLs are redacted from browser diagnostics.
@@ -178,5 +167,6 @@ environment, using encrypted `STOW_LIVE_ENDPOINT`, `STOW_LIVE_ACCESS_KEY_ID` and
 `STOW_LIVE_SECRET_ACCESS_KEY` secrets, plus `STOW_LIVE_BUCKET` and optional
 `STOW_LIVE_REGION` variables. The environment is configured with encrypted
 Railway testing-bucket credentials and permits deployments only from `main`.
-Live testing succeeded locally with Railway CLI credentials; the manual workflow
-will be available after these changes are pushed.
+The manual workflow is available from `main`.
+See the [recorded Railway run](assessment-evidence/2026-10-12/railway-browser.json) for local test results.
+<!-- repo-only:end -->

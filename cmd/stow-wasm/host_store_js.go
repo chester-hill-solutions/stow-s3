@@ -8,8 +8,8 @@ import (
 	"syscall/js"
 	"time"
 
+	stow "github.com/chester-hill-solutions/stow-s3/internal/embedded"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
-	stow "github.com/chester-hill-solutions/stow-s3/pkg/stow"
 )
 
 const hostChunkLimit = 256 << 10
