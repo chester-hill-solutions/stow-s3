@@ -57,6 +57,7 @@ func (s *FilesystemStore) CreateMultipartUpload(_ context.Context, bucket, key s
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return nil, err
 	}
@@ -107,6 +108,7 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return nil, err
 	}
@@ -138,6 +140,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return nil, err
 	}
@@ -265,6 +268,7 @@ func (s *FilesystemStore) ListMultipartUploads(_ context.Context, bucket string,
 func (s *FilesystemStore) AbortMultipartUpload(_ context.Context, uploadID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}

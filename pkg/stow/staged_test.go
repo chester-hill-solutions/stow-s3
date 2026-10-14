@@ -19,7 +19,10 @@ type stagedMemoryStore struct {
 
 func (s *stagedMemoryStore) StageObject(ctx context.Context, bucket, key string, body io.Reader, options stow.PutOptions) (stow.StagedObject, error) {
 	if s.entered != nil {
-		s.entered <- struct{}{}
+		select {
+		case s.entered <- struct{}{}:
+		default:
+		}
 	}
 	data, err := io.ReadAll(body)
 	if err != nil {

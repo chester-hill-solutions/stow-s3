@@ -1,6 +1,7 @@
 package s3api
 
 import (
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -94,5 +95,27 @@ func TestRequestBodyIsEmptyForABodylessRequest(t *testing.T) {
 	}
 	if len(body) != 0 {
 		t.Fatalf("body = %q, want empty", body)
+	}
+}
+
+func TestRequestBodyTransferDropsReplayReferences(t *testing.T) {
+	req := withBodyCache(httptest.NewRequest("PUT", "/bucket/key", strings.NewReader("payload")))
+	data, err := requestBody(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	owned := takeRequestBody(req, data)
+	if req.GetBody != nil || req.Context().Value(bodyCacheKey{}).(*bodyCache).data != nil {
+		t.Fatal("request retained replay references after handoff")
+	}
+	prepared, err := storage.PreparePut(owned, storage.PutOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if &prepared.Data[0] != &data[0] {
+		t.Fatal("materialized HTTP buffer was copied during handoff")
+	}
+	if again, err := requestBody(req); err != nil || len(again) != 0 {
+		t.Fatalf("request cache replayed a transferred body: %q %v", again, err)
 	}
 }

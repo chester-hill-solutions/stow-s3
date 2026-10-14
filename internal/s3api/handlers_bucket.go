@@ -171,7 +171,7 @@ func (s *Server) handlePutObject(ctx context.Context, w http.ResponseWriter, r *
 		writeError(w, r, s3Error{Code: code, Message: err.Error(), Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
 		return
 	}
-	checksumAlgorithm, checksumValue, err := checksumFromRequest(r, body)
+	checksumAlgorithm, checksumValue, computeChecksum, err := s.putChecksumFromRequest(r, body)
 	if err != nil {
 		code := "InvalidArgument"
 		if errors.Is(err, storage.ErrChecksumMismatch) {
@@ -200,7 +200,8 @@ func (s *Server) handlePutObject(ctx context.Context, w http.ResponseWriter, r *
 		return
 	}
 
-	meta, err := s.store.PutObject(ctx, bucket, key, newBodyReader(body), storage.PutOptions{
+	meta, err := s.store.PutObject(ctx, bucket, key, takeRequestBody(r, body), storage.PutOptions{
+		ComputeChecksum:   computeChecksum,
 		ContentType:       contentType,
 		Metadata:          metadata,
 		ChecksumAlgorithm: checksumAlgorithm,

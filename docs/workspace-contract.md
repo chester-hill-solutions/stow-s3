@@ -1,6 +1,6 @@
 # Stow Workspace Contract
 
-**0.3.0 development additions:** the [portable workspace contract and usage](portable-workspace-usage.md)
+**v0.3.0 workspace additions:** the [portable workspace contract and usage](portable-workspace-usage.md)
 specifies the implemented facade, opt-in v2 snapshots, capture-request reconciliation,
 registry policy and MCP surface. Existing v1 file checkpoints remain supported.
 

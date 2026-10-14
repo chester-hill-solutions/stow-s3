@@ -1,40 +1,28 @@
 # @chester-hill-solutions/stow-s3
 
-TypeScript client for the [stow](https://github.com/chester-hill-solutions/stow-s3) local S3-compatible dev bucket service.
+TypeScript APIs for native S3 sessions, workspaces and embedded browser storage.
 
 ## Install
 
-This checkout is the unpublished 0.3.0 development candidate. Build from the
-repository with `make build build-wasm`, then
-`npm ci --ignore-scripts --omit=optional --prefix packages/stow-s3` and
-`npm run build --prefix packages/stow-s3`. The registry instructions below apply
-to published versions and do not certify this candidate's availability.
-
-This package is hosted on GitHub Packages. That registry requires authentication
-for npm packages, including public ones. Configure the scope in your project
-`.npmrc`:
-
-```ini
-@chester-hill-solutions:registry=https://npm.pkg.github.com
-```
-
-Then authenticate with a GitHub personal access token (classic) with the
-`read:packages` scope before installing:
+The TypeScript package is not yet published to npm. v0.3.0 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Build the TypeScript client from a source checkout:
 
 ```sh
-npm login --scope=@chester-hill-solutions --auth-type=legacy --registry=https://npm.pkg.github.com
-npm install @chester-hill-solutions/stow-s3
+git clone https://github.com/chester-hill-solutions/stow-s3
+cd stow-s3
+make build build-wasm
+npm ci --ignore-scripts --omit=optional --prefix packages/stow-s3
+npm run build --prefix packages/stow-s3
+export STOW_BIN="$PWD/bin/stow-s3"
 ```
 
-Enter your GitHub username and use the token as the password. Keep the token in
-your user-level npm config; do not commit it. See [GitHub's npm registry
-authentication guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
-
-Build the Go binary first when working from the monorepo:
-
-```sh
-make build
-```
+Use `STOW_BIN` for the native process APIs.
+Embedded WASM APIs use the built package assets.
+Registry publication is deferred. Do not rely on a registry install for v0.3.0.
+<!-- repo-only:start -->
+See the [release checkpoint](../../docs/release-verification-2026-10-14.md) for availability.
+<!-- repo-only:end -->
 
 ## Usage
 
@@ -55,7 +43,11 @@ process.env.S3_SECRET_ACCESS_KEY = bucket.secretAccessKey;
 await bucket.stop();
 ```
 
-`Stow.start()` owns the child process it launches. Use `backend: "memory"` for an explicitly ephemeral instance. To use an already-running endpoint, call `Stow.connect({ endpoint, accessKeyId, secretAccessKey, region })`; its `client` is an owned AWS SDK client that the caller can use directly, and `disconnect()` destroys it. The TypeScript entry points remain endpoint-based; the repository's `js/wasm` bridge is a separate additive profile.
+`Stow.start()` owns its child process. Call `stop()` when finished.
+Use `backend: "memory"` for temporary storage.
+To connect to an existing endpoint, call `Stow.connect({ endpoint, accessKeyId, secretAccessKey, region })`.
+Use its `client`, then call `disconnect()` to destroy the SDK client.
+Embedded WASM APIs use separate entry points.
 
 Both connection helpers also accept an optional `sessionToken` or credential `provider` for temporary AWS credentials. Run-through starts can set `cacheMaxBytes`, `cacheMaxObjects`, and `cacheTtlSeconds`; the CLI also reads `STOW_CACHE_MAX_BYTES`, `STOW_CACHE_MAX_OBJECTS`, and `STOW_CACHE_TTL`. Live mirror writes require the filesystem backend and a durable coordinated outbox; file-backed workers use expiring claims to coordinate separate processes, while the package never treats an in-memory outbox as durable.
 
@@ -113,10 +105,8 @@ Run `make test-wasm` or `make test-node` to rebuild the packaged asset. Custom h
 
 ### Scoped sessions
 
-`withStow` gives a short-lived execution context a private, disposable S3
-workspace with no lifecycle glue: a local memory backend, a generated bucket and
-credentials, a loopback endpoint, and cleanup on success, failure, or
-cancellation.
+`withStow` starts a private memory-backed S3 server with a generated bucket and credentials.
+It uses a loopback endpoint and cleans up after success, failure or cancellation.
 
 ```ts
 import { withStow } from "@chester-hill-solutions/stow-s3";
@@ -132,14 +122,18 @@ const summary = await withStow(async (session) => {
 });
 ```
 
-- The native binary is installed automatically as a platform optional package, so
-  a plain `npm install` works with no `PATH` setup. Measured in
-  [`docs/history/experiments/distribution-spike.md`](../../docs/history/experiments/distribution-spike.md).
+- Source checkouts use `STOW_BIN`. A platform package can supply the binary in a published distribution.
+<!-- repo-only:start -->
+  See the [release checkpoint](../../docs/release-verification-2026-10-14.md) before using registry installation.
+<!-- repo-only:end -->
 - `STOW_*`, `S3_*`, and `AWS_*` are stripped from the child environment, so
   ambient cloud configuration cannot turn a local session into a run-through one.
-- Defaults are 16 MiB and 1,000 objects, sized from the measured memory profile in
-  [`docs/benchmarks/session-baseline.md`](../../docs/benchmarks/session-baseline.md).
-  Override with `maxBytes` and `maxObjects`.
+- Defaults are 16 MiB and 1,000 objects. Override with `maxBytes` and `maxObjects`.
+
+<!-- repo-only:start -->
+See the [session measurements](../../docs/benchmarks/session-baseline.md) for the default budget.
+<!-- repo-only:end -->
+
 - `capabilities()` reports what the server is actually enforcing, parsed from the
   versioned readiness message. A limit of `0` means the server reported no limit.
 - `handoff()` returns a fresh five-key environment mapping for a child process. It
@@ -229,6 +223,7 @@ stow serve --data-dir .dev-bucket --port 9000
 2. `bin/stow-s3` relative to the monorepo root (when developing in-repo)
 3. `stow` on `PATH`
 
+<!-- repo-only:start -->
 ## Development
 
 ```sh
@@ -239,10 +234,16 @@ npm test
 ```
 
 The package test suite includes lifecycle and shared-corpus coverage. Run `make build` before `npm test` when working from the monorepo.
-
-
+<!-- repo-only:end -->
 ## Large browser projects and persistent workers
 
-The additive `/project` entry point exports `BrowserProject`, `ContentStore` and `IndexedDbContentAdapter` for lazy file/asset persistence, shared immutable chunks, atomic project revisions, bounded range reads and explicit conditional manifest sync. `/worker` exports `AsyncEmbeddedStow`; `/browser-wasm` supplies `loadBrowserPersistentWasmHost` for the same Go object runtime over durable host storage. Existing entry points remain compatible.
+`/project` exports `BrowserProject`, `ContentStore` and `IndexedDbContentAdapter`.
+It supports shared chunks, atomic revisions, bounded range reads and conditional manifest sync.
+`/worker` exports `AsyncEmbeddedStow`.
+`/browser-wasm` provides `loadBrowserPersistentWasmHost` for durable host storage.
 
-See [project usage and guarantees](../../docs/browser-project-storage.md), [worker APIs](../../docs/browser-worker-runtime.md) and [the 1 GiB qualification receipt](../../docs/benchmarks/browser-project-2026-10-12.json). These are development-tree additions, not a publication claim.
+Use the [project guide](../../docs/browser-project-storage.md) or [worker guide](../../docs/browser-worker-runtime.md) to get started.
+
+<!-- repo-only:start -->
+See the [1 GiB test record](../../docs/benchmarks/browser-project-2026-10-12.json).
+<!-- repo-only:end -->

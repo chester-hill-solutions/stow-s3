@@ -1,11 +1,10 @@
 # Binary and worker runtime
 
-The v1 JSON/base64 bridge remains available. New hosts expose the v2 binary
-bridge: JSON metadata and an optional `Uint8Array` travel separately, and the
-response is `{ metadata: string, data?: Uint8Array }`. Metadata is a v2 response
-envelope with the same structured errors and operation results as v1. Object
-payloads are absent from its JSON. Go uses `CopyBytesToGo` and `CopyBytesToJS`;
-this removes base64 work but still copies across the WASM memory boundary.
+The v2 bridge sends JSON metadata and optional `Uint8Array` bytes separately.
+Its response is `{ metadata: string, data?: Uint8Array }`.
+The metadata envelope keeps v1 operation results and structured errors, without object payloads.
+Go uses `CopyBytesToGo` and `CopyBytesToJS`. This avoids base64 encoding but still copies bytes across WASM memory.
+The v1 JSON/base64 bridge remains available.
 
 `EmbeddedStow` automatically chooses binary calls when the host provides
 `callBinary`. Its methods remain synchronous. `AsyncEmbeddedStow` uses the same
@@ -63,8 +62,7 @@ reader close, or runtime close. Closing the host rejects pending calls; the
 browser host also terminates its worker. Closing an individual runtime first
 permits ordinary cleanup.
 
-The ready-made persistent worker instantiates IndexedDB, the content store and
-its bounded cache, and the host-backed Go runtime in the worker:
+The persistent worker opens IndexedDB, the content store, its bounded cache and the Go runtime:
 
 ```ts
 const host = loadBrowserPersistentWasmHost();
@@ -101,11 +99,9 @@ change its bytes, and garbage collection retains its content until close. The
 consumer must close an opened stream it never iterates. Iteration closes on
 completion, error, or early exit. Each Go read rechecks authorization.
 
-The ready-made persistent worker also exposes caller-owned storage maintenance.
-Its open receipt advertises `capabilities().hostMaintenance === true`. Memory
-and custom hosts reject these methods with `unsupported_backend` unless they
-explicitly implement this capability. These are administrative operations on
-the caller's namespace, separate from Go object authorization.
+The persistent worker supports storage maintenance when `capabilities().hostMaintenance === true`.
+Memory and custom hosts return `unsupported_backend` unless they implement that capability.
+These namespace administration operations are separate from Go object authorization.
 
 ```ts
 const recovery = await runtime.inspectRecovery();
@@ -127,9 +123,7 @@ the runtime disables maintenance along with its object operations.
 `getObject` remains a complete-object convenience operation and is subject to
 the response limit. `getObjectRange(bucket, key, { offset, length })` reads at
 most 256 KiB per call. It returns the object's metadata with the requested bytes;
-`size` describes the entire object. A range bounds read memory, but several
-independent range calls do not constitute a stable snapshot during concurrent
-replacement. Callers must coordinate their selected revision.
+`size` describes the entire object. A range bounds read memory, but separate range calls can read different versions during concurrent replacement. Callers must coordinate their selected revision.
 
 The Node host exposes `callBinaryAsync` and `openHost`. Host-backed handles must
 use asynchronous dispatch because persistence may await JavaScript promises;

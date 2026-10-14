@@ -157,7 +157,7 @@ func (i *Index) save() error {
 	if i.Buckets == nil {
 		i.Buckets = map[string]map[string]ManifestEntry{}
 	}
-	raw, err := json.MarshalIndent(i, "", "  ")
+	raw, err := json.Marshal(i)
 	if err != nil {
 		return fmt.Errorf("encode workspace index: %w", err)
 	}

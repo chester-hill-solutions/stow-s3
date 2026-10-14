@@ -30,7 +30,10 @@ export async function loadBrowserWasmBridge(options: BrowserWasmOptions = {}): P
   const response = await fetch(options.wasmUrl ?? new URL("./stow-runtime.wasm", import.meta.url));
   if (!response.ok) throw new Error(`WASM fetch failed with status ${response.status}`);
   const go = new Go();
-  const { instance } = await WebAssembly.instantiate(await response.arrayBuffer(), go.importObject);
+  const wasmType = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+  const { instance } = wasmType === "application/wasm" && typeof WebAssembly.instantiateStreaming === "function"
+    ? await WebAssembly.instantiateStreaming(response, go.importObject)
+    : await WebAssembly.instantiate(await response.arrayBuffer(), go.importObject);
   Reflect.deleteProperty(runtimeGlobal, "stow");
   const running = go.run(instance);
   const bridge = runtimeGlobal.stow;

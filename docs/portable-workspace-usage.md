@@ -1,11 +1,13 @@
 # Portable workspace usage
 
-The development tree adds portable object checkpoints, replayable capture requests,
-a shared workspace S3 facade, local MCP tools and an experimental OpenCode caller.
-The native package targets are macOS and Linux on arm64/x64; this local run
-verifies macOS arm64. Windows workspace runtime is not supported by the current
-rooted-read/capture implementation. These additions have not yet been published. See [the plan](plan.md) for release
-and pilot gates.
+Use native workspaces for file editing, checkpoints, capture recovery, S3 access and local MCP tools.
+Native workspace APIs are included in v0.3.0 GitHub downloads and the Go module.
+TypeScript and Python clients are not yet published to registries; use a source checkout.
+Native package targets are macOS and Linux on arm64/x64.
+Windows workspace capture is unsupported by the current rooted-read implementation.
+<!-- repo-only:start -->
+See the [plan](plan.md) for remaining release tests.
+<!-- repo-only:end -->
 
 ## Workspace lifetime and S3
 
@@ -32,8 +34,7 @@ these handles preserves the workspace. A second owner is refused.
 
 ## Conditional object saves
 
-Public Go `PutOptions` now exposes `IfMatch` and `IfNoneMatch` through the existing
-runtime/store write gate. Use the ETag from a read for `IfMatch`, or `IfNoneMatch: "*"`
+Go `PutOptions` supports `IfMatch` and `IfNoneMatch` at the runtime/store write gate. Use the ETag from a read for `IfMatch`, or `IfNoneMatch: "*"`
 for creation only when absent. A mismatch returns `ErrPreconditionFailed` without
 replacing current bytes. Empty conditions retain unconditional writes.
 
@@ -49,14 +50,15 @@ refuses conditions against older hosts that do not advertise support.
 
 These checks compare content ETags, not metadata or every intervening revision.
 They do not coordinate arbitrary host writers or provide a committed-write replay
-receipt after a lost response. A stronger native managed-save interface is described below. Native filesystem
-receipts support bounded recovery; wrapper consumers and declared-input readiness
-checks remain open in [W02/W09](storage-foundation-plan.md).
+receipt after a lost response. Use managed saves below when metadata changes must also invalidate an observation.
+Filesystem receipts support bounded recovery.
+<!-- repo-only:start -->
+Wrapper support and declared-input checks remain open in [W02/W09](storage-foundation-plan.md).
+<!-- repo-only:end -->
 
 ## Managed saves in native storage
 
-The development Go API adds `Runtime.ReadForSave` and `Runtime.SaveObject` for
-built-in memory storage and the owned filesystem profile below. Check
+Use `Runtime.ReadForSave` and `Runtime.SaveObject` with built-in memory storage or the owned filesystem profile below. Check
 `Capabilities().GuardedSaves` before using them.
 An observation includes an opaque `SaveCondition` bound to that runtime and exact
 bucket/key. Saving compares the managed record generation, content and logical
@@ -95,9 +97,11 @@ Tokens are native values bound to the open runtime, cannot be serialized for a
 bridge, and do not confer permission. Workspace and custom public stores refuse
 with `ErrGuardedSavesUnsupported`, including stores qualified for ETag conditions.
 The native object MCP profile below wraps these managed saves. WASM, in-process
-TypeScript and S3 have no managed-save API in this slice. Resource ACLs and
-declared-input publication remain target work in the
-[shared contract](storage-admission-contract.md).
+TypeScript and S3 have no managed-save API.
+
+<!-- repo-only:start -->
+Resource ACLs and declared-input publication remain target work in the [shared contract](storage-admission-contract.md).
+<!-- repo-only:end -->
 
 ### Filesystem save receipts and recovery
 
@@ -105,6 +109,10 @@ declared-input publication remain target work in the
 It stores body and logical metadata in one object record. `Reset` is unavailable;
 `Close` preserves the directory and releases ownership. Set quota and operation
 mask options at open, and use normal bucket creation before the first save.
+
+New objects use protobuf metadata followed by raw payload bytes in one atomic record.
+Existing JSON records remain readable and change format only when overwritten.
+Older Stow versions cannot read the new records.
 
 ```go
 runtime, err := stow.OpenFilesystem(stow.FilesystemOptions{
@@ -163,15 +171,23 @@ to reapply the body. A retirement API would need caller acknowledgement of the
 replay window, terminal-only eligibility, recovery-hold checks and a durable
 tombstone; no automatic retirement or outcome override is provided.
 
+<!-- repo-only:start -->
 The [receipt lifecycle proposal](receipt-retirement-proposal.md) specifies the
 archive ordering, replay behavior, bounded admission and decision required before
 adding retirement.
+<!-- repo-only:end -->
 
 Arbitrary host edits, directory copies, shared-host fencing, pre-enrollment ABA
-history and physical power-loss qualification are outside this profile. Admission
-refreshes authoritative object/multipart accounting by scanning the store; workload
-costs still need measurement. Local evidence is recorded in
-[the implementation receipt](implementation-2026-09-30.md).
+history and physical power-loss qualification are outside this profile.
+Successful managed filesystem mutations update object and multipart accounting incrementally.
+Opening, changed store revisions and uncertain mutations reconcile authoritative accounting.
+Unresolved publication keeps reads and receipt resolution available while refusing mutations.
+The public runtime returned by `OpenFilesystem` has no `RefreshUsage` method.
+Editable workspaces retain conservative reconciliation and their separate refresh operation.
+
+<!-- repo-only:start -->
+Local evidence is recorded in [the implementation receipt](implementation-2026-09-30.md).
+<!-- repo-only:end -->
 
 ## Portable capture and reconciliation
 
@@ -183,16 +199,17 @@ stow-s3 workspace checkpoint --id WORKSPACE_ID --registry-dir /absolute/registry
 
 Persist the key and exact options before calling. Pause all writers first.
 
-This verb consults no policy unless you pass `--policy /path/to/revision.json`, which
-loads a persisted revision and decides the capture by it. The revision is read per
-decision, so a revocation takes effect when it is issued rather than when the process
-started. Without the flag the capture is decided by the environment only, and a policy
-denying capture sits on disk unread. Use
-`--resolve` with the same arguments after an uncertain reply; it creates no new
-checkpoint. The response carries `version`, `result` and a typed `error` on failure.
-Success is `result.outcome=committed`, with `result.checkpoint.id`. Inspect the
-exit status as well as the JSON. Scope/options conflicts and permanent failures
-must not be retried as new captures. Receipts remain valid only while retained.
+Pass `--policy /path/to/revision.json` to apply a stored capture policy.
+Without it, capture uses the environment's permissions only.
+Stow rereads the policy for each decision, so later revocation can take effect.
+
+After an uncertain reply, use `--resolve` with the same arguments.
+Resolution creates no new checkpoint.
+The response includes `version`, `result` and a typed `error` on failure.
+Success has `result.outcome=committed` and `result.checkpoint.id`.
+Check the exit status as well as JSON.
+Do not retry option conflicts or permanent failures as new captures.
+Receipts remain valid only while retained.
 
 The shared Go APIs are `CaptureCheckpoint` and `ResolveCheckpoint`, with
 `CheckpointRequest{Key, Options}`. `CheckpointOptions.PortableObjects=true` selects
@@ -290,7 +307,7 @@ to 256 KiB. Hosts can narrow
 body/observation limits with `--max-object-bytes` and `--max-observations`. Stdio
 requests have a 1 MiB line limit. These payload limits do not imply an RSS ceiling
 or streaming filesystem decoding. See the [object MCP contract](object-mcp-contract.md)
-for scope, result semantics and evidence. This is a native object-record profile;
+for tool arguments, results and limits. This is a native object-record profile;
 resource ACLs, encrypted storage and workspace-host-edit coordination remain open.
 
 ## Local MCP
@@ -314,12 +331,19 @@ failure information. Stdio stdout contains protocol only. The workflow guide is
 available at `stow://guides/checkpoints/v1`. The official Go MCP SDK is pinned at
 1.8.0, using Go 1.25.6. Closing the connection does not destroy storage.
 
-Reliable turn saves require a host admission barrier. The
-[OpenCode example](../examples/opencode/README.md) implements the first experimental
-caller profile. An agent choosing to call the MCP save tool remains best effort.
+To ensure a save between turns, the host must require a confirmed save before admitting another prompt.
+An agent choosing when to call a save tool cannot guarantee this boundary.
+
+<!-- repo-only:start -->
+The [OpenCode example](../examples/opencode/README.md) implements an experimental caller.
+<!-- repo-only:end -->
 
 ## Cost and scope
 
+Captures store full payload copies. Retaining five checkpoints costs roughly five copies plus manifests.
+Measure your working set before choosing a capture deadline.
+
+<!-- repo-only:start -->
 Captures currently store full payload copies. With tests stopped on the local
 macOS arm64 host, five-run measurements were:
 
@@ -328,19 +352,20 @@ macOS arm64 host, five-run measurements were:
 | 256 files / 8 MiB | 129 ms | 124–185 ms |
 | 4,096 files / 64 MiB | 1.74 s | 1.53–11.10 s |
 
-The large run included an 11.10-second first capture; a median is not a latency
-bound. The earlier ~31-second result was dominated by repeated directory scans,
-which have been removed. Capture now uses at most eight copy workers and sixteen
-file flushes, and waits for each barrier before verifying/publishing. All content
-and mutation checks remain. Retaining five checkpoints still costs roughly five
-payload copies plus manifests. A tested parent-file sharing experiment was removed
-because it made saves slower on this filesystem.
+The large run included an 11.10-second first capture. The median is not a latency bound.
+Capture uses at most eight copy workers and sixteen file flushes.
+It waits for each barrier before verification and publication.
+Five retained checkpoints cost roughly five payload copies plus manifests.
+A tested parent-file sharing experiment was removed because it slowed saves on this filesystem.
 
 Measure the actual working set before turn-by-turn use and choose a bounded
 deadline accordingly. Transfer time, peak RSS and a second host remain separate
 checks. These measurements are not service-level promises.
-
+<!-- repo-only:end -->
 Per-request body limits and storage quotas do not imply a process memory ceiling.
 Stow's filesystem checks protect supported storage operations; arbitrary processes
-with host access remain outside this boundary. See [implementation evidence](implementation-2026-09-29.md)
-for exact validation and outstanding resource limits.
+with host access remain outside this boundary.
+
+<!-- repo-only:start -->
+See [implementation evidence](implementation-2026-09-29.md) for validation and outstanding limits.
+<!-- repo-only:end -->

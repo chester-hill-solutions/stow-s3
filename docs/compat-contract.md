@@ -1,20 +1,25 @@
-# Stow v1 S3 Compatibility Contract
+# S3 HTTP API
 
-This document is the authoritative contract for `@chester-hill-solutions/stow-s3` v1. Implementers and test authors MUST treat it as the acceptance spec. Behavior not listed here as supported is unsupported unless explicitly noted as provider-tolerant (SDKs may send headers stow ignores).
+Stow supports the native S3 operations and limits listed below.
+Unlisted behavior is unsupported unless marked provider-tolerant, such as SDK headers that Stow ignores.
 
-**Scope:** Docker-free local S3-compatible dev bucket service (PGLite-inspired). Greenfield Go core + TypeScript npm wrapper.
+**Scope:** local S3-compatible storage with a Go server and client wrappers.
 
 **Non-goals (v1):** Versioning, Object Lock, ACLs, bucket policies, IAM, KMS/SSE, lifecycle rules, replication, notifications, S3 Select, batch operations.
 
-## 0. 0.2.0 SDK compatibility amendments
+## 0. SDK compatibility profile
 
+<!-- repo-only:start -->
 This section is normative for the 0.2.0 remediation release and is linked by `docs/adr/0002-sdk-compatibility-and-mirror-writes.md`. It amends the original v1 contract where the two differ.
+<!-- repo-only:end -->
 
 ### 0.1 Compatibility profile
 
 The supported external profile is the version-pinned AWS SDK v3 (Node) and AWS SDK for Go v2. Stow accepts the safe union of behavior observable through those SDKs. It does not require undocumented Amazon-service strictness. Benign unknown headers are ignored; semantic markers for unsupported operations fail before they can fall through to a supported operation.
 
+<!-- repo-only:start -->
 Raw HTTP tests cover authentication, routing, safety, malformed input, and protocol edges. Every shared conformance scenario must run through both SDK runners and both storage backends.
+<!-- repo-only:end -->
 
 ### 0.2 Naming and path decoding
 
@@ -28,19 +33,40 @@ Every supplied `x-amz-*` header must appear in `SignedHeaders`, including copy
 source, source conditions, user metadata and checksum headers. Adding an unsigned
 copy-source header to a presigned PUT cannot change the authenticated operation.
 
-Authentication material is read as the client wrote it, not repaired into a form the verifier prefers. A `SignedHeaders` list that is not in canonical form, an `Authorization` header carrying a repeated or unrecognized component, and an authentication query parameter that appears twice or under another spelling are each refused (`403`) rather than normalized. The accepted grammar and the reasons are in §4.1 and §4.2; this is a narrowing of what is accepted, deliberately, and it is inside the contract's own "Safety invariants" clause rather than undocumented Amazon strictness — the canonical forms in question are the SigV4 specification, not an Amazon service behaviour, and the refusals make the verifier's input match the signature's input.
+Stow validates authentication material without rewriting it.
+Noncanonical `SignedHeaders`, repeated or unknown `Authorization` components, and duplicate or differently spelled authentication query parameters return `403`.
+Sections 4.1 and 4.2 define the accepted grammar.
 
+<!-- repo-only:start -->
 The shared corpus must cover missing/malformed auth, both date forms, wrong secret, skew, expired presigns, 604800, 604801, unsupported methods, and anonymous requests.
+<!-- repo-only:end -->
 
 ### 0.4 Policies and propagation
 
-The public policies are `readThroughCache` and `mirrorWrites`; `local` is a mode, not a policy. `readThroughCache` writes locally unless the separate live-write flag is enabled. `mirrorWrites` explicitly enables propagation and emits a loud startup warning. The legacy `proxy` policy is rejected with a migration error.
+The policies are `readThroughCache` and `mirrorWrites`. `local` is a mode.
+Both policies require separate live-write consent for upstream propagation.
+`mirrorWrites` emits a startup warning. The legacy `proxy` policy returns a migration error.
 
-Local mutations commit before upstream propagation. A durable per-key outbox stores an immutable versioned reference, retries transient failures with bounded backoff, coordinates file-backed workers with expiring claims, and retains deterministic failures for inspection. An entry that was already attempted is reconciled against upstream before it is re-propagated: a put whose upstream ETag, content type, user metadata and requested checksum match the immutable local version, or a delete whose object is already absent, is acknowledged without a second upstream mutation. A crash remains at-least-once only when upstream cannot be read during recovery or the object was replaced by another writer. Durable outbox files carry a schema version; a file written by a newer revision is rejected at open, and unversioned files migrate. Admin retry/discard actions require the configured admin token, including on loopback.
+Local mutations commit before propagation.
+A durable per-key outbox records an immutable local version and upstream baseline.
+It retries transient failures with bounded backoff and retains deterministic failures for inspection.
+Filesystem workers coordinate through expiring claims.
+
+Before retrying an attempted put, recovery checks its upstream ETag, content type, user metadata and requested checksum.
+A match acknowledges the write without another mutation.
+An attempted delete is acknowledged when the upstream object is absent.
+Recovery may need another conditional attempt if it cannot confirm the result.
+
+Outbox files have schema versions. Newer schemas fail at open; unversioned files migrate.
+Retry and discard routes always require the admin token, including on loopback.
 
 ### 0.5 Conditional operations and checksums
 
-The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional PUTs, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Header names, encodings, response headers, multipart behavior, and error codes are normative in the shared corpus; unknown checksum algorithms fail clearly.
+The SDK profile includes atomic `If-None-Match: *` and `If-Match` conditional PUTs, conditional GET/HEAD validators, Content-MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256. Unknown checksum algorithms return an error.
+
+<!-- repo-only:start -->
+Header names, encodings, response headers, multipart behavior and error codes are normative in the shared corpus.
+<!-- repo-only:end -->
 
 COPY supports source conditions. Destination `If-Match` and `If-None-Match`
 conditions return `501 NotImplemented` before mutation; atomic destination
@@ -61,22 +87,32 @@ be checked independently, but that does not establish a completed-object checksu
 Upstream composite checksums are not relabeled as full-object checksums in the
 local cache. Existing multipart ETag behavior remains supported.
 
-Conditional **writes** and conditional **reads** do not fail the same way, and conflating them is a divergence from S3 that this contract previously carried:
+Conditional writes and reads return different statuses:
 
 | Request | Condition | Response |
 |---|---|---|
-| `PUT` / `COPY` | `If-None-Match: *` and the key exists | `412 PreconditionFailed` |
-| `PUT` / `COPY` | `If-None-Match: *` and the key does not exist | `200` (the create proceeds) |
+| `PUT` | `If-None-Match: *` and the key exists | `412 PreconditionFailed` |
+| `PUT` | `If-None-Match: *` and the key does not exist | `200` (the create proceeds) |
 | `PUT` | `If-Match: <etag>` and it does not match | `412 PreconditionFailed` |
 | `GET` / `HEAD` | `If-None-Match` matches the current validator | `304 Not Modified` |
 | `GET` / `HEAD` | `If-None-Match` does not match | `200` with the body |
 | `GET` / `HEAD` | `If-Match` does not match | `412 PreconditionFailed` |
 
-A matching `If-None-Match` on a read is a **successful answer carrying no body**, not a failed request. AWS S3 and MinIO both return `304`, and `aws-sdk-go-v2` surfaces it as a `NotModified` API error with `StatusCode: 304` rather than as a `GetObjectOutput` — so a client written against real S3 already knows to expect that shape. The corpus case `conditional-get-if-none-match-not-modified` pins the **status only**. A 304 carries no body and therefore no S3 error code, so the name each SDK invents is its own artifact rather than a wire property: `aws-sdk-go-v2` reports `NotModified`, `@aws-sdk/client-s3` reports `Unknown`. Pinning either would make the shared corpus unsatisfiable by the other runtime, and it is shared precisely so that every runtime is held to the same observable behaviour.
+A matching `If-None-Match` read returns `304` without a body or S3 error code.
+SDKs may report different local error names: Go reports `NotModified`; the TypeScript SDK reports `Unknown`.
+<!-- repo-only:start -->
+The shared corpus checks status only, because those names are not wire properties.
+<!-- repo-only:end -->
 
 ### 0.6 Backends and versioning
 
-Filesystem is the default. Memory is an explicitly selected ephemeral backend with the same behavioral contract. The old sidecar format is not migrated; startup warns and continues with the new atomic format. The package is 0.2.0 while the package remains pre-1.0; the existing major-version rule is amended as recorded in ADR 0002. The npm version, binary version, and status version use one source.
+Filesystem is the default. Memory is temporary storage with the same supported behavior.
+The old sidecar format is not migrated; startup warns and uses the atomic format.
+
+<!-- repo-only:start -->
+The 0.2.0 pre-1.0 version rule is recorded in ADR 0002.
+The npm, binary and status versions use one source.
+<!-- repo-only:end -->
 
 ---
 
@@ -192,6 +228,7 @@ Bucket-specific CORS XML configuration APIs are **out of scope**; CORS is a fixe
 
 ---
 
+<!-- repo-only:start -->
 ## 2. SDK Flows to Test (Conformance Suite)
 
 Each flow below MUST pass against the local endpoint using the pinned AWS SDK v3 (`@aws-sdk/client-s3`) and AWS SDK for Go v2 runners, with `endpoint`, `forcePathStyle` / virtual-hosted toggles, and stow-issued local dev credentials. The shared corpus is the source of truth; the two runners must agree on the safe union of SDK-observable behavior.
@@ -297,7 +334,7 @@ Run PutObject + GetObject with:
 Both MUST succeed on the same bucket/object.
 
 ---
-
+<!-- repo-only:end -->
 ## 3. URL Style Support
 
 | Style | Request form | v1 support |
@@ -328,7 +365,7 @@ Both MUST succeed on the same bucket/object.
 | Secret key | Paired with local access key; NEVER upstream credentials for local endpoint auth |
 | Canonical URI | The **decoded** request path, percent-encoded exactly once per path segment, with `/` separators left as separators. Encoding an already-encoded path produces `%2520` for a space and rejects the request with `403 SignatureDoesNotMatch` |
 | `SignedHeaders` form | Must be the canonical SigV4 form: lowercase, `;`-delimited, no empty entries, no repeats, ascending. Header *names* are matched case-insensitively, so a signed header sent as `X-Amz-Meta-Foo` against a list entry of `x-amz-meta-foo` is accepted |
-| `Authorization` components | Exactly `Credential`, `SignedHeaders`, `Signature`, each at most once. A repeated component is refused, and so is an unrecognized one — the grammar is closed, and a verifier that skips a claim it cannot check is verifying a subset of the header and reporting it as the whole |
+| `Authorization` components | Exactly `Credential`, `SignedHeaders`, `Signature`, each at most once. Repeated and unrecognized components are rejected |
 | Signature comparison | Exact. A signature is lowercase hex and is compared byte for byte; two spellings of the same hex are not interchangeable |
 
 **Failure responses:**
@@ -336,16 +373,9 @@ Both MUST succeed on the same bucket/object.
 - Wrong secret → `403 SignatureDoesNotMatch`
 - Request time skew > 15 minutes → `403 RequestTimeTooSkewed`
 
-**On refusing rather than repairing.** The canonical form of `SignedHeaders` is what
-the SigV4 specification defines and what the canonical request embeds verbatim, so
-a list that is not in it is a client statement the verifier cannot reproduce.
-Normalizing it — trimming, lower-casing, dropping empties, sorting — authenticates
-against a header list the client never wrote: `host;host` names one header twice,
-and an unsorted list is silently sorted into the conforming form and then verified
-against that. The same reasoning covers a repeated `Authorization` component, where
-last-one-wins would make the header's meaning depend on the order two claims were
-written in. These refusals are inside the safe union of the pinned SDKs' behaviour,
-neither of which can emit any of these forms.
+Stow does not trim, lowercase, deduplicate or sort a malformed `SignedHeaders` value before verification.
+Doing so would verify a different header list from the one supplied.
+Repeated `Authorization` components are also rejected rather than choosing one value.
 
 ### 4.2 Presigned URLs
 
@@ -405,7 +435,12 @@ Every response MUST include `x-amz-request-id` header matching `RequestId` in bo
 
 ## 6. Run-Through Mode Behavior Contract
 
-Run-through mode is enabled **only** by naming it: `--mode run-through` or `STOW_MODE=run-through`, with upstream endpoint + access key + secret key present in the environment (`STOW_*` > `S3_*` > `AWS_*`). Local-only is the default, and the presence of credentials alone does not change it — credentials decide how a requested upstream is authenticated, not whether one is used. Override: `STOW_MODE=local` forces local-only. See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001.
+Enable run-through with `--mode run-through` or `STOW_MODE=run-through` and configured upstream credentials.
+Environment precedence is `STOW_*` > `S3_*` > `AWS_*`.
+Credentials alone do not change local mode. `STOW_MODE=local` forces local-only storage.
+<!-- repo-only:start -->
+See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001.
+<!-- repo-only:end -->
 
 ### 6.1 Policies
 
@@ -413,9 +448,13 @@ Run-through mode is enabled **only** by naming it: `--mode run-through` or `STOW
 |--------|-------|--------|
 | **local mode** (the default, always) | Local store only | Local store only |
 | **readThroughCache** | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
-| **mirrorWrites** | Same read-through behavior | Local first, then upstream with durable outbox; startup warning required |
+| **mirrorWrites** | Same read-through behavior | Local first; upstream requires live-write consent and durable outbox; startup warning required |
 
-A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local. See `docs/adr/0005-live-write-requires-explicit-consent.md`.
+A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local.
+
+<!-- repo-only:start -->
+See `docs/adr/0005-live-write-requires-explicit-consent.md`.
+<!-- repo-only:end -->
 
 ### 6.2 Read-Through Cache Semantics
 
@@ -434,8 +473,17 @@ GET/HeadObject flow (readThroughCache):
 - Returns **union** of local keys and upstream keys (deduplicated by key name).
 - For duplicate keys, **local metadata wins** for `ETag`/`Size`/`LastModified` in listing (local is authoritative for dev).
 - The merged result is ordered by key, then `max-keys` and `continuation-token` are applied to the merged set. Continuation tokens are opaque; a client resumes by returning a token it received and MUST NOT construct one.
-- **Consistency: eventual.** The local store and the upstream provider are independent systems read at different times, and there is no transaction spanning them. The listing is therefore a union of two separately-timed reads, not a snapshot of one instant — and no implementation can make it one without abandoning the merge. Under concurrent writes a key **MAY appear in two consecutive pages, or in neither**, and a key deleted upstream mid-listing MAY still be returned. Clients MUST tolerate this. This is the guarantee S3's own `ListObjectsV2` offers, and it is not stronger here: claiming a cross-source snapshot would be a divergence from the compatibility target, not an improvement.
-- **Concurrent writes are detected, not silently resolved.** A mirrored write asserts, as a precondition, the upstream ETag that stow's copy of the object was derived from. If upstream has moved since stow read the key, the write is refused and surfaces as a conflict; the outbox entry goes terminal and no retry can resolve it without a new decision. A precondition failure **MUST NOT** be treated as a transport failure and retried, because retrying it cannot succeed. The precondition comes from durable provenance recorded when an upstream object is fetched. For a key without prior read provenance, Stow observes upstream immediately before preparing the local mutation and records that validator (or confirmed absence). A change after that observation is detected. If upstream cannot be observed, the local mutation still commits, but its outbox entry is terminal and propagation is refused as unsafe. Existing v2 outbox entries without a recorded baseline are also refused rather than sent unconditionally. Put, copy, multipart completion, and delete all use the captured conditional state. Detection is a refusal, not a merge, and stow does not pick a winner — the local store stays authoritative for the caller's own read while the conflict is surfaced. The policy definitions are in the table above; [ADR 0011](adr/0011-local-is-the-default-mode.md) records the current mode-selection rule, and `docs/history/architecture/environment-implementation.md` R-707 records the fetch bound this permits.
+- **Consistency: eventual.** Local and upstream listings occur at different times, without a shared transaction.
+  Concurrent writes can make a key appear on two consecutive pages or neither page.
+  A key deleted upstream during listing can still appear. Clients MUST tolerate these results.
+- **Concurrent writes:** propagation uses the upstream ETag captured during a prior read, or an observation before preparing the mutation.
+  Confirmed absence becomes an expected-absence condition.
+  If upstream changes, the local mutation remains committed and the outbox reports a terminal conflict.
+  A precondition failure MUST NOT be retried as a transport failure.
+  If observation fails, the local mutation commits but propagation is refused.
+  Existing v2 entries without a baseline also fail rather than writing unconditionally.
+  Put, copy, multipart completion and delete use the captured condition.
+  Stow does not merge conflicts or choose a winner.
 - Under `readThroughCache` and `mirrorWrites`, listing is the merged local/upstream result described above; the legacy `proxy` policy is not supported.
 
 **Object size / buffering (v1, intentional):**
@@ -463,6 +511,7 @@ On every `Stow.start()`, log to stdout (and expose via `/_stow/status`):
 - Write policy: `local-only` | `allowLiveWrites` | `mirrorWrites`
 - Override hints: `STOW_MODE=local` forces local; in local mode, how to ask for run-through (`--mode run-through` or `STOW_MODE=run-through`); `allowLiveWrites` flag
 
+<!-- repo-only:start -->
 ### 6.4 Conformance Tests (Run-Through)
 
 Required manual/CI scenarios (against AWS S3, Cloudflare R2, or custom endpoint):
@@ -477,21 +526,25 @@ Required manual/CI scenarios (against AWS S3, Cloudflare R2, or custom endpoint)
 8. A paged merged listing fetches a bounded window per page rather than the full prefix set from each source. Assert against the upstream mock's call count and requested `max-keys`, so the O(n)-per-page behaviour cannot return. Keys are written across both sources so the assertion cannot pass by accident on a single-source listing.
 
 ---
-
+<!-- repo-only:end -->
 ## 7. Admin Routes
 
-Non-S3 HTTP routes for observability and debugging. **No SigV4 required** (local dev only; bind localhost by default).
+Admin routes use separate authentication from SigV4.
+Read-only routes allow loopback requests without a token.
+Other addresses require `STOW_ADMIN_TOKEN`, sent as `X-Stow-Admin`.
+Outbox mutation routes require the token on every address.
+Unauthorized requests return `404`. Without a configured token, outbox mutations are unavailable.
 
 | Route | Method | Auth | Response |
-|-------|--------|------|----------|
-| `/_stow/health` | `GET` | None | `200 OK` JSON: `{ "status": "ok" }` — liveness probe |
-| `/_stow/status` | `GET` | None | `200 OK` JSON: mode, listen address, region, bucket count, object count (approx), cache policy, write policy, upstream endpoint (redacted), uptime seconds, version |
-| `/_stow/inspect` | `GET` | None | `200 OK` JSON: detailed snapshot — buckets with object counts, in-flight multipart uploads, cache hit/miss counters, last upstream error (if any), and outbox entries. Query `?bucket={name}` scopes to one bucket |
-| `/_stow/metrics` | `GET` | None | `200 OK` Prometheus exposition: cache, upstream, multipart, retry, and outbox metrics |
-| `/_stow/outbox/retry` | `POST` | Loopback only | `200 OK` after attempting all due outbox entries; reports a failure if an entry remains failed |
-| `/_stow/outbox/discard?id={id}` | `POST` | Loopback only | `200 OK` after removing the selected outbox entry; `404` if the entry is unknown |
+| --- | --- | --- | --- |
+| `/_stow/health` | `GET` | Read-only rule | `200` JSON `{ "status": "ok" }` |
+| `/_stow/status` | `GET` | Read-only rule | `200` JSON with mode, address, region, counts, policies, redacted upstream, uptime and version |
+| `/_stow/inspect` | `GET` | Read-only rule | `200` JSON with buckets, uploads, cache state and outbox entries; `?bucket={name}` selects a bucket |
+| `/_stow/metrics` | `GET` | Read-only rule | `200` Prometheus metrics |
+| `/_stow/outbox/retry` | `POST` | Admin token | `200` after retrying due entries; reports remaining failures |
+| `/_stow/outbox/discard?id={id}` | `POST` | Admin token | `200` after removal; `404` for an unknown entry |
 
-**Security:** Admin routes, including `/_stow/metrics`, MUST NOT be exposed on `0.0.0.0` in default configuration; require an explicit public-exposure flag and warning before binding publicly.
+`--allow-public-admin` is deprecated and ignored. It does not grant access.
 
 **Errors:** Unknown `/_stow/*` paths → `404` JSON `{ "error": "not found" }`.
 
@@ -514,12 +567,13 @@ Non-S3 HTTP routes for observability and debugging. **No SigV4 required** (local
 
 ---
 
+<!-- repo-only:start -->
 ## Appendix B — Versioning This Contract
 
 - The 0.2.0 pre-1.0 release may contain documented breaking behavior as specified by ADR 0002; the stable `@chester-hill-solutions/stow-s3` 1.x boundary is reserved for the first non-breaking stable contract.
 - New operations may be added in minor versions if marked **experimental** in changelog first.
 - Conformance test suite in repo MUST reference this file by path and commit SHA in CI logs.
-
+<!-- repo-only:end -->
 ## Appendix C — Request and upstream transport boundaries (0.3.0)
 
 Native `serve` and `workspace serve` accept `--max-request-bytes`. Omitting the
@@ -589,8 +643,11 @@ metadata publication require a trusted, cooperative host filesystem.
 Nonempty `continuation-token` values must be valid UTF-8, at most 1024 bytes,
 and contain no NUL; invalid values return `400 InvalidArgument`. Current tokens
 are lexical key markers, not authenticated query-bound provider tokens. Clients
-should replay returned tokens. The [acceptance coverage map](compatibility-coverage-2026-09-29.md)
-records shared SDK cases and focused raw protocol evidence.
+should replay returned tokens.
+
+<!-- repo-only:start -->
+The [acceptance coverage map](compatibility-coverage-2026-09-29.md) records SDK and raw protocol tests.
+<!-- repo-only:end -->
 
 Resource-policy listings paginate permitted objects and prefixes before choosing
 their lexical continuation marker. Backend cursors and denied names stay internal;

@@ -2,7 +2,6 @@ package runtime
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/policy"
@@ -23,21 +22,10 @@ func (i *Instance) putObjectReaderLocked(ctx context.Context, write stagedWriteR
 		return Object{}, ErrQuotaExceeded
 	}
 	target := objectTarget(bucket, key)
-	_, targetReserved := i.reservedTargets[target]
 	meta, err := i.store.PutObject(ctx, bucket, key, body, streamStorageOptions(options))
-	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
+	if !i.finishPut(target, oldSize, requestedSize, exists, err) {
 		return Object{}, err
 	}
-	if exists {
-		i.usage.Bytes -= oldSize
-	} else {
-		i.usage.Objects++
-	}
-	i.usage.Bytes += requestedSize
-	if targetReserved {
-		i.consumeTargetReservation(target)
-	}
-	i.reconcileTargetReservation(target, true)
 	return objectFromMeta(meta, nil), err
 }
 
@@ -57,7 +45,13 @@ func (i *Instance) PutObjectStream(ctx context.Context, bucket, key string, body
 	if err := i.checkResource(authority.ObjectWrite, policy.Object(bucket, key)); err != nil {
 		return Object{}, err
 	}
-	verified := &sizedObjectReader{reader: body, remaining: size}
+	var verified io.Reader = &sizedObjectReader{reader: body, remaining: size}
+	if owned, ok := body.(*storage.OwnedBody); ok {
+		if int64(owned.Len()) != size {
+			return Object{}, fmt.Errorf("owned body does not match declared size")
+		}
+		verified = owned
+	}
 	i.mu.Lock()
 	if err := i.checkMutationLocked(ctx); err != nil {
 		i.mu.Unlock()
@@ -76,6 +70,8 @@ type sizedObjectReader struct {
 	reader    io.Reader
 	remaining int64
 }
+
+func (r *sizedObjectReader) ReadSize() int64 { return r.remaining }
 
 func (r *sizedObjectReader) Read(buffer []byte) (int, error) {
 	if len(buffer) == 0 {

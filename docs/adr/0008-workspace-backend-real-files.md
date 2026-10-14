@@ -1,6 +1,7 @@
 ---
 status: accepted
-decision_digest: cb5ff6133ffa3c4f
+amended: 2026-10-14
+decision_digest: 8e5136907576da20
 ---
 
 # A workspace stores objects as real files, with metadata in one manifest
@@ -32,8 +33,10 @@ different contracts, so they should be two backends.
 
 ### 1. A third backend, not a change to the filesystem store
 
-`internal/storage/fs` keeps its record format, its atomicity, and its
-sharding. The workspace backend is a new implementation of the same
+`internal/storage/fs` keeps its atomic object-record boundary and its
+sharding. [ADR 0020](0020-binary-object-records.md) changes its encoding to
+protobuf metadata and raw payloads while retaining legacy record readers.
+The workspace backend is a new implementation of the same
 `storage.Store` contract, selected by name, and the two coexist. A data
 directory written by one is never read by the other; the formats are
 distinguishable on sight and a mismatched open is refused rather than
@@ -128,4 +131,10 @@ removed without an explicit destroy.
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+- 2026-10-14: Hot object-index updates use compact JSON with the same fields
+  and version. Existing indented documents remain readable. Index replacement
+  remains atomic and durable; each update still rewrites the complete index.
+
+- 2026-10-13: ADR 0020 changes the filesystem object encoding after Railway
+  profiles showed payload decoding dominating mutations. The atomic record and
+  workspace boundaries remain in force; existing JSON records remain readable.

@@ -99,6 +99,7 @@ function main() {
       samples.push(measure());
     }
     const floor = lowestPerPackage(samples);
+    if (existsSync(baselinePath)) floor.packageOwners = JSON.parse(readFileSync(baselinePath, "utf8")).packageOwners ?? {};
     writeFileSync(baselinePath, `${JSON.stringify(floor, null, 2)}\n`);
     const recorded = Object.keys(floor.packages).length;
     console.log(
@@ -186,11 +187,12 @@ function reportThin(measured, baseline) {
 
 // measure runs the suite and reads the profile.
 function measure() {
-  execFileSync("go", ["test", "./...", "-coverprofile", profilePath], {
+  execFileSync("go", ["test", "./...", "-coverpkg=./...", "-coverprofile", profilePath], {
     cwd: repoRoot,
     stdio: "inherit",
   });
-  return coverageFromProfile(readFileSync(profilePath, "utf8"));
+  const owners = existsSync(baselinePath) ? JSON.parse(readFileSync(baselinePath, "utf8")).packageOwners ?? {} : {};
+  return coverageFromProfile(readFileSync(profilePath, "utf8"), owners);
 }
 
 // lowestPerPackage reduces several samples to the floor to record: the aggregate
@@ -362,7 +364,8 @@ export function thinPackages(measured) {
     .sort((a, b) => a.percentage - b.percentage);
 }
 
-function coverageFromProfile(profile) {
+function coverageFromProfile(profile, owners = {}) {
+  profile = mergeCoverageProfile(profile);
   // Each line is "name.go:startLine.startCol,endLine.endCol numStatements count".
   const entry = /:\d+\.\d+,\d+\.\d+ (\d+) (\d+)$/;
   let totalStatements = 0;
@@ -393,7 +396,7 @@ function coverageFromProfile(profile) {
     percentage: round((coveredStatements / totalStatements) * 100),
     coveredStatements,
     totalStatements,
-    packages: statementsByPackage(profile),
+    packages: statementsByPackage(profile, owners),
   };
 }
 
@@ -416,7 +419,8 @@ function packageOf(nameWithFile) {
 // per-package one did not exist at all: the profile's file name was matched by a
 // regex that never captured it. A per-package floor built on a measurement nobody had
 // tested would have been a floor on nothing.
-export function statementsByPackage(profile) {
+export function statementsByPackage(profile, owners = {}) {
+  profile = mergeCoverageProfile(profile);
   const entry = /^(.+):\d+\.\d+,\d+\.\d+ (\d+) (\d+)$/;
   const byPackage = new Map();
   for (const line of profile.split("\n")) {
@@ -432,7 +436,8 @@ export function statementsByPackage(profile) {
     if (!Number.isFinite(statements) || !Number.isFinite(count)) {
       continue;
     }
-    const name = packageOf(match[1]);
+    const original = packageOf(match[1]);
+    const name = owners[original] ?? original;
     const seen = byPackage.get(name) ?? {
       coveredStatements: 0,
       totalStatements: 0,
@@ -448,6 +453,20 @@ export function statementsByPackage(profile) {
     packages[name] = byPackage.get(name);
   }
   return packages;
+}
+
+export function mergeCoverageProfile(profile) {
+  const entry = /^(.+:\d+\.\d+,\d+\.\d+) (\d+) (\d+)$/;
+  const blocks = new Map();
+  for (const line of profile.split("\n")) {
+    const match = entry.exec(line);
+    if (!match) continue;
+    const statements = Number(match[2]);
+    const previous = blocks.get(match[1]);
+    if (previous && previous.statements !== statements) throw new Error("Inconsistent coverage block: " + match[1]);
+    blocks.set(match[1], { statements, covered: previous?.covered || Number(match[3]) > 0 });
+  }
+  return ["mode: set", ...[...blocks].map(([location, block]) => `${location} ${block.statements} ${block.covered ? 1 : 0}`)].join("\n");
 }
 
 function round(value) {

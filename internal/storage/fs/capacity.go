@@ -20,8 +20,12 @@ type capacityBinding struct{ Host, Namespace, StoreID string }
 func (s *FilesystemStore) BindNamespace(namespace *capacity.Namespace) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if namespace == nil || !s.SupportsGuardedWrites() {
+	s.usageRevision++
+	if namespace == nil || s.closed || !s.SupportsGuardedWrites() {
 		return capacity.ErrInvalid
+	}
+	if s.activeStages != 0 {
+		return capacity.ErrConflict
 	}
 	host, id := namespace.Binding()
 	binding := capacityBinding{Host: host, Namespace: id, StoreID: s.saves.id}
@@ -132,7 +136,7 @@ func (s *FilesystemStore) capacityClassForBucket(path string, data []byte, parts
 	if len(parts) < 4 || parts[2] != "objects" {
 		return "", capacity.ErrUnknown
 	}
-	_, err := readObjectRecord(path)
+	_, err := readObjectHeader(path)
 	return capacity.Payload, err
 }
 

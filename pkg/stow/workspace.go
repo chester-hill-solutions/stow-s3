@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
 	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
@@ -159,7 +160,7 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	}
 
 	ws := &Workspace{
-		Runtime:          &Runtime{inner: instance},
+		Runtime:          embedded.WrapInstance(instance),
 		dir:              store.Root(),
 		workingDirectory: store.Root(),
 		bucket:           store.WorkspaceBucket(),

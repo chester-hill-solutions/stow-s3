@@ -1,30 +1,25 @@
 # stow-s3
 
-A disposable, fully isolated S3 endpoint for tests, from Python.
-
-`stow-s3` starts a native stow server as a child process, gives you an endpoint
-and credentials, and guarantees the server is gone when you are done. Nothing
-touches a real bucket, and nothing is left running between tests.
+Python helpers for private S3 test servers and native file workspaces.
+A session starts a local server, returns its endpoint and credentials, and stops it on close.
 
 ## Install
 
-This checkout is the unpublished 0.3.0 development candidate. Build the native
-binary with `make build`, then install the editable client from the repository
-root with `python3 -m pip install -e 'packages/stow-s3-py[boto3]'`. The wheel
-instructions below describe published distributions, not this candidate.
+The Python package is not yet published to PyPI. v0.3.0 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Install the Python client from a source checkout. From the repository root:
 
 ```sh
-pip install stow-s3
+make build
+export STOW_BIN="$PWD/bin/stow-s3"
+python3 -m pip install -e 'packages/stow-s3-py[boto3]'
 ```
 
-The native binary ships inside a platform wheel, so there is no `PATH` entry to
-set, no binary to download, and no Go toolchain to install.
-
-`boto3` is optional. Install it if you want the built-in client helper:
-
-```sh
-pip install "stow-s3[boto3]"
-```
+`boto3` is optional. Omit the extra if you supply another S3 client.
+Use `STOW_BIN` to select the built native server.
+<!-- repo-only:start -->
+See the [release checkpoint](../../docs/release-verification-2026-10-14.md) for package availability.
+<!-- repo-only:end -->
 
 ## Use
 
@@ -54,13 +49,15 @@ with with_session(max_bytes=1024 * 1024, max_objects=10) as session:
     ...
 ```
 
-The defaults are 16 MiB and 1000 objects, which came from measurement rather
-than taste. See `docs/benchmarks/session-baseline.md`.
+Defaults are 16 MiB and 1,000 objects.
+<!-- repo-only:start -->
+See the [session measurements](../../docs/benchmarks/session-baseline.md).
+<!-- repo-only:end -->
 
 ## Without boto3
 
-A session performs no S3 I/O of its own. It reports the endpoint and credentials
-and hands back a client, so any S3 library will work:
+A session performs no S3 requests itself. Use its endpoint and credentials with your chosen S3 library.
+For example, you can construct a boto3 client directly:
 
 ```python
 import boto3  # or whatever you prefer

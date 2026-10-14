@@ -120,22 +120,28 @@ func (s *MemoryStore) ListBuckets(_ context.Context) ([]BucketInfo, error) {
 	return out, nil
 }
 
-func (s *MemoryStore) PutObject(_ context.Context, bucket, key string, body io.Reader, opts PutOptions) (*ObjectMeta, error) {
+func (s *MemoryStore) PutObject(ctx context.Context, bucket, key string, body io.Reader, opts PutOptions) (*ObjectMeta, error) {
+	pending, err := s.StageObject(ctx, bucket, key, body, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer pending.Abort(context.Background())
+	return pending.Commit(ctx)
+}
+
+func (s *MemoryStore) StageObject(ctx context.Context, bucket, key string, body io.Reader, opts PutOptions) (StagedObject, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+	}
 	if err := ValidateBucketName(bucket); err != nil {
 		return nil, err
 	}
 	if err := ValidateKey(key); err != nil {
 		return nil, err
 	}
-	// The bucket is checked before the body is read, not after.
-	//
-	// Reading it means materializing the whole request and hashing it, so an
-	// impossible one is refused before paying for a body nobody wanted.
-	//
-	// This is a fast refusal, not the answer: the bucket can be deleted between
-	// this line and the commit, so the commit revalidates it under the lock. That
-	// is what makes a bucket deleted mid-request still fail correctly rather than
-	// leave an object in a bucket that is gone.
+	// Reject missing buckets before preparation, then recheck at publication.
 	s.mu.RLock()
 	_, bucketExists := s.buckets[bucket]
 	s.mu.RUnlock()
@@ -143,16 +149,21 @@ func (s *MemoryStore) PutObject(_ context.Context, bucket, key string, body io.R
 		return nil, ErrBucketNotFound
 	}
 
-	// The body is consumed outside the lock, for the same reason: a reader can
-	// be arbitrarily slow, and holding the store's single lock across an
-	// arbitrary reader blocks every other operation in the process.
-	etag, data, err := ETagForReader(body)
+	if opts.Guard != nil {
+		guard := *opts.Guard
+		opts.Guard = &guard
+	}
+	prepared, err := PreparePut(body, opts)
 	if err != nil {
 		return nil, err
 	}
-	if err := VerifyChecksum(opts, data); err != nil {
-		return nil, err
-	}
+	return &memoryStagedObject{store: s, bucket: bucket, key: key, prepared: &prepared}, nil
+}
+
+func (s *MemoryStore) commitMemoryPut(pending *memoryStagedObject) (*ObjectMeta, error) {
+	bucket, key := pending.bucket, pending.key
+	prepared := pending.prepared
+	opts := prepared.Options
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -181,15 +192,15 @@ func (s *MemoryStore) PutObject(_ context.Context, bucket, key string, body io.R
 		Bucket:            bucket,
 		Key:               key,
 		VersionID:         versionID,
-		Size:              int64(len(data)),
-		ETag:              etag,
+		Size:              int64(len(prepared.Data)),
+		ETag:              prepared.ETag,
 		ContentType:       opts.ContentType,
 		LastModified:      now,
-		Metadata:          CloneMetadata(opts.Metadata),
-		ChecksumAlgorithm: NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
+		Metadata:          opts.Metadata,
+		ChecksumAlgorithm: opts.ChecksumAlgorithm,
 		ChecksumValue:     opts.ChecksumValue,
 	}
-	b.objects[key] = &memObject{data: data, meta: meta}
+	b.objects[key] = &memObject{data: prepared.Data, meta: meta}
 	out := cloneObjectMeta(meta)
 	return &out, nil
 }
@@ -213,7 +224,7 @@ func (s *MemoryStore) GetObject(_ context.Context, bucket, key string) (io.ReadC
 		return nil, nil, ErrObjectNotFound
 	}
 	meta := cloneObjectMeta(obj.meta)
-	return io.NopCloser(bytes.NewReader(obj.data)), &meta, nil
+	return &memoryObjectReader{Reader: bytes.NewReader(obj.data)}, &meta, nil
 }
 
 func (s *MemoryStore) HeadObject(_ context.Context, bucket, key string) (*ObjectMeta, error) {
@@ -457,3 +468,9 @@ func (s *MemoryStore) findMultipart(uploadID string) (*memMultipart, *memBucket,
 	}
 	return nil, nil, false
 }
+
+type memoryObjectReader struct{ *bytes.Reader }
+
+func (*memoryObjectReader) Close() error { return nil }
+
+func (*MemoryStore) ComputesPutChecksums() bool { return true }

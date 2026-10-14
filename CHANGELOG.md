@@ -1,9 +1,25 @@
 # Changelog
 
-## Unreleased — 0.3.0 development candidate
+## 0.3.0 — 2026-10-14
 
-This is the development tree. Release qualification and publication are separate
-from local implementation; see the [release checkpoint](docs/release-verification-2026-10-03.md).
+Native downloads for Linux and macOS on x86_64 and ARM64 are distributed through
+GitHub Releases. npm and PyPI publication remain deferred; use source checkouts
+for those clients. See the [release notes](docs/releases/v0.3.0.md) and
+[verification checkpoint](docs/release-verification-2026-10-14.md).
+
+### Storage performance and compatibility
+
+- Protobuf metadata and raw filesystem payloads, header-only metadata reads,
+  incremental managed usage accounting and streaming GET/COPY.
+- Bounded staging for ordinary unbound filesystem uploads outside the publication
+  lock, with integrity checks and commit-time conditions and quotas.
+- Safe overlapping reads, caller-owned GET results and adoption of internally
+  owned HTTP request bodies.
+- A smaller embedded WASM runtime, streaming browser instantiation where supported,
+  and stream-buffer reuse after copying returned bytes into JavaScript.
+- Compact native workspace indexes with unchanged fields and format version.
+- Legacy JSON object records remain readable. New writes use version 2, which
+  older Stow versions cannot read; preserve a backup if you need to downgrade.
 
 ### Browser storage
 

@@ -1,7 +1,7 @@
 # Stow
 
-> An object store you can embed. Run it in Go or WebAssembly, with a native S3
-> endpoint for existing SDKs.
+> Portable working storage for agents, applications and tests. Objects, files
+> and checkpoints through local S3, native workspaces and embedded runtimes.
 
 Stow is an Apache 2.0 object engine with native S3 HTTP compatibility and a
 WebAssembly profile. Prepared filesystem workspaces support checkpoints,
@@ -20,6 +20,8 @@ checks the remote ETag, content type, metadata, and requested checksum before
 acknowledging an attempted write. Retry and discard require the admin token.
 
 ## Start here
+
+- [API reference](/docs/api/): public Go, TypeScript and Python declarations, methods, defaults and errors.
 
 - [Browser file history and sync](/docs/browser-file-history/):
   local commit, undo/redo, conditional writes, recovery, and limits.
@@ -43,16 +45,15 @@ acknowledging an attempted write. Retry and discard require the admin token.
 
 ## Install
 
-The npm and PyPI install surfaces are **not yet announced as usable**. The
-`v0.2.0` release published the main package and all four platform carriers to
-public npmjs, then failed before the GitHub Release, so there is no release page
-and no `SHA256SUMS.txt` to verify a download against, and PyPI was not published.
-A clean install of `0.2.0` from npm has not been verified end to end. The Go
-module is published.
+Native v0.3.0 binaries for Linux and macOS are distributed through
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Verify the archive with the release checksum manifest and run `stow-s3 --version`.
+npm and PyPI publication are deferred; use source checkouts for those clients.
 
-Platforms: Linux and macOS, on x64 and arm64. There is no Windows build, and the
-workspace backend needs an advisory file lock that Windows does not provide, so
-it refuses there rather than guessing. On Windows, use WSL.
+
+The 0.3.0 TypeScript and Python clients are not yet published. Use a source checkout.
+The Go module is published. Native package targets are Linux and macOS on x64 and arm64.
+Use WSL on Windows.
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
@@ -63,18 +64,5 @@ then `export STOW_BIN="$PWD/bin/stow-s3"`, then `npm install && npm run build`
 in `packages/stow-s3` (TypeScript) or `pip install -e
 "packages/stow-s3-py[boto3]"` (Python). A published package carries its own
 binary and does not need `STOW_BIN`.
-The next candidate, **0.3.0**, targets the same public npmjs distribution and has
-**not yet been published**. Publisher setup, live-provider gates and anonymous
-exact-version installation must pass before availability is announced. Published
-npm versions are immutable. For the new candidate, remove any old scope override
-to `npm.pkg.github.com`; it would send installation requests to the wrong
-registry.
-
 If the binary cannot be found or run, `stow-s3 doctor` reports which side is
 broken.
-
-## Optional
-
-- Product Hunt listing and the other five launch images
-- `site/launch/*.html` are the sources of the launch graphics; the rendered
-  PNGs are in `site/images/`

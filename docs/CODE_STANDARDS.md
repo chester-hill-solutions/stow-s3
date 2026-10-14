@@ -1,16 +1,27 @@
 # Stow Code Standards
 
-Stow uses ratcheted code-quality checks modeled on CallCaster and GoCanvass. Existing debt is recorded once in a checked-in baseline; new violations fail CI. Baselines may shrink when debt is removed, but they may not grow to make a change pass.
+Stow records existing code-quality debt in checked-in baselines.
+New violations fail CI. Remove baseline entries when their debt is removed.
+Do not raise a baseline to make a regression pass.
+
+Coverage instruments module packages across test boundaries. The embedded API and
+its public `pkg/stow` facade retain the original combined coverage floor through
+`packageOwners` in the coverage baseline. Extracting the implementation does not
+lower the floor or stop counting the existing public contract tests.
+
+The Go quality ratchet excludes files carrying Go's generated-code marker.
+Generated protobuf code remains subject to compilation, formatting and tests.
+The benchmark build regenerates its schema with pinned tools and checks for drift.
 
 ## Commands
 
-Run the complete local gate with:
+Run the complete gate:
 
 ```sh
 make standards
 ```
 
-Individual gates:
+Run individual checks:
 
 ```sh
 make format-check
@@ -25,7 +36,7 @@ make check-version
 make check-generated
 ```
 
-The TypeScript wrapper also exposes the equivalent package-local commands through `packages/stow-s3`:
+From `packages/stow-s3`, use the package checks:
 
 ```sh
 npm run lint
@@ -36,154 +47,104 @@ npm run check:dry
 
 ## Ratchet policy
 
-- `scripts/baselines/go-quality.json` records Go quality identities.
-- `scripts/baselines/lint-ratchet.json` records TypeScript warning counts.
-- `scripts/baselines/type-escapes.json` records TypeScript escape identities.
-- `scripts/baselines/dry.json` records TypeScript duplication counts.
-- `scripts/baselines/file-size.json` records oversized-file identities.
-- `scripts/baselines/go-coverage.json` records the current Go coverage floor; improvements require an explicit baseline update and regressions fail.
-- A new identity fails the gate.
-- A stale identity also fails the gate, forcing the baseline to be lowered after debt is removed.
-- A baseline-generation command is allowed only as an explicit maintenance action after reviewing the diff. It is not a way to approve a regression.
-- CI checks out full history (`fetch-depth: 0`) and compares against the explicit parent/merge-base; a shallow checkout is a hard failure, never a skipped ratchet.
-- Inline suppressions are themselves counted where the check can detect them. A suppression requires a precise explanation and does not reset the ratchet.
-- Existing test fixtures and generated output are excluded only when their exclusion is documented in the check configuration.
-- The coverage baseline is **the strictest platform's measurement**, not the machine that
-  last regenerated it. `--baseline` writes whichever machine ran it, and coverage is
-  platform-dependent: `internal/parentwatch` covers 22 statements on macOS and 10 on Linux,
-  and the aggregate differs by a comparable margin. A floor recorded on macOS therefore
-  fails the Linux job, and because a stored floor may not be lowered, the wrong value
-  cannot be corrected by reverting it — it has to be set down to the strictest platform's
-  number, which is what the recorded floors are. Read the Linux job's coverage lines before
-  regenerating, not only the local run.
-- `tools/quality` is a **scanner**, not a gate. It measures and prints (`--json` for a
-  consumer); `scripts/check-go-quality.mjs` applies `compareKeys`, `expandedKeys` and
-  `compareIdentities` from `scripts/ratchet.mjs`, like the other five ratchets. It was both
-  once, and its private copy of the history check compared the *scan* against the parent
-  baseline rather than the *committed baseline* against the parent, so raising the floor
-  passed and an unrecorded improvement was invisible, while a comment on that function
-  claimed the opposite. The scanner refuses nothing, which is why a caller can review a
-  verdict rather than infer one.
-- The Go comment budget covers **non-test Go only**, and only `comment-lines` is
-  ratcheted. `comment-ratio` is still reported but is not a floor: it is a density, so
-  removing code raises it, and a two-sided ratchet on a density fails the cleanup it
-  should encourage. Test files are excluded from the comment budget alone; the `any`
-  rule was already scoped away from tests before this, and every other structural rule
-  — complexity, parameter count, function length, file size — still applies to them. A
-  test comment says what a test proves; a production comment says why the system is
-  shaped as it is; counting them in one budget made them compete, and half the budget
-  was test prose, so documenting a test properly had to be funded by deleting
-  documentation from unrelated shipped code. Test files remain held to the coverage
-  ratchet, `gofmt` and `go vet`.
+| Baseline | Records |
+| --- | --- |
+| `scripts/baselines/go-quality.json` | Go quality identities |
+| `scripts/baselines/lint-ratchet.json` | TypeScript warning counts |
+| `scripts/baselines/type-escapes.json` | TypeScript type escapes |
+| `scripts/baselines/dry.json` | TypeScript duplication counts |
+| `scripts/baselines/file-size.json` | Oversized files |
+| `scripts/baselines/go-coverage.json` | Go coverage floors |
+
+New and stale identities both fail. Update a baseline after reviewing the removed debt.
+Baseline generation is a maintenance operation, not permission to accept a regression.
+Detected inline suppressions also count and need a specific explanation.
+Fixture and generated-output exclusions must be documented in the check configuration.
+
+CI uses full history (`fetch-depth: 0`) to compare against the parent or merge base.
+A shallow checkout fails the history check.
+
+Coverage floors use the strictest platform measurement.
+`internal/parentwatch` covers 22 statements on macOS and 10 on Linux, which changes aggregate coverage.
+Check Linux CI results before updating the baseline; local measurements alone can set an invalid floor.
+Coverage improvements require an explicit baseline update. Regressions fail.
+
+`tools/quality` scans Go code and prints measurements.
+`scripts/check-go-quality.mjs` applies the ratchet through shared comparison helpers in `scripts/ratchet.mjs`.
+The scanner does not enforce the gate.
+
+The Go comment budget counts production `comment-lines` only.
+`comment-ratio` is reported without a floor; removing code can raise that ratio.
+Test comments are excluded from this budget.
+Structural checks, coverage, formatting and vet still apply to tests.
 
 ## Go standards
 
-The Go gate combines hard correctness checks with ratcheted structural checks:
-
-- `gofmt -l` and `go vet ./...` are hard failures.
-- `go test ./...` is a hard correctness gate.
-- `packages/stow-s3/go.mod` is an intentional nested-module boundary so Go package discovery never walks TypeScript `node_modules` after an npm install.
-- `tools/quality` reports functions over 200 lines, cyclomatic complexity over 15, and functions with more than five parameters.
-- `any` and `panic` use are tracked as type/safety escape hatches.
-- The shared storage, S3, and run-through tests are part of the same release gate; backend-specific exemptions are not allowed without a written reason.
+- `gofmt -l`, `go vet ./...` and `go test ./...` must pass.
+- `packages/stow-s3/go.mod` prevents Go discovery from entering TypeScript `node_modules`.
+- `tools/quality` reports functions over 200 lines, complexity over 15, and more than five parameters.
+- `any` and `panic` usage count as type or safety escapes.
+- Storage, S3 and run-through tests share the release gate.
+  Backend-specific exemptions require a written reason.
 
 ## TypeScript standards
 
-The wrapper uses a flat ESLint configuration with warning-level ratchets for:
+The flat ESLint configuration sets warning ratchets for:
 
-- cyclomatic complexity (`15`);
-- maximum nesting depth (`3`);
-- maximum parameters (`5`);
-- function length (`200` lines, excluding blank lines/comments);
-- `console`, non-null assertions, explicit `any`, and `as unknown as`.
+- complexity over 15;
+- nesting depth over 3;
+- more than five parameters;
+- functions over 200 lines, excluding blank lines and comments;
+- `console`, non-null assertions, explicit `any` and `as unknown as`.
 
-The following are hard errors:
+Duplicate imports, `@ts-ignore`, `@ts-nocheck` and undocumented `@ts-expect-error` are hard errors.
+Type checks, Node tests and generated-output checks must also pass.
 
-- duplicate imports;
-- `@ts-ignore` and `@ts-nocheck`;
-- undocumented `@ts-expect-error`;
-- generated `dist` drift;
-- typecheck and Node test failures.
-
-The TypeScript escape ratchet additionally records `as any`, double casts, explicit `any`, and suppression comments by source identity. This is deliberately separate from ESLint so type-boundary escapes cannot silently disappear behind a rule configuration.
+The separate type-escape ratchet tracks `as any`, double casts, explicit `any` and suppression comments by source identity.
+Changing ESLint rules does not remove these recorded escapes.
 
 ## Duplication and size
 
-`jscpd` tracks duplicated TypeScript structure. The Go quality and file-size gates track Go structural metrics and file size. Cross-language Go clone detection is not yet part of the gate and must not be implied by this document; it is a follow-up before claiming full cross-language DRY coverage. Each implemented dimension is ratcheted independently.
+`jscpd` checks TypeScript duplication. Go quality and file-size checks track structural metrics and file size.
+Cross-language clone detection is not implemented. Each existing dimension has a separate ratchet.
 
-Generated `packages/stow-s3/dist` is checked into the repository for release reproducibility, but it is excluded from lint and duplication scans. The build is cleaned and regenerated, and CI fails if the checked-in output differs.
-
-`make check-generated` compares the committed `dist` against a fresh build of the tree, so a committed artifact that the current source does not produce fails it. It is not a check that the build is repeatable from itself, which is what it was for a while: the target ran the build before the comparison, so the two digests were both of fresh output and a stale artifact passed. The corpus jobs' `git diff --exit-code -- packages/stow-s3/dist` is the same comparison and stays as an independent second opinion. See [CONTRIBUTING](../CONTRIBUTING.md).
+Tracked `packages/stow-s3/dist` output is excluded from lint and duplication scans.
+`make check-generated` compares it with a fresh build.
+Capture the saved digest before rebuilding; otherwise stale output could pass.
+Corpus jobs also run `git diff --exit-code -- packages/stow-s3/dist`.
+See [Contributing](../CONTRIBUTING.md).
 
 ## The site is gated on its claims, not on its prose
 
-`scripts/check-site-claims.mjs` checks `site/index.html`, the six launch cards,
-`agent.md` and `llms.txt` for claims that can be compared against the tree: the
-install commands each prints, four short forms that do not resolve
-(`go get /pkg/stow`, `go get pkg/stow`, `Backend: memory`, `@chs/stow`), the
-binary and WASM sizes against the built artefacts, and the default quotas against
-`internal/runtime/types.go`.
+`scripts/check-site-claims.mjs` checks the homepage, six launch cards, `agent.md` and `llms.txt`.
+It verifies install commands, binary/WASM sizes and default quotas against the source and built artifacts.
+It rejects four known invalid forms: `go get /pkg/stow`, `go get pkg/stow`, `Backend: memory` and `@chs/stow`.
 
-It exists because all four of those were wrong while every other gate stayed
-green. `check-install-surface` covers the four documents an agent reads and did not
-cover `index.html`, so the page a person lands on was the one surface nothing
-checked — and it told readers to run a Go command that resolves to nothing, showed
-a Go snippet that does not compile, and told them the social card to install a
-package name that does not exist.
-
-What the gate deliberately does not do is judge the writing. The page was a
-generation out of date in positioning, selling an S3 test-fixture product for a
-project whose centre of gravity is agent workspaces and portable checkpoints, and
-no amount of substring matching catches that. A gate that cannot see the change
-under test is worse than no gate, because it is green, so this one checks only what
-it can actually see and says so.
-
-`scripts/check-site-claims.test.mjs` tests the decision against fixtures rather
-than only running it. That is not ceremony: the first version of the gate collapsed
-only spaces, so a deliberately reintroduced `go get /pkg/stow` — wrapped across a
-newline, as the real line is — went unreported, and the running check was green.
+This gate cannot assess writing quality or product positioning.
+Review those manually. Fixture tests include commands split across lines.
 
 ## Platform rationale held here rather than in the code
 
-Long platform and gate arguments live here so the code carries the rule and this
-document carries the reasoning. Each was originally a comment block; the comment
-line ratchet (`comment-lines`, see [Ratchet policy](#ratchet-policy)) makes prose
-in shipped `.go` the most expensive place in the repository to keep anything.
+Keep long explanations here. Code comments should explain local choices without repeating the guide.
 
-- **Windows parent-directory sync.** `atomicfile.syncDir` is a no-op on Windows,
-  and that is the platform's answer rather than a gap. `os.Open` on a directory
-  succeeds and `File.Sync` then calls `FlushFileBuffers` on the handle, which
-  Windows refuses for a directory with `ERROR_ACCESS_DENIED`; while the arm
-  reported that error, every workspace test failed at manifest write, so the
-  workspace backend could not persist at all. The durability argument differs
-  rather than being skipped: on POSIX a rename is atomic but the directory entry
-  recording it is not durable until the directory is fsynced; on Windows the
-  rename goes through `MoveFileEx`, the filesystem journals directory metadata,
-  and there is no supported way to flush a directory handle. A caller needing
-  more there must `FlushFileBuffers` the file handle before the rename, which is a
-  different design. Reporting an error is worse than silence — every write would
-  fail where the write is in fact fine.
-- **kqueue process watching.** A `kqueue` filter is scoped to the open
-  descriptor, so closing the descriptor removes every filter registered against
-  it and nothing about the filter survives it. Closing it on return, with no
-  goroutine ever waiting on the kqueue, is what leaves a macOS watch unarmed while
-  every layer above reports success. `kevent()` also returns a count of delivered
-  events, not of registered changes.
-- **The `--offline` flag is not read back.** Reading a flag after the fact and
-  re-parsing its string can fail, and it fails silently: a value that cannot be
-  read leaves the config at `false`, so the network stays open on a flag whose
-  whole purpose is closing it. Two things prevent that state. The flag package
-  parses the value, so an unparseable one never becomes a config; and `serve`'s
-  flag set is `ExitOnError`, so the parse error has printed why and exited before
-  a config exists — which is why `serve` discards the error from `flags.Parse` and
-  why discarding it is safe rather than merely convenient.
-- **Negative SigV4 cases carry the whole signed header set.** With a shorter
-  list, a repairing verifier produces one missing a required header, and the
-  ordinary "the date and the content hash must be signed" rule refuses the request
-  for a reason that has nothing to do with strictness. Such a case passes whether
-  or not the parser is strict, which is how a suite of fifteen negative cases can
-  be entirely green against the behaviour it is meant to pin.
+- **Windows directory sync:** `atomicfile.syncDir` is a no-op.
+  Windows rejects `FlushFileBuffers` on directory handles with `ERROR_ACCESS_DENIED`.
+  POSIX directory fsync and Windows journaled rename provide different durability behavior.
+  A stronger Windows design would need to flush file handles before rename.
+- **kqueue process watching:** closing a descriptor removes its registered filters.
+  Keep it open while the watcher waits. `kevent()` returns delivered event count, not registered change count.
+- **Offline flag parsing:** the flag package parses directly into configuration.
+  `serve` uses `ExitOnError`, so invalid flags exit before configuration is used.
+  Do not reread and silently reinterpret a parsed flag.
+- **Negative SigV4 tests:** include every required signed header.
+  Otherwise a missing-header error can hide the malformed input the test intends to reject.
+
+## Documentation style
+
+Use the [writing rules in Contributing](../CONTRIBUTING.md#documentation-style).
 
 ## CI
 
-`make standards` is the local equivalent of the required CI quality job. The release workflow must run the same command after dependency installation. A quality failure is never converted into a warning-only job.
+`make standards` is the local equivalent of the required CI quality job.
+The release workflow runs it after dependency installation.
+Quality failures must fail the job.
