@@ -1,0 +1,130 @@
+{
+  "runner": {
+    "id": "90f1a2b9-696c-43c6-8985-b94643bf335d",
+    "status": "REMOVED",
+    "createdAt": "2026-10-14T16:44:12.051Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-hot-paths-20261014",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Provision pinned tools for qualification on the benchmark instance",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:50a9e6f50fac07a87f3964ba5954efa0bdcf460666793083f8a5501d1d22d1c0",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  },
+  "target": {
+    "id": "8f49fc2d-2f4c-4714-8030-ad94811acc0b",
+    "status": "REMOVED",
+    "createdAt": "2026-10-14T13:01:53.473Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-owned-http-body-20261014",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Build memory variants from cleaned, source-preserving snapshots",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:f27715815d3d308ef192e2a25e1a228e04bcec129b3855167cdc8e5454b6300d",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 2,
+              "memoryBytes": 2147483648
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/target.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/data"
+      ]
+    }
+  }
+}

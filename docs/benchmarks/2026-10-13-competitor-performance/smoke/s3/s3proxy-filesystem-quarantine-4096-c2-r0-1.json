@@ -1,0 +1,248 @@
+{
+  "scenario": {
+    "backend": "filesystem",
+    "workload": "quarantine",
+    "bytes": 4096,
+    "concurrency": 2,
+    "rate": 0,
+    "soak": false,
+    "implementation": "s3proxy-filesystem"
+  },
+  "startupMs": 910.803740000003,
+  "firstWriteMs": 1001.4906979999942,
+  "firstWriteBytes": 4096,
+  "firstWriteVerified": true,
+  "warmup": null,
+  "load": {
+    "mode": "closed-loop capacity",
+    "offered": 46,
+    "dropped": 0,
+    "failed": 0,
+    "successful": 46,
+    "windowSuccessful": 44,
+    "peakQueue": 0,
+    "expiredBeforeStart": 0,
+    "errors": {},
+    "measuredSeconds": 0.5,
+    "drainMs": 2.926,
+    "filesPerSecond": 88,
+    "responseLatencyMs": {
+      "samples": 46,
+      "mean": 21.832,
+      "p50": 14.942,
+      "p95": 41.23,
+      "p99": 45.381,
+      "max": 45.381
+    },
+    "serviceLatencyMs": {
+      "samples": 46,
+      "mean": 21.83,
+      "p50": 14.942,
+      "p95": 41.23,
+      "p99": 45.379,
+      "max": 45.379
+    },
+    "queueWaitMs": {
+      "samples": 46,
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.002,
+      "p99": 0.004,
+      "max": 0.004
+    },
+    "schedulerLagMs": {
+      "samples": 0,
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    },
+    "perSecond": [
+      {
+        "second": 0,
+        "offered": 46,
+        "dropped": 0,
+        "successful": 44,
+        "failed": 0,
+        "peakQueue": 0
+      }
+    ]
+  },
+  "resources": {
+    "intervalSeconds": 0.5088379189999978,
+    "sampleIntervalMs": 250,
+    "samples": [
+      {
+        "elapsedSeconds": 0.0024219459999949323,
+        "process": {
+          "rssBytes": 175587328,
+          "highWaterRssBytes": 175587328,
+          "cpuSeconds": 2.29,
+          "readBytes": 0,
+          "writtenBytes": 53248
+        },
+        "diskAvailableBytes": 4935630848,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 24437935\nuser_usec 21513190\nsystem_usec 2924745\nnice_usec 0\nnr_periods 188\nnr_throttled 92\nthrottled_usec 10684125\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 254894080,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 49046007\nuser_usec 39843667\nsystem_usec 9202340\nnice_usec 0\nnr_periods 541\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.25558390299999884,
+        "process": {
+          "rssBytes": 179011584,
+          "highWaterRssBytes": 179011584,
+          "cpuSeconds": 2.8,
+          "readBytes": 0,
+          "writtenBytes": 229376
+        },
+        "diskAvailableBytes": 4935606272,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 24947820\nuser_usec 21906034\nsystem_usec 3041786\nnice_usec 0\nnr_periods 190\nnr_throttled 94\nthrottled_usec 10809426\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 257253376,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 49121310\nuser_usec 39913722\nsystem_usec 9207587\nnice_usec 0\nnr_periods 544\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.5079365969999999,
+        "process": {
+          "rssBytes": 190799872,
+          "highWaterRssBytes": 190799872,
+          "cpuSeconds": 3.31,
+          "readBytes": 0,
+          "writtenBytes": 430080
+        },
+        "diskAvailableBytes": 4935630848,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 25461599\nuser_usec 22370222\nsystem_usec 3091376\nnice_usec 0\nnr_periods 193\nnr_throttled 97\nthrottled_usec 11030358\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 257646592,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 49198329\nuser_usec 39976301\nsystem_usec 9222028\nnice_usec 0\nnr_periods 546\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    ],
+    "serverPeakSampledRssBytes": 190799872,
+    "serverHighWaterRssBytes": 190799872,
+    "serverAverageCpuPercent": 200.45675880535242,
+    "generatorPeakSampledRssBytes": 257646592,
+    "generatorCpuSeconds": 0.153508,
+    "generatorEventLoopDelayMs": {
+      "mean": 20.12501333333333,
+      "max": 21.856255
+    },
+    "diskReadBytes": 0,
+    "diskWrittenBytes": 376832,
+    "minimumSampledDiskAvailableBytes": 4935606272,
+    "diskHeadroomMaintained": true
+  },
+  "measurements": {
+    "operations": {
+      "put": {
+        "latencyMs": {
+          "samples": 46,
+          "mean": 4.174,
+          "p50": 2.324,
+          "p95": 15.243,
+          "p99": 32.572,
+          "max": 32.572
+        },
+        "successful": 46,
+        "failed": 0,
+        "windowSuccessful": 46,
+        "windowFailed": 0,
+        "windowBytes": 188416,
+        "successfulBytes": 188416,
+        "requestsPerSecond": 92,
+        "payloadMiBPerSecond": 0.359,
+        "completedAttemptsPerSecond": 92
+      },
+      "get": {
+        "latencyMs": {
+          "samples": 46,
+          "mean": 3.491,
+          "p50": 2.278,
+          "p95": 14.217,
+          "p99": 25.843,
+          "max": 25.843
+        },
+        "successful": 46,
+        "failed": 0,
+        "windowSuccessful": 46,
+        "windowFailed": 0,
+        "windowBytes": 188416,
+        "successfulBytes": 188416,
+        "requestsPerSecond": 92,
+        "payloadMiBPerSecond": 0.359,
+        "completedAttemptsPerSecond": 92
+      },
+      "verdict": {
+        "latencyMs": {
+          "samples": 46,
+          "mean": 7.261,
+          "p50": 2.698,
+          "p95": 28.531,
+          "p99": 34.03,
+          "max": 34.03
+        },
+        "successful": 46,
+        "failed": 0,
+        "windowSuccessful": 46,
+        "windowFailed": 0,
+        "windowBytes": 4830,
+        "successfulBytes": 4830,
+        "requestsPerSecond": 92,
+        "payloadMiBPerSecond": 0.009,
+        "completedAttemptsPerSecond": 92
+      },
+      "delete": {
+        "latencyMs": {
+          "samples": 92,
+          "mean": 2.289,
+          "p50": 1.656,
+          "p95": 4.057,
+          "p99": 22.001,
+          "max": 22.001
+        },
+        "successful": 92,
+        "failed": 0,
+        "windowSuccessful": 88,
+        "windowFailed": 0,
+        "windowBytes": 0,
+        "successfulBytes": 0,
+        "requestsPerSecond": 176,
+        "payloadMiBPerSecond": 0,
+        "completedAttemptsPerSecond": 176
+      }
+    },
+    "errors": {}
+  },
+  "verification": {
+    "verifiedObjects": 4,
+    "algorithm": "SHA-256",
+    "complete": true,
+    "unknownOutcomeKeys": []
+  },
+  "leftovers": {
+    "count": 0,
+    "truncated": false
+  }
+}

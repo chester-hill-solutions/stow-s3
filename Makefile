@@ -135,6 +135,20 @@ benchmark: build build-wasm
 	node packages/stow-s3/scripts/benchmark-concurrency.mjs --runs 5 --payload-bytes 1048576
 	node packages/stow-s3/scripts/benchmark-workspace.mjs --runs 7
 
+.PHONY: benchmark-performance benchmark-performance-smoke benchmark-embedded
+PERF_OUT ?= .cache/performance/$(shell date -u +%Y%m%dT%H%M%SZ)
+PERF_CONFIG ?= docs/benchmarks/performance-local.json
+
+benchmark-performance: build
+	node packages/stow-s3/scripts/benchmark-performance.mjs --config "$(PERF_CONFIG)" --out "$(PERF_OUT)"
+
+benchmark-performance-smoke: build
+	node --test scripts/performance.test.mjs packages/stow-s3/scripts/performance/*.test.mjs
+	node packages/stow-s3/scripts/benchmark-performance.mjs --smoke --out "$(PERF_OUT)"
+
+benchmark-embedded:
+	node scripts/benchmark-embedded.mjs --out "$(PERF_OUT)"
+
 # The committed density baseline, re-measured and compared. Kept out of
 # `standards` for the same reason as benchmark: RSS depends on the machine, and a
 # required check that fails on a loaded runner is worse than none. What was

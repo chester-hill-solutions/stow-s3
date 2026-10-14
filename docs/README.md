@@ -55,4 +55,14 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 For dated test results, see the [assessment records](assessment-evidence/2026-09-29/README.md),
 [Railway browser tests](assessment-evidence/2026-10-12/railway-browser.json)
 and [benchmarks](benchmarks/session-baseline.md).
+Use the [performance testing guide](performance-testing.md) to reproduce throughput,
+latency, resource and quarantine workflow measurements.
+The [October 13 memory results](benchmarks/2026-10-13-memory-performance/README.md)
+include a quarantine rate sweep and five-minute memory observations.
+The [October 13 Railway comparison](benchmarks/2026-10-13-railway-performance/README.md)
+compares Stow with Afero, Go buffers/files, S3Proxy and MinIO.
+The [storage optimization results](benchmarks/2026-10-13-storage-optimization/README.md)
+compare protobuf records and owned upload buffers against the earlier implementation.
+The [expanded competitor results](benchmarks/2026-10-13-competitor-performance/README.md)
+add SQLite, RustFS, agent startup/first-write measurements and a private chart preview.
 <!-- repo-only:end -->

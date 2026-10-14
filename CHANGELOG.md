@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1 — 2026-10-14
+
+Adds reproducible performance measurement tools and carefully scoped benchmark
+results to the documentation site. These exploratory measurements do not claim
+sustained production capacity or broad performance superiority. Runtime APIs and
+storage formats are unchanged from v0.3.0.
+
+See the [release notes](docs/releases/v0.3.1.md) and [performance testing guide](docs/performance-testing.md).
+
 ## 0.3.0 — 2026-10-14
 
 Native downloads for Linux and macOS on x86_64 and ARM64 are distributed through

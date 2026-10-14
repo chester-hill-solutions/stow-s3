@@ -1,0 +1,19 @@
+// Benchmark-only overlay. Never copied into the production source tree.
+package main
+
+import (
+ "net/http"
+ "net/http/pprof"
+ "runtime"
+)
+
+func init() {
+ runtime.SetMutexProfileFraction(1)
+ runtime.SetBlockProfileRate(1)
+ mux := http.NewServeMux()
+ mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+ mux.HandleFunc("/debug/pprof/mutex", pprof.Handler("mutex").ServeHTTP)
+ mux.HandleFunc("/debug/pprof/block", pprof.Handler("block").ServeHTTP)
+ mux.HandleFunc("/debug/pprof/heap", pprof.Handler("heap").ServeHTTP)
+ go func() { if err := http.ListenAndServe("127.0.0.1:6060", mux); err != nil { panic(err) } }()
+}

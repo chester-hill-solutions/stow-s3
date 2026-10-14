@@ -1,0 +1,19 @@
+File: stow-s3-profile
+Build ID: 67990ab223c39b697e4617995e4fd361102ea7d9
+Type: delay
+Time: 2026-10-14 04:39:29 UTC
+Showing nodes accounting for 4602.11ms, 99.67% of 4617.55ms total
+Dropped 114 nodes (cum <= 23.09ms)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%  4611.90ms 99.88%  net/http.(*conn).serve
+         0     0%     0%  4611.55ms 99.87%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).ServeHTTP
+         0     0%     0%  4611.55ms 99.87%  net/http.serverHandler.ServeHTTP
+         0     0%     0%  4611.21ms 99.86%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatch
+         0     0%     0%  4611.21ms 99.86%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatchObject
+         0     0%     0%  4611.20ms 99.86%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).handlePutObject
+         0     0%     0%  4610.90ms 99.86%  net/http.(*Server).Serve.gowrap3
+         0     0%     0%  4602.32ms 99.67%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).PutObject
+         0     0%     0%  4602.32ms 99.67%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*StoreAdapter).PutObject
+ 3746.21ms 81.13% 81.13%  4601.66ms 99.66%  sync.(*RWMutex).Unlock
+         0     0% 81.13%  4601.65ms 99.66%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).PutObject.deferwrap1
+  855.91ms 18.54% 99.67%   855.91ms 18.54%  sync.(*Mutex).Unlock (inline)

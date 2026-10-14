@@ -1,0 +1,292 @@
+--- a/internal/storage/bytes.go
++++ b/internal/storage/bytes.go
+@@ -5,9 +5,14 @@
+ // ByteReader is a reader that already holds its whole content in memory and can
+ // hand it over without another copy.
+ //
+-// BytesOf borrows these read-only bytes. PreparePut consumes Read into owned bytes.
+-// The runtime must not expose a caller's buffer through ByteReader to an arbitrary
+-// store. TestRuntimeNeverExposesCallerBytesToTheStore pins that requirement.
++// It exists so a caller that has already materialised a body does not pay for a
++// second full-size buffer on the way to the store.
++//
++// Ownership: the bytes belong to the reader and a consumer must treat them as
++// read-only, copying to keep them past the call. Every store does that through
++// ETagForReader, which is what lets the runtime hand a caller's buffer to a store
++// without copying again — so the runtime must not hand a store a reader that
++// exposes those bytes. Pinned by TestRuntimeNeverExposesCallerBytesToTheStore.
+ type ByteReader interface {
+ 	io.Reader
+ 	// Bytes returns the reader's content. The returned slice is owned by the
+@@ -17,7 +22,7 @@
+ 
+ // BytesOf returns a reader's content without copying it when the reader already
+ // holds it in memory, and by reading it once when it does not. The returned
+-// bytes may be borrowed from the reader and must be treated as read-only.
++// bytes are owned by whoever called BytesOf and must be treated as read-only.
+ func BytesOf(r io.Reader) ([]byte, error) {
+ 	if r == nil {
+ 		return nil, nil
+--- a/internal/storage/checksum.go
++++ b/internal/storage/checksum.go
+@@ -85,7 +85,6 @@
+ 
+ func ResolvePutChecksum(opts PutOptions, data []byte) (PutOptions, error) {
+ 	if !opts.ComputeChecksum {
+-		opts.ChecksumAlgorithm = NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm)
+ 		return opts, VerifyChecksum(opts, data)
+ 	}
+ 	algorithm := NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm)
+@@ -93,8 +92,6 @@
+ 		if opts.ChecksumValue != "" {
+ 			return opts, fmt.Errorf("checksum value requires an algorithm")
+ 		}
+-		opts.ChecksumAlgorithm = ""
+-		opts.ComputeChecksum = false
+ 		return opts, nil
+ 	}
+ 	computed, err := ComputeChecksum(algorithm, data)
+--- a/internal/storage/memory.go
++++ b/internal/storage/memory.go
+@@ -146,11 +146,14 @@
+ 	// The body is consumed outside the lock, for the same reason: a reader can
+ 	// be arbitrarily slow, and holding the store's single lock across an
+ 	// arbitrary reader blocks every other operation in the process.
+-	prepared, err := PreparePut(body, opts)
+-	if err != nil {
+-		return nil, err
+-	}
+-	opts = prepared.Options
++	etag, data, err := ETagForReader(body)
++	if err != nil {
++		return nil, err
++	}
++	opts, err = ResolvePutChecksum(opts, data)
++	if err != nil {
++		return nil, err
++	}
+ 
+ 	s.mu.Lock()
+ 	defer s.mu.Unlock()
+@@ -179,15 +182,15 @@
+ 		Bucket:            bucket,
+ 		Key:               key,
+ 		VersionID:         versionID,
+-		Size:              int64(len(prepared.Data)),
+-		ETag:              prepared.ETag,
++		Size:              int64(len(data)),
++		ETag:              etag,
+ 		ContentType:       opts.ContentType,
+ 		LastModified:      now,
+-		Metadata:          opts.Metadata,
+-		ChecksumAlgorithm: opts.ChecksumAlgorithm,
++		Metadata:          CloneMetadata(opts.Metadata),
++		ChecksumAlgorithm: NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
+ 		ChecksumValue:     opts.ChecksumValue,
+ 	}
+-	b.objects[key] = &memObject{data: prepared.Data, meta: meta}
++	b.objects[key] = &memObject{data: data, meta: meta}
+ 	out := cloneObjectMeta(meta)
+ 	return &out, nil
+ }
+--- a/internal/storage/fs/fs_put.go
++++ b/internal/storage/fs/fs_put.go
+@@ -1,6 +1,7 @@
+ package fs
+ 
+ import (
++	"bytes"
+ 	"context"
+ 	storage "github.com/chester-hill-solutions/stow-s3/internal/storage"
+ 	"io"
+@@ -24,16 +25,14 @@
+ 	if err := s.checkRecoveryHoldsLocked(bucket, key); err != nil {
+ 		return nil, err
+ 	}
+-	var prepared storage.PreparedPut
+ 	if opts.RequestKey != "" {
+ 		var receipt storage.SaveReceipt
+ 		var found bool
+ 		var err error
+-		prepared, receipt, found, err = s.prepareSaveLocked(bucket, key, body, opts)
++		body, receipt, found, err = s.saveBodyLocked(bucket, key, body, opts)
+ 		if err != nil || found {
+ 			return receipt.Meta, err
+ 		}
+-		opts = prepared.Options
+ 	}
+ 
+ 	if _, err := os.Stat(s.bucketDir(bucket)); os.IsNotExist(err) {
+@@ -50,12 +49,13 @@
+ 		return nil, err
+ 	}
+ 
+-	if opts.RequestKey == "" {
+-		prepared, err = storage.PreparePut(body, opts)
+-		if err != nil {
+-			return nil, err
+-		}
+-		opts = prepared.Options
++	etag, data, err := storage.ETagForReader(body)
++	if err != nil {
++		return nil, err
++	}
++	opts, err = storage.ResolvePutChecksum(opts, data)
++	if err != nil {
++		return nil, err
+ 	}
+ 	recordVersion, err := storage.NewRecordVersion()
+ 	if err != nil {
+@@ -64,11 +64,11 @@
+ 	now := time.Now().UTC()
+ 	record := objectRecord{
+ 		RecordVersion:     recordVersion,
+-		Data:              prepared.Data,
++		Data:              data,
+ 		ContentType:       opts.ContentType,
+-		Metadata:          opts.Metadata,
+-		ETag:              prepared.ETag,
+-		ChecksumAlgorithm: opts.ChecksumAlgorithm,
++		Metadata:          storage.CloneMetadata(opts.Metadata),
++		ETag:              etag,
++		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
+ 		ChecksumValue:     opts.ChecksumValue,
+ 		LastModified:      now,
+ 	}
+@@ -112,16 +112,13 @@
+ 	return existing, existingData, nil
+ }
+ 
+-func (s *FilesystemStore) prepareSaveLocked(bucket, key string, body io.Reader, opts storage.PutOptions) (storage.PreparedPut, storage.SaveReceipt, bool, error) {
+-	if err := s.checkSaveRequest(bucket, key, opts); err != nil {
+-		return storage.PreparedPut{}, storage.SaveReceipt{}, false, err
++func (s *FilesystemStore) saveBodyLocked(bucket, key string, body io.Reader, opts storage.PutOptions) (io.Reader, storage.SaveReceipt, bool, error) {
++	data, err := io.ReadAll(body)
++	if err != nil {
++		return nil, storage.SaveReceipt{}, false, err
+ 	}
+-	prepared, err := storage.PreparePut(body, opts)
+-	if err != nil {
+-		return storage.PreparedPut{}, storage.SaveReceipt{}, false, err
+-	}
+-	receipt, found, err := s.replaySaveLocked(bucket, key, prepared.Data, prepared.Options)
+-	return prepared, receipt, found, err
++	receipt, found, err := s.replaySaveLocked(bucket, key, data, opts)
++	return bytes.NewReader(data), receipt, found, err
+ }
+ 
+ func (*FilesystemStore) ComputesPutChecksums() bool { return true }
+--- a/internal/storage/fs/save_requests.go
++++ b/internal/storage/fs/save_requests.go
+@@ -33,26 +33,12 @@
+ 	return s.replaySaveLocked(bucket, key, data, opts)
+ }
+ 
+-func (s *FilesystemStore) checkSaveRequest(bucket, key string, opts storage.PutOptions) error {
++func (s *FilesystemStore) replaySaveLocked(bucket, key string, data []byte, opts storage.PutOptions) (storage.SaveReceipt, bool, error) {
+ 	if !s.SupportsDurableSaveRequests() {
+-		return storage.ErrSaveRequestsUnsupported
++		return storage.SaveReceipt{}, false, storage.ErrSaveRequestsUnsupported
+ 	}
+ 	if !validRequestKey(opts.RequestKey) || !validSaveOptions(opts) || !validSaveStrings(bucket, key) {
+-		return storage.ErrInvalidSaveRequest
+-	}
+-	return nil
+-}
+-
+-func (s *FilesystemStore) replaySaveLocked(bucket, key string, data []byte, opts storage.PutOptions) (storage.SaveReceipt, bool, error) {
+-	if err := s.checkSaveRequest(bucket, key, opts); err != nil {
+-		return storage.SaveReceipt{}, false, err
+-	}
+-	if opts.ComputeChecksum {
+-		var err error
+-		opts, err = storage.ResolvePutChecksum(opts, data)
+-		if err != nil {
+-			return storage.SaveReceipt{}, false, err
+-		}
++		return storage.SaveReceipt{}, false, storage.ErrInvalidSaveRequest
+ 	}
+ 	meaning := s.saveMeaning(bucket, key, data, opts)
+ 	if pending := s.saves.pending; pending != nil && pending.RequestKey == opts.RequestKey && pending.Meaning != meaning {
+--- a/internal/storage/workspace/objects.go
++++ b/internal/storage/workspace/objects.go
+@@ -51,11 +51,14 @@
+ 		return nil, err
+ 	}
+ 
+-	prepared, err := storage.PreparePut(body, opts)
+-	if err != nil {
+-		return nil, err
+-	}
+-	opts = prepared.Options
++	data, err := storage.BytesOf(body)
++	if err != nil {
++		return nil, err
++	}
++	opts, err = storage.ResolvePutChecksum(opts, data)
++	if err != nil {
++		return nil, err
++	}
+ 
+ 	version, err := storage.NewRecordVersion()
+ 	if err != nil {
+@@ -63,7 +66,7 @@
+ 	}
+ 
+ 	absPath, form := s.pathFor(bucket, key)
+-	if err := s.writeAtomic(absPath, prepared.Data); err != nil {
++	if err := s.writeAtomic(absPath, data); err != nil {
+ 		return nil, fmt.Errorf("workspace store: write %s: %w", key, err)
+ 	}
+ 	written, err := s.openRead(absPath, nil)
+@@ -78,12 +81,12 @@
+ 
+ 	entry := ManifestEntry{
+ 		Form:              form,
+-		Size:              int64(len(prepared.Data)),
+-		ETag:              prepared.ETag,
++		Size:              int64(len(data)),
++		ETag:              storage.ETagForBytes(data),
+ 		VersionID:         version,
+ 		ContentType:       opts.ContentType,
+-		Metadata:          opts.Metadata,
+-		ChecksumAlgorithm: opts.ChecksumAlgorithm,
++		Metadata:          storage.CloneMetadata(opts.Metadata),
++		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
+ 		ChecksumValue:     opts.ChecksumValue,
+ 		Modified:          info.ModTime().UTC().Truncate(time.Second),
+ 	}
+--- a/internal/storage/put_body.go
++++ /dev/null
+@@ -1,31 +0,0 @@
+-package storage
+-
+-import (
+-	"bytes"
+-	"io"
+-)
+-
+-// PreparedPut owns the bytes and normalized properties of a buffered object write.
+-type PreparedPut struct {
+-	Data    []byte
+-	ETag    string
+-	Options PutOptions
+-}
+-
+-// PreparePut consumes the reader, verifies integrity and copies retained metadata.
+-// Reader size hints affect allocation only; protocol length checks stay with callers.
+-func PreparePut(body io.Reader, opts PutOptions) (PreparedPut, error) {
+-	if body == nil {
+-		body = bytes.NewReader(nil)
+-	}
+-	etag, data, err := ETagForReader(body)
+-	if err != nil {
+-		return PreparedPut{}, err
+-	}
+-	opts, err = ResolvePutChecksum(opts, data)
+-	if err != nil {
+-		return PreparedPut{}, err
+-	}
+-	opts.Metadata = CloneMetadata(opts.Metadata)
+-	return PreparedPut{Data: data, ETag: etag, Options: opts}, nil
+-}

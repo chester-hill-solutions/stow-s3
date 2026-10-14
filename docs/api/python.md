@@ -56,7 +56,7 @@ with with_session() as session:
 
 
 ```python
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 ```
 
 ## adopt_workspace_handoff

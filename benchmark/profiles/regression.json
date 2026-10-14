@@ -1,0 +1,21 @@
+{
+  "label": "Railway Stow storage performance regression comparison; exploratory",
+  "targets": ["stow-memory", "stow-filesystem"],
+  "warmupSeconds": 5,
+  "durationSeconds": 20,
+  "repetitions": 3,
+  "soakSeconds": 0,
+  "sizes": [1048576],
+  "concurrency": [4],
+  "rates": [0],
+  "retainedObjects": 16,
+  "maxQueue": 8,
+  "workloads": ["put", "get", "quarantine"],
+  "embedded": {
+    "benchtime": "500ms",
+    "count": 3,
+    "cpu": "4",
+    "pattern": "BenchmarkComparison/stow-(memory|filesystem)/(put|get|quarantine)/1048576B$",
+    "expectedSamples": 18
+  }
+}

@@ -1,0 +1,49 @@
+File: stow-s3-profile
+Build ID: 67990ab223c39b697e4617995e4fd361102ea7d9
+Type: cpu
+Time: 2026-10-14 04:38:36 UTC
+Duration: 23s, Total samples = 16.65s (72.39%)
+Showing nodes accounting for 12.52s, 75.20% of 16.65s total
+Dropped 257 nodes (cum <= 0.08s)
+Showing top 40 nodes out of 101
+      flat  flat%   sum%        cum   cum%
+     0.02s  0.12%  0.12%     15.14s 90.93%  net/http.(*conn).serve
+         0     0%  0.12%     14.70s 88.29%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).ServeHTTP
+         0     0%  0.12%     14.70s 88.29%  net/http.serverHandler.ServeHTTP
+     8.11s 48.71% 48.83%      8.11s 48.71%  internal/runtime/syscall.Syscall6
+     0.05s   0.3% 49.13%      7.83s 47.03%  github.com/chester-hill-solutions/stow-s3/internal/storage.readOwnedBytes
+     0.01s  0.06% 49.19%      7.62s 45.77%  internal/poll.ignoringEINTRIO (inline)
+     0.01s  0.06% 49.25%      7.61s 45.71%  github.com/chester-hill-solutions/stow-s3/internal/s3api.requestBody
+         0     0% 49.25%      7.60s 45.65%  github.com/chester-hill-solutions/stow-s3/internal/s3api.prepareRequestForAuth
+         0     0% 49.25%      7.60s 45.65%  github.com/chester-hill-solutions/stow-s3/internal/storage.BytesOf
+         0     0% 49.25%      7.59s 45.59%  syscall.Syscall
+     0.02s  0.12% 49.37%      7.46s 44.80%  net/http.(*connReader).Read
+     0.03s  0.18% 49.55%      7.44s 44.68%  net/http.(*maxBytesReader).Read
+     0.01s  0.06% 49.61%      7.43s 44.62%  net.(*conn).Read
+         0     0% 49.61%      7.42s 44.56%  net.(*netFD).Read
+     0.01s  0.06% 49.67%      7.41s 44.50%  internal/poll.(*FD).Read
+     0.03s  0.18% 49.85%      7.41s 44.50%  net/http.(*body).Read
+     0.02s  0.12% 49.97%      7.38s 44.32%  net/http.(*body).readLocked
+         0     0% 49.97%      7.35s 44.14%  syscall.Read (inline)
+     0.02s  0.12% 50.09%      7.35s 44.14%  syscall.read
+     0.01s  0.06% 50.15%      7.34s 44.08%  bufio.(*Reader).Read
+         0     0% 50.15%      7.34s 44.08%  io.(*LimitedReader).Read
+     0.02s  0.12% 50.27%      7.34s 44.08%  syscall.RawSyscall6
+         0     0% 50.27%      4.88s 29.31%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatch
+         0     0% 50.27%      4.88s 29.31%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatchObject
+         0     0% 50.27%      4.82s 28.95%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).handlePutObject
+         0     0% 50.27%      4.68s 28.11%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*StoreAdapter).PutObject
+         0     0% 50.27%      4.67s 28.05%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).PutObject
+         0     0% 50.27%      4.65s 27.93%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).putObjectLocked
+         0     0% 50.27%      4.65s 27.93%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).putObjectReaderLocked
+     0.01s  0.06% 50.33%      4.61s 27.69%  github.com/chester-hill-solutions/stow-s3/internal/storage.(*MemoryStore).PutObject
+         0     0% 50.33%      4.60s 27.63%  github.com/chester-hill-solutions/stow-s3/internal/storage.PreparePut
+         0     0% 50.33%      4.37s 26.25%  github.com/chester-hill-solutions/stow-s3/internal/storage.ETagForReader
+         0     0% 50.33%      4.14s 24.86%  crypto/md5.(*digest).Write
+         0     0% 50.33%      4.14s 24.86%  crypto/md5.Sum
+     4.14s 24.86% 75.20%      4.14s 24.86%  crypto/md5.block
+         0     0% 75.20%      4.14s 24.86%  github.com/chester-hill-solutions/stow-s3/internal/storage.ETagForBytes
+         0     0% 75.20%      2.26s 13.57%  io.Copy (inline)
+         0     0% 75.20%      2.26s 13.57%  io.copyBuffer
+         0     0% 75.20%      2.21s 13.27%  bytes.(*Reader).WriteTo
+         0     0% 75.20%      2.08s 12.49%  github.com/chester-hill-solutions/stow-s3/internal/auth.(*Verifier).Authenticate

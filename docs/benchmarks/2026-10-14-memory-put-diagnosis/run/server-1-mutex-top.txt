@@ -1,0 +1,48 @@
+File: stow-s3-profile
+Build ID: 67990ab223c39b697e4617995e4fd361102ea7d9
+Type: delay
+Time: 2026-10-14 04:38:59 UTC
+Showing nodes accounting for 101.08ms, 99.31% of 101.78ms total
+Dropped 114 nodes (cum <= 0.51ms)
+Showing top 40 nodes out of 46
+      flat  flat%   sum%        cum   cum%
+   65.71ms 64.56% 64.56%    85.04ms 83.55%  sync.(*RWMutex).Unlock
+   19.52ms 19.18% 83.74%    19.52ms 19.18%  sync.(*Mutex).Unlock (inline)
+   15.85ms 15.57% 99.31%    15.85ms 15.57%  runtime.unlock (inline)
+         0     0% 99.31%    11.39ms 11.19%  bufio.(*Reader).Read
+         0     0% 99.31%    85.42ms 83.92%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).PutObject
+         0     0% 99.31%    85.04ms 83.55%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).PutObject.deferwrap1
+         0     0% 99.31%    85.42ms 83.92%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*StoreAdapter).PutObject
+         0     0% 99.31%    97.29ms 95.59%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).ServeHTTP
+         0     0% 99.31%    85.73ms 84.23%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatch
+         0     0% 99.31%    85.73ms 84.23%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatchObject
+         0     0% 99.31%    85.73ms 84.23%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).handlePutObject
+         0     0% 99.31%    11.55ms 11.35%  github.com/chester-hill-solutions/stow-s3/internal/s3api.prepareRequestForAuth
+         0     0% 99.31%    11.55ms 11.35%  github.com/chester-hill-solutions/stow-s3/internal/s3api.requestBody
+         0     0% 99.31%    11.55ms 11.35%  github.com/chester-hill-solutions/stow-s3/internal/storage.BytesOf
+         0     0% 99.31%    11.91ms 11.70%  github.com/chester-hill-solutions/stow-s3/internal/storage.readOwnedBytes
+         0     0% 99.31%    11.41ms 11.21%  internal/poll.(*FD).Read
+         0     0% 99.31%    11.42ms 11.22%  internal/poll.ignoringEINTRIO (inline)
+         0     0% 99.31%    11.39ms 11.19%  io.(*LimitedReader).Read
+         0     0% 99.31%    11.41ms 11.21%  net.(*conn).Read
+         0     0% 99.31%    11.41ms 11.21%  net.(*netFD).Read
+         0     0% 99.31%    85.37ms 83.88%  net/http.(*Server).Serve.gowrap3
+         0     0% 99.31%    11.39ms 11.19%  net/http.(*body).Read
+         0     0% 99.31%    11.39ms 11.19%  net/http.(*body).readLocked
+         0     0% 99.31%    97.36ms 95.65%  net/http.(*conn).serve
+         0     0% 99.31%    11.41ms 11.21%  net/http.(*connReader).Read
+         0     0% 99.31%    11.39ms 11.19%  net/http.(*maxBytesReader).Read
+         0     0% 99.31%    97.29ms 95.59%  net/http.serverHandler.ServeHTTP
+         0     0% 99.31%    11.36ms 11.16%  runtime.entersyscall
+         0     0% 99.31%    11.35ms 11.15%  runtime.entersyscall_sysmon
+         0     0% 99.31%     1.27ms  1.25%  runtime.findRunnable
+         0     0% 99.31%     2.36ms  2.31%  runtime.gcBgMarkWorker
+         0     0% 99.31%     2.38ms  2.34%  runtime.gcMarkDone
+         0     0% 99.31%     1.93ms  1.90%  runtime.gcMarkTermination
+         0     0% 99.31%     1.93ms  1.90%  runtime.gcMarkTermination.func3
+         0     0% 99.31%     0.52ms  0.51%  runtime.makeslice
+         0     0% 99.31%     0.54ms  0.53%  runtime.mallocgc
+         0     0% 99.31%     0.51ms   0.5%  runtime.mallocgcLarge
+         0     0% 99.31%     1.25ms  1.23%  runtime.mcall
+         0     0% 99.31%     1.08ms  1.06%  runtime.park_m
+         0     0% 99.31%    11.36ms 11.16%  runtime.reentersyscall

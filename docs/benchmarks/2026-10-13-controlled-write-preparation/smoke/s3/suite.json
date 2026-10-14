@@ -1,0 +1,2351 @@
+{
+  "version": 1,
+  "config": {
+    "version": 1,
+    "label": "Railway paired write-preparation comparison; exploratory",
+    "warmupSeconds": 0,
+    "durationSeconds": 2,
+    "repetitions": 1,
+    "timeoutMs": 10000,
+    "sampleMs": 250,
+    "maxQueue": 8,
+    "maxBytes": 268435456,
+    "maxObjects": 4096,
+    "serverConcurrency": 128,
+    "scannerDelayMs": 2,
+    "retainedObjects": 16,
+    "soakSeconds": 0,
+    "minFreeDiskBytes": 1073741824,
+    "backends": [
+      "memory"
+    ],
+    "workloads": [
+      "put",
+      "get",
+      "quarantine"
+    ],
+    "sizes": [
+      1048576
+    ],
+    "concurrency": [
+      4
+    ],
+    "rates": [
+      0
+    ]
+  },
+  "targets": [
+    "stow-memory-before",
+    "stow-memory",
+    "stow-filesystem-before",
+    "stow-filesystem"
+  ],
+  "metadata": {
+    "generator": {
+      "recordedAt": "2026-10-14T03:20:59.999Z",
+      "cpu": "AMD EPYC 9655P 96-Core Processor",
+      "hostLogicalCpus": 48,
+      "hostMemoryBytes": 346488950784,
+      "platform": "linux",
+      "arch": "x64",
+      "release": "6.18.15+deb13-cloud-amd64",
+      "node": "v25.9.0",
+      "cgroup": {
+        "cpuMax": "400000 100000",
+        "memoryMax": "4294967296",
+        "cpuStat": "usage_usec 202777\nuser_usec 152073\nsystem_usec 50703\nnice_usec 0\nnr_periods 14\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      },
+      "mountInfo": "35140 16984 0:589 / / rw,relatime - overlay overlay rw,lowerdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313364/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313363/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313362/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313361/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313360/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313359/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313358/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313357/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313356/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313355/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313354/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313202/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313201/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313200/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313199/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/283307/fs,upperdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313365/fs,workdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313365/work,uuid=on\n35253 35140 230:4000 / /results rw,relatime - ext4 /dev/zd4000 rw,discard,stripe=8192\n35254 35140 0:2195 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n35255 35140 0:2831 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755,inode64\n35256 35140 0:2943 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs rw\n35685 35255 0:3127 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666,max=1024\n35686 35255 0:2193 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n35932 35140 0:25 /containers/storage/overlay-containers/89f66ce700e88955279f07688ed8d8ceb96942c29877c32c659bd1be3af3fc73/userdata/resolv.conf /etc/resolv.conf rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n35933 35140 0:25 /containers/storage/overlay-containers/89f66ce700e88955279f07688ed8d8ceb96942c29877c32c659bd1be3af3fc73/userdata/hosts /etc/hosts rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n35934 35255 0:1094 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=62500k,inode64\n35935 35140 0:25 /containers/storage/overlay-containers/89f66ce700e88955279f07688ed8d8ceb96942c29877c32c659bd1be3af3fc73/userdata/.containerenv /run/.containerenv rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n35942 35140 0:25 /containers/storage/overlay-containers/89f66ce700e88955279f07688ed8d8ceb96942c29877c32c659bd1be3af3fc73/userdata/hostname /etc/hostname rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n35943 35256 0:27 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot\n35947 35254 0:25 /crun/.empty-directory /proc/acpi ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n35948 35254 0:6 /null /proc/kcore ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n35949 35254 0:6 /null /proc/keys ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n35952 35254 0:6 /null /proc/timer_list ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n35971 35256 0:25 /crun/.empty-directory /sys/firmware ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n35984 35254 0:6 /null /proc/interrupts ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n35985 35254 0:2195 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n36012 35254 0:2195 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n36013 35254 0:2195 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n36015 35254 0:2195 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n36016 35254 0:2195 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw",
+      "deployment": {
+        "RAILWAY_DEPLOYMENT_ID": "c544a874-4682-4e38-93ca-b27117c8af7e",
+        "RAILWAY_REPLICA_ID": "276481e3-be9c-43cc-b576-a176b4edc60c",
+        "RAILWAY_SERVICE_ID": "83497842-c51d-420e-8ba1-181589730ad4",
+        "RAILWAY_ENVIRONMENT_ID": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411"
+      },
+      "build": {
+        "binaries": {
+          "stow-s3": "7c80ec1b79aa0d457e2c4f7e7eb680ae2a8f13bf060fef2961a86d170dca70a6",
+          "stow-s3-before": "7f09703ce8151b6e39455d0f3c9e899e75b8e7019f36a0cc0687c64ff4925f8e",
+          "embedded.test": "ff9d24a65306bd5560aa75f41a67263b182ee6c1cedf78e64271045dd3cf2b56",
+          "embedded-before.test": "d88c6666968b60ac0555fca79768ec7136907ccf1f2e75711f8dc4d0c74dae3f"
+        },
+        "variants": {
+          "specification": {
+            "scope": "Reconstructed immediately preceding write-preparation implementation; keeps usage/recovery consolidation and all earlier changes. Not the historical pre-streaming build.",
+            "afterVerificationDeployment": "6b36d5a2-38e0-4fe8-83d6-8852ef4ece07",
+            "beforePatchSha256": "f7f7a058905c3f59e0d6b14e9d74dda173120fcef20115adae1c486601a37fa5",
+            "files": [
+              {
+                "path": "internal/storage/bytes.go",
+                "afterSha256": "ce36c51a325098a9e249028787b3fb783adb3e655b4ce2901dea13995fb351d3",
+                "beforeSha256": "efb463bec5d530408a10377e5b377163afd2bb45ea3ed975681eb1340108617c"
+              },
+              {
+                "path": "internal/storage/checksum.go",
+                "afterSha256": "bc693fb9cdad92f18129837bb27d3959c73697eb4898b2481786f87fe72021f6",
+                "beforeSha256": "2bfd595b2408f411bda48154da53756ba0e1bbda88a521fe6044945db188161d"
+              },
+              {
+                "path": "internal/storage/memory.go",
+                "afterSha256": "1f96537cccacb01644a1e29e427612075d9558df9c7bced1fc1a26e28c8254fb",
+                "beforeSha256": "c830c8d14ebfe341af01d110819c9635c875ba24cc57c673504a56383d81d78d"
+              },
+              {
+                "path": "internal/storage/fs/fs_put.go",
+                "afterSha256": "dedec598b3a14543f263d66504216244bd0b9adfbbdb5335d987a9d8ad280451",
+                "beforeSha256": "afaf985f06f83e6fe110f6cfbef110b3d93ac580d7176ccfafe7fbb605ea52c1"
+              },
+              {
+                "path": "internal/storage/fs/save_requests.go",
+                "afterSha256": "7e6c283ef9986808a2cfc3d06316eccc6200316deeb9f9ae95170db19e526c5a",
+                "beforeSha256": "f6429cc5981b634e66d37d812f659d415f4ec5073021b68a4e6c088fd81fb0c5"
+              },
+              {
+                "path": "internal/storage/workspace/objects.go",
+                "afterSha256": "7a86691c3ba5d923d51fed528480e892286f67d50729360279bb221b1726fe6d",
+                "beforeSha256": "c96da5dcb8c178e22836c031dfd36117158da569aedbad4abd1344420fe5c03d"
+              },
+              {
+                "path": "internal/storage/put_body.go",
+                "afterSha256": "b3d2aa093a86ccb69fe74cb709151e59cd31b65b2f5eee3c4a7cbd9fde07303f",
+                "beforeSha256": null
+              }
+            ]
+          },
+          "variants": {
+            "after": {
+              "productionSourceSha256": "5ee635991e1c33d16a668a948279ac6f96356f8920a9a086afe1f55302632706",
+              "serverSha256": "7c80ec1b79aa0d457e2c4f7e7eb680ae2a8f13bf060fef2961a86d170dca70a6",
+              "embeddedSha256": "ff9d24a65306bd5560aa75f41a67263b182ee6c1cedf78e64271045dd3cf2b56",
+              "raceTestsPassed": true
+            },
+            "before": {
+              "productionSourceSha256": "83510190ebb4ff721eac66830f1592f416cc28e62b1b639c9fb783824aec5e6c",
+              "serverSha256": "7f09703ce8151b6e39455d0f3c9e899e75b8e7019f36a0cc0687c64ff4925f8e",
+              "embeddedSha256": "d88c6666968b60ac0555fca79768ec7136907ccf1f2e75711f8dc4d0c74dae3f",
+              "raceTestsPassed": true,
+              "excludedTests": [
+                "TestComputedChecksumSaveReplay",
+                "TestStorePreparesEmptyBody"
+              ],
+              "expectedRetryRegressionsReproduced": true
+            }
+          },
+          "go": "go version go1.25.6 linux/amd64",
+          "source": {
+            "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+            "dirtyFiles": [
+              "M Makefile",
+              " M docs/CODE_STANDARDS.md",
+              " M docs/README.md",
+              " M docs/adr/0008-workspace-backend-real-files.md",
+              " M docs/adr/README.md",
+              " M docs/api/go.md",
+              " M docs/portable-workspace-usage.md",
+              " M go.mod",
+              " M go.sum",
+              " M internal/atomicfile/atomicfile.go",
+              " M internal/runtime/adapter.go",
+              " M internal/runtime/buckets.go",
+              " M internal/runtime/instance.go",
+              " M internal/runtime/multipart.go",
+              " M internal/runtime/objects.go",
+              " M internal/runtime/save_requests.go",
+              " M internal/runtime/staged-reset_test.go",
+              " M internal/runtime/staged-writes.go",
+              " M internal/runtime/state.go",
+              " M internal/runtime/stream-writes.go",
+              " M internal/runtime/streams.go",
+              " M internal/runtime/streams_test.go",
+              " M internal/runtime/types.go",
+              " M internal/runtime/workspace_usage.go",
+              " M internal/s3api/checksum_test.go",
+              " M internal/s3api/errors.go",
+              " M internal/s3api/handlers_bucket.go",
+              " M internal/s3api/handlers_multipart.go",
+              " M internal/s3api/request.go",
+              " M internal/storage/bytes.go",
+              " M internal/storage/checksum.go",
+              " M internal/storage/fs/capacity.go",
+              " M internal/storage/fs/fs.go",
+              " M internal/storage/fs/fs_atomic.go",
+              " M internal/storage/fs/fs_copy.go",
+              " M internal/storage/fs/fs_list.go",
+              " M internal/storage/fs/fs_multipart.go",
+              " M internal/storage/fs/fs_put.go",
+              " M internal/storage/fs/fs_records.go",
+              " M internal/storage/fs/recovery_holds.go",
+              " M internal/storage/fs/save_requests.go",
+              " M internal/storage/memory.go",
+              " M internal/storage/store.go",
+              " M internal/storage/types.go",
+              " M internal/storage/util.go",
+              " M internal/storage/workspace/objects.go",
+              " M packages/stow-s3/dist/stow-runtime.wasm",
+              " M pkg/stow/filesystem.go",
+              " M pkg/stow/runtime.go",
+              " M scripts/baselines/go-quality.json",
+              " M site/build.mjs",
+              " M site/index.html",
+              " M tools/quality/main.go",
+              "?? .github/workflows/performance.yml",
+              "?? benchmark/",
+              "?? docs/adr/0020-binary-object-records.md",
+              "?? docs/benchmarks/2026-10-12-performance/",
+              "?? docs/benchmarks/2026-10-13-competitor-performance/",
+              "?? docs/benchmarks/2026-10-13-memory-performance/",
+              "?? docs/benchmarks/2026-10-13-railway-performance/",
+              "?? docs/benchmarks/2026-10-13-storage-optimization/",
+              "?? docs/benchmarks/2026-10-13-streaming-performance/",
+              "?? docs/benchmarks/2026-10-13-usage-recovery/",
+              "?? docs/benchmarks/2026-10-13-wasm-size/",
+              "?? docs/benchmarks/2026-10-13-write-preparation/",
+              "?? docs/benchmarks/performance-local.json",
+              "?? docs/benchmarks/performance-qualification.json",
+              "?? docs/benchmarks/railway-environment.json",
+              "?? docs/performance-testing.md",
+              "?? docs/railway-performance.md",
+              "?? internal/runtime/managed_usage_test.go",
+              "?? internal/runtime/stream_allocation_test.go",
+              "?? internal/runtime/stream_copy.go",
+              "?? internal/runtime/stream_performance_test.go",
+              "?? internal/runtime/usage_multipart.go",
+              "?? internal/runtime/usage_recovery.go",
+              "?? internal/runtime/usage_state.go",
+              "?? internal/runtime/usage_transitions_test.go",
+              "?? internal/storage/fs/record_codec.go",
+              "?? internal/storage/fs/record_format_test.go",
+              "?? internal/storage/fs/record_io.go",
+              "?? internal/storage/fs/record_performance_test.go",
+              "?? internal/storage/fs/recordpb/",
+              "?? internal/storage/fs/runtime_recovery_test.go",
+              "?? internal/storage/fs/save_checksum_test.go",
+              "?? internal/storage/fs/usage_revision.go",
+              "?? internal/storage/owned_reader.go",
+              "?? internal/storage/owned_reader_test.go",
+              "?? internal/storage/put_body.go",
+              "?? internal/storage/put_body_contract_test.go",
+              "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+              "?? packages/stow-s3/scripts/performance/",
+              "?? pkg/stow/filesystem_native.go",
+              "?? pkg/stow/filesystem_recovery_test.go",
+              "?? pkg/stow/filesystem_unsupported.go",
+              "?? pkg/stow/performance_benchmark_test.go",
+              "?? pkg/stow/wasm_dependencies_test.go",
+              "?? scripts/benchmark-embedded.mjs",
+              "?? scripts/performance.test.mjs",
+              "?? site/assets/benchmark-render.js",
+              "?? site/assets/benchmarks.css",
+              "?? site/assets/benchmarks.js",
+              "?? site/benchmark-data.json",
+              "?? tools/quality/generated.go",
+              "?? tools/quality/generated_test.go"
+            ],
+            "payloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+            "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+          }
+        },
+        "harnessSha256": "8bc4d0759e1e3159dbe3ba4b48b00b11affbf88532c9bcf713a0aacf566c974f",
+        "versions": {
+          "node": "25.9.0",
+          "go": "1.25.6",
+          "java": "17.0.16+8",
+          "afero": "1.15.0",
+          "sqliteDriver": "github.com/mattn/go-sqlite3@v1.14.52",
+          "rustfs": "1.0.1",
+          "rustfsPackageSha256": "fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9",
+          "s3proxy": "4.1.1",
+          "s3proxySha256": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+          "minio": "RELEASE.2025-10-15T17-29-55Z",
+          "minioSourceSha256": "be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"
+        },
+        "source": {
+          "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+          "dirtyFiles": [
+            "M Makefile",
+            " M docs/CODE_STANDARDS.md",
+            " M docs/README.md",
+            " M docs/adr/0008-workspace-backend-real-files.md",
+            " M docs/adr/README.md",
+            " M docs/api/go.md",
+            " M docs/portable-workspace-usage.md",
+            " M go.mod",
+            " M go.sum",
+            " M internal/atomicfile/atomicfile.go",
+            " M internal/runtime/adapter.go",
+            " M internal/runtime/buckets.go",
+            " M internal/runtime/instance.go",
+            " M internal/runtime/multipart.go",
+            " M internal/runtime/objects.go",
+            " M internal/runtime/save_requests.go",
+            " M internal/runtime/staged-reset_test.go",
+            " M internal/runtime/staged-writes.go",
+            " M internal/runtime/state.go",
+            " M internal/runtime/stream-writes.go",
+            " M internal/runtime/streams.go",
+            " M internal/runtime/streams_test.go",
+            " M internal/runtime/types.go",
+            " M internal/runtime/workspace_usage.go",
+            " M internal/s3api/checksum_test.go",
+            " M internal/s3api/errors.go",
+            " M internal/s3api/handlers_bucket.go",
+            " M internal/s3api/handlers_multipart.go",
+            " M internal/s3api/request.go",
+            " M internal/storage/bytes.go",
+            " M internal/storage/checksum.go",
+            " M internal/storage/fs/capacity.go",
+            " M internal/storage/fs/fs.go",
+            " M internal/storage/fs/fs_atomic.go",
+            " M internal/storage/fs/fs_copy.go",
+            " M internal/storage/fs/fs_list.go",
+            " M internal/storage/fs/fs_multipart.go",
+            " M internal/storage/fs/fs_put.go",
+            " M internal/storage/fs/fs_records.go",
+            " M internal/storage/fs/recovery_holds.go",
+            " M internal/storage/fs/save_requests.go",
+            " M internal/storage/memory.go",
+            " M internal/storage/store.go",
+            " M internal/storage/types.go",
+            " M internal/storage/util.go",
+            " M internal/storage/workspace/objects.go",
+            " M packages/stow-s3/dist/stow-runtime.wasm",
+            " M pkg/stow/filesystem.go",
+            " M pkg/stow/runtime.go",
+            " M scripts/baselines/go-quality.json",
+            " M site/build.mjs",
+            " M site/index.html",
+            " M tools/quality/main.go",
+            "?? .github/workflows/performance.yml",
+            "?? benchmark/",
+            "?? docs/adr/0020-binary-object-records.md",
+            "?? docs/benchmarks/2026-10-12-performance/",
+            "?? docs/benchmarks/2026-10-13-competitor-performance/",
+            "?? docs/benchmarks/2026-10-13-memory-performance/",
+            "?? docs/benchmarks/2026-10-13-railway-performance/",
+            "?? docs/benchmarks/2026-10-13-storage-optimization/",
+            "?? docs/benchmarks/2026-10-13-streaming-performance/",
+            "?? docs/benchmarks/2026-10-13-usage-recovery/",
+            "?? docs/benchmarks/2026-10-13-wasm-size/",
+            "?? docs/benchmarks/2026-10-13-write-preparation/",
+            "?? docs/benchmarks/performance-local.json",
+            "?? docs/benchmarks/performance-qualification.json",
+            "?? docs/benchmarks/railway-environment.json",
+            "?? docs/performance-testing.md",
+            "?? docs/railway-performance.md",
+            "?? internal/runtime/managed_usage_test.go",
+            "?? internal/runtime/stream_allocation_test.go",
+            "?? internal/runtime/stream_copy.go",
+            "?? internal/runtime/stream_performance_test.go",
+            "?? internal/runtime/usage_multipart.go",
+            "?? internal/runtime/usage_recovery.go",
+            "?? internal/runtime/usage_state.go",
+            "?? internal/runtime/usage_transitions_test.go",
+            "?? internal/storage/fs/record_codec.go",
+            "?? internal/storage/fs/record_format_test.go",
+            "?? internal/storage/fs/record_io.go",
+            "?? internal/storage/fs/record_performance_test.go",
+            "?? internal/storage/fs/recordpb/",
+            "?? internal/storage/fs/runtime_recovery_test.go",
+            "?? internal/storage/fs/save_checksum_test.go",
+            "?? internal/storage/fs/usage_revision.go",
+            "?? internal/storage/owned_reader.go",
+            "?? internal/storage/owned_reader_test.go",
+            "?? internal/storage/put_body.go",
+            "?? internal/storage/put_body_contract_test.go",
+            "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+            "?? packages/stow-s3/scripts/performance/",
+            "?? pkg/stow/filesystem_native.go",
+            "?? pkg/stow/filesystem_recovery_test.go",
+            "?? pkg/stow/filesystem_unsupported.go",
+            "?? pkg/stow/performance_benchmark_test.go",
+            "?? pkg/stow/wasm_dependencies_test.go",
+            "?? scripts/benchmark-embedded.mjs",
+            "?? scripts/performance.test.mjs",
+            "?? site/assets/benchmark-render.js",
+            "?? site/assets/benchmarks.css",
+            "?? site/assets/benchmarks.js",
+            "?? site/benchmark-data.json",
+            "?? tools/quality/generated.go",
+            "?? tools/quality/generated_test.go"
+          ],
+          "payloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+          "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+        },
+        "wasmSha256": "c81ac1e311e74fc9312ee6e88d86c2e661ef0bc70e949e495e7c309f695f2d0c",
+        "benchmarkModuleSumSha256": "6e998399e2cb4b6a03426ab446706a60e843c7b0d7a69200f9c6ed9781eba829",
+        "sdkLockfileSha256": "9bdfa3a3b9f0514dd04bab816ae7f7f915f5b6590c930e480a2ab59687a7a861"
+      }
+    },
+    "target": {
+      "recordedAt": "2026-10-14T03:21:00.004Z",
+      "cpu": "AMD EPYC 9655P 96-Core Processor",
+      "hostLogicalCpus": 48,
+      "hostMemoryBytes": 346488950784,
+      "platform": "linux",
+      "arch": "x64",
+      "release": "6.18.15+deb13-cloud-amd64",
+      "node": "v25.9.0",
+      "cgroup": {
+        "cpuMax": "200000 100000",
+        "memoryMax": "2147483648",
+        "cpuStat": "usage_usec 130533\nuser_usec 95254\nsystem_usec 35279\nnice_usec 0\nnr_periods 9\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      },
+      "mountInfo": "36995 18658 0:1824 / / rw,relatime - overlay overlay rw,lowerdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313378/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313377/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313376/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313375/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313374/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313373/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313372/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313371/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313370/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313369/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313368/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313202/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313201/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313200/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313199/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/283307/fs,upperdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313379/fs,workdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/313379/work,uuid=on\n37040 36995 230:3984 / /data rw,relatime - ext4 /dev/zd3984 rw,discard,stripe=8192\n37041 36995 0:3287 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n37042 36995 0:3324 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755,inode64\n37050 36995 0:3413 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs rw\n37070 37042 0:3462 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666,max=1024\n37071 37042 0:3284 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n37072 36995 0:25 /containers/storage/overlay-containers/b536c6987c833ca24b334abd724e2da9ca293bb822bc4c0f2a4800c8da466672/userdata/resolv.conf /etc/resolv.conf rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n37194 36995 0:25 /containers/storage/overlay-containers/b536c6987c833ca24b334abd724e2da9ca293bb822bc4c0f2a4800c8da466672/userdata/hosts /etc/hosts rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n37195 37042 0:3264 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=62500k,inode64\n37196 36995 0:25 /containers/storage/overlay-containers/b536c6987c833ca24b334abd724e2da9ca293bb822bc4c0f2a4800c8da466672/userdata/.containerenv /run/.containerenv rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n37197 36995 0:25 /containers/storage/overlay-containers/b536c6987c833ca24b334abd724e2da9ca293bb822bc4c0f2a4800c8da466672/userdata/hostname /etc/hostname rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n37198 37050 0:27 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot\n37210 37041 0:25 /crun/.empty-directory /proc/acpi ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n37211 37041 0:6 /null /proc/kcore ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n37214 37041 0:6 /null /proc/keys ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n37215 37041 0:6 /null /proc/timer_list ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n37216 37050 0:25 /crun/.empty-directory /sys/firmware ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n37259 37041 0:6 /null /proc/interrupts ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n37274 37041 0:3287 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n37280 37041 0:3287 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n37411 37041 0:3287 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n37412 37041 0:3287 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n37413 37041 0:3287 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw",
+      "deployment": {
+        "RAILWAY_DEPLOYMENT_ID": "68cce335-7eb7-4811-b3f2-a6fd122d3b71",
+        "RAILWAY_REPLICA_ID": "040fca6e-cf72-4189-9531-247194cf4259",
+        "RAILWAY_SERVICE_ID": "86625750-7c04-458f-98e2-4d7d33787535",
+        "RAILWAY_ENVIRONMENT_ID": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411"
+      },
+      "build": {
+        "binaries": {
+          "stow-s3": "7c80ec1b79aa0d457e2c4f7e7eb680ae2a8f13bf060fef2961a86d170dca70a6",
+          "stow-s3-before": "7f09703ce8151b6e39455d0f3c9e899e75b8e7019f36a0cc0687c64ff4925f8e",
+          "embedded.test": "ff9d24a65306bd5560aa75f41a67263b182ee6c1cedf78e64271045dd3cf2b56",
+          "embedded-before.test": "d88c6666968b60ac0555fca79768ec7136907ccf1f2e75711f8dc4d0c74dae3f"
+        },
+        "variants": {
+          "specification": {
+            "scope": "Reconstructed immediately preceding write-preparation implementation; keeps usage/recovery consolidation and all earlier changes. Not the historical pre-streaming build.",
+            "afterVerificationDeployment": "6b36d5a2-38e0-4fe8-83d6-8852ef4ece07",
+            "beforePatchSha256": "f7f7a058905c3f59e0d6b14e9d74dda173120fcef20115adae1c486601a37fa5",
+            "files": [
+              {
+                "path": "internal/storage/bytes.go",
+                "afterSha256": "ce36c51a325098a9e249028787b3fb783adb3e655b4ce2901dea13995fb351d3",
+                "beforeSha256": "efb463bec5d530408a10377e5b377163afd2bb45ea3ed975681eb1340108617c"
+              },
+              {
+                "path": "internal/storage/checksum.go",
+                "afterSha256": "bc693fb9cdad92f18129837bb27d3959c73697eb4898b2481786f87fe72021f6",
+                "beforeSha256": "2bfd595b2408f411bda48154da53756ba0e1bbda88a521fe6044945db188161d"
+              },
+              {
+                "path": "internal/storage/memory.go",
+                "afterSha256": "1f96537cccacb01644a1e29e427612075d9558df9c7bced1fc1a26e28c8254fb",
+                "beforeSha256": "c830c8d14ebfe341af01d110819c9635c875ba24cc57c673504a56383d81d78d"
+              },
+              {
+                "path": "internal/storage/fs/fs_put.go",
+                "afterSha256": "dedec598b3a14543f263d66504216244bd0b9adfbbdb5335d987a9d8ad280451",
+                "beforeSha256": "afaf985f06f83e6fe110f6cfbef110b3d93ac580d7176ccfafe7fbb605ea52c1"
+              },
+              {
+                "path": "internal/storage/fs/save_requests.go",
+                "afterSha256": "7e6c283ef9986808a2cfc3d06316eccc6200316deeb9f9ae95170db19e526c5a",
+                "beforeSha256": "f6429cc5981b634e66d37d812f659d415f4ec5073021b68a4e6c088fd81fb0c5"
+              },
+              {
+                "path": "internal/storage/workspace/objects.go",
+                "afterSha256": "7a86691c3ba5d923d51fed528480e892286f67d50729360279bb221b1726fe6d",
+                "beforeSha256": "c96da5dcb8c178e22836c031dfd36117158da569aedbad4abd1344420fe5c03d"
+              },
+              {
+                "path": "internal/storage/put_body.go",
+                "afterSha256": "b3d2aa093a86ccb69fe74cb709151e59cd31b65b2f5eee3c4a7cbd9fde07303f",
+                "beforeSha256": null
+              }
+            ]
+          },
+          "variants": {
+            "after": {
+              "productionSourceSha256": "5ee635991e1c33d16a668a948279ac6f96356f8920a9a086afe1f55302632706",
+              "serverSha256": "7c80ec1b79aa0d457e2c4f7e7eb680ae2a8f13bf060fef2961a86d170dca70a6",
+              "embeddedSha256": "ff9d24a65306bd5560aa75f41a67263b182ee6c1cedf78e64271045dd3cf2b56",
+              "raceTestsPassed": true
+            },
+            "before": {
+              "productionSourceSha256": "83510190ebb4ff721eac66830f1592f416cc28e62b1b639c9fb783824aec5e6c",
+              "serverSha256": "7f09703ce8151b6e39455d0f3c9e899e75b8e7019f36a0cc0687c64ff4925f8e",
+              "embeddedSha256": "d88c6666968b60ac0555fca79768ec7136907ccf1f2e75711f8dc4d0c74dae3f",
+              "raceTestsPassed": true,
+              "excludedTests": [
+                "TestComputedChecksumSaveReplay",
+                "TestStorePreparesEmptyBody"
+              ],
+              "expectedRetryRegressionsReproduced": true
+            }
+          },
+          "go": "go version go1.25.6 linux/amd64",
+          "source": {
+            "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+            "dirtyFiles": [
+              "M Makefile",
+              " M docs/CODE_STANDARDS.md",
+              " M docs/README.md",
+              " M docs/adr/0008-workspace-backend-real-files.md",
+              " M docs/adr/README.md",
+              " M docs/api/go.md",
+              " M docs/portable-workspace-usage.md",
+              " M go.mod",
+              " M go.sum",
+              " M internal/atomicfile/atomicfile.go",
+              " M internal/runtime/adapter.go",
+              " M internal/runtime/buckets.go",
+              " M internal/runtime/instance.go",
+              " M internal/runtime/multipart.go",
+              " M internal/runtime/objects.go",
+              " M internal/runtime/save_requests.go",
+              " M internal/runtime/staged-reset_test.go",
+              " M internal/runtime/staged-writes.go",
+              " M internal/runtime/state.go",
+              " M internal/runtime/stream-writes.go",
+              " M internal/runtime/streams.go",
+              " M internal/runtime/streams_test.go",
+              " M internal/runtime/types.go",
+              " M internal/runtime/workspace_usage.go",
+              " M internal/s3api/checksum_test.go",
+              " M internal/s3api/errors.go",
+              " M internal/s3api/handlers_bucket.go",
+              " M internal/s3api/handlers_multipart.go",
+              " M internal/s3api/request.go",
+              " M internal/storage/bytes.go",
+              " M internal/storage/checksum.go",
+              " M internal/storage/fs/capacity.go",
+              " M internal/storage/fs/fs.go",
+              " M internal/storage/fs/fs_atomic.go",
+              " M internal/storage/fs/fs_copy.go",
+              " M internal/storage/fs/fs_list.go",
+              " M internal/storage/fs/fs_multipart.go",
+              " M internal/storage/fs/fs_put.go",
+              " M internal/storage/fs/fs_records.go",
+              " M internal/storage/fs/recovery_holds.go",
+              " M internal/storage/fs/save_requests.go",
+              " M internal/storage/memory.go",
+              " M internal/storage/store.go",
+              " M internal/storage/types.go",
+              " M internal/storage/util.go",
+              " M internal/storage/workspace/objects.go",
+              " M packages/stow-s3/dist/stow-runtime.wasm",
+              " M pkg/stow/filesystem.go",
+              " M pkg/stow/runtime.go",
+              " M scripts/baselines/go-quality.json",
+              " M site/build.mjs",
+              " M site/index.html",
+              " M tools/quality/main.go",
+              "?? .github/workflows/performance.yml",
+              "?? benchmark/",
+              "?? docs/adr/0020-binary-object-records.md",
+              "?? docs/benchmarks/2026-10-12-performance/",
+              "?? docs/benchmarks/2026-10-13-competitor-performance/",
+              "?? docs/benchmarks/2026-10-13-memory-performance/",
+              "?? docs/benchmarks/2026-10-13-railway-performance/",
+              "?? docs/benchmarks/2026-10-13-storage-optimization/",
+              "?? docs/benchmarks/2026-10-13-streaming-performance/",
+              "?? docs/benchmarks/2026-10-13-usage-recovery/",
+              "?? docs/benchmarks/2026-10-13-wasm-size/",
+              "?? docs/benchmarks/2026-10-13-write-preparation/",
+              "?? docs/benchmarks/performance-local.json",
+              "?? docs/benchmarks/performance-qualification.json",
+              "?? docs/benchmarks/railway-environment.json",
+              "?? docs/performance-testing.md",
+              "?? docs/railway-performance.md",
+              "?? internal/runtime/managed_usage_test.go",
+              "?? internal/runtime/stream_allocation_test.go",
+              "?? internal/runtime/stream_copy.go",
+              "?? internal/runtime/stream_performance_test.go",
+              "?? internal/runtime/usage_multipart.go",
+              "?? internal/runtime/usage_recovery.go",
+              "?? internal/runtime/usage_state.go",
+              "?? internal/runtime/usage_transitions_test.go",
+              "?? internal/storage/fs/record_codec.go",
+              "?? internal/storage/fs/record_format_test.go",
+              "?? internal/storage/fs/record_io.go",
+              "?? internal/storage/fs/record_performance_test.go",
+              "?? internal/storage/fs/recordpb/",
+              "?? internal/storage/fs/runtime_recovery_test.go",
+              "?? internal/storage/fs/save_checksum_test.go",
+              "?? internal/storage/fs/usage_revision.go",
+              "?? internal/storage/owned_reader.go",
+              "?? internal/storage/owned_reader_test.go",
+              "?? internal/storage/put_body.go",
+              "?? internal/storage/put_body_contract_test.go",
+              "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+              "?? packages/stow-s3/scripts/performance/",
+              "?? pkg/stow/filesystem_native.go",
+              "?? pkg/stow/filesystem_recovery_test.go",
+              "?? pkg/stow/filesystem_unsupported.go",
+              "?? pkg/stow/performance_benchmark_test.go",
+              "?? pkg/stow/wasm_dependencies_test.go",
+              "?? scripts/benchmark-embedded.mjs",
+              "?? scripts/performance.test.mjs",
+              "?? site/assets/benchmark-render.js",
+              "?? site/assets/benchmarks.css",
+              "?? site/assets/benchmarks.js",
+              "?? site/benchmark-data.json",
+              "?? tools/quality/generated.go",
+              "?? tools/quality/generated_test.go"
+            ],
+            "payloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+            "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+          }
+        },
+        "harnessSha256": "8bc4d0759e1e3159dbe3ba4b48b00b11affbf88532c9bcf713a0aacf566c974f",
+        "versions": {
+          "node": "25.9.0",
+          "go": "1.25.6",
+          "java": "17.0.16+8",
+          "afero": "1.15.0",
+          "sqliteDriver": "github.com/mattn/go-sqlite3@v1.14.52",
+          "rustfs": "1.0.1",
+          "rustfsPackageSha256": "fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9",
+          "s3proxy": "4.1.1",
+          "s3proxySha256": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+          "minio": "RELEASE.2025-10-15T17-29-55Z",
+          "minioSourceSha256": "be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"
+        },
+        "source": {
+          "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+          "dirtyFiles": [
+            "M Makefile",
+            " M docs/CODE_STANDARDS.md",
+            " M docs/README.md",
+            " M docs/adr/0008-workspace-backend-real-files.md",
+            " M docs/adr/README.md",
+            " M docs/api/go.md",
+            " M docs/portable-workspace-usage.md",
+            " M go.mod",
+            " M go.sum",
+            " M internal/atomicfile/atomicfile.go",
+            " M internal/runtime/adapter.go",
+            " M internal/runtime/buckets.go",
+            " M internal/runtime/instance.go",
+            " M internal/runtime/multipart.go",
+            " M internal/runtime/objects.go",
+            " M internal/runtime/save_requests.go",
+            " M internal/runtime/staged-reset_test.go",
+            " M internal/runtime/staged-writes.go",
+            " M internal/runtime/state.go",
+            " M internal/runtime/stream-writes.go",
+            " M internal/runtime/streams.go",
+            " M internal/runtime/streams_test.go",
+            " M internal/runtime/types.go",
+            " M internal/runtime/workspace_usage.go",
+            " M internal/s3api/checksum_test.go",
+            " M internal/s3api/errors.go",
+            " M internal/s3api/handlers_bucket.go",
+            " M internal/s3api/handlers_multipart.go",
+            " M internal/s3api/request.go",
+            " M internal/storage/bytes.go",
+            " M internal/storage/checksum.go",
+            " M internal/storage/fs/capacity.go",
+            " M internal/storage/fs/fs.go",
+            " M internal/storage/fs/fs_atomic.go",
+            " M internal/storage/fs/fs_copy.go",
+            " M internal/storage/fs/fs_list.go",
+            " M internal/storage/fs/fs_multipart.go",
+            " M internal/storage/fs/fs_put.go",
+            " M internal/storage/fs/fs_records.go",
+            " M internal/storage/fs/recovery_holds.go",
+            " M internal/storage/fs/save_requests.go",
+            " M internal/storage/memory.go",
+            " M internal/storage/store.go",
+            " M internal/storage/types.go",
+            " M internal/storage/util.go",
+            " M internal/storage/workspace/objects.go",
+            " M packages/stow-s3/dist/stow-runtime.wasm",
+            " M pkg/stow/filesystem.go",
+            " M pkg/stow/runtime.go",
+            " M scripts/baselines/go-quality.json",
+            " M site/build.mjs",
+            " M site/index.html",
+            " M tools/quality/main.go",
+            "?? .github/workflows/performance.yml",
+            "?? benchmark/",
+            "?? docs/adr/0020-binary-object-records.md",
+            "?? docs/benchmarks/2026-10-12-performance/",
+            "?? docs/benchmarks/2026-10-13-competitor-performance/",
+            "?? docs/benchmarks/2026-10-13-memory-performance/",
+            "?? docs/benchmarks/2026-10-13-railway-performance/",
+            "?? docs/benchmarks/2026-10-13-storage-optimization/",
+            "?? docs/benchmarks/2026-10-13-streaming-performance/",
+            "?? docs/benchmarks/2026-10-13-usage-recovery/",
+            "?? docs/benchmarks/2026-10-13-wasm-size/",
+            "?? docs/benchmarks/2026-10-13-write-preparation/",
+            "?? docs/benchmarks/performance-local.json",
+            "?? docs/benchmarks/performance-qualification.json",
+            "?? docs/benchmarks/railway-environment.json",
+            "?? docs/performance-testing.md",
+            "?? docs/railway-performance.md",
+            "?? internal/runtime/managed_usage_test.go",
+            "?? internal/runtime/stream_allocation_test.go",
+            "?? internal/runtime/stream_copy.go",
+            "?? internal/runtime/stream_performance_test.go",
+            "?? internal/runtime/usage_multipart.go",
+            "?? internal/runtime/usage_recovery.go",
+            "?? internal/runtime/usage_state.go",
+            "?? internal/runtime/usage_transitions_test.go",
+            "?? internal/storage/fs/record_codec.go",
+            "?? internal/storage/fs/record_format_test.go",
+            "?? internal/storage/fs/record_io.go",
+            "?? internal/storage/fs/record_performance_test.go",
+            "?? internal/storage/fs/recordpb/",
+            "?? internal/storage/fs/runtime_recovery_test.go",
+            "?? internal/storage/fs/save_checksum_test.go",
+            "?? internal/storage/fs/usage_revision.go",
+            "?? internal/storage/owned_reader.go",
+            "?? internal/storage/owned_reader_test.go",
+            "?? internal/storage/put_body.go",
+            "?? internal/storage/put_body_contract_test.go",
+            "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+            "?? packages/stow-s3/scripts/performance/",
+            "?? pkg/stow/filesystem_native.go",
+            "?? pkg/stow/filesystem_recovery_test.go",
+            "?? pkg/stow/filesystem_unsupported.go",
+            "?? pkg/stow/performance_benchmark_test.go",
+            "?? pkg/stow/wasm_dependencies_test.go",
+            "?? scripts/benchmark-embedded.mjs",
+            "?? scripts/performance.test.mjs",
+            "?? site/assets/benchmark-render.js",
+            "?? site/assets/benchmarks.css",
+            "?? site/assets/benchmarks.js",
+            "?? site/benchmark-data.json",
+            "?? tools/quality/generated.go",
+            "?? tools/quality/generated_test.go"
+          ],
+          "payloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+          "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+        },
+        "wasmSha256": "c81ac1e311e74fc9312ee6e88d86c2e661ef0bc70e949e495e7c309f695f2d0c",
+        "benchmarkModuleSumSha256": "6e998399e2cb4b6a03426ab446706a60e843c7b0d7a69200f9c6ed9781eba829",
+        "sdkLockfileSha256": "9bdfa3a3b9f0514dd04bab816ae7f7f915f5b6590c930e480a2ab59687a7a861"
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "put",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory-before"
+      },
+      "startupMs": 34.761988999991445,
+      "firstWriteMs": 42.17766099999426,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 360,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 360,
+        "windowSuccessful": 356,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 6.011,
+        "filesPerSecond": 178,
+        "responseLatencyMs": {
+          "samples": 360,
+          "mean": 22.263,
+          "p50": 18.052,
+          "p95": 37.698,
+          "p99": 59.581,
+          "max": 76.48
+        },
+        "serviceLatencyMs": {
+          "samples": 360,
+          "mean": 22.261,
+          "p50": 18.052,
+          "p95": 37.698,
+          "p99": 59.581,
+          "max": 76.48
+        },
+        "queueWaitMs": {
+          "samples": 360,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.012,
+          "max": 0.067
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0188849710000003,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 66736128,
+        "serverHighWaterRssBytes": 66801664,
+        "serverAverageCpuPercent": 89.65344861146127,
+        "generatorPeakSampledRssBytes": 154152960,
+        "generatorCpuSeconds": 2.124288,
+        "generatorEventLoopDelayMs": {
+          "mean": 29.31663811764706,
+          "max": 39.649279
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 360,
+              "mean": 21.741,
+              "p50": 17.521,
+              "p95": 36.956,
+              "p99": 58.991,
+              "max": 75.972
+            },
+            "successful": 360,
+            "failed": 0,
+            "windowSuccessful": 356,
+            "windowFailed": 0,
+            "windowBytes": 373293056,
+            "successfulBytes": 377487360,
+            "requestsPerSecond": 178,
+            "payloadMiBPerSecond": 178,
+            "completedAttemptsPerSecond": 178
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 20,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 0,
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "put",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory"
+      },
+      "startupMs": 27.056958999979543,
+      "firstWriteMs": 39.08262299999478,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 348,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 348,
+        "windowSuccessful": 344,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 10.146,
+        "filesPerSecond": 172,
+        "responseLatencyMs": {
+          "samples": 348,
+          "mean": 23.065,
+          "p50": 18.415,
+          "p95": 36.956,
+          "p99": 57.257,
+          "max": 66.446
+        },
+        "serviceLatencyMs": {
+          "samples": 348,
+          "mean": 23.064,
+          "p50": 18.415,
+          "p95": 36.956,
+          "p99": 57.257,
+          "max": 66.445
+        },
+        "queueWaitMs": {
+          "samples": 348,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.003,
+          "max": 0.034
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.022961599,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 67207168,
+        "serverHighWaterRssBytes": 68276224,
+        "serverAverageCpuPercent": 88.97845618472367,
+        "generatorPeakSampledRssBytes": 160051200,
+        "generatorCpuSeconds": 2.099247,
+        "generatorEventLoopDelayMs": {
+          "mean": 32.14263329032258,
+          "max": 39.157759
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 348,
+              "mean": 22.548,
+              "p50": 17.873,
+              "p95": 36.59,
+              "p99": 56.69,
+              "max": 65.956
+            },
+            "successful": 348,
+            "failed": 0,
+            "windowSuccessful": 344,
+            "windowFailed": 0,
+            "windowBytes": 360710144,
+            "successfulBytes": 364904448,
+            "requestsPerSecond": 172,
+            "payloadMiBPerSecond": 172,
+            "completedAttemptsPerSecond": 172
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 20,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 1,
+      "rawFile": "stow-memory-put-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "put",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem-before"
+      },
+      "startupMs": 27.28654600001755,
+      "firstWriteMs": 40.95936400000937,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 145,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 145,
+        "windowSuccessful": 141,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 54.904,
+        "filesPerSecond": 70.5,
+        "responseLatencyMs": {
+          "samples": 145,
+          "mean": 56.319,
+          "p50": 63.879,
+          "p95": 83.568,
+          "p99": 111.522,
+          "max": 159.98
+        },
+        "serviceLatencyMs": {
+          "samples": 145,
+          "mean": 56.318,
+          "p50": 63.879,
+          "p95": 83.568,
+          "p99": 111.522,
+          "max": 159.979
+        },
+        "queueWaitMs": {
+          "samples": 145,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.003,
+          "max": 0.006
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.059786546,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 29683712,
+        "serverHighWaterRssBytes": 29683712,
+        "serverAverageCpuPercent": 41.26641188382633,
+        "generatorPeakSampledRssBytes": 161624064,
+        "generatorCpuSeconds": 0.926867,
+        "generatorEventLoopDelayMs": {
+          "mean": 21.58940595744681,
+          "max": 31.997951
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 152637440,
+        "minimumSampledDiskAvailableBytes": 4913532928,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 145,
+              "mean": 55.787,
+              "p50": 63.247,
+              "p95": 83.568,
+              "p99": 111.522,
+              "max": 159.409
+            },
+            "successful": 145,
+            "failed": 0,
+            "windowSuccessful": 141,
+            "windowFailed": 0,
+            "windowBytes": 147849216,
+            "successfulBytes": 152043520,
+            "requestsPerSecond": 70.5,
+            "payloadMiBPerSecond": 70.5,
+            "completedAttemptsPerSecond": 70.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 20,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 2,
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "put",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem"
+      },
+      "startupMs": 26.54411300001084,
+      "firstWriteMs": 39.644137000024784,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 145,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 145,
+        "windowSuccessful": 141,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 28.523,
+        "filesPerSecond": 70.5,
+        "responseLatencyMs": {
+          "samples": 145,
+          "mean": 55.572,
+          "p50": 48.829,
+          "p95": 86.961,
+          "p99": 91.397,
+          "max": 102.821
+        },
+        "serviceLatencyMs": {
+          "samples": 145,
+          "mean": 55.571,
+          "p50": 48.829,
+          "p95": 86.961,
+          "p99": 91.397,
+          "max": 102.82
+        },
+        "queueWaitMs": {
+          "samples": 145,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.002,
+          "max": 0.005
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0355795069999996,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 27832320,
+        "serverHighWaterRssBytes": 27832320,
+        "serverAverageCpuPercent": 40.77462939402643,
+        "generatorPeakSampledRssBytes": 172634112,
+        "generatorCpuSeconds": 0.893091,
+        "generatorEventLoopDelayMs": {
+          "mean": 21.137170863157895,
+          "max": 26.738687
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 152637440,
+        "minimumSampledDiskAvailableBytes": 4913532928,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 145,
+              "mean": 55.043,
+              "p50": 48.346,
+              "p95": 86.1,
+              "p99": 90.492,
+              "max": 102.293
+            },
+            "successful": 145,
+            "failed": 0,
+            "windowSuccessful": 141,
+            "windowFailed": 0,
+            "windowBytes": 147849216,
+            "successfulBytes": 152043520,
+            "requestsPerSecond": 70.5,
+            "payloadMiBPerSecond": 70.5,
+            "completedAttemptsPerSecond": 70.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 20,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 3,
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "get",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory-before"
+      },
+      "startupMs": 18.466958000004524,
+      "firstWriteMs": 22.519946000014897,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 779,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 779,
+        "windowSuccessful": 775,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 7.701,
+        "filesPerSecond": 387.5,
+        "responseLatencyMs": {
+          "samples": 779,
+          "mean": 10.288,
+          "p50": 7.671,
+          "p95": 18.052,
+          "p99": 88.709,
+          "max": 124.229
+        },
+        "serviceLatencyMs": {
+          "samples": 779,
+          "mean": 10.287,
+          "p50": 7.671,
+          "p95": 18.052,
+          "p99": 88.709,
+          "max": 124.228
+        },
+        "queueWaitMs": {
+          "samples": 779,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.049
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0162829299999996,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 47177728,
+        "serverHighWaterRssBytes": 47177728,
+        "serverAverageCpuPercent": 93.24088261759972,
+        "generatorPeakSampledRssBytes": 229732352,
+        "generatorCpuSeconds": 3.165528,
+        "generatorEventLoopDelayMs": {
+          "mean": 22.566353454545453,
+          "max": 29.261823
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 779,
+              "mean": 10.275,
+              "p50": 7.671,
+              "p95": 17.873,
+              "p99": 88.709,
+              "max": 124.22
+            },
+            "successful": 779,
+            "failed": 0,
+            "windowSuccessful": 775,
+            "windowFailed": 0,
+            "windowBytes": 812646400,
+            "successfulBytes": 816840704,
+            "requestsPerSecond": 387.5,
+            "payloadMiBPerSecond": 387.5,
+            "completedAttemptsPerSecond": 387.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 0,
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "get",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory"
+      },
+      "startupMs": 16.78013500000816,
+      "firstWriteMs": 21.56867500001681,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 881,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 881,
+        "windowSuccessful": 877,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 7.729,
+        "filesPerSecond": 438.5,
+        "responseLatencyMs": {
+          "samples": 881,
+          "mean": 9.107,
+          "p50": 7.904,
+          "p95": 16.838,
+          "p99": 23.151,
+          "max": 94.123
+        },
+        "serviceLatencyMs": {
+          "samples": 881,
+          "mean": 9.106,
+          "p50": 7.904,
+          "p95": 16.838,
+          "p99": 23.151,
+          "max": 94.122
+        },
+        "queueWaitMs": {
+          "samples": 881,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.043
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0215721429999993,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 45105152,
+        "serverHighWaterRssBytes": 45105152,
+        "serverAverageCpuPercent": 118.71948316612715,
+        "generatorPeakSampledRssBytes": 237289472,
+        "generatorCpuSeconds": 3.051516,
+        "generatorEventLoopDelayMs": {
+          "mean": 22.636916363636363,
+          "max": 28.704767
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 881,
+              "mean": 9.096,
+              "p50": 7.904,
+              "p95": 16.838,
+              "p99": 23.151,
+              "max": 94.112
+            },
+            "successful": 881,
+            "failed": 0,
+            "windowSuccessful": 877,
+            "windowFailed": 0,
+            "windowBytes": 919601152,
+            "successfulBytes": 923795456,
+            "requestsPerSecond": 438.5,
+            "payloadMiBPerSecond": 438.5,
+            "completedAttemptsPerSecond": 438.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 1,
+      "rawFile": "stow-memory-get-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "get",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem-before"
+      },
+      "startupMs": 26.854240999993635,
+      "firstWriteMs": 41.62186699997983,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 723,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 723,
+        "windowSuccessful": 719,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 5.271,
+        "filesPerSecond": 359.5,
+        "responseLatencyMs": {
+          "samples": 723,
+          "mean": 11.078,
+          "p50": 10.136,
+          "p95": 19.548,
+          "p99": 26.878,
+          "max": 64.708
+        },
+        "serviceLatencyMs": {
+          "samples": 723,
+          "mean": 11.077,
+          "p50": 10.136,
+          "p95": 19.548,
+          "p99": 26.878,
+          "max": 64.708
+        },
+        "queueWaitMs": {
+          "samples": 723,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.003,
+          "max": 0.017
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.015496796999998,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 20312064,
+        "serverHighWaterRssBytes": 20312064,
+        "serverAverageCpuPercent": 97.24649540090546,
+        "generatorPeakSampledRssBytes": 219017216,
+        "generatorCpuSeconds": 3.030035,
+        "generatorEventLoopDelayMs": {
+          "mean": 23.005612651162792,
+          "max": 28.737535
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4918796288,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 723,
+              "mean": 11.065,
+              "p50": 10.136,
+              "p95": 19.548,
+              "p99": 26.878,
+              "max": 64.689
+            },
+            "successful": 723,
+            "failed": 0,
+            "windowSuccessful": 719,
+            "windowFailed": 0,
+            "windowBytes": 753926144,
+            "successfulBytes": 758120448,
+            "requestsPerSecond": 359.5,
+            "payloadMiBPerSecond": 359.5,
+            "completedAttemptsPerSecond": 359.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 2,
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "get",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem"
+      },
+      "startupMs": 33.06986499999766,
+      "firstWriteMs": 45.9821809999994,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 884,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 884,
+        "windowSuccessful": 880,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 4.829,
+        "filesPerSecond": 440,
+        "responseLatencyMs": {
+          "samples": 884,
+          "mean": 9.059,
+          "p50": 7.671,
+          "p95": 17.521,
+          "p99": 21.168,
+          "max": 76.763
+        },
+        "serviceLatencyMs": {
+          "samples": 884,
+          "mean": 9.059,
+          "p50": 7.671,
+          "p95": 17.521,
+          "p99": 21.168,
+          "max": 76.763
+        },
+        "queueWaitMs": {
+          "samples": 884,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.002,
+          "max": 0.01
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0197233430000017,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 21323776,
+        "serverHighWaterRssBytes": 22753280,
+        "serverAverageCpuPercent": 123.28421160402452,
+        "generatorPeakSampledRssBytes": 243204096,
+        "generatorCpuSeconds": 2.928901,
+        "generatorEventLoopDelayMs": {
+          "mean": 23.806938987951806,
+          "max": 38.830079
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4918796288,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 884,
+              "mean": 9.048,
+              "p50": 7.671,
+              "p95": 17.521,
+              "p99": 21.168,
+              "max": 76.759
+            },
+            "successful": 884,
+            "failed": 0,
+            "windowSuccessful": 880,
+            "windowFailed": 0,
+            "windowBytes": 922746880,
+            "successfulBytes": 926941184,
+            "requestsPerSecond": 440,
+            "payloadMiBPerSecond": 440,
+            "completedAttemptsPerSecond": 440
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 3,
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory-before"
+      },
+      "startupMs": 21.976062000001548,
+      "firstWriteMs": 30.477562999993097,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 199,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 199,
+        "windowSuccessful": 195,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 9.419,
+        "filesPerSecond": 97.5,
+        "responseLatencyMs": {
+          "samples": 199,
+          "mean": 40.292,
+          "p50": 39.229,
+          "p95": 53.404,
+          "p99": 70.563,
+          "max": 74.097
+        },
+        "serviceLatencyMs": {
+          "samples": 199,
+          "mean": 40.291,
+          "p50": 39.229,
+          "p95": 53.404,
+          "p99": 70.563,
+          "max": 74.097
+        },
+        "queueWaitMs": {
+          "samples": 199,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.002,
+          "max": 0.005
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.015391578999999,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 62300160,
+        "serverHighWaterRssBytes": 63012864,
+        "serverAverageCpuPercent": 79.38903866978997,
+        "generatorPeakSampledRssBytes": 207192064,
+        "generatorCpuSeconds": 2.689824,
+        "generatorEventLoopDelayMs": {
+          "mean": 22.39785890909091,
+          "max": 32.718847
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 199,
+              "mean": 10.788,
+              "p50": 9.549,
+              "p95": 18.233,
+              "p99": 32.471,
+              "max": 32.818
+            },
+            "successful": 199,
+            "failed": 0,
+            "windowSuccessful": 198,
+            "windowFailed": 0,
+            "windowBytes": 207618048,
+            "successfulBytes": 208666624,
+            "requestsPerSecond": 99,
+            "payloadMiBPerSecond": 99,
+            "completedAttemptsPerSecond": 99
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 199,
+              "mean": 10.526,
+              "p50": 10.136,
+              "p95": 19.354,
+              "p99": 23.852,
+              "max": 34.883
+            },
+            "successful": 199,
+            "failed": 0,
+            "windowSuccessful": 196,
+            "windowFailed": 0,
+            "windowBytes": 205520896,
+            "successfulBytes": 208666624,
+            "requestsPerSecond": 98,
+            "payloadMiBPerSecond": 98,
+            "completedAttemptsPerSecond": 98
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 199,
+              "mean": 6.126,
+              "p50": 5.579,
+              "p95": 12.743,
+              "p99": 17.006,
+              "max": 17.806
+            },
+            "successful": 199,
+            "failed": 0,
+            "windowSuccessful": 196,
+            "windowFailed": 0,
+            "windowBytes": 20580,
+            "successfulBytes": 20895,
+            "requestsPerSecond": 98,
+            "payloadMiBPerSecond": 0.01,
+            "completedAttemptsPerSecond": 98
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 398,
+              "mean": 3.866,
+              "p50": 2.442,
+              "p95": 9.838,
+              "p99": 15.395,
+              "max": 16.548
+            },
+            "successful": 398,
+            "failed": 0,
+            "windowSuccessful": 391,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 195.5,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 195.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 0,
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory"
+      },
+      "startupMs": 16.68253600000753,
+      "firstWriteMs": 19.716365000000224,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 203,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 203,
+        "windowSuccessful": 199,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 5.196,
+        "filesPerSecond": 99.5,
+        "responseLatencyMs": {
+          "samples": 203,
+          "mean": 39.446,
+          "p50": 37.698,
+          "p95": 64.518,
+          "p99": 77.173,
+          "max": 79.41
+        },
+        "serviceLatencyMs": {
+          "samples": 203,
+          "mean": 39.445,
+          "p50": 37.698,
+          "p95": 64.518,
+          "p99": 77.173,
+          "max": 79.409
+        },
+        "queueWaitMs": {
+          "samples": 203,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.002,
+          "max": 0.006
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0182857979999973,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 66117632,
+        "serverHighWaterRssBytes": 66117632,
+        "serverAverageCpuPercent": 75.3114351548344,
+        "generatorPeakSampledRssBytes": 209551360,
+        "generatorCpuSeconds": 2.589492,
+        "generatorEventLoopDelayMs": {
+          "mean": 22.488715636363636,
+          "max": 31.145983
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 203,
+              "mean": 10.123,
+              "p50": 8.818,
+              "p95": 19.163,
+              "p99": 22.248,
+              "max": 25.436
+            },
+            "successful": 203,
+            "failed": 0,
+            "windowSuccessful": 203,
+            "windowFailed": 0,
+            "windowBytes": 212860928,
+            "successfulBytes": 212860928,
+            "requestsPerSecond": 101.5,
+            "payloadMiBPerSecond": 101.5,
+            "completedAttemptsPerSecond": 101.5
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 203,
+              "mean": 12.767,
+              "p50": 10.237,
+              "p95": 37.698,
+              "p99": 44.647,
+              "max": 45.921
+            },
+            "successful": 203,
+            "failed": 0,
+            "windowSuccessful": 202,
+            "windowFailed": 0,
+            "windowBytes": 211812352,
+            "successfulBytes": 212860928,
+            "requestsPerSecond": 101,
+            "payloadMiBPerSecond": 101,
+            "completedAttemptsPerSecond": 101
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 203,
+              "mean": 4.799,
+              "p50": 3.195,
+              "p95": 11.422,
+              "p99": 16.18,
+              "max": 18.44
+            },
+            "successful": 203,
+            "failed": 0,
+            "windowSuccessful": 201,
+            "windowFailed": 0,
+            "windowBytes": 21105,
+            "successfulBytes": 21315,
+            "requestsPerSecond": 100.5,
+            "payloadMiBPerSecond": 0.01,
+            "completedAttemptsPerSecond": 100.5
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 406,
+              "mean": 3.498,
+              "p50": 2.301,
+              "p95": 8.906,
+              "p99": 12.492,
+              "max": 19.233
+            },
+            "successful": 406,
+            "failed": 0,
+            "windowSuccessful": 399,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 199.5,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 199.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 1,
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem-before"
+      },
+      "startupMs": 26.541943000018364,
+      "firstWriteMs": 39.76162500001374,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 105,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 105,
+        "windowSuccessful": 101,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 34.359,
+        "filesPerSecond": 50.5,
+        "responseLatencyMs": {
+          "samples": 105,
+          "mean": 77.001,
+          "p50": 75.653,
+          "p95": 112.637,
+          "p99": 119.567,
+          "max": 121.135
+        },
+        "serviceLatencyMs": {
+          "samples": 105,
+          "mean": 77,
+          "p50": 75.653,
+          "p95": 112.637,
+          "p99": 119.567,
+          "max": 121.135
+        },
+        "queueWaitMs": {
+          "samples": 105,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.003,
+          "max": 0.005
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0402804499999982,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 26157056,
+        "serverHighWaterRssBytes": 26157056,
+        "serverAverageCpuPercent": 51.95364196132943,
+        "generatorPeakSampledRssBytes": 209944576,
+        "generatorCpuSeconds": 1.600145,
+        "generatorEventLoopDelayMs": {
+          "mean": 21.346260425531916,
+          "max": 31.342591
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 110960640,
+        "minimumSampledDiskAvailableBytes": 4914581504,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 105,
+              "mean": 18.506,
+              "p50": 16.671,
+              "p95": 29.105,
+              "p99": 40.418,
+              "max": 43.724
+            },
+            "successful": 105,
+            "failed": 0,
+            "windowSuccessful": 104,
+            "windowFailed": 0,
+            "windowBytes": 109051904,
+            "successfulBytes": 110100480,
+            "requestsPerSecond": 52,
+            "payloadMiBPerSecond": 52,
+            "completedAttemptsPerSecond": 52
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 105,
+              "mean": 26.873,
+              "p50": 24.575,
+              "p95": 55.022,
+              "p99": 58.407,
+              "max": 60.403
+            },
+            "successful": 105,
+            "failed": 0,
+            "windowSuccessful": 102,
+            "windowFailed": 0,
+            "windowBytes": 106954752,
+            "successfulBytes": 110100480,
+            "requestsPerSecond": 51,
+            "payloadMiBPerSecond": 51,
+            "completedAttemptsPerSecond": 51
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 105,
+              "mean": 10.419,
+              "p50": 9.936,
+              "p95": 18.233,
+              "p99": 20.958,
+              "max": 22.619
+            },
+            "successful": 105,
+            "failed": 0,
+            "windowSuccessful": 102,
+            "windowFailed": 0,
+            "windowBytes": 10710,
+            "successfulBytes": 11025,
+            "requestsPerSecond": 51,
+            "payloadMiBPerSecond": 0.005,
+            "completedAttemptsPerSecond": 51
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 210,
+              "mean": 8.569,
+              "p50": 8.474,
+              "p95": 18.233,
+              "p99": 22.027,
+              "max": 23.474
+            },
+            "successful": 210,
+            "failed": 0,
+            "windowSuccessful": 203,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 101.5,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 101.5
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 2,
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "concurrency": 4,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem"
+      },
+      "startupMs": 24.174528000003193,
+      "firstWriteMs": 36.74183800001629,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 108,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 108,
+        "windowSuccessful": 104,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 2,
+        "drainMs": 26.702,
+        "filesPerSecond": 52,
+        "responseLatencyMs": {
+          "samples": 108,
+          "mean": 74.651,
+          "p50": 74.904,
+          "p95": 107.17,
+          "p99": 114.901,
+          "max": 115.861
+        },
+        "serviceLatencyMs": {
+          "samples": 108,
+          "mean": 74.65,
+          "p50": 74.904,
+          "p95": 107.17,
+          "p99": 114.901,
+          "max": 115.86
+        },
+        "queueWaitMs": {
+          "samples": 108,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.002,
+          "max": 0.006
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 2.0323772040000003,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 26308608,
+        "serverHighWaterRssBytes": 26308608,
+        "serverAverageCpuPercent": 49.69549933999357,
+        "generatorPeakSampledRssBytes": 209944576,
+        "generatorCpuSeconds": 1.6493,
+        "generatorEventLoopDelayMs": {
+          "mean": 21.388440510638297,
+          "max": 31.064063
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 114130944,
+        "minimumSampledDiskAvailableBytes": 4915634176,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 108,
+              "mean": 19.015,
+              "p50": 16.342,
+              "p95": 34.469,
+              "p99": 45.999,
+              "max": 48.059
+            },
+            "successful": 108,
+            "failed": 0,
+            "windowSuccessful": 107,
+            "windowFailed": 0,
+            "windowBytes": 112197632,
+            "successfulBytes": 113246208,
+            "requestsPerSecond": 53.5,
+            "payloadMiBPerSecond": 53.5,
+            "completedAttemptsPerSecond": 53.5
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 108,
+              "mean": 26.19,
+              "p50": 23.382,
+              "p95": 52.352,
+              "p99": 61.387,
+              "max": 69.995
+            },
+            "successful": 108,
+            "failed": 0,
+            "windowSuccessful": 106,
+            "windowFailed": 0,
+            "windowBytes": 111149056,
+            "successfulBytes": 113246208,
+            "requestsPerSecond": 53,
+            "payloadMiBPerSecond": 53,
+            "completedAttemptsPerSecond": 53
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 108,
+              "mean": 10.198,
+              "p50": 9.838,
+              "p95": 16.671,
+              "p99": 21.809,
+              "max": 22.089
+            },
+            "successful": 108,
+            "failed": 0,
+            "windowSuccessful": 106,
+            "windowFailed": 0,
+            "windowBytes": 11130,
+            "successfulBytes": 11340,
+            "requestsPerSecond": 53,
+            "payloadMiBPerSecond": 0.005,
+            "completedAttemptsPerSecond": 53
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 216,
+              "mean": 7.617,
+              "p50": 7.671,
+              "p95": 15.243,
+              "p99": 20.545,
+              "max": 43.688
+            },
+            "successful": 216,
+            "failed": 0,
+            "windowSuccessful": 208,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 104,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 104
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 16,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 3,
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-1.json"
+    }
+  ],
+  "complete": true,
+  "versions": {
+    "node": "25.9.0",
+    "go": "1.25.6",
+    "java": "17.0.16+8",
+    "afero": "1.15.0",
+    "sqliteDriver": "github.com/mattn/go-sqlite3@v1.14.52",
+    "rustfs": "1.0.1",
+    "rustfsPackageSha256": "fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9",
+    "s3proxy": "4.1.1",
+    "s3proxySha256": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+    "minio": "RELEASE.2025-10-15T17-29-55Z",
+    "minioSourceSha256": "be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"
+  }
+}

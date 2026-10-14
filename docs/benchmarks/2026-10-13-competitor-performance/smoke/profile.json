@@ -1,0 +1,48 @@
+{
+  "label": "Railway comparison smoke; no capacity claims",
+  "targets": [
+    "stow-memory",
+    "s3proxy-memory",
+    "stow-filesystem",
+    "s3proxy-filesystem",
+    "minio-filesystem",
+    "rustfs-filesystem"
+  ],
+  "warmupSeconds": 0,
+  "durationSeconds": 0.5,
+  "repetitions": 1,
+  "soakSeconds": 0,
+  "sizes": [
+    4096
+  ],
+  "concurrency": [
+    2
+  ],
+  "rates": [
+    0
+  ],
+  "retainedObjects": 4,
+  "maxQueue": 8,
+  "workloads": [
+    "put",
+    "get",
+    "quarantine"
+  ],
+  "embedded": {
+    "benchtime": "100ms",
+    "count": 1,
+    "cpu": "1,2",
+    "expectedSamples": 162
+  },
+  "agent": {
+    "samples": 3,
+    "implementationCount": 9,
+    "sizes": [
+      4096,
+      1048576
+    ]
+  },
+  "nodeAgent": {
+    "samples": 2
+  }
+}

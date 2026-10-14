@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { Marked } from "marked";
 import { pages } from "./docs.mjs";
 import { escapeHtml, highlightHome, renderCodeBlock } from "./code.mjs";
+import {renderBenchmarkSection} from "./assets/benchmark-render.js";
 export { escapeHtml } from "./code.mjs";
 
 const site = dirname(fileURLToPath(import.meta.url));
@@ -117,7 +118,10 @@ export async function buildSite(destination = output) {
   for (const name of ["assets", "images", "launch", "agent.md", "llms.txt", "_headers"]) {
     await cp(join(site, name), join(destination, name), { recursive: true });
   }
-  await writeFile(join(destination, "index.html"), highlightHome(await readFile(join(site, "index.html"), "utf8")));
+  const benchmarks=JSON.parse(await readFile(join(site,"benchmark-data.json"),"utf8"));
+  await writeFile(join(destination,"assets/benchmark-data.json"),JSON.stringify(benchmarks,null,2)+"\n");
+  const home=(await readFile(join(site,"index.html"),"utf8")).replace("<!-- benchmark-section -->",renderBenchmarkSection(benchmarks));
+  await writeFile(join(destination, "index.html"), highlightHome(home));
   for (const page of manifest) {
     const markdown = await readFile(join(root, page.source), "utf8");
     const directory = join(destination, page.route);

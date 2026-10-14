@@ -1,0 +1,2939 @@
+{
+  "version": 1,
+  "config": {
+    "version": 1,
+    "label": "Railway comparison smoke; no capacity claims",
+    "warmupSeconds": 0,
+    "durationSeconds": 0.5,
+    "repetitions": 1,
+    "timeoutMs": 10000,
+    "sampleMs": 250,
+    "maxQueue": 8,
+    "maxBytes": 268435456,
+    "maxObjects": 4096,
+    "serverConcurrency": 128,
+    "scannerDelayMs": 2,
+    "retainedObjects": 4,
+    "soakSeconds": 0,
+    "minFreeDiskBytes": 1073741824,
+    "backends": [
+      "memory"
+    ],
+    "workloads": [
+      "put",
+      "get",
+      "quarantine"
+    ],
+    "sizes": [
+      4096
+    ],
+    "concurrency": [
+      2
+    ],
+    "rates": [
+      0
+    ]
+  },
+  "targets": [
+    "stow-memory",
+    "s3proxy-memory",
+    "stow-filesystem",
+    "s3proxy-filesystem",
+    "minio-filesystem",
+    "rustfs-filesystem"
+  ],
+  "metadata": {
+    "generator": {
+      "recordedAt": "2026-10-14T18:11:09.464Z",
+      "cpu": "AMD EPYC 9655P 96-Core Processor",
+      "hostLogicalCpus": 48,
+      "hostMemoryBytes": 346488950784,
+      "platform": "linux",
+      "arch": "x64",
+      "release": "6.18.15+deb13-cloud-amd64",
+      "node": "v25.9.0",
+      "cgroup": {
+        "cpuMax": "400000 100000",
+        "memoryMax": "4294967296",
+        "cpuStat": "usage_usec 43280341\nuser_usec 35361674\nsystem_usec 7918666\nnice_usec 0\nnr_periods 409\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      },
+      "mountInfo": "42523 24842 0:1184 / / rw,relatime - overlay overlay rw,lowerdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317310/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317309/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317308/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317307/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317306/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317305/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317304/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317303/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317302/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317301/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317300/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317299/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317298/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317297/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317296/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317295/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317294/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317293/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317292/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317291/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317290/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317289/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317288/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317287/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317286/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317285/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/283307/fs,upperdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317311/fs,workdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317311/work,uuid=on\n42524 42523 230:4000 / /results rw,relatime - ext4 /dev/zd4000 rw,discard,stripe=8192\n42525 42523 0:4896 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n42526 42523 0:4897 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755,inode64\n42527 42523 0:4898 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs rw\n42528 42526 0:4899 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666,max=1024\n42529 42526 0:4895 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n42530 42523 0:25 /containers/storage/overlay-containers/77b589e26bfa141657e41df79005ef0837ab190283ca3d3610e8fd3f5d01b1b8/userdata/resolv.conf /etc/resolv.conf rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42531 42523 0:25 /containers/storage/overlay-containers/77b589e26bfa141657e41df79005ef0837ab190283ca3d3610e8fd3f5d01b1b8/userdata/hosts /etc/hosts rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42532 42526 0:2823 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=62500k,inode64\n42533 42523 0:25 /containers/storage/overlay-containers/77b589e26bfa141657e41df79005ef0837ab190283ca3d3610e8fd3f5d01b1b8/userdata/.containerenv /run/.containerenv rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42534 42523 0:25 /containers/storage/overlay-containers/77b589e26bfa141657e41df79005ef0837ab190283ca3d3610e8fd3f5d01b1b8/userdata/hostname /etc/hostname rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42535 42527 0:27 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot\n42536 42525 0:25 /crun/.empty-directory /proc/acpi ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42561 42525 0:6 /null /proc/kcore ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42562 42525 0:6 /null /proc/keys ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42563 42525 0:6 /null /proc/timer_list ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42564 42527 0:25 /crun/.empty-directory /sys/firmware ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42642 42525 0:6 /null /proc/interrupts ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42643 42525 0:4896 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n42644 42525 0:4896 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n42732 42525 0:4896 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n42733 42525 0:4896 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n42734 42525 0:4896 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw",
+      "deployment": {
+        "RAILWAY_DEPLOYMENT_ID": "23fab8fe-35c5-4e0a-857e-e76df896dd6b",
+        "RAILWAY_REPLICA_ID": "6e9418cc-bc9e-4186-8164-960e7fdda602",
+        "RAILWAY_SERVICE_ID": "83497842-c51d-420e-8ba1-181589730ad4",
+        "RAILWAY_ENVIRONMENT_ID": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411"
+      },
+      "build": {
+        "binaries": {
+          "stow-s3": "38d81edddc9b4afc4098a7995fb8556f0241cc03d3295d10a38d61b98d0d43b3",
+          "minio": "25f041db600ba7b5e617246d53da7d66555839bd823c5eb9f70c0d5a3f60e1fd",
+          "rustfs": "a5ac41209ca8eca6c591c1584cc108b308850e1b74955afd4af9fe1b0379f2eb",
+          "s3proxy.jar": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+          "embedded.test": "d0f1ea3b2a9d511f69ae20a4f6af5e14547af35e3764cecf24156aee8ca9e922"
+        },
+        "harnessSha256": "c5ddaa3b91f4f43e2ca1efa37c7380627196c411fc05e61d497eae71a3b2fda7",
+        "versions": {
+          "node": "25.9.0",
+          "go": "1.25.6",
+          "java": "17.0.16+8",
+          "afero": "1.15.0",
+          "sqliteDriver": "github.com/mattn/go-sqlite3@v1.14.52",
+          "rustfs": "1.0.1",
+          "rustfsPackageSha256": "fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9",
+          "s3proxy": "4.1.1",
+          "s3proxySha256": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+          "minio": "RELEASE.2025-10-15T17-29-55Z",
+          "minioSourceSha256": "be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"
+        },
+        "source": {
+          "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+          "dirtyFiles": [
+            "M CONTEXT.md",
+            " M Makefile",
+            " M cmd/stow-wasm/binary_js.go",
+            " M cmd/stow-wasm/host-store-range.go",
+            " M cmd/stow-wasm/host_store_io_js.go",
+            " M cmd/stow-wasm/host_store_js.go",
+            " M cmd/stow-wasm/host_store_sessions_js.go",
+            " M cmd/stow-wasm/main.go",
+            " M cmd/stow-wasm/operations.go",
+            " M docs/CODE_STANDARDS.md",
+            " M docs/README.md",
+            " M docs/adr/0008-workspace-backend-real-files.md",
+            " M docs/adr/README.md",
+            " M docs/api/go.md",
+            " M docs/portable-workspace-usage.md",
+            " M go.mod",
+            " M go.sum",
+            " M internal/atomicfile/atomicfile.go",
+            " M internal/runtime/adapter.go",
+            " M internal/runtime/buckets.go",
+            " M internal/runtime/instance.go",
+            " M internal/runtime/multipart.go",
+            " M internal/runtime/objects.go",
+            " M internal/runtime/save_requests.go",
+            " M internal/runtime/staged-reset_test.go",
+            " M internal/runtime/staged-writes.go",
+            " M internal/runtime/state.go",
+            " M internal/runtime/stream-writes.go",
+            " M internal/runtime/streams.go",
+            " M internal/runtime/streams_test.go",
+            " M internal/runtime/types.go",
+            " M internal/runtime/workspace_usage.go",
+            " M internal/s3api/checksum_test.go",
+            " M internal/s3api/errors.go",
+            " M internal/s3api/handlers_bucket.go",
+            " M internal/s3api/handlers_multipart.go",
+            " M internal/s3api/request.go",
+            " M internal/s3api/request_internal_test.go",
+            " M internal/storage/bytes.go",
+            " M internal/storage/checksum.go",
+            " M internal/storage/fs/capacity.go",
+            " M internal/storage/fs/fs.go",
+            " M internal/storage/fs/fs_atomic.go",
+            " M internal/storage/fs/fs_copy.go",
+            " M internal/storage/fs/fs_list.go",
+            " M internal/storage/fs/fs_multipart.go",
+            " M internal/storage/fs/fs_put.go",
+            " M internal/storage/fs/fs_records.go",
+            " M internal/storage/fs/recovery_holds.go",
+            " M internal/storage/fs/save_requests.go",
+            " M internal/storage/memory.go",
+            " M internal/storage/store.go",
+            " M internal/storage/types.go",
+            " M internal/storage/util.go",
+            " M internal/storage/workspace/manifest.go",
+            " M internal/storage/workspace/objects.go",
+            " M internal/storage/workspace/recovery_holds.go",
+            " M packages/stow-s3/dist/browser-wasm-host.d.ts.map",
+            " M packages/stow-s3/dist/browser-wasm-host.js",
+            " M packages/stow-s3/dist/browser-wasm-host.js.map",
+            " M packages/stow-s3/dist/stow-runtime.wasm",
+            " M packages/stow-s3/scripts/browser-tests/worker.spec.mjs",
+            " M packages/stow-s3/src/browser-wasm-host.ts",
+            " M pkg/stow/errors.go",
+            " M pkg/stow/filesystem.go",
+            " M pkg/stow/guarded_save.go",
+            " M pkg/stow/object_recovery.go",
+            " M pkg/stow/prepare.go",
+            " M pkg/stow/runtime.go",
+            " M pkg/stow/save_requests.go",
+            " M pkg/stow/staged.go",
+            " M pkg/stow/staged_test.go",
+            " M pkg/stow/store.go",
+            " M pkg/stow/streams.go",
+            " M pkg/stow/types.go",
+            " M pkg/stow/workspace.go",
+            " M pkg/stow/workspace_facade.go",
+            " M scripts/baselines/go-coverage.json",
+            " M scripts/baselines/go-quality.json",
+            " M scripts/check-coverage.mjs",
+            " M scripts/check-coverage.test.mjs",
+            " M scripts/wasm-agent-workload.mjs",
+            " M scripts/wasm-agent-workload.test.mjs",
+            " M site/build.mjs",
+            " M site/index.html",
+            " M tools/api-reference/main.go",
+            " M tools/quality/main.go",
+            "?? .github/workflows/performance.yml",
+            "?? benchmark/",
+            "?? docs/adr/0020-binary-object-records.md",
+            "?? docs/benchmarks/2026-10-12-performance/",
+            "?? docs/benchmarks/2026-10-13-competitor-performance/",
+            "?? docs/benchmarks/2026-10-13-controlled-write-preparation/",
+            "?? docs/benchmarks/2026-10-13-memory-performance/",
+            "?? docs/benchmarks/2026-10-13-railway-performance/",
+            "?? docs/benchmarks/2026-10-13-storage-optimization/",
+            "?? docs/benchmarks/2026-10-13-streaming-performance/",
+            "?? docs/benchmarks/2026-10-13-usage-recovery/",
+            "?? docs/benchmarks/2026-10-13-wasm-size/",
+            "?? docs/benchmarks/2026-10-13-write-preparation/",
+            "?? docs/benchmarks/2026-10-14-embedded-api/",
+            "?? docs/benchmarks/2026-10-14-hot-paths/",
+            "?? docs/benchmarks/2026-10-14-memory-put-diagnosis/",
+            "?? docs/benchmarks/2026-10-14-memory-write-staging/",
+            "?? docs/benchmarks/2026-10-14-owned-http-body/",
+            "?? docs/benchmarks/2026-10-14-wasm-size-exploration/",
+            "?? docs/benchmarks/performance-local.json",
+            "?? docs/benchmarks/performance-qualification.json",
+            "?? docs/benchmarks/railway-environment.json",
+            "?? docs/performance-testing.md",
+            "?? docs/railway-performance.md",
+            "?? internal/atomicfile/stream_test.go",
+            "?? internal/embedded/",
+            "?? internal/recoveryerrors/",
+            "?? internal/runtime/disk_staging_test.go",
+            "?? internal/runtime/managed_usage_test.go",
+            "?? internal/runtime/memory_staging_test.go",
+            "?? internal/runtime/owned_body_test.go",
+            "?? internal/runtime/read_concurrency_test.go",
+            "?? internal/runtime/stream_allocation_test.go",
+            "?? internal/runtime/stream_copy.go",
+            "?? internal/runtime/stream_performance_test.go",
+            "?? internal/runtime/usage_multipart.go",
+            "?? internal/runtime/usage_recovery.go",
+            "?? internal/runtime/usage_state.go",
+            "?? internal/runtime/usage_transitions_test.go",
+            "?? internal/s3api/owned_body_allocation_test.go",
+            "?? internal/storage/bucket_address_test.go",
+            "?? internal/storage/fs/disk_performance_test.go",
+            "?? internal/storage/fs/record_codec.go",
+            "?? internal/storage/fs/record_format_test.go",
+            "?? internal/storage/fs/record_io.go",
+            "?? internal/storage/fs/record_performance_test.go",
+            "?? internal/storage/fs/record_stream_test.go",
+            "?? internal/storage/fs/recordpb/",
+            "?? internal/storage/fs/runtime_recovery_test.go",
+            "?? internal/storage/fs/save_checksum_test.go",
+            "?? internal/storage/fs/stage_body.go",
+            "?? internal/storage/fs/stage_body_test.go",
+            "?? internal/storage/fs/staged_put.go",
+            "?? internal/storage/fs/staged_put_test.go",
+            "?? internal/storage/fs/usage_revision.go",
+            "?? internal/storage/memory_staged.go",
+            "?? internal/storage/memory_staged_test.go",
+            "?? internal/storage/owned_body.go",
+            "?? internal/storage/owned_body_test.go",
+            "?? internal/storage/owned_reader.go",
+            "?? internal/storage/owned_reader_test.go",
+            "?? internal/storage/put_body.go",
+            "?? internal/storage/put_body_contract_test.go",
+            "?? internal/storage/stream_prepare.go",
+            "?? internal/storage/workspace/index_performance_test.go",
+            "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+            "?? packages/stow-s3/scripts/performance/",
+            "?? pkg/stow/filesystem_native.go",
+            "?? pkg/stow/filesystem_recovery_test.go",
+            "?? pkg/stow/filesystem_unsupported.go",
+            "?? pkg/stow/performance_benchmark_test.go",
+            "?? pkg/stow/read_performance_test.go",
+            "?? pkg/stow/wasm_dependencies_test.go",
+            "?? scripts/benchmark-embedded.mjs",
+            "?? scripts/performance.test.mjs",
+            "?? site/assets/benchmark-render.js",
+            "?? site/assets/benchmarks.css",
+            "?? site/assets/benchmarks.js",
+            "?? site/benchmark-data.json",
+            "?? tools/quality/generated.go",
+            "?? tools/quality/generated_test.go"
+          ],
+          "payloadSha256": "bb32c46b5247d6f72192d2d381f70495a9de5a4d80eefbc3ebb3bbbffb398228",
+          "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+        },
+        "wasmSha256": "99a8688b9f04c07f986846db77cfc8ae8ab148e6c27b22c3c24202c62e3ec47f",
+        "benchmarkModuleSumSha256": "6e998399e2cb4b6a03426ab446706a60e843c7b0d7a69200f9c6ed9781eba829",
+        "sdkLockfileSha256": "9bdfa3a3b9f0514dd04bab816ae7f7f915f5b6590c930e480a2ab59687a7a861"
+      }
+    },
+    "target": {
+      "recordedAt": "2026-10-14T18:11:09.483Z",
+      "cpu": "AMD EPYC 9655P 96-Core Processor",
+      "hostLogicalCpus": 48,
+      "hostMemoryBytes": 346488950784,
+      "platform": "linux",
+      "arch": "x64",
+      "release": "6.18.15+deb13-cloud-amd64",
+      "node": "v25.9.0",
+      "cgroup": {
+        "cpuMax": "200000 100000",
+        "memoryMax": "2147483648",
+        "cpuStat": "usage_usec 142017\nuser_usec 104424\nsystem_usec 37592\nnice_usec 0\nnr_periods 15\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      },
+      "mountInfo": "42880 25556 0:4888 / / rw,relatime - overlay overlay rw,lowerdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317310/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317309/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317308/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317307/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317306/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317305/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317304/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317303/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317302/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317301/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317300/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317299/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317298/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317297/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317296/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317295/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317294/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317293/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317292/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317291/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317290/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317289/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317288/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317287/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317286/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317285/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/283307/fs,upperdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317312/fs,workdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/317312/work,uuid=on\n42881 42880 230:3984 / /data rw,relatime - ext4 /dev/zd3984 rw,discard,stripe=8192\n42882 42880 0:4939 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n42883 42880 0:4943 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755,inode64\n42884 42880 0:4944 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs rw\n42885 42883 0:4946 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666,max=1024\n42886 42883 0:4933 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n42887 42883 0:4917 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=62500k,inode64\n42888 42880 0:25 /containers/storage/overlay-containers/bd1b2c3ea5b2afc4db1e14697a744172ea154f96e9948f0d6d892848762699fe/userdata/.containerenv /run/.containerenv rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42889 42880 0:25 /containers/storage/overlay-containers/bd1b2c3ea5b2afc4db1e14697a744172ea154f96e9948f0d6d892848762699fe/userdata/hostname /etc/hostname rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42890 42880 0:25 /containers/storage/overlay-containers/bd1b2c3ea5b2afc4db1e14697a744172ea154f96e9948f0d6d892848762699fe/userdata/resolv.conf /etc/resolv.conf rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42891 42880 0:25 /containers/storage/overlay-containers/bd1b2c3ea5b2afc4db1e14697a744172ea154f96e9948f0d6d892848762699fe/userdata/hosts /etc/hosts rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42892 42884 0:27 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot\n42893 42882 0:25 /crun/.empty-directory /proc/acpi ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42894 42882 0:6 /null /proc/kcore ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42895 42882 0:6 /null /proc/keys ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42896 42882 0:6 /null /proc/timer_list ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42897 42884 0:25 /crun/.empty-directory /sys/firmware ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n42898 42882 0:6 /null /proc/interrupts ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n42899 42882 0:4939 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n42900 42882 0:4939 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n42901 42882 0:4939 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n42902 42882 0:4939 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n42903 42882 0:4939 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw",
+      "deployment": {
+        "RAILWAY_DEPLOYMENT_ID": "e09d0550-2eaf-454b-883d-16a3d38e2ccb",
+        "RAILWAY_REPLICA_ID": "6c9aa4ea-4741-48ee-8736-0bba934624ab",
+        "RAILWAY_SERVICE_ID": "86625750-7c04-458f-98e2-4d7d33787535",
+        "RAILWAY_ENVIRONMENT_ID": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411"
+      },
+      "build": {
+        "binaries": {
+          "stow-s3": "38d81edddc9b4afc4098a7995fb8556f0241cc03d3295d10a38d61b98d0d43b3",
+          "minio": "25f041db600ba7b5e617246d53da7d66555839bd823c5eb9f70c0d5a3f60e1fd",
+          "rustfs": "a5ac41209ca8eca6c591c1584cc108b308850e1b74955afd4af9fe1b0379f2eb",
+          "s3proxy.jar": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+          "embedded.test": "d0f1ea3b2a9d511f69ae20a4f6af5e14547af35e3764cecf24156aee8ca9e922"
+        },
+        "harnessSha256": "c5ddaa3b91f4f43e2ca1efa37c7380627196c411fc05e61d497eae71a3b2fda7",
+        "versions": {
+          "node": "25.9.0",
+          "go": "1.25.6",
+          "java": "17.0.16+8",
+          "afero": "1.15.0",
+          "sqliteDriver": "github.com/mattn/go-sqlite3@v1.14.52",
+          "rustfs": "1.0.1",
+          "rustfsPackageSha256": "fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9",
+          "s3proxy": "4.1.1",
+          "s3proxySha256": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+          "minio": "RELEASE.2025-10-15T17-29-55Z",
+          "minioSourceSha256": "be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"
+        },
+        "source": {
+          "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+          "dirtyFiles": [
+            "M CONTEXT.md",
+            " M Makefile",
+            " M cmd/stow-wasm/binary_js.go",
+            " M cmd/stow-wasm/host-store-range.go",
+            " M cmd/stow-wasm/host_store_io_js.go",
+            " M cmd/stow-wasm/host_store_js.go",
+            " M cmd/stow-wasm/host_store_sessions_js.go",
+            " M cmd/stow-wasm/main.go",
+            " M cmd/stow-wasm/operations.go",
+            " M docs/CODE_STANDARDS.md",
+            " M docs/README.md",
+            " M docs/adr/0008-workspace-backend-real-files.md",
+            " M docs/adr/README.md",
+            " M docs/api/go.md",
+            " M docs/portable-workspace-usage.md",
+            " M go.mod",
+            " M go.sum",
+            " M internal/atomicfile/atomicfile.go",
+            " M internal/runtime/adapter.go",
+            " M internal/runtime/buckets.go",
+            " M internal/runtime/instance.go",
+            " M internal/runtime/multipart.go",
+            " M internal/runtime/objects.go",
+            " M internal/runtime/save_requests.go",
+            " M internal/runtime/staged-reset_test.go",
+            " M internal/runtime/staged-writes.go",
+            " M internal/runtime/state.go",
+            " M internal/runtime/stream-writes.go",
+            " M internal/runtime/streams.go",
+            " M internal/runtime/streams_test.go",
+            " M internal/runtime/types.go",
+            " M internal/runtime/workspace_usage.go",
+            " M internal/s3api/checksum_test.go",
+            " M internal/s3api/errors.go",
+            " M internal/s3api/handlers_bucket.go",
+            " M internal/s3api/handlers_multipart.go",
+            " M internal/s3api/request.go",
+            " M internal/s3api/request_internal_test.go",
+            " M internal/storage/bytes.go",
+            " M internal/storage/checksum.go",
+            " M internal/storage/fs/capacity.go",
+            " M internal/storage/fs/fs.go",
+            " M internal/storage/fs/fs_atomic.go",
+            " M internal/storage/fs/fs_copy.go",
+            " M internal/storage/fs/fs_list.go",
+            " M internal/storage/fs/fs_multipart.go",
+            " M internal/storage/fs/fs_put.go",
+            " M internal/storage/fs/fs_records.go",
+            " M internal/storage/fs/recovery_holds.go",
+            " M internal/storage/fs/save_requests.go",
+            " M internal/storage/memory.go",
+            " M internal/storage/store.go",
+            " M internal/storage/types.go",
+            " M internal/storage/util.go",
+            " M internal/storage/workspace/manifest.go",
+            " M internal/storage/workspace/objects.go",
+            " M internal/storage/workspace/recovery_holds.go",
+            " M packages/stow-s3/dist/browser-wasm-host.d.ts.map",
+            " M packages/stow-s3/dist/browser-wasm-host.js",
+            " M packages/stow-s3/dist/browser-wasm-host.js.map",
+            " M packages/stow-s3/dist/stow-runtime.wasm",
+            " M packages/stow-s3/scripts/browser-tests/worker.spec.mjs",
+            " M packages/stow-s3/src/browser-wasm-host.ts",
+            " M pkg/stow/errors.go",
+            " M pkg/stow/filesystem.go",
+            " M pkg/stow/guarded_save.go",
+            " M pkg/stow/object_recovery.go",
+            " M pkg/stow/prepare.go",
+            " M pkg/stow/runtime.go",
+            " M pkg/stow/save_requests.go",
+            " M pkg/stow/staged.go",
+            " M pkg/stow/staged_test.go",
+            " M pkg/stow/store.go",
+            " M pkg/stow/streams.go",
+            " M pkg/stow/types.go",
+            " M pkg/stow/workspace.go",
+            " M pkg/stow/workspace_facade.go",
+            " M scripts/baselines/go-coverage.json",
+            " M scripts/baselines/go-quality.json",
+            " M scripts/check-coverage.mjs",
+            " M scripts/check-coverage.test.mjs",
+            " M scripts/wasm-agent-workload.mjs",
+            " M scripts/wasm-agent-workload.test.mjs",
+            " M site/build.mjs",
+            " M site/index.html",
+            " M tools/api-reference/main.go",
+            " M tools/quality/main.go",
+            "?? .github/workflows/performance.yml",
+            "?? benchmark/",
+            "?? docs/adr/0020-binary-object-records.md",
+            "?? docs/benchmarks/2026-10-12-performance/",
+            "?? docs/benchmarks/2026-10-13-competitor-performance/",
+            "?? docs/benchmarks/2026-10-13-controlled-write-preparation/",
+            "?? docs/benchmarks/2026-10-13-memory-performance/",
+            "?? docs/benchmarks/2026-10-13-railway-performance/",
+            "?? docs/benchmarks/2026-10-13-storage-optimization/",
+            "?? docs/benchmarks/2026-10-13-streaming-performance/",
+            "?? docs/benchmarks/2026-10-13-usage-recovery/",
+            "?? docs/benchmarks/2026-10-13-wasm-size/",
+            "?? docs/benchmarks/2026-10-13-write-preparation/",
+            "?? docs/benchmarks/2026-10-14-embedded-api/",
+            "?? docs/benchmarks/2026-10-14-hot-paths/",
+            "?? docs/benchmarks/2026-10-14-memory-put-diagnosis/",
+            "?? docs/benchmarks/2026-10-14-memory-write-staging/",
+            "?? docs/benchmarks/2026-10-14-owned-http-body/",
+            "?? docs/benchmarks/2026-10-14-wasm-size-exploration/",
+            "?? docs/benchmarks/performance-local.json",
+            "?? docs/benchmarks/performance-qualification.json",
+            "?? docs/benchmarks/railway-environment.json",
+            "?? docs/performance-testing.md",
+            "?? docs/railway-performance.md",
+            "?? internal/atomicfile/stream_test.go",
+            "?? internal/embedded/",
+            "?? internal/recoveryerrors/",
+            "?? internal/runtime/disk_staging_test.go",
+            "?? internal/runtime/managed_usage_test.go",
+            "?? internal/runtime/memory_staging_test.go",
+            "?? internal/runtime/owned_body_test.go",
+            "?? internal/runtime/read_concurrency_test.go",
+            "?? internal/runtime/stream_allocation_test.go",
+            "?? internal/runtime/stream_copy.go",
+            "?? internal/runtime/stream_performance_test.go",
+            "?? internal/runtime/usage_multipart.go",
+            "?? internal/runtime/usage_recovery.go",
+            "?? internal/runtime/usage_state.go",
+            "?? internal/runtime/usage_transitions_test.go",
+            "?? internal/s3api/owned_body_allocation_test.go",
+            "?? internal/storage/bucket_address_test.go",
+            "?? internal/storage/fs/disk_performance_test.go",
+            "?? internal/storage/fs/record_codec.go",
+            "?? internal/storage/fs/record_format_test.go",
+            "?? internal/storage/fs/record_io.go",
+            "?? internal/storage/fs/record_performance_test.go",
+            "?? internal/storage/fs/record_stream_test.go",
+            "?? internal/storage/fs/recordpb/",
+            "?? internal/storage/fs/runtime_recovery_test.go",
+            "?? internal/storage/fs/save_checksum_test.go",
+            "?? internal/storage/fs/stage_body.go",
+            "?? internal/storage/fs/stage_body_test.go",
+            "?? internal/storage/fs/staged_put.go",
+            "?? internal/storage/fs/staged_put_test.go",
+            "?? internal/storage/fs/usage_revision.go",
+            "?? internal/storage/memory_staged.go",
+            "?? internal/storage/memory_staged_test.go",
+            "?? internal/storage/owned_body.go",
+            "?? internal/storage/owned_body_test.go",
+            "?? internal/storage/owned_reader.go",
+            "?? internal/storage/owned_reader_test.go",
+            "?? internal/storage/put_body.go",
+            "?? internal/storage/put_body_contract_test.go",
+            "?? internal/storage/stream_prepare.go",
+            "?? internal/storage/workspace/index_performance_test.go",
+            "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+            "?? packages/stow-s3/scripts/performance/",
+            "?? pkg/stow/filesystem_native.go",
+            "?? pkg/stow/filesystem_recovery_test.go",
+            "?? pkg/stow/filesystem_unsupported.go",
+            "?? pkg/stow/performance_benchmark_test.go",
+            "?? pkg/stow/read_performance_test.go",
+            "?? pkg/stow/wasm_dependencies_test.go",
+            "?? scripts/benchmark-embedded.mjs",
+            "?? scripts/performance.test.mjs",
+            "?? site/assets/benchmark-render.js",
+            "?? site/assets/benchmarks.css",
+            "?? site/assets/benchmarks.js",
+            "?? site/benchmark-data.json",
+            "?? tools/quality/generated.go",
+            "?? tools/quality/generated_test.go"
+          ],
+          "payloadSha256": "bb32c46b5247d6f72192d2d381f70495a9de5a4d80eefbc3ebb3bbbffb398228",
+          "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+        },
+        "wasmSha256": "99a8688b9f04c07f986846db77cfc8ae8ab148e6c27b22c3c24202c62e3ec47f",
+        "benchmarkModuleSumSha256": "6e998399e2cb4b6a03426ab446706a60e843c7b0d7a69200f9c6ed9781eba829",
+        "sdkLockfileSha256": "9bdfa3a3b9f0514dd04bab816ae7f7f915f5b6590c930e480a2ab59687a7a861"
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "put",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory"
+      },
+      "startupMs": 35.6355329999933,
+      "firstWriteMs": 41.861462000000756,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 681,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 681,
+        "windowSuccessful": 679,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 0.613,
+        "filesPerSecond": 1358,
+        "responseLatencyMs": {
+          "samples": 681,
+          "mean": 1.468,
+          "p50": 1.216,
+          "p95": 3.01,
+          "p99": 4.758,
+          "max": 10.537
+        },
+        "serviceLatencyMs": {
+          "samples": 681,
+          "mean": 1.467,
+          "p50": 1.216,
+          "p95": 3.01,
+          "p99": 4.758,
+          "max": 10.536
+        },
+        "queueWaitMs": {
+          "samples": 681,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.005,
+          "max": 0.082
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5124186740000005,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 19959808,
+        "serverHighWaterRssBytes": 19959808,
+        "serverAverageCpuPercent": 23.41835028440042,
+        "generatorPeakSampledRssBytes": 140353536,
+        "generatorCpuSeconds": 0.646612,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.033536,
+          "max": 21.299199
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 681,
+              "mean": 1.442,
+              "p50": 1.181,
+              "p95": 2.951,
+              "p99": 4.758,
+              "max": 10.514
+            },
+            "successful": 681,
+            "failed": 0,
+            "windowSuccessful": 679,
+            "windowFailed": 0,
+            "windowBytes": 2781184,
+            "successfulBytes": 2789376,
+            "requestsPerSecond": 1358,
+            "payloadMiBPerSecond": 5.305,
+            "completedAttemptsPerSecond": 1358
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 6,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 0,
+      "rawFile": "stow-memory-put-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "put",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "s3proxy-memory"
+      },
+      "startupMs": 992.5607420000015,
+      "firstWriteMs": 1108.487592999998,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 157,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 157,
+        "windowSuccessful": 155,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 1.32,
+        "filesPerSecond": 310,
+        "responseLatencyMs": {
+          "samples": 157,
+          "mean": 6.376,
+          "p50": 3.164,
+          "p95": 29.69,
+          "p99": 42.476,
+          "max": 42.476
+        },
+        "serviceLatencyMs": {
+          "samples": 157,
+          "mean": 6.375,
+          "p50": 3.164,
+          "p95": 29.69,
+          "p99": 42.476,
+          "max": 42.476
+        },
+        "queueWaitMs": {
+          "samples": 157,
+          "mean": 0.001,
+          "p50": 0,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.024
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5099748679999975,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 194547712,
+        "serverHighWaterRssBytes": 194547712,
+        "serverAverageCpuPercent": 205.89249900055958,
+        "generatorPeakSampledRssBytes": 144678912,
+        "generatorCpuSeconds": 0.142076,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.073813333333334,
+          "max": 20.905983
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935667712,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 157,
+              "mean": 6.349,
+              "p50": 3.101,
+              "p95": 29.69,
+              "p99": 42.059,
+              "max": 42.438
+            },
+            "successful": 157,
+            "failed": 0,
+            "windowSuccessful": 155,
+            "windowFailed": 0,
+            "windowBytes": 634880,
+            "successfulBytes": 643072,
+            "requestsPerSecond": 310,
+            "payloadMiBPerSecond": 1.211,
+            "completedAttemptsPerSecond": 310
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 6,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 1,
+      "rawFile": "s3proxy-memory-put-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "put",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem"
+      },
+      "startupMs": 26.28019300001324,
+      "firstWriteMs": 41.91624099999899,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 94,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 94,
+        "windowSuccessful": 92,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 14.097,
+        "filesPerSecond": 184,
+        "responseLatencyMs": {
+          "samples": 94,
+          "mean": 10.868,
+          "p50": 9.268,
+          "p95": 21.379,
+          "p99": 26.673,
+          "max": 26.673
+        },
+        "serviceLatencyMs": {
+          "samples": 94,
+          "mean": 10.867,
+          "p50": 9.268,
+          "p95": 21.379,
+          "p99": 26.673,
+          "max": 26.673
+        },
+        "queueWaitMs": {
+          "samples": 94,
+          "mean": 0.001,
+          "p50": 0,
+          "p95": 0.001,
+          "p99": 0.048,
+          "max": 0.048
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5194042859999972,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 19501056,
+        "serverHighWaterRssBytes": 19501056,
+        "serverAverageCpuPercent": 11.551695204917952,
+        "generatorPeakSampledRssBytes": 146251776,
+        "generatorCpuSeconds": 0.097075,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.225365333333333,
+          "max": 21.037055
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 770048,
+        "minimumSampledDiskAvailableBytes": 4935581696,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 94,
+              "mean": 10.832,
+              "p50": 9.268,
+              "p95": 21.379,
+              "p99": 26.638,
+              "max": 26.638
+            },
+            "successful": 94,
+            "failed": 0,
+            "windowSuccessful": 92,
+            "windowFailed": 0,
+            "windowBytes": 376832,
+            "successfulBytes": 385024,
+            "requestsPerSecond": 184,
+            "payloadMiBPerSecond": 0.719,
+            "completedAttemptsPerSecond": 184
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 6,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 2,
+      "rawFile": "stow-filesystem-put-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "put",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "s3proxy-filesystem"
+      },
+      "startupMs": 926.3295379999909,
+      "firstWriteMs": 1018.0100640000019,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 179,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 179,
+        "windowSuccessful": 177,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 4.722,
+        "filesPerSecond": 354,
+        "responseLatencyMs": {
+          "samples": 179,
+          "mean": 5.63,
+          "p50": 2.541,
+          "p95": 29.987,
+          "p99": 49.318,
+          "max": 50.393
+        },
+        "serviceLatencyMs": {
+          "samples": 179,
+          "mean": 5.63,
+          "p50": 2.541,
+          "p95": 29.987,
+          "p99": 49.318,
+          "max": 50.393
+        },
+        "queueWaitMs": {
+          "samples": 179,
+          "mean": 0.001,
+          "p50": 0,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.008
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5129523369999952,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 195620864,
+        "serverHighWaterRssBytes": 195620864,
+        "serverAverageCpuPercent": 198.8488844724787,
+        "generatorPeakSampledRssBytes": 148217856,
+        "generatorCpuSeconds": 0.14167,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.189866666666667,
+          "max": 21.168127
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 733184,
+        "minimumSampledDiskAvailableBytes": 4935614464,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 179,
+              "mean": 5.604,
+              "p50": 2.516,
+              "p95": 29.987,
+              "p99": 49.318,
+              "max": 50.359
+            },
+            "successful": 179,
+            "failed": 0,
+            "windowSuccessful": 177,
+            "windowFailed": 0,
+            "windowBytes": 724992,
+            "successfulBytes": 733184,
+            "requestsPerSecond": 354,
+            "payloadMiBPerSecond": 1.383,
+            "completedAttemptsPerSecond": 354
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 6,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 3,
+      "rawFile": "s3proxy-filesystem-put-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "put",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "minio-filesystem"
+      },
+      "startupMs": 214.91519500000868,
+      "firstWriteMs": 237.84464100000332,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 119,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 119,
+        "windowSuccessful": 117,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 7.022,
+        "filesPerSecond": 234,
+        "responseLatencyMs": {
+          "samples": 119,
+          "mean": 8.51,
+          "p50": 8.307,
+          "p95": 10.76,
+          "p99": 12.87,
+          "max": 14.591
+        },
+        "serviceLatencyMs": {
+          "samples": 119,
+          "mean": 8.509,
+          "p50": 8.307,
+          "p95": 10.76,
+          "p99": 12.87,
+          "max": 14.59
+        },
+        "queueWaitMs": {
+          "samples": 119,
+          "mean": 0.001,
+          "p50": 0,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.005
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5131253569999972,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 169107456,
+        "serverHighWaterRssBytes": 169107456,
+        "serverAverageCpuPercent": 29.232622779934232,
+        "generatorPeakSampledRssBytes": 162373632,
+        "generatorCpuSeconds": 0.097693,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.12842666666667,
+          "max": 20.840447
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 1933312,
+        "minimumSampledDiskAvailableBytes": 4934029312,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 119,
+              "mean": 8.484,
+              "p50": 8.307,
+              "p95": 10.76,
+              "p99": 12.87,
+              "max": 14.569
+            },
+            "successful": 119,
+            "failed": 0,
+            "windowSuccessful": 117,
+            "windowFailed": 0,
+            "windowBytes": 479232,
+            "successfulBytes": 487424,
+            "requestsPerSecond": 234,
+            "payloadMiBPerSecond": 0.914,
+            "completedAttemptsPerSecond": 234
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 6,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 4,
+      "rawFile": "minio-filesystem-put-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "put",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "rustfs-filesystem"
+      },
+      "startupMs": 96.30137100000866,
+      "firstWriteMs": 133.51527800000622,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 63,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 63,
+        "windowSuccessful": 61,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 7.045,
+        "filesPerSecond": 122,
+        "responseLatencyMs": {
+          "samples": 63,
+          "mean": 16.054,
+          "p50": 15.705,
+          "p95": 19.548,
+          "p99": 28.522,
+          "max": 28.522
+        },
+        "serviceLatencyMs": {
+          "samples": 63,
+          "mean": 16.054,
+          "p50": 15.705,
+          "p95": 19.548,
+          "p99": 28.521,
+          "max": 28.521
+        },
+        "queueWaitMs": {
+          "samples": 63,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.005,
+          "max": 0.005
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5155128029999978,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 160886784,
+        "serverHighWaterRssBytes": 160886784,
+        "serverAverageCpuPercent": 40.73613667360283,
+        "generatorPeakSampledRssBytes": 174956544,
+        "generatorCpuSeconds": 0.070758,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.103168,
+          "max": 20.725759
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 671744,
+        "minimumSampledDiskAvailableBytes": 4935311360,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 63,
+              "mean": 16.013,
+              "p50": 15.705,
+              "p95": 19.354,
+              "p99": 28.498,
+              "max": 28.498
+            },
+            "successful": 63,
+            "failed": 0,
+            "windowSuccessful": 61,
+            "windowFailed": 0,
+            "windowBytes": 249856,
+            "successfulBytes": 258048,
+            "requestsPerSecond": 122,
+            "payloadMiBPerSecond": 0.477,
+            "completedAttemptsPerSecond": 122
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 6,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 5,
+      "rawFile": "rustfs-filesystem-put-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "get",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory"
+      },
+      "startupMs": 16.284351000009337,
+      "firstWriteMs": 19.983605999994325,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 1199,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 1199,
+        "windowSuccessful": 1197,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 0.187,
+        "filesPerSecond": 2394,
+        "responseLatencyMs": {
+          "samples": 1199,
+          "mean": 0.833,
+          "p50": 0.793,
+          "p95": 1.101,
+          "p99": 2.491,
+          "max": 3.592
+        },
+        "serviceLatencyMs": {
+          "samples": 1199,
+          "mean": 0.832,
+          "p50": 0.793,
+          "p95": 1.101,
+          "p99": 2.491,
+          "max": 3.592
+        },
+        "queueWaitMs": {
+          "samples": 1199,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.042
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5049376170000033,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 19795968,
+        "serverHighWaterRssBytes": 19795968,
+        "serverAverageCpuPercent": 27.726197313597872,
+        "generatorPeakSampledRssBytes": 178495488,
+        "generatorCpuSeconds": 0.616004,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.00418133333333,
+          "max": 20.381695
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 1199,
+              "mean": 0.826,
+              "p50": 0.785,
+              "p95": 1.09,
+              "p99": 2.491,
+              "max": 3.585
+            },
+            "successful": 1199,
+            "failed": 0,
+            "windowSuccessful": 1197,
+            "windowFailed": 0,
+            "windowBytes": 4902912,
+            "successfulBytes": 4911104,
+            "requestsPerSecond": 2394,
+            "payloadMiBPerSecond": 9.352,
+            "completedAttemptsPerSecond": 2394
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 0,
+      "rawFile": "stow-memory-get-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "get",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "s3proxy-memory"
+      },
+      "startupMs": 1001.0689370000036,
+      "firstWriteMs": 1149.6913880000066,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 199,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 199,
+        "windowSuccessful": 197,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 33.075,
+        "filesPerSecond": 394,
+        "responseLatencyMs": {
+          "samples": 199,
+          "mean": 5.345,
+          "p50": 2.124,
+          "p95": 32.15,
+          "p99": 38.133,
+          "max": 38.133
+        },
+        "serviceLatencyMs": {
+          "samples": 199,
+          "mean": 5.345,
+          "p50": 2.124,
+          "p95": 32.15,
+          "p99": 38.133,
+          "max": 38.133
+        },
+        "queueWaitMs": {
+          "samples": 199,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.003,
+          "max": 0.003
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5372010910000027,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 201867264,
+        "serverHighWaterRssBytes": 201867264,
+        "serverAverageCpuPercent": 199.18053368212435,
+        "generatorPeakSampledRssBytes": 178495488,
+        "generatorCpuSeconds": 0.134027,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.001259519999998,
+          "max": 20.774911
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935667712,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 199,
+              "mean": 5.337,
+              "p50": 2.124,
+              "p95": 32.15,
+              "p99": 38.075,
+              "max": 38.124
+            },
+            "successful": 199,
+            "failed": 0,
+            "windowSuccessful": 197,
+            "windowFailed": 0,
+            "windowBytes": 806912,
+            "successfulBytes": 815104,
+            "requestsPerSecond": 394,
+            "payloadMiBPerSecond": 1.539,
+            "completedAttemptsPerSecond": 394
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 1,
+      "rawFile": "s3proxy-memory-get-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "get",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem"
+      },
+      "startupMs": 28.0796149999951,
+      "firstWriteMs": 40.00268900001538,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 1270,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 1270,
+        "windowSuccessful": 1268,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 0.302,
+        "filesPerSecond": 2536,
+        "responseLatencyMs": {
+          "samples": 1270,
+          "mean": 0.787,
+          "p50": 0.696,
+          "p95": 1.112,
+          "p99": 2.864,
+          "max": 4.43
+        },
+        "serviceLatencyMs": {
+          "samples": 1270,
+          "mean": 0.786,
+          "p50": 0.696,
+          "p95": 1.112,
+          "p99": 2.864,
+          "max": 4.429
+        },
+        "queueWaitMs": {
+          "samples": 1270,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.002,
+          "max": 0.004
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5053787809999994,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 20230144,
+        "serverHighWaterRssBytes": 20230144,
+        "serverAverageCpuPercent": 41.55299112172266,
+        "generatorPeakSampledRssBytes": 237477888,
+        "generatorCpuSeconds": 0.637066,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.04650666666667,
+          "max": 21.643263
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935606272,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 1270,
+              "mean": 0.781,
+              "p50": 0.689,
+              "p95": 1.101,
+              "p99": 2.864,
+              "max": 4.423
+            },
+            "successful": 1270,
+            "failed": 0,
+            "windowSuccessful": 1268,
+            "windowFailed": 0,
+            "windowBytes": 5193728,
+            "successfulBytes": 5201920,
+            "requestsPerSecond": 2536,
+            "payloadMiBPerSecond": 9.906,
+            "completedAttemptsPerSecond": 2536
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 2,
+      "rawFile": "stow-filesystem-get-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "get",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "s3proxy-filesystem"
+      },
+      "startupMs": 973.4683269999805,
+      "firstWriteMs": 1074.8643079999893,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 206,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 206,
+        "windowSuccessful": 204,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 2.872,
+        "filesPerSecond": 408,
+        "responseLatencyMs": {
+          "samples": 206,
+          "mean": 4.868,
+          "p50": 2.062,
+          "p95": 25.573,
+          "p99": 40.822,
+          "max": 44.804
+        },
+        "serviceLatencyMs": {
+          "samples": 206,
+          "mean": 4.867,
+          "p50": 2.062,
+          "p95": 25.573,
+          "p99": 40.822,
+          "max": 44.803
+        },
+        "queueWaitMs": {
+          "samples": 206,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.002,
+          "max": 0.015
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5367104259999979,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 194617344,
+        "serverHighWaterRssBytes": 194617344,
+        "serverAverageCpuPercent": 195.6362219056285,
+        "generatorPeakSampledRssBytes": 237477888,
+        "generatorCpuSeconds": 0.144555,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.03009536,
+          "max": 20.709375
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935630848,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 206,
+              "mean": 4.858,
+              "p50": 2.042,
+              "p95": 25.573,
+              "p99": 40.822,
+              "max": 44.788
+            },
+            "successful": 206,
+            "failed": 0,
+            "windowSuccessful": 204,
+            "windowFailed": 0,
+            "windowBytes": 835584,
+            "successfulBytes": 843776,
+            "requestsPerSecond": 408,
+            "payloadMiBPerSecond": 1.594,
+            "completedAttemptsPerSecond": 408
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 3,
+      "rawFile": "s3proxy-filesystem-get-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "get",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "minio-filesystem"
+      },
+      "startupMs": 217.4397309999913,
+      "firstWriteMs": 230.65737100000842,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 1279,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 1279,
+        "windowSuccessful": 1277,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 0.738,
+        "filesPerSecond": 2554,
+        "responseLatencyMs": {
+          "samples": 1279,
+          "mean": 0.782,
+          "p50": 0.71,
+          "p95": 1.017,
+          "p99": 3.426,
+          "max": 4.888
+        },
+        "serviceLatencyMs": {
+          "samples": 1279,
+          "mean": 0.781,
+          "p50": 0.71,
+          "p95": 1.017,
+          "p99": 3.426,
+          "max": 4.876
+        },
+        "queueWaitMs": {
+          "samples": 1279,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.04
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5065521000000008,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 270999552,
+        "serverHighWaterRssBytes": 270999552,
+        "serverAverageCpuPercent": 106.60305228228235,
+        "generatorPeakSampledRssBytes": 252944384,
+        "generatorCpuSeconds": 0.56218,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.11409066666667,
+          "max": 21.872639
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935520256,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 1279,
+              "mean": 0.776,
+              "p50": 0.71,
+              "p95": 1.017,
+              "p99": 3.426,
+              "max": 4.867
+            },
+            "successful": 1279,
+            "failed": 0,
+            "windowSuccessful": 1277,
+            "windowFailed": 0,
+            "windowBytes": 5230592,
+            "successfulBytes": 5238784,
+            "requestsPerSecond": 2554,
+            "payloadMiBPerSecond": 9.977,
+            "completedAttemptsPerSecond": 2554
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 4,
+      "rawFile": "minio-filesystem-get-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "get",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "rustfs-filesystem"
+      },
+      "startupMs": 96.66900800002622,
+      "firstWriteMs": 137.02822400000878,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 1273,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 1273,
+        "windowSuccessful": 1271,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 0.451,
+        "filesPerSecond": 2542,
+        "responseLatencyMs": {
+          "samples": 1273,
+          "mean": 0.785,
+          "p50": 0.71,
+          "p95": 0.997,
+          "p99": 3.259,
+          "max": 5.67
+        },
+        "serviceLatencyMs": {
+          "samples": 1273,
+          "mean": 0.784,
+          "p50": 0.71,
+          "p95": 0.997,
+          "p99": 3.259,
+          "max": 5.669
+        },
+        "queueWaitMs": {
+          "samples": 1273,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.016
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.506366571999999,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 157495296,
+        "serverHighWaterRssBytes": 157495296,
+        "serverAverageCpuPercent": 33.57251631531481,
+        "generatorPeakSampledRssBytes": 266313728,
+        "generatorCpuSeconds": 0.552623,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.000768,
+          "max": 20.660223
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 8192,
+        "minimumSampledDiskAvailableBytes": 4935368704,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "get": {
+            "latencyMs": {
+              "samples": 1273,
+              "mean": 0.779,
+              "p50": 0.703,
+              "p95": 0.987,
+              "p99": 3.259,
+              "max": 5.661
+            },
+            "successful": 1273,
+            "failed": 0,
+            "windowSuccessful": 1271,
+            "windowFailed": 0,
+            "windowBytes": 5206016,
+            "successfulBytes": 5214208,
+            "requestsPerSecond": 2542,
+            "payloadMiBPerSecond": 9.93,
+            "completedAttemptsPerSecond": 2542
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 5,
+      "rawFile": "rustfs-filesystem-get-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "quarantine",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-memory"
+      },
+      "startupMs": 19.83931599999778,
+      "firstWriteMs": 23.40428200000315,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 173,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 173,
+        "windowSuccessful": 171,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 3.754,
+        "filesPerSecond": 342,
+        "responseLatencyMs": {
+          "samples": 173,
+          "mean": 5.801,
+          "p50": 5.864,
+          "p95": 7.084,
+          "p99": 10.136,
+          "max": 10.207
+        },
+        "serviceLatencyMs": {
+          "samples": 173,
+          "mean": 5.8,
+          "p50": 5.864,
+          "p95": 7.084,
+          "p99": 10.136,
+          "max": 10.206
+        },
+        "queueWaitMs": {
+          "samples": 173,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.001,
+          "max": 0.003
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.508530740000002,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 19918848,
+        "serverHighWaterRssBytes": 19918848,
+        "serverAverageCpuPercent": 21.630944080194556,
+        "generatorPeakSampledRssBytes": 276930560,
+        "generatorCpuSeconds": 0.415381,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.075861333333332,
+          "max": 22.167551
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935675904,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 173,
+              "mean": 0.77,
+              "p50": 0.769,
+              "p95": 0.997,
+              "p99": 1.981,
+              "max": 2.196
+            },
+            "successful": 173,
+            "failed": 0,
+            "windowSuccessful": 173,
+            "windowFailed": 0,
+            "windowBytes": 708608,
+            "successfulBytes": 708608,
+            "requestsPerSecond": 346,
+            "payloadMiBPerSecond": 1.352,
+            "completedAttemptsPerSecond": 346
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 173,
+              "mean": 0.669,
+              "p50": 0.669,
+              "p95": 0.92,
+              "p99": 1.14,
+              "max": 1.14
+            },
+            "successful": 173,
+            "failed": 0,
+            "windowSuccessful": 172,
+            "windowFailed": 0,
+            "windowBytes": 704512,
+            "successfulBytes": 708608,
+            "requestsPerSecond": 344,
+            "payloadMiBPerSecond": 1.344,
+            "completedAttemptsPerSecond": 344
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 173,
+              "mean": 0.749,
+              "p50": 0.718,
+              "p95": 1.027,
+              "p99": 2.442,
+              "max": 3.393
+            },
+            "successful": 173,
+            "failed": 0,
+            "windowSuccessful": 172,
+            "windowFailed": 0,
+            "windowBytes": 18060,
+            "successfulBytes": 18165,
+            "requestsPerSecond": 344,
+            "payloadMiBPerSecond": 0.034,
+            "completedAttemptsPerSecond": 344
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 346,
+              "mean": 0.702,
+              "p50": 0.663,
+              "p95": 0.902,
+              "p99": 3.195,
+              "max": 4.656
+            },
+            "successful": 346,
+            "failed": 0,
+            "windowSuccessful": 343,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 686,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 686
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 0,
+      "rawFile": "stow-memory-quarantine-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "memory",
+        "workload": "quarantine",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "s3proxy-memory"
+      },
+      "startupMs": 1000.7716289999953,
+      "firstWriteMs": 1172.0004889999982,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 41,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 41,
+        "windowSuccessful": 39,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 35.583,
+        "filesPerSecond": 78,
+        "responseLatencyMs": {
+          "samples": 41,
+          "mean": 25.345,
+          "p50": 23.616,
+          "p95": 50.309,
+          "p99": 53.512,
+          "max": 53.512
+        },
+        "serviceLatencyMs": {
+          "samples": 41,
+          "mean": 25.344,
+          "p50": 23.616,
+          "p95": 50.309,
+          "p99": 53.51,
+          "max": 53.51
+        },
+        "queueWaitMs": {
+          "samples": 41,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.003,
+          "max": 0.003
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.54036002,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 197128192,
+        "serverHighWaterRssBytes": 197128192,
+        "serverAverageCpuPercent": 201.71736613674707,
+        "generatorPeakSampledRssBytes": 279683072,
+        "generatorCpuSeconds": 0.135592,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.18541568,
+          "max": 21.135359
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 0,
+        "minimumSampledDiskAvailableBytes": 4935667712,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 41,
+              "mean": 4.035,
+              "p50": 2.78,
+              "p95": 13.799,
+              "p99": 25.973,
+              "max": 25.973
+            },
+            "successful": 41,
+            "failed": 0,
+            "windowSuccessful": 40,
+            "windowFailed": 0,
+            "windowBytes": 163840,
+            "successfulBytes": 167936,
+            "requestsPerSecond": 80,
+            "payloadMiBPerSecond": 0.313,
+            "completedAttemptsPerSecond": 80
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 41,
+              "mean": 5.354,
+              "p50": 2.592,
+              "p95": 25.829,
+              "p99": 31.565,
+              "max": 31.565
+            },
+            "successful": 41,
+            "failed": 0,
+            "windowSuccessful": 40,
+            "windowFailed": 0,
+            "windowBytes": 163840,
+            "successfulBytes": 167936,
+            "requestsPerSecond": 80,
+            "payloadMiBPerSecond": 0.313,
+            "completedAttemptsPerSecond": 80
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 41,
+              "mean": 5.764,
+              "p50": 2.951,
+              "p95": 24.821,
+              "p99": 31.3,
+              "max": 31.3
+            },
+            "successful": 41,
+            "failed": 0,
+            "windowSuccessful": 39,
+            "windowFailed": 0,
+            "windowBytes": 4095,
+            "successfulBytes": 4305,
+            "requestsPerSecond": 78,
+            "payloadMiBPerSecond": 0.008,
+            "completedAttemptsPerSecond": 78
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 82,
+              "mean": 3.929,
+              "p50": 1.707,
+              "p95": 18.052,
+              "p99": 40.339,
+              "max": 40.339
+            },
+            "successful": 82,
+            "failed": 0,
+            "windowSuccessful": 78,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 156,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 156
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 1,
+      "rawFile": "s3proxy-memory-quarantine-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "stow-filesystem"
+      },
+      "startupMs": 27.47464199998649,
+      "firstWriteMs": 44.34679799998412,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 43,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 43,
+        "windowSuccessful": 41,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 8.919,
+        "filesPerSecond": 82,
+        "responseLatencyMs": {
+          "samples": 43,
+          "mean": 23.466,
+          "p50": 22.47,
+          "p95": 29.69,
+          "p99": 40.818,
+          "max": 40.818
+        },
+        "serviceLatencyMs": {
+          "samples": 43,
+          "mean": 23.465,
+          "p50": 22.47,
+          "p95": 29.69,
+          "p99": 40.816,
+          "max": 40.816
+        },
+        "queueWaitMs": {
+          "samples": 43,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.003,
+          "max": 0.003
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5126470399999962,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 19894272,
+        "serverHighWaterRssBytes": 19894272,
+        "serverAverageCpuPercent": 19.50659853610015,
+        "generatorPeakSampledRssBytes": 282435584,
+        "generatorCpuSeconds": 0.126622,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.035584,
+          "max": 20.496383
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 528384,
+        "minimumSampledDiskAvailableBytes": 4935589888,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 43,
+              "mean": 6.492,
+              "p50": 5.524,
+              "p95": 12.617,
+              "p99": 14.844,
+              "max": 14.844
+            },
+            "successful": 43,
+            "failed": 0,
+            "windowSuccessful": 43,
+            "windowFailed": 0,
+            "windowBytes": 176128,
+            "successfulBytes": 176128,
+            "requestsPerSecond": 86,
+            "payloadMiBPerSecond": 0.336,
+            "completedAttemptsPerSecond": 86
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 43,
+              "mean": 4.134,
+              "p50": 4.307,
+              "p95": 7.671,
+              "p99": 9.401,
+              "max": 9.401
+            },
+            "successful": 43,
+            "failed": 0,
+            "windowSuccessful": 43,
+            "windowFailed": 0,
+            "windowBytes": 176128,
+            "successfulBytes": 176128,
+            "requestsPerSecond": 86,
+            "payloadMiBPerSecond": 0.336,
+            "completedAttemptsPerSecond": 86
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 43,
+              "mean": 8.647,
+              "p50": 8.39,
+              "p95": 12.492,
+              "p99": 21.038,
+              "max": 21.038
+            },
+            "successful": 43,
+            "failed": 0,
+            "windowSuccessful": 42,
+            "windowFailed": 0,
+            "windowBytes": 4410,
+            "successfulBytes": 4515,
+            "requestsPerSecond": 84,
+            "payloadMiBPerSecond": 0.008,
+            "completedAttemptsPerSecond": 84
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 86,
+              "mean": 1.008,
+              "p50": 0.624,
+              "p95": 4.098,
+              "p99": 5.77,
+              "max": 5.77
+            },
+            "successful": 86,
+            "failed": 0,
+            "windowSuccessful": 83,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 166,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 166
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 2,
+      "rawFile": "stow-filesystem-quarantine-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "s3proxy-filesystem"
+      },
+      "startupMs": 1059.4001169999829,
+      "firstWriteMs": 1159.6923689999967,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 36,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 36,
+        "windowSuccessful": 34,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 19.355,
+        "filesPerSecond": 68,
+        "responseLatencyMs": {
+          "samples": 36,
+          "mean": 28.705,
+          "p50": 26.348,
+          "p95": 52.875,
+          "p99": 52.984,
+          "max": 52.984
+        },
+        "serviceLatencyMs": {
+          "samples": 36,
+          "mean": 28.704,
+          "p50": 26.348,
+          "p95": 52.875,
+          "p99": 52.982,
+          "max": 52.982
+        },
+        "queueWaitMs": {
+          "samples": 36,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.002,
+          "max": 0.002
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.523810430999998,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 198692864,
+        "serverHighWaterRssBytes": 198692864,
+        "serverAverageCpuPercent": 204.27237349154734,
+        "generatorPeakSampledRssBytes": 285581312,
+        "generatorCpuSeconds": 0.122105,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.17558528,
+          "max": 21.725183
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 294912,
+        "minimumSampledDiskAvailableBytes": 4935614464,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 36,
+              "mean": 5.66,
+              "p50": 2.394,
+              "p95": 26.878,
+              "p99": 38.204,
+              "max": 38.204
+            },
+            "successful": 36,
+            "failed": 0,
+            "windowSuccessful": 36,
+            "windowFailed": 0,
+            "windowBytes": 147456,
+            "successfulBytes": 147456,
+            "requestsPerSecond": 72,
+            "payloadMiBPerSecond": 0.281,
+            "completedAttemptsPerSecond": 72
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 36,
+              "mean": 5.211,
+              "p50": 2.233,
+              "p95": 26.878,
+              "p99": 29.632,
+              "max": 29.632
+            },
+            "successful": 36,
+            "failed": 0,
+            "windowSuccessful": 36,
+            "windowFailed": 0,
+            "windowBytes": 147456,
+            "successfulBytes": 147456,
+            "requestsPerSecond": 72,
+            "payloadMiBPerSecond": 0.281,
+            "completedAttemptsPerSecond": 72
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 36,
+              "mean": 8.162,
+              "p50": 2.725,
+              "p95": 39.621,
+              "p99": 42.023,
+              "max": 42.023
+            },
+            "successful": 36,
+            "failed": 0,
+            "windowSuccessful": 35,
+            "windowFailed": 0,
+            "windowBytes": 3675,
+            "successfulBytes": 3780,
+            "requestsPerSecond": 70,
+            "payloadMiBPerSecond": 0.007,
+            "completedAttemptsPerSecond": 70
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 72,
+              "mean": 3.754,
+              "p50": 1.608,
+              "p95": 23.151,
+              "p99": 42.131,
+              "max": 42.131
+            },
+            "successful": 72,
+            "failed": 0,
+            "windowSuccessful": 69,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 138,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 138
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 3,
+      "rawFile": "s3proxy-filesystem-quarantine-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "minio-filesystem"
+      },
+      "startupMs": 223.25902299999143,
+      "firstWriteMs": 244.1273489999876,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 58,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 58,
+        "windowSuccessful": 56,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 12.94,
+        "filesPerSecond": 112,
+        "responseLatencyMs": {
+          "samples": 58,
+          "mean": 17.657,
+          "p50": 16.671,
+          "p95": 31.204,
+          "p99": 33.555,
+          "max": 33.555
+        },
+        "serviceLatencyMs": {
+          "samples": 58,
+          "mean": 17.656,
+          "p50": 16.671,
+          "p95": 31.204,
+          "p99": 33.554,
+          "max": 33.554
+        },
+        "queueWaitMs": {
+          "samples": 58,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.007,
+          "max": 0.007
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.51970248,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 167911424,
+        "serverHighWaterRssBytes": 167911424,
+        "serverAverageCpuPercent": 42.33191267434399,
+        "generatorPeakSampledRssBytes": 285581312,
+        "generatorCpuSeconds": 0.236337,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.077226666666668,
+          "max": 21.069823
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 712704,
+        "minimumSampledDiskAvailableBytes": 4934803456,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 58,
+              "mean": 6.083,
+              "p50": 5.152,
+              "p95": 15.395,
+              "p99": 21.468,
+              "max": 21.468
+            },
+            "successful": 58,
+            "failed": 0,
+            "windowSuccessful": 56,
+            "windowFailed": 0,
+            "windowBytes": 229376,
+            "successfulBytes": 237568,
+            "requestsPerSecond": 112,
+            "payloadMiBPerSecond": 0.438,
+            "completedAttemptsPerSecond": 112
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 58,
+              "mean": 1.241,
+              "p50": 1.101,
+              "p95": 1.848,
+              "p99": 3.895,
+              "max": 3.895
+            },
+            "successful": 58,
+            "failed": 0,
+            "windowSuccessful": 56,
+            "windowFailed": 0,
+            "windowBytes": 229376,
+            "successfulBytes": 237568,
+            "requestsPerSecond": 112,
+            "payloadMiBPerSecond": 0.438,
+            "completedAttemptsPerSecond": 112
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 58,
+              "mean": 6.033,
+              "p50": 5.308,
+              "p95": 10.653,
+              "p99": 20.956,
+              "max": 20.956
+            },
+            "successful": 58,
+            "failed": 0,
+            "windowSuccessful": 56,
+            "windowFailed": 0,
+            "windowBytes": 5880,
+            "successfulBytes": 6090,
+            "requestsPerSecond": 112,
+            "payloadMiBPerSecond": 0.011,
+            "completedAttemptsPerSecond": 112
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 116,
+              "mean": 1.074,
+              "p50": 1.017,
+              "p95": 1.455,
+              "p99": 2.103,
+              "max": 3.023
+            },
+            "successful": 116,
+            "failed": 0,
+            "windowSuccessful": 112,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 224,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 224
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 4,
+      "rawFile": "minio-filesystem-quarantine-4096-c2-r0-1.json"
+    },
+    {
+      "scenario": {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "bytes": 4096,
+        "concurrency": 2,
+        "rate": 0,
+        "soak": false,
+        "implementation": "rustfs-filesystem"
+      },
+      "startupMs": 115.10699800000293,
+      "firstWriteMs": 216.86167500002193,
+      "firstWriteBytes": 4096,
+      "firstWriteVerified": true,
+      "warmup": null,
+      "load": {
+        "mode": "closed-loop capacity",
+        "offered": 30,
+        "dropped": 0,
+        "failed": 0,
+        "successful": 30,
+        "windowSuccessful": 28,
+        "peakQueue": 0,
+        "expiredBeforeStart": 0,
+        "errors": {},
+        "measuredSeconds": 0.5,
+        "drainMs": 10.53,
+        "filesPerSecond": 56,
+        "responseLatencyMs": {
+          "samples": 30,
+          "mean": 34.011,
+          "p50": 34.128,
+          "p95": 37.325,
+          "p99": 43.184,
+          "max": 43.184
+        },
+        "serviceLatencyMs": {
+          "samples": 30,
+          "mean": 34.01,
+          "p50": 34.128,
+          "p95": 37.325,
+          "p99": 43.183,
+          "max": 43.183
+        },
+        "queueWaitMs": {
+          "samples": 30,
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.003,
+          "max": 0.003
+        },
+        "schedulerLagMs": {
+          "samples": 0,
+          "mean": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        }
+      },
+      "resources": {
+        "intervalSeconds": 0.5146266700000051,
+        "sampleIntervalMs": 250,
+        "serverPeakSampledRssBytes": 176017408,
+        "serverHighWaterRssBytes": 176017408,
+        "serverAverageCpuPercent": 52.46521716412354,
+        "generatorPeakSampledRssBytes": 285581312,
+        "generatorCpuSeconds": 0.093829,
+        "generatorEventLoopDelayMs": {
+          "mean": 20.17348266666667,
+          "max": 20.955135
+        },
+        "diskReadBytes": 0,
+        "diskWrittenBytes": 905216,
+        "minimumSampledDiskAvailableBytes": 4934369280,
+        "diskHeadroomMaintained": true
+      },
+      "measurements": {
+        "operations": {
+          "put": {
+            "latencyMs": {
+              "samples": 30,
+              "mean": 13.145,
+              "p50": 12.87,
+              "p95": 16.506,
+              "p99": 16.858,
+              "max": 16.858
+            },
+            "successful": 30,
+            "failed": 0,
+            "windowSuccessful": 30,
+            "windowFailed": 0,
+            "windowBytes": 122880,
+            "successfulBytes": 122880,
+            "requestsPerSecond": 60,
+            "payloadMiBPerSecond": 0.234,
+            "completedAttemptsPerSecond": 60
+          },
+          "get": {
+            "latencyMs": {
+              "samples": 30,
+              "mean": 1.157,
+              "p50": 1.007,
+              "p95": 2.103,
+              "p99": 3.464,
+              "max": 3.464
+            },
+            "successful": 30,
+            "failed": 0,
+            "windowSuccessful": 30,
+            "windowFailed": 0,
+            "windowBytes": 122880,
+            "successfulBytes": 122880,
+            "requestsPerSecond": 60,
+            "payloadMiBPerSecond": 0.234,
+            "completedAttemptsPerSecond": 60
+          },
+          "verdict": {
+            "latencyMs": {
+              "samples": 30,
+              "mean": 13.005,
+              "p50": 12.743,
+              "p95": 18.052,
+              "p99": 18.485,
+              "max": 18.485
+            },
+            "successful": 30,
+            "failed": 0,
+            "windowSuccessful": 28,
+            "windowFailed": 0,
+            "windowBytes": 2940,
+            "successfulBytes": 3150,
+            "requestsPerSecond": 56,
+            "payloadMiBPerSecond": 0.006,
+            "completedAttemptsPerSecond": 56
+          },
+          "delete": {
+            "latencyMs": {
+              "samples": 60,
+              "mean": 2.257,
+              "p50": 2.124,
+              "p95": 3.04,
+              "p99": 5.194,
+              "max": 5.194
+            },
+            "successful": 60,
+            "failed": 0,
+            "windowSuccessful": 56,
+            "windowFailed": 0,
+            "windowBytes": 0,
+            "successfulBytes": 0,
+            "requestsPerSecond": 112,
+            "payloadMiBPerSecond": 0,
+            "completedAttemptsPerSecond": 112
+          }
+        },
+        "errors": {}
+      },
+      "verification": {
+        "verifiedObjects": 4,
+        "algorithm": "SHA-256",
+        "complete": true,
+        "unknownOutcomeKeys": []
+      },
+      "leftovers": {
+        "count": 0,
+        "truncated": false
+      },
+      "repetition": 1,
+      "orderWithinRepetition": 5,
+      "rawFile": "rustfs-filesystem-quarantine-4096-c2-r0-1.json"
+    }
+  ],
+  "complete": true,
+  "versions": {
+    "node": "25.9.0",
+    "go": "1.25.6",
+    "java": "17.0.16+8",
+    "afero": "1.15.0",
+    "sqliteDriver": "github.com/mattn/go-sqlite3@v1.14.52",
+    "rustfs": "1.0.1",
+    "rustfsPackageSha256": "fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9",
+    "s3proxy": "4.1.1",
+    "s3proxySha256": "cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b",
+    "minio": "RELEASE.2025-10-15T17-29-55Z",
+    "minioSourceSha256": "be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "recordedAt": "2026-10-13T12:46:57.039Z",
+  "suitesComplete": 3,
+  "completedRuns": 22,
+  "dataVerification": true,
+  "noOperationFailures": true,
+  "noQuarantineLeftovers": true,
+  "diskHeadroomMaintained": true,
+  "totalDropped": 185,
+  "measurementTests": {
+    "passed": 12,
+    "failed": 0,
+    "command": "node --test scripts/performance.test.mjs packages/stow-s3/scripts/performance/verification.test.mjs"
+  },
+  "releaseBuild": {
+    "command": "make build",
+    "exitCode": 0
+  },
+  "baselineComparison": {
+    "sameBinary": false,
+    "sameHarness": true,
+    "sameLockfile": true,
+    "runtimePathsChecked": [
+      "cmd",
+      "pkg",
+      "internal",
+      "go.mod",
+      "go.sum",
+      "packages/stow-s3/src",
+      "packages/stow-s3/package.json",
+      "packages/stow-s3/package-lock.json"
+    ],
+    "runtimeChangedFiles": []
+  },
+  "memoryMinutes": [
+    {
+      "minute": 1,
+      "minMiB": 41.46875,
+      "maxMiB": 51
+    },
+    {
+      "minute": 2,
+      "minMiB": 41.03125,
+      "maxMiB": 45.203125
+    },
+    {
+      "minute": 3,
+      "minMiB": 42.375,
+      "maxMiB": 49.109375
+    },
+    {
+      "minute": 4,
+      "minMiB": 39.171875,
+      "maxMiB": 46.015625
+    },
+    {
+      "minute": 5,
+      "minMiB": 39.953125,
+      "maxMiB": 48.9375
+    }
+  ],
+  "qualificationProtocolComplete": false
+}

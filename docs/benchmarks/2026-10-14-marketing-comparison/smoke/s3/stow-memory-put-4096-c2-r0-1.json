@@ -1,0 +1,193 @@
+{
+  "scenario": {
+    "backend": "memory",
+    "workload": "put",
+    "bytes": 4096,
+    "concurrency": 2,
+    "rate": 0,
+    "soak": false,
+    "implementation": "stow-memory"
+  },
+  "startupMs": 35.6355329999933,
+  "firstWriteMs": 41.861462000000756,
+  "firstWriteBytes": 4096,
+  "firstWriteVerified": true,
+  "warmup": null,
+  "load": {
+    "mode": "closed-loop capacity",
+    "offered": 681,
+    "dropped": 0,
+    "failed": 0,
+    "successful": 681,
+    "windowSuccessful": 679,
+    "peakQueue": 0,
+    "expiredBeforeStart": 0,
+    "errors": {},
+    "measuredSeconds": 0.5,
+    "drainMs": 0.613,
+    "filesPerSecond": 1358,
+    "responseLatencyMs": {
+      "samples": 681,
+      "mean": 1.468,
+      "p50": 1.216,
+      "p95": 3.01,
+      "p99": 4.758,
+      "max": 10.537
+    },
+    "serviceLatencyMs": {
+      "samples": 681,
+      "mean": 1.467,
+      "p50": 1.216,
+      "p95": 3.01,
+      "p99": 4.758,
+      "max": 10.536
+    },
+    "queueWaitMs": {
+      "samples": 681,
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.001,
+      "p99": 0.005,
+      "max": 0.082
+    },
+    "schedulerLagMs": {
+      "samples": 0,
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    },
+    "perSecond": [
+      {
+        "second": 0,
+        "offered": 681,
+        "dropped": 0,
+        "successful": 679,
+        "failed": 0,
+        "peakQueue": 0
+      }
+    ]
+  },
+  "resources": {
+    "intervalSeconds": 0.5124186740000005,
+    "sampleIntervalMs": 250,
+    "samples": [
+      {
+        "elapsedSeconds": 0.007003262000005634,
+        "process": {
+          "rssBytes": 15945728,
+          "highWaterRssBytes": 15945728,
+          "cpuSeconds": 0,
+          "readBytes": 0,
+          "writtenBytes": 0
+        },
+        "diskAvailableBytes": 4935675904,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 197937\nuser_usec 160344\nsystem_usec 37592\nnice_usec 0\nnr_periods 16\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 98029568,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 43396371\nuser_usec 35471260\nsystem_usec 7925111\nnice_usec 0\nnr_periods 411\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.2670027260000061,
+        "process": {
+          "rssBytes": 19742720,
+          "highWaterRssBytes": 19742720,
+          "cpuSeconds": 0.06,
+          "readBytes": 0,
+          "writtenBytes": 0
+        },
+        "diskAvailableBytes": 4935675904,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 268806\nuser_usec 207499\nsystem_usec 61306\nnice_usec 0\nnr_periods 18\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 111648768,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 43732117\nuser_usec 35754024\nsystem_usec 7978093\nnice_usec 0\nnr_periods 413\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.5118595100000021,
+        "process": {
+          "rssBytes": 19959808,
+          "highWaterRssBytes": 19959808,
+          "cpuSeconds": 0.12,
+          "readBytes": 0,
+          "writtenBytes": 0
+        },
+        "diskAvailableBytes": 4935675904,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 346712\nuser_usec 252154\nsystem_usec 94558\nnice_usec 0\nnr_periods 21\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 140353536,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 44039996\nuser_usec 35996787\nsystem_usec 8043209\nnice_usec 0\nnr_periods 416\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    ],
+    "serverPeakSampledRssBytes": 19959808,
+    "serverHighWaterRssBytes": 19959808,
+    "serverAverageCpuPercent": 23.41835028440042,
+    "generatorPeakSampledRssBytes": 140353536,
+    "generatorCpuSeconds": 0.646612,
+    "generatorEventLoopDelayMs": {
+      "mean": 20.033536,
+      "max": 21.299199
+    },
+    "diskReadBytes": 0,
+    "diskWrittenBytes": 0,
+    "minimumSampledDiskAvailableBytes": 4935675904,
+    "diskHeadroomMaintained": true
+  },
+  "measurements": {
+    "operations": {
+      "put": {
+        "latencyMs": {
+          "samples": 681,
+          "mean": 1.442,
+          "p50": 1.181,
+          "p95": 2.951,
+          "p99": 4.758,
+          "max": 10.514
+        },
+        "successful": 681,
+        "failed": 0,
+        "windowSuccessful": 679,
+        "windowFailed": 0,
+        "windowBytes": 2781184,
+        "successfulBytes": 2789376,
+        "requestsPerSecond": 1358,
+        "payloadMiBPerSecond": 5.305,
+        "completedAttemptsPerSecond": 1358
+      }
+    },
+    "errors": {}
+  },
+  "verification": {
+    "verifiedObjects": 6,
+    "algorithm": "SHA-256",
+    "complete": true,
+    "unknownOutcomeKeys": []
+  },
+  "leftovers": {
+    "count": 0,
+    "truncated": false
+  },
+  "repetition": 1,
+  "orderWithinRepetition": 0
+}

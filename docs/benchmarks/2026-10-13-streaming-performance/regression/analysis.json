@@ -1,0 +1,596 @@
+{
+  "checkedAt": "2026-10-13T23:08:14.654Z",
+  "complete": true,
+  "nativeSamples": 18,
+  "s3Runs": 18,
+  "sameBuild": true,
+  "embedded": [
+    {
+      "implementation": "stow-memory",
+      "workload": "put",
+      "bytes": 1048576,
+      "cpu": 4,
+      "repetitions": 3,
+      "medianNsPerOp": 1213661,
+      "payloadMiBPerSecond": 823.956,
+      "minPayloadMiBPerSecond": 814.495,
+      "maxPayloadMiBPerSecond": 839.567,
+      "medianAllocatedBytesPerOp": 1074666,
+      "medianAllocationsPerOp": 14
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "get",
+      "bytes": 1048576,
+      "cpu": 4,
+      "repetitions": 3,
+      "medianNsPerOp": 146674,
+      "payloadMiBPerSecond": 6817.827,
+      "minPayloadMiBPerSecond": 6771.269,
+      "maxPayloadMiBPerSecond": 6906.977,
+      "medianAllocatedBytesPerOp": 34396,
+      "medianAllocationsPerOp": 10
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "cpu": 4,
+      "repetitions": 3,
+      "medianNsPerOp": 1572025,
+      "payloadMiBPerSecond": 636.12,
+      "minPayloadMiBPerSecond": 633.707,
+      "maxPayloadMiBPerSecond": 666.771,
+      "medianAllocatedBytesPerOp": 1103205,
+      "medianAllocationsPerOp": 47
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "put",
+      "bytes": 1048576,
+      "cpu": 4,
+      "repetitions": 3,
+      "medianNsPerOp": 2862044,
+      "payloadMiBPerSecond": 349.398,
+      "minPayloadMiBPerSecond": 344.324,
+      "maxPayloadMiBPerSecond": 368.052,
+      "medianAllocatedBytesPerOp": 1112601,
+      "medianAllocationsPerOp": 158
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "get",
+      "bytes": 1048576,
+      "cpu": 4,
+      "repetitions": 3,
+      "medianNsPerOp": 208033,
+      "payloadMiBPerSecond": 4806.929,
+      "minPayloadMiBPerSecond": 4776.325,
+      "maxPayloadMiBPerSecond": 4960.279,
+      "medianAllocatedBytesPerOp": 37907,
+      "medianAllocationsPerOp": 44
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "cpu": 4,
+      "repetitions": 3,
+      "medianNsPerOp": 3809550,
+      "payloadMiBPerSecond": 262.499,
+      "minPayloadMiBPerSecond": 254.307,
+      "maxPayloadMiBPerSecond": 266.237,
+      "medianAllocatedBytesPerOp": 1156305,
+      "medianAllocationsPerOp": 441
+    }
+  ],
+  "resources": [
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-1.json",
+      "backend": "memory",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 86.563,
+      "generatorAverageCpuPercent": 101.404,
+      "generatorEventLoopMaxMs": 48.464,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 66.91,
+      "startupMs": 42.189
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-1.json",
+      "backend": "filesystem",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 38.807,
+      "generatorAverageCpuPercent": 41.646,
+      "generatorEventLoopMaxMs": 30.556,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4685.91,
+      "serverHighWaterRssMiB": 27.145,
+      "startupMs": 25.723
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-2.json",
+      "backend": "filesystem",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 37.941,
+      "generatorAverageCpuPercent": 40.342,
+      "generatorEventLoopMaxMs": 28.541,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4685.91,
+      "serverHighWaterRssMiB": 28.512,
+      "startupMs": 25.758
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-2.json",
+      "backend": "memory",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 93.076,
+      "generatorAverageCpuPercent": 99.984,
+      "generatorEventLoopMaxMs": 43.713,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 66.172,
+      "startupMs": 16.897
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-3.json",
+      "backend": "memory",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 88.276,
+      "generatorAverageCpuPercent": 100.487,
+      "generatorEventLoopMaxMs": 43.45,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 65.238,
+      "startupMs": 16.541
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-3.json",
+      "backend": "filesystem",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 38.5,
+      "generatorAverageCpuPercent": 40.184,
+      "generatorEventLoopMaxMs": 29.753,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4685.91,
+      "serverHighWaterRssMiB": 28.68,
+      "startupMs": 25.86
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-1.json",
+      "backend": "memory",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 145.197,
+      "generatorAverageCpuPercent": 150.817,
+      "generatorEventLoopMaxMs": 33.817,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 49.602,
+      "startupMs": 16.579
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-1.json",
+      "backend": "filesystem",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 151.184,
+      "generatorAverageCpuPercent": 151.573,
+      "generatorEventLoopMaxMs": 31.801,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 3,
+        "throttledPeriodPercent": 1.493,
+        "cumulativeThrottledSeconds": 0.002
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4690.93,
+      "serverHighWaterRssMiB": 21.426,
+      "startupMs": 27.561
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-2.json",
+      "backend": "filesystem",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 133.178,
+      "generatorAverageCpuPercent": 150.065,
+      "generatorEventLoopMaxMs": 33.784,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4690.93,
+      "serverHighWaterRssMiB": 21.199,
+      "startupMs": 32.006
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-2.json",
+      "backend": "memory",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 147.62,
+      "generatorAverageCpuPercent": 149.962,
+      "generatorEventLoopMaxMs": 41.976,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 2,
+        "throttledPeriodPercent": 1,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 49.613,
+      "startupMs": 17.515
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-3.json",
+      "backend": "memory",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 129.494,
+      "generatorAverageCpuPercent": 146.681,
+      "generatorEventLoopMaxMs": 34.57,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 1,
+        "throttledPeriodPercent": 0.5,
+        "cumulativeThrottledSeconds": 0.003
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 51.676,
+      "startupMs": 17.643
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-3.json",
+      "backend": "filesystem",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 142.483,
+      "generatorAverageCpuPercent": 150.572,
+      "generatorEventLoopMaxMs": 37.028,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 9,
+        "throttledPeriodPercent": 4.5,
+        "cumulativeThrottledSeconds": 0.02
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4690.93,
+      "serverHighWaterRssMiB": 19.801,
+      "startupMs": 33.938
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-1.json",
+      "backend": "memory",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 87.942,
+      "generatorAverageCpuPercent": 124.741,
+      "generatorEventLoopMaxMs": 32.506,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 60.746,
+      "startupMs": 18.062
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-1.json",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 54.566,
+      "generatorAverageCpuPercent": 82.791,
+      "generatorEventLoopMaxMs": 31.556,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4686.898,
+      "serverHighWaterRssMiB": 25.629,
+      "startupMs": 24.717
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-2.json",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 53.637,
+      "generatorAverageCpuPercent": 81.715,
+      "generatorEventLoopMaxMs": 36.176,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4686.906,
+      "serverHighWaterRssMiB": 24.516,
+      "startupMs": 24.635
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-2.json",
+      "backend": "memory",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 89.306,
+      "generatorAverageCpuPercent": 127.052,
+      "generatorEventLoopMaxMs": 37.65,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 61.211,
+      "startupMs": 17.355
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-3.json",
+      "backend": "memory",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-memory",
+      "serverAverageCpuPercent": 85.401,
+      "generatorAverageCpuPercent": 122.994,
+      "generatorEventLoopMaxMs": 39.518,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4707.027,
+      "serverHighWaterRssMiB": 60.387,
+      "startupMs": 18.417
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-3.json",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "rate": 0,
+      "soak": false,
+      "implementation": "stow-filesystem",
+      "serverAverageCpuPercent": 53.504,
+      "generatorAverageCpuPercent": 82.35,
+      "generatorEventLoopMaxMs": 32.834,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "minimumDiskAvailableMiB": 4686.898,
+      "serverHighWaterRssMiB": 24.715,
+      "startupMs": 26.822
+    }
+  ],
+  "agent": [],
+  "serverAgent": [],
+  "nodeAgent": []
+}

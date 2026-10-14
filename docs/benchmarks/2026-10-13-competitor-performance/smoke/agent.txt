@@ -1,0 +1,131 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-benchmark
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkAgentStartup/buffer-memory/4096B         	
+AGENT_SAMPLE {"implementation":"buffer-memory","bytes":4096,"sample":0,"startupMs":0.00028,"firstWriteMs":0.00175,"verified":true}
+
+AGENT_SAMPLE {"implementation":"buffer-memory","bytes":4096,"sample":1,"startupMs":0.00011,"firstWriteMs":0.00183,"verified":true}
+
+AGENT_SAMPLE {"implementation":"buffer-memory","bytes":4096,"sample":2,"startupMs":0.00007,"firstWriteMs":0.00112,"verified":true}
+       3	     57146 ns/op	      1567 first-write-ns/op	       153.3 startup-ns/op
+BenchmarkAgentStartup/buffer-memory/1048576B      	
+AGENT_SAMPLE {"implementation":"buffer-memory","bytes":1048576,"sample":0,"startupMs":0.00032,"firstWriteMs":0.04177,"verified":true}
+
+AGENT_SAMPLE {"implementation":"buffer-memory","bytes":1048576,"sample":1,"startupMs":0.00014,"firstWriteMs":0.311107,"verified":true}
+
+AGENT_SAMPLE {"implementation":"buffer-memory","bytes":1048576,"sample":2,"startupMs":0.00019,"firstWriteMs":0.342286,"verified":true}
+       3	   1656020 ns/op	    231721 first-write-ns/op	       216.7 startup-ns/op
+BenchmarkAgentStartup/afero-memory/4096B          	
+AGENT_SAMPLE {"implementation":"afero-memory","bytes":4096,"sample":0,"startupMs":0.00019,"firstWriteMs":0.00286,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-memory","bytes":4096,"sample":1,"startupMs":0.00009,"firstWriteMs":0.00157,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-memory","bytes":4096,"sample":2,"startupMs":0.00009,"firstWriteMs":0.00095,"verified":true}
+       3	     46153 ns/op	      1793 first-write-ns/op	       123.3 startup-ns/op
+BenchmarkAgentStartup/afero-memory/1048576B       	
+AGENT_SAMPLE {"implementation":"afero-memory","bytes":1048576,"sample":0,"startupMs":0.00036,"firstWriteMs":0.065399,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-memory","bytes":1048576,"sample":1,"startupMs":0.00013,"firstWriteMs":0.252157,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-memory","bytes":1048576,"sample":2,"startupMs":0.00009,"firstWriteMs":0.064039,"verified":true}
+       3	   1607154 ns/op	    127198 first-write-ns/op	       193.3 startup-ns/op
+BenchmarkAgentStartup/sqlite-memory/4096B         	
+AGENT_SAMPLE {"implementation":"sqlite-memory","bytes":4096,"sample":0,"startupMs":0.097079,"firstWriteMs":0.109989,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-memory","bytes":4096,"sample":1,"startupMs":0.059009,"firstWriteMs":0.069729,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-memory","bytes":4096,"sample":2,"startupMs":0.157048,"firstWriteMs":0.165988,"verified":true,"sqliteVersion":"3.53.4"}
+       3	    195501 ns/op	    115235 first-write-ns/op	    104379 startup-ns/op
+BenchmarkAgentStartup/sqlite-memory/1048576B      	
+AGENT_SAMPLE {"implementation":"sqlite-memory","bytes":1048576,"sample":0,"startupMs":0.09602,"firstWriteMs":0.675284,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-memory","bytes":1048576,"sample":1,"startupMs":0.066629,"firstWriteMs":0.548204,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-memory","bytes":1048576,"sample":2,"startupMs":0.066449,"firstWriteMs":0.540494,"verified":true,"sqliteVersion":"3.53.4"}
+       3	   2407099 ns/op	    587994 first-write-ns/op	     76366 startup-ns/op
+BenchmarkAgentStartup/stow-memory/4096B           	
+AGENT_SAMPLE {"implementation":"stow-memory","bytes":4096,"sample":0,"startupMs":0.00426,"firstWriteMs":0.016029,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-memory","bytes":4096,"sample":1,"startupMs":0.00083,"firstWriteMs":0.00734,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-memory","bytes":4096,"sample":2,"startupMs":0.00058,"firstWriteMs":0.01653,"verified":true}
+       3	     58479 ns/op	     13300 first-write-ns/op	      1890 startup-ns/op
+BenchmarkAgentStartup/stow-memory/1048576B        	
+AGENT_SAMPLE {"implementation":"stow-memory","bytes":1048576,"sample":0,"startupMs":0.00558,"firstWriteMs":1.150368,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-memory","bytes":1048576,"sample":1,"startupMs":0.00134,"firstWriteMs":1.404216,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-memory","bytes":1048576,"sample":2,"startupMs":0.00086,"firstWriteMs":1.366276,"verified":true}
+       3	   2831991 ns/op	   1306953 first-write-ns/op	      2593 startup-ns/op
+BenchmarkAgentStartup/tempfile-filesystem/4096B   	
+AGENT_SAMPLE {"implementation":"tempfile-filesystem","bytes":4096,"sample":0,"startupMs":0.00021,"firstWriteMs":0.024799,"verified":true}
+
+AGENT_SAMPLE {"implementation":"tempfile-filesystem","bytes":4096,"sample":1,"startupMs":0.00011,"firstWriteMs":0.01997,"verified":true}
+
+AGENT_SAMPLE {"implementation":"tempfile-filesystem","bytes":4096,"sample":2,"startupMs":0.00009,"firstWriteMs":0.01836,"verified":true}
+       3	     83509 ns/op	     21043 first-write-ns/op	       136.7 startup-ns/op
+BenchmarkAgentStartup/tempfile-filesystem/1048576B         	
+AGENT_SAMPLE {"implementation":"tempfile-filesystem","bytes":1048576,"sample":0,"startupMs":0.00036,"firstWriteMs":0.115059,"verified":true}
+
+AGENT_SAMPLE {"implementation":"tempfile-filesystem","bytes":1048576,"sample":1,"startupMs":0.00014,"firstWriteMs":0.089589,"verified":true}
+
+AGENT_SAMPLE {"implementation":"tempfile-filesystem","bytes":1048576,"sample":2,"startupMs":0.00013,"firstWriteMs":0.089299,"verified":true}
+       3	   1604071 ns/op	     97982 first-write-ns/op	       210.0 startup-ns/op
+BenchmarkAgentStartup/atomic-filesystem/4096B              	
+AGENT_SAMPLE {"implementation":"atomic-filesystem","bytes":4096,"sample":0,"startupMs":0.00026,"firstWriteMs":0.567634,"verified":true}
+
+AGENT_SAMPLE {"implementation":"atomic-filesystem","bytes":4096,"sample":1,"startupMs":0.00016,"firstWriteMs":0.658933,"verified":true}
+
+AGENT_SAMPLE {"implementation":"atomic-filesystem","bytes":4096,"sample":2,"startupMs":0.00012,"firstWriteMs":0.561754,"verified":true}
+       3	    671513 ns/op	    596107 first-write-ns/op	       180.0 startup-ns/op
+BenchmarkAgentStartup/atomic-filesystem/1048576B           	
+AGENT_SAMPLE {"implementation":"atomic-filesystem","bytes":1048576,"sample":0,"startupMs":0.00041,"firstWriteMs":1.139988,"verified":true}
+
+AGENT_SAMPLE {"implementation":"atomic-filesystem","bytes":1048576,"sample":1,"startupMs":0.00031,"firstWriteMs":1.384325,"verified":true}
+
+AGENT_SAMPLE {"implementation":"atomic-filesystem","bytes":1048576,"sample":2,"startupMs":0.00031,"firstWriteMs":1.07461,"verified":true}
+       3	   2776985 ns/op	   1199641 first-write-ns/op	       343.3 startup-ns/op
+BenchmarkAgentStartup/afero-filesystem/4096B               	
+AGENT_SAMPLE {"implementation":"afero-filesystem","bytes":4096,"sample":0,"startupMs":0.00027,"firstWriteMs":0.01788,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-filesystem","bytes":4096,"sample":1,"startupMs":0.0001,"firstWriteMs":0.01147,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-filesystem","bytes":4096,"sample":2,"startupMs":0.00007,"firstWriteMs":0.0099,"verified":true}
+       3	     83306 ns/op	     13083 first-write-ns/op	       146.7 startup-ns/op
+BenchmarkAgentStartup/afero-filesystem/1048576B            	
+AGENT_SAMPLE {"implementation":"afero-filesystem","bytes":1048576,"sample":0,"startupMs":0.0003,"firstWriteMs":0.096109,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-filesystem","bytes":1048576,"sample":1,"startupMs":0.00027,"firstWriteMs":0.111719,"verified":true}
+
+AGENT_SAMPLE {"implementation":"afero-filesystem","bytes":1048576,"sample":2,"startupMs":0.00008,"firstWriteMs":0.093489,"verified":true}
+       3	   1611557 ns/op	    100439 first-write-ns/op	       216.7 startup-ns/op
+BenchmarkAgentStartup/sqlite-filesystem/4096B              	
+AGENT_SAMPLE {"implementation":"sqlite-filesystem","bytes":4096,"sample":0,"startupMs":2.475494,"firstWriteMs":2.771971,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-filesystem","bytes":4096,"sample":1,"startupMs":1.485016,"firstWriteMs":1.756743,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-filesystem","bytes":4096,"sample":2,"startupMs":1.869781,"firstWriteMs":2.150348,"verified":true,"sqliteVersion":"3.53.4"}
+       3	   2675176 ns/op	   2226354 first-write-ns/op	   1943430 startup-ns/op
+BenchmarkAgentStartup/sqlite-filesystem/1048576B           	
+AGENT_SAMPLE {"implementation":"sqlite-filesystem","bytes":1048576,"sample":0,"startupMs":2.379646,"firstWriteMs":5.255357,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-filesystem","bytes":1048576,"sample":1,"startupMs":1.93536,"firstWriteMs":5.368776,"verified":true,"sqliteVersion":"3.53.4"}
+
+AGENT_SAMPLE {"implementation":"sqlite-filesystem","bytes":1048576,"sample":2,"startupMs":2.87014,"firstWriteMs":5.184567,"verified":true,"sqliteVersion":"3.53.4"}
+       3	   9463827 ns/op	   5269567 first-write-ns/op	   2395049 startup-ns/op
+BenchmarkAgentStartup/stow-filesystem/4096B                	
+AGENT_SAMPLE {"implementation":"stow-filesystem","bytes":4096,"sample":0,"startupMs":1.440125,"firstWriteMs":1.97453,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-filesystem","bytes":4096,"sample":1,"startupMs":1.592494,"firstWriteMs":7.089608,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-filesystem","bytes":4096,"sample":2,"startupMs":1.715352,"firstWriteMs":2.252587,"verified":true}
+       3	   3976373 ns/op	   3772242 first-write-ns/op	   1582657 startup-ns/op
+BenchmarkAgentStartup/stow-filesystem/1048576B             	
+AGENT_SAMPLE {"implementation":"stow-filesystem","bytes":1048576,"sample":0,"startupMs":4.522845,"firstWriteMs":7.470404,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-filesystem","bytes":1048576,"sample":1,"startupMs":1.450165,"firstWriteMs":4.609793,"verified":true}
+
+AGENT_SAMPLE {"implementation":"stow-filesystem","bytes":1048576,"sample":2,"startupMs":1.626824,"firstWriteMs":6.319796,"verified":true}
+       3	   7950859 ns/op	   6133331 first-write-ns/op	   2533278 startup-ns/op
+PASS

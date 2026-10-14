@@ -1,0 +1,27 @@
+--- docs/api/go.md
++++ Railway generated go.md
+@@ -2170,9 +2170,10 @@
+ ```go
+ type RecoveryHold struct {
+ 	RecoveryHoldRequest
+-	Meaning		string		`json:"meaning"`
+-	State		string		`json:"state"`
+-	Created		time.Time	`json:"created"`
++	Meaning	string	`json:"meaning"`
++	State	string	`json:"state"`
++	Created	time.
++		Time	`json:"created"`
+ 	FinishedAt	time.Time	`json:"finished_at,omitempty"`
+ }
+ ```
+@@ -2185,8 +2186,8 @@
+ type RecoveryHoldPage struct {
+ 	Holds		[]RecoveryHold	`json:"holds"`
+ 	NextCursor	string		`json:"next_cursor,omitempty"`
+-	ReservedBytes	int64		`json:"reserved_bytes"`
+-
++
++	ReservedBytes		int64	`json:"reserved_bytes"`
+ 	PeakReservedBytes	int64	`json:"peak_reserved_bytes"`
+ }
+ ```

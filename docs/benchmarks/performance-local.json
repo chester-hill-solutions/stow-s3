@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "label": "Local exploratory baseline; loopback HTTP; warmed caches",
+  "warmupSeconds": 1,
+  "durationSeconds": 5,
+  "repetitions": 3,
+  "soakSeconds": 30,
+  "maxQueue": 8,
+  "backends": ["memory", "filesystem"],
+  "workloads": ["put", "get", "quarantine"],
+  "sizes": [1048576],
+  "concurrency": [4],
+  "rates": [0, 100]
+}

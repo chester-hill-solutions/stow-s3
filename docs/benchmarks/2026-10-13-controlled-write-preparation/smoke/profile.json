@@ -1,0 +1,37 @@
+{
+  "label": "Railway paired write-preparation comparison; exploratory",
+  "pairedVariants": true,
+  "targets": [
+    "stow-memory-before",
+    "stow-memory",
+    "stow-filesystem-before",
+    "stow-filesystem"
+  ],
+  "warmupSeconds": 0,
+  "durationSeconds": 2,
+  "repetitions": 1,
+  "soakSeconds": 0,
+  "sizes": [
+    1048576
+  ],
+  "concurrency": [
+    4
+  ],
+  "rates": [
+    0
+  ],
+  "retainedObjects": 16,
+  "maxQueue": 8,
+  "workloads": [
+    "put",
+    "get",
+    "quarantine"
+  ],
+  "embedded": {
+    "benchtime": "500ms",
+    "count": 1,
+    "cpu": "4",
+    "pattern": "BenchmarkComparison/stow-(memory|filesystem)/(put|get|quarantine)/1048576B$",
+    "expectedSamplesPerVariant": 36
+  }
+}

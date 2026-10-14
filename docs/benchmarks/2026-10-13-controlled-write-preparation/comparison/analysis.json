@@ -1,0 +1,3589 @@
+{
+  "complete": true,
+  "checkedAt": "2026-10-14T03:55:42.762Z",
+  "sameImageAndWorkers": true,
+  "source": {
+    "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+    "dirtyFiles": [
+      "M Makefile",
+      " M docs/CODE_STANDARDS.md",
+      " M docs/README.md",
+      " M docs/adr/0008-workspace-backend-real-files.md",
+      " M docs/adr/README.md",
+      " M docs/api/go.md",
+      " M docs/portable-workspace-usage.md",
+      " M go.mod",
+      " M go.sum",
+      " M internal/atomicfile/atomicfile.go",
+      " M internal/runtime/adapter.go",
+      " M internal/runtime/buckets.go",
+      " M internal/runtime/instance.go",
+      " M internal/runtime/multipart.go",
+      " M internal/runtime/objects.go",
+      " M internal/runtime/save_requests.go",
+      " M internal/runtime/staged-reset_test.go",
+      " M internal/runtime/staged-writes.go",
+      " M internal/runtime/state.go",
+      " M internal/runtime/stream-writes.go",
+      " M internal/runtime/streams.go",
+      " M internal/runtime/streams_test.go",
+      " M internal/runtime/types.go",
+      " M internal/runtime/workspace_usage.go",
+      " M internal/s3api/checksum_test.go",
+      " M internal/s3api/errors.go",
+      " M internal/s3api/handlers_bucket.go",
+      " M internal/s3api/handlers_multipart.go",
+      " M internal/s3api/request.go",
+      " M internal/storage/bytes.go",
+      " M internal/storage/checksum.go",
+      " M internal/storage/fs/capacity.go",
+      " M internal/storage/fs/fs.go",
+      " M internal/storage/fs/fs_atomic.go",
+      " M internal/storage/fs/fs_copy.go",
+      " M internal/storage/fs/fs_list.go",
+      " M internal/storage/fs/fs_multipart.go",
+      " M internal/storage/fs/fs_put.go",
+      " M internal/storage/fs/fs_records.go",
+      " M internal/storage/fs/recovery_holds.go",
+      " M internal/storage/fs/save_requests.go",
+      " M internal/storage/memory.go",
+      " M internal/storage/store.go",
+      " M internal/storage/types.go",
+      " M internal/storage/util.go",
+      " M internal/storage/workspace/objects.go",
+      " M packages/stow-s3/dist/stow-runtime.wasm",
+      " M pkg/stow/filesystem.go",
+      " M pkg/stow/runtime.go",
+      " M scripts/baselines/go-quality.json",
+      " M site/build.mjs",
+      " M site/index.html",
+      " M tools/quality/main.go",
+      "?? .github/workflows/performance.yml",
+      "?? benchmark/",
+      "?? docs/adr/0020-binary-object-records.md",
+      "?? docs/benchmarks/2026-10-12-performance/",
+      "?? docs/benchmarks/2026-10-13-competitor-performance/",
+      "?? docs/benchmarks/2026-10-13-memory-performance/",
+      "?? docs/benchmarks/2026-10-13-railway-performance/",
+      "?? docs/benchmarks/2026-10-13-storage-optimization/",
+      "?? docs/benchmarks/2026-10-13-streaming-performance/",
+      "?? docs/benchmarks/2026-10-13-usage-recovery/",
+      "?? docs/benchmarks/2026-10-13-wasm-size/",
+      "?? docs/benchmarks/2026-10-13-write-preparation/",
+      "?? docs/benchmarks/performance-local.json",
+      "?? docs/benchmarks/performance-qualification.json",
+      "?? docs/benchmarks/railway-environment.json",
+      "?? docs/performance-testing.md",
+      "?? docs/railway-performance.md",
+      "?? internal/runtime/managed_usage_test.go",
+      "?? internal/runtime/stream_allocation_test.go",
+      "?? internal/runtime/stream_copy.go",
+      "?? internal/runtime/stream_performance_test.go",
+      "?? internal/runtime/usage_multipart.go",
+      "?? internal/runtime/usage_recovery.go",
+      "?? internal/runtime/usage_state.go",
+      "?? internal/runtime/usage_transitions_test.go",
+      "?? internal/storage/fs/record_codec.go",
+      "?? internal/storage/fs/record_format_test.go",
+      "?? internal/storage/fs/record_io.go",
+      "?? internal/storage/fs/record_performance_test.go",
+      "?? internal/storage/fs/recordpb/",
+      "?? internal/storage/fs/runtime_recovery_test.go",
+      "?? internal/storage/fs/save_checksum_test.go",
+      "?? internal/storage/fs/usage_revision.go",
+      "?? internal/storage/owned_reader.go",
+      "?? internal/storage/owned_reader_test.go",
+      "?? internal/storage/put_body.go",
+      "?? internal/storage/put_body_contract_test.go",
+      "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+      "?? packages/stow-s3/scripts/performance/",
+      "?? pkg/stow/filesystem_native.go",
+      "?? pkg/stow/filesystem_recovery_test.go",
+      "?? pkg/stow/filesystem_unsupported.go",
+      "?? pkg/stow/performance_benchmark_test.go",
+      "?? pkg/stow/wasm_dependencies_test.go",
+      "?? scripts/benchmark-embedded.mjs",
+      "?? scripts/performance.test.mjs",
+      "?? site/assets/benchmark-render.js",
+      "?? site/assets/benchmarks.css",
+      "?? site/assets/benchmarks.js",
+      "?? site/benchmark-data.json",
+      "?? tools/quality/generated.go",
+      "?? tools/quality/generated_test.go"
+    ],
+    "payloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+    "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+  },
+  "variants": {
+    "specification": {
+      "scope": "Reconstructed immediately preceding write-preparation implementation; keeps usage/recovery consolidation and all earlier changes. Not the historical pre-streaming build.",
+      "afterVerificationDeployment": "6b36d5a2-38e0-4fe8-83d6-8852ef4ece07",
+      "beforePatchSha256": "f7f7a058905c3f59e0d6b14e9d74dda173120fcef20115adae1c486601a37fa5",
+      "files": [
+        {
+          "path": "internal/storage/bytes.go",
+          "afterSha256": "ce36c51a325098a9e249028787b3fb783adb3e655b4ce2901dea13995fb351d3",
+          "beforeSha256": "efb463bec5d530408a10377e5b377163afd2bb45ea3ed975681eb1340108617c"
+        },
+        {
+          "path": "internal/storage/checksum.go",
+          "afterSha256": "bc693fb9cdad92f18129837bb27d3959c73697eb4898b2481786f87fe72021f6",
+          "beforeSha256": "2bfd595b2408f411bda48154da53756ba0e1bbda88a521fe6044945db188161d"
+        },
+        {
+          "path": "internal/storage/memory.go",
+          "afterSha256": "1f96537cccacb01644a1e29e427612075d9558df9c7bced1fc1a26e28c8254fb",
+          "beforeSha256": "c830c8d14ebfe341af01d110819c9635c875ba24cc57c673504a56383d81d78d"
+        },
+        {
+          "path": "internal/storage/fs/fs_put.go",
+          "afterSha256": "dedec598b3a14543f263d66504216244bd0b9adfbbdb5335d987a9d8ad280451",
+          "beforeSha256": "afaf985f06f83e6fe110f6cfbef110b3d93ac580d7176ccfafe7fbb605ea52c1"
+        },
+        {
+          "path": "internal/storage/fs/save_requests.go",
+          "afterSha256": "7e6c283ef9986808a2cfc3d06316eccc6200316deeb9f9ae95170db19e526c5a",
+          "beforeSha256": "f6429cc5981b634e66d37d812f659d415f4ec5073021b68a4e6c088fd81fb0c5"
+        },
+        {
+          "path": "internal/storage/workspace/objects.go",
+          "afterSha256": "7a86691c3ba5d923d51fed528480e892286f67d50729360279bb221b1726fe6d",
+          "beforeSha256": "c96da5dcb8c178e22836c031dfd36117158da569aedbad4abd1344420fe5c03d"
+        },
+        {
+          "path": "internal/storage/put_body.go",
+          "afterSha256": "b3d2aa093a86ccb69fe74cb709151e59cd31b65b2f5eee3c4a7cbd9fde07303f",
+          "beforeSha256": null
+        }
+      ]
+    },
+    "variants": {
+      "after": {
+        "productionSourceSha256": "5ee635991e1c33d16a668a948279ac6f96356f8920a9a086afe1f55302632706",
+        "serverSha256": "7c80ec1b79aa0d457e2c4f7e7eb680ae2a8f13bf060fef2961a86d170dca70a6",
+        "embeddedSha256": "ff9d24a65306bd5560aa75f41a67263b182ee6c1cedf78e64271045dd3cf2b56",
+        "raceTestsPassed": true
+      },
+      "before": {
+        "productionSourceSha256": "83510190ebb4ff721eac66830f1592f416cc28e62b1b639c9fb783824aec5e6c",
+        "serverSha256": "7f09703ce8151b6e39455d0f3c9e899e75b8e7019f36a0cc0687c64ff4925f8e",
+        "embeddedSha256": "d88c6666968b60ac0555fca79768ec7136907ccf1f2e75711f8dc4d0c74dae3f",
+        "raceTestsPassed": true,
+        "excludedTests": [
+          "TestComputedChecksumSaveReplay",
+          "TestStorePreparesEmptyBody"
+        ],
+        "expectedRetryRegressionsReproduced": true
+      }
+    },
+    "go": "go version go1.25.6 linux/amd64",
+    "source": {
+      "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+      "dirtyFiles": [
+        "M Makefile",
+        " M docs/CODE_STANDARDS.md",
+        " M docs/README.md",
+        " M docs/adr/0008-workspace-backend-real-files.md",
+        " M docs/adr/README.md",
+        " M docs/api/go.md",
+        " M docs/portable-workspace-usage.md",
+        " M go.mod",
+        " M go.sum",
+        " M internal/atomicfile/atomicfile.go",
+        " M internal/runtime/adapter.go",
+        " M internal/runtime/buckets.go",
+        " M internal/runtime/instance.go",
+        " M internal/runtime/multipart.go",
+        " M internal/runtime/objects.go",
+        " M internal/runtime/save_requests.go",
+        " M internal/runtime/staged-reset_test.go",
+        " M internal/runtime/staged-writes.go",
+        " M internal/runtime/state.go",
+        " M internal/runtime/stream-writes.go",
+        " M internal/runtime/streams.go",
+        " M internal/runtime/streams_test.go",
+        " M internal/runtime/types.go",
+        " M internal/runtime/workspace_usage.go",
+        " M internal/s3api/checksum_test.go",
+        " M internal/s3api/errors.go",
+        " M internal/s3api/handlers_bucket.go",
+        " M internal/s3api/handlers_multipart.go",
+        " M internal/s3api/request.go",
+        " M internal/storage/bytes.go",
+        " M internal/storage/checksum.go",
+        " M internal/storage/fs/capacity.go",
+        " M internal/storage/fs/fs.go",
+        " M internal/storage/fs/fs_atomic.go",
+        " M internal/storage/fs/fs_copy.go",
+        " M internal/storage/fs/fs_list.go",
+        " M internal/storage/fs/fs_multipart.go",
+        " M internal/storage/fs/fs_put.go",
+        " M internal/storage/fs/fs_records.go",
+        " M internal/storage/fs/recovery_holds.go",
+        " M internal/storage/fs/save_requests.go",
+        " M internal/storage/memory.go",
+        " M internal/storage/store.go",
+        " M internal/storage/types.go",
+        " M internal/storage/util.go",
+        " M internal/storage/workspace/objects.go",
+        " M packages/stow-s3/dist/stow-runtime.wasm",
+        " M pkg/stow/filesystem.go",
+        " M pkg/stow/runtime.go",
+        " M scripts/baselines/go-quality.json",
+        " M site/build.mjs",
+        " M site/index.html",
+        " M tools/quality/main.go",
+        "?? .github/workflows/performance.yml",
+        "?? benchmark/",
+        "?? docs/adr/0020-binary-object-records.md",
+        "?? docs/benchmarks/2026-10-12-performance/",
+        "?? docs/benchmarks/2026-10-13-competitor-performance/",
+        "?? docs/benchmarks/2026-10-13-memory-performance/",
+        "?? docs/benchmarks/2026-10-13-railway-performance/",
+        "?? docs/benchmarks/2026-10-13-storage-optimization/",
+        "?? docs/benchmarks/2026-10-13-streaming-performance/",
+        "?? docs/benchmarks/2026-10-13-usage-recovery/",
+        "?? docs/benchmarks/2026-10-13-wasm-size/",
+        "?? docs/benchmarks/2026-10-13-write-preparation/",
+        "?? docs/benchmarks/performance-local.json",
+        "?? docs/benchmarks/performance-qualification.json",
+        "?? docs/benchmarks/railway-environment.json",
+        "?? docs/performance-testing.md",
+        "?? docs/railway-performance.md",
+        "?? internal/runtime/managed_usage_test.go",
+        "?? internal/runtime/stream_allocation_test.go",
+        "?? internal/runtime/stream_copy.go",
+        "?? internal/runtime/stream_performance_test.go",
+        "?? internal/runtime/usage_multipart.go",
+        "?? internal/runtime/usage_recovery.go",
+        "?? internal/runtime/usage_state.go",
+        "?? internal/runtime/usage_transitions_test.go",
+        "?? internal/storage/fs/record_codec.go",
+        "?? internal/storage/fs/record_format_test.go",
+        "?? internal/storage/fs/record_io.go",
+        "?? internal/storage/fs/record_performance_test.go",
+        "?? internal/storage/fs/recordpb/",
+        "?? internal/storage/fs/runtime_recovery_test.go",
+        "?? internal/storage/fs/save_checksum_test.go",
+        "?? internal/storage/fs/usage_revision.go",
+        "?? internal/storage/owned_reader.go",
+        "?? internal/storage/owned_reader_test.go",
+        "?? internal/storage/put_body.go",
+        "?? internal/storage/put_body_contract_test.go",
+        "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+        "?? packages/stow-s3/scripts/performance/",
+        "?? pkg/stow/filesystem_native.go",
+        "?? pkg/stow/filesystem_recovery_test.go",
+        "?? pkg/stow/filesystem_unsupported.go",
+        "?? pkg/stow/performance_benchmark_test.go",
+        "?? pkg/stow/wasm_dependencies_test.go",
+        "?? scripts/benchmark-embedded.mjs",
+        "?? scripts/performance.test.mjs",
+        "?? site/assets/benchmark-render.js",
+        "?? site/assets/benchmarks.css",
+        "?? site/assets/benchmarks.js",
+        "?? site/benchmark-data.json",
+        "?? tools/quality/generated.go",
+        "?? tools/quality/generated_test.go"
+      ],
+      "payloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+      "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+    }
+  },
+  "s3Runs": 72,
+  "nativeSamples": 72,
+  "managedSaveSamples": 12,
+  "failures": 0,
+  "drops": 0,
+  "analysisSourceSha256": "0abf084ab367db5cab5918e77cd56b4cb885ddfa742fb30f8e441ee78f90ba92",
+  "s3": [
+    {
+      "backend": "memory",
+      "workload": "put",
+      "before": {
+        "filesPerSecond": 177.65,
+        "minFilesPerSecond": 172.3,
+        "maxFilesPerSecond": 187,
+        "payloadMiBPerSecond": 177.65,
+        "medianRunP99Ms": 41.851,
+        "peakSampledServerRssMiB": 66.168,
+        "medianServerCpuPercent": 89.846,
+        "minimumCompletedSamples": 3450,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "after": {
+        "filesPerSecond": 171.05,
+        "minFilesPerSecond": 159.95,
+        "maxFilesPerSecond": 188.4,
+        "payloadMiBPerSecond": 171.05,
+        "medianRunP99Ms": 42.913,
+        "peakSampledServerRssMiB": 66.984,
+        "medianServerCpuPercent": 87.956,
+        "minimumCompletedSamples": 3203,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -7.096,
+          -10.717,
+          -1.531,
+          9.344,
+          -8.77,
+          6.756
+        ],
+        "medianPairedPercentChange": -4.314,
+        "geometricMeanPercentChange": -2.298,
+        "conditional95PercentInterval": [
+          -10.616,
+          6.794
+        ]
+      },
+      "pairs": [
+        {
+          "before": 184.6,
+          "after": 171.5,
+          "beforeFile": "stow-memory-before-put-1048576-c4-r0-1.json",
+          "afterFile": "stow-memory-put-1048576-c4-r0-1.json"
+        },
+        {
+          "before": 179.15,
+          "after": 159.95,
+          "beforeFile": "stow-memory-before-put-1048576-c4-r0-2.json",
+          "afterFile": "stow-memory-put-1048576-c4-r0-2.json"
+        },
+        {
+          "before": 173.05,
+          "after": 170.4,
+          "beforeFile": "stow-memory-before-put-1048576-c4-r0-3.json",
+          "afterFile": "stow-memory-put-1048576-c4-r0-3.json"
+        },
+        {
+          "before": 172.3,
+          "after": 188.4,
+          "beforeFile": "stow-memory-before-put-1048576-c4-r0-4.json",
+          "afterFile": "stow-memory-put-1048576-c4-r0-4.json"
+        },
+        {
+          "before": 187,
+          "after": 170.6,
+          "beforeFile": "stow-memory-before-put-1048576-c4-r0-5.json",
+          "afterFile": "stow-memory-put-1048576-c4-r0-5.json"
+        },
+        {
+          "before": 176.15,
+          "after": 188.05,
+          "beforeFile": "stow-memory-before-put-1048576-c4-r0-6.json",
+          "afterFile": "stow-memory-put-1048576-c4-r0-6.json"
+        }
+      ]
+    },
+    {
+      "backend": "filesystem",
+      "workload": "put",
+      "before": {
+        "filesPerSecond": 66.5,
+        "minFilesPerSecond": 62.3,
+        "maxFilesPerSecond": 66.55,
+        "payloadMiBPerSecond": 66.5,
+        "medianRunP99Ms": 105.584,
+        "peakSampledServerRssMiB": 28.777,
+        "medianServerCpuPercent": 37.939,
+        "minimumCompletedSamples": 1250,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "after": {
+        "filesPerSecond": 66.475,
+        "minFilesPerSecond": 66.45,
+        "maxFilesPerSecond": 66.6,
+        "payloadMiBPerSecond": 66.475,
+        "medianRunP99Ms": 102.479,
+        "peakSampledServerRssMiB": 28.723,
+        "medianServerCpuPercent": 38.104,
+        "minimumCompletedSamples": 1333,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          0,
+          -0.15,
+          0.15,
+          -0.15,
+          0.075,
+          6.661
+        ],
+        "medianPairedPercentChange": 0.038,
+        "geometricMeanPercentChange": 1.068,
+        "conditional95PercentInterval": [
+          -1.695,
+          3.909
+        ]
+      },
+      "pairs": [
+        {
+          "before": 66.5,
+          "after": 66.5,
+          "beforeFile": "stow-filesystem-before-put-1048576-c4-r0-1.json",
+          "afterFile": "stow-filesystem-put-1048576-c4-r0-1.json"
+        },
+        {
+          "before": 66.55,
+          "after": 66.45,
+          "beforeFile": "stow-filesystem-before-put-1048576-c4-r0-2.json",
+          "afterFile": "stow-filesystem-put-1048576-c4-r0-2.json"
+        },
+        {
+          "before": 66.5,
+          "after": 66.6,
+          "beforeFile": "stow-filesystem-before-put-1048576-c4-r0-3.json",
+          "afterFile": "stow-filesystem-put-1048576-c4-r0-3.json"
+        },
+        {
+          "before": 66.55,
+          "after": 66.45,
+          "beforeFile": "stow-filesystem-before-put-1048576-c4-r0-4.json",
+          "afterFile": "stow-filesystem-put-1048576-c4-r0-4.json"
+        },
+        {
+          "before": 66.5,
+          "after": 66.55,
+          "beforeFile": "stow-filesystem-before-put-1048576-c4-r0-5.json",
+          "afterFile": "stow-filesystem-put-1048576-c4-r0-5.json"
+        },
+        {
+          "before": 62.3,
+          "after": 66.45,
+          "beforeFile": "stow-filesystem-before-put-1048576-c4-r0-6.json",
+          "afterFile": "stow-filesystem-put-1048576-c4-r0-6.json"
+        }
+      ]
+    },
+    {
+      "backend": "memory",
+      "workload": "get",
+      "before": {
+        "filesPerSecond": 528.05,
+        "minFilesPerSecond": 460.45,
+        "maxFilesPerSecond": 558.1,
+        "payloadMiBPerSecond": 528.05,
+        "medianRunP99Ms": 17.877,
+        "peakSampledServerRssMiB": 51.57,
+        "medianServerCpuPercent": 152.474,
+        "minimumCompletedSamples": 9213,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "after": {
+        "filesPerSecond": 535.9,
+        "minFilesPerSecond": 488.45,
+        "maxFilesPerSecond": 550,
+        "payloadMiBPerSecond": 535.9,
+        "medianRunP99Ms": 17.522,
+        "peakSampledServerRssMiB": 51.418,
+        "medianServerCpuPercent": 153.062,
+        "minimumCompletedSamples": 9773,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          19.448,
+          12.713,
+          -3.655,
+          -8.897,
+          2.721,
+          -5.63
+        ],
+        "medianPairedPercentChange": -0.467,
+        "geometricMeanPercentChange": 2.29,
+        "conditional95PercentInterval": [
+          -8.55,
+          14.416
+        ]
+      },
+      "pairs": [
+        {
+          "before": 460.45,
+          "after": 550,
+          "beforeFile": "stow-memory-before-get-1048576-c4-r0-1.json",
+          "afterFile": "stow-memory-get-1048576-c4-r0-1.json"
+        },
+        {
+          "before": 478.65,
+          "after": 539.5,
+          "beforeFile": "stow-memory-before-get-1048576-c4-r0-2.json",
+          "afterFile": "stow-memory-get-1048576-c4-r0-2.json"
+        },
+        {
+          "before": 558.1,
+          "after": 537.7,
+          "beforeFile": "stow-memory-before-get-1048576-c4-r0-3.json",
+          "afterFile": "stow-memory-get-1048576-c4-r0-3.json"
+        },
+        {
+          "before": 536.15,
+          "after": 488.45,
+          "beforeFile": "stow-memory-before-get-1048576-c4-r0-4.json",
+          "afterFile": "stow-memory-get-1048576-c4-r0-4.json"
+        },
+        {
+          "before": 519.95,
+          "after": 534.1,
+          "beforeFile": "stow-memory-before-get-1048576-c4-r0-5.json",
+          "afterFile": "stow-memory-get-1048576-c4-r0-5.json"
+        },
+        {
+          "before": 555.95,
+          "after": 524.65,
+          "beforeFile": "stow-memory-before-get-1048576-c4-r0-6.json",
+          "afterFile": "stow-memory-get-1048576-c4-r0-6.json"
+        }
+      ]
+    },
+    {
+      "backend": "filesystem",
+      "workload": "get",
+      "before": {
+        "filesPerSecond": 541.275,
+        "minFilesPerSecond": 523.25,
+        "maxFilesPerSecond": 559.45,
+        "payloadMiBPerSecond": 541.275,
+        "medianRunP99Ms": 17.262,
+        "peakSampledServerRssMiB": 21.137,
+        "medianServerCpuPercent": 160.244,
+        "minimumCompletedSamples": 10469,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "after": {
+        "filesPerSecond": 551.7,
+        "minFilesPerSecond": 460.25,
+        "maxFilesPerSecond": 565.85,
+        "payloadMiBPerSecond": 551.7,
+        "medianRunP99Ms": 17.348,
+        "peakSampledServerRssMiB": 21.664,
+        "medianServerCpuPercent": 168.921,
+        "minimumCompletedSamples": 9209,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          5.686,
+          4.923,
+          -1.618,
+          -17.177,
+          0.596,
+          3.902
+        ],
+        "medianPairedPercentChange": 2.249,
+        "geometricMeanPercentChange": -0.949,
+        "conditional95PercentInterval": [
+          -10.043,
+          9.065
+        ]
+      },
+      "pairs": [
+        {
+          "before": 523.25,
+          "after": 553,
+          "beforeFile": "stow-filesystem-before-get-1048576-c4-r0-1.json",
+          "afterFile": "stow-filesystem-get-1048576-c4-r0-1.json"
+        },
+        {
+          "before": 539.3,
+          "after": 565.85,
+          "beforeFile": "stow-filesystem-before-get-1048576-c4-r0-2.json",
+          "afterFile": "stow-filesystem-get-1048576-c4-r0-2.json"
+        },
+        {
+          "before": 559.45,
+          "after": 550.4,
+          "beforeFile": "stow-filesystem-before-get-1048576-c4-r0-3.json",
+          "afterFile": "stow-filesystem-get-1048576-c4-r0-3.json"
+        },
+        {
+          "before": 555.7,
+          "after": 460.25,
+          "beforeFile": "stow-filesystem-before-get-1048576-c4-r0-4.json",
+          "afterFile": "stow-filesystem-get-1048576-c4-r0-4.json"
+        },
+        {
+          "before": 536.55,
+          "after": 539.75,
+          "beforeFile": "stow-filesystem-before-get-1048576-c4-r0-5.json",
+          "afterFile": "stow-filesystem-get-1048576-c4-r0-5.json"
+        },
+        {
+          "before": 543.25,
+          "after": 564.45,
+          "beforeFile": "stow-filesystem-before-get-1048576-c4-r0-6.json",
+          "afterFile": "stow-filesystem-get-1048576-c4-r0-6.json"
+        }
+      ]
+    },
+    {
+      "backend": "memory",
+      "workload": "quarantine",
+      "before": {
+        "filesPerSecond": 104.825,
+        "minFilesPerSecond": 101.55,
+        "maxFilesPerSecond": 109.85,
+        "payloadMiBPerSecond": 104.825,
+        "medianRunP99Ms": 56.974,
+        "peakSampledServerRssMiB": 61.746,
+        "medianServerCpuPercent": 84.96,
+        "minimumCompletedSamples": 2035,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "after": {
+        "filesPerSecond": 104.425,
+        "minFilesPerSecond": 102.2,
+        "maxFilesPerSecond": 107.6,
+        "payloadMiBPerSecond": 104.425,
+        "medianRunP99Ms": 57.268,
+        "peakSampledServerRssMiB": 62.184,
+        "medianServerCpuPercent": 84.032,
+        "minimumCompletedSamples": 2048,
+        "p99HasAtLeast1000FilesInEveryWindow": true
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -3.505,
+          -4.083,
+          -1.909,
+          2.574,
+          5.711,
+          -0.867
+        ],
+        "medianPairedPercentChange": -1.388,
+        "geometricMeanPercentChange": -0.406,
+        "conditional95PercentInterval": [
+          -4.265,
+          3.609
+        ]
+      },
+      "pairs": [
+        {
+          "before": 109.85,
+          "after": 106,
+          "beforeFile": "stow-memory-before-quarantine-1048576-c4-r0-1.json",
+          "afterFile": "stow-memory-quarantine-1048576-c4-r0-1.json"
+        },
+        {
+          "before": 106.55,
+          "after": 102.2,
+          "beforeFile": "stow-memory-before-quarantine-1048576-c4-r0-2.json",
+          "afterFile": "stow-memory-quarantine-1048576-c4-r0-2.json"
+        },
+        {
+          "before": 104.75,
+          "after": 102.75,
+          "beforeFile": "stow-memory-before-quarantine-1048576-c4-r0-3.json",
+          "afterFile": "stow-memory-quarantine-1048576-c4-r0-3.json"
+        },
+        {
+          "before": 104.9,
+          "after": 107.6,
+          "beforeFile": "stow-memory-before-quarantine-1048576-c4-r0-4.json",
+          "afterFile": "stow-memory-quarantine-1048576-c4-r0-4.json"
+        },
+        {
+          "before": 101.55,
+          "after": 107.35,
+          "beforeFile": "stow-memory-before-quarantine-1048576-c4-r0-5.json",
+          "afterFile": "stow-memory-quarantine-1048576-c4-r0-5.json"
+        },
+        {
+          "before": 103.75,
+          "after": 102.85,
+          "beforeFile": "stow-memory-before-quarantine-1048576-c4-r0-6.json",
+          "afterFile": "stow-memory-quarantine-1048576-c4-r0-6.json"
+        }
+      ]
+    },
+    {
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "before": {
+        "filesPerSecond": 55.875,
+        "minFilesPerSecond": 42.65,
+        "maxFilesPerSecond": 56.85,
+        "payloadMiBPerSecond": 55.875,
+        "medianRunP99Ms": 116.631,
+        "peakSampledServerRssMiB": 28.57,
+        "medianServerCpuPercent": 52.228,
+        "minimumCompletedSamples": 857,
+        "p99HasAtLeast1000FilesInEveryWindow": false
+      },
+      "after": {
+        "filesPerSecond": 54.4,
+        "minFilesPerSecond": 44.45,
+        "maxFilesPerSecond": 55.1,
+        "payloadMiBPerSecond": 54.4,
+        "medianRunP99Ms": 124.422,
+        "peakSampledServerRssMiB": 25.48,
+        "medianServerCpuPercent": 51.239,
+        "minimumCompletedSamples": 893,
+        "p99HasAtLeast1000FilesInEveryWindow": false
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -16.742,
+          -1.082,
+          28.957,
+          -5.101,
+          -2.131,
+          -21.188
+        ],
+        "medianPairedPercentChange": -3.616,
+        "geometricMeanPercentChange": -4.11,
+        "conditional95PercentInterval": [
+          -19.935,
+          14.843
+        ]
+      },
+      "pairs": [
+        {
+          "before": 55.25,
+          "after": 46,
+          "beforeFile": "stow-filesystem-before-quarantine-1048576-c4-r0-1.json",
+          "afterFile": "stow-filesystem-quarantine-1048576-c4-r0-1.json"
+        },
+        {
+          "before": 55.45,
+          "after": 54.85,
+          "beforeFile": "stow-filesystem-before-quarantine-1048576-c4-r0-2.json",
+          "afterFile": "stow-filesystem-quarantine-1048576-c4-r0-2.json"
+        },
+        {
+          "before": 42.65,
+          "after": 55,
+          "beforeFile": "stow-filesystem-before-quarantine-1048576-c4-r0-3.json",
+          "afterFile": "stow-filesystem-quarantine-1048576-c4-r0-3.json"
+        },
+        {
+          "before": 56.85,
+          "after": 53.95,
+          "beforeFile": "stow-filesystem-before-quarantine-1048576-c4-r0-4.json",
+          "afterFile": "stow-filesystem-quarantine-1048576-c4-r0-4.json"
+        },
+        {
+          "before": 56.3,
+          "after": 55.1,
+          "beforeFile": "stow-filesystem-before-quarantine-1048576-c4-r0-5.json",
+          "afterFile": "stow-filesystem-quarantine-1048576-c4-r0-5.json"
+        },
+        {
+          "before": 56.4,
+          "after": 44.45,
+          "beforeFile": "stow-filesystem-before-quarantine-1048576-c4-r0-6.json",
+          "afterFile": "stow-filesystem-quarantine-1048576-c4-r0-6.json"
+        }
+      ]
+    }
+  ],
+  "embedded": [
+    {
+      "implementation": "stow-memory",
+      "workload": "put",
+      "before": {
+        "payloadMiBPerSecond": 824.556,
+        "medianNsPerOp": 1212796.5,
+        "medianAllocatedBytesPerOp": 1075066.5,
+        "medianAllocationsPerOp": 14
+      },
+      "after": {
+        "payloadMiBPerSecond": 810.981,
+        "medianNsPerOp": 1233140,
+        "medianAllocatedBytesPerOp": 1074960,
+        "medianAllocationsPerOp": 14
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          3.343,
+          6.757,
+          -4.08,
+          -4.181,
+          -1.981,
+          -0.055
+        ],
+        "medianPairedPercentChange": -1.018,
+        "geometricMeanPercentChange": -0.111,
+        "conditional95PercentInterval": [
+          -4.533,
+          4.516
+        ]
+      },
+      "samples": [
+        {
+          "variant": "before",
+          "repetition": 1,
+          "ns": 1265181,
+          "mib": 790.4052734375,
+          "allocated": 1075585,
+          "allocs": 14,
+          "iterations": 469
+        },
+        {
+          "variant": "after",
+          "repetition": 1,
+          "ns": 1224238,
+          "mib": 816.8315887451172,
+          "allocated": 1074681,
+          "allocs": 14,
+          "iterations": 494
+        },
+        {
+          "variant": "before",
+          "repetition": 2,
+          "ns": 1264451,
+          "mib": 790.8535003662109,
+          "allocated": 1075036,
+          "allocs": 14,
+          "iterations": 484
+        },
+        {
+          "variant": "after",
+          "repetition": 2,
+          "ns": 1184431,
+          "mib": 844.2878723144531,
+          "allocated": 1074652,
+          "allocs": 14,
+          "iterations": 495
+        },
+        {
+          "variant": "before",
+          "repetition": 3,
+          "ns": 1199810,
+          "mib": 833.4636688232422,
+          "allocated": 1075293,
+          "allocs": 14,
+          "iterations": 477
+        },
+        {
+          "variant": "after",
+          "repetition": 3,
+          "ns": 1250858,
+          "mib": 799.4556427001953,
+          "allocated": 1075496,
+          "allocs": 14,
+          "iterations": 471
+        },
+        {
+          "variant": "before",
+          "repetition": 4,
+          "ns": 1195281,
+          "mib": 836.6203308105469,
+          "allocated": 1074669,
+          "allocs": 14,
+          "iterations": 494
+        },
+        {
+          "variant": "after",
+          "repetition": 4,
+          "ns": 1247444,
+          "mib": 801.6395568847656,
+          "allocated": 1076171,
+          "allocs": 14,
+          "iterations": 454
+        },
+        {
+          "variant": "before",
+          "repetition": 5,
+          "ns": 1217438,
+          "mib": 821.3996887207031,
+          "allocated": 1075097,
+          "allocs": 14,
+          "iterations": 482
+        },
+        {
+          "variant": "after",
+          "repetition": 5,
+          "ns": 1242042,
+          "mib": 805.1300048828125,
+          "allocated": 1075239,
+          "allocs": 14,
+          "iterations": 478
+        },
+        {
+          "variant": "before",
+          "repetition": 6,
+          "ns": 1208155,
+          "mib": 827.7130126953125,
+          "allocated": 1074446,
+          "allocs": 14,
+          "iterations": 501
+        },
+        {
+          "variant": "after",
+          "repetition": 6,
+          "ns": 1208819,
+          "mib": 827.2552490234375,
+          "allocated": 1074620,
+          "allocs": 14,
+          "iterations": 496
+        }
+      ]
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "get",
+      "before": {
+        "payloadMiBPerSecond": 6792.903,
+        "medianNsPerOp": 147213.5,
+        "medianAllocatedBytesPerOp": 34417.5,
+        "medianAllocationsPerOp": 10
+      },
+      "after": {
+        "payloadMiBPerSecond": 7028.041,
+        "medianNsPerOp": 142289.5,
+        "medianAllocatedBytesPerOp": 34464,
+        "medianAllocationsPerOp": 10
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          4.789,
+          5.47,
+          4.169,
+          2.794,
+          6.047,
+          -2.773
+        ],
+        "medianPairedPercentChange": 4.479,
+        "geometricMeanPercentChange": 3.373,
+        "conditional95PercentInterval": [
+          -0.03,
+          6.892
+        ]
+      },
+      "samples": [
+        {
+          "variant": "before",
+          "repetition": 1,
+          "ns": 150681,
+          "mib": 6636.552810668945,
+          "allocated": 34389,
+          "allocs": 10,
+          "iterations": 3954
+        },
+        {
+          "variant": "after",
+          "repetition": 1,
+          "ns": 143794,
+          "mib": 6954.402923583984,
+          "allocated": 34416,
+          "allocs": 10,
+          "iterations": 3861
+        },
+        {
+          "variant": "before",
+          "repetition": 2,
+          "ns": 146471,
+          "mib": 6827.306747436523,
+          "allocated": 34446,
+          "allocs": 10,
+          "iterations": 3752
+        },
+        {
+          "variant": "after",
+          "repetition": 2,
+          "ns": 138874,
+          "mib": 7200.784683227539,
+          "allocated": 34344,
+          "allocs": 10,
+          "iterations": 4132
+        },
+        {
+          "variant": "before",
+          "repetition": 3,
+          "ns": 147666,
+          "mib": 6772.022247314453,
+          "allocated": 34365,
+          "allocs": 10,
+          "iterations": 4048
+        },
+        {
+          "variant": "after",
+          "repetition": 3,
+          "ns": 141757,
+          "mib": 7054.347991943359,
+          "allocated": 34456,
+          "allocs": 10,
+          "iterations": 3721
+        },
+        {
+          "variant": "before",
+          "repetition": 4,
+          "ns": 146812,
+          "mib": 6811.418533325195,
+          "allocated": 34368,
+          "allocs": 10,
+          "iterations": 4041
+        },
+        {
+          "variant": "after",
+          "repetition": 4,
+          "ns": 142822,
+          "mib": 7001.733779907227,
+          "allocated": 34501,
+          "allocs": 10,
+          "iterations": 3578
+        },
+        {
+          "variant": "before",
+          "repetition": 5,
+          "ns": 147615,
+          "mib": 6774.387359619141,
+          "allocated": 34448,
+          "allocs": 10,
+          "iterations": 3752
+        },
+        {
+          "variant": "after",
+          "repetition": 5,
+          "ns": 139197,
+          "mib": 7184.0667724609375,
+          "allocated": 34472,
+          "allocs": 10,
+          "iterations": 3667
+        },
+        {
+          "variant": "before",
+          "repetition": 6,
+          "ns": 143639,
+          "mib": 6961.908340454102,
+          "allocated": 34506,
+          "allocs": 10,
+          "iterations": 3560
+        },
+        {
+          "variant": "after",
+          "repetition": 6,
+          "ns": 147735,
+          "mib": 6768.865585327148,
+          "allocated": 34511,
+          "allocs": 10,
+          "iterations": 3546
+        }
+      ]
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "quarantine",
+      "before": {
+        "payloadMiBPerSecond": 648.208,
+        "medianNsPerOp": 1542911.5,
+        "medianAllocatedBytesPerOp": 1103291,
+        "medianAllocationsPerOp": 47
+      },
+      "after": {
+        "payloadMiBPerSecond": 666.28,
+        "medianNsPerOp": 1500870,
+        "medianAllocatedBytesPerOp": 1102698.5,
+        "medianAllocationsPerOp": 47
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          1.398,
+          1.257,
+          7.386,
+          2.328,
+          1.774,
+          -1.814
+        ],
+        "medianPairedPercentChange": 1.586,
+        "geometricMeanPercentChange": 2.019,
+        "conditional95PercentInterval": [
+          -1.039,
+          5.171
+        ]
+      },
+      "samples": [
+        {
+          "variant": "before",
+          "repetition": 1,
+          "ns": 1514494,
+          "mib": 660.2859497070312,
+          "allocated": 1103284,
+          "allocs": 47,
+          "iterations": 376
+        },
+        {
+          "variant": "after",
+          "repetition": 1,
+          "ns": 1493613,
+          "mib": 669.5175170898438,
+          "allocated": 1102549,
+          "allocs": 47,
+          "iterations": 402
+        },
+        {
+          "variant": "before",
+          "repetition": 2,
+          "ns": 1560267,
+          "mib": 640.9168243408203,
+          "allocated": 1103298,
+          "allocs": 47,
+          "iterations": 375
+        },
+        {
+          "variant": "after",
+          "repetition": 2,
+          "ns": 1540890,
+          "mib": 648.9753723144531,
+          "allocated": 1102684,
+          "allocs": 47,
+          "iterations": 397
+        },
+        {
+          "variant": "before",
+          "repetition": 3,
+          "ns": 1613753,
+          "mib": 619.6689605712891,
+          "allocated": 1102930,
+          "allocs": 47,
+          "iterations": 388
+        },
+        {
+          "variant": "after",
+          "repetition": 3,
+          "ns": 1502773,
+          "mib": 665.435791015625,
+          "allocated": 1102629,
+          "allocs": 47,
+          "iterations": 399
+        },
+        {
+          "variant": "before",
+          "repetition": 4,
+          "ns": 1521114,
+          "mib": 657.4153900146484,
+          "allocated": 1102522,
+          "allocs": 47,
+          "iterations": 403
+        },
+        {
+          "variant": "after",
+          "repetition": 4,
+          "ns": 1486496,
+          "mib": 672.7218627929688,
+          "allocated": 1102761,
+          "allocs": 47,
+          "iterations": 394
+        },
+        {
+          "variant": "before",
+          "repetition": 5,
+          "ns": 1525556,
+          "mib": 655.4985046386719,
+          "allocated": 1103390,
+          "allocs": 47,
+          "iterations": 372
+        },
+        {
+          "variant": "after",
+          "repetition": 5,
+          "ns": 1498967,
+          "mib": 667.1237945556641,
+          "allocated": 1102713,
+          "allocs": 47,
+          "iterations": 396
+        },
+        {
+          "variant": "before",
+          "repetition": 6,
+          "ns": 1560457,
+          "mib": 640.8405303955078,
+          "allocated": 1103363,
+          "allocs": 47,
+          "iterations": 373
+        },
+        {
+          "variant": "after",
+          "repetition": 6,
+          "ns": 1589293,
+          "mib": 629.2152404785156,
+          "allocated": 1102843,
+          "allocs": 47,
+          "iterations": 391
+        }
+      ]
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "put",
+      "before": {
+        "payloadMiBPerSecond": 358.052,
+        "medianNsPerOp": 2793438.5,
+        "medianAllocatedBytesPerOp": 1108535,
+        "medianAllocationsPerOp": 158
+      },
+      "after": {
+        "payloadMiBPerSecond": 380.182,
+        "medianNsPerOp": 2630937,
+        "medianAllocatedBytesPerOp": 1108536.5,
+        "medianAllocationsPerOp": 158
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -13.608,
+          6.914,
+          14.743,
+          6.833,
+          0.342,
+          1.523
+        ],
+        "medianPairedPercentChange": 4.178,
+        "geometricMeanPercentChange": 2.407,
+        "conditional95PercentInterval": [
+          -7.398,
+          13.251
+        ]
+      },
+      "samples": [
+        {
+          "variant": "before",
+          "repetition": 1,
+          "ns": 2566366,
+          "mib": 389.6522521972656,
+          "allocated": 1107455,
+          "allocs": 158,
+          "iterations": 228
+        },
+        {
+          "variant": "after",
+          "repetition": 1,
+          "ns": 2970659,
+          "mib": 336.6279602050781,
+          "allocated": 1109835,
+          "allocs": 158,
+          "iterations": 214
+        },
+        {
+          "variant": "before",
+          "repetition": 2,
+          "ns": 2855538,
+          "mib": 350.19874572753906,
+          "allocated": 1111756,
+          "allocs": 158,
+          "iterations": 204
+        },
+        {
+          "variant": "after",
+          "repetition": 2,
+          "ns": 2670874,
+          "mib": 374.41253662109375,
+          "allocated": 1108274,
+          "allocs": 158,
+          "iterations": 223
+        },
+        {
+          "variant": "before",
+          "repetition": 3,
+          "ns": 2832369,
+          "mib": 353.0597686767578,
+          "allocated": 1109307,
+          "allocs": 158,
+          "iterations": 217
+        },
+        {
+          "variant": "after",
+          "repetition": 3,
+          "ns": 2468441,
+          "mib": 405.11131286621094,
+          "allocated": 1108274,
+          "allocs": 158,
+          "iterations": 223
+        },
+        {
+          "variant": "before",
+          "repetition": 4,
+          "ns": 2754508,
+          "mib": 363.04473876953125,
+          "allocated": 1110027,
+          "allocs": 158,
+          "iterations": 213
+        },
+        {
+          "variant": "after",
+          "repetition": 4,
+          "ns": 2578341,
+          "mib": 387.8498077392578,
+          "allocated": 1106505,
+          "allocs": 158,
+          "iterations": 234
+        },
+        {
+          "variant": "before",
+          "repetition": 5,
+          "ns": 2599873,
+          "mib": 384.63592529296875,
+          "allocated": 1105611,
+          "allocs": 158,
+          "iterations": 240
+        },
+        {
+          "variant": "after",
+          "repetition": 5,
+          "ns": 2591000,
+          "mib": 385.9519958496094,
+          "allocated": 1108799,
+          "allocs": 158,
+          "iterations": 220
+        },
+        {
+          "variant": "before",
+          "repetition": 6,
+          "ns": 3036433,
+          "mib": 329.3323516845703,
+          "allocated": 1107763,
+          "allocs": 158,
+          "iterations": 226
+        },
+        {
+          "variant": "after",
+          "repetition": 6,
+          "ns": 2990904,
+          "mib": 334.3486785888672,
+          "allocated": 1115743,
+          "allocs": 158,
+          "iterations": 186
+        }
+      ]
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "get",
+      "before": {
+        "payloadMiBPerSecond": 5293.889,
+        "medianNsPerOp": 188897,
+        "medianAllocatedBytesPerOp": 37768.5,
+        "medianAllocationsPerOp": 44
+      },
+      "after": {
+        "payloadMiBPerSecond": 5035.381,
+        "medianNsPerOp": 198602.5,
+        "medianAllocatedBytesPerOp": 37820.5,
+        "medianAllocationsPerOp": 44
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -11.069,
+          -3.362,
+          14.008,
+          -5.519,
+          -0.678,
+          -17.647
+        ],
+        "medianPairedPercentChange": -4.441,
+        "geometricMeanPercentChange": -4.53,
+        "conditional95PercentInterval": [
+          -14.913,
+          7.12
+        ]
+      },
+      "samples": [
+        {
+          "variant": "before",
+          "repetition": 1,
+          "ns": 178571,
+          "mib": 5600.004196166992,
+          "allocated": 37665,
+          "allocs": 44,
+          "iterations": 3196
+        },
+        {
+          "variant": "after",
+          "repetition": 1,
+          "ns": 200797,
+          "mib": 4980.154037475586,
+          "allocated": 37945,
+          "allocs": 44,
+          "iterations": 2634
+        },
+        {
+          "variant": "before",
+          "repetition": 2,
+          "ns": 190744,
+          "mib": 5242.633819580078,
+          "allocated": 37860,
+          "allocs": 44,
+          "iterations": 2782
+        },
+        {
+          "variant": "after",
+          "repetition": 2,
+          "ns": 197380,
+          "mib": 5066.375732421875,
+          "allocated": 37753,
+          "allocs": 44,
+          "iterations": 2994
+        },
+        {
+          "variant": "before",
+          "repetition": 3,
+          "ns": 206552,
+          "mib": 4841.403961181641,
+          "allocated": 37951,
+          "allocs": 44,
+          "iterations": 2623
+        },
+        {
+          "variant": "after",
+          "repetition": 3,
+          "ns": 181173,
+          "mib": 5519.571304321289,
+          "allocated": 37678,
+          "allocs": 44,
+          "iterations": 3163
+        },
+        {
+          "variant": "before",
+          "repetition": 4,
+          "ns": 188796,
+          "mib": 5296.716690063477,
+          "allocated": 37817,
+          "allocs": 44,
+          "iterations": 2863
+        },
+        {
+          "variant": "after",
+          "repetition": 4,
+          "ns": 199825,
+          "mib": 5004.386901855469,
+          "allocated": 38015,
+          "allocs": 44,
+          "iterations": 2522
+        },
+        {
+          "variant": "before",
+          "repetition": 5,
+          "ns": 188998,
+          "mib": 5291.0614013671875,
+          "allocated": 37621,
+          "allocs": 44,
+          "iterations": 3306
+        },
+        {
+          "variant": "after",
+          "repetition": 5,
+          "ns": 190288,
+          "mib": 5255.184173583984,
+          "allocated": 37747,
+          "allocs": 44,
+          "iterations": 3007
+        },
+        {
+          "variant": "before",
+          "repetition": 6,
+          "ns": 182384,
+          "mib": 5482.931137084961,
+          "allocated": 37720,
+          "allocs": 44,
+          "iterations": 3068
+        },
+        {
+          "variant": "after",
+          "repetition": 6,
+          "ns": 221466,
+          "mib": 4515.371322631836,
+          "allocated": 37888,
+          "allocs": 44,
+          "iterations": 2732
+        }
+      ]
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "quarantine",
+      "before": {
+        "payloadMiBPerSecond": 271.764,
+        "medianNsPerOp": 3680530.5,
+        "medianAllocatedBytesPerOp": 1157347.5,
+        "medianAllocationsPerOp": 441
+      },
+      "after": {
+        "payloadMiBPerSecond": 259.128,
+        "medianNsPerOp": 3859048.5,
+        "medianAllocatedBytesPerOp": 1156410.5,
+        "medianAllocationsPerOp": 441
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -27.498,
+          3.489,
+          -1.55,
+          3.143,
+          -13.357,
+          0.674
+        ],
+        "medianPairedPercentChange": -0.438,
+        "geometricMeanPercentChange": -6.583,
+        "conditional95PercentInterval": [
+          -19.381,
+          8.246
+        ]
+      },
+      "samples": [
+        {
+          "variant": "before",
+          "repetition": 1,
+          "ns": 3601553,
+          "mib": 277.6622772216797,
+          "allocated": 1154591,
+          "allocs": 441,
+          "iterations": 169
+        },
+        {
+          "variant": "after",
+          "repetition": 1,
+          "ns": 4967416,
+          "mib": 201.3111114501953,
+          "allocated": 1158890,
+          "allocs": 441,
+          "iterations": 144
+        },
+        {
+          "variant": "before",
+          "repetition": 2,
+          "ns": 3994040,
+          "mib": 250.3776550292969,
+          "allocated": 1159251,
+          "allocs": 441,
+          "iterations": 139
+        },
+        {
+          "variant": "after",
+          "repetition": 2,
+          "ns": 3859266,
+          "mib": 259.1133117675781,
+          "allocated": 1155965,
+          "allocs": 441,
+          "iterations": 160
+        },
+        {
+          "variant": "before",
+          "repetition": 3,
+          "ns": 3735229,
+          "mib": 267.72499084472656,
+          "allocated": 1158885,
+          "allocs": 441,
+          "iterations": 144
+        },
+        {
+          "variant": "after",
+          "repetition": 3,
+          "ns": 3793984,
+          "mib": 263.5765075683594,
+          "allocated": 1153883,
+          "allocs": 441,
+          "iterations": 169
+        },
+        {
+          "variant": "before",
+          "repetition": 4,
+          "ns": 3625832,
+          "mib": 275.8026123046875,
+          "allocated": 1157348,
+          "allocs": 441,
+          "iterations": 152
+        },
+        {
+          "variant": "after",
+          "repetition": 4,
+          "ns": 3515265,
+          "mib": 284.4715118408203,
+          "allocated": 1155600,
+          "allocs": 441,
+          "iterations": 158
+        },
+        {
+          "variant": "before",
+          "repetition": 5,
+          "ns": 3349836,
+          "mib": 298.5191345214844,
+          "allocated": 1155016,
+          "allocs": 441,
+          "iterations": 166
+        },
+        {
+          "variant": "after",
+          "repetition": 5,
+          "ns": 3866305,
+          "mib": 258.64601135253906,
+          "allocated": 1156856,
+          "allocs": 441,
+          "iterations": 151
+        },
+        {
+          "variant": "before",
+          "repetition": 6,
+          "ns": 3884919,
+          "mib": 257.40623474121094,
+          "allocated": 1157347,
+          "allocs": 441,
+          "iterations": 152
+        },
+        {
+          "variant": "after",
+          "repetition": 6,
+          "ns": 3858831,
+          "mib": 259.1419219970703,
+          "allocated": 1158300,
+          "allocs": 441,
+          "iterations": 147
+        }
+      ]
+    }
+  ],
+  "managedSave": {
+    "before": {
+      "payloadMiBPerSecond": 98.29,
+      "medianNsPerOp": 10175099,
+      "medianAllocatedBytesPerOp": 7417247.5,
+      "medianAllocationsPerOp": 598
+    },
+    "after": {
+      "payloadMiBPerSecond": 114.884,
+      "medianNsPerOp": 8704541.5,
+      "medianAllocatedBytesPerOp": 2166604.5,
+      "medianAllocationsPerOp": 550.5
+    },
+    "effect": {
+      "pairedPercentChanges": [
+        -3.013,
+        30.494,
+        9.383,
+        13.925,
+        18.925,
+        17.351
+      ],
+      "medianPairedPercentChange": 15.638,
+      "geometricMeanPercentChange": 14.053,
+      "conditional95PercentInterval": [
+        2.829,
+        26.501
+      ]
+    },
+    "samples": {
+      "before": [
+        {
+          "repetition": 1,
+          "ns": 9935171,
+          "mib": 100.65078735351562,
+          "allocated": 7417010,
+          "allocs": 597
+        },
+        {
+          "repetition": 2,
+          "ns": 11014287,
+          "mib": 90.789794921875,
+          "allocated": 7416982,
+          "allocs": 598
+        },
+        {
+          "repetition": 3,
+          "ns": 10070917,
+          "mib": 99.29656982421875,
+          "allocated": 7417199,
+          "allocs": 598
+        },
+        {
+          "repetition": 4,
+          "ns": 9637756,
+          "mib": 103.759765625,
+          "allocated": 7417296,
+          "allocs": 598
+        },
+        {
+          "repetition": 5,
+          "ns": 10287637,
+          "mib": 97.20802307128906,
+          "allocated": 7417453,
+          "allocs": 599
+        },
+        {
+          "repetition": 6,
+          "ns": 10279281,
+          "mib": 97.28431701660156,
+          "allocated": 7417536,
+          "allocs": 600
+        }
+      ],
+      "after": [
+        {
+          "repetition": 1,
+          "ns": 10243982,
+          "mib": 97.61810302734375,
+          "allocated": 2167394,
+          "allocs": 552
+        },
+        {
+          "repetition": 2,
+          "ns": 8440818,
+          "mib": 118.47496032714844,
+          "allocated": 2167202,
+          "allocs": 552
+        },
+        {
+          "repetition": 3,
+          "ns": 9206615,
+          "mib": 108.61396789550781,
+          "allocated": 2167106,
+          "allocs": 551
+        },
+        {
+          "repetition": 4,
+          "ns": 8459936,
+          "mib": 118.20793151855469,
+          "allocated": 2165859,
+          "allocs": 550
+        },
+        {
+          "repetition": 5,
+          "ns": 8650001,
+          "mib": 115.60440063476562,
+          "allocated": 2165193,
+          "allocs": 550
+        },
+        {
+          "repetition": 6,
+          "ns": 8759082,
+          "mib": 114.16435241699219,
+          "allocated": 2166103,
+          "allocs": 550
+        }
+      ]
+    }
+  },
+  "startup": [
+    {
+      "backend": "memory",
+      "variant": "before",
+      "samples": 18,
+      "medianReadyMs": 17.256,
+      "medianFirstWriteMs": 20.574
+    },
+    {
+      "backend": "memory",
+      "variant": "after",
+      "samples": 18,
+      "medianReadyMs": 16.903,
+      "medianFirstWriteMs": 20.878
+    },
+    {
+      "backend": "filesystem",
+      "variant": "before",
+      "samples": 18,
+      "medianReadyMs": 25.921,
+      "medianFirstWriteMs": 37.736
+    },
+    {
+      "backend": "filesystem",
+      "variant": "after",
+      "samples": 18,
+      "medianReadyMs": 25.4,
+      "medianFirstWriteMs": 37.908
+    }
+  ],
+  "resources": [
+    {
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-1.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 101.592,
+      "serverAverageCpuPercent": 92.575,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 46.137,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.738,
+      "highWaterRssMiB": 64.738
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-1.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 100.715,
+      "serverAverageCpuPercent": 87.971,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 44.99,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.816,
+      "highWaterRssMiB": 64.816
+    },
+    {
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-1.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 40.212,
+      "serverAverageCpuPercent": 37.753,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 28.262,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 27.094,
+      "highWaterRssMiB": 27.094
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-1.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 38.852,
+      "serverAverageCpuPercent": 38.067,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 27.918,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 28.723,
+      "highWaterRssMiB": 28.723
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-2.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 100.303,
+      "serverAverageCpuPercent": 85.521,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 46.465,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 66.984,
+      "highWaterRssMiB": 66.984
+    },
+    {
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-2.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 100.595,
+      "serverAverageCpuPercent": 90.014,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 44.27,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.652,
+      "highWaterRssMiB": 64.652
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-2.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 39.596,
+      "serverAverageCpuPercent": 38.479,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 28.541,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 26.773,
+      "highWaterRssMiB": 26.773
+    },
+    {
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-2.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 40.023,
+      "serverAverageCpuPercent": 38.713,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 29.098,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 28.035,
+      "highWaterRssMiB": 28.035
+    },
+    {
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-3.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 39.743,
+      "serverAverageCpuPercent": 38.124,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 31.457,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 28.199,
+      "highWaterRssMiB": 28.199
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-3.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 37.063,
+      "serverAverageCpuPercent": 37.349,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 30.982,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 27.066,
+      "highWaterRssMiB": 27.066
+    },
+    {
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-3.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 100.241,
+      "serverAverageCpuPercent": 89.677,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 42.697,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.922,
+      "highWaterRssMiB": 64.922
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-3.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 100.021,
+      "serverAverageCpuPercent": 87.942,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 43.385,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 66.926,
+      "highWaterRssMiB": 66.926
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-4.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 40.669,
+      "serverAverageCpuPercent": 38.711,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 29.295,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 26.539,
+      "highWaterRssMiB": 26.539
+    },
+    {
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-4.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 40.862,
+      "serverAverageCpuPercent": 38.789,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 28.934,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 28.777,
+      "highWaterRssMiB": 28.777
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-4.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 100.121,
+      "serverAverageCpuPercent": 94.774,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 48.89,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 65.813,
+      "highWaterRssMiB": 65.969
+    },
+    {
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-4.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 100.305,
+      "serverAverageCpuPercent": 88.604,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 44.499,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 66.168,
+      "highWaterRssMiB": 66.168
+    },
+    {
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-5.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 100.383,
+      "serverAverageCpuPercent": 91.24,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 45.318,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.598,
+      "highWaterRssMiB": 64.598
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-5.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 99.973,
+      "serverAverageCpuPercent": 86.591,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 43.057,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 65.992,
+      "highWaterRssMiB": 65.992
+    },
+    {
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-5.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 40.111,
+      "serverAverageCpuPercent": 37.748,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 28.131,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 26.855,
+      "highWaterRssMiB": 26.855
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-5.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 39.139,
+      "serverAverageCpuPercent": 38.14,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 29.557,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 27.039,
+      "highWaterRssMiB": 27.039
+    },
+    {
+      "rawFile": "stow-memory-put-1048576-c4-r0-6.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 100.228,
+      "serverAverageCpuPercent": 93.067,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 45.875,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.922,
+      "highWaterRssMiB": 64.922
+    },
+    {
+      "rawFile": "stow-memory-before-put-1048576-c4-r0-6.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "put",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 99.94,
+      "serverAverageCpuPercent": 87.783,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 41.091,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 64.934,
+      "highWaterRssMiB": 64.934
+    },
+    {
+      "rawFile": "stow-filesystem-put-1048576-c4-r0-6.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 38.494,
+      "serverAverageCpuPercent": 37.162,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 28.099,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 27.051,
+      "highWaterRssMiB": 27.051
+    },
+    {
+      "rawFile": "stow-filesystem-before-put-1048576-c4-r0-6.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "put",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 37.781,
+      "serverAverageCpuPercent": 36.028,
+      "targetThrottling": {
+        "periods": 198,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 29.655,
+      "minimumDiskAvailableMiB": 4685.91,
+      "peakRssMiB": 26.527,
+      "highWaterRssMiB": 26.527
+    },
+    {
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-1.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 150.599,
+      "serverAverageCpuPercent": 114.316,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.227,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.551,
+      "highWaterRssMiB": 49.551
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-1.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 155.653,
+      "serverAverageCpuPercent": 157.848,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 2,
+        "throttledPeriodPercent": 1,
+        "cumulativeThrottledSeconds": 0.002
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 32.555,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.496,
+      "highWaterRssMiB": 49.496
+    },
+    {
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-1.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 154.486,
+      "serverAverageCpuPercent": 147.282,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 7,
+        "throttledPeriodPercent": 3.483,
+        "cumulativeThrottledSeconds": 0.037
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 32.522,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 19.773,
+      "highWaterRssMiB": 19.773
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-1.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 153.507,
+      "serverAverageCpuPercent": 178.309,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 32,
+        "throttledPeriodPercent": 16,
+        "cumulativeThrottledSeconds": 0.247
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 40.829,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 19.691,
+      "highWaterRssMiB": 19.691
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-2.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 154.896,
+      "serverAverageCpuPercent": 162.021,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 8,
+        "throttledPeriodPercent": 4,
+        "cumulativeThrottledSeconds": 0.07
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.013,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.535,
+      "highWaterRssMiB": 49.535
+    },
+    {
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-2.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 152.027,
+      "serverAverageCpuPercent": 124.652,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 40.665,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.668,
+      "highWaterRssMiB": 49.668
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-2.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 153.933,
+      "serverAverageCpuPercent": 175.424,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 26,
+        "throttledPeriodPercent": 13,
+        "cumulativeThrottledSeconds": 0.173
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 32.227,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 21.27,
+      "highWaterRssMiB": 21.27
+    },
+    {
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-2.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 152.692,
+      "serverAverageCpuPercent": 154.654,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 4,
+        "throttledPeriodPercent": 2,
+        "cumulativeThrottledSeconds": 0.008
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.079,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 19.566,
+      "highWaterRssMiB": 19.617
+    },
+    {
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-3.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 152.424,
+      "serverAverageCpuPercent": 164.819,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 16,
+        "throttledPeriodPercent": 8,
+        "cumulativeThrottledSeconds": 0.135
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.014,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 20.848,
+      "highWaterRssMiB": 20.848
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-3.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 152.277,
+      "serverAverageCpuPercent": 159.794,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 6,
+        "throttledPeriodPercent": 3,
+        "cumulativeThrottledSeconds": 0.032
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 45.023,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 21.172,
+      "highWaterRssMiB": 21.465
+    },
+    {
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-3.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 152.44,
+      "serverAverageCpuPercent": 168.907,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 3,
+        "throttledPeriodPercent": 1.5,
+        "cumulativeThrottledSeconds": 0.007
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.948,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 51.5,
+      "highWaterRssMiB": 51.5
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-3.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 154.266,
+      "serverAverageCpuPercent": 155.317,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 1,
+        "throttledPeriodPercent": 0.5,
+        "cumulativeThrottledSeconds": 0.005
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 31.654,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.422,
+      "highWaterRssMiB": 49.422
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-4.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 151.877,
+      "serverAverageCpuPercent": 123.147,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 39.715,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 20.098,
+      "highWaterRssMiB": 20.098
+    },
+    {
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-4.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 152.819,
+      "serverAverageCpuPercent": 167.218,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 10,
+        "throttledPeriodPercent": 5,
+        "cumulativeThrottledSeconds": 0.033
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 31.375,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 19.586,
+      "highWaterRssMiB": 19.633
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-4.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 151.739,
+      "serverAverageCpuPercent": 138.927,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 1,
+        "throttledPeriodPercent": 0.5,
+        "cumulativeThrottledSeconds": 0.02
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 31.031,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.598,
+      "highWaterRssMiB": 49.598
+    },
+    {
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-4.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 151.933,
+      "serverAverageCpuPercent": 153.602,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 2,
+        "throttledPeriodPercent": 0.995,
+        "cumulativeThrottledSeconds": 0.002
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 31.736,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 51.48,
+      "highWaterRssMiB": 51.48
+    },
+    {
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-5.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 149.212,
+      "serverAverageCpuPercent": 151.346,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 7,
+        "throttledPeriodPercent": 3.5,
+        "cumulativeThrottledSeconds": 0.019
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.996,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.484,
+      "highWaterRssMiB": 49.484
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-5.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 153.36,
+      "serverAverageCpuPercent": 150.65,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 4,
+        "throttledPeriodPercent": 2,
+        "cumulativeThrottledSeconds": 0.023
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.374,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 49.469,
+      "highWaterRssMiB": 49.469
+    },
+    {
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-5.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 148.035,
+      "serverAverageCpuPercent": 158.577,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 5,
+        "throttledPeriodPercent": 2.5,
+        "cumulativeThrottledSeconds": 0.022
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.472,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 19.68,
+      "highWaterRssMiB": 19.68
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-5.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 151.123,
+      "serverAverageCpuPercent": 162.418,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 13,
+        "throttledPeriodPercent": 6.5,
+        "cumulativeThrottledSeconds": 0.034
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.554,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 21.664,
+      "highWaterRssMiB": 21.664
+    },
+    {
+      "rawFile": "stow-memory-get-1048576-c4-r0-6.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 150.64,
+      "serverAverageCpuPercent": 150.808,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 8,
+        "throttledPeriodPercent": 4,
+        "cumulativeThrottledSeconds": 0.016
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.178,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 51.418,
+      "highWaterRssMiB": 51.418
+    },
+    {
+      "rawFile": "stow-memory-before-get-1048576-c4-r0-6.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "get",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 154.03,
+      "serverAverageCpuPercent": 162.909,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 3,
+        "throttledPeriodPercent": 1.5,
+        "cumulativeThrottledSeconds": 0.002
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.26,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 51.57,
+      "highWaterRssMiB": 51.57
+    },
+    {
+      "rawFile": "stow-filesystem-get-1048576-c4-r0-6.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 154.956,
+      "serverAverageCpuPercent": 177.192,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 15,
+        "throttledPeriodPercent": 7.5,
+        "cumulativeThrottledSeconds": 0.127
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 40.436,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 21.227,
+      "highWaterRssMiB": 21.227
+    },
+    {
+      "rawFile": "stow-filesystem-before-get-1048576-c4-r0-6.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "get",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 154.407,
+      "serverAverageCpuPercent": 161.91,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 8,
+        "throttledPeriodPercent": 4,
+        "cumulativeThrottledSeconds": 0.051
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 32.686,
+      "minimumDiskAvailableMiB": 4690.93,
+      "peakRssMiB": 21.137,
+      "highWaterRssMiB": 21.137
+    },
+    {
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-1.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 132.248,
+      "serverAverageCpuPercent": 88.134,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.767,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 60.293,
+      "highWaterRssMiB": 60.293
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-1.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 127.834,
+      "serverAverageCpuPercent": 84.42,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.309,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 61.492,
+      "highWaterRssMiB": 61.492
+    },
+    {
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-1.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 93.692,
+      "serverAverageCpuPercent": 51.696,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 45.646,
+      "minimumDiskAvailableMiB": 4686.898,
+      "peakRssMiB": 26.906,
+      "highWaterRssMiB": 26.906
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-1.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 1,
+      "generatorAverageCpuPercent": 88.239,
+      "serverAverageCpuPercent": 50.171,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 35.455,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 25.281,
+      "highWaterRssMiB": 25.281
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-2.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 133.449,
+      "serverAverageCpuPercent": 84.867,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.882,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 61.551,
+      "highWaterRssMiB": 61.551
+    },
+    {
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-2.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 135.934,
+      "serverAverageCpuPercent": 85.677,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 36.012,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 61.676,
+      "highWaterRssMiB": 61.676
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-2.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 90.223,
+      "serverAverageCpuPercent": 52.82,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.57,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 25.02,
+      "highWaterRssMiB": 25.02
+    },
+    {
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-2.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 2,
+      "generatorAverageCpuPercent": 91.81,
+      "serverAverageCpuPercent": 51.329,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.358,
+      "minimumDiskAvailableMiB": 4686.906,
+      "peakRssMiB": 25.727,
+      "highWaterRssMiB": 25.727
+    },
+    {
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-3.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 98.499,
+      "serverAverageCpuPercent": 51.967,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 36.766,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 28.57,
+      "highWaterRssMiB": 28.57
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-3.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 87.722,
+      "serverAverageCpuPercent": 52.135,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 36.274,
+      "minimumDiskAvailableMiB": 4686.906,
+      "peakRssMiB": 25.48,
+      "highWaterRssMiB": 25.48
+    },
+    {
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-3.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 131.509,
+      "serverAverageCpuPercent": 85.629,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 37.126,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 61.242,
+      "highWaterRssMiB": 61.242
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-3.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 3,
+      "generatorAverageCpuPercent": 133.564,
+      "serverAverageCpuPercent": 82.311,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 35.193,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 61.453,
+      "highWaterRssMiB": 61.453
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-4.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 95.139,
+      "serverAverageCpuPercent": 50.342,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 38.797,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 24.789,
+      "highWaterRssMiB": 24.789
+    },
+    {
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-4.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 97.618,
+      "serverAverageCpuPercent": 53.14,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 36.405,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 25.813,
+      "highWaterRssMiB": 25.813
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-4.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 136.532,
+      "serverAverageCpuPercent": 83.644,
+      "targetThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.275,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 62.184,
+      "highWaterRssMiB": 62.184
+    },
+    {
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-4.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 4,
+      "generatorAverageCpuPercent": 132.895,
+      "serverAverageCpuPercent": 84.29,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 33.194,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 60.18,
+      "highWaterRssMiB": 60.18
+    },
+    {
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-5.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 135.276,
+      "serverAverageCpuPercent": 78.937,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 34.439,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 60.949,
+      "highWaterRssMiB": 60.949
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-5.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 133.036,
+      "serverAverageCpuPercent": 85.348,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 46.072,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 60.93,
+      "highWaterRssMiB": 60.93
+    },
+    {
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-5.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 89.083,
+      "serverAverageCpuPercent": 52.49,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 35.029,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 25.395,
+      "highWaterRssMiB": 25.395
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-5.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 5,
+      "generatorAverageCpuPercent": 91.671,
+      "serverAverageCpuPercent": 53.354,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 201,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 37.224,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 25.316,
+      "highWaterRssMiB": 25.316
+    },
+    {
+      "rawFile": "stow-memory-quarantine-1048576-c4-r0-6.json",
+      "variant": "after",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 132.793,
+      "serverAverageCpuPercent": 79.272,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 35.75,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 59.754,
+      "highWaterRssMiB": 59.777
+    },
+    {
+      "rawFile": "stow-memory-before-quarantine-1048576-c4-r0-6.json",
+      "variant": "before",
+      "backend": "memory",
+      "workload": "quarantine",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 129.824,
+      "serverAverageCpuPercent": 84.074,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 35.881,
+      "minimumDiskAvailableMiB": 4707.027,
+      "peakRssMiB": 61.746,
+      "highWaterRssMiB": 61.746
+    },
+    {
+      "rawFile": "stow-filesystem-quarantine-1048576-c4-r0-6.json",
+      "variant": "after",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 91.592,
+      "serverAverageCpuPercent": 50.063,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 42.893,
+      "minimumDiskAvailableMiB": 4686.906,
+      "peakRssMiB": 25.023,
+      "highWaterRssMiB": 25.023
+    },
+    {
+      "rawFile": "stow-filesystem-before-quarantine-1048576-c4-r0-6.json",
+      "variant": "before",
+      "backend": "filesystem",
+      "workload": "quarantine",
+      "repetition": 6,
+      "generatorAverageCpuPercent": 100.167,
+      "serverAverageCpuPercent": 53.146,
+      "targetThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottling": {
+        "periods": 200,
+        "throttledPeriods": 0,
+        "throttledPeriodPercent": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorEventLoopMaxMs": 36.438,
+      "minimumDiskAvailableMiB": 4686.902,
+      "peakRssMiB": 24.73,
+      "highWaterRssMiB": 24.73
+    }
+  ],
+  "statisticalScope": "Six paired rounds on one target worker. Student-t interval for mean log throughput ratio, conditional on these rounds; shared-host noise and client limits remain. No sustained-capacity qualification.",
+  "baselineScope": "Reconstructed immediately preceding write-preparation implementation; keeps usage/recovery consolidation and all earlier changes. Not the historical pre-streaming build."
+}

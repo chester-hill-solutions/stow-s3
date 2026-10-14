@@ -1,0 +1,29 @@
+File: stow-s3-profile
+Build ID: 67990ab223c39b697e4617995e4fd361102ea7d9
+Type: delay
+Time: 2026-10-14 04:39:29 UTC
+Showing nodes accounting for 27928.27ms, 100% of 27931.54ms total
+Dropped 55 nodes (cum <= 139.66ms)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0% 27930.74ms   100%  net/http.(*Server).Serve.gowrap3
+         0     0%     0% 27930.74ms   100%  net/http.(*conn).serve
+         0     0%     0% 27520.69ms 98.53%  net/http.serverHandler.ServeHTTP
+         0     0%     0% 23003.59ms 82.36%  net/http.(*ServeMux).ServeHTTP
+         0     0%     0% 23003.59ms 82.36%  net/http.HandlerFunc.ServeHTTP
+         0     0%     0% 23003.59ms 82.36%  net/http/pprof.Profile
+         0     0%     0% 23000.50ms 82.35%  net/http/pprof.sleep
+23000.50ms 82.35% 82.35% 23000.50ms 82.35%  runtime.selectgo
+         0     0% 82.35%  4517.10ms 16.17%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).ServeHTTP
+         0     0% 82.35%  4517.06ms 16.17%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatch
+         0     0% 82.35%  4517.06ms 16.17%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).dispatchObject
+         0     0% 82.35%  4517.05ms 16.17%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).handlePutObject
+         0     0% 82.35%  3651.65ms 13.07%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*StoreAdapter).ComputesPutChecksums
+         0     0% 82.35%  3651.65ms 13.07%  github.com/chester-hill-solutions/stow-s3/internal/s3api.(*Server).putChecksumFromRequest
+ 3651.65ms 13.07% 95.42%  3651.65ms 13.07%  sync.(*RWMutex).RLock (inline)
+    9.65ms 0.035% 95.45%   865.41ms  3.10%  sync.(*RWMutex).Lock
+         0     0% 95.45%   865.40ms  3.10%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).PutObject
+         0     0% 95.45%   865.40ms  3.10%  github.com/chester-hill-solutions/stow-s3/internal/runtime.(*StoreAdapter).PutObject
+  856.43ms  3.07% 98.52%   856.43ms  3.07%  sync.(*Mutex).Lock (inline)
+         0     0% 98.52%   410.04ms  1.47%  net/http.(*response).finishRequest
+         0     0% 98.52%   410.04ms  1.47%  net/http.(*connReader).abortPendingRead
+  410.04ms  1.47%   100%   410.04ms  1.47%  sync.(*Cond).Wait

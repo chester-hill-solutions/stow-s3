@@ -1,0 +1,44 @@
+[INFO] 
+> @chester-hill-solutions/stow-s3@0.3.0 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+[INFO] 
+> @chester-hill-solutions/stow-s3@0.3.0 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+
+[INFO] API reference written: 13 pages
+
+[INFO] GOTOOLCHAIN=go1.25.6 go vet ./...
+
+[INFO] GOTOOLCHAIN=go1.25.6 go test -race ./...
+
+[INFO] ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	6.006s
+
+[INFO] ok  	github.com/chester-hill-solutions/stow-s3/conformance	12.316s
+ok  	github.com/chester-hill-solutions/stow-s3/examples/resumable-transfer	2.484s
+?   	github.com/chester-hill-solutions/stow-s3/examples/storage-dogfood	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	1.115s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	1.081s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	1.888s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/capacity	1.666s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/mcpstorage	6.222s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	1.169s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policy	1.048s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policystore	1.085s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	1.055s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/rooted	1.949s
+
+[INFO] ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	13.504s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	4.930s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	2.409s
+--- FAIL: TestMemoryStagingRechecksConditionAndAbort (0.00s)
+    memory_staged_test.go:83: object not found
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage	11.679s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	6.993s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	3.848s
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+

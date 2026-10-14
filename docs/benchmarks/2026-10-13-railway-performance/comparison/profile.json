@@ -1,0 +1,35 @@
+{
+  "label": "Railway local storage comparison; exploratory",
+  "targets": [
+    "stow-memory",
+    "s3proxy-memory",
+    "stow-filesystem",
+    "s3proxy-filesystem",
+    "minio-filesystem"
+  ],
+  "warmupSeconds": 5,
+  "durationSeconds": 20,
+  "repetitions": 3,
+  "soakSeconds": 0,
+  "sizes": [
+    1048576
+  ],
+  "concurrency": [
+    4
+  ],
+  "rates": [
+    0
+  ],
+  "retainedObjects": 16,
+  "maxQueue": 8,
+  "workloads": [
+    "put",
+    "get",
+    "quarantine"
+  ],
+  "embedded": {
+    "benchtime": "300ms",
+    "count": 3,
+    "cpu": "1,4"
+  }
+}
