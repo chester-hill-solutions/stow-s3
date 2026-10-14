@@ -9,6 +9,7 @@ package atomicfile
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -24,6 +25,32 @@ import (
 // cannot decide what to do about it, and the common response — retry, or carry on — is
 // wrong in both directions. The parent directory is created if missing.
 func Write(path string, data []byte, perm os.FileMode) error {
+	return WriteParts(path, perm, data)
+}
+
+func WriteParts(path string, perm os.FileMode, parts ...[]byte) error {
+	return writeFile(path, perm, func(tmp *os.File) error {
+		for _, data := range parts {
+			if _, err := tmp.Write(data); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+// WriteStream publishes a prefix and payload through the same durable replacement.
+func WriteStream(path string, perm os.FileMode, prefix []byte, body io.Reader) error {
+	return writeFile(path, perm, func(tmp *os.File) error {
+		if _, err := tmp.Write(prefix); err != nil {
+			return err
+		}
+		_, err := io.Copy(tmp, body)
+		return err
+	})
+}
+
+func writeFile(path string, perm os.FileMode, write func(*os.File) error) error {
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return wrap(path, err)
@@ -43,7 +70,7 @@ func Write(path string, data []byte, perm os.FileMode) error {
 		}
 	}()
 
-	if _, err := tmp.Write(data); err != nil {
+	if err := write(tmp); err != nil {
 		_ = tmp.Close()
 		return wrap(path, err)
 	}
@@ -70,8 +97,6 @@ func Write(path string, data []byte, perm os.FileMode) error {
 	return nil
 }
 
-// wrap names the file in a failure. A caller holding many paths cannot otherwise
-// tell which write failed, and "not a directory" on its own is not a bug report.
 func wrap(path string, err error) error {
 	return fmt.Errorf("atomicfile: write %s: %w", path, err)
 }

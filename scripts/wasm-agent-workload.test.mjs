@@ -9,10 +9,8 @@
 //
 // The three properties, in the order they matter:
 //
-//   - Reads add no linear memory. An agent's compounding cost is many small
-//     reads, so if reads were growing the footprint a binary transport would be
-//     urgent for them. They are not: the pages are already committed, and a
-//     transport change would not help.
+//   - Repeated reads settle without linear-memory growth. The first read can
+//     commit allocator scratch pages; subsequent passes must stop growing.
 //   - The fixed post-boot floor is the largest single term in total footprint, so
 //     shrinking the runtime beats optimizing the bridge for a small-file workload.
 //   - Writes do pay a multiple of their payload, which is the one place a
@@ -40,16 +38,13 @@ async function measure() {
   return JSON.parse(stdout);
 }
 
-test("an agent working set reads without growing the footprint", async () => {
+test("repeated agent working-set reads settle without growing the footprint", async () => {
   const result = await measure();
 
-  // The property that decides the transport question for reads. Linear memory
-  // never shrinks, so a reading of zero after a full pass means the reads did not
-  // commit a single new page.
-  assert.equal(
-    result.memory.readOverheadMiB,
-    0,
-    `reading the working set committed ${result.memory.readOverheadMiB} MiB; a transport change would now matter for reads`,
+  assert.equal(result.memory.repeatedReadPasses.length, 20);
+  assert.ok(
+    result.memory.repeatedReadPasses.slice(-5).every(pass => pass.growthMiB === 0),
+    "repeated reads are still committing linear-memory pages after warmup",
   );
 
   // The harness must still be an isolate. A measurement from a realm that had

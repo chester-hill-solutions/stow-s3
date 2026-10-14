@@ -1,9 +1,8 @@
 # Browser file editor
 
-A small demonstration of local file stages, persisted undo/redo, offline reload
-and explicit sync to a private native Stow S3 fixture. It uses the real Go WASM
-runtime and real IndexedDB. The remote fixture has generated local credentials;
-it does not use ambient cloud credentials or contact a cloud provider.
+This demo stores file stages in IndexedDB with the Go WASM runtime.
+It supports undo/redo, offline reload and explicit sync to a private native S3 fixture.
+The fixture uses generated local credentials and makes no cloud requests.
 
 From the repository root:
 
@@ -30,17 +29,16 @@ You can then stop the server and reload to exercise actual network loss. Edits
 and history still work; sync needs the server running again. The offline checkbox
 only disables the remote transport, which is useful for a shorter demonstration.
 
-Every input event starts a full-snapshot local save. Closing/reloading before a
-save confirms can interrupt that input; the display reports saving until the
-commit completes. History retains 50 stages within an 8 MiB / 200-object budget.
-The fixture resets on server restart, while local history remains. Those are
-separate lifetimes, so reconnecting can produce a conflict.
+Each input event starts a full-file save. Wait for confirmation before closing or reloading.
+History retains 50 stages within an 8 MiB / 200-object budget.
+Server restart resets the fixture but preserves local history. Reconnecting can therefore produce a conflict.
 
 The demo's same-origin proxy uses `S3ObjectSyncRemote` and the AWS SDK to talk to
 the real fixture. Production hosts can supply their own proxy or use the S3
 transport directly with scoped credentials and appropriate CORS configuration.
 See [the library contract and limits](../../docs/browser-file-history.md).
 
+<!-- repo-only:start -->
 ## Verification
 
 Manually verified in Chrome on 2026-10-12: real WASM and IndexedDB saves;
@@ -57,3 +55,4 @@ testing bucket and additionally checks direct browser CORS/conditional requests.
 It creates a unique disposable prefix, temporarily configures the test origin's
 CORS rule, and verifies both object cleanup and policy restoration afterward.
 See [the qualification contract](../../docs/browser-file-history.md#repeatable-browser-and-railway-tests).
+<!-- repo-only:end -->

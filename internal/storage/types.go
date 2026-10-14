@@ -26,6 +26,7 @@ type BucketInfo struct {
 
 // PutOptions configures object writes.
 type PutOptions struct {
+	ComputeChecksum   bool
 	ContentType       string
 	Metadata          map[string]string
 	ChecksumAlgorithm string

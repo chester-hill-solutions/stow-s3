@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/auth"
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/s3api"
 )
@@ -61,7 +62,7 @@ func (w *Workspace) FacadeWithOptions(options WorkspaceFacadeOptions) (*Workspac
 		return nil, ErrClosed
 	}
 	if w.facade == nil {
-		facade, err := startWorkspaceFacade(w.Runtime.inner, options)
+		facade, err := startWorkspaceFacade(embedded.UnwrapInstance(w.Runtime), options)
 		if err != nil {
 			return nil, err
 		}
@@ -141,5 +142,5 @@ func (w *Workspace) closeLocked() error {
 
 // RefreshUsage accounts for direct filesystem writes at a caller's quiescent boundary.
 func (w *Workspace) RefreshUsage(ctx context.Context) error {
-	return w.Runtime.inner.RefreshUsage(ctx)
+	return embedded.UnwrapInstance(w.Runtime).RefreshUsage(ctx)
 }

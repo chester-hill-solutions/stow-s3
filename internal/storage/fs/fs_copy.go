@@ -5,6 +5,7 @@ package fs
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -20,21 +21,14 @@ func (s *FilesystemStore) CopyObject(ctx context.Context, srcBucket, srcKey, dst
 	})
 }
 
-// CopyObjectCond copies from one captured source record, under one lock.
-//
-// The read and the write happen together, which is what makes this a single
-// transaction. Taking the lock separately instead lets a source overwritten in
-// between be copied as the bytes of one version carrying the metadata of another.
-//
-// The conditions are evaluated against the record being copied, under that same
-// lock, so a condition naming a version the source has moved on from refuses the
-// copy instead of publishing a version the caller never asked for.
+// CopyObjectCond checks conditions and copies one captured version under the same lock.
 func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	if err := storage.ValidateCopyRequest(req); err != nil {
 		return nil, err
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return nil, err
 	}
@@ -45,12 +39,16 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 	if err := s.requireBucket(req.DestBucket); err != nil {
 		return nil, err
 	}
-	record, err := s.readObject(req.SourceBucket, req.SourceKey)
+	reader, record, err := openObjectRecord(s.objectPath(req.SourceBucket, req.SourceKey))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, storage.ErrObjectNotFound
 		}
 		return nil, err
+	}
+	defer reader.Close()
+	if record.Key != "" && record.Key != req.SourceKey {
+		return nil, fmt.Errorf("object path digest collision: stored key does not match requested key")
 	}
 	sourceMeta := record.meta(req.SourceBucket, req.SourceKey)
 	if err := storage.CheckCopySourceConditions(req.Options, &sourceMeta); err != nil {
@@ -65,6 +63,7 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 	copied := objectRecord{
 		RecordVersion:     recordVersion,
 		Data:              record.Data,
+		payloadSize:       record.payloadSize,
 		ETag:              record.ETag,
 		ContentType:       record.ContentType,
 		Metadata:          storage.CloneMetadata(record.Metadata),
@@ -77,7 +76,7 @@ func (s *FilesystemStore) CopyObjectCond(_ context.Context, req storage.CopyRequ
 	if err := s.checkRecoveryHoldsLocked(req.DestBucket, req.DestKey); err != nil {
 		return nil, err
 	}
-	if err := s.writeObject(req.DestBucket, req.DestKey, copied); err != nil {
+	if err := s.writeObjectStream(req.DestBucket, req.DestKey, copied, reader); err != nil {
 		return nil, err
 	}
 	meta := copied.meta(req.DestBucket, req.DestKey)

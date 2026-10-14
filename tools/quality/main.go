@@ -237,6 +237,9 @@ func scanRoots(roots []string) (report, error) {
 			if entry.IsDir() || !strings.HasSuffix(path, ".go") {
 				return nil
 			}
+			if generatedGo(path) {
+				return nil
+			}
 			// Test files are scanned for every structural rule and excluded from the
 			// comment budget alone. See commentLinesRule for why the two are counted
 			// apart.

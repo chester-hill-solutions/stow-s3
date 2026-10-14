@@ -29,15 +29,30 @@ func (s *FilesystemStore) ReplaySaveRequest(ctx context.Context, bucket, key str
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	return s.replaySaveLocked(bucket, key, data, opts)
 }
 
-func (s *FilesystemStore) replaySaveLocked(bucket, key string, data []byte, opts storage.PutOptions) (storage.SaveReceipt, bool, error) {
+func (s *FilesystemStore) checkSaveRequest(bucket, key string, opts storage.PutOptions) error {
 	if !s.SupportsDurableSaveRequests() {
-		return storage.SaveReceipt{}, false, storage.ErrSaveRequestsUnsupported
+		return storage.ErrSaveRequestsUnsupported
 	}
 	if !validRequestKey(opts.RequestKey) || !validSaveOptions(opts) || !validSaveStrings(bucket, key) {
-		return storage.SaveReceipt{}, false, storage.ErrInvalidSaveRequest
+		return storage.ErrInvalidSaveRequest
+	}
+	return nil
+}
+
+func (s *FilesystemStore) replaySaveLocked(bucket, key string, data []byte, opts storage.PutOptions) (storage.SaveReceipt, bool, error) {
+	if err := s.checkSaveRequest(bucket, key, opts); err != nil {
+		return storage.SaveReceipt{}, false, err
+	}
+	if opts.ComputeChecksum {
+		var err error
+		opts, err = storage.ResolvePutChecksum(opts, data)
+		if err != nil {
+			return storage.SaveReceipt{}, false, err
+		}
 	}
 	meaning := s.saveMeaning(bucket, key, data, opts)
 	if pending := s.saves.pending; pending != nil && pending.RequestKey == opts.RequestKey && pending.Meaning != meaning {
@@ -68,6 +83,7 @@ func (s *FilesystemStore) ResolveSaveRequest(ctx context.Context, bucket, key, r
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if !s.SupportsDurableSaveRequests() {
 		return storage.SaveReceipt{}, storage.ErrSaveRequestsUnsupported
 	}

@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"sort"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/recoveryerrors"
 )
 
 const MaxRecoveryHolds = 256
@@ -18,8 +20,8 @@ const MaxRecoveryHoldPeakBytes = 2 * MaxRecoveryHoldBytes
 var (
 	ErrRecoveryHeld         = errors.New("workspace: retained recovery dependency")
 	ErrRecoveryHoldConflict = errors.New("workspace: recovery hold identity conflict")
-	ErrRecoveryHoldNotFound = errors.New("workspace: recovery hold not found")
-	ErrRecoveryHoldFull     = errors.New("workspace: recovery hold capacity exhausted")
+	ErrRecoveryHoldNotFound = recoveryerrors.NotFound
+	ErrRecoveryHoldFull     = recoveryerrors.Full
 	ErrRecoveryHoldCorrupt  = errors.New("workspace: recovery hold state unreadable")
 )
 

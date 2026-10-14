@@ -2,51 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <title>Stow work and checkpoints</title>
     <link rel="stylesheet" href="card.css" />
   </head>
   <body>
     <!-- 02 The problem. The two dead ends on the right are the whole argument:
          scratch that does not survive, and a bucket that is not yours. -->
     <div class="card">
-      <div class="wordmark"><span class="box"></span><span>STOW <b>S3</b></span></div>
+      <div class="wordmark"><span class="box"></span><span>stow</span></div>
 
       <h1 class="mt-lg" style="font-size: 128px">
-        The run ended.<br />The work is in <em>scratch.</em>
+        A place for the work.<br />A record of <em>the changes.</em>
       </h1>
 
       <div class="flow">
         <div class="node">
-          <small>the agent</small>
-          Your Run
+          <small>declared inputs</small>
+          Prepare files
         </div>
         <div class="arrow">&#10230;</div>
         <div class="node">
-          <small>gone with the job</small>
-          Runner Scratch
+          <small>immutable snapshots</small>
+          Checkpoint
         </div>
         <div class="arrow">&#10230;</div>
         <div class="node">
-          <small>or someone else's</small>
-          A Cloud Bucket
+          <small>verified archives</small>
+          Hand off
         </div>
       </div>
 
-      <div class="mt-lg" style="display: flex; gap: 26px; flex-wrap: wrap">
-        <span class="clients" style="margin: 0">
-          <span style="text-decoration: line-through; text-decoration-thickness: 3px"
-            >nothing to inspect</span
-          >
-          <span style="text-decoration: line-through; text-decoration-thickness: 3px"
-            >no record of what changed</span
-          >
-          <span style="text-decoration: line-through; text-decoration-thickness: 3px"
-            >no way to pick it up elsewhere</span
-          >
-        </span>
-      </div>
+      <p class="sub mt">Working files that outlive the process. Checkpoints you can compare and carry to another host.</p>
 
       <div class="foot">
-        <span class="tag">The artifact outlives the process, or it does not</span>
+        <span class="tag">Durable workspaces · Explicit checkpoints</span>
         <span class="url">github.com/chester-hill-solutions/stow-s3</span>
       </div>
     </div>

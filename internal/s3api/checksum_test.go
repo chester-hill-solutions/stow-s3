@@ -110,3 +110,29 @@ func TestCRC64MultipartDeclarationIsExplicitlyUnsupported(t *testing.T) {
 		t.Fatalf("status=%d body=%s", resp.StatusCode, body)
 	}
 }
+
+func TestPutComputesRequestedChecksumWithoutSuppliedValue(t *testing.T) {
+	ts := newTestServer(t)
+	defer ts.Close()
+	request, _ := http.NewRequest(http.MethodPut, ts.URL+"/auto-checksum", nil)
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response.Body.Close()
+	body := "owned checksum payload"
+	request, _ = http.NewRequest(http.MethodPut, ts.URL+"/auto-checksum/key", strings.NewReader(body))
+	request.Header.Set("x-amz-sdk-checksum-algorithm", "CRC32C")
+	response, err = http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Body.Close()
+	expected, err := storage.ComputeChecksum("CRC32C", []byte(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if response.StatusCode != http.StatusOK || response.Header.Get("x-amz-checksum-crc32c") != expected {
+		t.Fatalf("status=%d checksum=%q", response.StatusCode, response.Header.Get("x-amz-checksum-crc32c"))
+	}
+}

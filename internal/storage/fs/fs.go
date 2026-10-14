@@ -1,7 +1,6 @@
 package fs
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -21,17 +20,21 @@ import (
 const legacyMetaSuffix = ".stowmeta"
 
 // FilesystemStore persists object records on disk with atomic writes.
-// Each object is stored as one JSON record containing its bytes and metadata.
+// Each object is stored as one versioned record containing its bytes and metadata.
 type FilesystemStore struct {
 	dataDir        string
 	lockPath       string
 	lockID         string
 	mu             sync.RWMutex
 	closeOnce      sync.Once
+	closed         bool
+	activeStages   int
 	saves          saveState
 	saveFault      func(string) error
 	namespace      *capacity.Namespace
 	capacityActive bool
+	usageRevision  uint64
+	fencedDirs     map[string]struct{}
 }
 
 var _ storage.Store = (*FilesystemStore)(nil)
@@ -73,7 +76,7 @@ func newFilesystemStore(dataDir string, namespace *capacity.Namespace) (*Filesys
 	warnLegacyLayout(dataDir)
 	// Recorded last: the marker asserts stow has finished initializing the
 	// directory, so a client that sees it may treat the directory as resettable.
-	store := &FilesystemStore{dataDir: dataDir, lockPath: lockPath, lockID: lockID}
+	store := &FilesystemStore{dataDir: dataDir, lockPath: lockPath, lockID: lockID, fencedDirs: make(map[string]struct{})}
 	if store.SupportsGuardedWrites() {
 		if err := store.initializeSaves(); err != nil {
 			_ = releaseStoreLock(lockPath, lockID)
@@ -171,6 +174,9 @@ func (s *FilesystemStore) isBoundedObjectPath(bucket, path string) bool {
 // walk the loop upward deleting directories it did not create.
 func (s *FilesystemStore) pruneEmptyShards(bucket, objPath string) {
 	root := s.objectsDir(bucket)
+	if filepath.Dir(objPath) != root {
+		s.forgetFencedDirectories(filepath.Dir(objPath))
+	}
 	if rel, err := filepath.Rel(root, objPath); err == nil {
 		parts := strings.Split(rel, string(filepath.Separator))
 		if len(parts) == 3 && parts[0] == boundedPathPrefix {
@@ -211,6 +217,7 @@ func (s *FilesystemStore) CreateBucket(_ context.Context, name string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}
@@ -232,6 +239,7 @@ func (s *FilesystemStore) DeleteBucket(_ context.Context, name string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}
@@ -250,6 +258,7 @@ func (s *FilesystemStore) DeleteBucket(_ context.Context, name string) error {
 	} else if hasUploads {
 		return storage.ErrBucketNotEmpty
 	}
+	s.forgetFencedDirectories(dir)
 	return os.RemoveAll(dir)
 }
 
@@ -311,15 +320,19 @@ func (s *FilesystemStore) GetObject(_ context.Context, bucket, key string) (io.R
 	if err := s.requireBucket(bucket); err != nil {
 		return nil, nil, err
 	}
-	record, err := s.readObject(bucket, key)
+	reader, record, err := openObjectRecord(s.objectPath(bucket, key))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil, storage.ErrObjectNotFound
 		}
 		return nil, nil, err
 	}
+	if record.Key != "" && record.Key != key {
+		reader.Close()
+		return nil, nil, fmt.Errorf("object path digest collision: stored key does not match requested key")
+	}
 	meta := record.meta(bucket, key)
-	return io.NopCloser(bytes.NewReader(record.Data)), &meta, nil
+	return reader, &meta, nil
 }
 
 func (s *FilesystemStore) HeadObject(_ context.Context, bucket, key string) (*storage.ObjectMeta, error) {
@@ -335,7 +348,7 @@ func (s *FilesystemStore) HeadObject(_ context.Context, bucket, key string) (*st
 	if err := s.requireBucket(bucket); err != nil {
 		return nil, err
 	}
-	record, err := s.readObject(bucket, key)
+	record, err := s.readObjectHeader(bucket, key)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, storage.ErrObjectNotFound
@@ -355,6 +368,7 @@ func (s *FilesystemStore) DeleteObject(_ context.Context, bucket, key string) er
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}
@@ -382,6 +396,7 @@ func (s *FilesystemStore) DeleteObjects(_ context.Context, bucket string, keys [
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return nil, err
 	}
@@ -431,6 +446,9 @@ func readBucketCreated(dir string) (time.Time, error) {
 func (s *FilesystemStore) Close() error {
 	var err error
 	s.closeOnce.Do(func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		s.closed = true
 		err = releaseStoreLock(s.lockPath, s.lockID)
 	})
 	return err

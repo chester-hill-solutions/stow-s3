@@ -3,8 +3,16 @@ import { mkdtemp, readFile, rm, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { buildSite, renderMarkdown, rewriteLink } from "../build.mjs";
+import { buildSite, publicMarkdown, renderMarkdown, rewriteLink } from "../build.mjs";
 import { pages } from "../docs.mjs";
+
+test("public guides omit repository commentary, retain code examples and reject broken markers", () => {
+  const input = "Visible\n<!-- repo-only:start -->\n## ADRs\nPrivate\n<!-- repo-only:end -->\n```md\n<!-- repo-only:start -->\n```\nEnd";
+  assert.equal(publicMarkdown(input), "Visible\n```md\n<!-- repo-only:start -->\n```\nEnd");
+  assert.throws(() => publicMarkdown("<!-- repo-only:start -->\nforgotten"), /Unclosed/);
+  assert.throws(() => publicMarkdown("<!-- repo-only:end -->"), /Unexpected/);
+  assert.throws(() => publicMarkdown("<!-- repo-only:start -->\n<!-- repo-only:start -->"), /Nested/);
+});
 
 test("published guides render examples and turn repo documentation links into site routes", () => {
   const page = pages.find((entry) => entry.source === "docs/outbox.md");
@@ -14,24 +22,37 @@ test("published guides render examples and turn repo documentation links into si
   assert.equal(headings[0].id, "recovery");
   assert.equal(rewriteLink("https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-project-storage.md", page.source, pages), "/docs/browser-projects/");
   const license = "https://github.com/chester-hill-solutions/stow-s3/blob/main/LICENSE";
-  assert.equal(rewriteLink(license, page.source, pages), license);
+  const revision = process.env.STOW_SITE_SOURCE_REVISION ?? "main";
+  assert.equal(rewriteLink(license, page.source, pages), `https://github.com/chester-hill-solutions/stow-s3/blob/${revision}/LICENSE`);
 });
 
 test("public output contains complete guides and excludes build tools, source files and credentials", async (t) => {
   const output = await mkdtemp(join(tmpdir(), "stow-site-build-"));
   t.after(() => rm(output, { recursive: true, force: true }));
   const manifest = await buildSite(output);
+  assert.equal(manifest.some((page) => page.route.startsWith("/docs/decisions/")), false);
+  for (const route of ["docs/decisions", "docs/contributing", "docs/standards"]) {
+    await assert.rejects(access(join(output, route)));
+  }
   for (const page of manifest) {
     const html = await readFile(join(output, page.route, "index.html"), "utf8");
     assert.match(html, /<main id="main"/);
     assert.match(html, /<h1 /);
     assert.match(html, /aria-label="Documentation"/);
     assert.match(html, /rel="canonical"/);
+    assert.match(html, /href="\/assets\/theme\.css/);
+    assert.doesNotMatch(html, /href="\/assets\/stow\.css/);
+    assert.doesNotMatch(html, /Architecture decisions|repo-only:|docs\/adr\/|W02\/W09/);
+    assert.doesNotMatch(html, /href="[^"]*\/(?:history|adr|assessment-evidence|benchmarks)\//);
+    assert.doesNotMatch(html, /href="[^"]*\/(?:storage-foundation-plan|planning-index|implementation-\d|release-verification-\d)/);
   }
-  for (const name of ["serve.py", "build.mjs", "package.json", "wrangler.jsonc", ".env"]) {
+  for (const name of ["serve.py", "build.mjs", "package.json", "wrangler.jsonc", ".env", "design", "redesign-plan.md"]) {
     await assert.rejects(access(join(output, name)));
   }
   const home = await readFile(join(output, "index.html"), "utf8");
+  for (const anchor of ["problem", "testing", "workspace", "browser", "demo", "surfaces", "edge"]) {
+    assert.ok(home.includes(`id="${anchor}"`), `Keep the existing #${anchor} entry point`);
+  }
   assert.doesNotMatch(home, /href="https:\/\/github\.com\/chester-hill-solutions\/stow-s3(?:#|\/(?:blob|tree)\/main\/(?:docs|examples\/browser-editor))/);
   const documents = [{ route: "/", html: home }, ...await Promise.all(manifest.map(async (page) => ({
     route: page.route, html: await readFile(join(output, page.route, "index.html"), "utf8"),
@@ -39,7 +60,7 @@ test("public output contains complete guides and excludes build tools, source fi
   const byRoute = new Map(documents.map((document) => [document.route, document.html]));
   const broken = [];
   for (const document of documents) {
-    for (const match of document.html.matchAll(/href="([^"]+)"/g)) {
+    for (const match of document.html.matchAll(/(?:href|src)="([^"]+)"/g)) {
       const url = new URL(match[1].replaceAll("&amp;", "&"), `https://site.test${document.route}`);
       if (url.origin !== "https://site.test") continue;
       const target = byRoute.get(url.pathname);
@@ -51,5 +72,5 @@ test("public output contains complete guides and excludes build tools, source fi
       }
     }
   }
-  assert.deepEqual(broken, [], "Every public navigation target and section anchor must exist");
+  assert.deepEqual(broken, [], "Every public navigation target, section anchor and asset must exist");
 });

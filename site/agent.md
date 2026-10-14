@@ -60,7 +60,7 @@ conditional attempt, so do not assume exactly-once delivery. Outbox retry and
 discard routes require the admin token, including on loopback. See the
 [run-through contract](/docs/s3-compatibility/#62-read-through-cache-semantics).
 
-## Checkpoints and handoff for agent work (0.3.0 development tree)
+## Checkpoints and handoff for agent work
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent
 works. Before saving, stop known writers and write objective, progress and next
@@ -74,29 +74,18 @@ The local `mcp` command exposes the same storage operations within configured
 workspace/transfer scope. Agent-requested saves are best effort. A host controller
 must own prompt admission to guarantee its chosen turn boundary. Full chat state,
 process memory, credentials and external side effects are outside a checkpoint.
-See the portable workspace guide and experimental OpenCode example in the repository.
+Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
 ## Install
 
-**The npm and PyPI install surfaces are not yet announced as usable.** The
-`v0.2.0` release published the main package and all four platform carriers to
-public npmjs, then failed before the GitHub Release, so there is no release page
-and no `SHA256SUMS.txt` to verify a download against, and PyPI was not published.
-A clean install of `0.2.0` from npm has not been verified end to end, which is
-the reason to wait rather than a claim that it is broken. Do not spend a turn
-trying those install commands until a complete release is announced. The Go
-module *is* published and is the shortest path today.
+Native v0.3.0 binaries for Linux and macOS are distributed through
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Verify the archive with the release checksum manifest and run `stow-s3 --version`.
+npm and PyPI publication are deferred; use source checkouts for those clients.
 
-**Platforms: Linux and macOS, on x64 and arm64.** There is no Windows build, and
-the workspace backend needs an advisory file lock that Windows does not provide,
-so it refuses there rather than guessing. On Windows, use WSL.
 
-The next candidate, **0.3.0**, targets the same public npmjs distribution and has
-**not yet been published**. Publisher setup, live-provider gates and anonymous
-exact-version installation must pass before availability is announced. Published
-npm versions are immutable. For the new candidate, remove any old scope override
-to `npm.pkg.github.com`; it would send installation requests to the wrong
-registry.
+The 0.3.0 TypeScript and Python clients are not yet published. Use a source checkout.
+Native package targets are Linux and macOS on x64 and arm64. Use WSL on Windows.
 
 Go, published and installable now:
 
@@ -151,10 +140,7 @@ are not guessable:
 ./bin/stow-s3 serve --port 0 --mode local --data-dir "$PWD/.stow" --ready-fd 3
 ```
 
-The full contract covers both readiness channels and their traps, the probe routes,
-default behavior, and platform support. Read
-[`docs/running-and-probing.md`](../docs/running-and-probing.md). Every claim in it
-is asserted by a test.
+Use the [server guide](/docs/server/) for readiness fields and probe authentication.
 
 `STOW_ENDPOINT` and AWS credentials in the environment describe an upstream; they do
 not select one. The server is local-only unless you pass `--mode run-through` or
@@ -247,6 +233,8 @@ encryption. Check the README before assuming any of these exist; the gap is
 narrow and deliberate, but guessing wastes a cycle.
 
 ## Links
+
+- [API reference](/docs/api/): public methods, parameters, return types and errors.
 
 - Repository and full README: https://github.com/chester-hill-solutions/stow-s3
 - Diagnostics: `npx stow-doctor` or `stow-s3 doctor`

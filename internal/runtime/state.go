@@ -7,24 +7,24 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-func (i *Instance) objectQuotaFits(target string, objectDelta int64) bool {
+func (i *usageState) objectQuotaFits(target string, objectDelta int64) bool {
 	reserved := i.reservedObjects
 	if _, ok := i.reservedTargets[target]; ok {
 		reserved--
 	}
-	return i.usage.Objects+objectDelta+reserved <= i.options.MaxObjects
+	return i.usage.Objects+objectDelta+reserved <= i.limits.MaxObjects
 }
 
-func (i *Instance) bytesQuotaFits(oldSize, newSize int64) bool {
-	return i.usage.Bytes+i.reservedBytes-oldSize+newSize <= i.options.MaxBytes
+func (i *usageState) bytesQuotaFits(oldSize, newSize int64) bool {
+	return i.usage.Bytes+i.reservedBytes-oldSize+newSize <= i.limits.MaxBytes
 }
 
-func (i *Instance) hasTargetReservation(target string) bool {
+func (i *usageState) hasTargetReservation(target string) bool {
 	_, ok := i.reservedTargets[target]
 	return ok
 }
 
-func (i *Instance) consumeTargetReservation(target string) {
+func (i *usageState) consumeTargetReservation(target string) {
 	if _, ok := i.reservedTargets[target]; !ok {
 		return
 	}
@@ -32,11 +32,11 @@ func (i *Instance) consumeTargetReservation(target string) {
 	i.reservedObjects--
 }
 
-func (i *Instance) addMultipartTarget(target string) {
+func (i *usageState) addMultipartTarget(target string) {
 	i.multipartTargets[target]++
 }
 
-func (i *Instance) removeMultipartTarget(target string) {
+func (i *usageState) removeMultipartTarget(target string) {
 	count := i.multipartTargets[target]
 	if count <= 1 {
 		delete(i.multipartTargets, target)
@@ -49,7 +49,7 @@ func (i *Instance) removeMultipartTarget(target string) {
 // no committed object yet, and reports whether it did. Callers decide what
 // running out of room means: initialization fails the open, while a live
 // reconciliation simply leaves the reservation unmade.
-func (i *Instance) reserveTarget(target string) bool {
+func (i *usageState) reserveTarget(target string) bool {
 	if i.hasTargetReservation(target) || !i.objectQuotaFits(target, 0) {
 		return false
 	}
@@ -58,7 +58,7 @@ func (i *Instance) reserveTarget(target string) bool {
 	return true
 }
 
-func (i *Instance) reconcileTargetReservation(target string, objectExists bool) {
+func (i *usageState) reconcileTargetReservation(target string, objectExists bool) {
 	if i.multipartTargets[target] == 0 || objectExists {
 		i.consumeTargetReservation(target)
 		return
@@ -66,26 +66,32 @@ func (i *Instance) reconcileTargetReservation(target string, objectExists bool) 
 	i.reserveTarget(target)
 }
 
-func (i *Instance) initialize(ctx context.Context) error {
-	if err := i.checkContext(ctx); err != nil {
-		return err
-	}
-	buckets, err := i.quotaStore().ListBuckets(ctx)
+type usageScanner struct {
+	usageState
+	options        Options
+	store          storage.Store
+	multipartStore storage.MultipartStore
+}
+
+func scanStoredUsage(ctx context.Context, options Options, store storage.Store, quotaStore storage.Store) (usageState, error) {
+	multipart, _ := store.(storage.MultipartStore)
+	i := usageScanner{usageState: newUsageState(options), options: options, store: quotaStore, multipartStore: multipart}
+	buckets, err := quotaStore.ListBuckets(ctx)
 	if err != nil {
-		return err
+		return usageState{}, err
 	}
 	for _, bucket := range buckets {
 		if err := i.initializeBucket(ctx, bucket.Name); err != nil {
-			return err
+			return usageState{}, err
 		}
 	}
 	if i.usage.Objects > i.options.MaxObjects || i.usage.Bytes > i.options.MaxBytes || i.reservedObjects > i.options.MaxObjects || i.reservedBytes > i.options.MaxBytes {
-		return ErrQuotaExceeded
+		return usageState{}, ErrQuotaExceeded
 	}
-	return nil
+	return i.usageState, nil
 }
 
-func (i *Instance) initializeBucket(ctx context.Context, bucket string) error {
+func (i *usageScanner) initializeBucket(ctx context.Context, bucket string) error {
 	if err := i.initializeObjects(ctx, bucket); err != nil {
 		return err
 	}
@@ -99,10 +105,22 @@ func (i *Instance) initializeBucket(ctx context.Context, bucket string) error {
 	return i.initializeMultipart(ctx, bucket)
 }
 
-func (i *Instance) initializeObjects(ctx context.Context, bucket string) error {
+func (i *usageScanner) initializeObjects(ctx context.Context, bucket string) error {
+	if scanner, ok := i.store.(storage.ObjectUsageStore); ok {
+		usage, err := scanner.ScanObjectUsage(ctx, bucket)
+		if err != nil {
+			return err
+		}
+		if usage.Bytes < 0 || usage.Objects < 0 || i.usage.Bytes > i.options.MaxBytes-usage.Bytes || i.usage.Objects > i.options.MaxObjects-usage.Objects {
+			return ErrQuotaExceeded
+		}
+		i.usage.Bytes += usage.Bytes
+		i.usage.Objects += usage.Objects
+		return nil
+	}
 	continuation := ""
 	for {
-		result, err := i.quotaStore().ListObjectsV2(ctx, bucket, storage.ListOptions{ContinuationToken: continuation, MaxKeys: 1000})
+		result, err := i.store.ListObjectsV2(ctx, bucket, storage.ListOptions{ContinuationToken: continuation, MaxKeys: 1000})
 		if err != nil {
 			return err
 		}
@@ -123,7 +141,7 @@ func (i *Instance) initializeObjects(ctx context.Context, bucket string) error {
 	}
 }
 
-func (i *Instance) initializeMultipart(ctx context.Context, bucket string) error {
+func (i *usageScanner) initializeMultipart(ctx context.Context, bucket string) error {
 	markers := storage.MultipartListOptions{MaxUploads: 1000}
 	for {
 		result, err := i.multipartStore.ListMultipartUploads(ctx, bucket, markers)
@@ -146,7 +164,7 @@ func (i *Instance) initializeMultipart(ctx context.Context, bucket string) error
 	}
 }
 
-func (i *Instance) initializeMultipartUpload(ctx context.Context, upload storage.MultipartUpload) error {
+func (i *usageScanner) initializeMultipartUpload(ctx context.Context, upload storage.MultipartUpload) error {
 	if err := i.admitMultipartUpload(); err != nil {
 		return err
 	}
@@ -173,7 +191,7 @@ func (i *Instance) initializeMultipartUpload(ctx context.Context, upload storage
 	if i.multipartTargets[target] != 1 {
 		return nil
 	}
-	_, exists, err := i.objectSize(ctx, upload.Bucket, upload.Key)
+	_, exists, err := storedObjectSize(ctx, i.store, upload.Bucket, upload.Key)
 	if err != nil {
 		return err
 	}
@@ -186,9 +204,9 @@ func (i *Instance) initializeMultipartUpload(ctx context.Context, upload storage
 	return nil
 }
 
-func (i *Instance) admitMultipartUpload() error {
-	if int64(len(i.multipart)) >= i.options.MaxMultipartUploads {
-		return fmt.Errorf("%w: maximum outstanding multipart uploads (%d) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data", ErrQuotaExceeded, i.options.MaxMultipartUploads)
+func (i *usageState) admitMultipartUpload() error {
+	if int64(len(i.multipart)) >= i.limits.MaxMultipartUploads {
+		return fmt.Errorf("%w: maximum outstanding multipart uploads (%d) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data", ErrQuotaExceeded, i.limits.MaxMultipartUploads)
 	}
 	return nil
 }

@@ -1,0 +1,60 @@
+/* Shared brand and primitives for the landing page and generated guides. */
+:root {
+  color-scheme: light;
+  --ink-0: #f7f5ee; --ink-1: #eeeee5; --ink-2: #e5e7dd; --ink-3: #dce0d3;
+  --text-1: #101613; --text-2: #4b554e; --text-3: #596257;
+  --accent: #123f30; --accent-soft: #235b43; --accent-quiet: #e7ecdf;
+  --highlight: #9ac43b; --line: #b8bdb3; --line-soft: #d4d7cd;
+  --code-bg: #101a16; --code-text: #e9eee5;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --gutter: clamp(1.25rem, 4.5vw, 4rem);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 2rem; }
+body { margin: 0; background: var(--ink-0); color: var(--text-1); font: 1rem/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; }
+button, summary { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+img, svg { max-width: 100%; }
+a { color: inherit; text-underline-offset: .22em; }
+a:hover { text-decoration-thickness: 2px; }
+code, pre { font-family: var(--mono); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; border-radius: 2px; }
+::selection { background: #cde0b5; color: var(--text-1); }
+.skip { position: absolute; top: -5rem; left: 1rem; z-index: 10; padding: .8rem 1.2rem; background: var(--accent); color: var(--ink-0); }
+.skip:focus { top: 1rem; }
+.container { width: min(100% - var(--gutter) * 2, 1280px); margin-inline: auto; }
+.masthead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 92px; border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; align-items: center; min-height: 44px; flex: none; }
+.brand img { display: block; width: 128px; height: 36px; }
+.masthead nav { display: flex; align-items: center; gap: .6rem; }
+.masthead nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .6rem .75rem; text-decoration: none; font-size: .8125rem; }
+.masthead nav a:hover, .masthead nav a[aria-current] { color: var(--accent); }
+.masthead nav .nav-source { border: 1px solid var(--text-1); border-radius: 4px; margin-left: 1rem; gap: 1rem; padding-inline: 1.1rem; }
+.btn { display: inline-flex; justify-content: center; align-items: center; gap: 1rem; min-height: 48px; padding: .85rem 1.3rem; border: 1px solid transparent; border-radius: 5px; text-decoration: none; font-size: .9375rem; font-weight: 500; line-height: 1.2; }
+.btn-primary { background: var(--accent); color: var(--ink-0); }
+.btn-primary:hover { background: var(--accent-soft); }
+.btn-ghost { background: transparent; color: var(--text-1); border-color: var(--line); }
+.btn-ghost:hover { background: var(--ink-1); border-color: var(--text-2); }
+.text-link { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; color: var(--accent); font-size: .9375rem; }
+.eyebrow { margin: 0 0 1.5rem; font: .75rem/1.4 var(--mono); letter-spacing: .025em; text-transform: uppercase; }
+.install { display: flex; align-items: stretch; max-width: 100%; min-width: 0; background: var(--ink-1); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.install code { min-width: 0; flex: 1; padding: 1rem; overflow-x: auto; white-space: nowrap; font-size: .75rem; }
+.install button { flex: none; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--text-1); min-width: 68px; min-height: 44px; padding: .75rem; font: .6875rem var(--mono); }
+.install button:hover { background: var(--ink-2); }
+.install button[data-copied="1"] { color: var(--accent); }
+@media (max-width: 600px) {
+  .masthead { min-height: 108px; align-content: center; flex-wrap: wrap; gap: .25rem; padding-block: .7rem; }
+  .brand img { width: 105px; height: 30px; }
+  .masthead nav { gap: .1rem; }
+  .masthead nav a { padding-inline: .5rem; font-size: .75rem; }
+  .masthead nav .nav-source { margin-left: .25rem; gap: .4rem; padding-inline: .6rem; }
+}
+@media (max-width: 390px) {
+  .masthead nav { width: 100%; justify-content: space-between; }
+  .masthead nav a { min-width: 44px; padding-inline: .3rem; font-size: .6875rem; }
+  .masthead nav .nav-source { margin-left: 0; padding-inline: .4rem; gap: .35rem; }
+  .masthead { padding-block: .8rem; }
+}

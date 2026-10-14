@@ -39,10 +39,12 @@ func (i *Instance) CreateBucket(ctx context.Context, name string) error {
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
+	if err := i.checkMutationLocked(ctx); err != nil {
 		return err
 	}
-	return i.store.CreateBucket(ctx, name)
+	err := i.store.CreateBucket(ctx, name)
+	i.recordMutation(err)
+	return err
 }
 
 func (i *Instance) DeleteBucket(ctx context.Context, name string) error {
@@ -54,10 +56,12 @@ func (i *Instance) DeleteBucket(ctx context.Context, name string) error {
 	}
 	i.mu.Lock()
 	defer i.mu.Unlock()
-	if err := i.checkOpen(); err != nil {
+	if err := i.checkMutationLocked(ctx); err != nil {
 		return err
 	}
-	return i.store.DeleteBucket(ctx, name)
+	err := i.store.DeleteBucket(ctx, name)
+	i.recordMutation(err)
+	return err
 }
 
 func (i *Instance) ListBuckets(ctx context.Context) ([]Bucket, error) {

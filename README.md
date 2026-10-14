@@ -1,67 +1,47 @@
 # Stow
 
-Portable working storage for agents, tools, applications and tests: S3-compatible
-object storage, prepared file workspaces, and checkpoints you can inspect and
-explicitly export and adopt elsewhere.
+Stow stores objects, files and checkpoints for applications, agents and tests.
+Use an S3 endpoint, a native file workspace, or an embedded runtime.
+Browser APIs add local editing history and remote sync.
 
-Stow owns the data lifecycle. Your application or agent runner owns execution,
-turn scheduling, model access and any sandbox or resource enforcement. Local S3
-fixtures and agent working data are two uses of the same storage foundation.
+Your application runs the code and controls network access. Stow manages storage.
 
 Start with the [documentation index](docs/README.md) or the
 [public documentation](https://stow.chesterhillsolutions.ca/docs/).
 
 ## Storage surfaces
 
-**An S3 service** provides common object operations through ordinary SDKs, using
-memory or filesystem storage. Scoped TypeScript and Python helpers start and
-clean up a private storage process. Run-through mode adds an optional upstream
-cache; captured data can be read offline while retained. Configure `STOW_BUCKET`
-when restricting upstream reads to one bucket. Prewarming selected keys alone
-is not a permanent online allowlist.
+- **S3 service:** use an S3 SDK with memory or filesystem storage.
+  TypeScript and Python sessions start a private server and stop it on close.
+  [Run-through mode](docs/run-through.md) adds a remote cache for offline reads.
+  Set `STOW_BUCKET` to restrict upstream reads to one bucket.
+  Prewarming keys does not restrict later online reads.
+- **Workspace:** prepare a directory, capture checkpoints, compare changes, and transfer work.
+  The embedded API and `workspace serve` share one runtime.
+  The S3 filesystem backend uses a separate object-record format.
+  Native Go APIs support [guarded saves and recovery receipts](docs/portable-workspace-usage.md#managed-saves-in-native-storage).
+  MCP callers can use the [fixed-bucket object tools](docs/portable-workspace-usage.md#native-object-mcp).
+- **Browser storage:** keep objects and editing history in IndexedDB.
+  [File history](docs/browser-file-history.md) stores whole-file stages.
+  [Project storage](docs/browser-project-storage.md) shares content between multi-file revisions.
+  [Workers](docs/browser-worker-runtime.md) support binary transport and bounded streams.
+  Your application supplies the sync transport.
 
-**A workspace** is a real directory with declared inputs, durable identity,
-verified file or portable object checkpoints, diffs and explicit handoff/adoption.
-The embedded API and optional `workspace serve` loopback S3 facade share one runtime.
-The ordinary S3 filesystem backend has a different object-record layout. Native
-Go callers can also use [guarded reads/saves and retained filesystem receipts](docs/portable-workspace-usage.md#managed-saves-in-native-storage)
-to refuse stale edits and resolve a lost reply after reopening an owned store.
-Agents can use the same core through the fixed-bucket
-[native object MCP profile](docs/portable-workspace-usage.md#native-object-mcp).
+The [MCP bucket browser](extensions/stow/README.md) adds read-only previews and object references.
 
-**Browser storage** persists objects and editing history in IndexedDB. The
-[file history API](docs/browser-file-history.md) retains whole-file stages;
-[project storage](docs/browser-project-storage.md) shares content across atomic
-multi-file revisions. [Workers](docs/browser-worker-runtime.md) support binary
-transport and bounded streams. Applications provide remote sync transports.
+Stow can keep upstream credentials separate from local credentials.
+It does not restrict other host processes or their network access.
+Storage quotas do not limit files written directly by those processes.
 
-The optional [MCP bucket browser and plugin](extensions/stow/README.md) adds a
-scoped read-only UI, resource previews and composer references to that server.
+<!-- repo-only:start -->
+The [storage plan](docs/storage-foundation-plan.md) tracks unfinished work.
+The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpoint before each prompt.
+Real interruption, second-host and Linux acceptance tests remain open.
+MCP tool access alone does not ensure a checkpoint after every turn.
 
-The storage service can hold upstream credentials while callers use generated
-local credentials. This does not isolate arbitrary host processes or their
-network access. Workspace/API quotas do not hard-limit direct filesystem writes.
-
-**Current development goal:** complete one installable prepare → use → checkpoint
-→ inspect → transfer → reopen workflow, then exercise it through a thin existing
-agent-runner integration. An experimental OpenCode caller gates each prompt on a confirmed save;
-local meaningful real-model continuation has passed; real interruption, second-host
-and Linux acceptance remain open. See the [consolidated storage plan](docs/storage-foundation-plan.md)
-and [later model evidence](docs/opencode-receiver-remediation-2026-09-29.md).
-The [planning index](docs/planning-index.md) identifies current documents and records
-where unfinished work from superseded plans now belongs.
-
-A local stdio MCP adapter exposes scoped inspection, portable checkpoint capture,
-request reconciliation, diff and optional handoff tools. Start with the
-[portable workspace guide](docs/portable-workspace-usage.md) and
-[OpenCode caller example](examples/opencode/README.md). MCP tool access alone does
-not guarantee a checkpoint after every turn; the caller owns that admission barrier.
-
-The [multiplayer lab](examples/multiplayer-prototype/README.md) explores three agents
-sharing a directory, selective file-change reports and checkpoint recovery. Run
-`make multiplayer` for the offline demo or `make multiplayer-real` for the local
-OpenCode model. This is a throwaway caller experiment above the storage primitive.
-
+The [multiplayer lab](examples/multiplayer-prototype/README.md) is an experimental caller.
+Run `make multiplayer` for the offline demo or `make multiplayer-real` for the local OpenCode model.
+<!-- repo-only:end -->
 ## Checkpoints and editing history
 
 Native workspace deltas compare checkpoints in one workspace and verify the
@@ -104,29 +84,18 @@ Stow implements the common S3 operations needed by application and test workload
 
 Stow implements a subset of Amazon S3. Versioning, ACLs, bucket policies, lifecycle rules, replication, notifications, tagging, object lock, S3 Select, and KMS-backed encryption are not implemented.
 
-If you are choosing between Stow and a fuller S3 emulator for a test suite: Stow
-is one static binary with no runtime dependency, it is fast enough to run
-per-test-case, and it implements the operations above and refuses the rest
-explicitly rather than pretending. It is not a drop-in for a workload that needs
-versioning or bucket policies.
+Stow is a static binary with no runtime dependency. Use another S3 implementation
+if your workload needs versioning, bucket policies, or another unsupported operation.
 
 ## When to use it
 
-Use Stow when a workload needs S3 behavior without a cloud account or network
-service, or when you are giving an agent somewhere to work that will still be
-there afterwards:
+Use Stow for:
 
-- giving a coding agent an isolated directory seeded with its declared inputs;
-- checkpointing what an agent did, and comparing two agents' work;
-- moving a workspace to another machine and picking it up there;
-- keeping object data readable when the upstream is not;
-- local application development;
-- unit and integration tests that need a real S3-shaped API;
-- CI jobs that need disposable object storage;
-- tools and agents that need a private scratch bucket;
-- Go programs that want an in-process object runtime;
-- browser or Node.js integrations that need an embedded runtime;
-- development against an existing upstream S3-compatible service.
+- agent working directories, checkpoints and transfer;
+- local development and tests that need an S3 API;
+- disposable object storage in CI;
+- cached reads when an upstream is offline;
+- embedded Go, Node.js or browser storage.
 
 ## A workspace, end to end
 
@@ -146,8 +115,7 @@ belongs to. The root's parent directory must already exist:
 }
 ```
 
-Prepare it. The result names the workspace, the totals it seeded, and the
-directory to use as the agent process's cwd:
+Prepare the workspace. The result includes its ID, seeded totals and root directory:
 
 ```sh
 stow-s3 workspace prepare --manifest task.json
@@ -163,10 +131,9 @@ stow-s3 workspace prepare --manifest task.json
 }
 ```
 
-The agent works in `root`. When you want what it did, checkpoint it. The
-checkpoint is immutable and content-addressed. Every later verb needs `--team
-platform` too, because a team's partition is a real directory boundary and a
-checkpoint filed under it is invisible without it:
+Run the agent in `root`. Pause writers before capturing a checkpoint.
+Checkpoints are immutable and content-addressed.
+Use `--team platform` on later commands to select the same registry partition:
 
 ```sh
 stow-s3 workspace checkpoint --id ws_843fbd0cdf9b744b --team platform
@@ -181,8 +148,7 @@ stow-s3 workspace checkpoint --id ws_843fbd0cdf9b744b --team platform
 }
 ```
 
-Two checkpoints of the same workspace diff into exactly what changed between
-them, which is how you compare two agents working from the same inputs:
+Compare two checkpoints from the same workspace:
 
 ```sh
 stow-s3 workspace checkpoint --id ws_843fbd0cdf9b744b \
@@ -197,11 +163,9 @@ stow-s3 workspace diff --from cp_a4424a293103532626d4a507 \
 }
 ```
 
-To transfer the work, write a handoff with `--archive`. The file-output handoff
-records its archive reference relative to the document; move both unchanged and
-adopt into a new workspace on a supported destination. The earlier relocation
-workaround is fixed in the development tree. See [current usage](docs/portable-workspace-usage.md)
-and [implementation evidence](docs/implementation-2026-09-29.md).
+Create a handoff with `--archive` to transfer the work.
+The handoff records the archive path relative to the document. Move both files together.
+See the [workspace guide](docs/portable-workspace-usage.md) for supported destination hosts.
 
 ```sh
 stow-s3 workspace handoff \
@@ -212,13 +176,10 @@ stow-s3 workspace handoff \
   --output /tmp/task-42.handoff.json
 ```
 
-`--output` writes the document to that path and prints nothing, which is the
-point: the file is the artifact the receiving machine gets. Without `--archive`
-the reference is local (version 1); with it, portable (version 2).
+`--output` writes the document without printing it.
+Without `--archive`, the reference is local (version 1). With it, the reference is portable (version 2).
 
-On the other machine, adopt it. The archive and its digest are verified before
-anything is written, so a handoff that arrived over a channel is checked rather
-than trusted:
+On the receiving machine, adopt the handoff. Stow verifies the archive and digest before writing files:
 
 ```sh
 stow-s3 workspace adopt --handoff /tmp/task-42.handoff.json --root /srv/agents/task-42
@@ -234,23 +195,15 @@ stow-s3 workspace adopt --handoff /tmp/task-42.handoff.json --root /srv/agents/t
 }
 ```
 
-Note the ids above: `adopt` built `ws_460a0b6f67fb107b` from a handoff naming
-`ws_843fbd0cdf9b744b`. A handoff reference *names* a workspace; it does not carry
-its identity. `workspace resume --handoff` returns the workspace the document names
-— `ws_843fbd0cdf9b744b` above, not the copy — while `adopt` builds a different
-workspace from the archive. And `resume` refuses `--handoff` alongside
-`--registry-dir` on purpose:
+`adopt` creates a new workspace ID. `resume --handoff` opens the original workspace named in the document.
+`resume` rejects a handoff combined with `--registry-dir`:
 
 ```console
 $ stow-s3 workspace resume --handoff task-42.handoff.json --registry-dir /elsewhere
 workspace resume accepts --handoff or --id/--registry-dir/--team, not both
 ```
 
-A caller that could redirect a handoff at a different registry would resume a
-workspace somewhere the document never pointed at.
-
-The last verb worth knowing is `delta`, which writes the difference between two
-checkpoints to a document the other side can apply:
+Use `delta` to transfer changes between two checkpoints:
 
 ```sh
 stow-s3 workspace delta --from cp_a4424a293103532626d4a507 \
@@ -267,13 +220,8 @@ stow-s3 workspace delta --from cp_a4424a293103532626d4a507 \
 }
 ```
 
-`apply` verifies every precondition before it writes anything, so a delta whose
-payload no longer matches its digest is refused rather than applied.
-
-**Verify the document itself.** The digests inside a delta cover its content bytes
-and nothing else, so a document altered in transit can keep every one of them
-intact and still name a different destination than the sender chose. Pass the
-digest `delta` reported:
+`apply` checks preconditions and payload digests before writing.
+To verify the whole document, pass the digest reported by `delta`:
 
 ```sh
 stow-s3 workspace apply --delta change.stowdelta --base cp_a4424a293103532626d4a507 \
@@ -287,10 +235,8 @@ delta refused: delta document does not match the digest the sender published:
 the document hashes to f7388c05885e824e8..., the sender published 58338f9f00c64e4d2...
 ```
 
-The check is opt-in, and that is a real limitation rather than a convenience: a
-receiver with no trusted copy of the digest cannot invent one, so it applies what
-it was given. If your delta crossed a channel you do not control, treat the digest
-as part of the delta and carry it with the document.
+This check is optional. Receive the digest through a trusted channel;
+an altered document and its replacement digest can still agree.
 
 See [the task manifest and workspace lifecycle guide](docs/task-manifest.md)
 for the schema, archive safety rules, and limitations. A workspace is filesystem
@@ -301,7 +247,7 @@ submodules, and Git LFS payloads are not included.
 
 ### Finding a workspace again
 
-`workspace list` enumerates what this machine knows about, quietest first:
+`workspace list` shows registered workspaces, ordered by idle time:
 
 ```sh
 stow-s3 workspace list --team platform
@@ -332,69 +278,41 @@ stow-s3 workspace list --team platform
 }
 ```
 
-Every other verb needs an id, and there was no way to get one short of keeping a
-note of it — which made a feature whose whole promise is "your work will still be
-here" impossible to show to somebody who had not. `readable: false` marks an entry
-whose directory has been deleted: the registry entry is real, the workspace is not,
-and nothing else in the product reports that state. Every entry is listed, including
-those — the listing's job is to surface a problem rather than tidy it away, and an
-entry you have to pass a flag to see is one you never think to look for. Dropping
-the unreadable ones is one line in your own code.
+Use the returned `id` with other workspace commands.
+`readable: false` means the workspace directory is missing; its registry entry still exists.
+`registry_dir` includes the selected team partition.
+Check `has_ttl` before interpreting `expires_in_seconds`: zero can also mean no TTL.
+Listing does not create a registry or open a workspace.
 
-`registry_dir` is the directory the entries came from, after `--team` has been
-composed into it. With `--team platform` above that names the partition rather than
-the root, so it is a path you can open and look at.
-
-`has_ttl` is there because `expires_in_seconds` is zero both for a workspace with
-no lifetime — the default — and for one expiring this second, and a sweep that
-branched on the number would take half a registry with it.
-
-A team's partition is a directory boundary, so `list` shows one team's workspaces
-and `--team` selects which. Listing creates nothing: it does not make a registry
-that was not there, and it does not open a workspace.
-
-`workspace collect` reclaims workspaces that are past their TTL and provably unused.
-It will not reach most of what a registry accumulates, and by design: a prepared
-workspace has no lifetime — that is the default — and a workspace opened on your own
-project directory counts as adopted, which no unattended sweep may ever remove. So
-`workspace prune` exists for the rest:
+`workspace collect` removes expired workspaces that are eligible and unused.
+It preserves adopted directories and workspaces without a TTL.
+Use `prune` to remove registry entries for directories that are already missing:
 
 ```sh
 stow-s3 workspace prune --include-adopted
 ```
 
-`prune` forgets entries whose workspace directory **no longer exists**. It cannot
-delete your data, because everything it removes is already gone — the only things it
-touches are stow's own records, the entry and its checkpoint references. It asks for no age and coordinates registry/checkpoint removal with active storage
-operations. An entry that still points at a real directory is left alone and reported
-as `present`; that is `collect`'s question, not this one's.
-
-Adopted entries are kept by default, because the entry is the only remaining record
-that you ever adopted that project. `--include-adopted` forgets those too. Nothing
-but the record is at stake — the directory has already been deleted — and a registry
-can otherwise reach a size where one `workspace list` is mostly entries for
-directories that no longer exist, with no way to clear them.
+`prune` removes registry entries and checkpoint references, not workspace data.
+It keeps entries for existing directories and reports them as `present`.
+Adopted entries remain unless you pass `--include-adopted`.
+Removal coordinates with active storage operations.
 
 ## Install
 
-**The npm and PyPI install surfaces are not yet announced as usable.** The
-`v0.2.0` release published the main package and all four platform carriers to
-public npmjs, then failed before the GitHub Release, so there is no release page
-and no `SHA256SUMS.txt` to check a download against, and PyPI was never
-published. A clean `npm install` of `0.2.0` has not been verified end to end,
-which is the reason to wait rather than a claim that it is broken. Do not use the
-npm or Python install commands below until a complete release is announced.
+Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
+against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
+Run `stow-s3 --version` to check the installed version. Use WSL on Windows.
 
-**Platforms: Linux and macOS, on x64 and arm64.** There is no Windows build, and
-the workspace backend needs an advisory file lock that Windows does not provide,
-so it refuses there rather than guessing. On Windows, use WSL.
-
-The next candidate, **0.3.0**, targets the same public npmjs distribution and has
-**not yet been published**. Publisher setup, live-provider gates and anonymous
-exact-version installation must pass before availability is announced. Published
-npm versions are immutable. For the new candidate, remove any old scope override
-to `npm.pkg.github.com`; it would send installation requests to the wrong
-registry.
+**TypeScript and Python clients are not yet published to npm or PyPI.**
+Use a source checkout for those clients. Registry publication is deferred for
+v0.3.0. See the [release notes](docs/releases/v0.3.0.md), including the filesystem
+upgrade compatibility note.
+<!-- repo-only:start -->
+The [current release checkpoint](docs/release-verification-2026-10-14.md) records
+validation and distribution. The [October 3 checkpoint](docs/release-verification-2026-10-03.md)
+is historical; its registry blockers do not apply to native GitHub downloads.
+<!-- repo-only:end -->
 
 The Go module is published and installs today:
 
@@ -423,11 +341,8 @@ which side is broken if the binary cannot be found or run.
 
 ## Quick start: a scoped session
 
-For a test that needs an S3 API and nothing else, a session is the shortest path
-from nothing to a working client. It starts a private server on an ephemeral port,
-creates a bucket, waits until the server reports itself ready, and hands back a
-client that is already pointed at it. On close it stops the server and removes the
-data directory.
+A session starts a private server on an ephemeral port and waits for readiness.
+Closing the session stops the server and removes its data directory.
 
 TypeScript (not yet on npm — see [Install](#install)):
 
@@ -478,37 +393,24 @@ with with_session() as session:
     body = s3.get_object(Bucket=bucket, Key="input.json")["Body"].read()
 ```
 
-The two clients differ in one deliberate way. The TypeScript session creates its
-bucket for you and exposes it as `session.bucket`. The Python session performs
-no S3 I/O at all: it hands back a client, and `new_bucket_name()` returns a name
-that is very unlikely to collide with another session. Creating the bucket is
-yours to do, which is what keeps `boto3` a genuinely optional extra.
+TypeScript creates `session.bucket` automatically.
+Python performs no S3 I/O: call `create_bucket` with the name from `new_bucket_name()`.
+This keeps `boto3` optional.
 
 ### What a session guarantees
 
-- **It cannot inherit your cloud configuration.** `STOW_*`, `S3_*`, and `AWS_*`
-  are stripped from the child environment before anything is set, so a stray
-  credential in your shell cannot turn a local session into a run-through one.
-  A server you start yourself is safe for the same reason: ambient credentials no
-  longer select a mode at all.
-- **It cannot outlive you.** A session passes its parent's process ID, and the
-  server exits if that process dies, including when it is killed rather than
-  closed.
-- **It reports the server's real limits, not assumed ones.** Capabilities and
-  limits come from the readiness message.
-- **It is bounded.** The default session holds at most 16 MiB and 1,000 objects,
-  and a single request body is capped at 8 MiB. The limits are enforced by the
-  server on every request, not by the client.
-- **It is tuned for many-per-machine use.** A session's own server runs with a
-  tighter garbage collector target than a long-lived server, because a session's
-  peak memory matters more than its throughput. Set `GOGC` yourself to override
-  it. A server you start with `stow serve` is never tuned this way.
+- Sessions remove inherited `STOW_*`, `S3_*` and `AWS_*` variables before configuring the child server.
+- The server exits when the session's parent process dies.
+- Readiness reports the server's capabilities and limits.
+- Default limits are 16 MiB, 1,000 objects and 8 MiB per request body.
+  The server enforces them on each request.
+- Session servers use a tighter garbage collector target. Set `GOGC` to override it.
+  Independently started servers use their normal collector settings.
 
 ## Diagnostics: stow doctor
 
-When a session will not start, `stow doctor` reports what each side can see
-rather than a single opaque failure. It checks both the client and the server and
-merges the results into one list:
+If a session fails to start, run `stow doctor`.
+It combines client and server checks into one report:
 
 ```bash
 npx stow-doctor
@@ -538,13 +440,10 @@ Start a filesystem-backed server:
 ./bin/stow-s3 serve --port 0 --data-dir .stow
 ```
 
-`--port 0` asks for an ephemeral port, and the endpoint the server reports is the
-one it actually bound — read it rather than assuming a port, because any port can
-be taken and the credentials are generated unless you pass them. For a launcher or
-a script, pass `--ready-fd 3` and read the JSON readiness record from that
-descriptor instead of parsing stdout, and probe `/_stow/health` to confirm the
-server is up. Both, plus the port and mode traps, are in
-[`docs/running-and-probing.md`](docs/running-and-probing.md).
+Read the reported endpoint and credentials; do not assume a port or key pair.
+For scripts, use `--ready-fd 3` to receive a JSON readiness record on an inherited descriptor.
+Probe `/_stow/health` to confirm readiness.
+See [running a server](docs/running-and-probing.md) for the protocol.
 
 The server prints a machine-readable readiness line:
 
@@ -709,41 +608,24 @@ The browser profile requires a compatible embedded host and persistence adapter.
 
 ### Where each surface can run
 
-The object model is the same everywhere. What changes is the storage underneath, and one surface is not available at all without a filesystem.
+Choose the API that matches your host:
 
 | Surface | Needs a filesystem | Use it for |
-|---|---|---|
-| `serve` (S3 over HTTP) | yes | a local S3 endpoint, SDK compatibility |
-| `workspace` | **yes** | giving an agent a real working directory |
-| `/embedded` on Node | no | an in-process object runtime in Node |
-| `/embedded` in a browser | no | a durable object store on a host with no filesystem |
-| `/browser` with IndexedDB | no | the same, surviving a reload |
+| --- | --- | --- |
+| Native `serve` | Yes, for persistent storage | S3 over HTTP; memory storage is also available |
+| Native `workspace` | Yes | An editable working directory |
+| `/embedded` on Node or in a browser | No | An in-memory object runtime |
+| `/browser` with IndexedDB | No | Objects that survive browser reloads |
+| `/project` with IndexedDB | No | Retained multi-file revisions |
+| Persistent WASM worker | No | Objects and streams stored through a host adapter |
 
-**The workspace is the agent surface, and it requires a real directory.** It
-stores each object as a real file at a key-derived path, so a host with no
-filesystem cannot provide one. That is a structural limit, not a configuration
-choice, and `stow.OpenWorkspace` refuses rather than pretending.
+Workspaces require real directories. Embedded memory stores are volatile.
+For browser durability, use an IndexedDB adapter or the persistent worker loader.
+An isolate needs external storage to survive reclamation.
 
-**On a host with no filesystem — a browser, or an edge isolate — the deployment is
-the embedded profile with a persistence adapter**, and the browser profile's
-generation-checked IndexedDB adapter is the reference implementation. It records
-which upstream state a local copy was derived from, refuses a commit whose
-generation has moved, and validates its quota, so it is a durable object store
-with generation-based conflict detection and no filesystem at all.
-
-**Read `backend`, not `persistent`, to tell the cases apart.** The capability
-report's `persistent` is a property of the backend and the host, not a setting you
-can turn on: it is `false` on a memory backend because that host has nowhere to
-persist, and that is the same answer a caller would get from forgetting to ask.
-`backend` names what is underneath — `memory`, `filesystem`, `workspace`, or the
-browser profile's `indexeddb` — and that is the field to branch on.
-
-**An isolate is ephemeral.** A Worker or any other isolate can be reclaimed
-between requests, so durability on that host comes from the platform's own storage
-rather than from the process. A *durable workspace* is therefore not possible
-there: the directory a workspace is, cannot outlive the isolate holding it. The
-workspace contract rules out a network relay for the same reason.
-
+Check capabilities before using an operation.
+`backend` identifies the storage implementation; `persistent` reports whether it retains data.
+Neither field enables persistence.
 
 ## Run-through mode: the offline cache
 
@@ -773,8 +655,11 @@ exist is not an error, so resetting before a first run is fine.
 
 `cleanSlate` is a deprecated alias with identical checks. A data directory
 created before this check existed has no marker, so its first reset is refused;
-nothing is deleted. See
-[ADR 0006](docs/adr/0006-owned-data-directory-reset.md).
+nothing is deleted.
+
+<!-- repo-only:start -->
+See [ADR 0006](docs/adr/0006-owned-data-directory-reset.md).
+<!-- repo-only:end -->
 
 ## Running on another host
 
@@ -790,10 +675,8 @@ The S3 routes require the generated or configured credentials. Use the current s
 
 ## Admin and metrics routes
 
-Diagnostics live under `/_stow/`, separate from S3 authentication. **`/_stow/health`
-is the health endpoint; `/health` is not** — every path outside `/_stow/` is an S3
-path requiring SigV4, so an unsigned `GET /health` is refused with `403`, which
-means the probe used the wrong path rather than that the server is unhealthy.
+Diagnostics use `/_stow/`, separate from S3 authentication.
+Use `/_stow/health` for liveness. An unsigned request to `/health` returns `403 AccessDenied`.
 
 | Route | Effect |
 |---|---|
@@ -804,11 +687,8 @@ means the probe used the wrong path rather than that the server is unhealthy.
 | `/_stow/outbox/retry` | retries failed upstream propagation |
 | `/_stow/outbox/discard` | discards an outbox entry |
 
-The two `outbox` routes change what is propagated to a live provider, so they
-always require the admin token — including on loopback, because loopback is not
-a privilege boundary. The read-only routes work on loopback without a token, so
-`stow doctor` and a local shell need nothing, and require the token from any
-other address.
+Outbox mutation routes always require an admin token, including on loopback.
+Read-only routes need no token on loopback. Other addresses require the token.
 
 Set the token with `STOW_ADMIN_TOKEN` rather than the flag, so it does not appear
 in the process list:
@@ -822,18 +702,12 @@ A request without a valid token gets `404`, not `403`, so the route's existence
 is not advertised. With no token configured the outbox routes are not reachable
 at all.
 
-`--allow-public-admin` is **deprecated and ignored**. It used to be the only
-gate, which made exposing the outbox routes an unauthenticated act rather than a
-privileged one. The flag now logs a warning and changes nothing; use
-`--admin-token`.
+`--allow-public-admin` is deprecated and ignored. Configure `STOW_ADMIN_TOKEN` or `--admin-token` instead.
 
 ## Browser origins (CORS)
 
-Stow permits loopback origins by default — `http://localhost:*` and
-`http://127.0.0.1:*` — which is the case a local dev server actually has. It
-previously reflected whatever `Origin` a request carried, which let any website
-a developer visited read their local bucket using the credentials their SDK had
-already placed in the page.
+Stow permits loopback origins by default: `http://localhost:*` and `http://127.0.0.1:*`.
+Add other origins explicitly:
 
 Name the origins you need instead:
 
@@ -845,6 +719,7 @@ Name the origins you need instead:
 for it by name. Responses always carry `Vary: Origin`, without which a cache can
 serve one origin's allow header to another.
 
+<!-- repo-only:start -->
 ## Development
 
 Run the complete local checks:
@@ -860,27 +735,13 @@ backend, the TypeScript client, the Python client, and the WebAssembly bridge.
 ratchets. New debt and stale debt baselines both fail; the coverage gate separately
 reports improvements above its floor.
 
-The workspace verbs are specified once, in
-[`conformance/workspace/cases.json`](conformance/workspace/cases.json), and
-asserted by three independent drivers: the Go suite against the binary, the
-TypeScript wrapper against itself, and the Python wrapper against itself. A client
-cannot disagree with the engine about what a verb returns without one of them
-failing. The reason that file exists is in
-[its README](conformance/workspace/README.md); the short version is that both
-client wrappers shipped the same bug for a long time, each hidden by a test double
-that answered with a contract the production code did not have. What each key in a
-step means is in
-[the step vocabulary](docs/workspace-contract-steps.md), which is checked against the
-three drivers: `includeAdopted` once reached two of them and the case file passed
-anyway, because a field no driver reads is an error in none of the three languages.
+The [workspace corpus](conformance/workspace/cases.json) defines shared cases.
+Independent Go, TypeScript and Python drivers check the CLI and wrapper results.
+See the [step vocabulary](docs/workspace-contract-steps.md) for case fields.
 
-The Go version is pinned exactly, in `.go-version` and in the `toolchain` line of
-`go.mod`. The WebAssembly artifact in `packages/stow-s3/dist` is committed and
-`check-generated` rebuilds and diffs it, and a build from a different patch
-release does not reproduce it byte for byte. Nothing has to be installed by hand:
-the `toolchain` directive makes the Go command fetch the pinned version on
-demand. To move to a new patch, change both files, then rebuild and commit the
-artifact.
+`.go-version` and `go.mod` pin the Go toolchain.
+`make check-generated` compares tracked WASM and TypeScript output with a fresh build.
+To update the toolchain, change both version files, rebuild, and commit the output.
 
 The repository contains the Go server, storage backends, runtime packages, WebAssembly bridge, TypeScript package, Python package, and shared conformance tests.
 
@@ -899,7 +760,7 @@ native CLI. To capture the workspace CLI's high-water RSS separately, run
 recorded machine-specific baseline and raw JSON are in
 `docs/benchmarks/2026-09-27/`; the older session memory experiments remain in
 `docs/benchmarks/session-baseline.md`.
-
+<!-- repo-only:end -->
 ## License
 
 Apache License 2.0.

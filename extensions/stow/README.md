@@ -1,11 +1,12 @@
 # Stow MCP browser and plugin
 
-This integration adds a read-only bucket browser to Stow's existing Go stdio MCP
-server. It uses the official [MCP Apps](https://github.com/modelcontextprotocol/ext-apps)
-and [OpenAI MCP Extensions](https://github.com/openai/mcp-extensions) SDKs. The
-browser lists 50 objects per page, previews at most 64 KiB per object (or the
-configured lower bound), and attaches up to ten resource references to composer
-context on explicit selection. References resolve current object bytes.
+The bucket browser adds read-only browsing to Stow's Go stdio MCP server.
+It uses [MCP Apps](https://github.com/modelcontextprotocol/ext-apps)
+and [OpenAI MCP Extensions](https://github.com/openai/mcp-extensions).
+
+It lists 50 objects per page and previews at most 64 KiB per object, or the configured lower limit.
+Select objects to attach up to ten resource references to composer context.
+References resolve current bytes, not historical versions.
 
 ## Run the native server
 
@@ -61,13 +62,14 @@ register a public plugin. Alternatively, edit a copy of `plugin/mcp.json` manual
 Remote classic ChatGPT integrations require a separately authorized transport
 and server registration; this package does not deploy one.
 
+<!-- repo-only:start -->
 ## Build and verify the UI
 
-Node is needed only to develop/build the UI or run the optional configuration
-helper. Dependencies are pinned and locked. The UI build also uses the repository's
-pinned Go toolchain for compression, independent of Node's zlib version. The gzip artifact is deterministic
-and embedded by Go; the MCP resource serves normal HTML with no network assets.
-Bundled dependency license texts are included in the HTML and plugin package.
+Use Node to build the UI or run the configuration helper.
+Dependencies are pinned in the lockfile.
+The pinned Go toolchain produces a deterministic gzip artifact for embedding.
+The MCP resource serves HTML without external assets.
+The HTML and plugin include dependency license texts.
 
 ```sh
 npm ci --ignore-scripts --prefix extensions/stow
@@ -82,3 +84,4 @@ scope, Unicode keys, preview bounds and absence of save observations. UI host
 fixtures cover initial-result handling, plain-text rendering, prefix/cursor
 paging, explicit attachments, composer removals, unsupported capabilities and
 late preview responses. They do not establish live ChatGPT host compatibility.
+<!-- repo-only:end -->

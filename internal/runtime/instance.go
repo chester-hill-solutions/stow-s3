@@ -11,24 +11,19 @@ import (
 )
 
 type Instance struct {
-	mu               sync.Mutex
-	store            storage.Store
-	storeEpoch       uint64
-	multipartStore   storage.MultipartStore
-	resetStore       func() (storage.Store, error)
-	options          Options
-	authority        authority.Authority
-	policy           policy.Source
-	usage            Usage
-	multipart        map[string]multipartUsage
-	multipartTargets map[string]int
-	reservedTargets  map[string]struct{}
-	reservedObjects  int64
-	reservedBytes    int64
-	persistent       bool
-	closed           bool
-	closeOnce        sync.Once
-	closeErr         error
+	usageState
+	mu             sync.RWMutex
+	store          storage.Store
+	storeEpoch     uint64
+	multipartStore storage.MultipartStore
+	resetStore     func() (storage.Store, error)
+	options        Options
+	authority      authority.Authority
+	policy         policy.Source
+	persistent     bool
+	closed         bool
+	closeOnce      sync.Once
+	closeErr       error
 }
 
 type multipartUsage struct {
@@ -65,16 +60,14 @@ func newInstance(options Options, store storage.Store, resetStore func() (storag
 	// when it was issued.
 	multipart, _ := store.(storage.MultipartStore)
 	return &Instance{
-		store:            store,
-		multipartStore:   multipart,
-		resetStore:       resetStore,
-		options:          options,
-		authority:        granted,
-		policy:           options.Policy,
-		multipart:        make(map[string]multipartUsage),
-		multipartTargets: make(map[string]int),
-		reservedTargets:  make(map[string]struct{}),
-		persistent:       persistent,
+		usageState:     newUsageState(options),
+		store:          store,
+		multipartStore: multipart,
+		resetStore:     resetStore,
+		options:        options,
+		authority:      granted,
+		policy:         options.Policy,
+		persistent:     persistent,
 	}
 }
 
@@ -245,12 +238,7 @@ func (i *Instance) Reset(ctx context.Context) error {
 	i.storeEpoch++
 	// Re-derived: the store just closed is the one multipartStore pointed at.
 	i.multipartStore, _ = next.(storage.MultipartStore)
-	i.usage = Usage{}
-	i.multipart = make(map[string]multipartUsage)
-	i.multipartTargets = make(map[string]int)
-	i.reservedTargets = make(map[string]struct{})
-	i.reservedObjects = 0
-	i.reservedBytes = 0
+	i.usageState = newUsageState(i.options)
 	return nil
 }
 
