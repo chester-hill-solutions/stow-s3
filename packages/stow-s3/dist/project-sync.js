@@ -15,7 +15,7 @@ export async function syncProject(storage, remote, bucket, exclusive) {
     return exclusive(async () => storage.status(await storage.load()));
 }
 async function prepare(storage) {
-    let loaded = await storage.load();
+    const loaded = await storage.load();
     const reconcile = loaded.state.attempt !== null;
     let attempt = loaded.state.attempt;
     if (!attempt) {
@@ -23,7 +23,7 @@ async function prepare(storage) {
         if (!revisionId || revisionId === loaded.state.syncedVersionId)
             return null;
         attempt = { id: crypto.randomUUID(), revisionId, basis: loaded.state.basis };
-        loaded = await storage.publish(loaded, { ...loaded.state, attempt });
+        await storage.publish(loaded, { ...loaded.state, attempt });
     }
     return { attempt, record: await storage.requireRecord(attempt.revisionId), reconcile };
 }
