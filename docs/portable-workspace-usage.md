@@ -1,7 +1,8 @@
 # Portable workspace usage
 
 Use native workspaces for file editing, checkpoints, capture recovery, S3 access and local MCP tools.
-These APIs are available in the development checkout; the 0.3.0 packages are unpublished.
+Native workspace APIs are included in v0.3.0 GitHub downloads and the Go module.
+TypeScript and Python clients are not yet published to registries; use a source checkout.
 Native package targets are macOS and Linux on arm64/x64.
 Windows workspace capture is unsupported by the current rooted-read implementation.
 <!-- repo-only:start -->

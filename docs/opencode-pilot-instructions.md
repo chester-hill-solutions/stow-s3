@@ -11,7 +11,8 @@ docs/implementation-2026-09-29.md, and examples/opencode/README.md.
 Follow the README's installation section before running the pilot.
 
 INSTALL
-- Stow 0.3.0 is unpublished: use the supplied Git commit, not an npm/PyPI release.
+- Use the supplied Git commit for this pilot. Native v0.3.0 downloads are separate;
+  the TypeScript and Python clients are not yet published to npm/PyPI.
 - Use macOS/Linux arm64/x64, Git, Make, Go 1.25.6 and Node.js 24 with npm.
 - On a new machine clone https://github.com/chester-hill-solutions/stow.git and
   check out the supplied commit. Preserve changes in an existing checkout.

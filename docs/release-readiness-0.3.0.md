@@ -1,6 +1,7 @@
 # Release readiness for 0.3.0
 
-Superseded by the [2026-10-03 verification checkpoint](release-verification-2026-10-03.md)
+Superseded for the selected downloads-only distribution by the [2026-10-14 verification checkpoint](release-verification-2026-10-14.md).
+The [2026-10-03 checkpoint](release-verification-2026-10-03.md) records the later registry findings
 for current gates and user actions. The account/visibility conclusions below are
 historical: unauthenticated HTTP 401 does not establish private visibility on the
 GitHub npm registry, which documents authentication for public packages too.

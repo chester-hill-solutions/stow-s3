@@ -12,7 +12,8 @@ The development package provides:
 - `/worker`: asynchronous object operations and bounded streams;
 - `/browser-wasm`: memory and persistent WASM worker loaders.
 
-These APIs are implemented in the source checkout. The 0.3.0 package is unpublished.
+These APIs are implemented in the source checkout. The TypeScript package is not
+yet published to npm; v0.3.0 GitHub downloads contain the native server.
 
 ## A project with reusable assets
 
