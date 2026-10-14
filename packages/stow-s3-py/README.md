@@ -5,7 +5,9 @@ A session starts a local server, returns its endpoint and credentials, and stops
 
 ## Install
 
-The 0.3.0 candidate is unpublished. From the repository root:
+The Python package is not yet published to PyPI. v0.3.0 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Install the Python client from a source checkout. From the repository root:
 
 ```sh
 make build
@@ -16,7 +18,7 @@ python3 -m pip install -e 'packages/stow-s3-py[boto3]'
 `boto3` is optional. Omit the extra if you supply another S3 client.
 Use `STOW_BIN` to select the built native server.
 <!-- repo-only:start -->
-See the [release checkpoint](../../docs/release-verification-2026-10-03.md) for package availability.
+See the [release checkpoint](../../docs/release-verification-2026-10-14.md) for package availability.
 <!-- repo-only:end -->
 
 ## Use

@@ -46,7 +46,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 - [Storage admission design](storage-admission-contract.md) describes the shared
   foundation contract; consult usage guides for implemented API names.
 - [Contributing](../CONTRIBUTING.md) and [code standards](CODE_STANDARDS.md).
-- [Release verification](release-verification-2026-10-03.md) is a dated checkpoint,
+- [Release verification](release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
   not evidence that a later candidate was published.
 
 ## Evidence and history

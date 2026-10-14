@@ -4,7 +4,9 @@ TypeScript APIs for native S3 sessions, workspaces and embedded browser storage.
 
 ## Install
 
-The 0.3.0 candidate is unpublished. Build from a source checkout:
+The TypeScript package is not yet published to npm. v0.3.0 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Build the TypeScript client from a source checkout:
 
 ```sh
 git clone https://github.com/chester-hill-solutions/stow-s3
@@ -17,9 +19,9 @@ export STOW_BIN="$PWD/bin/stow-s3"
 
 Use `STOW_BIN` for the native process APIs.
 Embedded WASM APIs use the built package assets.
-Future releases target public npm; remove old `npm.pkg.github.com` scope overrides.
+Registry publication is deferred. Do not rely on a registry install for v0.3.0.
 <!-- repo-only:start -->
-See the [release checkpoint](../../docs/release-verification-2026-10-03.md) for availability.
+See the [release checkpoint](../../docs/release-verification-2026-10-14.md) for availability.
 <!-- repo-only:end -->
 
 ## Usage
@@ -122,7 +124,7 @@ const summary = await withStow(async (session) => {
 
 - Source checkouts use `STOW_BIN`. A platform package can supply the binary in a published distribution.
 <!-- repo-only:start -->
-  See the [release checkpoint](../../docs/release-verification-2026-10-03.md) before using registry installation.
+  See the [release checkpoint](../../docs/release-verification-2026-10-14.md) before using registry installation.
 <!-- repo-only:end -->
 - `STOW_*`, `S3_*`, and `AWS_*` are stripped from the child environment, so
   ambient cloud configuration cannot turn a local session into a run-through one.

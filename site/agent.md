@@ -60,7 +60,7 @@ conditional attempt, so do not assume exactly-once delivery. Outbox retry and
 discard routes require the admin token, including on loopback. See the
 [run-through contract](/docs/s3-compatibility/#62-read-through-cache-semantics).
 
-## Checkpoints and handoff for agent work (0.3.0 development tree)
+## Checkpoints and handoff for agent work
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent
 works. Before saving, stop known writers and write objective, progress and next
@@ -77,6 +77,12 @@ process memory, credentials and external side effects are outside a checkpoint.
 Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
 ## Install
+
+Native v0.3.0 binaries for Linux and macOS are distributed through
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Verify the archive with the release checksum manifest and run `stow-s3 --version`.
+npm and PyPI publication are deferred; use source checkouts for those clients.
+
 
 The 0.3.0 TypeScript and Python clients are not yet published. Use a source checkout.
 Native package targets are Linux and macOS on x64 and arm64. Use WSL on Windows.

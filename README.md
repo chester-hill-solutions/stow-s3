@@ -299,14 +299,20 @@ Removal coordinates with active storage operations.
 
 ## Install
 
-**Use a source checkout for TypeScript and Python.** The 0.3.0 candidate is unpublished.
+Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
+against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
+Run `stow-s3 --version` to check the installed version. Use WSL on Windows.
+
+**TypeScript and Python clients are not yet published to npm or PyPI.**
+Use a source checkout for those clients. Registry publication is deferred for
+v0.3.0. See the [release notes](docs/releases/v0.3.0.md), including the filesystem
+upgrade compatibility note.
 <!-- repo-only:start -->
-The 0.2.0 npm packages were uploaded, but the release failed before publishing a GitHub Release or checksum file.
-PyPI publication and clean npm installation have not been verified.
-See the [release checkpoint](docs/release-verification-2026-10-03.md) for details.
+The [current release checkpoint](docs/release-verification-2026-10-14.md) records
+validation and distribution. The [October 3 checkpoint](docs/release-verification-2026-10-03.md)
+is historical; its registry blockers do not apply to native GitHub downloads.
 <!-- repo-only:end -->
-Native package targets are Linux and macOS on x64 and arm64. Use WSL on Windows.
-Remove old `npm.pkg.github.com` scope overrides before using a future public npm release.
 
 The Go module is published and installs today:
 
