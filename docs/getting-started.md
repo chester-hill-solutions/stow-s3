@@ -7,13 +7,13 @@ Choose the API that matches your application.
 ## Install the native server
 
 Download the matching Linux or macOS archive from
-[Stow v0.3.0](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0).
+[Stow v0.3.1](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.1).
 Both x86_64 (`amd64`) and ARM64 (`arm64`) are supported. Check the archive against
 `SHA256SUMS.txt` from that release, extract it and put `stow-s3` on your PATH.
 Then run `stow-s3 --version`.
 
 npm and PyPI publication are deferred. Use the source steps below for TypeScript,
-Python and browser examples. Read the [release notes](releases/v0.3.0.md) before
+Python and browser examples. Read the [release notes](releases/v0.3.1.md) before
 upgrading a persistent filesystem object store: older versions cannot read new
 version-2 object records.
 

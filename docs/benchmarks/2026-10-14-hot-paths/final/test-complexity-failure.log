@@ -1,0 +1,79 @@
+ok  	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	1.135s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	1.016s
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.041s
+{"hotPaths":{"summary":[{"name":"BenchmarkEmbeddedGet/4KiB-4","before":{"nsPerOp":4709,"MBps":870.04,"bytesPerOp":21768,"allocsPerOp":12},"after":{"nsPerOp":1532.5,"MBps":2674.5550000000003,"bytesPerOp":4730.5,"allocsPerOp":10},"allocatedBytesReductionPercent":78.26855935317897,"throughputChangePercent":207.2756933115824},{"name":"BenchmarkEmbeddedGet/1MiB-4","before":{"nsPerOp":1825817,"MBps":574.5250000000001,"bytesPerOp":6289953,"allocsPerOp":32},"after":{"nsPerOp":233944,"MBps":4482.195,"bytesPerOp":1064854.5,"allocsPerOp":10},"allocatedBytesReductionPercent":83.07054917580466,"throughputChangePercent":680.4504496802654},{"name":"BenchmarkEmbeddedGet/8MiB-4","before":{"nsPerOp":6243046,"MBps":1343.965,"bytesPerOp":50092638.5,"allocsPerOp":41},"after":{"nsPerOp":745196,"MBps":11264.92,"bytesPerOp":8401347,"allocsPerOp":11},"allocatedBytesReductionPercent":83.22837995447175,"throughputChangePercent":737.7723444570288},{"name":"BenchmarkDiskObject/1MiB/put-4","before":{"nsPerOp":4390847,"MBps":238.925,"bytesPerOp":5251135,"allocsPerOp":150},"after":{"nsPerOp":3311092.5,"MBps":316.735,"bytesPerOp":215275.5,"allocsPerOp":142},"allocatedBytesReductionPercent":95.90040058006507,"throughputChangePercent":32.61021853059074},{"name":"BenchmarkDiskObject/1MiB/copy-4","before":{"nsPerOp":1548472,"MBps":678.26,"bytesPerOp":1056181.5,"allocsPerOp":96},"after":{"nsPerOp":1365048,"MBps":768.7149999999999,"bytesPerOp":7627,"allocsPerOp":96},"allocatedBytesReductionPercent":99.27787032815856,"throughputChangePercent":13.43718316132474},{"name":"BenchmarkDiskObject/32MiB/put-4","before":{"nsPerOp":89494935.5,"MBps":374.92999999999995,"bytesPerOp":201113757,"allocsPerOp":166},"after":{"nsPerOp":81903527,"MBps":409.765,"bytesPerOp":215290.5,"allocsPerOp":142},"allocatedBytesReductionPercent":99.89295088351415,"throughputChangePercent":9.268719892856382},{"name":"BenchmarkDiskObject/32MiB/copy-4","before":{"nsPerOp":26705536.5,"MBps":1256.62,"bytesPerOp":33562058.5,"allocsPerOp":96},"after":{"nsPerOp":26464683.5,"MBps":1267.925,"bytesPerOp":7637.5,"allocsPerOp":96},"allocatedBytesReductionPercent":99.97724364850863,"throughputChangePercent":0.910092123338635},{"name":"BenchmarkWorkspaceIndex/1000-4","before":{"nsPerOp":3165794,"MBps":0,"bytesPerOp":1182609,"allocsPerOp":8055.5,"fileBytes":344060},"after":{"nsPerOp":1841843.5,"MBps":0,"bytesPerOp":667280,"allocsPerOp":8051,"fileBytes":226037},"allocatedBytesReductionPercent":43.5756027562787,"throughputChangePercent":71.8818129770526},{"name":"BenchmarkWorkspaceIndex/10000-4","before":{"nsPerOp":27790904,"MBps":0,"bytesPerOp":13863344,"allocsPerOp":80066.5,"fileBytes":3440060},"after":{"nsPerOp":16489298.5,"MBps":0,"bytesPerOp":7615144.5,"allocsPerOp":80056,"fileBytes":2260037},"allocatedBytesReductionPercent":45.06993045833675,"throughputChangePercent":68.53903154218477}],"wasm":{"before":{"bytes":4610006,"sha256":"299ee696ddc9147adae6aecf0dbe16572af76ace056383bbd2da5ba173dc71d8","gzipBytes":1255970,"brotliBytes":924486},"after":{"bytes":4610009,"sha256":"99a8688b9f04c07f986846db77cfc8ae8ab148e6c27b22c3c24202c62e3ec47f","gzipBytes":1256892,"brotliBytes":925382}},"startupSummary":[{"variant":"before","readyMs":22.9323035,"firstWriteMs":33.780843999999995,"putGetPairsPerSecond":249.15051962281913},{"variant":"after","readyMs":22.503763,"firstWriteMs":33.7871785,"putGetPairsPerSecond":299.3351515690784}]}}
+mkdir -p bin
+GOTOOLCHAIN=go1.25.6 GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -ldflags "-s -w" -o bin/stow-runtime.wasm ./cmd/stow-wasm
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 265 packages, and audited 266 packages in 2s
+
+121 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> @chester-hill-solutions/stow-s3@0.3.0 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.3.0 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+API reference written: 13 pages
+GOTOOLCHAIN=go1.25.6 go vet ./...
+GOTOOLCHAIN=go1.25.6 go test -race ./...
+ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	3.411s
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	10.641s
+ok  	github.com/chester-hill-solutions/stow-s3/examples/resumable-transfer	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/examples/storage-dogfood	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	1.445s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/capacity	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/internal/embedded	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/mcpstorage	3.352s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	1.136s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policy	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policystore	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/internal/recoveryerrors	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/rooted	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	16.498s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	3.035s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	3.747s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	7.203s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	7.963s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	13.609s
+?   	github.com/chester-hill-solutions/stow-s3/tools/api-reference	[no test files]
+?   	github.com/chester-hill-solutions/stow-s3/tools/mcp-browser-pack	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/tools/quality	1.767s
+node scripts/check-go-quality.mjs
+Go quality ratchet violation
+  new debt: complexity: 3 > 2
+  new: internal/runtime/read_concurrency_test.go:TestWholeObjectReadsOverlapAndCloseWaits#1
+Fix the violation; do not raise the baseline to pass.
+make: *** [Makefile:113: check-go-quality] Error 1
+node:internal/errors:998
+  const err = new Error(message);
+              ^
+
+Error: Command failed: make standards
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at exec (file:///src/benchmark/verify.mjs:22:47)
+    at file:///src/benchmark/verify.mjs:95:1 {
+  status: 2,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 22464,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v25.9.0

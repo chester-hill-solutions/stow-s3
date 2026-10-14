@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "label": "Sustained local qualification; loopback HTTP; warmed caches",
+  "warmupSeconds": 30,
+  "durationSeconds": 300,
+  "repetitions": 5,
+  "soakSeconds": 1800,
+  "maxQueue": 128,
+  "backends": ["memory", "filesystem"],
+  "workloads": ["put", "get", "quarantine"],
+  "sizes": [1048576],
+  "concurrency": [4],
+  "rates": [0, 100],
+  "sampleMs": 1000
+}

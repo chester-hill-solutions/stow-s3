@@ -1,0 +1,11 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-benchmark
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkComparison/stow-memory/put/1048576B-4         	     477	   1199810 ns/op	 873.95 MB/s	 1075293 B/op	      14 allocs/op
+BenchmarkComparison/stow-memory/get/1048576B-4         	    4048	    147666 ns/op	7100.98 MB/s	   34365 B/op	      10 allocs/op
+BenchmarkComparison/stow-memory/quarantine/1048576B-4  	     388	   1613753 ns/op	 649.77 MB/s	 1102930 B/op	      47 allocs/op
+BenchmarkComparison/stow-filesystem/put/1048576B-4     	     217	   2832369 ns/op	 370.21 MB/s	 1109307 B/op	     158 allocs/op
+BenchmarkComparison/stow-filesystem/get/1048576B-4     	    2623	    206552 ns/op	5076.58 MB/s	   37951 B/op	      44 allocs/op
+BenchmarkComparison/stow-filesystem/quarantine/1048576B-4         	     144	   3735229 ns/op	 280.73 MB/s	 1158885 B/op	     441 allocs/op
+PASS

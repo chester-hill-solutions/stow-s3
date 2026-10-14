@@ -1,0 +1,66 @@
+[
+  {
+    "id": "0b75b5df-7061-4ec4-ab32-f55e07c9f8d3",
+    "status": "REMOVED",
+    "createdAt": "2026-10-14T19:44:47.604Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-release-030-20261014",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Verify public v0.3.0 release downloads and checksums on Railway",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:f4321cc1ffd0dcb2080a0bf23d5ac656b1322ffa05a0d8e610f1b74ba736e2b5",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  }
+]

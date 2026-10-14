@@ -1,0 +1,386 @@
+{
+  "complete": true,
+  "checkedAt": "2026-10-13T23:08:14.673Z",
+  "beforeRunId": "59d62a35-6293-4ddb-a06f-ce041bd9b9c9",
+  "afterRunId": "128a9a91-501f-45d9-9211-af0eddf7c083",
+  "sameS3ConfigurationAndCpuLimits": true,
+  "competitorsRemeasured": false,
+  "s3": [
+    {
+      "implementation": "stow-memory",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "before": {
+        "payloadMiBPerSecond": 197.35,
+        "filesPerSecond": 197.35,
+        "medianRunP99ResponseMs": 38.075,
+        "peakSampledServerRssMiB": 68.598
+      },
+      "after": {
+        "payloadMiBPerSecond": 174.7,
+        "filesPerSecond": 174.7,
+        "medianRunP99ResponseMs": 42.48,
+        "peakSampledServerRssMiB": 66.91
+      },
+      "throughputRatio": 0.885,
+      "throughputChangePercent": -11.477,
+      "beforeRange": [
+        196.65,
+        197.4
+      ],
+      "afterRange": [
+        173.6,
+        187.3
+      ]
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "put",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "before": {
+        "payloadMiBPerSecond": 66.45,
+        "filesPerSecond": 66.45,
+        "medianRunP99ResponseMs": 93.234,
+        "peakSampledServerRssMiB": 33.367
+      },
+      "after": {
+        "payloadMiBPerSecond": 66.5,
+        "filesPerSecond": 66.5,
+        "medianRunP99ResponseMs": 101.969,
+        "peakSampledServerRssMiB": 28.273
+      },
+      "throughputRatio": 1.001,
+      "throughputChangePercent": 0.075,
+      "beforeRange": [
+        66.45,
+        66.55
+      ],
+      "afterRange": [
+        66.5,
+        66.55
+      ]
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "before": {
+        "payloadMiBPerSecond": 505.6,
+        "filesPerSecond": 505.6,
+        "medianRunP99ResponseMs": 18.415,
+        "peakSampledServerRssMiB": 67.195
+      },
+      "after": {
+        "payloadMiBPerSecond": 510.95,
+        "filesPerSecond": 510.95,
+        "medianRunP99ResponseMs": 18.973,
+        "peakSampledServerRssMiB": 51.676
+      },
+      "throughputRatio": 1.011,
+      "throughputChangePercent": 1.058,
+      "beforeRange": [
+        499.45,
+        507.35
+      ],
+      "afterRange": [
+        482.45,
+        516.55
+      ]
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "get",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "before": {
+        "payloadMiBPerSecond": 356.95,
+        "filesPerSecond": 356.95,
+        "medianRunP99ResponseMs": 29.105,
+        "peakSampledServerRssMiB": 30.203
+      },
+      "after": {
+        "payloadMiBPerSecond": 492.7,
+        "filesPerSecond": 492.7,
+        "medianRunP99ResponseMs": 19.354,
+        "peakSampledServerRssMiB": 20.988
+      },
+      "throughputRatio": 1.38,
+      "throughputChangePercent": 38.031,
+      "beforeRange": [
+        353.05,
+        393.3
+      ],
+      "afterRange": [
+        475.7,
+        519.25
+      ]
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "before": {
+        "payloadMiBPerSecond": 113.95,
+        "filesPerSecond": 113.95,
+        "medianRunP99ResponseMs": 51.833,
+        "peakSampledServerRssMiB": 69.012
+      },
+      "after": {
+        "payloadMiBPerSecond": 108.55,
+        "filesPerSecond": 108.55,
+        "medianRunP99ResponseMs": 53.938,
+        "peakSampledServerRssMiB": 61.211
+      },
+      "throughputRatio": 0.953,
+      "throughputChangePercent": -4.739,
+      "beforeRange": [
+        113.6,
+        114.6
+      ],
+      "afterRange": [
+        107.8,
+        109.9
+      ]
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "concurrency": 4,
+      "before": {
+        "payloadMiBPerSecond": 50.35,
+        "filesPerSecond": 50.35,
+        "medianRunP99ResponseMs": 124.422,
+        "peakSampledServerRssMiB": 30.051
+      },
+      "after": {
+        "payloadMiBPerSecond": 56.65,
+        "filesPerSecond": 56.65,
+        "medianRunP99ResponseMs": 119.567,
+        "peakSampledServerRssMiB": 25.629
+      },
+      "throughputRatio": 1.125,
+      "throughputChangePercent": 12.512,
+      "beforeRange": [
+        46.9,
+        51.25
+      ],
+      "afterRange": [
+        56.15,
+        56.65
+      ]
+    }
+  ],
+  "native": [
+    {
+      "implementation": "stow-memory",
+      "workload": "put",
+      "bytes": 1048576,
+      "cpu": 4,
+      "before": {
+        "implementation": "stow-memory",
+        "workload": "put",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 1234602,
+        "payloadMiBPerSecond": 809.975,
+        "minPayloadMiBPerSecond": 733.604,
+        "maxPayloadMiBPerSecond": 811.52,
+        "medianAllocatedBytesPerOp": 1087123,
+        "medianAllocationsPerOp": 14
+      },
+      "after": {
+        "implementation": "stow-memory",
+        "workload": "put",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 1213661,
+        "payloadMiBPerSecond": 823.956,
+        "minPayloadMiBPerSecond": 814.495,
+        "maxPayloadMiBPerSecond": 839.567,
+        "medianAllocatedBytesPerOp": 1074666,
+        "medianAllocationsPerOp": 14
+      },
+      "allocationReductionPercent": 1.146
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "get",
+      "bytes": 1048576,
+      "cpu": 4,
+      "before": {
+        "implementation": "stow-memory",
+        "workload": "get",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 134676,
+        "payloadMiBPerSecond": 7425.232,
+        "minPayloadMiBPerSecond": 7307.892,
+        "maxPayloadMiBPerSecond": 7497.54,
+        "medianAllocatedBytesPerOp": 35016,
+        "medianAllocationsPerOp": 9
+      },
+      "after": {
+        "implementation": "stow-memory",
+        "workload": "get",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 146674,
+        "payloadMiBPerSecond": 6817.827,
+        "minPayloadMiBPerSecond": 6771.269,
+        "maxPayloadMiBPerSecond": 6906.977,
+        "medianAllocatedBytesPerOp": 34396,
+        "medianAllocationsPerOp": 10
+      },
+      "allocationReductionPercent": 1.771
+    },
+    {
+      "implementation": "stow-memory",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "cpu": 4,
+      "before": {
+        "implementation": "stow-memory",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 1740970,
+        "payloadMiBPerSecond": 574.389,
+        "minPayloadMiBPerSecond": 567.446,
+        "maxPayloadMiBPerSecond": 590.611,
+        "medianAllocatedBytesPerOp": 1112266,
+        "medianAllocationsPerOp": 46
+      },
+      "after": {
+        "implementation": "stow-memory",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 1572025,
+        "payloadMiBPerSecond": 636.12,
+        "minPayloadMiBPerSecond": 633.707,
+        "maxPayloadMiBPerSecond": 666.771,
+        "medianAllocatedBytesPerOp": 1103205,
+        "medianAllocationsPerOp": 47
+      },
+      "allocationReductionPercent": 0.815
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "put",
+      "bytes": 1048576,
+      "cpu": 4,
+      "before": {
+        "implementation": "stow-filesystem",
+        "workload": "put",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 3073904,
+        "payloadMiBPerSecond": 325.317,
+        "minPayloadMiBPerSecond": 320.797,
+        "maxPayloadMiBPerSecond": 339.174,
+        "medianAllocatedBytesPerOp": 2217360,
+        "medianAllocationsPerOp": 320
+      },
+      "after": {
+        "implementation": "stow-filesystem",
+        "workload": "put",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 2862044,
+        "payloadMiBPerSecond": 349.398,
+        "minPayloadMiBPerSecond": 344.324,
+        "maxPayloadMiBPerSecond": 368.052,
+        "medianAllocatedBytesPerOp": 1112601,
+        "medianAllocationsPerOp": 158
+      },
+      "allocationReductionPercent": 49.823
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "get",
+      "bytes": 1048576,
+      "cpu": 4,
+      "before": {
+        "implementation": "stow-filesystem",
+        "workload": "get",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 272640,
+        "payloadMiBPerSecond": 3667.841,
+        "minPayloadMiBPerSecond": 3667.336,
+        "maxPayloadMiBPerSecond": 4066.277,
+        "medianAllocatedBytesPerOp": 39563,
+        "medianAllocationsPerOp": 43
+      },
+      "after": {
+        "implementation": "stow-filesystem",
+        "workload": "get",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 208033,
+        "payloadMiBPerSecond": 4806.929,
+        "minPayloadMiBPerSecond": 4776.325,
+        "maxPayloadMiBPerSecond": 4960.279,
+        "medianAllocatedBytesPerOp": 37907,
+        "medianAllocationsPerOp": 44
+      },
+      "allocationReductionPercent": 4.186
+    },
+    {
+      "implementation": "stow-filesystem",
+      "workload": "quarantine",
+      "bytes": 1048576,
+      "cpu": 4,
+      "before": {
+        "implementation": "stow-filesystem",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 4958191,
+        "payloadMiBPerSecond": 201.683,
+        "minPayloadMiBPerSecond": 197.544,
+        "maxPayloadMiBPerSecond": 215.931,
+        "medianAllocatedBytesPerOp": 2305756,
+        "medianAllocationsPerOp": 1040
+      },
+      "after": {
+        "implementation": "stow-filesystem",
+        "workload": "quarantine",
+        "bytes": 1048576,
+        "cpu": 4,
+        "repetitions": 3,
+        "medianNsPerOp": 3809550,
+        "payloadMiBPerSecond": 262.499,
+        "minPayloadMiBPerSecond": 254.307,
+        "maxPayloadMiBPerSecond": 266.237,
+        "medianAllocatedBytesPerOp": 1156305,
+        "medianAllocationsPerOp": 441
+      },
+      "allocationReductionPercent": 49.851
+    }
+  ],
+  "resourceSummary": {
+    "generatorMaxAverageCpuPercent": 151.573,
+    "generatorMaxThrottledPeriodPercent": 0,
+    "targetMaxThrottledPeriodPercent": 4.5,
+    "targetMaxCumulativeThrottledSeconds": 0.02,
+    "minimumDiskAvailableMiB": 4685.91
+  },
+  "limits": "Exploratory cross-run comparison, shared Railway hardware, warm bounded working set; no scanner, DPI, TLS, power-loss or sustained capacity qualification. Native baseline uses 300ms windows and new native cases use 500ms."
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "e09d0550-2eaf-454b-883d-16a3d38e2ccb",
+    "status": "REMOVED",
+    "createdAt": "2026-10-14T17:59:29.026Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-marketing-refresh-20261014",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Refresh marketing S3 comparisons with optimized Stow",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:37d529a64aded3ddc0f21153bcc7112b829c7965835feff520b32478555eacfb",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 2,
+              "memoryBytes": 2147483648
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/target.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/data"
+      ]
+    }
+  }
+]

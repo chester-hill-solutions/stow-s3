@@ -1,0 +1,1745 @@
+{
+  "complete": true,
+  "runId": "c80e35c3-f6e3-4020-91af-ae8ad6c8e95b",
+  "analysisSourceSha256": "61e313b64eddada6d0c8d09974f55b7ed690e22974fde18a52b5ec281eb28430",
+  "summary": [
+    {
+      "workload": "put",
+      "variant": "baseline",
+      "medianFilesPerSecond": 487.425,
+      "medianPayloadMiBPerSecond": 487.425,
+      "medianRunP99Ms": 12.43,
+      "medianHighWaterRssMiB": 69.004,
+      "medianClientCpuPercent": 278.29,
+      "medianServerCpuPercent": 166.954,
+      "minimumCompletedSamples": 9172,
+      "maxStartSkewMs": 2,
+      "generatorHeadroomObserved": true
+    },
+    {
+      "workload": "put",
+      "variant": "staging",
+      "medianFilesPerSecond": 509.275,
+      "medianPayloadMiBPerSecond": 509.275,
+      "medianRunP99Ms": 11.654,
+      "medianHighWaterRssMiB": 70.471,
+      "medianClientCpuPercent": 282.448,
+      "medianServerCpuPercent": 168.932,
+      "minimumCompletedSamples": 9760,
+      "maxStartSkewMs": 3,
+      "generatorHeadroomObserved": true
+    },
+    {
+      "workload": "put",
+      "variant": "after",
+      "medianFilesPerSecond": 529.625,
+      "medianPayloadMiBPerSecond": 529.625,
+      "medianRunP99Ms": 10.868,
+      "medianHighWaterRssMiB": 65.109,
+      "medianClientCpuPercent": 290.331,
+      "medianServerCpuPercent": 169.89,
+      "minimumCompletedSamples": 10084,
+      "maxStartSkewMs": 1,
+      "generatorHeadroomObserved": true
+    },
+    {
+      "workload": "quarantine",
+      "variant": "baseline",
+      "medianFilesPerSecond": 198.65,
+      "medianPayloadMiBPerSecond": 198.65,
+      "medianRunP99Ms": 30.591,
+      "medianHighWaterRssMiB": 63.969,
+      "medianClientCpuPercent": 338.132,
+      "medianServerCpuPercent": 147.225,
+      "minimumCompletedSamples": 3800,
+      "maxStartSkewMs": 1,
+      "generatorHeadroomObserved": true
+    },
+    {
+      "workload": "quarantine",
+      "variant": "staging",
+      "medianFilesPerSecond": 211.1,
+      "medianPayloadMiBPerSecond": 211.1,
+      "medianRunP99Ms": 28.674,
+      "medianHighWaterRssMiB": 63.689,
+      "medianClientCpuPercent": 360.227,
+      "medianServerCpuPercent": 160.304,
+      "minimumCompletedSamples": 4128,
+      "maxStartSkewMs": 1,
+      "generatorHeadroomObserved": false
+    },
+    {
+      "workload": "quarantine",
+      "variant": "after",
+      "medianFilesPerSecond": 213.8,
+      "medianPayloadMiBPerSecond": 213.8,
+      "medianRunP99Ms": 28.393,
+      "medianHighWaterRssMiB": 60.635,
+      "medianClientCpuPercent": 363.111,
+      "medianServerCpuPercent": 157.977,
+      "minimumCompletedSamples": 4152,
+      "maxStartSkewMs": 1,
+      "generatorHeadroomObserved": false
+    }
+  ],
+  "effects": [
+    {
+      "workload": "put",
+      "before": "baseline",
+      "after": "staging",
+      "throughput": {
+        "pairedPercentChanges": [
+          6.411,
+          5.239,
+          3.534,
+          7.8,
+          6.108,
+          -1.635
+        ],
+        "geometricMeanPercentChange": 4.53,
+        "conditional95PercentInterval": [
+          1.011,
+          8.172
+        ]
+      },
+      "p99": {
+        "pairedPercentChanges": [
+          -10.365,
+          -8.565,
+          -7.647,
+          -11.255,
+          -8.562,
+          3.034
+        ],
+        "geometricMeanPercentChange": -7.342,
+        "conditional95PercentInterval": [
+          -12.449,
+          -1.938
+        ]
+      },
+      "rss": {
+        "pairedPercentChanges": [
+          1.914,
+          2.504,
+          4.57,
+          0.77,
+          2.026,
+          0.845
+        ],
+        "geometricMeanPercentChange": 2.097,
+        "conditional95PercentInterval": [
+          0.657,
+          3.557
+        ]
+      }
+    },
+    {
+      "workload": "put",
+      "before": "staging",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          3.32,
+          2.094,
+          8.264,
+          1.857,
+          1.401,
+          4.354
+        ],
+        "geometricMeanPercentChange": 3.523,
+        "conditional95PercentInterval": [
+          0.913,
+          6.199
+        ]
+      },
+      "p99": {
+        "pairedPercentChanges": [
+          -8.568,
+          -3.905,
+          -13.866,
+          -1.968,
+          -0.992,
+          -9.473
+        ],
+        "geometricMeanPercentChange": -6.575,
+        "conditional95PercentInterval": [
+          -11.715,
+          -1.135
+        ]
+      },
+      "rss": {
+        "pairedPercentChanges": [
+          -7.4,
+          -5.693,
+          -7.449,
+          -8.348,
+          -7.906,
+          -6.156
+        ],
+        "geometricMeanPercentChange": -7.163,
+        "conditional95PercentInterval": [
+          -8.232,
+          -6.082
+        ]
+      }
+    },
+    {
+      "workload": "put",
+      "before": "baseline",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          9.943,
+          7.443,
+          12.091,
+          9.802,
+          7.595,
+          2.647
+        ],
+        "geometricMeanPercentChange": 8.213,
+        "conditional95PercentInterval": [
+          4.831,
+          11.703
+        ]
+      },
+      "p99": {
+        "pairedPercentChanges": [
+          -18.045,
+          -12.136,
+          -20.452,
+          -13.001,
+          -9.469,
+          -6.727
+        ],
+        "geometricMeanPercentChange": -13.434,
+        "conditional95PercentInterval": [
+          -18.712,
+          -7.813
+        ]
+      },
+      "rss": {
+        "pairedPercentChanges": [
+          -5.628,
+          -3.332,
+          -3.219,
+          -7.642,
+          -6.04,
+          -5.363
+        ],
+        "geometricMeanPercentChange": -5.216,
+        "conditional95PercentInterval": [
+          -6.974,
+          -3.425
+        ]
+      }
+    },
+    {
+      "workload": "quarantine",
+      "before": "baseline",
+      "after": "staging",
+      "throughput": {
+        "pairedPercentChanges": [
+          6.613,
+          9.242,
+          3.586,
+          8.632,
+          10.242,
+          3.628
+        ],
+        "geometricMeanPercentChange": 6.958,
+        "conditional95PercentInterval": [
+          3.973,
+          10.029
+        ]
+      },
+      "p99": {
+        "pairedPercentChanges": [
+          -6.726,
+          -6.73,
+          -5.798,
+          -8.565,
+          -12.134,
+          4.059
+        ],
+        "geometricMeanPercentChange": -6.108,
+        "conditional95PercentInterval": [
+          -11.482,
+          -0.408
+        ]
+      },
+      "rss": {
+        "pairedPercentChanges": [
+          -3.303,
+          -4.33,
+          -0.264,
+          4.129,
+          -1.933,
+          3.005
+        ],
+        "geometricMeanPercentChange": -0.498,
+        "conditional95PercentInterval": [
+          -4.003,
+          3.135
+        ]
+      }
+    },
+    {
+      "workload": "quarantine",
+      "before": "staging",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          1.972,
+          -1.402,
+          -1.043,
+          0.581,
+          -2.449,
+          4.116
+        ],
+        "geometricMeanPercentChange": 0.271,
+        "conditional95PercentInterval": [
+          -2.24,
+          2.848
+        ]
+      },
+      "p99": {
+        "pairedPercentChanges": [
+          -2.943,
+          3.032,
+          6.155,
+          -0.991,
+          1,
+          -11.254
+        ],
+        "geometricMeanPercentChange": -0.99,
+        "conditional95PercentInterval": [
+          -7.225,
+          5.665
+        ]
+      },
+      "rss": {
+        "pairedPercentChanges": [
+          -1.434,
+          -4.657,
+          -4.321,
+          -5.444,
+          -5.27,
+          -6.365
+        ],
+        "geometricMeanPercentChange": -4.594,
+        "conditional95PercentInterval": [
+          -6.342,
+          -2.814
+        ]
+      }
+    },
+    {
+      "workload": "quarantine",
+      "before": "baseline",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          8.715,
+          7.71,
+          2.506,
+          9.263,
+          7.543,
+          7.894
+        ],
+        "geometricMeanPercentChange": 7.248,
+        "conditional95PercentInterval": [
+          4.694,
+          9.866
+        ]
+      },
+      "p99": {
+        "pairedPercentChanges": [
+          -9.471,
+          -3.902,
+          0,
+          -9.47,
+          -11.255,
+          -7.652
+        ],
+        "geometricMeanPercentChange": -7.037,
+        "conditional95PercentInterval": [
+          -11.306,
+          -2.563
+        ]
+      },
+      "rss": {
+        "pairedPercentChanges": [
+          -4.69,
+          -8.786,
+          -4.573,
+          -1.54,
+          -7.101,
+          -3.551
+        ],
+        "geometricMeanPercentChange": -5.069,
+        "conditional95PercentInterval": [
+          -7.738,
+          -2.324
+        ]
+      }
+    }
+  ],
+  "nativeSummary": [
+    {
+      "parallel": false,
+      "variant": "baseline",
+      "medianPayloadMiBPerSecond": 489.023,
+      "medianAllocatedBytesPerOp": 2129535,
+      "medianAllocationsPerOp": 188
+    },
+    {
+      "parallel": false,
+      "variant": "staging",
+      "medianPayloadMiBPerSecond": 488.705,
+      "medianAllocatedBytesPerOp": 2129998,
+      "medianAllocationsPerOp": 194
+    },
+    {
+      "parallel": false,
+      "variant": "after",
+      "medianPayloadMiBPerSecond": 540.875,
+      "medianAllocatedBytesPerOp": 1073004,
+      "medianAllocationsPerOp": 189
+    },
+    {
+      "parallel": true,
+      "variant": "baseline",
+      "medianPayloadMiBPerSecond": 684.291,
+      "medianAllocatedBytesPerOp": 2129498.5,
+      "medianAllocationsPerOp": 189
+    },
+    {
+      "parallel": true,
+      "variant": "staging",
+      "medianPayloadMiBPerSecond": 1438.081,
+      "medianAllocatedBytesPerOp": 2129805.5,
+      "medianAllocationsPerOp": 193
+    },
+    {
+      "parallel": true,
+      "variant": "after",
+      "medianPayloadMiBPerSecond": 1723.597,
+      "medianAllocatedBytesPerOp": 1072917,
+      "medianAllocationsPerOp": 189
+    }
+  ],
+  "nativeEffects": [
+    {
+      "parallel": false,
+      "before": "baseline",
+      "after": "staging",
+      "throughput": {
+        "pairedPercentChanges": [
+          -1.049,
+          -7.018,
+          6.323,
+          -1.783,
+          1.339,
+          -4.892
+        ],
+        "geometricMeanPercentChange": -1.273,
+        "conditional95PercentInterval": [
+          -6.056,
+          3.754
+        ]
+      },
+      "allocated": {
+        "pairedPercentChanges": [
+          0.022,
+          0.021,
+          0.022,
+          0.022,
+          0.022,
+          0.022
+        ],
+        "geometricMeanPercentChange": 0.022,
+        "conditional95PercentInterval": [
+          0.021,
+          0.022
+        ]
+      }
+    },
+    {
+      "parallel": false,
+      "before": "staging",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          4.358,
+          15.889,
+          11.039,
+          9.798,
+          2.438,
+          19.793
+        ],
+        "geometricMeanPercentChange": 10.388,
+        "conditional95PercentInterval": [
+          3.678,
+          17.533
+        ]
+      },
+      "allocated": {
+        "pairedPercentChanges": [
+          -49.625,
+          -49.624,
+          -49.624,
+          -49.624,
+          -49.624,
+          -49.624
+        ],
+        "geometricMeanPercentChange": -49.624,
+        "conditional95PercentInterval": [
+          -49.624,
+          -49.624
+        ]
+      }
+    },
+    {
+      "parallel": false,
+      "before": "baseline",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          3.264,
+          7.756,
+          18.061,
+          7.84,
+          3.81,
+          13.932
+        ],
+        "geometricMeanPercentChange": 8.983,
+        "conditional95PercentInterval": [
+          3.12,
+          15.18
+        ]
+      },
+      "allocated": {
+        "pairedPercentChanges": [
+          -49.614,
+          -49.613,
+          -49.613,
+          -49.613,
+          -49.613,
+          -49.613
+        ],
+        "geometricMeanPercentChange": -49.613,
+        "conditional95PercentInterval": [
+          -49.614,
+          -49.613
+        ]
+      }
+    },
+    {
+      "parallel": true,
+      "before": "baseline",
+      "after": "staging",
+      "throughput": {
+        "pairedPercentChanges": [
+          112.67,
+          98.89,
+          113.364,
+          115.448,
+          102.712,
+          117.637
+        ],
+        "geometricMeanPercentChange": 110.006,
+        "conditional95PercentInterval": [
+          102.182,
+          118.134
+        ]
+      },
+      "allocated": {
+        "pairedPercentChanges": [
+          0.015,
+          0.014,
+          0.015,
+          0.014,
+          0.015,
+          0.014
+        ],
+        "geometricMeanPercentChange": 0.014,
+        "conditional95PercentInterval": [
+          0.014,
+          0.015
+        ]
+      }
+    },
+    {
+      "parallel": true,
+      "before": "staging",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          22.828,
+          18.526,
+          18.984,
+          26.561,
+          20.915,
+          14.073
+        ],
+        "geometricMeanPercentChange": 20.252,
+        "conditional95PercentInterval": [
+          15.89,
+          24.779
+        ]
+      },
+      "allocated": {
+        "pairedPercentChanges": [
+          -49.624,
+          -49.624,
+          -49.624,
+          -49.624,
+          -49.624,
+          -49.624
+        ],
+        "geometricMeanPercentChange": -49.624,
+        "conditional95PercentInterval": [
+          -49.624,
+          -49.624
+        ]
+      }
+    },
+    {
+      "parallel": true,
+      "before": "baseline",
+      "after": "after",
+      "throughput": {
+        "pairedPercentChanges": [
+          161.218,
+          135.736,
+          153.869,
+          172.674,
+          145.109,
+          148.265
+        ],
+        "geometricMeanPercentChange": 152.538,
+        "conditional95PercentInterval": [
+          139.39,
+          166.407
+        ]
+      },
+      "allocated": {
+        "pairedPercentChanges": [
+          -49.617,
+          -49.616,
+          -49.616,
+          -49.617,
+          -49.616,
+          -49.616
+        ],
+        "geometricMeanPercentChange": -49.616,
+        "conditional95PercentInterval": [
+          -49.617,
+          -49.616
+        ]
+      }
+    }
+  ],
+  "native": [
+    {
+      "variant": "baseline",
+      "repetition": 1,
+      "parallel": false,
+      "iterations": 297,
+      "nsPerOp": 1993920,
+      "payloadMiBPerSecond": 501.5246348900658,
+      "allocatedBytesPerOp": 2129550,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "baseline",
+      "repetition": 1,
+      "parallel": true,
+      "iterations": 424,
+      "nsPerOp": 1434050,
+      "payloadMiBPerSecond": 697.3257557267877,
+      "allocatedBytesPerOp": 2129493,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "staging",
+      "repetition": 1,
+      "parallel": false,
+      "iterations": 296,
+      "nsPerOp": 2015053,
+      "payloadMiBPerSecond": 496.26486251230114,
+      "allocatedBytesPerOp": 2130010,
+      "allocationsPerOp": 194
+    },
+    {
+      "variant": "staging",
+      "repetition": 1,
+      "parallel": true,
+      "iterations": 933,
+      "nsPerOp": 674309,
+      "payloadMiBPerSecond": 1482.9996336990905,
+      "allocatedBytesPerOp": 2129802,
+      "allocationsPerOp": 193
+    },
+    {
+      "variant": "after",
+      "repetition": 1,
+      "parallel": false,
+      "iterations": 315,
+      "nsPerOp": 1930904,
+      "payloadMiBPerSecond": 517.8921375687243,
+      "allocatedBytesPerOp": 1073003,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 1,
+      "parallel": true,
+      "iterations": 1052,
+      "nsPerOp": 548985,
+      "payloadMiBPerSecond": 1821.5433937174969,
+      "allocatedBytesPerOp": 1072913,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "baseline",
+      "repetition": 2,
+      "parallel": false,
+      "iterations": 296,
+      "nsPerOp": 1950067,
+      "payloadMiBPerSecond": 512.802893439046,
+      "allocatedBytesPerOp": 2129542,
+      "allocationsPerOp": 188
+    },
+    {
+      "variant": "baseline",
+      "repetition": 2,
+      "parallel": true,
+      "iterations": 438,
+      "nsPerOp": 1400482,
+      "payloadMiBPerSecond": 714.0398805554088,
+      "allocatedBytesPerOp": 2129501,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 2,
+      "parallel": false,
+      "iterations": 331,
+      "nsPerOp": 1809704,
+      "payloadMiBPerSecond": 552.5765539557851,
+      "allocatedBytesPerOp": 1073002,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 2,
+      "parallel": true,
+      "iterations": 1064,
+      "nsPerOp": 594089,
+      "payloadMiBPerSecond": 1683.2494794550985,
+      "allocatedBytesPerOp": 1072918,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "staging",
+      "repetition": 2,
+      "parallel": false,
+      "iterations": 289,
+      "nsPerOp": 2097251,
+      "payloadMiBPerSecond": 476.8146492718325,
+      "allocatedBytesPerOp": 2129995,
+      "allocationsPerOp": 194
+    },
+    {
+      "variant": "staging",
+      "repetition": 2,
+      "parallel": true,
+      "iterations": 889,
+      "nsPerOp": 704148,
+      "payloadMiBPerSecond": 1420.1559899339343,
+      "allocatedBytesPerOp": 2129809,
+      "allocationsPerOp": 193
+    },
+    {
+      "variant": "staging",
+      "repetition": 3,
+      "parallel": false,
+      "iterations": 262,
+      "nsPerOp": 1973741,
+      "payloadMiBPerSecond": 506.6520885972374,
+      "allocatedBytesPerOp": 2129983,
+      "allocationsPerOp": 194
+    },
+    {
+      "variant": "staging",
+      "repetition": 3,
+      "parallel": true,
+      "iterations": 849,
+      "nsPerOp": 674533,
+      "payloadMiBPerSecond": 1482.5071568032995,
+      "allocatedBytesPerOp": 2129816,
+      "allocationsPerOp": 193
+    },
+    {
+      "variant": "baseline",
+      "repetition": 3,
+      "parallel": false,
+      "iterations": 288,
+      "nsPerOp": 2098546,
+      "payloadMiBPerSecond": 476.52040984567407,
+      "allocatedBytesPerOp": 2129513,
+      "allocationsPerOp": 188
+    },
+    {
+      "variant": "baseline",
+      "repetition": 3,
+      "parallel": true,
+      "iterations": 404,
+      "nsPerOp": 1439210,
+      "payloadMiBPerSecond": 694.8256335072713,
+      "allocatedBytesPerOp": 2129489,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 3,
+      "parallel": false,
+      "iterations": 336,
+      "nsPerOp": 1777515,
+      "payloadMiBPerSecond": 562.5831568228679,
+      "allocatedBytesPerOp": 1072995,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 3,
+      "parallel": true,
+      "iterations": 1003,
+      "nsPerOp": 566911,
+      "payloadMiBPerSecond": 1763.9453106395888,
+      "allocatedBytesPerOp": 1072916,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "staging",
+      "repetition": 4,
+      "parallel": false,
+      "iterations": 301,
+      "nsPerOp": 1996018,
+      "payloadMiBPerSecond": 500.99748599461526,
+      "allocatedBytesPerOp": 2130001,
+      "allocationsPerOp": 194
+    },
+    {
+      "variant": "staging",
+      "repetition": 4,
+      "parallel": true,
+      "iterations": 945,
+      "nsPerOp": 692855,
+      "payloadMiBPerSecond": 1443.303432897215,
+      "allocatedBytesPerOp": 2129801,
+      "allocationsPerOp": 193
+    },
+    {
+      "variant": "after",
+      "repetition": 4,
+      "parallel": false,
+      "iterations": 327,
+      "nsPerOp": 1817901,
+      "payloadMiBPerSecond": 550.0849606221681,
+      "allocatedBytesPerOp": 1073010,
+      "allocationsPerOp": 190
+    },
+    {
+      "variant": "after",
+      "repetition": 4,
+      "parallel": true,
+      "iterations": 1094,
+      "nsPerOp": 547446,
+      "payloadMiBPerSecond": 1826.6641824033786,
+      "allocatedBytesPerOp": 1072917,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "baseline",
+      "repetition": 4,
+      "parallel": false,
+      "iterations": 297,
+      "nsPerOp": 1960427,
+      "payloadMiBPerSecond": 510.092954239051,
+      "allocatedBytesPerOp": 2129536,
+      "allocationsPerOp": 188
+    },
+    {
+      "variant": "baseline",
+      "repetition": 4,
+      "parallel": true,
+      "iterations": 420,
+      "nsPerOp": 1492743,
+      "payloadMiBPerSecond": 669.9076800226161,
+      "allocatedBytesPerOp": 2129507,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 5,
+      "parallel": false,
+      "iterations": 303,
+      "nsPerOp": 2028905,
+      "payloadMiBPerSecond": 492.87669950046944,
+      "allocatedBytesPerOp": 1073005,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "after",
+      "repetition": 5,
+      "parallel": true,
+      "iterations": 1047,
+      "nsPerOp": 605535,
+      "payloadMiBPerSecond": 1651.4322045794215,
+      "allocatedBytesPerOp": 1072920,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "baseline",
+      "repetition": 5,
+      "parallel": false,
+      "iterations": 284,
+      "nsPerOp": 2106216,
+      "payloadMiBPerSecond": 474.78511225819193,
+      "allocatedBytesPerOp": 2129530,
+      "allocationsPerOp": 188
+    },
+    {
+      "variant": "baseline",
+      "repetition": 5,
+      "parallel": true,
+      "iterations": 422,
+      "nsPerOp": 1484218,
+      "payloadMiBPerSecond": 673.755472578826,
+      "allocatedBytesPerOp": 2129497,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "staging",
+      "repetition": 5,
+      "parallel": false,
+      "iterations": 295,
+      "nsPerOp": 2078379,
+      "payloadMiBPerSecond": 481.14419939770363,
+      "allocatedBytesPerOp": 2129990,
+      "allocationsPerOp": 194
+    },
+    {
+      "variant": "staging",
+      "repetition": 5,
+      "parallel": true,
+      "iterations": 864,
+      "nsPerOp": 732180,
+      "payloadMiBPerSecond": 1365.78436996367,
+      "allocatedBytesPerOp": 2129808,
+      "allocationsPerOp": 193
+    },
+    {
+      "variant": "after",
+      "repetition": 6,
+      "parallel": false,
+      "iterations": 327,
+      "nsPerOp": 1880882,
+      "payloadMiBPerSecond": 531.6654633305013,
+      "allocatedBytesPerOp": 1073013,
+      "allocationsPerOp": 190
+    },
+    {
+      "variant": "after",
+      "repetition": 6,
+      "parallel": true,
+      "iterations": 890,
+      "nsPerOp": 611805,
+      "payloadMiBPerSecond": 1634.50772713528,
+      "allocatedBytesPerOp": 1072917,
+      "allocationsPerOp": 189
+    },
+    {
+      "variant": "staging",
+      "repetition": 6,
+      "parallel": false,
+      "iterations": 288,
+      "nsPerOp": 2253166,
+      "payloadMiBPerSecond": 443.8199404748696,
+      "allocatedBytesPerOp": 2130003,
+      "allocationsPerOp": 195
+    },
+    {
+      "variant": "staging",
+      "repetition": 6,
+      "parallel": true,
+      "iterations": 826,
+      "nsPerOp": 697906,
+      "payloadMiBPerSecond": 1432.85772009411,
+      "allocatedBytesPerOp": 2129803,
+      "allocationsPerOp": 193
+    },
+    {
+      "variant": "baseline",
+      "repetition": 6,
+      "parallel": false,
+      "iterations": 301,
+      "nsPerOp": 2142930,
+      "payloadMiBPerSecond": 466.65080053944837,
+      "allocatedBytesPerOp": 2129534,
+      "allocationsPerOp": 188
+    },
+    {
+      "variant": "baseline",
+      "repetition": 6,
+      "parallel": true,
+      "iterations": 394,
+      "nsPerOp": 1518899,
+      "payloadMiBPerSecond": 658.3716231296486,
+      "allocatedBytesPerOp": 2129500,
+      "allocationsPerOp": 189
+    }
+  ],
+  "startup": [
+    {
+      "variant": "baseline",
+      "samples": 12,
+      "medianReadyMs": 18.143,
+      "medianFirstWriteMs": 21.858
+    },
+    {
+      "variant": "staging",
+      "samples": 12,
+      "medianReadyMs": 17.515,
+      "medianFirstWriteMs": 21.663
+    },
+    {
+      "variant": "after",
+      "samples": 12,
+      "medianReadyMs": 18.143,
+      "medianFirstWriteMs": 22.023
+    }
+  ],
+  "resources": [
+    {
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 280.0828333333333,
+      "serverCpuPercent": 127.97975131009672,
+      "serverThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 339.4543666666667,
+      "serverCpuPercent": 108.74726002127252,
+      "serverThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 43,
+        "throttledPeriods": 1,
+        "cumulativeThrottledSeconds": 0.011
+      }
+    },
+    {
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 287.8538666666666,
+      "serverCpuPercent": 128.41770477442276,
+      "serverThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 42,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 351.32700000000006,
+      "serverCpuPercent": 117.75656010073885,
+      "serverThrottle": {
+        "periods": 40,
+        "throttledPeriods": 1,
+        "cumulativeThrottledSeconds": 0.008
+      },
+      "generatorThrottle": {
+        "periods": 41,
+        "throttledPeriods": 3,
+        "cumulativeThrottledSeconds": 0.08
+      }
+    },
+    {
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 298.3983333333333,
+      "serverCpuPercent": 127.31824656724093,
+      "serverThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 374.3402,
+      "serverCpuPercent": 117.36320586017668,
+      "serverThrottle": {
+        "periods": 40,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 42,
+        "throttledPeriods": 7,
+        "cumulativeThrottledSeconds": 0.113
+      }
+    },
+    {
+      "repetition": 1,
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 274.5963300000001,
+      "serverCpuPercent": 159.78366018383667,
+      "serverThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 1,
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 281.63836,
+      "serverCpuPercent": 166.2480236094686,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 1,
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 292.67274499999996,
+      "serverCpuPercent": 166.2754342260856,
+      "serverThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 1,
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 339.469945,
+      "serverCpuPercent": 148.79123990316927,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 2,
+        "cumulativeThrottledSeconds": 0.006
+      }
+    },
+    {
+      "repetition": 1,
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 362.48475499999995,
+      "serverCpuPercent": 158.56427369089096,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 5,
+        "cumulativeThrottledSeconds": 0.015
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 19,
+        "cumulativeThrottledSeconds": 0.188
+      }
+    },
+    {
+      "repetition": 1,
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 361.20411500000006,
+      "serverCpuPercent": 161.0026595142351,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 8,
+        "cumulativeThrottledSeconds": 0.021
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 21,
+        "cumulativeThrottledSeconds": 0.173
+      }
+    },
+    {
+      "repetition": 2,
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 344.212665,
+      "serverCpuPercent": 148.18745197117678,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 5,
+        "cumulativeThrottledSeconds": 0.034
+      }
+    },
+    {
+      "repetition": 2,
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 359.48763999999994,
+      "serverCpuPercent": 158.72161303172126,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 2,
+        "cumulativeThrottledSeconds": 0.007
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 20,
+        "cumulativeThrottledSeconds": 0.114
+      }
+    },
+    {
+      "repetition": 2,
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 359.829985,
+      "serverCpuPercent": 161.38797954784982,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 13,
+        "cumulativeThrottledSeconds": 0.061
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 14,
+        "cumulativeThrottledSeconds": 0.134
+      }
+    },
+    {
+      "repetition": 2,
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 278.05536,
+      "serverCpuPercent": 167.99779510820505,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 212,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 2,
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 288.88879,
+      "serverCpuPercent": 170.06842555169382,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 1,
+        "cumulativeThrottledSeconds": 0.007
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 2,
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 281.89502500000003,
+      "serverCpuPercent": 170.40927502498397,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 3,
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 279.57926999999995,
+      "serverCpuPercent": 166.003263781457,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 3,
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 272.75405,
+      "serverCpuPercent": 164.86594209982158,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 212,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 3,
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 289.81431,
+      "serverCpuPercent": 170.86034625321426,
+      "serverThrottle": {
+        "periods": 208,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 3,
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 365.21695000000005,
+      "serverCpuPercent": 161.78162559229605,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 10,
+        "cumulativeThrottledSeconds": 0.079
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 25,
+        "cumulativeThrottledSeconds": 0.255
+      }
+    },
+    {
+      "repetition": 3,
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 340.023565,
+      "serverCpuPercent": 144.87499935070085,
+      "serverThrottle": {
+        "periods": 208,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 3,
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 369.8364450000001,
+      "serverCpuPercent": 158.31609536916883,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 4,
+        "cumulativeThrottledSeconds": 0.031
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 37,
+        "cumulativeThrottledSeconds": 0.459
+      }
+    },
+    {
+      "repetition": 4,
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 360.62474,
+      "serverCpuPercent": 159.2204407285465,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 6,
+        "cumulativeThrottledSeconds": 0.047
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 19,
+        "cumulativeThrottledSeconds": 0.099
+      }
+    },
+    {
+      "repetition": 4,
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 363.86761000000007,
+      "serverCpuPercent": 156.80187097582166,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 7,
+        "cumulativeThrottledSeconds": 0.014
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 20,
+        "cumulativeThrottledSeconds": 0.147
+      }
+    },
+    {
+      "repetition": 4,
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 332.88612,
+      "serverCpuPercent": 145.2166088894569,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 4,
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 284.80690500000003,
+      "serverCpuPercent": 171.83984763075202,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 4,
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 288.774825,
+      "serverCpuPercent": 170.17314360555315,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 4,
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 280.906025,
+      "serverCpuPercent": 166.7689590537788,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 5,
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 290.84706,
+      "serverCpuPercent": 169.5671337880578,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 5,
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 282.298455,
+      "serverCpuPercent": 167.1398706603605,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 5,
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 284.706365,
+      "serverCpuPercent": 170.50652161042828,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 5,
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 362.35518499999995,
+      "serverCpuPercent": 157.5912337957964,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 4,
+        "cumulativeThrottledSeconds": 0.011
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 13,
+        "cumulativeThrottledSeconds": 0.079
+      }
+    },
+    {
+      "repetition": 5,
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 336.79305999999997,
+      "serverCpuPercent": 148.17749150176743,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 1,
+        "cumulativeThrottledSeconds": 0.008
+      }
+    },
+    {
+      "repetition": 5,
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 359.004645,
+      "serverCpuPercent": 162.2326206952907,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 12,
+        "cumulativeThrottledSeconds": 0.028
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 21,
+        "cumulativeThrottledSeconds": 0.105
+      }
+    },
+    {
+      "repetition": 6,
+      "workload": "quarantine",
+      "variant": "after",
+      "clientCpuPercent": 365.53276999999997,
+      "serverCpuPercent": 157.63875769552143,
+      "serverThrottle": {
+        "periods": 209,
+        "throttledPeriods": 6,
+        "cumulativeThrottledSeconds": 0.013
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 31,
+        "cumulativeThrottledSeconds": 0.4
+      }
+    },
+    {
+      "repetition": 6,
+      "workload": "quarantine",
+      "variant": "staging",
+      "clientCpuPercent": 352.785685,
+      "serverCpuPercent": 157.15987257144369,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 9,
+        "cumulativeThrottledSeconds": 0.042
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 9,
+        "cumulativeThrottledSeconds": 0.096
+      }
+    },
+    {
+      "repetition": 6,
+      "workload": "quarantine",
+      "variant": "baseline",
+      "clientCpuPercent": 334.70703,
+      "serverCpuPercent": 146.27339816782862,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 211,
+        "throttledPeriods": 2,
+        "cumulativeThrottledSeconds": 0.004
+      }
+    },
+    {
+      "repetition": 6,
+      "workload": "put",
+      "variant": "after",
+      "clientCpuPercent": 293.36985000000004,
+      "serverCpuPercent": 169.71080466552925,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 6,
+      "workload": "put",
+      "variant": "staging",
+      "clientCpuPercent": 283.000195,
+      "serverCpuPercent": 167.45438207099795,
+      "serverThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    },
+    {
+      "repetition": 6,
+      "workload": "put",
+      "variant": "baseline",
+      "clientCpuPercent": 278.52432,
+      "serverCpuPercent": 170.6697524601841,
+      "serverThrottle": {
+        "periods": 208,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      },
+      "generatorThrottle": {
+        "periods": 210,
+        "throttledPeriods": 0,
+        "cumulativeThrottledSeconds": 0
+      }
+    }
+  ],
+  "limitations": [
+    "Six blocked repetitions on shared Railway hosts; intervals condition on this run and exclude broader host variation.",
+    "Twenty-second closed-loop windows; four clients across four Node processes; private HTTP without TLS.",
+    "Quarantine includes a fixed two-millisecond simulated scanner delay and no real DPI scanning.",
+    "Service latency includes client hashing, SDK work, workflow steps, and accepted drain completions; pooled histograms use bounded percentile approximation.",
+    "Process high-water RSS is distinct from cumulative bytes allocated per operation.",
+    "Server CPU sampling includes the start barrier and final worker verification; client CPU includes measured traffic and drain.",
+    "WASM in the comparison image is not executed; rebuilt SDK size and identity are reported by the separate full validation receipt.",
+    "Native signed HTTP benchmarks use the handler and runtime in process without sockets on four Go scheduler CPUs; live HTTP targets have a two-CPU quota."
+  ]
+}

@@ -1,0 +1,479 @@
+{
+  "scenario": {
+    "backend": "memory",
+    "workload": "quarantine",
+    "bytes": 1048576,
+    "concurrency": 4,
+    "rate": 0,
+    "soak": false
+  },
+  "warmup": {
+    "mode": "closed-loop capacity",
+    "offered": 184,
+    "dropped": 0,
+    "failed": 0,
+    "successful": 184,
+    "windowSuccessful": 180,
+    "peakQueue": 0,
+    "expiredBeforeStart": 0,
+    "errors": {},
+    "measuredSeconds": 1,
+    "drainMs": 8.385,
+    "filesPerSecond": 180,
+    "responseLatencyMs": {
+      "samples": 184,
+      "mean": 21.827,
+      "p50": 21.379,
+      "p95": 30.895,
+      "p99": 37.325,
+      "max": 38.304
+    },
+    "serviceLatencyMs": {
+      "samples": 184,
+      "mean": 21.826,
+      "p50": 21.379,
+      "p95": 30.895,
+      "p99": 37.325,
+      "max": 38.304
+    },
+    "queueWaitMs": {
+      "samples": 184,
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.001,
+      "p99": 0.002,
+      "max": 0.004
+    },
+    "schedulerLagMs": {
+      "samples": 0,
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    },
+    "perSecond": [
+      {
+        "second": 0,
+        "offered": 184,
+        "dropped": 0,
+        "successful": 180,
+        "failed": 0,
+        "peakQueue": 0
+      }
+    ]
+  },
+  "load": {
+    "mode": "closed-loop capacity",
+    "offered": 1018,
+    "dropped": 0,
+    "failed": 0,
+    "successful": 1018,
+    "windowSuccessful": 1014,
+    "peakQueue": 0,
+    "expiredBeforeStart": 0,
+    "errors": {},
+    "measuredSeconds": 5,
+    "drainMs": 11.182,
+    "filesPerSecond": 202.8,
+    "responseLatencyMs": {
+      "samples": 1018,
+      "mean": 19.66,
+      "p50": 19.548,
+      "p95": 24.575,
+      "p99": 27.418,
+      "max": 33.3
+    },
+    "serviceLatencyMs": {
+      "samples": 1018,
+      "mean": 19.659,
+      "p50": 19.548,
+      "p95": 24.575,
+      "p99": 27.418,
+      "max": 33.3
+    },
+    "queueWaitMs": {
+      "samples": 1018,
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.001,
+      "p99": 0.001,
+      "max": 0.012
+    },
+    "schedulerLagMs": {
+      "samples": 0,
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    },
+    "perSecond": [
+      {
+        "second": 0,
+        "offered": 207,
+        "dropped": 0,
+        "successful": 203,
+        "failed": 0,
+        "peakQueue": 0
+      },
+      {
+        "second": 1,
+        "offered": 202,
+        "dropped": 0,
+        "successful": 202,
+        "failed": 0,
+        "peakQueue": 0
+      },
+      {
+        "second": 2,
+        "offered": 208,
+        "dropped": 0,
+        "successful": 208,
+        "failed": 0,
+        "peakQueue": 0
+      },
+      {
+        "second": 3,
+        "offered": 208,
+        "dropped": 0,
+        "successful": 208,
+        "failed": 0,
+        "peakQueue": 0
+      },
+      {
+        "second": 4,
+        "offered": 193,
+        "dropped": 0,
+        "successful": 193,
+        "failed": 0,
+        "peakQueue": 0
+      }
+    ]
+  },
+  "measurements": {
+    "operations": {
+      "put": {
+        "latencyMs": {
+          "samples": 1018,
+          "mean": 5.154,
+          "p50": 4.853,
+          "p95": 7.748,
+          "p99": 9.36,
+          "max": 13.111
+        },
+        "successful": 1018,
+        "failed": 0,
+        "windowSuccessful": 1017,
+        "windowFailed": 0,
+        "windowBytes": 1066401792,
+        "successfulBytes": 1067450368,
+        "requestsPerSecond": 203.4,
+        "payloadMiBPerSecond": 203.4,
+        "completedAttemptsPerSecond": 203.4
+      },
+      "get": {
+        "latencyMs": {
+          "samples": 1018,
+          "mean": 3.83,
+          "p50": 3.601,
+          "p95": 6.607,
+          "p99": 8.818,
+          "max": 13.452
+        },
+        "successful": 1018,
+        "failed": 0,
+        "windowSuccessful": 1017,
+        "windowFailed": 0,
+        "windowBytes": 1066401792,
+        "successfulBytes": 1067450368,
+        "requestsPerSecond": 203.4,
+        "payloadMiBPerSecond": 203.4,
+        "completedAttemptsPerSecond": 203.4
+      },
+      "verdict": {
+        "latencyMs": {
+          "samples": 1018,
+          "mean": 2.992,
+          "p50": 2.807,
+          "p95": 5.806,
+          "p99": 7.595,
+          "max": 9.933
+        },
+        "successful": 1018,
+        "failed": 0,
+        "windowSuccessful": 1015,
+        "windowFailed": 0,
+        "windowBytes": 106575,
+        "successfulBytes": 106890,
+        "requestsPerSecond": 203,
+        "payloadMiBPerSecond": 0.02,
+        "completedAttemptsPerSecond": 203
+      },
+      "delete": {
+        "latencyMs": {
+          "samples": 2036,
+          "mean": 2.418,
+          "p50": 2.278,
+          "p95": 5.101,
+          "p99": 6.808,
+          "max": 9.542
+        },
+        "successful": 2036,
+        "failed": 0,
+        "windowSuccessful": 2029,
+        "windowFailed": 0,
+        "windowBytes": 0,
+        "successfulBytes": 0,
+        "requestsPerSecond": 405.8,
+        "payloadMiBPerSecond": 0,
+        "completedAttemptsPerSecond": 405.8
+      }
+    },
+    "errors": {}
+  },
+  "resources": {
+    "intervalSeconds": 5.018,
+    "sampleIntervalMs": 250,
+    "minimumSampledDiskAvailableBytes": 7478280192,
+    "serverPeakSampledRssBytes": 79675392,
+    "serverCpuSeconds": 5.08,
+    "serverAverageCpuPercent": 101.238,
+    "generatorPeakSampledRssBytes": 251510784,
+    "generatorCpuSeconds": 6.405,
+    "generatorEventLoopDelayMs": {
+      "mean": 20.689,
+      "max": 23.986
+    },
+    "diskReadBytes": null,
+    "diskWrittenBytes": null,
+    "allocationBytes": null,
+    "samples": [
+      {
+        "elapsedSeconds": 0.004,
+        "server": {
+          "rssBytes": 74760192,
+          "cpuSeconds": 1.05
+        },
+        "diskAvailableBytes": 7478280192,
+        "generatorRssBytes": 236011520
+      },
+      {
+        "elapsedSeconds": 0.261,
+        "server": {
+          "rssBytes": 74809344,
+          "cpuSeconds": 1.3
+        },
+        "diskAvailableBytes": 7500677120,
+        "generatorRssBytes": 236175360
+      },
+      {
+        "elapsedSeconds": 0.519,
+        "server": {
+          "rssBytes": 74858496,
+          "cpuSeconds": 1.56
+        },
+        "diskAvailableBytes": 7531991040,
+        "generatorRssBytes": 243253248
+      },
+      {
+        "elapsedSeconds": 0.778,
+        "server": {
+          "rssBytes": 74907648,
+          "cpuSeconds": 1.83
+        },
+        "diskAvailableBytes": 7555252224,
+        "generatorRssBytes": 243351552
+      },
+      {
+        "elapsedSeconds": 1.034,
+        "server": {
+          "rssBytes": 74956800,
+          "cpuSeconds": 2.1
+        },
+        "diskAvailableBytes": 7589097472,
+        "generatorRssBytes": 243367936
+      },
+      {
+        "elapsedSeconds": 1.298,
+        "server": {
+          "rssBytes": 75005952,
+          "cpuSeconds": 2.37
+        },
+        "diskAvailableBytes": 7610011648,
+        "generatorRssBytes": 245219328
+      },
+      {
+        "elapsedSeconds": 1.553,
+        "server": {
+          "rssBytes": 75005952,
+          "cpuSeconds": 2.62
+        },
+        "diskAvailableBytes": 7637172224,
+        "generatorRssBytes": 245612544
+      },
+      {
+        "elapsedSeconds": 1.819,
+        "server": {
+          "rssBytes": 75005952,
+          "cpuSeconds": 2.88
+        },
+        "diskAvailableBytes": 7660036096,
+        "generatorRssBytes": 246628352
+      },
+      {
+        "elapsedSeconds": 2.079,
+        "server": {
+          "rssBytes": 79511552,
+          "cpuSeconds": 3.16
+        },
+        "diskAvailableBytes": 7688130560,
+        "generatorRssBytes": 246628352
+      },
+      {
+        "elapsedSeconds": 2.336,
+        "server": {
+          "rssBytes": 79511552,
+          "cpuSeconds": 3.42
+        },
+        "diskAvailableBytes": 7731036160,
+        "generatorRssBytes": 247087104
+      },
+      {
+        "elapsedSeconds": 2.601,
+        "server": {
+          "rssBytes": 79527936,
+          "cpuSeconds": 3.68
+        },
+        "diskAvailableBytes": 7771926528,
+        "generatorRssBytes": 247611392
+      },
+      {
+        "elapsedSeconds": 2.858,
+        "server": {
+          "rssBytes": 79544320,
+          "cpuSeconds": 3.96
+        },
+        "diskAvailableBytes": 7807283200,
+        "generatorRssBytes": 248987648
+      },
+      {
+        "elapsedSeconds": 3.117,
+        "server": {
+          "rssBytes": 79544320,
+          "cpuSeconds": 4.22
+        },
+        "diskAvailableBytes": 7832305664,
+        "generatorRssBytes": 248987648
+      },
+      {
+        "elapsedSeconds": 3.377,
+        "server": {
+          "rssBytes": 79544320,
+          "cpuSeconds": 4.49
+        },
+        "diskAvailableBytes": 7867248640,
+        "generatorRssBytes": 249004032
+      },
+      {
+        "elapsedSeconds": 3.634,
+        "server": {
+          "rssBytes": 79577088,
+          "cpuSeconds": 4.76
+        },
+        "diskAvailableBytes": 7928111104,
+        "generatorRssBytes": 249020416
+      },
+      {
+        "elapsedSeconds": 3.891,
+        "server": {
+          "rssBytes": 79577088,
+          "cpuSeconds": 5.03
+        },
+        "diskAvailableBytes": 7951556608,
+        "generatorRssBytes": 251265024
+      },
+      {
+        "elapsedSeconds": 4.154,
+        "server": {
+          "rssBytes": 79577088,
+          "cpuSeconds": 5.27
+        },
+        "diskAvailableBytes": 7984775168,
+        "generatorRssBytes": 251363328
+      },
+      {
+        "elapsedSeconds": 4.412,
+        "server": {
+          "rssBytes": 79577088,
+          "cpuSeconds": 5.53
+        },
+        "diskAvailableBytes": 8006823936,
+        "generatorRssBytes": 251346944
+      },
+      {
+        "elapsedSeconds": 4.669,
+        "server": {
+          "rssBytes": 79609856,
+          "cpuSeconds": 5.8
+        },
+        "diskAvailableBytes": 8038465536,
+        "generatorRssBytes": 251346944
+      },
+      {
+        "elapsedSeconds": 4.926,
+        "server": {
+          "rssBytes": 79659008,
+          "cpuSeconds": 6.04
+        },
+        "diskAvailableBytes": 8074153984,
+        "generatorRssBytes": 251428864
+      },
+      {
+        "elapsedSeconds": 5.018,
+        "server": {
+          "rssBytes": 79675392,
+          "cpuSeconds": 6.13
+        },
+        "diskAvailableBytes": 8087928832,
+        "generatorRssBytes": 251510784
+      }
+    ],
+    "diskWriteBytesPerPayloadByte": null,
+    "diskHeadroomMaintained": true
+  },
+  "capabilities": {
+    "persistent": false,
+    "multipart": true,
+    "upstream": false,
+    "conditionalWrites": true,
+    "presignedUrls": true,
+    "maxBytes": 268435456,
+    "maxObjects": 4096,
+    "maxRequestBytes": 1048576,
+    "maxConcurrentRequests": 128
+  },
+  "binaryVersion": "0.3.0",
+  "verification": {
+    "verifiedObjects": 16,
+    "algorithm": "SHA-256",
+    "complete": true,
+    "unknownOutcomeKeys": []
+  },
+  "leftovers": {
+    "count": 0,
+    "truncated": false
+  },
+  "retainedFootprint": {
+    "before": {
+      "apparentBytes": 0,
+      "allocatedBytes": 0,
+      "files": 0
+    },
+    "after": {
+      "apparentBytes": 0,
+      "allocatedBytes": 0,
+      "files": 0
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "label": "Memory quarantine five-minute run at 100 files/sec; loopback HTTP",
+  "warmupSeconds": 10,
+  "durationSeconds": 300,
+  "repetitions": 1,
+  "timeoutMs": 10000,
+  "sampleMs": 250,
+  "maxQueue": 8,
+  "maxBytes": 268435456,
+  "maxObjects": 4096,
+  "serverConcurrency": 128,
+  "scannerDelayMs": 2,
+  "retainedObjects": 16,
+  "soakSeconds": 0,
+  "minFreeDiskBytes": 1073741824,
+  "backends": [
+    "memory"
+  ],
+  "workloads": [
+    "quarantine"
+  ],
+  "sizes": [
+    1048576
+  ],
+  "concurrency": [
+    4
+  ],
+  "rates": [
+    100
+  ]
+}

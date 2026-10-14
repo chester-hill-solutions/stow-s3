@@ -1,0 +1,1888 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-10-14T19:48:38.922076+00:00",
+  "provider": "railway",
+  "workspaceId": "457628da-bacc-4a40-aac3-a7141004534d",
+  "projectId": "8d90188e-0f1e-4c47-9379-9399ae06e6fa",
+  "projectName": "stow-conformance-scratch",
+  "environmentId": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411",
+  "environmentName": "benchmark",
+  "state": "release-0.3.0-published-downloads-verified",
+  "verifiedServiceInstanceCount": 2,
+  "proposedProfiles": {
+    "embeddedSandbox": {
+      "vCPU": 4,
+      "memoryGB": 4
+    },
+    "s3Target": {
+      "maxVCPU": 2,
+      "maxMemoryGB": 2,
+      "replicas": 1
+    },
+    "s3Generator": {
+      "maxVCPU": 4,
+      "maxMemoryGB": 4,
+      "replicas": 1
+    }
+  },
+  "resourceProfilesApplied": true,
+  "services": {
+    "target": {
+      "id": "86625750-7c04-458f-98e2-4d7d33787535",
+      "deploymentId": "e09d0550-2eaf-454b-883d-16a3d38e2ccb",
+      "status": "REMOVED",
+      "verifiedCpuMax": "200000 100000",
+      "verifiedMemoryMax": "2147483648"
+    },
+    "runner": {
+      "id": "83497842-c51d-420e-8ba1-181589730ad4",
+      "deploymentId": "0b75b5df-7061-4ec4-ab32-f55e07c9f8d3",
+      "status": "REMOVED",
+      "verifiedCpuMax": "400000 100000",
+      "verifiedMemoryMax": "4294967296"
+    }
+  },
+  "verifiedCpu": "AMD EPYC 9655P 96-Core Processor",
+  "smoke": {
+    "runId": "5eb22223-9479-4b2b-9b03-ea1afbb57bdd",
+    "complete": true,
+    "embedded": true,
+    "s3Runs": 15,
+    "acceptable": true
+  },
+  "comparison": {
+    "runId": "56565c98-7de2-4264-89ff-e93c98923a26",
+    "complete": true,
+    "embeddedSamples": 378,
+    "s3Runs": 45,
+    "acceptable": true,
+    "evidence": "2026-10-13-railway-performance/comparison",
+    "startedAt": "2026-10-13T14:56:21.002Z",
+    "finishedAt": "2026-10-13T15:19:37.153Z"
+  },
+  "excludedRuns": [
+    {
+      "runId": "8834de8f-1c6a-4661-b47f-3c7f9d957bde",
+      "reason": "Incomplete comparison: MinIO port accepted HTTP before storage initialization. Authenticated readiness added before restarting the full batch."
+    }
+  ],
+  "iacReadback": {
+    "checkedAt": "2026-10-13T14:56:51.995Z",
+    "changes": 0
+  },
+  "computeStopped": true,
+  "optimization": {
+    "status": "complete",
+    "runnerDeploymentId": "72012b17-5f2a-4b58-a527-c30d16dba908",
+    "targetDeploymentId": "d31f39e3-8e2f-42ef-854c-d512c2de4b5b",
+    "protobuf": "1.36.12",
+    "sameSourceAndBinaryHashes": true,
+    "smokeRunId": "b7af929a-da15-4a53-a9c8-ae2bb0d5d11f",
+    "regressionRunId": "f21f38c4-0c69-48b3-a2ee-49bd9bb84b3d",
+    "fullValidationDeployment": "b4d2e2fa-6a58-4081-ae89-b4748392f749",
+    "sdkWasmSha256": "f4da0cecaa4d19307b77314be57a5b3cf50d9b784c175baead6b0e0a6a4fc2b0"
+  },
+  "competitorComparison": {
+    "runId": "639202b1-4c59-44ab-8567-142e764b4a18",
+    "smokeRunId": "07f0b443-570f-4cca-9cbd-79ecb3af8a65",
+    "complete": true,
+    "sourcePayloadSha256": "bb32c46b5247d6f72192d2d381f70495a9de5a4d80eefbc3ebb3bbbffb398228",
+    "runnerDeploymentId": "23fab8fe-35c5-4e0a-857e-e76df896dd6b",
+    "targetDeploymentId": "e09d0550-2eaf-454b-883d-16a3d38e2ccb",
+    "sameBuild": true,
+    "s3Runs": 54,
+    "nativeSamples": 486,
+    "goStartupSamples": 360,
+    "nodeStartupSamples": 60,
+    "evidence": "2026-10-14-marketing-comparison",
+    "startedAt": "2026-10-14T18:11:30.955Z",
+    "finishedAt": "2026-10-14T18:39:30.187Z",
+    "published": false,
+    "computeStopped": true,
+    "chartCombinations": 13,
+    "chartSourceArchiveSha256": "3a373c1bd22f24239988bbb8059a52cc7c256638cc8980120106f5f6b2ee2c86",
+    "exportSha256": "b681c28b56680c037d854c7d495cb342af9a293c83d4168b654db18e10217bc8",
+    "retainedCloudRoot": "/results/marketing-refresh-20261014"
+  },
+  "websitePreview": {
+    "published": false,
+    "complete": true,
+    "comparisonScope": "S3-shaped agent storage",
+    "verificationDeployment": "b37d3d8d-2ae7-4a8f-839d-529330a1e38a",
+    "sourcePayloadSha256": "f586e539b2283685b7391ec96322d1775e955117dbeec5dbfb3e69b6b1c6dc62",
+    "chartCombinations": 13,
+    "screenshots": 6,
+    "browserErrors": [],
+    "checks": [
+      "S3-only dataset derived from completed Railway comparison",
+      "site build and unit tests",
+      "documentation links",
+      "Railway Chromium peer inclusion and desktop/mobile chart controls"
+    ],
+    "benchmarkRerun": false
+  },
+  "websitePreviewOriginalCombined": {
+    "published": false,
+    "verificationDeployment": "fce13738-fcb4-44e8-b115-c1ffbe53cfa5",
+    "sourcePayloadSha256": "b398563af5c2c57eb88afabcaa670e772e763ed75c6f933630081863d414f5d5",
+    "complete": true,
+    "chartCombinations": 39,
+    "screenshots": 8,
+    "browserErrors": [],
+    "sdkBrowserPassed": 33,
+    "sdkBrowserSkipped": 2,
+    "checks": [
+      "make standards",
+      "make test-conformance",
+      "make test-node test-wasm",
+      "make test-browser",
+      "protobuf generated-source drift check",
+      "Railway Chromium chart controls and desktop/mobile previews"
+    ]
+  },
+  "wasmSizeOptimization": {
+    "complete": true,
+    "sourcePayloadSha256": "c7efa39d0392d02343b43240b39b60e0a2702a6603a3531097f0bf34a6314a16",
+    "verificationDeployment": "33e20f9f-c5e1-45cb-80a0-da89acce5a48",
+    "beforeBytes": 9800798,
+    "afterBytes": 6435354,
+    "sdkWasmSha256": "4493871fa6ccabba1a9950e233c3c2017f2f4cb073a5027f3cf5916176aeb9e0",
+    "evidence": "2026-10-13-wasm-size",
+    "computeStopped": true
+  },
+  "streamingOptimization": {
+    "complete": true,
+    "runId": "128a9a91-501f-45d9-9211-af0eddf7c083",
+    "sourcePayloadSha256": "ea612bb6ac196c85af211b7d34942369be08a88fe170d7e9bd6d47896d27e1db",
+    "verificationSourcePayloadSha256": "ac6e2b0067ebd27e3fec335e642e46d23e64b97140d5d72b630e5826e261cbf8",
+    "verificationDeployment": "aa2bded5-b990-45c3-a193-be4995b3eacb",
+    "runnerDeploymentId": "1759d12f-2b45-4cd7-a5ce-8ab2b53f1bae",
+    "targetDeploymentId": "3fc51368-d9f8-4351-9e36-9327b3a47f2c",
+    "sameBuild": true,
+    "s3Runs": 18,
+    "nativeSamples": 18,
+    "evidence": "2026-10-13-streaming-performance",
+    "sdkWasmBytes": 6480771,
+    "sdkWasmSha256": "2e9fae1653da71245e2342adcaeafa39cc44391ddc72ddf7ff614e71688fd2a8",
+    "startedAt": "2026-10-13T23:00:02.626Z",
+    "finishedAt": "2026-10-13T23:07:55.404Z",
+    "competitorsRemeasured": false,
+    "published": false,
+    "computeStopped": true,
+    "unresolved": "Memory HTTP PUT measured 11.5% lower; native memory PUT did not show the same drop. Controlled alternating comparison needed for attribution."
+  },
+  "usageRecoveryConsolidation": {
+    "complete": true,
+    "verificationDeployment": "a7a8f54d-472c-4cd5-bab3-42d7c588859f",
+    "verificationSourcePayloadSha256": "a059a1c453d2a6276731760c37148ca8fff5bbed56597056288f12966305fb70",
+    "reproductionDeployment": "41538d80-5f73-48a3-a9d1-108e4bd52738",
+    "reproductionSourcePayloadSha256": "aa5c499e6054f3cd7593911e376e2ee5d5be9244713cf23aeb10c9a3e81b8543",
+    "twoRecoveryRegressionsFailBeforeAndPassAfter": true,
+    "sdkWasmBytes": 6488824,
+    "sdkWasmSha256": "8c0d3785c92302b348665d674af84c1e25cf2048fb5df0002d53671e6d87c248",
+    "evidence": "2026-10-13-usage-recovery",
+    "benchmarkRerun": false,
+    "published": false,
+    "computeStopped": true
+  },
+  "writePreparationConsolidation": {
+    "complete": true,
+    "verificationDeployment": "6b36d5a2-38e0-4fe8-83d6-8852ef4ece07",
+    "verificationSourcePayloadSha256": "ad2dc4dc47bbaf19b274b689ef3f847a162dc0d7b4c32b9d4892f08da4965a0f",
+    "verificationStatusObserved": "SUCCESS",
+    "reproductionDeployment": "d4f7a9e1-34c6-456e-b86a-3bddb4ce6771",
+    "reproductionSourcePayloadSha256": "0f9f16a67edf61682ba544775632357a76251213be36b80f3111ee31bc20a1bb",
+    "reproductionScope": "Pre-fix filesystem PUT and replay implementations restored in sanitized cloud snapshot; other preparation changes remain",
+    "twoRetryRegressionsFailBeforeAndPassAfter": true,
+    "emptyBodyCompatibilityTested": true,
+    "sdkWasmBytes": 6490152,
+    "sdkWasmSha256": "c81ac1e311e74fc9312ee6e88d86c2e661ef0bc70e949e495e7c309f695f2d0c",
+    "sdkWasmDeltaBytes": 1328,
+    "evidence": "2026-10-13-write-preparation",
+    "benchmarkRerun": false,
+    "published": false,
+    "computeStopped": true
+  },
+  "controlledWritePreparationComparison": {
+    "complete": true,
+    "runId": "7f7cb5a5-f003-468c-9a58-a946673457a5",
+    "sourcePayloadSha256": "1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+    "runnerDeploymentId": "c544a874-4682-4e38-93ca-b27117c8af7e",
+    "targetDeploymentId": "68cce335-7eb7-4811-b3f2-a6fd122d3b71",
+    "smokeResultsPath": "/results/controlled-smoke-6461d916-c877-4ae1-a99e-04ddc0470789",
+    "sameBuild": true,
+    "expectedS3Runs": 72,
+    "expectedNativeSamples": 72,
+    "expectedManagedSaveSamples": 12,
+    "baselineScope": "Reconstructed immediately preceding write-preparation implementation; retains usage/recovery and streaming changes",
+    "published": false,
+    "computeStopped": true,
+    "evidence": "2026-10-13-controlled-write-preparation",
+    "s3Runs": 72,
+    "nativeSamples": 72,
+    "managedSaveSamples": 12,
+    "failures": 0,
+    "drops": 0,
+    "sourceArchiveVerifiedAgainstCompiledSource": true,
+    "binaryRetentionPath": "/results/builds/1dd00722a4f0fec71b45a2f8de222fd1dcfded1b917bddbfa83b2eb54cb0e7da",
+    "startedAt": "2026-10-14T03:22:15.331Z",
+    "finishedAt": "2026-10-14T03:53:52.443Z",
+    "managedSave": {
+      "before": {
+        "payloadMiBPerSecond": 98.29,
+        "medianNsPerOp": 10175099,
+        "medianAllocatedBytesPerOp": 7417247.5,
+        "medianAllocationsPerOp": 598
+      },
+      "after": {
+        "payloadMiBPerSecond": 114.884,
+        "medianNsPerOp": 8704541.5,
+        "medianAllocatedBytesPerOp": 2166604.5,
+        "medianAllocationsPerOp": 550.5
+      },
+      "effect": {
+        "pairedPercentChanges": [
+          -3.013,
+          30.494,
+          9.383,
+          13.925,
+          18.925,
+          17.351
+        ],
+        "medianPairedPercentChange": 15.638,
+        "geometricMeanPercentChange": 14.053,
+        "conditional95PercentInterval": [
+          2.829,
+          26.501
+        ]
+      }
+    },
+    "s3Effects": [
+      {
+        "backend": "memory",
+        "workload": "put",
+        "effect": {
+          "pairedPercentChanges": [
+            -7.096,
+            -10.717,
+            -1.531,
+            9.344,
+            -8.77,
+            6.756
+          ],
+          "medianPairedPercentChange": -4.314,
+          "geometricMeanPercentChange": -2.298,
+          "conditional95PercentInterval": [
+            -10.616,
+            6.794
+          ]
+        }
+      },
+      {
+        "backend": "filesystem",
+        "workload": "put",
+        "effect": {
+          "pairedPercentChanges": [
+            0,
+            -0.15,
+            0.15,
+            -0.15,
+            0.075,
+            6.661
+          ],
+          "medianPairedPercentChange": 0.038,
+          "geometricMeanPercentChange": 1.068,
+          "conditional95PercentInterval": [
+            -1.695,
+            3.909
+          ]
+        }
+      },
+      {
+        "backend": "memory",
+        "workload": "get",
+        "effect": {
+          "pairedPercentChanges": [
+            19.448,
+            12.713,
+            -3.655,
+            -8.897,
+            2.721,
+            -5.63
+          ],
+          "medianPairedPercentChange": -0.467,
+          "geometricMeanPercentChange": 2.29,
+          "conditional95PercentInterval": [
+            -8.55,
+            14.416
+          ]
+        }
+      },
+      {
+        "backend": "filesystem",
+        "workload": "get",
+        "effect": {
+          "pairedPercentChanges": [
+            5.686,
+            4.923,
+            -1.618,
+            -17.177,
+            0.596,
+            3.902
+          ],
+          "medianPairedPercentChange": 2.249,
+          "geometricMeanPercentChange": -0.949,
+          "conditional95PercentInterval": [
+            -10.043,
+            9.065
+          ]
+        }
+      },
+      {
+        "backend": "memory",
+        "workload": "quarantine",
+        "effect": {
+          "pairedPercentChanges": [
+            -3.505,
+            -4.083,
+            -1.909,
+            2.574,
+            5.711,
+            -0.867
+          ],
+          "medianPairedPercentChange": -1.388,
+          "geometricMeanPercentChange": -0.406,
+          "conditional95PercentInterval": [
+            -4.265,
+            3.609
+          ]
+        }
+      },
+      {
+        "backend": "filesystem",
+        "workload": "quarantine",
+        "effect": {
+          "pairedPercentChanges": [
+            -16.742,
+            -1.082,
+            28.957,
+            -5.101,
+            -2.131,
+            -21.188
+          ],
+          "medianPairedPercentChange": -3.616,
+          "geometricMeanPercentChange": -4.11,
+          "conditional95PercentInterval": [
+            -19.935,
+            14.843
+          ]
+        }
+      }
+    ],
+    "analysisSourceSha256": "0abf084ab367db5cab5918e77cd56b4cb885ddfa742fb30f8e441ee78f90ba92",
+    "competitorsRemeasured": false
+  },
+  "memoryHttpPutDiagnosis": {
+    "runId": "7d3dc9b9-11d7-47c8-be81-f39d343982eb",
+    "complete": true,
+    "published": false,
+    "serverMatchesControlledBinary": true,
+    "serverSha256": "7c80ec1b79aa0d457e2c4f7e7eb680ae2a8f13bf060fef2961a86d170dca70a6",
+    "sourcePayloadSha256": "9598f9438b812cff968949a9bd877ddf999cd7074da83f1bb5b2a38a88d1db48",
+    "computeStopped": true,
+    "evidence": "docs/benchmarks/2026-10-14-memory-put-diagnosis",
+    "summary": [
+      {
+        "processes": 1,
+        "medianMiBPerSecond": 173.2,
+        "medianClientCpuPercent": 101.511,
+        "medianServerCpuPercent": 83.263,
+        "maximumStartSkewMs": 0
+      },
+      {
+        "processes": 4,
+        "medianMiBPerSecond": 516.225,
+        "medianClientCpuPercent": 279.16,
+        "medianServerCpuPercent": 169.6,
+        "maximumStartSkewMs": 2
+      }
+    ],
+    "effect": {
+      "geometricMeanPercentChange": 198.4,
+      "conditional95PercentInterval": [
+        187.017,
+        210.235
+      ]
+    },
+    "allMeasuredWindowsPassed": true,
+    "competitorsRemeasured": false,
+    "productionChanged": false
+  },
+  "memoryWriteStaging": {
+    "complete": true,
+    "redDeploymentId": "3bbe5aec-6d3c-42fb-8d4d-8d2855e31899",
+    "redRegressionsObserved": true,
+    "redSourceSha256": "c4aec1b8960124deb365445e00ee32b7b908d0d531fcac54de798b5dd10d0f90",
+    "evidence": "docs/benchmarks/2026-10-14-memory-write-staging",
+    "published": false,
+    "initialValidationDeploymentId": "840db06a-5cba-4b16-bbbb-35d8785e758d",
+    "validationDeploymentId": "244bd6e0-d02c-4f2e-b0d9-422cfe89a0cd",
+    "validationSourceSha256": "6889966e62281fa26545d48e9e5985523e1214c258e097ea9a9068091247e7dd",
+    "supersededValidationDeploymentIds": [
+      "840db06a-5cba-4b16-bbbb-35d8785e758d",
+      "a186b199-99d4-46d6-98fe-476c20a918ac"
+    ],
+    "computeStopped": true,
+    "checks": [
+      "make standards",
+      "make test-conformance",
+      "make test-node test-wasm",
+      "make test-browser"
+    ],
+    "browserTestsPassed": 33,
+    "browserTestsSkipped": 2,
+    "wasmBytes": 6497695,
+    "wasmSha256": "5d7ac26a55e9bb828d09876ed8af74cf3a2e0f8fed012f379efb4ccbf7b5b52a",
+    "throughputRemeasured": false
+  },
+  "ownedHttpBody": {
+    "complete": true,
+    "redDeploymentId": "fca27d42-b82e-4fa8-bc7e-a390a25a1a8f",
+    "redAllocationBytesPerOp": 2132193,
+    "validationDeploymentId": "2237f150-6918-471c-b5c7-ad8dfce2cbe8",
+    "initialValidationDeploymentId": "0adf1077-d5c0-4b53-8eb4-3247a6a11b45",
+    "targetDeploymentId": "8f49fc2d-2f4c-4714-8030-ad94811acc0b",
+    "initialTargetDeploymentId": "1082f5e2-3cbd-4969-88f4-98a32783e4ed",
+    "evidence": "docs/benchmarks/2026-10-14-owned-http-body",
+    "published": false,
+    "validationComplete": true,
+    "validationSourceSha256": "77534993453f4997d18b5141aebad29821ea3a61b458962f2d2ddbdd0aaa3c4c",
+    "wasmBytes": 6504060,
+    "wasmSha256": "d41c489a93c7a349de69c5bb415b04f4de3964bdacb12fdde8557d9d6eed9283",
+    "productionSourceSha256": "ed958b131d418fcc55930686752127519be43a7192e603126daaf85ff5cb4b04",
+    "comparisonSourceSha256": "178ca240d23a9f260a1bafc5404521d0e1efd1ee0bc96d0d19d5d6e03fc38f55",
+    "runnerDeploymentId": "322bffea-01e1-4213-99a6-b2903e9d3843",
+    "runId": "c80e35c3-f6e3-4020-91af-ae8ad6c8e95b",
+    "comparisonComplete": true,
+    "computeStopped": true,
+    "allMeasuredWindowsPassed": true,
+    "liveWindows": 36,
+    "smokeWindows": 6,
+    "nativeSamples": 36,
+    "failures": 0,
+    "drops": 0,
+    "browserTestsPassed": 33,
+    "browserTestsSkipped": 2,
+    "wasmDeltaBytes": 6365,
+    "startedAt": "2026-10-14T13:18:06.180Z",
+    "finishedAt": "2026-10-14T13:36:34.323Z",
+    "analysisSourceSha256": "61e313b64eddada6d0c8d09974f55b7ed690e22974fde18a52b5ec281eb28430",
+    "summary": [
+      {
+        "workload": "put",
+        "variant": "baseline",
+        "medianFilesPerSecond": 487.425,
+        "medianPayloadMiBPerSecond": 487.425,
+        "medianRunP99Ms": 12.43,
+        "medianHighWaterRssMiB": 69.004,
+        "medianClientCpuPercent": 278.29,
+        "medianServerCpuPercent": 166.954,
+        "minimumCompletedSamples": 9172,
+        "maxStartSkewMs": 2,
+        "generatorHeadroomObserved": true
+      },
+      {
+        "workload": "put",
+        "variant": "staging",
+        "medianFilesPerSecond": 509.275,
+        "medianPayloadMiBPerSecond": 509.275,
+        "medianRunP99Ms": 11.654,
+        "medianHighWaterRssMiB": 70.471,
+        "medianClientCpuPercent": 282.448,
+        "medianServerCpuPercent": 168.932,
+        "minimumCompletedSamples": 9760,
+        "maxStartSkewMs": 3,
+        "generatorHeadroomObserved": true
+      },
+      {
+        "workload": "put",
+        "variant": "after",
+        "medianFilesPerSecond": 529.625,
+        "medianPayloadMiBPerSecond": 529.625,
+        "medianRunP99Ms": 10.868,
+        "medianHighWaterRssMiB": 65.109,
+        "medianClientCpuPercent": 290.331,
+        "medianServerCpuPercent": 169.89,
+        "minimumCompletedSamples": 10084,
+        "maxStartSkewMs": 1,
+        "generatorHeadroomObserved": true
+      },
+      {
+        "workload": "quarantine",
+        "variant": "baseline",
+        "medianFilesPerSecond": 198.65,
+        "medianPayloadMiBPerSecond": 198.65,
+        "medianRunP99Ms": 30.591,
+        "medianHighWaterRssMiB": 63.969,
+        "medianClientCpuPercent": 338.132,
+        "medianServerCpuPercent": 147.225,
+        "minimumCompletedSamples": 3800,
+        "maxStartSkewMs": 1,
+        "generatorHeadroomObserved": true
+      },
+      {
+        "workload": "quarantine",
+        "variant": "staging",
+        "medianFilesPerSecond": 211.1,
+        "medianPayloadMiBPerSecond": 211.1,
+        "medianRunP99Ms": 28.674,
+        "medianHighWaterRssMiB": 63.689,
+        "medianClientCpuPercent": 360.227,
+        "medianServerCpuPercent": 160.304,
+        "minimumCompletedSamples": 4128,
+        "maxStartSkewMs": 1,
+        "generatorHeadroomObserved": false
+      },
+      {
+        "workload": "quarantine",
+        "variant": "after",
+        "medianFilesPerSecond": 213.8,
+        "medianPayloadMiBPerSecond": 213.8,
+        "medianRunP99Ms": 28.393,
+        "medianHighWaterRssMiB": 60.635,
+        "medianClientCpuPercent": 363.111,
+        "medianServerCpuPercent": 157.977,
+        "minimumCompletedSamples": 4152,
+        "maxStartSkewMs": 1,
+        "generatorHeadroomObserved": false
+      }
+    ],
+    "effects": [
+      {
+        "workload": "put",
+        "before": "baseline",
+        "after": "staging",
+        "throughput": {
+          "pairedPercentChanges": [
+            6.411,
+            5.239,
+            3.534,
+            7.8,
+            6.108,
+            -1.635
+          ],
+          "geometricMeanPercentChange": 4.53,
+          "conditional95PercentInterval": [
+            1.011,
+            8.172
+          ]
+        },
+        "p99": {
+          "pairedPercentChanges": [
+            -10.365,
+            -8.565,
+            -7.647,
+            -11.255,
+            -8.562,
+            3.034
+          ],
+          "geometricMeanPercentChange": -7.342,
+          "conditional95PercentInterval": [
+            -12.449,
+            -1.938
+          ]
+        },
+        "rss": {
+          "pairedPercentChanges": [
+            1.914,
+            2.504,
+            4.57,
+            0.77,
+            2.026,
+            0.845
+          ],
+          "geometricMeanPercentChange": 2.097,
+          "conditional95PercentInterval": [
+            0.657,
+            3.557
+          ]
+        }
+      },
+      {
+        "workload": "put",
+        "before": "staging",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            3.32,
+            2.094,
+            8.264,
+            1.857,
+            1.401,
+            4.354
+          ],
+          "geometricMeanPercentChange": 3.523,
+          "conditional95PercentInterval": [
+            0.913,
+            6.199
+          ]
+        },
+        "p99": {
+          "pairedPercentChanges": [
+            -8.568,
+            -3.905,
+            -13.866,
+            -1.968,
+            -0.992,
+            -9.473
+          ],
+          "geometricMeanPercentChange": -6.575,
+          "conditional95PercentInterval": [
+            -11.715,
+            -1.135
+          ]
+        },
+        "rss": {
+          "pairedPercentChanges": [
+            -7.4,
+            -5.693,
+            -7.449,
+            -8.348,
+            -7.906,
+            -6.156
+          ],
+          "geometricMeanPercentChange": -7.163,
+          "conditional95PercentInterval": [
+            -8.232,
+            -6.082
+          ]
+        }
+      },
+      {
+        "workload": "put",
+        "before": "baseline",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            9.943,
+            7.443,
+            12.091,
+            9.802,
+            7.595,
+            2.647
+          ],
+          "geometricMeanPercentChange": 8.213,
+          "conditional95PercentInterval": [
+            4.831,
+            11.703
+          ]
+        },
+        "p99": {
+          "pairedPercentChanges": [
+            -18.045,
+            -12.136,
+            -20.452,
+            -13.001,
+            -9.469,
+            -6.727
+          ],
+          "geometricMeanPercentChange": -13.434,
+          "conditional95PercentInterval": [
+            -18.712,
+            -7.813
+          ]
+        },
+        "rss": {
+          "pairedPercentChanges": [
+            -5.628,
+            -3.332,
+            -3.219,
+            -7.642,
+            -6.04,
+            -5.363
+          ],
+          "geometricMeanPercentChange": -5.216,
+          "conditional95PercentInterval": [
+            -6.974,
+            -3.425
+          ]
+        }
+      },
+      {
+        "workload": "quarantine",
+        "before": "baseline",
+        "after": "staging",
+        "throughput": {
+          "pairedPercentChanges": [
+            6.613,
+            9.242,
+            3.586,
+            8.632,
+            10.242,
+            3.628
+          ],
+          "geometricMeanPercentChange": 6.958,
+          "conditional95PercentInterval": [
+            3.973,
+            10.029
+          ]
+        },
+        "p99": {
+          "pairedPercentChanges": [
+            -6.726,
+            -6.73,
+            -5.798,
+            -8.565,
+            -12.134,
+            4.059
+          ],
+          "geometricMeanPercentChange": -6.108,
+          "conditional95PercentInterval": [
+            -11.482,
+            -0.408
+          ]
+        },
+        "rss": {
+          "pairedPercentChanges": [
+            -3.303,
+            -4.33,
+            -0.264,
+            4.129,
+            -1.933,
+            3.005
+          ],
+          "geometricMeanPercentChange": -0.498,
+          "conditional95PercentInterval": [
+            -4.003,
+            3.135
+          ]
+        }
+      },
+      {
+        "workload": "quarantine",
+        "before": "staging",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            1.972,
+            -1.402,
+            -1.043,
+            0.581,
+            -2.449,
+            4.116
+          ],
+          "geometricMeanPercentChange": 0.271,
+          "conditional95PercentInterval": [
+            -2.24,
+            2.848
+          ]
+        },
+        "p99": {
+          "pairedPercentChanges": [
+            -2.943,
+            3.032,
+            6.155,
+            -0.991,
+            1,
+            -11.254
+          ],
+          "geometricMeanPercentChange": -0.99,
+          "conditional95PercentInterval": [
+            -7.225,
+            5.665
+          ]
+        },
+        "rss": {
+          "pairedPercentChanges": [
+            -1.434,
+            -4.657,
+            -4.321,
+            -5.444,
+            -5.27,
+            -6.365
+          ],
+          "geometricMeanPercentChange": -4.594,
+          "conditional95PercentInterval": [
+            -6.342,
+            -2.814
+          ]
+        }
+      },
+      {
+        "workload": "quarantine",
+        "before": "baseline",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            8.715,
+            7.71,
+            2.506,
+            9.263,
+            7.543,
+            7.894
+          ],
+          "geometricMeanPercentChange": 7.248,
+          "conditional95PercentInterval": [
+            4.694,
+            9.866
+          ]
+        },
+        "p99": {
+          "pairedPercentChanges": [
+            -9.471,
+            -3.902,
+            0,
+            -9.47,
+            -11.255,
+            -7.652
+          ],
+          "geometricMeanPercentChange": -7.037,
+          "conditional95PercentInterval": [
+            -11.306,
+            -2.563
+          ]
+        },
+        "rss": {
+          "pairedPercentChanges": [
+            -4.69,
+            -8.786,
+            -4.573,
+            -1.54,
+            -7.101,
+            -3.551
+          ],
+          "geometricMeanPercentChange": -5.069,
+          "conditional95PercentInterval": [
+            -7.738,
+            -2.324
+          ]
+        }
+      }
+    ],
+    "nativeSummary": [
+      {
+        "parallel": false,
+        "variant": "baseline",
+        "medianPayloadMiBPerSecond": 489.023,
+        "medianAllocatedBytesPerOp": 2129535,
+        "medianAllocationsPerOp": 188
+      },
+      {
+        "parallel": false,
+        "variant": "staging",
+        "medianPayloadMiBPerSecond": 488.705,
+        "medianAllocatedBytesPerOp": 2129998,
+        "medianAllocationsPerOp": 194
+      },
+      {
+        "parallel": false,
+        "variant": "after",
+        "medianPayloadMiBPerSecond": 540.875,
+        "medianAllocatedBytesPerOp": 1073004,
+        "medianAllocationsPerOp": 189
+      },
+      {
+        "parallel": true,
+        "variant": "baseline",
+        "medianPayloadMiBPerSecond": 684.291,
+        "medianAllocatedBytesPerOp": 2129498.5,
+        "medianAllocationsPerOp": 189
+      },
+      {
+        "parallel": true,
+        "variant": "staging",
+        "medianPayloadMiBPerSecond": 1438.081,
+        "medianAllocatedBytesPerOp": 2129805.5,
+        "medianAllocationsPerOp": 193
+      },
+      {
+        "parallel": true,
+        "variant": "after",
+        "medianPayloadMiBPerSecond": 1723.597,
+        "medianAllocatedBytesPerOp": 1072917,
+        "medianAllocationsPerOp": 189
+      }
+    ],
+    "nativeEffects": [
+      {
+        "parallel": false,
+        "before": "baseline",
+        "after": "staging",
+        "throughput": {
+          "pairedPercentChanges": [
+            -1.049,
+            -7.018,
+            6.323,
+            -1.783,
+            1.339,
+            -4.892
+          ],
+          "geometricMeanPercentChange": -1.273,
+          "conditional95PercentInterval": [
+            -6.056,
+            3.754
+          ]
+        },
+        "allocated": {
+          "pairedPercentChanges": [
+            0.022,
+            0.021,
+            0.022,
+            0.022,
+            0.022,
+            0.022
+          ],
+          "geometricMeanPercentChange": 0.022,
+          "conditional95PercentInterval": [
+            0.021,
+            0.022
+          ]
+        }
+      },
+      {
+        "parallel": false,
+        "before": "staging",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            4.358,
+            15.889,
+            11.039,
+            9.798,
+            2.438,
+            19.793
+          ],
+          "geometricMeanPercentChange": 10.388,
+          "conditional95PercentInterval": [
+            3.678,
+            17.533
+          ]
+        },
+        "allocated": {
+          "pairedPercentChanges": [
+            -49.625,
+            -49.624,
+            -49.624,
+            -49.624,
+            -49.624,
+            -49.624
+          ],
+          "geometricMeanPercentChange": -49.624,
+          "conditional95PercentInterval": [
+            -49.624,
+            -49.624
+          ]
+        }
+      },
+      {
+        "parallel": false,
+        "before": "baseline",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            3.264,
+            7.756,
+            18.061,
+            7.84,
+            3.81,
+            13.932
+          ],
+          "geometricMeanPercentChange": 8.983,
+          "conditional95PercentInterval": [
+            3.12,
+            15.18
+          ]
+        },
+        "allocated": {
+          "pairedPercentChanges": [
+            -49.614,
+            -49.613,
+            -49.613,
+            -49.613,
+            -49.613,
+            -49.613
+          ],
+          "geometricMeanPercentChange": -49.613,
+          "conditional95PercentInterval": [
+            -49.614,
+            -49.613
+          ]
+        }
+      },
+      {
+        "parallel": true,
+        "before": "baseline",
+        "after": "staging",
+        "throughput": {
+          "pairedPercentChanges": [
+            112.67,
+            98.89,
+            113.364,
+            115.448,
+            102.712,
+            117.637
+          ],
+          "geometricMeanPercentChange": 110.006,
+          "conditional95PercentInterval": [
+            102.182,
+            118.134
+          ]
+        },
+        "allocated": {
+          "pairedPercentChanges": [
+            0.015,
+            0.014,
+            0.015,
+            0.014,
+            0.015,
+            0.014
+          ],
+          "geometricMeanPercentChange": 0.014,
+          "conditional95PercentInterval": [
+            0.014,
+            0.015
+          ]
+        }
+      },
+      {
+        "parallel": true,
+        "before": "staging",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            22.828,
+            18.526,
+            18.984,
+            26.561,
+            20.915,
+            14.073
+          ],
+          "geometricMeanPercentChange": 20.252,
+          "conditional95PercentInterval": [
+            15.89,
+            24.779
+          ]
+        },
+        "allocated": {
+          "pairedPercentChanges": [
+            -49.624,
+            -49.624,
+            -49.624,
+            -49.624,
+            -49.624,
+            -49.624
+          ],
+          "geometricMeanPercentChange": -49.624,
+          "conditional95PercentInterval": [
+            -49.624,
+            -49.624
+          ]
+        }
+      },
+      {
+        "parallel": true,
+        "before": "baseline",
+        "after": "after",
+        "throughput": {
+          "pairedPercentChanges": [
+            161.218,
+            135.736,
+            153.869,
+            172.674,
+            145.109,
+            148.265
+          ],
+          "geometricMeanPercentChange": 152.538,
+          "conditional95PercentInterval": [
+            139.39,
+            166.407
+          ]
+        },
+        "allocated": {
+          "pairedPercentChanges": [
+            -49.617,
+            -49.616,
+            -49.616,
+            -49.617,
+            -49.616,
+            -49.616
+          ],
+          "geometricMeanPercentChange": -49.616,
+          "conditional95PercentInterval": [
+            -49.617,
+            -49.616
+          ]
+        }
+      }
+    ],
+    "sourceArchiveVerifiedAgainstCompiledSource": true,
+    "competitorsRemeasured": false
+  },
+  "wasmSizeExploration": {
+    "complete": true,
+    "experimentalOnly": true,
+    "productionChanged": false,
+    "published": false,
+    "computeStopped": true,
+    "deploymentIds": [
+      "94282bb7-0158-403d-a697-29b679c000a2",
+      "c268be8c-2ac3-4f33-8b1c-a392f5bc5bc9"
+    ],
+    "evidence": "docs/benchmarks/2026-10-14-wasm-size-exploration",
+    "firstSourceSha256": "eea95409cbaca7071cea9c861c56a9128901bdeb120a64c8d600853aa7c3ee65",
+    "networkSourceSha256": "1d688cd0ea2ea154a90e7aa64ed4c01f0679d5d5632754ad90dadf6930f2155a",
+    "baselineReproduced": true,
+    "allVariantSmokeChecksPassed": true,
+    "results": [
+      {
+        "name": "baseline",
+        "bytes": 6504060,
+        "sha256": "d41c489a93c7a349de69c5bb415b04f4de3964bdacb12fdde8557d9d6eed9283",
+        "gzipBytes": 1805588,
+        "brotliBytes": 1328674,
+        "sections": [
+          {
+            "id": 0,
+            "name": "go:buildid",
+            "bytes": 114
+          },
+          {
+            "id": 1,
+            "bytes": 64
+          },
+          {
+            "id": 2,
+            "bytes": 718
+          },
+          {
+            "id": 3,
+            "bytes": 3808
+          },
+          {
+            "id": 4,
+            "bytes": 5
+          },
+          {
+            "id": 5,
+            "bytes": 3
+          },
+          {
+            "id": 6,
+            "bytes": 41
+          },
+          {
+            "id": 7,
+            "bytes": 33
+          },
+          {
+            "id": 9,
+            "bytes": 7516
+          },
+          {
+            "id": 10,
+            "bytes": 4094426
+          },
+          {
+            "id": 11,
+            "bytes": 2397181
+          },
+          {
+            "id": 0,
+            "name": "producers",
+            "bytes": 71
+          }
+        ],
+        "dependencyCount": 269,
+        "runtimeTestsExit": 0,
+        "isolateProbeExit": 0,
+        "savedBytes": 0,
+        "savedPercent": 0,
+        "gzipSavedPercent": 0,
+        "brotliSavedPercent": 0
+      },
+      {
+        "name": "combined",
+        "bytes": 5907813,
+        "sha256": "753bb342d7d3c4d3db59449a51eec27040f3829c6edb089d45b65b2389e35829",
+        "gzipBytes": 1656405,
+        "brotliBytes": 1229800,
+        "sections": [
+          {
+            "id": 0,
+            "name": "go:buildid",
+            "bytes": 114
+          },
+          {
+            "id": 1,
+            "bytes": 64
+          },
+          {
+            "id": 2,
+            "bytes": 718
+          },
+          {
+            "id": 3,
+            "bytes": 3612
+          },
+          {
+            "id": 4,
+            "bytes": 5
+          },
+          {
+            "id": 5,
+            "bytes": 3
+          },
+          {
+            "id": 6,
+            "bytes": 41
+          },
+          {
+            "id": 7,
+            "bytes": 33
+          },
+          {
+            "id": 9,
+            "bytes": 7124
+          },
+          {
+            "id": 10,
+            "bytes": 3714250
+          },
+          {
+            "id": 11,
+            "bytes": 2181698
+          },
+          {
+            "id": 0,
+            "name": "producers",
+            "bytes": 71
+          }
+        ],
+        "dependencyCount": 192,
+        "runtimeTestsExit": 0,
+        "isolateProbeExit": 0,
+        "savedBytes": 596247,
+        "savedPercent": 9.167304729661165,
+        "gzipSavedPercent": 8.262294609844549,
+        "brotliSavedPercent": 7.441554512243033
+      },
+      {
+        "name": "network-free",
+        "bytes": 4652200,
+        "sha256": "e96af59d023e717a6be6019df96776fefe326f3e004a209234cfe660caac5fe0",
+        "gzipBytes": 1264837,
+        "brotliBytes": 931587,
+        "sections": [
+          {
+            "id": 0,
+            "name": "go:buildid",
+            "bytes": 114
+          },
+          {
+            "id": 1,
+            "bytes": 64
+          },
+          {
+            "id": 2,
+            "bytes": 718
+          },
+          {
+            "id": 3,
+            "bytes": 3015
+          },
+          {
+            "id": 4,
+            "bytes": 5
+          },
+          {
+            "id": 5,
+            "bytes": 3
+          },
+          {
+            "id": 6,
+            "bytes": 41
+          },
+          {
+            "id": 7,
+            "bytes": 33
+          },
+          {
+            "id": 9,
+            "bytes": 5930
+          },
+          {
+            "id": 10,
+            "bytes": 2952873
+          },
+          {
+            "id": 11,
+            "bytes": 1689253
+          },
+          {
+            "id": 0,
+            "name": "producers",
+            "bytes": 71
+          }
+        ],
+        "dependencyCount": 123,
+        "runtimeTestsExit": 0,
+        "isolateProbeExit": 0,
+        "savedBytes": 1851860,
+        "savedPercent": 28.472369566086414,
+        "gzipSavedPercent": 29.94874799788213,
+        "brotliSavedPercent": 29.885961492435314
+      },
+      {
+        "name": "network-free-wasm-opt",
+        "bytes": 4379510,
+        "sha256": "ef688ab06fa7aa8da0d5b6a0383a1a764b526adab413adeaba90e7da03115a2f",
+        "gzipBytes": 1260753,
+        "brotliBytes": 939096,
+        "sections": [
+          {
+            "id": 1,
+            "bytes": 254
+          },
+          {
+            "id": 2,
+            "bytes": 689
+          },
+          {
+            "id": 3,
+            "bytes": 3082
+          },
+          {
+            "id": 4,
+            "bytes": 5
+          },
+          {
+            "id": 5,
+            "bytes": 3
+          },
+          {
+            "id": 6,
+            "bytes": 41
+          },
+          {
+            "id": 7,
+            "bytes": 33
+          },
+          {
+            "id": 9,
+            "bytes": 5900
+          },
+          {
+            "id": 12,
+            "bytes": 3
+          },
+          {
+            "id": 10,
+            "bytes": 2680019
+          },
+          {
+            "id": 11,
+            "bytes": 1689253
+          },
+          {
+            "id": 0,
+            "name": "go:buildid",
+            "bytes": 114
+          },
+          {
+            "id": 0,
+            "name": "producers",
+            "bytes": 71
+          }
+        ],
+        "dependencyCount": 123,
+        "runtimeTestsExit": 0,
+        "isolateProbeExit": 0,
+        "savedBytes": 2124550,
+        "savedPercent": 32.66498156536071,
+        "gzipSavedPercent": 30.174934702711802,
+        "brotliSavedPercent": 29.320811576052517
+      }
+    ],
+    "fullValidationComplete": false
+  },
+  "embeddedApiOptimization": {
+    "complete": true,
+    "computeStopped": true,
+    "published": false,
+    "evidence": "docs/benchmarks/2026-10-14-embedded-api",
+    "validationDeploymentId": "f46a2abe-b6a3-493f-ac0c-bad635c88846",
+    "validationSourceSha256": "083e02e8684a2f86d8b448bbd394b50d9717ee674415918c2a1c4780ad2a48e7",
+    "redDeploymentId": "6668d04c-b89c-4f18-b5c3-f54bb79141e4",
+    "memoryDiagnosisDeploymentId": "2f130a39-ac00-4ba5-870e-47e925456f8d",
+    "recoveryDeploymentId": "c60a4545-3a19-43e9-b35d-328f76677108",
+    "supersededValidationDeploymentIds": [
+      "fe268059-0cc2-4571-8ca4-582e2abd8924",
+      "72cc6276-6220-48e6-8263-e744fb302416",
+      "d2e89682-01b4-4077-9d4d-fd12186a064f",
+      "ed67e1d0-7f5c-4389-8e61-af526eb30784"
+    ],
+    "exportRetryRedeployId": "d0b28c22-89c0-4985-a5d1-49460bdca35a",
+    "sdkCopiedAndVerified": true,
+    "wasmBytes": 4610006,
+    "wasmSha256": "299ee696ddc9147adae6aecf0dbe16572af76ace056383bbd2da5ba173dc71d8",
+    "size": {
+      "complete": true,
+      "before": {
+        "bytes": 6504060,
+        "sha256": "d41c489a93c7a349de69c5bb415b04f4de3964bdacb12fdde8557d9d6eed9283",
+        "gzipBytes": 1805588,
+        "brotliBytes": 1328674
+      },
+      "after": {
+        "bytes": 4610006,
+        "sha256": "299ee696ddc9147adae6aecf0dbe16572af76ace056383bbd2da5ba173dc71d8",
+        "gzipBytes": 1255970,
+        "brotliBytes": 924486
+      },
+      "savedBytes": 1894054,
+      "savedPercent": 29.121102818854684,
+      "gzipSavedPercent": 30.43983455804979,
+      "brotliSavedPercent": 30.42040410213491,
+      "toolchain": "go version go1.25.6 linux/amd64",
+      "method": "Same pinned Go compiler and release flags; exact pre-refactor SDK reproduced; canonical embedded API extracted without changing native workspace behavior."
+    },
+    "exploratoryPerformanceSummary": [
+      {
+        "variant": "before",
+        "medianReadyMs": 67.1809005,
+        "medianFirstWriteMs": 92.686518,
+        "medianPutGetPairsPerSecond": 106.79816675392212
+      },
+      {
+        "variant": "after",
+        "medianReadyMs": 51.181726000000005,
+        "medianFirstWriteMs": 74.1794625,
+        "medianPutGetPairsPerSecond": 114.95994938614172
+      }
+    ],
+    "checks": [
+      "make standards",
+      "make test-conformance",
+      "make test-node test-wasm",
+      "make test-browser",
+      "protobuf generated-source drift check",
+      "Railway Chromium chart controls and desktop/mobile previews"
+    ],
+    "browserTestsPassed": 33,
+    "browserTestsSkipped": 2,
+    "publicApiInventoryUnchanged": true,
+    "competitorsRemeasured": false
+  },
+  "hotPathOptimization": {
+    "complete": true,
+    "deploymentId": "90f1a2b9-696c-43c6-8985-b94643bf335d",
+    "qualifiedSource": {
+      "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+      "dirtyFiles": [
+        "M CONTEXT.md",
+        " M Makefile",
+        " M cmd/stow-wasm/binary_js.go",
+        " M cmd/stow-wasm/host-store-range.go",
+        " M cmd/stow-wasm/host_store_io_js.go",
+        " M cmd/stow-wasm/host_store_js.go",
+        " M cmd/stow-wasm/host_store_sessions_js.go",
+        " M cmd/stow-wasm/main.go",
+        " M cmd/stow-wasm/operations.go",
+        " M docs/CODE_STANDARDS.md",
+        " M docs/README.md",
+        " M docs/adr/0008-workspace-backend-real-files.md",
+        " M docs/adr/README.md",
+        " M docs/api/go.md",
+        " M docs/portable-workspace-usage.md",
+        " M go.mod",
+        " M go.sum",
+        " M internal/atomicfile/atomicfile.go",
+        " M internal/runtime/adapter.go",
+        " M internal/runtime/buckets.go",
+        " M internal/runtime/instance.go",
+        " M internal/runtime/multipart.go",
+        " M internal/runtime/objects.go",
+        " M internal/runtime/save_requests.go",
+        " M internal/runtime/staged-reset_test.go",
+        " M internal/runtime/staged-writes.go",
+        " M internal/runtime/state.go",
+        " M internal/runtime/stream-writes.go",
+        " M internal/runtime/streams.go",
+        " M internal/runtime/streams_test.go",
+        " M internal/runtime/types.go",
+        " M internal/runtime/workspace_usage.go",
+        " M internal/s3api/checksum_test.go",
+        " M internal/s3api/errors.go",
+        " M internal/s3api/handlers_bucket.go",
+        " M internal/s3api/handlers_multipart.go",
+        " M internal/s3api/request.go",
+        " M internal/s3api/request_internal_test.go",
+        " M internal/storage/bytes.go",
+        " M internal/storage/checksum.go",
+        " M internal/storage/fs/capacity.go",
+        " M internal/storage/fs/fs.go",
+        " M internal/storage/fs/fs_atomic.go",
+        " M internal/storage/fs/fs_copy.go",
+        " M internal/storage/fs/fs_list.go",
+        " M internal/storage/fs/fs_multipart.go",
+        " M internal/storage/fs/fs_put.go",
+        " M internal/storage/fs/fs_records.go",
+        " M internal/storage/fs/recovery_holds.go",
+        " M internal/storage/fs/save_requests.go",
+        " M internal/storage/memory.go",
+        " M internal/storage/store.go",
+        " M internal/storage/types.go",
+        " M internal/storage/util.go",
+        " M internal/storage/workspace/objects.go",
+        " M internal/storage/workspace/recovery_holds.go",
+        " M packages/stow-s3/dist/stow-runtime.wasm",
+        " M packages/stow-s3/scripts/browser-tests/worker.spec.mjs",
+        " M packages/stow-s3/src/browser-wasm-host.ts",
+        " M pkg/stow/errors.go",
+        " M pkg/stow/filesystem.go",
+        " M pkg/stow/guarded_save.go",
+        " M pkg/stow/object_recovery.go",
+        " M pkg/stow/prepare.go",
+        " M pkg/stow/runtime.go",
+        " M pkg/stow/save_requests.go",
+        " M pkg/stow/staged.go",
+        " M pkg/stow/staged_test.go",
+        " M pkg/stow/store.go",
+        " M pkg/stow/streams.go",
+        " M pkg/stow/types.go",
+        " M pkg/stow/workspace.go",
+        " M pkg/stow/workspace_facade.go",
+        " M scripts/baselines/go-coverage.json",
+        " M scripts/baselines/go-quality.json",
+        " M scripts/check-coverage.mjs",
+        " M scripts/check-coverage.test.mjs",
+        " M scripts/wasm-agent-workload.mjs",
+        " M scripts/wasm-agent-workload.test.mjs",
+        " M site/build.mjs",
+        " M site/index.html",
+        " M tools/api-reference/main.go",
+        " M tools/quality/main.go",
+        "?? .github/workflows/performance.yml",
+        "?? benchmark/",
+        "?? docs/adr/0020-binary-object-records.md",
+        "?? docs/benchmarks/2026-10-12-performance/",
+        "?? docs/benchmarks/2026-10-13-competitor-performance/",
+        "?? docs/benchmarks/2026-10-13-controlled-write-preparation/",
+        "?? docs/benchmarks/2026-10-13-memory-performance/",
+        "?? docs/benchmarks/2026-10-13-railway-performance/",
+        "?? docs/benchmarks/2026-10-13-storage-optimization/",
+        "?? docs/benchmarks/2026-10-13-streaming-performance/",
+        "?? docs/benchmarks/2026-10-13-usage-recovery/",
+        "?? docs/benchmarks/2026-10-13-wasm-size/",
+        "?? docs/benchmarks/2026-10-13-write-preparation/",
+        "?? docs/benchmarks/2026-10-14-embedded-api/",
+        "?? docs/benchmarks/2026-10-14-hot-paths/",
+        "?? docs/benchmarks/2026-10-14-memory-put-diagnosis/",
+        "?? docs/benchmarks/2026-10-14-memory-write-staging/",
+        "?? docs/benchmarks/2026-10-14-owned-http-body/",
+        "?? docs/benchmarks/2026-10-14-wasm-size-exploration/",
+        "?? docs/benchmarks/performance-local.json",
+        "?? docs/benchmarks/performance-qualification.json",
+        "?? docs/benchmarks/railway-environment.json",
+        "?? docs/performance-testing.md",
+        "?? docs/railway-performance.md",
+        "?? internal/atomicfile/stream_test.go",
+        "?? internal/embedded/",
+        "?? internal/recoveryerrors/",
+        "?? internal/runtime/disk_staging_test.go",
+        "?? internal/runtime/managed_usage_test.go",
+        "?? internal/runtime/memory_staging_test.go",
+        "?? internal/runtime/owned_body_test.go",
+        "?? internal/runtime/read_concurrency_test.go",
+        "?? internal/runtime/stream_allocation_test.go",
+        "?? internal/runtime/stream_copy.go",
+        "?? internal/runtime/stream_performance_test.go",
+        "?? internal/runtime/usage_multipart.go",
+        "?? internal/runtime/usage_recovery.go",
+        "?? internal/runtime/usage_state.go",
+        "?? internal/runtime/usage_transitions_test.go",
+        "?? internal/s3api/owned_body_allocation_test.go",
+        "?? internal/storage/bucket_address_test.go",
+        "?? internal/storage/fs/disk_performance_test.go",
+        "?? internal/storage/fs/record_codec.go",
+        "?? internal/storage/fs/record_format_test.go",
+        "?? internal/storage/fs/record_io.go",
+        "?? internal/storage/fs/record_performance_test.go",
+        "?? internal/storage/fs/record_stream_test.go",
+        "?? internal/storage/fs/recordpb/",
+        "?? internal/storage/fs/runtime_recovery_test.go",
+        "?? internal/storage/fs/save_checksum_test.go",
+        "?? internal/storage/fs/staged_put.go",
+        "?? internal/storage/fs/staged_put_test.go",
+        "?? internal/storage/fs/usage_revision.go",
+        "?? internal/storage/memory_staged.go",
+        "?? internal/storage/memory_staged_test.go",
+        "?? internal/storage/owned_body.go",
+        "?? internal/storage/owned_body_test.go",
+        "?? internal/storage/owned_reader.go",
+        "?? internal/storage/owned_reader_test.go",
+        "?? internal/storage/put_body.go",
+        "?? internal/storage/put_body_contract_test.go",
+        "?? internal/storage/stream_prepare.go",
+        "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+        "?? packages/stow-s3/scripts/performance/",
+        "?? pkg/stow/filesystem_native.go",
+        "?? pkg/stow/filesystem_recovery_test.go",
+        "?? pkg/stow/filesystem_unsupported.go",
+        "?? pkg/stow/performance_benchmark_test.go",
+        "?? pkg/stow/read_performance_test.go",
+        "?? pkg/stow/wasm_dependencies_test.go",
+        "?? scripts/benchmark-embedded.mjs",
+        "?? scripts/performance.test.mjs",
+        "?? site/assets/benchmark-render.js",
+        "?? site/assets/benchmarks.css",
+        "?? site/assets/benchmarks.js",
+        "?? site/benchmark-data.json",
+        "?? tools/quality/generated.go",
+        "?? tools/quality/generated_test.go"
+      ],
+      "payloadSha256": "c596fb839153e5862e1a0117af9d6a3db0b44ed7ebb23f296a6d9d45aa5b8ed8",
+      "note": "Complete source snapshot; production and benchmark equality verified after extracting a regression-test worker to meet the quality gate"
+    },
+    "measuredSource": {
+      "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+      "dirtyFiles": [
+        "M CONTEXT.md",
+        " M Makefile",
+        " M cmd/stow-wasm/binary_js.go",
+        " M cmd/stow-wasm/host-store-range.go",
+        " M cmd/stow-wasm/host_store_io_js.go",
+        " M cmd/stow-wasm/host_store_js.go",
+        " M cmd/stow-wasm/host_store_sessions_js.go",
+        " M cmd/stow-wasm/main.go",
+        " M cmd/stow-wasm/operations.go",
+        " M docs/CODE_STANDARDS.md",
+        " M docs/README.md",
+        " M docs/adr/0008-workspace-backend-real-files.md",
+        " M docs/adr/README.md",
+        " M docs/api/go.md",
+        " M docs/portable-workspace-usage.md",
+        " M go.mod",
+        " M go.sum",
+        " M internal/atomicfile/atomicfile.go",
+        " M internal/runtime/adapter.go",
+        " M internal/runtime/buckets.go",
+        " M internal/runtime/instance.go",
+        " M internal/runtime/multipart.go",
+        " M internal/runtime/objects.go",
+        " M internal/runtime/save_requests.go",
+        " M internal/runtime/staged-reset_test.go",
+        " M internal/runtime/staged-writes.go",
+        " M internal/runtime/state.go",
+        " M internal/runtime/stream-writes.go",
+        " M internal/runtime/streams.go",
+        " M internal/runtime/streams_test.go",
+        " M internal/runtime/types.go",
+        " M internal/runtime/workspace_usage.go",
+        " M internal/s3api/checksum_test.go",
+        " M internal/s3api/errors.go",
+        " M internal/s3api/handlers_bucket.go",
+        " M internal/s3api/handlers_multipart.go",
+        " M internal/s3api/request.go",
+        " M internal/s3api/request_internal_test.go",
+        " M internal/storage/bytes.go",
+        " M internal/storage/checksum.go",
+        " M internal/storage/fs/capacity.go",
+        " M internal/storage/fs/fs.go",
+        " M internal/storage/fs/fs_atomic.go",
+        " M internal/storage/fs/fs_copy.go",
+        " M internal/storage/fs/fs_list.go",
+        " M internal/storage/fs/fs_multipart.go",
+        " M internal/storage/fs/fs_put.go",
+        " M internal/storage/fs/fs_records.go",
+        " M internal/storage/fs/recovery_holds.go",
+        " M internal/storage/fs/save_requests.go",
+        " M internal/storage/memory.go",
+        " M internal/storage/store.go",
+        " M internal/storage/types.go",
+        " M internal/storage/util.go",
+        " M internal/storage/workspace/objects.go",
+        " M internal/storage/workspace/recovery_holds.go",
+        " M packages/stow-s3/dist/stow-runtime.wasm",
+        " M packages/stow-s3/scripts/browser-tests/worker.spec.mjs",
+        " M packages/stow-s3/src/browser-wasm-host.ts",
+        " M pkg/stow/errors.go",
+        " M pkg/stow/filesystem.go",
+        " M pkg/stow/guarded_save.go",
+        " M pkg/stow/object_recovery.go",
+        " M pkg/stow/prepare.go",
+        " M pkg/stow/runtime.go",
+        " M pkg/stow/save_requests.go",
+        " M pkg/stow/staged.go",
+        " M pkg/stow/staged_test.go",
+        " M pkg/stow/store.go",
+        " M pkg/stow/streams.go",
+        " M pkg/stow/types.go",
+        " M pkg/stow/workspace.go",
+        " M pkg/stow/workspace_facade.go",
+        " M scripts/baselines/go-coverage.json",
+        " M scripts/baselines/go-quality.json",
+        " M scripts/check-coverage.mjs",
+        " M scripts/check-coverage.test.mjs",
+        " M scripts/wasm-agent-workload.mjs",
+        " M scripts/wasm-agent-workload.test.mjs",
+        " M site/build.mjs",
+        " M site/index.html",
+        " M tools/api-reference/main.go",
+        " M tools/quality/main.go",
+        "?? .github/workflows/performance.yml",
+        "?? benchmark/",
+        "?? docs/adr/0020-binary-object-records.md",
+        "?? docs/benchmarks/2026-10-12-performance/",
+        "?? docs/benchmarks/2026-10-13-competitor-performance/",
+        "?? docs/benchmarks/2026-10-13-controlled-write-preparation/",
+        "?? docs/benchmarks/2026-10-13-memory-performance/",
+        "?? docs/benchmarks/2026-10-13-railway-performance/",
+        "?? docs/benchmarks/2026-10-13-storage-optimization/",
+        "?? docs/benchmarks/2026-10-13-streaming-performance/",
+        "?? docs/benchmarks/2026-10-13-usage-recovery/",
+        "?? docs/benchmarks/2026-10-13-wasm-size/",
+        "?? docs/benchmarks/2026-10-13-write-preparation/",
+        "?? docs/benchmarks/2026-10-14-embedded-api/",
+        "?? docs/benchmarks/2026-10-14-hot-paths/",
+        "?? docs/benchmarks/2026-10-14-memory-put-diagnosis/",
+        "?? docs/benchmarks/2026-10-14-memory-write-staging/",
+        "?? docs/benchmarks/2026-10-14-owned-http-body/",
+        "?? docs/benchmarks/2026-10-14-wasm-size-exploration/",
+        "?? docs/benchmarks/performance-local.json",
+        "?? docs/benchmarks/performance-qualification.json",
+        "?? docs/benchmarks/railway-environment.json",
+        "?? docs/performance-testing.md",
+        "?? docs/railway-performance.md",
+        "?? internal/atomicfile/stream_test.go",
+        "?? internal/embedded/",
+        "?? internal/recoveryerrors/",
+        "?? internal/runtime/disk_staging_test.go",
+        "?? internal/runtime/managed_usage_test.go",
+        "?? internal/runtime/memory_staging_test.go",
+        "?? internal/runtime/owned_body_test.go",
+        "?? internal/runtime/read_concurrency_test.go",
+        "?? internal/runtime/stream_allocation_test.go",
+        "?? internal/runtime/stream_copy.go",
+        "?? internal/runtime/stream_performance_test.go",
+        "?? internal/runtime/usage_multipart.go",
+        "?? internal/runtime/usage_recovery.go",
+        "?? internal/runtime/usage_state.go",
+        "?? internal/runtime/usage_transitions_test.go",
+        "?? internal/s3api/owned_body_allocation_test.go",
+        "?? internal/storage/bucket_address_test.go",
+        "?? internal/storage/fs/disk_performance_test.go",
+        "?? internal/storage/fs/record_codec.go",
+        "?? internal/storage/fs/record_format_test.go",
+        "?? internal/storage/fs/record_io.go",
+        "?? internal/storage/fs/record_performance_test.go",
+        "?? internal/storage/fs/record_stream_test.go",
+        "?? internal/storage/fs/recordpb/",
+        "?? internal/storage/fs/runtime_recovery_test.go",
+        "?? internal/storage/fs/save_checksum_test.go",
+        "?? internal/storage/fs/staged_put.go",
+        "?? internal/storage/fs/staged_put_test.go",
+        "?? internal/storage/fs/usage_revision.go",
+        "?? internal/storage/memory_staged.go",
+        "?? internal/storage/memory_staged_test.go",
+        "?? internal/storage/owned_body.go",
+        "?? internal/storage/owned_body_test.go",
+        "?? internal/storage/owned_reader.go",
+        "?? internal/storage/owned_reader_test.go",
+        "?? internal/storage/put_body.go",
+        "?? internal/storage/put_body_contract_test.go",
+        "?? internal/storage/stream_prepare.go",
+        "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+        "?? packages/stow-s3/scripts/performance/",
+        "?? pkg/stow/filesystem_native.go",
+        "?? pkg/stow/filesystem_recovery_test.go",
+        "?? pkg/stow/filesystem_unsupported.go",
+        "?? pkg/stow/performance_benchmark_test.go",
+        "?? pkg/stow/read_performance_test.go",
+        "?? pkg/stow/wasm_dependencies_test.go",
+        "?? scripts/benchmark-embedded.mjs",
+        "?? scripts/performance.test.mjs",
+        "?? site/assets/benchmark-render.js",
+        "?? site/assets/benchmarks.css",
+        "?? site/assets/benchmarks.js",
+        "?? site/benchmark-data.json",
+        "?? tools/quality/generated.go",
+        "?? tools/quality/generated_test.go"
+      ],
+      "payloadSha256": "a832e92147e582bd20157e0d0a68dea889d7b5a4095364f2f9365acae3cabbcb",
+      "note": "Complete source snapshot after preserving explicit prefix-reader failures; all measurements are rerun; container verification uses an orphan subreaper"
+    },
+    "sourceEqualityProof": "2026-10-14-hot-paths/final/verification/hot-paths/reuse.json",
+    "sdkCopiedAndVerified": true,
+    "wasm": {
+      "before": {
+        "bytes": 4610006,
+        "sha256": "299ee696ddc9147adae6aecf0dbe16572af76ace056383bbd2da5ba173dc71d8",
+        "gzipBytes": 1255970,
+        "brotliBytes": 924486
+      },
+      "after": {
+        "bytes": 4610009,
+        "sha256": "99a8688b9f04c07f986846db77cfc8ae8ab148e6c27b22c3c24202c62e3ec47f",
+        "gzipBytes": 1256892,
+        "brotliBytes": 925382
+      }
+    },
+    "checks": [
+      "make standards",
+      "make test-conformance",
+      "make test-node test-wasm",
+      "make test-browser",
+      "protobuf generated-source drift check",
+      "Railway Chromium chart controls and desktop/mobile previews"
+    ],
+    "browser": {
+      "startTime": "2026-10-14T17:36:01.470Z",
+      "duration": 11674.000999999998,
+      "expected": 34,
+      "skipped": 2,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "scope": "Owned concurrent GET, bounded unbound-filesystem PUT/COPY, compact workspace index, browser WASM streaming startup and read-buffer reuse",
+    "evidence": "2026-10-14-hot-paths",
+    "published": false,
+    "retainedCloudRoot": "/results/hot-paths-90f1a2b9-696c-43c6-8985-b94643bf335d"
+  },
+  "previousCompetitorComparison": {
+    "runId": "59d62a35-6293-4ddb-a06f-ce041bd9b9c9",
+    "complete": true,
+    "sourcePayloadSha256": "8289f7bec9339e6e1ea26d70ad6eea40f99ef1be657d75c0762edb7981463447",
+    "runnerDeploymentId": "04b6d0a7-410a-4e84-967d-a61edb045907",
+    "targetDeploymentId": "99d14a9b-b8cb-4618-a814-08d097b3b7b7",
+    "sameBuild": true,
+    "s3Runs": 54,
+    "nativeSamples": 486,
+    "goStartupSamples": 360,
+    "nodeStartupSamples": 60,
+    "smokeRunId": "67816dc6-208f-4674-9f5b-dd0920fe5ebd",
+    "evidence": "2026-10-13-competitor-performance",
+    "startedAt": "2026-10-13T19:55:06.340Z",
+    "finishedAt": "2026-10-13T20:22:58.318Z"
+  },
+  "releaseQualification": {
+    "version": "0.3.0",
+    "qualifiedCommit": "55fc5282f6b40cac6631e88761ed2fa7c6929fad",
+    "finalDocumentationCommit": "a0586497064022871e19ebbf3c3e246b5bab203a",
+    "complete": true,
+    "published": true,
+    "computeStopped": true,
+    "rehearsalRunId": 38620413286,
+    "prUrl": "https://github.com/chester-hill-solutions/stow-s3/pull/61",
+    "evidence": "../assessment-evidence/2026-10-14-release",
+    "retainedNativeArchives": "/results/release-030-native-55fc528",
+    "retainedReceipts": "/results/release-0.3.0-55fc528",
+    "reviewRequirement": 1,
+    "mergedCommit": "09421edbe3d66e4653795d5459836547307d57c7",
+    "taggedReleaseRunId": 38625054848,
+    "releaseUrl": "https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.0",
+    "publishedAt": "2026-10-14T19:44:30Z",
+    "publishedDownloadVerificationComplete": true,
+    "publishedArchivesRetainedAt": "/results/release-030-published"
+  }
+}

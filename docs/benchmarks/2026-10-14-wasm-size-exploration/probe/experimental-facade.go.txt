@@ -1,0 +1,25 @@
+package stow
+import "context"
+type WorkspaceFacade struct {
+	MaxMultipartUploads   int64  `json:"max_multipart_uploads"`
+	MaxConcurrentRequests int    `json:"max_concurrent_requests"`
+	MaxRequestBytes       int64  `json:"max_request_bytes"`
+	Endpoint              string `json:"endpoint"`
+	Region                string `json:"region"`
+	AccessKeyID           string `json:"access_key_id"`
+	SecretAccessKey       string `json:"secret_access_key"`
+}
+
+
+type WorkspaceFacadeOptions struct {
+	MaxRequestBytes       int64
+	MaxConcurrentRequests int
+}
+
+
+type workspaceServer struct{}
+func (w *Workspace) Facade() (*WorkspaceFacade, error) { return w.FacadeWithOptions(WorkspaceFacadeOptions{}) }
+func (w *Workspace) FacadeWithOptions(WorkspaceFacadeOptions) (*WorkspaceFacade, error) { return nil, ErrUnsupportedBackend }
+func (w *Workspace) closeRuntimeLocked() error { if w.closed { return nil }; w.closing = true; return w.Runtime.Close() }
+func (w *Workspace) closeLocked() error { if err := w.closeRuntimeLocked(); err != nil { return err }; if err := w.session.Release(); err != nil { return err }; w.closed = true; return nil }
+func (w *Workspace) RefreshUsage(ctx context.Context) error { return w.Runtime.inner.RefreshUsage(ctx) }

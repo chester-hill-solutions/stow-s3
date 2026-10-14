@@ -1,0 +1,49 @@
+File: stow-s3-profile
+Build ID: 67990ab223c39b697e4617995e4fd361102ea7d9
+Type: cpu
+Time: 2026-10-14 04:38:36 UTC
+Duration: 23s, Total samples = 16.65s (72.39%)
+Showing nodes accounting for 15.42s, 92.61% of 16.65s total
+Dropped 257 nodes (cum <= 0.08s)
+Showing top 40 nodes out of 101
+      flat  flat%   sum%        cum   cum%
+     8.11s 48.71% 48.71%      8.11s 48.71%  internal/runtime/syscall.Syscall6
+     4.14s 24.86% 73.57%      4.14s 24.86%  crypto/md5.block
+     1.98s 11.89% 85.47%      1.98s 11.89%  crypto/internal/fips140/sha256.blockSHANI
+     0.23s  1.38% 86.85%      0.23s  1.38%  hash/crc32.ieeeCLMUL
+     0.14s  0.84% 87.69%      0.14s  0.84%  runtime.futex
+     0.14s  0.84% 88.53%      0.14s  0.84%  runtime.memmove
+     0.12s  0.72% 89.25%      0.12s  0.72%  runtime.memclrNoHeapPointers
+     0.09s  0.54% 89.79%      0.09s  0.54%  runtime.nanotime (inline)
+     0.07s  0.42% 90.21%      1.11s  6.67%  runtime.findRunnable
+     0.05s   0.3% 90.51%      7.83s 47.03%  github.com/chester-hill-solutions/stow-s3/internal/storage.readOwnedBytes
+     0.03s  0.18% 90.69%      7.41s 44.50%  net/http.(*body).Read
+     0.03s  0.18% 90.87%      7.44s 44.68%  net/http.(*maxBytesReader).Read
+     0.03s  0.18% 91.05%      0.82s  4.92%  runtime.netpoll
+     0.03s  0.18% 91.23%      0.19s  1.14%  runtime.reentersyscall
+     0.02s  0.12% 91.35%      7.38s 44.32%  net/http.(*body).readLocked
+     0.02s  0.12% 91.47%     15.14s 90.93%  net/http.(*conn).serve
+     0.02s  0.12% 91.59%      7.46s 44.80%  net/http.(*connReader).Read
+     0.02s  0.12% 91.71%      0.11s  0.66%  runtime.casgstatus
+     0.02s  0.12% 91.83%      7.34s 44.08%  syscall.RawSyscall6
+     0.02s  0.12% 91.95%      7.35s 44.14%  syscall.read
+     0.01s  0.06% 92.01%      7.34s 44.08%  bufio.(*Reader).Read
+     0.01s  0.06% 92.07%      7.61s 45.71%  github.com/chester-hill-solutions/stow-s3/internal/s3api.requestBody
+     0.01s  0.06% 92.13%      4.61s 27.69%  github.com/chester-hill-solutions/stow-s3/internal/storage.(*MemoryStore).PutObject
+     0.01s  0.06% 92.19%      7.41s 44.50%  internal/poll.(*FD).Read
+     0.01s  0.06% 92.25%      7.62s 45.77%  internal/poll.ignoringEINTRIO (inline)
+     0.01s  0.06% 92.31%      7.43s 44.62%  net.(*conn).Read
+     0.01s  0.06% 92.37%      0.20s  1.20%  runtime.entersyscall
+     0.01s  0.06% 92.43%      0.22s  1.32%  runtime.gcDrain
+     0.01s  0.06% 92.49%      0.15s   0.9%  runtime.markroot
+     0.01s  0.06% 92.55%      0.13s  0.78%  runtime.memclrNoHeapPointersChunked
+     0.01s  0.06% 92.61%      1.16s  6.97%  runtime.schedule
+         0     0% 92.61%      0.13s  0.78%  bufio.(*Reader).Peek
+         0     0% 92.61%      0.13s  0.78%  bufio.(*Reader).fill
+         0     0% 92.61%      0.14s  0.84%  bufio.(*Writer).Flush
+         0     0% 92.61%      0.12s  0.72%  bytes.(*Reader).Read
+         0     0% 92.61%      2.21s 13.27%  bytes.(*Reader).WriteTo
+         0     0% 92.61%      1.98s 11.89%  crypto/internal/fips140/sha256.(*Digest).Write
+         0     0% 92.61%      1.98s 11.89%  crypto/internal/fips140/sha256.block
+         0     0% 92.61%      4.14s 24.86%  crypto/md5.(*digest).Write
+         0     0% 92.61%      4.14s 24.86%  crypto/md5.Sum

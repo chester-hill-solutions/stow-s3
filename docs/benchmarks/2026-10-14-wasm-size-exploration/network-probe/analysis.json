@@ -1,0 +1,424 @@
+{
+  "complete": true,
+  "baselineReproduced": true,
+  "analysisOnRailway": true,
+  "removedDependencies": [
+    "vendor/golang.org/x/net/dns/dnsmessage",
+    "internal/nettrace",
+    "internal/singleflight",
+    "net",
+    "crypto/sha3",
+    "crypto/internal/fips140hash",
+    "crypto/hmac",
+    "container/list",
+    "crypto/aes",
+    "crypto/des",
+    "crypto/internal/fips140/nistec/fiat",
+    "crypto/internal/fips140/nistec",
+    "crypto/internal/fips140/ecdh",
+    "crypto/internal/fips140/edwards25519/field",
+    "crypto/ecdh",
+    "crypto/elliptic",
+    "crypto/internal/boring/bbig",
+    "crypto/internal/fips140/bigmod",
+    "crypto/internal/fips140/ecdsa",
+    "crypto/internal/fips140cache",
+    "crypto/sha512",
+    "internal/saferio",
+    "encoding/asn1",
+    "vendor/golang.org/x/crypto/cryptobyte/asn1",
+    "vendor/golang.org/x/crypto/cryptobyte",
+    "crypto/ecdsa",
+    "crypto/internal/fips140/edwards25519",
+    "crypto/internal/fips140/ed25519",
+    "crypto/ed25519",
+    "crypto/internal/fips140/hkdf",
+    "crypto/hkdf",
+    "crypto/internal/fips140/mlkem",
+    "crypto/internal/fips140/tls12",
+    "crypto/internal/fips140/tls13",
+    "vendor/golang.org/x/crypto/internal/alias",
+    "vendor/golang.org/x/crypto/chacha20",
+    "vendor/golang.org/x/crypto/internal/poly1305",
+    "vendor/golang.org/x/crypto/chacha20poly1305",
+    "crypto/internal/hpke",
+    "crypto/rc4",
+    "crypto/internal/fips140/rsa",
+    "crypto/rsa",
+    "crypto/fips140",
+    "crypto/tls/internal/fips140tls",
+    "crypto/dsa",
+    "crypto/x509/pkix",
+    "encoding/pem",
+    "net/url",
+    "crypto/x509",
+    "crypto/tls",
+    "vendor/golang.org/x/text/transform",
+    "log/internal",
+    "log",
+    "vendor/golang.org/x/text/unicode/bidi",
+    "vendor/golang.org/x/text/secure/bidirule",
+    "vendor/golang.org/x/text/unicode/norm",
+    "vendor/golang.org/x/net/idna",
+    "net/textproto",
+    "vendor/golang.org/x/net/http/httpguts",
+    "vendor/golang.org/x/net/http/httpproxy",
+    "vendor/golang.org/x/net/http2/hpack",
+    "mime",
+    "mime/quotedprintable",
+    "mime/multipart",
+    "net/http/httptrace",
+    "net/http/internal",
+    "net/http/internal/ascii",
+    "net/http/internal/httpcommon",
+    "net/http",
+    "github.com/chester-hill-solutions/stow-s3/internal/auth",
+    "encoding/xml",
+    "github.com/aws/aws-sdk-go-v2/internal/rand",
+    "github.com/aws/aws-sdk-go-v2/internal/sdk",
+    "runtime/debug",
+    "github.com/aws/aws-sdk-go-v2/internal/sync/singleflight",
+    "github.com/aws/smithy-go/context",
+    "github.com/aws/smithy-go/internal/sync/singleflight",
+    "github.com/aws/smithy-go/logging",
+    "github.com/aws/smithy-go/middleware",
+    "github.com/aws/smithy-go/document",
+    "github.com/aws/smithy-go",
+    "github.com/aws/smithy-go/auth",
+    "github.com/aws/smithy-go/traits",
+    "github.com/aws/smithy-go/eventstream",
+    "github.com/aws/smithy-go/metrics",
+    "github.com/aws/smithy-go/sync",
+    "github.com/aws/smithy-go/time",
+    "github.com/aws/smithy-go/tracing",
+    "github.com/aws/smithy-go/transport/http/internal/io",
+    "net/http/httputil",
+    "github.com/aws/smithy-go/transport/http",
+    "github.com/aws/smithy-go/auth/bearer",
+    "github.com/aws/smithy-go/ptr",
+    "github.com/aws/aws-sdk-go-v2/aws",
+    "github.com/aws/smithy-go/rand",
+    "github.com/aws/aws-sdk-go-v2/aws/middleware",
+    "github.com/aws/aws-sdk-go-v2/aws/transport/http",
+    "github.com/aws/aws-sdk-go-v2/credentials",
+    "github.com/aws/aws-sdk-go-v2/aws/defaults",
+    "github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream",
+    "github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream/eventstreamapi",
+    "github.com/aws/aws-sdk-go-v2/aws/protocol/xml",
+    "github.com/aws/aws-sdk-go-v2/aws/ratelimit",
+    "github.com/aws/aws-sdk-go-v2/internal/context",
+    "github.com/aws/aws-sdk-go-v2/internal/timeconv",
+    "github.com/aws/aws-sdk-go-v2/aws/retry",
+    "github.com/aws/aws-sdk-go-v2/internal/strings",
+    "github.com/aws/aws-sdk-go-v2/aws/signer/internal/v4",
+    "github.com/aws/aws-sdk-go-v2/internal/auth",
+    "github.com/aws/smithy-go/encoding/httpbinding",
+    "github.com/aws/aws-sdk-go-v2/aws/signer/v4",
+    "github.com/aws/aws-sdk-go-v2/internal/auth/smithy",
+    "github.com/aws/aws-sdk-go-v2/internal/configsources",
+    "regexp/syntax",
+    "regexp",
+    "github.com/aws/aws-sdk-go-v2/internal/endpoints",
+    "github.com/aws/aws-sdk-go-v2/internal/endpoints/awsrulesfn",
+    "github.com/aws/aws-sdk-go-v2/internal/timeouts",
+    "github.com/aws/aws-sdk-go-v2/internal/v4a/internal/crypto",
+    "github.com/aws/aws-sdk-go-v2/internal/v4a/internal/v4",
+    "github.com/aws/aws-sdk-go-v2/internal/v4a",
+    "github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding",
+    "github.com/aws/aws-sdk-go-v2/service/internal/presigned-url",
+    "github.com/aws/aws-sdk-go-v2/service/internal/checksum",
+    "github.com/aws/aws-sdk-go-v2/aws/arn",
+    "github.com/aws/aws-sdk-go-v2/service/internal/s3shared/arn",
+    "github.com/aws/aws-sdk-go-v2/service/internal/s3shared",
+    "github.com/aws/aws-sdk-go-v2/service/internal/s3shared/config",
+    "github.com/aws/aws-sdk-go-v2/service/s3/internal/arn",
+    "github.com/aws/aws-sdk-go-v2/internal/endpoints/v2",
+    "github.com/aws/aws-sdk-go-v2/service/s3/internal/endpoints",
+    "github.com/aws/smithy-go/encoding",
+    "github.com/aws/smithy-go/encoding/xml",
+    "github.com/aws/aws-sdk-go-v2/service/s3/internal/customizations",
+    "github.com/aws/aws-sdk-go-v2/service/s3/types",
+    "github.com/aws/smithy-go/container/private/cache",
+    "github.com/aws/smithy-go/container/private/cache/lru",
+    "github.com/aws/smithy-go/endpoints",
+    "github.com/aws/smithy-go/endpoints/private/bdd",
+    "github.com/aws/smithy-go/endpoints/private/rulesfn",
+    "github.com/aws/smithy-go/io",
+    "github.com/aws/smithy-go/waiter",
+    "github.com/aws/aws-sdk-go-v2/service/s3",
+    "github.com/chester-hill-solutions/stow-s3/internal/runthrough",
+    "github.com/chester-hill-solutions/stow-s3/internal/version",
+    "github.com/chester-hill-solutions/stow-s3/internal/s3api"
+  ],
+  "scriptSha256": "1d24663f1ab4d33628f83c8bc73b472c2c14e38106a775e21a56989ac2a65732",
+  "results": [
+    {
+      "name": "baseline",
+      "bytes": 6504060,
+      "sha256": "d41c489a93c7a349de69c5bb415b04f4de3964bdacb12fdde8557d9d6eed9283",
+      "gzipBytes": 1805588,
+      "brotliBytes": 1328674,
+      "sections": [
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 1,
+          "bytes": 64
+        },
+        {
+          "id": 2,
+          "bytes": 718
+        },
+        {
+          "id": 3,
+          "bytes": 3808
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 7516
+        },
+        {
+          "id": 10,
+          "bytes": 4094426
+        },
+        {
+          "id": 11,
+          "bytes": 2397181
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 269,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 0,
+      "savedPercent": 0,
+      "gzipSavedPercent": 0,
+      "brotliSavedPercent": 0
+    },
+    {
+      "name": "combined",
+      "bytes": 5907813,
+      "sha256": "753bb342d7d3c4d3db59449a51eec27040f3829c6edb089d45b65b2389e35829",
+      "gzipBytes": 1656405,
+      "brotliBytes": 1229800,
+      "sections": [
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 1,
+          "bytes": 64
+        },
+        {
+          "id": 2,
+          "bytes": 718
+        },
+        {
+          "id": 3,
+          "bytes": 3612
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 7124
+        },
+        {
+          "id": 10,
+          "bytes": 3714250
+        },
+        {
+          "id": 11,
+          "bytes": 2181698
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 192,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 596247,
+      "savedPercent": 9.167304729661165,
+      "gzipSavedPercent": 8.262294609844549,
+      "brotliSavedPercent": 7.441554512243033
+    },
+    {
+      "name": "network-free",
+      "bytes": 4652200,
+      "sha256": "e96af59d023e717a6be6019df96776fefe326f3e004a209234cfe660caac5fe0",
+      "gzipBytes": 1264837,
+      "brotliBytes": 931587,
+      "sections": [
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 1,
+          "bytes": 64
+        },
+        {
+          "id": 2,
+          "bytes": 718
+        },
+        {
+          "id": 3,
+          "bytes": 3015
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 5930
+        },
+        {
+          "id": 10,
+          "bytes": 2952873
+        },
+        {
+          "id": 11,
+          "bytes": 1689253
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 123,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 1851860,
+      "savedPercent": 28.472369566086414,
+      "gzipSavedPercent": 29.94874799788213,
+      "brotliSavedPercent": 29.885961492435314
+    },
+    {
+      "name": "network-free-wasm-opt",
+      "bytes": 4379510,
+      "sha256": "ef688ab06fa7aa8da0d5b6a0383a1a764b526adab413adeaba90e7da03115a2f",
+      "gzipBytes": 1260753,
+      "brotliBytes": 939096,
+      "sections": [
+        {
+          "id": 1,
+          "bytes": 254
+        },
+        {
+          "id": 2,
+          "bytes": 689
+        },
+        {
+          "id": 3,
+          "bytes": 3082
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 5900
+        },
+        {
+          "id": 12,
+          "bytes": 3
+        },
+        {
+          "id": 10,
+          "bytes": 2680019
+        },
+        {
+          "id": 11,
+          "bytes": 1689253
+        },
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 123,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 2124550,
+      "savedPercent": 32.66498156536071,
+      "gzipSavedPercent": 30.174934702711802,
+      "brotliSavedPercent": 29.320811576052517
+    }
+  ]
+}

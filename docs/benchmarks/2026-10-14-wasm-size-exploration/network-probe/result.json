@@ -1,0 +1,403 @@
+{
+  "complete": true,
+  "experimentalOnly": true,
+  "sdkUnchanged": true,
+  "networkProbe": true,
+  "finishedAt": "2026-10-14T14:13:58.062Z",
+  "toolchain": "go version go1.25.6 linux/amd64",
+  "binaryen": "wasm-opt version 108",
+  "source": {
+    "commit": "e7140fde9fc605b8213960a06d5e139e9b81d893",
+    "dirtyFiles": [
+      "M Makefile",
+      " M docs/CODE_STANDARDS.md",
+      " M docs/README.md",
+      " M docs/adr/0008-workspace-backend-real-files.md",
+      " M docs/adr/README.md",
+      " M docs/api/go.md",
+      " M docs/portable-workspace-usage.md",
+      " M go.mod",
+      " M go.sum",
+      " M internal/atomicfile/atomicfile.go",
+      " M internal/runtime/adapter.go",
+      " M internal/runtime/buckets.go",
+      " M internal/runtime/instance.go",
+      " M internal/runtime/multipart.go",
+      " M internal/runtime/objects.go",
+      " M internal/runtime/save_requests.go",
+      " M internal/runtime/staged-reset_test.go",
+      " M internal/runtime/staged-writes.go",
+      " M internal/runtime/state.go",
+      " M internal/runtime/stream-writes.go",
+      " M internal/runtime/streams.go",
+      " M internal/runtime/streams_test.go",
+      " M internal/runtime/types.go",
+      " M internal/runtime/workspace_usage.go",
+      " M internal/s3api/checksum_test.go",
+      " M internal/s3api/errors.go",
+      " M internal/s3api/handlers_bucket.go",
+      " M internal/s3api/handlers_multipart.go",
+      " M internal/s3api/request.go",
+      " M internal/s3api/request_internal_test.go",
+      " M internal/storage/bytes.go",
+      " M internal/storage/checksum.go",
+      " M internal/storage/fs/capacity.go",
+      " M internal/storage/fs/fs.go",
+      " M internal/storage/fs/fs_atomic.go",
+      " M internal/storage/fs/fs_copy.go",
+      " M internal/storage/fs/fs_list.go",
+      " M internal/storage/fs/fs_multipart.go",
+      " M internal/storage/fs/fs_put.go",
+      " M internal/storage/fs/fs_records.go",
+      " M internal/storage/fs/recovery_holds.go",
+      " M internal/storage/fs/save_requests.go",
+      " M internal/storage/memory.go",
+      " M internal/storage/store.go",
+      " M internal/storage/types.go",
+      " M internal/storage/util.go",
+      " M internal/storage/workspace/objects.go",
+      " M packages/stow-s3/dist/stow-runtime.wasm",
+      " M pkg/stow/filesystem.go",
+      " M pkg/stow/runtime.go",
+      " M pkg/stow/staged_test.go",
+      " M scripts/baselines/go-quality.json",
+      " M site/build.mjs",
+      " M site/index.html",
+      " M tools/quality/main.go",
+      "?? .github/workflows/performance.yml",
+      "?? benchmark/",
+      "?? docs/adr/0020-binary-object-records.md",
+      "?? docs/benchmarks/2026-10-12-performance/",
+      "?? docs/benchmarks/2026-10-13-competitor-performance/",
+      "?? docs/benchmarks/2026-10-13-controlled-write-preparation/",
+      "?? docs/benchmarks/2026-10-13-memory-performance/",
+      "?? docs/benchmarks/2026-10-13-railway-performance/",
+      "?? docs/benchmarks/2026-10-13-storage-optimization/",
+      "?? docs/benchmarks/2026-10-13-streaming-performance/",
+      "?? docs/benchmarks/2026-10-13-usage-recovery/",
+      "?? docs/benchmarks/2026-10-13-wasm-size/",
+      "?? docs/benchmarks/2026-10-13-write-preparation/",
+      "?? docs/benchmarks/2026-10-14-memory-put-diagnosis/",
+      "?? docs/benchmarks/2026-10-14-memory-write-staging/",
+      "?? docs/benchmarks/2026-10-14-owned-http-body/",
+      "?? docs/benchmarks/2026-10-14-wasm-size-exploration/",
+      "?? docs/benchmarks/performance-local.json",
+      "?? docs/benchmarks/performance-qualification.json",
+      "?? docs/benchmarks/railway-environment.json",
+      "?? docs/performance-testing.md",
+      "?? docs/railway-performance.md",
+      "?? internal/runtime/managed_usage_test.go",
+      "?? internal/runtime/memory_staging_test.go",
+      "?? internal/runtime/owned_body_test.go",
+      "?? internal/runtime/stream_allocation_test.go",
+      "?? internal/runtime/stream_copy.go",
+      "?? internal/runtime/stream_performance_test.go",
+      "?? internal/runtime/usage_multipart.go",
+      "?? internal/runtime/usage_recovery.go",
+      "?? internal/runtime/usage_state.go",
+      "?? internal/runtime/usage_transitions_test.go",
+      "?? internal/s3api/owned_body_allocation_test.go",
+      "?? internal/storage/fs/record_codec.go",
+      "?? internal/storage/fs/record_format_test.go",
+      "?? internal/storage/fs/record_io.go",
+      "?? internal/storage/fs/record_performance_test.go",
+      "?? internal/storage/fs/recordpb/",
+      "?? internal/storage/fs/runtime_recovery_test.go",
+      "?? internal/storage/fs/save_checksum_test.go",
+      "?? internal/storage/fs/usage_revision.go",
+      "?? internal/storage/memory_staged.go",
+      "?? internal/storage/memory_staged_test.go",
+      "?? internal/storage/owned_body.go",
+      "?? internal/storage/owned_body_test.go",
+      "?? internal/storage/owned_reader.go",
+      "?? internal/storage/owned_reader_test.go",
+      "?? internal/storage/put_body.go",
+      "?? internal/storage/put_body_contract_test.go",
+      "?? packages/stow-s3/scripts/benchmark-performance.mjs",
+      "?? packages/stow-s3/scripts/performance/",
+      "?? pkg/stow/filesystem_native.go",
+      "?? pkg/stow/filesystem_recovery_test.go",
+      "?? pkg/stow/filesystem_unsupported.go",
+      "?? pkg/stow/performance_benchmark_test.go",
+      "?? pkg/stow/wasm_dependencies_test.go",
+      "?? scripts/benchmark-embedded.mjs",
+      "?? scripts/performance.test.mjs",
+      "?? site/assets/benchmark-render.js",
+      "?? site/assets/benchmarks.css",
+      "?? site/assets/benchmarks.js",
+      "?? site/benchmark-data.json",
+      "?? tools/quality/generated.go",
+      "?? tools/quality/generated_test.go"
+    ],
+    "payloadSha256": "1d688cd0ea2ea154a90e7aa64ed4c01f0679d5d5632754ad90dadf6930f2155a",
+    "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+  },
+  "results": [
+    {
+      "name": "baseline",
+      "bytes": 6504060,
+      "sha256": "d41c489a93c7a349de69c5bb415b04f4de3964bdacb12fdde8557d9d6eed9283",
+      "gzipBytes": 1805588,
+      "brotliBytes": 1328674,
+      "sections": [
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 1,
+          "bytes": 64
+        },
+        {
+          "id": 2,
+          "bytes": 718
+        },
+        {
+          "id": 3,
+          "bytes": 3808
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 7516
+        },
+        {
+          "id": 10,
+          "bytes": 4094426
+        },
+        {
+          "id": 11,
+          "bytes": 2397181
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 269,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 0,
+      "savedPercent": 0
+    },
+    {
+      "name": "combined",
+      "bytes": 5907813,
+      "sha256": "753bb342d7d3c4d3db59449a51eec27040f3829c6edb089d45b65b2389e35829",
+      "gzipBytes": 1656405,
+      "brotliBytes": 1229800,
+      "sections": [
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 1,
+          "bytes": 64
+        },
+        {
+          "id": 2,
+          "bytes": 718
+        },
+        {
+          "id": 3,
+          "bytes": 3612
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 7124
+        },
+        {
+          "id": 10,
+          "bytes": 3714250
+        },
+        {
+          "id": 11,
+          "bytes": 2181698
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 192,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 596247,
+      "savedPercent": 9.167304729661165
+    },
+    {
+      "name": "network-free",
+      "bytes": 4652200,
+      "sha256": "e96af59d023e717a6be6019df96776fefe326f3e004a209234cfe660caac5fe0",
+      "gzipBytes": 1264837,
+      "brotliBytes": 931587,
+      "sections": [
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 1,
+          "bytes": 64
+        },
+        {
+          "id": 2,
+          "bytes": 718
+        },
+        {
+          "id": 3,
+          "bytes": 3015
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 5930
+        },
+        {
+          "id": 10,
+          "bytes": 2952873
+        },
+        {
+          "id": 11,
+          "bytes": 1689253
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 123,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 1851860,
+      "savedPercent": 28.472369566086414
+    },
+    {
+      "name": "network-free-wasm-opt",
+      "bytes": 4379510,
+      "sha256": "ef688ab06fa7aa8da0d5b6a0383a1a764b526adab413adeaba90e7da03115a2f",
+      "gzipBytes": 1260753,
+      "brotliBytes": 939096,
+      "sections": [
+        {
+          "id": 1,
+          "bytes": 254
+        },
+        {
+          "id": 2,
+          "bytes": 689
+        },
+        {
+          "id": 3,
+          "bytes": 3082
+        },
+        {
+          "id": 4,
+          "bytes": 5
+        },
+        {
+          "id": 5,
+          "bytes": 3
+        },
+        {
+          "id": 6,
+          "bytes": 41
+        },
+        {
+          "id": 7,
+          "bytes": 33
+        },
+        {
+          "id": 9,
+          "bytes": 5900
+        },
+        {
+          "id": 12,
+          "bytes": 3
+        },
+        {
+          "id": 10,
+          "bytes": 2680019
+        },
+        {
+          "id": 11,
+          "bytes": 1689253
+        },
+        {
+          "id": 0,
+          "name": "go:buildid",
+          "bytes": 114
+        },
+        {
+          "id": 0,
+          "name": "producers",
+          "bytes": 71
+        }
+      ],
+      "dependencyCount": 123,
+      "runtimeTestsExit": 0,
+      "isolateProbeExit": 0,
+      "savedBytes": 2124550,
+      "savedPercent": 32.66498156536071
+    }
+  ],
+  "limitations": [
+    "Experimental facade exclusion is an attribution probe, not a shipping patch or full validation.",
+    "The network-free probe uses the exact pinned Go content sniffer locally to attribute HTTP package initialization; this is not a proposed vendored production implementation.",
+    "No inlining and Binaryen variants require performance and full browser/SDK validation before adoption.",
+    "Compression sizes are encoding measurements, not deployed transfer measurements."
+  ]
+}

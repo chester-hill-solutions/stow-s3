@@ -1,0 +1,56 @@
+name: Performance evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Measurement profile (shared runners produce exploratory evidence)
+        type: choice
+        default: smoke
+        options: [smoke, local]
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    name: Performance (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: .go-version
+          cache: true
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: packages/stow-s3/package-lock.json
+      - name: Install measurement dependencies
+        run: npm ci --ignore-scripts
+        working-directory: packages/stow-s3
+      - name: Smoke measurements
+        if: inputs.profile == 'smoke'
+        run: make benchmark-performance-smoke PERF_OUT=.cache/performance/ci
+      - name: Local exploratory measurements
+        if: inputs.profile == 'local'
+        run: make benchmark-performance PERF_OUT=.cache/performance/ci
+      - name: Embedded exploratory measurements
+        run: node scripts/benchmark-embedded.mjs --out .cache/performance/ci --benchtime 300ms --count 3
+      - name: Upload raw measurements and report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: stow-performance-${{ matrix.os }}-${{ github.run_id }}
+          path: .cache/performance/ci
+          include-hidden-files: true
+          if-no-files-found: error

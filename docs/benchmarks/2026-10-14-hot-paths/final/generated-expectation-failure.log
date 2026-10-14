@@ -1,0 +1,33 @@
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.056s
+{"hotPaths":{"summary":[{"name":"BenchmarkEmbeddedGet/4KiB-4","before":{"nsPerOp":5015.5,"MBps":817.105,"bytesPerOp":21768,"allocsPerOp":12},"after":{"nsPerOp":1627,"MBps":2517.305,"bytesPerOp":4729,"allocsPerOp":10},"allocatedBytesReductionPercent":78.27545020213157,"throughputChangePercent":208.26674861708665},{"name":"BenchmarkEmbeddedGet/1MiB-4","before":{"nsPerOp":1972342.5,"MBps":532.615,"bytesPerOp":6289951,"allocsPerOp":32},"after":{"nsPerOp":241726.5,"MBps":4337.895,"bytesPerOp":1065542.5,"allocsPerOp":11},"allocatedBytesReductionPercent":83.05960571075991,"throughputChangePercent":715.9397087203926},{"name":"BenchmarkEmbeddedGet/8MiB-4","before":{"nsPerOp":6770927.5,"MBps":1241.645,"bytesPerOp":50092640,"allocsPerOp":41},"after":{"nsPerOp":762474.5,"MBps":11002.145,"bytesPerOp":8401620.5,"allocsPerOp":11},"allocatedBytesReductionPercent":83.22783446829713,"throughputChangePercent":788.0201895276498},{"name":"BenchmarkDiskObject/1MiB/put-4","before":{"nsPerOp":4600175.5,"MBps":228.095,"bytesPerOp":5251141.5,"allocsPerOp":150},"after":{"nsPerOp":3728035.5,"MBps":281.375,"bytesPerOp":215253,"allocsPerOp":142},"allocatedBytesReductionPercent":95.90083413292139,"throughputChangePercent":23.394090533740886},{"name":"BenchmarkDiskObject/1MiB/copy-4","before":{"nsPerOp":1657453.5,"MBps":632.685,"bytesPerOp":1056180.5,"allocsPerOp":96},"after":{"nsPerOp":1491972.5,"MBps":702.88,"bytesPerOp":7627,"allocsPerOp":96},"allocatedBytesReductionPercent":99.27786964444051,"throughputChangePercent":11.09142427223022},{"name":"BenchmarkDiskObject/32MiB/put-4","before":{"nsPerOp":93054021,"MBps":360.615,"bytesPerOp":201113726,"allocsPerOp":166},"after":{"nsPerOp":89761052.5,"MBps":373.82,"bytesPerOp":215256,"allocsPerOp":142},"allocatedBytesReductionPercent":99.89296802148651,"throughputChangePercent":3.6685939037980786},{"name":"BenchmarkDiskObject/32MiB/copy-4","before":{"nsPerOp":27128295,"MBps":1236.9250000000002,"bytesPerOp":33562057.5,"allocsPerOp":96},"after":{"nsPerOp":27053545.5,"MBps":1240.3899999999999,"bytesPerOp":7629,"allocsPerOp":96},"allocatedBytesReductionPercent":99.97726897404904,"throughputChangePercent":0.2763020469904731},{"name":"BenchmarkWorkspaceIndex/1000-4","before":{"nsPerOp":3472826,"MBps":0,"bytesPerOp":1182888,"allocsPerOp":8056,"fileBytes":344060},"after":{"nsPerOp":2167980,"MBps":0,"bytesPerOp":661672.5,"allocsPerOp":8051,"fileBytes":226037},"allocatedBytesReductionPercent":44.06296285024449,"throughputChangePercent":60.18717884851337},{"name":"BenchmarkWorkspaceIndex/10000-4","before":{"nsPerOp":29113236,"MBps":0,"bytesPerOp":13099343,"allocsPerOp":80064,"fileBytes":3440060},"after":{"nsPerOp":17059489.5,"MBps":0,"bytesPerOp":7789410.5,"allocsPerOp":80056.5,"fileBytes":2260037},"allocatedBytesReductionPercent":40.535868859987865,"throughputChangePercent":70.65713484568221}],"wasm":{"before":{"bytes":4610006,"sha256":"299ee696ddc9147adae6aecf0dbe16572af76ace056383bbd2da5ba173dc71d8","gzipBytes":1255970,"brotliBytes":924486},"after":{"bytes":4610009,"sha256":"99a8688b9f04c07f986846db77cfc8ae8ab148e6c27b22c3c24202c62e3ec47f","gzipBytes":1256892,"brotliBytes":925382}},"startupSummary":[{"variant":"before","readyMs":23.681162,"firstWriteMs":34.0747015,"putGetPairsPerSecond":250.22121487092804},{"variant":"after","readyMs":24.845175,"firstWriteMs":38.0727485,"putGetPairsPerSecond":263.23489324982427}]}}
+mkdir -p bin
+GOTOOLCHAIN=go1.25.6 GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -ldflags "-s -w" -o bin/stow-runtime.wasm ./cmd/stow-wasm
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 265 packages, and audited 266 packages in 3s
+
+121 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm notice
+npm notice New minor version of npm available! 11.12.1 -> 11.21.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.0
+npm notice To update run: npm install -g npm@11.21.0
+npm notice
+
+> @chester-hill-solutions/stow-s3@0.3.0 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.3.0 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+file:///src/benchmark/verify.mjs:61
+if (changed.some(name=>!allowedGenerated.includes(name))) throw new Error("Unexpected generated changes: " + changed.join(", "));
+                                                                ^
+
+Error: Unexpected generated changes: browser-wasm-host.d.ts.map, browser-wasm-host.js, browser-wasm-host.js.map, stow-runtime.wasm
+    at file:///src/benchmark/verify.mjs:61:65
+
+Node.js v25.9.0

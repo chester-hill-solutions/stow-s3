@@ -1,0 +1,78 @@
+mkdir -p bin
+GOTOOLCHAIN=go1.25.6 GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -ldflags "-s -w" -o bin/stow-runtime.wasm ./cmd/stow-wasm
+npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 265 packages, and audited 266 packages in 2s
+
+121 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> @chester-hill-solutions/stow-s3@0.3.0 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.3.0 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+API reference written: 13 pages
+GOTOOLCHAIN=go1.25.6 go vet ./...
+GOTOOLCHAIN=go1.25.6 go test -race ./...
+ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	3.253s
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	7.002s
+ok  	github.com/chester-hill-solutions/stow-s3/examples/resumable-transfer	1.804s
+?   	github.com/chester-hill-solutions/stow-s3/examples/storage-dogfood	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	1.022s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	1.022s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	1.574s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/capacity	1.114s
+?   	github.com/chester-hill-solutions/stow-s3/internal/embedded	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/mcpstorage	2.966s
+--- FAIL: TestChildExitsWhenParentIsKilled (10.06s)
+    parentwatch_test.go:114: watched process 20270 was still alive 10s after its parent was killed; child output:
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	10.065s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policy	1.010s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policystore	1.029s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	1.007s
+?   	github.com/chester-hill-solutions/stow-s3/internal/recoveryerrors	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/rooted	1.103s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	15.325s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	3.026s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	3.475s
+--- FAIL: TestStorePreparationFailurePreservesObject (0.01s)
+    --- FAIL: TestStorePreparationFailurePreservesObject/filesystem (0.00s)
+        put_body_contract_test.go:111: preparation error: <nil>, want unexpected EOF
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage	5.252s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	7.747s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	1.725s
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	9.757s
+?   	github.com/chester-hill-solutions/stow-s3/tools/api-reference	[no test files]
+?   	github.com/chester-hill-solutions/stow-s3/tools/mcp-browser-pack	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/tools/quality	1.717s
+FAIL
+make: *** [Makefile:23: test-race] Error 1
+node:internal/errors:998
+  const err = new Error(message);
+              ^
+
+Error: Command failed: make standards
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at exec (file:///src/benchmark/verify.mjs:22:47)
+    at file:///src/benchmark/verify.mjs:95:1 {
+  status: 2,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 12561,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v25.9.0

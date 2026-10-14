@@ -1,0 +1,391 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"><title>Stow benchmark · private preview</title><style>/* Shared brand and primitives for the landing page and generated guides. */
+:root {
+  color-scheme: light;
+  --ink-0: #f7f5ee; --ink-1: #eeeee5; --ink-2: #e5e7dd; --ink-3: #dce0d3;
+  --text-1: #101613; --text-2: #4b554e; --text-3: #596257;
+  --accent: #123f30; --accent-soft: #235b43; --accent-quiet: #e7ecdf;
+  --highlight: #9ac43b; --line: #b8bdb3; --line-soft: #d4d7cd;
+  --code-bg: #101a16; --code-text: #e9eee5;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --gutter: clamp(1.25rem, 4.5vw, 4rem);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 2rem; }
+body { margin: 0; background: var(--ink-0); color: var(--text-1); font: 1rem/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; }
+button, summary { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+img, svg { max-width: 100%; }
+a { color: inherit; text-underline-offset: .22em; }
+a:hover { text-decoration-thickness: 2px; }
+code, pre { font-family: var(--mono); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; border-radius: 2px; }
+::selection { background: #cde0b5; color: var(--text-1); }
+.skip { position: absolute; top: -5rem; left: 1rem; z-index: 10; padding: .8rem 1.2rem; background: var(--accent); color: var(--ink-0); }
+.skip:focus { top: 1rem; }
+.container { width: min(100% - var(--gutter) * 2, 1280px); margin-inline: auto; }
+.masthead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 92px; border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; align-items: center; min-height: 44px; flex: none; }
+.brand img { display: block; width: 128px; height: 36px; }
+.masthead nav { display: flex; align-items: center; gap: .6rem; }
+.masthead nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .6rem .75rem; text-decoration: none; font-size: .8125rem; }
+.masthead nav a:hover, .masthead nav a[aria-current] { color: var(--accent); }
+.masthead nav .nav-source { border: 1px solid var(--text-1); border-radius: 4px; margin-left: 1rem; gap: 1rem; padding-inline: 1.1rem; }
+.btn { display: inline-flex; justify-content: center; align-items: center; gap: 1rem; min-height: 48px; padding: .85rem 1.3rem; border: 1px solid transparent; border-radius: 5px; text-decoration: none; font-size: .9375rem; font-weight: 500; line-height: 1.2; }
+.btn-primary { background: var(--accent); color: var(--ink-0); }
+.btn-primary:hover { background: var(--accent-soft); }
+.btn-ghost { background: transparent; color: var(--text-1); border-color: var(--line); }
+.btn-ghost:hover { background: var(--ink-1); border-color: var(--text-2); }
+.text-link { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; color: var(--accent); font-size: .9375rem; }
+.eyebrow { margin: 0 0 1.5rem; font: .75rem/1.4 var(--mono); letter-spacing: .025em; text-transform: uppercase; }
+.install { display: flex; align-items: stretch; max-width: 100%; min-width: 0; background: var(--ink-1); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.install code { min-width: 0; flex: 1; padding: 1rem; overflow-x: auto; white-space: nowrap; font-size: .75rem; }
+.install button { flex: none; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--text-1); min-width: 68px; min-height: 44px; padding: .75rem; font: .6875rem var(--mono); }
+.install button:hover { background: var(--ink-2); }
+.install button[data-copied="1"] { color: var(--accent); }
+@media (max-width: 600px) {
+  .masthead { min-height: 108px; align-content: center; flex-wrap: wrap; gap: .25rem; padding-block: .7rem; }
+  .brand img { width: 105px; height: 30px; }
+  .masthead nav { gap: .1rem; }
+  .masthead nav a { padding-inline: .5rem; font-size: .75rem; }
+  .masthead nav .nav-source { margin-left: .25rem; gap: .4rem; padding-inline: .6rem; }
+}
+@media (max-width: 390px) {
+  .masthead nav { width: 100%; justify-content: space-between; }
+  .masthead nav a { min-width: 44px; padding-inline: .3rem; font-size: .6875rem; }
+  .masthead nav .nav-source { margin-left: 0; padding-inline: .4rem; gap: .35rem; }
+  .masthead { padding-block: .8rem; }
+}
+
+/* Landing composition. Shared primitives live in theme.css. */
+h1, h2, h3, p { margin-top: 0; }
+h1, h2, h3 { font-weight: 700; }
+h2 { margin-bottom: 1rem; font-size: clamp(2rem, 3.7vw, 3.4rem); line-height: 1.06; letter-spacing: -.055em; }
+.hero { display: grid; grid-template-columns: 1.12fr 1fr; gap: 1.2rem; align-items: center; padding-block: 64px 58px; }
+.hero-copy { position: relative; z-index: 1; }
+.hero h1 { margin: 0; font-size: clamp(4rem, 7.4vw, 6.75rem); line-height: .95; letter-spacing: -.065em; }
+.hero h1 span { display: block; }
+.hero h1 span:last-child { font-size: .79em; letter-spacing: -.06em; margin-top: .08em; white-space: nowrap; }
+.hero .lede { max-width: 43ch; margin: 1.7rem 0 1.9rem; font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.5; }
+.cta { display: flex; align-items: center; gap: 1.7rem; flex-wrap: wrap; }
+.cta .text-link { color: var(--text-1); }
+.languages { margin: 1.9rem 0 0; color: var(--text-2); font: .75rem/1.7 var(--mono); }
+.hero-art { margin: 0 -1rem 0 0; position: relative; }
+.hero-art img { display: block; width: 100%; height: auto; }
+.art-label { position: absolute; font: .6875rem var(--mono); }
+.label-objects { top: 2%; left: 11%; }
+.label-files { top: 7%; left: 63%; }
+.label-checkpoints { bottom: 3%; left: 31%; }
+.label-archive { bottom: 3%; right: 0; font-size: .6rem; }
+.capabilities { display: grid; grid-template-columns: repeat(4, 1fr); border-block: 1px solid var(--line); list-style: none; padding: 1.25rem 0; margin-block: 0; font: .75rem/1.5 var(--mono); text-align: center; }
+.capabilities li + li { border-left: 1px solid var(--line); }
+.paths { padding-block: 72px 64px; }
+.section-intro { margin-bottom: 2.7rem; }
+.section-intro p { color: var(--text-2); margin-bottom: 0; }
+.path-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.path { padding-inline: 2rem; display: grid; grid-template-columns: 34px 1fr; column-gap: 1.2rem; }
+.path > div { display: flex; flex-direction: column; }
+.path:first-child { padding-left: 0; }
+.path:last-child { padding-right: 0; }
+.path + .path { border-left: 1px solid var(--line); }
+.path-icon { width: 32px; height: 36px; }
+.path-number { color: var(--text-3); font: 1.5rem/1.5 var(--mono); }
+.path h3 { font-size: 1.4rem; letter-spacing: -.04em; margin: .65rem 0 .9rem; line-height: 1.2; }
+.path p { font-size: .9375rem; line-height: 1.55; max-width: 27ch; margin-bottom: 1rem; }
+.path .text-link { margin-top: auto; }
+.use-case-accordion { margin-top: 2rem; }
+.fixture { margin-top: .75rem; border: 1px solid #698578; border-radius: 5px; background: var(--ink-0); color: var(--text-1); }
+.fixture > summary { display: grid; grid-template-columns: 160px 1fr 24px; align-items: center; gap: 1.5rem; padding: 1.25rem 1.5rem; min-height: 80px; list-style: none; }
+.fixture > summary::-webkit-details-marker { display: none; }
+.fixture > summary::after { content: "+"; justify-self: end; font: 1.5rem/1 var(--mono); color: var(--accent); }
+.fixture[open] > summary::after { content: "−"; }
+.fixture[open] > summary { border-bottom: 1px solid var(--line); background: var(--accent-quiet); }
+.use-case-label { color: var(--accent); font: .6875rem/1.5 var(--mono); }
+.use-case-title { font-size: 1.35rem; font-weight: 600; line-height: 1.25; letter-spacing: -.03em; }
+.fixture :focus-visible { outline-color: var(--accent); }
+.fixture-body { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 1.5rem; }
+.fixture-body > div, .fixture-body pre { min-width: 0; }
+.fixture-body h3 { font-size: 1.1rem; line-height: 1.3; }
+.fixture-body p { color: var(--text-2); font-size: .875rem; }
+.fixture-body p.fixture-note { margin: 1rem 0 0; font-size: .75rem; }
+.fixture-code + h3 { margin-top: 1.7rem; }
+.session { background: var(--accent); color: var(--ink-0); padding-block: 54px; }
+.session h2 { font-size: clamp(2.25rem, 4vw, 3.5rem); }
+.session-copy > p { max-width: 66ch; color: #e2e8df; font-size: 1rem; }
+.session-copy .eyebrow { font: .6875rem/1.5 var(--mono); margin-bottom: 1rem; }
+.session-copy .source-note { display: inline-block; max-width: none; margin: .5rem 0 0; font: .6875rem/1.7 var(--mono); }
+.session-copy .source-note a { color: var(--ink-0); }
+.session-copy :focus-visible { outline-color: #c8df85; }
+.workspace { padding-block: 72px; display: grid; grid-template-columns: 1fr 1.08fr; gap: 3rem; align-items: center; }
+.workspace h2 { font-size: clamp(2rem, 3.5vw, 3rem); }
+.workspace p { max-width: 43ch; color: var(--text-2); font-size: .9375rem; margin-bottom: .4rem; }
+.handoff { margin: 0; }
+.handoff img { display: block; width: 100%; height: auto; }
+.handoff-labels { display: grid; grid-template-columns: repeat(3, 1fr); font: .6875rem var(--mono); text-align: center; margin-top: .75rem; }
+.demo-body { padding: 1.5rem; }
+.demo-heading { display: flex; justify-content: space-between; gap: 2rem; align-items: start; }
+.demo-heading h3 { font-size: 1.1rem; margin-bottom: .5rem; }
+.demo-heading p, .demo-body > p { font-size: .875rem; color: var(--text-2); }
+.demo-steps { display: flex; flex-wrap: wrap; gap: 1rem 2rem; font-size: .8125rem; padding-left: 1.2rem; margin-block: 1.5rem; }
+.demo-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.5rem; font-size: .8125rem; margin-block: 1.5rem; }
+.offline-switch { display: inline-flex; align-items: center; gap: .7rem; min-height: 44px; }
+.offline-switch input { accent-color: var(--accent); width: 20px; height: 20px; }
+.upload-label { display: inline-block; }
+.upload-label span { color: var(--text-2); }
+#demo-upload { max-width: 100%; min-height: 44px; padding-block: .5rem; }
+.demo-panels { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem; }
+.demo-local, .demo-remote { min-width: 0; background: var(--ink-1); padding: 1.25rem; border: 1px solid var(--line-soft); border-radius: 4px; }
+.demo-local > label { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: space-between; font: .75rem var(--mono); }
+.demo-local small { color: var(--text-2); }
+#demo-editor { display: block; width: 100%; resize: vertical; min-height: 180px; margin-block: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 3px; background: var(--ink-0); color: var(--text-1); font: .8125rem/1.7 var(--mono); }
+.demo-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.demo-actions .btn { padding-inline: .85rem; font-size: .8125rem; }
+.demo-detail { font-size: .75rem; color: var(--text-2); margin: .9rem 0 0; }
+.demo-remote h4 { margin: 0 0 1rem; font-size: .875rem; }
+#demo-remote-content { white-space: pre-wrap; overflow-wrap: anywhere; min-height: 140px; font-size: .8125rem; margin: 0 0 1rem; }
+.outbox { display: flex; justify-content: space-between; font: .75rem var(--mono); border-top: 1px solid var(--line); padding-block: .75rem; }
+.demo-message { margin-top: 1rem; border-left: 2px solid var(--accent); padding-left: 1rem; }
+.demo-real { padding-top: 1.3rem; border-top: 1px solid var(--line-soft); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+.demo-real p { margin: 0; font-size: .875rem; }
+.demo-real .text-link { font-size: .8125rem; }
+.api-section { padding-block: 40px 48px; border-top: 1px solid var(--line); }
+.api-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
+.api-heading h2 { margin-bottom: 0; font-size: clamp(1.6rem, 2.4vw, 2.2rem); }
+.api-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin: 0; }
+.api-list > div { border-top: 1px solid var(--line-soft); padding-top: 1rem; }
+.api-list dt { font-size: .875rem; font-weight: 600; margin-bottom: .5rem; }
+.api-list dd { margin: 0; color: var(--text-2); font-size: .8125rem; line-height: 1.65; }
+.api-list .text-link { font-size: .8125rem; margin-top: .4rem; }
+.scope-note { margin: 1.5rem 0 0; font-size: .75rem; color: var(--text-2); max-width: 100ch; }
+.scope-note a { color: var(--accent); }
+.finale { padding-block: 48px 52px; border-top: 1px solid var(--line); }
+.finale-heading { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+.finale h2 { font-size: clamp(1.8rem, 2.8vw, 2.5rem); margin-bottom: 0; }
+.availability { margin: 1.5rem 0; font-size: .8125rem; color: var(--text-2); max-width: 85ch; }
+.install-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.install-grid > div { min-width: 0; }
+.install-grid h3 { margin-bottom: .7rem; font: .6875rem var(--mono); color: var(--text-2); }
+.site-footer { padding-block: 1.2rem 2rem; border-top: 1px solid var(--line); }
+.footer-main { display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem; }
+.footer-main .brand img { width: 94px; height: 27px; }
+.footer-license { font: .625rem var(--mono); color: var(--text-2); border-left: 1px solid var(--line); padding-left: 1.2rem; }
+.footer-main nav { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-left: auto; }
+.footer-main nav a { display: inline-flex; align-items: center; min-height: 44px; font: .625rem var(--mono); text-decoration: none; }
+.trademark { margin: .8rem 0 0; max-width: 115ch; color: var(--text-2); font-size: .625rem; line-height: 1.7; }
+@media (max-width: 1024px) {
+  .hero { padding-block: 48px; }
+  .hero h1 { font-size: clamp(3.5rem, 7.5vw, 5.8rem); }
+  .hero-art { margin-right: 0; }
+  .art-label { font-size: .6rem; }
+  .label-archive { font-size: .5rem; }
+  .path { padding-inline: 1.2rem; column-gap: .8rem; }
+  .path h3 { font-size: 1.2rem; }
+}
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; padding-block: 40px 28px; gap: 1rem; }
+  .hero h1 { font-size: clamp(3.7rem, 12vw, 5.7rem); }
+  .hero .lede { max-width: 44ch; }
+  .hero-art { width: min(100%, 540px); justify-self: center; }
+  .art-label { font-size: .6875rem; }
+  .label-archive { font-size: .6rem; }
+  .capabilities { grid-template-columns: repeat(2, 1fr); row-gap: 1rem; font-size: .625rem; }
+  .capabilities li:nth-child(3) { border-left: 0; }
+  .paths { padding-block: 40px; }
+  .section-intro { margin-bottom: 1.8rem; }
+  .path-grid { grid-template-columns: 1fr; }
+  .path { padding: 1.3rem 0; column-gap: 1rem; }
+  .path + .path { border-left: 0; border-top: 1px solid var(--line); }
+  .path p { max-width: 44ch; margin-bottom: .25rem; }
+  .path h3 { font-size: 1.4rem; }
+  .path-number { font-size: 1.1rem; }
+  .fixture > summary { grid-template-columns: 1fr 24px; gap: .5rem 1rem; padding: 1rem 1.25rem; }
+  .use-case-label { grid-column: 1; }
+  .use-case-title { grid-column: 1; grid-row: 2; font-size: 1.15rem; }
+  .fixture > summary::after { grid-column: 2; grid-row: 1 / span 2; }
+  .fixture-body { grid-template-columns: 1fr; }
+  .fixture-body { padding: 1.25rem; gap: 1.5rem; }
+  .session { padding-block: 40px; }
+  .session h2 { max-width: 15ch; }
+  .session-copy .source-note { margin-top: .5rem; }
+  .workspace { grid-template-columns: 1fr; gap: 1.8rem; padding-block: 40px; }
+  .handoff { max-width: 500px; width: 100%; justify-self: center; }
+  .demo-body { padding: 1rem; }
+  .demo-heading { gap: 1rem; }
+  .demo-panels, .demo-real { grid-template-columns: 1fr; }
+  .demo-local, .demo-remote { padding: 1rem; }
+  .api-heading { align-items: start; flex-wrap: wrap; gap: .5rem; }
+  .api-list { grid-template-columns: repeat(2, 1fr); }
+  .finale { padding-block: 32px; }
+  .finale-heading { display: block; }
+  .finale-heading .btn { margin-top: 1.5rem; }
+  .install-grid { grid-template-columns: 1fr; }
+  .footer-main nav { margin-left: 0; gap: 1rem; }
+}
+@media (max-width: 390px) {
+  .hero h1 { font-size: 3.6rem; }
+  .hero h1 span:last-child { font-size: .72em; }
+  .hero .eyebrow { font-size: .625rem; }
+  .hero .lede { font-size: 1rem; }
+  .cta { gap: .7rem; }
+  .cta .btn { padding-inline: 1rem; font-size: .8125rem; }
+  .cta .text-link { font-size: .8125rem; }
+  .languages { font-size: .625rem; }
+  .art-label { font-size: .5rem; }
+  .label-archive { font-size: .4375rem; }
+  .api-list { grid-template-columns: 1fr; }
+}
+
+.performance {padding-block:64px;border-top:1px solid var(--line);}
+.performance-heading {display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2rem;}
+.performance-heading .eyebrow {margin-bottom:.75rem;}
+.performance-heading h2 {font-size:clamp(2.3rem,4vw,3.6rem);margin-bottom:.65rem;}
+.performance-heading p:not(.eyebrow) {color:var(--text-2);max-width:52ch;margin-bottom:0;}
+.benchmark-stamp {flex:none;border:1px solid var(--line);border-radius:3px;padding:.75rem 1rem;font:.65rem/1.6 var(--mono);text-transform:uppercase;letter-spacing:.02em;}
+.benchmark-stamp span {display:block;color:var(--text-2);}
+.benchmark-board {border:1px solid var(--line);border-radius:7px;background:var(--ink-1);overflow:hidden;}
+.benchmark-toolbar {padding:1.2rem 1.5rem;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;}
+.benchmark-views {display:flex;gap:.3rem;flex-wrap:wrap;}
+.benchmark-views button {border:0;border-radius:4px;min-height:44px;padding:.7rem .85rem;background:transparent;color:var(--text-2);font:.75rem var(--mono);}
+.benchmark-views button[aria-pressed=true] {color:var(--ink-0);background:var(--accent);box-shadow:inset 0 0 0 1px #ffffff0d;}
+.benchmark-views button:not(:disabled):hover {box-shadow:inset 0 0 0 1px var(--line);}
+.benchmark-selects {display:flex;gap:.8rem;flex-wrap:wrap;}
+.benchmark-selects label {font:.6rem var(--mono);color:var(--text-2);display:grid;gap:.35rem;text-transform:uppercase;letter-spacing:.03em;}
+.benchmark-selects select {min-height:36px;border:1px solid var(--line);border-radius:3px;background:var(--ink-0);color:var(--text-1);padding:.35rem 1.5rem .35rem .5rem;font:.7rem var(--mono);text-transform:none;max-width:100%;}
+.benchmark-charts {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;}
+.benchmark-chart {min-width:0;margin:0;padding:1.75rem 1.5rem;background:linear-gradient(145deg,#ffffff50,transparent 70%);}
+.benchmark-chart + .benchmark-chart {border-left:1px solid var(--line-soft);}
+.benchmark-chart:only-child {grid-column:1/-1;max-width:850px;width:100%;margin:auto;}
+.benchmark-chart figcaption {display:flex;justify-content:space-between;gap:1rem;align-items:start;margin-bottom:1.8rem;}
+.benchmark-chart h3 {font-size:1rem;line-height:1.3;margin:0 0 .35rem;}
+.benchmark-chart figcaption p {font:.625rem/1.5 var(--mono);color:var(--text-2);margin:0;}
+.benchmark-unit {text-align:right;font:.75rem var(--mono);white-space:nowrap;}
+.benchmark-unit small {display:block;font:.6rem var(--mono);color:var(--text-2);margin-top:.4rem;}
+.benchmark-chart ol {padding:0;list-style:none;margin:0;}
+.benchmark-row {display:grid;grid-template-columns:minmax(90px,1fr) minmax(80px,2fr) 78px;gap:.85rem;align-items:center;min-height:66px;border-bottom:1px solid #b8bdb320;}
+.benchmark-name {font:.7rem/1.45 var(--sans);color:var(--text-2);}
+.benchmark-track {position:relative;display:block;height:26px;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#b8bdb33b calc(25% - 1px),#b8bdb33b 25%);}
+.benchmark-bar {display:block;height:100%;border-radius:0 3px 3px 0;background:repeating-linear-gradient(135deg,#8e9a8e 0,#8e9a8e 5px,#879487 5px,#879487 6px);transform-origin:left;animation:benchmark-grow .45s cubic-bezier(.2,.6,.3,1) both;}
+.benchmark-row.is-stow .benchmark-name {font-weight:650;color:var(--accent);}
+.benchmark-row.is-stow .benchmark-bar {background:linear-gradient(90deg,var(--accent),#32764c);box-shadow:inset 0 1px 0 #ffffff25;}
+.benchmark-spread {position:absolute;top:50%;height:12px;background:transparent;border-inline:1px solid var(--text-1);transform:translateY(-50%);}
+.benchmark-spread::after {content:"";position:absolute;top:5px;width:100%;height:1px;background:var(--text-1);}
+.benchmark-value {text-align:right;font:.8rem/1.35 var(--mono);font-variant-numeric:tabular-nums;}
+.benchmark-value small {display:block;font-size:.55rem;color:var(--text-2);margin-top:.25rem;}
+.benchmark-axis {display:flex;justify-content:space-between;margin:1rem 78px 0 calc((100% - 78px - 1.7rem)/3 + .85rem);font:.6rem var(--mono);color:var(--text-2);}
+.benchmark-context {padding:0 1.5rem 1.4rem;margin:0;font:.675rem/1.8 var(--mono);color:var(--text-2);max-width:120ch;}
+.benchmark-proof {display:flex;align-items:center;gap:1rem 2rem;flex-wrap:wrap;border-top:1px solid var(--line);padding:.9rem 1.5rem;background:var(--accent-quiet);font:.625rem/1.7 var(--mono);color:var(--accent);}
+.benchmark-proof i {font-style:normal;border:1px solid var(--accent-soft);border-radius:50%;width:17px;height:17px;display:inline-grid;place-items:center;margin-right:.35rem;}
+.benchmark-proof a {margin-left:auto;min-height:36px;display:inline-flex;align-items:center;gap:.7rem;}
+.benchmark-method {margin-top:1.2rem;font-size:.75rem;color:var(--text-2);}
+.benchmark-method summary {min-height:44px;display:list-item;align-content:center;color:var(--accent);}
+.benchmark-method > div {columns:2;column-gap:3rem;padding-block:.5rem;max-width:110ch;}
+.benchmark-method p {margin:0 0 1rem;break-inside:avoid;line-height:1.8;}
+@keyframes benchmark-grow {from {transform:scaleX(0)} to {transform:scaleX(1)}}
+@media(max-width:1000px){.benchmark-toolbar {align-items:start;}.benchmark-charts {grid-template-columns:1fr;}.benchmark-chart + .benchmark-chart {border-left:0;border-top:1px solid var(--line-soft);}.benchmark-row {grid-template-columns:minmax(110px,1fr) minmax(140px,3fr) 92px;}.benchmark-axis {margin-inline:calc((100% - 92px - 1.7rem)/4 + .85rem) 92px;}}
+@media(max-width:600px){.performance {padding-block:40px;}.performance-heading {display:block;}.benchmark-stamp {display:inline-block;margin-top:1.25rem;}.benchmark-toolbar,.benchmark-chart {padding:1rem;}.benchmark-views {gap:.15rem;}.benchmark-views button {font-size:.65rem;padding-inline:.6rem;}.benchmark-selects {gap:.5rem;}.benchmark-selects label {min-width:0;}.benchmark-selects select {font-size:.65rem;}.benchmark-chart figcaption {margin-bottom:1.2rem;}.benchmark-unit {font-size:.675rem;}.benchmark-unit small {font-size:.5rem;}.benchmark-row {grid-template-columns:80px minmax(50px,1fr) 65px;gap:.55rem;}.benchmark-name {font-size:.625rem;}.benchmark-value {font-size:.725rem;}.benchmark-value small {font-size:.5rem;}.benchmark-axis {margin-inline:calc(80px + .55rem) calc(65px + .55rem);}.benchmark-context {padding:0 1rem 1rem;font-size:.6rem;}.benchmark-proof {padding:.75rem 1rem;gap:.5rem 1rem;}.benchmark-proof a {margin-left:0;}.benchmark-method > div {columns:1;}}
+@media(prefers-reduced-motion:reduce){.benchmark-bar {animation:none;}}
+</style></head><body><main><section class="performance container" id="performance" aria-labelledby="performance-title">
+    <div class="performance-heading"><div><p class="eyebrow">Measured on Railway</p><h2 id="performance-title">Agent storage, measured.</h2><p>Stow, MinIO, S3Proxy and RustFS: compare S3 server startup, first write, transfer, quarantine and memory.</p></div><span class="benchmark-stamp">Development snapshot<span>2026-10-13</span></span></div>
+    <div class="benchmark-board" data-benchmark-board>
+      <div class="benchmark-toolbar"><div class="benchmark-views" role="group" aria-label="Benchmark workload"><button type="button" data-view="agents" aria-pressed="true">Storage startup</button><button type="button" data-view="transfer" aria-pressed="false">Ingress &amp; egress</button><button type="button" data-view="quarantine" aria-pressed="false">Quarantine</button><button type="button" data-view="memory" aria-pressed="false">Memory</button></div>
+      <div class="benchmark-selects"><label>Storage<select data-storage><option value="filesystem">Filesystem</option><option value="memory">Memory</option></select></label><label>Payload<select data-bytes><option value="4096">4 KiB</option></select></label></div></div>
+      <div data-benchmark-panel><div class="benchmark-charts"><figure class="benchmark-chart"><figcaption><div><h3>Ready to work</h3><p>Median · whiskers show observed range</p></div><span class="benchmark-unit">ms<small>↓ Lower is better</small></span></figcaption><ol><li class="benchmark-row is-stow"><span class="benchmark-name">Stow</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:1.3384843499981798%"></i><i class="benchmark-spread" style="left:1.1854256000020542%;width:0.9383079999941402%"></i></span><span class="benchmark-value">26.77<small>23.71–42.47</small></span></li><li class="benchmark-row"><span class="benchmark-name">RustFS</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:5.238798449991736%"></i><i class="benchmark-spread" style="left:4.157149250002112%;width:3.2229057499906046%"></i></span><span class="benchmark-value">104.8<small>83.14–147.6</small></span></li><li class="benchmark-row"><span class="benchmark-name">MinIO</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:10.448529250000139%"></i><i class="benchmark-spread" style="left:9.796997500001453%;width:6.115200649993494%"></i></span><span class="benchmark-value">209<small>195.9–318.2</small></span></li><li class="benchmark-row"><span class="benchmark-name">S3Proxy</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:49.60511675000307%"></i><i class="benchmark-spread" style="left:46.393739950004964%;width:4.9265360499965025%"></i></span><span class="benchmark-value">992.1<small>927.9–1,026</small></span></li></ol><div class="benchmark-axis" aria-hidden="true"><span>0</span><span>1,000</span><span>2,000</span></div></figure><figure class="benchmark-chart"><figcaption><div><h3>Time to first write</h3><p>Median · whiskers show observed range</p></div><span class="benchmark-unit">ms<small>↓ Lower is better</small></span></figcaption><ol><li class="benchmark-row is-stow"><span class="benchmark-name">Stow</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:2.0609759000013583%"></i><i class="benchmark-spread" style="left:1.8056397499982269%;width:1.1055548999924214%"></i></span><span class="benchmark-value">41.22<small>36.11–58.22</small></span></li><li class="benchmark-row"><span class="benchmark-name">RustFS</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:7.574436550005339%"></i><i class="benchmark-spread" style="left:6.512417199998163%;width:3.1825869999942373%"></i></span><span class="benchmark-value">151.5<small>130.2–193.9</small></span></li><li class="benchmark-row"><span class="benchmark-name">MinIO</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:11.096506349998526%"></i><i class="benchmark-spread" style="left:10.360493749997113%;width:6.435574700002325%"></i></span><span class="benchmark-value">221.9<small>207.2–335.9</small></span></li><li class="benchmark-row"><span class="benchmark-name">S3Proxy</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:54.29375710000167%"></i><i class="benchmark-spread" style="left:49.311938549997286%;width:8.258674250001787%"></i></span><span class="benchmark-value">1,086<small>986.2–1,151</small></span></li></ol><div class="benchmark-axis" aria-hidden="true"><span>0</span><span>1,000</span><span>2,000</span></div></figure></div><p class="benchmark-context">Fresh S3 server processes with empty data directories. Startup ends on authenticated readiness; first write includes bucket creation and a 4 KiB PUT over target loopback. Nine launches per product; 10 ms readiness polls. Images and binaries are already present. This measures storage server startup, not an agent’s full startup.</p></div>
+      <div class="benchmark-proof"><span><i aria-hidden="true">✓</i> SHA-256 + length verified</span><span>Zero failed or dropped workflows</span><a href="data:application/json;charset=utf-8,%7B%22version%22%3A2%2C%22complete%22%3Atrue%2C%22comparisonScope%22%3A%22S3-shaped%20agent%20storage%22%2C%22qualification%22%3A%22Exploratory%20development%20snapshot%3B%20fixed%20workloads%2C%20not%20a%20sustained-capacity%20qualification%22%2C%22measuredAt%22%3A%222026-10-13T20%3A22%3A58.318Z%22%2C%22runId%22%3A%2259d62a35-6293-4ddb-a06f-ce041bd9b9c9%22%2C%22source%22%3A%7B%22commit%22%3A%22e7140fde9fc605b8213960a06d5e139e9b81d893%22%2C%22dirtyFiles%22%3A%5B%22M%20Makefile%22%2C%22%20M%20docs%2FCODE_STANDARDS.md%22%2C%22%20M%20docs%2FREADME.md%22%2C%22%20M%20docs%2Fadr%2F0008-workspace-backend-real-files.md%22%2C%22%20M%20docs%2Fadr%2FREADME.md%22%2C%22%20M%20docs%2Fportable-workspace-usage.md%22%2C%22%20M%20go.mod%22%2C%22%20M%20go.sum%22%2C%22%20M%20internal%2Fruntime%2Fstream-writes.go%22%2C%22%20M%20internal%2Fstorage%2Ffs%2Fcapacity.go%22%2C%22%20M%20internal%2Fstorage%2Ffs%2Ffs.go%22%2C%22%20M%20internal%2Fstorage%2Ffs%2Ffs_list.go%22%2C%22%20M%20internal%2Fstorage%2Ffs%2Ffs_put.go%22%2C%22%20M%20internal%2Fstorage%2Ffs%2Ffs_records.go%22%2C%22%20M%20internal%2Fstorage%2Futil.go%22%2C%22%20M%20packages%2Fstow-s3%2Fdist%2Fstow-runtime.wasm%22%2C%22%20M%20site%2Fbuild.mjs%22%2C%22%20M%20site%2Findex.html%22%2C%22%20M%20tools%2Fquality%2Fmain.go%22%2C%22%3F%3F%20.github%2Fworkflows%2Fperformance.yml%22%2C%22%3F%3F%20benchmark%2F%22%2C%22%3F%3F%20docs%2Fadr%2F0020-binary-object-records.md%22%2C%22%3F%3F%20docs%2Fbenchmarks%2F2026-10-12-performance%2F%22%2C%22%3F%3F%20docs%2Fbenchmarks%2F2026-10-13-memory-performance%2F%22%2C%22%3F%3F%20docs%2Fbenchmarks%2F2026-10-13-railway-performance%2F%22%2C%22%3F%3F%20docs%2Fbenchmarks%2F2026-10-13-storage-optimization%2F%22%2C%22%3F%3F%20docs%2Fbenchmarks%2Fperformance-local.json%22%2C%22%3F%3F%20docs%2Fbenchmarks%2Fperformance-qualification.json%22%2C%22%3F%3F%20docs%2Fbenchmarks%2Frailway-environment.json%22%2C%22%3F%3F%20docs%2Fperformance-testing.md%22%2C%22%3F%3F%20docs%2Frailway-performance.md%22%2C%22%3F%3F%20internal%2Fruntime%2Fstream_allocation_test.go%22%2C%22%3F%3F%20internal%2Fstorage%2Ffs%2Frecord_codec.go%22%2C%22%3F%3F%20internal%2Fstorage%2Ffs%2Frecord_format_test.go%22%2C%22%3F%3F%20internal%2Fstorage%2Ffs%2Frecord_io.go%22%2C%22%3F%3F%20internal%2Fstorage%2Ffs%2Frecord_performance_test.go%22%2C%22%3F%3F%20internal%2Fstorage%2Ffs%2Frecordpb%2F%22%2C%22%3F%3F%20internal%2Fstorage%2Fowned_reader.go%22%2C%22%3F%3F%20internal%2Fstorage%2Fowned_reader_test.go%22%2C%22%3F%3F%20packages%2Fstow-s3%2Fscripts%2Fbenchmark-performance.mjs%22%2C%22%3F%3F%20packages%2Fstow-s3%2Fscripts%2Fperformance%2F%22%2C%22%3F%3F%20pkg%2Fstow%2Fperformance_benchmark_test.go%22%2C%22%3F%3F%20scripts%2Fbenchmark-embedded.mjs%22%2C%22%3F%3F%20scripts%2Fperformance.test.mjs%22%2C%22%3F%3F%20site%2Fassets%2Fbenchmark-render.js%22%2C%22%3F%3F%20site%2Fassets%2Fbenchmarks.css%22%2C%22%3F%3F%20site%2Fassets%2Fbenchmarks.js%22%2C%22%3F%3F%20tools%2Fquality%2Fgenerated.go%22%2C%22%3F%3F%20tools%2Fquality%2Fgenerated_test.go%22%5D%2C%22payloadSha256%22%3A%228289f7bec9339e6e1ea26d70ad6eea40f99ef1be657d75c0762edb7981463447%22%2C%22note%22%3A%22Explicit%20source%20snapshot%3B%20includes%20uncommitted%20benchmark%20files%2C%20excludes%20credentials%20and%20caches%22%7D%2C%22binaryHashes%22%3A%7B%22stow-s3%22%3A%22934473bd3d56d74f52f4eff27154bc7fe4ec6297c2a72c77b0499076c0b0cc2a%22%2C%22minio%22%3A%2225f041db600ba7b5e617246d53da7d66555839bd823c5eb9f70c0d5a3f60e1fd%22%2C%22rustfs%22%3A%22a5ac41209ca8eca6c591c1584cc108b308850e1b74955afd4af9fe1b0379f2eb%22%2C%22s3proxy.jar%22%3A%22cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b%22%7D%2C%22wasmSha256%22%3A%22f4da0cecaa4d19307b77314be57a5b3cf50d9b784c175baead6b0e0a6a4fc2b0%22%2C%22versions%22%3A%7B%22node%22%3A%2225.9.0%22%2C%22go%22%3A%221.25.6%22%2C%22java%22%3A%2217.0.16%2B8%22%2C%22rustfs%22%3A%221.0.1%22%2C%22rustfsPackageSha256%22%3A%22fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9%22%2C%22s3proxy%22%3A%224.1.1%22%2C%22s3proxySha256%22%3A%22cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b%22%2C%22minio%22%3A%22RELEASE.2025-10-15T17-29-55Z%22%2C%22minioSourceSha256%22%3A%22be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c%22%7D%2C%22names%22%3A%7B%22stow-memory%22%3A%22Stow%22%2C%22stow-filesystem%22%3A%22Stow%22%2C%22s3proxy-memory%22%3A%22S3Proxy%22%2C%22s3proxy-filesystem%22%3A%22S3Proxy%22%2C%22minio-filesystem%22%3A%22MinIO%22%2C%22rustfs-filesystem%22%3A%22RustFS%22%7D%2C%22hardware%22%3A%7B%22cpu%22%3A%22AMD%20EPYC%209655P%2096-Core%20Processor%22%2C%22targetCpuMax%22%3A%22200000%20100000%22%2C%22targetMemoryMax%22%3A%222147483648%22%2C%22runnerCpuMax%22%3A%22400000%20100000%22%2C%22runnerMemoryMax%22%3A%224294967296%22%7D%2C%22settings%22%3A%7B%22sizes%22%3A%5B1048576%5D%2C%22concurrency%22%3A%5B4%5D%2C%22repetitions%22%3A3%2C%22warmupSeconds%22%3A5%2C%22durationSeconds%22%3A20%2C%22retainedObjects%22%3A16%2C%22scannerDelayMs%22%3A2%2C%22putPattern%22%3A%22Overwrite%20one%20key%20per%20worker%22%2C%22s3GetPattern%22%3A%22Cycle%20retained%20fixtures%22%2C%22serverStartup%22%3A%7B%22samplesPerProduct%22%3A9%2C%22bytes%22%3A4096%2C%22readinessPollMs%22%3A10%7D%2C%22transport%22%3A%22Private%20HTTP%2C%20no%20TLS%22%2C%22storage%22%3A%22Filesystem%3A%20same%20persistent%20target%20volume%3B%20memory%3A%20RAM%22%7D%2C%22validation%22%3A%7B%22failed%22%3A0%2C%22dropped%22%3A0%2C%22verified%22%3Atrue%2C%22sameBuild%22%3Atrue%2C%22s3Runs%22%3A54%2C%22generatorThrottledPeriods%22%3A0%2C%22maxGeneratorCpuPercent%22%3A154.838%2C%22maxTargetThrottledPeriodPercent%22%3A92%7D%2C%22s3%22%3A%5B%7B%22backend%22%3A%22memory%22%2C%22workload%22%3A%22put%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22stow-memory%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A197.35%2C%22payloadMiBPerSecond%22%3A197.35%2C%22minPayloadMiBPerSecond%22%3A196.65%2C%22maxPayloadMiBPerSecond%22%3A197.4%2C%22successfulRequestsPerSecond%22%3A197.35%2C%22medianRunP99ResponseMs%22%3A38.075%2C%22medianRunP99ServiceMs%22%3A38.075%2C%22peakSampledServerRssMiB%22%3A68.598%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A3937%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22memory%22%2C%22workload%22%3A%22put%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22s3proxy-memory%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A223.55%2C%22payloadMiBPerSecond%22%3A223.55%2C%22minPayloadMiBPerSecond%22%3A220.8%2C%22maxPayloadMiBPerSecond%22%3A229.3%2C%22successfulRequestsPerSecond%22%3A223.55%2C%22medianRunP99ResponseMs%22%3A34.128%2C%22medianRunP99ServiceMs%22%3A34.128%2C%22peakSampledServerRssMiB%22%3A559.574%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A4420%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22put%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22stow-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A66.45%2C%22payloadMiBPerSecond%22%3A66.45%2C%22minPayloadMiBPerSecond%22%3A66.45%2C%22maxPayloadMiBPerSecond%22%3A66.55%2C%22successfulRequestsPerSecond%22%3A66.45%2C%22medianRunP99ResponseMs%22%3A93.234%2C%22medianRunP99ServiceMs%22%3A93.234%2C%22peakSampledServerRssMiB%22%3A33.367%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A1333%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22put%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22s3proxy-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A66.7%2C%22payloadMiBPerSecond%22%3A66.7%2C%22minPayloadMiBPerSecond%22%3A66.6%2C%22maxPayloadMiBPerSecond%22%3A66.75%2C%22successfulRequestsPerSecond%22%3A66.7%2C%22medianRunP99ResponseMs%22%3A106.109%2C%22medianRunP99ServiceMs%22%3A106.109%2C%22peakSampledServerRssMiB%22%3A398.246%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A1336%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22put%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22minio-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A65.5%2C%22payloadMiBPerSecond%22%3A65.5%2C%22minPayloadMiBPerSecond%22%3A65.45%2C%22maxPayloadMiBPerSecond%22%3A65.55%2C%22successfulRequestsPerSecond%22%3A65.5%2C%22medianRunP99ResponseMs%22%3A107.17%2C%22medianRunP99ServiceMs%22%3A107.17%2C%22peakSampledServerRssMiB%22%3A275.219%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A1313%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22put%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22rustfs-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A65.35%2C%22payloadMiBPerSecond%22%3A65.35%2C%22minPayloadMiBPerSecond%22%3A65.25%2C%22maxPayloadMiBPerSecond%22%3A65.35%2C%22successfulRequestsPerSecond%22%3A65.35%2C%22medianRunP99ResponseMs%22%3A107.17%2C%22medianRunP99ServiceMs%22%3A107.17%2C%22peakSampledServerRssMiB%22%3A199.105%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A1309%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22memory%22%2C%22workload%22%3A%22get%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22stow-memory%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A505.6%2C%22payloadMiBPerSecond%22%3A505.6%2C%22minPayloadMiBPerSecond%22%3A499.45%2C%22maxPayloadMiBPerSecond%22%3A507.35%2C%22successfulRequestsPerSecond%22%3A505.6%2C%22medianRunP99ResponseMs%22%3A18.415%2C%22medianRunP99ServiceMs%22%3A18.415%2C%22peakSampledServerRssMiB%22%3A67.195%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A9993%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22memory%22%2C%22workload%22%3A%22get%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22s3proxy-memory%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A446.7%2C%22payloadMiBPerSecond%22%3A446.7%2C%22minPayloadMiBPerSecond%22%3A381.4%2C%22maxPayloadMiBPerSecond%22%3A451.6%2C%22successfulRequestsPerSecond%22%3A446.7%2C%22medianRunP99ResponseMs%22%3A21.168%2C%22medianRunP99ServiceMs%22%3A21.168%2C%22peakSampledServerRssMiB%22%3A312.406%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A7632%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22get%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22stow-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A356.95%2C%22payloadMiBPerSecond%22%3A356.95%2C%22minPayloadMiBPerSecond%22%3A353.05%2C%22maxPayloadMiBPerSecond%22%3A393.3%2C%22successfulRequestsPerSecond%22%3A356.95%2C%22medianRunP99ResponseMs%22%3A29.105%2C%22medianRunP99ServiceMs%22%3A29.105%2C%22peakSampledServerRssMiB%22%3A30.203%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A7065%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22get%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22s3proxy-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A417.45%2C%22payloadMiBPerSecond%22%3A417.45%2C%22minPayloadMiBPerSecond%22%3A410.55%2C%22maxPayloadMiBPerSecond%22%3A435.2%2C%22successfulRequestsPerSecond%22%3A417.45%2C%22medianRunP99ResponseMs%22%3A23.852%2C%22medianRunP99ServiceMs%22%3A23.852%2C%22peakSampledServerRssMiB%22%3A379.828%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A8215%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22get%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22minio-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A536.7%2C%22payloadMiBPerSecond%22%3A536.7%2C%22minPayloadMiBPerSecond%22%3A531.85%2C%22maxPayloadMiBPerSecond%22%3A537.3%2C%22successfulRequestsPerSecond%22%3A536.7%2C%22medianRunP99ResponseMs%22%3A19.354%2C%22medianRunP99ServiceMs%22%3A19.354%2C%22peakSampledServerRssMiB%22%3A365.547%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A10641%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22get%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22rustfs-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A559.9%2C%22payloadMiBPerSecond%22%3A559.9%2C%22minPayloadMiBPerSecond%22%3A554.3%2C%22maxPayloadMiBPerSecond%22%3A560.85%2C%22successfulRequestsPerSecond%22%3A559.9%2C%22medianRunP99ResponseMs%22%3A17.176%2C%22medianRunP99ServiceMs%22%3A17.176%2C%22peakSampledServerRssMiB%22%3A184.012%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A11090%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22memory%22%2C%22workload%22%3A%22quarantine%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22stow-memory%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A113.95%2C%22payloadMiBPerSecond%22%3A113.95%2C%22minPayloadMiBPerSecond%22%3A113.6%2C%22maxPayloadMiBPerSecond%22%3A114.6%2C%22successfulRequestsPerSecond%22%3A570%2C%22medianRunP99ResponseMs%22%3A51.833%2C%22medianRunP99ServiceMs%22%3A51.833%2C%22peakSampledServerRssMiB%22%3A69.012%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A2276%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22memory%22%2C%22workload%22%3A%22quarantine%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22s3proxy-memory%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A120.05%2C%22payloadMiBPerSecond%22%3A120.05%2C%22minPayloadMiBPerSecond%22%3A119.95%2C%22maxPayloadMiBPerSecond%22%3A126.1%2C%22successfulRequestsPerSecond%22%3A600.5%2C%22medianRunP99ResponseMs%22%3A52.352%2C%22medianRunP99ServiceMs%22%3A52.352%2C%22peakSampledServerRssMiB%22%3A430.383%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A2403%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22quarantine%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22stow-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A50.35%2C%22payloadMiBPerSecond%22%3A50.35%2C%22minPayloadMiBPerSecond%22%3A46.9%2C%22maxPayloadMiBPerSecond%22%3A51.25%2C%22successfulRequestsPerSecond%22%3A252.1%2C%22medianRunP99ResponseMs%22%3A124.422%2C%22medianRunP99ServiceMs%22%3A124.422%2C%22peakSampledServerRssMiB%22%3A30.051%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A942%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22quarantine%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22s3proxy-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A123%2C%22payloadMiBPerSecond%22%3A123%2C%22minPayloadMiBPerSecond%22%3A120.8%2C%22maxPayloadMiBPerSecond%22%3A127.35%2C%22successfulRequestsPerSecond%22%3A615.35%2C%22medianRunP99ResponseMs%22%3A53.938%2C%22medianRunP99ServiceMs%22%3A53.938%2C%22peakSampledServerRssMiB%22%3A388.465%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A2420%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22quarantine%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22minio-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A65.4%2C%22payloadMiBPerSecond%22%3A65.4%2C%22minPayloadMiBPerSecond%22%3A65.4%2C%22maxPayloadMiBPerSecond%22%3A65.45%2C%22successfulRequestsPerSecond%22%3A327.15%2C%22medianRunP99ResponseMs%22%3A98.97%2C%22medianRunP99ServiceMs%22%3A98.97%2C%22peakSampledServerRssMiB%22%3A372.84%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A1312%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%2C%7B%22backend%22%3A%22filesystem%22%2C%22workload%22%3A%22quarantine%22%2C%22bytes%22%3A1048576%2C%22concurrency%22%3A4%2C%22rate%22%3A0%2C%22soak%22%3Afalse%2C%22implementation%22%3A%22rustfs-filesystem%22%2C%22repetitions%22%3A3%2C%22filesPerSecond%22%3A53.35%2C%22payloadMiBPerSecond%22%3A53.35%2C%22minPayloadMiBPerSecond%22%3A51.85%2C%22maxPayloadMiBPerSecond%22%3A53.4%2C%22successfulRequestsPerSecond%22%3A267.15%2C%22medianRunP99ResponseMs%22%3A123.19%2C%22medianRunP99ServiceMs%22%3A123.19%2C%22peakSampledServerRssMiB%22%3A217.563%2C%22failedFiles%22%3A0%2C%22droppedFiles%22%3A0%2C%22minimumCompletedSamples%22%3A1041%2C%22verified%22%3Atrue%2C%22diskHeadroomMaintained%22%3Atrue%7D%5D%2C%22serverAgent%22%3A%5B%7B%22implementation%22%3A%22stow-memory%22%2C%22bytes%22%3A4096%2C%22startup%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A18.877165999962017%2C%22minMs%22%3A16.175070999888703%2C%22maxMs%22%3A24.085434000007808%2C%22p95Ms%22%3A24.085434000007808%7D%2C%22firstWrite%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A22.100414999993518%2C%22minMs%22%3A19.696317999856547%2C%22maxMs%22%3A28.571457999991253%2C%22p95Ms%22%3A28.571457999991253%7D%2C%22verified%22%3Atrue%7D%2C%7B%22implementation%22%3A%22s3proxy-memory%22%2C%22bytes%22%3A4096%2C%22startup%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A994.0184069999959%2C%22minMs%22%3A937.7386420000112%2C%22maxMs%22%3A1103.6667700000107%2C%22p95Ms%22%3A1103.6667700000107%7D%2C%22firstWrite%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A1148.9651399999857%2C%22minMs%22%3A1082.5702939999755%2C%22maxMs%22%3A1283.103700999869%2C%22p95Ms%22%3A1283.103700999869%7D%2C%22verified%22%3Atrue%7D%2C%7B%22implementation%22%3A%22stow-filesystem%22%2C%22bytes%22%3A4096%2C%22startup%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A26.769686999963596%2C%22minMs%22%3A23.708512000041083%2C%22maxMs%22%3A42.474671999923885%2C%22p95Ms%22%3A42.474671999923885%7D%2C%22firstWrite%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A41.219518000027165%2C%22minMs%22%3A36.112794999964535%2C%22maxMs%22%3A58.22389299981296%2C%22p95Ms%22%3A58.22389299981296%7D%2C%22verified%22%3Atrue%7D%2C%7B%22implementation%22%3A%22s3proxy-filesystem%22%2C%22bytes%22%3A4096%2C%22startup%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A992.1023350000614%2C%22minMs%22%3A927.8747990000993%2C%22maxMs%22%3A1026.4055200000294%2C%22p95Ms%22%3A1026.4055200000294%7D%2C%22firstWrite%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A1085.8751420000335%2C%22minMs%22%3A986.2387709999457%2C%22maxMs%22%3A1151.4122559999814%2C%22p95Ms%22%3A1151.4122559999814%7D%2C%22verified%22%3Atrue%7D%2C%7B%22implementation%22%3A%22minio-filesystem%22%2C%22bytes%22%3A4096%2C%22startup%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A208.97058500000276%2C%22minMs%22%3A195.93995000002906%2C%22maxMs%22%3A318.24396299989894%2C%22p95Ms%22%3A318.24396299989894%7D%2C%22firstWrite%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A221.93012699997053%2C%22minMs%22%3A207.20987499994226%2C%22maxMs%22%3A335.9213689999888%2C%22p95Ms%22%3A335.9213689999888%7D%2C%22verified%22%3Atrue%7D%2C%7B%22implementation%22%3A%22rustfs-filesystem%22%2C%22bytes%22%3A4096%2C%22startup%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A104.77596899983473%2C%22minMs%22%3A83.14298500004224%2C%22maxMs%22%3A147.60109999985434%2C%22p95Ms%22%3A147.60109999985434%7D%2C%22firstWrite%22%3A%7B%22samples%22%3A9%2C%22medianMs%22%3A151.48873100010678%2C%22minMs%22%3A130.24834399996325%2C%22maxMs%22%3A193.900083999848%2C%22p95Ms%22%3A193.900083999848%7D%2C%22verified%22%3Atrue%7D%5D%7D" download="stow-benchmark-results.json">Download results <span aria-hidden="true">↗</span></a></div>
+    </div>
+    <details class="benchmark-method"><summary>Test settings and what these comparisons cover</summary><div><p>AMD EPYC 9655P 96-Core Processor. One target at a time; separate generator. Each S3 server uses the same resource ceilings and client workflows. Filesystem and memory backends are compared separately. Bars use a linear scale from zero; ranges describe observed samples.</p><p>These peers expose S3-shaped blob storage. The workloads exercise bucket creation, PUT, GET and DELETE; they do not establish full S3 feature parity. Durability guarantees differ: Stow filesystem publishes with rename and fsync; S3Proxy’s filesystem adapter differs; RustFS uses one drive with strict durability.</p><p>These are exploratory development measurements. Image downloads, deployments, browser startup, cold OS caches, real scanners, flagged-file promotion, replication and failover are unmeasured. Some target runs reach the CPU ceiling; the fixed generator and concurrency can also constrain rates.</p></div></details>
+    <script id="benchmark-data" type="application/json">{"version":2,"complete":true,"comparisonScope":"S3-shaped agent storage","qualification":"Exploratory development snapshot; fixed workloads, not a sustained-capacity qualification","measuredAt":"2026-10-13T20:22:58.318Z","runId":"59d62a35-6293-4ddb-a06f-ce041bd9b9c9","source":{"commit":"e7140fde9fc605b8213960a06d5e139e9b81d893","dirtyFiles":["M Makefile"," M docs/CODE_STANDARDS.md"," M docs/README.md"," M docs/adr/0008-workspace-backend-real-files.md"," M docs/adr/README.md"," M docs/portable-workspace-usage.md"," M go.mod"," M go.sum"," M internal/runtime/stream-writes.go"," M internal/storage/fs/capacity.go"," M internal/storage/fs/fs.go"," M internal/storage/fs/fs_list.go"," M internal/storage/fs/fs_put.go"," M internal/storage/fs/fs_records.go"," M internal/storage/util.go"," M packages/stow-s3/dist/stow-runtime.wasm"," M site/build.mjs"," M site/index.html"," M tools/quality/main.go","?? .github/workflows/performance.yml","?? benchmark/","?? docs/adr/0020-binary-object-records.md","?? docs/benchmarks/2026-10-12-performance/","?? docs/benchmarks/2026-10-13-memory-performance/","?? docs/benchmarks/2026-10-13-railway-performance/","?? docs/benchmarks/2026-10-13-storage-optimization/","?? docs/benchmarks/performance-local.json","?? docs/benchmarks/performance-qualification.json","?? docs/benchmarks/railway-environment.json","?? docs/performance-testing.md","?? docs/railway-performance.md","?? internal/runtime/stream_allocation_test.go","?? internal/storage/fs/record_codec.go","?? internal/storage/fs/record_format_test.go","?? internal/storage/fs/record_io.go","?? internal/storage/fs/record_performance_test.go","?? internal/storage/fs/recordpb/","?? internal/storage/owned_reader.go","?? internal/storage/owned_reader_test.go","?? packages/stow-s3/scripts/benchmark-performance.mjs","?? packages/stow-s3/scripts/performance/","?? pkg/stow/performance_benchmark_test.go","?? scripts/benchmark-embedded.mjs","?? scripts/performance.test.mjs","?? site/assets/benchmark-render.js","?? site/assets/benchmarks.css","?? site/assets/benchmarks.js","?? tools/quality/generated.go","?? tools/quality/generated_test.go"],"payloadSha256":"8289f7bec9339e6e1ea26d70ad6eea40f99ef1be657d75c0762edb7981463447","note":"Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"},"binaryHashes":{"stow-s3":"934473bd3d56d74f52f4eff27154bc7fe4ec6297c2a72c77b0499076c0b0cc2a","minio":"25f041db600ba7b5e617246d53da7d66555839bd823c5eb9f70c0d5a3f60e1fd","rustfs":"a5ac41209ca8eca6c591c1584cc108b308850e1b74955afd4af9fe1b0379f2eb","s3proxy.jar":"cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b"},"wasmSha256":"f4da0cecaa4d19307b77314be57a5b3cf50d9b784c175baead6b0e0a6a4fc2b0","versions":{"node":"25.9.0","go":"1.25.6","java":"17.0.16+8","rustfs":"1.0.1","rustfsPackageSha256":"fdb9d5fe1693072029e7bcaa5f2b89a668f28b881f2aa07b5166d23772205dd9","s3proxy":"4.1.1","s3proxySha256":"cd2e81919e7e1b8d8a23750c9792bb306a2f841a0222a80919b72e989eedd94b","minio":"RELEASE.2025-10-15T17-29-55Z","minioSourceSha256":"be6d0bd3696c3a13a35f02d3a0280b64319c67918b4501c5c3d87f96d000085c"},"names":{"stow-memory":"Stow","stow-filesystem":"Stow","s3proxy-memory":"S3Proxy","s3proxy-filesystem":"S3Proxy","minio-filesystem":"MinIO","rustfs-filesystem":"RustFS"},"hardware":{"cpu":"AMD EPYC 9655P 96-Core Processor","targetCpuMax":"200000 100000","targetMemoryMax":"2147483648","runnerCpuMax":"400000 100000","runnerMemoryMax":"4294967296"},"settings":{"sizes":[1048576],"concurrency":[4],"repetitions":3,"warmupSeconds":5,"durationSeconds":20,"retainedObjects":16,"scannerDelayMs":2,"putPattern":"Overwrite one key per worker","s3GetPattern":"Cycle retained fixtures","serverStartup":{"samplesPerProduct":9,"bytes":4096,"readinessPollMs":10},"transport":"Private HTTP, no TLS","storage":"Filesystem: same persistent target volume; memory: RAM"},"validation":{"failed":0,"dropped":0,"verified":true,"sameBuild":true,"s3Runs":54,"generatorThrottledPeriods":0,"maxGeneratorCpuPercent":154.838,"maxTargetThrottledPeriodPercent":92},"s3":[{"backend":"memory","workload":"put","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"stow-memory","repetitions":3,"filesPerSecond":197.35,"payloadMiBPerSecond":197.35,"minPayloadMiBPerSecond":196.65,"maxPayloadMiBPerSecond":197.4,"successfulRequestsPerSecond":197.35,"medianRunP99ResponseMs":38.075,"medianRunP99ServiceMs":38.075,"peakSampledServerRssMiB":68.598,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":3937,"verified":true,"diskHeadroomMaintained":true},{"backend":"memory","workload":"put","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"s3proxy-memory","repetitions":3,"filesPerSecond":223.55,"payloadMiBPerSecond":223.55,"minPayloadMiBPerSecond":220.8,"maxPayloadMiBPerSecond":229.3,"successfulRequestsPerSecond":223.55,"medianRunP99ResponseMs":34.128,"medianRunP99ServiceMs":34.128,"peakSampledServerRssMiB":559.574,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":4420,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"put","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"stow-filesystem","repetitions":3,"filesPerSecond":66.45,"payloadMiBPerSecond":66.45,"minPayloadMiBPerSecond":66.45,"maxPayloadMiBPerSecond":66.55,"successfulRequestsPerSecond":66.45,"medianRunP99ResponseMs":93.234,"medianRunP99ServiceMs":93.234,"peakSampledServerRssMiB":33.367,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":1333,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"put","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"s3proxy-filesystem","repetitions":3,"filesPerSecond":66.7,"payloadMiBPerSecond":66.7,"minPayloadMiBPerSecond":66.6,"maxPayloadMiBPerSecond":66.75,"successfulRequestsPerSecond":66.7,"medianRunP99ResponseMs":106.109,"medianRunP99ServiceMs":106.109,"peakSampledServerRssMiB":398.246,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":1336,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"put","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"minio-filesystem","repetitions":3,"filesPerSecond":65.5,"payloadMiBPerSecond":65.5,"minPayloadMiBPerSecond":65.45,"maxPayloadMiBPerSecond":65.55,"successfulRequestsPerSecond":65.5,"medianRunP99ResponseMs":107.17,"medianRunP99ServiceMs":107.17,"peakSampledServerRssMiB":275.219,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":1313,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"put","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"rustfs-filesystem","repetitions":3,"filesPerSecond":65.35,"payloadMiBPerSecond":65.35,"minPayloadMiBPerSecond":65.25,"maxPayloadMiBPerSecond":65.35,"successfulRequestsPerSecond":65.35,"medianRunP99ResponseMs":107.17,"medianRunP99ServiceMs":107.17,"peakSampledServerRssMiB":199.105,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":1309,"verified":true,"diskHeadroomMaintained":true},{"backend":"memory","workload":"get","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"stow-memory","repetitions":3,"filesPerSecond":505.6,"payloadMiBPerSecond":505.6,"minPayloadMiBPerSecond":499.45,"maxPayloadMiBPerSecond":507.35,"successfulRequestsPerSecond":505.6,"medianRunP99ResponseMs":18.415,"medianRunP99ServiceMs":18.415,"peakSampledServerRssMiB":67.195,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":9993,"verified":true,"diskHeadroomMaintained":true},{"backend":"memory","workload":"get","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"s3proxy-memory","repetitions":3,"filesPerSecond":446.7,"payloadMiBPerSecond":446.7,"minPayloadMiBPerSecond":381.4,"maxPayloadMiBPerSecond":451.6,"successfulRequestsPerSecond":446.7,"medianRunP99ResponseMs":21.168,"medianRunP99ServiceMs":21.168,"peakSampledServerRssMiB":312.406,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":7632,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"get","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"stow-filesystem","repetitions":3,"filesPerSecond":356.95,"payloadMiBPerSecond":356.95,"minPayloadMiBPerSecond":353.05,"maxPayloadMiBPerSecond":393.3,"successfulRequestsPerSecond":356.95,"medianRunP99ResponseMs":29.105,"medianRunP99ServiceMs":29.105,"peakSampledServerRssMiB":30.203,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":7065,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"get","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"s3proxy-filesystem","repetitions":3,"filesPerSecond":417.45,"payloadMiBPerSecond":417.45,"minPayloadMiBPerSecond":410.55,"maxPayloadMiBPerSecond":435.2,"successfulRequestsPerSecond":417.45,"medianRunP99ResponseMs":23.852,"medianRunP99ServiceMs":23.852,"peakSampledServerRssMiB":379.828,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":8215,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"get","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"minio-filesystem","repetitions":3,"filesPerSecond":536.7,"payloadMiBPerSecond":536.7,"minPayloadMiBPerSecond":531.85,"maxPayloadMiBPerSecond":537.3,"successfulRequestsPerSecond":536.7,"medianRunP99ResponseMs":19.354,"medianRunP99ServiceMs":19.354,"peakSampledServerRssMiB":365.547,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":10641,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"get","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"rustfs-filesystem","repetitions":3,"filesPerSecond":559.9,"payloadMiBPerSecond":559.9,"minPayloadMiBPerSecond":554.3,"maxPayloadMiBPerSecond":560.85,"successfulRequestsPerSecond":559.9,"medianRunP99ResponseMs":17.176,"medianRunP99ServiceMs":17.176,"peakSampledServerRssMiB":184.012,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":11090,"verified":true,"diskHeadroomMaintained":true},{"backend":"memory","workload":"quarantine","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"stow-memory","repetitions":3,"filesPerSecond":113.95,"payloadMiBPerSecond":113.95,"minPayloadMiBPerSecond":113.6,"maxPayloadMiBPerSecond":114.6,"successfulRequestsPerSecond":570,"medianRunP99ResponseMs":51.833,"medianRunP99ServiceMs":51.833,"peakSampledServerRssMiB":69.012,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":2276,"verified":true,"diskHeadroomMaintained":true},{"backend":"memory","workload":"quarantine","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"s3proxy-memory","repetitions":3,"filesPerSecond":120.05,"payloadMiBPerSecond":120.05,"minPayloadMiBPerSecond":119.95,"maxPayloadMiBPerSecond":126.1,"successfulRequestsPerSecond":600.5,"medianRunP99ResponseMs":52.352,"medianRunP99ServiceMs":52.352,"peakSampledServerRssMiB":430.383,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":2403,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"quarantine","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"stow-filesystem","repetitions":3,"filesPerSecond":50.35,"payloadMiBPerSecond":50.35,"minPayloadMiBPerSecond":46.9,"maxPayloadMiBPerSecond":51.25,"successfulRequestsPerSecond":252.1,"medianRunP99ResponseMs":124.422,"medianRunP99ServiceMs":124.422,"peakSampledServerRssMiB":30.051,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":942,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"quarantine","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"s3proxy-filesystem","repetitions":3,"filesPerSecond":123,"payloadMiBPerSecond":123,"minPayloadMiBPerSecond":120.8,"maxPayloadMiBPerSecond":127.35,"successfulRequestsPerSecond":615.35,"medianRunP99ResponseMs":53.938,"medianRunP99ServiceMs":53.938,"peakSampledServerRssMiB":388.465,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":2420,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"quarantine","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"minio-filesystem","repetitions":3,"filesPerSecond":65.4,"payloadMiBPerSecond":65.4,"minPayloadMiBPerSecond":65.4,"maxPayloadMiBPerSecond":65.45,"successfulRequestsPerSecond":327.15,"medianRunP99ResponseMs":98.97,"medianRunP99ServiceMs":98.97,"peakSampledServerRssMiB":372.84,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":1312,"verified":true,"diskHeadroomMaintained":true},{"backend":"filesystem","workload":"quarantine","bytes":1048576,"concurrency":4,"rate":0,"soak":false,"implementation":"rustfs-filesystem","repetitions":3,"filesPerSecond":53.35,"payloadMiBPerSecond":53.35,"minPayloadMiBPerSecond":51.85,"maxPayloadMiBPerSecond":53.4,"successfulRequestsPerSecond":267.15,"medianRunP99ResponseMs":123.19,"medianRunP99ServiceMs":123.19,"peakSampledServerRssMiB":217.563,"failedFiles":0,"droppedFiles":0,"minimumCompletedSamples":1041,"verified":true,"diskHeadroomMaintained":true}],"serverAgent":[{"implementation":"stow-memory","bytes":4096,"startup":{"samples":9,"medianMs":18.877165999962017,"minMs":16.175070999888703,"maxMs":24.085434000007808,"p95Ms":24.085434000007808},"firstWrite":{"samples":9,"medianMs":22.100414999993518,"minMs":19.696317999856547,"maxMs":28.571457999991253,"p95Ms":28.571457999991253},"verified":true},{"implementation":"s3proxy-memory","bytes":4096,"startup":{"samples":9,"medianMs":994.0184069999959,"minMs":937.7386420000112,"maxMs":1103.6667700000107,"p95Ms":1103.6667700000107},"firstWrite":{"samples":9,"medianMs":1148.9651399999857,"minMs":1082.5702939999755,"maxMs":1283.103700999869,"p95Ms":1283.103700999869},"verified":true},{"implementation":"stow-filesystem","bytes":4096,"startup":{"samples":9,"medianMs":26.769686999963596,"minMs":23.708512000041083,"maxMs":42.474671999923885,"p95Ms":42.474671999923885},"firstWrite":{"samples":9,"medianMs":41.219518000027165,"minMs":36.112794999964535,"maxMs":58.22389299981296,"p95Ms":58.22389299981296},"verified":true},{"implementation":"s3proxy-filesystem","bytes":4096,"startup":{"samples":9,"medianMs":992.1023350000614,"minMs":927.8747990000993,"maxMs":1026.4055200000294,"p95Ms":1026.4055200000294},"firstWrite":{"samples":9,"medianMs":1085.8751420000335,"minMs":986.2387709999457,"maxMs":1151.4122559999814,"p95Ms":1151.4122559999814},"verified":true},{"implementation":"minio-filesystem","bytes":4096,"startup":{"samples":9,"medianMs":208.97058500000276,"minMs":195.93995000002906,"maxMs":318.24396299989894,"p95Ms":318.24396299989894},"firstWrite":{"samples":9,"medianMs":221.93012699997053,"minMs":207.20987499994226,"maxMs":335.9213689999888,"p95Ms":335.9213689999888},"verified":true},{"implementation":"rustfs-filesystem","bytes":4096,"startup":{"samples":9,"medianMs":104.77596899983473,"minMs":83.14298500004224,"maxMs":147.60109999985434,"p95Ms":147.60109999985434},"firstWrite":{"samples":9,"medianMs":151.48873100010678,"minMs":130.24834399996325,"maxMs":193.900083999848,"p95Ms":193.900083999848},"verified":true}]}</script>
+  </section></main><script type="module">const escape=value=>String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+const format=value=>new Intl.NumberFormat("en-US",{maximumSignificantDigits:4}).format(value);
+const axis=value=>{
+  if(!(value>0))return 1;
+  const power=10**Math.floor(Math.log10(value));
+  return [1,2,2.5,5,10].map(n=>n*power).find(n=>n>=value*1.05)??power*20;
+};
+const backend=implementation=>implementation.endsWith("memory")?"memory":"filesystem";
+
+function renderBenchmarkPanel(data, selection) {
+  const {view,storage,bytes}=selection;
+  const match=row=>backend(row.implementation)===storage&&row.bytes===bytes;
+  let charts=[],note;
+  if(view==="agents") {
+    const rows=data.serverAgent.filter(match);
+    charts=[chart(data,rows,{title:"Ready to work",unit:"ms",lower:true,value:r=>r.startup.medianMs,min:r=>r.startup.minMs,max:r=>r.startup.maxMs}),
+      chart(data,rows,{title:"Time to first write",unit:"ms",lower:true,value:r=>r.firstWrite.medianMs,min:r=>r.firstWrite.minMs,max:r=>r.firstWrite.maxMs})];
+    note="Fresh S3 server processes with empty data directories. Startup ends on authenticated readiness; first write includes bucket creation and a 4 KiB PUT over target loopback. Nine launches per product; 10 ms readiness polls. Images and binaries are already present. This measures storage server startup, not an agent’s full startup.";
+  } else if(view==="quarantine") {
+    const rows=data.s3.filter(row=>match(row)&&row.workload==="quarantine");
+    const factor=1048576/bytes;
+    charts=[chart(data,rows,{title:"Completed quarantine workflows",unit:"files/s",value:r=>r.filesPerSecond,
+      min:r=>r.minPayloadMiBPerSecond*factor,max:r=>r.maxPayloadMiBPerSecond*factor}),
+      chart(data,rows,{title:"Tail workflow latency",unit:"ms",lower:true,value:r=>r.medianRunP99ResponseMs,summary:"Median of each run’s p99"})];
+    note=loadNote(data)+` Quarantine: PUT → verified GET → simulated verdict PUT → two deletes, with a ${data.settings.scannerDelayMs} ms simulated scanner delay. Flagged-file retention and real scanning are unmeasured.`;
+  } else {
+    const memory=view==="memory";
+    charts=["put","get"].map(workload=>{
+      const rows=data.s3.filter(row=>match(row)&&row.workload===workload);
+      return chart(data,rows,memory?{title:(workload==="put"?"Write":"Read")+" memory",unit:"MiB",lower:true,
+        value:r=>r.peakSampledServerRssMiB,summary:"Peak sampled server RSS during load"}:
+        {title:workload==="put"?"Upload throughput":"Download throughput",unit:"MiB/s",value:r=>r.payloadMiBPerSecond,
+          min:r=>r.minPayloadMiBPerSecond,max:r=>r.maxPayloadMiBPerSecond});
+    });
+    note=loadNote(data)+(memory?" RSS excludes the generator, OS page cache and startup window. Sampling can miss short peaks.":"");
+  }
+  return `<div class="benchmark-charts">${charts.join("")}</div><p class="benchmark-context">${escape(note)}</p>`;
+}
+
+function loadNote(data) {
+  return `${data.settings.repetitions} × ${data.settings.durationSeconds} s runs after ${data.settings.warmupSeconds} s warm-up · ${data.settings.concurrency[0]} workers · ${data.settings.retainedObjects} retained fixtures · 2 vCPU / 2 GiB target · private HTTP without TLS. Filesystem cases use the same persistent volume; memory cases retain objects in RAM. PUT overwrites one key per worker; GET cycles the fixtures.`;
+}
+
+function chart(data, rows, spec) {
+  const values=rows.map(row=>({row,value:spec.value(row),min:spec.min?.(row),max:spec.max?.(row)}));
+  const ceiling=axis(Math.max(...values.map(r=>r.max??r.value)));
+  values.sort((a,b)=>spec.lower?a.value-b.value:b.value-a.value);
+  const bars=values.map(({row,value,min,max})=>{
+    const stow=row.implementation.startsWith("stow-");
+    const range=min!==undefined&&max!==undefined?`<small>${format(min)}–${format(max)}</small>`:"";
+    const marker=min!==undefined&&max!==undefined&&max>min?`<i class="benchmark-spread" style="left:${min/ceiling*100}%;width:${(max-min)/ceiling*100}%"></i>`:"";
+    return `<li class="benchmark-row${stow?" is-stow":""}"><span class="benchmark-name">${escape(data.names[row.implementation]??row.implementation)}</span><span class="benchmark-track" aria-hidden="true"><i class="benchmark-bar" style="width:${value/ceiling*100}%"></i>${marker}</span><span class="benchmark-value">${format(value)}${range}</span></li>`;
+  }).join("");
+  return `<figure class="benchmark-chart"><figcaption><div><h3>${escape(spec.title)}</h3><p>${escape(spec.summary??"Median · whiskers show observed range")}</p></div><span class="benchmark-unit">${escape(spec.unit)}<small>${spec.lower?"↓ Lower is better":"↑ Higher is better"}</small></span></figcaption><ol>${bars}</ol><div class="benchmark-axis" aria-hidden="true"><span>0</span><span>${format(ceiling/2)}</span><span>${format(ceiling)}</span></div></figure>`;
+}
+
+function renderBenchmarkSection(data) {
+  if(data.complete!==true)throw new Error("Benchmark charts require complete evidence");
+  const initial={view:"agents",storage:"filesystem",bytes:4096};
+  return `<section class="performance container" id="performance" aria-labelledby="performance-title">
+    <div class="performance-heading"><div><p class="eyebrow">Measured on Railway</p><h2 id="performance-title">Agent storage, measured.</h2><p>Stow, MinIO, S3Proxy and RustFS: compare S3 server startup, first write, transfer, quarantine and memory.</p></div><span class="benchmark-stamp">Development snapshot<span>${escape(data.measuredAt.slice(0,10))}</span></span></div>
+    <div class="benchmark-board" data-benchmark-board>
+      <div class="benchmark-toolbar"><div class="benchmark-views" role="group" aria-label="Benchmark workload"><button type="button" data-view="agents" aria-pressed="true">Storage startup</button><button type="button" data-view="transfer" aria-pressed="false">Ingress &amp; egress</button><button type="button" data-view="quarantine" aria-pressed="false">Quarantine</button><button type="button" data-view="memory" aria-pressed="false">Memory</button></div>
+      <div class="benchmark-selects"><label>Storage<select data-storage><option value="filesystem">Filesystem</option><option value="memory">Memory</option></select></label><label>Payload<select data-bytes><option value="4096">4 KiB</option></select></label></div></div>
+      <div data-benchmark-panel>${renderBenchmarkPanel(data,initial)}</div>
+      <div class="benchmark-proof"><span><i aria-hidden="true">✓</i> SHA-256 + length verified</span><span>Zero failed or dropped workflows</span><a href="/assets/benchmark-data.json" download="stow-benchmark-results.json">Download results <span aria-hidden="true">↗</span></a></div>
+    </div>
+    <details class="benchmark-method"><summary>Test settings and what these comparisons cover</summary><div><p>${escape(data.hardware.cpu)}. One target at a time; separate generator. Each S3 server uses the same resource ceilings and client workflows. Filesystem and memory backends are compared separately. Bars use a linear scale from zero; ranges describe observed samples.</p><p>These peers expose S3-shaped blob storage. The workloads exercise bucket creation, PUT, GET and DELETE; they do not establish full S3 feature parity. Durability guarantees differ: Stow filesystem publishes with rename and fsync; S3Proxy’s filesystem adapter differs; RustFS uses one drive with strict durability.</p><p>These are exploratory development measurements. Image downloads, deployments, browser startup, cold OS caches, real scanners, flagged-file promotion, replication and failover are unmeasured. Some target runs reach the CPU ceiling; the fixed generator and concurrency can also constrain rates.</p></div></details>
+    <script id="benchmark-data" type="application/json">${JSON.stringify(data).replaceAll("<","\\u003c")}<\/script>
+  </section>`;
+}
+
+
+const board=document.querySelector("[data-benchmark-board]");
+if(board){
+  const data=JSON.parse(document.getElementById("benchmark-data").textContent);
+  const panel=board.querySelector("[data-benchmark-panel]");
+  const storage=board.querySelector("[data-storage]"),bytes=board.querySelector("[data-bytes]");
+  const buttons=[...board.querySelectorAll("[data-view]")];
+  let view="agents";
+  function update(){
+    buttons.forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.view===view)));
+    const sizes=view==="agents"?[4096]:data.settings.sizes;
+    const selected=sizes.includes(Number(bytes.value))?Number(bytes.value):sizes[0];
+    bytes.innerHTML=sizes.map(size=>`<option value="${size}">${size<1048576?size/1024+" KiB":size/1048576+" MiB"}</option>`).join("");
+    bytes.value=String(selected);bytes.disabled=sizes.length===1;
+    panel.innerHTML=renderBenchmarkPanel(data,{view,storage:storage.value,bytes:selected});
+  }
+  buttons.forEach(button=>button.addEventListener("click",()=>{view=button.dataset.view;update();}));
+  [storage,bytes].forEach(control=>control.addEventListener("change",update));
+  update();
+}
+</script></body></html>
