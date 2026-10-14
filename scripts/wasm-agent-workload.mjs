@@ -79,7 +79,7 @@ const EDITS = [
 const percentile = (sorted, p) =>
   sorted.length === 0 ? 0 : sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))];
 
-const iso = await bootIsolate();
+const iso = await bootIsolate({ wasmPath: process.argv[2] });
 
 const report = {
   workload: { files: WORKING_SET.length, totalBytes: WORKING_SET.reduce((n, f) => n + f.size, 0) },
@@ -153,6 +153,18 @@ report.memory = {
   readOverheadMiB: +(afterReadsMiB - afterSeedMiB).toFixed(2),
   floorShare: +(report.afterBootMiB / afterReadsMiB).toFixed(2),
 };
+
+const repeatedReadPasses = [];
+for (let pass = 0; pass < 20; pass++) {
+  const beforePassMiB = iso.memoryBytes() / 1048576;
+  for (const file of WORKING_SET) {
+    const result = iso.call({ op: "getObject", handle, bucket: "repo", key: file.name });
+    if (!result.ok || unb64(result.result.data).length !== file.size) throw new Error("repeated read failed: " + file.name);
+  }
+  const afterPassMiB = iso.memoryBytes() / 1048576;
+  repeatedReadPasses.push({ afterMiB: afterPassMiB, growthMiB: afterPassMiB - beforePassMiB });
+}
+report.memory.repeatedReadPasses = repeatedReadPasses;
 
 // Phase 3 — the edits. A read-modify-write per file, which is the shape of an
 // agent changing code rather than replacing it wholesale.

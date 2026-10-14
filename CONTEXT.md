@@ -36,6 +36,17 @@ A local, S3-compatible HTTP endpoint intended for development and automated test
 
 A direct in-process object runtime with a small lifecycle interface (`open`, object/bucket operations, quotas, `reset`, and `close`). The first profile is memory-only. The S3 HTTP service is an optional compatibility adapter, not the runtime's primary interface. The `js/wasm` bridge supports binary payloads and retains the JSON/base64 protocol for compatibility; browser workers add asynchronous host persistence and bounded streams.
 
+`internal/embedded` owns the shared Go API implementation. `pkg/stow` re-exports
+that API and adds native filesystem/workspace entry points. The WASM command uses
+the internal API directly; native listeners, workspace files, and AWS clients do
+not enter its dependency closure.
+
+Whole-object reads return caller-owned bytes through the authorized streaming
+lifecycle. Independent reads may overlap; each stream read checks current access
+and runtime liveness. Native unbound filesystem uploads stage ordinary streams
+on disk before publication. Guarded saves and namespace admission retain their
+buffered accounting paths.
+
 ### Run-Through Adapter
 
 A routing layer that accepts S3 requests at a local endpoint and, when explicitly configured, reads from or propagates supported mutations to a live upstream provider using the developer's existing environment credentials. Reachability and mutation are two separate decisions: the adapter is only constructed in run-through mode, and within it, run-through configuration plus a `mirrorWrites` policy is still not permission to mutate upstream.

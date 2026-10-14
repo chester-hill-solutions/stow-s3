@@ -51,13 +51,11 @@ func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader,
 		return nil, err
 	}
 
-	data, err := storage.BytesOf(body)
+	prepared, err := storage.PreparePut(body, opts)
 	if err != nil {
 		return nil, err
 	}
-	if err := storage.VerifyChecksum(opts, data); err != nil {
-		return nil, err
-	}
+	opts = prepared.Options
 
 	version, err := storage.NewRecordVersion()
 	if err != nil {
@@ -65,7 +63,7 @@ func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader,
 	}
 
 	absPath, form := s.pathFor(bucket, key)
-	if err := s.writeAtomic(absPath, data); err != nil {
+	if err := s.writeAtomic(absPath, prepared.Data); err != nil {
 		return nil, fmt.Errorf("workspace store: write %s: %w", key, err)
 	}
 	written, err := s.openRead(absPath, nil)
@@ -80,12 +78,12 @@ func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader,
 
 	entry := ManifestEntry{
 		Form:              form,
-		Size:              int64(len(data)),
-		ETag:              storage.ETagForBytes(data),
+		Size:              int64(len(prepared.Data)),
+		ETag:              prepared.ETag,
 		VersionID:         version,
 		ContentType:       opts.ContentType,
-		Metadata:          storage.CloneMetadata(opts.Metadata),
-		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
+		Metadata:          opts.Metadata,
+		ChecksumAlgorithm: opts.ChecksumAlgorithm,
 		ChecksumValue:     opts.ChecksumValue,
 		Modified:          info.ModTime().UTC().Truncate(time.Second),
 	}
@@ -426,3 +424,5 @@ func (s *Store) pruneEmptyParents(bucket, absPath string) {
 		}
 	}
 }
+
+func (*Store) ComputesPutChecksums() bool { return true }

@@ -10,7 +10,7 @@ import (
 	"sync"
 	"syscall/js"
 
-	stow "github.com/chester-hill-solutions/stow-s3/pkg/stow"
+	stow "github.com/chester-hill-solutions/stow-s3/internal/embedded"
 )
 
 const protocolVersion = 1
@@ -25,6 +25,7 @@ type request struct {
 	Data              string       `json:"data"`
 	binaryData        []byte
 	binaryOutput      *[]byte
+	binaryBuffer      **[]byte
 	async             bool
 	ContentType       string            `json:"contentType"`
 	Metadata          map[string]string `json:"metadata"`

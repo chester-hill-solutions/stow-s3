@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"net"
+	"net/netip"
 	"sort"
 	"strings"
 	"unicode/utf8"
@@ -31,7 +31,7 @@ func ValidateBucketName(name string) error {
 		}
 		return ErrInvalidBucketName
 	}
-	if net.ParseIP(name) != nil {
+	if _, err := netip.ParseAddr(name); err == nil {
 		return ErrInvalidBucketName
 	}
 	for _, prefix := range reservedBucketPrefixes {
@@ -139,7 +139,7 @@ func CompletionETag(partETags []string) string {
 
 // ETagForReader reads an object and returns its ETag and bytes.
 func ETagForReader(r io.Reader) (string, []byte, error) {
-	data, err := io.ReadAll(r)
+	data, err := readOwnedBytes(r)
 	if err != nil {
 		return "", nil, err
 	}
@@ -280,7 +280,7 @@ func PaginateMultipartUploads(items []MultipartUpload, opts MultipartListOptions
 }
 
 // PaginateObjects applies ListObjectsV2 continuation/delimiter/max-keys semantics
-// to a sorted slice of ObjectMeta. Callers must pre-filter by prefix and sort by key.
+// to ObjectMeta. Callers must pre-filter by prefix; logical entries are sorted here.
 func PaginateObjects(items []ObjectMeta, opts ListOptions) *ListResult {
 	maxKeys := maxKeysOrDefault(opts.MaxKeys)
 	startAfter := opts.ContinuationToken

@@ -1,13 +1,7 @@
 # Agent task manifest
 
-**0.3.0 development additions:** the [portable workspace contract and usage](portable-workspace-usage.md)
-specifies the implemented facade, opt-in v2 snapshots, capture-request reconciliation,
-registry policy and MCP surface. Existing v1 file checkpoints remain supported.
-
-
-`stow-s3 workspace prepare` creates a new, Stow-owned directory, copies the
-declared local inputs into it, and prints a JSON launch descriptor. A task runner
-starts its agent with the returned `working_directory` as the process cwd.
+`stow-s3 workspace prepare` creates a directory, copies declared inputs, and returns a JSON launch descriptor.
+Run the agent with the returned `working_directory` as its current directory.
 
 ```json
 {
@@ -37,164 +31,217 @@ starts its agent with the returned `working_directory` as the process cwd.
 }
 ```
 
-Save this as `task.json`, then run:
+Save the manifest as `task.json` and prepare it:
 
 ```sh
 stow-s3 workspace prepare --manifest task.json
 ```
 
-Relative `root`, `registry_dir`, input `source`, and repository `source` paths
-are resolved from the manifest's directory. Input destinations are relative to
-the new workspace; directories copy their contents beneath the destination.
-Each repository needs an explicit `ref` that resolves to a commit in the local
-repository. Preparation fetches only that commit into a new detached shallow
-repository inside the task root. It does not register a linked worktree or
-modify the source repository, add a source remote to the task copy, or include
-source changes that are uncommitted or untracked. Older Git history is not
-fetched. Submodules are not initialized; Git LFS content is not downloaded.
-The root's parent must already exist and the root itself must not. Duplicate
-file destinations, absolute or parent-traversing destination paths, `.stow`
-destinations, symlink inputs, and non-regular input files are refused. Common
-credential-looking filenames and paths (such as `.env`, `.npmrc`, `.netrc`, SSH
-private keys, certificate/key files, and cloud credentials) are refused by
-default; an explicit `include_sensitive_inputs: true` is required to copy them.
-This filename check is a guard against accidental inclusion, not secret
-scanning. Sources are copied; they are not moved or modified.
+The [workspace guide](portable-workspace-usage.md) covers S3 access, portable object checkpoints,
+capture recovery, registry policy and MCP tools. Existing v1 file checkpoints remain supported.
 
-Destination paths and copied input path segments are checked against portable
-filesystem naming rules, including Windows device names and characters that
-cannot be represented consistently across supported platforms.
+## Paths and inputs
 
-Preparation checks the seed's size and file count (including the shallow Git
-metadata) against the workspace limits and returns a `base_identity`
-fingerprint, workspace ID, bucket, root, actual working directory, effective
-capabilities, authority, and a `repositories` array with the resolved commit
-for each Git input. The prepared task defaults to local `ReadWrite` authority
-and has no upstream access. It returns no S3 credentials. A same-machine
-handoff reference can be printed with
-`stow-s3 workspace handoff --id <workspace-id> --output handoff.json` and
-resumed with `stow-s3 workspace resume --handoff handoff.json`.
+Relative `root`, `registry_dir` and source paths resolve from the manifest's directory.
+Destinations are relative to the new workspace. Directory inputs copy their contents beneath the destination.
+The root's parent must exist; the root itself must not exist.
+Sources are copied without modification.
 
-`team` partitions the registry: the workspace and its checkpoints are filed under
-`<registry_dir>/teams/<team>`, so two jobs sharing one machine cannot resume,
-list, or collect each other's workspaces. It is a directory, not a label — a
-sweep in one partition does not see the other — and it names an organization, not
-an identity, so it carries no authorization of its own. Omit it and the
-workspace is filed at the registry root, which is where every workspace that
-predates the field already is.
+Preparation rejects duplicate file destinations, absolute destinations, parent traversal, `.stow` destinations,
+symlinks and non-regular input files. Destination names must satisfy portable filesystem naming rules,
+including restrictions on Windows device names and unsupported characters.
 
-Create an immutable snapshot with `stow-s3 workspace checkpoint --id <id>`.
-A live owner may retain the workspace claim while capture or handoff runs. Reliable
-capture requires the caller to pause writers; both
-resolve the workspace from the registry and read its directory, so an agent can
-keep working while a snapshot is taken. The only command that takes the workspace
-over is `resume`. Compare two snapshots with
-`stow-s3 workspace diff --from <checkpoint-id> --to <checkpoint-id>`. Restore
-one to a new workspace with
-`stow-s3 workspace restore --checkpoint-id <checkpoint-id> --root <new-root>`.
-The handoff reference may include `--checkpoint-id` to identify the snapshot
-alongside its mutable workspace. Checkpoints live on the same machine, outside
-the workspace, and are not portable archives. Capture scans the file tree before
-and after copying and refuses detected changes, which is what makes a capture of a
-moving tree safe: a workspace an agent is actively writing may well change
-mid-capture, and then the capture is refused rather than publishing a snapshot of
-two different moments. `.stow` and `.git` are excluded. Common
-credential-looking paths are recorded as excluded unless explicitly included.
+Preparation rejects common credential paths such as `.env`, `.npmrc`, `.netrc`, SSH keys and cloud credentials by default.
+Set `include_sensitive_inputs: true` to include them.
+This checks filenames, not file contents; it is not secret scanning.
 
-Export a checkpoint for transfer with
-`stow-s3 workspace export --checkpoint-id <id> --output checkpoint.tar.gz`;
-inspect a transfer archive before importing it with
-`stow-s3 workspace preview --archive checkpoint.tar.gz`; import it on another
-machine with
-`stow-s3 workspace import --archive checkpoint.tar.gz`. The archive is a
-gzip-compressed tar containing checkpoint files and manifest metadata only. It
-does not contain workspace credentials or registry state. Export refuses
-sensitive-looking paths unless `--include-sensitive` is explicitly supplied;
-import requires the same explicit opt-in for an archive that contains them.
-Preview validates paths, types, sizes, file digests, and the archive trailer
-without extracting or publishing files. It reports included paths and any
-sensitive-looking paths, so the import opt-in decision can be made after review.
-Both operations default to limits of 1 GiB and 100,000 files, which can be
-lowered or raised with `--max-bytes` and `--max-files`. Import validates paths,
-types, sizes, and digests in a private staging directory before publishing the
-checkpoint. It refuses traversal, symlinks, special files, corruption, and an
-existing checkpoint ID. This is integrity validation, not encryption or secret
-scanning.
+## Git inputs
 
-A handoff can carry the bytes as well as the names. `handoff --archive
-<path>` writes the named checkpoint beside the reference and records the
-archive's SHA-256, size, and file count in the document, so the two travel
-together; `adopt --handoff <reference> --root <new-root>` on the receiving
-machine verifies that digest, imports the archive, and restores a working
-workspace in one step. A relative archive path is resolved against the
-reference's own directory, so a copied pair stays valid. The digest is the
-contract: a handoff that names bytes it cannot vouch for is refused before any
-directory is created. A version 1 reference — an ID and a registry directory,
-no archive — is still accepted by `resume` and still means the same thing;
-`adopt` refuses it, and says which flag would make it portable.
+Each repository needs an explicit `ref` resolving to a local commit.
+Preparation creates a detached shallow checkout of that commit inside the workspace.
+It does not modify the source repository or create a linked worktree.
+The task copy has no source remote.
 
-Two machines that already share a point can exchange only what changed. `delta
---from <base> --to <target> --output <path>` writes a versioned document naming
-both ends and carrying the content of every added or changed path;
-`apply --delta <path> --base <checkpoint-id>` brings a third point to the
-target and publishes a new checkpoint, leaving the base untouched. The base is
-required rather than defaulted, because the conflict rule is stated against it:
-a path the document says was A and is now B, applied to a target holding
-neither, is one writer's intent applied to a state that does not exist. That is
-`ErrDeltaConflict` and it is a refusal, never a merge, and the target is left
-byte-identical. Content is verified against the digest each change declares
-before it is written, and a document over `MaxDeltaBytes` is refused at decode.
-Bounds match the archive path's, so a delta and an archive of the same work are
-accepted or refused together. A delta crossing two workspaces is refused.
+Uncommitted files, untracked files, older history, submodules and Git LFS payloads are not included.
+Repository checkouts accept regular files only. Symbolic links are rejected.
+Sensitive paths in the selected tree also require `include_sensitive_inputs: true`.
 
-Checkpoint directories are removed when their owning workspace is explicitly
-destroyed or successfully reclaimed by TTL collection. A workspace kept alive
-because it is adopted, locked, or otherwise not eligible for collection keeps
-its checkpoints too. `max_checkpoint_bytes` and `max_checkpoints` set separate
-per-workspace caps on retained checkpoint payload. Payload bytes are the sum of
-captured file sizes; manifest and filesystem overhead are not included. Zero or
-an omitted field means unlimited. A checkpoint that would cross either cap is
-refused; Stow never evicts an older checkpoint to make room. These caps are
-separate from the per-capture `--max-bytes` and `--max-files` archive limits.
-The `prepare` result reports both values in `capabilities.checkpoint_limits`.
+### From a GitHub URL
 
-`max_workspaces` is a different kind of cap: it bounds the registry rather than one
-workspace, and it is checked before anything is created. Zero or an omitted field
-means unlimited, which is the default. Reaching the limit refuses the prepare and
-names the two ways out — `workspace prune`, which forgets records whose directory is
-already gone, and `workspace collect`, which reclaims finished workspaces. Stow never
-collects on its own to make room, because an adopted entry is somebody's project and
-the oldest idle workspace is a task nobody said was finished. The count is of
-registry records rather than directories, and of the team partition when `team` is
-set, so one team's workspaces cannot consume another's quota on a shared runner.
+Use this flow to give a coding agent a disposable checkout. Git fetches the
+repository; Stow prepares a separate task copy from the local source. Repository
+`source` fields currently accept local repositories, rather than remote URLs.
 
-It is declared per `prepare` and is not stored in the registry. The registry is what
-is bounded, so a cap recorded on one workspace would be a property of that workspace
-rather than of the policy that asked for it, and a caller that omitted the field next
-time would get no bound at all. The cost is that the owner of the policy sets it every
-time, which is why the `prepare` result reports `capabilities.registry_bound` — the
-limit, the number in use, and how much remains — so a caller can see its headroom
-rather than discover the bound by being refused.
-Retention limits bound captured payload bytes and count, not manifest or
-filesystem overhead or arbitrary files written directly into the registry.
+In a fresh working directory, replace the GitHub URL and branch with your own:
 
-TypeScript and Python expose thin wrappers over the same installed
-`stow-s3 workspace` CLI contract. TypeScript imports them from
-`@chester-hill-solutions/stow-s3/workspace`; Python exports snake_case helpers
-from `stow_s3`. The wrappers return the CLI's JSON object and do not duplicate
-workspace or archive semantics.
+```sh
+mkdir -p tasks
+git clone --depth 1 --branch main https://github.com/your-org/your-repo.git source-repo
+```
 
-The manifest accepts local file and directory inputs plus explicit refs from
-local Git repositories. Repository checkouts support regular files only;
-checked out symbolic links are refused to avoid a staged path resolving outside
-the task tree. A selected tree that contains a sensitive-looking path still
-requires `include_sensitive_inputs: true`. The path check is not secret
-scanning.
+Save this as `task.json` beside `source-repo`. The task starts from the source
+clone's `HEAD`, which Stow resolves to a commit and reports in the preparation
+result. Its checkout is detached and has no source remote.
 
-The workspace is an isolated copy for safe task editing. It is not an OS sandbox:
-an agent running as the same user can still access other paths and network
-resources allowed to that process. Limits are checked during preparation and
-through Stow's object API, but ordinary file writes made directly by the agent
-are not hard-enforced by the runtime. The exploratory
-[Agent Isolate proposal](history/plans/agent-isolate-exploration.md) describes the additional
-execution boundary and supervision this would require.
+```json
+{
+  "version": 1,
+  "root": "./tasks/task-42",
+  "working_directory": "repo",
+  "repositories": [
+    { "source": "./source-repo", "destination": "repo", "ref": "HEAD" }
+  ],
+  "ttl_seconds": 3600,
+  "registry_dir": "./stow-registry"
+}
+```
+
+Prepare it, then run your agent in the returned `working_directory`:
+
+```sh
+stow-s3 workspace prepare --manifest task.json
+```
+
+For this manifest, that directory is `tasks/task-42/repo`. Your host chooses the
+agent command and its process permissions. Replace `<workspace-id>` below with
+the ID returned by preparation, and pause writers before checkpointing:
+
+```sh
+stow-s3 workspace checkpoint --id <workspace-id> --registry-dir ./stow-registry
+```
+
+Export any result you need to keep before disposing of the task. The
+[handoff guide](#transfer-archives) explains portable checkpoint archives.
+Explicit cleanup removes the owned task workspace and its retained checkpoints:
+
+```sh
+stow-s3 workspace destroy --id <workspace-id> --registry-dir ./stow-registry
+```
+
+Alternatively, after the one-hour TTL, run collection to remove eligible expired
+workspaces. Expiry alone does not delete them, and collection preserves active
+or otherwise ineligible workspaces:
+
+```sh
+stow-s3 workspace collect --registry-dir ./stow-registry
+```
+
+The original `source-repo` clone remains available for the next task. Stow's
+workspace cleanup does not remove it.
+
+## Preparation result and teams
+
+Preparation checks seeded bytes and file count, including shallow Git metadata, against workspace limits.
+The result includes:
+
+- `base_identity`, workspace ID, bucket, root and working directory;
+- effective capabilities and authority;
+- resolved commits in `repositories`;
+- checkpoint limits and registry headroom.
+
+Prepared tasks default to local `ReadWrite` authority, with no upstream access or S3 credentials.
+
+`team` selects `<registry_dir>/teams/<team>`. Commands list, resume and collect within that partition.
+It is a directory partition, not an authorization identity.
+Without `team`, records use the registry root.
+Use the same team value on later commands.
+
+Create and resume a same-machine handoff:
+
+```sh
+stow-s3 workspace handoff --id <workspace-id> --output handoff.json
+stow-s3 workspace resume --handoff handoff.json
+```
+
+## Capture, compare and restore
+
+Pause writers before capture. A live owner can keep its workspace claim during capture or handoff.
+`resume` takes ownership; capture and handoff read the registered directory.
+
+```sh
+stow-s3 workspace checkpoint --id <id>
+stow-s3 workspace diff --from <checkpoint-id> --to <checkpoint-id>
+stow-s3 workspace restore --checkpoint-id <checkpoint-id> --root <new-root>
+```
+
+Capture scans before and after copying and rejects detected changes.
+This does not provide a snapshot of an actively changing filesystem.
+It excludes `.stow`, `.git` and sensitive-looking paths unless explicitly included.
+Checkpoints are stored outside the workspace, on the same machine.
+A handoff can include `--checkpoint-id` to name a checkpoint alongside the mutable workspace.
+
+## Transfer archives
+
+```sh
+stow-s3 workspace export --checkpoint-id <id> --output checkpoint.tar.gz
+stow-s3 workspace preview --archive checkpoint.tar.gz
+stow-s3 workspace import --archive checkpoint.tar.gz
+```
+
+The gzip tar archive contains checkpoint files and manifest metadata, without credentials or registry state.
+Export and import require `--include-sensitive` for sensitive-looking paths.
+Preview validates paths, types, sizes, digests and trailer without extracting files.
+It reports included and sensitive-looking paths for review.
+
+Preview and import default to 1 GiB and 100,000 files.
+Set `--max-bytes` and `--max-files` to change those limits.
+Import validates in private staging before publication.
+It rejects traversal, symlinks, special files, corruption and an existing checkpoint ID.
+Integrity checks do not encrypt data or scan for secrets.
+
+For a portable handoff, use `handoff --archive <path>`.
+The document records archive SHA-256, size and file count.
+Move it with the archive; relative archive paths resolve from the document's directory.
+On the destination, `adopt --handoff <reference> --root <new-root>` verifies, imports and restores the checkpoint.
+A digest mismatch fails before directory creation.
+
+A version-1 handoff contains an ID and registry directory, without an archive.
+`resume` accepts it for local use. `adopt` requires a portable archive.
+
+## Deltas
+
+`delta --from <base> --to <target> --output <path>` records changed paths and payloads.
+`apply --delta <path> --base <checkpoint-id>` verifies the named base and creates a new checkpoint.
+The base remains unchanged.
+
+A base mismatch returns `ErrDeltaConflict`, without modifying the target.
+Payload digests are verified before writing. Documents over `MaxDeltaBytes` fail at decode.
+Delta bounds match archive bounds. Deltas between different workspaces are rejected.
+Deltas do not merge independent edits.
+
+## Retention limits
+
+Destroying a workspace or successful TTL collection removes its checkpoint directories.
+Adopted, locked and otherwise ineligible workspaces retain their checkpoints.
+
+`max_checkpoint_bytes` and `max_checkpoints` limit retained payload bytes and checkpoint count per workspace.
+Bytes count captured file sizes, without manifest or filesystem overhead.
+Zero or omitted values mean unlimited.
+Capture fails if either limit would be exceeded; older checkpoints are not automatically evicted.
+These limits are separate from per-capture `--max-bytes` and `--max-files`.
+The preparation result reports them in `capabilities.checkpoint_limits`.
+
+`max_workspaces` limits registry record count, within the selected team partition.
+It is checked before preparation creates anything.
+Zero or omitted values mean unlimited. At capacity, use `workspace prune` for missing directories
+or `workspace collect` for eligible expired workspaces.
+Stow does not remove another workspace automatically to make room.
+
+This manifest limit applies to one preparation request; it is not stored as registry policy.
+Supply it on every request that needs the bound.
+`capabilities.registry_bound` reports the limit, current count and remaining capacity.
+For standing registry policy, see the [workspace guide](portable-workspace-usage.md#retention).
+Retention limits exclude filesystem overhead and files written directly into the registry.
+
+## Client wrappers and isolation
+
+TypeScript exports workspace helpers from `@chester-hill-solutions/stow-s3/workspace`.
+Python exports snake_case helpers from `stow_s3`.
+Both wrap the native CLI and return its JSON results.
+
+A workspace is a separate copy for task editing. It is not an OS sandbox.
+An agent can access other paths and network resources permitted to its process.
+Limits apply during preparation and Stow API operations; they do not prevent direct filesystem writes.
+<!-- repo-only:start -->
+See the [Agent Isolate proposal](history/plans/agent-isolate-exploration.md) for a possible execution boundary.
+<!-- repo-only:end -->

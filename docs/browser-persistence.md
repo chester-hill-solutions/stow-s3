@@ -1,17 +1,12 @@
 # Browser persistence profile
 
-`@chester-hill-solutions/stow-s3/browser` adds a browser-facing persistence coordinator around the
-memory-only `EmbeddedStow` WASM profile. It is a separate entry point;
-`EmbeddedStow` and `@chester-hill-solutions/stow-s3/node-wasm` keep their existing synchronous
-contracts.
+`openBrowserEmbeddedStow` stores the embedded WASM runtime's objects through a persistence adapter.
+It restores the last committed generation when opened.
+`EmbeddedStow` and the Node WASM API remain synchronous; this persistence API is asynchronous.
 
-The coordinator never treats a successful in-memory mutation as durable until
-its adapter commit succeeds. Every mutation is serialized FIFO, applied to the
-in-memory runtime, committed as one logical transaction, and only then
-resolved to the caller. If a commit fails, the coordinator restores the last
-durable generation into the memory runtime and rejects with
-`persistence_error`; a failed restore poisons the profile rather than exposing
-divergent state.
+Mutations run in arrival order. Each promise resolves after its durable commit.
+If the commit fails, the coordinator restores the previous generation and returns `persistence_error`.
+If restoration also fails, the profile stops accepting operations.
 
 ```ts
 import {
@@ -41,44 +36,41 @@ await stow.putObject(
 await stow.close();
 ```
 
-The IndexedDB adapter uses a manifest store plus bucket and object stores.
-Object records use a compound namespace/bucket/key key and store `Uint8Array`
-bytes directly. A format-version marker and generation number make stale or
-unknown records fail loudly as `persistence_corrupt`. Namespace ownership is
-exclusive: a second live opener of the same namespace fails with `already_open`
-(the adapter uses Web Locks when available and an in-process equivalent
-otherwise). The caller-supplied host is never closed by `close()`.
+The IndexedDB adapter stores a manifest, buckets and object records.
+Object keys use `["namespace", "bucket", "key"]`; values hold `Uint8Array` bytes.
+A database can contain several namespaces.
+Unknown formats and stale generations return `persistence_corrupt`.
 
-`reset()` atomically clears the persisted generation and resets the live memory
-profile while keeping the instance and its namespace ownership. `close()` is
-terminal and idempotent: it drains accepted operations, closes the inner
-runtime and persistence resources, and retains the committed data for the next
-`openBrowserEmbeddedStow` call. The browser profile reports
-`backend: "indexeddb"`, `persistent: true`, `multipart: false`, and
-`upstream: false`; it never silently falls back to ephemeral memory.
+Only one opener can own a namespace. A competing opener returns `already_open`.
+Web Locks enforce ownership across tabs. Without Web Locks, ownership checks cover only the current JavaScript realm.
 
-Applications that need another durable store can implement `PersistenceAdapter`
-with `open`, `load`, `commit`, `clear`, and `close`. Commits carry an expected
-generation and a list of typed changes, so an adapter can apply all changes in
-one transaction and reject stale writers.
+`reset()` clears persisted and live state while retaining namespace ownership.
+`close()` drains accepted operations, closes the runtime and adapter, and preserves committed data.
+It is terminal and safe to repeat. It does not close the caller-supplied host.
+
+Capabilities report `backend: "indexeddb"`, `persistent: true`, `multipart: false` and `upstream: false`.
+Persistence errors do not cause a fallback to memory-only storage.
+
+To use another store, implement `PersistenceAdapter` with `open`, `load`, `commit`, `clear` and `close`.
+Each commit includes an expected generation and typed changes.
+Apply them in one transaction and reject stale writers.
 
 ## Known limits
 
-- Replay restores object bytes, buckets, metadata, and content types. Creation
-  dates, ETags, and last-modified times are persisted when available but are not
-  restored exactly, because the inner `EmbeddedStow` replay API is synchronous
-  and does not accept them.
-- Cross-context (multi-tab) ownership depends on Web Locks. Without Web Locks the
-  adapter only prevents a second opener in the same JavaScript realm.
-- The repository exercises this profile with a fake host and an in-memory
-  transactional adapter. There is no checked-in real-browser integration test, so
-  real IndexedDB and real Web Locks behavior is unverified by CI.
-- The object store key path is `["namespace", "bucket", "key"]`, so one database
-  can hold several namespaces rather than requiring one database per namespace.
-- Streaming uploads are unsupported; the host bridge still buffers whole objects.
+- Replay restores bytes, buckets, metadata and content types.
+  It does not restore creation dates, ETags and last-modified times exactly;
+  the synchronous replay API does not accept those values.
+- Cross-tab ownership requires Web Locks.
+- This profile buffers whole objects and replays the namespace into memory. It does not support streaming uploads.
+  Use [persistent workers](browser-worker-runtime.md) for bounded streams.
 
+<!-- repo-only:start -->
+Unit tests cover the coordinator with a fake host and transactional adapter.
+[Chromium tests](../packages/stow-s3/scripts/browser-tests/storage.spec.mjs) cover real IndexedDB commits,
+transaction rollback, WASM quotas, reload and Web Locks ownership.
+<!-- repo-only:end -->
 `writeBatch()` commits related object puts/deletes in one transaction and rolls
 back the whole batch on either a WASM operation failure or a persistence failure.
-This underpins the additive [browser file history and sync facade](browser-file-history.md).
+The [file history API](browser-file-history.md) uses this batch operation.
 The [editor example](../examples/browser-editor/README.md) exercises real WASM,
 IndexedDB, reload recovery, offline access and explicit sync to a native S3 fixture.

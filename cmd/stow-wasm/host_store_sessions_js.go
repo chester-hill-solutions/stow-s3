@@ -7,8 +7,8 @@ import (
 	"io"
 	"sync"
 
+	stow "github.com/chester-hill-solutions/stow-s3/internal/embedded"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
-	stow "github.com/chester-hill-solutions/stow-s3/pkg/stow"
 )
 
 type runtimeReadSession struct {
@@ -117,7 +117,7 @@ func handleOpenObjectRead(ctx context.Context, instance *stow.Runtime, req reque
 }
 
 func handleReadObjectChunk(_ context.Context, _ *stow.Runtime, req request) (json.RawMessage, error) {
-	if req.Length < 1 || req.Length > hostChunkLimit || req.binaryOutput == nil {
+	if req.Length < 1 || req.Length > hostChunkLimit || req.binaryOutput == nil || req.binaryBuffer == nil {
 		return nil, fmt.Errorf("invalid stream chunk length")
 	}
 	runtimeStreams.Lock()
@@ -127,7 +127,13 @@ func handleReadObjectChunk(_ context.Context, _ *stow.Runtime, req request) (jso
 		return nil, fmt.Errorf("object stream is not open")
 	}
 	session.mu.Lock()
-	buffer := make([]byte, req.Length)
+	pooled, _ := binaryReadBuffers.Get().(*[]byte)
+	if pooled == nil {
+		data := make([]byte, hostChunkLimit)
+		pooled = &data
+	}
+	*req.binaryBuffer = pooled
+	buffer := (*pooled)[:req.Length]
 	n, err := session.reader.Read(buffer)
 	session.mu.Unlock()
 	if err != nil && err != io.EOF {

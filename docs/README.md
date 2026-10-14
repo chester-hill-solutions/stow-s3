@@ -1,8 +1,9 @@
 # Stow documentation
 
-Start with the guide for the storage surface your application uses. The
-[README](../README.md) is the full product reference; [CONTEXT](../CONTEXT.md)
-defines the repository's terms.
+Choose a guide for your application. The [full reference](../README.md) covers the product.
+<!-- repo-only:start -->
+[CONTEXT](../CONTEXT.md) defines development terms.
+<!-- repo-only:end -->
 
 ## Getting started
 
@@ -10,13 +11,16 @@ defines the repository's terms.
 - [Running a native server](running-and-probing.md): startup, credentials and probes.
 - [TypeScript client](../packages/stow-s3/README.md) and
   [Python client](../packages/stow-s3-py/README.md).
+- [API reference](api/README.md): methods, parameters, return types, defaults and errors.
 
 ## Native storage and workspaces
 
 - [Portable workspace usage](portable-workspace-usage.md): preparation,
   checkpoints, guarded saves, handoff and adoption.
-- [Workspace contract](workspace-contract.md), [task manifests](task-manifest.md)
-  and [shared conformance vocabulary](workspace-contract-steps.md).
+- [Task manifests](task-manifest.md): inputs, Git checkouts and workspace limits.
+<!-- repo-only:start -->
+- [Workspace contract](workspace-contract.md) and [shared conformance vocabulary](workspace-contract-steps.md).
+<!-- repo-only:end -->
 - [Run-through cache](run-through.md) and [durable outbox](outbox.md): offline
   reads, conditional propagation, retry and recovery.
 - [S3 compatibility contract](compat-contract.md): supported behavior and refusals.
@@ -28,9 +32,10 @@ defines the repository's terms.
 - [File history](browser-file-history.md): local stages, undo/redo and explicit sync.
 - [Project storage](browser-project-storage.md): atomic revisions and shared content.
 - [Worker runtime](browser-worker-runtime.md): binary transport, streams and recovery.
-- [IndexedDB persistence](browser-persistence.md): the original bounded object profile.
+- [IndexedDB persistence](browser-persistence.md): objects that survive browser reloads.
 - [Runnable editor](../examples/browser-editor/README.md).
 
+<!-- repo-only:start -->
 ## Decisions and development
 
 - [Architecture decisions](adr/README.md) explain settled choices. Acceptance of
@@ -41,13 +46,13 @@ defines the repository's terms.
 - [Storage admission design](storage-admission-contract.md) describes the shared
   foundation contract; consult usage guides for implemented API names.
 - [Contributing](../CONTRIBUTING.md) and [code standards](CODE_STANDARDS.md).
-- [Release verification](release-verification-2026-10-03.md) is a dated checkpoint,
+- [Release verification](release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
   not evidence that a later candidate was published.
 
 ## Evidence and history
 
-[History](history/README.md) contains retired work orders and experiments.
-[Assessment receipts](assessment-evidence/2026-09-29/README.md),
-[Railway browser qualification](assessment-evidence/2026-10-12/railway-browser.json)
-and [benchmarks](benchmarks/session-baseline.md) have their own dates and scope.
-They do not turn a proposal or an untested host into a supported feature.
+[History](history/README.md) contains retired plans and experiments.
+For dated test results, see the [assessment records](assessment-evidence/2026-09-29/README.md),
+[Railway browser tests](assessment-evidence/2026-10-12/railway-browser.json)
+and [benchmarks](benchmarks/session-baseline.md).
+<!-- repo-only:end -->

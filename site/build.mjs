@@ -1,8 +1,10 @@
-import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Marked } from "marked";
-import { decisionPages, pages } from "./docs.mjs";
+import { pages } from "./docs.mjs";
+import { escapeHtml, highlightHome, renderCodeBlock } from "./code.mjs";
+export { escapeHtml } from "./code.mjs";
 
 const site = dirname(fileURLToPath(import.meta.url));
 const root = resolve(site, "..");
@@ -12,9 +14,26 @@ const revision = process.env.STOW_SITE_SOURCE_REVISION ?? "main";
 if (revision !== "main" && !/^[a-f0-9]{40}$/.test(revision)) throw new Error("Site source revision must be a full Git commit SHA");
 const sourceBase = `${repository}/blob/${revision}`;
 
-export function escapeHtml(text) {
-  return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+export function publicMarkdown(markdown) {
+  let omitted = false;
+  let fence;
+  const lines = [];
+  for (const line of markdown.split("\n")) {
+    const boundary = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (boundary) {
+      if (!fence) fence = boundary[1];
+      else if (boundary[1][0] === fence[0] && boundary[1].length >= fence.length && !boundary[2].trim()) fence = undefined;
+    }
+    if (!fence && line.trim() === "<!-- repo-only:start -->") {
+      if (omitted) throw new Error("Nested repo-only block");
+      omitted = true;
+    } else if (!fence && line.trim() === "<!-- repo-only:end -->") {
+      if (!omitted) throw new Error("Unexpected repo-only block end");
+      omitted = false;
+    } else if (!omitted) lines.push(line);
+  }
+  if (omitted) throw new Error("Unclosed repo-only block");
+  return lines.join("\n");
 }
 
 export function headingSlug(text) {
@@ -45,6 +64,7 @@ export function rewriteLink(href, source, manifest) {
 export function renderMarkdown(markdown, page, manifest) {
   const headings = [];
   const used = new Map();
+  let codeIndex = 0;
   const parser = new Marked({ gfm: true, renderer: {
     heading({ tokens, depth, text }) {
       const base = headingSlug(text);
@@ -60,8 +80,9 @@ export function renderMarkdown(markdown, page, manifest) {
       return `<a href="${escapeHtml(url)}"${title ? ` title="${escapeHtml(title)}"` : ""}>${this.parser.parseInline(tokens)}</a>`;
     },
     html({ text }) { return escapeHtml(text); },
+    code({ text, lang }) { return renderCodeBlock(text, lang, `stow-snippet-${++codeIndex}`); },
   } });
-  const body = parser.parse(markdown.replace(/^---\n[\s\S]*?\n---\n/, ""));
+  const body = parser.parse(publicMarkdown(markdown).replace(/^---\n[\s\S]*?\n---\n/, ""));
   return { body, headings };
 }
 
@@ -80,22 +101,23 @@ export function renderPage(page, markdown, manifest) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(page.title)} · Stow docs</title><meta name="description" content="${escapeHtml(page.title)}: Stow storage documentation, API examples and guarantees.">
 <link rel="canonical" href="https://stow.chesterhillsolutions.ca${page.route}">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/stow.css?v=20261012-docs"><link rel="stylesheet" href="/assets/docs.css?v=20261012">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/theme.css?v=20261013"><link rel="stylesheet" href="/assets/docs.css?v=20261013"><link rel="stylesheet" href="/assets/code.css?v=20261013">
 </head><body><a class="skip" href="#main">Skip to content</a><div class="docs-shell">
-<header class="masthead"><a href="/" aria-label="Stow home"><img src="/assets/wordmark.svg" alt="Stow S3" width="186" height="28"></a><nav aria-label="Primary"><a href="/">Overview</a><a href="/docs/" aria-current="page">Docs</a><a href="${repository}">GitHub</a></nav></header>
+<header class="masthead"><a class="brand" href="/" aria-label="Stow home"><img src="/assets/wordmark.svg?v=20261013" alt="Stow" width="143" height="40"></a><nav aria-label="Primary"><a href="/">Overview</a><a href="/docs/api/"${page.group === "API reference" ? ' aria-current="page"' : ""}>APIs</a><a href="/docs/"${page.group !== "API reference" ? ' aria-current="page"' : ""}>Documentation</a><a class="nav-source" href="${repository}">GitHub <span aria-hidden="true">↗</span></a></nav></header>
 <div class="docs-layout"><aside class="docs-sidebar"><details open><summary>Documentation</summary><nav aria-label="Documentation">${navigation(page, manifest)}</nav></details></aside>
 <main id="main" class="doc-content"><div class="doc-meta"><span>${escapeHtml(page.group)}</span><a href="${sourceBase}/${page.source}">View source</a></div>${body}
 <footer class="doc-footer">Stow · Apache 2.0 · <a href="/docs/">Documentation index</a></footer></main>
-<aside class="doc-toc" aria-label="On this page"><p>On this page</p><ul>${toc}</ul></aside></div></div><script src="/assets/docs.js" defer></script></body></html>\n`;
+<aside class="doc-toc" aria-label="On this page"><p>On this page</p><ul>${toc}</ul></aside></div></div><script src="/assets/docs.js" defer></script><script src="/assets/code.js" defer></script></body></html>\n`;
 }
 
 export async function buildSite(destination = output) {
-  const manifest = [...pages, ...decisionPages(await readdir(join(root, "docs/adr")))];
+  const manifest = pages;
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
-  for (const name of ["assets", "images", "launch", "index.html", "agent.md", "llms.txt", "_headers"]) {
+  for (const name of ["assets", "images", "launch", "agent.md", "llms.txt", "_headers"]) {
     await cp(join(site, name), join(destination, name), { recursive: true });
   }
+  await writeFile(join(destination, "index.html"), highlightHome(await readFile(join(site, "index.html"), "utf8")));
   for (const page of manifest) {
     const markdown = await readFile(join(root, page.source), "utf8");
     const directory = join(destination, page.route);

@@ -143,3 +143,42 @@ test("persistent worker inspects crashed stages, refuses live discard, and recla
   expect(result).toMatchObject({ supported: true, refusedLive: true, foundCrashStage: true, stages: 0, protections: 0, cacheBytes: 0, retained: [1, 2, 3, 4], partialAbsent: true });
   expect(result.reclaimed).toBeGreaterThanOrEqual(262_144);
 });
+
+test("browser WASM starts with streamed and fallback responses and keeps read chunks owned", async ({ page }) => {
+  await page.goto("/");
+  for (const streaming of [true, false]) {
+    if (!streaming) {
+      await page.route("**/stow-runtime.wasm", async route => {
+        const response = await route.fetch();
+        await route.fulfill({ response, headers: { ...response.headers(), "content-type": "application/octet-stream" } });
+      });
+    }
+    const result = await page.evaluate(async () => {
+      const { loadBrowserWasmBridge } = await import("/runtime/browser-wasm-host.js");
+      const { AsyncEmbeddedStow } = await import("/runtime/async-embedded.js");
+      const bridge = await loadBrowserWasmBridge();
+      const runtime = await AsyncEmbeddedStow.open({ callBinary: (metadata, data) => bridge.callBinaryAsync(metadata, data) }, { maxBytes: 3_000_000 });
+      try {
+        await runtime.createBucket("assets");
+        const data = new Uint8Array(2_000_000);
+        for (let n = 0; n < data.length; n++) data[n] = (n >>> 18) + 1;
+        await runtime.putObject("assets", "large", data);
+        const read = await runtime.getObjectStream("assets", "large");
+        const chunks = [];
+        for await (const chunk of read.chunks) chunks.push(chunk);
+        let offset = 0;
+        for (const chunk of chunks) {
+          for (let n = 0; n < chunk.length; n++) if (chunk[n] !== data[offset + n]) throw new Error("retained chunk was changed by buffer reuse");
+          offset += chunk.length;
+        }
+        chunks[0].fill(0);
+        const saved = await runtime.getObject("assets", "large");
+        return { size: offset, first: saved.data[0], last: saved.data[saved.data.length - 1] };
+      } finally {
+        await runtime.close();
+        await bridge.close();
+      }
+    });
+    expect(result).toEqual({ size: 2_000_000, first: 1, last: 8 });
+  }
+});

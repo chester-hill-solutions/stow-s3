@@ -43,7 +43,7 @@ func saveReceiptResult(receipt storage.SaveReceipt, err error) SaveResult {
 
 func (i *Instance) reconcileSaveReceiptLocked(ctx context.Context, result SaveResult, err error) error {
 	if result.Outcome == SaveCommitted || result.Outcome == SaveNotCommitted {
-		return errors.Join(err, i.refreshPersistentUsageLocked(ctx))
+		return errors.Join(err, i.refreshUsageObservationLocked(ctx))
 	}
 	return err
 }

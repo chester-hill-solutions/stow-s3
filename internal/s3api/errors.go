@@ -125,6 +125,7 @@ type storageErrorCase struct {
 }
 
 var storageErrorCases = []storageErrorCase{
+	{storage.ErrChecksumMismatch, "BadDigest", "The checksum did not match the request body", http.StatusBadRequest},
 	{storage.ErrInvalidMetadata, "InvalidArgument", "Invalid or conflicting user metadata", http.StatusBadRequest},
 	{storage.ErrBucketNotFound, "NoSuchBucket", "The specified bucket does not exist", http.StatusNotFound},
 	{storage.ErrInvalidBucketName, "InvalidBucketName", "The specified bucket name is not valid", http.StatusBadRequest},

@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
 )
 
 // WorkspaceInput copies one local file or directory into a prepared workspace.
@@ -162,7 +164,7 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 	if err := checkSeedLimits(ws, bytes, objects); err != nil {
 		return nil, err
 	}
-	if err := ws.Runtime.inner.RefreshUsage(context.Background()); err != nil {
+	if err := embedded.UnwrapInstance(ws.Runtime).RefreshUsage(context.Background()); err != nil {
 		return nil, err
 	}
 	if err := persistPreparedProvenance(root, repositories); err != nil {
