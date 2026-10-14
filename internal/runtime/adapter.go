@@ -85,23 +85,27 @@ func (a *StoreAdapter) PutObject(ctx context.Context, bucket, key string, body i
 	if body == nil {
 		body = bytes.NewReader(nil)
 	}
-	// A caller that already holds the body in memory, such as the S3 handler
-	// which read it once for the SigV4, Content-Length, Content-MD5 and
-	// checksum checks, hands those bytes over instead of being read again into
-	// a second full-size buffer. The runtime does not retain them; the store
-	// makes its own copy.
-	data, err := storage.BytesOf(body)
-	if err != nil {
-		return nil, err
-	}
-	object, err := a.instance.PutObject(ctx, bucket, key, data, PutOptions{
+	options := PutOptions{
+		computeChecksum:   opts.ComputeChecksum,
 		ContentType:       opts.ContentType,
 		Metadata:          opts.Metadata,
 		ChecksumAlgorithm: opts.ChecksumAlgorithm,
 		ChecksumValue:     opts.ChecksumValue,
 		IfMatch:           opts.IfMatch,
 		IfNoneMatch:       opts.IfNoneMatch,
-	})
+	}
+	var object Object
+	var err error
+	if owned, ok := body.(*storage.OwnedBody); ok {
+		object, err = a.instance.PutObjectStream(ctx, bucket, key, owned, StreamPutOptions{Size: int64(owned.Len()), PutOptions: options})
+	} else {
+		var data []byte
+		data, err = storage.BytesOf(body)
+		if err != nil {
+			return nil, err
+		}
+		object, err = a.instance.PutObject(ctx, bucket, key, data, options)
+	}
 	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return nil, err
 	}
@@ -109,11 +113,11 @@ func (a *StoreAdapter) PutObject(ctx context.Context, bucket, key string, body i
 }
 
 func (a *StoreAdapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
-	object, err := a.instance.GetObject(ctx, bucket, key)
+	reader, object, err := a.instance.OpenObject(ctx, bucket, key)
 	if err != nil {
 		return nil, nil, err
 	}
-	return io.NopCloser(bytes.NewReader(object.Data)), objectMeta(&object), nil
+	return reader, objectMeta(&object), nil
 }
 
 func (a *StoreAdapter) HeadObject(ctx context.Context, bucket, key string) (*storage.ObjectMeta, error) {
@@ -240,4 +244,11 @@ func (a *StoreAdapter) Close() error {
 		return nil
 	}
 	return a.instance.Close()
+}
+
+func (a *StoreAdapter) ComputesPutChecksums() bool {
+	a.instance.mu.RLock()
+	defer a.instance.mu.RUnlock()
+	store, ok := a.instance.store.(storage.PutChecksumStore)
+	return ok && store.ComputesPutChecksums()
 }

@@ -27,6 +27,7 @@ Use the [usage guides](../README.md) for supported APIs and the
 | [0017](0017-workers-profile-qualifies-platform-objects.md) | Workers qualifies platform objects as Stow's workspace substrate; execution stays caller-owned | `proposed` | — | — |
 | [0018](0018-snapshot-isolation-enforced-egress.md) | Isolation by snapshot and enforced egress, not by asking agents to cooperate | `accepted` | — | — |
 | [0019](0019-browser-project-content.md) | Browser projects use durable content references and the shared embedded runtime | `accepted` | — | — |
+| [0020](0020-binary-object-records.md) | Filesystem objects use protobuf metadata and raw payloads | `accepted` | — | — |
 
 ## Status vocabulary
 

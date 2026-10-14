@@ -69,6 +69,7 @@ func (s *FilesystemStore) BeginRecoveryHold(_ context.Context, options storage.R
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}
@@ -109,6 +110,7 @@ func (s *FilesystemStore) ReleaseRecoveryHold(_ context.Context, id, owner strin
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.usageRevision++
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}

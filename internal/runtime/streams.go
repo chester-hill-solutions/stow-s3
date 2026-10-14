@@ -29,8 +29,8 @@ func (i *Instance) openObject(ctx context.Context, bucket, key string, span *sto
 	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
 		return nil, Object{}, err
 	}
-	i.mu.Lock()
-	defer i.mu.Unlock()
+	i.mu.RLock()
+	defer i.mu.RUnlock()
 	if err := i.checkOpen(); err != nil {
 		return nil, Object{}, err
 	}
@@ -38,7 +38,11 @@ func (i *Instance) openObject(ctx context.Context, bucket, key string, span *sto
 	if err != nil {
 		return nil, Object{}, err
 	}
-	return &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader}, objectFromMeta(meta, nil), nil
+	stream := &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader}
+	if seeker, ok := reader.(io.Seeker); ok {
+		return &seekableObjectStream{objectStream: stream, seeker: seeker}, objectFromMeta(meta, nil), nil
+	}
+	return stream, objectFromMeta(meta, nil), nil
 }
 
 func (i *Instance) openStoreRange(ctx context.Context, bucket, key string, span *storage.ObjectRange) (io.ReadCloser, *storage.ObjectMeta, error) {
@@ -53,9 +57,15 @@ func (i *Instance) openStoreRange(ctx context.Context, bucket, key string, span 
 		_ = reader.Close()
 		return nil, nil, fmt.Errorf("object range exceeds object size")
 	}
-	if _, err := io.CopyN(io.Discard, reader, span.Offset); err != nil {
+	var skipErr error
+	if seeker, ok := reader.(io.Seeker); ok {
+		_, skipErr = seeker.Seek(span.Offset, io.SeekStart)
+	} else {
+		_, skipErr = io.CopyN(io.Discard, reader, span.Offset)
+	}
+	if skipErr != nil {
 		_ = reader.Close()
-		return nil, nil, err
+		return nil, nil, skipErr
 	}
 	return &limitedObjectReader{Reader: io.LimitReader(reader, span.Length), closer: reader}, meta, nil
 }
@@ -84,16 +94,9 @@ func (r *objectStream) Read(buffer []byte) (int, error) {
 		return 0, io.ErrClosedPipe
 	}
 	i := r.instance
-	i.mu.Lock()
-	defer i.mu.Unlock()
-	err := i.checkContext(r.context)
-	if err == nil {
-		err = i.checkOpen()
-	}
-	if err == nil {
-		err = i.checkResource(authority.ObjectRead, policy.Object(r.bucket, r.key))
-	}
-	if err != nil {
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+	if err := r.authorizeLocked(); err != nil {
 		_ = r.closeLocked()
 		return 0, err
 	}
@@ -116,4 +119,35 @@ func (r *objectStream) Close() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return r.closeLocked()
+}
+
+func (r *objectStream) authorizeLocked() error {
+	i := r.instance
+	if err := i.checkContext(r.context); err != nil {
+		return err
+	}
+	if err := i.checkOpen(); err != nil {
+		return err
+	}
+	return i.checkResource(authority.ObjectRead, policy.Object(r.bucket, r.key))
+}
+
+type seekableObjectStream struct {
+	*objectStream
+	seeker io.Seeker
+}
+
+func (r *seekableObjectStream) Seek(offset int64, whence int) (int64, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.closed {
+		return 0, io.ErrClosedPipe
+	}
+	r.instance.mu.RLock()
+	defer r.instance.mu.RUnlock()
+	if err := r.authorizeLocked(); err != nil {
+		_ = r.closeLocked()
+		return 0, err
+	}
+	return r.seeker.Seek(offset, whence)
 }

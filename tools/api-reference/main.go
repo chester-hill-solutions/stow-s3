@@ -105,17 +105,13 @@ func (c *catalog) function(fn *doc.Func) entry {
 	return item
 }
 
-func (c *catalog) alias(spec *ast.TypeSpec) (*catalog, *doc.Type) {
-	selector, ok := spec.Type.(*ast.SelectorExpr)
-	if !ok || !spec.Assign.IsValid() {
-		return nil, nil
-	}
+func (c *catalog) referencedPackage(selector *ast.SelectorExpr, pos token.Pos) *catalog {
 	qualifier, ok := selector.X.(*ast.Ident)
 	if !ok {
-		return nil, nil
+		return nil
 	}
 	for _, file := range c.files {
-		if spec.Pos() < file.Pos() || spec.Pos() > file.End() {
+		if pos < file.Pos() || pos > file.End() {
 			continue
 		}
 		for _, imported := range file.Imports {
@@ -133,16 +129,59 @@ func (c *catalog) alias(spec *ast.TypeSpec) (*catalog, *doc.Type) {
 			other, err := readCatalog(strings.TrimPrefix(path, "github.com/chester-hill-solutions/stow-s3/"))
 			if err != nil {
 				c.err = err
-				return nil, nil
+				return nil
 			}
-			for _, typ := range other.pkg.Types {
-				if typ.Name == selector.Sel.Name {
-					return other, typ
-				}
+			return other
+		}
+	}
+	return nil
+}
+
+func (c *catalog) alias(spec *ast.TypeSpec) (*catalog, *doc.Type) {
+	selector, ok := spec.Type.(*ast.SelectorExpr)
+	if !ok || !spec.Assign.IsValid() {
+		return nil, nil
+	}
+	other := c.referencedPackage(selector, spec.Pos())
+	if other != nil {
+		for _, typ := range other.pkg.Types {
+			if typ.Name == selector.Sel.Name {
+				return other, typ
 			}
 		}
 	}
 	return nil, nil
+}
+
+func (c *catalog) constantSource(spec *ast.ValueSpec) *ast.ValueSpec {
+	if len(spec.Values) != 1 {
+		return spec
+	}
+	selector, ok := spec.Values[0].(*ast.SelectorExpr)
+	if !ok {
+		return spec
+	}
+	other := c.referencedPackage(selector, spec.Pos())
+	if other == nil {
+		return spec
+	}
+	values := append([]*doc.Value(nil), other.pkg.Consts...)
+	for _, typ := range other.pkg.Types {
+		values = append(values, typ.Consts...)
+	}
+	for _, value := range values {
+		for _, raw := range value.Decl.Specs {
+			original := raw.(*ast.ValueSpec)
+			for index, name := range original.Names {
+				if name.Name == selector.Sel.Name && len(original.Values) == len(original.Names) {
+					spec.Type = original.Type
+					spec.Values = []ast.Expr{original.Values[index]}
+					return spec
+				}
+			}
+		}
+	}
+	return spec
 }
 
 func (c *catalog) typeEntry(typ *doc.Type) entry {
@@ -156,6 +195,9 @@ func (c *catalog) typeEntry(typ *doc.Type) entry {
 			continue
 		}
 		if other, aliased := c.alias(spec); aliased != nil {
+			if item.Description == "" {
+				item.Description = short(aliased.Doc)
+			}
 			for _, method := range aliased.Methods {
 				item.Methods = append(item.Methods, other.function(method))
 			}
@@ -189,6 +231,9 @@ func (c *catalog) valueEntries(kind string, values []*doc.Value) []entry {
 				single.Names = []*ast.Ident{name}
 				if len(spec.Values) == len(spec.Names) {
 					single.Values = []ast.Expr{spec.Values[i]}
+				}
+				if kind == "constant" {
+					c.constantSource(&single)
 				}
 				decl := &ast.GenDecl{Tok: value.Decl.Tok, Specs: []ast.Spec{&single}}
 				result = append(result, entry{Name: name.Name, Kind: kind, Signature: c.signature(decl), Description: description})

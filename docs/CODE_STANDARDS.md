@@ -4,6 +4,15 @@ Stow records existing code-quality debt in checked-in baselines.
 New violations fail CI. Remove baseline entries when their debt is removed.
 Do not raise a baseline to make a regression pass.
 
+Coverage instruments module packages across test boundaries. The embedded API and
+its public `pkg/stow` facade retain the original combined coverage floor through
+`packageOwners` in the coverage baseline. Extracting the implementation does not
+lower the floor or stop counting the existing public contract tests.
+
+The Go quality ratchet excludes files carrying Go's generated-code marker.
+Generated protobuf code remains subject to compilation, formatting and tests.
+The benchmark build regenerates its schema with pinned tools and checks for drift.
+
 ## Commands
 
 Run the complete gate:

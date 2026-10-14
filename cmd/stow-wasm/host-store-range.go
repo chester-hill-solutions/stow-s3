@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 
-	stow "github.com/chester-hill-solutions/stow-s3/pkg/stow"
+	stow "github.com/chester-hill-solutions/stow-s3/internal/embedded"
 )
 
 func handleGetObjectRange(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {

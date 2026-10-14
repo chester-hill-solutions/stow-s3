@@ -109,6 +109,10 @@ It stores body and logical metadata in one object record. `Reset` is unavailable
 `Close` preserves the directory and releases ownership. Set quota and operation
 mask options at open, and use normal bucket creation before the first save.
 
+New objects use protobuf metadata followed by raw payload bytes in one atomic record.
+Existing JSON records remain readable and change format only when overwritten.
+Older Stow versions cannot read the new records.
+
 ```go
 runtime, err := stow.OpenFilesystem(stow.FilesystemOptions{
     Dir: "/absolute/owned-object-store",
@@ -173,9 +177,12 @@ adding retirement.
 <!-- repo-only:end -->
 
 Arbitrary host edits, directory copies, shared-host fencing, pre-enrollment ABA
-history and physical power-loss qualification are outside this profile. Admission
-refreshes authoritative object/multipart accounting by scanning the store; workload
-costs still need measurement.
+history and physical power-loss qualification are outside this profile.
+Successful managed filesystem mutations update object and multipart accounting incrementally.
+Opening, changed store revisions and uncertain mutations reconcile authoritative accounting.
+Unresolved publication keeps reads and receipt resolution available while refusing mutations.
+The public runtime returned by `OpenFilesystem` has no `RefreshUsage` method.
+Editable workspaces retain conservative reconciliation and their separate refresh operation.
 
 <!-- repo-only:start -->
 Local evidence is recorded in [the implementation receipt](implementation-2026-09-30.md).

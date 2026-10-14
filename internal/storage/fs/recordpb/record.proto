@@ -1,0 +1,18 @@
+syntax = "proto3";
+package stow.storage.fs;
+option go_package = "github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb";
+
+message ObjectHeader {
+  uint32 version = 1;
+  string record_version = 2;
+  string save_request = 3;
+  string save_meaning = 4;
+  string key = 5;
+  string content_type = 6;
+  map<string, string> metadata = 7;
+  string etag = 8;
+  string checksum_algorithm = 9;
+  string checksum_value = 10;
+  string last_modified = 11;
+  int64 payload_size = 12;
+}

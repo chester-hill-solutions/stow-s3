@@ -24,10 +24,7 @@ type bodyCache struct {
 	read bool
 }
 
-// bodyReader exposes the already-materialised request body to the store, so the
-// bytes this layer read for the SigV4, Content-Length, Content-MD5 and checksum
-// checks are the same bytes the store takes, instead of being read a second time
-// into a full-size buffer on the way down.
+// bodyReader lends materialized bytes for copy and multipart operations.
 type bodyReader struct {
 	*bytes.Reader
 	data []byte
@@ -58,14 +55,16 @@ func restoreBody(r *http.Request, data []byte) {
 	}
 }
 
-// requestBody returns the whole request body, reading the socket at most once
-// per request.
-//
-// Every consumer of the body in this package needs all of it: SigV4 payload
-// verification, the Content-Length comparison, Content-MD5, the checksum
-// algorithms, and the store itself. Reading it separately for each one allocated
-// a fresh full-size copy per consumer, which is where most of the measured
-// per-MiB memory amplification came from.
+func takeRequestBody(r *http.Request, data []byte) *storage.OwnedBody {
+	if cache, ok := r.Context().Value(bodyCacheKey{}).(*bodyCache); ok {
+		cache.data = nil
+	}
+	r.Body = http.NoBody
+	r.GetBody = nil
+	return storage.NewOwnedBody(data)
+}
+
+// requestBody materializes once for authentication and integrity checks before handoff.
 func requestBody(r *http.Request) ([]byte, error) {
 	cache, ok := r.Context().Value(bodyCacheKey{}).(*bodyCache)
 	if ok && cache.read {
@@ -77,7 +76,7 @@ func requestBody(r *http.Request) ([]byte, error) {
 		}
 		return nil, nil
 	}
-	data, err := io.ReadAll(r.Body)
+	data, err := storage.BytesOf(requestSizedReader{Reader: r.Body, size: r.ContentLength})
 	if err != nil {
 		return nil, err
 	}
@@ -263,4 +262,28 @@ func prepareRequestForAuth(r *http.Request) (*http.Request, error) {
 	}
 	restoreBody(r, prepared)
 	return r, nil
+}
+
+type requestSizedReader struct {
+	io.Reader
+	size int64
+}
+
+func (r requestSizedReader) ReadSize() int64 {
+	if r.size > 4<<20 {
+		return 4 << 20
+	}
+	return r.size
+}
+
+func (s *Server) putChecksumFromRequest(r *http.Request, body []byte) (string, string, bool, error) {
+	if store, ok := s.store.(storage.PutChecksumStore); ok && store.ComputesPutChecksums() {
+		algorithm, value, err := checksumHeaderValues(r)
+		if err == nil && algorithm != "" {
+			_, err = storage.NewChecksumDigest(algorithm)
+		}
+		return algorithm, value, true, err
+	}
+	algorithm, value, err := checksumFromRequest(r, body)
+	return algorithm, value, false, err
 }

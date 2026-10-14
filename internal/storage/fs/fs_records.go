@@ -1,10 +1,12 @@
 package fs
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	storage "github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -27,6 +29,7 @@ type objectRecord struct {
 	ChecksumAlgorithm string            `json:"checksum_algorithm,omitempty"`
 	ChecksumValue     string            `json:"checksum_value,omitempty"`
 	LastModified      time.Time         `json:"last_modified"`
+	payloadSize       int64
 }
 
 func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) error {
@@ -37,9 +40,17 @@ func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) e
 }
 
 func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord) error {
+	return s.writeObjectBody(bucket, key, record, nil)
+}
+
+func (s *FilesystemStore) writeObjectStream(bucket, key string, record objectRecord, body io.Reader) error {
+	return s.writeObjectBody(bucket, key, record, body)
+}
+
+func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecord, body io.Reader) error {
 	path := s.objectPath(bucket, key)
 	if s.isBoundedObjectPath(bucket, path) {
-		if existing, err := readObjectRecord(path); err == nil && existing.Key != key {
+		if existing, err := readObjectHeader(path); err == nil && existing.Key != key {
 			return fmt.Errorf("object path digest collision: refusing to replace a different key")
 		} else if err != nil && !os.IsNotExist(err) {
 			return err
@@ -48,21 +59,39 @@ func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord
 	} else {
 		record.Key = ""
 	}
-	if err := s.writeRecord(path, record); err != nil {
+	if err := s.writeRecordBody(path, record, body); err != nil {
 		return err
 	}
 	if s.SupportsGuardedWrites() {
-		return syncSaveAncestors(filepath.Dir(path))
+		return s.fenceObjectDirectory(filepath.Dir(path))
 	}
 	return nil
 }
 
+func (s *FilesystemStore) writeRecordBody(path string, record objectRecord, body io.Reader) error {
+	if body == nil {
+		return s.writeRecord(path, record)
+	}
+	if s.namespace != nil {
+		data, err := io.ReadAll(body)
+		if err != nil {
+			return err
+		}
+		record.Data = data
+		return s.writeRecord(path, record)
+	}
+	header, err := encodeRecordPrefix(record)
+	if err != nil {
+		return err
+	}
+	return atomicfile.WriteStream(path, 0o644, header, body)
+}
+
 func (s *FilesystemStore) writeRecord(path string, record objectRecord) error {
-	if s.saves.pending != nil {
+	if s.saves.pending != nil || s.namespace == nil || s.capacityActive {
 		return writeObjectRecord(path, record)
 	}
-	record.Version = objectRecordVersion
-	data, err := json.Marshal(record)
+	data, err := encodeObjectRecord(record)
 	if err != nil {
 		return err
 	}
@@ -81,29 +110,26 @@ func (s *FilesystemStore) readObject(bucket, key string) (objectRecord, error) {
 }
 
 func writeObjectRecord(path string, record objectRecord) error {
-	record.Version = objectRecordVersion
-	return writeJSONAtomic(path, record)
+	header, err := encodeRecordPrefix(record)
+	if err != nil {
+		return err
+	}
+	return atomicfile.WriteParts(path, 0o644, header, record.Data)
 }
 
-func readObjectRecord(path string) (objectRecord, error) {
-	var record objectRecord
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return record, err
+func (s *FilesystemStore) readObjectHeader(bucket, key string) (objectRecord, error) {
+	record, err := readObjectHeader(s.objectPath(bucket, key))
+	if err == nil && record.Key != "" && record.Key != key {
+		err = fmt.Errorf("object path digest collision: stored key does not match requested key")
 	}
-	if err := json.Unmarshal(data, &record); err != nil {
-		return record, fmt.Errorf("decode object record: %w", err)
-	}
-	if record.Version != objectRecordVersion {
-		return record, fmt.Errorf("unsupported object record version %d", record.Version)
-	}
-	if record.Data == nil {
-		record.Data = []byte{}
-	}
-	return record, nil
+	return record, err
 }
 
 func (r objectRecord) meta(bucket, key string) storage.ObjectMeta {
+	size := r.payloadSize
+	if r.Data != nil {
+		size = int64(len(r.Data))
+	}
 	versionID := r.RecordVersion
 	if versionID == "" {
 		versionID = r.ETag
@@ -112,12 +138,32 @@ func (r objectRecord) meta(bucket, key string) storage.ObjectMeta {
 		Bucket:            bucket,
 		Key:               key,
 		VersionID:         versionID,
-		Size:              int64(len(r.Data)),
+		Size:              size,
 		ETag:              r.ETag,
 		ContentType:       r.ContentType,
 		LastModified:      r.LastModified.UTC(),
 		Metadata:          storage.CloneMetadata(r.Metadata),
 		ChecksumAlgorithm: r.ChecksumAlgorithm,
 		ChecksumValue:     r.ChecksumValue,
+	}
+}
+
+func (s *FilesystemStore) fenceObjectDirectory(dir string) error {
+	if _, ok := s.fencedDirs[dir]; ok {
+		return nil
+	}
+	if err := syncSaveAncestors(dir); err != nil {
+		return err
+	}
+	s.fencedDirs[dir] = struct{}{}
+	return nil
+}
+
+func (s *FilesystemStore) forgetFencedDirectories(root string) {
+	for dir := range s.fencedDirs {
+		rel, err := filepath.Rel(root, dir)
+		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			delete(s.fencedDirs, dir)
+		}
 	}
 }

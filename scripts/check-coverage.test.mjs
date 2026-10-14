@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   coverageProblems,
   lowestPerPackage,
+  mergeCoverageProfile,
   packageProblems,
   statementsByPackage,
   thinPackages,
@@ -23,6 +24,21 @@ const measured = (coveredStatements, percentage, packages) => ({
   packages: packages ?? {
     "example/pkg": { coveredStatements: 4000, totalStatements: 1000 },
   },
+});
+
+test("relocated implementation retains its original coverage floor", () => {
+  const profile = "mode: set\nexample/public/api.go:1.1,2.1 2 1\nexample/core/api.go:1.1,2.1 5 1\nexample/core/api.go:3.1,4.1 3 0\n";
+  const packages = statementsByPackage(profile, { "example/core": "example/public" });
+  assert.deepEqual(packages, { "example/public": { coveredStatements: 7, totalStatements: 10 } });
+  assert.deepEqual(packageProblems(packages, { "example/public": { coveredStatements: 7 } }), []);
+  assert.match(packageProblems(packages, { "example/public": { coveredStatements: 8 } })[0], /covered statements fell/);
+});
+
+test("shared-package coverage counts blocks once and retains hits from every test binary", () => {
+  const profile = "mode: set\nexample/core/api.go:1.1,2.1 5 0\nexample/core/api.go:3.1,4.1 3 1\nexample/core/api.go:1.1,2.1 5 1\nexample/core/api.go:3.1,4.1 3 0\nexample/core/api.go:5.1,6.1 2 0\n";
+  assert.deepEqual(statementsByPackage(profile), { "example/core": { coveredStatements: 8, totalStatements: 10 } });
+  assert.equal(mergeCoverageProfile(profile), mergeCoverageProfile(mergeCoverageProfile(profile)));
+  assert.throws(() => mergeCoverageProfile(profile + "example/core/api.go:1.1,2.1 6 1\n"), /Inconsistent coverage block/);
 });
 
 test("matching the floor passes", () => {

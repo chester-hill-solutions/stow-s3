@@ -3,10 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 	"syscall/js"
 )
 
 const binaryProtocolVersion = 2
+
+var binaryReadBuffers sync.Pool
 
 func parseBinaryRequest(args []js.Value) (request, error) {
 	if len(args) != 2 || args[0].Type() != js.TypeString || !args[1].InstanceOf(js.Global().Get("Uint8Array")) {
@@ -37,7 +40,14 @@ func callBinary(_ js.Value, args []js.Value) interface{} {
 
 func dispatchBinary(req request) js.Value {
 	var output []byte
+	var buffer *[]byte
 	req.binaryOutput = &output
+	req.binaryBuffer = &buffer
+	defer func() {
+		if buffer != nil {
+			binaryReadBuffers.Put(buffer)
+		}
+	}()
 	result, err := dispatch(req)
 	if err != nil {
 		return binaryResponse(errorResponse(err), nil)

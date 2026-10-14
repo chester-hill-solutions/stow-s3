@@ -320,7 +320,7 @@ type Bucket struct {
 
 
 ```go
-const BucketCreate = authority.BucketCreate
+const BucketCreate Operation = "bucket.create"
 ```
 
 ## BucketDelete
@@ -328,7 +328,7 @@ const BucketCreate = authority.BucketCreate
 
 
 ```go
-const BucketDelete = authority.BucketDelete
+const BucketDelete Operation = "bucket.delete"
 ```
 
 ## BucketList
@@ -336,7 +336,7 @@ const BucketDelete = authority.BucketDelete
 
 
 ```go
-const BucketList = authority.BucketList
+const BucketList Operation = "bucket.list"
 ```
 
 ## Capabilities
@@ -837,9 +837,7 @@ Returns: `PortableCheckpointDiff, error`.
 ConditionalWriteStore opts into atomic IfMatch/IfNoneMatch enforcement.
 
 ```go
-type ConditionalWriteStore interface {
-	SupportsConditionalWrites() bool
-}
+type ConditionalWriteStore interface{ SupportsConditionalWrites() bool }
 ```
 
 ## CopyStore
@@ -848,7 +846,8 @@ type ConditionalWriteStore interface {
 
 ```go
 type CopyStore interface {
-	CopyObject(context.Context, string, string, string, string) (Object, error)
+	CopyObject(context.
+		Context, string, string, string, string) (Object, error)
 }
 ```
 
@@ -1067,7 +1066,7 @@ Returns: `[]byte, error`.
 
 
 ```go
-const EnvironmentDestroy = authority.EnvironmentDestroy
+const EnvironmentDestroy Operation = "environment.destroy"
 ```
 
 ## EnvironmentPromote
@@ -1075,7 +1074,7 @@ const EnvironmentDestroy = authority.EnvironmentDestroy
 
 
 ```go
-const EnvironmentPromote = authority.EnvironmentPromote
+const EnvironmentPromote Operation = "environment.promote"
 ```
 
 ## EnvironmentReset
@@ -1083,7 +1082,7 @@ const EnvironmentPromote = authority.EnvironmentPromote
 
 
 ```go
-const EnvironmentReset = authority.EnvironmentReset
+const EnvironmentReset Operation = "environment.reset"
 ```
 
 ## ErrBucketExists
@@ -1091,7 +1090,7 @@ const EnvironmentReset = authority.EnvironmentReset
 
 
 ```go
-var ErrBucketExists = errors.New("stow: bucket already exists")
+var ErrBucketExists = embedded.ErrBucketExists
 ```
 
 ## ErrBucketNotEmpty
@@ -1099,7 +1098,7 @@ var ErrBucketExists = errors.New("stow: bucket already exists")
 
 
 ```go
-var ErrBucketNotEmpty = errors.New("stow: bucket is not empty")
+var ErrBucketNotEmpty = embedded.ErrBucketNotEmpty
 ```
 
 ## ErrBucketNotFound
@@ -1107,7 +1106,7 @@ var ErrBucketNotEmpty = errors.New("stow: bucket is not empty")
 
 
 ```go
-var ErrBucketNotFound = errors.New("stow: bucket not found")
+var ErrBucketNotFound = embedded.ErrBucketNotFound
 ```
 
 ## ErrCapacityConflict
@@ -1147,7 +1146,7 @@ var ErrCapacityUnknown = capacity.ErrUnknown
 
 
 ```go
-var ErrClosed = errors.New("stow: runtime is closed")
+var ErrClosed = embedded.ErrClosed
 ```
 
 ## ErrConditionalWritesUnsupported
@@ -1155,7 +1154,7 @@ var ErrClosed = errors.New("stow: runtime is closed")
 
 
 ```go
-var ErrConditionalWritesUnsupported = errors.New("stow: conditional writes unsupported")
+var ErrConditionalWritesUnsupported = embedded.ErrConditionalWritesUnsupported
 ```
 
 ## ErrDeltaConflict
@@ -1195,7 +1194,7 @@ var ErrDeltaVersionUnsupported = errors.New("delta document version is not suppo
 
 
 ```go
-var ErrGuardedSavesUnsupported = errors.New("stow: guarded saves unsupported")
+var ErrGuardedSavesUnsupported = embedded.ErrGuardedSavesUnsupported
 ```
 
 ## ErrInvalidBucket
@@ -1203,7 +1202,7 @@ var ErrGuardedSavesUnsupported = errors.New("stow: guarded saves unsupported")
 
 
 ```go
-var ErrInvalidBucket = errors.New("stow: invalid bucket name")
+var ErrInvalidBucket = embedded.ErrInvalidBucket
 ```
 
 ## ErrInvalidKey
@@ -1211,7 +1210,7 @@ var ErrInvalidBucket = errors.New("stow: invalid bucket name")
 
 
 ```go
-var ErrInvalidKey = errors.New("stow: invalid object key")
+var ErrInvalidKey = embedded.ErrInvalidKey
 ```
 
 ## ErrInvalidListLimit
@@ -1219,7 +1218,7 @@ var ErrInvalidKey = errors.New("stow: invalid object key")
 
 
 ```go
-var ErrInvalidListLimit = errors.New("stow: list limit must not be negative")
+var ErrInvalidListLimit = embedded.ErrInvalidListLimit
 ```
 
 ## ErrInvalidRecoveryHold
@@ -1227,7 +1226,7 @@ var ErrInvalidListLimit = errors.New("stow: list limit must not be negative")
 
 
 ```go
-var ErrInvalidRecoveryHold = storage.ErrInvalidRecoveryHold
+var ErrInvalidRecoveryHold = embedded.ErrInvalidRecoveryHold
 ```
 
 ## ErrInvalidSaveCondition
@@ -1235,7 +1234,7 @@ var ErrInvalidRecoveryHold = storage.ErrInvalidRecoveryHold
 
 
 ```go
-var ErrInvalidSaveCondition = errors.New("stow: invalid guarded save condition")
+var ErrInvalidSaveCondition = embedded.ErrInvalidSaveCondition
 ```
 
 ## ErrInvalidSaveRequest
@@ -1243,7 +1242,7 @@ var ErrInvalidSaveCondition = errors.New("stow: invalid guarded save condition")
 
 
 ```go
-var ErrInvalidSaveRequest = errors.New("stow: invalid save request")
+var ErrInvalidSaveRequest = embedded.ErrInvalidSaveRequest
 ```
 
 ## ErrMutationCommitted
@@ -1251,7 +1250,7 @@ var ErrInvalidSaveRequest = errors.New("stow: invalid save request")
 
 
 ```go
-var ErrMutationCommitted = storage.ErrMutationCommitted
+var ErrMutationCommitted = embedded.ErrMutationCommitted
 ```
 
 ## ErrNotAuthorized
@@ -1280,7 +1279,7 @@ Returns: `string`.
 
 
 ```go
-var ErrObjectNotFound = errors.New("stow: object not found")
+var ErrObjectNotFound = embedded.ErrObjectNotFound
 ```
 
 ## ErrPreconditionFailed
@@ -1288,7 +1287,7 @@ var ErrObjectNotFound = errors.New("stow: object not found")
 
 
 ```go
-var ErrPreconditionFailed = errors.New("stow: precondition failed")
+var ErrPreconditionFailed = embedded.ErrPreconditionFailed
 ```
 
 ## ErrQuotaExceeded
@@ -1296,7 +1295,7 @@ var ErrPreconditionFailed = errors.New("stow: precondition failed")
 
 
 ```go
-var ErrQuotaExceeded = errors.New("stow: runtime quota exceeded")
+var ErrQuotaExceeded = embedded.ErrQuotaExceeded
 ```
 
 ## ErrRecoveryHeld
@@ -1344,7 +1343,7 @@ var ErrRecoveryHoldNotFound = workspace.ErrRecoveryHoldNotFound
 
 
 ```go
-var ErrRecoveryHoldsUnsupported = storage.ErrRecoveryHoldsUnsupported
+var ErrRecoveryHoldsUnsupported = embedded.ErrRecoveryHoldsUnsupported
 ```
 
 ## ErrSaveConflict
@@ -1352,7 +1351,7 @@ var ErrRecoveryHoldsUnsupported = storage.ErrRecoveryHoldsUnsupported
 
 
 ```go
-var ErrSaveConflict = errors.New("stow: guarded save conflicts with current object")
+var ErrSaveConflict = embedded.ErrSaveConflict
 ```
 
 ## ErrSaveRequestConflict
@@ -1360,7 +1359,7 @@ var ErrSaveConflict = errors.New("stow: guarded save conflicts with current obje
 
 
 ```go
-var ErrSaveRequestConflict = errors.New("stow: save request key has different meaning")
+var ErrSaveRequestConflict = embedded.ErrSaveRequestConflict
 ```
 
 ## ErrSaveRequestFull
@@ -1368,7 +1367,7 @@ var ErrSaveRequestConflict = errors.New("stow: save request key has different me
 
 
 ```go
-var ErrSaveRequestFull = errors.New("stow: save request retention full")
+var ErrSaveRequestFull = embedded.ErrSaveRequestFull
 ```
 
 ## ErrSaveRequestNotCommitted
@@ -1376,7 +1375,7 @@ var ErrSaveRequestFull = errors.New("stow: save request retention full")
 
 
 ```go
-var ErrSaveRequestNotCommitted = errors.New("stow: save request was not committed")
+var ErrSaveRequestNotCommitted = embedded.ErrSaveRequestNotCommitted
 ```
 
 ## ErrSaveRequestNotFound
@@ -1384,7 +1383,7 @@ var ErrSaveRequestNotCommitted = errors.New("stow: save request was not committe
 
 
 ```go
-var ErrSaveRequestNotFound = errors.New("stow: save request receipt not found")
+var ErrSaveRequestNotFound = embedded.ErrSaveRequestNotFound
 ```
 
 ## ErrSaveRequestsUnsupported
@@ -1392,7 +1391,7 @@ var ErrSaveRequestNotFound = errors.New("stow: save request receipt not found")
 
 
 ```go
-var ErrSaveRequestsUnsupported = errors.New("stow: durable save requests unsupported")
+var ErrSaveRequestsUnsupported = embedded.ErrSaveRequestsUnsupported
 ```
 
 ## ErrSaveRequestUnknown
@@ -1400,7 +1399,7 @@ var ErrSaveRequestsUnsupported = errors.New("stow: durable save requests unsuppo
 
 
 ```go
-var ErrSaveRequestUnknown = errors.New("stow: save request effect unknown")
+var ErrSaveRequestUnknown = embedded.ErrSaveRequestUnknown
 ```
 
 ## ErrUnsupportedBackend
@@ -1408,7 +1407,7 @@ var ErrSaveRequestUnknown = errors.New("stow: save request effect unknown")
 
 
 ```go
-var ErrUnsupportedBackend = errors.New("stow: unsupported runtime backend")
+var ErrUnsupportedBackend = embedded.ErrUnsupportedBackend
 ```
 
 ## ExportCheckpoint
@@ -1689,7 +1688,7 @@ const MaxDeltaBytes int64 = 16 << 20
 
 
 ```go
-const MaxRecoveryHoldBytes = workspace.MaxRecoveryHoldBytes
+const MaxRecoveryHoldBytes = 2 << 20
 ```
 
 ## MaxRecoveryHoldPeakBytes
@@ -1697,7 +1696,8 @@ const MaxRecoveryHoldBytes = workspace.MaxRecoveryHoldBytes
 
 
 ```go
-const MaxRecoveryHoldPeakBytes = workspace.MaxRecoveryHoldPeakBytes
+const MaxRecoveryHoldPeakBytes = 2 *
+	MaxRecoveryHoldBytes
 ```
 
 ## MaxRecoveryHolds
@@ -1705,7 +1705,7 @@ const MaxRecoveryHoldPeakBytes = workspace.MaxRecoveryHoldPeakBytes
 
 
 ```go
-const MaxRecoveryHolds = workspace.MaxRecoveryHolds
+const MaxRecoveryHolds = 256
 ```
 
 ## MaxRecoveryReferences
@@ -1713,7 +1713,7 @@ const MaxRecoveryHolds = workspace.MaxRecoveryHolds
 
 
 ```go
-const MaxRecoveryReferences = workspace.MaxRecoveryReferences
+const MaxRecoveryReferences = 32
 ```
 
 ## MultipartOptions
@@ -1733,7 +1733,8 @@ MultipartStore is the optional extension: a store that can stream an object larg
 
 ```go
 type MultipartStore interface {
-	CreateMultipartUpload(ctx context.Context, bucket, key string, options MultipartOptions) (MultipartUpload, error)
+	CreateMultipartUpload(ctx context.Context, bucket, key string,
+		options MultipartOptions) (MultipartUpload, error)
 	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
 	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
 	AbortMultipartUpload(ctx context.Context, uploadID string) error
@@ -1781,7 +1782,7 @@ type Object struct {
 
 
 ```go
-const ObjectDelete = authority.ObjectDelete
+const ObjectDelete Operation = "object.delete"
 ```
 
 ## ObjectList
@@ -1789,7 +1790,7 @@ const ObjectDelete = authority.ObjectDelete
 
 
 ```go
-const ObjectList = authority.ObjectList
+const ObjectList Operation = "object.list"
 ```
 
 ## ObjectPage
@@ -1800,6 +1801,7 @@ const ObjectList = authority.ObjectList
 type ObjectPage struct {
 	Objects		[]Object
 	Truncated	bool
+
 	NextCursor	string
 }
 ```
@@ -1820,7 +1822,7 @@ type ObjectRange struct {
 
 
 ```go
-const ObjectRead = authority.ObjectRead
+const ObjectRead Operation = "object.read"
 ```
 
 ## ObjectRecoveryHoldOptions
@@ -1829,8 +1831,9 @@ const ObjectRead = authority.ObjectRead
 
 ```go
 type ObjectRecoveryHoldOptions struct {
-	ID, Owner	string
-	Objects		[]ObjectRecoveryReference
+	ID,
+	Owner	string
+	Objects	[]ObjectRecoveryReference
 }
 ```
 
@@ -1840,7 +1843,8 @@ type ObjectRecoveryHoldOptions struct {
 
 ```go
 type ObjectRecoveryReference struct {
-	Bucket, Key	string
+	Bucket,
+	Key	string
 	Condition	SaveCondition
 }
 ```
@@ -1850,7 +1854,7 @@ type ObjectRecoveryReference struct {
 
 
 ```go
-const ObjectWrite = authority.ObjectWrite
+const ObjectWrite Operation = "object.write"
 ```
 
 ## Open
@@ -2088,7 +2092,8 @@ type PutOptions struct {
 	ContentType	string
 	Metadata	map[string]string
 
-	IfMatch		string
+	IfMatch	string
+
 	IfNoneMatch	string
 }
 ```
@@ -2099,7 +2104,8 @@ type PutOptions struct {
 
 ```go
 type RangeStore interface {
-	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser, Object, error)
+	OpenObjectRange(context.
+		Context, string, string, ObjectRange) (io.ReadCloser, Object, error)
 }
 ```
 
@@ -2170,9 +2176,10 @@ func ReadWrite() Authority
 ```go
 type RecoveryHold struct {
 	RecoveryHoldRequest
-	Meaning		string		`json:"meaning"`
-	State		string		`json:"state"`
-	Created		time.Time	`json:"created"`
+	Meaning	string	`json:"meaning"`
+	State	string	`json:"state"`
+	Created	time.
+		Time	`json:"created"`
 	FinishedAt	time.Time	`json:"finished_at,omitempty"`
 }
 ```
@@ -2183,11 +2190,10 @@ type RecoveryHold struct {
 
 ```go
 type RecoveryHoldPage struct {
-	Holds		[]RecoveryHold	`json:"holds"`
-	NextCursor	string		`json:"next_cursor,omitempty"`
-	ReservedBytes	int64		`json:"reserved_bytes"`
-
-	PeakReservedBytes	int64	`json:"peak_reserved_bytes"`
+	Holds			[]RecoveryHold	`json:"holds"`
+	NextCursor		string		`json:"next_cursor,omitempty"`
+	ReservedBytes		int64		`json:"reserved_bytes"`
+	PeakReservedBytes	int64		`json:"peak_reserved_bytes"`
 }
 ```
 
@@ -2210,7 +2216,8 @@ type RecoveryHoldQuery struct {
 
 ```go
 type RecoveryHoldRequest struct {
-	ID		string			`json:"id"`
+	ID	string	`json:"id"`
+
 	Owner		string			`json:"owner"`
 	References	[]RecoveryReference	`json:"references"`
 	ExpiresAt	time.Time		`json:"expires_at,omitempty"`
@@ -2879,7 +2886,8 @@ Returns: `error`.
 ```go
 type StagedObject interface {
 	Commit(context.Context) (Object, error)
-	Abort(context.Context) error
+	Abort(context.
+		Context) error
 }
 ```
 
@@ -2889,7 +2897,8 @@ type StagedObject interface {
 
 ```go
 type StagedWriteStore interface {
-	StageObject(context.Context, string, string, io.Reader, PutOptions) (StagedObject, error)
+	StageObject(context.Context, string,
+		string, io.Reader, PutOptions) (StagedObject, error)
 }
 ```
 
@@ -2902,11 +2911,20 @@ type Store interface {
 	CreateBucket(ctx context.Context, name string) error
 	DeleteBucket(ctx context.Context, name string) error
 	ListBuckets(ctx context.Context) ([]Bucket, error)
+	PutObject(
+		ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
+	GetObject(ctx context.Context,
+		bucket,
 
-	PutObject(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
-	GetObject(ctx context.Context, bucket, key string) (Object, error)
-	HeadObject(ctx context.Context, bucket, key string) (Object, error)
-	DeleteObject(ctx context.Context, bucket, key string) error
+		key string) (Object, error)
+
+	HeadObject(ctx context.
+		Context,
+		bucket, key string) (Object,
+		error)
+	DeleteObject(ctx context.
+		Context, bucket,
+		key string) error
 	ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error)
 
 	Close() error
@@ -2919,7 +2937,8 @@ type Store interface {
 
 ```go
 type StreamingStore interface {
-	OpenObject(context.Context, string, string) (io.ReadCloser, Object, error)
+	OpenObject(context.Context,
+		string, string) (io.ReadCloser, Object, error)
 }
 ```
 
@@ -2949,7 +2968,7 @@ type StreamPutOptions struct {
 
 
 ```go
-const UpstreamRead = authority.UpstreamRead
+const UpstreamRead Operation = "upstream.read"
 ```
 
 ## UpstreamWrite
@@ -2957,7 +2976,7 @@ const UpstreamRead = authority.UpstreamRead
 
 
 ```go
-const UpstreamWrite = authority.UpstreamWrite
+const UpstreamWrite Operation = "upstream.write"
 ```
 
 ## Usage
@@ -2967,6 +2986,7 @@ Return current storage accounting.
 ```go
 type Usage struct {
 	Bytes	int64
+
 	Objects	int64
 }
 ```

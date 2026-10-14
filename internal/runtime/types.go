@@ -167,6 +167,7 @@ type Object struct {
 }
 
 type PutOptions struct {
+	computeChecksum   bool
 	ContentType       string
 	Metadata          map[string]string
 	ChecksumAlgorithm string

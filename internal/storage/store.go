@@ -96,3 +96,21 @@ type CopyRequest struct {
 type ConditionalCopyStore interface {
 	CopyObjectCond(ctx context.Context, req CopyRequest) (*ObjectMeta, error)
 }
+
+// UsageRevisionStore settles pending publication before reporting managed revisions.
+// Unknown publication returns its stable revision with ErrSaveRequestUnknown.
+type UsageRevisionStore interface {
+	UsageRevision(ctx context.Context) (uint64, error)
+}
+
+// PutChecksumStore computes requested checksums on owned bytes before publication.
+type PutChecksumStore interface {
+	ComputesPutChecksums() bool
+}
+
+type ObjectUsage struct{ Bytes, Objects int64 }
+
+// ObjectUsageStore scans one bucket's object accounting without paginated rescans.
+type ObjectUsageStore interface {
+	ScanObjectUsage(ctx context.Context, bucket string) (ObjectUsage, error)
+}
