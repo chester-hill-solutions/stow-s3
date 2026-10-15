@@ -31,7 +31,7 @@ are green.
 | WS-4 | **Done** | `CopyOptions` carries the date conditions, evaluated with RFC 9110 precedence |
 | WS-5 | **Done** | `ExpectedSHA256` on `CheckpointArchiveOptions`, `--expect-sha256` on `workspace adopt`, `expect_sha256` on the MCP tool |
 | WS-6 | **Done** | `prewarm` refuses without an explicitly configured upstream |
-| WS-7 | **Done** | stale store lock reclaimed by rename, not unconditional remove |
+| WS-7 | **Done** | OS advisory lock (`flock`/`LockFileEx`) held for the store's lifetime, replacing check-then-remove recovery; multiprocess regression test |
 | WS-8 | **Done** | released operations no longer charged or counted; released entries pruned |
 | WS-9 | **Done** | loopback admin trust withdrawn when a forwarding header is present |
 | WS-10 | **Done** | list page size clamped to 1000 centrally |
@@ -53,6 +53,26 @@ provenance after the failure, and suppress the error at the mutation boundary
 second ordering predicate, `outboxState.firstForKey`, also counted terminal
 entries and had to be fixed alongside `isPendingForKey` — two copies of one rule,
 which is the pattern the codebase warns about elsewhere.
+
+### Follow-up round: the three external findings
+
+1. **Store lock (was WS-7).** The rename-based reclaim was still check-then-act.
+   Replaced with an OS advisory lock held for the store's lifetime
+   (`flock` on unix, `LockFileEx` on Windows, refused on targets with neither).
+   The kernel releases it on exit, so there is no stale state to recover and no
+   two-owner window. `internal/storage/fs/fs_lock_test.go` covers both
+   single-process exclusion and a real second process.
+2. **Upstream read memory (`refreshFromUpstream`).** The body was read with
+   `io.ReadAll` before any cache accounting, so the cache limit was not a
+   peak-memory bound. The upstream reader is now streamed straight into the cache
+   store (disk-staged on the filesystem backend); when the caller needs the body
+   it is read back from the cache, falling back to a re-fetch only if the copy was
+   cached and then evicted.
+3. **Filesystem listing.** `ListObjectsV2` ignored its context, so a cancelled
+   listing walked the whole bucket. The context is now threaded through the walk
+   and checked per entry. The larger concern — a walk per page and an unbounded
+   prefix scan — needs an ordered index and genuinely incremental pagination,
+   which is a design change rather than a fix and remains open.
 
 ### WS-11 decision
 

@@ -13,12 +13,13 @@ import (
 )
 
 type objectListWalk struct {
+	ctx      context.Context
 	prefix   string
 	segments []string
 	collect  func(storage.ObjectMeta) error
 }
 
-func (s *FilesystemStore) ListObjectsV2(_ context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
+func (s *FilesystemStore) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
 	if err := storage.ValidateBucketName(bucket); err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func (s *FilesystemStore) ListObjectsV2(_ context.Context, bucket string, opts s
 		return nil, storage.ErrBucketNotFound
 	}
 	items := make([]storage.ObjectMeta, 0)
-	walk := objectListWalk{prefix: opts.Prefix, collect: func(meta storage.ObjectMeta) error {
+	walk := objectListWalk{ctx: ctx, prefix: opts.Prefix, collect: func(meta storage.ObjectMeta) error {
 		items = append(items, meta)
 		return nil
 	}}
@@ -48,6 +49,9 @@ func (s *FilesystemStore) walkObjects(bucket, dir string, walk objectListWalk) e
 		return err
 	}
 	for _, entry := range entries {
+		if walk.ctx != nil && walk.ctx.Err() != nil {
+			return walk.ctx.Err()
+		}
 		entryPath := filepath.Join(dir, entry.Name())
 		if entry.IsDir() {
 			if !isListDirectory(entry.Name(), walk.segments) {
@@ -81,6 +85,9 @@ func isListDirectory(name string, segments []string) bool {
 }
 
 func (s *FilesystemStore) appendListedObject(bucket string, walk objectListWalk, name, path string) error {
+	if walk.ctx != nil && walk.ctx.Err() != nil {
+		return walk.ctx.Err()
+	}
 	record, err := readObjectHeader(path)
 	if err != nil {
 		return err
