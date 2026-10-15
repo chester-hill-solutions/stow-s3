@@ -1,6 +1,10 @@
 package runtime
 
-import "github.com/chester-hill-solutions/stow-s3/internal/storage"
+import (
+	"errors"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
 
 func (s *usageState) admitCompletion(uploadID string, parts []storage.PartInfo, oldSize int64, exists bool) error {
 	upload := s.multipart[uploadID]
@@ -65,7 +69,7 @@ func (s *usageState) finishCompletion(uploadID string, oldSize int64, meta *stor
 }
 
 func (s *usageState) finishAbort(uploadID string, exists bool, err error) bool {
-	if !s.recordMutation(err) {
+	if !s.recordMutation(err) && !errors.Is(err, storage.ErrUploadNotFound) {
 		return false
 	}
 	s.removeUpload(uploadID, exists)

@@ -366,7 +366,11 @@ func (a multipartAdapter) CompleteMultipartUpload(ctx context.Context, uploadID 
 }
 
 func (a multipartAdapter) AbortMultipartUpload(ctx context.Context, uploadID string) error {
-	return a.multi.AbortMultipartUpload(ctx, uploadID)
+	err := a.multi.AbortMultipartUpload(ctx, uploadID)
+	if err != nil && errors.Is(err, ErrObjectNotFound) && !errors.Is(err, ErrMutationCommitted) {
+		return storage.ErrUploadNotFound
+	}
+	return err
 }
 
 func (a multipartAdapter) ListParts(ctx context.Context, uploadID string) ([]storage.PartInfo, error) {

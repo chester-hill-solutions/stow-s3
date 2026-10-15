@@ -75,8 +75,18 @@ Follow-up: **custom-store upload validation now preserves 404/NoSuchUpload**,
 with [regression and cost evidence](../benchmarks/2026-10-15-multipart-validation/README.md).
 All eight missing-route cases pass; unknown and committed errors retain their
 identity. Successful validation remains allocation-free, including large metadata.
-That report separately reproduces stale quota reservations after an uncertain
-abort is retried and backend absence is confirmed. That recovery path is unchanged.
+That report separately reproduced stale quota reservations after an uncertain
+abort is retried and backend absence is confirmed. Direct abort recovery remained
+unchanged at that point.
+
+Follow-up: **direct abort recovery now releases reservations on confirmed absence**,
+with [regression and cost evidence](../benchmarks/2026-10-15-abort-retry/README.md).
+Native raw/wrapped missing errors and public-store missing translation reach the
+existing cleanup while preserving the returned error. Concurrent retries clean
+up once; uncertainty/refusal and shared targets keep their proper reservations.
+The report also confirms a separate S3 variant: route validation rejects the
+retry before direct abort recovery can run. HTTP retry reconciliation remains
+unchanged and is the next finding.
 
 ## Codebase map
 
