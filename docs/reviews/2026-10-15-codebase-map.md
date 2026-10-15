@@ -96,7 +96,17 @@ preserve wrong-route, authorization, uncertainty and shared-target guarantees.
 Successful validation stays allocation-free; error/recovery costs are measured.
 That report separately confirms ambiguous native completion lookup discarding
 retained accounting and preventing a repaired policy-scoped abort until explicit
-usage refresh. Completion reconciliation remains unchanged in this correction.
+usage refresh. Completion reconciliation remained unchanged at that point.
+
+Follow-up: **completion now retains upload accounting after ambiguous lookup**,
+with [regression and comparative cost evidence](../benchmarks/2026-10-15-completion-lookup/README.md).
+A missing cause joined with a committed marker cannot discard the retained upload
+or hide lookup uncertainty. Repaired policy-scoped direct and S3 aborts recover
+without an explicit refresh; ordinary confirmed absence still releases quota.
+The report preserves both benchmark passes and their timing variability. It also
+confirms a separate object HEAD ambiguity: deletion removes the real object but
+leaves phantom usage that blocks capacity reuse. Object-size observation and
+deletion remain unchanged in this completion correction.
 
 ## Codebase map
 

@@ -1,0 +1,81 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type reviewCompletionLookupStore struct {
+	storage.MultipartStore
+	completed bool
+	lookupErr error
+}
+
+func (s *reviewCompletionLookupStore) CompleteMultipartUpload(ctx context.Context, id string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
+	meta, err := s.MultipartStore.CompleteMultipartUpload(ctx, id, parts)
+	s.completed = true
+	return meta, err
+}
+
+func (s *reviewCompletionLookupStore) GetMultipartUpload(ctx context.Context, id string) (*storage.MultipartUpload, error) {
+	if s.completed {
+		return nil, s.lookupErr
+	}
+	return s.MultipartStore.GetMultipartUpload(ctx, id)
+}
+
+func TestReviewCompletionAmbiguousMissingLookup(t *testing.T) {
+	for _, order := range []string{"marker-first", "missing-first"} {
+		t.Run(order, func(t *testing.T) {
+			ctx := context.Background()
+			f := newCompletionPublicationFixture(t)
+			f.block(t, "cleanup")
+			unavailable := errors.New("upload observation unavailable")
+			lookupErr := errors.Join(storage.ErrMutationCommitted, storage.ErrUploadNotFound, unavailable)
+			if order == "missing-first" {
+				lookupErr = errors.Join(storage.ErrUploadNotFound, unavailable, storage.ErrMutationCommitted)
+			}
+			original := f.instance.multipartStore
+			wrapped := &reviewCompletionLookupStore{MultipartStore: original, lookupErr: lookupErr}
+			f.instance.multipartStore = wrapped
+			meta, err := f.instance.CompleteMultipartUpload(ctx, f.upload, []storage.PartInfo{*f.part})
+			if meta == nil || meta.Size != 4 || !errors.Is(err, storage.ErrMutationCommitted) {
+				t.Fatalf("completion identity=%+v error=%v", meta, err)
+			}
+			parts, readErr := original.ListParts(ctx, f.upload)
+			if readErr != nil || len(parts) != 1 || parts[0].Size != 4 {
+				t.Fatalf("backing parts not retained: %+v %v", parts, readErr)
+			}
+			if !errors.Is(err, unavailable) {
+				t.Errorf("completion lost lookup uncertainty: %v", err)
+			}
+			if f.instance.reservedBytes != 4 || len(f.instance.multipart) != 1 {
+				t.Errorf("ambiguous absence released retained upload: bytes=%d sessions=%d", f.instance.reservedBytes, len(f.instance.multipart))
+			}
+			f.repair()
+			wrapped.completed = false
+			var set policy.Set
+			set.Add("runtime", "probe", policy.Selector{Kind: policy.KindObject, Prefix: "target"}, policy.Allow, authority.ObjectRead, authority.ObjectWrite)
+			f.instance.policy = policy.Fixed(&set)
+			defer func() { f.instance.policy = nil }()
+			if err := f.instance.AbortMultipartUpload(ctx, f.upload); err != nil {
+				t.Errorf("repaired retained upload cannot be aborted with matching policy: %v", err)
+				if err := f.instance.RefreshUsage(ctx); err != nil {
+					t.Fatalf("explicit refresh: %v", err)
+				}
+				if err := f.instance.AbortMultipartUpload(ctx, f.upload); err != nil {
+					t.Fatalf("abort after explicit refresh: %v", err)
+				}
+			}
+			object, err := f.instance.GetObject(ctx, "probe", "target")
+			if err != nil || string(object.Data) != "body" {
+				t.Fatalf("published object changed during recovery: %+v %v", object, err)
+			}
+		})
+	}
+}

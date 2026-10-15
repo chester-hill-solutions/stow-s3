@@ -1,0 +1,167 @@
+=== RUN   TestCompletionLookupWorkspaceAmbiguity
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/marker-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitymarker-first1542384523/001/.stow/multipart/a175c045f37e56aaed99d64d5d03b1c4/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "a175c045f37e56aaed99d64d5d03b1c4"
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/missing-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitymissing-first1680949876/001/.stow/multipart/1efd87b8c47c9c1372835c60bd49c6b2/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "1efd87b8c47c9c1372835c60bd49c6b2"
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/wrapped-marker-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitywrapped-marker-first1477315428/001/.stow/multipart/8debfa86961b30636a96bd7547a3d661/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "8debfa86961b30636a96bd7547a3d661"
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/wrapped-missing-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitywrapped-missing-first662131834/001/.stow/multipart/edf81bf91812062c8cc9b7502db6924b/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "edf81bf91812062c8cc9b7502db6924b"
+--- FAIL: TestCompletionLookupWorkspaceAmbiguity (0.50s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/marker-first (0.13s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/missing-first (0.12s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/wrapped-marker-first (0.11s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/wrapped-missing-first (0.14s)
+=== RUN   TestCompletionLookupReconciliation
+=== RUN   TestCompletionLookupReconciliation/exists=false/confirmed-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/wrapped-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/actual-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/unknown
+=== RUN   TestCompletionLookupReconciliation/exists=false/marker-only
+=== RUN   TestCompletionLookupReconciliation/exists=false/marker-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+=== RUN   TestCompletionLookupReconciliation/exists=false/missing-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+=== RUN   TestCompletionLookupReconciliation/exists=true/confirmed-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/wrapped-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/actual-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/unknown
+=== RUN   TestCompletionLookupReconciliation/exists=true/marker-only
+=== RUN   TestCompletionLookupReconciliation/exists=true/marker-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+=== RUN   TestCompletionLookupReconciliation/exists=true/missing-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+--- FAIL: TestCompletionLookupReconciliation (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/confirmed-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/wrapped-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/actual-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/unknown (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/marker-only (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=false/marker-first (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=false/missing-first (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/confirmed-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/wrapped-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/actual-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/unknown (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/marker-only (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=true/marker-first (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=true/missing-first (0.00s)
+=== RUN   TestCompletionLookupS3Recovery
+=== RUN   TestCompletionLookupS3Recovery/marker-first
+2026/10/15 19:37:33 POST /s3 500 31.728ms
+2026/10/15 19:37:33 DELETE /s3 500 63.334µs
+    completion_lookup_http_test.go:43: policy-scoped abort status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>6c2192799012e489a6d41b5832687549</RequestId></Error>
+    completion_lookup_http_test.go:43: part capacity not reusable: runtime quota exceeded
+=== RUN   TestCompletionLookupS3Recovery/missing-first
+2026/10/15 19:37:33 POST /s3 500 31.25175ms
+2026/10/15 19:37:33 DELETE /s3 500 111.167µs
+    completion_lookup_http_test.go:43: policy-scoped abort status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>a08ecc067950e1a3cfd94c78606587bb</RequestId></Error>
+    completion_lookup_http_test.go:43: part capacity not reusable: runtime quota exceeded
+--- FAIL: TestCompletionLookupS3Recovery (0.21s)
+    --- FAIL: TestCompletionLookupS3Recovery/marker-first (0.10s)
+    --- FAIL: TestCompletionLookupS3Recovery/missing-first (0.11s)
+=== RUN   TestCompletionLookupWorkspaceAmbiguity
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/marker-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitymarker-first3130071112/001/.stow/multipart/599e4941334eb8d5cee076eeec900514/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "599e4941334eb8d5cee076eeec900514"
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/missing-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitymissing-first2133024062/001/.stow/multipart/1c6a91e6270c9676a487ba281dfec71f/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "1c6a91e6270c9676a487ba281dfec71f"
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/wrapped-marker-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitywrapped-marker-first2312075772/001/.stow/multipart/9b3bc31fb5d2437edfa6d6c010482239/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "9b3bc31fb5d2437edfa6d6c010482239"
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/wrapped-missing-first
+    completion_lookup_uncertainty_test.go:59: completion lost committed/lookup error: local mutation committed
+        workspace store: clear upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionLookupWorkspaceAmbiguitywrapped-missing-first613991822/001/.stow/multipart/80da70c6fc08a3e2752498f7d1507b8b/upload.json: permission denied
+    completion_lookup_uncertainty_test.go:61: retained usage={Bytes:4 Objects:1} bytes=0 objects=0 sessions=0
+    completion_lookup_uncertainty_test.go:62: repaired policy-scoped abort: runtime cannot resolve the resource this operation addresses: upload "80da70c6fc08a3e2752498f7d1507b8b"
+--- FAIL: TestCompletionLookupWorkspaceAmbiguity (0.42s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/marker-first (0.11s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/missing-first (0.10s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/wrapped-marker-first (0.12s)
+    --- FAIL: TestCompletionLookupWorkspaceAmbiguity/wrapped-missing-first (0.10s)
+=== RUN   TestCompletionLookupReconciliation
+=== RUN   TestCompletionLookupReconciliation/exists=false/confirmed-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/wrapped-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/actual-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/unknown
+=== RUN   TestCompletionLookupReconciliation/exists=false/marker-only
+=== RUN   TestCompletionLookupReconciliation/exists=false/marker-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+=== RUN   TestCompletionLookupReconciliation/exists=false/missing-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+=== RUN   TestCompletionLookupReconciliation/exists=true/confirmed-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/wrapped-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/actual-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/unknown
+=== RUN   TestCompletionLookupReconciliation/exists=true/marker-only
+=== RUN   TestCompletionLookupReconciliation/exists=true/marker-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+=== RUN   TestCompletionLookupReconciliation/exists=true/missing-first
+    completion_lookup_uncertainty_test.go:152: lookup error lost: local mutation committed
+        after successful local completion
+    completion_lookup_uncertainty_test.go:152: accounting bytes=0 sessions=0 usage={Bytes:4 Objects:1}
+--- FAIL: TestCompletionLookupReconciliation (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/confirmed-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/wrapped-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/actual-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/unknown (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/marker-only (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=false/marker-first (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=false/missing-first (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/confirmed-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/wrapped-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/actual-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/unknown (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/marker-only (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=true/marker-first (0.00s)
+    --- FAIL: TestCompletionLookupReconciliation/exists=true/missing-first (0.00s)
+=== RUN   TestCompletionLookupS3Recovery
+=== RUN   TestCompletionLookupS3Recovery/marker-first
+2026/10/15 19:37:34 POST /s3 500 45.919292ms
+2026/10/15 19:37:34 DELETE /s3 500 227.375µs
+    completion_lookup_http_test.go:43: policy-scoped abort status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>38da7ee850be0d391fdce446af5d4338</RequestId></Error>
+    completion_lookup_http_test.go:43: part capacity not reusable: runtime quota exceeded
+=== RUN   TestCompletionLookupS3Recovery/missing-first
+2026/10/15 19:37:34 POST /s3 500 39.709708ms
+2026/10/15 19:37:34 DELETE /s3 500 157.416µs
+    completion_lookup_http_test.go:43: policy-scoped abort status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>f845300e3a7ef00f84dbb74e6da702c2</RequestId></Error>
+    completion_lookup_http_test.go:43: part capacity not reusable: runtime quota exceeded
+--- FAIL: TestCompletionLookupS3Recovery (0.24s)
+    --- FAIL: TestCompletionLookupS3Recovery/marker-first (0.12s)
+    --- FAIL: TestCompletionLookupS3Recovery/missing-first (0.12s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.769s
+FAIL

@@ -172,7 +172,7 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 
 func (i *Instance) reconcileCompletionError(ctx context.Context, uploadID string, cause error) error {
 	_, err := i.multipartStore.GetMultipartUpload(ctx, uploadID)
-	if errors.Is(err, storage.ErrUploadNotFound) {
+	if errors.Is(err, storage.ErrUploadNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
 		i.removeUpload(uploadID, true)
 		return cause
 	}

@@ -1,0 +1,57 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"io"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestReviewDeleteAmbiguousObjectHead(t *testing.T) {
+	for _, order := range []string{"marker-first", "missing-first"} {
+		t.Run(order, func(t *testing.T) {
+			ctx := context.Background()
+			store := &validationRecoveryStore{MemoryStore: storage.NewMemoryStore()}
+			instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 8, MaxObjects: 1}, store, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { _ = instance.Close() })
+			if err := instance.CreateBucket(ctx, "probe"); err != nil {
+				t.Fatal(err)
+			}
+			before, err := instance.PutObject(ctx, "probe", "target", []byte("old"), PutOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			unavailable := errors.New("head observation unavailable")
+			store.headErr = errors.Join(storage.ErrMutationCommitted, storage.ErrObjectNotFound, unavailable)
+			if order == "missing-first" {
+				store.headErr = errors.Join(storage.ErrObjectNotFound, unavailable, storage.ErrMutationCommitted)
+			}
+			err = instance.DeleteObject(ctx, "probe", "target")
+			if !errors.Is(err, unavailable) {
+				t.Errorf("ambiguous HEAD did not stop deletion: %v", err)
+			}
+			reader, object, readErr := store.MemoryStore.GetObject(ctx, "probe", "target")
+			if readErr != nil {
+				t.Errorf("object removed despite unknown HEAD: %v; runtime usage=%+v", readErr, instance.Usage())
+			} else {
+				body, err := io.ReadAll(reader)
+				_ = reader.Close()
+				if err != nil || string(body) != "old" || object.VersionID != before.VersionID {
+					t.Errorf("existing object changed: %+v error=%v", object, err)
+				}
+			}
+			store.headErr = nil
+			if err := instance.DeleteObject(ctx, "probe", "target"); err != nil {
+				t.Errorf("healthy deletion retry: %v", err)
+			}
+			if _, err := instance.PutObject(ctx, "probe", "other", []byte("x"), PutOptions{}); err != nil {
+				t.Errorf("confirmed removal stranded quota: %v; usage=%+v", err, instance.Usage())
+			}
+		})
+	}
+}
