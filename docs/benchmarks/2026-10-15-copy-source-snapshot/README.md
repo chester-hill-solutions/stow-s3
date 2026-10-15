@@ -1,5 +1,10 @@
 # Conditional COPY source capture — October 15, 2026
 
+**Withdrawn for performance regression.** The `959f3b5` implementation described
+below is historical evidence, not the current implementation. The
+[restoration](../2026-10-15-copy-cost-restoration/README.md) returns to the earlier
+documented COPY contract and adds a guard against GET→PUT payload emulation.
+
 This follow-up closes the custom-store source-version race identified in the
 [preceding review](../2026-10-15-core-copy-quality/README.md). It also makes the
 generic runtime fallback admit the size of the source it actually captured.

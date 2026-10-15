@@ -77,13 +77,13 @@ func mapCopyError(err error, resource string) s3Error {
 // Source conditions are handed to the store so the version it copies is the version
 // they were checked against. Checking them here first would leave a window in which
 // the source changes, and the copy would publish a version the caller never asked
-// about. A store that cannot evaluate conditions instead supplies a captured GET,
-// with the conditions enforced against that same read's metadata before its bytes
-// are streamed into the destination through the existing PUT interface.
+// about. A store that cannot evaluate conditions still produces a coherent copy,
+// with the conditions enforced against a version this request observed; that is
+// strictly weaker, and it is what storage.ConditionalCopyStore documents.
 func (s *Server) copyVerbatim(ctx context.Context, r *http.Request, req copyRequest) (*storage.ObjectMeta, error) {
 	options := copySourceConditions(r)
-	if hasConditions(options) {
-		return storage.CopyObject(ctx, s.store, storage.CopyRequest{
+	if conditional, ok := s.store.(storage.ConditionalCopyStore); ok && hasConditions(options) {
+		return conditional.CopyObjectCond(ctx, storage.CopyRequest{
 			SourceBucket: req.sourceBucket,
 			SourceKey:    req.sourceKey,
 			DestBucket:   req.destBucket,

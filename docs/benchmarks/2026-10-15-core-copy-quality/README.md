@@ -1,8 +1,10 @@
 # Core COPY correctness review — October 15, 2026
 
-The [source-snapshot follow-up](../2026-10-15-copy-source-snapshot/README.md)
-subsequently closes the generic fallback race identified below. This report retains
-the original evidence and measurements for the preceding independent fix.
+The [source-snapshot attempt](../2026-10-15-copy-source-snapshot/README.md) was
+withdrawn for performance regression. The
+[restoration](../2026-10-15-copy-cost-restoration/README.md) returns to this report's
+implementation and adds a regression guard; the generic fallback race remains a
+documented limitation.
 
 One change: preserve source preconditions when the run-through adapter wraps a
 custom store without optional conditional COPY support. No optimization ships in
