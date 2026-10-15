@@ -28,7 +28,7 @@ func TestCopyReplaceDoesNotBufferTheWholeSource(t *testing.T) {
 	runtime.GC()
 	var before runtime.MemStats
 	runtime.ReadMemStats(&before)
-	status, body := copyMemoryCopy(t, server, "/assets/target", "/assets/source", "REPLACE", nil)
+	status, body := copyMemoryCopy(t, server, "/assets/target", "/assets/source", nil)
 	var after runtime.MemStats
 	runtime.ReadMemStats(&after)
 
@@ -52,7 +52,7 @@ func TestCopyReplaceRefusesOversizedCopyWithoutBuffering(t *testing.T) {
 	runtime.GC()
 	var before runtime.MemStats
 	runtime.ReadMemStats(&before)
-	status, body := copyMemoryCopy(t, server, "/assets/target", "/assets/source", "REPLACE", nil)
+	status, body := copyMemoryCopy(t, server, "/assets/target", "/assets/source", nil)
 	var after runtime.MemStats
 	runtime.ReadMemStats(&after)
 
@@ -78,7 +78,7 @@ func TestCopyReplaceOntoItselfPublishesTheCapturedVersion(t *testing.T) {
 	payload := bytes.Repeat([]byte("a"), size)
 	copyMemoryPut(t, server, "/assets/self", payload, map[string]string{"X-Amz-Meta-Project": "one"})
 
-	status, body := copyMemoryCopy(t, server, "/assets/self", "/assets/self", "REPLACE", map[string]string{"X-Amz-Meta-Project": "two"})
+	status, body := copyMemoryCopy(t, server, "/assets/self", "/assets/self", map[string]string{"X-Amz-Meta-Project": "two"})
 	if status != http.StatusOK {
 		t.Fatalf("self REPLACE copy: %d %s", status, body)
 	}
@@ -150,16 +150,14 @@ func copyMemoryPut(t *testing.T, server *httptest.Server, path string, body []by
 	}
 }
 
-func copyMemoryCopy(t *testing.T, server *httptest.Server, destination, source, directive string, headers map[string]string) (int, string) {
+func copyMemoryCopy(t *testing.T, server *httptest.Server, destination, source string, headers map[string]string) (int, string) {
 	t.Helper()
 	request, err := http.NewRequest(http.MethodPut, server.URL+destination, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	request.Header.Set("X-Amz-Copy-Source", source)
-	if directive != "" {
-		request.Header.Set("X-Amz-Metadata-Directive", directive)
-	}
+	request.Header.Set("X-Amz-Metadata-Directive", "REPLACE")
 	for name, value := range headers {
 		request.Header.Set(name, value)
 	}
