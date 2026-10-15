@@ -45,7 +45,7 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 		return nil, err
 	}
 	clone := storage.CloneMultipartUpload(*upload)
-	return &clone, nil
+	return &clone, err
 }
 
 func (i *Instance) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {

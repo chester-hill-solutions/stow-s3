@@ -324,10 +324,10 @@ func (a multipartAdapter) CreateMultipartUpload(ctx context.Context, bucket, key
 		ContentType: opts.ContentType,
 		Metadata:    storage.CloneMetadata(opts.Metadata),
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, err
 	}
-	return uploadMetaOf(upload), nil
+	return uploadMetaOf(upload), err
 }
 
 func (a multipartAdapter) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {

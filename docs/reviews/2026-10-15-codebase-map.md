@@ -50,9 +50,18 @@ Follow-up: **committed part uploads now preserve their result and byte reservati
 with [regression and cost evidence](../benchmarks/2026-10-15-part-publication/README.md).
 First parts and growing/shrinking replacements are charged on committed errors;
 ordinary refusals retain the previous state. The original eight-under-four-byte
-probe passes. The next confirmed finding is committed upload initiation bypassing
-the session limit: two real uploads can be created at a one-upload cap. Its
-implementation remains unchanged; the new report retains the reproducer.
+probe passes. That report confirmed committed upload initiation bypassing the
+session limit: two real uploads could be created at a one-upload cap. Initiation
+remained unchanged in that part-upload correction.
+
+Follow-up: **committed initiation now preserves the upload descriptor and reserves
+its session/object capacity**, with
+[regression and cost evidence](../benchmarks/2026-10-15-initiation-publication/README.md).
+Ordinary refusals still reserve nothing, and known committed uploads can be
+completed or aborted through the runtime. The original session-cap probe passes.
+The next confirmed finding is abort recovery: a committed abort removes the upload
+and its parts but strands byte, object and session reservations. Abort accounting
+remains unchanged; the new report retains the reproducer.
 
 ## Codebase map
 

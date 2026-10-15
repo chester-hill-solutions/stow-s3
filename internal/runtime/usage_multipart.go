@@ -19,8 +19,7 @@ func (s *usageState) admitCompletion(uploadID string, parts []storage.PartInfo, 
 }
 
 func (s *usageState) finishUpload(upload *storage.MultipartUpload, exists bool, err error) bool {
-	s.recordMutation(err)
-	if err != nil {
+	if !s.recordMutation(err) {
 		return false
 	}
 	clone := storage.CloneMultipartUpload(*upload)

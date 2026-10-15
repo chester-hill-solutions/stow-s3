@@ -1,0 +1,10 @@
+=== RUN   TestReviewCommittedInitiationQuota
+    initiation_review_probe_test.go:60: known result=&{UploadID:review-1 Bucket:probe Key:target Initiated:2026-10-15 21:41:23.225811 +0000 UTC Options:{ContentType: Metadata:map[] ChecksumAlgorithm: ChecksumValue:}} first-error=local mutation committed
+        after upload initiation second-error=runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data actual uploads=[{UploadID:review-1 Bucket:probe Key:target Initiated:2026-10-15 21:41:23.225811 +0000 UTC ContentType: Metadata:map[]}] provider-calls=1
+--- PASS: TestReviewCommittedInitiationQuota (0.00s)
+=== RUN   TestReviewCommittedInitiationQuota
+    initiation_review_probe_test.go:60: known result=&{UploadID:review-1 Bucket:probe Key:target Initiated:2026-10-15 21:41:23.226492 +0000 UTC Options:{ContentType: Metadata:map[] ChecksumAlgorithm: ChecksumValue:}} first-error=local mutation committed
+        after upload initiation second-error=runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data actual uploads=[{UploadID:review-1 Bucket:probe Key:target Initiated:2026-10-15 21:41:23.226492 +0000 UTC ContentType: Metadata:map[]}] provider-calls=1
+--- PASS: TestReviewCommittedInitiationQuota (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	1.297s
