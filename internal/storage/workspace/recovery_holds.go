@@ -120,6 +120,9 @@ func (r *Registry) checkRecoveryHolds(matches func(RecoveryReference) bool) erro
 		if hold.State != "pending" {
 			continue
 		}
+		if !hold.ExpiresAt.IsZero() && !hold.ExpiresAt.After(time.Now().UTC()) {
+			continue
+		}
 		for _, reference := range hold.References {
 			if matches(reference) {
 				return fmt.Errorf("%w: %s", ErrRecoveryHeld, hold.ID)

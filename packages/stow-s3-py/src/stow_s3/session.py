@@ -257,7 +257,7 @@ def _server_args(binary: str, data_dir: Path, ready_fd: int, max_bytes: int, max
         "--port", "0",
         "--host", "127.0.0.1",
         "--data-dir", str(data_dir),
-        "--backend", "filesystem",
+        "--backend", "memory",
         "--mode", "local",
         "--max-bytes", str(max_bytes),
         "--max-objects", str(max_objects),

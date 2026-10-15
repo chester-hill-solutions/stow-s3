@@ -78,7 +78,11 @@ func (s *Store) Policy(env authority.Authority) (policy.Set, error) {
 	if err != nil {
 		return policy.Set{}, err
 	}
-	return record.Policy(s.now)
+	set, err := record.Policy(s.now)
+	if err != nil {
+		return policy.Set{}, err
+	}
+	return policy.New(set, env)
 }
 
 // Persist writes next as the successor of the stored record, and returns what it wrote.

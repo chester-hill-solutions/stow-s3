@@ -59,6 +59,23 @@ func TestARecordRoundTripsThroughTheStoreAndStillDecides(t *testing.T) {
 	}
 }
 
+// A record written under a wider grant must be refused when read under a
+// narrower one, not silently clipped. The store's read-side validation is what
+// makes "the environment a record is checked against is the one it will be read
+// under" true; the environment argument used to be ignored entirely.
+func TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead(t *testing.T) {
+	store := openStore(t)
+	if _, err := store.Persist(sampleRecord(t, 0), 0); err != nil {
+		t.Fatalf("persist: %v", err)
+	}
+	if _, err := store.Policy(authority.None()); !errors.Is(err, policy.ErrWidening) {
+		t.Fatalf("Policy under an environment that grants nothing = %v, want ErrWidening", err)
+	}
+	if _, err := store.Policy(authority.All()); err != nil {
+		t.Fatalf("Policy under the full environment: %v", err)
+	}
+}
+
 func TestARevisionThatHasPassedItsDeadlineRefusesAfterAReload(t *testing.T) {
 	store := openStore(t)
 	if _, err := store.Persist(sampleRecord(t, 0), 0); err != nil {
