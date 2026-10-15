@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	lockFileExclusiveLock = 0x00000002
-	lockFileReserved      = 0
-	lockFileBytes         = ^uint32(0)
+	lockFileFailImmediately = 0x00000001
+	lockFileExclusiveLock   = 0x00000002
+	lockFileReserved        = 0
+	lockFileBytes           = ^uint32(0)
 )
 
 var (
@@ -27,7 +28,7 @@ func lockStoreFile(path string) (*storeLock, error) {
 	var overlapped syscall.Overlapped
 	result, _, callErr := lockFileEx.Call(
 		file.Fd(),
-		uintptr(lockFileExclusiveLock),
+		uintptr(lockFileExclusiveLock|lockFileFailImmediately),
 		uintptr(lockFileReserved),
 		uintptr(lockFileBytes),
 		uintptr(lockFileBytes),

@@ -268,12 +268,19 @@ func readBoundedPart(body io.Reader, limit int64) ([]byte, error) {
 	if limit <= 0 {
 		return io.ReadAll(body)
 	}
-	data, err := io.ReadAll(io.LimitReader(body, limit+1))
+	data, err := io.ReadAll(io.LimitReader(body, limit))
 	if err != nil {
 		return nil, err
 	}
-	if int64(len(data)) > limit {
-		return nil, ErrQuotaExceeded
+	if int64(len(data)) == limit {
+		var extra [1]byte
+		n, err := body.Read(extra[:])
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
+		if n > 0 {
+			return nil, ErrQuotaExceeded
+		}
 	}
 	return data, nil
 }

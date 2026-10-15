@@ -2451,6 +2451,9 @@ Workspaces. Adopt a named transfer bundle into a new directory under the configu
     },
     "destination": {
       "type": "string"
+    },
+    "expect_sha256": {
+      "type": "string"
     }
   },
   "required": [

@@ -48,7 +48,7 @@ _ = object
 
 ## Symbols
 
-[AddRecoveryHold](#addrecoveryhold) · [AdoptHandoff](#adopthandoff) · [AdoptHandoffArchive](#adopthandoffarchive) · [AllowAll](#allowall) · [AllowNone](#allownone) · [ApplyDelta](#applydelta) · [ApplyDeltaWithOptions](#applydeltawithoptions) · [Authority](#authority) · [Backend](#backend) · [BackendFilesystem](#backendfilesystem) · [BackendHost](#backendhost) · [BackendMemory](#backendmemory) · [BackendWorkspace](#backendworkspace) · [Bucket](#bucket) · [BucketCreate](#bucketcreate) · [BucketDelete](#bucketdelete) · [BucketList](#bucketlist) · [Capabilities](#capabilities) · [CapacityHost](#capacityhost) · [CapacityHostOptions](#capacityhostoptions) · [CapacityNamespace](#capacitynamespace) · [CapacityNamespaceOptions](#capacitynamespaceoptions) · [CapacitySnapshot](#capacitysnapshot) · [CaptureCheckpoint](#capturecheckpoint) · [CapturePrincipal](#captureprincipal) · [CheckpointArchiveOptions](#checkpointarchiveoptions) · [CheckpointArchivePreview](#checkpointarchivepreview) · [CheckpointBucketChange](#checkpointbucketchange) · [CheckpointChange](#checkpointchange) · [CheckpointError](#checkpointerror) · [CheckpointFile](#checkpointfile) · [CheckpointHold](#checkpointhold) · [CheckpointInfo](#checkpointinfo) · [CheckpointManifest](#checkpointmanifest) · [CheckpointObject](#checkpointobject) · [CheckpointObjectChange](#checkpointobjectchange) · [CheckpointOf](#checkpointof) · [CheckpointOfAuthorized](#checkpointofauthorized) · [CheckpointOptions](#checkpointoptions) · [CheckpointProvenance](#checkpointprovenance) · [CheckpointRepository](#checkpointrepository) · [CheckpointRequest](#checkpointrequest) · [CheckpointResult](#checkpointresult) · [Collect](#collect) · [CollectOptions](#collectoptions) · [CollectResult](#collectresult) · [CompareCheckpoints](#comparecheckpoints) · [ComparePortableCheckpoints](#compareportablecheckpoints) · [ConditionalWriteStore](#conditionalwritestore) · [CopyStore](#copystore) · [CreateDelta](#createdelta) · [DecodeDelta](#decodedelta) · [DefaultWorkspaceRegistryDir](#defaultworkspaceregistrydir) · [DefaultWorkspaceRegistryDirForTeam](#defaultworkspaceregistrydirforteam) · [DeleteCheckpoint](#deletecheckpoint) · [DeltaChange](#deltachange) · [DeltaChangeAdded](#deltachangeadded) · [DeltaChangeChanged](#deltachangechanged) · [DeltaChangeDeleted](#deltachangedeleted) · [DeltaDocument](#deltadocument) · [DeltaDocumentDigest](#deltadocumentdigest) · [DeltaOptions](#deltaoptions) · [DeltaVersion](#deltaversion) · [DestroyRegisteredWorkspace](#destroyregisteredworkspace) · [DiscardRecoveryHold](#discardrecoveryhold) · [EncodeDelta](#encodedelta) · [EnvironmentDestroy](#environmentdestroy) · [EnvironmentPromote](#environmentpromote) · [EnvironmentReset](#environmentreset) · [ErrBucketExists](#errbucketexists) · [ErrBucketNotEmpty](#errbucketnotempty) · [ErrBucketNotFound](#errbucketnotfound) · [ErrCapacityConflict](#errcapacityconflict) · [ErrCapacityFull](#errcapacityfull) · [ErrCapacityInvalid](#errcapacityinvalid) · [ErrCapacityUnknown](#errcapacityunknown) · [ErrClosed](#errclosed) · [ErrConditionalWritesUnsupported](#errconditionalwritesunsupported) · [ErrDeltaConflict](#errdeltaconflict) · [ErrDeltaDigestMismatch](#errdeltadigestmismatch) · [ErrDeltaTooLarge](#errdeltatoolarge) · [ErrDeltaVersionUnsupported](#errdeltaversionunsupported) · [ErrGuardedSavesUnsupported](#errguardedsavesunsupported) · [ErrInvalidBucket](#errinvalidbucket) · [ErrInvalidKey](#errinvalidkey) · [ErrInvalidListLimit](#errinvalidlistlimit) · [ErrInvalidRecoveryHold](#errinvalidrecoveryhold) · [ErrInvalidSaveCondition](#errinvalidsavecondition) · [ErrInvalidSaveRequest](#errinvalidsaverequest) · [ErrMutationCommitted](#errmutationcommitted) · [ErrNotAuthorized](#errnotauthorized) · [ErrObjectNotFound](#errobjectnotfound) · [ErrPreconditionFailed](#errpreconditionfailed) · [ErrQuotaExceeded](#errquotaexceeded) · [ErrRecoveryHeld](#errrecoveryheld) · [ErrRecoveryHoldConflict](#errrecoveryholdconflict) · [ErrRecoveryHoldCorrupt](#errrecoveryholdcorrupt) · [ErrRecoveryHoldFull](#errrecoveryholdfull) · [ErrRecoveryHoldNotFound](#errrecoveryholdnotfound) · [ErrRecoveryHoldsUnsupported](#errrecoveryholdsunsupported) · [ErrSaveConflict](#errsaveconflict) · [ErrSaveRequestConflict](#errsaverequestconflict) · [ErrSaveRequestFull](#errsaverequestfull) · [ErrSaveRequestNotCommitted](#errsaverequestnotcommitted) · [ErrSaveRequestNotFound](#errsaverequestnotfound) · [ErrSaveRequestsUnsupported](#errsaverequestsunsupported) · [ErrSaveRequestUnknown](#errsaverequestunknown) · [ErrUnsupportedBackend](#errunsupportedbackend) · [ExportCheckpoint](#exportcheckpoint) · [ExportHandoff](#exporthandoff) · [FilesystemOptions](#filesystemoptions) · [GetRegistryPolicy](#getregistrypolicy) · [GitRepositoryInput](#gitrepositoryinput) · [Handoff](#handoff) · [HandoffArchive](#handoffarchive) · [HandoffError](#handofferror) · [HandoffExportOptions](#handoffexportoptions) · [ImportCheckpoint](#importcheckpoint) · [ImportHandoff](#importhandoff) · [List](#list) · [ListOptions](#listoptions) · [ListRecoveryHolds](#listrecoveryholds) · [ListWorkspacesOptions](#listworkspacesoptions) · [LoadCheckpoint](#loadcheckpoint) · [LookupWorkspace](#lookupworkspace) · [MaxDeltaBytes](#maxdeltabytes) · [MaxRecoveryHoldBytes](#maxrecoveryholdbytes) · [MaxRecoveryHoldPeakBytes](#maxrecoveryholdpeakbytes) · [MaxRecoveryHolds](#maxrecoveryholds) · [MaxRecoveryReferences](#maxrecoveryreferences) · [MultipartOptions](#multipartoptions) · [MultipartStore](#multipartstore) · [MultipartUpload](#multipartupload) · [Object](#object) · [ObjectDelete](#objectdelete) · [ObjectList](#objectlist) · [ObjectPage](#objectpage) · [ObjectRange](#objectrange) · [ObjectRead](#objectread) · [ObjectRecoveryHoldOptions](#objectrecoveryholdoptions) · [ObjectRecoveryReference](#objectrecoveryreference) · [ObjectWrite](#objectwrite) · [Open](#open) · [OpenCapacityHost](#opencapacityhost) · [OpenFilesystem](#openfilesystem) · [OpenWorkspace](#openworkspace) · [Operation](#operation) · [Options](#options) · [Part](#part) · [PortableCheckpointDiff](#portablecheckpointdiff) · [PreparedRepository](#preparedrepository) · [PreparedWorkspace](#preparedworkspace) · [PrepareOptions](#prepareoptions) · [PrepareWorkspace](#prepareworkspace) · [PreviewCheckpointArchive](#previewcheckpointarchive) · [Prune](#prune) · [PruneOptions](#pruneoptions) · [PruneResult](#pruneresult) · [PutOptions](#putoptions) · [RangeStore](#rangestore) · [ReadCheckpointFile](#readcheckpointfile) · [ReadHandoff](#readhandoff) · [ReadHandoffReader](#readhandoffreader) · [ReadOnly](#readonly) · [ReadWrite](#readwrite) · [RecoveryHold](#recoveryhold) · [RecoveryHoldPage](#recoveryholdpage) · [RecoveryHoldQuery](#recoveryholdquery) · [RecoveryHoldRequest](#recoveryholdrequest) · [RecoveryReference](#recoveryreference) · [RegistryPolicy](#registrypolicy) · [ReleaseRecoveryHold](#releaserecoveryhold) · [ReplacementCondition](#replacementcondition) · [ResolveCheckpoint](#resolvecheckpoint) · [ResolveRegistryDir](#resolveregistrydir) · [RestoreCheckpoint](#restorecheckpoint) · [RestoreCheckpointWithGit](#restorecheckpointwithgit) · [Resume](#resume) · [ResumeIn](#resumein) · [ResumeWith](#resumewith) · [Runtime](#runtime) · [SaveCommitted](#savecommitted) · [SaveCondition](#savecondition) · [SaveNotCommitted](#savenotcommitted) · [SaveOptions](#saveoptions) · [SaveOutcome](#saveoutcome) · [SaveResult](#saveresult) · [SaveUnknown](#saveunknown) · [SetRegistryPolicy](#setregistrypolicy) · [StagedObject](#stagedobject) · [StagedWriteStore](#stagedwritestore) · [Store](#store) · [StreamingStore](#streamingstore) · [StreamingWriteStore](#streamingwritestore) · [StreamPutOptions](#streamputoptions) · [UpstreamRead](#upstreamread) · [UpstreamWrite](#upstreamwrite) · [Usage](#usage) · [ValidateHandoff](#validatehandoff) · [VerifyDeltaDigest](#verifydeltadigest) · [Workspace](#workspace) · [WorkspaceFacade](#workspacefacade) · [WorkspaceFacadeOptions](#workspacefacadeoptions) · [WorkspaceInput](#workspaceinput) · [WorkspaceListing](#workspacelisting) · [WorkspaceOptions](#workspaceoptions) · [WorkspaceReference](#workspacereference) · [WorkspaceSummary](#workspacesummary) · [WorkspaceTaskManifest](#workspacetaskmanifest)
+[AddRecoveryHold](#addrecoveryhold) · [AdoptHandoff](#adopthandoff) · [AdoptHandoffArchive](#adopthandoffarchive) · [AllowAll](#allowall) · [AllowNone](#allownone) · [ApplyDelta](#applydelta) · [ApplyDeltaWithOptions](#applydeltawithoptions) · [Authority](#authority) · [Backend](#backend) · [BackendFilesystem](#backendfilesystem) · [BackendHost](#backendhost) · [BackendMemory](#backendmemory) · [BackendWorkspace](#backendworkspace) · [Bucket](#bucket) · [BucketCreate](#bucketcreate) · [BucketDelete](#bucketdelete) · [BucketList](#bucketlist) · [Capabilities](#capabilities) · [CapacityHost](#capacityhost) · [CapacityHostOptions](#capacityhostoptions) · [CapacityNamespace](#capacitynamespace) · [CapacityNamespaceOptions](#capacitynamespaceoptions) · [CapacitySnapshot](#capacitysnapshot) · [CaptureCheckpoint](#capturecheckpoint) · [CapturePrincipal](#captureprincipal) · [CheckpointArchiveOptions](#checkpointarchiveoptions) · [CheckpointArchivePreview](#checkpointarchivepreview) · [CheckpointBucketChange](#checkpointbucketchange) · [CheckpointChange](#checkpointchange) · [CheckpointError](#checkpointerror) · [CheckpointFile](#checkpointfile) · [CheckpointHold](#checkpointhold) · [CheckpointInfo](#checkpointinfo) · [CheckpointManifest](#checkpointmanifest) · [CheckpointObject](#checkpointobject) · [CheckpointObjectChange](#checkpointobjectchange) · [CheckpointOf](#checkpointof) · [CheckpointOfAuthorized](#checkpointofauthorized) · [CheckpointOptions](#checkpointoptions) · [CheckpointProvenance](#checkpointprovenance) · [CheckpointRepository](#checkpointrepository) · [CheckpointRequest](#checkpointrequest) · [CheckpointResult](#checkpointresult) · [Collect](#collect) · [CollectOptions](#collectoptions) · [CollectResult](#collectresult) · [CompareCheckpoints](#comparecheckpoints) · [ComparePortableCheckpoints](#compareportablecheckpoints) · [ConditionalWriteStore](#conditionalwritestore) · [CopyStore](#copystore) · [CreateDelta](#createdelta) · [DecodeDelta](#decodedelta) · [DefaultWorkspaceRegistryDir](#defaultworkspaceregistrydir) · [DefaultWorkspaceRegistryDirForTeam](#defaultworkspaceregistrydirforteam) · [DeleteCheckpoint](#deletecheckpoint) · [DeltaChange](#deltachange) · [DeltaChangeAdded](#deltachangeadded) · [DeltaChangeChanged](#deltachangechanged) · [DeltaChangeDeleted](#deltachangedeleted) · [DeltaDocument](#deltadocument) · [DeltaDocumentDigest](#deltadocumentdigest) · [DeltaOptions](#deltaoptions) · [DeltaVersion](#deltaversion) · [DestroyRegisteredWorkspace](#destroyregisteredworkspace) · [DiscardRecoveryHold](#discardrecoveryhold) · [EncodeDelta](#encodedelta) · [EnvironmentDestroy](#environmentdestroy) · [EnvironmentPromote](#environmentpromote) · [EnvironmentReset](#environmentreset) · [ErrBucketExists](#errbucketexists) · [ErrBucketNotEmpty](#errbucketnotempty) · [ErrBucketNotFound](#errbucketnotfound) · [ErrCapacityConflict](#errcapacityconflict) · [ErrCapacityFull](#errcapacityfull) · [ErrCapacityInvalid](#errcapacityinvalid) · [ErrCapacityUnknown](#errcapacityunknown) · [ErrClosed](#errclosed) · [ErrConditionalWritesUnsupported](#errconditionalwritesunsupported) · [ErrDeltaConflict](#errdeltaconflict) · [ErrDeltaDigestMismatch](#errdeltadigestmismatch) · [ErrDeltaTooLarge](#errdeltatoolarge) · [ErrDeltaVersionUnsupported](#errdeltaversionunsupported) · [ErrGuardedSavesUnsupported](#errguardedsavesunsupported) · [ErrHandoffDigestMismatch](#errhandoffdigestmismatch) · [ErrInvalidBucket](#errinvalidbucket) · [ErrInvalidKey](#errinvalidkey) · [ErrInvalidListLimit](#errinvalidlistlimit) · [ErrInvalidRecoveryHold](#errinvalidrecoveryhold) · [ErrInvalidSaveCondition](#errinvalidsavecondition) · [ErrInvalidSaveRequest](#errinvalidsaverequest) · [ErrMutationCommitted](#errmutationcommitted) · [ErrNotAuthorized](#errnotauthorized) · [ErrObjectNotFound](#errobjectnotfound) · [ErrPreconditionFailed](#errpreconditionfailed) · [ErrQuotaExceeded](#errquotaexceeded) · [ErrRecoveryHeld](#errrecoveryheld) · [ErrRecoveryHoldConflict](#errrecoveryholdconflict) · [ErrRecoveryHoldCorrupt](#errrecoveryholdcorrupt) · [ErrRecoveryHoldFull](#errrecoveryholdfull) · [ErrRecoveryHoldNotFound](#errrecoveryholdnotfound) · [ErrRecoveryHoldsUnsupported](#errrecoveryholdsunsupported) · [ErrSaveConflict](#errsaveconflict) · [ErrSaveRequestConflict](#errsaverequestconflict) · [ErrSaveRequestFull](#errsaverequestfull) · [ErrSaveRequestNotCommitted](#errsaverequestnotcommitted) · [ErrSaveRequestNotFound](#errsaverequestnotfound) · [ErrSaveRequestsUnsupported](#errsaverequestsunsupported) · [ErrSaveRequestUnknown](#errsaverequestunknown) · [ErrUnsupportedBackend](#errunsupportedbackend) · [ExportCheckpoint](#exportcheckpoint) · [ExportHandoff](#exporthandoff) · [FilesystemOptions](#filesystemoptions) · [GetRegistryPolicy](#getregistrypolicy) · [GitRepositoryInput](#gitrepositoryinput) · [Handoff](#handoff) · [HandoffArchive](#handoffarchive) · [HandoffError](#handofferror) · [HandoffExportOptions](#handoffexportoptions) · [ImportCheckpoint](#importcheckpoint) · [ImportHandoff](#importhandoff) · [List](#list) · [ListOptions](#listoptions) · [ListRecoveryHolds](#listrecoveryholds) · [ListWorkspacesOptions](#listworkspacesoptions) · [LoadCheckpoint](#loadcheckpoint) · [LookupWorkspace](#lookupworkspace) · [MaxDeltaBytes](#maxdeltabytes) · [MaxRecoveryHoldBytes](#maxrecoveryholdbytes) · [MaxRecoveryHoldPeakBytes](#maxrecoveryholdpeakbytes) · [MaxRecoveryHolds](#maxrecoveryholds) · [MaxRecoveryReferences](#maxrecoveryreferences) · [MultipartOptions](#multipartoptions) · [MultipartStore](#multipartstore) · [MultipartUpload](#multipartupload) · [Object](#object) · [ObjectDelete](#objectdelete) · [ObjectList](#objectlist) · [ObjectPage](#objectpage) · [ObjectRange](#objectrange) · [ObjectRead](#objectread) · [ObjectRecoveryHoldOptions](#objectrecoveryholdoptions) · [ObjectRecoveryReference](#objectrecoveryreference) · [ObjectWrite](#objectwrite) · [Open](#open) · [OpenCapacityHost](#opencapacityhost) · [OpenFilesystem](#openfilesystem) · [OpenWorkspace](#openworkspace) · [Operation](#operation) · [Options](#options) · [Part](#part) · [PortableCheckpointDiff](#portablecheckpointdiff) · [PreparedRepository](#preparedrepository) · [PreparedWorkspace](#preparedworkspace) · [PrepareOptions](#prepareoptions) · [PrepareWorkspace](#prepareworkspace) · [PreviewCheckpointArchive](#previewcheckpointarchive) · [Prune](#prune) · [PruneOptions](#pruneoptions) · [PruneResult](#pruneresult) · [PutOptions](#putoptions) · [RangeStore](#rangestore) · [ReadCheckpointFile](#readcheckpointfile) · [ReadHandoff](#readhandoff) · [ReadHandoffReader](#readhandoffreader) · [ReadOnly](#readonly) · [ReadWrite](#readwrite) · [RecoveryHold](#recoveryhold) · [RecoveryHoldPage](#recoveryholdpage) · [RecoveryHoldQuery](#recoveryholdquery) · [RecoveryHoldRequest](#recoveryholdrequest) · [RecoveryReference](#recoveryreference) · [RegistryPolicy](#registrypolicy) · [ReleaseRecoveryHold](#releaserecoveryhold) · [ReplacementCondition](#replacementcondition) · [ResolveCheckpoint](#resolvecheckpoint) · [ResolveRegistryDir](#resolveregistrydir) · [RestoreCheckpoint](#restorecheckpoint) · [RestoreCheckpointWithGit](#restorecheckpointwithgit) · [Resume](#resume) · [ResumeIn](#resumein) · [ResumeWith](#resumewith) · [Runtime](#runtime) · [SaveCommitted](#savecommitted) · [SaveCondition](#savecondition) · [SaveNotCommitted](#savenotcommitted) · [SaveOptions](#saveoptions) · [SaveOutcome](#saveoutcome) · [SaveResult](#saveresult) · [SaveUnknown](#saveunknown) · [SetRegistryPolicy](#setregistrypolicy) · [StagedObject](#stagedobject) · [StagedWriteStore](#stagedwritestore) · [Store](#store) · [StreamingStore](#streamingstore) · [StreamingWriteStore](#streamingwritestore) · [StreamPutOptions](#streamputoptions) · [UpstreamRead](#upstreamread) · [UpstreamWrite](#upstreamwrite) · [Usage](#usage) · [ValidateHandoff](#validatehandoff) · [VerifyDeltaDigest](#verifydeltadigest) · [Workspace](#workspace) · [WorkspaceFacade](#workspacefacade) · [WorkspaceFacadeOptions](#workspacefacadeoptions) · [WorkspaceInput](#workspaceinput) · [WorkspaceListing](#workspacelisting) · [WorkspaceOptions](#workspaceoptions) · [WorkspaceReference](#workspacereference) · [WorkspaceSummary](#workspacesummary) · [WorkspaceTaskManifest](#workspacetaskmanifest)
 
 ## AddRecoveryHold
 
@@ -345,9 +345,10 @@ Return the operations and limits supported by this handle.
 
 ```go
 type Capabilities struct {
-	Backend			Backend
-	MaxBytes		int64
-	MaxObjects		int64
+	Backend		Backend
+	MaxBytes	int64
+	MaxObjects	int64
+
 	MaxMultipartUploads	int64
 	Persistent		bool
 	Multipart		bool
@@ -428,6 +429,7 @@ type CapacityNamespaceOptions struct {
 	ID	string
 	MaxBytes,
 	RecoveryReserveBytes	int64
+
 	MaxOperations, MaxDependencies	int
 }
 ```
@@ -438,8 +440,9 @@ type CapacityNamespaceOptions struct {
 
 ```go
 type CapacitySnapshot struct {
-	PayloadBytes, RecoveryBytes, ReservedRecoveryBytes, PendingBytes	int64
-	Operations								int
+	PayloadBytes,
+	RecoveryBytes, ReservedRecoveryBytes, PendingBytes	int64
+	Operations	int
 }
 ```
 
@@ -480,6 +483,7 @@ type CheckpointArchiveOptions struct {
 	MaxBytes		int64
 	MaxFiles		int64
 	IncludeSensitiveFiles	bool
+	ExpectedSHA256		string
 }
 ```
 
@@ -846,8 +850,8 @@ type ConditionalWriteStore interface{ SupportsConditionalWrites() bool }
 
 ```go
 type CopyStore interface {
-	CopyObject(context.
-		Context, string, string, string, string) (Object, error)
+	CopyObject(context.Context, string, string, string, string) (
+		Object, error)
 }
 ```
 
@@ -1195,6 +1199,14 @@ var ErrDeltaVersionUnsupported = errors.New("delta document version is not suppo
 
 ```go
 var ErrGuardedSavesUnsupported = embedded.ErrGuardedSavesUnsupported
+```
+
+## ErrHandoffDigestMismatch
+
+
+
+```go
+var ErrHandoffDigestMismatch = errors.New("handoff archive does not match the published digest")
 ```
 
 ## ErrInvalidBucket
@@ -1696,8 +1708,7 @@ const MaxRecoveryHoldBytes = 2 << 20
 
 
 ```go
-const MaxRecoveryHoldPeakBytes = 2 *
-	MaxRecoveryHoldBytes
+const MaxRecoveryHoldPeakBytes = 2 * MaxRecoveryHoldBytes
 ```
 
 ## MaxRecoveryHolds
@@ -1733,13 +1744,13 @@ MultipartStore is the optional extension: a store that can stream an object larg
 
 ```go
 type MultipartStore interface {
-	CreateMultipartUpload(ctx context.Context, bucket, key string,
-		options MultipartOptions) (MultipartUpload, error)
+	CreateMultipartUpload(ctx context.Context, bucket, key string, options MultipartOptions) (MultipartUpload, error)
 	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
 	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
 	AbortMultipartUpload(ctx context.Context, uploadID string) error
 
-	GetMultipartUpload(ctx context.Context, uploadID string) (MultipartUpload, error)
+	GetMultipartUpload(ctx context.
+		Context, uploadID string) (MultipartUpload, error)
 	ListParts(ctx context.Context, uploadID string) ([]Part, error)
 	ListMultipartUploads(ctx context.Context, bucket string) ([]MultipartUpload, error)
 }
@@ -1799,9 +1810,9 @@ const ObjectList Operation = "object.list"
 
 ```go
 type ObjectPage struct {
-	Objects		[]Object
-	Truncated	bool
+	Objects	[]Object
 
+	Truncated	bool
 	NextCursor	string
 }
 ```
@@ -2092,8 +2103,7 @@ type PutOptions struct {
 	ContentType	string
 	Metadata	map[string]string
 
-	IfMatch	string
-
+	IfMatch		string
 	IfNoneMatch	string
 }
 ```
@@ -2104,8 +2114,8 @@ type PutOptions struct {
 
 ```go
 type RangeStore interface {
-	OpenObjectRange(context.
-		Context, string, string, ObjectRange) (io.ReadCloser, Object, error)
+	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser,
+		Object, error)
 }
 ```
 
@@ -2177,9 +2187,9 @@ func ReadWrite() Authority
 type RecoveryHold struct {
 	RecoveryHoldRequest
 	Meaning	string	`json:"meaning"`
-	State	string	`json:"state"`
-	Created	time.
-		Time	`json:"created"`
+
+	State		string		`json:"state"`
+	Created		time.Time	`json:"created"`
 	FinishedAt	time.Time	`json:"finished_at,omitempty"`
 }
 ```
@@ -2190,10 +2200,11 @@ type RecoveryHold struct {
 
 ```go
 type RecoveryHoldPage struct {
-	Holds			[]RecoveryHold	`json:"holds"`
-	NextCursor		string		`json:"next_cursor,omitempty"`
-	ReservedBytes		int64		`json:"reserved_bytes"`
-	PeakReservedBytes	int64		`json:"peak_reserved_bytes"`
+	Holds	[]RecoveryHold	`json:"holds"`
+
+	NextCursor		string	`json:"next_cursor,omitempty"`
+	ReservedBytes		int64	`json:"reserved_bytes"`
+	PeakReservedBytes	int64	`json:"peak_reserved_bytes"`
 }
 ```
 
@@ -2216,8 +2227,7 @@ type RecoveryHoldQuery struct {
 
 ```go
 type RecoveryHoldRequest struct {
-	ID	string	`json:"id"`
-
+	ID		string			`json:"id"`
 	Owner		string			`json:"owner"`
 	References	[]RecoveryReference	`json:"references"`
 	ExpiresAt	time.Time		`json:"expires_at,omitempty"`
@@ -2937,8 +2947,8 @@ type Store interface {
 
 ```go
 type StreamingStore interface {
-	OpenObject(context.Context,
-		string, string) (io.ReadCloser, Object, error)
+	OpenObject(
+		context.Context, string, string) (io.ReadCloser, Object, error)
 }
 ```
 
@@ -2986,7 +2996,6 @@ Return current storage accounting.
 ```go
 type Usage struct {
 	Bytes	int64
-
 	Objects	int64
 }
 ```
