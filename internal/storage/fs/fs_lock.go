@@ -44,11 +44,29 @@ func acquireStoreLock(lockPath string) (string, error) {
 		if !isStaleStoreLock(lockPath) {
 			return "", fmt.Errorf("acquire store lock: %w", err)
 		}
-		if removeErr := os.Remove(lockPath); removeErr != nil && !os.IsNotExist(removeErr) {
-			return "", fmt.Errorf("recover stale store lock: %w", removeErr)
+		observed := readStoreLockID(lockPath)
+		reclaimed := lockPath + ".reclaim." + nonce
+		if renameErr := os.Rename(lockPath, reclaimed); renameErr != nil {
+			if os.IsNotExist(renameErr) {
+				continue
+			}
+			return "", fmt.Errorf("recover stale store lock: %w", renameErr)
 		}
+		if readStoreLockID(reclaimed) != observed {
+			_ = os.Rename(reclaimed, lockPath)
+			return "", fmt.Errorf("acquire store lock: %w", os.ErrExist)
+		}
+		_ = os.Remove(reclaimed)
 	}
 	return "", fmt.Errorf("acquire store lock: %w", os.ErrExist)
+}
+
+func readStoreLockID(lockPath string) string {
+	data, err := os.ReadFile(lockPath)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(data))
 }
 
 func isStaleStoreLock(lockPath string) bool {

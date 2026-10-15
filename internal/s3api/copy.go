@@ -164,8 +164,10 @@ func copyContentType(r *http.Request) string {
 // to be empty", because only the first warrants the unconditional copy path.
 func copySourceConditions(r *http.Request) storage.CopyOptions {
 	return storage.CopyOptions{
-		SourceIfMatch:     r.Header.Get("x-amz-copy-source-if-match"),
-		SourceIfNoneMatch: r.Header.Get("x-amz-copy-source-if-none-match"),
+		SourceIfMatch:           r.Header.Get("x-amz-copy-source-if-match"),
+		SourceIfNoneMatch:       r.Header.Get("x-amz-copy-source-if-none-match"),
+		SourceIfModifiedSince:   r.Header.Get("x-amz-copy-source-if-modified-since"),
+		SourceIfUnmodifiedSince: r.Header.Get("x-amz-copy-source-if-unmodified-since"),
 	}
 }
 

@@ -177,26 +177,18 @@ func listStartAfter(opts ListOptions) string {
 	return opts.ContinuationToken
 }
 
-func maxKeysOrDefault(max int) int {
-	if max <= 0 {
-		return 1000
+const maxListPage = 1000
+
+func clampListPage(max int) int {
+	if max <= 0 || max > maxListPage {
+		return maxListPage
 	}
 	return max
 }
 
-func maxUploadsOrDefault(max int) int {
-	if max <= 0 {
-		return 1000
-	}
-	return max
-}
-
-func maxPartsOrDefault(max int) int {
-	if max <= 0 {
-		return 1000
-	}
-	return max
-}
+func maxKeysOrDefault(max int) int    { return clampListPage(max) }
+func maxUploadsOrDefault(max int) int { return clampListPage(max) }
+func maxPartsOrDefault(max int) int   { return clampListPage(max) }
 
 // PaginateParts applies ListParts marker and max-parts semantics to parts.
 // The input is sorted on a copy so callers retain their original ordering.

@@ -215,11 +215,17 @@ func prepareWorkspaceCommand(args []string) error {
 	result.Team = manifest.Team
 	// Set here rather than in makeWorkspaceResult, which three other verbs share and
 	// none of which has a bound: only a prepare that asked for one has a count.
-	result.Capabilities.RegistryBound = registryBound{
+	bound := registryBound{
 		MaxWorkspaces: prepared.MaxWorkspaces,
 		InUse:         prepared.RegistryEntries,
 		Remaining:     prepared.MaxWorkspaces - prepared.RegistryEntries,
 	}
+	if prepared.MaxWorkspaces == 0 {
+		bound = registryBound{}
+	} else if bound.Remaining < 0 {
+		bound.Remaining = 0
+	}
+	result.Capabilities.RegistryBound = bound
 	result.RegistryDir, err = stow.ResolveRegistryDir(manifest.RegistryDir, manifest.Team)
 	if err != nil {
 		return err

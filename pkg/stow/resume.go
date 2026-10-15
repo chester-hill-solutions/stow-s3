@@ -138,7 +138,7 @@ func resumeLimit(name string, persisted, requested int64) (int64, error) {
 	if requested == 0 {
 		return persisted, nil
 	}
-	if requested > persisted {
+	if persisted != 0 && requested > persisted {
 		return 0, fmt.Errorf("stow: resume %s would widen the workspace limit", name)
 	}
 	return requested, nil

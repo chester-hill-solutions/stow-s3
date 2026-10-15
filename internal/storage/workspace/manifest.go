@@ -72,6 +72,7 @@ type ManifestEntry struct {
 	Digest            string            `json:"digest,omitempty"`
 	Size              int64             `json:"size"`
 	ETag              string            `json:"etag,omitempty"`
+	Multipart         bool              `json:"multipart,omitempty"`
 	VersionID         string            `json:"version_id,omitempty"`
 	ContentType       string            `json:"content_type,omitempty"`
 	Metadata          map[string]string `json:"metadata,omitempty"`

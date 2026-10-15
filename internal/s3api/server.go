@@ -325,7 +325,19 @@ func isLoopbackRequest(r *http.Request) bool {
 		host = remote
 	}
 	ip := net.ParseIP(host)
-	return ip != nil && ip.IsLoopback()
+	if ip == nil || !ip.IsLoopback() {
+		return false
+	}
+	return !hasForwardingHeader(r)
+}
+
+func hasForwardingHeader(r *http.Request) bool {
+	for _, name := range []string{"Forwarded", "X-Forwarded-For", "X-Real-Ip", "X-Forwarded-Host"} {
+		if r.Header.Get(name) != "" {
+			return true
+		}
+	}
+	return false
 }
 
 // authorizeAdmin decides whether a request may reach an admin route.

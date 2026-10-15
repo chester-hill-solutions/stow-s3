@@ -120,7 +120,7 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 		return "", nil, ManifestEntry{}, err
 	}
 	entry, recorded := s.objectIndex.entry(bucket, key)
-	if !recorded || entry.ETag != derived.ETag || entry.stale(info.Size(), info.ModTime()) {
+	if !recorded || entryNeedsRederivation(entry, derived, info) {
 		if recorded && entry.ETag == derived.ETag {
 			entry.Size, entry.Modified = derived.Size, derived.Modified
 		} else {
@@ -135,6 +135,13 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 		}
 	}
 	return absPath, info, entry, nil
+}
+
+func entryNeedsRederivation(entry, derived ManifestEntry, info os.FileInfo) bool {
+	if entry.stale(info.Size(), info.ModTime()) {
+		return true
+	}
+	return entry.ETag != derived.ETag && !entry.Multipart
 }
 
 // formOf reports which form a path is in, by asking the layout where the key

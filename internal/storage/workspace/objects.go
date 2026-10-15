@@ -270,7 +270,9 @@ func (s *Store) ListObjectsV2(ctx context.Context, bucket string, opts storage.L
 		return nil, err
 	}
 
+	s.mu.RLock()
 	all, err := s.listAll(bucket)
+	s.mu.RUnlock()
 	if err != nil {
 		return nil, err
 	}

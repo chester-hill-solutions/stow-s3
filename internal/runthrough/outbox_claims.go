@@ -85,7 +85,13 @@ func (s *outboxState) claim(id, owner string, lease time.Duration) (ClaimedEntry
 
 func (s *outboxState) firstForKey(target OutboxEntry) bool {
 	for id, entry := range s.entries {
-		if id != target.ID && entry.Bucket == target.Bucket && entry.Key == target.Key && outboxEntryBefore(entry, target) {
+		if id == target.ID || entry.Bucket != target.Bucket || entry.Key != target.Key {
+			continue
+		}
+		if entry.Terminal {
+			continue
+		}
+		if outboxEntryBefore(entry, target) {
 			return false
 		}
 	}

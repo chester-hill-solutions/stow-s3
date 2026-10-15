@@ -116,6 +116,7 @@ func adoptHandoffCommand(args []string) error {
 	includeSensitive := flags.Bool("include-sensitive", false, "Allow sensitive-looking paths in the archive")
 	maxBytes := flags.Int64("max-bytes", 0, "Uncompressed byte cap (0 uses the 1 GiB default)")
 	maxFiles := flags.Int64("max-files", 0, "File count cap (0 uses the 100000-file default)")
+	expectSHA := flags.String("expect-sha256", "", "Verify the archive against this SHA-256, supplied out of band (recommended)")
 	chosen := registryFlag(flags)
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -140,6 +141,7 @@ func adoptHandoffCommand(args []string) error {
 	}
 	imported, err := importHandoffArchive(*handoffPath, registry, document, stow.CheckpointArchiveOptions{
 		MaxBytes: *maxBytes, MaxFiles: *maxFiles, IncludeSensitiveFiles: *includeSensitive,
+		ExpectedSHA256: *expectSHA,
 	})
 	if err != nil {
 		return err

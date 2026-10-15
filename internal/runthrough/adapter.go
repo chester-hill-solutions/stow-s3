@@ -347,7 +347,7 @@ func (a *Adapter) PutObject(ctx context.Context, bucket, key string, body io.Rea
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
-		if err := a.completeIntentLocked(ctx, prepared); err != nil {
+		if err := callerFacingPropagationError(a.completeIntentLocked(ctx, prepared)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
 	}

@@ -92,3 +92,26 @@ func (a *Adapter) recordUpstreamState(ctx context.Context, entry *OutboxEntry) e
 	}
 	return nil
 }
+
+func (a *Adapter) refreshUpstreamState(ctx context.Context, bucket, key string) {
+	if !a.upstreamReachable(bucket) {
+		return
+	}
+	provider, ok := a.outbox.(provenanceOutbox)
+	if !ok {
+		return
+	}
+	state := UpstreamState{}
+	meta, err := a.upstream.HeadObject(ctx, bucket, key)
+	switch {
+	case errors.Is(err, storage.ErrObjectNotFound):
+		state.Absent = true
+	case err != nil:
+		state.Unknown = true
+	case meta == nil || meta.ETag == "":
+		state.Unknown = true
+	default:
+		state.ETag = meta.ETag
+	}
+	_ = provider.SaveUpstreamState(bucket, key, state)
+}

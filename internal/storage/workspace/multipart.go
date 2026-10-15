@@ -235,9 +235,13 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 	if err != nil {
 		return nil, err
 	}
-	// This backend already had the single-part rule right; it now shares the
-	// rule with the other two rather than keeping the one correct copy of it.
 	meta.ETag = storage.CompletionETag(etags)
+	if entry, ok := s.objectIndex.entry(state.Bucket, state.Key); ok {
+		entry.ETag, entry.Multipart = meta.ETag, true
+		if err := s.recordLocked(state.Bucket, state.Key, entry); err != nil {
+			return nil, err
+		}
+	}
 	if err := os.RemoveAll(s.uploadDir(uploadID)); err != nil {
 		return nil, fmt.Errorf("workspace store: clear upload: %w", err)
 	}

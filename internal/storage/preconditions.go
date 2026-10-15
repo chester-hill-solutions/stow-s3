@@ -1,6 +1,11 @@
 package storage
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
+
+const httpTimeFormat = "Mon, 02 Jan 2006 15:04:05 GMT"
 
 // CheckWritePreconditions applies the shared object-write preconditions.
 func CheckWritePreconditions(opts PutOptions, existing *ObjectMeta) error {
@@ -39,13 +44,35 @@ func ValidateCopyRequest(req CopyRequest) error {
 //
 // It is CheckWritePreconditions with the source in the position a put's
 // destination occupies, because it is the same question: does the version about
-// to be used satisfy what the caller asked for? Writing it as a second
-// implementation of ETag matching would be a second place for the rule to drift.
 func CheckCopySourceConditions(opts CopyOptions, source *ObjectMeta) error {
-	return CheckWritePreconditions(PutOptions{
-		IfMatch:     opts.SourceIfMatch,
-		IfNoneMatch: opts.SourceIfNoneMatch,
-	}, source)
+	if opts.SourceIfMatch != "" {
+		if source == nil || !matchesETagHeader(opts.SourceIfMatch, source.ETag, false) {
+			return ErrPreconditionFailed
+		}
+	} else if err := checkCopyDate(opts.SourceIfUnmodifiedSince, source, false); err != nil {
+		return err
+	}
+	if opts.SourceIfNoneMatch != "" {
+		if source != nil && matchesETagHeader(opts.SourceIfNoneMatch, source.ETag, true) {
+			return ErrPreconditionFailed
+		}
+		return nil
+	}
+	return checkCopyDate(opts.SourceIfModifiedSince, source, true)
+}
+
+func checkCopyDate(raw string, source *ObjectMeta, modified bool) error {
+	if raw == "" {
+		return nil
+	}
+	when, err := time.Parse(httpTimeFormat, raw)
+	if err != nil || source == nil {
+		return ErrPreconditionFailed
+	}
+	if source.LastModified.Truncate(time.Second).After(when) != modified {
+		return ErrPreconditionFailed
+	}
+	return nil
 }
 
 func matchesETagHeader(header, actual string, weak bool) bool {

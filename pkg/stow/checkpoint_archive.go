@@ -34,6 +34,7 @@ type CheckpointArchiveOptions struct {
 	MaxBytes              int64
 	MaxFiles              int64
 	IncludeSensitiveFiles bool
+	ExpectedSHA256        string
 }
 
 // CheckpointArchivePreview describes the verified contents of an archive.
