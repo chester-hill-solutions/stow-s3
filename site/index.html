@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stow — portable working storage</title>
-  <meta name="description" content="Objects, files and checkpoints for agents, apps and tests. Local S3, portable workspaces, and embedded browser storage. Free and open source." />
+  <title>Stow — S3 storage, without the server</title>
+  <meta name="description" content="Embeddable object storage for applications, tests and ephemeral workloads. Call the object engine in-process from Go or WebAssembly, or start the native S3 endpoint. Portable checkpoints, workspaces and browser persistence included. Free and open source." />
   <link rel="canonical" href="https://stow.chesterhillsolutions.ca/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Stow — Your work. Stored. Ready to move." />
-  <meta property="og:description" content="Portable working storage for agents, apps and tests. Start locally. Keep history. Take your work with you." />
+  <meta property="og:title" content="Stow — S3 storage, without the server." />
+  <meta property="og:description" content="Embeddable object storage for applications, tests and ephemeral workloads. Run the object engine in-process or over the native S3 endpoint. No cloud storage service to provision." />
   <meta property="og:image" content="https://stow.chesterhillsolutions.ca/images/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Stow: Your work. Stored. Ready to move. Illustrated storage containers with files and checkpoints." />
+  <meta property="og:image:alt" content="Stow: S3 storage, without the server. Illustrated storage containers holding objects, files and checkpoints." />
   <meta property="og:url" content="https://stow.chesterhillsolutions.ca/" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="/assets/favicon.svg?v=20261013" type="image/svg+xml" />
@@ -37,9 +37,9 @@
   <main id="main">
     <section class="hero container" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow">Portable working storage</p>
-        <h1 id="hero-title"><span>Your work.</span> <span>Stored.</span> <span>Ready to move.</span></h1>
-        <p class="lede">Objects, files and checkpoints for agents, apps and tests. Start locally. Keep history. Take your work with you.</p>
+        <p class="eyebrow">Embeddable object storage</p>
+        <h1 id="hero-title"><span>S3 storage,</span> <span>without the server.</span></h1>
+        <p class="lede">One object model for applications, tests and ephemeral workloads: buckets, objects and conditional writes. Call it in-process from Go or WebAssembly, or over the native S3 endpoint when an ordinary SDK needs one. No cloud storage service to provision.</p>
         <div class="cta">
           <a class="btn btn-primary" href="/docs/getting-started/">Explore the docs <span aria-hidden="true">→</span></a>
           <a class="text-link" href="https://github.com/chester-hill-solutions/stow-s3">View source <span aria-hidden="true">↗</span></a>
@@ -55,13 +55,13 @@
       </figure>
     </section>
     <ul class="capabilities container" aria-label="At a glance">
-      <li>Local by default</li><li>S3-compatible APIs</li><li>Portable checkpoints</li><li>Apache 2.0</li>
+      <li>Embeddable, no server</li><li>S3-compatible endpoint</li><li>Portable checkpoints</li><li>Apache 2.0</li>
     </ul>
 
     <section class="paths container" id="problem" aria-labelledby="paths-title">
       <div class="section-intro">
-        <h2 id="paths-title">Three ways to stow.</h2>
-        <p>Choose the storage surface your application needs.</p>
+        <h2 id="paths-title">Three surfaces on one engine.</h2>
+        <p>The same buckets, objects and conditional writes — behind a native S3 endpoint, in agent workspaces, or in the browser.</p>
       </div>
       <div class="path-grid">
         <article class="path">
@@ -83,8 +83,8 @@
       <div class="session-inner container" id="use-cases">
         <div class="session-copy">
           <p class="eyebrow">Stow in practice</p>
-          <h2 id="session-title">See Stow in action.</h2>
-          <p>Four practical setups. Open a use case to try the offline demo or copy a storage fixture.</p>
+          <h2 id="session-title">A disposable bucket in one call.</h2>
+          <p>Four practical setups — tests and ephemeral workloads, cached reads, offline browser editing and disposable agent checkouts. Open one to try the offline demo or copy a storage fixture.</p>
           <p class="source-note">Build from source · TypeScript and Python preview · <a href="/docs/getting-started/">Source setup and first steps <span aria-hidden="true">↗</span></a></p>
         </div>
         <div class="use-case-accordion">
@@ -210,7 +210,7 @@ try {
         </div>
       </details>
       <details class="fixture use-case-panel" id="test-fixture" name="stow-use-cases" open>
-        <summary><span class="use-case-label">Development / CI</span><span class="use-case-title">Give every test its own bucket.</span></summary>
+        <summary><span class="use-case-label">Tests · ephemeral</span><span class="use-case-title">Give every test its own bucket.</span></summary>
         <div class="fixture-body">
           <div>
             <h3>Start → seed → assert → clean up</h3>
@@ -355,8 +355,8 @@ stow-s3 workspace destroy --id "$WORKSPACE_ID" \
 
     <section class="workspace container" id="workspace" aria-labelledby="workspace-title">
       <div>
-        <h2 id="workspace-title">Keep the checkpoint.<br />Carry the work.</h2>
-        <p>Immutable snapshots and verified portable archives let you move a workspace between machines.</p>
+        <h2 id="workspace-title">Your work.<br />Stored. Ready to move.</h2>
+        <p>Keep the checkpoint. Carry the work. Immutable snapshots and verified portable archives move a workspace between machines.</p>
         <a class="text-link" href="/docs/workspaces/">Explore workspaces <span aria-hidden="true">→</span></a>
       </div>
       <figure class="handoff" role="img" aria-label="Prepare files, capture an immutable checkpoint, and create a portable archive for handoff.">
@@ -366,10 +366,10 @@ stow-s3 workspace destroy --id "$WORKSPACE_ID" \
     </section>
 
     <section class="api-section container" id="surfaces" aria-labelledby="api-title">
-      <div class="api-heading"><h2 id="api-title">An API for where you work.</h2><a class="text-link" href="/docs/api/">All API references <span aria-hidden="true">↗</span></a></div>
+      <div class="api-heading"><h2 id="api-title">One object model, four ways in.</h2><a class="text-link" href="/docs/api/">All API references <span aria-hidden="true">↗</span></a></div>
       <dl class="api-list">
-        <div><dt>Native S3</dt><dd>Use familiar SDKs with memory or filesystem storage. Conditional requests, multipart uploads and presigned URLs.<br /><a class="text-link" href="/docs/s3-compatibility/">S3 compatibility <span aria-hidden="true">→</span></a></dd></div>
         <div><dt>Embedded Go + WASM</dt><dd>Call the object engine directly from Go, Node or a compatible WebAssembly host.<br /><a class="text-link" href="/docs/api/embedded/">Embedded API <span aria-hidden="true">→</span></a></dd></div>
+        <div><dt>Native S3</dt><dd>Use familiar SDKs with memory or filesystem storage. Conditional requests, multipart uploads and presigned URLs.<br /><a class="text-link" href="/docs/s3-compatibility/">S3 compatibility <span aria-hidden="true">→</span></a></dd></div>
         <div><dt>Browser projects + workers</dt><dd>Shared content, atomic revisions, range reads and bounded streams over durable browser storage.<br /><a class="text-link" href="/docs/browser-workers/">Workers and streams <span aria-hidden="true">→</span></a></dd></div>
         <div id="edge"><dt>S3 read-through cache</dt><dd>Fetch upstream objects, prewarm keys and use retained bytes offline. Select run-through explicitly.<br /><a class="text-link" href="/docs/run-through/">Cache guide <span aria-hidden="true">→</span></a></dd></div>
       </dl>

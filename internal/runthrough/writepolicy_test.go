@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
 )
 
@@ -37,6 +38,21 @@ func TestEffectiveWritePolicy(t *testing.T) {
 				t.Errorf("PropagatesUpstream = %v, want %v", got, tc.propagat)
 			}
 		})
+	}
+}
+
+// Consent is not the only gate: a grant that withholds upstream.write cannot
+// propagate even with the flag set, so the reported policy must not claim it
+// will. The pair was read without the resolved authority before, so a narrowing
+// grant was invisible to the banner and the status payload.
+func TestEffectiveWritePolicyHonoursAWithheldGrant(t *testing.T) {
+	readOnly := authority.ReadOnly()
+	cfg := runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true, Authority: &readOnly}
+	if got := runthrough.EffectiveWritePolicy(cfg); got != runthrough.WritePolicyMirrorWritesDisabled {
+		t.Fatalf("EffectiveWritePolicy = %q, want %q", got, runthrough.WritePolicyMirrorWritesDisabled)
+	}
+	if runthrough.PropagatesUpstream(cfg) {
+		t.Fatal("PropagatesUpstream = true for a grant that withholds upstream.write")
 	}
 }
 

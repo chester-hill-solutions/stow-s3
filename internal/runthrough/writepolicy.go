@@ -1,5 +1,7 @@
 package runthrough
 
+import "github.com/chester-hill-solutions/stow-s3/internal/authority"
+
 // Write policy names reported in the startup banner and the server status
 // payload. They describe what stow actually does, not what was requested.
 const (
@@ -26,12 +28,13 @@ const (
 //
 // Callers must use this instead of deriving the pair themselves.
 func EffectiveWritePolicy(cfg Config) string {
+	propagates := cfg.effectiveAuthority().Allows(authority.UpstreamWrite)
 	switch {
-	case cfg.Policy == PolicyMirrorWrites && cfg.AllowLiveWrites:
+	case cfg.Policy == PolicyMirrorWrites && propagates:
 		return WritePolicyMirrorWrites
 	case cfg.Policy == PolicyMirrorWrites:
 		return WritePolicyMirrorWritesDisabled
-	case cfg.AllowLiveWrites:
+	case propagates:
 		return WritePolicyAllowLiveWrites
 	default:
 		return WritePolicyLocalOnly
@@ -42,5 +45,5 @@ func EffectiveWritePolicy(cfg Config) string {
 // store under this configuration. Startup validation uses it to reject a
 // combination that cannot work, and the banner uses it to stay truthful.
 func PropagatesUpstream(cfg Config) bool {
-	return cfg.AllowLiveWrites
+	return cfg.effectiveAuthority().Allows(authority.UpstreamWrite)
 }

@@ -6,6 +6,8 @@ Implemented in the working tree on 2026-10-13: the homepage, shared documentatio
 
 Published on 2026-10-13 to [Stow](https://stow.chesterhillsolutions.ca/) as Cloudflare version `0eda14d0-605b-4ee3-844a-040a078a51e2`. The live homepage, documentation index, TypeScript API, theme, interaction script, hero illustration, social preview and agent index all return HTTP 200 and match the deployment bundle. Documentation source links use published revision `41d22d0728d5ffdb2e5fb2417958588a90bc7d5d`.
 
+Repositioned on 2026-10-14: the homepage now leads with the category rather than the vision. The hero reads "S3 storage, without the server." under the eyebrow "Embeddable object storage", and the capabilities, path, session and API copy present checkpoints, workspaces and browser persistence as extensions of the embedded object engine. Ephemeral workloads are named alongside testing and agent scenarios at the process level (scoped sessions and the embedded runtime), not as qualified edge or Workers deployment. The retained line "Your work. Stored. Ready to move." now heads the workspace section instead of the hero, so the headline row in the structure table above is superseded. The homepage metadata, the LLM index and the hero and social launch cards changed together; the visual design, section order and fragment targets are unchanged. See the note on the old headline below.
+
 This is a website design and implementation brief. Storage implementation and release status remain governed by the [consolidated storage plan](../docs/storage-foundation-plan.md), including W20 for publication and documentation gates. This brief adds no package capabilities or release claims.
 
 ## Design direction
