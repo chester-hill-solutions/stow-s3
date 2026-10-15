@@ -278,7 +278,7 @@ func (a *storeAdapter) ListObjectsV2(ctx context.Context, bucket string, options
 func (a *storeAdapter) DeleteObjects(ctx context.Context, bucket string, keys []string) ([]string, error) {
 	deleted := make([]string, 0, len(keys))
 	for _, key := range keys {
-		if err := a.store.DeleteObject(ctx, bucket, key); err != nil {
+		if err := a.store.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
 			return deleted, translate(err)
 		}
 		deleted = append(deleted, key)

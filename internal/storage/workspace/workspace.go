@@ -190,6 +190,11 @@ func (s *Store) Path(bucket, key string) (string, bool) {
 	if err != nil {
 		return "", false
 	}
+	file, err := s.openRead(absPath, nil)
+	if err != nil {
+		return "", false
+	}
+	file.Close()
 	return absPath, true
 }
 

@@ -39,7 +39,7 @@ are green.
 | WS-12 | **Done** | XML declaration emitted on every XML response |
 | WS-13 | **Done** | `resumeLimit` narrows an unlimited cap |
 | WS-14 | **Done** | `registry_bound.remaining` clamped; import/handoff counts report the payload count |
-| WS-15 | **Unscheduled** | the unreproduced leads |
+| WS-15 | **Partially done** | four leads fixed (see below); the rest documented |
 
 ### What WS-3 actually was
 
@@ -73,6 +73,43 @@ which is the pattern the codebase warns about elsewhere.
    and checked per entry. The larger concern — a walk per page and an unbounded
    prefix scan — needs an ordered index and genuinely incremental pagination,
    which is a design change rather than a fix and remains open.
+
+### WS-15 leads: fixed and open
+
+Fixed:
+
+- **`Workspace.Path` symlink escape.** `locate` follows directory entries and
+  `os.Stat`, so a key reached through a symlinked ancestor reported a path
+  outside the workspace that `GetObject` refuses. `Path` now confirms the
+  candidate through the same no-follow open the read paths use.
+  `path_symlink_test.go` covers it.
+- **`runtime.UploadPart` buffers before the quota check.** The whole part was
+  read with `io.ReadAll` before the budget was consulted, so an oversized part
+  could exhaust memory before being refused. The read is now bounded by the
+  session byte budget.
+- **`touchCache` could create a zero-valued index entry.** A cache hit for a key
+  with no index entry recorded only `accessedAt`, so eviction planning from it
+  could try to delete the empty key and undercount the bytes. The hit path now
+  records bucket, key and size.
+- **`embedded` batch delete failed on a missing key.** It now treats
+  `ErrObjectNotFound` as a confirmed delete, matching S3 and the built-in
+  backends.
+
+Open (needs a decision or a larger change, not a mechanical fix):
+
+- **`COPY … REPLACE` reads the whole source into memory** at the S3 layer, but the
+  runtime's `PutObject` buffers non-owned readers anyway, so a real fix needs a
+  streaming `PutObject` path rather than a change at one layer.
+- **`policystore.Store.Policy(env)` ignores `env`**, so the documented read-side
+  validation does not run. Authority cannot actually widen (`Allows` intersects
+  with the environment), but the contract and the parameter disagree.
+- **`RecoveryHold.ExpiresAt` is persisted but never enforced.**
+- **`EffectiveWritePolicy` ignores the resolved `Authority`**, so status can
+  report propagation a narrowing grant forbids.
+- **SigV4 leniencies** (case-insensitive ETag and `UNSIGNED-PAYLOAD`, only the
+  first value of a repeated signed header, canonical query sorted by decoded
+  keys). All fail closed or are unreachable with ordinary SDK clients.
+- **`ListObjectsV2` still walks per page**; the ordered index remains open.
 
 ### WS-11 decision
 

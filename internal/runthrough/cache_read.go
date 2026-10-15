@@ -83,7 +83,7 @@ func (a *Adapter) openLocal(ctx context.Context, bucket, key string, meta *stora
 
 func (a *Adapter) openCached(ctx context.Context, bucket, key string, meta *storage.ObjectMeta, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
 	a.cacheHits.Add(1)
-	a.touchCache(bucket, key)
+	a.touchCache(bucket, key, meta.Size)
 	if !needBody {
 		return nil, meta, nil
 	}
