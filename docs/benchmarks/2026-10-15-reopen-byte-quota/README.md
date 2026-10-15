@@ -1,5 +1,8 @@
 # Reopen enforces the combined byte quota
 
+Follow-up: the object-count finding at the end of this report is corrected in
+[the next independent change](../2026-10-15-reopen-object-quota/README.md).
+
 Baseline: `4ed7863` on `codex/core-copy-quality`, based on latest fetched
 `origin/main` `219d1dcfff9807b04660a40313b32127e5be2933`.
 
