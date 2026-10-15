@@ -46,7 +46,7 @@ test("public output contains complete guides and excludes build tools, source fi
     assert.doesNotMatch(html, /href="[^"]*\/(?:history|adr|assessment-evidence|benchmarks)\//);
     assert.doesNotMatch(html, /href="[^"]*\/(?:storage-foundation-plan|planning-index|implementation-\d|release-verification-\d)/);
   }
-  for (const name of ["serve.py", "build.mjs", "package.json", "wrangler.jsonc", ".env", "design", "redesign-plan.md"]) {
+  for (const name of ["serve.py", "build.mjs", "package.json", "cloudflare.config.ts", "wrangler.config.ts", ".env", "design", "redesign-plan.md"]) {
     await assert.rejects(access(join(output, name)));
   }
   const home = await readFile(join(output, "index.html"), "utf8");
@@ -73,4 +73,15 @@ test("public output contains complete guides and excludes build tools, source fi
     }
   }
   assert.deepEqual(broken, [], "Every public navigation target, section anchor and asset must exist");
+});
+
+test("Cloudflare deploy config retains the site Worker contract and build output", async () => {
+  const cloudflareConfig = await readFile(new URL("../cloudflare.config.ts", import.meta.url), "utf8");
+  const wranglerConfig = await readFile(new URL("../wrangler.config.ts", import.meta.url), "utf8");
+  assert.match(cloudflareConfig, /name: "stow-site"/);
+  assert.match(cloudflareConfig, /compatibilityDate: "2026-10-12"/);
+  assert.match(cloudflareConfig, /"stow\.chesterhillsolutions\.ca"/);
+  assert.match(cloudflareConfig, /notFoundHandling: "none"/);
+  assert.match(wranglerConfig, /command: "npm run build"/);
+  assert.match(wranglerConfig, /assetsDirectory: "\.build"/);
 });

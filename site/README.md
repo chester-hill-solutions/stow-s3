@@ -7,18 +7,23 @@ pages. Local preview scripts, build tools and package metadata are excluded from
 uploads. Markdown guides are rendered from the repository sources with the
 route manifest in `docs.mjs`.
 
-After reviewing site changes, deploy from the repository root with an
-authenticated Wrangler v4 installation:
+After reviewing site changes, deploy with Node.js 22.18 or later. The
+`cloudflare.config.ts` file is the source of truth for the Worker name,
+compatibility date, and custom domain. `wrangler.config.ts` contains only the
+build command and the `.build` asset directory required by the Wrangler
+bundler.
 
 ```sh
 npm ci --ignore-scripts --prefix site
 make check-doc-links
-wrangler deploy --config site/wrangler.jsonc --dry-run
-wrangler deploy --config site/wrangler.jsonc
+cd site
+npx cf auth login
+npx cf deploy --dry-run
+npx cf deploy
 ```
 
-Wrangler runs the build automatically before deployment. Preview the complete
-output with `python3 -m http.server 8080 --directory site/.build`.
+`cf deploy` runs the configured build before deployment. Preview the complete
+output from the repository root with `python3 -m http.server 8080 --directory site/.build`.
 Agent-readable instructions are available at `/agent.md`, and `/llms.txt` links
 to the current API contracts. Add new public guides to `docs.mjs`; the build
 rewrites links between published sources into site routes and supplies navigation,
