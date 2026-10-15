@@ -667,3 +667,12 @@ metadata recovery. Stop writers and preserve both files before repairing an inde
 obstruction. A live handle retains the intended metadata and can persist it on a
 successful close after repair; reopening an invalid index fails closed. If that
 handle was lost, current bytes alone cannot reconstruct all original metadata.
+
+Workspace multipart completion likewise returns the known object identity and a
+committed-mutation error if index persistence or upload cleanup fails after
+content publication. The live result retains the composite multipart ETag.
+Accounting includes the published object and retains part bytes and the upload
+session until upload absence is confirmed. An unavailable lookup conservatively
+retains those reservations. After repair, retry completion or abort the retained
+upload; abort preserves the published object. HTTP returns `500 InternalError`,
+and the same separate-publication and metadata-recovery limits above apply.

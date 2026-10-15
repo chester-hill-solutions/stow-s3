@@ -9,6 +9,11 @@ security and lifecycle components are mapped rather than exhaustively qualified.
 **Findings: two high-priority issues and two medium-priority issues, all
 reproduced. No production implementation changes are included.**
 
+Follow-up: **F1 is now corrected** in the separate
+[multipart publication change](../benchmarks/2026-10-15-multipart-publication/README.md).
+The findings and failure logs below describe the original review baseline;
+F2–F4 remain open. The original F1 probe passes after that correction.
+
 ## Codebase map
 
 ```mermaid

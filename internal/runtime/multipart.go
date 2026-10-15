@@ -3,6 +3,7 @@ package runtime
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
@@ -162,8 +163,20 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if !i.finishCompletion(uploadID, oldSize, meta, exists, err) {
 		return nil, err
 	}
+	if err != nil {
+		err = i.reconcileCompletionError(ctx, uploadID, err)
+	}
 	clone := *meta
 	return &clone, err
+}
+
+func (i *Instance) reconcileCompletionError(ctx context.Context, uploadID string, cause error) error {
+	_, err := i.multipartStore.GetMultipartUpload(ctx, uploadID)
+	if errors.Is(err, storage.ErrUploadNotFound) {
+		i.removeUpload(uploadID, true)
+		return cause
+	}
+	return errors.Join(cause, err)
 }
 
 func (i *Instance) AbortMultipartUpload(ctx context.Context, uploadID string) error {

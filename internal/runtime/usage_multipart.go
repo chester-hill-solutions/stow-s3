@@ -60,7 +60,9 @@ func (s *usageState) finishCompletion(uploadID string, oldSize int64, meta *stor
 	if !s.finishStoredPut(objectTarget(upload.upload.Bucket, upload.upload.Key), oldSize, meta, exists, err) {
 		return false
 	}
-	s.removeUpload(uploadID, true)
+	if err == nil {
+		s.removeUpload(uploadID, true)
+	}
 	return true
 }
 

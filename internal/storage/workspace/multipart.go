@@ -231,19 +231,22 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 	if opts.ContentType == "" {
 		opts.ContentType = detectContentTypeFromBytes(assembled)
 	}
-	meta, err := s.putLocked(ctx, state.Bucket, state.Key, bytes.NewReader(assembled), opts)
-	if err != nil {
-		return nil, err
+	meta, publishErr := s.putLocked(ctx, state.Bucket, state.Key, bytes.NewReader(assembled), opts)
+	if publishErr != nil && !errors.Is(publishErr, storage.ErrMutationCommitted) {
+		return nil, publishErr
 	}
 	meta.ETag = storage.CompletionETag(etags)
 	if entry, ok := s.objectIndex.entry(state.Bucket, state.Key); ok {
 		entry.ETag, entry.Multipart = meta.ETag, true
 		if err := s.recordLocked(state.Bucket, state.Key, entry); err != nil {
-			return nil, err
+			return meta, storage.CommittedError(errors.Join(publishErr, err))
 		}
 	}
+	if publishErr != nil {
+		return meta, publishErr
+	}
 	if err := os.RemoveAll(s.uploadDir(uploadID)); err != nil {
-		return nil, fmt.Errorf("workspace store: clear upload: %w", err)
+		return meta, storage.CommittedError(fmt.Errorf("workspace store: clear upload: %w", err))
 	}
 	return meta, nil
 }
