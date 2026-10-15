@@ -1,8 +1,9 @@
 """A disposable S3 session backed by the native stow server.
 
-The session owns the child process. Closing it stops the server and removes its
-data directory, and the server watches the parent so that a client which is
-killed rather than closed does not leave an orphan behind.
+The session owns the child process. Closing it stops the server and, for a
+directory the session created itself, removes it, and the server watches the
+parent so that a client which is killed rather than closed does not leave an
+orphan behind.
 
 A session is deliberately narrow: it holds the endpoint and credentials and owns
 the process, but performs no S3 I/O of its own. That is what lets an async
@@ -250,14 +251,14 @@ def _read_ready_line(
     return captured[0]
 
 
-def _server_args(binary: str, data_dir: Path, ready_fd: int, max_bytes: int, max_objects: int) -> list[str]:
+def _server_args(binary: str, data_dir: Path, ready_fd: int, max_bytes: int, max_objects: int, backend: str) -> list[str]:
     return [
         binary,
         "serve",
         "--port", "0",
         "--host", "127.0.0.1",
         "--data-dir", str(data_dir),
-        "--backend", "memory",
+        "--backend", backend,
         "--mode", "local",
         "--max-bytes", str(max_bytes),
         "--max-objects", str(max_objects),
@@ -283,6 +284,14 @@ def open_session(
 ) -> Session:
     """Start a server and return a session that owns it.
 
+    With no ``data_dir`` the session creates a temporary directory, uses the
+    memory backend, and removes that directory on close: it is disposable, and
+    nothing written through it outlives the process. When the caller supplies
+    ``data_dir``, that directory is the caller's storage and the session uses the
+    filesystem backend, so objects persist and a later session opened on the same
+    directory reads them. The session does not remove a caller-supplied
+    directory.
+
     The caller is responsible for calling :meth:`Session.close`, which
     :func:`with_session` does for you.
     """
@@ -303,7 +312,13 @@ def open_session(
 
     read_fd, write_fd = os.pipe()
     os.set_inheritable(write_fd, True)
-    command = _server_args(binary.path, target, write_fd, max_bytes, max_objects)
+    # A session that created its own temporary directory is disposable, so it
+    # keeps its bytes in memory. A directory the caller named is the caller's
+    # storage: the session persists objects there rather than holding them in
+    # memory and dropping them when it closes, which is what makes a reopened
+    # session see what the previous one wrote.
+    backend = "memory" if owned_dir is not None else "filesystem"
+    command = _server_args(binary.path, target, write_fd, max_bytes, max_objects, backend)
     if max_concurrent_requests is not None:
         command.extend(["--max-concurrent-requests", str(max_concurrent_requests)])
     if max_request_bytes is not None:

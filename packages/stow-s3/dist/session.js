@@ -32,9 +32,11 @@ function assertUsableLimits(options) {
     }
 }
 /**
- * Acquire a disposable session: a local, memory-backed, loopback S3 endpoint
- * with a generated bucket and generated credentials, isolated from ambient
- * STOW_*, S3_*, and AWS_* configuration.
+ * Acquire a session: a local, loopback S3 endpoint with a generated bucket and
+ * generated credentials, isolated from ambient STOW_*, S3_*, and AWS_*
+ * configuration. With no dataDir it is memory-backed and disposable. With a
+ * dataDir the caller supplies the storage, so the session uses the filesystem
+ * backend and objects written through it persist in that directory.
  */
 export async function openStow(options = {}) {
     assertUsableLimits(options);
@@ -49,7 +51,10 @@ export async function openStow(options = {}) {
     try {
         startup = await startStowWithReady({
             mode: "local",
-            backend: "memory",
+            // A session that created its own temporary directory is disposable and
+            // memory-backed. A directory the caller named is the caller's storage, so
+            // the session persists to it instead of holding the bytes in memory.
+            backend: options.dataDir === undefined ? "memory" : "filesystem",
             dataDir,
             maxRequestBytes: options.maxRequestBytes,
             maxConcurrentRequests: options.maxConcurrentRequests,

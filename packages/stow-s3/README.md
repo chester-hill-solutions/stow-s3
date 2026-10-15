@@ -129,6 +129,10 @@ const summary = await withStow(async (session) => {
 - `STOW_*`, `S3_*`, and `AWS_*` are stripped from the child environment, so
   ambient cloud configuration cannot turn a local session into a run-through one.
 - Defaults are 16 MiB and 1,000 objects. Override with `maxBytes` and `maxObjects`.
+- `dataDir` keeps the session's storage in a directory you name instead of a
+  temporary one. A supplied directory selects the filesystem backend, so objects
+  persist there and survive `close()`; a session with no `dataDir` is
+  memory-backed and disposable.
 
 <!-- repo-only:start -->
 See the [session measurements](../../docs/benchmarks/session-baseline.md) for the default budget.
