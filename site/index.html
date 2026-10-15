@@ -210,17 +210,16 @@ try {
         </div>
       </details>
       <details class="fixture use-case-panel" id="test-fixture" name="stow-use-cases" open>
-        <summary><span class="use-case-label">Tests · ephemeral</span><span class="use-case-title">Give every test its own bucket.</span></summary>
+        <summary><span class="use-case-label">Tests · pipelines</span><span class="use-case-title">Give every test and pipeline its own bucket.</span></summary>
         <div class="fixture-body">
           <div>
-            <h3>Start → seed → assert → clean up</h3>
-            <p>A scoped TypeScript session starts a private, memory-backed S3 server with a ready client and its own bucket. Seed a report and settings, then check the stored bytes with your usual S3 client.</p>
-            <p>Pass <code>s3</code>, <code>bucket</code>, or <code>session.awsSdkV3Config()</code> to your application's storage code. The callback cleans up the server and temporary data when it finishes—even if an assertion fails.</p>
-            <p>Use a <a href="/docs/getting-started/">source checkout</a> for the Stow client, install the AWS SDK, and set <code>STOW_BIN</code> to your built binary. Save the example as <code>storage.test.mjs</code> and run it with Node.</p>
-            <p class="fixture-note">TypeScript creates its bucket automatically. Python creates it explicitly. Go uses an embedded object runtime without an HTTP server.</p>
+            <h3>Start small: a session, a real S3 client, automatic cleanup</h3>
+            <p>A session starts a private, loopback S3 server with generated credentials and a ready client. Store a real artifact, read it back, and let the callback clean up—even if it throws. Pass <code>s3</code> and <code>bucket</code> to your application's storage code; the code that stores and reads objects does not change.</p>
+            <p>TypeScript creates the bucket automatically. Python creates it explicitly. Go uses an embedded object runtime without an HTTP server.</p>
+            <p class="fixture-note">Setup: use a <a href="/docs/getting-started/">source checkout</a>, install the AWS SDK, and set <code>STOW_BIN</code> to your built binary. A session is a separate server process, isolated from your cloud environment and bounded by its own quota.</p>
           </div>
           <div class="examples" data-examples>
-          <div class="code-editor-heading" hidden><span class="code-file" data-example-file>storage.test.mjs</span><span class="code-language" data-example-language>TypeScript</span></div>
+          <div class="code-editor-heading" hidden><span class="code-file" data-example-file>start-small.mjs</span><span class="code-language" data-example-language>TypeScript</span></div>
           <div class="example-tabs" hidden>
             <div role="tablist" aria-label="Example language">
               <button id="tab-typescript" type="button" role="tab" aria-controls="panel-typescript" aria-selected="true">TypeScript</button>
@@ -230,72 +229,47 @@ try {
             <button type="button" class="example-copy" data-copy="#example-typescript" aria-label="Copy TypeScript example">Copy</button>
           </div>
           <section class="code-panel" id="panel-typescript">
-            <h3>TypeScript · seeded storage test</h3>
-            <pre tabindex="0" aria-label="TypeScript seeded storage test"><code id="example-typescript" data-language="typescript" data-file="storage.test.mjs">import assert from "node:assert/strict";
-import { test } from "node:test";
-import { PutObjectCommand, GetObjectCommand }
-  from "@aws-sdk/client-s3";
-import { withStow }
-  from "@chester-hill-solutions/stow-s3";
-
-test("report fixture can be read", async () =&gt; {
-  await withStow(async (session) =&gt; {
-    const { s3, bucket } = session;
-    const fixtures = {
-      "reports/draft.json": { title: "Field notes", rows: [] },
-      "settings.json": { theme: "light" },
-    };
-    for (const [Key, value] of Object.entries(fixtures)) {
-      await s3.send(new PutObjectCommand({
-        Bucket: bucket, Key,
-        Body: JSON.stringify(value),
-        ContentType: "application/json",
-      }));
-    }
-    const result = await s3.send(new GetObjectCommand({
-      Bucket: bucket, Key: "reports/draft.json",
-    }));
-    assert.deepEqual(
-      JSON.parse(await result.Body.transformToString()),
-      fixtures["reports/draft.json"],
-    );
-  });
-});</code></pre>
+            <h3>TypeScript · store and read a report</h3>
+            <pre tabindex="0" aria-label="TypeScript store and read a report"><code id="example-typescript" data-language="typescript" data-file="start-small.mjs"><!-- include:examples/stow-recipes/start-small.mjs --></code></pre>
             <p class="code-context">Bucket created automatically · cleanup on exit<br /><a href="/docs/api/typescript/">TypeScript API <span aria-hidden="true">↗</span></a></p>
           </section>
           <section class="code-panel" id="panel-python">
-            <h3>Python · scoped S3 session</h3>
-            <pre tabindex="0" aria-label="Python scoped S3 session"><code id="example-python" data-language="python" data-file="session.py"><span class="k">from</span> stow_s3 <span class="k">import</span> with_session
-
-<span class="k">with</span> with_session() <span class="k">as</span> session:
-    s3 = session.s3_client()
-    bucket = session.new_bucket_name()
-    s3.create_bucket(Bucket=bucket)
-    s3.put_object(
-        Bucket=bucket,
-        Key=<span class="s">"hello.txt"</span>,
-        Body=<span class="s">b"Hello, Stow."</span>,
-    )</code></pre>
+            <h3>Python · store and read a report</h3>
+            <pre tabindex="0" aria-label="Python store and read a report"><code id="example-python" data-language="python" data-file="start_small.py"><!-- include:examples/stow-recipes/start_small.py --></code></pre>
             <p class="code-context">Create your bucket explicitly · cleanup on exit<br /><a href="/docs/api/python/">Python API <span aria-hidden="true">↗</span></a></p>
           </section>
           <section class="code-panel" id="panel-go">
             <h3>Go · embedded runtime</h3>
-            <pre tabindex="0" aria-label="Go embedded runtime"><code id="example-go" data-language="go" data-file="main.go"><span class="k">package</span> main
-
-<span class="k">import</span> <span class="s">"github.com/chester-hill-solutions/stow-s3/pkg/stow"</span>
-
-<span class="k">func</span> main() {
-    store, err := stow.Open(stow.Options{
-        Backend: stow.BackendMemory,
-    })
-    <span class="k">if</span> err != <span class="k">nil</span> {
-        panic(err)
-    }
-    <span class="k">defer</span> store.Close()
-}</code></pre>
+            <pre tabindex="0" aria-label="Go embedded runtime"><code id="example-go" data-language="go" data-file="start-small/main.go"><!-- include:examples/stow-recipes/go/start-small/main.go --></code></pre>
             <p class="code-context">Embedded object runtime · no HTTP server<br /><a href="/docs/api/go/">Go API <span aria-hidden="true">↗</span></a></p>
           </section>
         </div>
+          <div>
+            <h3>Keep the artifacts</h3>
+            <p>Name a data directory and the objects survive the session. The server stops; the directory is yours; the next session on it reads what the previous one wrote.</p>
+            <div class="fixture-code">
+              <div class="fixture-code-heading"><span class="code-file">keep-artifacts.mjs</span><span class="code-language">TypeScript</span><button type="button" data-copy="#fixture-keep-artifacts" hidden>Copy</button></div>
+              <pre tabindex="0" aria-label="Keep artifacts across sessions"><code id="fixture-keep-artifacts" data-language="typescript"><!-- include:examples/stow-recipes/keep-artifacts.mjs --></code></pre>
+            </div>
+            <p class="fixture-note">One option changes memory-backed scratch into filesystem storage. Pass a fixed <code>bucket</code> so the reopened session finds the same objects.</p>
+          </div>
+          <div>
+            <h3>Re-run a processing stage</h3>
+            <p>Workers read input objects by key and write results. Keep both and a stage can be inspected or rerun. Your application owns the queue and the retries; Stow is not a durable job queue.</p>
+            <div class="fixture-code">
+              <div class="fixture-code-heading"><span class="code-file">processing-stage.mjs</span><span class="code-language">TypeScript</span><button type="button" data-copy="#fixture-processing-stage" hidden>Copy</button></div>
+              <pre tabindex="0" aria-label="Re-run a processing stage"><code id="fixture-processing-stage" data-language="typescript"><!-- include:examples/stow-recipes/processing-stage.mjs#excerpt --></code></pre>
+            </div>
+            <p class="fixture-note"><a href="/docs/examples/">Full runnable examples <span aria-hidden="true">→</span></a></p>
+          </div>
+          <div>
+            <h3>Reject a stale update</h3>
+            <p>A conditional write compares the ETag you read with the object's current ETag and refuses the write if they differ, so two writers cannot clobber one another.</p>
+            <div class="fixture-code">
+              <div class="fixture-code-heading"><span class="code-file">conditional-write.mjs</span><span class="code-language">TypeScript</span><button type="button" data-copy="#fixture-conditional-write" hidden>Copy</button></div>
+              <pre tabindex="0" aria-label="Reject a stale update"><code id="fixture-conditional-write" data-language="typescript"><!-- include:examples/stow-recipes/conditional-write.mjs --></code></pre>
+            </div>
+          </div>
         </div>
       </details>
       <details class="fixture use-case-panel" name="stow-use-cases" id="agent-fixture">

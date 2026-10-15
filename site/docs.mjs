@@ -4,6 +4,7 @@ export const pages = [
   { route: "/docs/reference/", title: "Full reference", source: "README.md", group: "Start here" },
   { route: "/docs/typescript/", title: "TypeScript client", source: "packages/stow-s3/README.md", group: "Start here" },
   { route: "/docs/python/", title: "Python client", source: "packages/stow-s3-py/README.md", group: "Start here" },
+  { route: "/docs/examples/", title: "Examples", source: "examples/stow-recipes/README.md", group: "Start here" },
   { route: "/docs/workspaces/", title: "Workspace guide", source: "docs/portable-workspace-usage.md", group: "Native storage" },
   { route: "/docs/task-manifests/", title: "Task manifests", source: "docs/task-manifest.md", group: "Native storage" },
   { route: "/docs/run-through/", title: "Run-through cache", source: "docs/run-through.md", group: "Native storage" },

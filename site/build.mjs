@@ -1,4 +1,5 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Marked } from "marked";
@@ -14,6 +15,37 @@ const repository = "https://github.com/chester-hill-solutions/stow-s3";
 const revision = process.env.STOW_SITE_SOURCE_REVISION ?? "main";
 if (revision !== "main" && !/^[a-f0-9]{40}$/.test(revision)) throw new Error("Site source revision must be a full Git commit SHA");
 const sourceBase = `${repository}/blob/${revision}`;
+
+// Examples are authored once as runnable files and included into the homepage
+// and the guides, so a snippet cannot drift from the program it describes.
+// `<!-- include:path -->` takes the whole file; `path#name` takes the lines
+// between the file's `#region name` and `#endregion name` markers.
+const INCLUDE = /<!--\s*include:([^\s>]+)\s*-->/g;
+
+const fenceLanguage = (path) => ({ ".mjs": "js", ".js": "js", ".ts": "ts", ".py": "python", ".go": "go", ".sh": "bash" })[path.slice(path.lastIndexOf("."))] ?? "";
+
+export function includeText(spec) {
+  const [path, region] = spec.split("#", 2);
+  const text = readFileSync(join(root, path), "utf8").replace(/\n$/, "");
+  if (!region) return text;
+  const start = new RegExp(`^.*#region\\s+${region}\\s*$`, "m");
+  const end = new RegExp(`^.*#endregion\\s+${region}\\s*$`, "m");
+  const from = text.search(start);
+  const to = text.search(end);
+  if (from === -1 || to === -1 || to < from) throw new Error(`include ${spec}: missing or misordered region markers`);
+  return text.slice(from, to).split("\n").slice(1, -1).join("\n");
+}
+
+export function expandHomeIncludes(html) {
+  return html.replace(INCLUDE, (_, spec) => escapeHtml(includeText(spec)));
+}
+
+export function expandMarkdownIncludes(markdown) {
+  return markdown.replace(new RegExp(`^${INCLUDE.source}$`, "gm"), (_, spec) => {
+    const fence = "```";
+    return `${fence}${fenceLanguage(spec.split("#", 1)[0])}\n${includeText(spec)}\n${fence}`;
+  });
+}
 
 export function publicMarkdown(markdown) {
   let omitted = false;
@@ -83,7 +115,7 @@ export function renderMarkdown(markdown, page, manifest) {
     html({ text }) { return escapeHtml(text); },
     code({ text, lang }) { return renderCodeBlock(text, lang, `stow-snippet-${++codeIndex}`); },
   } });
-  const body = parser.parse(publicMarkdown(markdown).replace(/^---\n[\s\S]*?\n---\n/, ""));
+  const body = parser.parse(publicMarkdown(expandMarkdownIncludes(markdown)).replace(/^---\n[\s\S]*?\n---\n/, ""));
   return { body, headings };
 }
 
@@ -120,7 +152,7 @@ export async function buildSite(destination = output) {
   }
   const benchmarks=JSON.parse(await readFile(join(site,"benchmark-data.json"),"utf8"));
   await writeFile(join(destination,"assets/benchmark-data.json"),JSON.stringify(benchmarks,null,2)+"\n");
-  const home=(await readFile(join(site,"index.html"),"utf8")).replace("<!-- benchmark-section -->",renderBenchmarkSection(benchmarks));
+  const home=expandHomeIncludes(await readFile(join(site,"index.html"),"utf8")).replace("<!-- benchmark-section -->",renderBenchmarkSection(benchmarks));
   await writeFile(join(destination, "index.html"), highlightHome(home));
   for (const page of manifest) {
     const markdown = await readFile(join(root, page.source), "utf8");
