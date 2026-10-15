@@ -28,8 +28,14 @@ COPY adapters were still open at that point.
 Follow-up: **F3's remaining internal COPY adapters are corrected** in the separate
 [COPY adapter change](../benchmarks/2026-10-15-copy-adapter-publication/README.md).
 All six original probes now pass twice normally and twice under the race detector.
-F1–F4 are corrected locally. The same report confirms the next separate finding:
-known committed identity is still lost by the buffered custom-store PUT adapter.
+F1–F4 were corrected locally at that point. The same report confirmed the buffered
+custom-store PUT identity-loss finding, addressed in the next follow-up.
+
+Follow-up: **buffered custom-store PUT now preserves committed identity**, with
+[regression and cost evidence](../benchmarks/2026-10-15-buffered-put-publication/README.md).
+That report confirms the next separate high-priority finding: the public custom
+multipart completion adapter still drops committed metadata, causing an accounting
+panic after publication. The custom multipart implementation remains unchanged.
 
 ## Codebase map
 

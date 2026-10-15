@@ -217,10 +217,10 @@ func (a *storeAdapter) PutObject(ctx context.Context, bucket, key string, body i
 		IfMatch:     options.IfMatch,
 		IfNoneMatch: options.IfNoneMatch,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, translate(err)
 	}
-	return objectMetaOf(object), nil
+	return objectMetaOf(object), translate(err)
 }
 
 func (a *storeAdapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
