@@ -1,5 +1,9 @@
 # COPY quota review — 2026-10-15
 
+Follow-up: the byte-quota reopen defect below is now corrected; see the
+[fix and measurements](../benchmarks/2026-10-15-reopen-byte-quota/README.md).
+The remainder records the investigation at its original baseline.
+
 Reviewed branch `codex/core-copy-quality` at `73eb36c`, based on freshly fetched
 `origin/main` `219d1dcfff9807b04660a40313b32127e5be2933`.
 
