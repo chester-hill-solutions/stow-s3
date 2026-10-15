@@ -74,13 +74,11 @@ func mapCopyError(err error, resource string) s3Error {
 // copyVerbatim publishes the destination from one version of the source, with
 // the source's own metadata.
 //
-// When the request carries source conditions, they are handed to the store so the
-// version it copies is the version they were checked against. Checking them here first
-// would leave a window in which the source changes, and the copy would publish a
-// version the caller never asked about.
-//
-// A store that cannot evaluate conditions still produces a coherent copy, and the
-// conditions are still enforced against a version this request observed. That is
+// Source conditions are handed to the store so the version it copies is the version
+// they were checked against. Checking them here first would leave a window in which
+// the source changes, and the copy would publish a version the caller never asked
+// about. A store that cannot evaluate conditions still produces a coherent copy,
+// with the conditions enforced against a version this request observed; that is
 // strictly weaker, and it is what storage.ConditionalCopyStore documents.
 func (s *Server) copyVerbatim(ctx context.Context, r *http.Request, req copyRequest) (*storage.ObjectMeta, error) {
 	options := copySourceConditions(r)
@@ -107,10 +105,10 @@ func (s *Server) copyVerbatim(ctx context.Context, r *http.Request, req copyRequ
 
 // replaceMetadata publishes the source's bytes under the request's own metadata.
 //
-// The bytes still come from a single read, and the source conditions are checked
-// against the metadata of that same read rather than against a head taken before
-// it. A head-then-read ordering would let a source that moves on in between turn
-// a refusal into a copy of a version the caller did not ask for.
+// The bytes come from a single open, and the conditions are checked against the
+// metadata of that same open rather than a head taken before it, so a source that
+// moves on in between cannot turn a refusal into a copy the caller did not ask for.
+// The stream carries its length, so a staging backend never buffers it whole.
 func (s *Server) replaceMetadata(ctx context.Context, r *http.Request, req copyRequest) (*storage.ObjectMeta, error) {
 	metadata, err := extractMetadata(r.Header)
 	if err != nil {
@@ -119,11 +117,12 @@ func (s *Server) replaceMetadata(ctx context.Context, r *http.Request, req copyR
 	if len(metadata) > 0 && metadataSize(metadata) > maxMetadataBytes {
 		return nil, errMetadataTooLarge
 	}
-	body, sourceMeta, err := s.readSource(ctx, r, req)
+	source, sourceMeta, err := s.openSource(ctx, r, req)
 	if err != nil {
 		return nil, err
 	}
-	return s.store.PutObject(ctx, req.destBucket, req.destKey, newBodyReader(body), storage.PutOptions{
+	defer source.Close()
+	return s.store.PutObject(ctx, req.destBucket, req.destKey, sizedSource{ReadCloser: source, size: sourceMeta.Size}, storage.PutOptions{
 		ContentType:       copyContentType(r),
 		Metadata:          metadata,
 		ChecksumAlgorithm: sourceMeta.ChecksumAlgorithm,
@@ -131,23 +130,27 @@ func (s *Server) replaceMetadata(ctx context.Context, r *http.Request, req copyR
 	})
 }
 
-// readSource reads the source's bytes and its metadata together, then checks the
-// request's conditions against that metadata.
-func (s *Server) readSource(ctx context.Context, r *http.Request, req copyRequest) ([]byte, *storage.ObjectMeta, error) {
+// openSource opens the source and checks the request's conditions against the
+// metadata of that same open, the version whose bytes the store is handed.
+func (s *Server) openSource(ctx context.Context, r *http.Request, req copyRequest) (io.ReadCloser, *storage.ObjectMeta, error) {
 	rc, sourceMeta, err := s.store.GetObject(ctx, req.sourceBucket, req.sourceKey)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer rc.Close()
 	if err := checkCopyPreconditions(r.Header, sourceMeta); err != nil {
+		_ = rc.Close()
 		return nil, nil, err
 	}
-	body, err := io.ReadAll(rc)
-	if err != nil {
-		return nil, nil, err
-	}
-	return body, sourceMeta, nil
+	return rc, sourceMeta, nil
 }
+
+// sizedSource carries the source's length so a streaming store need not buffer it.
+type sizedSource struct {
+	io.ReadCloser
+	size int64
+}
+
+func (s sizedSource) ReadSize() int64 { return s.size }
 
 // copyContentType is the content type a REPLACE copy publishes under, defaulting
 // the way a plain write does.
@@ -172,5 +175,6 @@ func copySourceConditions(r *http.Request) storage.CopyOptions {
 }
 
 func hasConditions(options storage.CopyOptions) bool {
-	return options.SourceIfMatch != "" || options.SourceIfNoneMatch != ""
+	return options.SourceIfMatch != "" || options.SourceIfNoneMatch != "" ||
+		options.SourceIfModifiedSince != "" || options.SourceIfUnmodifiedSince != ""
 }
