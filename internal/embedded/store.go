@@ -347,10 +347,10 @@ func (a multipartAdapter) UploadPart(ctx context.Context, uploadID string, partN
 		return nil, err
 	}
 	part, err := a.multi.UploadPart(ctx, uploadID, partNumber, data)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, err
 	}
-	return partInfoOf(part), nil
+	return partInfoOf(part), err
 }
 
 func (a multipartAdapter) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {

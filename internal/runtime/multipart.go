@@ -100,7 +100,7 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 		return nil, err
 	}
 	clone := *part
-	return &clone, nil
+	return &clone, err
 }
 
 func (i *Instance) ListPartsPage(ctx context.Context, uploadID string, opts storage.ListPartsOptions) (*storage.ListPartsResult, error) {

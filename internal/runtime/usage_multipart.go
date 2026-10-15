@@ -34,8 +34,7 @@ func (s *usageState) finishUpload(upload *storage.MultipartUpload, exists bool, 
 }
 
 func (s *usageState) finishPart(uploadID string, part *storage.PartInfo, err error) bool {
-	s.recordMutation(err)
-	if err != nil {
+	if !s.recordMutation(err) {
 		return false
 	}
 	upload := s.multipart[uploadID]

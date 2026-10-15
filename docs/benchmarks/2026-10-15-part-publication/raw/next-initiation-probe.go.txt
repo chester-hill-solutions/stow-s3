@@ -1,0 +1,64 @@
+package stow_test
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
+	stowruntime "github.com/chester-hill-solutions/stow-s3/internal/runtime"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
+)
+
+type reviewCommittedInitiationStore struct {
+	*partPublicationStore
+	calls int
+}
+
+func (s *reviewCommittedInitiationStore) CreateMultipartUpload(ctx context.Context, bucket, key string, options stow.MultipartOptions) (stow.MultipartUpload, error) {
+	upload, err := s.partPublicationStore.CreateMultipartUpload(ctx, bucket, key, options)
+	if err != nil {
+		return upload, err
+	}
+	s.calls++
+	s.multipartStore.mu.Lock()
+	delete(s.uploads, upload.UploadID)
+	delete(s.parts, upload.UploadID)
+	upload.UploadID = fmt.Sprintf("review-%d", s.calls)
+	s.uploads[upload.UploadID] = upload
+	s.parts[upload.UploadID] = nil
+	s.multipartStore.mu.Unlock()
+	return upload, errors.Join(stow.ErrMutationCommitted, errors.New("after upload initiation"))
+}
+
+func TestReviewCommittedInitiationQuota(t *testing.T) {
+	ctx := context.Background()
+	store := &reviewCommittedInitiationStore{partPublicationStore: &partPublicationStore{singlePartPublicationStore: newSinglePartPublicationStore()}}
+	outer, err := stow.Open(stow.Options{Store: store, MaxBytes: 8, MaxObjects: 1, MaxMultipartUploads: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outer.Close()
+	if err := outer.CreateBucket(ctx, "probe"); err != nil {
+		t.Fatal(err)
+	}
+	inner := embedded.UnwrapInstance(outer)
+	upload, err := inner.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+	if !errors.Is(err, stow.ErrMutationCommitted) {
+		t.Fatal(err)
+	}
+	if upload == nil {
+		t.Error("committed upload identity discarded")
+	}
+	_, secondErr := inner.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+	uploads, listErr := store.ListMultipartUploads(ctx, "probe")
+	if listErr != nil {
+		t.Fatal(listErr)
+	}
+	t.Logf("known result=%+v first-error=%v second-error=%v actual uploads=%+v provider-calls=%d", upload, err, secondErr, uploads, store.calls)
+	if !errors.Is(secondErr, stowruntime.ErrQuotaExceeded) || len(uploads) != 1 || store.calls != 1 {
+		t.Errorf("committed initiation escaped quota: actual sessions=%d cap=1 provider-calls=%d error=%v", len(uploads), store.calls, secondErr)
+	}
+}
