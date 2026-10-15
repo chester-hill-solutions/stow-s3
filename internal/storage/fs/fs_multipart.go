@@ -83,8 +83,13 @@ func (s *FilesystemStore) CreateMultipartUpload(_ context.Context, bucket, key s
 		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
 		ChecksumValue:     opts.ChecksumValue,
 	}
-	if err := writeJSONAtomic(filepath.Join(dir, "manifest.json"), manifest); err != nil {
+	manifestData, err := json.Marshal(manifest)
+	if err != nil {
 		_ = os.RemoveAll(dir)
+		return nil, err
+	}
+	if err := s.writeCapacityFile(filepath.Join(dir, "manifest.json"), manifestData); err != nil {
+		_ = s.removeCapacityPath(dir)
 		return nil, err
 	}
 	upload := manifest.upload(uploadID)
@@ -122,7 +127,7 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
 		return nil, err
 	}
 	partPath := filepath.Join(dir, fmt.Sprintf("part-%05d", partNumber))
-	if err := writeBytesAtomic(partPath, data); err != nil {
+	if err := s.writeCapacityFile(partPath, data); err != nil {
 		return nil, err
 	}
 	now := time.Now().UTC()
@@ -219,7 +224,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	if err := s.writeObject(manifest.Bucket, manifest.Key, record); err != nil {
 		return nil, err
 	}
-	if err := os.RemoveAll(dir); err != nil {
+	if err := s.removeCapacityPath(dir); err != nil {
 		// The object is already committed; retain the upload so callers can retry cleanup.
 		return nil, fmt.Errorf("cleanup multipart upload: %w", err)
 	}
@@ -277,7 +282,7 @@ func (s *FilesystemStore) AbortMultipartUpload(_ context.Context, uploadID strin
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return storage.ErrUploadNotFound
 	}
-	return os.RemoveAll(dir)
+	return s.removeCapacityPath(dir)
 }
 
 func (s *FilesystemStore) listParts(_ context.Context, uploadID string) ([]storage.PartInfo, error) {
