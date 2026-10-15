@@ -22,6 +22,8 @@ measurements do not establish either a speedup or a general performance guarante
 - Persistent browser streams used fresh contexts and workers in a warmed Chromium
   process. Ten trials per version alternated order after excluded warm-ups.
   Each trial wrote/read 4 MiB and checked SHA-256 after read timing.
+  Reads follow writes in the same worker and can use its content cache; these
+  measurements do not isolate IndexedDB disk throughput.
 - Portable capture used 256 files totaling 8 MiB, five captures per block, with
   no modified files between captures. Native workspace RSS used the existing
   memory-only lifecycle harness, including its 500-file, 15.625 MiB workload.

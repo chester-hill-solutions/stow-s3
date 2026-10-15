@@ -347,8 +347,8 @@ Return the operations and limits supported by this handle.
 type Capabilities struct {
 	Backend		Backend
 	MaxBytes	int64
-	MaxObjects	int64
 
+	MaxObjects		int64
 	MaxMultipartUploads	int64
 	Persistent		bool
 	Multipart		bool
@@ -429,7 +429,6 @@ type CapacityNamespaceOptions struct {
 	ID	string
 	MaxBytes,
 	RecoveryReserveBytes	int64
-
 	MaxOperations, MaxDependencies	int
 }
 ```
@@ -441,7 +440,9 @@ type CapacityNamespaceOptions struct {
 ```go
 type CapacitySnapshot struct {
 	PayloadBytes,
-	RecoveryBytes, ReservedRecoveryBytes, PendingBytes	int64
+
+	RecoveryBytes,
+	ReservedRecoveryBytes, PendingBytes	int64
 	Operations	int
 }
 ```
@@ -841,7 +842,9 @@ Returns: `PortableCheckpointDiff, error`.
 ConditionalWriteStore opts into atomic IfMatch/IfNoneMatch enforcement.
 
 ```go
-type ConditionalWriteStore interface{ SupportsConditionalWrites() bool }
+type ConditionalWriteStore interface {
+	SupportsConditionalWrites() bool
+}
 ```
 
 ## CopyStore
@@ -850,8 +853,7 @@ type ConditionalWriteStore interface{ SupportsConditionalWrites() bool }
 
 ```go
 type CopyStore interface {
-	CopyObject(context.Context, string, string, string, string) (
-		Object, error)
+	CopyObject(context.Context, string, string, string, string) (Object, error)
 }
 ```
 
@@ -1624,6 +1626,7 @@ Returns: `WorkspaceListing, error`.
 type ListOptions struct {
 	Prefix	string
 	Cursor	string
+
 	Limit	int
 }
 ```
@@ -1700,7 +1703,8 @@ const MaxDeltaBytes int64 = 16 << 20
 
 
 ```go
-const MaxRecoveryHoldBytes = 2 << 20
+const MaxRecoveryHoldBytes = 2 <<
+	20
 ```
 
 ## MaxRecoveryHoldPeakBytes
@@ -1744,13 +1748,14 @@ MultipartStore is the optional extension: a store that can stream an object larg
 
 ```go
 type MultipartStore interface {
-	CreateMultipartUpload(ctx context.Context, bucket, key string, options MultipartOptions) (MultipartUpload, error)
-	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
+	CreateMultipartUpload(ctx context.Context, bucket,
+		key string, options MultipartOptions) (MultipartUpload, error)
+	UploadPart(ctx context.Context, uploadID string,
+		partNumber int, data []byte) (Part, error)
 	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
 	AbortMultipartUpload(ctx context.Context, uploadID string) error
 
-	GetMultipartUpload(ctx context.
-		Context, uploadID string) (MultipartUpload, error)
+	GetMultipartUpload(ctx context.Context, uploadID string) (MultipartUpload, error)
 	ListParts(ctx context.Context, uploadID string) ([]Part, error)
 	ListMultipartUploads(ctx context.Context, bucket string) ([]MultipartUpload, error)
 }
@@ -1777,9 +1782,11 @@ type MultipartUpload struct {
 
 ```go
 type Object struct {
-	Bucket		string
-	Key		string
-	Data		[]byte
+	Bucket	string
+
+	Key	string
+	Data	[]byte
+
 	Size		int64
 	ETag		string
 	ContentType	string
@@ -1810,8 +1817,7 @@ const ObjectList Operation = "object.list"
 
 ```go
 type ObjectPage struct {
-	Objects	[]Object
-
+	Objects		[]Object
 	Truncated	bool
 	NextCursor	string
 }
@@ -1842,9 +1848,8 @@ const ObjectRead Operation = "object.read"
 
 ```go
 type ObjectRecoveryHoldOptions struct {
-	ID,
-	Owner	string
-	Objects	[]ObjectRecoveryReference
+	ID, Owner	string
+	Objects		[]ObjectRecoveryReference
 }
 ```
 
@@ -1854,8 +1859,7 @@ type ObjectRecoveryHoldOptions struct {
 
 ```go
 type ObjectRecoveryReference struct {
-	Bucket,
-	Key	string
+	Bucket, Key	string
 	Condition	SaveCondition
 }
 ```
@@ -2114,8 +2118,7 @@ type PutOptions struct {
 
 ```go
 type RangeStore interface {
-	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser,
-		Object, error)
+	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser, Object, error)
 }
 ```
 
@@ -2186,8 +2189,7 @@ func ReadWrite() Authority
 ```go
 type RecoveryHold struct {
 	RecoveryHoldRequest
-	Meaning	string	`json:"meaning"`
-
+	Meaning		string		`json:"meaning"`
 	State		string		`json:"state"`
 	Created		time.Time	`json:"created"`
 	FinishedAt	time.Time	`json:"finished_at,omitempty"`
@@ -2200,11 +2202,10 @@ type RecoveryHold struct {
 
 ```go
 type RecoveryHoldPage struct {
-	Holds	[]RecoveryHold	`json:"holds"`
-
-	NextCursor		string	`json:"next_cursor,omitempty"`
-	ReservedBytes		int64	`json:"reserved_bytes"`
-	PeakReservedBytes	int64	`json:"peak_reserved_bytes"`
+	Holds			[]RecoveryHold	`json:"holds"`
+	NextCursor		string		`json:"next_cursor,omitempty"`
+	ReservedBytes		int64		`json:"reserved_bytes"`
+	PeakReservedBytes	int64		`json:"peak_reserved_bytes"`
 }
 ```
 
@@ -2896,8 +2897,7 @@ Returns: `error`.
 ```go
 type StagedObject interface {
 	Commit(context.Context) (Object, error)
-	Abort(context.
-		Context) error
+	Abort(context.Context) error
 }
 ```
 
@@ -2907,8 +2907,9 @@ type StagedObject interface {
 
 ```go
 type StagedWriteStore interface {
-	StageObject(context.Context, string,
-		string, io.Reader, PutOptions) (StagedObject, error)
+	StageObject(context.
+		Context, string, string, io.Reader, PutOptions) (StagedObject,
+		error)
 }
 ```
 
@@ -2919,24 +2920,17 @@ Store supplies object storage to Open.
 ```go
 type Store interface {
 	CreateBucket(ctx context.Context, name string) error
-	DeleteBucket(ctx context.Context, name string) error
+	DeleteBucket(
+		ctx context.Context,
+
+		name string) error
 	ListBuckets(ctx context.Context) ([]Bucket, error)
-	PutObject(
-		ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
-	GetObject(ctx context.Context,
-		bucket,
-
-		key string) (Object, error)
-
-	HeadObject(ctx context.
-		Context,
-		bucket, key string) (Object,
-		error)
-	DeleteObject(ctx context.
-		Context, bucket,
-		key string) error
+	PutObject(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
+	GetObject(ctx context.Context, bucket, key string) (Object, error)
+	HeadObject(
+		ctx context.Context, bucket, key string) (Object, error)
+	DeleteObject(ctx context.Context, bucket, key string) error
 	ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error)
-
 	Close() error
 }
 ```
@@ -2947,8 +2941,8 @@ type Store interface {
 
 ```go
 type StreamingStore interface {
-	OpenObject(
-		context.Context, string, string) (io.ReadCloser, Object, error)
+	OpenObject(context.Context, string, string) (io.
+		ReadCloser, Object, error)
 }
 ```
 
