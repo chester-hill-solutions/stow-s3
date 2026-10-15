@@ -345,13 +345,13 @@ Return the operations and limits supported by this handle.
 
 ```go
 type Capabilities struct {
-	Backend		Backend
-	MaxBytes	int64
-	MaxObjects	int64
-
+	Backend			Backend
+	MaxBytes		int64
+	MaxObjects		int64
 	MaxMultipartUploads	int64
 	Persistent		bool
 	Multipart		bool
+
 	Upstream		bool
 	ConditionalWrites	bool
 	GuardedSaves		bool
@@ -850,8 +850,9 @@ type ConditionalWriteStore interface{ SupportsConditionalWrites() bool }
 
 ```go
 type CopyStore interface {
-	CopyObject(context.Context, string, string, string, string) (
-		Object, error)
+	CopyObject(context.Context, string, string,
+
+		string, string) (Object, error)
 }
 ```
 
@@ -1623,6 +1624,7 @@ Returns: `WorkspaceListing, error`.
 ```go
 type ListOptions struct {
 	Prefix	string
+
 	Cursor	string
 	Limit	int
 }
@@ -1810,8 +1812,7 @@ const ObjectList Operation = "object.list"
 
 ```go
 type ObjectPage struct {
-	Objects	[]Object
-
+	Objects		[]Object
 	Truncated	bool
 	NextCursor	string
 }
@@ -2102,7 +2103,6 @@ type PruneResult struct {
 type PutOptions struct {
 	ContentType	string
 	Metadata	map[string]string
-
 	IfMatch		string
 	IfNoneMatch	string
 }
@@ -2186,8 +2186,7 @@ func ReadWrite() Authority
 ```go
 type RecoveryHold struct {
 	RecoveryHoldRequest
-	Meaning	string	`json:"meaning"`
-
+	Meaning		string		`json:"meaning"`
 	State		string		`json:"state"`
 	Created		time.Time	`json:"created"`
 	FinishedAt	time.Time	`json:"finished_at,omitempty"`
@@ -2200,11 +2199,10 @@ type RecoveryHold struct {
 
 ```go
 type RecoveryHoldPage struct {
-	Holds	[]RecoveryHold	`json:"holds"`
-
-	NextCursor		string	`json:"next_cursor,omitempty"`
-	ReservedBytes		int64	`json:"reserved_bytes"`
-	PeakReservedBytes	int64	`json:"peak_reserved_bytes"`
+	Holds			[]RecoveryHold	`json:"holds"`
+	NextCursor		string		`json:"next_cursor,omitempty"`
+	ReservedBytes		int64		`json:"reserved_bytes"`
+	PeakReservedBytes	int64		`json:"peak_reserved_bytes"`
 }
 ```
 
@@ -2241,6 +2239,7 @@ type RecoveryHoldRequest struct {
 ```go
 type RecoveryReference struct {
 	WorkspaceID	string	`json:"workspace_id"`
+
 	CheckpointID	string	`json:"checkpoint_id,omitempty"`
 }
 ```

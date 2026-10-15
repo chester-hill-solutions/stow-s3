@@ -121,18 +121,178 @@ func (s *checkpointScan) addRegularFile(path, rel string, entry os.DirEntry) err
 // Copy independent payloads with bounded buffers and descriptors. Wait for every
 // worker before verification, publication, or the caller's staging cleanup.
 func copyCheckpointFiles(ctx context.Context, source *rooted.Root, target string, files []CheckpointFile) error {
+	return copyCheckpointFilesFromParent(ctx, files, checkpointCopyPlan{source: source, target: target})
+}
+
+type checkpointCopyPlan struct {
+	source         *rooted.Root
+	target         string
+	registryDir    string
+	checkpointRoot string
+	parentID       string
+	parent         *CheckpointManifest
+	parentFiles    map[string]CheckpointFile
+}
+
+func (plan *checkpointCopyPlan) loadParent() error {
+	plan.checkpointRoot = filepath.Join(plan.registryDir, "checkpoints")
+	parent := plan.parent
+	var err error
+	if parent == nil {
+		parent, err = loadCheckpointParent(plan.registryDir, plan.parentID)
+	}
+	if err != nil {
+		return err
+	}
+	plan.parentFiles = checkpointParentFiles(parent)
+	return nil
+}
+
+func copyCheckpointFilesFromParent(ctx context.Context, files []CheckpointFile, plan checkpointCopyPlan) error {
+	if err := plan.loadParent(); err != nil {
+		return err
+	}
 	group, pending := errgroup.WithContext(ctx)
 	group.SetLimit(8)
 	for _, item := range files {
-		if pending.Err() != nil {
-			break
-		}
-		group.Go(func() error { return copyCheckpointInput(pending, source, target, item) })
+		group.Go(func() error {
+			return copyCheckpointItem(pending, plan, item)
+		})
 	}
+	return waitCheckpointCopies(group, ctx)
+}
+
+func copyCheckpointItem(ctx context.Context, plan checkpointCopyPlan, item CheckpointFile) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return plan.copy(ctx, item)
+}
+
+func (plan checkpointCopyPlan) copy(ctx context.Context, item CheckpointFile) error {
+	if err := prepareCheckpointFileDestination(plan.target, item); err != nil {
+		return err
+	}
+	parentFile, found := plan.parentFiles[item.Path]
+	destination := filepath.Join(plan.target, "files", filepath.FromSlash(item.Path))
+	destinationRelative, relErr := filepath.Rel(plan.checkpointRoot, destination)
+	parentRelative := filepath.Join(plan.parentID, "files", filepath.FromSlash(item.Path))
+	if plan.parent != nil {
+		parentRelative = filepath.Join(plan.parent.ID, "files", filepath.FromSlash(item.Path))
+	}
+	if found && relErr == nil && checkpointFilesMatch(parentFile, item) && tryReuseCheckpointPayload(ctx, plan.checkpointRoot, parentRelative, destinationRelative, item) {
+		return nil
+	}
+	return copyCheckpointInput(ctx, plan.source, plan.target, item)
+}
+
+func checkpointFilesMatch(parent, current CheckpointFile) bool {
+	return parent.Size == current.Size && parent.Mode == current.Mode && parent.SHA256 == current.SHA256
+}
+
+func prepareCheckpointFileDestination(target string, item CheckpointFile) error {
+	return os.MkdirAll(filepath.Dir(filepath.Join(target, "files", filepath.FromSlash(item.Path))), 0o700)
+}
+
+func checkpointParentFiles(parent *CheckpointManifest) map[string]CheckpointFile {
+	parentFiles := make(map[string]CheckpointFile)
+	if parent == nil {
+		return parentFiles
+	}
+	for _, file := range parent.Files {
+		parentFiles[file.Path] = file
+	}
+	return parentFiles
+}
+
+func waitCheckpointCopies(group *errgroup.Group, ctx context.Context) error {
 	if err := group.Wait(); err != nil {
 		return err
 	}
 	return ctx.Err()
+}
+
+func tryReuseCheckpointPayload(ctx context.Context, checkpointRoot, parentRelative, destinationRelative string, item CheckpointFile) bool {
+	parentInfo, valid := checkpointParentPayloadMatches(ctx, checkpointRoot, parentRelative, item)
+	if !valid {
+		return false
+	}
+	return ctx.Err() == nil && linkVerifiedCheckpointPayload(checkpointRoot, parentRelative, destinationRelative, parentInfo)
+}
+
+func checkpointParentPayloadMatches(ctx context.Context, checkpointRoot, parentRelative string, item CheckpointFile) (os.FileInfo, bool) {
+	parent, err := rooted.Open(checkpointRoot)
+	if err != nil {
+		return nil, false
+	}
+	defer parent.Close()
+	input, err := parent.OpenRegularFile(parentRelative)
+	if err != nil {
+		return nil, false
+	}
+	info, err := input.Stat()
+	if err != nil || info.Size() != item.Size || !checkpointStoredMode(info.Mode().Perm(), item.Mode) {
+		_ = input.Close()
+		return nil, false
+	}
+	digest, size, err := digestCheckpointInput(ctx, input)
+	return info, err == nil && size == item.Size && digest == item.SHA256 && ctx.Err() == nil
+}
+
+func linkVerifiedCheckpointPayload(checkpointRoot, parentRelative, destinationRelative string, parentInfo os.FileInfo) bool {
+	root, err := os.OpenRoot(checkpointRoot)
+	if err != nil {
+		return false
+	}
+	defer root.Close()
+	if err := root.Link(parentRelative, destinationRelative); err != nil {
+		return false
+	}
+	if verifyLinkedCheckpointPayload(checkpointRoot, destinationRelative, parentInfo) {
+		return true
+	}
+	_ = root.Remove(destinationRelative)
+	return false
+}
+
+func openLinkedCheckpointPayload(checkpointRoot, destinationRelative string) (*rooted.Root, *os.File, error) {
+	root, err := rooted.Open(checkpointRoot)
+	if err != nil {
+		return nil, nil, err
+	}
+	file, err := root.OpenRegularFile(destinationRelative)
+	if err != nil {
+		_ = root.Close()
+		return nil, nil, err
+	}
+	return root, file, nil
+}
+
+func verifyLinkedCheckpointPayload(checkpointRoot, destinationRelative string, parentInfo os.FileInfo) bool {
+	root, file, err := openLinkedCheckpointPayload(checkpointRoot, destinationRelative)
+	if err != nil {
+		return false
+	}
+	defer root.Close()
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil || !os.SameFile(parentInfo, info) {
+		return false
+	}
+	if err := file.Chmod(checkpointStoredPayloadMode); err != nil {
+		return false
+	}
+	linkedInfo, err := file.Stat()
+	if err != nil || linkedInfo.Mode().Perm() != checkpointStoredPayloadMode {
+		return false
+	}
+	return true
+}
+
+const checkpointStoredPayloadMode os.FileMode = 0o400
+
+func checkpointStoredMode(actual os.FileMode, manifestMode uint32) bool {
+	return actual.Perm() == os.FileMode(manifestMode)&0o777 || actual.Perm() == checkpointStoredPayloadMode
 }
 
 func copyCheckpointInput(ctx context.Context, source *rooted.Root, target string, item CheckpointFile) error {
@@ -152,7 +312,7 @@ func copyCheckpointInput(ctx context.Context, source *rooted.Root, target string
 	hash := sha256.New()
 	size, copyErr := io.Copy(io.MultiWriter(out, hash), io.LimitReader(checkpointReader{ctx: ctx, reader: in}, item.Size+1))
 	if copyErr == nil {
-		copyErr = out.Chmod(os.FileMode(item.Mode) & 0o777)
+		copyErr = out.Chmod(checkpointStoredPayloadMode)
 	}
 	inErr, outErr := in.Close(), out.Close()
 	if copyErr != nil {

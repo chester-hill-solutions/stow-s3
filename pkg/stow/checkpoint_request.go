@@ -191,7 +191,11 @@ func verifyCheckpointReceiptPayload(ctx context.Context, dir string, manifest Ch
 		if err != nil {
 			return CheckpointInfo{}, err
 		}
-		if !stat.Mode().IsRegular() || uint32(stat.Mode().Perm()) != file.Mode {
+		storedModeOK := stat.Mode().Perm() == os.FileMode(file.Mode)&0o777
+		if strings.HasPrefix(name, "files/") {
+			storedModeOK = checkpointStoredMode(stat.Mode().Perm(), file.Mode)
+		}
+		if !stat.Mode().IsRegular() || !storedModeOK {
 			return CheckpointInfo{}, fmt.Errorf("checkpoint file %q has invalid mode", file.Path)
 		}
 		hash, size, err := digestFileContext(ctx, path)
