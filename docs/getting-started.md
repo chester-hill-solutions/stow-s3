@@ -48,6 +48,7 @@ See the [release checkpoint](release-verification-2026-10-14.md) for package ava
 
 | Workload | Start with |
 | --- | --- |
+| Runnable examples for tests, local apps and pipelines | [Examples](../examples/stow-recipes/README.md) |
 | Existing S3 SDKs or disposable integration tests | [Native server](running-and-probing.md) and the [TypeScript client](../packages/stow-s3/README.md) |
 | An agent's working directory and checkpoints | [Workspace guide](portable-workspace-usage.md) |
 | Small-file offline editing with undo and redo | [Browser file history](browser-file-history.md) |
