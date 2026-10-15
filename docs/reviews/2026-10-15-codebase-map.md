@@ -59,9 +59,17 @@ its session/object capacity**, with
 [regression and cost evidence](../benchmarks/2026-10-15-initiation-publication/README.md).
 Ordinary refusals still reserve nothing, and known committed uploads can be
 completed or aborted through the runtime. The original session-cap probe passes.
-The next confirmed finding is abort recovery: a committed abort removes the upload
-and its parts but strands byte, object and session reservations. Abort accounting
-remains unchanged; the new report retains the reproducer.
+That report confirmed abort recovery stranding byte, object and session
+reservations after a committed abort removed the upload and its parts. Abort
+accounting remained unchanged in that initiation correction.
+
+Follow-up: **committed abort now releases byte, object and session reservations**,
+with [regression and cost evidence](../benchmarks/2026-10-15-abort-publication/README.md).
+The original capacity-reuse probe passes. Ordinary refusals keep reservations;
+shared targets retain the surviving uploads' capacity. The next confirmed S3 issue
+is separate: custom stores return 500/InternalError for missing upload IDs rather
+than the existing 404/NoSuchUpload contract. Eight route/error-wrapper combinations
+reproduce; their validation implementation remains unchanged in this abort fix.
 
 ## Codebase map
 

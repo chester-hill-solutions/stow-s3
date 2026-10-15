@@ -65,8 +65,7 @@ func (s *usageState) finishCompletion(uploadID string, oldSize int64, meta *stor
 }
 
 func (s *usageState) finishAbort(uploadID string, exists bool, err error) bool {
-	s.recordMutation(err)
-	if err != nil {
+	if !s.recordMutation(err) {
 		return false
 	}
 	s.removeUpload(uploadID, exists)
