@@ -270,12 +270,21 @@ func (a *Adapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (
 	return meta, nil
 }
 
-// localCopy performs the copy against the local store, through whichever
-// capability it offers, so the conditions are evaluated on the version the store
-// copies rather than on one this layer read separately.
+// localCopy delegates atomic source checks when the store supports them.
+// Otherwise it checks an observed source version, the weaker fallback documented
+// by storage.ConditionalCopyStore.
 func (a *Adapter) localCopy(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	if conditional, ok := a.local.(storage.ConditionalCopyStore); ok {
 		return conditional.CopyObjectCond(ctx, req)
+	}
+	if req.Options != (storage.CopyOptions{}) {
+		source, err := a.local.HeadObject(ctx, req.SourceBucket, req.SourceKey)
+		if err != nil {
+			return nil, err
+		}
+		if err := storage.CheckCopySourceConditions(req.Options, source); err != nil {
+			return nil, err
+		}
 	}
 	return a.local.CopyObject(ctx, req.SourceBucket, req.SourceKey, req.DestBucket, req.DestKey)
 }
