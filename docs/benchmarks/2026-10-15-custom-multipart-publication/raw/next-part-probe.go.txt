@@ -1,0 +1,56 @@
+package stow_test
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
+)
+
+type reviewCommittedPartStore struct{ *singlePartPublicationStore }
+
+func (s *reviewCommittedPartStore) UploadPart(ctx context.Context, id string, number int, data []byte) (stow.Part, error) {
+	part, err := s.singlePartPublicationStore.UploadPart(ctx, id, number, data)
+	if err != nil {
+		return part, err
+	}
+	return part, errors.Join(stow.ErrMutationCommitted, errors.New("after stored part"))
+}
+
+func TestReviewCustomCommittedPartQuota(t *testing.T) {
+	ctx := context.Background()
+	store := &reviewCommittedPartStore{newSinglePartPublicationStore()}
+	outer, err := stow.Open(stow.Options{Store: store, MaxBytes: 4, MaxObjects: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outer.Close()
+	if err := outer.CreateBucket(ctx, "probe"); err != nil {
+		t.Fatal(err)
+	}
+	inner := embedded.UnwrapInstance(outer)
+	upload, err := inner.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	part, uploadErr := inner.UploadPart(ctx, upload.UploadID, 1, storage.NewOwnedBody([]byte("part")))
+	parts, err := store.ListParts(ctx, upload.UploadID)
+	if err != nil || len(parts) != 1 || parts[0].Size != 4 || string(store.body) != "part" {
+		t.Fatalf("invalid probe: parts=%+v error=%v body=%q", parts, err, store.body)
+	}
+	t.Logf("committed part result=%+v error=%v actual parts=%+v body=%q", part, uploadErr, parts, store.body)
+	if !errors.Is(uploadErr, stow.ErrMutationCommitted) {
+		t.Fatal(uploadErr)
+	}
+	if part == nil {
+		t.Error("committed part identity discarded")
+	}
+	_, putErr := outer.PutObject(ctx, "probe", "target", []byte("body"), stow.PutOptions{})
+	if !errors.Is(putErr, stow.ErrQuotaExceeded) {
+		object, readErr := store.GetObject(ctx, "probe", "target")
+		t.Errorf("part escaped byte reservation: put=%v actual-object=%q read=%v part-bytes=%d actual-total=%d cap=4 usage=%+v", putErr, object.Data, readErr, len(store.body), len(store.body)+len(object.Data), outer.Usage())
+	}
+}

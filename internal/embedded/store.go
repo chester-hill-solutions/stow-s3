@@ -333,6 +333,9 @@ func (a multipartAdapter) CreateMultipartUpload(ctx context.Context, bucket, key
 func (a multipartAdapter) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {
 	upload, err := a.multi.GetMultipartUpload(ctx, uploadID)
 	if err != nil {
+		if errors.Is(err, ErrObjectNotFound) && !errors.Is(err, ErrMutationCommitted) {
+			return nil, storage.ErrUploadNotFound
+		}
 		return nil, err
 	}
 	return uploadMetaOf(upload), nil
@@ -356,10 +359,10 @@ func (a multipartAdapter) CompleteMultipartUpload(ctx context.Context, uploadID 
 		supplied = append(supplied, Part{PartNumber: part.PartNumber, ETag: part.ETag, Size: part.Size})
 	}
 	object, err := a.multi.CompleteMultipartUpload(ctx, uploadID, supplied)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, err
 	}
-	return objectMetaOf(object), nil
+	return objectMetaOf(object), err
 }
 
 func (a multipartAdapter) AbortMultipartUpload(ctx context.Context, uploadID string) error {

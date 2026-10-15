@@ -34,8 +34,17 @@ custom-store PUT identity-loss finding, addressed in the next follow-up.
 Follow-up: **buffered custom-store PUT now preserves committed identity**, with
 [regression and cost evidence](../benchmarks/2026-10-15-buffered-put-publication/README.md).
 That report confirms the next separate high-priority finding: the public custom
-multipart completion adapter still drops committed metadata, causing an accounting
-panic after publication. The custom multipart implementation remains unchanged.
+multipart completion adapter still dropped committed metadata, causing an accounting
+panic after publication. It remained unchanged in that PUT correction.
+
+Follow-up: **public custom multipart completion now preserves committed identity
+and reconciles confirmed cleanup**, with
+[regression and cost evidence](../benchmarks/2026-10-15-custom-multipart-publication/README.md).
+The completion panic and removed-upload quota leak are corrected together at the
+adapter boundary. Retained or uncertain uploads keep their reservations. The next
+confirmed finding is separate: committed part uploads lose their result and byte
+reservation, permitting eight stored bytes under a four-byte cap. That part-upload
+implementation remains unchanged; its reproducer is retained in the new report.
 
 ## Codebase map
 
