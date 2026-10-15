@@ -1,0 +1,77 @@
+--- FAIL: TestCustomStoreCopyPublication (0.00s)
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=false/committed (0.00s)
+        store_copy_publication_test.go:160: COPY panicked after publication: runtime error: invalid memory address or nil pointer dereference; usage={Bytes:4 Objects:1}
+        store_copy_publication_test.go:60: publication error lost: <nil>
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.333643 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:4 Objects:1}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=false/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.333856 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:4 Objects:1}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=true/committed (0.00s)
+        store_copy_publication_test.go:160: COPY panicked after publication: runtime error: invalid memory address or nil pointer dereference; usage={Bytes:7 Objects:2}
+        store_copy_publication_test.go:60: publication error lost: <nil>
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.333969 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:7 Objects:2}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=true/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.334034 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:7 Objects:2}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=false/committed (0.00s)
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.334138 +0000 UTC}
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=false/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.334173 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:4 Objects:1}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=true/committed (0.00s)
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.337078 +0000 UTC}
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=true/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.337144 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:7 Objects:2}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+--- FAIL: TestCustomStoreCopyPublication (0.01s)
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=false/committed (0.00s)
+        store_copy_publication_test.go:160: COPY panicked after publication: runtime error: invalid memory address or nil pointer dereference; usage={Bytes:4 Objects:1}
+        store_copy_publication_test.go:60: publication error lost: <nil>
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.342559 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:4 Objects:1}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=false/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.344895 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:4 Objects:1}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=true/committed (0.00s)
+        store_copy_publication_test.go:160: COPY panicked after publication: runtime error: invalid memory address or nil pointer dereference; usage={Bytes:7 Objects:2}
+        store_copy_publication_test.go:60: publication error lost: <nil>
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.345015 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:7 Objects:2}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=false/overwrite=true/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.345098 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:7 Objects:2}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=false/committed (0.00s)
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.3452 +0000 UTC}
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=false/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.345239 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:4 Objects:1}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=true/committed (0.00s)
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.345337 +0000 UTC}
+    --- FAIL: TestCustomStoreCopyPublication/optional=true/overwrite=true/committed-missing (0.00s)
+        store_copy_publication_test.go:60: publication error lost: stow: object not found
+        store_copy_publication_test.go:60: committed identity={Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC}, want {Bucket:probe Key:target Data:[] Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType:text/plain Metadata:map[state:copied] LastModified:2026-10-15 20:01:34.345378 +0000 UTC}
+        store_copy_publication_test.go:60: usage={Bytes:7 Objects:2}, want {Bytes:8 Objects:2}
+        store_copy_publication_test.go:60: published bytes escaped quota: <nil>
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.579s
+FAIL

@@ -6,13 +6,19 @@ This is a structural map plus focused correctness review. Deep dynamic checks
 cover publication failures and public-store adaptation; browser persistence,
 security and lifecycle components are mapped rather than exhaustively qualified.
 
-**Findings: two high-priority issues and two medium-priority issues, all
-reproduced. No production implementation changes are included.**
+**Original findings: two high-priority issues and two medium-priority issues,
+all reproduced. The original review included no production changes.**
 
 Follow-up: **F1 is now corrected** in the separate
 [multipart publication change](../benchmarks/2026-10-15-multipart-publication/README.md).
 The findings and failure logs below describe the original review baseline;
-F2–F4 remain open. The original F1 probe passes after that correction.
+F2–F4 were still open at that point. The original F1 probe passes after that correction.
+
+Follow-up: **F2 is corrected** in the separate
+[custom-store COPY change](../benchmarks/2026-10-15-custom-copy-publication/README.md).
+It also corrects F3's public-runtime variant, needed to return the committed COPY
+result to its caller. F3's two internal adapter variants and F4 remain open.
+The original F2 and F3 public probes pass after this correction; F4 still fails.
 
 ## Codebase map
 

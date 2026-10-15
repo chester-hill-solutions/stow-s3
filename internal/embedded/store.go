@@ -141,12 +141,12 @@ func (a *storeAdapter) DeleteBucket(ctx context.Context, name string) error {
 	return translate(a.store.DeleteBucket(ctx, name))
 }
 
-// translate maps public sentinels onto internal ones, preserving missing-object
-// and conditional-write failures for runtime accounting and protocol handling.
+// translate preserves committed outcomes and maps public refusal sentinels onto
+// internal ones for runtime accounting and protocol handling.
 func translate(err error) error {
 	switch {
-	case err == nil:
-		return nil
+	case err == nil || errors.Is(err, ErrMutationCommitted):
+		return err
 	case errors.Is(err, ErrBucketNotFound):
 		return storage.ErrBucketNotFound
 	case errors.Is(err, ErrObjectNotFound):
@@ -299,10 +299,10 @@ func (a *storeAdapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBuc
 		ContentType: source.ContentType,
 		Metadata:    source.Metadata,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, translate(err)
 	}
-	return objectMetaOf(copied), nil
+	return objectMetaOf(copied), translate(err)
 }
 
 func (a *storeAdapter) Close() error { return a.store.Close() }

@@ -676,3 +676,12 @@ session until upload absence is confirmed. An unavailable lookup conservatively
 retains those reservations. After repair, retry completion or abort the retained
 upload; abort preserves the published object. HTTP returns `500 InternalError`,
 and the same separate-publication and metadata-recovery limits above apply.
+
+For custom-store COPY, a published destination returned with
+`ErrMutationCommitted` is preserved through the fallback and public runtime, and
+usage includes that object. The committed marker takes precedence over a joined
+missing-object or precondition failure; its original error chain is retained.
+Stores must supply an accurate destination object with the committed marker.
+Ordinary refusals retain their empty result and existing sentinel translation.
+The base-store fallback continues to use GET and PUT with its existing consistency
+and buffering limits; optional COPY capability remains preferred.
