@@ -145,6 +145,82 @@ func TestOrdinaryWritesRespectSharedHostBudget(t *testing.T) {
 	}
 }
 
+func TestMultipartPartsRespectNamespaceBudget(t *testing.T) {
+	ctx := context.Background()
+	namespace := publicationNamespace(t)
+	store := publicationStore(t, namespace, t.TempDir())
+	upload, err := store.CreateMultipartUpload(ctx, "bucket", "large", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	partPath := filepath.Join(store.multipartDir(upload.UploadID), "part-00001")
+	_, err = store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader(strings.Repeat("x", 5<<20)))
+	if !errors.Is(err, capacity.ErrFull) {
+		t.Fatalf("oversized multipart part error = %v, want capacity.ErrFull", err)
+	}
+	if _, err := os.Stat(partPath); !os.IsNotExist(err) {
+		t.Fatalf("over-budget multipart part was published: %v", err)
+	}
+}
+
+func TestMultipartAbortReleasesNamespaceCapacity(t *testing.T) {
+	ctx := context.Background()
+	namespace := publicationNamespace(t)
+	store := publicationStore(t, namespace, t.TempDir())
+	upload, err := store.CreateMultipartUpload(ctx, "bucket", "small", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("part")); err != nil {
+		t.Fatal(err)
+	}
+	before, err := namespace.Snapshot(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if before.PayloadBytes == 0 || before.RecoveryBytes == 0 {
+		t.Fatalf("multipart resources were not charged: %+v", before)
+	}
+	if err := store.AbortMultipartUpload(ctx, upload.UploadID); err != nil {
+		t.Fatal(err)
+	}
+	after, err := namespace.Snapshot(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after.PayloadBytes != 0 || after.RecoveryBytes >= before.RecoveryBytes {
+		t.Fatalf("abort did not release multipart capacity: before=%+v after=%+v", before, after)
+	}
+}
+
+func TestMultipartCompletionReleasesPartCapacity(t *testing.T) {
+	ctx := context.Background()
+	namespace := publicationNamespace(t)
+	store := publicationStore(t, namespace, t.TempDir())
+	upload, err := store.CreateMultipartUpload(ctx, "bucket", "complete", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	part, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("part"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part}); err != nil {
+		t.Fatal(err)
+	}
+	objectInfo, err := os.Stat(store.objectPath("bucket", "complete"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	snapshot, err := namespace.Snapshot(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if snapshot.PayloadBytes != objectInfo.Size() {
+		t.Fatalf("completion payload charge = %d, want only the committed object size %d", snapshot.PayloadBytes, objectInfo.Size())
+	}
+}
+
 func assertPublicationCharge(t *testing.T, store *FilesystemStore, namespace *capacity.Namespace) {
 	t.Helper()
 	ctx := context.Background()
