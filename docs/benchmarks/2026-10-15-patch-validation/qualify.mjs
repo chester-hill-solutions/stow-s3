@@ -27,6 +27,7 @@ const metadata = {
   buildArgs: ["-buildvcs=false", "-trimpath", "-ldflags", "-s -w"],
   baselineRevision: "29897c891d39766d856fd3ff9b0e4e80036eb8e3",
   candidateRevision: (await execute("git", ["rev-parse", "HEAD"], { cwd: roots.candidate })).stdout.trim(),
+  qualificationHarnessSha256: hash(await readFile(new URL(import.meta.url))),
   order: ["baseline", "candidate", "candidate", "baseline"],
   artifacts: {}, harnesses: {},
   notes: [
@@ -35,6 +36,7 @@ const metadata = {
     "Browser trials create fresh contexts and persistent workers in a warmed Chromium process; warm-up trials are excluded.",
     "Raw per-block summaries are preserved. Do not infer a combined percentile from block percentiles.",
     "RSS is sampled by the existing native harnesses; browser heap and production capacity are not measured.",
+    "The general workspace lifecycle harness failed during baseline parallel cleanup. Capture comparisons use the serial portable harness; the workspace memory-only harness has no parallel stage.",
   ],
 };
 for (const [label, root] of Object.entries(roots)) {
@@ -61,7 +63,6 @@ for (const [block, label] of metadata.order.entries()) {
   const jobs = [
     ["session", ["packages/stow-s3/scripts/benchmark-session.mjs", "--sessions", "20", "--json", join(out, `${prefix}-session.json`)]],
     ["concurrency", ["packages/stow-s3/scripts/benchmark-concurrency.mjs", "--runs", "3", "--json", join(out, `${prefix}-concurrency.json`)]],
-    ["workspace", ["packages/stow-s3/scripts/benchmark-workspace.mjs", "--runs", "3", "--json", join(out, `${prefix}-workspace.json`)]],
     ["workspace-memory", ["packages/stow-s3/scripts/benchmark-workspace.mjs", "--memory-only", "--json", join(out, `${prefix}-workspace-memory.json`)]],
     ["portable", ["scripts/benchmark-portable.mjs", "256", "8388608", "5", "0"]],
   ];

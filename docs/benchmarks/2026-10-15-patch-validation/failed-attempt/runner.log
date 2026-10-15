@@ -1,0 +1,50 @@
+1-baseline: session
+1-baseline: concurrency
+1-baseline: workspace
+node:internal/errors:998
+  const err = new Error(message);
+              ^
+
+Error: Command failed: <node> packages/stow-s3/scripts/benchmark-workspace.mjs --runs 3 --json <candidate-root>/docs/benchmarks/2026-10-15-patch-validation/results/1-baseline-workspace.json
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+[Error: ENOTEMPTY: directory not empty, rmdir '<temp>/stow-workspace-parallel-RUPoE9/workspace-0/.stow'] {
+  errno: -66,
+  code: 'ENOTEMPTY',
+  syscall: 'rmdir',
+  path: '<temp>/stow-workspace-parallel-RUPoE9/workspace-0/.stow'
+}
+
+Node.js v25.9.0
+
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:509:20)
+    at maybeClose (node:internal/child_process:1108:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '<node> packages/stow-s3/scripts/benchmark-workspace.mjs --runs 3 --json <candidate-root>/docs/benchmarks/2026-10-15-patch-validation/results/1-baseline-workspace.json',
+  stdout: '\rtiny: run 1/3\rtiny: run 2/3\rtiny: run 3/3\n' +
+    '\ragent: run 1/3\ragent: run 2/3\ragent: run 3/3\n' +
+    '\rscale: run 1/3\rscale: run 2/3\rscale: run 3/3\n' +
+    '\r1 parallel workspaces: run 1/5\r1 parallel workspaces: run 2/5\r1 parallel workspaces: run 3/5\r1 parallel workspaces: run 4/5\r1 parallel workspaces: run 5/5\n',
+  stderr: 'node:internal/modules/run_main:107\n' +
+    '    triggerUncaughtException(\n' +
+    '    ^\n' +
+    '\n' +
+    "[Error: ENOTEMPTY: directory not empty, rmdir '<temp>/stow-workspace-parallel-RUPoE9/workspace-0/.stow'] {\n" +
+    '  errno: -66,\n' +
+    "  code: 'ENOTEMPTY',\n" +
+    "  syscall: 'rmdir',\n" +
+    "  path: '<temp>/stow-workspace-parallel-RUPoE9/workspace-0/.stow'\n" +
+    '}\n' +
+    '\n' +
+    'Node.js v25.9.0\n'
+}
+
+Node.js v25.9.0
