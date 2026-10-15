@@ -270,23 +270,11 @@ func (a *Adapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (
 	return meta, nil
 }
 
-// localCopy delegates atomic source checks when the store supports them.
-// Otherwise it checks an observed source version, the weaker fallback documented
-// by storage.ConditionalCopyStore.
+// localCopy delegates conditional source checks when the store supports them.
+// Otherwise it copies a captured read, checking conditions against that read's
+// metadata so a later source replacement cannot change the copied version.
 func (a *Adapter) localCopy(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
-	if conditional, ok := a.local.(storage.ConditionalCopyStore); ok {
-		return conditional.CopyObjectCond(ctx, req)
-	}
-	if req.Options != (storage.CopyOptions{}) {
-		source, err := a.local.HeadObject(ctx, req.SourceBucket, req.SourceKey)
-		if err != nil {
-			return nil, err
-		}
-		if err := storage.CheckCopySourceConditions(req.Options, source); err != nil {
-			return nil, err
-		}
-	}
-	return a.local.CopyObject(ctx, req.SourceBucket, req.SourceKey, req.DestBucket, req.DestKey)
+	return storage.CopyObject(ctx, a.local, req)
 }
 
 func (a *Adapter) UploadPart(ctx context.Context, uploadID string, partNumber int, body io.Reader) (*storage.PartInfo, error) {

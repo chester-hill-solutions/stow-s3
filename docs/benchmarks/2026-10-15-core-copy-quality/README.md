@@ -1,5 +1,9 @@
 # Core COPY correctness review — October 15, 2026
 
+The [source-snapshot follow-up](../2026-10-15-copy-source-snapshot/README.md)
+subsequently closes the generic fallback race identified below. This report retains
+the original evidence and measurements for the preceding independent fix.
+
 One change: preserve source preconditions when the run-through adapter wraps a
 custom store without optional conditional COPY support. No optimization ships in
 this change. The implementation adds nine lines and reuses the shared checker.

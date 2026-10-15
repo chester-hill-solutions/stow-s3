@@ -244,8 +244,8 @@ func (i *Instance) CopyObject(ctx context.Context, sourceBucket, sourceKey, dest
 // The conditions and the bytes come from one capture inside the store: a caller naming
 // an ETag is asking for that version, and a copy that re-read the source after the
 // check could publish a different one. When the store cannot evaluate them they are
-// checked here against the version this observed, and the copy still happens — a weaker
-// guarantee, which storage.ConditionalCopyStore documents.
+// checked again against a captured GET, and that same read supplies the copied bytes.
+// That captured read also provides the size used for quota admission.
 func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (Object, error) {
 	if err := i.checkContext(ctx); err != nil {
 		return Object{}, err
@@ -265,11 +265,14 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	if err := i.checkMutationLocked(ctx); err != nil {
 		return Object{}, err
 	}
-	// The source size for the quota check, and the conditions if the store cannot evaluate
-	// them. Both answer about a version the caller may then race.
-	sourceMeta, err := i.store.HeadObject(ctx, req.SourceBucket, req.SourceKey)
+	// Native conditional stores capture internally; a generic conditioned copy opens
+	// one source read for its conditions, quota admission and destination payload.
+	source, sourceMeta, err := i.copyObjectSource(ctx, req)
 	if err != nil {
 		return Object{}, err
+	}
+	if source != nil {
+		defer source.Close()
 	}
 	if err := i.checkCopySourceConditions(req, sourceMeta); err != nil {
 		return Object{}, err
@@ -285,7 +288,7 @@ func (i *Instance) CopyObjectCond(ctx context.Context, req storage.CopyRequest) 
 	if !i.bytesQuotaFits(oldSize, sourceMeta.Size) {
 		return Object{}, ErrQuotaExceeded
 	}
-	meta, err := i.storeCopy(ctx, req)
+	meta, err := i.storeCopy(ctx, req, source, sourceMeta)
 	if !i.finishStoredPut(target, oldSize, meta, exists, err) {
 		return Object{}, err
 	}
@@ -306,11 +309,27 @@ func (i *Instance) checkCopySourceConditions(req storage.CopyRequest, sourceMeta
 // storeCopy performs the copy through whichever capability the store offers, so
 // a store that can evaluate the conditions on the version it copies is used for
 // that rather than being asked to copy blindly.
-func (i *Instance) storeCopy(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
-	if conditional, ok := i.store.(storage.ConditionalCopyStore); ok {
-		return conditional.CopyObjectCond(ctx, req)
+func (i *Instance) storeCopy(ctx context.Context, req storage.CopyRequest, source io.Reader, meta *storage.ObjectMeta) (*storage.ObjectMeta, error) {
+	if source != nil {
+		return i.store.PutObject(ctx, req.DestBucket, req.DestKey, &sizedObjectReader{reader: source, remaining: meta.Size}, storage.PutOptions{
+			ContentType:       meta.ContentType,
+			Metadata:          meta.Metadata,
+			ChecksumAlgorithm: meta.ChecksumAlgorithm,
+			ChecksumValue:     meta.ChecksumValue,
+		})
 	}
-	return i.store.CopyObject(ctx, req.SourceBucket, req.SourceKey, req.DestBucket, req.DestKey)
+	return storage.CopyObject(ctx, i.store, req)
+}
+
+func (i *Instance) copyObjectSource(ctx context.Context, req storage.CopyRequest) (io.ReadCloser, *storage.ObjectMeta, error) {
+	if i.storeCopyChecksConditions() || req.Options == (storage.CopyOptions{}) {
+		meta, err := i.store.HeadObject(ctx, req.SourceBucket, req.SourceKey)
+		return nil, meta, err
+	}
+	if err := storage.ValidateCopyRequest(req); err != nil {
+		return nil, nil, err
+	}
+	return i.store.GetObject(ctx, req.SourceBucket, req.SourceKey)
 }
 
 // storeCopyChecksConditions reports whether the store evaluates the copy's source

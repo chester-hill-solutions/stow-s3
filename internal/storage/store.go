@@ -83,18 +83,18 @@ type CopyRequest struct {
 	Options      CopyOptions
 }
 
-// ConditionalCopyStore is the optional extension: a copy that can refuse to
-// publish anything unless the source version satisfies the caller's conditions.
+// ConditionalCopyStore is the optional extension: a backend COPY whose source
+// conditions apply to the same captured version as its payload and metadata.
 //
-// It is optional, and separately so, because this is the one case where two
-// implementations can differ in a way a client can observe and cannot fix. A
-// caller that checked a condition itself and then called CopyObject has asked
-// "copy the version whose ETag I read"; a store that re-reads the source cannot
-// honour that, because between the check and the copy the source may have moved
-// on, and the copy would then publish a version the caller never asked about and
-// never saw. So a store that implements this evaluates the conditions against
-// the same captured version whose bytes it copies, and a store that does not
-// implement it can only promise that the copy is internally coherent.
+// Checking a source with HEAD before calling CopyObject leaves a window in
+// which a writer can replace it. CopyObject's coherence guarantee alone does
+// not connect that later capture to the precondition check.
+//
+// The package CopyObject helper uses this extension when available. Otherwise
+// conditioned requests copy one GET snapshot through PUT; this can allocate
+// destination bytes and recompute the ETag using single-part write semantics.
+// Unconditioned requests retain the backend's ordinary CopyObject path.
+// Callers admitting a copy against a quota must use the captured source size.
 type ConditionalCopyStore interface {
 	CopyObjectCond(ctx context.Context, req CopyRequest) (*ObjectMeta, error)
 }
