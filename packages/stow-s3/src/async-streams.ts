@@ -27,7 +27,6 @@ export class EmbeddedStreamOperations {
     signal?.throwIfAborted();
     // Capture the token before honouring cancellation, so a successful open can be cleaned up.
     const { token } = await this.invoke<{ token: string }>({ op: "openObjectWrite", bucket, key, size, ...putOptions });
-    let committed = false;
     let written = 0;
     try {
       for await (const part of source instanceof Uint8Array ? single(source) : source) {
@@ -43,10 +42,11 @@ export class EmbeddedStreamOperations {
       signal?.throwIfAborted();
       if (written !== size) throw new RangeError("stream differs from declared size");
       const object = await this.invoke<BridgeObject>({ op: "commitObjectWrite", token }, undefined, { signal });
-      committed = true;
       return fromBridgeObject(object);
-    } finally {
-      if (!committed) await this.cleanup("abortObjectWrite", token);
+    } catch (error) {
+      try { await this.cleanup("abortObjectWrite", token); }
+      catch (cleanupError) { throw new AggregateError([error, cleanupError], "stream write and cleanup both failed", { cause: cleanupError }); }
+      throw error;
     }
   }
 
@@ -56,10 +56,16 @@ export class EmbeddedStreamOperations {
     const token = opened.token;
     const object = fromBridgeObject(opened.object);
     let closed = false;
-    const close = async () => {
-      if (closed) return;
+    let closePromise: Promise<void> | undefined;
+    const close = () => {
+      if (closePromise !== undefined) return closePromise;
       closed = true;
-      await this.cleanup("closeObjectRead", token);
+      closePromise = this.cleanup("closeObjectRead", token).catch((error: unknown) => {
+        closed = false;
+        closePromise = undefined;
+        throw error;
+      });
+      return closePromise;
     };
     if (options.signal?.aborted) {
       await close();
@@ -88,8 +94,10 @@ export class EmbeddedStreamOperations {
   }
 
   private async cleanup(op: string, token: string): Promise<void> {
-    try { await this.invoke<void>({ op, token }); } catch {
-      // Closing the runtime or terminating its worker also releases stream resources.
+    try { await this.invoke<void>({ op, token }); } catch (error) {
+      // A closed host/runtime has already released resources. Admission and
+      // persistence failures still need acknowledgement or a caller retry.
+      if (!(error instanceof EmbeddedStowError && error.code === "closed")) throw error;
     }
   }
 }

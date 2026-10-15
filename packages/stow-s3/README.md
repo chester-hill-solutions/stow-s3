@@ -4,8 +4,8 @@ TypeScript APIs for native S3 sessions, workspaces and embedded browser storage.
 
 ## Install
 
-The TypeScript package is not yet published to npm. v0.3.1 ships native binaries
-as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.1).
+The TypeScript package is not yet published to npm. v0.3.2 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.2).
 Build the TypeScript client from a source checkout:
 
 ```sh
@@ -19,7 +19,7 @@ export STOW_BIN="$PWD/bin/stow-s3"
 
 Use `STOW_BIN` for the native process APIs.
 Embedded WASM APIs use the built package assets.
-Registry publication is deferred. Do not rely on a registry install for v0.3.1.
+Registry publication is deferred. Do not rely on a registry install for v0.3.2.
 <!-- repo-only:start -->
 See the [release checkpoint](../../docs/release-verification-2026-10-14.md) for availability.
 <!-- repo-only:end -->

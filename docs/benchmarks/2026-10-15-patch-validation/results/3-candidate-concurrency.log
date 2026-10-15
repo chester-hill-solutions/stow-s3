@@ -1,0 +1,465 @@
+1 connections: run 1/31 connections: run 2/31 connections: run 3/3
+4 connections: run 1/34 connections: run 2/34 connections: run 3/3
+8 connections: run 1/38 connections: run 2/38 connections: run 3/3
+16 connections: run 1/316 connections: run 2/316 connections: run 3/3
+1 parallel sessions: run 1/31 parallel sessions: run 2/31 parallel sessions: run 3/3
+4 parallel sessions: run 1/34 parallel sessions: run 2/34 parallel sessions: run 3/3
+8 parallel sessions: run 1/38 parallel sessions: run 2/38 parallel sessions: run 3/3
+{
+  "environment": {
+    "measuredAt": "2026-10-15T16:14:21.139Z",
+    "node": "v25.9.0",
+    "os": "darwin arm64 23.5.0",
+    "cpu": "Apple M1 Pro",
+    "cpuCount": 8,
+    "totalMemoryMb": 16384,
+    "payloadBytes": 1048576,
+    "runsPerPoint": 3,
+    "notes": [
+      "Connection tests create one Stow server and N independent keep-alive HTTP agents, each limited to one socket.",
+      "Parallel-session tests create N independent Stow servers and upload one object to each concurrently.",
+      "RSS is sampled after the payloads are resident; it is loaded RSS, not a time-sampled peak.",
+      "Upload throughput uses two concurrent upload batches per connection point and excludes GET traffic."
+    ]
+  },
+  "connections": {
+    "1": {
+      "concurrentUploads": 1,
+      "samples": 3,
+      "readyMs": {
+        "samples": 3,
+        "min": 16.63,
+        "p50": 16.86,
+        "p95": 18.52,
+        "max": 18.52
+      },
+      "timeToFirstUploadMs": {
+        "samples": 3,
+        "min": 23.93,
+        "p50": 24.55,
+        "p95": 42.93,
+        "max": 42.93
+      },
+      "perUploadLatencyMs": {
+        "samples": 6,
+        "min": 4.47,
+        "p50": 5.16,
+        "p95": 6.87,
+        "max": 6.87
+      },
+      "perDownloadLatencyMs": {
+        "samples": 6,
+        "min": 1.79,
+        "p50": 2.25,
+        "p95": 3.52,
+        "max": 3.52
+      },
+      "uploadBatchMs": {
+        "samples": 6,
+        "min": 4.47,
+        "p50": 5.16,
+        "p95": 6.89,
+        "max": 6.89
+      },
+      "uploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 151.37,
+        "p50": 192.05,
+        "p95": 216.87,
+        "max": 216.87
+      },
+      "downloadBatchMs": {
+        "samples": 6,
+        "min": 1.8,
+        "p50": 2.26,
+        "p95": 3.55,
+        "max": 3.55
+      },
+      "downloadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 327.35,
+        "p50": 448.3,
+        "p95": 493.19,
+        "max": 493.19
+      },
+      "loadedServerRssMb": {
+        "samples": 3,
+        "min": 14.84,
+        "p50": 16.02,
+        "p95": 16.11,
+        "max": 16.11
+      },
+      "establishedConnections": {
+        "samples": 3,
+        "min": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    "4": {
+      "concurrentUploads": 4,
+      "samples": 3,
+      "readyMs": {
+        "samples": 3,
+        "min": 15.49,
+        "p50": 17.31,
+        "p95": 17.6,
+        "max": 17.6
+      },
+      "timeToFirstUploadMs": {
+        "samples": 3,
+        "min": 28.31,
+        "p50": 29.56,
+        "p95": 31.22,
+        "max": 31.22
+      },
+      "perUploadLatencyMs": {
+        "samples": 24,
+        "min": 6.38,
+        "p50": 8.73,
+        "p95": 10.24,
+        "max": 10.38
+      },
+      "perDownloadLatencyMs": {
+        "samples": 24,
+        "min": 1.91,
+        "p50": 3.83,
+        "p95": 4.93,
+        "max": 5.18
+      },
+      "uploadBatchMs": {
+        "samples": 6,
+        "min": 6.81,
+        "p50": 8.95,
+        "p95": 10.5,
+        "max": 10.5
+      },
+      "uploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 402.5,
+        "p50": 456.01,
+        "p95": 507.72,
+        "max": 507.72
+      },
+      "downloadBatchMs": {
+        "samples": 6,
+        "min": 3.95,
+        "p50": 4.59,
+        "p95": 5.18,
+        "max": 5.18
+      },
+      "downloadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 801.07,
+        "p50": 874.4,
+        "p95": 900.19,
+        "max": 900.19
+      },
+      "loadedServerRssMb": {
+        "samples": 3,
+        "min": 23.98,
+        "p50": 24.17,
+        "p95": 24.22,
+        "max": 24.22
+      },
+      "establishedConnections": {
+        "samples": 3,
+        "min": 4,
+        "p50": 4,
+        "p95": 4,
+        "max": 4
+      }
+    },
+    "8": {
+      "concurrentUploads": 8,
+      "samples": 3,
+      "readyMs": {
+        "samples": 3,
+        "min": 16.21,
+        "p50": 16.64,
+        "p95": 17.35,
+        "max": 17.35
+      },
+      "timeToFirstUploadMs": {
+        "samples": 3,
+        "min": 36.77,
+        "p50": 37.7,
+        "p95": 40.88,
+        "max": 40.88
+      },
+      "perUploadLatencyMs": {
+        "samples": 48,
+        "min": 10.86,
+        "p50": 16.27,
+        "p95": 23.41,
+        "max": 37.88
+      },
+      "perDownloadLatencyMs": {
+        "samples": 48,
+        "min": 3.58,
+        "p50": 7.06,
+        "p95": 23.71,
+        "max": 25.12
+      },
+      "uploadBatchMs": {
+        "samples": 6,
+        "min": 14.57,
+        "p50": 17.9,
+        "p95": 38.17,
+        "max": 38.17
+      },
+      "uploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 285.4,
+        "p50": 408.29,
+        "p95": 498.34,
+        "max": 498.34
+      },
+      "downloadBatchMs": {
+        "samples": 6,
+        "min": 8.32,
+        "p50": 8.43,
+        "p95": 32.14,
+        "max": 32.14
+      },
+      "downloadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 395.33,
+        "p50": 913.69,
+        "p95": 955.13,
+        "max": 955.13
+      },
+      "loadedServerRssMb": {
+        "samples": 3,
+        "min": 33.61,
+        "p50": 33.92,
+        "p95": 34,
+        "max": 34
+      },
+      "establishedConnections": {
+        "samples": 3,
+        "min": 8,
+        "p50": 8,
+        "p95": 8,
+        "max": 8
+      }
+    },
+    "16": {
+      "concurrentUploads": 16,
+      "samples": 3,
+      "readyMs": {
+        "samples": 3,
+        "min": 16.12,
+        "p50": 16.62,
+        "p95": 17.08,
+        "max": 17.08
+      },
+      "timeToFirstUploadMs": {
+        "samples": 3,
+        "min": 50.89,
+        "p50": 53.93,
+        "p95": 58.67,
+        "max": 58.67
+      },
+      "perUploadLatencyMs": {
+        "samples": 96,
+        "min": 16.27,
+        "p50": 30.01,
+        "p95": 35.84,
+        "max": 38.3
+      },
+      "perDownloadLatencyMs": {
+        "samples": 96,
+        "min": 7.11,
+        "p50": 13.44,
+        "p95": 17.05,
+        "max": 17.65
+      },
+      "uploadBatchMs": {
+        "samples": 6,
+        "min": 27.74,
+        "p50": 31.97,
+        "p95": 38.63,
+        "max": 38.63
+      },
+      "uploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 478.82,
+        "p50": 482.17,
+        "p95": 516.54,
+        "max": 516.54
+      },
+      "downloadBatchMs": {
+        "samples": 6,
+        "min": 15.26,
+        "p50": 16.81,
+        "p95": 17.93,
+        "max": 17.93
+      },
+      "downloadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 921.08,
+        "p50": 971.48,
+        "p95": 977.34,
+        "max": 977.34
+      },
+      "loadedServerRssMb": {
+        "samples": 3,
+        "min": 51.48,
+        "p50": 51.69,
+        "p95": 51.72,
+        "max": 51.72
+      },
+      "establishedConnections": {
+        "samples": 3,
+        "min": 16,
+        "p50": 16,
+        "p95": 16,
+        "max": 16
+      }
+    }
+  },
+  "parallelSessions": {
+    "1": {
+      "sessions": 1,
+      "samples": 3,
+      "timeToFirstUploadWallMs": {
+        "samples": 3,
+        "min": 22.25,
+        "p50": 23.06,
+        "p95": 24.49,
+        "max": 24.49
+      },
+      "concurrentUploadBatchMs": {
+        "samples": 3,
+        "min": 4.47,
+        "p50": 4.56,
+        "p95": 4.66,
+        "max": 4.66
+      },
+      "perUploadLatencyMs": {
+        "samples": 3,
+        "min": 4.46,
+        "p50": 4.55,
+        "p95": 4.59,
+        "max": 4.59
+      },
+      "perRoundtripLatencyMs": {
+        "samples": 3,
+        "min": 1.56,
+        "p50": 1.78,
+        "p95": 2.24,
+        "max": 2.24
+      },
+      "aggregateUploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 214.72,
+        "p50": 219.17,
+        "p95": 223.89,
+        "max": 223.89
+      },
+      "aggregateServerRssMb": {
+        "samples": 3,
+        "min": 13.84,
+        "p50": 13.91,
+        "p95": 14.31,
+        "max": 14.31
+      }
+    },
+    "4": {
+      "sessions": 4,
+      "samples": 3,
+      "timeToFirstUploadWallMs": {
+        "samples": 3,
+        "min": 31.18,
+        "p50": 31.56,
+        "p95": 36.65,
+        "max": 36.65
+      },
+      "concurrentUploadBatchMs": {
+        "samples": 3,
+        "min": 8.85,
+        "p50": 8.96,
+        "p95": 9.05,
+        "max": 9.05
+      },
+      "perUploadLatencyMs": {
+        "samples": 12,
+        "min": 8.12,
+        "p50": 8.58,
+        "p95": 8.96,
+        "max": 8.96
+      },
+      "perRoundtripLatencyMs": {
+        "samples": 12,
+        "min": 3.14,
+        "p50": 3.53,
+        "p95": 4.09,
+        "max": 4.09
+      },
+      "aggregateUploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 442.01,
+        "p50": 446.51,
+        "p95": 451.86,
+        "max": 451.86
+      },
+      "aggregateServerRssMb": {
+        "samples": 3,
+        "min": 55.63,
+        "p50": 55.98,
+        "p95": 56.08,
+        "max": 56.08
+      }
+    },
+    "8": {
+      "sessions": 8,
+      "samples": 3,
+      "timeToFirstUploadWallMs": {
+        "samples": 3,
+        "min": 48.06,
+        "p50": 50.13,
+        "p95": 113.84,
+        "max": 113.84
+      },
+      "concurrentUploadBatchMs": {
+        "samples": 3,
+        "min": 18.29,
+        "p50": 19,
+        "p95": 79.21,
+        "max": 79.21
+      },
+      "perUploadLatencyMs": {
+        "samples": 24,
+        "min": 16.08,
+        "p50": 17.71,
+        "p95": 78.69,
+        "max": 78.86
+      },
+      "perRoundtripLatencyMs": {
+        "samples": 24,
+        "min": 6.22,
+        "p50": 8.68,
+        "p95": 16.73,
+        "max": 17.08
+      },
+      "aggregateUploadThroughputMiBPerSecond": {
+        "samples": 3,
+        "min": 101,
+        "p50": 421.03,
+        "p95": 437.48,
+        "max": 437.48
+      },
+      "aggregateServerRssMb": {
+        "samples": 3,
+        "min": 110.72,
+        "p50": 111.27,
+        "p95": 111.86,
+        "max": 111.86
+      }
+    }
+  }
+}
+
+wrote <candidate-root>/docs/benchmarks/2026-10-15-patch-validation/results/3-candidate-concurrency.json

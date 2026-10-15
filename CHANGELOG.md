@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.2 — 2026-10-15
+
+- Release concurrent worker streams and content pins reliably; expose cleanup
+  failures and allow reader-close retries.
+- Invalidate stale multipart identities after host edits, including edits with
+  unchanged size and timestamps.
+- Apply preparation and checkpoint budgets before copying/hashing, including
+  Git tree reservations and fetched metadata admission before checkout.
+- Account multipart data against namespace capacity.
+
+Older workspace multipart entries are re-derived once and can receive a new
+ETag/version or reset object metadata. See the
+[release notes](docs/releases/v0.3.2.md) for compatibility and distribution details.
+
 ## 0.3.1 — 2026-10-14
 
 Adds reproducible performance measurement tools and carefully scoped benchmark
