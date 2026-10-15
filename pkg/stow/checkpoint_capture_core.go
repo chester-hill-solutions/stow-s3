@@ -64,7 +64,8 @@ func captureCheckpoint(ctx context.Context, target captureTarget, options Checkp
 		return CheckpointInfo{}, err
 	}
 	defer os.RemoveAll(tempDir)
-	if err := copyCheckpointFiles(ctx, source, tempDir, before); err != nil {
+	plan := checkpointCopyPlan{source: source, target: tempDir, registryDir: target.registryDir, parentID: options.ParentID}
+	if err := copyCheckpointFilesFromParent(ctx, before, plan); err != nil {
 		return CheckpointInfo{}, err
 	}
 	manifest, err := target.stageManifest(tempDir, before, excluded, options)
@@ -85,6 +86,17 @@ func captureCheckpoint(ctx context.Context, target captureTarget, options Checkp
 		ID: manifest.ID, WorkspaceID: target.workspaceID, ParentID: options.ParentID,
 		Created: manifest.Created, Files: int64(len(before)), Bytes: size, Excluded: manifest.Excluded,
 	}, nil
+}
+
+func loadCheckpointParent(registryDir, parentID string) (*CheckpointManifest, error) {
+	if parentID == "" {
+		return nil, nil
+	}
+	loaded, err := LoadCheckpoint(registryDir, parentID)
+	if err != nil {
+		return nil, err
+	}
+	return &loaded, nil
 }
 
 // checkRetention runs under the workspace capture gate.

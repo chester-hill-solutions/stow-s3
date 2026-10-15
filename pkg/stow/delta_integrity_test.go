@@ -60,7 +60,11 @@ func TestRegressionDeltaVerifiesDigest(t *testing.T) {
 	ws, base := live(t, registry, map[string]string{"edit.txt": "before"})
 	write(t, ws, "edit.txt", "after!")
 	target := checkpoint(t, ws)
-	err := os.WriteFile(filepath.Join(registry, "checkpoints", target, "files", "edit.txt"), []byte("forged"), 0600)
+	payload := filepath.Join(registry, "checkpoints", target, "files", "edit.txt")
+	if err := os.Chmod(payload, 0600); err != nil {
+		t.Fatal(err)
+	}
+	err := os.WriteFile(payload, []byte("forged"), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
