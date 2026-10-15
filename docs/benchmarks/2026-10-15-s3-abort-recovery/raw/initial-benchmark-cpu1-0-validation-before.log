@@ -1,0 +1,18 @@
+COMMAND ['/private/tmp/stow-s3-abort-recovery/before.test', '-test.run=^$', '-test.bench=^BenchmarkRuntimeMultipartValidation$', '-test.benchmem', '-test.benchtime=5000000x', '-test.count=3', '-test.cpu=1']
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkRuntimeMultipartValidation/success/metadata=1         	 5000000	        84.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/success/metadata=1         	 5000000	        77.96 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/success/metadata=1         	 5000000	        87.58 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/success/metadata=64        	 5000000	        74.50 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/success/metadata=64        	 5000000	       132.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/success/metadata=64        	 5000000	        76.20 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/wrong-key                  	 5000000	        74.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/wrong-key                  	 5000000	        70.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/wrong-key                  	 5000000	        70.52 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/unknown-id                 	 5000000	        77.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/unknown-id                 	 5000000	        82.03 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRuntimeMultipartValidation/unknown-id                 	 5000000	        92.87 ns/op	       0 B/op	       0 allocs/op
+PASS

@@ -1,0 +1,12 @@
+COMMAND ['/private/tmp/stow-s3-abort-recovery/before.test', '-test.run=^$', '-test.bench=^BenchmarkMultipartValidationRecoveryAccounting$', '-test.benchmem', '-test.benchtime=250000x', '-test.count=3', '-test.cpu=8']
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkMultipartValidationRecoveryAccounting/exists=false-8         	  250000	       523.5 ns/op	    1120 B/op	      10 allocs/op
+BenchmarkMultipartValidationRecoveryAccounting/exists=false-8         	  250000	       525.3 ns/op	    1120 B/op	      10 allocs/op
+BenchmarkMultipartValidationRecoveryAccounting/exists=false-8         	  250000	       520.2 ns/op	    1120 B/op	      10 allocs/op
+BenchmarkMultipartValidationRecoveryAccounting/exists=true-8          	  250000	       470.9 ns/op	     912 B/op	       9 allocs/op
+BenchmarkMultipartValidationRecoveryAccounting/exists=true-8          	  250000	       461.0 ns/op	     912 B/op	       9 allocs/op
+BenchmarkMultipartValidationRecoveryAccounting/exists=true-8          	  250000	       470.7 ns/op	     912 B/op	       9 allocs/op
+PASS

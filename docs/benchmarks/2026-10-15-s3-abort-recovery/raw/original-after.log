@@ -1,0 +1,46 @@
+=== RUN   TestReviewS3AbortRetryAccounting
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=false
+2026/10/15 19:11:28 DELETE /s3 500 139.209µs
+2026/10/15 19:11:28 DELETE /s3 404 12.042µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=true
+2026/10/15 19:11:28 DELETE /s3 500 10.5µs
+2026/10/15 19:11:28 DELETE /s3 404 8.458µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=false
+2026/10/15 19:11:28 DELETE /s3 500 6.166µs
+2026/10/15 19:11:28 DELETE /s3 404 7.583µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=true
+2026/10/15 19:11:28 DELETE /s3 500 8.708µs
+2026/10/15 19:11:28 DELETE /s3 404 6.25µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+--- PASS: TestReviewS3AbortRetryAccounting (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=false/wrapped=false (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=false/wrapped=true (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=true/wrapped=false (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=true/wrapped=true (0.00s)
+=== RUN   TestReviewS3AbortRetryAccounting
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=false
+2026/10/15 19:11:28 DELETE /s3 500 5.833µs
+2026/10/15 19:11:28 DELETE /s3 404 5.166µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=true
+2026/10/15 19:11:28 DELETE /s3 500 5.959µs
+2026/10/15 19:11:28 DELETE /s3 404 5.666µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=false
+2026/10/15 19:11:28 DELETE /s3 500 5.083µs
+2026/10/15 19:11:28 DELETE /s3 404 4.667µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=true
+2026/10/15 19:11:28 DELETE /s3 500 4.833µs
+2026/10/15 19:11:28 DELETE /s3 404 6.25µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+--- PASS: TestReviewS3AbortRetryAccounting (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=false/wrapped=false (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=false/wrapped=true (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=true/wrapped=false (0.00s)
+    --- PASS: TestReviewS3AbortRetryAccounting/exists=true/wrapped=true (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.281s

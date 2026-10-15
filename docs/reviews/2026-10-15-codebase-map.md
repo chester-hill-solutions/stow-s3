@@ -84,9 +84,19 @@ with [regression and cost evidence](../benchmarks/2026-10-15-abort-retry/README.
 Native raw/wrapped missing errors and public-store missing translation reach the
 existing cleanup while preserving the returned error. Concurrent retries clean
 up once; uncertainty/refusal and shared targets keep their proper reservations.
-The report also confirms a separate S3 variant: route validation rejects the
-retry before direct abort recovery can run. HTTP retry reconciliation remains
-unchanged and is the next finding.
+That report confirmed a separate S3 variant: route validation rejected the
+retry before direct abort recovery could run. HTTP retry reconciliation remained
+unchanged in that direct-abort correction.
+
+Follow-up: **S3 validation now reconciles confirmed upload absence**,
+with [regression and comparative cost evidence](../benchmarks/2026-10-15-s3-abort-recovery/README.md).
+All four multipart routes retain 404/NoSuchUpload while recovering stale quota.
+Cached-route matching, independent absence confirmation and target observation
+preserve wrong-route, authorization, uncertainty and shared-target guarantees.
+Successful validation stays allocation-free; error/recovery costs are measured.
+That report separately confirms ambiguous native completion lookup discarding
+retained accounting and preventing a repaired policy-scoped abort until explicit
+usage refresh. Completion reconciliation remains unchanged in this correction.
 
 ## Codebase map
 
