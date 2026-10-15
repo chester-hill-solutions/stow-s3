@@ -35,7 +35,11 @@ def categorize(text):
 # #region excerpt
 def classify_one(s3, key):
     """One unit of work: read an input key, write its result under results/."""
-    source = s3.get_object(Bucket=bucket, Key=f"inputs/{key}")["Body"].read()
+    response = s3.get_object(Bucket=bucket, Key=f"inputs/{key}")
+    try:
+        source = response["Body"].read()
+    finally:
+        response["Body"].close()
     category = categorize(source.decode())
     s3.put_object(
         Bucket=bucket,

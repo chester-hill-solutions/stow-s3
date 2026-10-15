@@ -30,6 +30,9 @@ with with_session() as session:
     except ClientError as error:
         print("stale update rejected:", error.response["Error"]["Code"], error.response["ResponseMetadata"]["HTTPStatusCode"])
 
-    retained = s3.get_object(Bucket=bucket, Key="config.json")["Body"].read()
-    print("retained:", retained.decode())
+    retained = s3.get_object(Bucket=bucket, Key="config.json")
+    try:
+        print("retained:", retained["Body"].read().decode())
+    finally:
+        retained["Body"].close()
     s3.close()

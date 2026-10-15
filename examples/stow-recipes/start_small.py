@@ -23,8 +23,11 @@ def publish_report(s3, bucket, report):
         Body=json.dumps(report).encode(),
         ContentType="application/json",
     )
-    body = s3.get_object(Bucket=bucket, Key="reports/latest.json")["Body"].read()
-    return json.loads(body)
+    response = s3.get_object(Bucket=bucket, Key="reports/latest.json")
+    try:
+        return json.loads(response["Body"].read())
+    finally:
+        response["Body"].close()
 
 
 report = {"service": "checkout", "ok": True, "duration_ms": 128}

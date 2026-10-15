@@ -31,6 +31,9 @@ print(f"wrote {bucket}/notes/design.md; server stopped")
 
 with with_session(data_dir=data_dir) as reopened:
     s3 = reopened.s3_client()
-    body = s3.get_object(Bucket=bucket, Key="notes/design.md")["Body"].read()
-    print("read back after reopen:", body.decode())
+    response = s3.get_object(Bucket=bucket, Key="notes/design.md")
+    try:
+        print("read back after reopen:", response["Body"].read().decode())
+    finally:
+        response["Body"].close()
     s3.close()
