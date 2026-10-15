@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { pages } from "../site/docs.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -21,7 +22,10 @@ export function linkProblems(markdown, source, directory = root) {
     let target;
     if (path.startsWith("/") && source.startsWith("site/")) {
       const asset = resolve(directory, "site", path.slice(1));
-      target = existsSync(asset) ? asset : resolve(directory, "site/.build", path.slice(1));
+      const page = pages.find((page) => page.route === path);
+      if (existsSync(asset)) target = asset;
+      else if (page) target = resolve(directory, page.source);
+      else target = resolve(directory, "site/.build", path.slice(1));
     } else if (isAbsolute(path)) {
       problems.push(`${source}: machine-specific link ${href}`);
       continue;

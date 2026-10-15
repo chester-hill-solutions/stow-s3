@@ -1,0 +1,59 @@
+✔ documentation links exclude examples, external destinations and same-page anchors (3.191917ms)
+✔ moving a guide breaks its old local link until the reference is repaired (1.962917ms)
+✔ machine-specific paths and references outside the repository fail (0.154542ms)
+✖ site documentation routes validate their sources without a site build (2.868083ms)
+✖ a stale built page cannot hide a missing route source (1.135708ms)
+✔ static website assets still resolve without a generated route (0.857709ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 113.983
+
+✖ failing tests:
+
+test at scripts/check-doc-links.test.mjs:27:1
+✖ site documentation routes validate their sources without a site build (2.868083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + [
+  +   'site/agent.md: missing local target /docs/browser-file-history/#sync'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (file:///Users/ladmin/.codex/worktrees/core-copy-quality/stow/scripts/check-doc-links.test.mjs:32:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'site/agent.md: missing local target /docs/browser-file-history/#sync' ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/check-doc-links.test.mjs:36:1
+✖ a stale built page cannot hide a missing route source (1.135708ms)
+  AssertionError [ERR_ASSERTION]: The "string" argument must be of type string. Received type undefined (undefined)
+      at TestContext.<anonymous> (file:///Users/ladmin/.codex/worktrees/core-copy-quality/stow/scripts/check-doc-links.test.mjs:41:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /missing local target/,
+    operator: 'match',
+    diff: 'simple'
+  }
