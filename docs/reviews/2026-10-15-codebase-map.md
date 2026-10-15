@@ -1,0 +1,190 @@
+# Stow codebase map and immediate correctness review
+
+Reviewed `codex/core-copy-quality` at `7120f18`, against freshly fetched
+`origin/main` `219d1dcfff9807b04660a40313b32127e5be2933` (2026-10-15).
+This is a structural map plus focused correctness review. Deep dynamic checks
+cover publication failures and public-store adaptation; browser persistence,
+security and lifecycle components are mapped rather than exhaustively qualified.
+
+**Findings: two high-priority issues and two medium-priority issues, all
+reproduced. No production implementation changes are included.**
+
+## Codebase map
+
+```mermaid
+flowchart TD
+    Clients["TypeScript / Python native clients"] --> CLI["Native CLI and readiness lifecycle"]
+    CLI --> HTTP["S3 HTTP adapter and SigV4"]
+    Facade["Workspace S3 facade"] --> HTTP
+    Public["Go API / workspace operations"] --> Embedded["Public API and custom-store adapters"]
+    Browser["WASM bridge / JavaScript hosts"] --> Embedded
+    HTTP --> Runtime["Runtime: authority, quotas, accounting, stream lifecycle"]
+    Embedded --> Runtime
+    Runtime --> Store["Store and optional capabilities"]
+    Runtime --> Runthrough["Optional run-through: local/cache/outbox"]
+    Runthrough --> Store
+    Runthrough --> Upstream["Upstream S3"]
+    Store --> Memory["Memory store"]
+    Store --> Filesystem["Managed filesystem records"]
+    Store --> Workspace["Editable workspace files and index"]
+    Store --> Host["Custom store / WASM host storage"]
+```
+
+The facade and native object API share one runtime. The S3 package itself accepts
+any internal store; CLI/facade composition supplies the runtime wrapper.
+
+| Area | Entry points | Responsibility and correctness boundary |
+|---|---|---|
+| Native executable | `cmd/stow-s3/main.go`, `store.go`, `runtime_store.go` | Select local/run-through backing, compose the runtime and HTTP service, report readiness, watch parent lifetime. |
+| Go API and workspace orchestration | `pkg/stow/runtime.go`, `workspace.go`, `workspace_facade.go`, `prepare*.go`, `checkpoint*.go`, `handoff*.go`, `resume.go` | Public API, workspace identity, preparation, checkpoints, transfer and retention. Host callers quiesce external file writers. |
+| Public adaptation | `internal/embedded/runtime.go`, `store.go`, `streams.go` | Translate public objects/errors and optional custom-store capabilities into internal contracts; shared by native Go and WASM. |
+| Runtime | `internal/runtime/instance.go`, `objects.go`, `staged-writes.go`, `streams.go`, `multipart.go`, `usage_*.go`, `state.go` | Admission, authority, quota/reservation ownership and accounting. Staging runs outside the publication lock; publication revalidates under it. |
+| S3 protocol | `internal/s3api/server.go`, `copy.go`, `handlers_*.go`; `internal/auth` | Request routing, XML, conditions, ranges, checksums, authentication and request limits. |
+| Store contracts and memory | `internal/storage/store.go`, `commit.go`, `staged.go`, `memory*.go` | Shared semantic contracts, optional capabilities, immutable owned payloads and memory multipart state. A committed error denotes a real mutation. |
+| Managed filesystem | `internal/storage/fs/fs*.go`, `record_*.go`, `staged_put.go`, `save_*.go`, `recovery_holds.go` | Exclusive directory ownership, atomic versioned records, streamed payloads, save receipts and recovery holds. Raw directory edits are outside the managed public profile. |
+| Editable workspace | `internal/storage/workspace/objects.go`, `multipart.go`, `manifest.go`, `resolve.go`, `rooted_reads.go`, `snapshot.go` | Ordinary files plus `.stow` identity/index and multipart data. File publication and index persistence are distinct steps. |
+| Upstream and recovery | `internal/runthrough/adapter.go`, `mutations_adapter.go`, `cache_*.go`, `outbox*.go`, `upstream.go` | Local-first mutations, separately bounded cache, explicit upstream-write consent, ordered durable intents and retry/reconciliation. Quota authority excludes separate cache/remote listings. |
+| Safety primitives | `internal/authority`, `policy`, `policystore`, `capacity`, `rooted`, `atomicfile` | Grants and policy revisions, namespace admission, confined filesystem access and durable publication primitives. |
+| WASM | `cmd/stow-wasm/main.go`, `operations.go`, `binary_js.go`, `host_store*.go` | Runtime handles, JSON/binary protocol and host callbacks. Its dependency closure uses embedded/runtime contracts without native server code. |
+| TypeScript native clients | `packages/stow-s3/src/session.ts`, `start.ts`, `ready*.ts`, `workspace*.ts` | Native process ownership, isolated session configuration, readiness parsing, CLI/workspace lifecycle and SDK integration. |
+| Browser persistence | `packages/stow-s3/src/embedded.ts`, `async-embedded.ts`, `worker-host.ts`, `content-*.ts`, `project*.ts`, `file-history*.ts`, `persistent-embedded.ts`, `indexeddb-*.ts` | WASM hosts, persistence ownership, content staging/GC, project revisions and file history. Snapshot replay and host-backed streaming are separate shipped profiles. |
+| Python client | `packages/stow-s3-py/src/stow_s3/{session,ready,workspace,workspace_serve,bin}.py` | Native process/workspace wrappers; S3 I/O is delegated to the caller's client. |
+| MCP | `internal/mcpstorage` and native CLI wiring | Tool-facing object/workspace operations and browser UI; relies on the underlying admission and authorization layers. |
+| Verification | `conformance`, backend contract tests, runtime/adapter tests, TS/Python tests, `scripts` | Four core conformance profiles, shared workspace/corpus cases, race checks, generated artifacts and quality gates. |
+
+Planned notification and expanded ACL/encryption ADRs are outside this shipped map.
+
+## Baseline reconciliation
+
+Completed work excluded from the findings:
+
+- Main already has date-only COPY condition forwarding and streamed filesystem
+  metadata-replacement COPY (PR 71).
+- This branch retains the run-through condition fix, restored backend COPY costs,
+  combined byte/object reopen quota fixes and clean-checkout documentation checker.
+- The separate `codex/patch-0.3.2` branch already contains stream cleanup,
+  workspace host-edit/snapshot identity fixes, multipart capacity publication and
+  bounded preparation/checkpoint work. Those are not presented as new findings.
+- The old lead that `policystore.Policy(env)` ignores its authority is stale:
+  current code calls `policy.New(set, env)`.
+
+Every implicated production file below is byte-identical between this branch
+and `origin/main`. Reproductions used this branch, with its repaired quota checks.
+The sibling patch branch does not repair these error-result paths; its workspace
+multipart change adds host-edit identity bookkeeping after the failing branch.
+
+## Immediate findings
+
+### F1 — High: workspace multipart completion panics after publishing content
+
+Location: [workspace completion](../../internal/storage/workspace/multipart.go#L234),
+then [runtime accounting](../../internal/runtime/usage_state.go#L58).
+
+Trigger: create/upload a real workspace multipart part, then obstruct
+`.stow/index.json` with a directory immediately before completion. This models a
+real index-persistence failure, using the same failure pattern as the existing
+workspace PUT test.
+
+`putLocked` publishes the destination and returns its metadata together with
+`ErrMutationCommitted`. `CompleteMultipartUpload` drops that metadata at line 236,
+returning `nil` with the committed error. Runtime accounting recognizes the
+committed marker, then dereferences `meta.Size` and panics.
+
+Observed twice normally and twice under `-race`: `target` contains `body`, but
+the call panics and committed usage remains `{Bytes:0 Objects:0}`. No data race
+is needed. Through a standard Go HTTP server, an uncaught handler panic aborts
+that request; this is not a claim that net/http crashes the whole server.
+
+First fix priority. Preserve the publication outcome and object identity while
+keeping multipart ETag, retained upload parts and quota reservations consistent.
+A nil guard alone does not establish correct accounting. Releasing reservations
+for upload files still retained on disk would introduce another quota defect.
+
+### F2 — High: custom-store fallback COPY panics on a committed error
+
+Location: [public-store COPY fallback](../../internal/embedded/store.go#L298),
+then [runtime accounting](../../internal/runtime/usage_state.go#L58).
+
+A supported caller-supplied base `Store` writes successfully and returns the
+object plus the exported committed-error marker for a later failure. Without
+optional `CopyStore`, the existing adapter expresses COPY through GET and PUT.
+The PUT result is discarded on any error, including a committed one, producing
+`nil` metadata for the runtime's committed accounting.
+
+Observed twice normally and twice under `-race`: the destination contains `body`,
+the call panics, and outer usage remains at the source only: four bytes/one
+object instead of eight bytes/two objects. The reproduction uses the public
+`Open(Options{Store: ...})` seam with a custom store that explicitly reports the
+committed outcome; it requires no external writer or unsupported race.
+
+Correct the result/error adaptation. Keep the existing base-store capability and
+COPY behavior; no generic snapshot emulation or new storage abstraction is needed.
+The neighboring buffered PUT and multipart adapters also discard metadata on
+errors and deserve contract coverage within their own supported operations.
+
+### F3 — Medium: COPY wrappers discard an already-committed object's identity
+
+Locations: [runtime adapters](../../internal/runtime/adapter.go#L142), including
+conditional COPY at line 155, and [public runtime](../../internal/embedded/runtime.go#L127).
+
+Using the same real workspace index obstruction, direct runtime COPY knows the
+published destination metadata and accounts for it. Its wrappers return nil or
+an empty object on every error, including `ErrMutationCommitted`.
+
+All three wrapper variants reproduce twice normally and twice under `-race`:
+the destination contains `body`, usage correctly reports eight bytes/two objects,
+and the committed marker survives, but returned key and ETag are empty. This is
+loss of the known committed identity, not demonstrated loss of stored bytes or
+incorrect accounting on these three paths. Callers lose the precise version
+result needed to assess the failed operation without another mutable HEAD.
+PUT already preserves this class of committed result.
+
+### F4 — Medium: a custom store's missing key stops batch deletion
+
+Location: [public-store batch adaptation](../../internal/embedded/store.go#L278).
+
+A custom store correctly returns public `ErrObjectNotFound` from `DeleteObject`.
+The batch wrapper checks it against the distinct internal sentinel before
+translation, treats it as a failure and stops the batch.
+
+Observed twice normally and twice under `-race`: deleting `[missing, existing]`
+returns an empty deleted list and an object-not-found error; `existing` remains.
+This violates the internal `Store.DeleteObjects` contract and the documented S3
+idempotent-delete behavior. The old remediation plan listed this as an open lead;
+this review confirms it rather than repeating completed work.
+
+Normalize the sentinel before deciding whether deletion failed. Preserve real
+partial failures and their confirmed-deleted prefix.
+
+## Evidence, tooling and review limits
+
+[Metadata](2026-10-15-codebase-map/metadata.json) records the baseline and tools.
+Go vet across the repository, TypeScript source/test type-checks, ESLint, Python
+syntax checks for all six source files, Go quality and file-size gates pass.
+The existing runtime, embedded, workspace and S3 tests pass after probes are
+removed: [ordinary suite output](2026-10-15-codebase-map/existing-tests.log).
+Fresh conformance and broad race results for the immediately preceding storage
+fix are in the [object-quota report](../benchmarks/2026-10-15-reopen-object-quota/README.md).
+
+Six probe cases were each run twice normally and twice under the race detector.
+They fail deterministically for the behaviors above; no data races were reported.
+Sources and actual output are retained:
+
+- [Native workspace/runtime probes](2026-10-15-codebase-map/runtime_probe.go.txt),
+  [normal output](2026-10-15-codebase-map/runtime-probe.log),
+  [race output](2026-10-15-codebase-map/runtime-probe-race.log).
+- [Custom-store probes](2026-10-15-codebase-map/embedded_probe.go.txt),
+  [normal output](2026-10-15-codebase-map/embedded-probe.log),
+  [race output](2026-10-15-codebase-map/embedded-probe-race.log).
+
+To reproduce, temporarily copy each `.go.txt` into its corresponding
+`internal/runtime` or `internal/embedded` directory as `map_review_probe_test.go`,
+then run `go test ./internal/runtime ./internal/embedded -run '^TestMap' -count=2`
+(or add `-race`). Remove those temporary files afterward: they deliberately fail
+until the fixes are implemented. They are stored as text so this report does not
+break the normal suite. Failure fixtures restore the obstructed index before
+closing the workspace.
+
+No implementation fix, new dependency, storage format or public API is included.
+No optimization or architecture rewrite is proposed. Fix F1 first, then F2, with
+separate regression-tested changes that preserve publication and recovery costs.
