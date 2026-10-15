@@ -98,6 +98,9 @@ func (a *StoreAdapter) PutObject(ctx context.Context, bucket, key string, body i
 	var err error
 	if owned, ok := body.(*storage.OwnedBody); ok {
 		object, err = a.instance.PutObjectStream(ctx, bucket, key, owned, StreamPutOptions{Size: int64(owned.Len()), PutOptions: options})
+	} else if sized, ok := body.(interface{ ReadSize() int64 }); ok {
+		// A reader that states its length streams; an unsized one keeps the buffered path.
+		object, err = a.instance.PutObjectStream(ctx, bucket, key, body, StreamPutOptions{Size: sized.ReadSize(), PutOptions: options})
 	} else {
 		var data []byte
 		data, err = storage.BytesOf(body)
