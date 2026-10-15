@@ -57,7 +57,7 @@ func (a *Adapter) finishDelete(ctx context.Context, bucket, key string, intent d
 		}
 		if errors.Is(localErr, storage.ErrObjectNotFound) {
 			if ready {
-				return storage.CommittedError(a.completeIntentLocked(ctx, prepared))
+				return storage.CommittedError(callerFacingPropagationError(a.completeIntentLocked(ctx, prepared)))
 			}
 			return nil
 		}
@@ -263,7 +263,7 @@ func (a *Adapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
-		if err := a.completeIntentLocked(ctx, prepared); err != nil {
+		if err := callerFacingPropagationError(a.completeIntentLocked(ctx, prepared)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
 	}
@@ -332,7 +332,7 @@ func (a *Adapter) CompleteMultipartUpload(ctx context.Context, uploadID string, 
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
-		if err := a.completeIntentLocked(ctx, prepared); err != nil {
+		if err := callerFacingPropagationError(a.completeIntentLocked(ctx, prepared)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
 	}

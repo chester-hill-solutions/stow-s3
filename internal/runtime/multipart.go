@@ -71,7 +71,7 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
-	data, err := io.ReadAll(body)
+	data, err := readBoundedPart(body, i.limits.MaxBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -262,4 +262,25 @@ func (i *Instance) checkMultipartOpen() error {
 		return ErrMultipartUnsupported
 	}
 	return i.checkOpen()
+}
+
+func readBoundedPart(body io.Reader, limit int64) ([]byte, error) {
+	if limit <= 0 {
+		return io.ReadAll(body)
+	}
+	data, err := io.ReadAll(io.LimitReader(body, limit))
+	if err != nil {
+		return nil, err
+	}
+	if int64(len(data)) == limit {
+		var extra [1]byte
+		n, err := body.Read(extra[:])
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
+		if n > 0 {
+			return nil, ErrQuotaExceeded
+		}
+	}
+	return data, nil
 }

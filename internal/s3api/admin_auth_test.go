@@ -171,6 +171,28 @@ func TestWrongOrEmptyTokenDoesNotAuthorize(t *testing.T) {
 	}
 }
 
+// A loopback RemoteAddr is not proof of a local caller: a reverse proxy on this
+// host makes every remote client look loopback. A forwarding header marks that
+// proxy, so its presence turns the loopback allowance off rather than on.
+func TestForwardingHeaderRemovesLoopbackAdminTrust(t *testing.T) {
+	for _, header := range []string{"X-Forwarded-For", "Forwarded", "X-Real-Ip", "X-Forwarded-Host"} {
+		t.Run(header, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "http://stow.example/_stow/status", nil)
+			req.RemoteAddr = "127.0.0.1:51000"
+			req.Header.Set(header, "203.0.113.7")
+			if got := adminStatusFor(t, req, s3api.Config{}); got != http.StatusNotFound {
+				t.Fatalf("loopback request with %s = %d, want 404", header, got)
+			}
+		})
+	}
+	// A direct loopback request with no forwarding header keeps the allowance.
+	plain := httptest.NewRequest(http.MethodGet, "http://stow.example/_stow/status", nil)
+	plain.RemoteAddr = "127.0.0.1:51000"
+	if got := adminStatusFor(t, plain, s3api.Config{}); got != http.StatusOK {
+		t.Fatalf("plain loopback status = %d, want 200", got)
+	}
+}
+
 // The pre-existing reflection bug: any website a developer visited could read
 // their local bucket, with the credentials the SDK had already put in the page.
 func TestCORSDoesNotReflectArbitraryOrigin(t *testing.T) {

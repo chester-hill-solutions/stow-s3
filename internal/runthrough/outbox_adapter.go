@@ -253,6 +253,8 @@ func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry Ou
 		retryAt := time.Time{}
 		if IsTransientRetry(err) {
 			retryAt = time.Now().Add(outboxRetryDelay(current.Attempts))
+		} else {
+			a.refreshUpstreamState(ctx, current.Bucket, current.Key)
 		}
 		markErr := claim.failure(err, retryAt)
 		if claim.provider == nil {
@@ -378,7 +380,10 @@ func (a *Adapter) orderingEntries() []OutboxEntry {
 }
 
 func (a *Adapter) retryEntry(ctx context.Context, entry OutboxEntry, now time.Time) (bool, error) {
-	if entry.Terminal || !outboxEntryDue(entry, now) {
+	if entry.Terminal {
+		return false, nil
+	}
+	if !outboxEntryDue(entry, now) {
 		return true, nil
 	}
 	key := outboxIdentity(entry.Bucket, entry.Key)
@@ -461,28 +466,4 @@ func findPendingEntry(entries []OutboxEntry, id string) (OutboxEntry, bool) {
 		}
 	}
 	return OutboxEntry{}, false
-}
-
-func isFirstPendingForKey(entries []OutboxEntry, target OutboxEntry) bool {
-	for _, entry := range entries {
-		if entry.Bucket != target.Bucket || entry.Key != target.Key || entry.ID == target.ID {
-			continue
-		}
-		if outboxEntryBefore(entry, target) {
-			return false
-		}
-	}
-	return true
-}
-
-func outboxEntryBefore(left, right OutboxEntry) bool {
-	leftSequence, leftOK := outboxSequenceOK(left.ID)
-	rightSequence, rightOK := outboxSequenceOK(right.ID)
-	if leftOK && rightOK && leftSequence != rightSequence {
-		return leftSequence < rightSequence
-	}
-	if left.CreatedAt.Equal(right.CreatedAt) {
-		return left.ID < right.ID
-	}
-	return left.CreatedAt.Before(right.CreatedAt)
 }

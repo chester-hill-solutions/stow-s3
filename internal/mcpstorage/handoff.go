@@ -19,8 +19,9 @@ type exportInput struct {
 }
 
 type adoptInput struct {
-	Bundle      string `json:"bundle"`
-	Destination string `json:"destination"`
+	Bundle       string `json:"bundle"`
+	Destination  string `json:"destination"`
+	ExpectSHA256 string `json:"expect_sha256,omitempty"`
 }
 
 func (a *adapter) configureRoots() error {
@@ -119,7 +120,7 @@ func (a *adapter) adopt(ctx context.Context, _ *mcp.CallToolRequest, input adopt
 	defer archive.Close()
 	ctx, cancel := context.WithTimeout(ctx, a.config.Timeout)
 	defer cancel()
-	ws, cp, err := stow.AdoptHandoffArchive(ctx, document, archive, stow.WorkspaceOptions{Dir: destination, RegistryDir: a.config.RegistryDir}, stow.CheckpointArchiveOptions{MaxBytes: a.config.MaxBytes, MaxFiles: a.config.MaxFiles})
+	ws, cp, err := stow.AdoptHandoffArchive(ctx, document, archive, stow.WorkspaceOptions{Dir: destination, RegistryDir: a.config.RegistryDir}, stow.CheckpointArchiveOptions{MaxBytes: a.config.MaxBytes, MaxFiles: a.config.MaxFiles, ExpectedSHA256: input.ExpectSHA256})
 	out := result{Outcome: "committed", OriginCheckpointID: cp.ID}
 	if err != nil {
 		response, value, finishErr := finish(out, err)

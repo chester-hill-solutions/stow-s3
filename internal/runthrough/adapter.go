@@ -1,7 +1,6 @@
 package runthrough
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -347,7 +346,7 @@ func (a *Adapter) PutObject(ctx context.Context, bucket, key string, body io.Rea
 		if _, err := a.commitPreparedIntent(prepared, objectVersion(meta)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
-		if err := a.completeIntentLocked(ctx, prepared); err != nil {
+		if err := callerFacingPropagationError(a.completeIntentLocked(ctx, prepared)); err != nil {
 			return meta, storage.CommittedError(err)
 		}
 	}
@@ -395,10 +394,6 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 		return nil, nil, err
 	}
 	defer rc.Close()
-	data, err := io.ReadAll(rc)
-	if err != nil {
-		return nil, nil, err
-	}
 	cacheStore := a.local
 	if a.separateCache {
 		cacheStore = a.cache
@@ -412,7 +407,7 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err := a.saveUpstreamState(bucket, key, UpstreamState{ETag: meta.ETag}); err != nil {
 		return nil, nil, err
 	}
-	cached, err := cacheStore.PutObject(ctx, bucket, key, bytes.NewReader(data), storage.PutOptions{
+	cached, err := cacheStore.PutObject(ctx, bucket, key, rc, storage.PutOptions{
 		ContentType:       meta.ContentType,
 		Metadata:          meta.Metadata,
 		ChecksumAlgorithm: meta.ChecksumAlgorithm,
@@ -430,7 +425,18 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if !needBody {
 		return nil, cached, nil
 	}
-	return io.NopCloser(bytes.NewReader(data)), cached, nil
+	reader, _, err := cacheStore.GetObject(ctx, bucket, key)
+	if err == nil {
+		return reader, cached, nil
+	}
+	if !errors.Is(err, storage.ErrObjectNotFound) {
+		return nil, nil, err
+	}
+	fresh, _, freshErr := a.upstream.GetObject(ctx, bucket, key)
+	if freshErr != nil {
+		return nil, nil, freshErr
+	}
+	return fresh, cached, nil
 }
 
 func (a *Adapter) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {

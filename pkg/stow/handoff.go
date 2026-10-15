@@ -11,9 +11,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/rooted"
 )
+
+var ErrHandoffDigestMismatch = errors.New("handoff archive does not match the published digest")
 
 type HandoffArchive struct {
 	Path   string `json:"path"`
@@ -65,7 +68,7 @@ func ExportHandoff(ctx context.Context, options HandoffExportOptions) (Handoff, 
 		return Handoff{}, err
 	}
 	document := Handoff{Version: 2, WorkspaceID: workspaceID, CheckpointID: checkpointID, Archive: bound}
-	document.Archive.Files = int64(len(manifest.Files))
+	document.Archive.Files = int64(len(checkpointPayloadFiles(manifest)))
 	data, err := json.MarshalIndent(document, "", "  ")
 	if err != nil {
 		return Handoff{}, err
@@ -282,8 +285,12 @@ func verifiedHandoffSource(ctx context.Context, source *os.File, bound *HandoffA
 	if err != nil {
 		return nil, err
 	}
-	if size != info.Size() || hex.EncodeToString(digest.Sum(nil)) != bound.SHA256 {
+	actual := hex.EncodeToString(digest.Sum(nil))
+	if size != info.Size() || actual != bound.SHA256 {
 		return nil, errors.New("handoff archive digest does not match reference")
+	}
+	if expected := strings.TrimSpace(options.ExpectedSHA256); expected != "" && !strings.EqualFold(actual, expected) {
+		return nil, fmt.Errorf("%w: the archive hashes to %s, the sender published %s", ErrHandoffDigestMismatch, actual, expected)
 	}
 	if _, err := copy.Seek(0, io.SeekStart); err != nil {
 		return nil, err

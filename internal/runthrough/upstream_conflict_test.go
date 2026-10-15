@@ -162,6 +162,48 @@ func TestAConflictIsTerminalAndNotRetriedForever(t *testing.T) {
 	}
 }
 
+// A terminal conflict is a dead letter, not a permanent block on its key. A
+// later write is a new decision by the caller, so it must propagate — or
+// conflict again, visibly — rather than return success while the terminal entry
+// keeps the key stuck. Before the fix the later write committed locally,
+// reported no error, and never reached upstream.
+func TestAWriteAfterATerminalConflictPropagates(t *testing.T) {
+	ctx := context.Background()
+	local := storage.NewMemoryStore()
+	if err := local.CreateBucket(ctx, "bucket"); err != nil {
+		t.Fatalf("create bucket: %v", err)
+	}
+	up := conflictUpstream(t, ctx, "original from upstream")
+
+	adapter := mirroringAdapter(t, local, up)
+	readThrough(t, adapter, ctx)
+	if _, err := up.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("written by the device")), storage.PutOptions{}); err != nil {
+		t.Fatalf("second writer: %v", err)
+	}
+
+	if _, err := adapter.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("agent v1")), storage.PutOptions{}); !errors.Is(err, runthrough.ErrUpstreamConflict) {
+		t.Fatalf("first put error = %v, want ErrUpstreamConflict", err)
+	}
+
+	// The conflict is a new decision point: re-observe upstream and propagate.
+	if _, err := adapter.PutObject(ctx, "bucket", "key", bytes.NewReader([]byte("agent v2")), storage.PutOptions{}); err != nil {
+		t.Fatalf("second put after a terminal conflict: %v", err)
+	}
+
+	rc, meta, err := up.GetObject(ctx, "bucket", "key")
+	if err != nil {
+		t.Fatalf("read upstream: %v", err)
+	}
+	defer rc.Close()
+	got := make([]byte, meta.Size)
+	if _, err := readFull(rc, got); err != nil {
+		t.Fatalf("read body: %v", err)
+	}
+	if string(got) != "agent v2" {
+		t.Fatalf("upstream body = %q, want the later write to have propagated", got)
+	}
+}
+
 func TestAFreshKeyPropagatesWhenUpstreamStillLacksIt(t *testing.T) {
 	ctx := context.Background()
 	local := storage.NewMemoryStore()

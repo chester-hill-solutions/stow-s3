@@ -254,10 +254,8 @@ func writeXML(w http.ResponseWriter, r *http.Request, status int, v any) {
 	w.Header().Set("x-amz-request-id", reqID)
 	setCORS(w, r)
 	w.WriteHeader(status)
+	_, _ = fmt.Fprintf(w, `<?xml version="1.0" encoding="UTF-8"?>`+"\n")
 	enc := xml.NewEncoder(w)
-	if _, ok := v.(struct{ XMLName xml.Name }); ok {
-		_, _ = fmt.Fprintf(w, `<?xml version="1.0" encoding="UTF-8"?>`+"\n")
-	}
 	_ = enc.Encode(v)
 }
 

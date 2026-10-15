@@ -28,7 +28,8 @@ func (n *Namespace) BeginOperation(ctx context.Context, operation Operation) err
 			}
 			return nil
 		}
-		if len(ns.Operations) >= ns.Options.MaxOperations || len(operation.Dependencies) > ns.Options.MaxDependencies {
+		pruneReleased(ns)
+		if activeOperationCount(ns) >= ns.Options.MaxOperations || len(operation.Dependencies) > ns.Options.MaxDependencies {
 			return ErrFull
 		}
 		if err := verifyDependencies(ns, operation.Dependencies); err != nil {
@@ -51,6 +52,24 @@ func (n *Namespace) BeginOperation(ctx context.Context, operation Operation) err
 		ns.Operations[operation.ID] = operationState{Operation: operation}
 		return n.host.write(state)
 	})
+}
+
+func activeOperationCount(ns *namespaceState) int {
+	count := 0
+	for _, operation := range ns.Operations {
+		if !operation.Released {
+			count++
+		}
+	}
+	return count
+}
+
+func pruneReleased(ns *namespaceState) {
+	for id, operation := range ns.Operations {
+		if operation.Released {
+			delete(ns.Operations, id)
+		}
+	}
 }
 
 func sameOperation(a, b Operation) bool {

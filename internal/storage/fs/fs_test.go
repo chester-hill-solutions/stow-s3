@@ -42,6 +42,7 @@ func TestFilesystemStoreObjectLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new store: %v", err)
 	}
+	t.Cleanup(func() { _ = store.Close() })
 
 	if err := store.CreateBucket(ctx, "photos"); err != nil {
 		t.Fatalf("create bucket: %v", err)
@@ -299,6 +300,7 @@ func TestFilesystemStoreOpaqueKeys(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new store: %v", err)
 	}
+	t.Cleanup(func() { _ = store.Close() })
 	if err := store.CreateBucket(ctx, "opaque"); err != nil {
 		t.Fatalf("create bucket: %v", err)
 	}
@@ -331,6 +333,7 @@ func TestFilesystemStoreMultipart(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new store: %v", err)
 	}
+	t.Cleanup(func() { _ = store.Close() })
 	_ = store.CreateBucket(ctx, "data")
 
 	upload, err := store.CreateMultipartUpload(ctx, "data", "big.bin", storage.MultipartOptions{})
@@ -377,6 +380,7 @@ func TestFilesystemStoreDeleteBucketNotEmpty(t *testing.T) {
 	ctx := context.Background()
 	dir := t.TempDir()
 	store, _ := fs.NewFilesystemStore(dir)
+	t.Cleanup(func() { _ = store.Close() })
 	_ = store.CreateBucket(ctx, "bucket")
 	_, _ = store.PutObject(ctx, "bucket", "k", strings.NewReader("x"), storage.PutOptions{})
 

@@ -3,6 +3,7 @@ package capacity
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -185,6 +186,31 @@ func TestOperationReserveIsChargedBeforePublication(t *testing.T) {
 	operation := Operation{ID: "op-1", Owner: "consumer", Meaning: "delivery", ReserveBytes: 1 << 20}
 	if err := namespace.BeginOperation(ctx, operation); !errors.Is(err, ErrFull) {
 		t.Fatalf("reserve past the recovery budget = %v", err)
+	}
+}
+
+// A released operation frees its slot and its reserve. Retaining them meant a
+// long-lived host filled its operation budget and recovery reserve with finished
+// work and then refused new operations, and enough of them made the state fail
+// validation outright.
+func TestReleasedOperationsFreeTheirSlotAndReserve(t *testing.T) {
+	ctx := context.Background()
+	namespace := budget(t)
+	// Well past the default 256-operation ceiling.
+	for i := 0; i < 600; i++ {
+		id := fmt.Sprintf("op-%d", i)
+		if err := namespace.BeginOperation(ctx, Operation{ID: id, Owner: "consumer", Meaning: "delivery"}); err != nil {
+			t.Fatalf("begin %s: %v", id, err)
+		}
+		if err := namespace.ReleaseOperation(ctx, id, "consumer"); err != nil {
+			t.Fatalf("release %s: %v", id, err)
+		}
+	}
+	if err := namespace.BeginOperation(ctx, Operation{ID: "final", Owner: "consumer", Meaning: "delivery"}); err != nil {
+		t.Fatalf("begin after many releases: %v", err)
+	}
+	if _, err := namespace.Snapshot(ctx); err != nil {
+		t.Fatalf("snapshot after many releases: %v", err)
 	}
 }
 

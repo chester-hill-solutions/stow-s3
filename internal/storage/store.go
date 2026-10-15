@@ -63,8 +63,10 @@ type MultipartStore interface {
 // mean the same thing: the copy is refused unless the source version being
 // copied is the one the caller asked for.
 type CopyOptions struct {
-	SourceIfMatch     string
-	SourceIfNoneMatch string
+	SourceIfMatch           string
+	SourceIfNoneMatch       string
+	SourceIfModifiedSince   string
+	SourceIfUnmodifiedSince string
 }
 
 // CopyRequest names a copy: which object, to where, under which conditions.

@@ -38,7 +38,7 @@ func (a *Adapter) CacheEvictions() uint64 {
 	return a.cacheEvictions.Load()
 }
 
-func (a *Adapter) touchCache(bucket, key string) {
+func (a *Adapter) touchCache(bucket, key string, size int64) {
 	if !a.separateCache {
 		return
 	}
@@ -47,6 +47,7 @@ func (a *Adapter) touchCache(bucket, key string) {
 	now := time.Now()
 	accessKey := cacheEntryKey(bucket, key)
 	entry := a.cacheEntries[accessKey]
+	entry.bucket, entry.key, entry.size = bucket, key, size
 	entry.accessedAt = now
 	if entry.expiresAt.IsZero() && a.cfg.Cache.TTL > 0 {
 		entry.expiresAt = now.Add(a.cfg.Cache.TTL)

@@ -108,11 +108,9 @@ func runPrewarm(dataDir, cacheDir, bucket string, keys []string, offline *offlin
 	} else if cacheDir != "" {
 		cfg.CacheDir = cacheDir
 	}
-	// The upstream client is built before any store is opened, so a run with no
-	// upstream configured fails without creating a cache directory. DetectMode
-	// would consult ambient credentials, which is exactly what this verb must not
-	// do: it runs on the way to cutting an agent off, and a stray AWS profile in
-	// the environment would turn a warm-up into reads against a real account.
+	if !cfg.Offline && (cfg.Upstream.Endpoint == "" || cfg.Upstream.AccessKey == "" || cfg.Upstream.SecretKey == "") {
+		return nil, errors.New("prewarm needs an upstream (set STOW_*, S3_*, or AWS_* env vars); pass --offline to read the cache without one")
+	}
 	upstream, err := runthrough.NewS3Client(cfg.Upstream)
 	if err != nil {
 		return nil, fmt.Errorf("prewarm needs an upstream: %w", err)

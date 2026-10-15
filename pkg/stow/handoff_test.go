@@ -2,12 +2,35 @@ package stow_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
 )
+
+// The digest inside handoff.json is only self-consistent: an attacker who
+// replaces the document and the archive together is accepted. A digest the
+// receiver carries out of band is checked against the bytes, so the replacement
+// is refused.
+func TestAdoptRefusesAnArchiveThatDoesNotMatchThePublishedDigest(t *testing.T) {
+	bundle, document := openedHandoffFixture(t)
+	_, _, err := stow.AdoptHandoff(context.Background(), filepath.Join(bundle, "handoff.json"),
+		stow.WorkspaceOptions{Dir: filepath.Join(t.TempDir(), "dest"), RegistryDir: t.TempDir()},
+		stow.CheckpointArchiveOptions{ExpectedSHA256: strings.Repeat("0", 64)})
+	if !errors.Is(err, stow.ErrHandoffDigestMismatch) {
+		t.Fatalf("mismatched expected digest = %v, want ErrHandoffDigestMismatch", err)
+	}
+	ws, _, err := stow.AdoptHandoff(context.Background(), filepath.Join(bundle, "handoff.json"),
+		stow.WorkspaceOptions{Dir: filepath.Join(t.TempDir(), "dest2"), RegistryDir: t.TempDir()},
+		stow.CheckpointArchiveOptions{ExpectedSHA256: document.Archive.SHA256})
+	if err != nil {
+		t.Fatalf("adopt with the published digest: %v", err)
+	}
+	ws.Close()
+}
 
 func TestHandoffBundleMovesWithoutEditing(t *testing.T) {
 	registry := t.TempDir()

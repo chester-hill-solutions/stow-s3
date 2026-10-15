@@ -100,6 +100,50 @@ func TestStoreMultiPartCompletionETagIsComposite(t *testing.T) {
 	})
 }
 
+// The ETag a completion returns is the ETag the object carries, not a value
+// minted for the reply. A later head or get must report the same one, or a
+// client that took the ETag from the completion and used it in a conditional
+// request would be refused by the very object it just created. The value is
+// read back rather than only compared to the parts because that is exactly the
+// path a client takes.
+func TestStoreCompletionETagIsReadableAfterwards(t *testing.T) {
+	withStores(t, func(t *testing.T, store storage.Store) {
+		ctx := context.Background()
+		if err := store.CreateBucket(ctx, "uploads"); err != nil {
+			t.Fatalf("create bucket: %v", err)
+		}
+		multi := requireMultipart(t, store)
+		upload, err := multi.CreateMultipartUpload(ctx, "uploads", "object.bin", storage.MultipartOptions{})
+		if err != nil {
+			t.Fatalf("create upload: %v", err)
+		}
+		first, err := multi.UploadPart(ctx, upload.UploadID, 1, bytes.NewReader(make([]byte, storage.MinPartSize)))
+		if err != nil {
+			t.Fatalf("upload first part: %v", err)
+		}
+		second, err := multi.UploadPart(ctx, upload.UploadID, 2, strings.NewReader("second"))
+		if err != nil {
+			t.Fatalf("upload second part: %v", err)
+		}
+		meta, err := multi.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*first, *second})
+		if err != nil {
+			t.Fatalf("complete: %v", err)
+		}
+		head, err := store.HeadObject(ctx, "uploads", "object.bin")
+		if err != nil {
+			t.Fatalf("head: %v", err)
+		}
+		if head.ETag != meta.ETag {
+			t.Fatalf("HeadObject ETag = %s, completion returned %s; the object must carry the ETag the completion reported", head.ETag, meta.ETag)
+		}
+		// A conditional write keyed on the completion ETag must be accepted,
+		// which is the reason the two values have to agree.
+		if _, err := store.PutObject(ctx, "uploads", "object.bin", strings.NewReader("rewritten"), storage.PutOptions{IfMatch: meta.ETag}); err != nil {
+			t.Fatalf("conditional put with the completion ETag failed: %v", err)
+		}
+	})
+}
+
 // An ETag is a function of the object's bytes, not of the path taken to store
 // them. The same body uploaded as one part and uploaded as a whole are the same
 // object, so they carry the same ETag. This is what makes an ETag portable

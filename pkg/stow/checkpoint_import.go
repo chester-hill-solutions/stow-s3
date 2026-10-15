@@ -139,8 +139,8 @@ func validateImportedCheckpoint(manifest CheckpointManifest, options CheckpointA
 	if err := validateArchiveSensitiveFiles(manifest, options.IncludeSensitiveFiles); err != nil {
 		return nil, 0, err
 	}
-	if int64(len(checkpointPayloadFiles(manifest))) > archiveFileLimit(options.MaxFiles) {
-		return nil, 0, fmt.Errorf("stow: checkpoint file count %d exceeds import limit %d", len(manifest.Files), archiveFileLimit(options.MaxFiles))
+	if payloadFiles := int64(len(checkpointPayloadFiles(manifest))); payloadFiles > archiveFileLimit(options.MaxFiles) {
+		return nil, 0, fmt.Errorf("stow: checkpoint file count %d exceeds import limit %d", payloadFiles, archiveFileLimit(options.MaxFiles))
 	}
 	bytes := checkpointManifestBytes(manifest)
 	if bytes > archiveByteLimit(options.MaxBytes) {

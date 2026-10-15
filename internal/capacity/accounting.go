@@ -81,16 +81,16 @@ func storeCharge(store *storeState, out *Snapshot) (int, error) {
 	return len(store.Resources), add(&out.RecoveryBytes, recovery)
 }
 
-// operationCharge charges each operation's reserve as recovery, so filling
 // the payload budget cannot leave no room to record its own release.
 func operationCharge(ns *namespaceState, out *Snapshot) error {
 	for _, operation := range ns.Operations {
+		if operation.Released {
+			continue
+		}
 		if err := add(&out.RecoveryBytes, operation.ReserveBytes); err != nil {
 			return err
 		}
-		if !operation.Released {
-			out.Operations++
-		}
+		out.Operations++
 	}
 	return nil
 }
@@ -169,7 +169,7 @@ func validateNamespace(id string, ns *namespaceState) error {
 	if ns == nil || id != ns.Options.ID || ns.Stores == nil || ns.Operations == nil {
 		return ErrUnknown
 	}
-	if len(ns.Operations) > ns.Options.MaxOperations {
+	if activeOperationCount(ns) > ns.Options.MaxOperations {
 		return ErrUnknown
 	}
 	for storeID, store := range ns.Stores {

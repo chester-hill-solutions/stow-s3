@@ -184,10 +184,17 @@ func (s *Store) IsOwned() bool { return s.manifest.Owned }
 // for. The bool is false when the key is absent, which is the same answer
 // GetObject gives, reached without reading a byte.
 func (s *Store) Path(bucket, key string) (string, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	absPath, err := s.locate(bucket, key)
 	if err != nil {
 		return "", false
 	}
+	file, err := s.openRead(absPath, nil)
+	if err != nil {
+		return "", false
+	}
+	file.Close()
 	return absPath, true
 }
 

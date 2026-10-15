@@ -23,8 +23,7 @@ const legacyMetaSuffix = ".stowmeta"
 // Each object is stored as one versioned record containing its bytes and metadata.
 type FilesystemStore struct {
 	dataDir        string
-	lockPath       string
-	lockID         string
+	lock           *storeLock
 	mu             sync.RWMutex
 	closeOnce      sync.Once
 	closed         bool
@@ -65,21 +64,21 @@ func newFilesystemStore(dataDir string, namespace *capacity.Namespace) (*Filesys
 	}
 
 	lockPath := filepath.Join(dataDir, storeLockName)
-	lockID, err := acquireStoreLock(lockPath)
+	lock, err := acquireStoreLock(lockPath)
 	if err != nil {
 		return nil, err
 	}
 	if err := removeStaleTemps(dataDir); err != nil {
-		_ = releaseStoreLock(lockPath, lockID)
+		_ = lock.release()
 		return nil, fmt.Errorf("clean staging files: %w", err)
 	}
 	warnLegacyLayout(dataDir)
 	// Recorded last: the marker asserts stow has finished initializing the
 	// directory, so a client that sees it may treat the directory as resettable.
-	store := &FilesystemStore{dataDir: dataDir, lockPath: lockPath, lockID: lockID, fencedDirs: make(map[string]struct{})}
+	store := &FilesystemStore{dataDir: dataDir, lock: lock, fencedDirs: make(map[string]struct{})}
 	if store.SupportsGuardedWrites() {
 		if err := store.initializeSaves(); err != nil {
-			_ = releaseStoreLock(lockPath, lockID)
+			_ = lock.release()
 			return nil, err
 		}
 	}
@@ -449,7 +448,7 @@ func (s *FilesystemStore) Close() error {
 		s.mu.Lock()
 		defer s.mu.Unlock()
 		s.closed = true
-		err = releaseStoreLock(s.lockPath, s.lockID)
+		err = s.lock.release()
 	})
 	return err
 }

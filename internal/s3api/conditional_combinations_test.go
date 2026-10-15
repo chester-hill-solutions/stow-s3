@@ -76,3 +76,54 @@ func TestCopyRefusesUnsupportedDestinationConditions(t *testing.T) {
 		})
 	}
 }
+
+// A copy-source date condition is evaluated unless its paired ETag condition
+// makes it moot: If-Match makes If-Unmodified-Since moot, and If-None-Match
+// makes If-Modified-Since moot, but the cross pairings leave the date in force.
+// The conditional store path used to drop every date header as soon as any ETag
+// condition was present, so those cross pairings were silently ignored and a
+// copy the caller meant to forbid went through.
+func TestCopySourceDateConditionsSurviveETagConditions(t *testing.T) {
+	srv, store := regressionServer(t)
+	ctx := context.Background()
+	source, err := store.PutObject(ctx, "bucket", "source", strings.NewReader("source"), storage.PutOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.PutObject(ctx, "bucket", "destination", strings.NewReader("destination"), storage.PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	before := source.LastModified.Add(-time.Hour).Format(http.TimeFormat)
+	after := source.LastModified.Add(time.Hour).Format(http.TimeFormat)
+	for _, tc := range []struct {
+		name    string
+		headers map[string]string
+		status  int
+	}{
+		{"none-match leaves unmodified-since in force", map[string]string{
+			"X-Amz-Copy-Source-If-None-Match":       `"different"`,
+			"X-Amz-Copy-Source-If-Unmodified-Since": before,
+		}, http.StatusPreconditionFailed},
+		{"match leaves modified-since in force", map[string]string{
+			"X-Amz-Copy-Source-If-Match":          source.ETag,
+			"X-Amz-Copy-Source-If-Modified-Since": after,
+		}, http.StatusPreconditionFailed},
+		{"match makes unmodified-since moot", map[string]string{
+			"X-Amz-Copy-Source-If-Match":            source.ETag,
+			"X-Amz-Copy-Source-If-Unmodified-Since": before,
+		}, http.StatusOK},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest("PUT", "/bucket/destination", nil)
+			req.Header.Set("X-Amz-Copy-Source", "/bucket/source")
+			for k, v := range tc.headers {
+				req.Header.Set(k, v)
+			}
+			res := httptest.NewRecorder()
+			srv.ServeHTTP(res, req)
+			if res.Code != tc.status {
+				t.Fatalf("status=%d want=%d body=%s", res.Code, tc.status, res.Body.String())
+			}
+		})
+	}
+}
