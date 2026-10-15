@@ -1,0 +1,28 @@
+{
+  "baseline": "524ca63",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "branch": "codex/core-copy-quality",
+  "commands": {
+    "full_go": "GOTOOLCHAIN=go1.25.6 go test ./...",
+    "race": "GOTOOLCHAIN=go1.25.6 go test -race ./internal/runtime ./internal/storage/... ./internal/s3api ./internal/runthrough ./internal/embedded ./pkg/stow",
+    "conformance": "make test-conformance",
+    "regression": "GOTOOLCHAIN=go1.25.6 go test ./internal/embedded -run ^TestCustomStoreBatchDelete -count=2 -v",
+    "regression_race": "same selection with -race -count=5",
+    "intermediate_benchmark": "standalone binaries: -test.run=^$ -test.bench=^BenchmarkCustomStoreBatchDelete$ -test.benchmem -test.benchtime=300ms -test.count=3",
+    "final_benchmark": "same benchmark with -test.benchtime=1s",
+    "vet": "GOTOOLCHAIN=go1.25.6 go vet ./internal/embedded ./internal/runtime ./internal/s3api",
+    "generated": "node scripts/check-generated.mjs",
+    "wasm": "node --test wasm/runtime.test.mjs",
+    "package": "node --import tsx --test test/embedded.test.ts test/node-wasm-host.test.ts test/wasm-assets.test.ts test/host-backed-streams.test.ts"
+  },
+  "notes": [
+    "Baseline regression ran before production modifications with valid Content-Length/Content-Type headers.",
+    "Benchmarks isolate adapter overhead, using a fixed-result store and no storage I/O.",
+    "Baseline, intermediate and final binaries used the identical benchmark harness.",
+    "No agent builds or tests ran concurrently with serial benchmark measurements.",
+    "Intermediate eager-translation implementation was rejected for its measured overhead; no production code from it remains.",
+    "Temporary probes and dependency symlink removed after use.",
+    "Log trailing whitespace normalized for repository checks.",
+    "Conformance verbose output summarized by backend invocation and final result."
+  ]
+}

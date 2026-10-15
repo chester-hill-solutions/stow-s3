@@ -17,8 +17,13 @@ F2–F4 were still open at that point. The original F1 probe passes after that c
 Follow-up: **F2 is corrected** in the separate
 [custom-store COPY change](../benchmarks/2026-10-15-custom-copy-publication/README.md).
 It also corrects F3's public-runtime variant, needed to return the committed COPY
-result to its caller. F3's two internal adapter variants and F4 remain open.
-The original F2 and F3 public probes pass after this correction; F4 still fails.
+result to its caller. F3's two internal adapter variants and F4 were still open
+after that correction; the original F4 probe still failed at that point.
+
+Follow-up: **F4 is corrected** in the separate
+[custom-store batch deletion change](../benchmarks/2026-10-15-batch-delete-missing/README.md).
+The original F4 probe now passes. F3's two internal runtime COPY adapters remain
+open; its public-runtime variant is already corrected.
 
 ## Codebase map
 
