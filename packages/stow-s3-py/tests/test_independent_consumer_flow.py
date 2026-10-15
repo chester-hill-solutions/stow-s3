@@ -12,6 +12,7 @@ import urllib.request
 
 import pytest
 from botocore.exceptions import ClientError
+from botocore.config import Config
 from stow_s3 import with_session
 
 
@@ -49,7 +50,9 @@ def test_real_sdk_application_pipeline(tmp_path, monkeypatch):
         {"amount_cents": 3299}, {"amount_cents": 1099}, {"amount_cents": 502}
     ]}
     with with_session(data_dir=saved, max_bytes=8 * 1024 * 1024, max_objects=30) as session:
-        s3 = session.s3_client()
+        # Ordinary SDK requests work without this, but botocore may choose
+        # SigV2 for presigned S3 URLs unless explicitly configured.
+        s3 = session.s3_client(config=Config(signature_version="s3v4"))
         bucket = session.new_bucket_name()
         s3.create_bucket(Bucket=bucket)
         s3.put_object(Bucket=bucket, Key="in/report.json",
@@ -74,6 +77,7 @@ def test_real_sdk_application_pipeline(tmp_path, monkeypatch):
             "get_object", Params={"Bucket": bucket, "Key": copied},
             ExpiresIn=45,
         )
+        assert "X-Amz-Algorithm=AWS4-HMAC-SHA256" in url
         with urllib.request.urlopen(url, timeout=10) as response:
             assert response.read() == output
 
