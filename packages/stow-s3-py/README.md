@@ -41,6 +41,11 @@ def test_my_handler():
 When the block ends, the server stops and its data directory is removed. If your
 test fails, cleanup happens anyway.
 
+Pass `data_dir` to keep the objects somewhere you own. A supplied directory
+selects the filesystem backend, so what one session writes a later session
+opened on the same directory reads; the session does not remove it. With no
+`data_dir`, a session is memory-backed and disposable.
+
 `with_session` takes limits that the server then enforces on every request, so a
 test that accidentally writes too much fails instead of consuming the disk:
 

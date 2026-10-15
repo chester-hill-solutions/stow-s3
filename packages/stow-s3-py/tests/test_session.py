@@ -314,6 +314,38 @@ def test_close_does_remove_a_session_created_data_dir() -> None:
 
 
 @needs_binary
+def test_a_default_session_is_memory_backed() -> None:
+    """The disposable default keeps its bytes in memory, matching TypeScript."""
+    with with_session() as session:
+        assert session.backend == "memory"
+
+
+@needs_binary
+def test_an_explicit_data_dir_persists_objects_across_reopen(tmp_path: Path) -> None:
+    """A directory the caller names is the caller's storage, not scratch.
+
+    Selecting the memory backend for every session left an explicit data_dir
+    holding nothing: a reopened session found none of what the previous one
+    wrote. A supplied directory selects the filesystem backend, so the bytes
+    written before close are the bytes read after.
+    """
+    directory = tmp_path / "data"
+    with with_session(data_dir=directory) as session:
+        assert session.backend == "filesystem"
+        s3 = session.s3_client()
+        bucket = session.new_bucket_name()
+        s3.create_bucket(Bucket=bucket)
+        s3.put_object(Bucket=bucket, Key="note.txt", Body=b"kept")
+        s3.close()
+
+    with with_session(data_dir=directory) as reopened:
+        s3 = reopened.s3_client()
+        body = s3.get_object(Bucket=bucket, Key="note.txt")["Body"].read()
+        s3.close()
+    assert body == b"kept"
+
+
+@needs_binary
 def test_configurable_request_body_limit():
     with with_session(max_request_bytes=1024, max_concurrent_requests=3) as session:
         assert session.capabilities.max_request_bytes == 1024

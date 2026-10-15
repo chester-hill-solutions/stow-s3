@@ -53,13 +53,20 @@ export interface EphemeralStowOptions {
     readonly bucket?: string;
     readonly timeoutMs?: number;
     readonly signal?: AbortSignal;
-    /** Keep session data in this directory instead of a temporary one. */
+    /**
+     * Keep session data in this directory instead of a temporary one. Naming a
+     * directory selects the filesystem backend, so objects written through the
+     * session persist there and survive close; a session with no dataDir is
+     * memory-backed and disposable.
+     */
     readonly dataDir?: string;
 }
 /**
- * Acquire a disposable session: a local, memory-backed, loopback S3 endpoint
- * with a generated bucket and generated credentials, isolated from ambient
- * STOW_*, S3_*, and AWS_* configuration.
+ * Acquire a session: a local, loopback S3 endpoint with a generated bucket and
+ * generated credentials, isolated from ambient STOW_*, S3_*, and AWS_*
+ * configuration. With no dataDir it is memory-backed and disposable. With a
+ * dataDir the caller supplies the storage, so the session uses the filesystem
+ * backend and objects written through it persist in that directory.
  */
 export declare function openStow(options?: EphemeralStowOptions): Promise<StowSession>;
 /**

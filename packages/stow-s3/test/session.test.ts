@@ -112,6 +112,33 @@ describe("stow session", session, () => {
     });
   });
 
+  it("persists through a caller-supplied data directory", async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), "stow-session-dir-"));
+    try {
+      const first = await openStow({ dataDir });
+      const bucket = first.bucket;
+      try {
+        assert.equal(first.capabilities().backend, "filesystem");
+        await first.s3.send(
+          new PutObjectCommand({ Bucket: bucket, Key: "note.txt", Body: "kept" }),
+        );
+      } finally {
+        await first.close();
+      }
+      const second = await openStow({ dataDir });
+      try {
+        const stored = await second.s3.send(
+          new GetObjectCommand({ Bucket: bucket, Key: "note.txt" }),
+        );
+        assert.equal(await stored.Body?.transformToString(), "kept");
+      } finally {
+        await second.close();
+      }
+    } finally {
+      await rm(dataDir, { recursive: true, force: true });
+    }
+  });
+
   it("enforces the session byte quota", async () => {
     await withStow(
       async (env) => {
