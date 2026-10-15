@@ -22,8 +22,14 @@ after that correction; the original F4 probe still failed at that point.
 
 Follow-up: **F4 is corrected** in the separate
 [custom-store batch deletion change](../benchmarks/2026-10-15-batch-delete-missing/README.md).
-The original F4 probe now passes. F3's two internal runtime COPY adapters remain
-open; its public-runtime variant is already corrected.
+The original F4 probe passes after that correction. F3's two internal runtime
+COPY adapters were still open at that point.
+
+Follow-up: **F3's remaining internal COPY adapters are corrected** in the separate
+[COPY adapter change](../benchmarks/2026-10-15-copy-adapter-publication/README.md).
+All six original probes now pass twice normally and twice under the race detector.
+F1–F4 are corrected locally. The same report confirms the next separate finding:
+known committed identity is still lost by the buffered custom-store PUT adapter.
 
 ## Codebase map
 

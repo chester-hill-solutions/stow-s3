@@ -141,10 +141,10 @@ func (a *StoreAdapter) DeleteObjects(ctx context.Context, bucket string, keys []
 
 func (a *StoreAdapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (*storage.ObjectMeta, error) {
 	object, err := a.instance.CopyObject(ctx, srcBucket, srcKey, dstBucket, dstKey)
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return nil, err
 	}
-	return objectMeta(&object), nil
+	return objectMeta(&object), err
 }
 
 // CopyObjectCond is the conditional form, and it is here rather than only on the
@@ -154,10 +154,10 @@ func (a *StoreAdapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBuc
 // the capability exists to close.
 func (a *StoreAdapter) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	object, err := a.instance.CopyObjectCond(ctx, req)
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return nil, err
 	}
-	return objectMeta(&object), nil
+	return objectMeta(&object), err
 }
 
 func (a *StoreAdapter) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
