@@ -66,10 +66,17 @@ accounting remained unchanged in that initiation correction.
 Follow-up: **committed abort now releases byte, object and session reservations**,
 with [regression and cost evidence](../benchmarks/2026-10-15-abort-publication/README.md).
 The original capacity-reuse probe passes. Ordinary refusals keep reservations;
-shared targets retain the surviving uploads' capacity. The next confirmed S3 issue
-is separate: custom stores return 500/InternalError for missing upload IDs rather
-than the existing 404/NoSuchUpload contract. Eight route/error-wrapper combinations
-reproduce; their validation implementation remains unchanged in this abort fix.
+shared targets retain the surviving uploads' capacity. That report confirmed the
+separate S3 issue: custom stores returned 500/InternalError for missing upload IDs
+rather than the existing 404/NoSuchUpload contract. Eight route/error-wrapper
+combinations reproduced; validation remained unchanged in that abort correction.
+
+Follow-up: **custom-store upload validation now preserves 404/NoSuchUpload**,
+with [regression and cost evidence](../benchmarks/2026-10-15-multipart-validation/README.md).
+All eight missing-route cases pass; unknown and committed errors retain their
+identity. Successful validation remains allocation-free, including large metadata.
+That report separately reproduces stale quota reservations after an uncertain
+abort is retried and backend absence is confirmed. That recovery path is unchanged.
 
 ## Codebase map
 

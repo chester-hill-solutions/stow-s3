@@ -387,6 +387,9 @@ func (a multipartAdapter) ListParts(ctx context.Context, uploadID string) ([]sto
 func (a multipartAdapter) ValidateMultipartUpload(ctx context.Context, uploadID, bucket, key string) error {
 	upload, err := a.multi.GetMultipartUpload(ctx, uploadID)
 	if err != nil {
+		if errors.Is(err, ErrObjectNotFound) && !errors.Is(err, ErrMutationCommitted) {
+			return storage.ErrUploadNotFound
+		}
 		return err
 	}
 	if upload.Bucket != bucket || upload.Key != key {
