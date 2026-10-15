@@ -70,10 +70,9 @@ func (s *Store) readFile(path string, expected os.FileInfo) ([]byte, error) {
 	return data, nil
 }
 
-func deriveReadFile(file *os.File, info os.FileInfo) (ManifestEntry, error) {
-	defer file.Close()
+func deriveFileMetadata(input io.Reader, info os.FileInfo) (ManifestEntry, error) {
 	hash := md5.New()
-	reader := io.TeeReader(io.LimitReader(file, info.Size()+1), hash)
+	reader := io.TeeReader(io.LimitReader(input, info.Size()+1), hash)
 	head := make([]byte, 512)
 	n, err := io.ReadFull(reader, head)
 	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {

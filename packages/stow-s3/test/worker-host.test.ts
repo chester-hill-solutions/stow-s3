@@ -272,7 +272,7 @@ test("failed stream cleanup remains visible and can be retried", async () => {
   await runtime.close();
 });
 
-test("queued cleanup is bounded, skips cancelled calls, and closes pending callers", async () => {
+function cleanupQueue(afterFirst: () => Promise<EmbeddedBinaryResponse>) {
   const [client, server] = pair();
   let finish: (value: EmbeddedBinaryResponse) => void = () => undefined;
   const gate = new Promise<EmbeddedBinaryResponse>((resolve) => { finish = resolve; });
@@ -280,11 +280,16 @@ test("queued cleanup is bounded, skips cancelled calls, and closes pending calle
   const stop = serveEmbeddedWorker(server, Promise.resolve({
     callBinary: async (metadata: string) => {
       calls.push(metadata);
-      return calls.length === 1 ? gate : new Promise<EmbeddedBinaryResponse>(() => undefined);
+      return calls.length === 1 ? gate : afterFirst();
     },
   }));
   const host = new WorkerEmbeddedHost(client);
   const metadata = JSON.stringify({ op: "closeObjectRead", token: "read" });
+  return { host, metadata, calls, finish, stop };
+}
+
+test("queued cleanup is bounded, skips cancelled calls, and closes pending callers", async () => {
+  const { host, metadata, calls, finish, stop } = cleanupQueue(() => new Promise<EmbeddedBinaryResponse>(() => undefined));
   try {
     const first = host.callBinary(metadata);
     const controller = new AbortController();
@@ -303,6 +308,34 @@ test("queued cleanup is bounded, skips cancelled calls, and closes pending calle
     assert.equal(calls.includes(cancelledMetadata), false);
     assert.ok(calls.length <= 2);
   } finally {
+    host.close();
+    stop();
+  }
+});
+
+test("cancelling undispatched cleanup immediately frees every reserved slot", async () => {
+  const { host, metadata, calls, finish, stop } = cleanupQueue(async () => response(null));
+  try {
+    const first = host.callBinary(metadata);
+    await delay(0);
+    const controllers = Array.from({ length: 31 }, () => new AbortController());
+    const cancelled = controllers.map((controller) => assert.rejects(
+      host.callBinary(JSON.stringify({ op: "closeObjectRead", token: "cancelled" }), undefined, { signal: controller.signal }),
+      hasCode("cancelled"),
+    ));
+    await assert.rejects(host.callBinary(metadata), hasCode("backpressure"));
+    controllers.forEach((controller) => controller.abort());
+    await Promise.all(cancelled);
+    const replacements = assert.doesNotReject(Promise.all(Array.from({ length: 31 }, () => host.callBinary(metadata))));
+    await assert.rejects(host.callBinary(metadata), hasCode("backpressure"));
+    assert.equal(calls.length, 1);
+    finish(response(null));
+    await first;
+    await replacements;
+    assert.equal(calls.length, 32);
+    assert.equal(calls.every((call) => call === metadata), true);
+  } finally {
+    finish(response(null));
     host.close();
     stop();
   }

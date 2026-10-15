@@ -218,8 +218,7 @@ func (i *Index) removeEntry(bucket, key string) {
 // stale reports whether a recorded entry no longer describes the file on disk,
 // which is what an agent overwriting a file behind stow's back looks like.
 //
-// Size and modification time are compared rather than the ETag because checking
-// the ETag would mean reading every file on every head.
+// Byte identity is checked separately by reconcileEntry.
 func (e ManifestEntry) stale(size int64, modified time.Time) bool {
 	if e.Size != size {
 		return true

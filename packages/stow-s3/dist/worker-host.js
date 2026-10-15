@@ -8,11 +8,6 @@ export class WorkerEmbeddedHost {
     endpoint;
     pending = new Map();
     nextId = 1;
-    pendingBytes = 0;
-    controls = 0;
-    controlBytes = 0;
-    activeControl;
-    controlQueue = [];
     closed = false;
     maxInFlight;
     maxInFlightBytes;
@@ -31,37 +26,15 @@ export class WorkerEmbeddedHost {
             return Promise.reject(abortError());
         const bytes = new TextEncoder().encode(metadata).byteLength + (data?.byteLength ?? 0);
         const control = isWorkerControl(metadata, data);
-        if (control ? this.controls >= MAX_PENDING_CONTROLS :
-            this.pending.size - this.controls >= this.maxInFlight || this.pendingBytes - this.controlBytes + bytes > this.maxInFlightBytes) {
+        const admitted = [...this.pending.values()].filter((pending) => pending.control === control);
+        if (admitted.length >= (control ? MAX_PENDING_CONTROLS : this.maxInFlight) ||
+            !control && admitted.reduce((total, pending) => total + pending.bytes, bytes) > this.maxInFlightBytes) {
             return Promise.reject(new EmbeddedStowError("backpressure", "worker in-flight limit reached"));
         }
         const id = this.nextId++;
         return new Promise((resolve, reject) => {
-            const pending = { bytes, control, resolve, reject, cancelled: false, detachAbort: () => undefined };
-            const abort = () => {
-                pending.cancelled = true;
-                pending.detachAbort();
-                reject(abortError());
-                try {
-                    this.endpoint.postMessage({ type: "stow-cancel", id });
-                }
-                catch {
-                    this.close();
-                }
-            };
-            options.signal?.addEventListener("abort", abort, { once: true });
-            pending.detachAbort = () => options.signal?.removeEventListener("abort", abort);
-            this.pending.set(id, pending);
-            this.pendingBytes += bytes;
-            if (control) {
-                this.controls++;
-                this.controlBytes += bytes;
-            }
             const send = () => {
-                if (pending.cancelled) {
-                    this.release(id, pending);
-                    return;
-                }
+                pending.state = { kind: "sent" };
                 try {
                     const transfer = inputTransfer(data, options.transfer === true);
                     const request = { type: "stow-call", id, metadata, data };
@@ -72,10 +45,27 @@ export class WorkerEmbeddedHost {
                     reject(error);
                 }
             };
-            if (control) {
-                this.controlQueue.push({ id, send });
+            const pending = { bytes, control, resolve, reject, detachAbort: () => undefined, state: { kind: "queued", send } };
+            const abort = () => {
+                const queued = pending.state.kind === "queued";
+                pending.state = { kind: "cancelled" };
+                pending.detachAbort();
+                reject(abortError());
+                if (queued)
+                    this.release(id, pending);
+                else
+                    try {
+                        this.endpoint.postMessage({ type: "stow-cancel", id });
+                    }
+                    catch {
+                        this.close();
+                    }
+            };
+            options.signal?.addEventListener("abort", abort, { once: true });
+            pending.detachAbort = () => options.signal?.removeEventListener("abort", abort);
+            this.pending.set(id, pending);
+            if (control)
                 this.dispatchControl();
-            }
             else
                 send();
         });
@@ -84,7 +74,6 @@ export class WorkerEmbeddedHost {
         if (this.closed)
             return;
         this.closed = true;
-        this.controlQueue.length = 0;
         this.endpoint.removeEventListener("message", this.receive);
         for (const [id, pending] of this.pending) {
             this.release(id, pending);
@@ -99,7 +88,7 @@ export class WorkerEmbeddedHost {
         if (pending === undefined)
             return;
         this.release(reply.id, pending);
-        if (pending.cancelled)
+        if (pending.state.kind === "cancelled")
             return;
         if (reply.type === "stow-error") {
             pending.reject(new EmbeddedStowError(reply.code ?? "worker_error", reply.message));
@@ -113,24 +102,23 @@ export class WorkerEmbeddedHost {
     };
     release(id, pending) {
         this.pending.delete(id);
-        this.pendingBytes -= pending.bytes;
-        if (pending.control) {
-            this.controls--;
-            this.controlBytes -= pending.bytes;
-            if (this.activeControl === id)
-                this.activeControl = undefined;
-            this.dispatchControl();
-        }
         pending.detachAbort();
+        if (pending.control)
+            this.dispatchControl();
     }
     dispatchControl() {
-        if (this.closed || this.activeControl !== undefined)
+        if (this.closed)
             return;
-        const next = this.controlQueue.shift();
-        if (next === undefined)
-            return;
-        this.activeControl = next.id;
-        next.send();
+        for (const pending of this.pending.values()) {
+            if (pending.control && pending.state.kind !== "queued")
+                return;
+        }
+        for (const pending of this.pending.values()) {
+            if (pending.control && pending.state.kind === "queued") {
+                pending.state.send();
+                return;
+            }
+        }
     }
 }
 function inputTransfer(data, transfer) {

@@ -18,11 +18,6 @@ export declare class WorkerEmbeddedHost implements AsyncEmbeddedHost {
     private readonly endpoint;
     private readonly pending;
     private nextId;
-    private pendingBytes;
-    private controls;
-    private controlBytes;
-    private activeControl;
-    private readonly controlQueue;
     private closed;
     private readonly maxInFlight;
     private readonly maxInFlightBytes;

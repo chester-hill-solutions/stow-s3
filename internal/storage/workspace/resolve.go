@@ -110,17 +110,14 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	derived, err := deriveReadFile(checked, info)
+	defer checked.Close()
+	derived, err := deriveFileMetadata(checked, info)
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	entry, recorded := s.objectIndex.entry(bucket, key)
-	if !recorded || entryNeedsRederivation(entry, derived, info) {
-		if recorded && entry.contentETag() == derived.ETag {
-			entry.Size, entry.Modified = derived.Size, derived.Modified
-		} else {
-			entry = derived
-		}
+	entry, _ := s.objectIndex.entry(bucket, key)
+	entry, changed := reconcileEntry(entry, derived)
+	if changed {
 		entry.Form = s.formOf(bucket, key, absPath)
 		if entry.Form == FormEscaped {
 			entry.Digest = Digest(key)
@@ -132,13 +129,16 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	return absPath, info, entry, nil
 }
 
-func entryNeedsRederivation(entry, derived ManifestEntry, info os.FileInfo) bool {
-	if entry.stale(info.Size(), info.ModTime()) {
-		return true
-	}
+// reconcileEntry applies the same byte-identity policy to live reads and snapshots.
+func reconcileEntry(entry, derived ManifestEntry) (ManifestEntry, bool) {
 	// Older multipart records have no content fingerprint. Re-derive them once
 	// instead of blessing potentially edited bytes with an unverified old ETag.
-	return entry.contentETag() != derived.ETag
+	if entry.contentETag() != derived.ETag {
+		return derived, true
+	}
+	changed := entry.stale(derived.Size, derived.Modified)
+	entry.Size, entry.Modified = derived.Size, derived.Modified
+	return entry, changed
 }
 
 func (e ManifestEntry) contentETag() string {

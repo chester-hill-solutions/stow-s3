@@ -1703,8 +1703,7 @@ const MaxDeltaBytes int64 = 16 << 20
 
 
 ```go
-const MaxRecoveryHoldBytes = 2 <<
-	20
+const MaxRecoveryHoldBytes = 2 << 20
 ```
 
 ## MaxRecoveryHoldPeakBytes
@@ -2189,7 +2188,8 @@ func ReadWrite() Authority
 ```go
 type RecoveryHold struct {
 	RecoveryHoldRequest
-	Meaning		string		`json:"meaning"`
+	Meaning	string	`json:"meaning"`
+
 	State		string		`json:"state"`
 	Created		time.Time	`json:"created"`
 	FinishedAt	time.Time	`json:"finished_at,omitempty"`
@@ -2228,7 +2228,8 @@ type RecoveryHoldQuery struct {
 
 ```go
 type RecoveryHoldRequest struct {
-	ID		string			`json:"id"`
+	ID	string	`json:"id"`
+
 	Owner		string			`json:"owner"`
 	References	[]RecoveryReference	`json:"references"`
 	ExpiresAt	time.Time		`json:"expires_at,omitempty"`

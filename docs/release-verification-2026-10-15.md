@@ -1,6 +1,7 @@
 # v0.3.2 local release checkpoint — 2026-10-15
 
-The patch is prepared locally on `codex/patch-0.3.2`. Publication has not started.
+The patch is proposed in [PR #77](https://github.com/chester-hill-solutions/stow-s3/pull/77)
+on `codex/patch-0.3.2`. No release has been published.
 Distribution remains native GitHub downloads for Linux/macOS on x86_64 and ARM64;
 npm and PyPI publication are deferred by `scripts/release-policy.json`.
 
@@ -20,11 +21,13 @@ object metadata. Git admission remains distinct from an OS-enforced disk quota.
 
 The [benchmark report](benchmarks/2026-10-15-patch-validation/report.md) preserves
 raw results and the failed baseline parallel-workspace measurement. Native
-startup block medians remain around 16.7 ms and WASM is byte-identical at
+startup block medians for the pre-review candidate remain around 16.7 ms and its WASM is byte-identical at
 4,615,854 bytes. Browser worker startup p50 rises by 3.4 ms; checkpoint peak RSS
 rises by about 0.3 MiB in the tested workload. All candidate browser trials release
 their 16 read pins, while the baseline leaves 15. Timing noise and measurement
 limits are reported without asserting zero overhead or production capacity.
+The review fixes below increase WASM to 4,617,652 bytes, a 1,798-byte (0.04%)
+increase. The earlier timing measurements do not qualify this updated artifact.
 
 ## Local verification
 
@@ -49,14 +52,31 @@ limits are reported without asserting zero overhead or production capacity.
 The [local build manifest](assessment-evidence/2026-10-15-patch/local-builds.json)
 records archive hashes and build revision. These are staged rehearsal artifacts;
 the hosted release must rebuild and qualify its exact final revision. Foreign
-platform execution and hosted wheel/packed-consumer qualification have not run.
+platform execution and hosted wheel/packed-consumer qualification are recorded
+separately below.
+
+## Review fixes
+
+- Retain read-session ownership across Go/WASM until persistent pin release
+  succeeds; expose failures and allow an explicit retry.
+- Derive live and snapshot metadata through one byte-identity policy without
+  making snapshot reads modify the workspace index.
+- Use the pending-call map as the worker queue owner. Remove cancelled unsent
+  controls immediately while retaining dispatched-call admission until reply.
+- Local verification after these fixes: complete Go suite, race tests for runtime,
+  workspace storage and workspace facade, 163 Node tests, 35 Chromium tests
+  (two configured skips), standalone WASM integration, TypeScript standards,
+  Go vet/quality/size gates, API references, documentation links, and reproducible
+  generated package output pass. Coverage is 70.23% (11,911/16,959 statements),
+  above the recorded floor. No quality baseline was relaxed.
 
 ## Publication gates still pending
 
-The branch has not been uploaded and there is no v0.3.2 release or hosted release
-rehearsal yet. The configured public destination is
-`github.com/chester-hill-solutions/stow-s3`. GitHub `main` requires one independent
-approved review and successful Build, Test, Conformance and Lint checks. Those
-protections remain in place. After authorization to upload the prepared branch,
-open the release PR and run the existing release rehearsal with version `0.3.2`.
-Merge/tag/publication must follow successful qualification and required review.
+[PR CI](https://github.com/chester-hill-solutions/stow-s3/actions/runs/38769771240)
+and the complete [hosted release rehearsal](https://github.com/chester-hill-solutions/stow-s3/actions/runs/38769813976)
+passed at `6ada2c2116f893a9ddbbb8c39fda759bf7a33eec`, before the review fixes.
+Those receipts do not qualify the updated revision; it needs fresh hosted CI and
+release qualification. The live-provider gate is intentionally skipped under
+the downloads-only policy. GitHub `main` still requires one independent approved
+review and successful Build, Test, Conformance and Lint checks. Merge, tagging and
+publication must follow successful qualification and required review.

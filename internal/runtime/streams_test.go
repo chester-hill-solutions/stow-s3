@@ -2,6 +2,7 @@ package runtime_test
 
 import (
 	"context"
+	"errors"
 	"io"
 	"strings"
 	"testing"
@@ -14,8 +15,10 @@ import (
 
 type observedStreamStore struct {
 	storage.Store
-	reads  int
-	closes int
+	reads         int
+	closes        int
+	closeFailures int
+	eofWithData   bool
 }
 
 func (s *observedStreamStore) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
@@ -33,12 +36,61 @@ type policyReader struct {
 
 func (r *policyReader) Read(buffer []byte) (int, error) {
 	r.store.reads++
-	return r.ReadCloser.Read(buffer)
+	n, err := r.ReadCloser.Read(buffer)
+	if n > 0 && r.store.eofWithData {
+		return n, io.EOF
+	}
+	return n, err
 }
 
 func (r *policyReader) Close() error {
 	r.store.closes++
+	if r.store.closeFailures > 0 {
+		r.store.closeFailures--
+		return errors.New("injected close failure")
+	}
 	return r.ReadCloser.Close()
+}
+
+func TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure(t *testing.T) {
+	for _, automatic := range []bool{false, true} {
+		t.Run(map[bool]string{false: "explicit", true: "EOF"}[automatic], func(t *testing.T) {
+			ctx := context.Background()
+			store := &observedStreamStore{Store: storage.NewMemoryStore(), closeFailures: 1, eofWithData: automatic}
+			if err := store.CreateBucket(ctx, "assets"); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := store.PutObject(ctx, "assets", "document", strings.NewReader("bytes"), storage.PutOptions{}); err != nil {
+				t.Fatal(err)
+			}
+			instance, err := runtime.OpenWithStore(runtime.Options{}, store, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer instance.Close()
+			reader, _, err := instance.OpenObject(ctx, "assets", "document")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if automatic {
+				data, err := io.ReadAll(reader)
+				if err != nil || string(data) != "bytes" {
+					t.Fatalf("read=%q err=%v", data, err)
+				}
+			} else if err := reader.Close(); err == nil {
+				t.Fatal("close hid the storage failure")
+			}
+			if _, err := reader.Read(make([]byte, 1)); !errors.Is(err, io.ErrClosedPipe) {
+				t.Fatalf("closed stream read: %v", err)
+			}
+			if err := reader.Close(); err != nil {
+				t.Fatal(err)
+			}
+			if err := reader.Close(); err != nil || store.closes != 2 {
+				t.Fatalf("close retry count=%d err=%v", store.closes, err)
+			}
+		})
+	}
 }
 
 func TestStreamRechecksPolicyBeforeReadingCapturedVersion(t *testing.T) {
