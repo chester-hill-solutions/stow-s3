@@ -91,13 +91,8 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 	return s.resolveLocked(bucket, key)
 }
 
-// resolveLocked is resolve for a caller that already holds the write lock.
-//
-// It exists because the lock is not reentrant and the write path has to look at an
-// object while holding it: PutObject peeks to evaluate its preconditions before it
-// knows what it is overwriting, and that peek may need to re-derive and persist an
-// entry that has gone stale. Reaching resolve from there takes the lock a second
-// time on the same goroutine and hangs every goroutine behind it, Close included.
+// resolveLocked also persists stale metadata while holding the caller's write lock.
+// Conditional writes use it to avoid reacquiring the non-reentrant lock via resolve.
 func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	absPath, err := s.locate(bucket, key)
 	if err != nil {
@@ -121,7 +116,7 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	}
 	entry, recorded := s.objectIndex.entry(bucket, key)
 	if !recorded || entryNeedsRederivation(entry, derived, info) {
-		if recorded && entry.ETag == derived.ETag {
+		if recorded && entry.contentETag() == derived.ETag {
 			entry.Size, entry.Modified = derived.Size, derived.Modified
 		} else {
 			entry = derived
@@ -141,7 +136,16 @@ func entryNeedsRederivation(entry, derived ManifestEntry, info os.FileInfo) bool
 	if entry.stale(info.Size(), info.ModTime()) {
 		return true
 	}
-	return entry.ETag != derived.ETag && !entry.Multipart
+	// Older multipart records have no content fingerprint. Re-derive them once
+	// instead of blessing potentially edited bytes with an unverified old ETag.
+	return entry.contentETag() != derived.ETag
+}
+
+func (e ManifestEntry) contentETag() string {
+	if e.Multipart {
+		return e.ContentETag
+	}
+	return e.ETag
 }
 
 // formOf reports which form a path is in, by asking the layout where the key

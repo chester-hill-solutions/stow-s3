@@ -1,5 +1,8 @@
 import { EmbeddedStowError } from "./embedded.js";
 import { isWorkerControl, isWorkerReply } from "./worker-protocol.js";
+// One runtime permits 16 streams. Cleanup has its own bounded queue so closing
+// those streams together does not discard releases when the reserved lane is busy.
+const MAX_PENDING_CONTROLS = 32;
 /** Bounds admitted calls instead of retaining an unbounded queue of copied payloads. */
 export class WorkerEmbeddedHost {
     endpoint;
@@ -8,6 +11,8 @@ export class WorkerEmbeddedHost {
     pendingBytes = 0;
     controls = 0;
     controlBytes = 0;
+    activeControl;
+    controlQueue = [];
     closed = false;
     maxInFlight;
     maxInFlightBytes;
@@ -26,7 +31,7 @@ export class WorkerEmbeddedHost {
             return Promise.reject(abortError());
         const bytes = new TextEncoder().encode(metadata).byteLength + (data?.byteLength ?? 0);
         const control = isWorkerControl(metadata, data);
-        if (control ? this.controls >= 1 :
+        if (control ? this.controls >= MAX_PENDING_CONTROLS :
             this.pending.size - this.controls >= this.maxInFlight || this.pendingBytes - this.controlBytes + bytes > this.maxInFlightBytes) {
             return Promise.reject(new EmbeddedStowError("backpressure", "worker in-flight limit reached"));
         }
@@ -52,21 +57,34 @@ export class WorkerEmbeddedHost {
                 this.controls++;
                 this.controlBytes += bytes;
             }
-            try {
-                const transfer = inputTransfer(data, options.transfer === true);
-                const request = { type: "stow-call", id, metadata, data };
-                this.endpoint.postMessage(request, transfer);
+            const send = () => {
+                if (pending.cancelled) {
+                    this.release(id, pending);
+                    return;
+                }
+                try {
+                    const transfer = inputTransfer(data, options.transfer === true);
+                    const request = { type: "stow-call", id, metadata, data };
+                    this.endpoint.postMessage(request, transfer);
+                }
+                catch (error) {
+                    this.release(id, pending);
+                    reject(error);
+                }
+            };
+            if (control) {
+                this.controlQueue.push({ id, send });
+                this.dispatchControl();
             }
-            catch (error) {
-                this.release(id, pending);
-                reject(error);
-            }
+            else
+                send();
         });
     }
     close() {
         if (this.closed)
             return;
         this.closed = true;
+        this.controlQueue.length = 0;
         this.endpoint.removeEventListener("message", this.receive);
         for (const [id, pending] of this.pending) {
             this.release(id, pending);
@@ -99,8 +117,20 @@ export class WorkerEmbeddedHost {
         if (pending.control) {
             this.controls--;
             this.controlBytes -= pending.bytes;
+            if (this.activeControl === id)
+                this.activeControl = undefined;
+            this.dispatchControl();
         }
         pending.detachAbort();
+    }
+    dispatchControl() {
+        if (this.closed || this.activeControl !== undefined)
+            return;
+        const next = this.controlQueue.shift();
+        if (next === undefined)
+            return;
+        this.activeControl = next.id;
+        next.send();
     }
 }
 function inputTransfer(data, transfer) {

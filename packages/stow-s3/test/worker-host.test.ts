@@ -6,6 +6,7 @@ import { EmbeddedStowError, type EmbeddedBinaryResponse } from "../dist/embedded
 import { WorkerEmbeddedHost, type AsyncEmbeddedHost } from "../dist/worker-host.js";
 import { serveEmbeddedWorker } from "../dist/worker-server.js";
 import type { WorkerEndpoint } from "../dist/worker-protocol.js";
+import { loadNodeWasmHost } from "../dist/node-wasm-host.js";
 
 class Endpoint implements WorkerEndpoint {
   readonly listeners = new Set<(event: MessageEvent<unknown>) => void>();
@@ -229,3 +230,80 @@ test("async streams split large input into bounded owned transfers and close rea
 function hasCode(code: string): (error: unknown) => boolean {
   return (error) => error instanceof EmbeddedStowError && error.code === code;
 }
+
+test("concurrent stream closes release every real WASM reader slot", async () => {
+  const wasm = await loadNodeWasmHost();
+  const [client, server] = pair();
+  const stop = serveEmbeddedWorker(server, Promise.resolve({
+    callBinary: (metadata: string, data?: Uint8Array) => wasm.callBinaryAsync(metadata, data),
+  }));
+  const host = new WorkerEmbeddedHost(client);
+  const runtime = await AsyncEmbeddedStow.open(host);
+  try {
+    await runtime.createBucket("assets");
+    await runtime.putObject("assets", "key", new Uint8Array([1, 2, 3]));
+    for (let round = 0; round < 2; round++) {
+      const readers = [];
+      for (let index = 0; index < 16; index++) readers.push(await runtime.getObjectStream("assets", "key"));
+      await Promise.all(readers.flatMap((reader) => [reader.close(), reader.close()]));
+    }
+  } finally {
+    await runtime.close();
+    host.close();
+    stop();
+    await wasm.close();
+  }
+});
+
+test("failed stream cleanup remains visible and can be retried", async () => {
+  let closes = 0;
+  const runtime = AsyncEmbeddedStow.attach({
+    callBinary: async (metadata: string) => {
+      const request: Record<string, unknown> = JSON.parse(metadata);
+      if (request.op === "openObjectRead") return response({ token: "read", object: { bucket: "assets", key: "key", size: 1, etag: "etag" } });
+      if (request.op === "closeObjectRead" && closes++ === 0) throw new EmbeddedStowError("backpressure", "busy");
+      return response(null);
+    },
+  }, 1, { backend: "memory", maxBytes: 1024, maxObjects: 16, persistent: false, multipart: false, upstream: false });
+  const reader = await runtime.getObjectStream("assets", "key");
+  await assert.rejects(reader.close(), hasCode("backpressure"));
+  await reader.close();
+  assert.equal(closes, 2);
+  await runtime.close();
+});
+
+test("queued cleanup is bounded, skips cancelled calls, and closes pending callers", async () => {
+  const [client, server] = pair();
+  let finish: (value: EmbeddedBinaryResponse) => void = () => undefined;
+  const gate = new Promise<EmbeddedBinaryResponse>((resolve) => { finish = resolve; });
+  const calls: string[] = [];
+  const stop = serveEmbeddedWorker(server, Promise.resolve({
+    callBinary: async (metadata: string) => {
+      calls.push(metadata);
+      return calls.length === 1 ? gate : new Promise<EmbeddedBinaryResponse>(() => undefined);
+    },
+  }));
+  const host = new WorkerEmbeddedHost(client);
+  const metadata = JSON.stringify({ op: "closeObjectRead", token: "read" });
+  try {
+    const first = host.callBinary(metadata);
+    const controller = new AbortController();
+    const cancelledMetadata = JSON.stringify({ op: "closeObjectRead", token: "cancelled" });
+    const cancelled = host.callBinary(cancelledMetadata, undefined, { signal: controller.signal });
+    const rejected = assert.rejects(cancelled, hasCode("cancelled"));
+    const queued = Array.from({ length: 30 }, () => assert.rejects(host.callBinary(metadata), hasCode("closed")));
+    await assert.rejects(host.callBinary(metadata), hasCode("backpressure"));
+    await delay(0);
+    controller.abort();
+    await rejected;
+    finish(response(null));
+    await first;
+    host.close();
+    await Promise.all(queued);
+    assert.equal(calls.includes(cancelledMetadata), false);
+    assert.ok(calls.length <= 2);
+  } finally {
+    host.close();
+    stop();
+  }
+});

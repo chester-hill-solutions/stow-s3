@@ -5,8 +5,8 @@ A session starts a local server, returns its endpoint and credentials, and stops
 
 ## Install
 
-The Python package is not yet published to PyPI. v0.3.1 ships native binaries
-as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.1).
+The Python package is not yet published to PyPI. v0.3.2 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.2).
 Install the Python client from a source checkout. From the repository root:
 
 ```sh

@@ -68,11 +68,13 @@ type Index struct {
 // ManifestEntry records what stow knows about one object. A missing entry is
 // legal and is the normal case for a file the host wrote.
 type ManifestEntry struct {
-	Form              Form              `json:"form"`
-	Digest            string            `json:"digest,omitempty"`
-	Size              int64             `json:"size"`
-	ETag              string            `json:"etag,omitempty"`
-	Multipart         bool              `json:"multipart,omitempty"`
+	Form      Form   `json:"form"`
+	Digest    string `json:"digest,omitempty"`
+	Size      int64  `json:"size"`
+	ETag      string `json:"etag,omitempty"`
+	Multipart bool   `json:"multipart,omitempty"`
+	// ContentETag identifies multipart bytes independently of the public composite ETag.
+	ContentETag       string            `json:"content_etag,omitempty"`
 	VersionID         string            `json:"version_id,omitempty"`
 	ContentType       string            `json:"content_type,omitempty"`
 	Metadata          map[string]string `json:"metadata,omitempty"`
