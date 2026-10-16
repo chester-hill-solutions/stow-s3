@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,math,statistics,collections
+p=Path('/private/tmp/stow-stream-completeness-2026-10-16');data=[];run=-1
+for line in (p/'paired.log').read_text().splitlines():
+ if 'PAIRED {' not in line:continue
+ s=json.loads(line.split('PAIRED ',1)[1])
+ if s['case']=='tiny' and s['cycle']==0 and s['position']==0:run+=1
+ s['run']=run;data.append(s)
+assert len(data)==1280
+rows=[]
+def corr(a,b):
+ ma=statistics.mean(a);mb=statistics.mean(b);den=math.sqrt(sum((x-ma)**2 for x in a)*sum((x-mb)**2 for x in b));return sum((x-ma)*(y-mb) for x,y in zip(a,b))/den if den else 0
+for cpu in [1,8]:
+ for case in ['tiny','64KiB-32KiB','64KiB-1KiB','seek','range','get-tiny','get-64KiB','save-64KiB']:
+  samples=[s for s in data if s['cpu']==cpu and s['case']==case];cycles=collections.defaultdict(dict)
+  for s in samples:cycles[s['run'],s['cycle']][s['label']]=s
+  ratios=[];controls=[]
+  for group in cycles.values():
+   assert len(group)==4
+   v={k:s['ns']/s['n'] for k,s in group.items()};ratios.append(100*(math.sqrt(v['after-a']*v['after-b']/(v['before-a']*v['before-b']))-1));controls.extend([100*(v['before-b']/v['before-a']-1),100*(v['after-b']/v['after-a']-1)])
+  versions={v:[s for s in samples if s['label'].startswith(v)] for v in ['before','after']}
+  summary={v:{'median_ns':statistics.median(s['ns']/s['n'] for s in ss),'median_bytes':statistics.median(s['allocated_bytes']/s['n'] for s in ss),'median_allocs':statistics.median(s['allocs']/s['n'] for s in ss),'median_gc_cpu_ns':statistics.median(s['gc_cpu_seconds']*1e9/s['n'] for s in ss),'median_gc_cycles_per_1000_ops':statistics.median(s['gc_cycles']*1000/s['n'] for s in ss)} for v,ss in versions.items()}
+  row={'cpu':cpu,'case':case,'samples':len(samples),'median_paired_cycle_change_pct':statistics.median(ratios),'paired_cycle_min_max_pct':[min(ratios),max(ratios)],'same_code_abs_median_pct':statistics.median(abs(x) for x in controls),'gc_cpu_vs_elapsed_correlation':corr([s['gc_cpu_seconds']/s['n'] for s in samples],[s['ns']/s['n'] for s in samples]),'versions':summary};rows.append(row);print(cpu,case,round(row['median_paired_cycle_change_pct'],2),'control',round(row['same_code_abs_median_pct'],2),'ns',summary['before']['median_ns'],summary['after']['median_ns'])
+(p/'paired-summary.json').write_text(json.dumps(rows,indent=2)+'\n')

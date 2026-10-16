@@ -1,0 +1,18 @@
+from pathlib import Path
+import subprocess,json,time
+p=Path('/private/tmp/stow-stream-completeness-2026-10-16')
+def run(cmd,name):
+ r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+r.stdout)
+ assert r.returncode==0,r.stdout[-3000:]
+ print(name,'complete',flush=True)
+cmd=[str(p/'matched.test'),'-test.run=^$','-test.bench=^BenchmarkStreamMatched$','-test.benchmem','-test.benchtime=50000x','-test.count=6','-test.cpu=1,8']
+run(cmd,'matched.log')
+order=['before','after','after','before'];groups=[('^BenchmarkStreamCompleteness$',100000),('^BenchmarkOpenedObjectRead$',50000)]
+(p/'plan.json').write_text(json.dumps({'matched_command':cmd,'direct_order':order,'groups':groups,'direct_samples_per_case_cpu_version':6,'cpus':[1,8],'ordinary_compiler_flags':True,'all_samples_retained':True,'no_concurrent_agent_builds_or_tests':True},indent=2)+'\n')
+for cpu in [1,8]:
+ for block,version in enumerate(order,1):
+  for g,(pattern,n) in enumerate(groups):
+   cmd=[str(p/(version+'.test')),'-test.run=^$','-test.bench='+pattern,'-test.benchmem',f'-test.benchtime={n}x','-test.count=3',f'-test.cpu={cpu}']
+   run(cmd,f'direct-cpu{cpu}-{block}-{version}-{g}.log')
+print('MEASUREMENTS COMPLETE',flush=True)

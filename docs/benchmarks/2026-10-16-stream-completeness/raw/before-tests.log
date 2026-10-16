@@ -1,0 +1,298 @@
+COMMAND ["go", "test", "./internal/runtime", "./internal/embedded", "-run", "^Test(Stream(EOF|Seek|Range|Partial)|EmbeddedStreamRejects)", "-count=2", "-v"]
+=== RUN   TestStreamEOFCompleteness
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=3
+--- FAIL: TestStreamEOFCompleteness (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamEOFControls
+=== RUN   TestStreamEOFControls/adapter=false/unknown-size
+=== RUN   TestStreamEOFControls/adapter=false/empty
+=== RUN   TestStreamEOFControls/adapter=false/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=false/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=read_failed
+=== RUN   TestStreamEOFControls/adapter=true/unknown-size
+=== RUN   TestStreamEOFControls/adapter=true/empty
+=== RUN   TestStreamEOFControls/adapter=true/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=true/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=read_failed
+--- PASS: TestStreamEOFControls (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=read_failed (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=read_failed (0.00s)
+=== RUN   TestStreamPartialCloseDoesNotRequireEOF
+--- PASS: TestStreamPartialCloseDoesNotRequireEOF (0.00s)
+=== RUN   TestStreamSeekCompleteness
+=== RUN   TestStreamSeekCompleteness/body=old/start
+=== RUN   TestStreamSeekCompleteness/body=old/current
+=== RUN   TestStreamSeekCompleteness/body=old/end
+=== RUN   TestStreamSeekCompleteness/body=old/rewind
+=== RUN   TestStreamSeekCompleteness/body=old/failed
+=== RUN   TestStreamSeekCompleteness/body=old/at-end
+=== RUN   TestStreamSeekCompleteness/body=old/beyond-end
+=== RUN   TestStreamSeekCompleteness/body=ol/start
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/current
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/end
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/rewind
+    stream_seek_completeness_test.go:56: seek stream="ol" error=<nil> want=unexpected EOF position=0
+=== RUN   TestStreamSeekCompleteness/body=ol/failed
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/at-end
+    stream_seek_completeness_test.go:56: seek stream="" error=<nil> want=unexpected EOF position=2
+=== RUN   TestStreamSeekCompleteness/body=ol/beyond-end
+--- FAIL: TestStreamSeekCompleteness (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/beyond-end (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/start (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/current (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/end (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/rewind (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/failed (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/beyond-end (0.00s)
+=== RUN   TestStreamRangeCompleteness
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2}
+    stream_seek_completeness_test.go:127: range data="l" error=<nil> want=unexpected EOF object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:db0a6f56c70d334477f5f0163242c4c5 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 14:30:28.670005 +0000 UTC ChecksumAlgorithm: ChecksumValue:}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2}
+    stream_seek_completeness_test.go:127: range data="l" error=<nil> want=unexpected EOF object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:56b78b3918aa0b0e7ffcded8f13f3c5c ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 14:30:28.670202 +0000 UTC ChecksumAlgorithm: ChecksumValue:}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0}
+--- FAIL: TestStreamRangeCompleteness (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0} (0.00s)
+    --- FAIL: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0} (0.00s)
+    --- FAIL: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0} (0.00s)
+=== RUN   TestStreamEOFCompleteness
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=0
+    stream_completeness_test.go:37: stream bytes=0 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=1
+    stream_completeness_test.go:37: stream bytes=1 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=2
+    stream_completeness_test.go:37: stream bytes=2 error=<nil> want=unexpected EOF
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=3
+--- FAIL: TestStreamEOFCompleteness (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=false/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- FAIL: TestStreamEOFCompleteness/adapter=true/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamEOFControls
+=== RUN   TestStreamEOFControls/adapter=false/unknown-size
+=== RUN   TestStreamEOFControls/adapter=false/empty
+=== RUN   TestStreamEOFControls/adapter=false/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=false/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=read_failed
+=== RUN   TestStreamEOFControls/adapter=true/unknown-size
+=== RUN   TestStreamEOFControls/adapter=true/empty
+=== RUN   TestStreamEOFControls/adapter=true/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=true/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=read_failed
+--- PASS: TestStreamEOFControls (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=read_failed (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=read_failed (0.00s)
+=== RUN   TestStreamPartialCloseDoesNotRequireEOF
+--- PASS: TestStreamPartialCloseDoesNotRequireEOF (0.00s)
+=== RUN   TestStreamSeekCompleteness
+=== RUN   TestStreamSeekCompleteness/body=old/start
+=== RUN   TestStreamSeekCompleteness/body=old/current
+=== RUN   TestStreamSeekCompleteness/body=old/end
+=== RUN   TestStreamSeekCompleteness/body=old/rewind
+=== RUN   TestStreamSeekCompleteness/body=old/failed
+=== RUN   TestStreamSeekCompleteness/body=old/at-end
+=== RUN   TestStreamSeekCompleteness/body=old/beyond-end
+=== RUN   TestStreamSeekCompleteness/body=ol/start
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/current
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/end
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/rewind
+    stream_seek_completeness_test.go:56: seek stream="ol" error=<nil> want=unexpected EOF position=0
+=== RUN   TestStreamSeekCompleteness/body=ol/failed
+    stream_seek_completeness_test.go:56: seek stream="l" error=<nil> want=unexpected EOF position=1
+=== RUN   TestStreamSeekCompleteness/body=ol/at-end
+    stream_seek_completeness_test.go:56: seek stream="" error=<nil> want=unexpected EOF position=2
+=== RUN   TestStreamSeekCompleteness/body=ol/beyond-end
+--- FAIL: TestStreamSeekCompleteness (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/beyond-end (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/start (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/current (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/end (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/rewind (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/failed (0.00s)
+    --- FAIL: TestStreamSeekCompleteness/body=ol/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/beyond-end (0.00s)
+=== RUN   TestStreamRangeCompleteness
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2}
+    stream_seek_completeness_test.go:127: range data="l" error=<nil> want=unexpected EOF object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:5df7ac9dde2ac91398ce8f6c86ef6df0 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 14:30:28.672185 +0000 UTC ChecksumAlgorithm: ChecksumValue:}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2}
+    stream_seek_completeness_test.go:127: range data="l" error=<nil> want=unexpected EOF object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:f9a592a000e0c4ba3bd8a39f6ae4f456 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 14:30:28.672318 +0000 UTC ChecksumAlgorithm: ChecksumValue:}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0}
+--- FAIL: TestStreamRangeCompleteness (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0} (0.00s)
+    --- FAIL: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0} (0.00s)
+    --- FAIL: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0} (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.457s
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=false
+    stream_completeness_test.go:22: public stream="o" size=3 error=<nil>
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=true
+    stream_completeness_test.go:22: public stream="o" size=3 error=<nil>
+--- FAIL: TestEmbeddedStreamRejectsPrematureEOF (0.00s)
+    --- FAIL: TestEmbeddedStreamRejectsPrematureEOF/together=false (0.00s)
+    --- FAIL: TestEmbeddedStreamRejectsPrematureEOF/together=true (0.00s)
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=false
+    stream_completeness_test.go:22: public stream="o" size=3 error=<nil>
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=true
+    stream_completeness_test.go:22: public stream="o" size=3 error=<nil>
+--- FAIL: TestEmbeddedStreamRejectsPrematureEOF (0.00s)
+    --- FAIL: TestEmbeddedStreamRejectsPrematureEOF/together=false (0.00s)
+    --- FAIL: TestEmbeddedStreamRejectsPrematureEOF/together=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.227s
+FAIL

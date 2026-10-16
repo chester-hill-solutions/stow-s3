@@ -38,7 +38,11 @@ func (i *Instance) openObject(ctx context.Context, bucket, key string, span *sto
 	if err != nil {
 		return nil, Object{}, err
 	}
-	stream := &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader}
+	size := meta.Size
+	if span != nil {
+		size = span.Length
+	}
+	stream := &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader, size: size}
 	if seeker, ok := reader.(io.Seeker); ok {
 		return &seekableObjectStream{objectStream: stream, seeker: seeker}, objectFromMeta(meta, nil), nil
 	}
@@ -85,6 +89,8 @@ type objectStream struct {
 	key      string
 	reader   io.ReadCloser
 	closed   bool
+	size     int64
+	position int64
 }
 
 func (r *objectStream) Read(buffer []byte) (int, error) {
@@ -101,6 +107,10 @@ func (r *objectStream) Read(buffer []byte) (int, error) {
 		return 0, err
 	}
 	n, err := r.reader.Read(buffer)
+	r.position += int64(n)
+	if err == io.EOF && r.position < r.size {
+		err = io.ErrUnexpectedEOF
+	}
 	if err != nil {
 		_ = r.closeLocked()
 	}
@@ -149,5 +159,9 @@ func (r *seekableObjectStream) Seek(offset int64, whence int) (int64, error) {
 		_ = r.closeLocked()
 		return 0, err
 	}
-	return r.seeker.Seek(offset, whence)
+	position, err := r.seeker.Seek(offset, whence)
+	if err == nil {
+		r.position = position
+	}
+	return position, err
 }

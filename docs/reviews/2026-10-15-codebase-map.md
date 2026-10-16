@@ -162,6 +162,14 @@ adverse timing samples and the 239-byte WASM growth remain explicit. The report
 separately confirms raw streaming APIs still allow early EOF without a read error.
 Streaming readers remain unchanged in this buffered-read correction.
 
+Follow-up: **runtime streams now reject premature EOF**, including adapter and
+public-wrapper reads, with [regression and comparative cost evidence](../benchmarks/2026-10-16-stream-completeness/README.md).
+Expected range length and successful seek positions preserve valid suffix reads.
+All 69 new cases pass, including WriterTo; allocation counts remain unchanged
+with 16 additional bytes per stream. Adverse direct timings, same-code controls,
+and an excluded incomplete-reference measurement are retained. The report confirms
+excess provider bytes remain accepted as a separate finding; that path is unchanged.
+
 ## Codebase map
 
 ```mermaid
