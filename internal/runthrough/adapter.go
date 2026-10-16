@@ -432,9 +432,9 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if !needBody {
 		return nil, cached, nil
 	}
-	reader, _, err := cacheStore.GetObject(ctx, bucket, key)
+	reader, readMeta, err := cacheStore.GetObject(ctx, bucket, key)
 	if err == nil {
-		return reader, cached, nil
+		return reader, readMeta, nil
 	}
 	if reader != nil {
 		_ = reader.Close()
@@ -442,11 +442,7 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if !errors.Is(err, storage.ErrObjectNotFound) {
 		return nil, nil, err
 	}
-	fresh, _, freshErr := a.upstream.GetObject(ctx, bucket, key)
-	if freshErr != nil {
-		return fresh, nil, freshErr
-	}
-	return fresh, cached, nil
+	return a.refetchUncachedObject(ctx, bucket, key, meta.ETag)
 }
 
 func (a *Adapter) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {

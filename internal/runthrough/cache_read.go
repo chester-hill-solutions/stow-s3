@@ -93,3 +93,17 @@ func (a *Adapter) openCached(ctx context.Context, bucket, key string, meta *stor
 	}
 	return store.GetObject(ctx, bucket, key)
 }
+
+func (a *Adapter) refetchUncachedObject(ctx context.Context, bucket, key, previousETag string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := a.upstream.GetObject(ctx, bucket, key)
+	if err != nil {
+		return reader, nil, err
+	}
+	if meta.ETag == previousETag {
+		return reader, meta, nil
+	}
+	if err := a.saveUpstreamState(bucket, key, UpstreamState{ETag: meta.ETag}); err != nil {
+		return reader, nil, err
+	}
+	return reader, meta, nil
+}

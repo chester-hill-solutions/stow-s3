@@ -1,0 +1,25 @@
+from pathlib import Path
+import subprocess,os,json,hashlib,re
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-runthrough-version-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+def run(cmd,name):
+ q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==0,(name,q.stdout[-3500:]);print(name,'PASS',flush=True)
+run(['go','test','./internal/runthrough','-run','^TestRefresh(Fallback|Head|Concurrent)','-count=2','-v'],'after-tests.log')
+run(['go','test','-race','./internal/runthrough','-count=5','-v'],'focused-race.log')
+run(['go','test','./...'],'full-go.log')
+run(['go','test','-race','./internal/runtime','./internal/storage/...','./internal/s3api','./internal/runthrough','./internal/embedded','./pkg/stow'],'broad-race.log')
+run(['make','check-go-quality','check-file-size'],'quality.log')
+run(['go','vet','./internal/runtime','./internal/embedded','./internal/storage/...','./internal/s3api','./internal/runthrough','./pkg/stow'],'vet.log')
+identity=json.loads((p/'environment.json').read_text())
+files=list(identity['sources'])
+for file in files:assert hashlib.sha256((r/file).read_bytes()).hexdigest()==identity['sources'][file]['sha256'],file
+assert not subprocess.check_output(['gofmt','-l',*files],cwd=r,text=True)
+assert not (r/'packages/stow-s3/node_modules').exists()
+assert not (r/'internal/runthrough/version_review_probe_test.go').exists()
+wasm=json.loads((p/'wasm.json').read_text());assert wasm['before']==wasm['after'],wasm
+(p/'final-source-check.log').write_text('Measured source hashes unchanged; gofmt clean; temporary probe and package symlink removed; rebuilt WASM byte-for-byte unchanged.\n')
+counts={}
+for name in ['before-tests.log','before-race.log','final-before.log','final-before-race.log','after-tests.log','focused-race.log']:
+ entries=re.findall(r'--- (PASS|FAIL|SKIP): (\S+) ',(p/name).read_text());names={n for _,n in entries};leaves=[(s,n) for s,n in entries if not any(x.startswith(n+'/') for x in names)]
+ counts[name]={s:sum(x==s for x,_ in leaves) for s in ['PASS','FAIL','SKIP']}
+(p/'test-counts.json').write_text(json.dumps(counts,indent=2)+'\n');print(json.dumps(counts,indent=2))

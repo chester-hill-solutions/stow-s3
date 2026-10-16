@@ -194,6 +194,14 @@ Original errors and cache decisions are preserved. The report separately reprodu
 native size-limit eviction followed by a changed upstream version returning a new
 body with old ETag/metadata. Source-version consistency remains unchanged in this fix.
 
+Follow-up: **refreshed reads now pair bodies with their captured metadata**,
+with [deterministic race, durable recovery and cost evidence](../benchmarks/2026-10-16-runthrough-version/README.md).
+Cache GET and upstream retry descriptors are retained; changed retry ETags update
+the existing provenance before handoff. Stable ETags avoid another save. The
+report exposes the changed-version durable fallback's near-2× local timing cost,
+and separately confirms refused propagation source reads still leak a returned
+reader. Outbox propagation remains unchanged in this correction.
+
 ## Codebase map
 
 ```mermaid

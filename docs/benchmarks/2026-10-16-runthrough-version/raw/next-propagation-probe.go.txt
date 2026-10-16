@@ -1,0 +1,33 @@
+package runthrough_test
+
+import (
+ "context"
+ "errors"
+ "strings"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestReviewPropagationClosesRefusedSource(t *testing.T){
+ ctx:=context.Background()
+ local:=newOpeningStore(t)
+ seedOpeningStore(t,local)
+ failure:=errors.New("source opening refused")
+ local.faultAt=1;local.failure=failure
+ outbox:=fileVersionOutbox(t)
+ upstream:=newMockUpstream()
+ adapter:=runthrough.NewWithOutbox(runthrough.Config{Policy:runthrough.PolicyMirrorWrites,AllowLiveWrites:true},local,storage.NewMemoryStore(),upstream,outbox)
+ defer adapter.Close()
+ _,err:=adapter.PutObject(ctx,"probe","target",strings.NewReader("old"),storage.PutOptions{})
+ if !errors.Is(err,failure) || !errors.Is(err,storage.ErrMutationCommitted){t.Fatalf("expected local commit with failed propagation: %v",err)}
+ if len(local.captures)!=1{t.Fatalf("source opens=%d",len(local.captures))}
+ capture:=local.captures[0]
+ _,statErr:=capture.file.Stat()
+ if capture.closes!=1{t.Errorf("propagation discarded reader: closes=%d file_still_open=%t",capture.closes,statErr==nil)}
+ if capture.reads!=0{t.Error("refused source consumed payload")}
+ if upstream.putCalls!=0{t.Error("refused source reached upstream write")}
+ local.failure=nil
+ if _,err:=adapter.PutObject(ctx,"probe","target",strings.NewReader("old"),storage.PutOptions{});err!=nil{t.Fatalf("repaired propagation failed: %v",err)}
+}
