@@ -1,0 +1,26 @@
+COMMAND ["go", "test", "-race", "./internal/runthrough", "-run", "^TestReviewPreparedAmbiguousMissing$", "-count=2", "-v"]
+=== RUN   TestReviewPreparedAmbiguousMissing
+=== RUN   TestReviewPreparedAmbiguousMissing/uncertain
+=== RUN   TestReviewPreparedAmbiguousMissing/marked-missing
+    prepared_review_probe_test.go:59: uncertainty lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_review_probe_test.go:62: uncertain recovery lost prepared intent outbox-1: prepared=0 pending=0
+    prepared_review_probe_test.go:75: intent loss persisted across reopen: prepared=0
+    prepared_review_probe_test.go:88: committed local write was never propagated after repair: puts=0
+--- FAIL: TestReviewPreparedAmbiguousMissing (0.44s)
+    --- PASS: TestReviewPreparedAmbiguousMissing/uncertain (0.35s)
+    --- FAIL: TestReviewPreparedAmbiguousMissing/marked-missing (0.09s)
+=== RUN   TestReviewPreparedAmbiguousMissing
+=== RUN   TestReviewPreparedAmbiguousMissing/uncertain
+=== RUN   TestReviewPreparedAmbiguousMissing/marked-missing
+    prepared_review_probe_test.go:59: uncertainty lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_review_probe_test.go:62: uncertain recovery lost prepared intent outbox-1: prepared=0 pending=0
+    prepared_review_probe_test.go:75: intent loss persisted across reopen: prepared=0
+    prepared_review_probe_test.go:88: committed local write was never propagated after repair: puts=0
+--- FAIL: TestReviewPreparedAmbiguousMissing (0.22s)
+    --- PASS: TestReviewPreparedAmbiguousMissing/uncertain (0.12s)
+    --- FAIL: TestReviewPreparedAmbiguousMissing/marked-missing (0.10s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	1.088s
+FAIL

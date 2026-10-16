@@ -1,0 +1,836 @@
+COMMAND ["go", "test", "./internal/runthrough", "-run", "^TestPreparedRecovery(Uncertainty|ConfirmedMissing)$", "-count=2", "-v"]
+=== RUN   TestPreparedRecoveryUncertainty
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:df9f232b95e9cf7cd29eda27a6120bc3 PreviousVersion:df9f232b95e9cf7cd29eda27a6120bc3 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:53.380412 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:df9f232b95e9cf7cd29eda27a6120bc3 PreviousVersion:df9f232b95e9cf7cd29eda27a6120bc3 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:53.380412 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:181c3c1eaafd9c94aa355888119baf94 PreviousVersion:181c3c1eaafd9c94aa355888119baf94 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:53.447919 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:181c3c1eaafd9c94aa355888119baf94 PreviousVersion:181c3c1eaafd9c94aa355888119baf94 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:53.447919 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:9df4d34ac858f9140f3ce828e2795540 PreviousVersion:9df4d34ac858f9140f3ce828e2795540 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:55.826575 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:9df4d34ac858f9140f3ce828e2795540 PreviousVersion:9df4d34ac858f9140f3ce828e2795540 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:55.826575 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:14c28b3c72fe15b6826709fcbf2247e3 PreviousVersion:14c28b3c72fe15b6826709fcbf2247e3 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:55.956373 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:14c28b3c72fe15b6826709fcbf2247e3 PreviousVersion:14c28b3c72fe15b6826709fcbf2247e3 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:31:55.956373 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown
+--- FAIL: TestPreparedRecoveryUncertainty (4.12s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing (0.06s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/unknown (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing (0.05s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/unknown (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing (0.05s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/unknown (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing (0.04s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/unknown (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing (0.04s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked (0.07s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/unknown (0.05s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked (0.06s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/unknown (0.04s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing (0.09s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked (0.08s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown (0.13s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked (0.09s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown (0.11s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked (0.09s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown (0.11s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing (0.09s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked (0.10s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown (0.17s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked (0.17s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown (0.17s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing (0.20s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked (0.11s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown (0.11s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing (0.11s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked (0.14s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing (0.12s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.11s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.13s)
+=== RUN   TestPreparedRecoveryConfirmedMissing
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true
+--- PASS: TestPreparedRecoveryConfirmedMissing (3.39s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.05s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.05s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.07s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.12s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.32s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.24s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.34s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.30s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.51s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.42s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.42s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.41s)
+=== RUN   TestPreparedRecoveryUncertainty
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:3c8545c4d7cc22dc6056769973605fa4 PreviousVersion:3c8545c4d7cc22dc6056769973605fa4 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:01.727643 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:3c8545c4d7cc22dc6056769973605fa4 PreviousVersion:3c8545c4d7cc22dc6056769973605fa4 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:01.727643 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:92707ce446c4335c95c6be33e20a889a PreviousVersion:92707ce446c4335c95c6be33e20a889a UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:01.793794 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:92707ce446c4335c95c6be33e20a889a PreviousVersion:92707ce446c4335c95c6be33e20a889a UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:01.793794 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=0
+    prepared_uncertainty_test.go:21: upstream body="old" want="new"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:6d51bdcb7d3d0105cf1ab0b21f156122 PreviousVersion:6d51bdcb7d3d0105cf1ab0b21f156122 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:05.019644 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:6d51bdcb7d3d0105cf1ab0b21f156122 PreviousVersion:6d51bdcb7d3d0105cf1ab0b21f156122 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:05.019644 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:01b4f20dcae54d5326a45abc2aa86647 PreviousVersion:01b4f20dcae54d5326a45abc2aa86647 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:05.227148 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[{ID:outbox-1 Operation:delete Bucket:probe Key:target SourceBucket: SourceKey: Version:01b4f20dcae54d5326a45abc2aa86647 PreviousVersion:01b4f20dcae54d5326a45abc2aa86647 UpstreamVersion:"149603e6c03516362a8da23f624db945" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:32:05.227148 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}]
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=local mutation committed
+        object not found
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked
+    prepared_uncertainty_test.go:21: original HEAD error lost: got=<nil> want=lookup: object not found
+        lookup uncertain
+        local mutation committed
+    prepared_uncertainty_test.go:21: uncertain recovery read HEAD 2 times
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: uncertain recovery rewrote the durable intent
+    prepared_uncertainty_test.go:21: uncertain recovery changed intent: prepared=[] pending=[]
+    prepared_uncertainty_test.go:21: uncertain recovery reached upstream: head=0 get=0 put=0 delete=1
+    prepared_uncertainty_test.go:21: wrong replay: puts=0 deletes=1
+    prepared_uncertainty_test.go:21: upstream body="" want="old"
+    prepared_uncertainty_test.go:21: second retry repeated a mutation
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown
+--- FAIL: TestPreparedRecoveryUncertainty (6.28s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing (0.09s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked (0.09s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/unknown (0.17s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing (0.09s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked (0.08s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/unknown (0.16s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing (0.10s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked (0.12s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/unknown (0.19s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing (0.11s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked (0.11s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/unknown (0.19s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing (0.09s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked (0.05s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown (0.08s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing (0.04s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked (0.04s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked (0.07s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/unknown (0.04s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing (0.07s)
+    --- FAIL: TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked (0.09s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/unknown (0.06s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing (0.16s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked (0.19s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown (0.21s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing (0.14s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked (0.12s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown (0.30s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing (0.09s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked (0.17s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown (0.15s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing (0.11s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked (0.12s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown (0.17s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing (0.10s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked (0.09s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown (0.16s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing (0.13s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked (0.20s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown (0.19s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing (0.20s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked (0.22s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown (0.18s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing (0.22s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.21s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.22s)
+=== RUN   TestPreparedRecoveryConfirmedMissing
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true
+--- PASS: TestPreparedRecoveryConfirmedMissing (1.70s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.04s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.07s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.07s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.14s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.18s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.19s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.15s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.16s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.19s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.15s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.16s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	15.791s
+FAIL

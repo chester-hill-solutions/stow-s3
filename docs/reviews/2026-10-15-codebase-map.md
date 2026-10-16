@@ -211,6 +211,16 @@ probe confirms ambiguous marked-missing HEAD recovery can permanently discard a
 prepared write intent despite a real local commit. Prepared recovery remains
 unchanged in this reader cleanup correction.
 
+Follow-up: **prepared recovery now preserves marked-missing HEAD uncertainty**,
+with [regression, race, conformance and Railway-only cost evidence](../benchmarks/2026-10-16-prepared-recovery/README.md).
+Two existing conditions prevent dropping committed write intents and prevent
+uncommitted deletes from reaching upstream. All 64 cases pass, including durable
+reopen; allocations match. Reliable-missing classification adds 4–7 ns in the
+isolated Railway benchmark. The runner is stopped after verified export. All
+future performance benchmarks run only on Railway. The report separately proves
+mutation preflight can lose the previous version, falsely classify a refused
+write as committed and overwrite upstream. Preflight remains unchanged here.
+
 ## Codebase map
 
 ```mermaid

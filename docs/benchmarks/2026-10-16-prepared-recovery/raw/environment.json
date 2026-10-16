@@ -1,0 +1,182 @@
+{
+  "base": "8e537ac0c0d0e92dd4bd435c0b376e94075ca7bf",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "sources": {
+    "internal/runthrough/outbox_adapter.go": {
+      "bytes": 15101,
+      "sha256": "66f3f4c71121fb74bb551bf50402f3fe1340b2525ee9c22a9a196922327c0d62"
+    },
+    "internal/runthrough/prepared_uncertainty_fixture_test.go": {
+      "bytes": 3901,
+      "sha256": "3b933e7d4d58bfc363f540e38114ead230f7efdf353b749ca150f28b70ab37e1"
+    },
+    "internal/runthrough/prepared_uncertainty_test.go": {
+      "bytes": 5376,
+      "sha256": "807d50e6a3bdf5bea95bd6a7558e83c9663c1b40ef0ae580de9068192b0d0ff9"
+    },
+    "internal/runthrough/prepared_uncertainty_bench_test.go": {
+      "bytes": 2790,
+      "sha256": "31ac2b9a15442a92961a506a36afe45a5074e50c491cbad995cda81935469fc5"
+    }
+  },
+  "binaries": {
+    "before": {
+      "bytes": 18519953,
+      "sha256": "5ebbb842685819c27e92f97b7e2fc57c85c043db774e7d5868a8c4a5ab0e5cb8"
+    },
+    "after": {
+      "bytes": 18519921,
+      "sha256": "37016bb3e176ceeaa66467b7c66927993df0b99736ec0f347e413dfcc92d9c37"
+    }
+  },
+  "go": "go version go1.25.6 linux/amd64",
+  "compiler": {
+    "CGO_ENABLED": "1",
+    "GOAMD64": "v1",
+    "GOARCH": "amd64",
+    "GOEXPERIMENT": "",
+    "GOFLAGS": "",
+    "GOOS": "linux",
+    "GOTOOLCHAIN": "local"
+  },
+  "input_manifest_sha256": "1bce4e6fa5b756996c3b7a826df616cea2163bbce03f2d554768a91190d80f6b",
+  "baseline_source_sha256": "a2bacf1a11c2cecc4ea7275dc961a5cf85d83dcb81a011784112833a977ee06d",
+  "provider": "Railway",
+  "measurementPhase": "deployed runner; binaries compiled during image build",
+  "start": {
+    "recordedAt": "2026-10-16T18:47:27.618Z",
+    "cpu": "AMD EPYC 9655P 96-Core Processor",
+    "hostLogicalCpus": 48,
+    "hostMemoryBytes": 346488950784,
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.18.15+deb13-cloud-amd64",
+    "node": "v25.9.0",
+    "cgroup": {
+      "cpuMax": "400000 100000",
+      "memoryMax": "4294967296",
+      "cpuStat": "usage_usec 201742\nuser_usec 132043\nsystem_usec 69698\nnice_usec 0\nnr_periods 10\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+    },
+    "mountInfo": "38604 13971 0:1574 / / rw,relatime - overlay overlay rw,lowerdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332190/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332189/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332188/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332187/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332186/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332185/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332184/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332183/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332182/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332181/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332180/fs,upperdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332229/fs,workdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332229/work,uuid=on\n38608 38604 230:4000 / /results rw,relatime - ext4 /dev/zd4000 rw,discard,stripe=8192\n38944 38604 0:2079 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n38945 38604 0:2107 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755,inode64\n39586 38604 0:2355 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs rw\n39597 38945 0:2381 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666,max=1024\n39598 38945 0:1896 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n39609 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/hostname /etc/hostname rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39612 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/resolv.conf /etc/resolv.conf rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39613 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/hosts /etc/hosts rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39614 38945 0:1725 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=62500k,inode64\n39625 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/.containerenv /run/.containerenv rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39626 39586 0:27 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot\n39627 38944 0:25 /crun/.empty-directory /proc/acpi ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39628 38944 0:6 /null /proc/kcore ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39629 38944 0:6 /null /proc/keys ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39638 38944 0:6 /null /proc/timer_list ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39642 39586 0:25 /crun/.empty-directory /sys/firmware ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39643 38944 0:6 /null /proc/interrupts ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39679 38944 0:2079 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n39680 38944 0:2079 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n39681 38944 0:2079 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n39682 38944 0:2079 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n39683 38944 0:2079 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw",
+    "deployment": {
+      "RAILWAY_DEPLOYMENT_ID": "ddeed917-0e0e-4e22-b463-fd0a3e61b6ef",
+      "RAILWAY_REPLICA_ID": "2dc85d5f-6ff5-42ed-8f46-5d738fd1cf6d",
+      "RAILWAY_SERVICE_ID": "83497842-c51d-420e-8ba1-181589730ad4",
+      "RAILWAY_ENVIRONMENT_ID": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411"
+    },
+    "build": {
+      "base": "8e537ac0c0d0e92dd4bd435c0b376e94075ca7bf",
+      "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+      "sources": {
+        "internal/runthrough/outbox_adapter.go": {
+          "bytes": 15101,
+          "sha256": "66f3f4c71121fb74bb551bf50402f3fe1340b2525ee9c22a9a196922327c0d62"
+        },
+        "internal/runthrough/prepared_uncertainty_fixture_test.go": {
+          "bytes": 3901,
+          "sha256": "3b933e7d4d58bfc363f540e38114ead230f7efdf353b749ca150f28b70ab37e1"
+        },
+        "internal/runthrough/prepared_uncertainty_test.go": {
+          "bytes": 5376,
+          "sha256": "807d50e6a3bdf5bea95bd6a7558e83c9663c1b40ef0ae580de9068192b0d0ff9"
+        },
+        "internal/runthrough/prepared_uncertainty_bench_test.go": {
+          "bytes": 2790,
+          "sha256": "31ac2b9a15442a92961a506a36afe45a5074e50c491cbad995cda81935469fc5"
+        }
+      },
+      "binaries": {
+        "before": {
+          "bytes": 18519953,
+          "sha256": "5ebbb842685819c27e92f97b7e2fc57c85c043db774e7d5868a8c4a5ab0e5cb8"
+        },
+        "after": {
+          "bytes": 18519921,
+          "sha256": "37016bb3e176ceeaa66467b7c66927993df0b99736ec0f347e413dfcc92d9c37"
+        }
+      },
+      "go": "go version go1.25.6 linux/amd64",
+      "compiler": {
+        "CGO_ENABLED": "1",
+        "GOAMD64": "v1",
+        "GOARCH": "amd64",
+        "GOEXPERIMENT": "",
+        "GOFLAGS": "",
+        "GOOS": "linux",
+        "GOTOOLCHAIN": "local"
+      },
+      "input_manifest_sha256": "1bce4e6fa5b756996c3b7a826df616cea2163bbce03f2d554768a91190d80f6b",
+      "baseline_source_sha256": "a2bacf1a11c2cecc4ea7275dc961a5cf85d83dcb81a011784112833a977ee06d"
+    }
+  },
+  "end": {
+    "recordedAt": "2026-10-16T18:48:45.696Z",
+    "cpu": "AMD EPYC 9655P 96-Core Processor",
+    "hostLogicalCpus": 48,
+    "hostMemoryBytes": 346488950784,
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.18.15+deb13-cloud-amd64",
+    "node": "v25.9.0",
+    "cgroup": {
+      "cpuMax": "400000 100000",
+      "memoryMax": "4294967296",
+      "cpuStat": "usage_usec 80446191\nuser_usec 79032985\nsystem_usec 1413205\nnice_usec 0\nnr_periods 791\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+    },
+    "mountInfo": "38604 13971 0:1574 / / rw,relatime - overlay overlay rw,lowerdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332190/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332189/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332188/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332187/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332186/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332185/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332184/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332183/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332182/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332181/fs:/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332180/fs,upperdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332229/fs,workdir=/var/lib/containers/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/332229/work,uuid=on\n38608 38604 230:4000 / /results rw,relatime - ext4 /dev/zd4000 rw,discard,stripe=8192\n38944 38604 0:2079 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw\n38945 38604 0:2107 / /dev rw,nosuid - tmpfs tmpfs rw,size=65536k,mode=755,inode64\n39586 38604 0:2355 / /sys ro,nosuid,nodev,noexec,relatime - sysfs sysfs rw\n39597 38945 0:2381 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,gid=5,mode=620,ptmxmode=666,max=1024\n39598 38945 0:1896 / /dev/mqueue rw,nosuid,nodev,noexec,relatime - mqueue mqueue rw\n39609 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/hostname /etc/hostname rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39612 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/resolv.conf /etc/resolv.conf rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39613 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/hosts /etc/hosts rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39614 38945 0:1725 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=62500k,inode64\n39625 38604 0:25 /containers/storage/overlay-containers/925532e0f5f64af89b5a1a1b7e999f6fdcd6b8a7f35d6ca1643f1dd7f803b8dc/userdata/.containerenv /run/.containerenv rw,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39626 39586 0:27 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot\n39627 38944 0:25 /crun/.empty-directory /proc/acpi ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39628 38944 0:6 /null /proc/kcore ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39629 38944 0:6 /null /proc/keys ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39638 38944 0:6 /null /proc/timer_list ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39642 39586 0:25 /crun/.empty-directory /sys/firmware ro,relatime - tmpfs tmpfs rw,size=33836812k,mode=755,inode64\n39643 38944 0:6 /null /proc/interrupts ro,relatime - devtmpfs udev rw,size=169168676k,nr_inodes=42292169,mode=755,inode64\n39679 38944 0:2079 /bus /proc/bus ro,nosuid,nodev,noexec,relatime - proc proc rw\n39680 38944 0:2079 /fs /proc/fs ro,nosuid,nodev,noexec,relatime - proc proc rw\n39681 38944 0:2079 /irq /proc/irq ro,nosuid,nodev,noexec,relatime - proc proc rw\n39682 38944 0:2079 /sys /proc/sys ro,nosuid,nodev,noexec,relatime - proc proc rw\n39683 38944 0:2079 /sysrq-trigger /proc/sysrq-trigger ro,nosuid,nodev,noexec,relatime - proc proc rw",
+    "deployment": {
+      "RAILWAY_DEPLOYMENT_ID": "ddeed917-0e0e-4e22-b463-fd0a3e61b6ef",
+      "RAILWAY_REPLICA_ID": "2dc85d5f-6ff5-42ed-8f46-5d738fd1cf6d",
+      "RAILWAY_SERVICE_ID": "83497842-c51d-420e-8ba1-181589730ad4",
+      "RAILWAY_ENVIRONMENT_ID": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411"
+    },
+    "build": {
+      "base": "8e537ac0c0d0e92dd4bd435c0b376e94075ca7bf",
+      "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+      "sources": {
+        "internal/runthrough/outbox_adapter.go": {
+          "bytes": 15101,
+          "sha256": "66f3f4c71121fb74bb551bf50402f3fe1340b2525ee9c22a9a196922327c0d62"
+        },
+        "internal/runthrough/prepared_uncertainty_fixture_test.go": {
+          "bytes": 3901,
+          "sha256": "3b933e7d4d58bfc363f540e38114ead230f7efdf353b749ca150f28b70ab37e1"
+        },
+        "internal/runthrough/prepared_uncertainty_test.go": {
+          "bytes": 5376,
+          "sha256": "807d50e6a3bdf5bea95bd6a7558e83c9663c1b40ef0ae580de9068192b0d0ff9"
+        },
+        "internal/runthrough/prepared_uncertainty_bench_test.go": {
+          "bytes": 2790,
+          "sha256": "31ac2b9a15442a92961a506a36afe45a5074e50c491cbad995cda81935469fc5"
+        }
+      },
+      "binaries": {
+        "before": {
+          "bytes": 18519953,
+          "sha256": "5ebbb842685819c27e92f97b7e2fc57c85c043db774e7d5868a8c4a5ab0e5cb8"
+        },
+        "after": {
+          "bytes": 18519921,
+          "sha256": "37016bb3e176ceeaa66467b7c66927993df0b99736ec0f347e413dfcc92d9c37"
+        }
+      },
+      "go": "go version go1.25.6 linux/amd64",
+      "compiler": {
+        "CGO_ENABLED": "1",
+        "GOAMD64": "v1",
+        "GOARCH": "amd64",
+        "GOEXPERIMENT": "",
+        "GOFLAGS": "",
+        "GOOS": "linux",
+        "GOTOOLCHAIN": "local"
+      },
+      "input_manifest_sha256": "1bce4e6fa5b756996c3b7a826df616cea2163bbce03f2d554768a91190d80f6b",
+      "baseline_source_sha256": "a2bacf1a11c2cecc4ea7275dc961a5cf85d83dcb81a011784112833a977ee06d"
+    }
+  },
+  "runtimeSettings": {
+    "GOGC": null,
+    "GOMEMLIMIT": null
+  }
+}
