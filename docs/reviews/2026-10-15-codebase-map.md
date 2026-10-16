@@ -140,6 +140,12 @@ and allocation measurements include every adverse sample. A separate probe also
 confirms early EOF yielding successful truncated objects and a bound incomplete
 condition. Length validation remains unchanged in this body-error correction.
 
+Performance follow-up: [repeated measurements and rejected prototypes](../benchmarks/2026-10-15-save-read-call-boundary/README.md)
+retain every adverse result. The original timing concern remains unresolved;
+neither private-helper variant demonstrates a dependable overall improvement.
+Production source and the shipped WASM are restored exactly to the body-error fix.
+No optimization is retained; early EOF remains a separate unimplemented finding.
+
 ## Codebase map
 
 ```mermaid
