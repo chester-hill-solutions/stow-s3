@@ -1,0 +1,178 @@
+package runtime
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/policy"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"io"
+	goruntime "runtime"
+	"runtime/metrics"
+	"testing"
+	"time"
+)
+
+type reviewReadSample struct {
+	CPU         int     `json:"cpu"`
+	Case        string  `json:"case"`
+	Cycle       int     `json:"cycle"`
+	Position    int     `json:"position"`
+	Label       string  `json:"label"`
+	N           int     `json:"n"`
+	Nanoseconds int64   `json:"ns"`
+	Bytes       uint64  `json:"allocated_bytes"`
+	Allocs      uint64  `json:"allocs"`
+	GCCycles    uint64  `json:"gc_cycles"`
+	GCPause     uint64  `json:"gc_pause_ns"`
+	GCCPU       float64 `json:"gc_cpu_seconds"`
+}
+
+func TestReviewMatchedPointerCosts(t *testing.T) {
+	samples := make([]reviewReadSample, 0, 320)
+	for _, item := range []struct {
+		name    string
+		size, n int
+		guarded bool
+	}{
+		{"get-3", 3, 50000, false}, {"get-64KiB", 64 << 10, 1000, false},
+		{"save-3", 3, 50000, true}, {"save-64KiB", 64 << 10, 1000, true},
+	} {
+		store := &saveBodyStore{MemoryStore: storage.NewMemoryStore()}
+		instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 1 << 20, MaxObjects: 1}, store, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ctx := context.Background()
+		if err := instance.CreateBucket(ctx, "probe"); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := instance.PutObject(ctx, "probe", "target", bytes.Repeat([]byte("x"), item.size), PutOptions{ContentType: "text/plain", Metadata: map[string]string{"state": "original"}}); err != nil {
+			t.Fatal(err)
+		}
+		for _, original := range []bool{false, true} {
+			reviewReadBatch(t, instance, item.size, 100, item.guarded, original)
+		}
+		gc := []metrics.Sample{{Name: "/cpu/classes/gc/total:cpu-seconds"}}
+		for cycle := 0; cycle < 20; cycle++ {
+			order := []string{"pointer-a", "current-a", "current-b", "pointer-b"}
+			if cycle%2 != 0 {
+				order = []string{"current-a", "pointer-a", "pointer-b", "current-b"}
+			}
+			for position, label := range order {
+				var before, after goruntime.MemStats
+				metrics.Read(gc)
+				gcBefore := gc[0].Value.Float64()
+				goruntime.ReadMemStats(&before)
+				original := label[:7] == "pointer"
+				start := time.Now()
+				reviewReadBatch(t, instance, item.size, item.n, item.guarded, original)
+				elapsed := time.Since(start).Nanoseconds()
+				goruntime.ReadMemStats(&after)
+				metrics.Read(gc)
+				samples = append(samples, reviewReadSample{CPU: goruntime.GOMAXPROCS(0), Case: item.name, Cycle: cycle, Position: position, Label: label, N: item.n, Nanoseconds: elapsed, Bytes: after.TotalAlloc - before.TotalAlloc, Allocs: after.Mallocs - before.Mallocs, GCCycles: uint64(after.NumGC - before.NumGC), GCPause: after.PauseTotalNs - before.PauseTotalNs, GCCPU: gc[0].Value.Float64() - gcBefore})
+			}
+		}
+		expected := 200 + 80*item.n
+		if store.gets != expected {
+			t.Fatalf("gets=%d expected=%d", store.gets, expected)
+		}
+		if err := instance.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, sample := range samples {
+		b, err := json.Marshal(sample)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log("MATCHED " + string(b))
+	}
+}
+
+func reviewReadBatch(t *testing.T, i *Instance, size, n int, guarded, original bool) {
+	t.Helper()
+	get := (*Instance).reviewValueGetObject
+	if original {
+		get = (*Instance).GetObject
+	}
+	save := (*Instance).reviewValueReadForSave
+	if original {
+		save = (*Instance).ReadForSave
+	}
+	ctx := context.Background()
+	for j := 0; j < n; j++ {
+		var object Object
+		var err error
+		if guarded {
+			var condition SaveCondition
+			object, condition, err = save(i, ctx, "probe", "target")
+			if err == nil && condition.ObservedAbsence() {
+				t.Fatal("existing object observed absent")
+			}
+		} else {
+			object, err = get(i, ctx, "probe", "target")
+		}
+		if err != nil || len(object.Data) != size {
+			t.Fatalf("bytes=%d expected=%d error=%v", len(object.Data), size, err)
+		}
+	}
+}
+
+func (i *Instance) reviewValueGetObject(ctx context.Context, bucket, key string) (Object, error) {
+	reader, object, err := i.OpenObject(ctx, bucket, key)
+	if err != nil {
+		return Object{}, err
+	}
+	return reviewReadOpenedValue(reader, object)
+}
+
+func reviewReadOpenedValue(reader io.ReadCloser, object Object) (Object, error) {
+	defer reader.Close()
+	size := object.Size
+	if size < 0 {
+		size = 0
+	}
+	if size > 32<<20 {
+		size = 32 << 20
+	}
+	buffer := bytes.NewBuffer(make([]byte, 0, int(size)))
+	_, err := io.Copy(buffer, reader)
+	if err != nil {
+		return Object{}, err
+	}
+	object.Data = buffer.Bytes()
+	return object, nil
+}
+
+func (i *Instance) reviewValueReadForSave(ctx context.Context, bucket, key string) (Object, SaveCondition, error) {
+	if err := i.checkContext(ctx); err != nil {
+		return Object{}, SaveCondition{}, err
+	}
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
+		return Object{}, SaveCondition{}, err
+	}
+	if !i.SupportsGuardedSaves() {
+		return Object{}, SaveCondition{}, ErrGuardedSavesUnsupported
+	}
+	reader, object, err := i.OpenObject(ctx, bucket, key)
+	condition := SaveCondition{owner: i, bucket: bucket, key: key}
+	if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
+		condition.guard.Absent = true
+		return Object{Bucket: bucket, Key: key}, condition, nil
+	}
+	if err != nil {
+		return Object{}, SaveCondition{}, err
+	}
+	object, err = reviewReadOpenedValue(reader, object)
+	if err != nil {
+		return Object{}, SaveCondition{}, err
+	}
+	condition.guard.Fingerprint = storage.ObjectFingerprint(storage.ObjectMeta{
+		VersionID: object.VersionID, ContentType: object.ContentType,
+		Metadata: object.Metadata, ChecksumAlgorithm: object.ChecksumAlgorithm, ChecksumValue: object.ChecksumValue,
+	}, object.Data)
+	return object, condition, nil
+}

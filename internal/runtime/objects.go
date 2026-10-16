@@ -29,10 +29,13 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 	if err != nil {
 		return Object{}, err
 	}
-	return readOpenedObject(reader, object)
+	if err := readOpenedObject(reader, &object); err != nil {
+		return Object{}, err
+	}
+	return object, nil
 }
 
-func readOpenedObject(reader io.ReadCloser, object Object) (Object, error) {
+func readOpenedObject(reader io.ReadCloser, object *Object) error {
 	defer reader.Close()
 	size := object.Size
 	if size < 0 {
@@ -44,10 +47,10 @@ func readOpenedObject(reader io.ReadCloser, object Object) (Object, error) {
 	buffer := bytes.NewBuffer(make([]byte, 0, int(size)))
 	_, err := io.Copy(buffer, reader)
 	if err != nil {
-		return Object{}, err
+		return err
 	}
 	object.Data = buffer.Bytes()
-	return object, nil
+	return nil
 }
 
 func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, error) {

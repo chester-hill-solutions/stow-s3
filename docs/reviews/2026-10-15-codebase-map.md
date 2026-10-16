@@ -146,6 +146,14 @@ neither private-helper variant demonstrates a dependable overall improvement.
 Production source and the shipped WASM are restored exactly to the body-error fix.
 No optimization is retained; early EOF remains a separate unimplemented finding.
 
+2026-10-16 follow-up: [measured read-result pointer refinement](../benchmarks/2026-10-16-read-result-pointer/README.md)
+removes whole-record copies at the existing private helper boundary. Tiny GET
+improves across matched and direct comparisons without extra allocation counts.
+Same-code controls and GC counters calibrate large-read variation; adverse +1.7%
+/+1.8% direct large-read results remain explicit, with no broad parity claim.
+Ownership/error/absence contracts pass; packaged WASM grows 123 bytes. Early EOF
+remains the next separate correctness finding.
+
 ## Codebase map
 
 ```mermaid

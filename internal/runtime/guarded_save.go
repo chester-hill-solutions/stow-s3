@@ -77,7 +77,7 @@ func (i *Instance) ReadForSave(ctx context.Context, bucket, key string) (Object,
 	if err != nil {
 		return Object{}, SaveCondition{}, err
 	}
-	object, err = readOpenedObject(reader, object)
+	err = readOpenedObject(reader, &object)
 	if err != nil {
 		return Object{}, SaveCondition{}, err
 	}
