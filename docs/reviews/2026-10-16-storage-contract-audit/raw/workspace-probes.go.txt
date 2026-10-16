@@ -1,0 +1,152 @@
+package workspace_test
+
+import (
+	"context"
+	"errors"
+	"io"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
+)
+
+// Real native stores; fault injection changes a filesystem target, never a
+// provider return value. The body callback orders the failure without sleeps.
+func auditBlockDocument(t *testing.T, path string) func() {
+	t.Helper()
+	saved := path + ".audit-saved"
+	if err := os.Rename(path, saved); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(path, 0700); err != nil {
+		_ = os.Rename(saved, path)
+		t.Fatal(err)
+	}
+	return func() {
+		t.Helper()
+		if err := os.Remove(path); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Rename(saved, path); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestContractAuditDeleteOutcome(t *testing.T) {
+	for _, batch := range []bool{false, true} {
+		for _, fault := range []bool{false, true} {
+			name := "single/healthy"
+			if batch {
+				name = "batch/healthy"
+			}
+			if fault {
+				name = strings.Replace(name, "healthy", "index-failure", 1)
+			}
+			t.Run(name, func(t *testing.T) {
+				store, root := newStore(t)
+				put(t, store, "victim", "payload")
+				restore := func() {}
+				if fault {
+					restore = auditBlockDocument(t, filepath.Join(root, ".stow", "index.json"))
+				}
+				ctx := context.Background()
+				var deleted []string
+				var err error
+				if batch {
+					deleted, err = store.DeleteObjects(ctx, bucket, []string{"victim"})
+				} else {
+					err = store.DeleteObject(ctx, bucket, "victim")
+				}
+				restore()
+				if fault && err == nil {
+					t.Fatal("filesystem fault did not fire")
+				}
+				if !fault && err != nil {
+					t.Fatal(err)
+				}
+				if _, headErr := store.HeadObject(ctx, bucket, "victim"); !errors.Is(headErr, storage.ErrObjectNotFound) {
+					t.Fatalf("actual object was not deleted: %v", headErr)
+				}
+				t.Logf("object absent; error=%v; committed=%v; confirmed=%v", err, errors.Is(err, storage.ErrMutationCommitted), deleted)
+				if fault && !errors.Is(err, storage.ErrMutationCommitted) {
+					t.Errorf("native deletion completed but error does not identify committed outcome")
+				}
+				if batch && !reflect.DeepEqual(deleted, []string{"victim"}) {
+					t.Errorf("confirmed deleted=%v, want [victim]", deleted)
+				}
+			})
+		}
+	}
+}
+
+type auditReader struct {
+	io.Reader
+	once func()
+}
+
+func (r *auditReader) Read(p []byte) (int, error) {
+	if r.once != nil {
+		f := r.once
+		r.once = nil
+		f()
+	}
+	return r.Reader.Read(p)
+}
+
+func TestContractAuditPartDescriptor(t *testing.T) {
+	for _, fault := range []bool{false, true} {
+		name := "healthy"
+		if fault {
+			name = "descriptor-failure"
+		}
+		t.Run(name, func(t *testing.T) {
+			store, root := newStore(t)
+			ctx := context.Background()
+			upload, err := store.CreateMultipartUpload(ctx, bucket, "target", storage.MultipartOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			old, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("old"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			restore := func() {}
+			body := &auditReader{Reader: strings.NewReader("replacement")}
+			if fault {
+				body.once = func() {
+					restore = auditBlockDocument(t, filepath.Join(workspace.InternalPath(root, "multipart", upload.UploadID), "upload.json"))
+				}
+			}
+			part, writeErr := store.UploadPart(ctx, upload.UploadID, 1, body)
+			restore()
+			if fault && writeErr == nil {
+				t.Fatal("filesystem fault did not fire")
+			}
+			if !fault && writeErr != nil {
+				t.Fatal(writeErr)
+			}
+			listed, err := store.ListParts(ctx, upload.UploadID)
+			if err != nil || len(listed) != 1 {
+				t.Fatalf("list=%v error=%v", listed, err)
+			}
+			data, err := os.ReadFile(filepath.Join(workspace.InternalPath(root, "multipart", upload.UploadID), "part-1"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Logf("old=%+v result=%+v write error=%v listed=%+v actual=%q", old, part, writeErr, listed[0], data)
+			if listed[0].Size != int64(len(data)) || !storage.ETagEqual(listed[0].ETag, storage.ETagForBytes(data)) {
+				t.Errorf("ListParts descriptor disagrees with actual stored bytes")
+			}
+			meta, completeErr := store.CompleteMultipartUpload(ctx, upload.UploadID, listed)
+			t.Logf("completion from ListParts: meta=%+v error=%v", meta, completeErr)
+			if completeErr != nil {
+				t.Errorf("completion from the returned list failed: %v", completeErr)
+			}
+		})
+	}
+}

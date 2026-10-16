@@ -220,6 +220,12 @@ cleanup. The retained results volume is untouched. [Export receipt](raw/railway-
 
 ## Next confirmed finding — left unchanged
 
+Priority reassessment: the [bounded audit](../../reviews/2026-10-16-storage-contract-audit.md)
+classifies this as conditional custom-provider hardening. The supplied native
+HEAD implementations do not generate the injected marked-missing result; native
+multipart recovery failures rank ahead of it. The evidence below remains valid
+for the injected input.
+
 Mutation preflight's localVersionStrict still classifies a marked-missing HEAD
 as ordinary absence and returns an empty previous version. This occurs before
 prepared recovery and is a separate entry point from the corrected reconciliation.

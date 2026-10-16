@@ -221,6 +221,14 @@ future performance benchmarks run only on Railway. The report separately proves
 mutation preflight can lose the previous version, falsely classify a refused
 write as committed and overwrite upstream. Preflight remains unchanged here.
 
+2026-10-16 priority reassessment: the [bounded storage contract audit](2026-10-16-storage-contract-audit.md)
+supersedes the rolling "next finding" priorities above. It distinguishes native
+filesystem failures from custom-provider defensive cases and consolidates the
+remaining work into three ranked defect groups. Native corrupt-upload recovery
+is the first recommendation. The marked-missing HEAD preflight repro remains
+valid for its injected input, but no native producer was identified; it is not
+the leading native correctness finding. No additional implementation is included.
+
 ## Codebase map
 
 ```mermaid
