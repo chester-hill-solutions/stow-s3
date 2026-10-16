@@ -128,7 +128,17 @@ The guard adds no allocations or provider calls; all measured timing costs and
 variation are retained. That review separately confirms a partial-body failure
 without a committed marker being converted into absence after successful open.
 The backend still prevents overwrite; body-phase classification remains unchanged
-in this marked-read correction.
+in that marked-read correction.
+
+Follow-up: **ReadForSave now distinguishes opening absence from body failure**,
+with [regression and comparative cost evidence](../benchmarks/2026-10-15-save-body-failure/README.md).
+Only the opening result can establish absence. Raw/wrapped body errors return no
+usable condition, and the existing GET read routine is shared without changing
+its buffering/closure contract. New and prior regressions retain healthy, absent,
+marked-error, stale-save and access behavior. Ordinary GET and guarded-read timing
+and allocation measurements include every adverse sample. A separate probe also
+confirms early EOF yielding successful truncated objects and a bound incomplete
+condition. Length validation remains unchanged in this body-error correction.
 
 ## Codebase map
 

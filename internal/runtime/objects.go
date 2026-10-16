@@ -29,6 +29,10 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 	if err != nil {
 		return Object{}, err
 	}
+	return readOpenedObject(reader, object)
+}
+
+func readOpenedObject(reader io.ReadCloser, object Object) (Object, error) {
 	defer reader.Close()
 	size := object.Size
 	if size < 0 {
@@ -38,7 +42,7 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 		size = 32 << 20
 	}
 	buffer := bytes.NewBuffer(make([]byte, 0, int(size)))
-	_, err = io.Copy(buffer, reader)
+	_, err := io.Copy(buffer, reader)
 	if err != nil {
 		return Object{}, err
 	}
