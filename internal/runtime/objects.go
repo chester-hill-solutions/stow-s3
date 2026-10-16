@@ -45,9 +45,12 @@ func readOpenedObject(reader io.ReadCloser, object *Object) error {
 		size = 32 << 20
 	}
 	buffer := bytes.NewBuffer(make([]byte, 0, int(size)))
-	_, err := io.Copy(buffer, reader)
+	n, err := io.Copy(buffer, reader)
 	if err != nil {
 		return err
+	}
+	if n < object.Size {
+		return io.ErrUnexpectedEOF
 	}
 	object.Data = buffer.Bytes()
 	return nil

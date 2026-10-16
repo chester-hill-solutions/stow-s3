@@ -1,0 +1,178 @@
+COMMAND ["go", "test", "./internal/runtime", "./internal/embedded", "-run", "^Test(BufferedRead(RejectsPrematureEOF|CompleteEOF|UnknownSize|PreservesWrappedEOF)|EmbeddedBufferedReadRejectsPrematureEOF)$", "-count=2", "-v"]
+=== RUN   TestBufferedReadRejectsPrematureEOF
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:26e26e233e38ecca65d4917fd0710416 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140196 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:b528735fd967e59378f049cadf38a659 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140475 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:dc40abe5db94f0f61624c9ef3e8d4e36 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140526 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:fd6327c49f8ec894e47494c52442881e ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140579 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:2e1b4f1402e50d5d3a17fb047bed8e1a ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140622 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:e2fb5f5158adbb6d03938ab1d8620ece ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140663 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:3b60251770523072ec3ffcea800c5075 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140706 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x14000114b00 bucket:probe key:target guard:{Absent:false Fingerprint:[116 22 151 192 41 182 34 111 4 155 232 21 178 71 132 164 219 100 163 92 107 42 156 127 34 181 62 205 242 209 183 88]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:72885c448a9f3efe9eebf5226435dfaa ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140772 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x14000114c60 bucket:probe key:target guard:{Absent:false Fingerprint:[74 175 153 56 103 77 86 242 179 254 226 245 48 164 220 157 63 125 209 184 207 108 174 178 103 18 168 206 116 170 37 138]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:9f87517429394b18476c9f45fbc71a30 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140841 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x14000114dc0 bucket:probe key:target guard:{Absent:false Fingerprint:[44 43 20 241 248 3 41 81 71 111 100 59 209 135 113 121 203 222 132 181 196 23 13 188 152 49 138 134 164 103 120 63]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:f79bec907e193b2e4dcad149afc3beb3 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140899 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x14000114f20 bucket:probe key:target guard:{Absent:false Fingerprint:[17 224 82 194 149 100 36 110 188 246 233 156 99 12 123 106 15 185 150 66 89 125 138 61 247 202 159 49 84 219 238 12]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:86378be65ded809c4228e1767185010e ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.140954 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x14000115080 bucket:probe key:target guard:{Absent:false Fingerprint:[27 71 122 14 50 140 182 40 240 52 231 247 224 71 96 23 58 19 116 128 161 219 105 188 241 193 153 99 8 162 128 195]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:12e5970f0124d876f1d01ea5bb4580cd ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141003 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001151e0 bucket:probe key:target guard:{Absent:false Fingerprint:[200 161 45 185 249 44 245 83 55 165 151 56 172 129 76 74 90 233 71 77 173 16 113 149 9 93 168 123 182 249 114 247]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+--- FAIL: TestBufferedReadRejectsPrematureEOF (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true (0.00s)
+=== RUN   TestBufferedReadCompleteEOF
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true
+--- PASS: TestBufferedReadCompleteEOF (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true (0.00s)
+=== RUN   TestBufferedReadUnknownSize
+=== RUN   TestBufferedReadUnknownSize/guarded=false
+=== RUN   TestBufferedReadUnknownSize/guarded=true
+--- PASS: TestBufferedReadUnknownSize (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=false (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=true (0.00s)
+=== RUN   TestBufferedReadPreservesWrappedEOF
+--- PASS: TestBufferedReadPreservesWrappedEOF (0.00s)
+=== RUN   TestBufferedReadRejectsPrematureEOF
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:4efd5093c0bed6d452a6908f827c0f6b ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141432 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:9b7fcbf96699922db0c3fa07b5d6004f ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141469 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:0ec9ae17118d350f455159fe6551a3b4 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141514 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:e51dd32dc9bf4a92b5d6123ed3c87a19 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141549 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:fced9c8cb70e84a4a589b3e5a03a2fe9 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141581 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:2c478d4a8cec78d8ee5076ff8799506c ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141615 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil>
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:b97ce018963503d3ccf602f850d598c6 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141649 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001e4c60 bucket:probe key:target guard:{Absent:false Fingerprint:[191 201 8 145 157 182 63 253 90 200 188 209 69 98 90 171 157 168 106 139 90 137 93 174 152 216 73 43 111 130 149 25]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:2d81d5443435da003683591fd345816f ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141703 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001e4dc0 bucket:probe key:target guard:{Absent:false Fingerprint:[77 108 2 178 42 43 157 196 38 156 168 5 72 71 226 227 83 70 62 246 197 175 172 4 202 104 86 252 40 66 40 153]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:f0719329469ede9aa174c700ef8aab92 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.14175 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001e4f20 bucket:probe key:target guard:{Absent:false Fingerprint:[241 56 169 136 197 90 220 78 118 155 199 22 174 0 195 234 31 107 79 191 206 46 103 62 246 85 31 41 75 184 216 244]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:5d1963cecf4bad480dcb0f125cbc3494 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141807 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001e5080 bucket:probe key:target guard:{Absent:false Fingerprint:[65 222 21 201 211 253 89 240 50 58 17 255 114 55 158 189 211 18 62 118 13 234 254 160 113 89 159 178 239 150 187 247]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:ed46bcd594b2c833151b5c8736e5d6a1 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141859 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001e51e0 bucket:probe key:target guard:{Absent:false Fingerprint:[109 88 203 3 9 145 180 2 8 68 79 251 138 53 140 42 203 8 179 241 96 44 90 13 204 65 129 194 218 115 49 219]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true
+    read_completeness_test.go:27: premature EOF became observation: object={Bucket:probe Key:target Data:[111 108] Size:3 ETag:"149603e6c03516362a8da23f624db945" VersionID:fdb57231336577c46581ef0f29847669 ContentType:text/plain Metadata:map[state:original] LastModified:2026-10-16 13:52:37.141915 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x140001e5340 bucket:probe key:target guard:{Absent:false Fingerprint:[74 213 200 128 193 249 228 165 180 154 211 226 140 180 102 129 79 66 177 19 121 88 60 171 179 171 97 33 229 149 0 51]} replace:false} error=<nil>
+    read_completeness_test.go:27: incomplete body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+--- FAIL: TestBufferedReadRejectsPrematureEOF (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false (0.00s)
+    --- FAIL: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true (0.00s)
+=== RUN   TestBufferedReadCompleteEOF
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true
+--- PASS: TestBufferedReadCompleteEOF (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true (0.00s)
+=== RUN   TestBufferedReadUnknownSize
+=== RUN   TestBufferedReadUnknownSize/guarded=false
+=== RUN   TestBufferedReadUnknownSize/guarded=true
+--- PASS: TestBufferedReadUnknownSize (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=false (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=true (0.00s)
+=== RUN   TestBufferedReadPreservesWrappedEOF
+--- PASS: TestBufferedReadPreservesWrappedEOF (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.461s
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.926723 +0000 UTC} condition={inner:{owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}} error=<nil>
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.929552 +0000 UTC} condition={inner:{owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}} error=<nil>
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.929601 +0000 UTC} condition={inner:{owner:0x14000180420 bucket:probe key:target guard:{Absent:false Fingerprint:[195 189 170 79 236 103 248 133 2 233 61 42 179 236 167 239 52 38 168 217 69 168 252 126 193 156 216 218 187 136 2 4]} replace:false}} error=<nil>
+    read_completeness_test.go:16: public incomplete read issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.929659 +0000 UTC} condition={inner:{owner:0x14000180580 bucket:probe key:target guard:{Absent:false Fingerprint:[80 108 182 46 146 168 80 111 8 249 187 142 226 60 234 112 53 237 92 125 111 252 99 119 171 4 50 28 182 209 194 121]} replace:false}} error=<nil>
+    read_completeness_test.go:16: public incomplete read issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+--- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true (0.00s)
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.931793 +0000 UTC} condition={inner:{owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}} error=<nil>
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.931849 +0000 UTC} condition={inner:{owner:<nil> bucket: key: guard:{Absent:false Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}} error=<nil>
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.931886 +0000 UTC} condition={inner:{owner:0x140001809a0 bucket:probe key:target guard:{Absent:false Fingerprint:[202 108 43 185 141 128 19 100 254 239 112 126 238 50 157 146 16 203 102 251 218 31 58 190 231 194 107 179 168 240 121 157]} replace:false}} error=<nil>
+    read_completeness_test.go:16: public incomplete read issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true
+    read_completeness_test.go:16: public incomplete read became observation: object={Bucket:probe Key:target Data:[111] Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType: Metadata:map[] LastModified:2026-10-16 13:52:36.932095 +0000 UTC} condition={inner:{owner:0x14000180b00 bucket:probe key:target guard:{Absent:false Fingerprint:[21 134 166 34 138 109 104 196 181 11 56 160 84 66 209 38 35 76 78 136 6 11 133 42 1 82 6 247 88 168 251 69]} replace:false}} error=<nil>
+    read_completeness_test.go:16: public incomplete read issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+--- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false (0.00s)
+    --- FAIL: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.251s
+FAIL

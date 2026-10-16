@@ -1,0 +1,13 @@
+from pathlib import Path
+import subprocess,json,time,os
+p=Path('/private/tmp/stow-read-completeness-2026-10-16')
+cmd=[str(p/'matched.test'),'-test.run=^TestReviewMatchedCompletenessCosts$','-test.v','-test.count=2','-test.cpu=1,8'];(p/'matched-plan.json').write_text(json.dumps({'command':cmd,'reference':'frozen 32168f8 methods, renamed only','candidate':'actual length-checked production methods','flags':'ordinary go test -c','selected_environment':{k:os.environ.get(k) for k in ['GOGC','GOMEMLIMIT','GOMAXPROCS']},'all_samples_retained':True,'no_concurrent_agent_tests_or_builds':True},indent=2)+'\n');r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/'matched.log').write_text('COMMAND '+json.dumps(cmd)+'\n'+r.stdout);assert r.returncode==0,r.stdout[-3000:];print('matched complete',flush=True)
+out=p/'direct';out.mkdir(exist_ok=True);order=['before','after','after','before'];groups=[('^BenchmarkReadForSaveObservation$/^present$',250000),('^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$',1000000),('^BenchmarkOpenedObjectRead$/^get-tiny$',250000),('^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$',50000),('^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$',100000),('^BenchmarkBufferedEOFRead$',100000)]
+(out/'plan.json').write_text(json.dumps({'order':order,'groups':groups,'cpus':[1,8],'samples_per_case_version_cpu':6,'flags':'ordinary go test -c','all_samples_retained':True},indent=2)+'\n')
+for cpu in [1,8]:
+ for block,version in enumerate(order,1):
+  lines=[];start=time.time()
+  for pattern,n in groups:
+   cmd=[str(p/(version+'.test')),'-test.run=^$','-test.bench='+pattern,'-test.benchmem',f'-test.benchtime={n}x','-test.count=3',f'-test.cpu={cpu}'];r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);lines.extend(['COMMAND '+json.dumps(cmd),r.stdout]);assert r.returncode==0,r.stdout
+  (out/f'cpu{cpu}-{block}-{version}.log').write_text('\n'.join(lines));print(cpu,block,version,round(time.time()-start,2),flush=True)
+print('COMPLETE',flush=True)

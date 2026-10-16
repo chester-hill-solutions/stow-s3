@@ -154,6 +154,14 @@ Same-code controls and GC counters calibrate large-read variation; adverse +1.7%
 Ownership/error/absence contracts pass; packaged WASM grows 123 bytes. Early EOF
 remains the next separate correctness finding.
 
+Follow-up: **buffered GET and guarded reads now reject premature EOF**, with
+[regression and comparative cost evidence](../benchmarks/2026-10-16-read-completeness/README.md).
+The shared helper compares copied bytes with original metadata size, preserving
+real body errors and complete/empty/unknown-size behavior. All 27 new cases pass;
+adverse timing samples and the 239-byte WASM growth remain explicit. The report
+separately confirms raw streaming APIs still allow early EOF without a read error.
+Streaming readers remain unchanged in this buffered-read correction.
+
 ## Codebase map
 
 ```mermaid
