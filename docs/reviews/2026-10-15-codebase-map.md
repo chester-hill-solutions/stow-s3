@@ -170,6 +170,15 @@ with 16 additional bytes per stream. Adverse direct timings, same-code controls,
 and an excluded incomplete-reference measurement are retained. The report confirms
 excess provider bytes remain accepted as a separate finding; that path is unchanged.
 
+Follow-up: **runtime reads now reject excess provider bytes**, with
+[regression and measurement evidence](../benchmarks/2026-10-16-excess-body/README.md).
+Known-length reads consume at most one extra byte to detect overrun and return
+only the valid prefix with an error; buffered/guarded results remain empty. All 41
+new cases and 990 focused race runs pass. Healthy allocation counts are unchanged;
+large adverse wall timings and CPU-time controls are retained without a parity
+claim. A separate file-backed probe confirms live readers can be discarded on
+opening errors without Close; combined-result ownership remains the next review.
+
 ## Codebase map
 
 ```mermaid

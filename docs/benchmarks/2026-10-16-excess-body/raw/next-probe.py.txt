@@ -1,0 +1,15 @@
+from pathlib import Path
+import subprocess,os,json
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-excess-body-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+overlay=p/'baseline-overlay.json';overlay.write_text(json.dumps({'Replace':{str(r/'internal/runtime/streams.go'):str(p/'baseline-streams.go.txt')}}))
+probe=r/'internal/runtime/opening_error_review_probe_test.go';probe.write_text((p/'next-open-error-probe.go.txt').read_text())
+try:
+ for baseline in [True,False]:
+  for race in [False,True]:
+   name='next-open-'+('before' if baseline else 'after')+('-race' if race else '')+'.log'
+   cmd=['go','test']+(['-overlay',str(overlay)] if baseline else [])+(['-race'] if race else [])+['./internal/runtime','-run','^TestReviewOpeningErrorDropsReader$','-count=2','-v']
+   result=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+result.stdout)
+   assert result.returncode==1 and result.stdout.count('opening error discarded reader:')==12,(name,result.stdout)
+   assert '[build failed]' not in result.stdout and 'DATA RACE' not in result.stdout
+   print(name,'twelve expected ownership failures',flush=True)
+finally:probe.unlink()

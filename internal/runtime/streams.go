@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"sync"
@@ -10,6 +11,8 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
+
+var errObjectSizeExceeded = errors.New("object stream exceeds declared size")
 
 func (i *Instance) OpenObject(ctx context.Context, bucket, key string) (io.ReadCloser, Object, error) {
 	return i.openObject(ctx, bucket, key, nil)
@@ -106,8 +109,18 @@ func (r *objectStream) Read(buffer []byte) (int, error) {
 		_ = r.closeLocked()
 		return 0, err
 	}
+	remaining := max(r.size-r.position, 0)
+	if r.size >= 0 && int64(len(buffer)) > remaining {
+		buffer = buffer[:remaining+1]
+	}
 	n, err := r.reader.Read(buffer)
 	r.position += int64(n)
+	if r.size >= 0 && int64(n) > remaining {
+		n = int(remaining)
+		if err == nil || err == io.EOF {
+			err = errObjectSizeExceeded
+		}
+	}
 	if err == io.EOF && r.position < r.size {
 		err = io.ErrUnexpectedEOF
 	}
