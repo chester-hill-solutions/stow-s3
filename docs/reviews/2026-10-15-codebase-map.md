@@ -235,6 +235,11 @@ This addresses A1 from the bounded audit. Workspace part/descriptor consistency
 (A2) remains the next independent change. No backward-compatibility or migration
 path is introduced.
 
+Follow-up: **workspace part descriptors and payloads now publish together**
+(A2), with [Railway comparisons and regression evidence](2026-10-16-workspace-parts.md).
+The remaining workspace owner-document enumeration can still omit damaged
+uploads; that native A1 recovery-class failure is confirmed and left unchanged.
+
 ## Codebase map
 
 ```mermaid

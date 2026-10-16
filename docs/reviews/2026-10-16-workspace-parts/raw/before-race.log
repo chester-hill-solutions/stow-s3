@@ -1,0 +1,61 @@
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/first/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/first/metadata-failure
+    part_publication_test.go:100: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurefirstmetadat1138062377/001/.stow/multipart/e93ea73f13992051353e6e67908b7945/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurefirstmetadat1138062377/001/.stow/multipart/e93ea73f13992051353e6e67908b7945/.tmp-4146376032 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurefirstmetadat1138062377/001/.stow/multipart/e93ea73f13992051353e6e67908b7945/upload.json: file exists
+    part_publication_test.go:100: reopened parts=[] error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/larger/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/larger/metadata-failure
+    part_publication_test.go:100: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurelargermetada2833896438/001/.stow/multipart/2f50b03327eaba3b1bba2b9c097321a2/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurelargermetada2833896438/001/.stow/multipart/2f50b03327eaba3b1bba2b9c097321a2/.tmp-1684356838 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurelargermetada2833896438/001/.stow/multipart/2f50b03327eaba3b1bba2b9c097321a2/upload.json: file exists
+    part_publication_test.go:100: listed descriptor does not identify published bytes: {PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:53:14.663022 +0000 UTC}
+    part_publication_test.go:100: completion from reopened list: invalid multipart part
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/metadata-failure
+    part_publication_test.go:100: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailuresame-sizemet315325284/001/.stow/multipart/af35c9c650a46b57d243d97b51a6ccfd/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailuresame-sizemet315325284/001/.stow/multipart/af35c9c650a46b57d243d97b51a6ccfd/.tmp-2219011413 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailuresame-sizemet315325284/001/.stow/multipart/af35c9c650a46b57d243d97b51a6ccfd/upload.json: file exists
+    part_publication_test.go:100: listed descriptor does not identify published bytes: {PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:53:15.663907 +0000 UTC}
+    part_publication_test.go:100: completion from reopened list: invalid multipart part
+--- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure (3.36s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/first/healthy (0.54s)
+    --- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure/first/metadata-failure (1.05s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/larger/healthy (0.50s)
+    --- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure/larger/metadata-failure (0.32s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/healthy (0.65s)
+    --- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/metadata-failure (0.30s)
+=== RUN   TestMultipartPartRecoveryPreservesQuota
+    part_publication_test.go:129: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartRecoveryPreservesQuota2085097542/001/.stow/multipart/5f4e50f508234cfeba4a40efc8679309/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartRecoveryPreservesQuota2085097542/001/.stow/multipart/5f4e50f508234cfeba4a40efc8679309/.tmp-2029124220 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartRecoveryPreservesQuota2085097542/001/.stow/multipart/5f4e50f508234cfeba4a40efc8679309/upload.json: file exists
+    part_publication_test.go:137: 11-byte part escaped 12-byte quota: <nil>
+--- FAIL: TestMultipartPartRecoveryPreservesQuota (0.26s)
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/first/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/first/metadata-failure
+    part_publication_test.go:100: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurefirstmetadat1686693340/001/.stow/multipart/6a8c0b2114d751bc4ad52cd1e55a3fa5/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurefirstmetadat1686693340/001/.stow/multipart/6a8c0b2114d751bc4ad52cd1e55a3fa5/.tmp-356861490 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurefirstmetadat1686693340/001/.stow/multipart/6a8c0b2114d751bc4ad52cd1e55a3fa5/upload.json: file exists
+    part_publication_test.go:100: reopened parts=[] error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/larger/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/larger/metadata-failure
+    part_publication_test.go:100: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurelargermetada1616970130/001/.stow/multipart/e92508eac79c97fba7c43a49dfa52115/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurelargermetada1616970130/001/.stow/multipart/e92508eac79c97fba7c43a49dfa52115/.tmp-3889588451 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailurelargermetada1616970130/001/.stow/multipart/e92508eac79c97fba7c43a49dfa52115/upload.json: file exists
+    part_publication_test.go:100: listed descriptor does not identify published bytes: {PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:53:17.363016 +0000 UTC}
+    part_publication_test.go:100: completion from reopened list: invalid multipart part
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/metadata-failure
+    part_publication_test.go:100: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailuresame-sizemet1274707164/001/.stow/multipart/b893c3cd60248949f4a5213d2dc3fd36/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailuresame-sizemet1274707164/001/.stow/multipart/b893c3cd60248949f4a5213d2dc3fd36/.tmp-586314983 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartDescriptorSurvivesMetadataFailuresame-sizemet1274707164/001/.stow/multipart/b893c3cd60248949f4a5213d2dc3fd36/upload.json: file exists
+    part_publication_test.go:100: listed descriptor does not identify published bytes: {PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:53:18.130093 +0000 UTC}
+    part_publication_test.go:100: completion from reopened list: invalid multipart part
+--- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure (2.12s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/first/healthy (0.22s)
+    --- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure/first/metadata-failure (0.17s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/larger/healthy (0.31s)
+    --- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure/larger/metadata-failure (0.83s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/healthy (0.42s)
+    --- FAIL: TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/metadata-failure (0.16s)
+=== RUN   TestMultipartPartRecoveryPreservesQuota
+    part_publication_test.go:129: replacement result error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartRecoveryPreservesQuota1986701279/001/.stow/multipart/3d241c350c78bf9ec8aff883af7c81ec/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartRecoveryPreservesQuota1986701279/001/.stow/multipart/3d241c350c78bf9ec8aff883af7c81ec/.tmp-3032213362 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartPartRecoveryPreservesQuota1986701279/001/.stow/multipart/3d241c350c78bf9ec8aff883af7c81ec/upload.json: file exists
+    part_publication_test.go:137: 11-byte part escaped 12-byte quota: <nil>
+--- FAIL: TestMultipartPartRecoveryPreservesQuota (0.21s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	6.341s
+FAIL

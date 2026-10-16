@@ -85,6 +85,14 @@ A refused completion is not a cancellation: the upload keeps its parts and remai
 completable, and nothing is released until the completion succeeds. A successful
 one transitions exactly once, the parts' reservation becoming the object.
 
+Staged parts live under the reserved internal directory. Each part's size,
+ETag, timestamp and payload are published together by one atomic replacement;
+listing and reopen accounting use those same retained bytes. The upload owner
+document holds initiation options and is not rewritten for part changes.
+Part records have 47 bytes of private header overhead, excluded from logical
+payload quotas. Old raw staged parts are refused without migration; finish or
+abort old uploads before changing builds. Completed objects remain real files.
+
 | Member | Guarantee |
 |---|---|
 | `ws.Dir() string` | The absolute workspace directory. Stable for the workspace's life. |

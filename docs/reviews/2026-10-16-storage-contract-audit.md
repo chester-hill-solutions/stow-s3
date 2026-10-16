@@ -5,7 +5,10 @@
 **Audit baseline: three defect groups, two high and one medium; no production change in the audit.**
 
 Follow-up: **A1 is corrected** in the separate
-[multipart recovery change](2026-10-16-multipart-recovery.md). A2 and A3 remain queued.
+[multipart recovery change](2026-10-16-multipart-recovery.md). **A2 is corrected** in
+the separate [atomic workspace part change](2026-10-16-workspace-parts.md). A3 remains
+queued. That follow-up also confirms the same A1 owner-enumeration failure in
+the workspace backend; it is the next priority and is left unchanged.
 
 The audit’s immediate recommendation was A1, native filesystem multipart recovery. The
 previous marked-missing HEAD preflight finding is conditional defensive work,
@@ -122,6 +125,11 @@ would not repair the persisted stale descriptor. Any solution that adds scans
 or hashing needs comparative measurements **on Railway** before selection.
 Compatibility risk: recovery must handle both fresh parts and replaced parts,
 including an upload left by an older build, without silently dropping data.
+
+Follow-up: A2 now uses one atomic descriptor/payload record, selected after
+comparative Railway measurements. The user removed the historical compatibility
+requirement below this audit; old raw staged parts are refused without migration.
+[Regression, measured costs and remaining recovery scope](2026-10-16-workspace-parts.md).
 
 ### A3 — Medium: completed native mutations lose their committed outcome
 

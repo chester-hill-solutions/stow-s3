@@ -637,6 +637,14 @@ upload state returns an error and preserves staging; enumeration must not omit i
 from runtime quota reconciliation. Repairing the metadata permits reconciliation
 to resume. Valid uploads for other buckets remain excluded from each bucket listing.
 
+Workspace staged parts publish their descriptor and payload in one atomic file
+replacement. Listing and quota reconstruction read that file's descriptor and
+validate its payload length; completion reads and verifies the payload. The
+upload owner document retains initiation options and is not rewritten for each
+part. The private staged-part encoding is not backward compatible: old raw part
+files are refused, with no migration or automatic deletion. Finish or abort old
+uploads before changing builds. Completed objects retain their existing layout.
+
 Workspace file reads and checkpoint input scans/copies pin an `os.OpenRoot`
 directory, refuse symbolic-link components and root identity replacement, and
 bound captured bytes to the measured file size plus one change-detection byte.

@@ -136,3 +136,8 @@ that persistence split is the next independent change; any proposed extra scan
 or hashing work first needs comparative Railway measurements. A3's committed
 outcome sites remain queued. The demoted synthetic HEAD cases are not promoted
 back into the native priority list.
+
+Follow-up: **A2 is now corrected** by the separately measured
+[atomic workspace part change](2026-10-16-workspace-parts.md). The same A1
+owner-enumeration omission is confirmed in workspace recovery and remains the next
+independent correctness change. A3 remains queued.

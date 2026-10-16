@@ -1,0 +1,21 @@
+=== RUN   TestNextWorkspaceOwnerRecovery
+=== RUN   TestNextWorkspaceOwnerRecovery/healthy
+    next_recovery_probe_test.go:36: damaged=false extra12bytes error=runtime quota exceeded retainedPartBytes=11 cap=12
+=== RUN   TestNextWorkspaceOwnerRecovery/damaged
+    next_recovery_probe_test.go:36: damaged=true extra12bytes error=<nil> retainedPartBytes=11 cap=12
+    next_recovery_probe_test.go:37: retained 11-byte part omitted: new 12-byte object accepted under cap12: <nil>
+--- FAIL: TestNextWorkspaceOwnerRecovery (1.97s)
+    --- PASS: TestNextWorkspaceOwnerRecovery/healthy (0.86s)
+    --- FAIL: TestNextWorkspaceOwnerRecovery/damaged (1.11s)
+=== RUN   TestNextWorkspaceOwnerRecovery
+=== RUN   TestNextWorkspaceOwnerRecovery/healthy
+    next_recovery_probe_test.go:36: damaged=false extra12bytes error=runtime quota exceeded retainedPartBytes=11 cap=12
+=== RUN   TestNextWorkspaceOwnerRecovery/damaged
+    next_recovery_probe_test.go:36: damaged=true extra12bytes error=<nil> retainedPartBytes=11 cap=12
+    next_recovery_probe_test.go:37: retained 11-byte part omitted: new 12-byte object accepted under cap12: <nil>
+--- FAIL: TestNextWorkspaceOwnerRecovery (3.07s)
+    --- PASS: TestNextWorkspaceOwnerRecovery/healthy (1.23s)
+    --- FAIL: TestNextWorkspaceOwnerRecovery/damaged (1.84s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	5.423s
+FAIL

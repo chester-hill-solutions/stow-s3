@@ -37,7 +37,6 @@ type uploadState struct {
 	Key       string                   `json:"key"`
 	Initiated time.Time                `json:"initiated"`
 	Options   storage.MultipartOptions `json:"options"`
-	Parts     []storage.PartInfo       `json:"parts"`
 }
 
 // upload renders the state as the descriptor the storage contract describes.
@@ -166,7 +165,7 @@ func (s *Store) UploadPart(ctx context.Context, uploadID string, partNumber int,
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	state, err := s.loadUpload(uploadID)
+	_, err := s.loadUpload(uploadID)
 	if err != nil {
 		return nil, err
 	}
@@ -174,31 +173,16 @@ func (s *Store) UploadPart(ctx context.Context, uploadID string, partNumber int,
 	if err != nil {
 		return nil, err
 	}
-	if err := writeFileAtomic(s.partPath(uploadID, partNumber), data); err != nil {
-		return nil, fmt.Errorf("workspace store: write part: %w", err)
-	}
 	part := storage.PartInfo{
 		PartNumber:   partNumber,
 		ETag:         storage.ETagForBytes(data),
 		Size:         int64(len(data)),
 		LastModified: s.now().UTC(),
 	}
-	state.Parts = upsertPart(state.Parts, part)
-	if err := s.saveUpload(state); err != nil {
+	if err := writePartRecord(s.partPath(uploadID, partNumber), part, data); err != nil {
 		return nil, err
 	}
 	return &part, nil
-}
-
-// upsertPart replaces a part with the same number, or appends it.
-func upsertPart(parts []storage.PartInfo, part storage.PartInfo) []storage.PartInfo {
-	for i := range parts {
-		if parts[i].PartNumber == part.PartNumber {
-			parts[i] = part
-			return parts
-		}
-	}
-	return append(parts, part)
 }
 
 // CompleteMultipartUpload assembles the staged parts into the key's own file,
@@ -264,7 +248,7 @@ func (s *Store) assemble(uploadID string, parts []storage.PartInfo) ([]byte, []s
 	etags := make([]string, 0, len(parts))
 	var total int64
 	for _, part := range parts {
-		data, err := os.ReadFile(s.partPath(uploadID, part.PartNumber))
+		data, err := readPartRecord(s.partPath(uploadID, part.PartNumber), part.PartNumber)
 		if err != nil {
 			return nil, nil, storage.ErrInvalidPart
 		}
@@ -319,14 +303,18 @@ func (s *Store) ListPartsPage(ctx context.Context, uploadID string, opts storage
 
 // ListParts returns an upload's staged parts.
 func (s *Store) ListParts(ctx context.Context, uploadID string) ([]storage.PartInfo, error) {
-	if _, err := s.GetMultipartUpload(ctx, uploadID); err != nil {
+	if err := s.checkOpen(); err != nil {
 		return nil, err
 	}
-	state, err := s.loadUpload(uploadID)
-	if err != nil {
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	return state.Parts, nil
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if _, err := s.loadUpload(uploadID); err != nil {
+		return nil, err
+	}
+	return s.listPartFiles(uploadID)
 }
 
 // ListMultipartUploads returns in-progress uploads for a bucket.
