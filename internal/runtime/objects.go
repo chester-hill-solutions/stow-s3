@@ -195,7 +195,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 		meta, err := i.quotaStore().HeadObject(ctx, bucket, key)
 		if err == nil {
 			sizes[key] = meta.Size
-		} else if !errors.Is(err, storage.ErrObjectNotFound) {
+		} else if !errors.Is(err, storage.ErrObjectNotFound) || errors.Is(err, storage.ErrMutationCommitted) {
 			return nil, err
 		}
 	}
@@ -333,7 +333,7 @@ func storedObjectSize(ctx context.Context, store storage.Store, bucket, key stri
 	if err == nil {
 		return meta.Size, true, nil
 	}
-	if errors.Is(err, storage.ErrObjectNotFound) {
+	if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
 		return 0, false, nil
 	}
 	return 0, false, err

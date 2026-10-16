@@ -106,7 +106,18 @@ without an explicit refresh; ordinary confirmed absence still releases quota.
 The report preserves both benchmark passes and their timing variability. It also
 confirms a separate object HEAD ambiguity: deletion removes the real object but
 leaves phantom usage that blocks capacity reuse. Object-size observation and
-deletion remain unchanged in this completion correction.
+deletion remained unchanged at that point.
+
+Follow-up: **ambiguous object HEAD now prevents mutation**, with
+[regression and comparative cost evidence](../benchmarks/2026-10-15-object-head-uncertainty/README.md).
+The shared size helper and batch-deletion preflight only accept missing without a
+committed marker. Actual objects, multipart state and quota remain intact until a
+healthy retry; ordinary missing and duplicate batch keys preserve their contracts.
+The two guards add no allocations or provider calls; measured classifier and
+lifecycle overheads, including adverse samples, are reported. That review also
+confirms ReadForSave issuing an absence condition after ambiguous GET while the
+backend guard still prevents overwrite. Guarded read classification remains
+unchanged in this object HEAD correction.
 
 ## Codebase map
 
