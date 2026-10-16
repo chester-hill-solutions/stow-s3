@@ -70,7 +70,7 @@ func (i *Instance) ReadForSave(ctx context.Context, bucket, key string) (Object,
 	}
 	object, err := i.GetObject(ctx, bucket, key)
 	condition := SaveCondition{owner: i, bucket: bucket, key: key}
-	if errors.Is(err, storage.ErrObjectNotFound) {
+	if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
 		condition.guard.Absent = true
 		return Object{Bucket: bucket, Key: key}, condition, nil
 	}

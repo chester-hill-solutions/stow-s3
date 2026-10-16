@@ -116,8 +116,19 @@ healthy retry; ordinary missing and duplicate batch keys preserve their contract
 The two guards add no allocations or provider calls; measured classifier and
 lifecycle overheads, including adverse samples, are reported. That review also
 confirms ReadForSave issuing an absence condition after ambiguous GET while the
-backend guard still prevents overwrite. Guarded read classification remains
-unchanged in this object HEAD correction.
+backend guard still prevents overwrite. Guarded read classification remained
+unchanged at that point.
+
+Follow-up: **ReadForSave now preserves marked missing errors**, with
+[regression and comparative cost evidence](../benchmarks/2026-10-15-save-read-uncertainty/README.md).
+Uncertain marked GET/body errors issue no usable condition; reliable missing
+objects still yield an absence condition and healthy reads retain fingerprinting.
+Native and public-wrapper tests preserve retry, quota and stale-save contracts.
+The guard adds no allocations or provider calls; all measured timing costs and
+variation are retained. That review separately confirms a partial-body failure
+without a committed marker being converted into absence after successful open.
+The backend still prevents overwrite; body-phase classification remains unchanged
+in this marked-read correction.
 
 ## Codebase map
 
