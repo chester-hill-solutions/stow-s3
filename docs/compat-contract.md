@@ -631,6 +631,12 @@ server's unlimited byte/object storage profile remains unlimited unless explicit
 storage quotas are configured; its upload count still defaults to 1,024. Neither
 request limit replaces storage quotas or bounds operating-system memory.
 
+Native filesystem multipart recovery distinguishes a missing upload directory
+from an existing upload whose manifest is missing, unreadable or invalid. Unknown
+upload state returns an error and preserves staging; enumeration must not omit it
+from runtime quota reconciliation. Repairing the metadata permits reconciliation
+to resume. Valid uploads for other buckets remain excluded from each bucket listing.
+
 Workspace file reads and checkpoint input scans/copies pin an `os.OpenRoot`
 directory, refuse symbolic-link components and root identity replacement, and
 bound captured bytes to the measured file size plus one change-detection byte.

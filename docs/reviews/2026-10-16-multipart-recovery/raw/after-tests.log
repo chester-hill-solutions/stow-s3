@@ -1,0 +1,99 @@
+COMMAND ['go', 'test', './internal/storage/fs', './internal/runtime', './internal/s3api', '-run', 'TestMultipartManifestFailuresPreserveUpload|TestMultipartAbsentUploadKeepsNotFound|TestFilesystemMultipart(RecoveryRefusesDamagedManifest|ValidationPreservesUnknownReservation|ManifestWireErrors)', '-count=2', '-v']
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (1.09s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.11s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.18s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.16s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.17s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.15s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.14s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.19s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.05s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (1.29s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.05s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.11s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.13s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.24s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.29s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.22s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.25s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.07s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	2.800s
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory
+--- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest (0.85s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated (0.18s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing (0.34s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory (0.32s)
+=== RUN   TestFilesystemMultipartValidationPreservesUnknownReservation
+--- PASS: TestFilesystemMultipartValidationPreservesUnknownReservation (0.22s)
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory
+--- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest (0.76s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated (0.25s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing (0.28s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory (0.23s)
+=== RUN   TestFilesystemMultipartValidationPreservesUnknownReservation
+--- PASS: TestFilesystemMultipartValidationPreservesUnknownReservation (0.08s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	2.169s
+=== RUN   TestFilesystemMultipartManifestWireErrors
+=== RUN   TestFilesystemMultipartManifestWireErrors/healthy
+2026/10/16 15:39:58 GET /s3 200 439.208µs
+2026/10/16 15:39:58 POST /s3 200 114.9775ms
+=== RUN   TestFilesystemMultipartManifestWireErrors/absent
+2026/10/16 15:39:58 GET /s3 200 72.625µs
+2026/10/16 15:39:58 POST /s3 404 53.958µs
+=== RUN   TestFilesystemMultipartManifestWireErrors/truncated
+2026/10/16 15:39:58 GET /s3 500 179.583µs
+2026/10/16 15:39:58 POST /s3 500 35.875µs
+=== RUN   TestFilesystemMultipartManifestWireErrors/missing-manifest
+2026/10/16 15:39:59 GET /s3 500 193.792µs
+2026/10/16 15:39:59 POST /s3 500 35.166µs
+--- PASS: TestFilesystemMultipartManifestWireErrors (0.77s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/healthy (0.27s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/absent (0.18s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/truncated (0.13s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/missing-manifest (0.20s)
+=== RUN   TestFilesystemMultipartManifestWireErrors
+=== RUN   TestFilesystemMultipartManifestWireErrors/healthy
+2026/10/16 15:39:59 GET /s3 200 1.248625ms
+2026/10/16 15:39:59 POST /s3 200 49.679333ms
+=== RUN   TestFilesystemMultipartManifestWireErrors/absent
+2026/10/16 15:39:59 GET /s3 200 63.916µs
+2026/10/16 15:39:59 POST /s3 404 37.75µs
+=== RUN   TestFilesystemMultipartManifestWireErrors/truncated
+2026/10/16 15:39:59 GET /s3 500 302.25µs
+2026/10/16 15:39:59 POST /s3 500 48.667µs
+=== RUN   TestFilesystemMultipartManifestWireErrors/missing-manifest
+2026/10/16 15:39:59 GET /s3 500 232.958µs
+2026/10/16 15:39:59 POST /s3 500 28.083µs
+--- PASS: TestFilesystemMultipartManifestWireErrors (0.64s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/healthy (0.19s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/absent (0.19s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/truncated (0.12s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/missing-manifest (0.14s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	1.940s

@@ -229,6 +229,12 @@ is the first recommendation. The marked-missing HEAD preflight repro remains
 valid for its injected input, but no native producer was identified; it is not
 the leading native correctness finding. No additional implementation is included.
 
+Follow-up: **native filesystem multipart manifest failures now block incomplete quota recovery**,
+with [native, runtime and S3 regression evidence](2026-10-16-multipart-recovery.md).
+This addresses A1 from the bounded audit. Workspace part/descriptor consistency
+(A2) remains the next independent change. No backward-compatibility or migration
+path is introduced.
+
 ## Codebase map
 
 ```mermaid

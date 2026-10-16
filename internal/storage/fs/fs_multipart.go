@@ -3,6 +3,7 @@ package fs
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -96,7 +97,7 @@ func (s *FilesystemStore) GetMultipartUpload(_ context.Context, uploadID string)
 	defer s.mu.RUnlock()
 	manifest, err := readMultipartManifest(s.multipartDir(uploadID))
 	if err != nil {
-		return nil, storage.ErrUploadNotFound
+		return nil, err
 	}
 	upload := manifest.upload(uploadID)
 	return &upload, nil
@@ -148,7 +149,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	dir := s.multipartDir(uploadID)
 	manifest, err := readMultipartManifest(dir)
 	if err != nil {
-		return nil, storage.ErrUploadNotFound
+		return nil, err
 	}
 
 	// Resolve and check every part before assembling any of it, so a completion
@@ -227,8 +228,16 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 }
 
 func (s *FilesystemStore) ValidateMultipartUpload(_ context.Context, uploadID, bucket, key string) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	manifest, err := readMultipartManifest(s.multipartDir(uploadID))
-	if err != nil || manifest.Bucket != bucket || manifest.Key != key {
+	if errors.Is(err, storage.ErrUploadNotFound) {
+		return storage.ErrNoSuchUpload
+	}
+	if err != nil {
+		return err
+	}
+	if manifest.Bucket != bucket || manifest.Key != key {
 		return storage.ErrNoSuchUpload
 	}
 	return nil
@@ -257,7 +266,10 @@ func (s *FilesystemStore) ListMultipartUploads(_ context.Context, bucket string,
 			continue
 		}
 		manifest, err := readMultipartManifest(filepath.Join(s.dataDir, ".multipart", entry.Name()))
-		if err != nil || manifest.Bucket != bucket {
+		if err != nil {
+			return nil, err
+		}
+		if manifest.Bucket != bucket {
 			continue
 		}
 		uploads = append(uploads, manifest.upload(entry.Name()))
@@ -337,8 +349,20 @@ func readMultipartManifest(dir string) (multipartManifest, error) {
 	var m multipartManifest
 	data, err := os.ReadFile(filepath.Join(dir, "manifest.json"))
 	if err != nil {
+		if os.IsNotExist(err) {
+			if _, dirErr := os.Stat(dir); os.IsNotExist(dirErr) {
+				return m, storage.ErrUploadNotFound
+			} else if dirErr != nil {
+				return m, dirErr
+			}
+		}
 		return m, err
 	}
-	err = json.Unmarshal(data, &m)
-	return m, err
+	if err := json.Unmarshal(data, &m); err != nil {
+		return m, err
+	}
+	if storage.ValidateBucketName(m.Bucket) != nil || storage.ValidateKey(m.Key) != nil {
+		return m, fmt.Errorf("invalid multipart manifest bucket or key")
+	}
+	return m, nil
 }

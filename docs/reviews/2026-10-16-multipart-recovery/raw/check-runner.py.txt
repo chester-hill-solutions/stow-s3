@@ -1,0 +1,18 @@
+from pathlib import Path
+import os,subprocess,sys
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-multipart-recovery-2026-10-16')
+env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+groups={
+ 'core':[
+  ('full-go.log',['go','test','./...']),
+  ('broad-race.log',['go','test','-race','./internal/storage/...','./internal/runtime','./internal/embedded','./internal/runthrough','./internal/s3api','./pkg/stow']),
+  ('vet.log',['go','vet','./...']),
+  ('quality.log',['make','check-go-quality','check-file-size'])],
+ 'conformance':[('conformance-full.log',['make','test-conformance'])]
+}
+for name,cmd in groups[sys.argv[1]]:
+ with (p/name).open('w') as f:
+  f.write('COMMAND '+repr(cmd)+'\n');f.flush()
+  q=subprocess.run(cmd,cwd=r,env=env,stdout=f,stderr=subprocess.STDOUT)
+ print(name,'exit',q.returncode,flush=True)
+ if q.returncode:raise SystemExit(q.returncode)

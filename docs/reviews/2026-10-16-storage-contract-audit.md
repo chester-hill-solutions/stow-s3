@@ -2,8 +2,12 @@
 
 ## Result and scope
 
-**Three remaining defect groups: two high, one medium. No production change.**
-The immediate recommendation is A1, native filesystem multipart recovery. The
+**Audit baseline: three defect groups, two high and one medium; no production change in the audit.**
+
+Follow-up: **A1 is corrected** in the separate
+[multipart recovery change](2026-10-16-multipart-recovery.md). A2 and A3 remain queued.
+
+The audit’s immediate recommendation was A1, native filesystem multipart recovery. The
 previous marked-missing HEAD preflight finding is conditional defensive work,
 not the highest-priority demonstrated native failure.
 
@@ -210,8 +214,8 @@ checks probe counts, prior source hashes and that every tracked Go source/test
 still matches the audit baseline. [Documentation/site checks](2026-10-16-storage-contract-audit/raw/docs.log) pass for this report.
 No benchmarks, implementation, dependency, public API or storage format changes.
 
-This audit stops at this consolidated inventory. Implement A1 first, verify its
-regression/conformance/race results, and report it independently. A2 and each A3
-site remain queued. Completion of this audit means the bounded producer/consumer
-review is recorded and ranked; it does not mean every storage fault is proven
+This audit stopped at this consolidated inventory. A1 has since been implemented
+and reported independently in the linked follow-up. A2 and each A3 site remain
+queued; A2 is now the next priority. Completion of this audit means the bounded
+producer/consumer review is recorded and ranked; it does not mean every storage fault is proven
 safe or that another bug cannot exist.
