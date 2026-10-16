@@ -354,7 +354,12 @@ func (a *Adapter) PutObject(ctx context.Context, bucket, key string, body io.Rea
 }
 
 func (a *Adapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
-	return a.resolveObject(ctx, bucket, key, true)
+	reader, meta, err := a.resolveObject(ctx, bucket, key, true)
+	if err != nil && reader != nil {
+		_ = reader.Close()
+		reader = nil
+	}
+	return reader, meta, err
 }
 
 func (a *Adapter) HeadObject(ctx context.Context, bucket, key string) (*storage.ObjectMeta, error) {
@@ -390,10 +395,12 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
 	a.cacheMisses.Add(1)
 	rc, meta, err := a.upstream.GetObject(ctx, bucket, key)
+	if rc != nil {
+		defer rc.Close()
+	}
 	if err != nil {
 		return nil, nil, err
 	}
-	defer rc.Close()
 	cacheStore := a.local
 	if a.separateCache {
 		cacheStore = a.cache
@@ -429,12 +436,15 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err == nil {
 		return reader, cached, nil
 	}
+	if reader != nil {
+		_ = reader.Close()
+	}
 	if !errors.Is(err, storage.ErrObjectNotFound) {
 		return nil, nil, err
 	}
 	fresh, _, freshErr := a.upstream.GetObject(ctx, bucket, key)
 	if freshErr != nil {
-		return nil, nil, freshErr
+		return fresh, nil, freshErr
 	}
 	return fresh, cached, nil
 }

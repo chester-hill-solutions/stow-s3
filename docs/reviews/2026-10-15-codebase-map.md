@@ -186,6 +186,14 @@ Close failures do not change original errors or guarded absence classification.
 The report separately reproduces run-through local/upstream error paths discarding
 readers before that cleanup boundary. Run-through remains unchanged in this fix.
 
+Follow-up: **run-through failed reads now release returned readers**, with
+[regression, conformance, race and comparative cost evidence](../benchmarks/2026-10-16-runthrough-open-cleanup/README.md).
+Local/cache errors close at the adapter boundary; refresh responses also close on
+warming HEAD failures, and failed cache readers close before an upstream retry.
+Original errors and cache decisions are preserved. The report separately reproduces
+native size-limit eviction followed by a changed upstream version returning a new
+body with old ETag/metadata. Source-version consistency remains unchanged in this fix.
+
 ## Codebase map
 
 ```mermaid

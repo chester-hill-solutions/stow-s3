@@ -76,7 +76,7 @@ func (a *Adapter) openLocal(ctx context.Context, bucket, key string, meta *stora
 	}
 	rc, bodyMeta, err := a.local.GetObject(ctx, bucket, key)
 	if err != nil {
-		return nil, nil, err
+		return rc, nil, err
 	}
 	return rc, bodyMeta, nil
 }

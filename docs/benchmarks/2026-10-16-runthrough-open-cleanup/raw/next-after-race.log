@@ -1,0 +1,10 @@
+COMMAND ["go", "test", "-overlay=/private/tmp/stow-runthrough-open-cleanup-2026-10-16/next-after-overlay.json", "-race", "./internal/runthrough", "-run", "^TestReviewEvictedRefreshReturnsMatchingVersion$", "-count=2", "-v"]
+=== RUN   TestReviewEvictedRefreshReturnsMatchingVersion
+    version_review_probe_test.go:38: mixed source versions: body="new" ETag="\"149603e6c03516362a8da23f624db945\"" (old="\"149603e6c03516362a8da23f624db945\"" new="\"22af645d1859cb5ca6da0c484f1f37ea\"") type="text/plain" state="old"
+--- FAIL: TestReviewEvictedRefreshReturnsMatchingVersion (0.00s)
+=== RUN   TestReviewEvictedRefreshReturnsMatchingVersion
+    version_review_probe_test.go:38: mixed source versions: body="new" ETag="\"149603e6c03516362a8da23f624db945\"" (old="\"149603e6c03516362a8da23f624db945\"" new="\"22af645d1859cb5ca6da0c484f1f37ea\"") type="text/plain" state="old"
+--- FAIL: TestReviewEvictedRefreshReturnsMatchingVersion (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.309s
+FAIL
