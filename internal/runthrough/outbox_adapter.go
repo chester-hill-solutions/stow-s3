@@ -134,6 +134,9 @@ func (a *Adapter) propagateEntry(ctx context.Context, entry OutboxEntry, reconci
 func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconcile bool) error {
 	rc, meta, err := a.local.GetObject(ctx, entry.Bucket, entry.Key)
 	if err != nil {
+		if rc != nil {
+			_ = rc.Close()
+		}
 		return err
 	}
 	if entry.Version != "" && entry.Version != objectVersion(meta) {

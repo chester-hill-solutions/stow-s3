@@ -1,0 +1,367 @@
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  143376	       924.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  191558	      1178 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  187227	       736.8 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  161091	      1446 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  131019	      1579 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  230312	       787.6 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  285895	      1418 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  149574	      1092 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 5419686	        20.65 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8601374	        14.57 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 7609826	        16.09 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 7568072	        14.51 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 8916352	        13.40 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 8552414	        13.74 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8763974	        15.02 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8687782	        13.32 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  304764	       485.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  236628	       481.3 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  239262	       508.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  217741	       500.8 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  262760	       449.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  306375	       447.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  304011	       429.9 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  319088	       420.9 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8393392	        13.87 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8411263	        13.96 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 7941738	        15.52 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 7735488	        16.91 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9360981	        14.81 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 8163542	        15.76 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 9165931	        13.71 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8845587	        13.48 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  278542	       497.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  259765	       494.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  223707	       500.3 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  212593	       526.8 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  280514	       408.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  313094	       418.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  269748	       441.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  270295	       429.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8968106	        13.67 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8928792	        13.25 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 9127759	        13.65 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 9037617	        13.61 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9127962	        13.67 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9055692	        13.28 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8638516	        13.16 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 9139404	        13.92 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  264139	       805.4 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  248904	       718.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  259326	       483.8 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  251409	       522.4 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  253676	       609.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  275576	       489.0 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  281109	       490.6 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  310725	       545.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 7305649	        15.64 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 7551502	        16.58 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 6984205	        15.34 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 8106259	        15.93 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 8348091	        19.58 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 6612858	        19.23 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 6750234	        18.49 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 2461812	        58.37 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	   56960	      4428 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  186284	      1830 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  262347	       535.7 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  231037	       548.7 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  261826	       529.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  249253	       853.6 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  273685	       402.6 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  321280	       411.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8316176	        16.83 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8807500	        13.39 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 8546551	        14.49 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 9097857	        13.99 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9023319	        15.20 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9001293	        15.41 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 9039122	        13.87 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8798271	        13.67 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  277603	       484.4 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  226110	       486.1 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  223344	       513.6 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  223039	       494.7 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  313448	       426.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  327368	       427.6 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  302022	       566.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  322417	       399.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8851243	        13.25 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 8073890	        14.65 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 8701431	        13.49 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 8714596	        13.95 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 8580340	        14.85 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9141174	        15.67 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8729970	        13.88 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8257802	        13.38 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  294066	       493.4 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  248876	       475.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  267655	       560.0 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  145382	       789.8 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  270445	       430.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  256698	       470.7 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  299179	       447.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  209268	       649.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 7233691	        38.34 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 5831540	        18.82 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 4188554	        40.86 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 6926268	        18.34 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 7069305	        14.52 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 8865630	        13.64 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 9336310	        14.23 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 7747704	        16.66 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first         	  270062	       605.1 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first         	  218779	       519.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  229880	       592.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile     	  228604	       538.1 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  329640	       407.3 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first        	  320113	       469.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  268468	       477.6 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile    	  230312	       478.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 7714725	        23.37 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first       	 7224690	        15.66 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 7952396	        13.75 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile   	 9011743	        13.28 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9272703	        13.15 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first    	 9400120	        13.11 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 9336825	        15.11 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile         	 8803246	        17.11 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  210422	       964.4 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  285243	       441.7 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  290047	       427.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  228618	       447.6 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  367754	       386.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  266148	       382.3 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  241989	       571.8 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  305083	       406.7 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8731372	        28.46 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 9039349	        13.28 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 9307796	        13.87 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8197117	        13.53 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 9133924	        14.15 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 9087438	        13.34 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8808066	        15.46 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 6129211	        18.79 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  246274	       453.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  230853	       510.1 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  239234	       792.7 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  152022	      1476 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  228213	       534.7 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  311853	       404.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  266484	       377.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  256047	       418.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 7724782	        36.68 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 7398006	        14.15 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8292876	        14.94 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 7464465	        15.36 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 7859790	        15.79 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 6003589	        21.70 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 6986136	        14.74 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8628514	        14.03 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  246938	       425.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  314118	       407.1 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  304365	       394.3 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  324031	       474.6 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  355713	       395.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  345763	       377.7 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  407342	       340.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  390560	       359.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8273602	        15.73 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 7592533	        13.48 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8282096	        16.75 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8438670	        24.36 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 7246066	        13.80 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8864347	        17.48 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 9215792	        17.39 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8879653	        12.65 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  267537	       505.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  248431	       906.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  301921	       466.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  281649	       593.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  273582	       416.2 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  302112	       465.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  373743	       456.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  404744	       719.7 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8139616	        26.37 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 6950242	        17.68 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8852468	        14.85 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8999858	        13.35 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8808658	        13.17 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 9108217	        13.06 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 7375250	        26.56 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8796044	        14.71 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  300576	      1366 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  227593	       718.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  227328	       618.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  222703	      1347 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  136364	       973.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  240535	      1278 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  239814	       452.4 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  358945	       371.3 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 9062930	        17.39 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8690062	        18.63 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 5816748	        34.60 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8586838	        13.36 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8285241	        20.55 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8286720	        13.20 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 9263696	        13.84 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8412442	        14.83 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  298006	       721.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  332152	       437.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  314984	       471.8 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  154726	      1045 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  306187	       369.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  398599	       501.7 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  132727	      1220 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  164640	      2190 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 6824426	        17.40 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 7918722	        14.36 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8833488	        15.98 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8397847	        13.37 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 9163044	        13.45 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 9412348	        13.24 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 9007120	        13.30 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 9035548	        13.23 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  299272	       383.9 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  300634	       505.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  228542	       509.2 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  303259	       427.3 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  340272	       397.8 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  284736	       368.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  339318	       358.1 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  377614	       360.9 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8995108	        13.09 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8273032	        14.50 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 9301093	        14.21 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 9277722	        14.11 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8673964	        18.33 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8415441	        14.10 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8947683	        13.84 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 9165814	        13.92 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-propagation-open-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkPropagationSourceOpen$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkPropagationSourceOpen/success/first-8         	  266175	       421.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/first-8         	  319711	       439.5 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  245974	       467.6 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/success/reconcile-8     	  314424	       484.1 ns/op	         0 failed-close/op	     616 B/op	       7 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  290482	       402.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/first-8        	  337888	       873.0 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  279115	       382.3 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/conflict/reconcile-8    	  379476	       323.5 ns/op	         0 failed-close/op	     600 B/op	       6 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 8672085	        13.10 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/first-8       	 9318849	        19.34 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 8616123	        13.08 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/nil-error/reconcile-8   	 9198956	        14.27 ns/op	         0 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 8858376	        15.20 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/first-8    	 9187347	        16.45 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 7463750	        13.94 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+BenchmarkPropagationSourceOpen/reader-error/reconcile-8         	 8928709	        12.93 ns/op	         1.000 failed-close/op	       0 B/op	       0 allocs/op
+PASS

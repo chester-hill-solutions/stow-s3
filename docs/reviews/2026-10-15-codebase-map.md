@@ -202,6 +202,15 @@ report exposes the changed-version durable fallback's near-2× local timing cost
 and separately confirms refused propagation source reads still leak a returned
 reader. Outbox propagation remains unchanged in this correction.
 
+Follow-up: **refused propagation source readers now close before returning their
+opening error**, with [regression, race, conformance and comparative cost evidence](../benchmarks/2026-10-16-propagation-open/README.md).
+The three-line guard preserves committed state, transient retries and conflict
+cleanup. All 33 cases pass; allocations match exactly. Adverse wall timing and
+fixed-iteration CPU diagnostics are retained without a parity claim. A separate
+probe confirms ambiguous marked-missing HEAD recovery can permanently discard a
+prepared write intent despite a real local commit. Prepared recovery remains
+unchanged in this reader cleanup correction.
+
 ## Codebase map
 
 ```mermaid
