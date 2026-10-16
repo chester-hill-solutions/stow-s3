@@ -179,6 +179,13 @@ large adverse wall timings and CPU-time controls are retained without a parity
 claim. A separate file-backed probe confirms live readers can be discarded on
 opening errors without Close; combined-result ownership remains the next review.
 
+Follow-up: **runtime opening errors now close returned readers**, with
+[regression, conformance, race and comparative cost evidence](../benchmarks/2026-10-16-open-error-cleanup/README.md).
+Public range fallback preserves reader ownership until the runtime can clean up;
+Close failures do not change original errors or guarded absence classification.
+The report separately reproduces run-through local/upstream error paths discarding
+readers before that cleanup boundary. Run-through remains unchanged in this fix.
+
 ## Codebase map
 
 ```mermaid

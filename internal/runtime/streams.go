@@ -39,6 +39,9 @@ func (i *Instance) openObject(ctx context.Context, bucket, key string, span *sto
 	}
 	reader, meta, err := i.openStoreRange(ctx, bucket, key, span)
 	if err != nil {
+		if reader != nil {
+			_ = reader.Close()
+		}
 		return nil, Object{}, err
 	}
 	size := meta.Size

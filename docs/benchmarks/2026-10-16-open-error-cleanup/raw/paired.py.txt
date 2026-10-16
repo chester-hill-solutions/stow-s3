@@ -1,0 +1,55 @@
+from pathlib import Path
+import os,subprocess,json,re,statistics,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-open-error-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+s=(p/'internal_runtime_streams.go.before.txt').read_text();a=s.index('func (i *Instance) openObject(');b=s.index('\nfunc (i *Instance) openStoreRange',a);ref=s[a:b];renamed=ref.replace('openObject(','reviewBeforeOpen(',1)
+probe='''package runtime
+import("context";"encoding/json";"errors";"io";"reflect"; goruntime "runtime";"syscall";"testing";"time";"github.com/chester-hill-solutions/stow-s3/internal/authority";"github.com/chester-hill-solutions/stow-s3/internal/policy";"github.com/chester-hill-solutions/stow-s3/internal/storage")
+'''+renamed+'''
+func reviewCPU(r syscall.Rusage)int64{return r.Utime.Sec*1000000+int64(r.Utime.Usec)+r.Stime.Sec*1000000+int64(r.Stime.Usec)}
+func TestReviewPairedOpeningCosts(t *testing.T){
+ ctx:=context.Background()
+ for _,mode:=range []string{"nil-error","reader-error","healthy-open"}{
+  base:=storage.NewMemoryStore();var store storage.Store=base
+  failure:=errors.New("opening refused")
+  if mode!="healthy-open"{fault:=&openingBenchmarkStore{MemoryStore:base,failure:failure};if mode=="reader-error"{fault.reader=&openingBenchmarkReader{}};store=fault}
+  instance,err:=OpenWithStore(Options{Backend:BackendMemory},store,nil);if err!=nil{t.Fatal(err)}
+  if mode=="healthy-open"{if err:=instance.CreateBucket(ctx,"probe");err!=nil{t.Fatal(err)};if _,err:=instance.PutObject(ctx,"probe","target",[]byte("old"),PutOptions{});err!=nil{t.Fatal(err)}}
+  openers:=map[string]func(context.Context,string,string,*storage.ObjectRange)(io.ReadCloser,Object,error){"before":instance.reviewBeforeOpen,"after":instance.openObject}
+  if mode=="healthy-open"{old,_,_:=instance.reviewBeforeOpen(ctx,"probe","target",nil);now,_,_:=instance.openObject(ctx,"probe","target",nil);if reflect.TypeOf(old)!=reflect.TypeOf(now){t.Fatal("reader types differ")};if _,ok:=old.(io.WriterTo);!ok{t.Fatal("WriterTo missing")};_ = old.Close();_ = now.Close()}
+  n:=200000;if mode=="healthy-open"{n=20000}
+  for cycle:=0;cycle<10;cycle++{
+   labels:=[]string{"before-a","after-a","after-b","before-b"};if cycle%2==1{labels=[]string{"after-a","before-a","before-b","after-b"}}
+   for position,label:=range labels{
+    key:=label[:len(label)-2];open:=openers[key]
+    var m0,m1 goruntime.MemStats;var c0,c1 syscall.Rusage
+    goruntime.ReadMemStats(&m0);_ = syscall.Getrusage(syscall.RUSAGE_SELF,&c0);start:=time.Now()
+    for k:=0;k<n;k++{reader,_,err:=open(ctx,"probe","target",nil);if mode=="healthy-open"{if err!=nil{t.Fatal(err)};_ = reader.Close()}else if err!=failure || reader!=nil{t.Fatal("opening error changed")}}
+    wall:=time.Since(start).Nanoseconds();_ = syscall.Getrusage(syscall.RUSAGE_SELF,&c1);goruntime.ReadMemStats(&m1)
+    row:=map[string]interface{}{"case":mode,"cpu":goruntime.GOMAXPROCS(0),"cycle":cycle,"position":position,"label":label,"n":n,"wall_ns":wall,"cpu_us":reviewCPU(c1)-reviewCPU(c0),"bytes":m1.TotalAlloc-m0.TotalAlloc,"allocs":m1.Mallocs-m0.Mallocs}
+    encoded,_:=json.Marshal(row);t.Logf("PAIRED %s",encoded)
+   }
+  }
+  _ = instance.Close()
+ }
+}
+'''
+(p/'paired-probe.go.txt').write_text(probe)
+(p/'paired-reference.json').write_text(json.dumps({'baseline_function_sha256':hashlib.sha256(ref.encode()).hexdigest(),'transformation':'Rename only openObject to reviewBeforeOpen. Both use unchanged openStoreRange and identical concrete stream types/methods, including WriterTo.','cycles':10,'order':'alternating ABBA/BAAB','CPU':'process user+system rusage; wall also retained'},indent=2)+'\n')
+overlay={'Replace':{str(r/'internal/runtime/paired_open_review_test.go'):str(p/'paired-probe.go.txt')}};(p/'paired-overlay.json').write_text(json.dumps(overlay))
+cmd=['go','test','-overlay='+str(p/'paired-overlay.json'),'-c','-o',str(p/'paired.test'),'./internal/runtime'];q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/'paired-build.log').write_text(q.stdout);assert q.returncode==0,q.stdout
+cmd=[str(p/'paired.test'),'-test.run=^TestReviewPairedOpeningCosts$','-test.cpu=1,8','-test.v'];q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/'paired.log').write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout);assert q.returncode==0,q.stdout[-2000:]
+rows=[json.loads(x) for x in re.findall(r'PAIRED (\{[^\n]+\})',q.stdout)];assert len(rows)==240,len(rows)
+(p/'paired-samples.json').write_text(json.dumps(rows,indent=2)+'\n')
+summary=[]
+for cpu in [1,8]:
+ for case in ['nil-error','reader-error','healthy-open']:
+  for metric in ['wall_ns','cpu_us']:
+   pairs=[];aa=[]
+   for cycle in range(10):
+    block={x['label']:x[metric]/x['n'] for x in rows if x['cpu']==cpu and x['case']==case and x['cycle']==cycle}
+    before=(block['before-a']+block['before-b'])/2;after=(block['after-a']+block['after-b'])/2
+    pairs.append((after/before-1)*100)
+    aa.extend([abs((block[v+'-a']/block[v+'-b']-1)*100) for v in ['before','after']])
+   summary.append({'cpu':cpu,'case':case,'metric':metric,'paired_cycle_change_percent':{'median':statistics.median(pairs),'min':min(pairs),'max':max(pairs)},'same_code_absolute_change_median_percent':statistics.median(aa)})
+(p/'paired-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps(summary,indent=2),flush=True)
