@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -95,7 +96,8 @@ func readPartRecord(path string, number int) ([]byte, error) {
 	return data, err
 }
 func (s *Store) listPartFiles(id string) ([]storage.PartInfo, error) {
-	entries, err := os.ReadDir(s.uploadDir(id))
+	dir := s.uploadDir(id)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +110,7 @@ func (s *Store) listPartFiles(id string) ([]storage.PartInfo, error) {
 		if err != nil || number < 1 || number > 10000 {
 			return nil, errPartRecord
 		}
-		file, part, err := openPartRecord(s.partPath(id, number), number)
+		file, part, err := openPartRecord(filepath.Join(dir, "part-"+strconv.Itoa(number)), number)
 		if err != nil {
 			return nil, err
 		}

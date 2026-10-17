@@ -1,5 +1,9 @@
 # Atomic workspace multipart part publication
 
+Follow-up: [Railway performance requalification and directory-path reuse](2026-10-17-part-listing-performance.md)
+records all new measurements, including adverse timings. Changed-version durable
+fallback is now measured on Railway and remains the next separate change.
+
 This corrects **A2 only** from the [bounded storage audit](2026-10-16-storage-contract-audit.md).
 Baseline is `91e8ba0501aaab5c3d221f6dde9f3bf52786425d` on
 `codex/core-copy-quality`. Freshly fetched `origin/main` is

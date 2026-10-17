@@ -1,5 +1,9 @@
 # Pair refreshed bodies with their captured metadata and upstream state
 
+Follow-up: [Railway performance requalification and directory-path reuse](../../reviews/2026-10-17-part-listing-performance.md)
+records all new measurements, including adverse timings. Changed-version durable
+fallback is now measured on Railway and remains the next separate change.
+
 Corrected on 2026-10-16 from `67db556d2a817c75ad4154d52ce65e8c7a26fc17` (full identity in
 [environment.json](raw/environment.json)), on `codex/core-copy-quality`.
 Freshly fetched `origin/main` is

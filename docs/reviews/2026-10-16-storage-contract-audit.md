@@ -1,5 +1,9 @@
 # Bounded storage contract audit — 2026-10-16
 
+Follow-up: [Railway performance requalification and directory-path reuse](2026-10-17-part-listing-performance.md)
+records all new measurements, including adverse timings. Changed-version durable
+fallback is now measured on Railway and remains the next separate change.
+
 Follow-up: **the confirmed native A1–A3 correctness queue is now corrected**.
 The final [filesystem completion change](2026-10-17-filesystem-completion.md) retains
 published metadata and accounting after cleanup failure, validated on Railway.
