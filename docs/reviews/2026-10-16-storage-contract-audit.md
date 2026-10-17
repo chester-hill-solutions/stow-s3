@@ -1,5 +1,9 @@
 # Bounded storage contract audit — 2026-10-16
 
+Follow-up: **workspace DELETE now preserves its committed outcome and partial
+batch results**, with [Railway regression evidence](2026-10-17-workspace-delete.md).
+Filesystem completion cleanup is the remaining confirmed A3 site.
+
 ## Result and scope
 
 **Audit baseline: three defect groups, two high and one medium; no production change in the audit.**

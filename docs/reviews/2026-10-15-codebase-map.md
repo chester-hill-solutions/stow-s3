@@ -1,5 +1,9 @@
 # Stow codebase map and immediate correctness review
 
+Follow-up: **workspace DELETE now preserves its committed outcome and partial
+batch results**, with [Railway regression evidence](2026-10-17-workspace-delete.md).
+Filesystem completion cleanup is the remaining confirmed A3 site.
+
 Reviewed `codex/core-copy-quality` at `7120f18`, against freshly fetched
 `origin/main` `219d1dcfff9807b04660a40313b32127e5be2933` (2026-10-15).
 This is a structural map plus focused correctness review. Deep dynamic checks

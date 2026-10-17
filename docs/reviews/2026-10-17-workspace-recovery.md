@@ -74,9 +74,9 @@ and [actual tested source hashes](2026-10-17-workspace-recovery/raw/after/enviro
 identify the change. The Git fixture contains the exact original parent quality
 baselines, not the repository history. Source/test formatting was done on Railway.
 The runner remains available for the next explicitly authorized correctness slice.
-The documentation check above precedes this new report. Uploading review reports
-and evidence for an additional Railway link check awaits separate approval; the
-source/test checks and their results are complete.
+The documentation check above precedes this new report. After explicit approval
+to include reports and evidence, an additional Railway report link check is
+recorded with the after-run evidence.
 
 Healthy reads use the same filesystem reads plus ID/bucket/key validation. A
 missing owner adds one directory stat. Failed initiation adds cleanup work only

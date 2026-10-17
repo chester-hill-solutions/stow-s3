@@ -695,6 +695,13 @@ retains those reservations. After repair, retry completion or abort the retained
 upload; abort preserves the published object. HTTP returns `500 InternalError`,
 and the same separate-publication and metadata-recovery limits above apply.
 
+Workspace DELETE that removes the file but cannot persist the object index
+returns `ErrMutationCommitted` with the original index error. Batch deletion
+includes that key in its confirmed-deleted results and stops at that error,
+preserving earlier progress and leaving later keys untouched. Runtime accounting
+reflects confirmed deletions immediately. Index repair and successful persistence
+are still required; a committed marker does not promise crash-safe recovery.
+
 For custom-store COPY, a published destination returned with
 `ErrMutationCommitted` is preserved through the fallback and public runtime, and
 usage includes that object. The committed marker takes precedence over a joined

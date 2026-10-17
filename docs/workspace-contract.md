@@ -260,6 +260,14 @@ disk; neither is hidden.
 so the internal subtree is self-describing: a directory or file named `.stow`
 at the root is stow's, and no user key can be spelled that way.
 
+
+Workspace DELETE that removes the file but cannot persist the object index
+returns `ErrMutationCommitted` with the original index error. Batch deletion
+includes that key in its confirmed-deleted results and stops at that error,
+preserving earlier progress and leaving later keys untouched. Runtime accounting
+reflects confirmed deletions immediately. Index repair and successful persistence
+are still required; a committed marker does not promise crash-safe recovery.
+
 ### 3.2 A key is natural only when all of these hold
 
 1. Every segment is non-empty and is neither `.` nor `..`.
