@@ -89,6 +89,11 @@ Staged parts live under the reserved internal directory. Each part's size,
 ETag, timestamp and payload are published together by one atomic replacement;
 listing and reopen accounting use those same retained bytes. The upload owner
 document holds initiation options and is not rewritten for part changes.
+An upload directory with missing, unreadable or invalid owner metadata is unknown
+state, rather than an absent upload. Lookup and enumeration return an error;
+runtime reopen and reconciliation must refuse to omit its retained parts. Repair
+owner metadata before resuming. Failed initiation attempts to clean up its new
+staging directory without removing any previously acknowledged upload.
 Part records have 47 bytes of private header overhead, excluded from logical
 payload quotas. Old raw staged parts are refused without migration; finish or
 abort old uploads before changing builds. Completed objects remain real files.

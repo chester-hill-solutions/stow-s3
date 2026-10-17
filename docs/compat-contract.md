@@ -631,11 +631,15 @@ server's unlimited byte/object storage profile remains unlimited unless explicit
 storage quotas are configured; its upload count still defaults to 1,024. Neither
 request limit replaces storage quotas or bounds operating-system memory.
 
-Native filesystem multipart recovery distinguishes a missing upload directory
-from an existing upload whose manifest is missing, unreadable or invalid. Unknown
-upload state returns an error and preserves staging; enumeration must not omit it
-from runtime quota reconciliation. Repairing the metadata permits reconciliation
-to resume. Valid uploads for other buckets remain excluded from each bucket listing.
+Native filesystem and workspace multipart recovery distinguish a missing upload
+directory from an existing upload whose owner metadata is missing, unreadable or
+invalid. Unknown upload state returns an error and preserves acknowledged parts;
+enumeration must not omit it from runtime quota reconciliation. Workspace owner
+identity must match its upload directory and contain a valid bucket and key.
+Repairing the metadata permits reconciliation to resume. Valid uploads for other
+buckets remain excluded from each bucket listing. A failed workspace initiation
+attempts to remove only its newly created staging directory; if cleanup also
+fails, that unknown state still blocks incomplete reconciliation.
 
 Workspace staged parts publish their descriptor and payload in one atomic file
 replacement. Listing and quota reconstruction read that file's descriptor and

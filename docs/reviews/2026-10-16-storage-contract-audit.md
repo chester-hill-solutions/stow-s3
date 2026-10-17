@@ -10,6 +10,10 @@ the separate [atomic workspace part change](2026-10-16-workspace-parts.md). A3 r
 queued. That follow-up also confirms the same A1 owner-enumeration failure in
 the workspace backend; it is the next priority and is left unchanged.
 
+Follow-up: **workspace owner recovery is now corrected** in the separate
+[workspace recovery change](2026-10-17-workspace-recovery.md). The two A3 sites
+remain the confirmed correctness queue.
+
 The audit’s immediate recommendation was A1, native filesystem multipart recovery. The
 previous marked-missing HEAD preflight finding is conditional defensive work,
 not the highest-priority demonstrated native failure.

@@ -63,13 +63,20 @@ func (s *Store) partPath(uploadID string, partNumber int) string {
 func (s *Store) loadUpload(uploadID string) (*uploadState, error) {
 	raw, err := os.ReadFile(filepath.Join(s.uploadDir(uploadID), multipartState))
 	if errors.Is(err, os.ErrNotExist) {
-		return nil, storage.ErrUploadNotFound
+		if _, dirErr := os.Stat(s.uploadDir(uploadID)); errors.Is(dirErr, os.ErrNotExist) {
+			return nil, storage.ErrUploadNotFound
+		} else if dirErr != nil {
+			return nil, dirErr
+		}
 	}
 	if err != nil {
 		return nil, fmt.Errorf("workspace store: read upload: %w", err)
 	}
 	state, err := decodeUploadState(raw)
 	if err != nil {
+		return nil, storage.ErrInvalidUpload
+	}
+	if state.UploadID != uploadID || storage.ValidateBucketName(state.Bucket) != nil || storage.ValidateKey(state.Key) != nil {
 		return nil, storage.ErrInvalidUpload
 	}
 	return state, nil
@@ -118,6 +125,7 @@ func (s *Store) CreateMultipartUpload(ctx context.Context, bucket, key string, o
 	}
 	state.Options.Metadata = storage.CloneMetadata(opts.Metadata)
 	if err := s.saveUpload(state); err != nil {
+		_ = os.RemoveAll(s.uploadDir(uploadID))
 		return nil, err
 	}
 	upload := state.upload()
@@ -350,7 +358,10 @@ func (s *Store) scanUploads(bucket string) ([]storage.MultipartUpload, error) {
 			continue
 		}
 		state, err := s.loadUpload(entry.Name())
-		if err != nil || state.Bucket != bucket {
+		if err != nil {
+			return nil, err
+		}
+		if state.Bucket != bucket {
 			continue
 		}
 		upload := state.upload()

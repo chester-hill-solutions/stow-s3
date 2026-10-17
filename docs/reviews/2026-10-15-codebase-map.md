@@ -240,6 +240,10 @@ Follow-up: **workspace part descriptors and payloads now publish together**
 The remaining workspace owner-document enumeration can still omit damaged
 uploads; that native A1 recovery-class failure is confirmed and left unchanged.
 
+Follow-up: **workspace owner recovery now refuses incomplete accounting**, with
+[Railway before/after evidence](2026-10-17-workspace-recovery.md). A3 workspace
+DELETE and filesystem completion remain independently queued.
+
 ## Codebase map
 
 ```mermaid

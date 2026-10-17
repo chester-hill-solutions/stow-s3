@@ -1,0 +1,47 @@
+from pathlib import Path
+import subprocess,shutil,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-correctness-2026-10-17');old=Path('/private/tmp/stow-workspace-parts-2026-10-16');c=old/'railway-validation'
+files=[x for x in subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','-z'],cwd=r).decode().split('\0')if x]
+for name in files:
+ src=r/name;dst=c/name
+ if not src.is_file():continue
+ if dst.is_file()and src.read_bytes()==dst.read_bytes():continue
+ dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst);shutil.copymode(src,dst)
+b=c/'benchmark';previous=b/'validation-previous-baselines';previous.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:(previous/name).write_bytes(subprocess.check_output(['git','show','HEAD^:scripts/baselines/'+name],cwd=r))
+for name in ['runner.mjs','http.mjs','resources.mjs']:shutil.copyfile(old/'railway-context-fixed/benchmark'/name,b/name)
+runner=(b/'runner.mjs').read_text();runner="import { appendFileSync } from 'node:fs';\nappendFileSync('/etc/hosts','\\n127.0.0.1 endpoint.localhost photos.endpoint.localhost\\n');\n"+runner;(b/'runner.mjs').write_text(runner)
+shutil.copyfile(old/'reap_validation.py.txt',b/'reap_validation.py')
+(b/'Dockerfile').write_text('''FROM node:25.9.0-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370 AS node
+FROM golang:1.25.6-bookworm@sha256:f4490d7b261d73af4543c46ac6597d7d101b6e1755bcdd8c5159fda7046b6b3e
+COPY --from=node /usr/local /usr/local
+ENV GOTOOLCHAIN=local GOFLAGS=-p=1 GOMAXPROCS=4 STOW_BASELINE_REF=HEAD
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY site/package.json site/package-lock.json ./site/
+RUN npm ci --ignore-scripts --prefix site
+COPY . .
+RUN cp -r scripts/baselines /tmp/current-baselines && cp benchmark/validation-previous-baselines/* scripts/baselines/ && git init && git config user.email validation@localhost && git config user.name RailwayValidation && git add scripts/baselines && git commit -m 'Validation fixture: original parent quality baselines' && cp /tmp/current-baselines/* scripts/baselines/ && useradd --uid 10001 --create-home --shell /bin/sh stow-validation && chown -R stow-validation:stow-validation /app /go/pkg/mod
+CMD ["node","benchmark/runner.mjs"]
+''')
+(b/'diagnosis.mjs').write_text('''import{readFile,writeFile,mkdir,open,copyFile}from'node:fs/promises';import{spawn}from'node:child_process';import{join,basename}from'node:path';import{createHash}from'node:crypto';import{systemMetadata}from'./resources.mjs';
+if(process.platform!=='linux'||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4'||process.env.RAILWAY_ENVIRONMENT_ID!=='3cd200cb-c94f-4e4d-9335-0f6c1b7e9411'||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway runner only');
+const root=process.argv[2];if(!root?.startsWith('/results/'))throw Error('Results volume required');await mkdir(root,{recursive:false});const save=(name,value)=>writeFile(join(root,name),typeof value==='string'?value:JSON.stringify(value,null,2)+'\\n');const config=JSON.parse(await readFile('benchmark/active-plan.json'));const results=[];
+async function run(step){const log=await open(join(root,step.name+'.log'),'w');const start=Date.now();let result;try{const child=spawn('python3',['benchmark/reap_validation.py','runuser','-u','stow-validation','--',...step.args],{env:{...process.env,...step.env},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({exitCode:code,signal}))});}finally{await log.close()}return{...step,...result,elapsedMs:Date.now()-start,passed:result.exitCode===(step.expected??0)};}
+try{await save('plan.json',config);const before=await systemMetadata();
+for(const step of config.steps){console.log('Starting '+step.name);results.push(await run(step));await save('checks.json',results);await save('progress.json',{completed:results.length,total:config.steps.length,last:results.at(-1)});console.log(JSON.stringify(results.at(-1)));}
+const sources={};for(const name of config.sources){const data=await readFile(name);sources[name]=createHash('sha256').update(data).digest('hex');await copyFile(name,join(root,'source-'+basename(name)+'.txt'));}await save('environment.json',{provider:'Railway',start:before,end:await systemMetadata(),sourceSHA256:sources,sourceManifest:JSON.parse(await readFile('benchmark/validation-input-manifest.json'))});await save('run.json',{complete:true,success:results.every(r=>r.passed),railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID,checks:results.length,phase:config.phase});
+}catch(error){await save('run.json',{complete:false,error:error.stack});throw error;}
+''')
+sources=['internal/storage/workspace/multipart.go','internal/storage/workspace/owner_recovery_test.go','internal/s3api/workspace_owner_test.go']
+steps=[{'name':'format','args':['gofmt','-w',*sources[1:]]}]
+for mode in ['normal','race']:
+ args=['go','test']+(['-race']if mode=='race'else[])+['./internal/storage/workspace','./internal/s3api','-run','^TestWorkspaceMultipartOwner','-count=2','-v']
+ steps.append({'name':'before-'+mode,'args':args,'expected':1})
+(b/'active-plan.json').write_text(json.dumps({'phase':'workspace-owner-before','sources':sources,'steps':steps},indent=2)+'\n')
+manifest={str(f.relative_to(c)):hashlib.sha256(f.read_bytes()).hexdigest()for f in sorted(c.rglob('*'))if f.is_file()and f!=b/'validation-input-manifest.json'}
+(b/'validation-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');(p/'before-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+for name in ['Dockerfile','diagnosis.mjs','runner.mjs','active-plan.json','reap_validation.py']:
+ shutil.copyfile(b/name,p/(name+'.txt'))
+print('Prepared Railway before-fix snapshot',len(manifest),'files')
