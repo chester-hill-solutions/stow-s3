@@ -1,0 +1,77 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/fs_multipart.go",
+      "internal/storage/fs/fs_test.go",
+      "internal/runtime/completion_cleanup_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "./internal/runtime",
+      "-run",
+      "^TestFilesystem(StoreMultipartCompletionReportsCleanupFailureAndCanRecover|CompletionCleanupOutcome)$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 830,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "./internal/runtime",
+      "-run",
+      "^TestFilesystem(StoreMultipartCompletionReportsCleanupFailureAndCanRecover|CompletionCleanupOutcome)$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3145,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./internal/storage/fs",
+      "./internal/runtime"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 338,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 347,
+    "passed": true
+  }
+]

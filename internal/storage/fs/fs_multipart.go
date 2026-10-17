@@ -222,7 +222,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	}
 	if err := os.RemoveAll(dir); err != nil {
 		// The object is already committed; retain the upload so callers can retry cleanup.
-		return nil, fmt.Errorf("cleanup multipart upload: %w", err)
+		return &meta, storage.CommittedError(fmt.Errorf("cleanup multipart upload: %w", err))
 	}
 	return &meta, nil
 }

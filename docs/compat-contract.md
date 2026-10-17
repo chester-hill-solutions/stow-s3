@@ -695,6 +695,14 @@ retains those reservations. After repair, retry completion or abort the retained
 upload; abort preserves the published object. HTTP returns `500 InternalError`,
 and the same separate-publication and metadata-recovery limits above apply.
 
+Filesystem multipart completion also returns the known published object metadata
+and `ErrMutationCommitted` when staging cleanup fails after object publication.
+The original cleanup error remains discoverable. Accounting includes the object
+and retains staging reservations until upload absence is confirmed; repairing
+permissions and retrying completion or aborting staging preserves recovery.
+The object record already contains its metadata, and HTTP still returns
+`500 InternalError` for the cleanup failure.
+
 Workspace DELETE that removes the file but cannot persist the object index
 returns `ErrMutationCommitted` with the original index error. Batch deletion
 includes that key in its confirmed-deleted results and stops at that error,

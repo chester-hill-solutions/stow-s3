@@ -1,5 +1,10 @@
 # Bounded storage contract audit — 2026-10-16
 
+Follow-up: **the confirmed native A1–A3 correctness queue is now corrected**.
+The final [filesystem completion change](2026-10-17-filesystem-completion.md) retains
+published metadata and accounting after cleanup failure, validated on Railway.
+The findings below remain historical evidence; performance follow-up is next.
+
 Follow-up: **workspace DELETE now preserves its committed outcome and partial
 batch results**, with [Railway regression evidence](2026-10-17-workspace-delete.md).
 Filesystem completion cleanup is the remaining confirmed A3 site.

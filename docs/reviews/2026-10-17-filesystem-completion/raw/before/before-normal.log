@@ -1,0 +1,29 @@
+=== RUN   TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover
+    fs_test.go:229: published completion lost outcome: meta=<nil> error=cleanup multipart upload: unlinkat /tmp/TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCa2170843658/001/.multipart/f53ccce7c568a46475d98879dfb05863/part-00001: permission denied
+--- FAIL: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.01s)
+=== RUN   TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover
+    fs_test.go:229: published completion lost outcome: meta=<nil> error=cleanup multipart upload: unlinkat /tmp/TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCa786942207/001/.multipart/77572052be9c30cdd29630bde8ad2279/part-00001: permission denied
+--- FAIL: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	0.019s
+=== RUN   TestFilesystemCompletionCleanupOutcome
+=== RUN   TestFilesystemCompletionCleanupOutcome/healthy
+=== RUN   TestFilesystemCompletionCleanupOutcome/cleanup-failure
+    completion_cleanup_test.go:59: published completion lost committed marker: cleanup multipart upload: unlinkat /tmp/TestFilesystemCompletionCleanupOutcomecleanup-failure3634854575/001/.multipart/2b93f9dbfab67fc892d30ead09b148c6/part-00001: permission denied
+    completion_cleanup_test.go:59: immediate committed usage={Bytes:0 Objects:0}
+    completion_cleanup_test.go:59: published completion lost metadata
+--- FAIL: TestFilesystemCompletionCleanupOutcome (0.01s)
+    --- PASS: TestFilesystemCompletionCleanupOutcome/healthy (0.00s)
+    --- FAIL: TestFilesystemCompletionCleanupOutcome/cleanup-failure (0.00s)
+=== RUN   TestFilesystemCompletionCleanupOutcome
+=== RUN   TestFilesystemCompletionCleanupOutcome/healthy
+=== RUN   TestFilesystemCompletionCleanupOutcome/cleanup-failure
+    completion_cleanup_test.go:59: published completion lost committed marker: cleanup multipart upload: unlinkat /tmp/TestFilesystemCompletionCleanupOutcomecleanup-failure1004610558/001/.multipart/5b7138e281d43722ff5d824042573cac/part-00001: permission denied
+    completion_cleanup_test.go:59: immediate committed usage={Bytes:0 Objects:0}
+    completion_cleanup_test.go:59: published completion lost metadata
+--- FAIL: TestFilesystemCompletionCleanupOutcome (0.01s)
+    --- PASS: TestFilesystemCompletionCleanupOutcome/healthy (0.00s)
+    --- FAIL: TestFilesystemCompletionCleanupOutcome/cleanup-failure (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.020s
+FAIL
