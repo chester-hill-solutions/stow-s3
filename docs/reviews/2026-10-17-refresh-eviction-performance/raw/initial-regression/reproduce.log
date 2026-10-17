@@ -1,0 +1,71 @@
+=== RUN   TestRefreshEvictionRetainsOpenedVersion
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+--- FAIL: TestRefreshEvictionRetainsOpenedVersion (0.02s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=true (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=true (0.01s)
+=== RUN   TestRefreshEvictionFailureClosesOpenedReader
+=== RUN   TestRefreshEvictionFailureClosesOpenedReader/adapter
+    refresh_eviction_test.go:124: reader leak: opened=0 closed=0 upstream closed=1
+=== RUN   TestRefreshEvictionFailureClosesOpenedReader/runtime
+    refresh_eviction_test.go:124: reader leak: opened=0 closed=0 upstream closed=1
+--- FAIL: TestRefreshEvictionFailureClosesOpenedReader (0.00s)
+    --- FAIL: TestRefreshEvictionFailureClosesOpenedReader/adapter (0.00s)
+    --- FAIL: TestRefreshEvictionFailureClosesOpenedReader/runtime (0.00s)
+=== RUN   TestRefreshEvictionRetainsOpenedVersion
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+=== RUN   TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+--- FAIL: TestRefreshEvictionRetainsOpenedVersion (0.02s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/memory/runtime/durable=true (0.01s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshEvictionRetainsOpenedVersion/filesystem/runtime/durable=true (0.00s)
+=== RUN   TestRefreshEvictionFailureClosesOpenedReader
+=== RUN   TestRefreshEvictionFailureClosesOpenedReader/adapter
+    refresh_eviction_test.go:124: reader leak: opened=0 closed=0 upstream closed=1
+=== RUN   TestRefreshEvictionFailureClosesOpenedReader/runtime
+    refresh_eviction_test.go:124: reader leak: opened=0 closed=0 upstream closed=1
+--- FAIL: TestRefreshEvictionFailureClosesOpenedReader (0.00s)
+    --- FAIL: TestRefreshEvictionFailureClosesOpenedReader/adapter (0.00s)
+    --- FAIL: TestRefreshEvictionFailureClosesOpenedReader/runtime (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.049s
+FAIL

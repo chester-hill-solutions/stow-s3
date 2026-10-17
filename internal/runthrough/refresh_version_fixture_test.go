@@ -61,7 +61,7 @@ type versionFixture struct {
 	adapter  *runthrough.Adapter
 	instance *runtime.Instance
 	client   *versionClient
-	cache    *storage.MemoryStore
+	cache    storage.Store
 	outbox   runthrough.Outbox
 	original *storage.ObjectMeta
 	body     string
@@ -73,10 +73,30 @@ func versionPut(ctx context.Context, client *mockUpstream, body string) error {
 	_, err := client.PutObject(ctx, "probe", "target", strings.NewReader(body), storage.PutOptions{ContentType: "application/new", Metadata: map[string]string{"state": "new"}, ChecksumAlgorithm: "SHA256", ChecksumValue: base64.StdEncoding.EncodeToString(checksum[:])})
 	return err
 }
+
+// disappearingVersionCache deterministically models another reader evicting the
+// freshly published entry before refresh can open it.
+type disappearingVersionCache struct{ *storage.MemoryStore }
+
+func (s *disappearingVersionCache) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	if err := s.MemoryStore.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
+		return nil, nil, err
+	}
+	return s.MemoryStore.GetObject(ctx, bucket, key)
+}
+
 func newVersionFixture(t testing.TB, body string, outbox runthrough.Outbox) *versionFixture {
 	t.Helper()
+	return newVersionFixtureWithCache(t, body, outbox, &disappearingVersionCache{storage.NewMemoryStore()})
+}
+
+func newVersionFixtureWithCache(t testing.TB, body string, outbox runthrough.Outbox, cache storage.Store) *versionFixture {
+	t.Helper()
 	ctx := context.Background()
-	local, cache := storage.NewMemoryStore(), storage.NewMemoryStore()
+	local := storage.NewMemoryStore()
+	if cache == nil {
+		cache = storage.NewMemoryStore()
+	}
 	if err := local.CreateBucket(ctx, "probe"); err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +118,11 @@ func newVersionFixture(t testing.TB, body string, outbox runthrough.Outbox) *ver
 		}
 		return nil
 	}
-	f.adapter = runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyReadThroughCache, Cache: runthrough.CachePolicy{MaxBytes: 1}}, local, cache, client, outbox)
+	maxBytes := int64(1)
+	if _, disappears := cache.(*disappearingVersionCache); disappears {
+		maxBytes = 0
+	}
+	f.adapter = runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyReadThroughCache, Cache: runthrough.CachePolicy{MaxBytes: maxBytes}}, local, cache, client, outbox)
 	f.instance, err = runtime.OpenWithStore(runtime.Options{Backend: runtime.BackendMemory}, f.adapter, nil)
 	if err != nil {
 		t.Fatal(err)

@@ -1,5 +1,7 @@
 # Bounded storage contract audit — 2026-10-16
 
+Performance follow-up: [oversized cache admission](2026-10-17-refresh-eviction-performance.md) removes a measured cache fill/evict/refetch cycle without reopening the completed correctness queue.
+
 Follow-up: [Railway performance requalification and directory-path reuse](2026-10-17-part-listing-performance.md)
 records all new measurements, including adverse timings. Changed-version durable
 fallback is now measured on Railway and remains the next separate change.

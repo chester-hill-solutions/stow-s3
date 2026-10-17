@@ -1,0 +1,75 @@
+package runthrough_test
+
+import (
+	"context"
+	"io"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+)
+
+type versionCostOutbox struct {
+	runthrough.Outbox
+	saves int
+}
+
+func (o *versionCostOutbox) SaveUpstreamState(bucket, key string, state runthrough.UpstreamState) error {
+	o.saves++
+	return o.Outbox.(interface {
+		SaveUpstreamState(string, string, runthrough.UpstreamState) error
+	}).SaveUpstreamState(bucket, key, state)
+}
+func (o *versionCostOutbox) UpstreamState(bucket, key string) (runthrough.UpstreamState, bool, error) {
+	return o.Outbox.(interface {
+		UpstreamState(string, string) (runthrough.UpstreamState, bool, error)
+	}).UpstreamState(bucket, key)
+}
+func BenchmarkRefreshVersionFallback(b *testing.B) {
+	for _, kind := range []string{"memory", "file"} {
+		for _, changed := range []bool{false, true} {
+			name := kind + "/stable"
+			if changed {
+				name = kind + "/changed"
+			}
+			b.Run(name, func(b *testing.B) { benchmarkVersionFallback(b, kind, changed) })
+		}
+	}
+}
+func benchmarkVersionFallback(b *testing.B, kind string, changed bool) {
+	var delegate runthrough.Outbox = runthrough.NewMemoryOutbox()
+	if kind == "file" {
+		delegate = fileVersionOutbox(b)
+	}
+	outbox := &versionCostOutbox{Outbox: delegate}
+	f := newVersionFixtureWithCache(b, "new", outbox, nil)
+	ctx := context.Background()
+	f.client.change = nil
+	if changed {
+		f.client.change = func() error {
+			body := "old"
+			if f.client.gets%2 == 0 {
+				body = "new"
+			}
+			return versionPut(ctx, f.client.mockUpstream, body)
+		}
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		reader, _, err := f.adapter.GetObject(ctx, "probe", "target")
+		if err != nil {
+			b.Fatal(err)
+		}
+		size, err := io.Copy(io.Discard, reader)
+		_ = reader.Close()
+		if err != nil || size != 3 {
+			b.Fatalf("read size=%d error=%v", size, err)
+		}
+	}
+	b.StopTimer()
+	if f.client.gets < b.N || f.client.gets > 2*b.N || f.client.closes != f.client.gets {
+		b.Fatalf("gets=%d closes=%d N=%d", f.client.gets, f.client.closes, b.N)
+	}
+	b.ReportMetric(float64(outbox.saves)/float64(b.N), "state-writes/op")
+	b.ReportMetric(float64(f.client.gets)/float64(b.N), "upstream-gets/op")
+}

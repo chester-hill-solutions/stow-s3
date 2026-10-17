@@ -1,0 +1,7 @@
+node scripts/check-go-quality.mjs
+Go quality ratchet violation
+  new debt: complexity: 3 > 2
+  stale baseline: comment-lines: 4081 < 4082; lower the baseline
+  new: internal/runthrough/refresh_eviction_test.go:checkEvictionVersion#1
+Fix the violation; do not raise the baseline to pass.
+make: *** [Makefile:113: check-go-quality] Error 1

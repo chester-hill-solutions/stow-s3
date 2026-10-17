@@ -1,0 +1,53 @@
+package runthrough_test
+
+import (
+ "context"
+ "fmt"
+ "io"
+ "os"
+ "path/filepath"
+ goruntime "runtime"
+ "strconv"
+ "strings"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+ fsstore "github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+)
+
+type resourceProbeClient struct { *mockUpstream; size int64 }
+func (c *resourceProbeClient) GetObject(context.Context, string, string) (io.ReadCloser, *storage.ObjectMeta, error) {
+ return io.NopCloser(io.LimitReader(resourceProbeZeros{}, c.size)), &storage.ObjectMeta{Bucket:"probe",Key:"target",Size:c.size,ETag:"stable",ContentType:"application/octet-stream"}, nil
+}
+type resourceProbeZeros struct{}
+func (resourceProbeZeros) Read(p []byte) (int,error) { clear(p); return len(p),nil }
+func resourceProbeRSS(b *testing.B) int64 {
+ b.Helper()
+ data,err:=os.ReadFile("/proc/self/status");if err!=nil{b.Fatal(err)}
+ for _,line:=range strings.Split(string(data),"\n"){if strings.HasPrefix(line,"VmRSS:"){n,err:=strconv.ParseInt(strings.Fields(line)[1],10,64);if err!=nil{b.Fatal(err)};return n*1024}}
+ b.Fatal("VmRSS unavailable");return 0
+}
+func resourceProbeUnlinked(b *testing.B) int64 {
+ b.Helper();entries,err:=os.ReadDir("/proc/self/fd");if err!=nil{b.Fatal(err)};var size int64
+ for _,entry:=range entries{path:=filepath.Join("/proc/self/fd",entry.Name());target,err:=os.Readlink(path);if err!=nil{continue};if !strings.Contains(target," (deleted)"){continue};info,err:=os.Stat(path);if err==nil{size+=info.Size()}}
+ return size
+}
+func BenchmarkRefreshHeldReaderResource(b *testing.B) {
+ for _,kind:=range []string{"memory","filesystem"}{for _,size:=range []int64{1<<20,16<<20}{b.Run(fmt.Sprintf("%s/bytes=%d",kind,size),func(b *testing.B){
+ if b.N!=1{b.Fatal("Resource observation requires benchtime=1x")}
+ ctx:=context.Background();local:=storage.NewMemoryStore();if err:=local.CreateBucket(ctx,"probe");err!=nil{b.Fatal(err)}
+ var cache storage.Store=storage.NewMemoryStore();if kind=="filesystem"{var err error;cache,err=fsstore.NewFilesystemStore(b.TempDir());if err!=nil{b.Fatal(err)}}
+ client:=&resourceProbeClient{mockUpstream:newMockUpstream(),size:size};adapter:=runthrough.NewWithCache(runthrough.Config{Policy:runthrough.PolicyReadThroughCache,Cache:runthrough.CachePolicy{MaxBytes:1}},local,cache,client);defer adapter.Close()
+ goruntime.GC();var start,held,released goruntime.MemStats;goruntime.ReadMemStats(&start);rssStart:=resourceProbeRSS(b)
+ reader,_,err:=adapter.GetObject(ctx,"probe","target");if err!=nil{b.Fatal(err)}
+ goruntime.GC();goruntime.ReadMemStats(&held);rssHeld:=resourceProbeRSS(b);unlinked:=resourceProbeUnlinked(b)
+ got,err:=io.Copy(io.Discard,reader);if err!=nil||got!=size{b.Fatalf("read=%d error=%v",got,err)};if err:=reader.Close();err!=nil{b.Fatal(err)};goruntime.KeepAlive(reader);reader=nil
+ goruntime.GC();goruntime.ReadMemStats(&released)
+ b.ReportMetric(float64(int64(held.HeapAlloc)-int64(start.HeapAlloc)),"held-heap-B")
+ b.ReportMetric(float64(rssHeld-rssStart),"held-rss-B")
+ b.ReportMetric(float64(held.TotalAlloc-start.TotalAlloc),"open-alloc-B")
+ b.ReportMetric(float64(unlinked),"held-unlinked-B")
+ b.ReportMetric(float64(int64(released.HeapAlloc)-int64(start.HeapAlloc)),"released-heap-B")
+ })}}
+}

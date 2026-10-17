@@ -1,5 +1,7 @@
 # Reduce multipart listing allocations without weakening recovery
 
+Follow-up: [oversized cache admission](2026-10-17-refresh-eviction-performance.md) addresses the measured oversized-object fallback cost. The measurements below describe this earlier listing change.
+
 Base `5f8f4844f5cfd987eb8e6d7cdb5a1d9af7f98bc2` contains the three preceding
 correctness corrections. A fresh fetch still reports `origin/main`
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.

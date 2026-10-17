@@ -1,0 +1,49 @@
+{
+  "sources": {
+    "benchmark/_fallback-variants/fallback-before/internal/runthrough/adapter.go": "f266f8cdd768b8c68e193aa44b9445a40eb49dc6de6f102038d9ae01f8371b2b",
+    "internal/storage/workspace/multipart.go": "610bff2d0e2517cd1058d1e5c6e3a800b2fad85d78531447889d323d36715a10",
+    "internal/storage/workspace/part_record.go": "72e9e3404515408f59af526b89b4732f170aa34670cfbcfba2f21cd7ead1112c",
+    "internal/storage/workspace/part_comparison_bench_test.go": "e2bc1c58fa1d2e9487034bb28bbf331a7c5230e800ec1039c1e3acce248a9a78",
+    "internal/storage/workspace/listing_descriptor_test.go": "4960c622fba8c654f5eeb401c07f6bf2578c9fb4b5e646da6495c688a43c668f",
+    "internal/runthrough/adapter.go": "9c0e820b1b13ad30545a0fa17d30d9385c1de4933bfef9ff99c6a7fcb89c1ed0",
+    "internal/runthrough/cache_read.go": "dee10012d95bfbe67aef25cb504258601f0569bd1e919d444b2104f8abb0785b",
+    "internal/runthrough/refresh_version_bench_test.go": "f05b75196d9c2d35da1c877d10843d272aef89f4fd3aad44e6741e4597146a5d",
+    "internal/runthrough/refresh_version_fixture_test.go": "4cd3d01409f036cbeeae9a219b332e9c5b3c3a73ad3b62914df2ebed8a66e54d"
+  },
+  "binaries": {
+    "fallback-before": {
+      "bytes": 18622776,
+      "sha256": "6763d51cf15b695536107e35b8554ea7078ceb8a0e345b2d21eafcf6a7bc2738"
+    },
+    "fallback-after": {
+      "bytes": 18622536,
+      "sha256": "77d088f43f20e368cff1869cb09e1114fa9554dfdcf0889accfc58aee60df6c3"
+    }
+  },
+  "variants": {
+    "fallback-before": {
+      "package": "./internal/runthrough",
+      "ref": "488378bb29dff15865cba4bddbad3238e9f3bbb3",
+      "files": [
+        "internal/runthrough/adapter.go"
+      ]
+    },
+    "fallback-after": {
+      "package": "./internal/runthrough",
+      "files": []
+    },
+    "resource-before": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/adapter.go",
+        "internal/runthrough/refresh_resource_probe_test.go"
+      ]
+    },
+    "resource-after": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/refresh_resource_probe_test.go"
+      ]
+    }
+  }
+}

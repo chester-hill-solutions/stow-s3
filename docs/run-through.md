@@ -30,6 +30,11 @@ Set byte and object limits with `--cache-max-bytes` and `--cache-max-objects`, o
 `STOW_CACHE_MAX_BYTES` and `STOW_CACHE_MAX_OBJECTS`.
 Set entry lifetime with `--cache-ttl` or `STOW_CACHE_TTL`. Stow reapplies limits on startup.
 
+An object larger than the entire byte budget bypasses cache storage. GET streams
+the observed upstream version; HEAD and prewarm return metadata without consuming
+its body. Any older cached copy of that key is removed, while unrelated keys
+remain cached. The oversized object is unavailable offline.
+
 TTL starts at the cache record's publication time. Reopening does not extend it.
 With a positive TTL, an entry without a verifiable publication time expires.
 

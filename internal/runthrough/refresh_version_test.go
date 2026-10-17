@@ -102,7 +102,7 @@ func TestRefreshFallbackMissingETagClosesReader(t *testing.T) {
 	}
 }
 func TestRefreshHeadDoesNotRefetchEvictedBody(t *testing.T) {
-	f := newVersionFixture(t, "new", nil)
+	f := newVersionFixtureWithCache(t, "new", nil, nil)
 	meta, err := f.adapter.HeadObject(context.Background(), "probe", "target")
 	if err != nil || meta.ETag != f.original.ETag || f.client.gets != 1 || f.client.closes != 1 {
 		t.Fatalf("head meta=%+v gets=%d closes=%d error=%v", meta, f.client.gets, f.client.closes, err)

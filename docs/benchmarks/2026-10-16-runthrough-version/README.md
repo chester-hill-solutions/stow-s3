@@ -1,5 +1,7 @@
 # Pair refreshed bodies with their captured metadata and upstream state
 
+Follow-up: [Railway cache-admission measurements](../../reviews/2026-10-17-refresh-eviction-performance.md) reduce oversized-object read costs while retaining the version-consistency fallback. Historical measurements below remain unchanged.
+
 Follow-up: [Railway performance requalification and directory-path reuse](../../reviews/2026-10-17-part-listing-performance.md)
 records all new measurements, including adverse timings. Changed-version durable
 fallback is now measured on Railway and remains the next separate change.

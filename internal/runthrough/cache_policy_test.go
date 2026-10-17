@@ -62,8 +62,8 @@ func TestAdapter_SeparateCacheEvictsByByteLimit(t *testing.T) {
 	if _, err := cache.HeadObject(ctx, "bucket", "large"); !errors.Is(err, storage.ErrObjectNotFound) {
 		t.Fatalf("oversized cache object error = %v, want not found", err)
 	}
-	if evictions := adapter.CacheEvictions(); evictions != 1 {
-		t.Fatalf("cache evictions = %d, want 1", evictions)
+	if evictions := adapter.CacheEvictions(); evictions != 0 {
+		t.Fatalf("cache evictions = %d, want 0", evictions)
 	}
 }
 
