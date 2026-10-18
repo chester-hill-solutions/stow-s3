@@ -86,3 +86,6 @@ complete the directory durability fence even if an earlier rename succeeded but
 its fence failed. Equality with visible disk state alone cannot acknowledge
 successful persistence. No unchanged-save optimization is included here; no
 indexing, checkpointing or storage abstraction has begun.
+
+Follow-up: [unchanged-save measurements and implementation](2026-10-18-outbox-unchanged.md)
+avoid healthy native rewrites while retaining both file and directory fences.

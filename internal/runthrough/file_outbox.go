@@ -14,11 +14,12 @@ import (
 )
 
 type FileOutbox struct {
-	path        string
-	lockPath    string
-	mu          sync.Mutex
-	state       outboxState
-	journalSeen bool
+	path          string
+	lockPath      string
+	mu            sync.Mutex
+	state         outboxState
+	journalSeen   bool
+	nativeJournal bool
 }
 
 type persistedOutbox struct {
@@ -105,6 +106,7 @@ func (o *FileOutbox) reloadLocked() error {
 	}
 	o.state = state
 	o.journalSeen = true
+	o.nativeJournal = len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic
 	o.updateSequences()
 	o.updateTokens()
 	return nil
@@ -145,35 +147,32 @@ func (o *FileOutbox) updateSequence(id string) {
 	}
 }
 
-func (o *FileOutbox) withState(update func(*outboxState) error) (err error) {
-	o.mu.Lock()
-	defer o.mu.Unlock()
-	lock, err := acquireOutboxFileLock(o.lockPath)
-	if err != nil {
+func (o *FileOutbox) withState(update func(*outboxState) error) error {
+	return o.withLockedState(func(state outboxState) error {
+		next := state.clone()
+		if err := update(&next); err != nil {
+			return err
+		}
+		return o.commitState(next)
+	})
+}
+
+func (o *FileOutbox) commitState(state outboxState) error {
+	if err := o.persistState(state); err != nil {
 		return err
 	}
-	defer func() { _ = lock.release() }()
-	if err := o.reloadLocked(); err != nil {
-		return err
-	}
-	next := o.state.clone()
-	if err := update(&next); err != nil {
-		return err
-	}
-	if err := o.persistState(next); err != nil {
-		return err
-	}
-	o.state = next
+	o.state = state
 	o.journalSeen = true
+	o.nativeJournal = true
 	return nil
 }
 
 func (o *FileOutbox) readState() (state outboxState, err error) {
-	err = o.withReadState(func(current outboxState) { state = current.clone() })
+	err = o.withLockedState(func(current outboxState) error { state = current.clone(); return nil })
 	return state, err
 }
 
-func (o *FileOutbox) withReadState(read func(outboxState)) error {
+func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	lock, err := acquireOutboxFileLock(o.lockPath)
@@ -184,8 +183,7 @@ func (o *FileOutbox) withReadState(read func(outboxState)) error {
 	if err := o.reloadLocked(); err != nil {
 		return err
 	}
-	read(o.state)
-	return nil
+	return operation(o.state)
 }
 
 func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {

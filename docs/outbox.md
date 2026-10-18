@@ -31,6 +31,8 @@ retrying the same condition cannot resolve it.
 Filesystem outbox updates return an error if journal replacement cannot complete its durability fence.
 The replacement may already be visible when that error occurs; it does not prove the old journal was restored.
 Reads that need to record upstream provenance fail until it can be saved durably.
+Unchanged native provenance saves may retain the journal file, but still sync its
+data and parent directory. Legacy migration and repair fallbacks replace it.
 
 A missing journal path is allowed when creating an outbox. An existing zero-byte
 journal is rejected as corrupt. Restore a valid journal before retrying; Stow does
