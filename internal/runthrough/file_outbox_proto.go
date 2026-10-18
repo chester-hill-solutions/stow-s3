@@ -196,7 +196,11 @@ func normalizeDecodedOutboxState(state outboxState) (outboxState, error) {
 	if state.provenance == nil {
 		state.provenance = make(map[string]UpstreamState)
 	}
-	migrateOutboxAttempts(state.entries)
-	migrateOutboxAttempts(state.prepared)
+	if err := normalizeOutboxEntries(state.entries); err != nil {
+		return outboxState{}, err
+	}
+	if err := normalizeOutboxEntries(state.prepared); err != nil {
+		return outboxState{}, err
+	}
 	return state, nil
 }

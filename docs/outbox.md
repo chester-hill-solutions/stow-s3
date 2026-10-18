@@ -64,6 +64,8 @@ Both require the configured admin token, including on loopback.
 Without an admin token, these mutation routes are unavailable.
 
 Outbox snapshots use framed protobuf schema 4. Stow rejects unsupported versions and unknown fields.
+Active/prepared map identities must match their stored entry IDs; mismatches
+are rejected before decoded state is used.
 Repeated identities within a protobuf collection are rejected, even for identical
 records. Writes with invalid UTF-8 identity strings fail before replacing the
 journal, preserving the existing bytes instead of changing the identities.

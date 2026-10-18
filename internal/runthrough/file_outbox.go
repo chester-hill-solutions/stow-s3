@@ -81,16 +81,20 @@ func decodeLegacyOutboxState(data []byte) (outboxState, error) {
 	return normalizeDecodedOutboxState(outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken})
 }
 
-// migrateOutboxAttempts marks entries written by a format that kept an attempt count
-// but no marker of whether the attempt reached upstream, so the next claim reconciles
-// them against upstream before propagating again.
-func migrateOutboxAttempts(entries map[string]OutboxEntry) {
+// normalizeOutboxEntries validates entry IDs and marks historical attempts for
+// upstream reconciliation. Older formats recorded an attempt count without
+// recording whether that attempt reached upstream.
+func normalizeOutboxEntries(entries map[string]OutboxEntry) error {
 	for id, entry := range entries {
+		if entry.ID != id {
+			return fmt.Errorf("outbox entry identity %q does not match ID %q", id, entry.ID)
+		}
 		if !entry.Attempted && entry.Attempts > 0 {
 			entry.Attempted = true
 			entries[id] = entry
 		}
 	}
+	return nil
 }
 
 func (o *FileOutbox) reloadLocked() error {
