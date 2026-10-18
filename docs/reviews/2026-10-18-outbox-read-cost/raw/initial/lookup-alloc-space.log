@@ -1,0 +1,30 @@
+File: readcost.test
+Build ID: c96b49f8f0c7fdaf0439146b85fb0ff90b65bf49
+Type: alloc_space
+Time: 2026-10-18 05:05:10 UTC
+Showing nodes accounting for 129418.46kB, 99.76% of 129734.39kB total
+Dropped 242 nodes (cum <= 648.67kB)
+      flat  flat%   sum%        cum   cum%
+38435.94kB 29.63% 29.63% 106852.91kB 82.36%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+32001.95kB 24.67% 54.29% 32001.95kB 24.67%  reflect.New
+   22601kB 17.42% 71.71% 22612.25kB 17.43%  os.readFileContents
+22401.17kB 17.27% 88.98% 22401.17kB 17.27%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+13977.93kB 10.77% 99.76% 13977.93kB 10.77%  google.golang.org/protobuf/internal/impl.pointer.AppendPointerSlice (inline)
+    0.34kB 0.00026% 99.76% 10389.42kB  8.01%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.NewFileOutbox
+    0.12kB 9.6e-05% 99.76% 129695.87kB   100%  testing.(*B).runN
+         0     0% 99.76% 10356.38kB  7.98%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).SaveUpstreamState (inline)
+         0     0% 99.76% 108724.22kB 83.81%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).UpstreamState
+         0     0% 99.76% 129462.48kB 99.79%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).reloadLocked
+         0     0% 99.76% 119080.59kB 91.79%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withLockedState
+         0     0% 99.76% 129488.92kB 99.81%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkFileOutboxReadCost.func1.1
+         0     0% 99.76% 129488.77kB 99.81%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.benchmarkOutboxReadCost
+         0     0% 99.76% 106852.91kB 82.36%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxState
+         0     0% 99.76% 68387.98kB 52.71%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 99.76% 68387.98kB 52.71%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 99.76% 68387.98kB 52.71%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+         0     0% 99.76% 68387.98kB 52.71%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0% 99.76% 68414.63kB 52.73%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 99.76% 68414.63kB 52.73%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 99.76% 22622.48kB 17.44%  os.ReadFile
+         0     0% 99.76% 113912.44kB 87.80%  testing.(*B).launch
+         0     0% 99.76% 15780.85kB 12.16%  testing.(*B).run1.func1
