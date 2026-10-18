@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,sys,statistics,hashlib
+p=Path('/private/tmp/stow-incoming-memory-2026-10-18');j=json.loads((p/'final-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete'] and run['success'] and len(checks)==12 and all(x['passed']for x in checks);assert run['railwayDeploymentId']==j['deploymentId'];d=json.loads((e/'measurements.json').read_text());assert len(d['cases'])==41 and len(d['commands'])==123 and all(x['exitCode']==0 for x in d['commands']);assert len(d['commands'])==len(d['cases'])*3 and len(d['observations'])==225
+sources=json.loads((p/'source-manifest.json').read_text());env=json.loads((e/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+for n,h in env['sourceSHA256'].items():
+ if n.endswith('.go'):assert h==sources[n],n
+keys={};
+for row in d['observations']:keys.setdefault((row['kind'],row['size'],row['phase']),[]).append(row)
+summary=[]
+for (kind,size,phase),rows in sorted(keys.items()):
+ assert len(rows)==3,(kind,size,phase,len(rows))
+ out=dict(kind=kind,size=size,phase=phase,count=len(rows))
+ for key in ['ns','allocatedBytes','allocations','retainedHeapDelta','maxRSSBytes']:
+  vals=[r[key]for r in rows];out[key]={'median':statistics.median(vals),'min':min(vals),'max':max(vals)}
+ summary.append(out)
+(e/'comparison-analysis.json').write_text(json.dumps(summary,indent=2)+'\n');receipt={'success':True,'commands':len(d['commands']),'observations':len(d['observations']),'checks':len(checks),'sourceManifestSHA256':env['sourceManifestSHA256'],'railwayDeploymentId':j['deploymentId'],'binarySHA256':d['binarySHA256'],'noProductionChange':True};(e/'validation-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt));
+for row in summary:
+ if row['size']==64<<20 or 'sixteen'in row['phase']:print(row['kind'],row['size'],row['phase'],'allocMB',round(row['allocatedBytes']['median']/1e6,3),'retainedMiB',round(row['retainedHeapDelta']['median']/(1<<20),2),'rssMiB',round(row['maxRSSBytes']['median']/(1<<20),2),'ms',round(row['ns']['median']/1e6,2))

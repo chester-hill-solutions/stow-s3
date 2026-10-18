@@ -1,0 +1,31 @@
+file:///app/benchmark/measure.mjs:4
+const commands=[],observations=[];for(let round=0;round<3;round++){const cells=round%2?[...cases].reverse():cases;for(const cell of cells){const args=['-test.run=^TestIncomingMemoryProbe$','-test.v','-test.count=1'];const q=spawnSync('python3',['benchmark/measure-child.py',binary,...args],{cwd:'/app',encoding:'utf8',env:{...process.env,STOW_BENCH_ROOT:fixture,STOW_PROBE_KIND:cell.kind,STOW_PROBE_SIZE:String(cell.size),GOMAXPROCS:'4'},timeout:90000,maxBuffer:2000000});const log=`sample-${round}-${cell.kind}-${cell.size}.log`;await writeFile(root+'/'+log,q.stdout+q.stderr);const usageLine=q.stdout.split('\n').find(l=>l.startsWith('STOW_CHILD_RESOURCE:'));const usage=usageLine?JSON.parse(usageLine.slice(20)):null;commands.push({round,...cell,args,log,exitCode:q.status,signal:q.signal,error:q.error?.code??null,usage});for(const line of q.stdout.split('\n'))if(line.startsWith('STOW_MEMORY:'))observations.push({round,...cell,...JSON.parse(line.slice(12)),...usage});await writeFile(root+'/measurements.json',JSON.stringify({cases,binary,binarySHA256,diskType:disk.type,commands,observations},null,2));await writeFile(root+'/measurement-progress.json',JSON.stringify({commands:commands.length,total:cases.length*3,last:cell,exitCode:q.status}));if(q.status!==0||!usage)throw Error(q.stdout+q.stderr)} }console.log(JSON.stringify({commands:commands.length,observations:observations.length,binarySHA256}));
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+
+Error: === RUN   TestIncomingMemoryProbe
+STOW_MEMORY:{"allocatedBytes":552359992,"allocations":1245,"heapAfter":164744408,"heapBefore":350456,"ns":30559646,"phase":"http-sixteen-at-store","retainedHeapDelta":164393952}
+STOW_CONTROL:seventeenth handler refused before body read
+    incoming_memory_probe_test.go:398: content contract n=8388608 meta=&{Bucket:bucket Key:http-0 VersionID:983fdac148447a569914da9fbc380aa8 Size:8388608 ETag:"eafad8c17066f7ea34758d6b549b784d" ContentType:application/octet-stream LastModified:2026-10-18 22:13:14.758918534 +0000 UTC Metadata:map[X-Amz-Meta-Source:probe] ChecksumAlgorithm: ChecksumValue:} err=<nil> close=<nil>
+--- FAIL: TestIncomingMemoryProbe (1.80s)
+FAIL
+STOW_CHILD_RESOURCE:{"maxRSSBytes": 296251392, "userSeconds": 0.26957, "systemSeconds": 0.053922}
+2026/10/18 22:13:13 PUT /s3 200 74.205915ms
+2026/10/18 22:13:13 PUT /s3 200 102.570115ms
+2026/10/18 22:13:13 PUT /s3 200 192.122628ms
+2026/10/18 22:13:13 PUT /s3 200 314.629741ms
+2026/10/18 22:13:13 PUT /s3 200 352.105175ms
+2026/10/18 22:13:13 PUT /s3 200 542.107084ms
+2026/10/18 22:13:13 PUT /s3 200 679.735369ms
+2026/10/18 22:13:14 PUT /s3 200 804.085982ms
+2026/10/18 22:13:14 PUT /s3 200 894.714454ms
+2026/10/18 22:13:14 PUT /s3 200 934.199336ms
+2026/10/18 22:13:14 PUT /s3 200 1.15401993s
+2026/10/18 22:13:14 PUT /s3 200 1.397654033s
+2026/10/18 22:13:14 PUT /s3 200 1.520120368s
+2026/10/18 22:13:14 PUT /s3 200 1.541996806s
+2026/10/18 22:13:14 PUT /s3 200 1.756976752s
+2026/10/18 22:13:14 PUT /s3 200 1.75720105s
+
+    at file:///app/benchmark/measure.mjs:4:1283
+
+Node.js v25.9.0

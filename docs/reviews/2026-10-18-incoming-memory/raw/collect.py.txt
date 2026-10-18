@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,shutil,hashlib,subprocess
+p=Path('/private/tmp/stow-incoming-memory-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-incoming-memory/raw';j=json.loads((p/'final-start.json').read_text());src=p/('export-'+j['id']);run=json.loads((src/'run.json').read_text());receipt=json.loads((src/'validation-receipt.json').read_text());assert run['complete']and run['success']and receipt['noProductionChange'];base=json.loads((p/'baseline.json').read_text())['base']
+for n,h in json.loads((p/'source-manifest.json').read_text()).items():
+ if n.endswith('.go')or n in ['go.mod','go.sum']:assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+assert not subprocess.check_output(['git','diff','--name-only',base,'--','*.go','go.mod','go.sum'],cwd=r)
+dest=raw/'final';dest.mkdir(parents=True,exist_ok=True)
+for f in src.iterdir():
+ if f.is_file():shutil.copy2(f,dest/f.name)
+initial=json.loads((p/'probe-start.json').read_text());failed=p/('export-'+initial['id']);v=json.loads((failed/'run.json').read_text());checks=json.loads((failed/'checks.json').read_text());assert v['complete']and not v['success']and [x['name']for x in checks if not x['passed']]==['measure'];bad=raw/'failed-probe';bad.mkdir(exist_ok=True)
+for f in failed.iterdir():
+ if f.is_file():shutil.copy2(f,bad/f.name)
+for suffix in ['start.json','deployments.json','upload.log']:shutil.copy2(p/('final-'+suffix),dest/suffix)
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','transport-receipt.json','transport-Dockerfile.txt','probe-plan.json','final-plan.json','install-final.js','incoming-probe.go.txt','measure.mjs','doc-links-capture.mjs','preserve-report-failure.js']:shutil.copy2(p/n,raw/n)
+for n in ['setup.py','preflight.py','package.py','deploy.py','control.py','watch.py','remote.py','export.py','analyze.py','correct-probe.py','install-final.py','adapt-final.py','report.py','collect.py','publish.py','preserve-report-failure.py','adjust-capture.py','manifest.py','stop.py','verify.py']:
+ if(p/n).exists():shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['runner.mjs','http.mjs','resources.mjs','diagnosis.mjs','diagnosis-validation.mjs','reap_validation.py','measure-child.py']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-incoming-memory.md');print('Collected measurements and verified unchanged production Go sources')
