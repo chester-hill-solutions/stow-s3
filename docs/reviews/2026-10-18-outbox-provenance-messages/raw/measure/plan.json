@@ -1,0 +1,145 @@
+{
+  "phase": "outbox-proto-block-measure",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/outbox_proto_blocks_test.go",
+    "internal/runthrough/outbox_proto_blocks_resource_test.go",
+    "internal/runthrough/outbox_proto_blocks_bench_test.go",
+    "benchmark/bulk-file_outbox_proto.go.txt",
+    "benchmark/bounded-file_outbox_proto.go.txt",
+    "benchmark/proto-block-file-bench.go.txt",
+    "benchmark/proto-block-before.json",
+    "benchmark/proto-block-bulk.json",
+    "benchmark/proto-block-bounded.json",
+    "benchmark/proto-block-comparison.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_proto_blocks_test.go",
+        "internal/runthrough/outbox_proto_blocks_resource_test.go",
+        "internal/runthrough/outbox_proto_blocks_bench_test.go",
+        "benchmark/bulk-file_outbox_proto.go.txt",
+        "benchmark/bounded-file_outbox_proto.go.txt",
+        "benchmark/proto-block-file-bench.go.txt"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/proto-block-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/proto-block-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/proto-block-before.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/proto-block-before.test"
+      ]
+    },
+    {
+      "name": "bulk-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/proto-block-bulk.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "bulk-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/proto-block-bulk.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "bounded-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/proto-block-bounded.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "bounded-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/proto-block-bounded.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "bounded-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/proto-block-bounded.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/proto-block-bounded.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/proto-block-comparison.mjs"
+      ]
+    }
+  ]
+}

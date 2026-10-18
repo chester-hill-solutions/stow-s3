@@ -23,9 +23,13 @@ func encodeOutboxProto(state outboxState) ([]byte, error) {
 		keys = append(keys, key)
 	}
 	slices.Sort(keys)
-	for _, key := range keys {
-		value := state.provenance[key]
-		message.Provenance = append(message.Provenance, &outboxpb.Provenance{Identity: key, Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown})
+	if len(keys) != 0 {
+		values := make([]outboxpb.Provenance, len(keys))
+		for index, key := range keys {
+			value := state.provenance[key]
+			values[index] = outboxpb.Provenance{Identity: key, Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown}
+			message.Provenance = append(message.Provenance, &values[index])
+		}
 	}
 	var err error
 	message.Entries, err = outboxProtoEntries(state.entries)

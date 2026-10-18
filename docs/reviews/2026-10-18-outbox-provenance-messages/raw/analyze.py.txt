@@ -1,0 +1,53 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from statistics import median
+import json,re,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');job=json.loads((p/'measure-start.json').read_text());d=p/('export-'+job['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==10 and all(x['passed']for x in checks)
+receipts={};rx=re.compile(r'^--- (PASS|FAIL|SKIP): ((?:TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)\S*)');reference={}
+for variant in ['before','bulk','bounded']:
+ for mode in ['normal','race']:
+  name=variant+'-'+mode;counts=Counter();contents=(d/(name+'.log')).read_text()
+  for line in contents.splitlines():
+   m=rx.match(line.strip())
+   if m:counts[(m[1],m[2])]+=1
+  leaves={label for status,label in counts if not any(other.startswith(label+'/')for _,other in counts)};assert len(leaves)==50,(name,len(leaves))
+  wantFails={'TestOutboxProtoBlockEarlyErrorAllocation'}if variant=='bulk'else set()
+  for label in leaves:
+   assert counts.get(('FAIL',label),0)==(2 if label in wantFails else 0),(name,label)
+   assert counts.get(('PASS',label),0)==(0 if label in wantFails else 2),(name,label)
+  assert not any(status=='SKIP'for status,label in counts)
+  fingerprints=[json.loads(line.removeprefix('STOWPROTOFRAME: '))for line in contents.splitlines()if line.startswith('STOWPROTOFRAME: ')];assert len(fingerprints)==28
+  grouped={}
+  for f in fingerprints:
+   if f['name']in grouped:assert f==grouped[f['name']]
+   grouped[f['name']]=f
+  assert len(grouped)==14
+  if not reference:reference=grouped
+  assert grouped==reference,(name,'wire mismatch')
+  errorRows=[json.loads(line.removeprefix('STOWPROTOERROR: '))for line in contents.splitlines()if line.startswith('STOWPROTOERROR: ')];heap=[json.loads(line.removeprefix('STOWPROTOHEAP: '))for line in contents.splitlines()if line.startswith('STOWPROTOHEAP: ')];assert len(errorRows)==len(heap)==2
+  assert all((x['allocatedBytes']>512<<10)==(variant=='bulk')for x in errorRows)
+  assert all(x['heapAfter']-x['heapBefore']<16<<20 for x in heap)
+  receipts[name]={'distinctCases':50,'passes':100-2*len(wantFails),'expectedFailures':2*len(wantFails),'skipped':0,'cases':sorted(leaves),'frames':grouped,'earlyError':errorRows,'retention':heap}
+commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==8;assert json.loads((d/'fixture-filesystem.json').read_text())['statfsType']==61267
+cells=defaultdict(lambda:defaultdict(list));samples=[];pattern=re.compile(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$')
+for command in commands['runs']:
+ assert command['exitCode']==0 and command['signal']is None
+ rows=[]
+ for line in(d/command['log']).read_text().splitlines():
+  m=pattern.match(line)
+  if not m:continue
+  row={'name':m[1],'iterations':int(m[2]),'index':command['index'],'variant':command['variant'],'log':command['log']};parts=m[3].split();assert len(parts)%2==0
+  for n in range(0,len(parts),2):row[parts[n+1]]=float(parts[n])
+  rows.append(row);samples.append(row);cells[row['name']][row['variant']].append(row)
+ assert len(rows)==48,(command,len(rows))
+assert len(samples)==384 and len(cells)==48
+summary=[]
+for name,variants in sorted(cells.items()):
+ assert set(variants)=={'before','bounded'}and all(len(x)==4 for x in variants.values());stats={}
+ for label,rows in variants.items():
+  keys=[k for k in rows[0]if k not in ['name','iterations','index','variant','log']];stats[label]={key:median(x[key]for x in rows)for key in keys};stats[label]['nsMin']=min(x['ns/op']for x in rows);stats[label]['nsMax']=max(x['ns/op']for x in rows)
+ summary.append({'name':name,**stats,'timeDeltaPercent':(stats['bounded']['ns/op']/stats['before']['ns/op']-1)*100,'allocDeltaPercent':(stats['bounded']['allocs/op']/stats['before']['allocs/op']-1)*100,'byteDeltaPercent':(stats['bounded']['B/op']/stats['before']['B/op']-1)*100})
+source=json.loads((d/'environment.json').read_text())['sourceSHA256'];r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');base=json.loads((p/'baseline.json').read_text())['base'];assert hashlib.sha256(subprocess.check_output(['git','show',base+':internal/runthrough/file_outbox_proto.go'],cwd=r)).hexdigest()==source['internal/runthrough/file_outbox_proto.go']
+(d/'contract-receipt.json').write_text(json.dumps(receipts,indent=2)+'\n');(d/'comparison-analysis.json').write_text(json.dumps({'observations':384,'comparisons':summary,'samples':samples},indent=2)+'\n')
+print('Verified 50 cases twice per variant/mode, identical 14 frame fingerprints, early-error rejection and 384 observations')
+for row in summary:print(row['name'],'time%=',round(row['timeDeltaPercent'],2),'alloc%=',round(row['allocDeltaPercent'],2),'B%=',round(row['byteDeltaPercent'],2),'allocs=',row['before']['allocs/op'],'->',row['bounded']['allocs/op'])

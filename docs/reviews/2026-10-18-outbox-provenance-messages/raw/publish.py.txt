@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,base64,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');report='docs/reviews/2026-10-18-outbox-provenance-messages.md';raw=str(Path(report).with_suffix(''))+'/raw';repair=json.loads((p/'final-start.json').read_text());root='/results/'+repair['id']
+def remote(script,name):
+ f=p/name;f.write_text(script);q=subprocess.run(['python3',str(p/'remote.py'),str(f)],text=True,capture_output=True);print(q.stdout);assert q.returncode==0,q.stdout+q.stderr
+jobs={phase:'/results/'+json.loads((p/(phase+'-start.json')).read_text())['id']for phase in ['measure','provenance','ownership','confirmation','final']}
+remote("const fs=require('node:fs');for(const[phase,src]of Object.entries("+json.dumps(jobs)+")){const result=JSON.parse(fs.readFileSync(src+'/run.json'));if(!result.complete||!result.success)throw Error('Job active');const failed=JSON.parse(fs.readFileSync(src+'/checks.json')).filter(x=>!x.passed).map(x=>x.name);if(JSON.stringify(failed)!==JSON.stringify([]))throw Error('Unexpected checks');const dst='/app/'+"+json.dumps(raw)+"+'/'+phase;fs.rmSync(dst,{recursive:true,force:true});fs.mkdirSync(dst,{recursive:true});for(const entry of fs.readdirSync(src,{withFileTypes:true}))if(entry.isFile())fs.copyFileSync(src+'/'+entry.name,dst+'/'+entry.name)}console.log('Copied both completed Railway measurement jobs');",'publish-copy.js')
+manifestHash=hashlib.sha256((r/raw/'source-manifest.json').read_bytes()).hexdigest();remote("const fs=require('node:fs'),crypto=require('node:crypto');const src='/app/benchmark/validation-input-manifest.json';if(crypto.createHash('sha256').update(fs.readFileSync(src)).digest('hex')!=="+json.dumps(manifestHash)+")throw Error('Manifest changed');fs.copyFileSync(src,'/app/"+raw+"/source-manifest.json');console.log('Copied verified upload manifest');",'publish-manifest.js')
+names=[report];names.extend(str(f.relative_to(r))for f in (r/raw).iterdir()if f.is_file()and f.name!='source-manifest.json');names.extend(raw+'/'+phase+'/'+n for phase in ['measure','provenance','ownership','confirmation','final']for n in ['comparison-analysis.json','capacity-receipt.json','confirmation-analysis.json','contract-receipt.json','red-receipt.json','green-receipt.json','export-receipt.json','start.json']if(r/raw/phase/n).exists())
+batches=[];batch={};size=0
+for name in names:
+ data=base64.b64encode((r/name).read_bytes()).decode()
+ if len(data)>80000:
+  if batch:batches.append(batch);batch={};size=0
+  for i in range(0,len(data),60000):
+   script="const fs=require('node:fs'),path=require('node:path');const f='/app/'+"+json.dumps(name)+";fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,Buffer.from("+json.dumps(data[i:i+60000])+",'base64'),{flag:"+json.dumps('w'if i==0 else'a')+"});console.log('Published large artifact chunk');";remote(script,'publish-chunk-'+str(len(batches))+'-'+str(i)+'.js')
+  digest=hashlib.sha256((r/name).read_bytes()).hexdigest();remote("const fs=require('node:fs'),crypto=require('node:crypto');if(crypto.createHash('sha256').update(fs.readFileSync('/app/'+"+json.dumps(name)+")).digest('hex')!=="+json.dumps(digest)+")throw Error('Artifact transfer mismatch');console.log('Verified large artifact');",'publish-artifact-verify.js');continue
+ if size+len(data)>80000:batches.append(batch);batch={};size=0
+ batch[name]=data;size+=len(data)
+if batch:batches.append(batch)
+for i,batch in enumerate(batches):remote("const fs=require('node:fs'),path=require('node:path');for(const[n,b]of Object.entries("+json.dumps(batch)+")){fs.mkdirSync(path.dirname('/app/'+n),{recursive:true});fs.writeFileSync('/app/'+n,Buffer.from(b,'base64'))}console.log('Published report batch "+str(i)+"');",'publish-batch-'+str(i)+'.js')
+script="""const fs=require('node:fs'),cp=require('node:child_process'),crypto=require('node:crypto');const root=ROOT,expected=JSON.parse(fs.readFileSync(root+'/environment.json')).sourceSHA256;
+for(const[n,h]of Object.entries(expected))if(crypto.createHash('sha256').update(fs.readFileSync('/app/'+n)).digest('hex')!==h)throw Error('Source changed: '+n);
+const documents={};for(const n of [REPORT])documents[n]=crypto.createHash('sha256').update(fs.readFileSync('/app/'+n)).digest('hex');
+const checks=[];for(const[name,args]of [['site-build',['npm','run','build','--prefix','site']],['site-tests',['npm','test','--prefix','site']],['report-links',['node','scripts/check-doc-links.mjs']]]){
+ const q=cp.spawnSync('python3',['benchmark/reap_validation.py','runuser','-u','stow-validation','--',...args],{cwd:'/app',encoding:'utf8',timeout:45000,maxBuffer:4000000});fs.writeFileSync(root+'/report-'+name+'.log',q.stdout+q.stderr);checks.push({name,args,exitCode:q.status});console.log(name+': '+q.status);if(q.status!==0){console.log(q.stdout+q.stderr);process.exit(1)}}
+const result={exitCode:0,checks,documentSHA256:documents,sourceSHA256:expected,railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID};fs.writeFileSync(root+'/report-receipt.json',JSON.stringify(result,null,2)+'\\n');for(const n of fs.readdirSync(root))if(n.startsWith('report-'))fs.copyFileSync(root+'/'+n,'/app/'+RAW+'/final/'+n);console.log(JSON.stringify(result));
+""".replace('ROOT',json.dumps(root)).replace('REPORT',json.dumps(report)).replace('RAW',json.dumps(raw));remote(script,'publish-check.js')
