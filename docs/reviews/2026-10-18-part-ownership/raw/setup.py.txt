@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,json,shutil
+p=Path('/private/tmp/stow-part-ownership-2026-10-18');old=Path('/private/tmp/stow-incoming-memory-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');assert not subprocess.check_output(['git','status','--porcelain'],cwd=r)
+for n in ['control.py','watch.py','remote.py','export.py','preflight.py','deploy.py']:
+ s=(old/n).read_text().replace(str(old),str(p)).replace('stow-incoming-memory-20261018','stow-part-ownership-20261018').replace('Measure native incoming-write buffering; production unchanged','Qualify multipart ownership transfer');(p/n).write_text(s)
+for n in ['transport-Dockerfile.txt','doc-links-capture.mjs']:shutil.copy2(old/n,p/n)
+base=subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip();main=subprocess.check_output(['git','rev-parse','origin/main'],cwd=r).decode().strip();(p/'baseline.json').write_text(json.dumps({'base':base,'originMain':main,'branch':'codex/core-copy-quality'},indent=2)+'\n')
+for n in ['internal/storage/owned_reader.go','internal/s3api/handlers_multipart.go']:(p/('baseline-'+Path(n).name+'.txt')).write_bytes((r/n).read_bytes())

@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,hashlib,shutil
+p=Path('/private/tmp/stow-part-ownership-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');j=json.loads((p/'final-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());assert run['complete']and run['success'];env=json.loads((e/'environment.json').read_text())
+for n,h in env['sourceSHA256'].items():
+ if n.endswith('.go'):
+  f=e/('source-'+Path(n).name+'.txt');assert hashlib.sha256(f.read_bytes()).hexdigest()==h,n;shutil.copy2(f,r/n);assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h
+print('Copied exact Railway-formatted/tested bytes for all five changed Go files')

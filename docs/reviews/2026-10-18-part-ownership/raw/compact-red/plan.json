@@ -1,0 +1,72 @@
+{
+  "phase": "memory-retention-regression",
+  "sources": [
+    "internal/storage/memory.go",
+    "internal/storage/owned_reader.go",
+    "internal/storage/part_owned_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/part_owned_test.go"
+      ]
+    },
+    {
+      "name": "candidate-retention-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage",
+        "-run",
+        "^TestPartMemoryKeepsCompactPayload$",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "candidate-retention-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage",
+        "-run",
+        "^TestPartMemoryKeepsCompactPayload$",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "original-retention-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage",
+        "-run",
+        "^TestPartMemoryKeepsCompactPayload$",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "original-retention-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage",
+        "-run",
+        "^TestPartMemoryKeepsCompactPayload$",
+        "-count=1",
+        "-v"
+      ]
+    }
+  ]
+}

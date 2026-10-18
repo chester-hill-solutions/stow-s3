@@ -1,0 +1,84 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/part_owned_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "candidate-retention-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage",
+      "-run",
+      "^TestPartMemoryKeepsCompactPayload$",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 957,
+    "passed": true
+  },
+  {
+    "name": "candidate-retention-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage",
+      "-run",
+      "^TestPartMemoryKeepsCompactPayload$",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1690,
+    "passed": true
+  },
+  {
+    "name": "original-retention-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/storage",
+      "-run",
+      "^TestPartMemoryKeepsCompactPayload$",
+      "-count=1",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1008,
+    "passed": true
+  },
+  {
+    "name": "original-retention-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/storage",
+      "-run",
+      "^TestPartMemoryKeepsCompactPayload$",
+      "-count=1",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2693,
+    "passed": true
+  }
+]
