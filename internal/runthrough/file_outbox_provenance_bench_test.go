@@ -103,3 +103,39 @@ func benchmarkProvenanceSave(b *testing.B, depth int, queued, changed bool) {
 		b.Fatalf("state=%+v known=%t error=%v", got, known, err)
 	}
 }
+
+func BenchmarkFileOutboxLookup(b *testing.B) {
+	for _, fixture := range []struct {
+		name   string
+		depth  int
+		queued bool
+	}{
+		{"provenance=0", 0, false}, {"provenance=128", 128, false}, {"provenance=2048", 2048, false}, {"provenance=16384", 16384, false}, {"mixed=1024", 1024, true},
+	} {
+		b.Run(fixture.name, func(b *testing.B) {
+			outbox, path := seedProvenanceBenchmark(b, fixture.depth, fixture.queued)
+			info, err := os.Stat(path)
+			if err != nil {
+				b.Fatal(err)
+			}
+			before := benchmarkProcessWrites(b)
+			var got UpstreamState
+			var known bool
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				got, known, err = outbox.UpstreamState("bucket", "target")
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+			b.StopTimer()
+			after := benchmarkProcessWrites(b)
+			b.ReportMetric(float64(info.Size()), "journal-B")
+			b.ReportMetric(float64(after-before)/float64(b.N), "written-B/op")
+			if !known || got != (UpstreamState{ETag: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}) {
+				b.Fatalf("lookup value=%+v known=%t", got, known)
+			}
+		})
+	}
+}

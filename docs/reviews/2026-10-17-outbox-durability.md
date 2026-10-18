@@ -1,5 +1,7 @@
 # Return outbox durability failures and measure journal save cost
 
+Follow-up: [protobuf outbox measurements and implementation](2026-10-17-outbox-protobuf.md).
+
 Outbox persistence reported success after replacing its journal even when opening
 or syncing the parent directory failed. A successful acknowledgement could therefore
 describe a replacement whose directory entry had not been durably committed.

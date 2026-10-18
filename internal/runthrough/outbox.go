@@ -37,10 +37,9 @@ var (
 	ErrOutboxFormatVersion = errors.New("outbox file format version is not supported by this writer")
 )
 
-// outboxFormatVersion is the on-disk schema revision written by this build.
-// Version 0 (unversioned) files are migrated on read; anything newer is
-// rejected rather than downgraded.
-const outboxFormatVersion = 3
+// outboxLegacyJSONVersion is the newest JSON schema accepted for migration.
+// New writes use the framed protobuf format in file_outbox_proto.go.
+const outboxLegacyJSONVersion = 3
 
 const (
 	OutboxPut       OutboxOperation = "put"

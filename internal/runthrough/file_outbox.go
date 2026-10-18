@@ -49,13 +49,20 @@ func NewFileOutbox(path string) (*FileOutbox, error) {
 }
 
 func decodeOutboxState(data []byte) (outboxState, error) {
+	if len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic {
+		return decodeOutboxProto(data)
+	}
+	return decodeLegacyOutboxState(data)
+}
+
+func decodeLegacyOutboxState(data []byte) (outboxState, error) {
 	var persisted persistedOutbox
 	if err := json.Unmarshal(data, &persisted); err != nil {
 		return outboxState{}, fmt.Errorf("decode outbox: %w", err)
 	}
-	if persisted.Version < 0 || persisted.Version > outboxFormatVersion {
+	if persisted.Version < 0 || persisted.Version > outboxLegacyJSONVersion {
 		return outboxState{}, fmt.Errorf("%w: file declares version %d, this writer supports 0-%d",
-			ErrOutboxFormatVersion, persisted.Version, outboxFormatVersion)
+			ErrOutboxFormatVersion, persisted.Version, outboxLegacyJSONVersion)
 	}
 	if persisted.Entries == nil && persisted.Prepared == nil {
 		var legacy map[string]OutboxEntry
@@ -64,30 +71,7 @@ func decodeOutboxState(data []byte) (outboxState, error) {
 		}
 		persisted.Entries = legacy
 	}
-	if persisted.Entries == nil {
-		persisted.Entries = make(map[string]OutboxEntry)
-	}
-	if persisted.Prepared == nil {
-		persisted.Prepared = make(map[string]OutboxEntry)
-	}
-	for id, entry := range persisted.Entries {
-		if !entry.Prepared {
-			continue
-		}
-		delete(persisted.Entries, id)
-		persisted.Prepared[id] = entry
-	}
-	for id := range persisted.Prepared {
-		if _, exists := persisted.Entries[id]; exists {
-			return outboxState{}, fmt.Errorf("outbox entry %q is both prepared and active", id)
-		}
-	}
-	if persisted.Provenance == nil {
-		persisted.Provenance = make(map[string]UpstreamState)
-	}
-	migrateOutboxAttempts(persisted.Entries)
-	migrateOutboxAttempts(persisted.Prepared)
-	return outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken}, nil
+	return normalizeDecodedOutboxState(outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken})
 }
 
 // migrateOutboxAttempts marks entries written by a format that kept an attempt count
@@ -300,7 +284,7 @@ func (o *FileOutbox) Close() error {
 }
 
 func (o *FileOutbox) persistState(state outboxState) error {
-	data, err := json.MarshalIndent(persistedOutbox{Provenance: state.provenance, Version: outboxFormatVersion, Entries: state.entries, Prepared: state.prepared, Seq: state.seq, NextToken: state.nextToken}, "", "  ")
+	data, err := encodeOutboxProto(state)
 	if err != nil {
 		return err
 	}

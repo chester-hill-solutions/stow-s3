@@ -50,7 +50,9 @@ A newer local version does not replace the version recorded by the original inte
 Both require the configured admin token, including on loopback.
 Without an admin token, these mutation routes are unavailable.
 
-Outbox files have a schema version. Stow rejects newer schemas and migrates unversioned files.
-All writers sharing an outbox must use the same revision.
+Outbox snapshots use framed protobuf schema 4. Stow rejects unsupported versions and unknown fields.
+Existing JSON schemas 0–3 remain readable and convert on the next successful write.
+Configured paths keep their names, including any `.json` suffix, while rewritten contents are binary.
+All writers sharing an outbox must use the same revision; older binaries cannot read rewritten snapshots.
 See the [compatibility contract](compat-contract.md#62-read-through-cache-semantics) for propagation rules
 and the [server reference](../README.md#admin-and-metrics-routes) for authentication.

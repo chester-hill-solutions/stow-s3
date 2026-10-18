@@ -1,0 +1,76 @@
+{
+  "phase": "outbox-protobuf-split-schema-verification",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_selector_test.go",
+    "internal/runthrough/file_outbox_proto_bench_test.go",
+    "internal/runthrough/file_outbox_proto_test.go",
+    "internal/runthrough/outboxpb/outbox.proto",
+    "internal/runthrough/outboxpb/outbox.pb.go",
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go",
+    "internal/runthrough/outboxpb/entry.proto",
+    "internal/runthrough/outboxpb/entry.pb.go"
+  ],
+  "steps": [
+    {
+      "name": "generate",
+      "args": [
+        "protoc",
+        "--go_out=.",
+        "--go_opt=paths=source_relative",
+        "internal/runthrough/outboxpb/entry.proto",
+        "internal/runthrough/outboxpb/outbox.proto"
+      ]
+    },
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_proto.go",
+        "internal/runthrough/file_outbox_proto_selector_test.go",
+        "internal/runthrough/file_outbox_proto_bench_test.go",
+        "internal/runthrough/file_outbox_proto_test.go",
+        "internal/runthrough/outboxpb/outbox.pb.go",
+        "internal/runthrough/file_outbox.go",
+        "internal/runthrough/file_outbox_provenance_bench_test.go",
+        "internal/runthrough/outboxpb/entry.pb.go"
+      ]
+    },
+    {
+      "name": "codec-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProto|TestFileOutboxReports|TestOutboxFence)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "codec-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProto|TestFileOutboxReports|TestOutboxFence)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ package runthrough_test
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/binary"
 	"errors"
 	"os"
 	"os/exec"
@@ -14,32 +14,47 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"google.golang.org/protobuf/proto"
 )
 
 func expireFileOutboxClaim(t *testing.T, path, id string) {
 	t.Helper()
 	data, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("read outbox: %v", err)
+		t.Fatal(err)
 	}
-	var state struct {
-		Entries map[string]map[string]interface{} `json:"entries"`
+	const magic = "STOWOUT4"
+	const prefix = len(magic) + 4
+	if len(data) < prefix || !bytes.HasPrefix(data, []byte(magic)) {
+		t.Fatal("claim fixture is not protobuf")
 	}
-	if err := json.Unmarshal(data, &state); err != nil {
-		t.Fatalf("decode outbox: %v", err)
+	if uint64(binary.LittleEndian.Uint32(data[len(magic):prefix])) != uint64(len(data)-prefix) {
+		t.Fatal("claim fixture length is invalid")
 	}
-	entry, ok := state.Entries[id]
-	if !ok {
+	state := &outboxpb.Outbox{}
+	if err := proto.Unmarshal(data[prefix:], state); err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, entry := range state.Entries {
+		if entry.Identity == id {
+			entry.ClaimUntil = time.Now().Add(-time.Second).Format(time.RFC3339Nano)
+			found = true
+		}
+	}
+	if !found {
 		t.Fatalf("claim entry %q not found", id)
 	}
-	entry["claim_until"] = time.Now().Add(-time.Second).Format(time.RFC3339Nano)
-	data, err = json.Marshal(state)
+	payload, err := (proto.MarshalOptions{Deterministic: true}).Marshal(state)
 	if err != nil {
-		t.Fatalf("encode outbox: %v", err)
+		t.Fatal(err)
 	}
-	if err := os.WriteFile(path, data, 0o600); err != nil {
-		t.Fatalf("write expired claim: %v", err)
+	data = append(data[:prefix], payload...)
+	binary.LittleEndian.PutUint32(data[len(magic):prefix], uint32(len(payload)))
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
 	}
 }
 
