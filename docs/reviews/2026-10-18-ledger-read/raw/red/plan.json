@@ -1,0 +1,44 @@
+{
+  "phase": "ledger-read-red",
+  "sources": [
+    "internal/capacity/state.go",
+    "internal/capacity/state_read_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/state_read_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/capacity",
+        "-run",
+        "^TestLedgerRead",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/capacity",
+        "-run",
+        "^TestLedgerRead",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

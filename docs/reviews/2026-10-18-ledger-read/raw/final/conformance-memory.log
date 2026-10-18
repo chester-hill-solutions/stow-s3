@@ -1,0 +1,911 @@
+=== RUN   TestContractDriversAgreeOnTheStepSurface
+--- PASS: TestContractDriversAgreeOnTheStepSurface (0.00s)
+=== RUN   TestContractCaseFileUsesOnlyKnownFields
+--- PASS: TestContractCaseFileUsesOnlyKnownFields (0.00s)
+=== RUN   TestContractDriversIsolateTheDefaultRegistry
+--- PASS: TestContractDriversIsolateTheDefaultRegistry (0.00s)
+=== RUN   TestContractStepVocabularyIsDocumented
+--- PASS: TestContractStepVocabularyIsDocumented (0.00s)
+=== RUN   TestGetObjectWithAMatchingIfNoneMatchIsNotModified
+2026/10/18 19:22:48 PUT /s3 200 84.459µs
+2026/10/18 19:22:48 PUT /s3 200 96.169µs
+2026/10/18 19:22:48 GET /s3 304 25.139µs
+--- PASS: TestGetObjectWithAMatchingIfNoneMatchIsNotModified (0.01s)
+=== RUN   TestGetObjectWithAStaleIfNoneMatchReturnsTheBody
+2026/10/18 19:22:48 PUT /s3 200 51.119µs
+2026/10/18 19:22:48 PUT /s3 200 75.359µs
+2026/10/18 19:22:48 GET /s3 200 80.251µs
+--- PASS: TestGetObjectWithAStaleIfNoneMatchReturnsTheBody (0.01s)
+=== RUN   TestConditionalCopyRefusesWhenTheSourceHasMovedOn
+2026/10/18 19:22:48 PUT /s3 200 38.189µs
+2026/10/18 19:22:48 PUT /s3 200 106.569µs
+2026/10/18 19:22:48 PUT /s3 200 65.241µs
+2026/10/18 19:22:48 PUT /s3 412 84.259µs
+2026/10/18 19:22:48 HEAD /s3 404 48.1µs
+2026/10/18 19:22:48 PUT /s3 200 51.62µs
+2026/10/18 19:22:48 HEAD /s3 200 22.879µs
+2026/10/18 19:22:48 GET /s3 200 24.99µs
+--- PASS: TestConditionalCopyRefusesWhenTheSourceHasMovedOn (0.01s)
+=== RUN   TestCopyWithAMatchingIfNoneMatchIsRefused
+2026/10/18 19:22:48 PUT /s3 200 78.429µs
+2026/10/18 19:22:48 PUT /s3 200 69.139µs
+2026/10/18 19:22:48 PUT /s3 412 35.33µs
+--- PASS: TestCopyWithAMatchingIfNoneMatchIsRefused (0.01s)
+=== RUN   TestCopyWhileTheSourceIsRewrittenPublishesOneVersion
+2026/10/18 19:22:48 PUT /s3 200 41.84µs
+2026/10/18 19:22:48 PUT /s3 200 77.629µs
+2026/10/18 19:22:48 PUT /s3 200 102.848µs
+2026/10/18 19:22:48 PUT /s3 200 54.919µs
+2026/10/18 19:22:48 PUT /s3 200 70.329µs
+2026/10/18 19:22:48 HEAD /s3 200 27µs
+2026/10/18 19:22:48 GET /s3 200 81.899µs
+2026/10/18 19:22:48 HEAD /s3 200 61.089µs
+2026/10/18 19:22:48 GET /s3 200 83.359µs
+2026/10/18 19:22:48 PUT /s3 200 57.289µs
+2026/10/18 19:22:48 PUT /s3 200 39.28µs
+2026/10/18 19:22:48 PUT /s3 200 54.24µs
+2026/10/18 19:22:48 PUT /s3 200 51.33µs
+2026/10/18 19:22:48 HEAD /s3 200 21.69µs
+2026/10/18 19:22:48 GET /s3 200 39.85µs
+2026/10/18 19:22:48 HEAD /s3 200 13.1µs
+2026/10/18 19:22:48 GET /s3 200 21.419µs
+2026/10/18 19:22:48 PUT /s3 200 48.379µs
+2026/10/18 19:22:48 PUT /s3 200 75.539µs
+2026/10/18 19:22:48 PUT /s3 200 48.129µs
+2026/10/18 19:22:48 PUT /s3 200 115.138µs
+2026/10/18 19:22:48 HEAD /s3 200 26.7µs
+2026/10/18 19:22:48 GET /s3 200 56.959µs
+2026/10/18 19:22:48 HEAD /s3 200 27.85µs
+2026/10/18 19:22:48 GET /s3 200 49.409µs
+2026/10/18 19:22:48 PUT /s3 200 54.229µs
+2026/10/18 19:22:48 PUT /s3 200 40.16µs
+2026/10/18 19:22:48 PUT /s3 200 48.18µs
+2026/10/18 19:22:48 PUT /s3 200 89.259µs
+2026/10/18 19:22:48 HEAD /s3 200 43.98µs
+2026/10/18 19:22:48 GET /s3 200 45.879µs
+2026/10/18 19:22:48 HEAD /s3 200 29.549µs
+2026/10/18 19:22:48 GET /s3 200 78.949µs
+2026/10/18 19:22:48 PUT /s3 200 65.399µs
+2026/10/18 19:22:48 PUT /s3 200 38.17µs
+2026/10/18 19:22:48 PUT /s3 200 78.699µs
+2026/10/18 19:22:48 PUT /s3 200 41.879µs
+2026/10/18 19:22:48 HEAD /s3 200 24.05µs
+2026/10/18 19:22:48 GET /s3 200 72.28µs
+2026/10/18 19:22:48 HEAD /s3 200 30.5µs
+2026/10/18 19:22:48 GET /s3 200 47.559µs
+2026/10/18 19:22:48 PUT /s3 200 53.14µs
+2026/10/18 19:22:48 PUT /s3 200 37.299µs
+2026/10/18 19:22:48 PUT /s3 200 70.15µs
+2026/10/18 19:22:48 PUT /s3 200 49.65µs
+2026/10/18 19:22:48 HEAD /s3 200 30.05µs
+2026/10/18 19:22:48 GET /s3 200 75.539µs
+2026/10/18 19:22:48 HEAD /s3 200 24.969µs
+2026/10/18 19:22:48 GET /s3 200 34.3µs
+2026/10/18 19:22:48 PUT /s3 200 54.76µs
+2026/10/18 19:22:48 PUT /s3 200 30.78µs
+2026/10/18 19:22:48 PUT /s3 200 82.389µs
+2026/10/18 19:22:48 PUT /s3 200 55.659µs
+2026/10/18 19:22:48 HEAD /s3 200 25.68µs
+2026/10/18 19:22:48 GET /s3 200 54.79µs
+2026/10/18 19:22:48 HEAD /s3 200 25.73µs
+2026/10/18 19:22:48 GET /s3 200 37.239µs
+2026/10/18 19:22:48 PUT /s3 200 54.4µs
+2026/10/18 19:22:48 PUT /s3 200 85.289µs
+2026/10/18 19:22:48 PUT /s3 200 69.809µs
+2026/10/18 19:22:48 PUT /s3 200 47.91µs
+2026/10/18 19:22:48 HEAD /s3 200 27.79µs
+2026/10/18 19:22:48 GET /s3 200 47.259µs
+2026/10/18 19:22:48 HEAD /s3 200 13.18µs
+2026/10/18 19:22:48 GET /s3 200 42.019µs
+2026/10/18 19:22:48 PUT /s3 200 51.829µs
+2026/10/18 19:22:48 PUT /s3 200 27.85µs
+2026/10/18 19:22:48 PUT /s3 200 65.54µs
+2026/10/18 19:22:48 PUT /s3 200 100.089µs
+2026/10/18 19:22:48 HEAD /s3 200 21.66µs
+2026/10/18 19:22:48 GET /s3 200 48.939µs
+2026/10/18 19:22:48 HEAD /s3 200 14.82µs
+2026/10/18 19:22:48 GET /s3 200 23.95µs
+2026/10/18 19:22:48 PUT /s3 200 44.399µs
+2026/10/18 19:22:48 PUT /s3 200 39.779µs
+2026/10/18 19:22:48 PUT /s3 200 85.119µs
+2026/10/18 19:22:48 PUT /s3 200 25.199µs
+2026/10/18 19:22:48 HEAD /s3 200 19.05µs
+2026/10/18 19:22:48 GET /s3 200 41.139µs
+2026/10/18 19:22:48 HEAD /s3 200 16.42µs
+2026/10/18 19:22:48 GET /s3 200 59.06µs
+2026/10/18 19:22:48 PUT /s3 200 58.959µs
+--- PASS: TestCopyWhileTheSourceIsRewrittenPublishesOneVersion (0.02s)
+=== RUN   TestCopyOfADeletedSourceIsRefused
+2026/10/18 19:22:48 PUT /s3 200 44.669µs
+2026/10/18 19:22:48 PUT /s3 200 45.879µs
+2026/10/18 19:22:48 DELETE /s3 204 19.77µs
+2026/10/18 19:22:48 PUT /s3 404 32.38µs
+2026/10/18 19:22:48 HEAD /s3 404 47.119µs
+--- PASS: TestCopyOfADeletedSourceIsRefused (0.01s)
+=== RUN   TestCopyOntoItselfPreservesTheObject
+2026/10/18 19:22:48 PUT /s3 200 47.66µs
+2026/10/18 19:22:48 PUT /s3 200 87.619µs
+2026/10/18 19:22:48 PUT /s3 200 32.279µs
+2026/10/18 19:22:48 HEAD /s3 200 26.319µs
+2026/10/18 19:22:48 GET /s3 200 22.34µs
+--- PASS: TestCopyOntoItselfPreservesTheObject (0.01s)
+=== RUN   TestSharedCorpus
+=== RUN   TestSharedCorpus/put-get-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 48.909µs
+2026/10/18 19:22:48 PUT /s3 200 86.979µs
+2026/10/18 19:22:48 HEAD /s3 200 32.19µs
+2026/10/18 19:22:48 GET /s3 200 35.93µs
+=== RUN   TestSharedCorpus/opaque-key-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 45.62µs
+2026/10/18 19:22:48 PUT /s3 200 78.479µs
+2026/10/18 19:22:48 HEAD /s3 200 38.94µs
+2026/10/18 19:22:48 GET /s3 200 30.6µs
+=== RUN   TestSharedCorpus/opaque-key-dot-segment
+2026/10/18 19:22:48 PUT /s3 200 44.79µs
+2026/10/18 19:22:48 PUT /s3 200 80.629µs
+2026/10/18 19:22:48 HEAD /s3 200 40.849µs
+2026/10/18 19:22:48 GET /s3 200 26.25µs
+=== RUN   TestSharedCorpus/empty-object-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 41.281µs
+2026/10/18 19:22:48 PUT /s3 200 47.65µs
+2026/10/18 19:22:48 HEAD /s3 200 20.229µs
+2026/10/18 19:22:48 GET /s3 200 31.25µs
+=== RUN   TestSharedCorpus/conditional-put-if-none-match-rejects-existing
+2026/10/18 19:22:48 PUT /s3 200 38.97µs
+2026/10/18 19:22:48 PUT /s3 200 68.499µs
+2026/10/18 19:22:48 PUT /s3 412 46.979µs
+=== RUN   TestSharedCorpus/conditional-put-if-match-updates-existing
+2026/10/18 19:22:48 PUT /s3 200 57.2µs
+2026/10/18 19:22:48 PUT /s3 200 98.769µs
+2026/10/18 19:22:48 PUT /s3 200 85.239µs
+2026/10/18 19:22:48 GET /s3 200 65.689µs
+=== RUN   TestSharedCorpus/conditional-get-if-none-match-not-modified
+2026/10/18 19:22:48 PUT /s3 200 48.239µs
+2026/10/18 19:22:48 PUT /s3 200 89.059µs
+2026/10/18 19:22:48 GET /s3 304 69.829µs
+=== RUN   TestSharedCorpus/checksum-content-md5-rejects-mismatch
+2026/10/18 19:22:48 PUT /s3 200 46.73µs
+2026/10/18 19:22:48 PUT /s3 400 59.06µs
+=== RUN   TestSharedCorpus/checksum-crc32-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 42.01µs
+2026/10/18 19:22:48 PUT /s3 200 57.629µs
+2026/10/18 19:22:48 GET /s3 200 22.65µs
+=== RUN   TestSharedCorpus/list-prefix-pagination-url-encoding
+2026/10/18 19:22:48 PUT /s3 200 52.929µs
+2026/10/18 19:22:48 PUT /s3 200 71.469µs
+2026/10/18 19:22:48 PUT /s3 200 48.049µs
+2026/10/18 19:22:48 PUT /s3 200 51.359µs
+2026/10/18 19:22:48 GET /s3 200 58.229µs
+2026/10/18 19:22:48 GET /s3 200 60.7µs
+=== RUN   TestSharedCorpus/list-delimiter-pagination
+2026/10/18 19:22:48 PUT /s3 200 40.92µs
+2026/10/18 19:22:48 PUT /s3 200 54.769µs
+2026/10/18 19:22:48 PUT /s3 200 47.239µs
+2026/10/18 19:22:48 PUT /s3 200 32.97µs
+2026/10/18 19:22:48 PUT /s3 200 50.41µs
+2026/10/18 19:22:48 GET /s3 200 58.231µs
+2026/10/18 19:22:48 GET /s3 200 46.699µs
+=== RUN   TestSharedCorpus/copy-cross-bucket-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 34.87µs
+2026/10/18 19:22:48 PUT /s3 200 74.759µs
+2026/10/18 19:22:48 PUT /s3 200 45.359µs
+2026/10/18 19:22:48 PUT /s3 200 28.969µs
+2026/10/18 19:22:48 GET /s3 200 36.01µs
+=== RUN   TestSharedCorpus/copy-replace-metadata
+2026/10/18 19:22:48 PUT /s3 200 32.549µs
+2026/10/18 19:22:48 PUT /s3 200 34.989µs
+2026/10/18 19:22:48 PUT /s3 200 44.909µs
+2026/10/18 19:22:48 PUT /s3 200 34.9µs
+2026/10/18 19:22:48 GET /s3 200 31.57µs
+=== RUN   TestSharedCorpus/copy-if-none-match-rejects-existing
+2026/10/18 19:22:48 PUT /s3 200 43.6µs
+2026/10/18 19:22:48 PUT /s3 200 30.24µs
+2026/10/18 19:22:48 PUT /s3 200 42.949µs
+2026/10/18 19:22:48 PUT /s3 412 199.798µs
+=== RUN   TestSharedCorpus/multipart-two-part-lifecycle
+2026/10/18 19:22:48 PUT /s3 200 100.108µs
+2026/10/18 19:22:48 POST /s3 200 66.029µs
+2026/10/18 19:22:48 GET /s3 200 50.999µs
+2026/10/18 19:22:48 PUT /s3 200 10.240396ms
+2026/10/18 19:22:48 PUT /s3 200 69.609µs
+2026/10/18 19:22:48 GET /s3 200 76.86µs
+2026/10/18 19:22:48 POST /s3 200 689.903µs
+2026/10/18 19:22:48 GET /s3 200 937.371µs
+2026/10/18 19:22:48 HEAD /s3 200 48.82µs
+=== RUN   TestSharedCorpus/range-partial-object
+2026/10/18 19:22:48 PUT /s3 200 55.909µs
+2026/10/18 19:22:48 PUT /s3 200 83.759µs
+2026/10/18 19:22:48 GET /s3 206 42.73µs
+=== RUN   TestSharedCorpus/range-suffix-returns-the-last-bytes
+2026/10/18 19:22:48 PUT /s3 200 41.45µs
+2026/10/18 19:22:48 PUT /s3 200 89.099µs
+2026/10/18 19:22:48 GET /s3 206 30µs
+=== RUN   TestSharedCorpus/range-open-ended-runs-to-the-last-byte
+2026/10/18 19:22:48 PUT /s3 200 33.29µs
+2026/10/18 19:22:48 PUT /s3 200 64.729µs
+2026/10/18 19:22:48 GET /s3 206 53.15µs
+=== RUN   TestSharedCorpus/range-end-past-the-object-is-clamped
+2026/10/18 19:22:48 PUT /s3 200 48.5µs
+2026/10/18 19:22:48 PUT /s3 200 85.669µs
+2026/10/18 19:22:48 GET /s3 206 31.869µs
+=== RUN   TestSharedCorpus/range-whole-object-is-still-partial-content
+2026/10/18 19:22:48 PUT /s3 200 37.129µs
+2026/10/18 19:22:48 PUT /s3 200 82.949µs
+2026/10/18 19:22:48 GET /s3 206 25.99µs
+=== RUN   TestSharedCorpus/range-start-past-the-object-is-unsatisfiable
+2026/10/18 19:22:48 PUT /s3 200 34.209µs
+2026/10/18 19:22:48 PUT /s3 200 43.5µs
+2026/10/18 19:22:48 GET /s3 416 24.36µs
+2026/10/18 19:22:48 HEAD /s3 200 32.24µs
+=== RUN   TestSharedCorpus/range-unsatisfiable-reports-the-real-object-size
+2026/10/18 19:22:48 PUT /s3 200 43.55µs
+2026/10/18 19:22:48 PUT /s3 200 56.849µs
+2026/10/18 19:22:48 GET /s3 416 38.01µs
+2026/10/18 19:22:48 HEAD /s3 200 50.089µs
+=== RUN   TestSharedCorpus/metadata-case-normalizes-sdk-keys
+2026/10/18 19:22:48 PUT /s3 200 33.17µs
+2026/10/18 19:22:48 PUT /s3 200 67.449µs
+2026/10/18 19:22:48 HEAD /s3 200 46.38µs
+2026/10/18 19:22:48 GET /s3 200 32.73µs
+=== RUN   TestSharedCorpus/checksum-crc64nvme-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 34.25µs
+2026/10/18 19:22:48 PUT /s3 200 161.519µs
+2026/10/18 19:22:48 GET /s3 200 49.359µs
+=== RUN   TestSharedCorpus/checksum-crc32c-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 42.27µs
+2026/10/18 19:22:48 PUT /s3 200 65.329µs
+2026/10/18 19:22:48 GET /s3 200 27.109µs
+=== RUN   TestSharedCorpus/checksum-sha1-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 40.699µs
+2026/10/18 19:22:48 PUT /s3 200 74.649µs
+2026/10/18 19:22:48 GET /s3 200 22.71µs
+=== RUN   TestSharedCorpus/checksum-sha256-roundtrip
+2026/10/18 19:22:48 PUT /s3 200 37.019µs
+2026/10/18 19:22:48 PUT /s3 200 96.789µs
+2026/10/18 19:22:48 GET /s3 200 28.24µs
+=== RUN   TestSharedCorpus/checksum-crc64nvme-rejects-mismatch
+2026/10/18 19:22:48 PUT /s3 200 68.02µs
+2026/10/18 19:22:48 PUT /s3 400 92.609µs
+=== RUN   TestSharedCorpus/copy-conditional-matching-etag
+2026/10/18 19:22:48 PUT /s3 200 60.349µs
+2026/10/18 19:22:48 PUT /s3 200 86.68µs
+2026/10/18 19:22:48 PUT /s3 200 86.349µs
+2026/10/18 19:22:48 GET /s3 200 36.38µs
+=== RUN   TestSharedCorpus/copy-conditional-none-match-rejects
+2026/10/18 19:22:48 PUT /s3 200 56.269µs
+2026/10/18 19:22:48 PUT /s3 200 69.469µs
+2026/10/18 19:22:48 PUT /s3 412 43.479µs
+=== RUN   TestSharedCorpus/copy-conditional-combined-rejects
+2026/10/18 19:22:48 PUT /s3 200 53.74µs
+2026/10/18 19:22:48 PUT /s3 200 80.839µs
+2026/10/18 19:22:48 PUT /s3 412 120.548µs
+=== RUN   TestSharedCorpus/copy-conditional-none-match-allows
+2026/10/18 19:22:48 PUT /s3 200 41.869µs
+2026/10/18 19:22:48 PUT /s3 200 64.589µs
+2026/10/18 19:22:48 PUT /s3 200 99.418µs
+2026/10/18 19:22:48 GET /s3 200 62.919µs
+=== RUN   TestSharedCorpus/bucket-lifecycle
+2026/10/18 19:22:48 PUT /s3 200 53.559µs
+2026/10/18 19:22:48 GET /s3 200 68.619µs
+2026/10/18 19:22:48 HEAD /s3 200 27.91µs
+2026/10/18 19:22:48 DELETE /s3 204 18.08µs
+2026/10/18 19:22:48 HEAD /s3 404 80.939µs
+2026/10/18 19:22:48 PUT /s3 200 29.23µs
+2026/10/18 19:22:48 HEAD /s3 200 79.029µs
+=== RUN   TestSharedCorpus/bucket-delete-rejects-nonempty
+2026/10/18 19:22:48 PUT /s3 200 39.45µs
+2026/10/18 19:22:48 PUT /s3 200 58.929µs
+2026/10/18 19:22:48 GET /s3 200 36.359µs
+2026/10/18 19:22:48 HEAD /s3 200 14.97µs
+2026/10/18 19:22:48 DELETE /s3 409 25.63µs
+=== RUN   TestSharedCorpus/batch-delete-reports-existing-and-missing
+2026/10/18 19:22:48 PUT /s3 200 32.77µs
+2026/10/18 19:22:48 PUT /s3 200 43.03µs
+2026/10/18 19:22:48 POST /s3 200 319.946µs
+2026/10/18 19:22:48 HEAD /s3 404 38.729µs
+2026/10/18 19:22:48 HEAD /s3 404 64.899µs
+=== RUN   TestSharedCorpus/batch-delete-quiet-suppresses-successes
+2026/10/18 19:22:48 PUT /s3 200 34.151µs
+2026/10/18 19:22:48 PUT /s3 200 70.579µs
+2026/10/18 19:22:48 POST /s3 200 94.669µs
+2026/10/18 19:22:48 HEAD /s3 404 35.78µs
+2026/10/18 19:22:48 HEAD /s3 404 31.43µs
+=== RUN   TestSharedCorpus/multipart-reject-empty
+2026/10/18 19:22:48 PUT /s3 200 60.9µs
+2026/10/18 19:22:48 POST /s3 200 45.979µs
+2026/10/18 19:22:48 PUT /s3 200 41.45µs
+2026/10/18 19:22:48 POST /s3 400 72.979µs
+2026/10/18 19:22:48 DELETE /s3 204 35.289µs
+=== RUN   TestSharedCorpus/multipart-reject-duplicate
+2026/10/18 19:22:48 PUT /s3 200 36.869µs
+2026/10/18 19:22:48 POST /s3 200 27.74µs
+2026/10/18 19:22:48 PUT /s3 200 35.32µs
+2026/10/18 19:22:48 POST /s3 400 122.949µs
+2026/10/18 19:22:48 DELETE /s3 204 34.339µs
+=== RUN   TestSharedCorpus/multipart-reject-unsorted
+2026/10/18 19:22:48 PUT /s3 200 30.339µs
+2026/10/18 19:22:48 POST /s3 200 27.24µs
+2026/10/18 19:22:48 PUT /s3 200 35.809µs
+2026/10/18 19:22:48 PUT /s3 200 30.329µs
+2026/10/18 19:22:48 POST /s3 400 64.969µs
+2026/10/18 19:22:48 DELETE /s3 204 33.62µs
+=== RUN   TestSharedCorpus/multipart-reject-wrong-etag
+2026/10/18 19:22:48 PUT /s3 200 93.679µs
+2026/10/18 19:22:48 POST /s3 200 50.36µs
+2026/10/18 19:22:48 PUT /s3 200 62.65µs
+2026/10/18 19:22:48 POST /s3 400 124.109µs
+2026/10/18 19:22:48 DELETE /s3 204 28.329µs
+=== RUN   TestSharedCorpus/multipart-reject-short-nonfinal
+2026/10/18 19:22:48 PUT /s3 200 38.899µs
+2026/10/18 19:22:48 POST /s3 200 59.749µs
+2026/10/18 19:22:48 PUT /s3 200 47.92µs
+2026/10/18 19:22:48 PUT /s3 200 29.37µs
+2026/10/18 19:22:48 POST /s3 400 80.479µs
+2026/10/18 19:22:48 DELETE /s3 204 39.29µs
+=== RUN   TestSharedCorpus/multipart-reject-aborted
+2026/10/18 19:22:48 PUT /s3 200 32.3µs
+2026/10/18 19:22:48 POST /s3 200 56.279µs
+2026/10/18 19:22:48 PUT /s3 200 47.469µs
+2026/10/18 19:22:48 DELETE /s3 204 34.75µs
+2026/10/18 19:22:48 POST /s3 404 39.98µs
+2026/10/18 19:22:48 DELETE /s3 404 33.02µs
+=== RUN   TestSharedCorpus/multipart-reject-repeated
+2026/10/18 19:22:48 PUT /s3 200 48.02µs
+2026/10/18 19:22:48 POST /s3 200 40.699µs
+2026/10/18 19:22:48 PUT /s3 200 76.639µs
+2026/10/18 19:22:48 POST /s3 200 85.819µs
+2026/10/18 19:22:48 POST /s3 404 51.229µs
+2026/10/18 19:22:48 DELETE /s3 404 30.13µs
+=== RUN   TestSharedCorpus/presigned-get
+2026/10/18 19:22:48 PUT /s3 200 66.58µs
+2026/10/18 19:22:48 PUT /s3 200 52.639µs
+2026/10/18 19:22:48 GET /s3 200 59.889µs
+=== RUN   TestSharedCorpus/presigned-put
+2026/10/18 19:22:48 PUT /s3 200 56.079µs
+2026/10/18 19:22:48 PUT /s3 200 74.099µs
+2026/10/18 19:22:48 GET /s3 200 28.729µs
+=== RUN   TestSharedCorpus/presigned-head
+2026/10/18 19:22:48 PUT /s3 200 44.4µs
+2026/10/18 19:22:48 PUT /s3 200 73.249µs
+2026/10/18 19:22:48 HEAD /s3 200 89.409µs
+=== RUN   TestSharedCorpus/presigned-expired
+2026/10/18 19:22:48 PUT /s3 200 35.82µs
+2026/10/18 19:22:48 PUT /s3 200 50.869µs
+2026/10/18 19:22:48 GET /s3 403 35.609µs
+=== RUN   TestSharedCorpus/presigned-future
+2026/10/18 19:22:48 PUT /s3 200 54.959µs
+2026/10/18 19:22:48 PUT /s3 200 56.499µs
+2026/10/18 19:22:48 GET /s3 403 23.85µs
+=== RUN   TestSharedCorpus/presigned-virtual-host
+2026/10/18 19:22:48 PUT /s3 200 42.27µs
+2026/10/18 19:22:48 PUT /s3 200 63.069µs
+2026/10/18 19:22:48 GET /s3 200 81.089µs
+=== RUN   TestSharedCorpus/list-token-reject-overlong
+2026/10/18 19:22:48 PUT /s3 200 38.699µs
+2026/10/18 19:22:48 GET /s3 400 66.289µs
+=== RUN   TestSharedCorpus/list-token-reject-nul
+2026/10/18 19:22:48 PUT /s3 200 59.649µs
+2026/10/18 19:22:48 GET /s3 400 55.159µs
+--- PASS: TestSharedCorpus (0.36s)
+    --- PASS: TestSharedCorpus/put-get-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/opaque-key-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/opaque-key-dot-segment (0.01s)
+    --- PASS: TestSharedCorpus/empty-object-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/conditional-put-if-none-match-rejects-existing (0.01s)
+    --- PASS: TestSharedCorpus/conditional-put-if-match-updates-existing (0.01s)
+    --- PASS: TestSharedCorpus/conditional-get-if-none-match-not-modified (0.01s)
+    --- PASS: TestSharedCorpus/checksum-content-md5-rejects-mismatch (0.01s)
+    --- PASS: TestSharedCorpus/checksum-crc32-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/list-prefix-pagination-url-encoding (0.01s)
+    --- PASS: TestSharedCorpus/list-delimiter-pagination (0.01s)
+    --- PASS: TestSharedCorpus/copy-cross-bucket-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/copy-replace-metadata (0.01s)
+    --- PASS: TestSharedCorpus/copy-if-none-match-rejects-existing (0.01s)
+    --- PASS: TestSharedCorpus/multipart-two-part-lifecycle (0.03s)
+    --- PASS: TestSharedCorpus/range-partial-object (0.01s)
+    --- PASS: TestSharedCorpus/range-suffix-returns-the-last-bytes (0.01s)
+    --- PASS: TestSharedCorpus/range-open-ended-runs-to-the-last-byte (0.01s)
+    --- PASS: TestSharedCorpus/range-end-past-the-object-is-clamped (0.01s)
+    --- PASS: TestSharedCorpus/range-whole-object-is-still-partial-content (0.01s)
+    --- PASS: TestSharedCorpus/range-start-past-the-object-is-unsatisfiable (0.01s)
+    --- PASS: TestSharedCorpus/range-unsatisfiable-reports-the-real-object-size (0.01s)
+    --- PASS: TestSharedCorpus/metadata-case-normalizes-sdk-keys (0.01s)
+    --- PASS: TestSharedCorpus/checksum-crc64nvme-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/checksum-crc32c-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/checksum-sha1-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/checksum-sha256-roundtrip (0.01s)
+    --- PASS: TestSharedCorpus/checksum-crc64nvme-rejects-mismatch (0.01s)
+    --- PASS: TestSharedCorpus/copy-conditional-matching-etag (0.01s)
+    --- PASS: TestSharedCorpus/copy-conditional-none-match-rejects (0.01s)
+    --- PASS: TestSharedCorpus/copy-conditional-combined-rejects (0.01s)
+    --- PASS: TestSharedCorpus/copy-conditional-none-match-allows (0.01s)
+    --- PASS: TestSharedCorpus/bucket-lifecycle (0.01s)
+    --- PASS: TestSharedCorpus/bucket-delete-rejects-nonempty (0.01s)
+    --- PASS: TestSharedCorpus/batch-delete-reports-existing-and-missing (0.01s)
+    --- PASS: TestSharedCorpus/batch-delete-quiet-suppresses-successes (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-empty (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-duplicate (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-unsorted (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-wrong-etag (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-short-nonfinal (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-aborted (0.01s)
+    --- PASS: TestSharedCorpus/multipart-reject-repeated (0.01s)
+    --- PASS: TestSharedCorpus/presigned-get (0.01s)
+    --- PASS: TestSharedCorpus/presigned-put (0.01s)
+    --- PASS: TestSharedCorpus/presigned-head (0.01s)
+    --- PASS: TestSharedCorpus/presigned-expired (0.01s)
+    --- PASS: TestSharedCorpus/presigned-future (0.01s)
+    --- PASS: TestSharedCorpus/presigned-virtual-host (0.01s)
+    --- PASS: TestSharedCorpus/list-token-reject-overlong (0.01s)
+    --- PASS: TestSharedCorpus/list-token-reject-nul (0.01s)
+=== RUN   TestKeysNeedingEncodingAreSignable
+2026/10/18 19:22:48 PUT /s3 200 41.31µs
+=== RUN   TestKeysNeedingEncodingAreSignable/space
+2026/10/18 19:22:48 PUT /s3 200 93.379µs
+2026/10/18 19:22:48 GET /s3 200 23.89µs
+2026/10/18 19:22:48 HEAD /s3 200 17.18µs
+=== RUN   TestKeysNeedingEncodingAreSignable/percent
+2026/10/18 19:22:48 PUT /s3 200 67.259µs
+2026/10/18 19:22:48 GET /s3 200 26.029µs
+2026/10/18 19:22:48 HEAD /s3 200 22.55µs
+=== RUN   TestKeysNeedingEncodingAreSignable/literal_plus
+2026/10/18 19:22:48 PUT /s3 200 38.62µs
+2026/10/18 19:22:48 GET /s3 200 20.33µs
+2026/10/18 19:22:48 HEAD /s3 200 16.27µs
+=== RUN   TestKeysNeedingEncodingAreSignable/non-ascii
+2026/10/18 19:22:48 PUT /s3 200 33.071µs
+2026/10/18 19:22:48 GET /s3 200 17.479µs
+2026/10/18 19:22:48 HEAD /s3 200 15.09µs
+=== RUN   TestKeysNeedingEncodingAreSignable/space_and_slash
+2026/10/18 19:22:48 PUT /s3 200 28.34µs
+2026/10/18 19:22:48 GET /s3 200 17.36µs
+2026/10/18 19:22:48 HEAD /s3 200 12.94µs
+=== RUN   TestKeysNeedingEncodingAreSignable/encoded-looking
+2026/10/18 19:22:48 PUT /s3 200 25.55µs
+2026/10/18 19:22:48 GET /s3 200 15.79µs
+2026/10/18 19:22:48 HEAD /s3 200 27.07µs
+--- PASS: TestKeysNeedingEncodingAreSignable (0.01s)
+    --- PASS: TestKeysNeedingEncodingAreSignable/space (0.00s)
+    --- PASS: TestKeysNeedingEncodingAreSignable/percent (0.00s)
+    --- PASS: TestKeysNeedingEncodingAreSignable/literal_plus (0.00s)
+    --- PASS: TestKeysNeedingEncodingAreSignable/non-ascii (0.00s)
+    --- PASS: TestKeysNeedingEncodingAreSignable/space_and_slash (0.00s)
+    --- PASS: TestKeysNeedingEncodingAreSignable/encoded-looking (0.00s)
+=== RUN   TestCopyObjectWithAnEncodedSourceKey
+2026/10/18 19:22:48 PUT /s3 200 41.74µs
+2026/10/18 19:22:48 PUT /s3 200 46.179µs
+2026/10/18 19:22:48 PUT /s3 200 31.95µs
+2026/10/18 19:22:48 GET /s3 200 20.869µs
+--- PASS: TestCopyObjectWithAnEncodedSourceKey (0.01s)
+=== RUN   TestLiveProviderResolve
+=== RUN   TestLiveProviderResolve/aws_profile_against_an_aws_endpoint_runs
+=== RUN   TestLiveProviderResolve/r2_profile_against_an_r2_endpoint_runs
+=== RUN   TestLiveProviderResolve/distinct_r2_profile_runs_only_R2
+=== RUN   TestLiveProviderResolve/distinct_custom_profile_runs_custom
+=== RUN   TestLiveProviderResolve/required_R2_profile_cannot_substitute_custom_endpoint
+=== RUN   TestLiveProviderResolve/custom_endpoint_with_a_port_runs_as_custom
+=== RUN   TestLiveProviderResolve/aws_profile_refuses_a_custom_endpoint
+=== RUN   TestLiveProviderResolve/r2_profile_refuses_an_aws_endpoint
+=== RUN   TestLiveProviderResolve/missing_configuration_skips_by_default
+=== RUN   TestLiveProviderResolve/missing_configuration_fails_when_the_gate_requires_it
+=== RUN   TestLiveProviderResolve/explicitly_requesting_the_other_profile_skips
+=== RUN   TestLiveProviderResolve/explicit_request_against_a_mismatched_endpoint_fails
+=== RUN   TestLiveProviderResolve/dry_run_reports_the_profile_without_configuration
+=== RUN   TestLiveProviderResolve/plaintext_endpoints_are_rejected
+=== RUN   TestLiveProviderResolve/an_unknown_profile_is_rejected
+--- PASS: TestLiveProviderResolve (0.05s)
+    --- PASS: TestLiveProviderResolve/aws_profile_against_an_aws_endpoint_runs (0.00s)
+    --- PASS: TestLiveProviderResolve/r2_profile_against_an_r2_endpoint_runs (0.00s)
+    --- PASS: TestLiveProviderResolve/distinct_r2_profile_runs_only_R2 (0.00s)
+    --- PASS: TestLiveProviderResolve/distinct_custom_profile_runs_custom (0.00s)
+    --- PASS: TestLiveProviderResolve/required_R2_profile_cannot_substitute_custom_endpoint (0.00s)
+    --- PASS: TestLiveProviderResolve/custom_endpoint_with_a_port_runs_as_custom (0.00s)
+    --- PASS: TestLiveProviderResolve/aws_profile_refuses_a_custom_endpoint (0.00s)
+    --- PASS: TestLiveProviderResolve/r2_profile_refuses_an_aws_endpoint (0.00s)
+    --- PASS: TestLiveProviderResolve/missing_configuration_skips_by_default (0.00s)
+    --- PASS: TestLiveProviderResolve/missing_configuration_fails_when_the_gate_requires_it (0.00s)
+    --- PASS: TestLiveProviderResolve/explicitly_requesting_the_other_profile_skips (0.00s)
+    --- PASS: TestLiveProviderResolve/explicit_request_against_a_mismatched_endpoint_fails (0.00s)
+    --- PASS: TestLiveProviderResolve/dry_run_reports_the_profile_without_configuration (0.00s)
+    --- PASS: TestLiveProviderResolve/plaintext_endpoints_are_rejected (0.00s)
+    --- PASS: TestLiveProviderResolve/an_unknown_profile_is_rejected (0.00s)
+=== RUN   TestLiveProviderTestDerivesTheProviderItCannotInherit
+=== RUN   TestLiveProviderTestDerivesTheProviderItCannotInherit/an_r2_endpoint_under_the_r2_profile_derives_cloudflare-r2
+=== RUN   TestLiveProviderTestDerivesTheProviderItCannotInherit/a_mismatched_profile_is_refused_rather_than_derived_from_the_endpoint
+=== RUN   TestLiveProviderTestDerivesTheProviderItCannotInherit/a_plaintext_endpoint_is_refused_before_the_provider_matters
+=== RUN   TestLiveProviderTestDerivesTheProviderItCannotInherit/neither_a_profile_nor_a_provider_is_refused_rather_than_guessed
+=== RUN   TestLiveProviderTestDerivesTheProviderItCannotInherit/a_provider_the_caller_named_is_trusted_over_the_endpoint
+--- PASS: TestLiveProviderTestDerivesTheProviderItCannotInherit (0.02s)
+    --- PASS: TestLiveProviderTestDerivesTheProviderItCannotInherit/an_r2_endpoint_under_the_r2_profile_derives_cloudflare-r2 (0.01s)
+    --- PASS: TestLiveProviderTestDerivesTheProviderItCannotInherit/a_mismatched_profile_is_refused_rather_than_derived_from_the_endpoint (0.00s)
+    --- PASS: TestLiveProviderTestDerivesTheProviderItCannotInherit/a_plaintext_endpoint_is_refused_before_the_provider_matters (0.00s)
+    --- PASS: TestLiveProviderTestDerivesTheProviderItCannotInherit/neither_a_profile_nor_a_provider_is_refused_rather_than_guessed (0.00s)
+    --- PASS: TestLiveProviderTestDerivesTheProviderItCannotInherit/a_provider_the_caller_named_is_trusted_over_the_endpoint (0.01s)
+=== RUN   TestPutGetRoundtrip
+2026/10/18 19:22:48 PUT /s3 200 104.549µs
+2026/10/18 19:22:48 PUT /s3 200 113.059µs
+2026/10/18 19:22:48 HEAD /s3 200 45.8µs
+2026/10/18 19:22:48 GET /s3 200 35.619µs
+2026/10/18 19:22:48 DELETE /s3 204 45.699µs
+--- PASS: TestPutGetRoundtrip (0.01s)
+=== RUN   TestPutObjectConditionalWrite
+2026/10/18 19:22:48 PUT /s3 200 80.099µs
+2026/10/18 19:22:48 PUT /s3 200 94.739µs
+2026/10/18 19:22:48 PUT /s3 412 82.259µs
+--- PASS: TestPutObjectConditionalWrite (0.01s)
+=== RUN   TestPutObjectRejectsWrongContentMD5
+2026/10/18 19:22:48 PUT /s3 200 42.53µs
+2026/10/18 19:22:48 PUT /s3 400 41.22µs
+--- PASS: TestPutObjectRejectsWrongContentMD5 (0.01s)
+=== RUN   TestListObjectsV2Prefix
+2026/10/18 19:22:48 PUT /s3 200 58.339µs
+2026/10/18 19:22:48 PUT /s3 200 84.649µs
+2026/10/18 19:22:48 PUT /s3 200 126.478µs
+2026/10/18 19:22:48 PUT /s3 200 76.899µs
+2026/10/18 19:22:48 GET /s3 200 52.989µs
+--- PASS: TestListObjectsV2Prefix (0.01s)
+=== RUN   TestDeleteObject
+2026/10/18 19:22:48 PUT /s3 200 46.099µs
+2026/10/18 19:22:48 PUT /s3 200 113.298µs
+2026/10/18 19:22:48 DELETE /s3 204 35.58µs
+2026/10/18 19:22:48 DELETE /s3 204 18.55µs
+--- PASS: TestDeleteObject (0.01s)
+=== RUN   TestCopyObject
+2026/10/18 19:22:48 PUT /s3 200 41.319µs
+2026/10/18 19:22:48 PUT /s3 200 49.299µs
+2026/10/18 19:22:48 PUT /s3 200 51.68µs
+2026/10/18 19:22:48 PUT /s3 200 34.18µs
+2026/10/18 19:22:48 GET /s3 200 31.04µs
+--- PASS: TestCopyObject (0.01s)
+=== RUN   TestCopyObjectReplaceMetadata
+2026/10/18 19:22:48 PUT /s3 200 27.72µs
+2026/10/18 19:22:48 PUT /s3 200 85.809µs
+2026/10/18 19:22:48 PUT /s3 200 107.299µs
+2026/10/18 19:22:48 PUT /s3 200 68.61µs
+2026/10/18 19:22:48 HEAD /s3 200 35.46µs
+--- PASS: TestCopyObjectReplaceMetadata (0.01s)
+=== RUN   TestCopyObjectPreconditionFailure
+2026/10/18 19:22:48 PUT /s3 200 68.149µs
+2026/10/18 19:22:48 PUT /s3 200 78.759µs
+2026/10/18 19:22:48 PUT /s3 412 276.517µs
+--- PASS: TestCopyObjectPreconditionFailure (0.01s)
+=== RUN   TestRangeGetObject
+2026/10/18 19:22:48 PUT /s3 200 68.54µs
+2026/10/18 19:22:48 PUT /s3 200 138.528µs
+2026/10/18 19:22:48 GET /s3 206 52.14µs
+2026/10/18 19:22:48 GET /s3 206 39.39µs
+2026/10/18 19:22:48 GET /s3 416 49.95µs
+--- PASS: TestRangeGetObject (0.01s)
+=== RUN   TestDeleteObjects
+2026/10/18 19:22:48 PUT /s3 200 32.26µs
+2026/10/18 19:22:48 PUT /s3 200 50.39µs
+2026/10/18 19:22:48 PUT /s3 200 34.8µs
+2026/10/18 19:22:48 PUT /s3 200 72.149µs
+2026/10/18 19:22:48 POST /s3 200 138.808µs
+2026/10/18 19:22:48 GET /s3 200 50.759µs
+--- PASS: TestDeleteObjects (0.01s)
+=== RUN   TestPathStyleRequired
+2026/10/18 19:22:48 PUT /s3 200 32.05µs
+2026/10/18 19:22:48 PUT /s3 200 48.329µs
+2026/10/18 19:22:48 GET /s3 200 67.869µs
+--- PASS: TestPathStyleRequired (0.01s)
+=== RUN   TestSigV4RejectsUnsigned
+2026/10/18 19:22:48 GET /s3 403 35.189µs
+--- PASS: TestSigV4RejectsUnsigned (0.01s)
+=== RUN   TestListMultipartUploads
+2026/10/18 19:22:48 PUT /s3 200 52.119µs
+2026/10/18 19:22:48 POST /s3 200 94.069µs
+2026/10/18 19:22:48 GET /s3 200 76.921µs
+2026/10/18 19:22:48 DELETE /s3 204 36.46µs
+--- PASS: TestListMultipartUploads (0.01s)
+=== RUN   TestMultipartUpload
+2026/10/18 19:22:48 PUT /s3 200 37.089µs
+2026/10/18 19:22:48 POST /s3 200 31.841µs
+2026/10/18 19:22:48 PUT /s3 200 12.214285ms
+2026/10/18 19:22:48 PUT /s3 200 114.359µs
+2026/10/18 19:22:48 GET /s3 200 85.139µs
+2026/10/18 19:22:48 POST /s3 200 912.811µs
+2026/10/18 19:22:48 GET /s3 200 883.1µs
+--- PASS: TestMultipartUpload (0.04s)
+=== RUN   TestCompleteMultipartRejectsWrongETag
+2026/10/18 19:22:48 PUT /s3 200 62.85µs
+2026/10/18 19:22:48 POST /s3 200 83.559µs
+2026/10/18 19:22:48 PUT /s3 200 85.01µs
+2026/10/18 19:22:48 POST /s3 400 129.238µs
+2026/10/18 19:22:48 DELETE /s3 204 47.189µs
+--- PASS: TestCompleteMultipartRejectsWrongETag (0.01s)
+=== RUN   TestCompletedMultipartObjectCarriesInitiationProperties
+2026/10/18 19:22:48 PUT /s3 200 64.019µs
+2026/10/18 19:22:48 POST /s3 200 67.459µs
+2026/10/18 19:22:48 PUT /s3 200 81.809µs
+2026/10/18 19:22:48 POST /s3 200 152.808µs
+2026/10/18 19:22:48 HEAD /s3 200 43.749µs
+2026/10/18 19:22:48 GET /s3 200 28.3µs
+--- PASS: TestCompletedMultipartObjectCarriesInitiationProperties (0.01s)
+=== RUN   TestCompleteMultipartMinimumPartSize
+2026/10/18 19:22:48 PUT /s3 200 50.36µs
+=== RUN   TestCompleteMultipartMinimumPartSize/one_byte_plus_one_byte
+2026/10/18 19:22:48 POST /s3 200 72.849µs
+2026/10/18 19:22:48 PUT /s3 200 99.489µs
+2026/10/18 19:22:48 PUT /s3 200 60.099µs
+2026/10/18 19:22:48 POST /s3 400 126.419µs
+2026/10/18 19:22:48 HEAD /s3 404 41.7µs
+2026/10/18 19:22:48 DELETE /s3 204 35.66µs
+=== RUN   TestCompleteMultipartMinimumPartSize/five_mebibytes_plus_one_byte
+2026/10/18 19:22:48 POST /s3 200 43.1µs
+2026/10/18 19:22:48 PUT /s3 200 12.276564ms
+2026/10/18 19:22:48 PUT /s3 200 103.849µs
+2026/10/18 19:22:48 POST /s3 200 2.876851ms
+2026/10/18 19:22:48 HEAD /s3 200 55.849µs
+2026/10/18 19:22:48 DELETE /s3 404 42.999µs
+=== RUN   TestCompleteMultipartMinimumPartSize/a_single_one-byte_part
+2026/10/18 19:22:48 POST /s3 200 47.989µs
+2026/10/18 19:22:48 PUT /s3 200 85.629µs
+2026/10/18 19:22:48 POST /s3 200 97.879µs
+2026/10/18 19:22:48 HEAD /s3 200 28.609µs
+2026/10/18 19:22:48 DELETE /s3 404 32.199µs
+--- PASS: TestCompleteMultipartMinimumPartSize (0.03s)
+    --- PASS: TestCompleteMultipartMinimumPartSize/one_byte_plus_one_byte (0.00s)
+    --- PASS: TestCompleteMultipartMinimumPartSize/five_mebibytes_plus_one_byte (0.02s)
+    --- PASS: TestCompleteMultipartMinimumPartSize/a_single_one-byte_part (0.00s)
+=== RUN   TestMultipartCompletionSucceedsWhenInitiationNamesAChecksumAlgorithm
+2026/10/18 19:22:48 PUT /s3 200 71.289µs
+2026/10/18 19:22:48 POST /s3 200 61.57µs
+2026/10/18 19:22:48 PUT /s3 200 66.909µs
+2026/10/18 19:22:48 POST /s3 200 90.619µs
+2026/10/18 19:22:48 GET /s3 200 40.489µs
+--- PASS: TestMultipartCompletionSucceedsWhenInitiationNamesAChecksumAlgorithm (0.01s)
+=== RUN   TestPresignedGetPut
+2026/10/18 19:22:48 PUT /s3 200 58.41µs
+2026/10/18 19:22:48 PUT /s3 200 64.94µs
+2026/10/18 19:22:48 GET /s3 200 84.9µs
+2026/10/18 19:22:48 PUT /s3 200 70.479µs
+2026/10/18 19:22:48 HEAD /s3 200 43.47µs
+--- PASS: TestPresignedGetPut (0.01s)
+=== RUN   TestPresignedURLIsRefusedFarBeforeItsSigningTime
+2026/10/18 19:22:48 PUT /s3 200 56.589µs
+2026/10/18 19:22:48 PUT /s3 200 79.079µs
+2026/10/18 19:22:48 GET /s3 403 42.12µs
+--- PASS: TestPresignedURLIsRefusedFarBeforeItsSigningTime (0.01s)
+=== RUN   TestResumeUploadRetainedRestartNoResend
+=== RUN   TestResumeUploadRetainedRestartNoResend/filesystem
+2026/10/18 19:22:48 PUT /s3 200 617.084µs
+2026/10/18 19:22:48 POST /s3 200 1.02158ms
+2026/10/18 19:22:48 GET /s3 200 186.148µs
+2026/10/18 19:22:48 PUT /s3 200 16.031887ms
+2026/10/18 19:22:48 GET /s3 200 6.303236ms
+2026/10/18 19:22:48 PUT /s3 200 993.86µs
+2026/10/18 19:22:48 GET /s3 200 7.370146ms
+2026/10/18 19:22:48 GET /s3 200 6.94693ms
+2026/10/18 19:22:49 POST /s3 200 13.091376ms
+2026/10/18 19:22:49 GET /s3 404 180.029µs
+2026/10/18 19:22:49 HEAD /s3 200 214.308µs
+2026/10/18 19:22:49 GET /s3 200 6.665082ms
+    resume_upload_test.go:65: filesystem retained restart: parts=map[1:1 2:1] sent=5243197 bytes, list pages=5, completions=1
+=== RUN   TestResumeUploadRetainedRestartNoResend/runtimefs
+2026/10/18 19:22:49 PUT /s3 200 716.853µs
+2026/10/18 19:22:49 POST /s3 200 1.00059ms
+2026/10/18 19:22:49 GET /s3 200 184.208µs
+2026/10/18 19:22:49 PUT /s3 200 17.592691ms
+2026/10/18 19:22:49 GET /s3 200 7.350915ms
+2026/10/18 19:22:49 PUT /s3 200 772.892µs
+2026/10/18 19:22:49 GET /s3 200 7.056277ms
+2026/10/18 19:22:49 GET /s3 200 7.726401ms
+2026/10/18 19:22:49 POST /s3 200 14.013457ms
+2026/10/18 19:22:49 GET /s3 404 141.579µs
+2026/10/18 19:22:49 HEAD /s3 200 169.659µs
+2026/10/18 19:22:49 GET /s3 200 1.01444ms
+    resume_upload_test.go:65: runtimefs retained restart: parts=map[1:1 2:1] sent=5243197 bytes, list pages=5, completions=1
+=== RUN   TestResumeUploadRetainedRestartNoResend/workspace
+2026/10/18 19:22:49 PUT /s3 200 216.897µs
+2026/10/18 19:22:49 POST /s3 200 1.285147ms
+2026/10/18 19:22:49 GET /s3 200 158.318µs
+2026/10/18 19:22:49 PUT /s3 200 14.571651ms
+2026/10/18 19:22:49 GET /s3 200 210.908µs
+2026/10/18 19:22:49 PUT /s3 200 1.01294ms
+2026/10/18 19:22:49 GET /s3 200 222.028µs
+2026/10/18 19:22:49 GET /s3 200 228.798µs
+2026/10/18 19:22:49 POST /s3 200 20.617ms
+2026/10/18 19:22:49 GET /s3 404 110.379µs
+2026/10/18 19:22:49 HEAD /s3 200 5.89342ms
+2026/10/18 19:22:49 GET /s3 200 17.507ms
+    resume_upload_test.go:65: workspace retained restart: parts=map[1:1 2:1] sent=5243197 bytes, list pages=5, completions=1
+--- PASS: TestResumeUploadRetainedRestartNoResend (0.38s)
+    --- PASS: TestResumeUploadRetainedRestartNoResend/filesystem (0.12s)
+    --- PASS: TestResumeUploadRetainedRestartNoResend/runtimefs (0.13s)
+    --- PASS: TestResumeUploadRetainedRestartNoResend/workspace (0.13s)
+=== RUN   TestResumeUploadChangedSourceCorruptStateAndAbortedRemote
+=== RUN   TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/source
+2026/10/18 19:22:49 PUT /s3 200 706.172µs
+2026/10/18 19:22:49 POST /s3 200 706.933µs
+2026/10/18 19:22:49 GET /s3 200 122.429µs
+2026/10/18 19:22:49 PUT /s3 200 15.471402ms
+=== RUN   TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/state
+2026/10/18 19:22:49 PUT /s3 200 815.763µs
+2026/10/18 19:22:49 POST /s3 200 689.523µs
+2026/10/18 19:22:49 GET /s3 200 109.588µs
+2026/10/18 19:22:49 PUT /s3 200 16.62766ms
+=== RUN   TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/aborted
+2026/10/18 19:22:49 PUT /s3 200 833.822µs
+2026/10/18 19:22:49 POST /s3 200 910.12µs
+2026/10/18 19:22:49 GET /s3 200 177.008µs
+2026/10/18 19:22:49 PUT /s3 200 17.272744ms
+2026/10/18 19:22:49 DELETE /s3 204 429.227µs
+2026/10/18 19:22:49 GET /s3 404 64.949µs
+=== RUN   TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/part
+2026/10/18 19:22:49 PUT /s3 200 770.072µs
+2026/10/18 19:22:49 POST /s3 200 857.15µs
+2026/10/18 19:22:49 GET /s3 200 135.398µs
+2026/10/18 19:22:49 PUT /s3 200 16.50411ms
+2026/10/18 19:22:49 PUT /s3 200 17.287775ms
+2026/10/18 19:22:49 GET /s3 200 7.585562ms
+--- PASS: TestResumeUploadChangedSourceCorruptStateAndAbortedRemote (0.21s)
+    --- PASS: TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/source (0.04s)
+    --- PASS: TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/state (0.04s)
+    --- PASS: TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/aborted (0.05s)
+    --- PASS: TestResumeUploadChangedSourceCorruptStateAndAbortedRemote/part (0.08s)
+=== RUN   TestResumeUploadMemoryRestartLosesRemote
+2026/10/18 19:22:49 PUT /s3 200 100.679µs
+2026/10/18 19:22:49 POST /s3 200 73.66µs
+2026/10/18 19:22:49 GET /s3 200 56.5µs
+2026/10/18 19:22:49 PUT /s3 200 11.433404ms
+2026/10/18 19:22:49 PUT /s3 200 62.879µs
+2026/10/18 19:22:49 GET /s3 404 75.579µs
+--- PASS: TestResumeUploadMemoryRestartLosesRemote (0.04s)
+=== RUN   TestTheLocalStoreIsTheNamespace
+2026/10/18 19:22:49 PUT /s3 200 808.363µs
+2026/10/18 19:22:49 PUT /s3 200 1.101849ms
+2026/10/18 19:22:49 GET /s3 404 77.499µs
+--- PASS: TestTheLocalStoreIsTheNamespace (0.02s)
+=== RUN   TestReadThroughCachesAKeyInsideALocalBucket
+2026/10/18 19:22:49 PUT /s3 200 898.33µs
+2026/10/18 19:22:49 PUT /s3 200 673.403µs
+2026/10/18 19:22:49 PUT /s3 200 740.523µs
+2026/10/18 19:22:49 GET /s3 200 110.368µs
+2026/10/18 19:22:49 GET /s3 200 2.359096ms
+2026/10/18 19:22:52 GET /s3 200 3.35008923s
+--- PASS: TestReadThroughCachesAKeyInsideALocalBucket (3.37s)
+=== RUN   TestMirrorWritesDoesNotTellTheCallerTheObjectIsMissing
+2026/10/18 19:22:52 PUT /s3 200 872.911µs
+2026/10/18 19:22:52 HEAD /s3 404 80.719µs
+2026/10/18 19:22:52 PUT /s3 404 75.739µs
+2026/10/18 19:22:52 HEAD /s3 404 44.58µs
+2026/10/18 19:22:52 PUT /s3 200 5.135488ms
+2026/10/18 19:22:52 GET /s3 200 102.639µs
+--- PASS: TestMirrorWritesDoesNotTellTheCallerTheObjectIsMissing (0.02s)
+=== RUN   TestMirrorWritesCreatesTheBucketUpstream
+    runthrough_pair_test.go:296: needs an authority decision: bucket-creation consent is not derivable from UpstreamWrite (see the comment above)
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+=== RUN   TestLocalOnlyWritesNeverReachTheUpstream
+2026/10/18 19:22:52 PUT /s3 200 716.023µs
+2026/10/18 19:22:52 PUT /s3 200 917.971µs
+2026/10/18 19:22:52 HEAD /s3 404 83.449µs
+2026/10/18 19:22:52 HEAD /s3 404 46.989µs
+--- PASS: TestLocalOnlyWritesNeverReachTheUpstream (0.02s)
+=== RUN   TestPairGrantsUpstreamAccessByDefault
+--- PASS: TestPairGrantsUpstreamAccessByDefault (0.01s)
+=== RUN   TestNormalizeLiveProvider
+=== RUN   TestNormalizeLiveProvider/aws
+=== RUN   TestNormalizeLiveProvider/r2
+=== RUN   TestNormalizeLiveProvider/custom
+--- PASS: TestNormalizeLiveProvider (0.00s)
+    --- PASS: TestNormalizeLiveProvider/aws (0.00s)
+    --- PASS: TestNormalizeLiveProvider/r2 (0.00s)
+    --- PASS: TestNormalizeLiveProvider/custom (0.00s)
+=== RUN   TestNormalizeLivePrefix
+=== RUN   TestNormalizeLivePrefix/#00
+=== RUN   TestNormalizeLivePrefix/_absolute
+=== RUN   TestNormalizeLivePrefix/.
+=== RUN   TestNormalizeLivePrefix/..
+=== RUN   TestNormalizeLivePrefix/ci_.._application
+=== RUN   TestNormalizeLivePrefix/ci__live
+=== RUN   TestNormalizeLivePrefix/ci\live
+=== RUN   TestNormalizeLivePrefix/ci_\x00live
+--- PASS: TestNormalizeLivePrefix (0.00s)
+    --- PASS: TestNormalizeLivePrefix/#00 (0.00s)
+    --- PASS: TestNormalizeLivePrefix/_absolute (0.00s)
+    --- PASS: TestNormalizeLivePrefix/. (0.00s)
+    --- PASS: TestNormalizeLivePrefix/.. (0.00s)
+    --- PASS: TestNormalizeLivePrefix/ci_.._application (0.00s)
+    --- PASS: TestNormalizeLivePrefix/ci__live (0.00s)
+    --- PASS: TestNormalizeLivePrefix/ci\live (0.00s)
+    --- PASS: TestNormalizeLivePrefix/ci_\x00live (0.00s)
+=== RUN   TestLiveObjectKeyIsProviderAndRunIsolated
+--- PASS: TestLiveObjectKeyIsProviderAndRunIsolated (0.00s)
+=== RUN   TestRemoveAndVerifyLiveObject
+=== RUN   TestRemoveAndVerifyLiveObject/deletes_and_verifies_absence
+=== RUN   TestRemoveAndVerifyLiveObject/rejects_a_delete_failure
+=== RUN   TestRemoveAndVerifyLiveObject/rejects_a_residual_listing
+=== RUN   TestRemoveAndVerifyLiveObject/times_out_when_the_head_remains
+--- PASS: TestRemoveAndVerifyLiveObject (0.01s)
+    --- PASS: TestRemoveAndVerifyLiveObject/deletes_and_verifies_absence (0.00s)
+    --- PASS: TestRemoveAndVerifyLiveObject/rejects_a_delete_failure (0.00s)
+    --- PASS: TestRemoveAndVerifyLiveObject/rejects_a_residual_listing (0.00s)
+    --- PASS: TestRemoveAndVerifyLiveObject/times_out_when_the_head_remains (0.01s)
+=== RUN   TestUpstreamRunThrough
+    upstream_test.go:25: skipping upstream conformance; set STOW_CONFORMANCE_UPSTREAM=1
+--- SKIP: TestUpstreamRunThrough (0.00s)
+=== RUN   TestResolveLeavesNoReferenceInAnyFieldOfAStep
+--- PASS: TestResolveLeavesNoReferenceInAnyFieldOfAStep (0.00s)
+=== RUN   TestResolveLeavesStatedBodiesAlone
+--- PASS: TestResolveLeavesStatedBodiesAlone (0.00s)
+=== RUN   TestResolveReachesEachDeclaredField
+--- PASS: TestResolveReachesEachDeclaredField (0.00s)
+=== RUN   TestResolveDoesNotEditTheStepItWasGiven
+--- PASS: TestResolveDoesNotEditTheStepItWasGiven (0.00s)
+=== RUN   TestCheckContractRegistryFlagsNamesAVerbTheTableDoesNotCover
+--- PASS: TestCheckContractRegistryFlagsNamesAVerbTheTableDoesNotCover (0.00s)
+=== RUN   TestCheckContractRegistryFlagsAcceptsTheThreeWaysAStepReachesARegistry
+--- PASS: TestCheckContractRegistryFlagsAcceptsTheThreeWaysAStepReachesARegistry (0.00s)
+=== RUN   TestTheRegistryFlagTableMatchesTheBinary
+--- PASS: TestTheRegistryFlagTableMatchesTheBinary (0.63s)
+=== RUN   TestCheckRegistryFlagsAgainstBinaryNamesBothDirections
+--- PASS: TestCheckRegistryFlagsAgainstBinaryNamesBothDirections (0.00s)
+=== RUN   TestCheckRegistryFlagsAgainstBinaryIsSilentOnAgreement
+--- PASS: TestCheckRegistryFlagsAgainstBinaryIsSilentOnAgreement (0.00s)
+=== RUN   TestWorkspaceContractHoldsInTheCLI
+=== RUN   TestWorkspaceContractHoldsInTheCLI/prepare_seeds_every_declared_input_and_reports_the_totals_it_seeded
+=== RUN   TestWorkspaceContractHoldsInTheCLI/serve_owns_a_persistent_workspace_and_reports_its_authenticated_endpoint
+=== RUN   TestWorkspaceContractHoldsInTheCLI/the_seeded_inputs_are_really_on_disk__at_the_destinations_the_manifest_named
+=== RUN   TestWorkspaceContractHoldsInTheCLI/checkpoint_counts_the_same_files_and_bytes_the_seed_did
+=== RUN   TestWorkspaceContractHoldsInTheCLI/an_agent_changes_the_workspace_between_checkpoints
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_second_checkpoint_names_the_first_as_its_parent_and_counts_the_new_file
+=== RUN   TestWorkspaceContractHoldsInTheCLI/diff_between_the_two_checkpoints_names_only_what_the_agent_changed
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_second_workspace_can_share_the_registry_without_sharing_the_workspace
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_checkpoint_of_the_second_workspace_is_its_own__in_the_same_registry
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_delta_across_two_workspaces_is_refused__which_is_why_this_is_not_version_control
+=== RUN   TestWorkspaceContractHoldsInTheCLI/handoff_without_an_archive_is_a_local_reference__version_1
+=== RUN   TestWorkspaceContractHoldsInTheCLI/handoff_with_an_archive_is_a_portable_reference__version_2
+=== RUN   TestWorkspaceContractHoldsInTheCLI/adopt_restores_the_archive_into_a_registry_that_has_never_seen_it
+=== RUN   TestWorkspaceContractHoldsInTheCLI/the_adopted_workspace_holds_the_agent_s_file__not_only_the_seed
+=== RUN   TestWorkspaceContractHoldsInTheCLI/resume_takes_the_registry_from_the_document__not_from_a_flag
+=== RUN   TestWorkspaceContractHoldsInTheCLI/resume_refuses_to_override_the_registry_a_handoff_document_names
+=== RUN   TestWorkspaceContractHoldsInTheCLI/delta_names_both_ends__and_writes_the_document_it_describes
+=== RUN   TestWorkspaceContractHoldsInTheCLI/apply_rebuilds_the_base_plus_the_delta_into_a_new_checkpoint
+=== RUN   TestWorkspaceContractHoldsInTheCLI/applying_a_delta_to_a_base_it_was_not_measured_from_is_refused
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_delta_whose_payload_no_longer_matches_its_digest_is_refused
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_substituted_destination_applies_when_the_receiver_is_not_told_the_digest__which_is_why_the_check_is_opt_in
+=== RUN   TestWorkspaceContractHoldsInTheCLI/a_delta_whose_destination_was_renamed_in_transit_is_refused_on_the_document_digest
+=== RUN   TestWorkspaceContractHoldsInTheCLI/collect_sweeps_the_registry_it_is_pointed_at_and_reports_what_it_swept
+=== RUN   TestWorkspaceContractHoldsInTheCLI/destroy_removes_the_workspace_stow_created__and_says_so
+=== RUN   TestWorkspaceContractHoldsInTheCLI/prune_leaves_a_workspace_whose_directory_is_still_there__because_presence_is_not_evidence_that_anything_is_finished
+=== RUN   TestWorkspaceContractHoldsInTheCLI/list_names_the_workspaces_left_in_the_team_partition_after_one_is_destroyed
+=== RUN   TestWorkspaceContractHoldsInTheCLI/the_caller_s_own_directory_is_gone__which_is_the_only_thing_prune_acts_on
+=== RUN   TestWorkspaceContractHoldsInTheCLI/prune_forgets_stow_s_own_record_once_the_directory_it_names_is_gone
+=== RUN   TestWorkspaceContractHoldsInTheCLI/the_adopted_directory_is_gone_too__and_prune_leaves_the_record_by_default
+=== RUN   TestWorkspaceContractHoldsInTheCLI/an_adopted_entry_is_the_caller_s_only_record_that_they_adopted_the_project__so_prune_refuses_it_and_says_which_case_that_is
+=== RUN   TestWorkspaceContractHoldsInTheCLI/__include_adopted_is_what_turns_that_refusal_into_a_forget__and_only_the_record_goes__the_directory_was_already_gone
+--- PASS: TestWorkspaceContractHoldsInTheCLI (0.25s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/prepare_seeds_every_declared_input_and_reports_the_totals_it_seeded (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/serve_owns_a_persistent_workspace_and_reports_its_authenticated_endpoint (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/the_seeded_inputs_are_really_on_disk__at_the_destinations_the_manifest_named (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/checkpoint_counts_the_same_files_and_bytes_the_seed_did (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/an_agent_changes_the_workspace_between_checkpoints (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_second_checkpoint_names_the_first_as_its_parent_and_counts_the_new_file (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/diff_between_the_two_checkpoints_names_only_what_the_agent_changed (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_second_workspace_can_share_the_registry_without_sharing_the_workspace (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_checkpoint_of_the_second_workspace_is_its_own__in_the_same_registry (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_delta_across_two_workspaces_is_refused__which_is_why_this_is_not_version_control (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/handoff_without_an_archive_is_a_local_reference__version_1 (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/handoff_with_an_archive_is_a_portable_reference__version_2 (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/adopt_restores_the_archive_into_a_registry_that_has_never_seen_it (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/the_adopted_workspace_holds_the_agent_s_file__not_only_the_seed (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/resume_takes_the_registry_from_the_document__not_from_a_flag (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/resume_refuses_to_override_the_registry_a_handoff_document_names (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/delta_names_both_ends__and_writes_the_document_it_describes (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/apply_rebuilds_the_base_plus_the_delta_into_a_new_checkpoint (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/applying_a_delta_to_a_base_it_was_not_measured_from_is_refused (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_delta_whose_payload_no_longer_matches_its_digest_is_refused (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_substituted_destination_applies_when_the_receiver_is_not_told_the_digest__which_is_why_the_check_is_opt_in (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/a_delta_whose_destination_was_renamed_in_transit_is_refused_on_the_document_digest (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/collect_sweeps_the_registry_it_is_pointed_at_and_reports_what_it_swept (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/destroy_removes_the_workspace_stow_created__and_says_so (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/prune_leaves_a_workspace_whose_directory_is_still_there__because_presence_is_not_evidence_that_anything_is_finished (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/list_names_the_workspaces_left_in_the_team_partition_after_one_is_destroyed (0.01s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/the_caller_s_own_directory_is_gone__which_is_the_only_thing_prune_acts_on (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/prune_forgets_stow_s_own_record_once_the_directory_it_names_is_gone (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/the_adopted_directory_is_gone_too__and_prune_leaves_the_record_by_default (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/an_adopted_entry_is_the_caller_s_only_record_that_they_adopted_the_project__so_prune_refuses_it_and_says_which_case_that_is (0.00s)
+    --- PASS: TestWorkspaceContractHoldsInTheCLI/__include_adopted_is_what_turns_that_refusal_into_a_forget__and_only_the_record_goes__the_directory_was_already_gone (0.01s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	5.696s

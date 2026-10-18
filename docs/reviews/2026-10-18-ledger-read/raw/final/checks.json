@@ -1,0 +1,326 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/state.go",
+      "internal/capacity/state_read_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 375,
+    "passed": true
+  },
+  {
+    "name": "verified-red-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestLedgerRead",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 492,
+    "passed": true
+  },
+  {
+    "name": "verified-red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestLedgerRead",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1919,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 21888,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 52557,
+    "passed": true
+  },
+  {
+    "name": "full-go",
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 54516,
+    "passed": true
+  },
+  {
+    "name": "broad-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/capacity",
+      "./internal/storage/...",
+      "./internal/runtime",
+      "./internal/embedded",
+      "./internal/runthrough",
+      "./internal/s3api",
+      "./pkg/stow",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 82888,
+    "passed": true
+  },
+  {
+    "name": "conformance-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 6229,
+    "passed": true
+  },
+  {
+    "name": "conformance-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8936,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4459,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4341,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3254,
+    "passed": true
+  },
+  {
+    "name": "site-build",
+    "args": [
+      "npm",
+      "run",
+      "build",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 375,
+    "passed": true
+  },
+  {
+    "name": "site-tests",
+    "args": [
+      "npm",
+      "test",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 596,
+    "passed": true
+  },
+  {
+    "name": "doc-links",
+    "args": [
+      "node",
+      "scripts/check-doc-links.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 129,
+    "passed": true
+  },
+  {
+    "name": "install-benchmark",
+    "args": [
+      "cp",
+      "benchmark/ledger-bench.go.txt",
+      "internal/capacity/ledger_read_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "format-benchmark",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/ledger_read_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/ledger-before.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 138,
+    "passed": true
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/ledger-after.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 436,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/ledger-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7476,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmark",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_read_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13,
+    "passed": true
+  }
+]

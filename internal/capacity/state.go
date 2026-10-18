@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -128,9 +129,34 @@ func (h *Host) access(ctx context.Context, visit func(*hostState) error) error {
 	return visit(state)
 }
 
+func readBoundedStateFile(path string) ([]byte, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	size := info.Size()
+	if size < 0 || size > maxStateBytes {
+		return nil, ErrUnknown
+	}
+	data := make([]byte, int(size)+1)
+	n, err := io.ReadFull(file, data)
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+		return nil, err
+	}
+	if int64(n) != size {
+		return nil, ErrUnknown
+	}
+	return data[:n], nil
+}
+
 func (h *Host) read() (*hostState, error) {
 	path := filepath.Join(h.dir, "capacity.json")
-	data, err := os.ReadFile(path)
+	data, err := readBoundedStateFile(path)
 	if os.IsNotExist(err) {
 		return &hostState{Version: 1, MaxBytes: h.options.MaxBytes, MaxNamespaces: h.options.MaxNamespaces, Namespaces: map[string]*namespaceState{}}, nil
 	}
