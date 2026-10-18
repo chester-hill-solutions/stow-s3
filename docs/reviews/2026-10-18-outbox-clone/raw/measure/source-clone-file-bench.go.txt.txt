@@ -1,0 +1,130 @@
+package runthrough
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
+	"slices"
+	"strings"
+	"testing"
+	"time"
+)
+
+func BenchmarkFileOutboxCloneCycle(b *testing.B) {
+	for _, depth := range []int{0, 128, 4096} {
+		for _, action := range []string{"enqueue", "prepare", "provenance", "renew"} {
+			b.Run(fmt.Sprintf("depth=%d/%s", depth, action), func(b *testing.B) { benchmarkCloneCycle(b, depth, action, false) })
+		}
+	}
+}
+func BenchmarkFileOutboxCloneCycleFallback(b *testing.B) {
+	for _, depth := range []int{128, 4096} {
+		b.Run(fmt.Sprintf("depth=%d", depth), func(b *testing.B) { benchmarkCloneCycle(b, depth, "prepare", true) })
+	}
+}
+func benchmarkCloneCycle(b *testing.B, depth int, action string, fallback bool) {
+	state := newOutboxState()
+	for n := 0; n < depth; n++ {
+		id := fmt.Sprintf("seed-%06d", n)
+		state.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Version: "retained-version", CreatedAt: time.Unix(100, 0).UTC()}
+		id = "prepared-" + id
+		state.prepared[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Prepared: true, CreatedAt: time.Unix(100, 0).UTC()}
+	}
+	if fallback {
+		id := fmt.Sprintf("prepared-seed-%06d", depth-1)
+		entry := state.prepared[id]
+		entry.CreatedAt = time.Date(2026, 10, 18, 1, 2, 3, 0, time.FixedZone("unusual", 3660))
+		state.prepared[id] = entry
+	}
+	if action == "renew" {
+		state.entries["leased"] = OutboxEntry{ID: "leased", Operation: OutboxPut, Bucket: "bucket", Key: "leased", Version: "leased-version", CreatedAt: time.Unix(100, 0).UTC(), ClaimOwner: "benchmark-owner", ClaimToken: 1, ClaimUntil: time.Now().UTC().Add(time.Hour), Attempted: true}
+		state.nextToken = 1
+	}
+	outbox, err := NewFileOutbox(filepath.Join(b.TempDir(), "outbox"))
+	if err != nil {
+		b.Fatal(err)
+	}
+	if err := outbox.withState(func(s *outboxState) error { *s = state; return nil }); err != nil {
+		b.Fatal(err)
+	}
+	wantActive, err := outbox.PendingSnapshot()
+	if err != nil {
+		b.Fatal(err)
+	}
+	wantPrepared, err := outbox.PreparedSnapshot()
+	if err != nil {
+		b.Fatal(err)
+	}
+	slices.SortFunc(wantActive, func(a, b OutboxEntry) int { return strings.Compare(a.ID, b.ID) })
+	slices.SortFunc(wantPrepared, func(a, b OutboxEntry) int { return strings.Compare(a.ID, b.ID) })
+	entry := OutboxEntry{ID: "benchmark-probe", Operation: OutboxPut, Bucket: "bucket", Key: "probe", Version: "probe-version", CreatedAt: time.Unix(100, 0).UTC()}
+	runtime.GC()
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		switch action {
+		case "enqueue":
+			_, err = outbox.Enqueue(entry)
+			if err == nil {
+				err = outbox.MarkSuccess(entry.ID)
+			}
+		case "prepare":
+			_, err = outbox.Prepare(entry)
+			if err == nil {
+				err = outbox.DiscardPrepared(entry.ID)
+			}
+		case "provenance":
+			err = outbox.SaveUpstreamState("bucket", "target", UpstreamState{ETag: fmt.Sprint(n % 2)})
+		case "renew":
+			err = outbox.Renew("leased", "benchmark-owner", 1, time.Hour)
+		}
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+	b.StopTimer()
+	b.ReportMetric(float64(len(outbox.validatedData)), "cached-B")
+	b.ReportMetric(float64(outboxReadCostHWM(b)), "process-HWM-B")
+	runtime.GC()
+	var memory runtime.MemStats
+	runtime.ReadMemStats(&memory)
+	b.ReportMetric(float64(memory.HeapAlloc), "process-live-heap-B")
+	bytes, err := os.ReadFile(outbox.path)
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ReportMetric(float64(len(bytes)), "journal-B")
+	reopened, err := NewFileOutbox(outbox.path)
+	if err != nil {
+		b.Fatal(err)
+	}
+	active, err := reopened.PendingSnapshot()
+	if err != nil {
+		b.Fatal(err)
+	}
+	prepared, err := reopened.PreparedSnapshot()
+	if err != nil {
+		b.Fatal(err)
+	}
+	slices.SortFunc(active, func(a, b OutboxEntry) int { return strings.Compare(a.ID, b.ID) })
+	slices.SortFunc(prepared, func(a, b OutboxEntry) int { return strings.Compare(a.ID, b.ID) })
+	if action == "renew" {
+		for i := range active {
+			if active[i].ID == "leased" {
+				active[i].ClaimUntil = wantActive[i].ClaimUntil
+			}
+		}
+	}
+	if !reflect.DeepEqual(active, wantActive) || !reflect.DeepEqual(prepared, wantPrepared) {
+		b.Fatal("write-cache benchmark changed retained fields")
+	}
+	if action == "provenance" {
+		value, known, err := reopened.UpstreamState("bucket", "target")
+		if err != nil || !known || value.ETag != fmt.Sprint((b.N-1)%2) {
+			b.Fatal("changed provenance not persisted")
+		}
+	}
+	runtime.KeepAlive(outbox)
+}

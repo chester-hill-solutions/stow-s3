@@ -1,0 +1,56 @@
+{
+  "phase": "outbox-clone-final-repaired",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/outbox_clone_test.go",
+    "internal/runthrough/outbox_clone_bench_test.go",
+    "internal/runthrough/outbox_clone_capacity_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox.go",
+        "internal/runthrough/outbox_clone_test.go",
+        "internal/runthrough/outbox_clone_bench_test.go",
+        "internal/runthrough/outbox_clone_capacity_test.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestOutbox)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestOutbox)",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}
