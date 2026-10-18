@@ -1,0 +1,254 @@
+{
+  "phase": "multipart-admission-final",
+  "sources": [
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/capacity_multipart_test.go",
+    "internal/storage/fs/capacity_multipart_shared_test.go",
+    "internal/storage/fs/capacity_multipart_recovery_test.go",
+    "internal/storage/fs/capacity.go",
+    "benchmark/multipart-bench.go.txt",
+    "benchmark/multipart-measure.mjs",
+    "benchmark/before-overlay.json",
+    "benchmark/baseline-fs_multipart.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/fs_multipart.go",
+        "internal/storage/fs/capacity_multipart_test.go",
+        "internal/storage/fs/capacity_multipart_shared_test.go",
+        "internal/storage/fs/capacity_multipart_recovery_test.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "verified-red-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestMultipart",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "verified-red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestMultipart",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "./internal/capacity",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "./internal/capacity",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "go",
+        "test",
+        "./...",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "broad-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/capacity",
+        "./internal/storage/...",
+        "./internal/runtime",
+        "./internal/embedded",
+        "./internal/runthrough",
+        "./internal/s3api",
+        "./pkg/stow",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "conformance-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "conformance-runtime-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-runtime-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "doc-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ]
+    },
+    {
+      "name": "install-benchmark",
+      "args": [
+        "cp",
+        "benchmark/multipart-bench.go.txt",
+        "internal/storage/fs/multipart_admission_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmark",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/multipart_admission_bench_test.go"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/multipart-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/multipart-after.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/multipart-measure.mjs"
+      ]
+    },
+    {
+      "name": "remove-benchmark",
+      "args": [
+        "rm",
+        "internal/storage/fs/multipart_admission_bench_test.go"
+      ]
+    }
+  ]
+}
