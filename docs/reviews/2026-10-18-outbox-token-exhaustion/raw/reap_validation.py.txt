@@ -1,0 +1,21 @@
+import ctypes
+import os
+import sys
+
+libc = ctypes.CDLL(None, use_errno=True)
+if libc.prctl(36, 1, 0, 0, 0) != 0:
+    raise OSError(ctypes.get_errno(), 'PR_SET_CHILD_SUBREAPER')
+child = os.fork()
+if child == 0:
+    os.execvp(sys.argv[1], sys.argv[1:])
+result = None
+while True:
+    try:
+        pid, status = os.wait()
+    except ChildProcessError:
+        break
+    if pid == child:
+        result = os.waitstatus_to_exitcode(status)
+if result is None:
+    raise RuntimeError('Lost validation child')
+sys.exit(result if result >= 0 else 128 - result)

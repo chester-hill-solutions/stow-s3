@@ -73,11 +73,16 @@ func (s *outboxState) claim(id, owner string, lease time.Duration) (ClaimedEntry
 			return ClaimedEntry{}, false, nil
 		}
 	}
+	token, err := s.nextFencingToken()
+	if err != nil {
+		return ClaimedEntry{}, false, err
+	}
 	claimed := ClaimedEntry{Entry: entry, Reconcile: entry.Attempted}
 	entry.ClaimOwner = owner
 	entry.ClaimUntil = now.Add(lease)
-	entry.ClaimToken = s.assignToken()
+	entry.ClaimToken = token
 	entry.Attempted = true
+	s.nextToken = token
 	s.entries[id] = entry
 	claimed.Entry = entry
 	return claimed, true, nil

@@ -165,9 +165,11 @@ func (s *outboxState) assignID(entry *OutboxEntry) error {
 	return nil
 }
 
-func (s *outboxState) assignToken() uint64 {
-	s.nextToken++
-	return s.nextToken
+func (s *outboxState) nextFencingToken() (uint64, error) {
+	if s.nextToken == ^uint64(0) {
+		return 0, fmt.Errorf("outbox fencing token sequence exhausted")
+	}
+	return s.nextToken + 1, nil
 }
 
 func (s *outboxState) enqueue(entry OutboxEntry) (OutboxEntry, error) {
@@ -195,13 +197,18 @@ func (s *outboxState) prepareOwned(entry OutboxEntry, owner string, lease time.D
 	if s.hasPreparedKey(entry) {
 		return OutboxEntry{}, ErrOutboxPreparedUnresolved
 	}
+	token, err := s.nextFencingToken()
+	if err != nil {
+		return OutboxEntry{}, err
+	}
 	if err := s.assignID(&entry); err != nil {
 		return OutboxEntry{}, err
 	}
 	entry.Prepared = true
 	entry.PreparedOwner = owner
 	entry.PreparedUntil = time.Now().UTC().Add(lease)
-	entry.PreparedToken = s.assignToken()
+	entry.PreparedToken = token
+	s.nextToken = token
 	s.prepared[entry.ID] = entry
 	return entry, nil
 }

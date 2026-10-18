@@ -1,0 +1,151 @@
+from pathlib import Path
+import json,re
+p=Path('/private/tmp/stow-outbox-token-exhaustion-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');job=json.loads((p/'after-start.json').read_text());d=p/('export-'+job['id']);checks=json.loads((d/'checks.json').read_text());assert len(checks)==16 and all(x['passed']for x in checks);a=json.loads((d/'comparison-analysis.json').read_text());assert a['observations']==128
+raw='2026-10-18-outbox-token-exhaustion/raw/'
+s='''# Refuse exhausted outbox fencing tokens — 2026-10-18
+
+## Defect and operational consequence
+
+Baseline `cb8dc49` already refuses ID-sequence exhaustion, but its shared fencing
+allocator incremented uint64 without checking the limit. Claim and PrepareOwned
+could therefore issue token zero after the maximum value. Reload raises the
+counter from stored lease fields; a retained maximum-valued token can repeatedly
+restore the counter to the limit and cause repeated zero tokens.
+
+The deterministic reproduction uses a valid temporary journal with a terminal
+anchor carrying the maximum token and an ordinary target intent. Claim target
+with owner `same-worker`, release it, reopen with a peer handle, and claim it again
+with the same owner. Both leases receive zero. A completion from the first lease
+then matches the second lease's owner/token and removes the current intent.
+Both native protobuf and supported legacy JSON reproduce this loss of fencing.
+The test sends no upstream requests; no deployed incident or object-data corruption
+is asserted. Existing formats can represent the maximum value, so this check is
+not a test that performs 2^64 acquisitions.
+
+`origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
+[Exact baseline refs](RAWbaseline.json) and
+[stale-acknowledgement output](RAWbefore/regression-normal.log) are retained.
+The rejected write-cache optimization remains rejected; its ownership/resource
+regressions remain in the full suite.
+
+## Test-first evidence
+
+Before implementation changes, tests run twice normally and twice under race
+detection against the original allocator. **32 distinct cases fail twice per
+mode: 64 failures normally and 64 under race. Thirty controls pass twice per mode.**
+[The red receipt](RAWbefore/red-receipt.json) verifies names and repetitions.
+Each mode records four accepted stale acknowledgements and four removed current
+intents: two formats, twice each. Harness success means the expected test exit 1
+was observed, not that the regression tests passed.
+
+The matrix covers native/JSON inputs; the persisted counter and maxima recovered
+from active claim, active prepared-token and prepared records; Claim/PrepareOwned;
+the last legal token; concurrent last-token contenders using peer handles; and
+shared-state atomicity. Counter and map/lease snapshots, journal bytes and reopen
+must survive refused allocation unchanged. Pure-state cases also expose ID/token
+consumption that filesystem transaction cloning could otherwise hide.
+
+Controls keep invalid-owner/lease and unresolved-key errors, ineligible claims,
+ID-allocation failure atomicity, and existing maximum-token owner renewal/release/
+completion usable. The first run also failed one over-strict JSON/missing-entry
+control: a successful no-op claim is allowed to migrate JSON to native format.
+That fixture now permits migration while checking unchanged semantic state and
+counters. [Initial output](RAWinitial-before/regression-normal.log) and
+[initial test source](RAWinitial-before/source-outbox_token_exhaustion_controls_test.go.txt)
+remain retained. No implementation was changed to satisfy that control, and no
+quality baseline was raised.
+
+## Focused change and preserved contracts
+
+Replace the mutating increment helper with a private checked calculation of the
+next fencing token. At the limit it returns an error through existing returns.
+Claim checks availability only after existing eligibility/held-lease checks, then
+updates the counter when granting ownership. PrepareOwned retains invalid-lease
+and unresolved-key precedence, checks capacity before assigning an ID, and commits
+the counter with the new prepared entry. A failed ID assignment does not consume
+a computed token. No new sentinel, exported API, dependency, format, index, lock,
+checkpoint or storage abstraction is added.
+
+The last representable token remains valid once. Subsequent ownership allocations
+fail closed rather than wrap. They return empty results without changing the
+original journal or state. Existing owners do not need a new token to renew or
+finish; these operations remain usable at exhaustion. The existing mutex and
+shared filesystem lock serialize checking and committing across peer handles.
+Claim/prepared fields, Attempted reconciliation, per-key ordering, ID semantics,
+legacy migration, authoritative reads and durable publication remain intact.
+
+Compatibility cost: an exhausted journal can still open and existing work can
+finish, but new ownership cannot be allocated. There is no automatic reset that
+could reuse a stale token. Already removed intents cannot be reconstructed, and
+a previously wrapped counter without a retained maximum marker cannot be inferred
+from the current snapshot. This is a deliberate refusal of previously unsafe
+behavior, not a new capacity-management API. Existing lease/key sentinels retain
+precedence. At the simultaneous token-limit/invalid-ID boundary, a generic token
+exhaustion error may precede the generic ID error; no error-string API is promised.
+
+## Validation
+
+All **62 cases pass twice normally and twice with race detection**, 124 passes per
+focused mode. Regression and benchmark source bytes match the corrected original
+red run. [Green receipt and hashes](RAWafter/green-receipt.json) verify this.
+All **16 final Railway stages pass**: formatting; focused normal/race twice; full Go;
+broad storage/runtime/embedded/run-through/S3/public-package race tests; four
+conformance profiles (memory, filesystem, runtime-memory, runtime-filesystem); vet;
+site build/tests; documentation links; quality/file-size/format gates; benchmark
+build and interleaved comparison. [Exact commands/results](RAWafter/checks.json)
+retain every stage.
+
+All Go formatting, builds, tests, race/conformance, code/documentation checks and
+benchmarks run on the authorized Railway scratch deployment. Go 1.25.6, Node
+25.9.0, 4 CPU/4 GiB cgroup, UID 10001. Benchmark TMPDIR is under ext4 `/results`,
+verified before timing. [Filesystem receipt](RAWafter/fixture-filesystem.json)
+and environment records retain actual paths/limits. Local work is reads, editing,
+Git, packaging, hashing and exported-data analysis. Exact Railway-formatted source
+is copied back rather than formatted or tested locally.
+
+## Comparative measurements
+
+The same benchmark source runs original/fixed binaries in ABBA BAAB order, eight
+processes, GOMAXPROCS 1/4, 400-ms minimum per case: four observations per variant/cell,
+**128 observations** total. Baseline binary/source hashes are pinned before uploading
+the implementation. Backend `state` isolates the existing private state transitions;
+`file` includes public calls, full reload/clone/encoding and durable file/directory
+syncs. This is not a comparison of backend service guarantees.
+
+Each operation is Claim+Release or PrepareOwned+DiscardPreparedOwned: two calls.
+Depth is retained entries in each queue; depth 128 means 256 retained intents.
+Claim adds one fixed target and primes its Attempted marker outside timing. Seeding,
+verification and target cleanup are untimed. These are serial synthetic cycles,
+not end-to-end S3 throughput or latency guarantees. Allocation bytes/counts are
+cumulative per cycle, not retained heap/RSS. The token decimal width and iteration
+counts can differ between observations. Samples remain small; no significance or
+universal speedup is claimed. Every adverse cell is retained.
+
+| Backend | Depth per queue | Cycle | CPU | Before → after µs | Change | Allocs before → after |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+'''.replace('RAW',raw)
+for row in a['comparisons']:
+ name=row['name'];backend=name.split('/')[1];depth=re.search(r'depth=(\d+)',name)[1];cycle=name.split('/')[-1].removesuffix('-4');cpu=4 if name.endswith('-4')else 1
+ s+=f"| {backend} | {depth} | {cycle} | {cpu} | {row['before']['ns/op']/1e3:,.3f} → {row['after']['ns/op']/1e3:,.3f} | {row['timeDeltaPercent']:+.2f}% | {row['before']['allocs/op']:,.1f} → {row['after']['allocs/op']:,.1f} |\n"
+s+='''
+[All observations, ranges, iterations and allocated bytes](RAWafter/comparison-analysis.json),
+[commands/order and binary hashes](RAWafter/comparison-runs.json), and the
+[pinned baseline binary receipt](RAWbefore/benchmark-binary.json) are retained.
+The new success-path work is a boundary comparison and checked result handling;
+the helper allocates an error only on exhaustion. No new retained cache or buffer
+is introduced. Provider IO variability and map iteration can dominate wall time;
+adverse values are not classified away or omitted.
+
+The final report and outbox documentation are checked on the same source with the
+site build/tests and documentation-link checker. The runner is stopped after verified
+exports, and the separate target service remains removed and unchanged. Source,
+commands, upload/hash receipts, the first control failure, all red/green output and
+teardown are retained with the artifact manifest.
+
+Next correctness investigation: completion APIs compare owner/token fields but may
+accept empty-owner/zero-token credentials on an unclaimed record. Reproduce this
+through the existing API before changing it. No next fix is implemented here.
+The measured journal-write performance work remains open; any reuse experiment
+must pass the caller-buffer retention guard before adoption.
+'''.replace('RAW',raw)
+(p/'report.md').write_text(s);(r/'docs/reviews/2026-10-18-outbox-token-exhaustion.md').write_text(s);print('Wrote test-first correctness report with all comparative cells and next finding')

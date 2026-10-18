@@ -22,6 +22,8 @@ rejected, even for identical input; Commit finishes an existing prepared intent.
 Custom IDs must not be recycled while stale consumers could refer to the old
 intent. Completed IDs are not retained as an idempotency history.
 Automatic allocation returns an error on ID-sequence exhaustion instead of wrapping.
+Fencing-token allocation also fails at sequence exhaustion. Existing lease owners
+can still renew or finish their work without resetting that counter.
 
 The write condition uses the upstream validator captured during a read or before the local mutation.
 A confirmed missing key uses an expected-absence condition.
