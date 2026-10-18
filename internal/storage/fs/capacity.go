@@ -2,6 +2,7 @@ package fs
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -177,16 +178,16 @@ func (s *FilesystemStore) reconciledCapacityUsageLocked() (capacity.Usage, error
 	return usage, s.namespace.Reconcile(context.Background(), usage)
 }
 
-func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
+func (s *FilesystemStore) writeCapacityFile(path string, data ...[]byte) error {
 	if s.namespace == nil || s.capacityActive {
-		return writeBytesAtomic(path, data)
+		return writeBytesAtomic(path, data...)
 	}
-	admission, err := s.capacityFileAdmission(path, data)
+	admission, err := s.capacityFileAdmission(path, data...)
 	if err != nil {
 		return err
 	}
 	return s.namespace.WithAdmission(context.Background(), admission, func() error {
-		if err := writeBytesAtomic(path, data); err != nil {
+		if err := writeBytesAtomic(path, data...); err != nil {
 			return errors.Join(capacity.ErrUnknown, err)
 		}
 		if err := syncSaveAncestors(filepath.Dir(path)); err != nil {
@@ -196,7 +197,7 @@ func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
 	})
 }
 
-func (s *FilesystemStore) capacityFileAdmission(path string, data []byte) (capacity.Admission, error) {
+func (s *FilesystemStore) capacityFileAdmission(path string, data ...[]byte) (capacity.Admission, error) {
 	usage, err := s.reconciledCapacityUsageLocked()
 	if err != nil {
 		return capacity.Admission{}, err
@@ -205,13 +206,19 @@ func (s *FilesystemStore) capacityFileAdmission(path string, data []byte) (capac
 	if err != nil {
 		return capacity.Admission{}, err
 	}
-	resource := resourceFor(path, data, class)
+	digest := sha256.New()
+	var size int64
+	for _, part := range data {
+		_, _ = digest.Write(part)
+		size += int64(len(part))
+	}
+	resource := resourceFromHash(path, digest.Sum(nil), size, class)
 	usage.Resources = replaceResource(usage.Resources, resource)
 	admission := capacity.Admission{Usage: usage}
 	if class == capacity.Payload {
-		admission.StagingBytes = int64(len(data))
+		admission.StagingBytes = size
 	} else {
-		admission.RecoveryBytes = int64(len(data))
+		admission.RecoveryBytes = size
 	}
 	return admission, nil
 }

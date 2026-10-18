@@ -1,0 +1,55 @@
+from pathlib import Path
+import shutil
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');d=r/'internal/storage/fs'
+for n in ['fs_records.go','fs_atomic.go','capacity.go']:(p/('baseline-'+n+'.txt')).write_bytes((d/n).read_bytes())
+f=d/'fs_multipart.go';s=f.read_text().replace('"context"','"context"\n "encoding/base64"',1)
+a=s.index('\t// Allocated once at the exact total:');b=s.index('\n\tetag :=',a)
+s=s[:a]+''' upload := manifest.upload(uploadID)
+ if err := verifyMultipartChecksum(upload.Options, chunks); err != nil {
+  return nil, err
+ }
+''' + s[b:]
+s=s.replace('Size:        int64(len(combined)),','Size:        total,').replace('Data:              combined,','payloadSize:       total,').replace('refuses it before assembly rather than after.','refuses it before publication.').replace('s.writeObject(manifest.Bucket, manifest.Key, record)','s.writeObject(manifest.Bucket, manifest.Key, record, chunks...)')
+s+='''
+// The validated part buffers are the publication source; checksum them without
+// allocating a second concatenated payload.
+func verifyMultipartChecksum(opts storage.MultipartOptions, parts [][]byte) error {
+ if opts.ChecksumValue == "" { return nil }
+ if storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm) == "" {
+  return storage.VerifyChecksum(storage.MultipartPutOptions(opts), nil)
+ }
+ digest, err := storage.NewChecksumDigest(opts.ChecksumAlgorithm)
+ if err != nil { return err }
+ for _, part := range parts { _, _ = digest.Write(part) }
+ if base64.StdEncoding.EncodeToString(digest.Sum(nil)) != opts.ChecksumValue {
+  return storage.ErrChecksumMismatch
+ }
+ return nil
+}
+''';f.write_text(s)
+f=d/'fs_records.go';s=f.read_text()
+s=s.replace('func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) error {','func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord, parts ...[]byte) error {').replace('return s.writeObjectRaw(bucket, key, record)','return s.writeObjectRaw(bucket, key, record, parts...)',1)
+s=s.replace('func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord) error {','func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord, parts ...[]byte) error {').replace('return s.writeObjectBody(bucket, key, record, nil)','return s.writeObjectBody(bucket, key, record, nil, parts...)',1)
+s=s.replace('func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecord, body io.Reader) error {','func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecord, body io.Reader, parts ...[]byte) error {').replace('s.writeRecordBody(path, record, body)','s.writeRecordBody(path, record, body, parts...)',1)
+s=s.replace('func (s *FilesystemStore) writeRecordBody(path string, record objectRecord, body io.Reader) error {','''func (s *FilesystemStore) writeRecordBody(path string, record objectRecord, body io.Reader, parts ...[]byte) error {
+ if len(parts) > 0 {
+  header, err := encodeRecordPrefix(record)
+  if err != nil { return err }
+  return s.writeCapacityFile(path, append([][]byte{header}, parts...)...)
+ }''')
+f.write_text(s)
+f=d/'fs_atomic.go';s=f.read_text().replace('func writeBytesAtomic(path string, data []byte) error {','func writeBytesAtomic(path string, data ...[]byte) error {').replace('atomicfile.Write(path, data, 0o644)','atomicfile.WriteParts(path, 0o644, data...)');f.write_text(s)
+f=d/'capacity.go';s=f.read_text().replace('"context"','"context"\n "crypto/sha256"',1)
+s=s.replace('func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {','func (s *FilesystemStore) writeCapacityFile(path string, data ...[]byte) error {').replace('writeBytesAtomic(path, data)','writeBytesAtomic(path, data...)').replace('s.capacityFileAdmission(path, data)','s.capacityFileAdmission(path, data...)')
+s=s.replace('func (s *FilesystemStore) capacityFileAdmission(path string, data []byte) (capacity.Admission, error) {','func (s *FilesystemStore) capacityFileAdmission(path string, data ...[]byte) (capacity.Admission, error) {')
+s=s.replace('resource := resourceFor(path, data, class)','''digest := sha256.New()
+ var size int64
+ for _, part := range data {
+  _, _ = digest.Write(part)
+  size += int64(len(part))
+ }
+ resource := resourceFromHash(path, digest.Sum(nil), size, class)''')
+s=s.replace('admission.StagingBytes = int64(len(data))','admission.StagingBytes = size').replace('admission.RecoveryBytes = int64(len(data))','admission.RecoveryBytes = size');f.write_text(s)
+for n in ['completion_buffer_test.go','completion_buffer_verify_test.go','completion_capacity_version_test.go']:shutil.copy2(p/(n+'.txt'),d/n)
+for n in ['fs_multipart.go','fs_records.go','fs_atomic.go','capacity.go']:(p/('candidate-'+n+'.txt')).write_bytes((d/n).read_bytes())
+print('Applied focused multipart buffer publication change; no local Go execution')

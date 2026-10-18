@@ -2,6 +2,7 @@ package fs
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -182,15 +183,8 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		return nil, err
 	}
 
-	// Allocated once at the exact total: the parts are already on disk and
-	// already the right size, so growing the destination by appending discovers
-	// nothing and reallocates on the way.
-	combined := make([]byte, 0, total)
-	for _, chunk := range chunks {
-		combined = append(combined, chunk...)
-	}
 	upload := manifest.upload(uploadID)
-	if err := storage.VerifyChecksum(storage.MultipartPutOptions(upload.Options), combined); err != nil {
+	if err := verifyMultipartChecksum(upload.Options, chunks); err != nil {
 		return nil, err
 	}
 
@@ -202,14 +196,14 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	completion := storage.Completion{
 		Upload:      upload,
 		ETag:        etag,
-		Size:        int64(len(combined)),
+		Size:        total,
 		VersionID:   recordVersion,
 		CompletedAt: time.Now().UTC(),
 	}
 	meta := completion.ObjectMeta()
 	record := objectRecord{
 		RecordVersion:     recordVersion,
-		Data:              combined,
+		payloadSize:       total,
 		ETag:              etag,
 		ContentType:       meta.ContentType,
 		Metadata:          meta.Metadata,
@@ -218,11 +212,11 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		LastModified:      meta.LastModified,
 	}
 	// A completion publishes the object like any other write, so a held object
-	// refuses it before assembly rather than after.
+	// refuses it before publication.
 	if err := s.checkRecoveryHoldsLocked(manifest.Bucket, manifest.Key); err != nil {
 		return nil, err
 	}
-	if err := s.writeObject(manifest.Bucket, manifest.Key, record); err != nil {
+	if err := s.writeObject(manifest.Bucket, manifest.Key, record, chunks...); err != nil {
 		return nil, err
 	}
 	if err := s.removeCapacityPath(dir); err != nil {
@@ -370,4 +364,26 @@ func readMultipartManifest(dir string) (multipartManifest, error) {
 		return m, fmt.Errorf("invalid multipart manifest bucket or key")
 	}
 	return m, nil
+}
+
+// The validated part buffers are the publication source; checksum them without
+// allocating a second concatenated payload.
+func verifyMultipartChecksum(opts storage.MultipartOptions, parts [][]byte) error {
+	if opts.ChecksumValue == "" {
+		return nil
+	}
+	if storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm) == "" {
+		return storage.VerifyChecksum(storage.MultipartPutOptions(opts), nil)
+	}
+	digest, err := storage.NewChecksumDigest(opts.ChecksumAlgorithm)
+	if err != nil {
+		return err
+	}
+	for _, part := range parts {
+		_, _ = digest.Write(part)
+	}
+	if base64.StdEncoding.EncodeToString(digest.Sum(nil)) != opts.ChecksumValue {
+		return storage.ErrChecksumMismatch
+	}
+	return nil
 }

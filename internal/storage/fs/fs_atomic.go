@@ -7,8 +7,8 @@ import (
 )
 
 // Atomic writes share one implementation and propagate file and directory sync errors.
-func writeBytesAtomic(path string, data []byte) error {
-	return atomicfile.Write(path, data, 0o644)
+func writeBytesAtomic(path string, data ...[]byte) error {
+	return atomicfile.WriteParts(path, 0o644, data...)
 }
 
 func writeJSONAtomic(path string, v any) error {

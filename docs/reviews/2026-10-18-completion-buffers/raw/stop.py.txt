@@ -1,0 +1,11 @@
+from pathlib import Path
+import json,subprocess,os,sys
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');cli='/Users/ladmin/.npm/_npx/840d6e3429277c8b/node_modules/@railway/cli/bin/railway';env=dict(os.environ,RAILWAY_CALLER='skill:use-railway@1.6.1',RAILWAY_AGENT_SESSION='stow-completion-buffer-20261018');scope=['--project','8d90188e-0f1e-4c47-9379-9399ae06e6fa','--environment','3cd200cb-c94f-4e4d-9335-0f6c1b7e9411'];runner='83497842-c51d-420e-8ba1-181589730ad4';target='86625750-7c04-458f-98e2-4d7d33787535';job=json.loads((p/'final-start.json').read_text());dep=job['deploymentId']
+def run(args):
+ q=subprocess.run([cli,*args],env=env,text=True,capture_output=True,timeout=55);assert q.returncode==0,q.stdout+q.stderr;return q.stdout
+def row(sid):return json.loads(run(['deployment','list',*scope,'--service',sid,'--limit','1','--json']))[0]
+a,b=row(runner),row(target);assert a['id']==dep and b['id']=='e09d0550-2eaf-454b-883d-16a3d38e2ccb'and b['status']=='REMOVED'
+if sys.argv[1]=='stop':
+ e=p/('export-'+job['id']);v=json.loads((e/'run.json').read_text());receipt=json.loads((e/'report-receipt.json').read_text());assert v['complete']and v['success']and v['checks']==6 and receipt['exitCode']==0 and receipt['railwayDeploymentId']==dep and a['status']=='SUCCESS';print(run(['down',*scope,'--service',runner,'--yes']))
+else:
+ result={n:{k:v.get(k)for k in ['id','status','createdAt']}for n,v in [('runner',a),('target',b)]};result['stopVerified']=a['status']=='REMOVED';(p/'runner-stop-status.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
