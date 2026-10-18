@@ -167,17 +167,23 @@ func (o *FileOutbox) withState(update func(*outboxState) error) (err error) {
 }
 
 func (o *FileOutbox) readState() (state outboxState, err error) {
+	err = o.withReadState(func(current outboxState) { state = current.clone() })
+	return state, err
+}
+
+func (o *FileOutbox) withReadState(read func(outboxState)) error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	lock, err := acquireOutboxFileLock(o.lockPath)
 	if err != nil {
-		return outboxState{}, err
+		return err
 	}
 	defer func() { _ = lock.release() }()
 	if err := o.reloadLocked(); err != nil {
-		return outboxState{}, err
+		return err
 	}
-	return o.state.clone(), nil
+	read(o.state)
+	return nil
 }
 
 func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {

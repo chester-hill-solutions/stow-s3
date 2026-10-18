@@ -1,0 +1,46 @@
+{
+  "phase": "next-finding-empty-journal-reproduction",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "benchmark/_lookup-repro/empty_journal_repro_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-reproduction",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/_lookup-repro/empty_journal_repro_test.go"
+      ]
+    },
+    {
+      "name": "empty-journal-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=/app/benchmark/_lookup-repro/overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxRejectsTruncatedJournal$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "empty-journal-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=/app/benchmark/_lookup-repro/overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxRejectsTruncatedJournal$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

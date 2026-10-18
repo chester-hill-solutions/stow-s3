@@ -1,0 +1,145 @@
+package runthrough_test
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"sync"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+)
+
+func TestFileOutboxLookupReloadsSharedProvenance(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "outbox")
+	writer, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reader, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value, known, err := reader.UpstreamState("bucket", "key"); err != nil || known || value != (runthrough.UpstreamState{}) {
+		t.Fatalf("missing value=%+v known=%t error=%v", value, known, err)
+	}
+	for _, want := range []runthrough.UpstreamState{{ETag: "first"}, {Absent: true}, {Unknown: true}, {}, {ETag: "last"}} {
+		if err := writer.SaveUpstreamState("bucket", "key", want); err != nil {
+			t.Fatal(err)
+		}
+		got, known, err := reader.UpstreamState("bucket", "key")
+		if err != nil || !known || got != want {
+			t.Fatalf("value=%+v known=%t error=%v, want %+v", got, known, err, want)
+		}
+		got.ETag = "caller changed its copy"
+		if again, known, err := reader.UpstreamState("bucket", "key"); err != nil || !known || again != want {
+			t.Fatalf("lookup copy changed durable state: value=%+v known=%t error=%v", again, known, err)
+		}
+		if value, known, err := reader.UpstreamState("other-bucket", "key"); err != nil || known || value != (runthrough.UpstreamState{}) {
+			t.Fatalf("other bucket value=%+v known=%t error=%v", value, known, err)
+		}
+	}
+}
+
+func TestFileOutboxLookupFailsClosedAndRecovers(t *testing.T) {
+	for _, fault := range []string{"corrupt-journal", "unreadable-journal", "unavailable-lock"} {
+		t.Run(fault, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "outbox")
+			outbox, err := runthrough.NewFileOutbox(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := runthrough.UpstreamState{ETag: "committed"}
+			if err := outbox.SaveUpstreamState("bucket", "key", want); err != nil {
+				t.Fatal(err)
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			broken := path
+			if fault == "unavailable-lock" {
+				broken += ".lock"
+			}
+			if fault == "corrupt-journal" {
+				err = os.WriteFile(path, []byte("corrupt"), 0o600)
+			} else if err = os.Remove(broken); err == nil {
+				err = os.Mkdir(broken, 0o700)
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			for n := 0; n < 2; n++ {
+				if got, known, err := outbox.UpstreamState("bucket", "key"); err == nil || known || got != (runthrough.UpstreamState{}) {
+					t.Fatalf("failed lookup returned stale state: value=%+v known=%t error=%v", got, known, err)
+				}
+			}
+			if fault != "corrupt-journal" {
+				if err := os.Remove(broken); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if fault != "unavailable-lock" {
+				if err := os.WriteFile(path, data, 0o600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if got, known, err := outbox.UpstreamState("bucket", "key"); err != nil || !known || got != want {
+				t.Fatalf("repaired lookup value=%+v known=%t error=%v", got, known, err)
+			}
+		})
+	}
+}
+
+func TestFileOutboxLookupConcurrentReadersAndWriter(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "outbox")
+	first, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := first.SaveUpstreamState("bucket", "key", runthrough.UpstreamState{ETag: "one"}); err != nil {
+		t.Fatal(err)
+	}
+	var workers sync.WaitGroup
+	start := make(chan struct{})
+	errors := make(chan error, 5)
+	workers.Add(1)
+	go func() {
+		defer workers.Done()
+		<-start
+		for n := 0; n < 16; n++ {
+			value := runthrough.UpstreamState{ETag: "one"}
+			if n%2 == 0 {
+				value.ETag = "two"
+			}
+			if err := first.SaveUpstreamState("bucket", "key", value); err != nil {
+				errors <- err
+				return
+			}
+		}
+	}()
+	for _, reader := range []*runthrough.FileOutbox{first, second, first, second} {
+		workers.Add(1)
+		go func(reader *runthrough.FileOutbox) {
+			defer workers.Done()
+			<-start
+			for n := 0; n < 32; n++ {
+				value, known, err := reader.UpstreamState("bucket", "key")
+				if err != nil || !known || (value.ETag != "one" && value.ETag != "two") || value.Absent || value.Unknown {
+					errors <- fmt.Errorf("concurrent lookup value=%+v known=%t error=%v", value, known, err)
+					return
+				}
+			}
+		}(reader)
+	}
+	close(start)
+	workers.Wait()
+	close(errors)
+	for err := range errors {
+		t.Error(err)
+	}
+}

@@ -305,3 +305,6 @@ provenance reads also clone unrelated queue maps through `readState`. The lookup
 and save measurements establish the remaining work. A future change must retain
 fresh reads under the file lock and the completed durability fence after an
 uncertain earlier rename. Neither optimization is implemented here.
+
+Follow-up: [single-key lookup measurements](2026-10-17-outbox-lookup.md) remove the
+redundant lookup clone. Full-journal reads and unchanged-save rewrites remain.

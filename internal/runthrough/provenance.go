@@ -21,9 +21,10 @@ type provenanceOutbox interface {
 }
 
 func (o *FileOutbox) UpstreamState(bucket, key string) (UpstreamState, bool, error) {
-	s, err := o.readState()
-	value, ok := s.provenance[outboxIdentity(bucket, key)]
-	return value, ok, err
+	var value UpstreamState
+	var known bool
+	err := o.withReadState(func(s outboxState) { value, known = s.provenance[outboxIdentity(bucket, key)] })
+	return value, known, err
 }
 
 func (o *FileOutbox) SaveUpstreamState(bucket, key string, value UpstreamState) error {
