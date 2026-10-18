@@ -1,0 +1,14 @@
+from pathlib import Path
+from collections import Counter
+import json,re,sys
+p=Path('/private/tmp/stow-outbox-postprofile-2026-10-18');phase=sys.argv[1]if len(sys.argv)>1 else'candidate';d=p/('export-'+json.loads((p/(phase+'-start.json')).read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==(6 if phase=='candidate' else 14)and all(x['passed']for x in checks)
+result={}
+for mode in ['normal','race']:
+ name=('candidate-'if phase=='candidate'else'focused-')+mode;text=(d/(name+'.log')).read_text();counts=Counter()
+ for line in text.splitlines():
+  m=re.match(r'\s*--- (PASS|FAIL|SKIP): ((?:TestFileOutboxFrameRead|TestOutboxFrameReader)\S+)',line)
+  if m:counts[(m[1],m[2])]+=1
+ leaves={n for _,n in counts if not any(other.startswith(n+'/')for _,other in counts)};assert len(leaves)==40,(name,len(leaves));assert all(counts.get(('PASS',n))==2 for n in leaves);assert not any(s!='PASS'for s,n in counts)
+ samples=[json.loads(x.removeprefix('STOWFRAMEREAD: '))for x in text.splitlines()if x.startswith('STOWFRAMEREAD: ')];assert len(samples)==8 and all(x['allocatedBytes']<=1<<20 for x in samples)
+ result[name]={'distinctCases':40,'passed':80,'failed':0,'skipped':0,'cases':sorted(leaves),'samples':samples}
+(d/('candidate-receipt.json'if phase=='candidate'else'green-receipt.json')).write_text(json.dumps(result,indent=2)+'\n');print('Verified all 40 new reader/resource cases twice per mode; byte/state/error parity and growth/version guards passed')

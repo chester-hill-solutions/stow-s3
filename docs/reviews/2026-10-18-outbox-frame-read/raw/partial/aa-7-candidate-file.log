@@ -1,0 +1,11 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxDecodeCycle/depth=0/enqueue           	     202	   6277589 ns/op	         0 cached-B	        14.00 journal-B	  16891904 process-HWM-B	    395312 process-live-heap-B	    9053 B/op	      86 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/enqueue-4         	     178	   5622125 ns/op	         0 cached-B	        14.00 journal-B	  18468864 process-HWM-B	    403792 process-live-heap-B	    9054 B/op	      86 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/enqueue         	     164	   7597986 ns/op	         0 cached-B	     25486 journal-B	  18534400 process-HWM-B	    637216 process-live-heap-B	  831891 B/op	    5516 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/enqueue-4       	     153	   8612672 ns/op	         0 cached-B	     25486 journal-B	  18907136 process-HWM-B	    640432 process-live-heap-B	  831831 B/op	    5515 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/enqueue        	      28	  48622470 ns/op	         0 cached-B	    815118 journal-B	  52908032 process-HWM-B	   7577784 process-live-heap-B	26030541 B/op	  170182 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/enqueue-4      	      34	  46351574 ns/op	         0 cached-B	    815118 journal-B	  52908032 process-HWM-B	   7581256 process-live-heap-B	26059488 B/op	  170570 allocs/op
+PASS

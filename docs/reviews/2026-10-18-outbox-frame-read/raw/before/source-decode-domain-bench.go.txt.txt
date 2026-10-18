@@ -1,0 +1,63 @@
+package runthrough
+
+import (
+	"fmt"
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb"
+	"google.golang.org/protobuf/proto"
+	"reflect"
+	"testing"
+)
+
+func decodeDomainFixture(message *outboxpb.Outbox) (outboxState, error) {
+	d := outboxProtoRecordDecoder{state: newOutboxState()}
+	d.metadata.Version = message.Version
+	d.metadata.Seq = message.Seq
+	d.metadata.NextToken = message.NextToken
+	for _, p := range message.Provenance {
+		d.provenance = p
+		if err := d.addProvenance(); err != nil {
+			return outboxState{}, err
+		}
+	}
+	for _, e := range message.Entries {
+		d.entry = e
+		if err := d.addEntry(false); err != nil {
+			return outboxState{}, err
+		}
+	}
+	for _, e := range message.Prepared {
+		d.entry = e
+		if err := d.addEntry(true); err != nil {
+			return outboxState{}, err
+		}
+	}
+	return d.finish()
+}
+func BenchmarkOutboxDecodeDomain(b *testing.B) {
+	for _, rich := range []bool{false, true} {
+		b.Run(fmt.Sprintf("rich=%t", rich), func(b *testing.B) {
+			state := decodeProfileFixture(4096, rich)
+			data, err := encodeOutboxProto(state)
+			if err != nil {
+				b.Fatal(err)
+			}
+			message := &outboxpb.Outbox{}
+			if err := proto.Unmarshal(data[outboxProtoPrefixSize:], message); err != nil {
+				b.Fatal(err)
+			}
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				decodeProfileSink, err = decodeDomainFixture(message)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+			b.StopTimer()
+			if !reflect.DeepEqual(decodeProfileSink, state) {
+				b.Fatal("domain fixture changed")
+			}
+			decodeProfileSink = outboxState{}
+		})
+	}
+}

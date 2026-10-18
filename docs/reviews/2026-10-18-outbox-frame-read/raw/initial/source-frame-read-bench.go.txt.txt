@@ -1,0 +1,52 @@
+package runthrough
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
+	"testing"
+)
+
+func BenchmarkOutboxFrameReload(b *testing.B) {
+	for _, format := range []string{"native", "legacy"} {
+		for _, depth := range []int{0, 128, 4096} {
+			b.Run(fmt.Sprintf("format=%s/depth=%d", format, depth), func(b *testing.B) {
+				state := decodeProfileFixture(depth, false)
+				data, err := encodeOutboxProto(state)
+				if format == "legacy" {
+					data, err = json.Marshal(persistedOutbox{Version: outboxLegacyJSONVersion, Entries: state.entries, Prepared: state.prepared, Provenance: state.provenance, Seq: state.seq, NextToken: state.nextToken})
+				}
+				if err != nil {
+					b.Fatal(err)
+				}
+				path := filepath.Join(b.TempDir(), "outbox")
+				if err := os.WriteFile(path, data, 0600); err != nil {
+					b.Fatal(err)
+				}
+				outbox, err := NewFileOutbox(path)
+				if err != nil {
+					b.Fatal(err)
+				}
+				want := outbox.state.clone()
+				b.ReportAllocs()
+				b.SetBytes(int64(len(data)))
+				b.ResetTimer()
+				for n := 0; n < b.N; n++ {
+					if err := outbox.reloadLocked(); err != nil {
+						b.Fatal(err)
+					}
+				}
+				b.StopTimer()
+				b.ReportMetric(float64(len(data)), "journal-B")
+				if !reflect.DeepEqual(want, outbox.state) || !bytes.Equal(data, outbox.validatedData) {
+					b.Fatal("cached reload changed state or bytes")
+				}
+				runtime.KeepAlive(outbox)
+			})
+		}
+	}
+}

@@ -1,0 +1,73 @@
+{
+  "phase": "outbox-postprofile-before",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_decode.go",
+    "internal/runthrough/outbox_frame_read_resource_test.go",
+    "benchmark/decode-profile-bench.go.txt",
+    "benchmark/decode-domain-bench.go.txt",
+    "benchmark/decode-file-bench.go.txt",
+    "benchmark/post-profile.json",
+    "benchmark/post-profile.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_frame_read_resource_test.go",
+        "benchmark/decode-profile-bench.go.txt",
+        "benchmark/decode-domain-bench.go.txt",
+        "benchmark/decode-file-bench.go.txt"
+      ]
+    },
+    {
+      "name": "resource-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxFrameReadResourceBudget$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "resource-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxFrameReadResourceBudget$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/post-profile.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/post-profile.test"
+      ]
+    },
+    {
+      "name": "profiles",
+      "args": [
+        "node",
+        "benchmark/post-profile.mjs"
+      ]
+    }
+  ]
+}

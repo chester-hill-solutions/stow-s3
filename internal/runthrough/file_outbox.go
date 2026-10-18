@@ -98,7 +98,7 @@ func normalizeOutboxEntries(entries map[string]OutboxEntry) error {
 }
 
 func (o *FileOutbox) reloadLocked() error {
-	data, err := os.ReadFile(o.path)
+	data, err := readOutboxFile(o.path)
 	if os.IsNotExist(err) && !o.journalSeen {
 		o.state = newOutboxState()
 		return nil

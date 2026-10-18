@@ -1,0 +1,97 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/candidate-file_outbox.go.txt",
+      "benchmark/candidate-file_outbox_read.go.txt",
+      "internal/runthrough/outbox_frame_read_resource_test.go",
+      "internal/runthrough/outbox_frame_read_test.go",
+      "benchmark/empty-frame-test.go.txt",
+      "benchmark/frame-read-bench.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "candidate-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/frame-candidate.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxFrameRead|TestOutboxFrameReader|TestFileOutboxDuplicateFlood|TestOutboxDecode)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1928,
+    "passed": true
+  },
+  {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/frame-candidate.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxFrameRead|TestOutboxFrameReader|TestFileOutboxDuplicateFlood|TestOutboxDecode)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 5539,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/frame-before-measure.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/frame-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 349,
+    "passed": true
+  },
+  {
+    "name": "candidate-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/frame-candidate-measure.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/frame-candidate.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1947,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/frame-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 326607,
+    "passed": true
+  }
+]

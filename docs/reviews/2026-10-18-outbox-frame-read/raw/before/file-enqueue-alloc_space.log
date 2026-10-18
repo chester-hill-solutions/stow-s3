@@ -1,0 +1,45 @@
+File: post-profile.test
+Build ID: d891571500456aead629a84f12762f47e25c566a
+Type: alloc_space
+Time: 2026-10-18 13:11:42 UTC
+Active filters:
+   focus=benchmarkDecodeCycle
+Showing nodes accounting for 315989.88kB, 96.54% of 327328.38kB total
+Dropped 155 nodes (cum <= 1636.64kB)
+Showing top 35 nodes out of 41
+      flat  flat%   sum%        cum   cum%
+         0     0%     0% 327040.71kB 99.91%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkFileOutboxDecodeCycle.func1
+ 7589.80kB  2.32%  2.32% 327040.71kB 99.91%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.benchmarkDecodeCycle
+         0     0%  2.32% 327040.71kB 99.91%  testing.(*B).runN
+         0     0%  2.32% 307127.94kB 93.83%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withLockedState
+         0     0%  2.32%   281010kB 85.85%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withState (inline)
+         0     0%  2.32% 278598.30kB 85.11%  testing.(*B).launch
+         0     0%  2.32% 140604.62kB 42.96%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).MarkSuccess
+         0     0%  2.32% 133144.51kB 40.68%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).reloadLocked
+         0     0%  2.32% 131819.95kB 40.27%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).Enqueue
+         0     0%  2.32% 107529.51kB 32.85%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+    5.62kB 0.0017%  2.32% 107529.51kB 32.85%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoRecords
+         0     0%  2.32% 107529.51kB 32.85%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxState
+         0     0%  2.32% 107520.51kB 32.85%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).consume
+       9kB 0.0027%  2.32% 107520.51kB 32.85%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).record
+         0     0%  2.32% 102436.62kB 31.29%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).commitState
+         0     0%  2.32% 102436.62kB 31.29%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).persistState
+    3.75kB 0.0011%  2.32% 102396.40kB 31.28%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.encodeOutboxProto
+88054.16kB 26.90% 29.23% 88054.16kB 26.90%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).addEntry
+    4784kB  1.46% 30.69% 83124.38kB 25.39%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxProtoEntries
+         0     0% 30.69% 82690.70kB 25.26%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).Enqueue.(*FileOutbox).withState.func2
+         0     0% 30.69% 82510.31kB 25.21%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).MarkSuccess.(*FileOutbox).withState.func2
+78340.38kB 23.93% 54.62% 78340.38kB 23.93%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxProtoEntry
+71344.91kB 21.80% 76.42% 71344.91kB 21.80%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxState.clone
+         0     0% 76.42% 48442.41kB 14.80%  testing.(*B).run1.func1
+         0     0% 76.42% 27228.20kB  8.32%  os.ReadFile
+   27201kB  8.31% 84.73% 27212.25kB  8.31%  os.readFileContents
+         0     0% 84.73% 19457.35kB  5.94%  google.golang.org/protobuf/proto.UnmarshalOptions.Unmarshal
+         0     0% 84.73% 19457.35kB  5.94%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 84.73% 19457.26kB  5.94%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 84.73% 19457.26kB  5.94%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 84.73% 19457.26kB  5.94%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+19457.26kB  5.94% 90.67% 19457.26kB  5.94%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+         0     0% 90.67% 19268.27kB  5.89%  google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+   19200kB  5.87% 96.54% 19268.27kB  5.89%  google.golang.org/protobuf/proto.MarshalOptions.marshal
+         0     0% 96.54% 17540.88kB  5.36%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).PendingSnapshot

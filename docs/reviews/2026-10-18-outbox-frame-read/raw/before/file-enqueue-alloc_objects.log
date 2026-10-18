@@ -1,0 +1,42 @@
+File: post-profile.test
+Build ID: d891571500456aead629a84f12762f47e25c566a
+Type: alloc_objects
+Time: 2026-10-18 13:11:42 UTC
+Active filters:
+   focus=benchmarkDecodeCycle
+Showing nodes accounting for 1801484, 99.36% of 1813010 total
+Dropped 163 nodes (cum <= 9065)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%    1811051 99.89%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkFileOutboxDecodeCycle.func1
+     28617  1.58%  1.58%    1811051 99.89%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.benchmarkDecodeCycle
+         0     0%  1.58%    1811051 99.89%  testing.(*B).runN
+         0     0%  1.58%    1674194 92.34%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withLockedState
+         0     0%  1.58%    1576557 86.96%  testing.(*B).launch
+         0     0%  1.58%    1574242 86.83%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withState (inline)
+         0     0%  1.58%    1198676 66.12%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).reloadLocked
+         0     0%  1.58%    1198496 66.11%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+        24 0.0013%  1.58%    1198496 66.11%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoRecords
+         0     0%  1.58%    1198496 66.11%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxState
+         0     0%  1.58%    1198400 66.10%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).consume
+        24 0.0013%  1.58%    1198400 66.10%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).record
+         0     0%  1.58%     999501 55.13%  google.golang.org/protobuf/proto.UnmarshalOptions.Unmarshal
+         0     0%  1.58%     999501 55.13%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0%  1.58%     999499 55.13%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0%  1.58%     999499 55.13%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0%  1.58%     999499 55.13%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+    999499 55.13% 56.71%     999499 55.13%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+         0     0% 56.71%     820438 45.25%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).MarkSuccess
+         0     0% 56.71%     720529 39.74%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).Enqueue
+         0     0% 56.71%     394205 21.74%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).commitState
+         0     0% 56.71%     394205 21.74%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).persistState
+        48 0.0026% 56.71%     393843 21.72%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.encodeOutboxProto
+        96 0.0053% 56.72%     393334 21.70%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxProtoEntries
+    393238 21.69% 78.41%     393238 21.69%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxProtoEntry
+         0     0% 78.41%     271018 14.95%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).Enqueue.(*FileOutbox).withState.func2
+         0     0% 78.41%     270996 14.95%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).MarkSuccess.(*FileOutbox).withState.func2
+         0     0% 78.41%     234494 12.93%  testing.(*B).run1.func1
+    198875 10.97% 89.38%     198875 10.97%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).addEntry
+    181055  9.99% 99.36%     181055  9.99%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxState.clone
+         8 0.00044% 99.36%      99933  5.51%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.NewFileOutbox
+         0     0% 99.36%      99924  5.51%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).PendingSnapshot
+         0     0% 99.36%      33257  1.83%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.benchmarkDecodeCycle.(*FileOutbox).withState.func6
