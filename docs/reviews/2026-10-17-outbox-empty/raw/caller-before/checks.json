@@ -1,0 +1,62 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/file_outbox_empty_api_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22,
+    "passed": true
+  },
+  {
+    "name": "caller-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestRetryPendingRefusesEmptyJournal$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1228,
+    "passed": true
+  },
+  {
+    "name": "caller-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestRetryPendingRefusesEmptyJournal$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1873,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 464,
+    "passed": true
+  }
+]

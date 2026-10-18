@@ -95,10 +95,6 @@ func (o *FileOutbox) reloadLocked() error {
 	if err != nil {
 		return err
 	}
-	if len(data) == 0 {
-		o.state = newOutboxState()
-		return nil
-	}
 	state, err := decodeOutboxState(data)
 	if err != nil {
 		return err

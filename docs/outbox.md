@@ -32,6 +32,10 @@ Filesystem outbox updates return an error if journal replacement cannot complete
 The replacement may already be visible when that error occurs; it does not prove the old journal was restored.
 Reads that need to record upstream provenance fail until it can be saved durably.
 
+A missing journal path is allowed when creating an outbox. An existing zero-byte
+journal is rejected as corrupt. Restore a valid journal before retrying; Stow does
+not reconstruct a truncated journal automatically.
+
 Transient failures retry with bounded backoff. Deterministic failures remain available for inspection.
 
 After a lost put reply, recovery compares the upstream object with the recorded local version.

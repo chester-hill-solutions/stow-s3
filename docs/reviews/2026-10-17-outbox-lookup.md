@@ -129,3 +129,6 @@ The reproduction source is retained as evidence; it is not added as a failing te
 to the passing suite. This finding is **not fixed by the lookup change** and takes
 priority over avoiding unchanged-save rewrites. Missing-path initialization must
 remain valid when correcting it.
+
+Follow-up: [zero-byte journal correction](2026-10-17-outbox-empty.md) removes the
+empty-file recovery bypass and preserves missing-path initialization.
