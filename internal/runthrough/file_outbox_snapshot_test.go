@@ -1,11 +1,13 @@
 package runthrough_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
 	"runtime"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -35,7 +37,7 @@ func snapshotFixture(t *testing.T) (*runthrough.FileOutbox, string, []runthrough
 	for _, id := range []string{"outbox-15", "outbox-13"} {
 		value := base
 		value.ID, value.Key = id, id
-		got, err := outbox.Prepare(value)
+		got, err := outbox.PrepareOwned(value, "snapshot-owner", time.Hour)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -52,8 +54,9 @@ func readSnapshot(outbox *runthrough.FileOutbox, prepared bool) ([]runthrough.Ou
 }
 
 func writeSnapshotEntry(outbox *runthrough.FileOutbox, prepared bool, value runthrough.OutboxEntry) (runthrough.OutboxEntry, error) {
+	value.ID = ""
 	if prepared {
-		return outbox.Prepare(value)
+		return outbox.PrepareOwned(value, "snapshot-owner", time.Hour)
 	}
 	return outbox.Enqueue(value)
 }
@@ -92,13 +95,14 @@ func checkSnapshotOwnership(t *testing.T, prepared bool) {
 		t.Fatal(err)
 	}
 	changed := want[0]
+	changed.Key = "snapshot-peer-append"
 	changed.Version = "peer-version"
 	changed.CreatedAt = changed.CreatedAt.Add(24 * time.Hour)
 	changed, err = writeSnapshotEntry(peer, prepared, changed)
 	if err != nil {
 		t.Fatal(err)
 	}
-	updated := append(slices.Clone(want[1:]), changed)
+	updated := append(slices.Clone(want), changed)
 	requireSnapshot(t, outbox, prepared, updated)
 	if !reflect.DeepEqual(held, want) {
 		t.Fatalf("held snapshot changed: %+v", held)
@@ -166,6 +170,8 @@ func checkConcurrentSnapshots(t *testing.T, prepared bool) {
 		t.Fatal(err)
 	}
 	entry := want[0]
+	entry.Key = "snapshot-writer-0"
+	entry.CreatedAt = entry.CreatedAt.Add(-time.Hour)
 	entry.Version, entry.LastError = "one", "one"
 	if _, err := writeSnapshotEntry(peer, prepared, entry); err != nil {
 		t.Fatal(err)
@@ -179,6 +185,7 @@ func checkConcurrentSnapshots(t *testing.T, prepared bool) {
 		<-start
 		for n := 0; n < 16; n++ {
 			value := entry
+			value.Key = fmt.Sprintf("snapshot-writer-%d", n+1)
 			if n%2 == 0 {
 				value.Version, value.LastError = "two", "two"
 			}
@@ -193,7 +200,7 @@ func checkConcurrentSnapshots(t *testing.T, prepared bool) {
 		go func(reader *runthrough.FileOutbox) {
 			defer workers.Done()
 			<-start
-			if err := readConcurrentSnapshots(reader, prepared, len(want)); err != nil {
+			if err := readConcurrentSnapshots(reader, prepared, len(want)+1); err != nil {
 				failures <- err
 			}
 		}(reader)
@@ -207,13 +214,17 @@ func checkConcurrentSnapshots(t *testing.T, prepared bool) {
 }
 
 func readConcurrentSnapshots(outbox *runthrough.FileOutbox, prepared bool, count int) error {
+	maximum := count + 16
 	for n := 0; n < 32; n++ {
 		got, err := readSnapshot(outbox, prepared)
-		if err != nil || len(got) != count {
+		if err != nil || len(got) < count || len(got) > maximum {
 			return fmt.Errorf("snapshot count=%d error=%v", len(got), err)
 		}
-		if (got[0].Version != "one" && got[0].Version != "two") || got[0].LastError != got[0].Version {
-			return fmt.Errorf("inconsistent snapshot: %+v", got[0])
+		count = len(got)
+		for _, entry := range got {
+			if strings.HasPrefix(entry.Key, "snapshot-writer-") && ((entry.Version != "one" && entry.Version != "two") || entry.LastError != entry.Version) {
+				return fmt.Errorf("inconsistent snapshot: %+v", entry)
+			}
 		}
 		held := slices.Clone(got)
 		runtime.Gosched()
@@ -222,4 +233,52 @@ func readConcurrentSnapshots(outbox *runthrough.FileOutbox, prepared bool, count
 		}
 	}
 	return nil
+}
+
+func TestFileOutboxHeldSnapshotsSurviveRecordMutation(t *testing.T) {
+	for _, prepared := range []bool{false, true} {
+		t.Run(fmt.Sprint(prepared), func(t *testing.T) { checkSnapshotRecordMutation(t, prepared) })
+	}
+}
+
+func checkSnapshotRecordMutation(t *testing.T, prepared bool) {
+	t.Helper()
+	outbox, path, active, staged := snapshotFixture(t)
+	want := active
+	if prepared {
+		want = staged
+	}
+	held := requireSnapshot(t, outbox, prepared, want)
+	peer, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first := want[0]
+	if prepared {
+		err = peer.RenewPrepared(first.ID, first.PreparedOwner, first.PreparedToken, 2*time.Hour)
+	} else {
+		err = peer.MarkFailure(first.ID, errors.New("snapshot-peer-error"), time.Time{})
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := readSnapshot(outbox, prepared)
+	if err != nil || len(got) != len(want) {
+		t.Fatalf("updated snapshot=%+v error=%v", got, err)
+	}
+	normalized := slices.Clone(got)
+	if prepared {
+		if !got[0].PreparedUntil.After(first.PreparedUntil) {
+			t.Fatal("prepared lease was not renewed")
+		}
+		normalized[0].PreparedUntil = first.PreparedUntil
+	} else {
+		if got[0].Attempts != first.Attempts+1 || got[0].LastError != "snapshot-peer-error" || !got[0].NextAttempt.IsZero() {
+			t.Fatalf("failure fields inconsistent: %+v", got[0])
+		}
+		normalized[0].Attempts, normalized[0].LastError, normalized[0].NextAttempt = first.Attempts, first.LastError, first.NextAttempt
+	}
+	if !reflect.DeepEqual(normalized, want) || !reflect.DeepEqual(held, want) {
+		t.Fatalf("record mutation changed unrelated fields or held snapshot: updated=%+v held=%+v", got, held)
+	}
 }

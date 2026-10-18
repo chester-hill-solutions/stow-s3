@@ -1,0 +1,37 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-outbox-admission-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');e=p/('export-'+json.loads((p/'final-start.json').read_text())['id']);a=json.loads((e/'comparison-analysis.json').read_text());assert a['observations']==256
+initial=p/('export-'+json.loads((p/'after-start.json').read_text())['id']);earlier=json.loads((initial/'comparison-analysis.json').read_text());
+rows=['All values are per-cell medians. Times cover the two-call cycle; CPU means GOMAXPROCS.',''];maxbytes=0
+for backend in ['memory','file']:
+ rows.extend(['### '+backend.capitalize()+' outbox','','| Depth per queue | Admission | ID | CPU | Final µs before → after | Initial Δ | Final Δ | Allocs/cycle before → after |','| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: |'])
+ for x in [x for x in a['summary']if x['backend']==backend]:
+  b=x['before'];f=x['after'];old=next(o for o in earlier['summary']if all(o[k]==x[k]for k in ['backend','depth','method','kind','cpu']));rows.append(f"| {x['depth']} | {x['method']} | {x['kind']} | {x['cpu']} | {b['nsPerOp']['median']/1000:,.3f} → {f['nsPerOp']['median']/1000:,.3f} | {old['timeChangePercent']:+.2f}% | {x['timeChangePercent']:+.2f}% | {b['allocsPerOp']['median']:,.1f} → {f['allocsPerOp']['median']:,.1f} |");maxbytes=max(maxbytes,abs(f['bytesPerOp']['median']-b['bytesPerOp']['median']))
+ rows.append('')
+volume=p/('export-'+json.loads((p/'volume-start.json').read_text())['id']);v=json.loads((volume/'comparison-analysis.json').read_text());assert v['observations']==128
+rows.extend(['### Ext4 volume outbox','','This separate cohort uses the same byte-identical original/refined binaries as the final overlay cohort, with TMPDIR on the ext4 results volume. Cohorts are not pooled.','', '| Depth per queue | Admission | ID | CPU | µs before → after | Change | Allocs/cycle before → after |','| ---: | --- | --- | ---: | ---: | ---: | ---: |'])
+for x in v['summary']:
+ b=x['before'];f=x['after'];rows.append(f"| {x['depth']} | {x['method']} | {x['kind']} | {x['cpu']} | {b['nsPerOp']['median']/1000:,.3f} → {f['nsPerOp']['median']/1000:,.3f} | {x['timeChangePercent']:+.2f}% | {b['allocsPerOp']['median']:,.1f} → {f['allocsPerOp']['median']:,.1f} |");maxbytes=max(maxbytes,abs(f['bytesPerOp']['median']-b['bytesPerOp']['median']))
+rows.append('')
+aa=p/('export-'+json.loads((p/'aa-start.json').read_text())['id']);control=json.loads((aa/'comparison-analysis.json').read_text());assert control['identicalBinary']and control['observations']==16
+rows.extend(['### Identical-binary ext4 control','','Both A/B labels execute the exact refined binary, CPU 4, explicit-ID prepare/discard cycles. These 16 observations remain separate from the before/after cohorts.','', '| Depth per queue | Label A median ms | Label B median ms | Label median change | Overall sample range ms |','| ---: | ---: | ---: | ---: | ---: |'])
+for x in control['summary']:
+ low=min(x['before']['min'],x['after']['min']);high=max(x['before']['max'],x['after']['max']);rows.append(f"| {x['depth']} | {x['before']['median']/1e6:.3f} | {x['after']['median']/1e6:.3f} | {x['timeChangePercent']:+.2f}% | {low/1e6:.3f}–{high/1e6:.3f} |")
+rows.extend(['','This demonstrates variability in the control; it does not rule out an implementation effect or replace the ext4 before/after results. The +27.6% ext4 cell remains an unresolved performance finding.',''])
+rows.extend(['The largest absolute difference between median allocated bytes is '+str(maxbytes)+' B/cycle.','Exact bytes, iteration counts and ranges for each cell remain in the analysis.'])
+validation='''All **54 originally failing cases and seven controls pass twice normally and
+twice under race detection**, 122 passing cases per mode in the new matrix, using
+byte-identical original admission regression/benchmark source from the first red run;
+the separate exhaustion tests were reproduced against original code before the
+allocator refinement. The
+[green receipt](2026-10-18-outbox-admission/raw/final/green-receipt.json) verifies exact cases and source hashes.
+
+All **17 final Railway stages pass**: formatting; focused outbox tests twice normally
+and twice with race detection; full Go suite; broad storage/runtime/embedded/
+run-through/S3/public-package race tests; four conformance profiles (memory,
+filesystem, runtime-memory, runtime-filesystem); vet; site build/tests;
+documentation links; quality/file-size/format gates; original/final benchmark builds; and
+interleaved comparison. [Final commands/results](2026-10-18-outbox-admission/raw/final/checks.json)
+and [baseline commands/results](2026-10-18-outbox-admission/raw/before/checks.json)
+retain every stage. No baseline or tolerance was raised.'''
+s=(p/'report.md').read_text();assert s.count('VALIDATION')==s.count('PERFORMANCE\n')==1;s=s.replace('VALIDATION',validation).replace('PERFORMANCE\n','\n'.join(rows)+'\n');(r/'docs/reviews/2026-10-18-outbox-admission.md').write_text(s);print('Generated report for',a['observations'],'observations')

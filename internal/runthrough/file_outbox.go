@@ -195,8 +195,9 @@ func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {
 func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
 	var enqueued OutboxEntry
 	err := o.withState(func(state *outboxState) error {
-		enqueued = state.enqueue(entry)
-		return nil
+		var err error
+		enqueued, err = state.enqueue(entry)
+		return err
 	})
 	if err != nil {
 		return OutboxEntry{}, err
@@ -207,8 +208,9 @@ func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
 func (o *FileOutbox) Prepare(entry OutboxEntry) (OutboxEntry, error) {
 	var prepared OutboxEntry
 	err := o.withState(func(state *outboxState) error {
-		prepared = state.prepare(entry)
-		return nil
+		var err error
+		prepared, err = state.prepare(entry)
+		return err
 	})
 	if err != nil {
 		return OutboxEntry{}, err

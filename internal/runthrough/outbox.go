@@ -138,19 +138,31 @@ func (s outboxState) clone() outboxState {
 	return outboxState{provenance: provenance, entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
 }
 
-func (s *outboxState) assignID(entry OutboxEntry) OutboxEntry {
+func (s *outboxState) assignID(entry *OutboxEntry) error {
+	nextSeq := s.seq
 	if entry.ID == "" {
-		s.seq++
-		entry.ID = fmt.Sprintf("outbox-%d", s.seq)
-	} else if strings.HasPrefix(entry.ID, "outbox-") {
-		if sequence, err := strconv.ParseUint(strings.TrimPrefix(entry.ID, "outbox-"), 10, 64); err == nil && sequence > s.seq {
-			s.seq = sequence
+		if nextSeq == ^uint64(0) {
+			return fmt.Errorf("outbox ID sequence exhausted")
+		}
+		nextSeq++
+		entry.ID = fmt.Sprintf("outbox-%d", nextSeq)
+	} else {
+		_, active := s.entries[entry.ID]
+		_, prepared := s.prepared[entry.ID]
+		if active || prepared {
+			return fmt.Errorf("outbox entry %q already exists", entry.ID)
+		}
+		if strings.HasPrefix(entry.ID, "outbox-") {
+			if sequence, err := strconv.ParseUint(strings.TrimPrefix(entry.ID, "outbox-"), 10, 64); err == nil && sequence > nextSeq {
+				nextSeq = sequence
+			}
 		}
 	}
+	s.seq = nextSeq
 	if entry.CreatedAt.IsZero() {
 		entry.CreatedAt = time.Now().UTC()
 	}
-	return entry
+	return nil
 }
 
 func (s *outboxState) assignToken() uint64 {
@@ -158,27 +170,33 @@ func (s *outboxState) assignToken() uint64 {
 	return s.nextToken
 }
 
-func (s *outboxState) enqueue(entry OutboxEntry) OutboxEntry {
-	entry = s.assignID(entry)
+func (s *outboxState) enqueue(entry OutboxEntry) (OutboxEntry, error) {
+	if err := s.assignID(&entry); err != nil {
+		return OutboxEntry{}, err
+	}
 	entry.Prepared = false
 	s.entries[entry.ID] = entry
-	return entry
+	return entry, nil
 }
 
-func (s *outboxState) prepare(entry OutboxEntry) OutboxEntry {
-	entry = s.assignID(entry)
+func (s *outboxState) prepare(entry OutboxEntry) (OutboxEntry, error) {
+	if err := s.assignID(&entry); err != nil {
+		return OutboxEntry{}, err
+	}
 	entry.Prepared = true
 	s.prepared[entry.ID] = entry
-	return entry
+	return entry, nil
 }
 
 func (s *outboxState) prepareOwned(entry OutboxEntry, owner string, lease time.Duration) (OutboxEntry, error) {
 	if owner == "" || lease <= 0 {
 		return OutboxEntry{}, ErrOutboxClaimLease
 	}
-	entry = s.assignID(entry)
 	if s.hasPreparedKey(entry) {
 		return OutboxEntry{}, ErrOutboxPreparedUnresolved
+	}
+	if err := s.assignID(&entry); err != nil {
+		return OutboxEntry{}, err
 	}
 	entry.Prepared = true
 	entry.PreparedOwner = owner
@@ -352,13 +370,13 @@ func NewMemoryOutbox() *MemoryOutbox {
 func (o *MemoryOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	return o.state.enqueue(entry), nil
+	return o.state.enqueue(entry)
 }
 
 func (o *MemoryOutbox) Prepare(entry OutboxEntry) (OutboxEntry, error) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	return o.state.prepare(entry), nil
+	return o.state.prepare(entry)
 }
 
 func (o *MemoryOutbox) Prepared() []OutboxEntry {

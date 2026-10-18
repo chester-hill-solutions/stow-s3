@@ -17,6 +17,11 @@ An outbox intent can propagate only after Stow confirms its local commit.
 A failed local mutation cannot produce a later upstream write.
 Stow processes entries for each key in order.
 Filesystem workers use expiring claims and a filesystem lock to coordinate.
+Enqueue and Prepare create new intents. An ID already in either live queue is
+rejected, even for identical input; Commit finishes an existing prepared intent.
+Custom IDs must not be recycled while stale consumers could refer to the old
+intent. Completed IDs are not retained as an idempotency history.
+Automatic allocation returns an error on ID-sequence exhaustion instead of wrapping.
 
 The write condition uses the upstream validator captured during a read or before the local mutation.
 A confirmed missing key uses an expected-absence condition.

@@ -1,0 +1,24 @@
+{
+  "completed": 7,
+  "total": 7,
+  "last": {
+    "name": "baseline-snapshots-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay",
+      "benchmark/admission-baseline-overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox(SnapshotsOwnValuesAndPreserveOrder|ConcurrentSnapshotsAndWriter|HeldSnapshotsSurviveRecordMutation)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1890,
+    "passed": true
+  }
+}

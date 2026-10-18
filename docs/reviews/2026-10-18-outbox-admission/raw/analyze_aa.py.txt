@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,re,statistics
+p=Path('/private/tmp/stow-outbox-admission-2026-10-18');e=p/('export-'+json.loads((p/'aa-start.json').read_text())['id']);run=json.loads((e/'run.json').read_text());assert run['complete']and run['success'];data=json.loads((e/'comparison-runs.json').read_text());assert data['binarySHA256']['before']==data['binarySHA256']['after'];final=p/('export-'+json.loads((p/'final-start.json').read_text())['id']);assert data['binarySHA256']['after']==json.loads((final/'comparison-runs.json').read_text())['binarySHA256']['after'];rows=[]
+for process in data['runs']:
+ assert process['exitCode']==0;count=0
+ for line in (e/process['log']).read_text().splitlines():
+  m=re.match(r'^BenchmarkOutboxAdmission/file/depth=(0|128)/prepare/explicit-4\s+(\d+)\s+([\d.]+) ns/op\s+(\d+) B/op\s+(\d+) allocs/op$',line)
+  if m:depth,n,ns,b,a=m.groups();rows.append({'label':process['variant'],'run':process['index'],'depth':int(depth),'iterations':int(n),'nsPerOp':float(ns),'bytesPerOp':int(b),'allocsPerOp':int(a)});count+=1
+ assert count==2,(process,count)
+assert len(rows)==16;summary=[]
+for depth in [0,128]:
+ cell={'depth':depth}
+ for label in ['before','after']:
+  values=[r['nsPerOp']for r in rows if r['label']==label and r['depth']==depth];assert len(values)==4;cell[label]={'median':statistics.median(values),'min':min(values),'max':max(values)}
+ cell['timeChangePercent']=(cell['after']['median']/cell['before']['median']-1)*100;summary.append(cell)
+result={'identicalBinary':True,'binarySHA256':data['binarySHA256']['after'],'observations':16,'method':'prepare/explicit','cpu':4,'summary':summary,'samples':rows};(e/'comparison-analysis.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:result[k]for k in ['identicalBinary','observations','summary']},indent=2))

@@ -1,0 +1,37 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkOutboxAdmission/memory/depth=0/enqueue/auto           	 1000000	       330.6 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/enqueue/auto-4         	 1000000	       337.9 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/enqueue/explicit       	 1538475	       207.9 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/enqueue/explicit-4     	 1518354	       259.9 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/prepare/auto           	 1150544	       275.5 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/prepare/auto-4         	 1000000	       362.9 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/prepare/explicit       	 1757959	       200.3 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=0/prepare/explicit-4     	 1808328	       221.0 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/enqueue/auto         	 1168414	       296.8 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/enqueue/auto-4       	 1204184	       312.6 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/enqueue/explicit     	 1785552	       194.2 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/enqueue/explicit-4   	 1611901	       229.4 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/prepare/auto         	 1040233	       329.4 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/prepare/auto-4       	 1000000	       331.1 ns/op	     376 B/op	       3 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/prepare/explicit     	 1722290	       198.4 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/memory/depth=128/prepare/explicit-4   	 1647780	       198.1 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/auto             	     325	   1209372 ns/op	    8754 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/auto-4           	     314	   1243133 ns/op	    8753 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/explicit         	     250	   1253624 ns/op	    8776 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/explicit-4       	     290	   1220006 ns/op	    8775 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/auto             	     310	   1108123 ns/op	    8753 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/auto-4           	     298	   1083783 ns/op	    8715 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/explicit         	     291	   1179254 ns/op	    8775 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/explicit-4       	     310	   1040774 ns/op	    8775 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/auto           	     195	   1845540 ns/op	 1008932 B/op	    6034 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/auto-4         	     194	   1831136 ns/op	 1009114 B/op	    6035 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/explicit       	     188	   2155279 ns/op	 1008895 B/op	    6033 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/explicit-4     	     178	   2175782 ns/op	 1008899 B/op	    6033 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/auto           	     182	   2080856 ns/op	 1008932 B/op	    6034 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/auto-4         	     172	   1831651 ns/op	 1009128 B/op	    6035 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/explicit       	     189	   1933989 ns/op	 1008896 B/op	    6033 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/explicit-4     	     175	   1999806 ns/op	 1008897 B/op	    6033 allocs/op
+PASS

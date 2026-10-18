@@ -1,0 +1,128 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/file_outbox_snapshot_test.go",
+      "internal/runthrough/outbox_admission_sequence_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "baseline-counter-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay",
+      "benchmark/admission-baseline-overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxAdmissionRejectsExhaustedSequence$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1776,
+    "passed": true
+  },
+  {
+    "name": "baseline-counter-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay",
+      "benchmark/admission-baseline-overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxAdmissionRejectsExhaustedSequence$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 3278,
+    "passed": true
+  },
+  {
+    "name": "candidate-counter-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxAdmissionRejectsExhaustedSequence$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1963,
+    "passed": true
+  },
+  {
+    "name": "candidate-counter-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxAdmissionRejectsExhaustedSequence$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4056,
+    "passed": true
+  },
+  {
+    "name": "baseline-snapshots-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay",
+      "benchmark/admission-baseline-overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox(SnapshotsOwnValuesAndPreserveOrder|ConcurrentSnapshotsAndWriter|HeldSnapshotsSurviveRecordMutation)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 718,
+    "passed": true
+  },
+  {
+    "name": "baseline-snapshots-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay",
+      "benchmark/admission-baseline-overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox(SnapshotsOwnValuesAndPreserveOrder|ConcurrentSnapshotsAndWriter|HeldSnapshotsSurviveRecordMutation)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1890,
+    "passed": true
+  }
+]
