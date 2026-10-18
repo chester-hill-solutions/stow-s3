@@ -2,11 +2,10 @@ package fs
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -65,14 +64,9 @@ func (s *FilesystemStore) checkCapacityBinding(path string, binding capacityBind
 	return nil
 }
 
-func resourceFor(path string, data []byte, class string) capacity.Resource {
-	name := sha256.Sum256([]byte(filepath.Clean(path)))
-	version := sha256.Sum256(data)
-	return capacity.Resource{ID: hex.EncodeToString(name[:]), Version: hex.EncodeToString(version[:]), Bytes: int64(len(data)), Class: class}
-}
-
 func (s *FilesystemStore) scanCapacityLocked() (capacity.Usage, error) {
 	usage := capacity.Usage{StoreID: s.saves.id}
+	var buffer []byte
 	err := filepath.WalkDir(s.dataDir, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -86,21 +80,17 @@ func (s *FilesystemStore) scanCapacityLocked() (capacity.Usage, error) {
 		if entry.Name() == storeLockName {
 			return nil
 		}
-		data, err := os.ReadFile(path)
+		resource, err := s.readCapacityResource(path, &buffer)
 		if err != nil {
 			return err
 		}
-		class, err := s.validateCapacityFile(path, data)
-		if err != nil {
-			return err
-		}
-		usage.Resources = append(usage.Resources, resourceFor(path, data, class))
+		usage.Resources = append(usage.Resources, resource)
 		return nil
 	})
 	return usage, err
 }
 
-func (s *FilesystemStore) validateCapacityFile(path string, data []byte) (string, error) {
+func (s *FilesystemStore) validateCapacityFile(path string, file *os.File) (string, error) {
 	rel, err := filepath.Rel(s.dataDir, path)
 	if err != nil {
 		return "", err
@@ -108,7 +98,7 @@ func (s *FilesystemStore) validateCapacityFile(path string, data []byte) (string
 	parts := strings.Split(rel, string(filepath.Separator))
 	switch parts[0] {
 	case "buckets":
-		return s.capacityClassForBucket(path, data, parts)
+		return s.capacityClassForBucket(file, parts)
 	case ".multipart":
 		return capacityClassForMultipart(path, parts)
 	}
@@ -126,17 +116,24 @@ func (s *FilesystemStore) validateCapacityFile(path string, data []byte) (string
 // capacityClassForBucket classifies one file under buckets/. A file this store
 // did not write is refused rather than guessed at, because a scan that skips
 // one under-reports and the budget it feeds then lets more data in.
-func (s *FilesystemStore) capacityClassForBucket(path string, data []byte, parts []string) (string, error) {
+func (s *FilesystemStore) capacityClassForBucket(file *os.File, parts []string) (string, error) {
 	if len(parts) < 3 {
 		return "", capacity.ErrUnknown
 	}
 	if parts[2] == "bucket.json" {
+		data, err := io.ReadAll(file)
+		if err != nil {
+			return "", err
+		}
+		if _, err := file.Seek(0, io.SeekStart); err != nil {
+			return "", err
+		}
 		return capacity.Recovery, validateJSONRecord(data)
 	}
 	if len(parts) < 4 || parts[2] != "objects" {
 		return "", capacity.ErrUnknown
 	}
-	_, err := readObjectHeader(path)
+	_, _, err := readRecordHeader(file)
 	return capacity.Payload, err
 }
 

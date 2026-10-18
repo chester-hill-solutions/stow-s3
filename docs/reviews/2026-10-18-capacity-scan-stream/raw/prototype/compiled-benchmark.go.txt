@@ -1,0 +1,97 @@
+package fs
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"os"
+	"strings"
+	"syscall"
+	"testing"
+)
+
+func BenchmarkCapacityPayloadScan(b *testing.B) {
+	root := os.Getenv("STOW_BENCH_ROOT")
+	if !strings.HasPrefix(root, "/results/") {
+		b.Fatal("Railway volume required")
+	}
+	var disk syscall.Statfs_t
+	if err := syscall.Statfs(root, &disk); err != nil || disk.Type != 61267 {
+		b.Fatalf("ext4 required: %v", err)
+	}
+	for _, kind := range []string{"object", "part"} {
+		for _, size := range []int64{1 << 20, 64 << 20} {
+			for _, stage := range []string{"scan", "bind", "delete"} {
+				b.Run(fmt.Sprintf("kind=%s/size=%d/stage=%s", kind, size, stage), func(b *testing.B) {
+					store, ns, path := capacityPayloadFixture(b, root, kind, size)
+					want := expectedPayloadResource(b, path)
+					if stage != "bind" {
+						if err := store.BindNamespace(ns); err != nil {
+							b.Fatal(err)
+						}
+					}
+					b.ReportAllocs()
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						var err error
+						if stage == "delete" {
+							b.StopTimer()
+							err = store.CreateBucket(context.Background(), "empty")
+							if err != nil {
+								b.Fatal(err)
+							}
+							b.StartTimer()
+						}
+						switch stage {
+						case "scan":
+							_, err = store.scanCapacityLocked()
+						case "bind":
+							err = store.BindNamespace(ns)
+						case "delete":
+							err = store.DeleteBucket(context.Background(), "empty")
+						}
+						if err != nil {
+							b.Fatal(err)
+						}
+					}
+					b.StopTimer()
+					assertPayloadResource(b, store, want)
+					snap, err := ns.Snapshot(context.Background())
+					if err != nil || snap.PayloadBytes != want.Bytes || snap.PendingBytes != 0 {
+						b.Fatalf("wrong charge %+v %v", snap, err)
+					}
+					if stage == "delete" {
+						if _, err := store.HeadBucket(context.Background(), "empty"); !errors.Is(err, storage.ErrBucketNotFound) {
+							b.Fatalf("deletion failed: %v", err)
+						}
+					}
+				})
+			}
+		}
+	}
+	for _, size := range []int64{1 << 20, 64 << 20} {
+		b.Run(fmt.Sprintf("header=%d", size), func(b *testing.B) {
+			store, _, path := capacityPayloadFixture(b, root, "object", size)
+			_ = store
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				record, err := readObjectHeader(path)
+				if err != nil || record.payloadSize != size {
+					b.Fatalf("header=%+v %v", record, err)
+				}
+			}
+		})
+	}
+	b.Run("empty", func(b *testing.B) {
+		store, _ := capacityScanFixture(b, root, 0)
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			if _, err := store.scanCapacityLocked(); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+}

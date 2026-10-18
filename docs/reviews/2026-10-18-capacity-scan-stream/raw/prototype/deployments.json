@@ -1,0 +1,129 @@
+[
+  {
+    "id": "3a2c61df-2837-418b-bae3-4bff53fc6359",
+    "status": "SUCCESS",
+    "createdAt": "2026-10-18T21:13:09.147Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-scan-memory-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Retry identical source after terminal pre-build upload failure",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:7d0dd26d8d10eb8a1056e3b45249aa69d01a112793a7983beaa4d997a85649fa",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  },
+  {
+    "id": "a49b8ef7-a60a-48c2-a950-1dbdeeef2b03",
+    "status": "FAILED",
+    "createdAt": "2026-10-18T21:10:11.322Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-scan-memory-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Measure native capacity-scan memory and reproduce payload materialization before edits",
+      "configErrors": [
+        "Failed to create code snapshot. Please review your last commit, or try again.",
+        "If this error persists, please reach out to the Railway team."
+      ],
+      "logsV2": true,
+      "reason": "deploy",
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  }
+]
