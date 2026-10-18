@@ -1,0 +1,4 @@
+from pathlib import Path
+import subprocess,os,sys
+cli='/Users/ladmin/.npm/_npx/840d6e3429277c8b/node_modules/@railway/cli/bin/railway';env=dict(os.environ,RAILWAY_CALLER='skill:use-railway@1.6.1',RAILWAY_AGENT_SESSION='stow-ledger-fences-20261018');js=Path(sys.argv[1]).read_text();assert len(js.encode())<125000
+q=subprocess.run([cli,'ssh','--project','8d90188e-0f1e-4c47-9379-9399ae06e6fa','--environment','3cd200cb-c94f-4e4d-9335-0f6c1b7e9411','--service','83497842-c51d-420e-8ba1-181589730ad4','--','node','-e',js],env=env,text=True,capture_output=True,timeout=55);print(q.stdout);assert q.returncode==0,q.stderr

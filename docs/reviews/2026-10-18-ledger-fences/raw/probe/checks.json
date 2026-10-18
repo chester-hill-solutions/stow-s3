@@ -1,0 +1,125 @@
+[
+  {
+    "name": "install-capacity-benchmark",
+    "args": [
+      "cp",
+      "benchmark/ledger-fence-bench.go.txt",
+      "internal/capacity/ledger_fence_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 24,
+    "passed": true
+  },
+  {
+    "name": "install-mutation-benchmark",
+    "args": [
+      "cp",
+      "benchmark/mutation-fence-bench.go.txt",
+      "internal/storage/fs/ledger_fence_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  },
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/ledger_fence_bench_test.go",
+      "internal/storage/fs/ledger_fence_bench_test.go",
+      "benchmark/diagnostic-state.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "build-capacity-before",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/capacity-before.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 14882,
+    "passed": true
+  },
+  {
+    "name": "build-capacity-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/diagnostic-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/capacity-after.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 481,
+    "passed": true
+  },
+  {
+    "name": "build-fs-before",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/fs-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3043,
+    "passed": true
+  },
+  {
+    "name": "build-fs-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/diagnostic-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/fs-after.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 873,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/fence-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 103759,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmarks",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_fence_bench_test.go",
+      "internal/storage/fs/ledger_fence_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  }
+]
