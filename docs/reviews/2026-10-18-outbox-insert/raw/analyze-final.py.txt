@@ -1,0 +1,14 @@
+from pathlib import Path
+from collections import Counter
+import json,re,sys
+p=Path('/private/tmp/stow-outbox-insert-2026-10-18');phase='final';d=p/('export-'+json.loads((p/(phase+'-start.json')).read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==14 and all(x['passed']for x in checks)
+result={}
+for mode in ['normal','race']:
+ name='focused-'+mode;text=(d/(name+'.log')).read_text();counts=Counter()
+ for line in text.splitlines():
+  m=re.match(r'\s*--- (PASS|FAIL|SKIP): ((?:TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDuplicateBoundaryAllocation)\S*)',line)
+  if m:counts[(m[1],m[2])]+=1
+ leaves={n for _,n in counts if not any(other.startswith(n+'/')for _,other in counts)};assert len(leaves)==9,(name,len(leaves));assert all(counts.get(('PASS',n))==2 for n in leaves)and not any(s!='PASS'for s,n in counts)
+ rows=[json.loads(x.removeprefix('STOWINSERTBOUNDARY: '))for x in text.splitlines()if x.startswith('STOWINSERTBOUNDARY: ')];assert len(rows)==6 and all(x['extraBytes']<=640 for x in rows)
+ result[name]={'distinctCases':9,'passed':18,'failed':0,'skipped':0,'cases':sorted(leaves),'samples':rows,'allowanceBytes':640,'decodesPerSample':256}
+(d/'green-receipt.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified nine new cases twice per mode and all 14 final gates')

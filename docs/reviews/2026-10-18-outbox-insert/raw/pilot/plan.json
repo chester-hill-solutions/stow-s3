@@ -1,0 +1,110 @@
+{
+  "phase": "outbox-insert-pilot",
+  "sources": [
+    "internal/runthrough/file_outbox_proto_decode.go",
+    "internal/runthrough/outbox_interleaved_identity_test.go",
+    "benchmark/candidate-file_outbox_proto_decode.go.txt",
+    "benchmark/insert-bench.go.txt",
+    "benchmark/decode-file-bench.go.txt",
+    "benchmark/insert-before.json",
+    "benchmark/insert-candidate.json",
+    "benchmark/insert-candidate-test.json",
+    "benchmark/insert-comparison.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_interleaved_identity_test.go",
+        "benchmark/candidate-file_outbox_proto_decode.go.txt",
+        "benchmark/insert-bench.go.txt",
+        "benchmark/decode-file-bench.go.txt"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/insert-candidate-test.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/insert-candidate-test.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/insert-before.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/insert-before.test"
+      ]
+    },
+    {
+      "name": "candidate-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/insert-candidate.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/insert-candidate.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/insert-comparison.mjs"
+      ]
+    }
+  ]
+}

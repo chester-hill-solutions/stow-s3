@@ -1,0 +1,28 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from statistics import median
+import json,re,sys
+p=Path('/private/tmp/stow-outbox-insert-2026-10-18');phase=sys.argv[1]if len(sys.argv)>1 else'boundary';d=p/('export-'+json.loads((p/(phase+'-start.json')).read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==(8 if phase=='boundary'else 5)and all(x['passed']for x in checks);budget=512 if phase=='boundary'else 640;result={}
+for variant in ['before','candidate']:
+ for mode in ['normal','race']:
+  name=variant+'-'+mode;text=(d/(name+'.log')).read_text();counts=Counter(m[1]for line in text.splitlines()if(m:=re.match(r'\s*--- (PASS|FAIL|SKIP): TestOutboxDuplicateBoundaryAllocation/\S+',line)));expected={'PASS':6}if variant=='before'else{'FAIL':6};assert dict(counts)==expected,(name,counts)
+  rows=[json.loads(x.removeprefix('STOWINSERTBOUNDARY: '))for x in text.splitlines()if x.startswith('STOWINSERTBOUNDARY: ')];assert len(rows)==6 and all((x['extraBytes']>budget)==(variant=='candidate')for x in rows)
+  assert text.count('duplicate rejection rebuilt the full small-map prefix')==(6 if variant=='candidate'else 0)
+  result[name]={'counts':dict(counts),'samples':rows,'allowanceBytes':budget,'decodesPerSample':64 if phase=='boundary'else 256}
+(d/'boundary-receipt.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified baseline passes and only the candidate allocation guard fails twice per mode at budget',budget)
+if phase!='boundary':raise SystemExit()
+commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==8;samples=[];cells=defaultdict(lambda:defaultdict(list))
+for c in commands['runs']:
+ assert c['exitCode']==0 and c['signal']is None and c['sha256']==commands['binarySHA256'][c['variant']];rows=[]
+ for line in(d/c['log']).read_text().splitlines():
+  m=re.match(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$',line)
+  if m:
+   parts=m[3].split();row={'name':m[1],'iterations':int(m[2]),'index':c['index'],'variant':c['variant'],'log':c['log'],**{parts[i+1]:float(parts[i])for i in range(0,len(parts),2)}};rows.append(row);samples.append(row);cells[m[1]][c['variant']].append(row)
+ assert len(rows)==6
+assert len(samples)==48 and len(cells)==6;summary=[]
+for name,v in sorted(cells.items()):
+ assert set(v)=={'before','candidate'}and all(len(z)==4 for z in v.values());stats={}
+ for label,rows in v.items():stats[label]={m:median(x[m]for x in rows)for m in ['ns/op','B/op','allocs/op']};stats[label].update(nsMin=min(x['ns/op']for x in rows),nsMax=max(x['ns/op']for x in rows))
+ summary.append({'name':name,**stats,'timeDeltaPercent':(stats['candidate']['ns/op']/stats['before']['ns/op']-1)*100,'byteDeltaPercent':(stats['candidate']['B/op']/stats['before']['B/op']-1)*100,'allocDeltaPercent':(stats['candidate']['allocs/op']/stats['before']['allocs/op']-1)*100})
+(d/'comparison-analysis.json').write_text(json.dumps({'observations':48,'comparisons':summary,'samples':samples},indent=2)+'\n')
+for x in summary:print(x['name'],'time%=',round(x['timeDeltaPercent'],2),'bytes',x['before']['B/op'],'->',x['candidate']['B/op'],'objects',x['before']['allocs/op'],'->',x['candidate']['allocs/op'])

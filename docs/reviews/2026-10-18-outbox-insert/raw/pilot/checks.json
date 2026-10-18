@@ -1,0 +1,128 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_interleaved_identity_test.go",
+      "benchmark/candidate-file_outbox_proto_decode.go.txt",
+      "benchmark/insert-bench.go.txt",
+      "benchmark/decode-file-bench.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 24,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 24717,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 42000,
+    "passed": true
+  },
+  {
+    "name": "candidate-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2267,
+    "passed": true
+  },
+  {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxInterleavedDuplicateRecovery|TestOutboxDecode|TestFileOutboxDuplicateFlood|TestOutboxProtoRejectsDuplicate|TestFileOutboxRefusesDuplicate)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7010,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-before.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/insert-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2122,
+    "passed": true
+  },
+  {
+    "name": "candidate-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-candidate.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/insert-candidate.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2120,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/insert-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 101292,
+    "passed": true
+  }
+]

@@ -1,0 +1,92 @@
+package runthrough
+
+import (
+	"fmt"
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb"
+	"google.golang.org/protobuf/proto"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+var insertStateSink outboxState
+var insertErrorSink error
+
+func insertBenchFrame(b *testing.B, field string, keyBytes, depth int, duplicate bool) []byte {
+	b.Helper()
+	m := &outboxpb.Outbox{Version: outboxProtoVersion}
+	prefix := strings.Repeat("x", keyBytes-12)
+	for n := 0; n < depth; n++ {
+		id := fmt.Sprintf("%s-%011d", prefix, n)
+		if field == "provenance" {
+			m.Provenance = append(m.Provenance, &outboxpb.Provenance{Identity: outboxIdentity("bucket", id), Etag: "validator"})
+		} else {
+			e := &outboxpb.Entry{Identity: id, Id: id, Operation: "put", Bucket: "bucket", Key: id, Version: "version", Prepared: field == "prepared"}
+			if field == "entries" {
+				m.Entries = append(m.Entries, e)
+			} else {
+				m.Prepared = append(m.Prepared, e)
+			}
+		}
+	}
+	if duplicate {
+		if field == "provenance" {
+			v := proto.Clone(m.Provenance[depth/2]).(*outboxpb.Provenance)
+			v.Etag = "replacement"
+			m.Provenance = append(m.Provenance, v)
+		} else {
+			records := m.Entries
+			if field == "prepared" {
+				records = m.Prepared
+			}
+			v := proto.Clone(records[depth/2]).(*outboxpb.Entry)
+			v.Version = "replacement"
+			records = append(records, v)
+			if field == "entries" {
+				m.Entries = records
+			} else {
+				m.Prepared = records
+			}
+		}
+	}
+	payload, err := proto.Marshal(m)
+	if err != nil {
+		b.Fatal(err)
+	}
+	return decodeFrame(payload)
+}
+func benchmarkOutboxInsert(b *testing.B, field string, keyBytes, depth int, reject bool) {
+	frame := insertBenchFrame(b, field, keyBytes, depth, reject)
+	want, wantErr := referenceDecodeOutboxProto(frame)
+	if (wantErr != nil) != reject {
+		b.Fatalf("fixture error: %v", wantErr)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		insertStateSink, insertErrorSink = decodeOutboxProto(frame)
+	}
+	b.StopTimer()
+	b.ReportMetric(float64(len(frame)), "frame-B")
+	if decodeErrorClass(insertErrorSink) != decodeErrorClass(wantErr) || !reflect.DeepEqual(insertStateSink, want) {
+		b.Fatalf("insert changed state/error: %v", insertErrorSink)
+	}
+	insertStateSink = outboxState{}
+	insertErrorSink = nil
+}
+func BenchmarkOutboxInsertDecode(b *testing.B) {
+	for _, field := range []string{"provenance", "entries", "prepared"} {
+		for _, size := range []int{16, 1024} {
+			b.Run(fmt.Sprintf("field=%s/key=%d", field, size), func(b *testing.B) { benchmarkOutboxInsert(b, field, size, 4096, false) })
+		}
+	}
+}
+func BenchmarkOutboxInsertReject(b *testing.B) {
+	for _, field := range []string{"provenance", "entries", "prepared"} {
+		for _, size := range []int{16, 1024} {
+			for _, depth := range []int{1, 8, 129} {
+				b.Run(fmt.Sprintf("field=%s/key=%d/prefix=%d", field, size, depth), func(b *testing.B) { benchmarkOutboxInsert(b, field, size, depth, true) })
+			}
+		}
+	}
+}
