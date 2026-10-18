@@ -1,0 +1,26 @@
+from pathlib import Path
+from collections import Counter
+import re,json
+p=Path('/private/tmp/stow-outbox-decode-2026-10-18');d=p/('export-'+json.loads((p/'final-start.json').read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==14 and all(x['passed']for x in checks)
+rx=re.compile(r'^--- (PASS|FAIL|SKIP): ((?:TestOutboxDecode|TestFileOutboxDuplicateFlood)\S*)');result={}
+for variant in ['focused']:
+ for mode in ['normal','race']:
+  name=variant+'-'+mode;text=(d/(name+'.log')).read_text();counts=Counter()
+  for line in text.splitlines():
+   m=rx.match(line.strip())
+   if m:counts[(m[1],m[2])]+=1
+  leaves={n for _,n in counts if not any(other.startswith(n+'/')for _,other in counts)}
+  summary={s:sum(counts.get((s,n),0)for n in leaves)for s in ['PASS','FAIL','SKIP']};assert len(leaves)==34,(name,len(leaves));assert summary=={'PASS':68,'FAIL':0,'SKIP':0},(name,summary)
+  assert text.count('STOWMUTATION: cases=6000 seed=81173')==2 and text.count('STOWFIELDORDER: cases=2000 seed=81174')==2
+  samples=[json.loads(line.removeprefix('STOWDECODEFLOOD: '))for line in text.splitlines()if line.startswith('STOWDECODEFLOOD: ')];assert len(samples)==6 and all((x['allocatedBytes']>1<<20)==(variant=='before')for x in samples)
+  result[name]={'distinctCases':34,'counts':summary,'samples':samples,'mutationsPerRun':6000,'fieldOrdersPerRun':2000,'repeats':2,'cases':sorted(leaves)}
+(d/'green-receipt.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified 34 focused cases twice per mode and all 14 final checks')
+
+env=json.loads((d/'environment.json').read_text());confirmed=json.loads((p/'export-5a336dd2-7366-4176-b647-47ec3f427657/environment.json').read_text())['sourceSHA256'];import hashlib,subprocess
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow')
+for n,h in env['sourceSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n in ['file_outbox_proto.go','file_outbox_proto_decode.go']:assert env['sourceSHA256']['internal/runthrough/'+n]==confirmed['benchmark/candidate-'+n+'.txt']
+a=subprocess.check_output(['git','show',json.loads((p/'baseline.json').read_text())['base']+':internal/runthrough/file_outbox_proto.go'],cwd=r);b=(r/'internal/runthrough/file_outbox_proto.go').read_bytes()
+assert a[:a.index(b'func decodeOutboxProto(')]==b[:b.index(b'func decodeOutboxProto(')]
+assert a[a.index(b'func decodeOutboxProtoEntry('):]==b[b.index(b'func decodeOutboxProtoEntry('):]
+print('Verified exact measured source, unchanged encoder and entry-decoder/normalization')

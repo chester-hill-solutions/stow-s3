@@ -1,0 +1,44 @@
+File: decode-before.test
+Build ID: 4d7ea1b106cb3c1d6bea8b46b3dddc2c51e9864f
+Type: cpu
+Time: 2026-10-18 12:28:47 UTC
+Duration: 4.73s, Total samples = 4.52s (95.60%)
+Showing nodes accounting for 3.55s, 78.54% of 4.52s total
+Dropped 103 nodes (cum <= 0.02s)
+Showing top 35 nodes out of 133
+      flat  flat%   sum%        cum   cum%
+     0.46s 10.18% 10.18%      2.51s 55.53%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.40s  8.85% 19.03%      1.04s 23.01%  runtime.scanobject
+     0.21s  4.65% 23.67%      0.39s  8.63%  runtime.findObject
+     0.16s  3.54% 27.21%      0.16s  3.54%  runtime.duffcopy
+     0.16s  3.54% 30.75%      0.33s  7.30%  runtime.mallocgcTiny
+     0.16s  3.54% 34.29%      0.16s  3.54%  unicode/utf8.Valid
+     0.15s  3.32% 37.61%      0.15s  3.32%  runtime.(*mspan).base (inline)
+     0.14s  3.10% 40.71%      0.14s  3.10%  runtime.nextFreeFast (inline)
+     0.12s  2.65% 43.36%      1.26s 27.88%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+     0.10s  2.21% 45.58%      0.10s  2.21%  time.leadingInt[go.shape.string] (inline)
+     0.09s  1.99% 47.57%      0.09s  1.99%  runtime.(*mspan).writeHeapBitsSmall
+     0.09s  1.99% 49.56%      1.95s 43.14%  runtime.mallocgc
+     0.09s  1.99% 51.55%      0.10s  2.21%  runtime.spanOf (inline)
+     0.08s  1.77% 53.32%      0.08s  1.77%  google.golang.org/protobuf/encoding/protowire.ConsumeBytes
+     0.08s  1.77% 55.09%      0.19s  4.20%  runtime.mallocgcSmallNoscan
+     0.07s  1.55% 56.64%      0.18s  3.98%  runtime.greyobject
+     0.07s  1.55% 58.19%      0.08s  1.77%  sync/atomic.StorePointer
+     0.07s  1.55% 59.73%      0.07s  1.55%  time.parseRFC3339[go.shape.string].func1 (inline)
+     0.06s  1.33% 61.06%      0.06s  1.33%  memeqbody
+     0.06s  1.33% 62.39%      0.06s  1.33%  runtime.(*mspan).heapBitsSmallForAddr
+     0.06s  1.33% 63.72%      0.10s  2.21%  runtime.(*sweepLocked).sweep
+     0.06s  1.33% 65.04%      0.06s  1.33%  runtime.madvise
+     0.06s  1.33% 66.37%      0.06s  1.33%  runtime.memclrNoHeapPointers
+     0.06s  1.33% 67.70%      0.07s  1.55%  runtime.typePointers.next
+     0.05s  1.11% 68.81%      0.05s  1.11%  runtime.(*mspan).divideByElemSize (inline)
+     0.05s  1.11% 69.91%      0.54s 11.95%  runtime.mallocgcSmallScanNoHeader
+     0.05s  1.11% 71.02%      0.05s  1.11%  runtime.memmove
+     0.05s  1.11% 72.12%      0.90s 19.91%  runtime.slicebytetostring
+     0.05s  1.11% 73.23%      0.14s  3.10%  runtime.sweepone
+     0.04s  0.88% 74.12%      0.04s  0.88%  aeshashbody
+     0.04s  0.88% 75.00%      0.36s  7.96%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoEntry
+     0.04s  0.88% 75.88%      0.04s  0.88%  runtime.(*fixalloc).alloc
+     0.04s  0.88% 76.77%      0.55s 12.17%  runtime.mapassign
+     0.04s  0.88% 77.65%      0.04s  0.88%  runtime.typePointers.nextFast (inline)
+     0.04s  0.88% 78.54%      0.04s  0.88%  time.isDigit[go.shape.string] (inline)

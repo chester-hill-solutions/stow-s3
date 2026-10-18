@@ -1,0 +1,38 @@
+from pathlib import Path
+import json,subprocess,hashlib,shutil
+p=Path('/private/tmp/stow-outbox-decode-2026-10-18');old=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True)
+files=[n for n in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if n]+['internal/runthrough/outbox_decode_resource_test.go']
+for name in files:
+ f=r/name
+ if f.is_file():dest=c/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dest)
+b=c/'benchmark';b.mkdir(exist_ok=True)
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/name,b/name)
+z=b/'validation-previous-baselines';z.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:shutil.copy2(r/'scripts/baselines'/name,z/name)
+for name in ['control.py','export.py','remote.py','watch.py']:(p/name).write_text((old/name).read_text().replace(str(old),str(p)).replace('stow-outbox-proto-blocks-20261018','stow-outbox-decode-20261018'))
+(b/'decode-profile-bench.go.txt').write_text('''package runthrough
+import("fmt";"reflect";"testing";"time")
+var decodeProfileSink outboxState
+func decodeProfileFixture(depth int, rich bool) outboxState {
+ if rich {return protoBlockFixture(depth,true)}
+ s:=newOutboxState()
+ for n:=0;n<depth;n++ {
+  id:=fmt.Sprintf("active-%08d",n);s.entries[id]=OutboxEntry{ID:id,Operation:OutboxPut,Bucket:"bucket",Key:id,Version:"retained-version",CreatedAt:time.Unix(100+int64(n),int64(n)).UTC()}
+  id=fmt.Sprintf("prepared-%08d",n);s.prepared[id]=OutboxEntry{ID:id,Prepared:true,Operation:OutboxPut,Bucket:"bucket",Key:id,CreatedAt:time.Unix(100+int64(n),int64(n)).UTC()}
+ }
+ return s
+}
+func BenchmarkOutboxDecodeProfile(b *testing.B){
+ for _,rich:=range []bool{false,true}{b.Run(fmt.Sprintf("rich=%t",rich),func(b *testing.B){
+  state:=decodeProfileFixture(4096,rich);data,err:=encodeOutboxProto(state);if err!=nil{b.Fatal(err)}
+  b.ReportAllocs();b.ResetTimer();for n:=0;n<b.N;n++ {decodeProfileSink,err=decodeOutboxProto(data);if err!=nil{b.Fatal(err)}};b.StopTimer();b.ReportMetric(float64(len(data)),"frame-B");if !reflect.DeepEqual(decodeProfileSink,state){b.Fatal("profile fixture changed")};decodeProfileSink=outboxState{}
+ })}
+}
+''')
+(b/'decode-profile.json').write_text(json.dumps({'Replace':{'/app/internal/runthrough/diagnostic_decode_profile_bench_test.go':'/app/benchmark/decode-profile-bench.go.txt'}},indent=2)+'\n')
+manifest={n:hashlib.sha256((c/n).read_bytes()).hexdigest()for n in files if(c/n).is_file()}
+for f in [p/'source-manifest.json',b/'validation-input-manifest.json']:f.write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({k:subprocess.check_output(['git','rev-parse',v],cwd=r).decode().strip()for k,v in [('base','HEAD'),('origin_main','origin/main')]},indent=2)+'\n')
+sources=['internal/runthrough/file_outbox_proto.go','internal/runthrough/outbox_decode_resource_test.go','benchmark/decode-profile-bench.go.txt','benchmark/decode-profile.json','benchmark/decode-profiles.mjs'];steps=[{'name':'format','args':['gofmt','-w',*sources[1:3]]},{'name':'resource-normal','args':['go','test','./internal/runthrough','-run','^TestOutboxDecodeRejectsDuplicateFloodWithinBudget$','-count=2','-v'],'expected':1},{'name':'resource-race','args':['go','test','-race','./internal/runthrough','-run','^TestOutboxDecodeRejectsDuplicateFloodWithinBudget$','-count=2','-v'],'expected':1},{'name':'build','args':['go','test','-overlay=benchmark/decode-profile.json','-c','./internal/runthrough','-o','benchmark/decode-before.test']},{'name':'profiles','args':['node','benchmark/decode-profiles.mjs']}]
+plan={'phase':'outbox-decode-before','sources':sources,'steps':steps};(p/'before-plan.json').write_text(json.dumps(plan,indent=2)+'\n');(b/'active-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+print('Prepared original-code resource reproduction and allocation/CPU profiling plan')

@@ -1,0 +1,1 @@
+const fs=require('node:fs');for(const name of ['resource-normal.log','resource-race.log']){const t=fs.readFileSync('/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/'+name,'utf8');console.log(name,t.split('\n').filter(l=>l.startsWith('STOWDECODEFLOOD:')||l.startsWith('--- FAIL:')).join('\n'));}

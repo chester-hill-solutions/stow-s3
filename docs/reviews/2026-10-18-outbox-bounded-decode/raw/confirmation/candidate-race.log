@@ -1,0 +1,160 @@
+=== RUN   TestOutboxDecodeRecordEquivalence
+=== RUN   TestOutboxDecodeRecordEquivalence/scalar-truncation
+=== RUN   TestOutboxDecodeRecordEquivalence/wrong-wire
+=== RUN   TestOutboxDecodeRecordEquivalence/root-group
+=== RUN   TestOutboxDecodeRecordEquivalence/last-version
+=== RUN   TestOutboxDecodeRecordEquivalence/utf8-after-time-error
+=== RUN   TestOutboxDecodeRecordEquivalence/format-after-time-error
+=== RUN   TestOutboxDecodeRecordEquivalence/provenance-priority
+=== RUN   TestOutboxDecodeRecordEquivalence/duplicate-child-scalar
+=== RUN   TestOutboxDecodeRecordEquivalence/single-empty
+=== RUN   TestOutboxDecodeRecordEquivalence/empty
+=== RUN   TestOutboxDecodeRecordEquivalence/late-version
+=== RUN   TestOutboxDecodeRecordEquivalence/duplicate
+=== RUN   TestOutboxDecodeRecordEquivalence/root-unknown-before-duplicate
+=== RUN   TestOutboxDecodeRecordEquivalence/malformed-after-duplicate
+--- PASS: TestOutboxDecodeRecordEquivalence (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/scalar-truncation (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/wrong-wire (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/root-group (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/last-version (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/utf8-after-time-error (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/format-after-time-error (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/provenance-priority (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/duplicate-child-scalar (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/single-empty (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/empty (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/late-version (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/duplicate (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/root-unknown-before-duplicate (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/malformed-after-duplicate (0.00s)
+=== RUN   TestOutboxDecodeMutationEquivalence
+STOWMUTATION: cases=6000 seed=81173
+--- PASS: TestOutboxDecodeMutationEquivalence (0.22s)
+=== RUN   TestOutboxDecodeFieldOrderEquivalence
+STOWFIELDORDER: cases=2000 seed=81174
+--- PASS: TestOutboxDecodeFieldOrderEquivalence (0.05s)
+=== RUN   TestOutboxDecodeGroupDepthEquivalence
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-0
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-0
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-1
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-1
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-100
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-100
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-9998
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-9998
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-9999
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-9999
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-10000
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-10000
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-10001
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-10001
+--- PASS: TestOutboxDecodeGroupDepthEquivalence (0.02s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-0 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-0 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-1 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-1 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-100 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-100 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-9998 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-9998 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-9999 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-9999 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-10000 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-10000 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-10001 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-10001 (0.00s)
+=== RUN   TestFileOutboxDuplicateFloodPreservesRecovery
+--- PASS: TestFileOutboxDuplicateFloodPreservesRecovery (0.04s)
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget/provenance
+STOWDECODEFLOOD: {"collection":"provenance","frameBytes":65550,"allocatedBytes":1400}
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget/entries
+STOWDECODEFLOOD: {"collection":"entries","frameBytes":65550,"allocatedBytes":1912}
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget/prepared
+STOWDECODEFLOOD: {"collection":"prepared","frameBytes":65550,"allocatedBytes":2216}
+--- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget (0.10s)
+    --- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget/provenance (0.03s)
+    --- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget/entries (0.04s)
+    --- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget/prepared (0.03s)
+=== RUN   TestOutboxDecodeRecordEquivalence
+=== RUN   TestOutboxDecodeRecordEquivalence/last-version
+=== RUN   TestOutboxDecodeRecordEquivalence/root-unknown-before-duplicate
+=== RUN   TestOutboxDecodeRecordEquivalence/malformed-after-duplicate
+=== RUN   TestOutboxDecodeRecordEquivalence/provenance-priority
+=== RUN   TestOutboxDecodeRecordEquivalence/wrong-wire
+=== RUN   TestOutboxDecodeRecordEquivalence/root-group
+=== RUN   TestOutboxDecodeRecordEquivalence/duplicate-child-scalar
+=== RUN   TestOutboxDecodeRecordEquivalence/single-empty
+=== RUN   TestOutboxDecodeRecordEquivalence/empty
+=== RUN   TestOutboxDecodeRecordEquivalence/late-version
+=== RUN   TestOutboxDecodeRecordEquivalence/duplicate
+=== RUN   TestOutboxDecodeRecordEquivalence/utf8-after-time-error
+=== RUN   TestOutboxDecodeRecordEquivalence/format-after-time-error
+=== RUN   TestOutboxDecodeRecordEquivalence/scalar-truncation
+--- PASS: TestOutboxDecodeRecordEquivalence (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/last-version (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/root-unknown-before-duplicate (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/malformed-after-duplicate (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/provenance-priority (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/wrong-wire (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/root-group (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/duplicate-child-scalar (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/single-empty (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/empty (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/late-version (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/duplicate (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/utf8-after-time-error (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/format-after-time-error (0.00s)
+    --- PASS: TestOutboxDecodeRecordEquivalence/scalar-truncation (0.00s)
+=== RUN   TestOutboxDecodeMutationEquivalence
+STOWMUTATION: cases=6000 seed=81173
+--- PASS: TestOutboxDecodeMutationEquivalence (0.22s)
+=== RUN   TestOutboxDecodeFieldOrderEquivalence
+STOWFIELDORDER: cases=2000 seed=81174
+--- PASS: TestOutboxDecodeFieldOrderEquivalence (0.06s)
+=== RUN   TestOutboxDecodeGroupDepthEquivalence
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-0
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-0
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-1
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-1
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-100
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-100
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-9998
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-9998
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-9999
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-9999
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-10000
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-10000
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/root-10001
+=== RUN   TestOutboxDecodeGroupDepthEquivalence/entry-10001
+--- PASS: TestOutboxDecodeGroupDepthEquivalence (0.03s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-0 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-0 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-1 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-1 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-100 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-100 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-9998 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-9998 (0.01s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-9999 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-9999 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-10000 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-10000 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/root-10001 (0.00s)
+    --- PASS: TestOutboxDecodeGroupDepthEquivalence/entry-10001 (0.00s)
+=== RUN   TestFileOutboxDuplicateFloodPreservesRecovery
+--- PASS: TestFileOutboxDuplicateFloodPreservesRecovery (0.04s)
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget/provenance
+STOWDECODEFLOOD: {"collection":"provenance","frameBytes":65550,"allocatedBytes":1656}
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget/entries
+STOWDECODEFLOOD: {"collection":"entries","frameBytes":65550,"allocatedBytes":1912}
+=== RUN   TestOutboxDecodeRejectsDuplicateFloodWithinBudget/prepared
+STOWDECODEFLOOD: {"collection":"prepared","frameBytes":65550,"allocatedBytes":2216}
+--- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget (0.10s)
+    --- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget/provenance (0.03s)
+    --- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget/entries (0.03s)
+    --- PASS: TestOutboxDecodeRejectsDuplicateFloodWithinBudget/prepared (0.03s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	1.893s

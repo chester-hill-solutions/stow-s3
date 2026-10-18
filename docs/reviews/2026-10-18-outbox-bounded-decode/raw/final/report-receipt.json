@@ -1,0 +1,46 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-bounded-decode.md": "fabdad52484d5239a79b53921efe4d3432d4e8c10f3b97eb448d65579594f084"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox_proto.go": "db9c3633a2e48cd8e0a063e7a2d64e0619b7315e49e6536eb5d8d743fe4b86c8",
+    "internal/runthrough/file_outbox_proto_decode.go": "530d7adcf647401e051dc56894a267f1e6419900f769549e6892ba0610af9b04",
+    "internal/runthrough/outbox_decode_resource_test.go": "247aaa0702b9e16e6b89a2df1ae4751a5d38223717b768607ac16af307ca93f5",
+    "internal/runthrough/outbox_decode_reference_test.go": "6fb696a392867d78c3d81bc19b2759f8a72794c5493c743a17461dd4824eba95",
+    "internal/runthrough/outbox_decode_equivalence_test.go": "ed5fd5bdc96e8a0ca53e29cc8a0a0105b19aeb703dc6f9f355b204c28ef84445",
+    "internal/runthrough/outbox_decode_recovery_test.go": "76ec590bfd1c272852bbfc9eaca006aabaab7409ff27aaed41db32ac4914cbf0"
+  },
+  "railwayDeploymentId": "0c2710b0-fe71-4fa7-b98d-bdb44ed287de"
+}

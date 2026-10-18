@@ -1,0 +1,161 @@
+package runthrough
+
+import (
+	"encoding/binary"
+	"errors"
+	"fmt"
+	"google.golang.org/protobuf/encoding/protowire"
+	"google.golang.org/protobuf/proto"
+	"math/rand"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+)
+
+func decodeFrame(payload []byte) []byte {
+	result := make([]byte, outboxProtoPrefixSize, len(payload)+outboxProtoPrefixSize)
+	copy(result, outboxProtoMagic)
+	binary.LittleEndian.PutUint32(result[len(outboxProtoMagic):], uint32(len(payload)))
+	return append(result, payload...)
+}
+func decodeField(number protowire.Number, payload []byte) []byte {
+	return protowire.AppendBytes(protowire.AppendTag(nil, number, protowire.BytesType), payload)
+}
+func decodeVarint(number protowire.Number, value uint64) []byte {
+	return protowire.AppendVarint(protowire.AppendTag(nil, number, protowire.VarintType), value)
+}
+func decodeErrorClass(err error) string {
+	if err == nil {
+		return "ok"
+	}
+	if errors.Is(err, ErrOutboxFormatVersion) {
+		return "format"
+	}
+	if errors.Is(err, proto.Error) {
+		return "wire"
+	}
+	var stamp *time.ParseError
+	if errors.As(err, &stamp) {
+		return "timestamp"
+	}
+	text := err.Error()
+	for _, kind := range []string{"duplicate outbox provenance", "duplicate outbox entry", "both prepared and active", "does not match ID", "attempt count"} {
+		if strings.Contains(text, kind) {
+			return kind
+		}
+	}
+	return text
+}
+func checkDecodeEquivalent(t *testing.T, data []byte) {
+	t.Helper()
+	want, oldErr := referenceDecodeOutboxProto(data)
+	got, err := decodeOutboxProto(data)
+	if decodeErrorClass(err) != decodeErrorClass(oldErr) {
+		t.Fatalf("error changed: old=%v new=%v bytes=%x", oldErr, err, data)
+	}
+	if err == nil && !reflect.DeepEqual(got, want) {
+		t.Fatalf("decoded state changed: bytes=%x", data)
+	}
+	if err != nil && (got.entries != nil || got.prepared != nil || got.provenance != nil) {
+		t.Fatal("partial state escaped failed decode")
+	}
+}
+func TestOutboxDecodeRecordEquivalence(t *testing.T) {
+	version := decodeVarint(1, outboxProtoVersion)
+	entry := append(decodeField(1, []byte("entry")), decodeField(2, []byte("entry"))...)
+	duplicate := append(decodeField(3, entry), decodeField(3, entry)...)
+	invalidTime := append(append([]byte(nil), entry...), decodeField(13, []byte("invalid-date"))...)
+	invalidText := append(append([]byte(nil), entry...), decodeField(5, []byte{255})...)
+	childUnknown := append(append([]byte(nil), entry...), decodeVarint(99, 1)...)
+	fixtures := map[string][]byte{
+		"empty":                         version,
+		"late-version":                  append(decodeField(3, entry), version...),
+		"last-version":                  append(append(decodeVarint(1, 99), decodeField(3, entry)...), version...),
+		"duplicate":                     append(append([]byte(nil), version...), duplicate...),
+		"root-unknown-before-duplicate": append(append(append([]byte(nil), version...), decodeVarint(99, 1)...), duplicate...),
+		"malformed-after-duplicate":     append(append(append([]byte(nil), version...), duplicate...), 255),
+		"utf8-after-time-error":         append(append(append([]byte(nil), version...), decodeField(3, invalidTime)...), decodeField(4, invalidText)...),
+		"format-after-time-error":       append(append(append([]byte(nil), version...), decodeField(3, invalidTime)...), decodeField(4, childUnknown)...),
+		"provenance-priority":           append(append(append([]byte(nil), version...), decodeField(3, invalidTime)...), append(decodeField(2, nil), decodeField(2, nil)...)...),
+		"scalar-truncation":             append(append(append([]byte(nil), version...), decodeVarint(1, uint64(1)<<32|outboxProtoVersion)...), decodeVarint(5, ^uint64(0))...),
+		"wrong-wire":                    append(append([]byte(nil), version...), decodeVarint(3, 1)...),
+		"root-group":                    append(append([]byte(nil), version...), []byte{0x4b, 0x4c}...),
+		"duplicate-child-scalar":        append(append([]byte(nil), version...), decodeField(3, append(decodeField(1, []byte("ignored")), entry...))...),
+		"single-empty":                  append(append([]byte(nil), version...), decodeField(3, nil)...),
+	}
+	for name, data := range fixtures {
+		t.Run(name, func(t *testing.T) { checkDecodeEquivalent(t, decodeFrame(data)) })
+	}
+}
+func TestOutboxDecodeMutationEquivalence(t *testing.T) {
+	var seeds [][]byte
+	for _, state := range []outboxState{newOutboxState(), protoOutboxFixture(), protoBlockFixture(2, true)} {
+		data, err := encodeOutboxProto(state)
+		if err != nil {
+			t.Fatal(err)
+		}
+		seeds = append(seeds, data[outboxProtoPrefixSize:])
+	}
+	random := rand.New(rand.NewSource(81173))
+	for n := 0; n < 6000; n++ {
+		source := seeds[n%len(seeds)]
+		data := append([]byte(nil), source...)
+		index := random.Intn(len(data) + 1)
+		switch n % 4 {
+		case 0:
+			if index < len(data) {
+				data[index] ^= byte(1 << random.Intn(8))
+			}
+		case 1:
+			data = data[:index]
+		case 2:
+			data = append(append(append([]byte(nil), data[:index]...), byte(random.Intn(256))), data[index:]...)
+		case 3:
+			if index < len(data) {
+				data = append(data[:index], data[index+1:]...)
+			}
+		}
+		checkDecodeEquivalent(t, decodeFrame(data))
+	}
+	fmt.Println("STOWMUTATION: cases=6000 seed=81173")
+}
+
+func TestOutboxDecodeFieldOrderEquivalence(t *testing.T) {
+	version := decodeVarint(1, outboxProtoVersion)
+	entry := append(decodeField(1, []byte("entry")), decodeField(2, []byte("entry"))...)
+	choices := [][]byte{version, decodeVarint(1, 99), decodeVarint(5, ^uint64(0)), decodeVarint(6, 73), decodeVarint(99, 1), decodeVarint(3, 1)}
+	for _, field := range []protowire.Number{2, 3, 4} {
+		for _, payload := range [][]byte{nil, entry, append(append([]byte(nil), entry...), decodeField(13, []byte("bad-date"))...), append(append([]byte(nil), entry...), decodeField(5, []byte{255})...), append(append([]byte(nil), entry...), decodeVarint(99, 1)...)} {
+			choices = append(choices, decodeField(field, payload))
+		}
+	}
+	random := rand.New(rand.NewSource(81174))
+	for n := 0; n < 2000; n++ {
+		var payload []byte
+		for count := 1 + random.Intn(12); count > 0; count-- {
+			payload = append(payload, choices[random.Intn(len(choices))]...)
+		}
+		checkDecodeEquivalent(t, decodeFrame(payload))
+	}
+	fmt.Println("STOWFIELDORDER: cases=2000 seed=81174")
+}
+
+func TestOutboxDecodeGroupDepthEquivalence(t *testing.T) {
+	version := decodeVarint(1, outboxProtoVersion)
+	for _, depth := range []int{0, 1, 100, 9998, 9999, 10000, 10001} {
+		var group []byte
+		for n := 0; n < depth; n++ {
+			group = protowire.AppendTag(group, 99, protowire.StartGroupType)
+		}
+		for n := 0; n < depth; n++ {
+			group = protowire.AppendTag(group, 99, protowire.EndGroupType)
+		}
+		t.Run(fmt.Sprintf("root-%d", depth), func(t *testing.T) {
+			checkDecodeEquivalent(t, decodeFrame(append(append([]byte(nil), version...), group...)))
+		})
+		t.Run(fmt.Sprintf("entry-%d", depth), func(t *testing.T) {
+			checkDecodeEquivalent(t, decodeFrame(append(append([]byte(nil), version...), decodeField(3, group)...)))
+		})
+	}
+}

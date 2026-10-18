@@ -1,0 +1,15 @@
+from pathlib import Path
+import json,base64,shutil
+p=Path('/private/tmp/stow-outbox-decode-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');b=p/'context/benchmark';updates={}
+for name in ['candidate-file_outbox_proto.go.txt','candidate-file_outbox_proto_decode.go.txt']:updates['benchmark/'+name]=(p/name).read_bytes()
+for name in ['outbox_decode_reference_test.go','outbox_decode_equivalence_test.go']:updates['internal/runthrough/'+name]=(r/'internal/runthrough'/name).read_bytes()
+overlay={'Replace':{'/app/internal/runthrough/file_outbox_proto.go':'/app/benchmark/candidate-file_outbox_proto.go.txt','/app/internal/runthrough/file_outbox_proto_decode.go':'/app/benchmark/candidate-file_outbox_proto_decode.go.txt','/app/internal/runthrough/diagnostic_decode_profile_bench_test.go':'/app/benchmark/decode-profile-bench.go.txt'}};updates['benchmark/decode-candidate.json']=(json.dumps(overlay,indent=2)+'\n').encode()
+sources=['internal/runthrough/file_outbox_proto.go','internal/runthrough/outbox_decode_resource_test.go',*['internal/runthrough/'+n for n in ['outbox_decode_reference_test.go','outbox_decode_equivalence_test.go']],*['benchmark/'+n for n in ['candidate-file_outbox_proto.go.txt','candidate-file_outbox_proto_decode.go.txt','decode-candidate.json']]]
+steps=[{'name':'format','args':['gofmt','-w',*sources[2:6]]}]
+focus='^(TestOutboxDecode|TestOutboxProto|TestFileOutbox)'
+for variant in ['before','candidate']:
+ for race in [False,True]:
+  steps.append({'name':variant+('-race'if race else'-normal'),'args':['go','test',*(['-race']if race else[]),*(['-overlay=benchmark/decode-candidate.json']if variant=='candidate'else[]),'./internal/runthrough','-run',focus,'-count=1','-v'],**({'expected':1}if variant=='before'else{})})
+plan={'phase':'outbox-decode-prototype','sources':sources,'steps':steps};(p/'prototype-plan.json').write_text(json.dumps(plan,indent=2)+'\n');updates['benchmark/active-plan.json']=(p/'prototype-plan.json').read_bytes();root='/results/'+json.loads((p/'before-start.json').read_text())['id'];script="const fs=require('node:fs');const run=JSON.parse(fs.readFileSync("+json.dumps(root+'/run.json')+"));if(!run.complete||!run.success)throw Error('Original reproduction not terminal');for(const[n,b]of Object.entries("+json.dumps({n:base64.b64encode(v).decode()for n,v in updates.items()})+")){fs.writeFileSync(n,Buffer.from(b,'base64'));fs.chownSync(n,10001,10001)}console.log('Installed original/candidate differential and resource proof without production edits');";(p/'install-prototype.js').write_text(script)
+for suffix in ['upload.log','deployments.json']:shutil.copy2(p/('before-'+suffix),p/('prototype-'+suffix))
+print('Prepared test-first bounded record decoder proof')
