@@ -175,17 +175,17 @@ func normalizeDecodedOutboxState(state outboxState) (outboxState, error) {
 	if state.prepared == nil {
 		state.prepared = make(map[string]OutboxEntry)
 	}
+	for id := range state.prepared {
+		if _, exists := state.entries[id]; exists {
+			return outboxState{}, fmt.Errorf("outbox entry %q is both prepared and active", id)
+		}
+	}
 	for id, entry := range state.entries {
 		if !entry.Prepared {
 			continue
 		}
 		delete(state.entries, id)
 		state.prepared[id] = entry
-	}
-	for id := range state.prepared {
-		if _, exists := state.entries[id]; exists {
-			return outboxState{}, fmt.Errorf("outbox entry %q is both prepared and active", id)
-		}
 	}
 	if state.provenance == nil {
 		state.provenance = make(map[string]UpstreamState)
