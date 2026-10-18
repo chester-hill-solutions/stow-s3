@@ -184,14 +184,21 @@ func (h *Host) read() (*hostState, error) {
 	return &state, nil
 }
 
+func stateIntegrity(data []byte) string {
+	digest := sha256.New()
+	_, _ = digest.Write([]byte("stow-capacity-v1\x00"))
+	_, _ = digest.Write(data)
+	var checksum [sha256.Size]byte
+	return hex.EncodeToString(digest.Sum(checksum[:0]))
+}
+
 func encodeState(state *hostState) ([]byte, error) {
 	state.Integrity = ""
 	data, err := json.Marshal(state)
 	if err != nil {
 		return nil, err
 	}
-	digest := sha256.Sum256(append([]byte("stow-capacity-v1\x00"), data...))
-	state.Integrity = hex.EncodeToString(digest[:])
+	state.Integrity = stateIntegrity(data)
 	return json.Marshal(state)
 }
 

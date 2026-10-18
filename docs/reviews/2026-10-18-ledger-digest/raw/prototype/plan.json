@@ -1,0 +1,145 @@
+{
+  "phase": "ledger-digest-isolated-prototype",
+  "sources": [
+    "internal/capacity/state.go",
+    "internal/capacity/state_digest_test.go",
+    "benchmark/stream-state.go.txt",
+    "benchmark/isolate-bench.go.txt",
+    "benchmark/digest-measure.mjs",
+    "benchmark/measure-child.py",
+    "benchmark/stream-overlay.json",
+    "benchmark/digest-baseline-state.go.txt",
+    "benchmark/digest-baseline-overlay.json"
+  ],
+  "steps": [
+    {
+      "name": "remove-old-binaries",
+      "args": [
+        "rm",
+        "-f",
+        "benchmark/digest-before.test",
+        "benchmark/digest-after.test"
+      ]
+    },
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/state_digest_test.go",
+        "benchmark/stream-state.go.txt",
+        "benchmark/digest-baseline-state.go.txt"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/digest-baseline-overlay.json",
+        "./internal/capacity",
+        "-run",
+        "^TestStateDigest",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/digest-baseline-overlay.json",
+        "-race",
+        "./internal/capacity",
+        "-run",
+        "^TestStateDigest",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "prototype-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/stream-overlay.json",
+        "./internal/capacity",
+        "-run",
+        "^TestStateDigest",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "prototype-race",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/stream-overlay.json",
+        "-race",
+        "./internal/capacity",
+        "-run",
+        "^TestStateDigest",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "install-benchmark",
+      "args": [
+        "cp",
+        "benchmark/isolate-bench.go.txt",
+        "internal/capacity/ledger_isolate_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmark",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/ledger_isolate_bench_test.go"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/digest-baseline-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/digest-before.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/stream-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/digest-after.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/digest-measure.mjs"
+      ]
+    },
+    {
+      "name": "remove-benchmark",
+      "args": [
+        "rm",
+        "internal/capacity/ledger_isolate_bench_test.go"
+      ]
+    }
+  ]
+}

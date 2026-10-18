@@ -1,0 +1,75 @@
+{
+  "phase": "ledger-read-isolation",
+  "sources": [
+    "internal/capacity/state.go",
+    "benchmark/legacy-reader-state.go.txt",
+    "benchmark/isolate-bench.go.txt",
+    "benchmark/isolate-measure.mjs",
+    "benchmark/measure-child.py",
+    "benchmark/legacy-overlay.json",
+    "benchmark/isolate-profile.mjs"
+  ],
+  "steps": [
+    {
+      "name": "install-benchmark",
+      "args": [
+        "cp",
+        "benchmark/isolate-bench.go.txt",
+        "internal/capacity/ledger_isolate_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmark",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/ledger_isolate_bench_test.go",
+        "benchmark/legacy-reader-state.go.txt"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/legacy-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/legacy-reader.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/bounded-reader.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/isolate-measure.mjs"
+      ]
+    },
+    {
+      "name": "profile",
+      "args": [
+        "node",
+        "benchmark/isolate-profile.mjs"
+      ]
+    },
+    {
+      "name": "remove-benchmark",
+      "args": [
+        "rm",
+        "internal/capacity/ledger_isolate_bench_test.go"
+      ]
+    }
+  ]
+}
