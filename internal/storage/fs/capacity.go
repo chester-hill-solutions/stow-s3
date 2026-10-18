@@ -179,24 +179,9 @@ func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
 	if s.namespace == nil || s.capacityActive {
 		return writeBytesAtomic(path, data)
 	}
-	if err := s.reconcileCapacityLocked(); err != nil {
-		return err
-	}
-	usage, err := s.scanCapacityLocked()
+	admission, err := s.capacityFileAdmission(path, data)
 	if err != nil {
 		return err
-	}
-	class, err := s.capacityClass(path)
-	if err != nil {
-		return err
-	}
-	resource := resourceFor(path, data, class)
-	usage.Resources = replaceResource(usage.Resources, resource)
-	admission := capacity.Admission{Usage: usage}
-	if class == capacity.Payload {
-		admission.StagingBytes = int64(len(data))
-	} else {
-		admission.RecoveryBytes = int64(len(data))
 	}
 	return s.namespace.WithAdmission(context.Background(), admission, func() error {
 		if err := writeBytesAtomic(path, data); err != nil {
@@ -207,6 +192,29 @@ func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
 		}
 		return nil
 	})
+}
+
+func (s *FilesystemStore) capacityFileAdmission(path string, data []byte) (capacity.Admission, error) {
+	if err := s.reconcileCapacityLocked(); err != nil {
+		return capacity.Admission{}, err
+	}
+	usage, err := s.scanCapacityLocked()
+	if err != nil {
+		return capacity.Admission{}, err
+	}
+	class, err := s.capacityClass(path)
+	if err != nil {
+		return capacity.Admission{}, err
+	}
+	resource := resourceFor(path, data, class)
+	usage.Resources = replaceResource(usage.Resources, resource)
+	admission := capacity.Admission{Usage: usage}
+	if class == capacity.Payload {
+		admission.StagingBytes = int64(len(data))
+	} else {
+		admission.RecoveryBytes = int64(len(data))
+	}
+	return admission, nil
 }
 
 func (s *FilesystemStore) capacityClass(path string) (string, error) {
