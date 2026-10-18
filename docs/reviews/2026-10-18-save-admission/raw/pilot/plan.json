@@ -1,0 +1,56 @@
+{
+  "phase": "save-admission-green-pilot",
+  "sources": [
+    "internal/storage/fs/capacity_save_test.go",
+    "internal/capacity/admission_unknown_test.go",
+    "internal/storage/fs/capacity_save.go",
+    "internal/storage/fs/save_requests.go",
+    "internal/capacity/admission.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_save_test.go",
+        "internal/capacity/admission_unknown_test.go",
+        "internal/storage/fs/capacity_save.go",
+        "internal/storage/fs/save_requests.go",
+        "internal/capacity/admission.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "./internal/capacity",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "./internal/capacity",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

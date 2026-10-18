@@ -47,9 +47,11 @@ func (n *Namespace) WithAdmission(ctx context.Context, admission Admission, effe
 			return err
 		}
 		if err := effect(); err != nil {
-			// The reservation is durable before the effect runs, so a failed
-			// effect withdraws it: left pending it would refuse every later
-			// admission for this store, and nothing would clear it.
+			// An uncertain effect may already occupy its projected resources.
+			// Keep the durable reservation until verified reconciliation.
+			if errors.Is(err, ErrUnknown) {
+				return err
+			}
 			store.Resources = settled
 			store.Pending = nil
 			return errors.Join(err, n.host.write(state))
