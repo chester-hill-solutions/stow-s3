@@ -64,6 +64,9 @@ Both require the configured admin token, including on loopback.
 Without an admin token, these mutation routes are unavailable.
 
 Outbox snapshots use framed protobuf schema 4. Stow rejects unsupported versions and unknown fields.
+Repeated identities within a protobuf collection are rejected, even for identical
+records. Writes with invalid UTF-8 identity strings fail before replacing the
+journal, preserving the existing bytes instead of changing the identities.
 Existing JSON schemas 0–3 remain readable and convert on the next successful write.
 Configured paths keep their names, including any `.json` suffix, while rewritten contents are binary.
 All writers sharing an outbox must use the same revision; older binaries cannot read rewritten snapshots.

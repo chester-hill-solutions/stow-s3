@@ -32,8 +32,7 @@ func TestOutboxProtoMatchesJSONState(t *testing.T) {
 			case "empty":
 				state = newOutboxState()
 			case "invalid-utf8":
-				state.provenance["\xfe"] = UpstreamState{ETag: "first"}
-				state.provenance["\xff"] = UpstreamState{ETag: "last\xff"}
+				state.provenance["valid-value"] = UpstreamState{ETag: "last\xff"}
 				e := state.entries["active"]
 				e.LastError = "bad\xff"
 				state.entries["active"] = e

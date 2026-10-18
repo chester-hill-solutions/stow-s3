@@ -1,0 +1,22 @@
+{
+  "phase": "outbox-identities-baseline-build-repair",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_test.go",
+    "internal/runthrough/file_outbox_identity_test.go",
+    "internal/runthrough/file_outbox_identity_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "benchmark-build",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/outbox-identities-before.test"
+      ]
+    }
+  ]
+}

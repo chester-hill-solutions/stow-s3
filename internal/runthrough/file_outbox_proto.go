@@ -25,7 +25,7 @@ func encodeOutboxProto(state outboxState) ([]byte, error) {
 	slices.Sort(keys)
 	for _, key := range keys {
 		value := state.provenance[key]
-		message.Provenance = append(message.Provenance, &outboxpb.Provenance{Identity: outboxProtoText(key), Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown})
+		message.Provenance = append(message.Provenance, &outboxpb.Provenance{Identity: key, Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown})
 	}
 	var err error
 	message.Entries, err = outboxProtoEntries(state.entries)
@@ -86,7 +86,7 @@ func outboxProtoEntry(key string, e OutboxEntry) (*outboxpb.Entry, error) {
 		times[i] = string(data)
 	}
 	return &outboxpb.Entry{
-		Identity: outboxProtoText(key), Id: outboxProtoText(e.ID), Operation: outboxProtoText(string(e.Operation)), Bucket: outboxProtoText(e.Bucket), Key: outboxProtoText(e.Key),
+		Identity: key, Id: outboxProtoText(e.ID), Operation: outboxProtoText(string(e.Operation)), Bucket: outboxProtoText(e.Bucket), Key: outboxProtoText(e.Key),
 		SourceBucket: outboxProtoText(e.SourceBucket), SourceKey: outboxProtoText(e.SourceKey), Version: outboxProtoText(e.Version), PreviousVersion: outboxProtoText(e.PreviousVersion),
 		UpstreamVersion: outboxProtoText(e.UpstreamVersion), UpstreamAbsent: e.UpstreamAbsent, Prepared: e.Prepared,
 		CreatedAt: times[0], Attempts: int64(e.Attempts), NextAttempt: times[1], LastError: outboxProtoText(e.LastError), Terminal: e.Terminal,
@@ -111,11 +111,14 @@ func decodeOutboxProto(data []byte) (outboxState, error) {
 		return outboxState{}, fmt.Errorf("%w: protobuf version %d or unknown fields", ErrOutboxFormatVersion, message.Version)
 	}
 	state := outboxState{provenance: make(map[string]UpstreamState, len(message.Provenance)), seq: message.Seq, nextToken: message.NextToken}
-	for _, value := range message.Provenance {
+	for index, value := range message.Provenance {
 		if len(value.ProtoReflect().GetUnknown()) != 0 {
 			return outboxState{}, fmt.Errorf("%w: unknown provenance fields", ErrOutboxFormatVersion)
 		}
 		state.provenance[value.Identity] = UpstreamState{ETag: value.Etag, Absent: value.Absent, Unknown: value.Unknown}
+		if len(state.provenance) != index+1 {
+			return outboxState{}, fmt.Errorf("duplicate outbox provenance identity %q", value.Identity)
+		}
 	}
 	var err error
 	state.entries, err = decodeOutboxProtoEntries(message.Entries)
@@ -131,7 +134,7 @@ func decodeOutboxProto(data []byte) (outboxState, error) {
 
 func decodeOutboxProtoEntries(entries []*outboxpb.Entry) (map[string]OutboxEntry, error) {
 	result := make(map[string]OutboxEntry, len(entries))
-	for _, entry := range entries {
+	for index, entry := range entries {
 		if len(entry.ProtoReflect().GetUnknown()) != 0 {
 			return nil, fmt.Errorf("%w: unknown entry fields", ErrOutboxFormatVersion)
 		}
@@ -140,6 +143,9 @@ func decodeOutboxProtoEntries(entries []*outboxpb.Entry) (map[string]OutboxEntry
 			return nil, err
 		}
 		result[entry.Identity] = decoded
+		if len(result) != index+1 {
+			return nil, fmt.Errorf("duplicate outbox entry identity %q", entry.Identity)
+		}
 	}
 	return result, nil
 }
