@@ -200,9 +200,12 @@ func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
 	}
 	return s.namespace.WithAdmission(context.Background(), admission, func() error {
 		if err := writeBytesAtomic(path, data); err != nil {
-			return err
+			return errors.Join(capacity.ErrUnknown, err)
 		}
-		return syncSaveAncestors(filepath.Dir(path))
+		if err := syncSaveAncestors(filepath.Dir(path)); err != nil {
+			return errors.Join(capacity.ErrUnknown, err)
+		}
+		return nil
 	})
 }
 
