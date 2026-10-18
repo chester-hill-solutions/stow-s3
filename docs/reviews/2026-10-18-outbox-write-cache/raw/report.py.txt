@@ -1,0 +1,240 @@
+from pathlib import Path
+import json,re
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');a=json.loads((p/'export-f7288dff-81a1-41c3-a2ea-f3bc714592fe/comparison-analysis.json').read_text());c=json.loads((p/'export-0e94c32b-14a6-4a66-a651-ba7fa678b98a/confirmation-analysis.json').read_text());job=json.loads((p/'final-start.json').read_text());d=p/('export-'+job['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==18 and all(x['passed']for x in checks)
+f=json.loads((d/'final-analysis.json').read_text());assert f['observations']==32
+capacity=json.loads((d/'capacity-receipt.json').read_text());assert len(capacity['rows'])==3 and all(x['exitCode']==0 for x in capacity['checks'])
+raw='2026-10-18-outbox-write-cache/raw/'
+s='''# Reuse canonical native outbox state after a successful write — 2026-10-18
+
+## Outcome and original evidence
+
+The existing byte-identity cache now covers successful native writes when the
+in-memory state is exactly equivalent to a reload. It reuses the buffer already
+produced for publication. Every operation still reads the file under the existing
+locks and compares fresh bytes; changed bytes still decode and validate. File and
+directory syncs remain mandatory.
+
+The [preceding phase investigation](2026-10-18-outbox-write-phases.md) measured
+decoding at about 32% of cycle time with 8,192 retained intents, allocating about
+7.6 MB per direct decode. Successful writes previously invalidated the byte cache,
+so consecutive mutations repeatedly rebuilt the same native state. This is a
+measured performance inefficiency, not an assertion of a baseline corruption bug.
+
+Before changing product source, separate before/guarded binaries measured the
+candidate on Railway ext4. Normal backlog cases remove about **73% of allocations**
+and **46% of allocated bytes**. At 8,192 intents, the first cohort's operation
+medians improve **12–26%**. Small/mid timing results are mixed; every adverse result
+is retained below. A large unusual-timestamp fallback remains about **11% slower**.
+That is an accepted, explicit cost, not a claimed optimization of that path.
+
+Baseline is `feb0f27`; `origin/main` was fetched and remains
+`219d1dcfff9807b04660a40313b32127e5be2933`. Exact refs are in
+[baseline.json](RAWbaseline.json). The existing occupied-ID, identity-binding,
+recovery, migration, native-format and directory-fence fixes are retained.
+
+## Correctness proof before adoption
+
+A blind prototype that merely retains freshly written bytes skips observable
+reload behavior. The new contracts first pass against the original implementation,
+twice normally and twice under race detection: **17 cases, 34 passes per mode**.
+The blind prototype fails **13 distinct cases twice**, 26 failures, while four
+controls pass twice. Its expected nonzero exit is a successful counterexample
+stage, not a passing test suite. These are defects in a rejected experiment,
+not newly discovered defects in the baseline.
+
+Cases cover enqueue/prepare snapshots against a fresh handle; invalid UTF-8 text;
+monotonic and second-offset timestamps; historical attempts requiring reconciliation;
+caller-supplied fencing tokens; provenance canonicalization; changed/missing peer
+journals; and a directory-sync failure after rename. The uncertain-write test runs
+as UID 10001 with a real Unix directory permission fault, then compares the same
+handle with a reopened journal. No upstream mutations occur.
+[Contract names, exact counts and repetitions](RAWproof/contract-receipt.json)
+and [proof commands and results](RAWproof/checks.json) are retained, including the
+blind prototype's original raw diagnostics. Diagnostic text contains intentional
+invalid bytes; analysis uses replacement decoding only to identify case names.
+The original log bytes and hashes remain intact.
+
+## Small implementation change
+
+The native encoder exposes its already-built protobuf message through a private
+helper while preserving the existing encoder interface and byte format. Before
+publication, an eligibility check uses the existing entry decoder and full value
+comparison to verify text/time round-trip equality. It refuses reuse when reload
+would mark a historical attempt, migrate a prepared record, raise an ID/token
+counter, initialize absent maps, or reject queue overlap. Provenance text must
+also match. Conservative refusal uses the existing decode path.
+
+Only a successful durable publication installs reusable encoded bytes. The cache
+is cleared before encoding or writing; a failed encoder, file sync, rename or
+directory sync cannot leave an acknowledged cache for a different state. Existing
+in-memory commit/error behavior remains intact. The transient protobuf message is
+checked before IO and is not retained as a second cache. No extra persistent file,
+lock, map, index, timer, checkpoint or storage abstraction is added.
+
+Fresh full-file reads remain authoritative. In-place edits, historical restores,
+missing files, malformed frames and peer replacements retain validation. Existing
+claim/prepared fences, per-key ordering, idempotent Commit, ID refusal and failure
+recovery remain covered. The schema remains version 4; legacy readers, normalized
+values, public APIs, dependencies and generated schemas are unchanged. Future
+normalization or counter-repair changes must keep eligibility aligned; the reopen
+contract tests protect that relationship.
+
+## Measurement method
+
+All formatting, compilation, tests and measurements run on the authorized Railway
+scratch deployment `8fb6e6de-de0b-4adf-9041-d29c24308347`, service
+`83497842-c51d-420e-8ba1-181589730ad4`, benchmark environment
+`3cd200cb-c94f-4e4d-9335-0f6c1b7e9411`. Go 1.25.6, Node 25.9.0, 4 CPU/4 GiB
+cgroup, validation UID 10001. GOMAXPROCS is 1 or 4. TMPDIR is explicitly under
+ext4 `/results`, verified before timing. Local actions are editing, Git, packaging,
+hashing and exported-data analysis. No local benchmark or Go test runs.
+
+Both binaries use the same benchmark/contracts and seeded fixtures, changing only
+the two production files through overlays. Queue depths are **per queue**: 128
+means 256 retained intents, 4,096 means 8,192. Seeding, warm snapshots, GC setup and
+retained-field/reopen verification are outside timing. The fixtures are synthetic
+backlogs, not an asserted production traffic distribution or S3 latency SLA.
+
+Enqueue and prepare measure admission plus completion/discard: **two API calls and
+two durable replacements per operation**. Provenance alternates a changed value;
+renew updates a held claim: **one API call and one replacement**. Times across
+these methods are not interchangeable request latencies. The fallback puts an
+unusual non-hour timestamp offset in a retained record; full decode and eligibility
+work remain necessary. All retained fields and the final provenance/lease are
+checked after timing. Allocation bytes/counts are cumulative per operation, not
+live heap or RSS.
+
+The first ABBA BAAB sequence runs eight processes, 400-ms minimum per case,
+GOMAXPROCS 1/4, four observations per variant/cell: **224 observations**. Longer
+targeted before/after and identical-current-binary cohorts each add 64 observations,
+with 1-second minima; an eight-process four-CPU fallback cohort adds 16. **368
+observations before the comment-only quality repair** remain in separate cohorts. Rebuilt binary hashes must match
+the first cohort before confirmation. A/A labels execute the same guarded binary.
+No tolerance/baseline is raised, and adverse observations are not dropped.
+
+## First cohort: all operations
+
+Times are per-cell medians. CPU denotes GOMAXPROCS. The final column is cumulative
+allocation count per measured operation.
+
+| Depth per queue | Operation | CPU | Before → after ms | Time change | Allocs before → after | Allocated-byte change |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+'''.replace('RAW',raw)
+for row in a['comparisons']:
+ name=row['name'];depth=re.search(r'depth=(\d+)',name)[1];cpu=4 if name.endswith('-4')else 1;action='fallback prepare/discard'if'Fallback'in name else name.split('/')[-1].removesuffix('-4')
+ s+=f"| {depth} | {action} | {cpu} | {row['before']['ns/op']/1e6:.3f} → {row['safe']['ns/op']/1e6:.3f} | {row['nsDeltaPercent']:+.2f}% | {row['before']['allocs/op']:,.1f} → {row['safe']['allocs/op']:,.1f} | {row['bytesDeltaPercent']:+.2f}% |\n"
+s+='''
+The initial adverse +22.18% medium enqueue, +17.73% empty renew and +11.65% medium
+prepare cells remain visible. Allocation improvements do not erase those timings.
+[All initial observations, ranges and memory metrics](RAWproof/comparison-analysis.json)
+and [commands/order/binary hashes](RAWproof/comparison-runs.json) are retained.
+
+## Longer confirmation and same-binary controls
+
+| Cohort | Depth per queue | Operation | CPU | Before/label A → after/label B ms | Time change |
+| --- | ---: | --- | ---: | ---: | ---: |
+'''.replace('RAW',raw)
+for row in c['comparisons']:
+ name=row['name'];depth=re.search(r'depth=(\d+)',name)[1];cpu=4 if name.endswith('-4')else 1;action='fallback prepare/discard'if'Fallback'in name else name.split('/')[-1].removesuffix('-4');cohort={'aa':'Same binary','confirmation':'Before/after','fallback':'Fallback before/after'}[row['cohort']]
+ s+=f"| {cohort} | {depth} | {action} | {cpu} | {row['before']['ns/op']/1e6:.3f} → {row['safe']['ns/op']/1e6:.3f} | {row['nsDeltaPercent']:+.2f}% |\n"
+s+='''
+The targeted medium cases improve about 7–19% in confirmation and repeat the
+allocation reduction. This does not remeasure every initial cell: the initial
+medium prepare slowdown remains unresolved. Empty enqueue changes sign across
+CPU settings (+13.07% / -14.50%); empty renew is +2.06% / +0.70%. Same-binary labels
+range from -5.06% to +9.70%. These limited samples show variability but do not prove
+zero implementation effect or statistical significance. No universal latency
+improvement is claimed. The large fallback's +11.97% initial / +11.13% confirmation
+is a reproducible cost of eligibility work when the state cannot be reused.
+[Separate confirmation/control samples and ranges](RAWconfirmation/confirmation-analysis.json)
+and [exact commands and matching binary hashes](RAWconfirmation/comparison-runs.json)
+are retained rather than pooled with the initial cohort.
+
+## Final-source confirmation
+
+The first final validation passed all functional/conformance stages but failed the
+comment-line ratchet (4080 versus 4077). The only source repair removes the three
+new explanatory comment lines; the explanation remains in this report. No baseline
+is raised. [The failed quality gate](RAWinitial-final/quality.log) and
+[the exact comment-only diff receipt](RAWcomment-only-repair.json) are retained.
+
+The repaired source reruns the complete final validation and adds 32 measurements
+at GOMAXPROCS 4, ABBA BAAB, 400-ms minimum. The benchmark source and original native
+baseline are unchanged. This separate cohort qualifies the exact final Go bytes;
+it is not substituted for either earlier cohort. **400 observations total** are
+retained across the three before/after/control cohorts.
+
+| Depth per queue | Operation | Before → after ms | Time change | Allocation change | Allocated-byte change |
+| ---: | --- | ---: | ---: | ---: | ---: |
+FINAL_ROWS
+
+[Exact final observations and source hashes](RAWfinal/final-analysis.json) and
+[final commands and binary hashes](RAWfinal/comparison-runs.json) are retained.
+
+## Memory and compatibility costs
+
+One encoded journal frame remains in the existing cache after a reusable write.
+Previously a write cleared it until a later validated read. There is no new cache
+collection or second map, but write-only handles now retain that buffer too.
+A separate untimed Railway probe records slice length and backing capacity:
+
+| Depth per queue | Frame length B | Buffer capacity B |
+| ---: | ---: | ---: |
+'''.replace('RAW',raw)
+for row in capacity['rows']:s+=f"| {row['depth']} | {row['length']:,} | {row['capacity']:,} |\n"
+s+='''
+Capacity is the slice's backing capacity, not allocator/RSS accounting. Full live
+heap after GC and cumulative process high-water RSS are also retained for every
+benchmark observation. These process metrics include fixtures/testing machinery
+and preceding subcases; they are not isolated per-handle peaks or memory limits.
+For the four-CPU large enqueue example, live heap is 7.59 → 7.47 MB and allocated
+bytes are 31.62 → 17.02 MB per two-call cycle. A retained buffer can coexist with a
+fresh read buffer and serialization work; no new resource guarantee is asserted.
+[Capacity source, command and results](RAWfinal/capacity-receipt.json) are retained.
+
+Eligibility is O(journal entries), uses the existing timestamp decoder, and adds
+work to fallback writes. Noncanonical text/times, historical attempts and counter
+repair keep existing normalization; unknown-offset timestamps can keep reuse
+unavailable persistently. This performance cost is preserved to retain contracts.
+The change is adopted for measured normal native-path allocation and backlog gains,
+without a workload threshold, a weaker durability policy or altered accepted values.
+The previous admission +27.6% ext4 observation is also preserved in its original
+[report](2026-10-18-outbox-admission.md), not resolved by this different experiment.
+
+## Final validation and next finding
+
+All 18 final Railway stages pass: formatting and exact measured-source equality;
+focused normal/race tests twice; full Go suite; broad storage/runtime/embedded/
+run-through/S3/public-package race tests; four conformance profiles (memory,
+filesystem, runtime-memory, runtime-filesystem); vet; site build/tests; documentation
+links; quality/file-size/format gates; both final benchmark builds and their comparison. [Final commands/results](RAWfinal/checks.json)
+and [source equivalence](RAWfinal/measured-source-equivalence.json) prove the actual
+adopted production/contracts bytes match the final-source comparison. The earlier
+guarded overlay differs only by the three explanatory comments identified above. All 17 new
+contracts pass twice in each focused mode, without skipping the permission-fault
+case. Existing format, identity, migration, ownership, peer and recovery coverage
+remains in the broader suites.
+
+The final report and documentation are checked on the same Railway source. Exact
+source copies, failed blind-prototype diagnostics, every observation, harnesses,
+source/transfer hashes and teardown receipt are retained. Benchmark binaries are
+removed after their hashes are recorded. The scratch runner is stopped after
+verified exports; the separate target service remains removed and unchanged.
+
+Next correctness investigation: the fencing-token allocator still increments its
+uint64 counter without an exhaustion guard, unlike the ID allocator. Reproduce the
+operational consequence before changing it; the serializer already permits the
+maximum counter value. No untested corruption claim or next fix is made here.
+
+The next measured performance finding is the eligibility scan's roughly 11%
+overhead on a large journal with an unusual timestamp. A later experiment should reduce that
+cost while preserving canonicalization and fencing; any adoption needs its own
+comparative evidence. Whole-journal cloning/encoding and durable sync costs also
+remain. No filesystem indexing, incremental checkpointing, storage abstraction
+or next optimization is implemented in this change.
+'''.replace('RAW',raw)
+rows=[]
+for row in f['comparisons']:
+ name=row['name'];depth=re.search(r'depth=(\d+)',name)[1];action=name.split('/')[-1].removesuffix('-4');rows.append(f"| {depth} | {action} | {row['before']['ns/op']/1e6:.3f} → {row['safe']['ns/op']/1e6:.3f} | {row['nsDeltaPercent']:+.2f}% | {row['allocDeltaPercent']:+.2f}% | {row['bytesDeltaPercent']:+.2f}% |")
+s=s.replace('FINAL_ROWS','\n'.join(rows))
+(p/'report.md').write_text(s);(r/'docs/reviews/2026-10-18-outbox-write-cache.md').write_text(s);print('Wrote measured report, retaining all adverse cells and fallback cost')

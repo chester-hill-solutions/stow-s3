@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/write-cache/retention_regression_test.go.txt"
+      ],
+      "expected": 0,
+      "exitCode": 0,
+      "signal": null,
+      "passed": true
+    },
+    {
+      "name": "candidate-red",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/retention-regression-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxReleasesCallerStringBuffers$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1,
+      "exitCode": 1,
+      "signal": null,
+      "passed": true
+    },
+    {
+      "name": "baseline-green",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/retention-regression-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxReleasesCallerStringBuffers$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 0,
+      "exitCode": 0,
+      "signal": null,
+      "passed": true
+    }
+  ]
+}

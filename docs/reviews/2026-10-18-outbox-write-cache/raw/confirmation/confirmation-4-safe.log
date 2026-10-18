@@ -1,0 +1,13 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxWriteCache/depth=0/enqueue           	     222	   7479092 ns/op	        14.00 cached-B	        14.00 journal-B	  16867328 process-HWM-B	    395472 process-live-heap-B	    8087 B/op	      67 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/enqueue-4         	     182	   5611659 ns/op	        14.00 cached-B	        14.00 journal-B	  16273408 process-HWM-B	    398352 process-live-heap-B	    8087 B/op	      67 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/renew             	     447	   3633606 ns/op	       151.0 cached-B	       151.0 journal-B	  16228352 process-HWM-B	    396568 process-live-heap-B	    4370 B/op	      36 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/renew-4           	     332	   3345353 ns/op	       150.0 cached-B	       150.0 journal-B	  15785984 process-HWM-B	    399352 process-live-heap-B	    4371 B/op	      36 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/enqueue         	     170	   6820902 ns/op	     25486 cached-B	     25486 journal-B	  18518016 process-HWM-B	    629432 process-live-heap-B	  544807 B/op	    1620 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/enqueue-4       	     128	   8056981 ns/op	     25486 cached-B	     25486 journal-B	  19222528 process-HWM-B	    643832 process-live-heap-B	  544808 B/op	    1620 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/renew           	     290	   4204458 ns/op	     25623 cached-B	     25623 journal-B	  18771968 process-HWM-B	    641208 process-live-heap-B	  272623 B/op	     812 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/renew-4         	     334	   4775236 ns/op	     25623 cached-B	     25623 journal-B	  20537344 process-HWM-B	    644568 process-live-heap-B	  272624 B/op	     812 allocs/op
+PASS

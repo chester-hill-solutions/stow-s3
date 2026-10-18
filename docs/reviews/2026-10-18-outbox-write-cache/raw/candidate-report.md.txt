@@ -1,0 +1,270 @@
+# Reuse canonical native outbox state after a successful write — 2026-10-18
+
+## Outcome and original evidence
+
+The existing byte-identity cache now covers successful native writes when the
+in-memory state is exactly equivalent to a reload. It reuses the buffer already
+produced for publication. Every operation still reads the file under the existing
+locks and compares fresh bytes; changed bytes still decode and validate. File and
+directory syncs remain mandatory.
+
+The [preceding phase investigation](2026-10-18-outbox-write-phases.md) measured
+decoding at about 32% of cycle time with 8,192 retained intents, allocating about
+7.6 MB per direct decode. Successful writes previously invalidated the byte cache,
+so consecutive mutations repeatedly rebuilt the same native state. This is a
+measured performance inefficiency, not an assertion of a baseline corruption bug.
+
+Before changing product source, separate before/guarded binaries measured the
+candidate on Railway ext4. Normal backlog cases remove about **73% of allocations**
+and **46% of allocated bytes**. At 8,192 intents, the first cohort's operation
+medians improve **12–26%**. Small/mid timing results are mixed; every adverse result
+is retained below. A large unusual-timestamp fallback remains about **11% slower**.
+That is an accepted, explicit cost, not a claimed optimization of that path.
+
+Baseline is `feb0f27`; `origin/main` was fetched and remains
+`219d1dcfff9807b04660a40313b32127e5be2933`. Exact refs are in
+[baseline.json](2026-10-18-outbox-write-cache/raw/baseline.json). The existing occupied-ID, identity-binding,
+recovery, migration, native-format and directory-fence fixes are retained.
+
+## Correctness proof before adoption
+
+A blind prototype that merely retains freshly written bytes skips observable
+reload behavior. The new contracts first pass against the original implementation,
+twice normally and twice under race detection: **17 cases, 34 passes per mode**.
+The blind prototype fails **13 distinct cases twice**, 26 failures, while four
+controls pass twice. Its expected nonzero exit is a successful counterexample
+stage, not a passing test suite. These are defects in a rejected experiment,
+not newly discovered defects in the baseline.
+
+Cases cover enqueue/prepare snapshots against a fresh handle; invalid UTF-8 text;
+monotonic and second-offset timestamps; historical attempts requiring reconciliation;
+caller-supplied fencing tokens; provenance canonicalization; changed/missing peer
+journals; and a directory-sync failure after rename. The uncertain-write test runs
+as UID 10001 with a real Unix directory permission fault, then compares the same
+handle with a reopened journal. No upstream mutations occur.
+[Contract names, exact counts and repetitions](2026-10-18-outbox-write-cache/raw/proof/contract-receipt.json)
+and [proof commands and results](2026-10-18-outbox-write-cache/raw/proof/checks.json) are retained, including the
+blind prototype's original raw diagnostics. Diagnostic text contains intentional
+invalid bytes; analysis uses replacement decoding only to identify case names.
+The original log bytes and hashes remain intact.
+
+## Small implementation change
+
+The native encoder exposes its already-built protobuf message through a private
+helper while preserving the existing encoder interface and byte format. Before
+publication, an eligibility check uses the existing entry decoder and full value
+comparison to verify text/time round-trip equality. It refuses reuse when reload
+would mark a historical attempt, migrate a prepared record, raise an ID/token
+counter, initialize absent maps, or reject queue overlap. Provenance text must
+also match. Conservative refusal uses the existing decode path.
+
+Only a successful durable publication installs reusable encoded bytes. The cache
+is cleared before encoding or writing; a failed encoder, file sync, rename or
+directory sync cannot leave an acknowledged cache for a different state. Existing
+in-memory commit/error behavior remains intact. The transient protobuf message is
+checked before IO and is not retained as a second cache. No extra persistent file,
+lock, map, index, timer, checkpoint or storage abstraction is added.
+
+Fresh full-file reads remain authoritative. In-place edits, historical restores,
+missing files, malformed frames and peer replacements retain validation. Existing
+claim/prepared fences, per-key ordering, idempotent Commit, ID refusal and failure
+recovery remain covered. The schema remains version 4; legacy readers, normalized
+values, public APIs, dependencies and generated schemas are unchanged. Future
+normalization or counter-repair changes must keep eligibility aligned; the reopen
+contract tests protect that relationship.
+
+## Measurement method
+
+All formatting, compilation, tests and measurements run on the authorized Railway
+scratch deployment `8fb6e6de-de0b-4adf-9041-d29c24308347`, service
+`83497842-c51d-420e-8ba1-181589730ad4`, benchmark environment
+`3cd200cb-c94f-4e4d-9335-0f6c1b7e9411`. Go 1.25.6, Node 25.9.0, 4 CPU/4 GiB
+cgroup, validation UID 10001. GOMAXPROCS is 1 or 4. TMPDIR is explicitly under
+ext4 `/results`, verified before timing. Local actions are editing, Git, packaging,
+hashing and exported-data analysis. No local benchmark or Go test runs.
+
+Both binaries use the same benchmark/contracts and seeded fixtures, changing only
+the two production files through overlays. Queue depths are **per queue**: 128
+means 256 retained intents, 4,096 means 8,192. Seeding, warm snapshots, GC setup and
+retained-field/reopen verification are outside timing. The fixtures are synthetic
+backlogs, not an asserted production traffic distribution or S3 latency SLA.
+
+Enqueue and prepare measure admission plus completion/discard: **two API calls and
+two durable replacements per operation**. Provenance alternates a changed value;
+renew updates a held claim: **one API call and one replacement**. Times across
+these methods are not interchangeable request latencies. The fallback puts an
+unusual non-hour timestamp offset in a retained record; full decode and eligibility
+work remain necessary. All retained fields and the final provenance/lease are
+checked after timing. Allocation bytes/counts are cumulative per operation, not
+live heap or RSS.
+
+The first ABBA BAAB sequence runs eight processes, 400-ms minimum per case,
+GOMAXPROCS 1/4, four observations per variant/cell: **224 observations**. Longer
+targeted before/after and identical-current-binary cohorts each add 64 observations,
+with 1-second minima; an eight-process four-CPU fallback cohort adds 16. **368
+observations before the comment-only quality repair** remain in separate cohorts. Rebuilt binary hashes must match
+the first cohort before confirmation. A/A labels execute the same guarded binary.
+No tolerance/baseline is raised, and adverse observations are not dropped.
+
+## First cohort: all operations
+
+Times are per-cell medians. CPU denotes GOMAXPROCS. The final column is cumulative
+allocation count per measured operation.
+
+| Depth per queue | Operation | CPU | Before → after ms | Time change | Allocs before → after | Allocated-byte change |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 0 | enqueue | 1 | 6.879 → 7.168 | +4.20% | 85.0 → 67.0 | -16.62% |
+| 0 | enqueue | 4 | 7.299 → 7.076 | -3.06% | 85.0 → 67.0 | -16.62% |
+| 0 | prepare | 1 | 6.641 → 6.879 | +3.59% | 85.0 → 67.0 | -16.62% |
+| 0 | prepare | 4 | 6.407 → 6.906 | +7.78% | 85.0 → 67.0 | -16.62% |
+| 0 | provenance | 1 | 3.270 → 3.304 | +1.03% | 41.0 → 34.0 | -16.54% |
+| 0 | provenance | 4 | 3.914 → 3.933 | +0.48% | 41.0 → 34.0 | -16.55% |
+| 0 | renew | 1 | 3.236 → 3.809 | +17.73% | 52.0 → 36.0 | -23.38% |
+| 0 | renew | 4 | 3.461 → 4.025 | +16.31% | 52.0 → 36.0 | -23.50% |
+| 128 | enqueue | 1 | 7.882 → 9.631 | +22.18% | 5,991.5 → 1,620.0 | -45.82% |
+| 128 | enqueue | 4 | 8.038 → 8.312 | +3.41% | 5,998.5 → 1,620.0 | -45.86% |
+| 128 | prepare | 1 | 7.777 → 8.651 | +11.23% | 5,997.0 → 1,620.0 | -45.85% |
+| 128 | prepare | 4 | 7.368 → 8.227 | +11.65% | 6,000.5 → 1,620.0 | -45.87% |
+| 128 | provenance | 1 | 4.318 → 3.779 | -12.48% | 2,998.0 → 812.0 | -45.84% |
+| 128 | provenance | 4 | 4.759 → 4.845 | +1.82% | 2,999.0 → 812.0 | -45.85% |
+| 128 | renew | 1 | 3.990 → 3.844 | -3.67% | 3,006.5 → 812.0 | -45.87% |
+| 128 | renew | 4 | 4.488 → 3.870 | -13.76% | 3,004.0 → 812.0 | -45.85% |
+| 4096 | enqueue | 1 | 47.687 → 36.637 | -23.17% | 183,343.0 → 49,292.0 | -46.22% |
+| 4096 | enqueue | 4 | 44.620 → 33.512 | -24.90% | 183,119.5 → 49,292.0 | -46.18% |
+| 4096 | prepare | 1 | 47.159 → 37.436 | -20.62% | 181,734.0 → 49,292.0 | -45.92% |
+| 4096 | prepare | 4 | 44.719 → 33.853 | -24.30% | 183,119.5 → 49,292.0 | -46.18% |
+| 4096 | provenance | 1 | 22.596 → 19.828 | -12.25% | 90,870.5 → 24,649.0 | -45.95% |
+| 4096 | provenance | 4 | 22.646 → 16.670 | -26.39% | 91,942.5 → 24,650.0 | -46.34% |
+| 4096 | renew | 1 | 24.617 → 18.685 | -24.10% | 91,721.5 → 24,648.0 | -46.22% |
+| 4096 | renew | 4 | 22.075 → 18.103 | -17.99% | 91,842.0 → 24,648.0 | -46.26% |
+| 128 | fallback prepare/discard | 1 | 7.794 → 8.499 | +9.04% | 6,004.0 → 6,009.0 | +0.02% |
+| 128 | fallback prepare/discard | 4 | 7.929 → 8.068 | +1.76% | 6,003.0 → 6,010.0 | +0.04% |
+| 4096 | fallback prepare/discard | 1 | 47.276 → 48.383 | +2.34% | 182,321.0 → 181,746.0 | -0.20% |
+| 4096 | fallback prepare/discard | 4 | 43.691 → 48.921 | +11.97% | 182,321.0 → 181,359.0 | -0.33% |
+
+The initial adverse +22.18% medium enqueue, +17.73% empty renew and +11.65% medium
+prepare cells remain visible. Allocation improvements do not erase those timings.
+[All initial observations, ranges and memory metrics](2026-10-18-outbox-write-cache/raw/proof/comparison-analysis.json)
+and [commands/order/binary hashes](2026-10-18-outbox-write-cache/raw/proof/comparison-runs.json) are retained.
+
+## Longer confirmation and same-binary controls
+
+| Cohort | Depth per queue | Operation | CPU | Before/label A → after/label B ms | Time change |
+| --- | ---: | --- | ---: | ---: | ---: |
+| Same binary | 0 | enqueue | 1 | 7.276 → 7.038 | -3.27% |
+| Same binary | 0 | enqueue | 4 | 7.333 → 8.044 | +9.70% |
+| Same binary | 0 | renew | 1 | 3.317 → 3.149 | -5.06% |
+| Same binary | 0 | renew | 4 | 3.447 → 3.455 | +0.22% |
+| Same binary | 128 | enqueue | 1 | 8.928 → 9.336 | +4.58% |
+| Same binary | 128 | enqueue | 4 | 8.189 → 7.865 | -3.95% |
+| Same binary | 128 | renew | 1 | 4.391 → 4.244 | -3.35% |
+| Same binary | 128 | renew | 4 | 4.238 → 4.044 | -4.58% |
+| Before/after | 0 | enqueue | 1 | 6.406 → 7.244 | +13.07% |
+| Before/after | 0 | enqueue | 4 | 7.319 → 6.257 | -14.50% |
+| Before/after | 0 | renew | 1 | 3.382 → 3.452 | +2.06% |
+| Before/after | 0 | renew | 4 | 3.189 → 3.211 | +0.70% |
+| Before/after | 128 | enqueue | 1 | 9.084 → 7.397 | -18.56% |
+| Before/after | 128 | enqueue | 4 | 8.339 → 7.748 | -7.09% |
+| Before/after | 128 | renew | 1 | 4.431 → 3.944 | -10.98% |
+| Before/after | 128 | renew | 4 | 4.926 → 4.395 | -10.79% |
+| Fallback before/after | 128 | fallback prepare/discard | 4 | 8.654 → 8.528 | -1.46% |
+| Fallback before/after | 4096 | fallback prepare/discard | 4 | 45.617 → 50.693 | +11.13% |
+
+The targeted medium cases improve about 7–19% in confirmation and repeat the
+allocation reduction. This does not remeasure every initial cell: the initial
+medium prepare slowdown remains unresolved. Empty enqueue changes sign across
+CPU settings (+13.07% / -14.50%); empty renew is +2.06% / +0.70%. Same-binary labels
+range from -5.06% to +9.70%. These limited samples show variability but do not prove
+zero implementation effect or statistical significance. No universal latency
+improvement is claimed. The large fallback's +11.97% initial / +11.13% confirmation
+is a reproducible cost of eligibility work when the state cannot be reused.
+[Separate confirmation/control samples and ranges](2026-10-18-outbox-write-cache/raw/confirmation/confirmation-analysis.json)
+and [exact commands and matching binary hashes](2026-10-18-outbox-write-cache/raw/confirmation/comparison-runs.json)
+are retained rather than pooled with the initial cohort.
+
+## Final-source confirmation
+
+The first final validation passed all functional/conformance stages but failed the
+comment-line ratchet (4080 versus 4077). The only source repair removes the three
+new explanatory comment lines; the explanation remains in this report. No baseline
+is raised. [The failed quality gate](2026-10-18-outbox-write-cache/raw/initial-final/quality.log) and
+[the exact comment-only diff receipt](2026-10-18-outbox-write-cache/raw/comment-only-repair.json) are retained.
+
+The repaired source reruns the complete final validation and adds 32 measurements
+at GOMAXPROCS 4, ABBA BAAB, 400-ms minimum. The benchmark source and original native
+baseline are unchanged. This separate cohort qualifies the exact final Go bytes;
+it is not substituted for either earlier cohort. **400 observations total** are
+retained across the three before/after/control cohorts.
+
+| Depth per queue | Operation | Before → after ms | Time change | Allocation change | Allocated-byte change |
+| ---: | --- | ---: | ---: | ---: | ---: |
+| 128 | enqueue | 8.327 → 7.606 | -8.66% | -72.98% | -45.83% |
+| 128 | renew | 4.823 → 4.592 | -4.80% | -72.95% | -45.83% |
+| 4096 | enqueue | 45.908 → 36.993 | -19.42% | -72.96% | -46.03% |
+| 4096 | renew | 21.650 → 17.611 | -18.66% | -73.07% | -46.14% |
+
+[Exact final observations and source hashes](2026-10-18-outbox-write-cache/raw/final/final-analysis.json) and
+[final commands and binary hashes](2026-10-18-outbox-write-cache/raw/final/comparison-runs.json) are retained.
+
+## Memory and compatibility costs
+
+One encoded journal frame remains in the existing cache after a reusable write.
+Previously a write cleared it until a later validated read. There is no new cache
+collection or second map, but write-only handles now retain that buffer too.
+A separate untimed Railway probe records slice length and backing capacity:
+
+| Depth per queue | Frame length B | Buffer capacity B |
+| ---: | ---: | ---: |
+| 0 | 14 | 24 |
+| 128 | 25,486 | 25,486 |
+| 4096 | 815,118 | 815,118 |
+
+Capacity is the slice's backing capacity, not allocator/RSS accounting. Full live
+heap after GC and cumulative process high-water RSS are also retained for every
+benchmark observation. These process metrics include fixtures/testing machinery
+and preceding subcases; they are not isolated per-handle peaks or memory limits.
+For the four-CPU large enqueue example, live heap is 7.59 → 7.47 MB and allocated
+bytes are 31.62 → 17.02 MB per two-call cycle. A retained buffer can coexist with a
+fresh read buffer and serialization work; no new resource guarantee is asserted.
+[Capacity source, command and results](2026-10-18-outbox-write-cache/raw/final/capacity-receipt.json) are retained.
+
+Eligibility is O(journal entries), uses the existing timestamp decoder, and adds
+work to fallback writes. Noncanonical text/times, historical attempts and counter
+repair keep existing normalization; unknown-offset timestamps can keep reuse
+unavailable persistently. This performance cost is preserved to retain contracts.
+The change is adopted for measured normal native-path allocation and backlog gains,
+without a workload threshold, a weaker durability policy or altered accepted values.
+The previous admission +27.6% ext4 observation is also preserved in its original
+[report](2026-10-18-outbox-admission.md), not resolved by this different experiment.
+
+## Final validation and next finding
+
+All 18 final Railway stages pass: formatting and exact measured-source equality;
+focused normal/race tests twice; full Go suite; broad storage/runtime/embedded/
+run-through/S3/public-package race tests; four conformance profiles (memory,
+filesystem, runtime-memory, runtime-filesystem); vet; site build/tests; documentation
+links; quality/file-size/format gates; both final benchmark builds and their comparison. [Final commands/results](2026-10-18-outbox-write-cache/raw/final/checks.json)
+and [source equivalence](2026-10-18-outbox-write-cache/raw/final/measured-source-equivalence.json) prove the actual
+adopted production/contracts bytes match the final-source comparison. The earlier
+guarded overlay differs only by the three explanatory comments identified above. All 17 new
+contracts pass twice in each focused mode, without skipping the permission-fault
+case. Existing format, identity, migration, ownership, peer and recovery coverage
+remains in the broader suites.
+
+The final report and documentation are checked on the same Railway source. Exact
+source copies, failed blind-prototype diagnostics, every observation, harnesses,
+source/transfer hashes and teardown receipt are retained. Benchmark binaries are
+removed after their hashes are recorded. The scratch runner is stopped after
+verified exports; the separate target service remains removed and unchanged.
+
+Next correctness investigation: the fencing-token allocator still increments its
+uint64 counter without an exhaustion guard, unlike the ID allocator. Reproduce the
+operational consequence before changing it; the serializer already permits the
+maximum counter value. No untested corruption claim or next fix is made here.
+
+The next measured performance finding is the eligibility scan's roughly 11%
+overhead on a large journal with an unusual timestamp. A later experiment should reduce that
+cost while preserving canonicalization and fencing; any adoption needs its own
+comparative evidence. Whole-journal cloning/encoding and durable sync costs also
+remain. No filesystem indexing, incremental checkpointing, storage abstraction
+or next optimization is implemented in this change.

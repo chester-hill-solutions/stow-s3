@@ -1,0 +1,48 @@
+{
+  "railwayDeploymentId": "8fb6e6de-de0b-4adf-9041-d29c24308347",
+  "checks": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/write-cache/capacity_probe_test.go.txt"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "measure",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/write-cache-capacity.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxWriteCacheCapacityProbe$",
+        "-v",
+        "-count=1"
+      ],
+      "exitCode": 0,
+      "signal": null
+    }
+  ],
+  "rows": [
+    {
+      "depth": 0,
+      "length": 14,
+      "capacity": 24
+    },
+    {
+      "depth": 128,
+      "length": 25486,
+      "capacity": 25486
+    },
+    {
+      "depth": 4096,
+      "length": 815118,
+      "capacity": 815118
+    }
+  ],
+  "sourceSHA256": "7b39ef2734a91308f7e8757a2876f692251896e905f9f21ffe7856a5771e516f"
+}

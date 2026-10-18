@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,base64,hashlib
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');b=p/'context/benchmark'
+f=b/'write-cache/safe-file_outbox_proto.go.txt';s=f.read_text()
+s=s.replace('decoded,err:=decodeOutboxProtoEntry(written)\n   if err!=nil||entry!=decoded||(entry.Attempts>0&&!entry.Attempted)||(!group.prepared&&entry.Prepared)||entry.ClaimToken>state.nextToken||entry.PreparedToken>state.nextToken{return false}\n   if sequence,_:=outboxSequenceOK(entry.ID);sequence>state.seq{return false}', 'if !reusableOutboxProtoEntry(state,entry,written)||(!group.prepared&&entry.Prepared){return false}')
+s+='''
+func reusableOutboxProtoEntry(state outboxState,entry OutboxEntry,written *outboxpb.Entry) bool {
+ decoded,err:=decodeOutboxProtoEntry(written)
+ if err!=nil||entry!=decoded{return false}
+ if entry.Attempts>0&&!entry.Attempted{return false}
+ if entry.ClaimToken>state.nextToken||entry.PreparedToken>state.nextToken{return false}
+ sequence,_:=outboxSequenceOK(entry.ID)
+ return sequence<=state.seq
+}
+'''
+f.write_text(s)
+f=b/'write-cache/contract_test.go.txt';s=f.read_text();a=s.index('    entry:=OutboxEntry{ID:');z=s.index('    if method=="enqueue"',a);fixture=s[a:z].replace('    entry:=',' entry:=').replace('    switch kind',' switch kind');s=s[:a]+'    entry:=ownWriteCanonicalFixture(kind)\n'+s[z:];s+='\nfunc ownWriteCanonicalFixture(kind string) OutboxEntry{\n'+fixture+' return entry\n}\n';f.write_text(s)
+original=json.loads((p/'prototype-inputs.json').read_text());updates={name:base64.b64encode((p/'context'/name).read_bytes()).decode()for name in original};updates['benchmark/active-plan.json']=base64.b64encode((p/'proof-plan.json').read_bytes()).decode()
+script="const fs=require('node:fs'),crypto=require('node:crypto');const checks="+json.dumps(original)+";for(const[name,digest]of Object.entries(checks))if(crypto.createHash('sha256').update(fs.readFileSync(name)).digest('hex')!==digest)throw Error('Prototype upload mismatch '+name);const updates="+json.dumps(updates)+";const hashes={};for(const[name,encoded]of Object.entries(updates)){const bytes=Buffer.from(encoded,'base64');fs.writeFileSync(name,bytes);hashes[name]=crypto.createHash('sha256').update(bytes).digest('hex')}console.log(JSON.stringify({verifiedInitialPrototypes:true,finalUpdates:hashes}));"
+(p/'install-proof.js').write_text(script);(p/'prototype-inputs-final.json').write_text(json.dumps({name:hashlib.sha256((p/'context'/name).read_bytes()).hexdigest()for name in original},indent=2)+'\n')
