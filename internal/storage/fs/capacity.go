@@ -165,14 +165,19 @@ func (s *FilesystemStore) reconcileCapacityLocked() error {
 	if s.namespace == nil || s.capacityActive {
 		return nil
 	}
+	_, err := s.reconciledCapacityUsageLocked()
+	return err
+}
+
+func (s *FilesystemStore) reconciledCapacityUsageLocked() (capacity.Usage, error) {
 	if s.saves.pendingError != nil || s.saves.pending != nil {
-		return capacity.ErrUnknown
+		return capacity.Usage{}, capacity.ErrUnknown
 	}
 	usage, err := s.scanCapacityLocked()
 	if err != nil {
-		return errors.Join(capacity.ErrUnknown, err)
+		return capacity.Usage{}, errors.Join(capacity.ErrUnknown, err)
 	}
-	return s.namespace.Reconcile(context.Background(), usage)
+	return usage, s.namespace.Reconcile(context.Background(), usage)
 }
 
 func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
@@ -195,10 +200,7 @@ func (s *FilesystemStore) writeCapacityFile(path string, data []byte) error {
 }
 
 func (s *FilesystemStore) capacityFileAdmission(path string, data []byte) (capacity.Admission, error) {
-	if err := s.reconcileCapacityLocked(); err != nil {
-		return capacity.Admission{}, err
-	}
-	usage, err := s.scanCapacityLocked()
+	usage, err := s.reconciledCapacityUsageLocked()
 	if err != nil {
 		return capacity.Admission{}, err
 	}
@@ -242,10 +244,7 @@ func (s *FilesystemStore) removeCapacityPath(path string) error {
 	if s.namespace == nil || s.capacityActive {
 		return os.RemoveAll(path)
 	}
-	if err := s.reconcileCapacityLocked(); err != nil {
-		return err
-	}
-	usage, err := s.scanCapacityLocked()
+	usage, err := s.reconciledCapacityUsageLocked()
 	if err != nil {
 		return err
 	}

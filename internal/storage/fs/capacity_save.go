@@ -40,10 +40,7 @@ func (s *FilesystemStore) admitSaveLocked(entry saveEntry, record objectRecord, 
 }
 
 func (s *FilesystemStore) saveAdmissionLocked(entry saveEntry, record objectRecord, reserve int) (capacity.Admission, error) {
-	if err := s.reconcileCapacityLocked(); err != nil {
-		return capacity.Admission{}, err
-	}
-	usage, err := s.scanCapacityLocked()
+	usage, err := s.reconciledCapacityUsageLocked()
 	if err != nil {
 		return capacity.Admission{}, err
 	}

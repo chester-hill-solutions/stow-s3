@@ -1,0 +1,14 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/storage/fs
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkAdmissionScan/objects=0/op=put-4         	      10	  18610639 ns/op	  291464 B/op	     595 allocs/op
+BenchmarkAdmissionScan/objects=0/op=save-4        	      10	  38972385 ns/op	  465446 B/op	    1233 allocs/op
+BenchmarkAdmissionScan/objects=0/op=delete-4      	      10	  15172581 ns/op	   67984 B/op	     528 allocs/op
+BenchmarkAdmissionScan/objects=8/op=put-4         	      10	  25363153 ns/op	 8836396 B/op	     876 allocs/op
+BenchmarkAdmissionScan/objects=8/op=save-4        	      10	  46170818 ns/op	 9016399 B/op	    1505 allocs/op
+BenchmarkAdmissionScan/objects=8/op=delete-4      	      10	  22927932 ns/op	 8622326 B/op	     818 allocs/op
+BenchmarkAdmissionScan/stage=scan-4               	      10	   5894549 ns/op	 8491063 B/op	     309 allocs/op
+BenchmarkAdmissionScan/stage=reconcile-4          	      10	  11524042 ns/op	 8533952 B/op	     477 allocs/op
+BenchmarkAdmissionScan/unbound-create-4           	      10	   3522350 ns/op	    4132 B/op	      40 allocs/op
+PASS

@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,statistics,re,hashlib
+p=Path('/private/tmp/stow-admission-scan-2026-10-18');phase='final';j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert v['complete'] and v['success'] and all(x['passed']for x in checks) and len(checks)==22
+for n in ['verified-red-normal','verified-red-race']:
+ t=(e/(n+'.log')).read_text();assert 'build failed'not in t and 'DATA RACE'not in t
+ for op in ['put','save','delete']:
+  assert t.count('--- FAIL: TestCapacityMutationAllocation/'+op+' (')==2,(n,op)
+  assert op+' repeated existing payload reads:'in t,(n,op)
+for n in ['focused-normal','focused-race']:
+ t=(e/(n+'.log')).read_text();assert '--- FAIL:'not in t and 'DATA RACE'not in t
+ assert t.count('--- PASS: TestCapacityMutationAllocation ')==2,(n,'allocation proof twice')
+ for op in ['put','save','delete']:assert t.count('--- PASS: TestCapacityMutationAllocation/'+op+' ')==2,(n,op)
+for n in ['focused-normal','focused-race']:
+ t=(e/(n+'.log')).read_text()
+ for name in ['TestCapacityFenceFailureRetainsReservation','TestCapacityWriteFailureBeforeRenameCanReconcile','TestSaveCapacityConcurrentAdmission','TestSaveCapacityProjectsExactRecordAndReceipt','TestMultipartPartsRespectNamespaceBudget','TestMultipartAbortReleasesNamespaceCapacity','TestMultipartRejectedReplacementPreservesPart','TestBucketCapacityRefusalLeavesNoBucket','TestBucketCapacityHoldPreventsDeletion','TestBucketCapacityConcurrentCreationRespectsReserve']:
+  assert len(re.findall(r'^--- PASS: '+name+r' \(',t,re.M))==2,(n,name)
+proof=json.loads((p/'proof-start.json').read_text());pe=p/('export-'+proof['id']);ps=json.loads((pe/'environment.json').read_text())['sourceSHA256'];fs=json.loads((e/'environment.json').read_text())['sourceSHA256']
+for prod,temp in [('internal/storage/fs/capacity.go','benchmark/scan-capacity.go.txt'),('internal/storage/fs/capacity_save.go','benchmark/scan-capacity_save.go.txt')]:
+ assert fs[prod]==ps[temp],(prod,'production differs from the measured prototype')
+ assert hashlib.sha256((p/('baseline-'+Path(prod).name+'.txt')).read_bytes()).hexdigest()==ps[prod],prod
+assert fs['internal/storage/fs/capacity_scan_test.go']==ps['internal/storage/fs/capacity_scan_test.go']
+rows=json.loads((e/'measurements.json').read_text());assert len(rows['observations'])==144 and all(r['iterations']==10 for r in rows['observations'])
+analysis=[]
+for name in sorted({r['name']for r in rows['observations']}):
+ cell={'name':name,'labels':{}}
+ for label in ['A','B','C','D']:
+  values=[r for r in rows['observations']if r['name']==name and r['label']==label];assert len(values)==4
+  cell['labels'][label]={k:{'median':statistics.median(r[k]for r in values),'min':min(r[k]for r in values),'max':max(r[k]for r in values)}for k in ['ns','bytes','allocs']}
+ cell['changePercent']={k:100*(cell['labels']['B'][k]['median']/cell['labels']['A'][k]['median']-1)for k in ['ns','bytes','allocs']}
+ cell['sameBinaryControlTimePercent']=100*(cell['labels']['D']['ns']['median']/cell['labels']['C']['ns']['median']-1)
+ analysis.append(cell)
+(e/'comparison-analysis.json').write_text(json.dumps(analysis,indent=2)+'\n')
+(e/'validation-receipt.json').write_text(json.dumps({'checks':len(checks),'allPassed':True,'measurements':144,'regressionTopLevelTests':1,'nativeLeafCases':3,'originalExistingPayloadBytes':8388608,'allocationBudgetBytes':12582912,'normalRepeats':2,'raceRepeats':2,'sources':json.loads((e/'environment.json').read_text())['sourceSHA256']},indent=2)+'\n')
+for c in analysis:
+ a,b=c['labels']['A'],c['labels']['B'];print(c['name'],f"time {a['ns']['median']/1e6:.3f}->{b['ns']['median']/1e6:.3f} ms ({c['changePercent']['ns']:+.2f}%)",f"bytes {a['bytes']['median']}->{b['bytes']['median']}",f"allocs {a['allocs']['median']}->{b['allocs']['median']}",f"AA {c['sameBinaryControlTimePercent']:+.2f}%")

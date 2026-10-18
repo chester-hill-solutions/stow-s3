@@ -1,0 +1,714 @@
+=== RUN   TestBucketCapacityConcurrentCreationRespectsReserve
+--- PASS: TestBucketCapacityConcurrentCreationRespectsReserve (0.18s)
+=== RUN   TestBucketCapacityFenceFailureRetainsMetadata
+--- PASS: TestBucketCapacityFenceFailureRetainsMetadata (0.02s)
+=== RUN   TestBucketCapacityCreationChargesMetadata
+--- PASS: TestBucketCapacityCreationChargesMetadata (0.02s)
+=== RUN   TestBucketCapacityDeletionReleasesAfterReopen
+--- PASS: TestBucketCapacityDeletionReleasesAfterReopen (0.02s)
+=== RUN   TestBucketCapacityRefusalLeavesNoBucket
+--- PASS: TestBucketCapacityRefusalLeavesNoBucket (0.11s)
+=== RUN   TestBucketCapacityHoldPreventsDeletion
+--- PASS: TestBucketCapacityHoldPreventsDeletion (0.02s)
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+--- PASS: TestCapacityFenceFailureRetainsReservation (0.74s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.08s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.10s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+--- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile (0.08s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.04s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.04s)
+=== RUN   TestMultipartCompletionAdmissionRefusalRetainsUpload
+--- PASS: TestMultipartCompletionAdmissionRefusalRetainsUpload (0.04s)
+=== RUN   TestMultipartBoundCompletionCleanupPreservesCommittedOutcome
+--- PASS: TestMultipartBoundCompletionCleanupPreservesCommittedOutcome (0.03s)
+=== RUN   TestMultipartCapacityHoldProtectsPart
+--- PASS: TestMultipartCapacityHoldProtectsPart (0.03s)
+=== RUN   TestMultipartConcurrentNamespaceAdmission
+--- PASS: TestMultipartConcurrentNamespaceAdmission (0.05s)
+=== RUN   TestMultipartSharedHostAdmission
+--- PASS: TestMultipartSharedHostAdmission (0.06s)
+=== RUN   TestMultipartPartsRespectNamespaceBudget
+--- PASS: TestMultipartPartsRespectNamespaceBudget (0.04s)
+=== RUN   TestMultipartAbortReleasesNamespaceCapacity
+--- PASS: TestMultipartAbortReleasesNamespaceCapacity (0.02s)
+=== RUN   TestMultipartCompletionReleasesPartCapacity
+--- PASS: TestMultipartCompletionReleasesPartCapacity (0.03s)
+=== RUN   TestMultipartManifestRecoveryBudget
+--- PASS: TestMultipartManifestRecoveryBudget (0.03s)
+=== RUN   TestMultipartRejectedReplacementPreservesPart
+--- PASS: TestMultipartRejectedReplacementPreservesPart (0.05s)
+=== RUN   TestMultipartManifestChargeMatchesScan
+--- PASS: TestMultipartManifestChargeMatchesScan (0.02s)
+=== RUN   TestMultipartReplacementChargesOnePart
+--- PASS: TestMultipartReplacementChargesOnePart (0.05s)
+=== RUN   TestOrdinaryWritesShareNamespaceAdmission
+--- PASS: TestOrdinaryWritesShareNamespaceAdmission (0.05s)
+=== RUN   TestOrdinaryOverwriteAndReopenChargeOneRecord
+--- PASS: TestOrdinaryOverwriteAndReopenChargeOneRecord (0.03s)
+=== RUN   TestOrdinaryWritesRespectSharedHostBudget
+--- PASS: TestOrdinaryWritesRespectSharedHostBudget (0.05s)
+=== RUN   TestSaveCapacityConcurrentAdmission
+--- PASS: TestSaveCapacityConcurrentAdmission (0.05s)
+=== RUN   TestSaveCapacitySharesHostBudget
+--- PASS: TestSaveCapacitySharesHostBudget (0.06s)
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt/key
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt/lon
+--- PASS: TestSaveCapacityProjectsExactRecordAndReceipt (0.09s)
+    --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt/key (0.04s)
+    --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt/lon (0.05s)
+=== RUN   TestSaveCapacityRefusesBeforeIntent
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304
+--- PASS: TestSaveCapacityRefusesBeforeIntent (0.30s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304 (0.04s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000 (0.02s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304 (0.05s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304 (0.05s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304 (0.05s)
+=== RUN   TestSaveCapacityChargesSuccessAndReplay
+--- PASS: TestSaveCapacityChargesSuccessAndReplay (0.02s)
+=== RUN   TestSaveCapacitySharesNamespace
+--- PASS: TestSaveCapacitySharesNamespace (0.05s)
+=== RUN   TestSaveCapacityRetainsInterruptedReservation
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/prepared
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/publishing
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/published
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/sync
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/terminal
+--- PASS: TestSaveCapacityRetainsInterruptedReservation (0.33s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/prepared (0.07s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/publishing (0.05s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/published (0.08s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/sync (0.08s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/terminal (0.06s)
+=== RUN   TestSaveCapacityReservesReceiptSpace
+--- PASS: TestSaveCapacityReservesReceiptSpace (1.01s)
+=== RUN   TestSaveCapacityReopenSettlesReservation
+=== RUN   TestSaveCapacityReopenSettlesReservation/prepared
+=== RUN   TestSaveCapacityReopenSettlesReservation/published
+--- PASS: TestSaveCapacityReopenSettlesReservation (0.05s)
+    --- PASS: TestSaveCapacityReopenSettlesReservation/prepared (0.03s)
+    --- PASS: TestSaveCapacityReopenSettlesReservation/published (0.03s)
+=== RUN   TestCapacityMutationAllocation
+=== RUN   TestCapacityMutationAllocation/put
+    capacity_scan_test.go:92: put with 8 MiB of existing payload: 8800072 allocated bytes/op
+=== RUN   TestCapacityMutationAllocation/save
+    capacity_scan_test.go:92: save with 8 MiB of existing payload: 8983904 allocated bytes/op
+=== RUN   TestCapacityMutationAllocation/delete
+    capacity_scan_test.go:92: delete with 8 MiB of existing payload: 8727240 allocated bytes/op
+--- PASS: TestCapacityMutationAllocation (0.41s)
+    --- PASS: TestCapacityMutationAllocation/put (0.14s)
+    --- PASS: TestCapacityMutationAllocation/save (0.12s)
+    --- PASS: TestCapacityMutationAllocation/delete (0.15s)
+=== RUN   TestDiskPutAndCopyAllocationBounded
+=== RUN   TestDiskPutAndCopyAllocationBounded/put
+=== RUN   TestDiskPutAndCopyAllocationBounded/copy
+--- PASS: TestDiskPutAndCopyAllocationBounded (3.58s)
+    --- PASS: TestDiskPutAndCopyAllocationBounded/put (2.18s)
+    --- PASS: TestDiskPutAndCopyAllocationBounded/copy (1.14s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (0.03s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.01s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.00s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.00s)
+=== RUN   TestBinaryRecordRoundTrip
+--- PASS: TestBinaryRecordRoundTrip (0.00s)
+=== RUN   TestOpenRecordSurvivesOverwriteAndDelete
+--- PASS: TestOpenRecordSurvivesOverwriteAndDelete (0.00s)
+=== RUN   TestBinaryRecordSurvivesReopen
+--- PASS: TestBinaryRecordSurvivesReopen (0.00s)
+=== RUN   TestLegacyJSONRecordReadableAndRewritten
+--- PASS: TestLegacyJSONRecordReadableAndRewritten (0.00s)
+=== RUN   TestMalformedBinaryRecordRefused
+=== RUN   TestMalformedBinaryRecordRefused/prefix
+=== RUN   TestMalformedBinaryRecordRefused/header-size
+=== RUN   TestMalformedBinaryRecordRefused/truncated-payload
+=== RUN   TestMalformedBinaryRecordRefused/extra-payload
+=== RUN   TestMalformedBinaryRecordRefused/version
+--- PASS: TestMalformedBinaryRecordRefused (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/prefix (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/header-size (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/truncated-payload (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/extra-payload (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/version (0.00s)
+=== RUN   TestHeadAllocationBounded
+--- PASS: TestHeadAllocationBounded (1.68s)
+=== RUN   TestRecordWriteToCopiesOnlyRemainingPayload
+--- PASS: TestRecordWriteToCopiesOnlyRemainingPayload (0.00s)
+=== RUN   TestRecoveryHoldBlocksMutationUntilRelease
+--- PASS: TestRecoveryHoldBlocksMutationUntilRelease (0.06s)
+=== RUN   TestRecoveryHoldOutlivesTheStore
+--- PASS: TestRecoveryHoldOutlivesTheStore (0.01s)
+=== RUN   TestRecoveryHoldIdentityIsEnforced
+--- PASS: TestRecoveryHoldIdentityIsEnforced (0.01s)
+=== RUN   TestRecoveryHoldRefusesAStaleObservation
+--- PASS: TestRecoveryHoldRefusesAStaleObservation (0.00s)
+=== RUN   TestRecoveryHoldRefusesAMalformedRequest
+--- PASS: TestRecoveryHoldRefusesAMalformedRequest (0.00s)
+=== RUN   TestRecoveryHoldRefusesUnreadableState
+--- PASS: TestRecoveryHoldRefusesUnreadableState (0.01s)
+=== RUN   TestRuntimeReopensAfterInterruptedPublishing
+--- PASS: TestRuntimeReopensAfterInterruptedPublishing (0.01s)
+=== RUN   TestComputedChecksumSaveReplay
+=== RUN   TestComputedChecksumSaveReplay/put
+=== RUN   TestComputedChecksumSaveReplay/receipt
+--- PASS: TestComputedChecksumSaveReplay (0.02s)
+    --- PASS: TestComputedChecksumSaveReplay/put (0.01s)
+    --- PASS: TestComputedChecksumSaveReplay/receipt (0.01s)
+=== RUN   TestSaveRecoveryAtPublicationBoundaries
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/prepared
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/publishing
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/published
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/sync
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/terminal
+--- PASS: TestSaveRecoveryAtPublicationBoundaries (0.04s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/prepared (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/publishing (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/published (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/sync (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/terminal (0.01s)
+=== RUN   TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete
+--- PASS: TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete (0.01s)
+=== RUN   TestSaveJournalBoundedAdmission
+=== RUN   TestSaveJournalBoundedAdmission/count
+=== RUN   TestSaveJournalBoundedAdmission/bytes
+=== RUN   TestSaveJournalBoundedAdmission/entry
+--- PASS: TestSaveJournalBoundedAdmission (0.01s)
+    --- PASS: TestSaveJournalBoundedAdmission/count (0.00s)
+    --- PASS: TestSaveJournalBoundedAdmission/bytes (0.00s)
+    --- PASS: TestSaveJournalBoundedAdmission/entry (0.01s)
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal
+--- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence (0.01s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed (0.00s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity (0.00s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal (0.00s)
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-raw
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-valid
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw
+--- PASS: TestSaveEvidenceMetadataCorruptionRefuses (0.02s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/pending-raw (0.00s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/pending-valid (0.01s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw (0.01s)
+=== RUN   TestSaveLegacyRecordAndUnkeyedPublication
+--- PASS: TestSaveLegacyRecordAndUnkeyedPublication (0.01s)
+=== RUN   TestSaveInvalidRequestKeyRefusesAndReopens
+--- PASS: TestSaveInvalidRequestKeyRefusesAndReopens (0.01s)
+=== RUN   TestSaveMalformedLogicalOptionsRefuseBeforeEvidence
+--- PASS: TestSaveMalformedLogicalOptionsRefuseBeforeEvidence (0.01s)
+=== RUN   TestSaveMalformedLookupResourceRefuses
+--- PASS: TestSaveMalformedLookupResourceRefuses (0.00s)
+=== RUN   TestPrefixFullReadRetainsUnderlyingFailure
+--- PASS: TestPrefixFullReadRetainsUnderlyingFailure (0.00s)
+=== RUN   TestDiskStageOwnsBytesAndChecksums
+--- PASS: TestDiskStageOwnsBytesAndChecksums (0.00s)
+=== RUN   TestDiskStageRechecksConditionsAndCleansAbort
+--- PASS: TestDiskStageRechecksConditionsAndCleansAbort (0.00s)
+=== RUN   TestDiskStageFailurePreservesPublishedObject
+--- PASS: TestDiskStageFailurePreservesPublishedObject (0.00s)
+=== RUN   TestDiskStaleStageRemovedOnReopen
+--- PASS: TestDiskStaleStageRemovedOnReopen (0.00s)
+=== RUN   TestDiskStagePreventsCapacityRebindingUntilFinished
+--- PASS: TestDiskStagePreventsCapacityRebindingUntilFinished (0.01s)
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32C
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA1
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA256
+--- PASS: TestDiskStageVerifiesLargeStreamChecksums (0.02s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32 (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32C (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA1 (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA256 (0.00s)
+=== RUN   TestFilesystemStoreBucketContract
+--- PASS: TestFilesystemStoreBucketContract (0.00s)
+=== RUN   TestFilesystemStoreObjectContract
+--- PASS: TestFilesystemStoreObjectContract (0.00s)
+=== RUN   TestFilesystemStoreMultipartContract
+--- PASS: TestFilesystemStoreMultipartContract (0.00s)
+=== RUN   TestFilesystemStoreListHonorsCancellation
+--- PASS: TestFilesystemStoreListHonorsCancellation (0.00s)
+=== RUN   TestStoreLockAdmitsOneOwnerAtATime
+--- PASS: TestStoreLockAdmitsOneOwnerAtATime (0.00s)
+=== RUN   TestStoreLockExcludesAnotherProcess
+--- PASS: TestStoreLockExcludesAnotherProcess (0.01s)
+=== RUN   TestFilesystemStoreSingleOwnerLock
+--- PASS: TestFilesystemStoreSingleOwnerLock (0.00s)
+=== RUN   TestFilesystemStoreObjectLifecycle
+--- PASS: TestFilesystemStoreObjectLifecycle (0.00s)
+=== RUN   TestFilesystemStoreRemovesStaleAtomicTempsOnOpen
+--- PASS: TestFilesystemStoreRemovesStaleAtomicTempsOnOpen (0.00s)
+=== RUN   TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock
+--- PASS: TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock (0.00s)
+=== RUN   TestFilesystemStoreRecoversStaleLockBeforeCleanup
+--- PASS: TestFilesystemStoreRecoversStaleLockBeforeCleanup (0.00s)
+=== RUN   TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover
+--- PASS: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.00s)
+=== RUN   TestFilesystemStoreUsesSingleObjectRecord
+--- PASS: TestFilesystemStoreUsesSingleObjectRecord (0.00s)
+=== RUN   TestFilesystemStoreOpaqueKeys
+--- PASS: TestFilesystemStoreOpaqueKeys (0.01s)
+=== RUN   TestFilesystemStoreMultipart
+--- PASS: TestFilesystemStoreMultipart (0.10s)
+=== RUN   TestFilesystemStoreDeleteBucketNotEmpty
+--- PASS: TestFilesystemStoreDeleteBucketNotEmpty (0.00s)
+=== RUN   TestFilesystemStoreDeletePrunesShards
+--- PASS: TestFilesystemStoreDeletePrunesShards (0.01s)
+=== RUN   TestFilesystemStoreDeleteBucketRefusesLongKeyObjects
+--- PASS: TestFilesystemStoreDeleteBucketRefusesLongKeyObjects (0.00s)
+=== RUN   TestFilesystemStoreCopyLongKey
+--- PASS: TestFilesystemStoreCopyLongKey (0.00s)
+=== RUN   TestFilesystemStoreDeleteObjectsWithLongKeys
+--- PASS: TestFilesystemStoreDeleteObjectsWithLongKeys (0.00s)
+=== RUN   TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide
+--- PASS: TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide (0.01s)
+=== RUN   TestFilesystemStoreReadsLegacyLongKeyShards
+--- PASS: TestFilesystemStoreReadsLegacyLongKeyShards (0.00s)
+=== RUN   TestFilesystemStoreLongKeysRoundTrip
+--- PASS: TestFilesystemStoreLongKeysRoundTrip (0.01s)
+=== RUN   TestFilesystemStoreShortKeysStayFlat
+--- PASS: TestFilesystemStoreShortKeysStayFlat (0.00s)
+=== RUN   TestFilesystemStoreLongestKeysUseBoundedPaths
+--- PASS: TestFilesystemStoreLongestKeysUseBoundedPaths (0.00s)
+=== RUN   TestFilesystemStoreBoundedPathsWithLongRootAndReopen
+--- PASS: TestFilesystemStoreBoundedPathsWithLongRootAndReopen (0.01s)
+=== RUN   TestFilesystemStoreCompletesMultipartUploadToBoundedPath
+--- PASS: TestFilesystemStoreCompletesMultipartUploadToBoundedPath (0.00s)
+=== RUN   TestFilesystemStoreListsMixedKeyLengths
+--- PASS: TestFilesystemStoreListsMixedKeyLengths (0.01s)
+=== RUN   TestBucketCapacityConcurrentCreationRespectsReserve
+--- PASS: TestBucketCapacityConcurrentCreationRespectsReserve (0.16s)
+=== RUN   TestBucketCapacityFenceFailureRetainsMetadata
+--- PASS: TestBucketCapacityFenceFailureRetainsMetadata (0.02s)
+=== RUN   TestBucketCapacityCreationChargesMetadata
+--- PASS: TestBucketCapacityCreationChargesMetadata (0.01s)
+=== RUN   TestBucketCapacityDeletionReleasesAfterReopen
+--- PASS: TestBucketCapacityDeletionReleasesAfterReopen (0.02s)
+=== RUN   TestBucketCapacityRefusalLeavesNoBucket
+--- PASS: TestBucketCapacityRefusalLeavesNoBucket (0.10s)
+=== RUN   TestBucketCapacityHoldPreventsDeletion
+--- PASS: TestBucketCapacityHoldPreventsDeletion (0.02s)
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+--- PASS: TestCapacityFenceFailureRetainsReservation (0.76s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.11s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+--- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile (0.09s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.05s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.04s)
+=== RUN   TestMultipartCompletionAdmissionRefusalRetainsUpload
+--- PASS: TestMultipartCompletionAdmissionRefusalRetainsUpload (0.04s)
+=== RUN   TestMultipartBoundCompletionCleanupPreservesCommittedOutcome
+--- PASS: TestMultipartBoundCompletionCleanupPreservesCommittedOutcome (0.03s)
+=== RUN   TestMultipartCapacityHoldProtectsPart
+--- PASS: TestMultipartCapacityHoldProtectsPart (0.03s)
+=== RUN   TestMultipartConcurrentNamespaceAdmission
+--- PASS: TestMultipartConcurrentNamespaceAdmission (0.05s)
+=== RUN   TestMultipartSharedHostAdmission
+--- PASS: TestMultipartSharedHostAdmission (0.06s)
+=== RUN   TestMultipartPartsRespectNamespaceBudget
+--- PASS: TestMultipartPartsRespectNamespaceBudget (0.04s)
+=== RUN   TestMultipartAbortReleasesNamespaceCapacity
+--- PASS: TestMultipartAbortReleasesNamespaceCapacity (0.02s)
+=== RUN   TestMultipartCompletionReleasesPartCapacity
+--- PASS: TestMultipartCompletionReleasesPartCapacity (0.03s)
+=== RUN   TestMultipartManifestRecoveryBudget
+--- PASS: TestMultipartManifestRecoveryBudget (0.03s)
+=== RUN   TestMultipartRejectedReplacementPreservesPart
+--- PASS: TestMultipartRejectedReplacementPreservesPart (0.04s)
+=== RUN   TestMultipartManifestChargeMatchesScan
+--- PASS: TestMultipartManifestChargeMatchesScan (0.02s)
+=== RUN   TestMultipartReplacementChargesOnePart
+--- PASS: TestMultipartReplacementChargesOnePart (0.05s)
+=== RUN   TestOrdinaryWritesShareNamespaceAdmission
+--- PASS: TestOrdinaryWritesShareNamespaceAdmission (0.04s)
+=== RUN   TestOrdinaryOverwriteAndReopenChargeOneRecord
+--- PASS: TestOrdinaryOverwriteAndReopenChargeOneRecord (0.03s)
+=== RUN   TestOrdinaryWritesRespectSharedHostBudget
+--- PASS: TestOrdinaryWritesRespectSharedHostBudget (0.05s)
+=== RUN   TestSaveCapacityConcurrentAdmission
+--- PASS: TestSaveCapacityConcurrentAdmission (0.05s)
+=== RUN   TestSaveCapacitySharesHostBudget
+--- PASS: TestSaveCapacitySharesHostBudget (0.05s)
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt/key
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt/lon
+--- PASS: TestSaveCapacityProjectsExactRecordAndReceipt (0.09s)
+    --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt/key (0.04s)
+    --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt/lon (0.05s)
+=== RUN   TestSaveCapacityRefusesBeforeIntent
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304
+--- PASS: TestSaveCapacityRefusesBeforeIntent (0.31s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304 (0.04s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000 (0.02s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304 (0.05s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304 (0.05s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304 (0.05s)
+=== RUN   TestSaveCapacityChargesSuccessAndReplay
+--- PASS: TestSaveCapacityChargesSuccessAndReplay (0.02s)
+=== RUN   TestSaveCapacitySharesNamespace
+--- PASS: TestSaveCapacitySharesNamespace (0.06s)
+=== RUN   TestSaveCapacityRetainsInterruptedReservation
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/prepared
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/publishing
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/published
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/sync
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/terminal
+--- PASS: TestSaveCapacityRetainsInterruptedReservation (0.30s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/prepared (0.06s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/publishing (0.05s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/published (0.07s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/sync (0.07s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/terminal (0.05s)
+=== RUN   TestSaveCapacityReservesReceiptSpace
+--- PASS: TestSaveCapacityReservesReceiptSpace (1.01s)
+=== RUN   TestSaveCapacityReopenSettlesReservation
+=== RUN   TestSaveCapacityReopenSettlesReservation/prepared
+=== RUN   TestSaveCapacityReopenSettlesReservation/published
+--- PASS: TestSaveCapacityReopenSettlesReservation (0.05s)
+    --- PASS: TestSaveCapacityReopenSettlesReservation/prepared (0.02s)
+    --- PASS: TestSaveCapacityReopenSettlesReservation/published (0.02s)
+=== RUN   TestCapacityMutationAllocation
+=== RUN   TestCapacityMutationAllocation/put
+    capacity_scan_test.go:92: put with 8 MiB of existing payload: 8824480 allocated bytes/op
+=== RUN   TestCapacityMutationAllocation/save
+    capacity_scan_test.go:92: save with 8 MiB of existing payload: 9028328 allocated bytes/op
+=== RUN   TestCapacityMutationAllocation/delete
+    capacity_scan_test.go:92: delete with 8 MiB of existing payload: 8702544 allocated bytes/op
+--- PASS: TestCapacityMutationAllocation (0.40s)
+    --- PASS: TestCapacityMutationAllocation/put (0.12s)
+    --- PASS: TestCapacityMutationAllocation/save (0.13s)
+    --- PASS: TestCapacityMutationAllocation/delete (0.15s)
+=== RUN   TestDiskPutAndCopyAllocationBounded
+=== RUN   TestDiskPutAndCopyAllocationBounded/put
+=== RUN   TestDiskPutAndCopyAllocationBounded/copy
+--- PASS: TestDiskPutAndCopyAllocationBounded (2.79s)
+    --- PASS: TestDiskPutAndCopyAllocationBounded/put (1.31s)
+    --- PASS: TestDiskPutAndCopyAllocationBounded/copy (1.19s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (0.03s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.01s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.00s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.00s)
+=== RUN   TestBinaryRecordRoundTrip
+--- PASS: TestBinaryRecordRoundTrip (0.00s)
+=== RUN   TestOpenRecordSurvivesOverwriteAndDelete
+--- PASS: TestOpenRecordSurvivesOverwriteAndDelete (0.00s)
+=== RUN   TestBinaryRecordSurvivesReopen
+--- PASS: TestBinaryRecordSurvivesReopen (0.00s)
+=== RUN   TestLegacyJSONRecordReadableAndRewritten
+--- PASS: TestLegacyJSONRecordReadableAndRewritten (0.00s)
+=== RUN   TestMalformedBinaryRecordRefused
+=== RUN   TestMalformedBinaryRecordRefused/prefix
+=== RUN   TestMalformedBinaryRecordRefused/header-size
+=== RUN   TestMalformedBinaryRecordRefused/truncated-payload
+=== RUN   TestMalformedBinaryRecordRefused/extra-payload
+=== RUN   TestMalformedBinaryRecordRefused/version
+--- PASS: TestMalformedBinaryRecordRefused (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/prefix (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/header-size (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/truncated-payload (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/extra-payload (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/version (0.00s)
+=== RUN   TestHeadAllocationBounded
+--- PASS: TestHeadAllocationBounded (1.67s)
+=== RUN   TestRecordWriteToCopiesOnlyRemainingPayload
+--- PASS: TestRecordWriteToCopiesOnlyRemainingPayload (0.00s)
+=== RUN   TestRecoveryHoldBlocksMutationUntilRelease
+--- PASS: TestRecoveryHoldBlocksMutationUntilRelease (0.06s)
+=== RUN   TestRecoveryHoldOutlivesTheStore
+--- PASS: TestRecoveryHoldOutlivesTheStore (0.01s)
+=== RUN   TestRecoveryHoldIdentityIsEnforced
+--- PASS: TestRecoveryHoldIdentityIsEnforced (0.01s)
+=== RUN   TestRecoveryHoldRefusesAStaleObservation
+--- PASS: TestRecoveryHoldRefusesAStaleObservation (0.00s)
+=== RUN   TestRecoveryHoldRefusesAMalformedRequest
+--- PASS: TestRecoveryHoldRefusesAMalformedRequest (0.00s)
+=== RUN   TestRecoveryHoldRefusesUnreadableState
+--- PASS: TestRecoveryHoldRefusesUnreadableState (0.01s)
+=== RUN   TestRuntimeReopensAfterInterruptedPublishing
+--- PASS: TestRuntimeReopensAfterInterruptedPublishing (0.01s)
+=== RUN   TestComputedChecksumSaveReplay
+=== RUN   TestComputedChecksumSaveReplay/put
+=== RUN   TestComputedChecksumSaveReplay/receipt
+--- PASS: TestComputedChecksumSaveReplay (0.02s)
+    --- PASS: TestComputedChecksumSaveReplay/put (0.01s)
+    --- PASS: TestComputedChecksumSaveReplay/receipt (0.01s)
+=== RUN   TestSaveRecoveryAtPublicationBoundaries
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/prepared
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/publishing
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/published
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/sync
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/terminal
+--- PASS: TestSaveRecoveryAtPublicationBoundaries (0.05s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/prepared (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/publishing (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/published (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/sync (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/terminal (0.01s)
+=== RUN   TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete
+--- PASS: TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete (0.01s)
+=== RUN   TestSaveJournalBoundedAdmission
+=== RUN   TestSaveJournalBoundedAdmission/count
+=== RUN   TestSaveJournalBoundedAdmission/bytes
+=== RUN   TestSaveJournalBoundedAdmission/entry
+--- PASS: TestSaveJournalBoundedAdmission (0.02s)
+    --- PASS: TestSaveJournalBoundedAdmission/count (0.00s)
+    --- PASS: TestSaveJournalBoundedAdmission/bytes (0.00s)
+    --- PASS: TestSaveJournalBoundedAdmission/entry (0.01s)
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal
+--- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence (0.02s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed (0.01s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity (0.00s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal (0.01s)
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-raw
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-valid
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw
+--- PASS: TestSaveEvidenceMetadataCorruptionRefuses (0.02s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/pending-raw (0.01s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/pending-valid (0.01s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw (0.01s)
+=== RUN   TestSaveLegacyRecordAndUnkeyedPublication
+--- PASS: TestSaveLegacyRecordAndUnkeyedPublication (0.01s)
+=== RUN   TestSaveInvalidRequestKeyRefusesAndReopens
+--- PASS: TestSaveInvalidRequestKeyRefusesAndReopens (0.00s)
+=== RUN   TestSaveMalformedLogicalOptionsRefuseBeforeEvidence
+--- PASS: TestSaveMalformedLogicalOptionsRefuseBeforeEvidence (0.01s)
+=== RUN   TestSaveMalformedLookupResourceRefuses
+--- PASS: TestSaveMalformedLookupResourceRefuses (0.00s)
+=== RUN   TestPrefixFullReadRetainsUnderlyingFailure
+--- PASS: TestPrefixFullReadRetainsUnderlyingFailure (0.00s)
+=== RUN   TestDiskStageOwnsBytesAndChecksums
+--- PASS: TestDiskStageOwnsBytesAndChecksums (0.00s)
+=== RUN   TestDiskStageRechecksConditionsAndCleansAbort
+--- PASS: TestDiskStageRechecksConditionsAndCleansAbort (0.00s)
+=== RUN   TestDiskStageFailurePreservesPublishedObject
+--- PASS: TestDiskStageFailurePreservesPublishedObject (0.00s)
+=== RUN   TestDiskStaleStageRemovedOnReopen
+--- PASS: TestDiskStaleStageRemovedOnReopen (0.00s)
+=== RUN   TestDiskStagePreventsCapacityRebindingUntilFinished
+--- PASS: TestDiskStagePreventsCapacityRebindingUntilFinished (0.01s)
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32C
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA1
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA256
+--- PASS: TestDiskStageVerifiesLargeStreamChecksums (0.02s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32 (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32C (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME (0.01s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA1 (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA256 (0.00s)
+=== RUN   TestFilesystemStoreBucketContract
+--- PASS: TestFilesystemStoreBucketContract (0.00s)
+=== RUN   TestFilesystemStoreObjectContract
+--- PASS: TestFilesystemStoreObjectContract (0.01s)
+=== RUN   TestFilesystemStoreMultipartContract
+--- PASS: TestFilesystemStoreMultipartContract (0.00s)
+=== RUN   TestFilesystemStoreListHonorsCancellation
+--- PASS: TestFilesystemStoreListHonorsCancellation (0.00s)
+=== RUN   TestStoreLockAdmitsOneOwnerAtATime
+--- PASS: TestStoreLockAdmitsOneOwnerAtATime (0.00s)
+=== RUN   TestStoreLockExcludesAnotherProcess
+--- PASS: TestStoreLockExcludesAnotherProcess (0.01s)
+=== RUN   TestFilesystemStoreSingleOwnerLock
+--- PASS: TestFilesystemStoreSingleOwnerLock (0.00s)
+=== RUN   TestFilesystemStoreObjectLifecycle
+--- PASS: TestFilesystemStoreObjectLifecycle (0.00s)
+=== RUN   TestFilesystemStoreRemovesStaleAtomicTempsOnOpen
+--- PASS: TestFilesystemStoreRemovesStaleAtomicTempsOnOpen (0.00s)
+=== RUN   TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock
+--- PASS: TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock (0.00s)
+=== RUN   TestFilesystemStoreRecoversStaleLockBeforeCleanup
+--- PASS: TestFilesystemStoreRecoversStaleLockBeforeCleanup (0.00s)
+=== RUN   TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover
+--- PASS: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.01s)
+=== RUN   TestFilesystemStoreUsesSingleObjectRecord
+--- PASS: TestFilesystemStoreUsesSingleObjectRecord (0.00s)
+=== RUN   TestFilesystemStoreOpaqueKeys
+--- PASS: TestFilesystemStoreOpaqueKeys (0.01s)
+=== RUN   TestFilesystemStoreMultipart
+--- PASS: TestFilesystemStoreMultipart (0.11s)
+=== RUN   TestFilesystemStoreDeleteBucketNotEmpty
+--- PASS: TestFilesystemStoreDeleteBucketNotEmpty (0.00s)
+=== RUN   TestFilesystemStoreDeletePrunesShards
+--- PASS: TestFilesystemStoreDeletePrunesShards (0.01s)
+=== RUN   TestFilesystemStoreDeleteBucketRefusesLongKeyObjects
+--- PASS: TestFilesystemStoreDeleteBucketRefusesLongKeyObjects (0.01s)
+=== RUN   TestFilesystemStoreCopyLongKey
+--- PASS: TestFilesystemStoreCopyLongKey (0.01s)
+=== RUN   TestFilesystemStoreDeleteObjectsWithLongKeys
+--- PASS: TestFilesystemStoreDeleteObjectsWithLongKeys (0.01s)
+=== RUN   TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide
+--- PASS: TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide (0.02s)
+=== RUN   TestFilesystemStoreReadsLegacyLongKeyShards
+--- PASS: TestFilesystemStoreReadsLegacyLongKeyShards (0.01s)
+=== RUN   TestFilesystemStoreLongKeysRoundTrip
+--- PASS: TestFilesystemStoreLongKeysRoundTrip (0.01s)
+=== RUN   TestFilesystemStoreShortKeysStayFlat
+--- PASS: TestFilesystemStoreShortKeysStayFlat (0.00s)
+=== RUN   TestFilesystemStoreLongestKeysUseBoundedPaths
+--- PASS: TestFilesystemStoreLongestKeysUseBoundedPaths (0.00s)
+=== RUN   TestFilesystemStoreBoundedPathsWithLongRootAndReopen
+--- PASS: TestFilesystemStoreBoundedPathsWithLongRootAndReopen (0.01s)
+=== RUN   TestFilesystemStoreCompletesMultipartUploadToBoundedPath
+--- PASS: TestFilesystemStoreCompletesMultipartUploadToBoundedPath (0.01s)
+=== RUN   TestFilesystemStoreListsMixedKeyLengths
+--- PASS: TestFilesystemStoreListsMixedKeyLengths (0.01s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	20.167s
+=== RUN   TestAdmissionRetainsUnknownEffectUntilReconciliation
+--- PASS: TestAdmissionRetainsUnknownEffectUntilReconciliation (0.01s)
+=== RUN   TestReconcileAccountsPayloadAndRecoverySeparately
+--- PASS: TestReconcileAccountsPayloadAndRecoverySeparately (0.01s)
+=== RUN   TestReconcileRefusesUnboundStoreAndDuplicateResources
+--- PASS: TestReconcileRefusesUnboundStoreAndDuplicateResources (0.00s)
+=== RUN   TestBindStoreRefusesAStoreClaimedElsewhere
+--- PASS: TestBindStoreRefusesAStoreClaimedElsewhere (0.00s)
+=== RUN   TestAdmissionPublishesOnlyAfterTheEffectSucceeds
+--- PASS: TestAdmissionPublishesOnlyAfterTheEffectSucceeds (0.01s)
+=== RUN   TestAdmissionRefusesAnUnusableRequest
+--- PASS: TestAdmissionRefusesAnUnusableRequest (0.00s)
+=== RUN   TestHeldDependencyRefusesReplacement
+--- PASS: TestHeldDependencyRefusesReplacement (0.01s)
+=== RUN   TestBeginOperationRefusesAnUnverifiableDependency
+--- PASS: TestBeginOperationRefusesAnUnverifiableDependency (0.00s)
+=== RUN   TestOperationReserveIsChargedBeforePublication
+--- PASS: TestOperationReserveIsChargedBeforePublication (0.00s)
+=== RUN   TestReleasedOperationsFreeTheirSlotAndReserve
+--- PASS: TestReleasedOperationsFreeTheirSlotAndReserve (0.90s)
+=== RUN   TestHostStateSurvivesReopenAndRefusesTampering
+--- PASS: TestHostStateSurvivesReopenAndRefusesTampering (0.01s)
+=== RUN   TestBindRefusesAnUnequalRebindAndHonoursItsBound
+--- PASS: TestBindRefusesAnUnequalRebindAndHonoursItsBound (0.00s)
+=== RUN   TestAdmissionRetainsUnknownEffectUntilReconciliation
+--- PASS: TestAdmissionRetainsUnknownEffectUntilReconciliation (0.01s)
+=== RUN   TestReconcileAccountsPayloadAndRecoverySeparately
+--- PASS: TestReconcileAccountsPayloadAndRecoverySeparately (0.00s)
+=== RUN   TestReconcileRefusesUnboundStoreAndDuplicateResources
+--- PASS: TestReconcileRefusesUnboundStoreAndDuplicateResources (0.00s)
+=== RUN   TestBindStoreRefusesAStoreClaimedElsewhere
+--- PASS: TestBindStoreRefusesAStoreClaimedElsewhere (0.00s)
+=== RUN   TestAdmissionPublishesOnlyAfterTheEffectSucceeds
+--- PASS: TestAdmissionPublishesOnlyAfterTheEffectSucceeds (0.01s)
+=== RUN   TestAdmissionRefusesAnUnusableRequest
+--- PASS: TestAdmissionRefusesAnUnusableRequest (0.00s)
+=== RUN   TestHeldDependencyRefusesReplacement
+--- PASS: TestHeldDependencyRefusesReplacement (0.01s)
+=== RUN   TestBeginOperationRefusesAnUnverifiableDependency
+--- PASS: TestBeginOperationRefusesAnUnverifiableDependency (0.00s)
+=== RUN   TestOperationReserveIsChargedBeforePublication
+--- PASS: TestOperationReserveIsChargedBeforePublication (0.00s)
+=== RUN   TestReleasedOperationsFreeTheirSlotAndReserve
+--- PASS: TestReleasedOperationsFreeTheirSlotAndReserve (0.96s)
+=== RUN   TestHostStateSurvivesReopenAndRefusesTampering
+--- PASS: TestHostStateSurvivesReopenAndRefusesTampering (0.01s)
+=== RUN   TestBindRefusesAnUnequalRebindAndHonoursItsBound
+--- PASS: TestBindRefusesAnUnequalRebindAndHonoursItsBound (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/capacity	2.980s
