@@ -1,6 +1,7 @@
 package runthrough
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -20,6 +21,7 @@ type FileOutbox struct {
 	state         outboxState
 	journalSeen   bool
 	nativeJournal bool
+	validatedData []byte
 }
 
 type persistedOutbox struct {
@@ -100,6 +102,9 @@ func (o *FileOutbox) reloadLocked() error {
 	if err != nil {
 		return err
 	}
+	if o.validatedData != nil && bytes.Equal(data, o.validatedData) {
+		return nil
+	}
 	state, err := decodeOutboxState(data)
 	if err != nil {
 		return err
@@ -109,6 +114,7 @@ func (o *FileOutbox) reloadLocked() error {
 	o.nativeJournal = len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic
 	o.updateSequences()
 	o.updateTokens()
+	o.validatedData = data
 	return nil
 }
 
@@ -158,6 +164,7 @@ func (o *FileOutbox) withState(update func(*outboxState) error) error {
 }
 
 func (o *FileOutbox) commitState(state outboxState) error {
+	o.validatedData = nil
 	if err := o.persistState(state); err != nil {
 		return err
 	}

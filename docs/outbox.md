@@ -64,10 +64,13 @@ Outbox snapshots use framed protobuf schema 4. Stow rejects unsupported versions
 Existing JSON schemas 0–3 remain readable and convert on the next successful write.
 Configured paths keep their names, including any `.json` suffix, while rewritten contents are binary.
 All writers sharing an outbox must use the same revision; older binaries cannot read rewritten snapshots.
-File-backed operations read and decode the complete journal under the shared lock.
-Their cost grows with retained provenance and queued work; cache byte/object limits
-apply to cached objects. See the [Railway measurements](reviews/2026-10-18-outbox-read-cost.md)
-for measured latency, allocations and process memory, with their workload limits.
+
+File-backed operations read the complete journal under the shared lock. A handle
+reuses its validated state only when the freshly read bytes are identical;
+changed bytes are decoded and validated again. It may retain one journal read
+buffer until a write attempt. Cache byte/object limits apply to cached objects.
+See the [Railway comparison](reviews/2026-10-18-outbox-reuse.md) for latency,
+allocation and retained-memory measurements, with their workload limits.
 
 See the [compatibility contract](compat-contract.md#62-read-through-cache-semantics) for propagation rules
 and the [server reference](../README.md#admin-and-metrics-routes) for authentication.

@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-reuse-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');sources=None;total=0
+for phase in ['pilot','main','repair']:
+ j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);assert json.loads((e/'run.json').read_text())['complete'];failed=[x['name']for x in json.loads((e/'checks.json').read_text())if not x['passed']];assert failed==(['negative-control']if phase=='main'else[])
+ if phase!='repair':
+  samples=json.loads((e/'samples.json').read_text());assert len(samples)==(36 if phase=='pilot' else 360);total+=len(samples);assert len({x['index']for x in samples})==len(samples);cleanup=json.loads((e/'binary-cleanup.json').read_text());assert cleanup['removed']and cleanup['fixturesRemoved']
+ env=json.loads((e/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ if phase=='main':sources=env['sourceSHA256'];build=json.loads((e/'comparison-build.json').read_text());original=subprocess.check_output(['git','show',json.loads((p/'baseline.json').read_text())['base']+':internal/runthrough/file_outbox.go'],cwd=r);assert hashlib.sha256(original).hexdigest()==build['sources']['benchmark/_before/file_outbox.go']
+ if phase=='repair':
+  assert env['sourceSHA256']==sources
+  control=json.loads((e/'negative-control.json').read_text());assert len(control['results'])==2 and all(x['expectedStaleStateFailure']and x['exitCode']!=0 for x in control['results']);receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0
+  for n,h in receipt['documentSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+ for row in json.loads((e/'export-receipt.json').read_text())['files']:
+  data=(e/row['name']).read_bytes();assert len(data)==row['bytes']and hashlib.sha256(data).hexdigest()==row['sha256'],row['name']
+for n,h in sources.items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+assert total==396
+print('Verified 396 observations, exact baseline/current sources, binary cleanup, all production checks, repaired negative control and final document receipts')

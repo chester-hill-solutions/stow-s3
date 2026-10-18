@@ -174,9 +174,7 @@ func benchmarkOutboxAPICost(b *testing.B, path, stage string) {
 		b.Fatal(err)
 	}
 	value := UpstreamState{ETag: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
-	if err := outbox.SaveUpstreamState("bucket", "target", value); err != nil {
-		b.Fatal(err)
-	}
+	prepareOutboxReadCost(b, outbox, value, stage)
 	var got UpstreamState
 	var known bool
 	measureOutboxReadCost(b, func(n int) error {
@@ -204,7 +202,31 @@ func benchmarkOutboxAPICost(b *testing.B, path, stage string) {
 			b.Fatalf("save: %+v %t %v", actual, exists, err)
 		}
 	}
+	runtime.GC()
+	var memory runtime.MemStats
+	runtime.ReadMemStats(&memory)
+	b.ReportMetric(float64(memory.HeapAlloc), "process-live-heap-B")
 	runtime.KeepAlive(outbox)
+}
+
+func prepareOutboxReadCost(b *testing.B, outbox *FileOutbox, value UpstreamState, stage string) {
+	b.Helper()
+	values := []UpstreamState{value}
+	if stage == "changed" {
+		values = append(values, UpstreamState{ETag: "cccccccccccccccccccccccccccccccc"}, value)
+	}
+	for _, next := range values {
+		if err := outbox.SaveUpstreamState("bucket", "target", next); err != nil {
+			b.Fatal(err)
+		}
+	}
+	if stage == "changed" {
+		return
+	}
+	got, known, err := outbox.UpstreamState("bucket", "target")
+	if err != nil || !known || got != value {
+		b.Fatalf("warm target: %+v %t %v", got, known, err)
+	}
 }
 
 func outboxReadCostHWM(b *testing.B) uint64 {

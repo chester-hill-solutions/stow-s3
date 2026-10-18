@@ -1,0 +1,9 @@
+import{readFile,writeFile}from'node:fs/promises';import{spawn}from'node:child_process';import{join}from'node:path';import{createHash}from'node:crypto';
+const root=process.env.STOW_RESULT_ROOT;if(!root?.startsWith('/results/')||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4')throw Error('Railway only');
+const file='/app/benchmark/_unsafe/file_outbox.go',data=await readFile(file),overlay=join(root,'unsafe-overlay.json');await writeFile(overlay,JSON.stringify({Replace:{'/app/internal/runthrough/file_outbox.go':file}}));await writeFile(join(root,'source-unsafe-file_outbox.go.txt'),data);const results=[];
+for(const race of [false,true]){
+ let output='';const args=['test','-overlay='+overlay,...(race?['-race']:[]),'./internal/runthrough','-run','^TestFileOutboxReloadAfterCommitAndHistoricalRestore$','-count=2','-v'];const child=spawn('go',args,{stdio:['ignore','pipe','pipe']});child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);const code=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',resolve)});
+ await writeFile(join(root,'negative-control'+(race?'-race':'-normal')+'.log'),output);
+ if(code===0||!output.includes('ETag:external-version')||!output.includes('want {ETag:upstream-version')||(output.match(/--- FAIL: TestFileOutboxReloadAfterCommitAndHistoricalRestore/g)||[]).length!==2)throw Error('Expected stale-state regression failure not reproduced: '+output.slice(-3000));results.push({race,args,exitCode:code,expectedStaleStateFailure:true});
+}
+await writeFile(join(root,'negative-control.json'),JSON.stringify({sourceSHA256:createHash('sha256').update(data).digest('hex'),results},null,2)+'\n');console.log('Missing invalidation deterministically failed twice normally and twice under race detection');
