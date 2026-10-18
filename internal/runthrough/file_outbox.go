@@ -14,10 +14,11 @@ import (
 )
 
 type FileOutbox struct {
-	path     string
-	lockPath string
-	mu       sync.Mutex
-	state    outboxState
+	path        string
+	lockPath    string
+	mu          sync.Mutex
+	state       outboxState
+	journalSeen bool
 }
 
 type persistedOutbox struct {
@@ -88,7 +89,7 @@ func migrateOutboxAttempts(entries map[string]OutboxEntry) {
 
 func (o *FileOutbox) reloadLocked() error {
 	data, err := os.ReadFile(o.path)
-	if os.IsNotExist(err) {
+	if os.IsNotExist(err) && !o.journalSeen {
 		o.state = newOutboxState()
 		return nil
 	}
@@ -100,6 +101,7 @@ func (o *FileOutbox) reloadLocked() error {
 		return err
 	}
 	o.state = state
+	o.journalSeen = true
 	o.updateSequences()
 	o.updateTokens()
 	return nil
@@ -159,6 +161,7 @@ func (o *FileOutbox) withState(update func(*outboxState) error) (err error) {
 		return err
 	}
 	o.state = next
+	o.journalSeen = true
 	return nil
 }
 

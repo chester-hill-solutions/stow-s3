@@ -98,3 +98,6 @@ This finding is not fixed here. The next correction must distinguish missing-pat
 initialization from losing a journal already observed by the same live handle,
 while preserving fresh reads and cross-process locking. These tests do not claim
 that a new process can infer a missing journal's prior history.
+
+Follow-up: [observed-journal loss correction](2026-10-17-outbox-missing.md) distinguishes
+fresh initialization from missing-file reloads after a live handle knows a journal.

@@ -1,0 +1,23 @@
+{
+  "completed": 3,
+  "total": 3,
+  "last": {
+    "name": "null-journal-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=/app/benchmark/_null-repro/overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutboxRefuses(NullJournal|OtherScalarJournalRoots)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1754,
+    "passed": true
+  }
+}

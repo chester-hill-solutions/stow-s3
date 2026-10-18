@@ -1,0 +1,1234 @@
+=== RUN   TestFileOutboxPersistsProtobufAndReopens
+--- PASS: TestFileOutboxPersistsProtobufAndReopens (0.00s)
+=== RUN   TestFileOutboxMigratesJSONToProtobuf
+--- PASS: TestFileOutboxMigratesJSONToProtobuf (0.00s)
+=== RUN   TestFileOutboxRefusesFutureProtobufWithoutReplacement
+--- PASS: TestFileOutboxRefusesFutureProtobufWithoutReplacement (0.00s)
+=== RUN   TestOutboxProtoMatchesJSONState
+=== RUN   TestOutboxProtoMatchesJSONState/empty
+=== RUN   TestOutboxProtoMatchesJSONState/complete
+=== RUN   TestOutboxProtoMatchesJSONState/invalid-utf8
+=== RUN   TestOutboxProtoMatchesJSONState/legacy-attempt
+--- PASS: TestOutboxProtoMatchesJSONState (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/empty (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/complete (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/invalid-utf8 (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/legacy-attempt (0.00s)
+=== RUN   TestOutboxProtoRejectsIncompleteFiles
+--- PASS: TestOutboxProtoRejectsIncompleteFiles (0.00s)
+=== RUN   TestOutboxProtoRejectsUnknownSchema
+=== RUN   TestOutboxProtoRejectsUnknownSchema/version
+=== RUN   TestOutboxProtoRejectsUnknownSchema/snapshot
+=== RUN   TestOutboxProtoRejectsUnknownSchema/provenance
+=== RUN   TestOutboxProtoRejectsUnknownSchema/entry
+--- PASS: TestOutboxProtoRejectsUnknownSchema (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/version (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/snapshot (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/provenance (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/entry (0.00s)
+=== RUN   TestOutboxProtoPreservesTimestampErrors
+--- PASS: TestOutboxProtoPreservesTimestampErrors (0.00s)
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/provenance
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/enqueue
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/prepare
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/commit
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/acknowledge
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/close
+--- PASS: TestFileOutboxReportsDirectoryFenceFailure (0.02s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/provenance (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/enqueue (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/prepare (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/commit (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/acknowledge (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/close (0.00s)
+=== RUN   TestRetryPendingCannotBypassTheGrant
+--- PASS: TestRetryPendingCannotBypassTheGrant (0.00s)
+=== RUN   TestRetryPendingPropagatesWithTheFullGrant
+--- PASS: TestRetryPendingPropagatesWithTheFullGrant (0.00s)
+=== RUN   TestRetryPendingRefusesEmptyJournal
+--- PASS: TestRetryPendingRefusesEmptyJournal (0.00s)
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead/adapter
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead/runtime
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead/head
+--- PASS: TestOutboxFenceFailureRefusesUnrecordedRead (0.01s)
+    --- PASS: TestOutboxFenceFailureRefusesUnrecordedRead/adapter (0.00s)
+    --- PASS: TestOutboxFenceFailureRefusesUnrecordedRead/runtime (0.00s)
+    --- PASS: TestOutboxFenceFailureRefusesUnrecordedRead/head (0.00s)
+=== RUN   TestFileOutboxLookupReloadsSharedProvenance
+--- PASS: TestFileOutboxLookupReloadsSharedProvenance (0.00s)
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers/corrupt-journal
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers/unreadable-journal
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers/unavailable-lock
+--- PASS: TestFileOutboxLookupFailsClosedAndRecovers (0.00s)
+    --- PASS: TestFileOutboxLookupFailsClosedAndRecovers/corrupt-journal (0.00s)
+    --- PASS: TestFileOutboxLookupFailsClosedAndRecovers/unreadable-journal (0.00s)
+    --- PASS: TestFileOutboxLookupFailsClosedAndRecovers/unavailable-lock (0.00s)
+=== RUN   TestFileOutboxLookupConcurrentReadersAndWriter
+--- PASS: TestFileOutboxLookupConcurrentReadersAndWriter (0.01s)
+=== RUN   TestFileOutboxRefusesMissingLiveJournal
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/lookup
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/pending
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/prepared
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/enqueue
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/prepare
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/save-provenance
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/close
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/lookup
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/pending
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/prepared
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/enqueue
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/prepare
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/save-provenance
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/close
+--- PASS: TestFileOutboxRefusesMissingLiveJournal (0.05s)
+    --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer (0.02s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/lookup (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/pending (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/prepared (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/enqueue (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/prepare (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/save-provenance (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/close (0.00s)
+    --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened (0.02s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/lookup (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/pending (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/prepared (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/enqueue (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/prepare (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/save-provenance (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/close (0.00s)
+=== RUN   TestFileOutboxTracksFirstEnqueue
+--- PASS: TestFileOutboxTracksFirstEnqueue (0.00s)
+=== RUN   TestFileOutboxLearnsPeerJournal
+--- PASS: TestFileOutboxLearnsPeerJournal (0.00s)
+=== RUN   TestFileOutboxTracksEmptyJournal
+--- PASS: TestFileOutboxTracksEmptyJournal (0.00s)
+=== RUN   TestFileOutboxFreshWriteFailureCanRetry
+--- PASS: TestFileOutboxFreshWriteFailureCanRetry (0.00s)
+=== RUN   TestRetryPendingRefusesMissingJournal
+--- PASS: TestRetryPendingRefusesMissingJournal (0.00s)
+=== RUN   TestFileOutboxRejectsEmptyJournal
+=== RUN   TestFileOutboxRejectsEmptyJournal/open
+=== RUN   TestFileOutboxRejectsEmptyJournal/lookup
+=== RUN   TestFileOutboxRejectsEmptyJournal/pending
+=== RUN   TestFileOutboxRejectsEmptyJournal/prepared
+=== RUN   TestFileOutboxRejectsEmptyJournal/enqueue
+=== RUN   TestFileOutboxRejectsEmptyJournal/prepare
+=== RUN   TestFileOutboxRejectsEmptyJournal/save-provenance
+=== RUN   TestFileOutboxRejectsEmptyJournal/close
+--- PASS: TestFileOutboxRejectsEmptyJournal (0.03s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/open (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/lookup (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/pending (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/prepared (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/enqueue (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/prepare (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/save-provenance (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/close (0.00s)
+=== RUN   TestFileOutboxRejectsEveryTruncatedJournal
+--- PASS: TestFileOutboxRejectsEveryTruncatedJournal (0.02s)
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal/missing
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal/protobuf
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal/legacy-json
+--- PASS: TestFileOutboxAcceptsValidEmptyJournal (0.00s)
+    --- PASS: TestFileOutboxAcceptsValidEmptyJournal/missing (0.00s)
+    --- PASS: TestFileOutboxAcceptsValidEmptyJournal/protobuf (0.00s)
+    --- PASS: TestFileOutboxAcceptsValidEmptyJournal/legacy-json (0.00s)
+=== RUN   TestRunthroughOpeningErrorClosesReader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/nil
+--- PASS: TestRunthroughOpeningErrorClosesReader (0.02s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/nil (0.00s)
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/reader
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/close-error
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/nil
+--- PASS: TestRunthroughHeadOpeningErrorClosesReader (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/reader (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/close-error (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/nil (0.00s)
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error
+--- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error (0.00s)
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached
+--- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached (0.00s)
+=== RUN   TestRunthroughCommittedOpeningErrorPreserved
+--- PASS: TestRunthroughCommittedOpeningErrorPreserved (0.00s)
+=== RUN   TestFileOutboxSharedInstancesReloadBeforeMutation
+--- PASS: TestFileOutboxSharedInstancesReloadBeforeMutation (0.00s)
+=== RUN   TestFileOutboxProcessHelper
+--- PASS: TestFileOutboxProcessHelper (0.00s)
+=== RUN   TestFileOutboxConcurrentProcessesDoNotLoseEntries
+--- PASS: TestFileOutboxConcurrentProcessesDoNotLoseEntries (1.02s)
+=== RUN   TestFileOutboxClaimIsExclusiveAndExpires
+--- PASS: TestFileOutboxClaimIsExclusiveAndExpires (0.01s)
+=== RUN   TestPreparedIntentIsOwnedAndRejectsDuplicateKey
+--- PASS: TestPreparedIntentIsOwnedAndRejectsDuplicateKey (0.00s)
+=== RUN   TestRetryPendingContinuesAcrossKeys
+--- PASS: TestRetryPendingContinuesAcrossKeys (0.01s)
+=== RUN   TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestRetryPendingSerializesConcurrentAttemptsForOneEntry
+--- PASS: TestRetryPendingSerializesConcurrentAttemptsForOneEntry (0.10s)
+=== RUN   TestFileOutboxRestartsWithMonotonicIDs
+--- PASS: TestFileOutboxRestartsWithMonotonicIDs (0.00s)
+=== RUN   TestFileOutboxRejectsNewerFormatVersion
+--- PASS: TestFileOutboxRejectsNewerFormatVersion (0.00s)
+=== RUN   TestFileOutboxUpgradesLegacyAttemptedEntries
+--- PASS: TestFileOutboxUpgradesLegacyAttemptedEntries (0.00s)
+=== RUN   TestRetryPendingBlocksLaterSameKeyIntent
+--- PASS: TestRetryPendingBlocksLaterSameKeyIntent (0.00s)
+=== RUN   TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject
+--- PASS: TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedCommit
+--- PASS: TestFileOutboxPersistsPreparedCommit (0.00s)
+=== RUN   TestRetryReconcilesCommittedUpstreamPut
+--- PASS: TestRetryReconcilesCommittedUpstreamPut (1.11s)
+=== RUN   TestRetryReconcilesCommittedUpstreamDelete
+--- PASS: TestRetryReconcilesCommittedUpstreamDelete (1.11s)
+=== RUN   TestOutboxInspectionSnapshotsActiveAndPreparedEntries
+--- PASS: TestOutboxInspectionSnapshotsActiveAndPreparedEntries (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedIntentAcrossRestart
+--- PASS: TestFileOutboxPersistsPreparedIntentAcrossRestart (0.01s)
+=== RUN   TestRetryPendingCommitsPreparedIntentAfterLocalMutation
+--- PASS: TestRetryPendingCommitsPreparedIntentAfterLocalMutation (0.00s)
+=== RUN   TestRetryPendingDiscardsPreparedIntentWhenLocalMutationDidNotCommit
+--- PASS: TestRetryPendingDiscardsPreparedIntentWhenLocalMutationDidNotCommit (0.00s)
+=== RUN   TestRetryPendingDiscardsPreparedDeleteWhenLocalObjectRemains
+--- PASS: TestRetryPendingDiscardsPreparedDeleteWhenLocalObjectRemains (0.00s)
+=== RUN   TestPreparedRecoveryUncertainty
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown
+--- PASS: TestPreparedRecoveryUncertainty (0.38s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown (0.02s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked (0.02s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.01s)
+=== RUN   TestPreparedRecoveryConfirmedMissing
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true
+--- PASS: TestPreparedRecoveryConfirmedMissing (0.10s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.01s)
+=== RUN   TestPropagationOpeningFailureClosesSource
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true
+--- PASS: TestPropagationOpeningFailureClosesSource (0.25s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true (0.01s)
+=== RUN   TestPropagationVersionConflictClosesSourceOnce
+--- PASS: TestPropagationVersionConflictClosesSourceOnce (0.00s)
+=== RUN   TestProvenanceSurvivesRestartAndEviction
+=== RUN   TestProvenanceSurvivesRestartAndEviction/read
+=== RUN   TestProvenanceSurvivesRestartAndEviction/write
+--- PASS: TestProvenanceSurvivesRestartAndEviction (0.01s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/read (0.00s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/write (0.01s)
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=3
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=15
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=0
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=3
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=15
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=0
+--- PASS: TestRefreshConcurrentCacheReadCapturesVersion (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=3 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=15 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=0 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=3 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=15 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=0 (0.00s)
+=== RUN   TestRefreshOversizedStreamsObservedVersion
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true
+--- PASS: TestRefreshOversizedStreamsObservedVersion (0.03s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true (0.01s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true (0.00s)
+=== RUN   TestRefreshOversizedEvictionFailureClosesUpstreamReader
+=== RUN   TestRefreshOversizedEvictionFailureClosesUpstreamReader/adapter
+=== RUN   TestRefreshOversizedEvictionFailureClosesUpstreamReader/runtime
+--- PASS: TestRefreshOversizedEvictionFailureClosesUpstreamReader (0.00s)
+    --- PASS: TestRefreshOversizedEvictionFailureClosesUpstreamReader/adapter (0.00s)
+    --- PASS: TestRefreshOversizedEvictionFailureClosesUpstreamReader/runtime (0.00s)
+=== RUN   TestRefreshOversizedReaderSurvivesCacheReplacement
+--- PASS: TestRefreshOversizedReaderSurvivesCacheReplacement (0.00s)
+=== RUN   TestRefreshOversizedPreservesObservedWriteCondition
+--- PASS: TestRefreshOversizedPreservesObservedWriteCondition (0.01s)
+=== RUN   TestRefreshOversizedRevalidationDropsStaleCache
+--- PASS: TestRefreshOversizedRevalidationDropsStaleCache (0.00s)
+=== RUN   TestRefreshOversizedProvenanceFailureClosesStream
+--- PASS: TestRefreshOversizedProvenanceFailureClosesStream (0.00s)
+=== RUN   TestRefreshOversizedReaderOwnership
+--- PASS: TestRefreshOversizedReaderOwnership (0.00s)
+=== RUN   TestRefreshOversizedStreamErrorsReachCaller
+--- PASS: TestRefreshOversizedStreamErrorsReachCaller (0.00s)
+=== RUN   TestRefreshOversizedHeadDoesNotReadUncacheableBody
+--- PASS: TestRefreshOversizedHeadDoesNotReadUncacheableBody (0.00s)
+=== RUN   TestRefreshCacheAdmissionBoundary
+=== RUN   TestRefreshCacheAdmissionBoundary/0
+=== RUN   TestRefreshCacheAdmissionBoundary/1
+=== RUN   TestRefreshCacheAdmissionBoundary/2
+--- PASS: TestRefreshCacheAdmissionBoundary (0.00s)
+    --- PASS: TestRefreshCacheAdmissionBoundary/0 (0.00s)
+    --- PASS: TestRefreshCacheAdmissionBoundary/1 (0.00s)
+    --- PASS: TestRefreshCacheAdmissionBoundary/2 (0.00s)
+=== RUN   TestRefreshFallbackCapturesVersion
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body=""/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body=""/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body=""/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body=""/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=true
+--- PASS: TestRefreshFallbackCapturesVersion (0.02s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body=""/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body=""/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body=""/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body=""/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=true (0.00s)
+=== RUN   TestRefreshFallbackProvenanceFailureClosesReader
+=== RUN   TestRefreshFallbackProvenanceFailureClosesReader/adapter
+=== RUN   TestRefreshFallbackProvenanceFailureClosesReader/runtime
+--- PASS: TestRefreshFallbackProvenanceFailureClosesReader (0.00s)
+    --- PASS: TestRefreshFallbackProvenanceFailureClosesReader/adapter (0.00s)
+    --- PASS: TestRefreshFallbackProvenanceFailureClosesReader/runtime (0.00s)
+=== RUN   TestRefreshFallbackRetainsStableVersion
+--- PASS: TestRefreshFallbackRetainsStableVersion (0.00s)
+=== RUN   TestRefreshFallbackMissingETagClosesReader
+--- PASS: TestRefreshFallbackMissingETagClosesReader (0.00s)
+=== RUN   TestRefreshHeadDoesNotRefetchEvictedBody
+--- PASS: TestRefreshHeadDoesNotRefetchEvictedBody (0.00s)
+=== RUN   TestRefreshFallbackDurableProvenanceSurvivesReopen
+--- PASS: TestRefreshFallbackDurableProvenanceSurvivesReopen (0.00s)
+=== RUN   TestRefreshFallbackObservationAuthorizesCurrentWrite
+--- PASS: TestRefreshFallbackObservationAuthorizesCurrentWrite (0.01s)
+=== RUN   TestRetryClassification
+=== RUN   TestRetryClassification/bad_request
+=== RUN   TestRetryClassification/throttled
+=== RUN   TestRetryClassification/unavailable
+=== RUN   TestRetryClassification/version_conflict
+--- PASS: TestRetryClassification (0.00s)
+    --- PASS: TestRetryClassification/bad_request (0.00s)
+    --- PASS: TestRetryClassification/throttled (0.00s)
+    --- PASS: TestRetryClassification/unavailable (0.00s)
+    --- PASS: TestRetryClassification/version_conflict (0.00s)
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata/content-type
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata/metadata
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata/checksum
+--- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata (0.03s)
+    --- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata/content-type (0.01s)
+    --- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata/metadata (0.01s)
+    --- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata/checksum (0.01s)
+=== RUN   TestPreparedDeleteFailureDiscardsProductionIntent
+--- PASS: TestPreparedDeleteFailureDiscardsProductionIntent (0.00s)
+=== RUN   TestPropagationDoesNotOverwriteAConcurrentlyChangedObject
+--- PASS: TestPropagationDoesNotOverwriteAConcurrentlyChangedObject (0.00s)
+=== RUN   TestFileOutboxPersistsProtobufAndReopens
+--- PASS: TestFileOutboxPersistsProtobufAndReopens (0.01s)
+=== RUN   TestFileOutboxMigratesJSONToProtobuf
+--- PASS: TestFileOutboxMigratesJSONToProtobuf (0.01s)
+=== RUN   TestFileOutboxRefusesFutureProtobufWithoutReplacement
+--- PASS: TestFileOutboxRefusesFutureProtobufWithoutReplacement (0.00s)
+=== RUN   TestOutboxProtoMatchesJSONState
+=== RUN   TestOutboxProtoMatchesJSONState/empty
+=== RUN   TestOutboxProtoMatchesJSONState/complete
+=== RUN   TestOutboxProtoMatchesJSONState/invalid-utf8
+=== RUN   TestOutboxProtoMatchesJSONState/legacy-attempt
+--- PASS: TestOutboxProtoMatchesJSONState (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/empty (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/complete (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/invalid-utf8 (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/legacy-attempt (0.00s)
+=== RUN   TestOutboxProtoRejectsIncompleteFiles
+--- PASS: TestOutboxProtoRejectsIncompleteFiles (0.00s)
+=== RUN   TestOutboxProtoRejectsUnknownSchema
+=== RUN   TestOutboxProtoRejectsUnknownSchema/version
+=== RUN   TestOutboxProtoRejectsUnknownSchema/snapshot
+=== RUN   TestOutboxProtoRejectsUnknownSchema/provenance
+=== RUN   TestOutboxProtoRejectsUnknownSchema/entry
+--- PASS: TestOutboxProtoRejectsUnknownSchema (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/version (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/snapshot (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/provenance (0.00s)
+    --- PASS: TestOutboxProtoRejectsUnknownSchema/entry (0.00s)
+=== RUN   TestOutboxProtoPreservesTimestampErrors
+--- PASS: TestOutboxProtoPreservesTimestampErrors (0.00s)
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/provenance
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/enqueue
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/prepare
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/commit
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/acknowledge
+=== RUN   TestFileOutboxReportsDirectoryFenceFailure/close
+--- PASS: TestFileOutboxReportsDirectoryFenceFailure (0.02s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/provenance (0.01s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/enqueue (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/prepare (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/commit (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/acknowledge (0.00s)
+    --- PASS: TestFileOutboxReportsDirectoryFenceFailure/close (0.00s)
+=== RUN   TestRetryPendingCannotBypassTheGrant
+--- PASS: TestRetryPendingCannotBypassTheGrant (0.00s)
+=== RUN   TestRetryPendingPropagatesWithTheFullGrant
+--- PASS: TestRetryPendingPropagatesWithTheFullGrant (0.00s)
+=== RUN   TestRetryPendingRefusesEmptyJournal
+--- PASS: TestRetryPendingRefusesEmptyJournal (0.00s)
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead/adapter
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead/runtime
+=== RUN   TestOutboxFenceFailureRefusesUnrecordedRead/head
+--- PASS: TestOutboxFenceFailureRefusesUnrecordedRead (0.01s)
+    --- PASS: TestOutboxFenceFailureRefusesUnrecordedRead/adapter (0.00s)
+    --- PASS: TestOutboxFenceFailureRefusesUnrecordedRead/runtime (0.00s)
+    --- PASS: TestOutboxFenceFailureRefusesUnrecordedRead/head (0.00s)
+=== RUN   TestFileOutboxLookupReloadsSharedProvenance
+--- PASS: TestFileOutboxLookupReloadsSharedProvenance (0.00s)
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers/corrupt-journal
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers/unreadable-journal
+=== RUN   TestFileOutboxLookupFailsClosedAndRecovers/unavailable-lock
+--- PASS: TestFileOutboxLookupFailsClosedAndRecovers (0.00s)
+    --- PASS: TestFileOutboxLookupFailsClosedAndRecovers/corrupt-journal (0.00s)
+    --- PASS: TestFileOutboxLookupFailsClosedAndRecovers/unreadable-journal (0.00s)
+    --- PASS: TestFileOutboxLookupFailsClosedAndRecovers/unavailable-lock (0.00s)
+=== RUN   TestFileOutboxLookupConcurrentReadersAndWriter
+--- PASS: TestFileOutboxLookupConcurrentReadersAndWriter (0.02s)
+=== RUN   TestFileOutboxRefusesMissingLiveJournal
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/lookup
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/pending
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/prepared
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/enqueue
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/prepare
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/save-provenance
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/writer/close
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/lookup
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/pending
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/prepared
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/enqueue
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/prepare
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/save-provenance
+=== RUN   TestFileOutboxRefusesMissingLiveJournal/reopened/close
+--- PASS: TestFileOutboxRefusesMissingLiveJournal (0.06s)
+    --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer (0.03s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/lookup (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/pending (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/prepared (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/enqueue (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/prepare (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/save-provenance (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/writer/close (0.01s)
+    --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened (0.03s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/lookup (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/pending (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/prepared (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/enqueue (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/prepare (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/save-provenance (0.00s)
+        --- PASS: TestFileOutboxRefusesMissingLiveJournal/reopened/close (0.00s)
+=== RUN   TestFileOutboxTracksFirstEnqueue
+--- PASS: TestFileOutboxTracksFirstEnqueue (0.00s)
+=== RUN   TestFileOutboxLearnsPeerJournal
+--- PASS: TestFileOutboxLearnsPeerJournal (0.00s)
+=== RUN   TestFileOutboxTracksEmptyJournal
+--- PASS: TestFileOutboxTracksEmptyJournal (0.00s)
+=== RUN   TestFileOutboxFreshWriteFailureCanRetry
+--- PASS: TestFileOutboxFreshWriteFailureCanRetry (0.00s)
+=== RUN   TestRetryPendingRefusesMissingJournal
+--- PASS: TestRetryPendingRefusesMissingJournal (0.00s)
+=== RUN   TestFileOutboxRejectsEmptyJournal
+=== RUN   TestFileOutboxRejectsEmptyJournal/open
+=== RUN   TestFileOutboxRejectsEmptyJournal/lookup
+=== RUN   TestFileOutboxRejectsEmptyJournal/pending
+=== RUN   TestFileOutboxRejectsEmptyJournal/prepared
+=== RUN   TestFileOutboxRejectsEmptyJournal/enqueue
+=== RUN   TestFileOutboxRejectsEmptyJournal/prepare
+=== RUN   TestFileOutboxRejectsEmptyJournal/save-provenance
+=== RUN   TestFileOutboxRejectsEmptyJournal/close
+--- PASS: TestFileOutboxRejectsEmptyJournal (0.03s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/open (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/lookup (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/pending (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/prepared (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/enqueue (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/prepare (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/save-provenance (0.00s)
+    --- PASS: TestFileOutboxRejectsEmptyJournal/close (0.00s)
+=== RUN   TestFileOutboxRejectsEveryTruncatedJournal
+--- PASS: TestFileOutboxRejectsEveryTruncatedJournal (0.03s)
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal/missing
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal/protobuf
+=== RUN   TestFileOutboxAcceptsValidEmptyJournal/legacy-json
+--- PASS: TestFileOutboxAcceptsValidEmptyJournal (0.00s)
+    --- PASS: TestFileOutboxAcceptsValidEmptyJournal/missing (0.00s)
+    --- PASS: TestFileOutboxAcceptsValidEmptyJournal/protobuf (0.00s)
+    --- PASS: TestFileOutboxAcceptsValidEmptyJournal/legacy-json (0.00s)
+=== RUN   TestRunthroughOpeningErrorClosesReader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/nil
+--- PASS: TestRunthroughOpeningErrorClosesReader (0.02s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/nil (0.00s)
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/reader
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/close-error
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/nil
+--- PASS: TestRunthroughHeadOpeningErrorClosesReader (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/reader (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/close-error (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/nil (0.00s)
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error
+--- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader (0.00s)
+    --- PASS: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error (0.00s)
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached
+--- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached (0.00s)
+=== RUN   TestRunthroughCommittedOpeningErrorPreserved
+--- PASS: TestRunthroughCommittedOpeningErrorPreserved (0.00s)
+=== RUN   TestFileOutboxSharedInstancesReloadBeforeMutation
+--- PASS: TestFileOutboxSharedInstancesReloadBeforeMutation (0.00s)
+=== RUN   TestFileOutboxProcessHelper
+--- PASS: TestFileOutboxProcessHelper (0.00s)
+=== RUN   TestFileOutboxConcurrentProcessesDoNotLoseEntries
+--- PASS: TestFileOutboxConcurrentProcessesDoNotLoseEntries (1.01s)
+=== RUN   TestFileOutboxClaimIsExclusiveAndExpires
+--- PASS: TestFileOutboxClaimIsExclusiveAndExpires (0.01s)
+=== RUN   TestPreparedIntentIsOwnedAndRejectsDuplicateKey
+--- PASS: TestPreparedIntentIsOwnedAndRejectsDuplicateKey (0.00s)
+=== RUN   TestRetryPendingContinuesAcrossKeys
+--- PASS: TestRetryPendingContinuesAcrossKeys (0.01s)
+=== RUN   TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestRetryPendingSerializesConcurrentAttemptsForOneEntry
+--- PASS: TestRetryPendingSerializesConcurrentAttemptsForOneEntry (0.10s)
+=== RUN   TestFileOutboxRestartsWithMonotonicIDs
+--- PASS: TestFileOutboxRestartsWithMonotonicIDs (0.00s)
+=== RUN   TestFileOutboxRejectsNewerFormatVersion
+--- PASS: TestFileOutboxRejectsNewerFormatVersion (0.00s)
+=== RUN   TestFileOutboxUpgradesLegacyAttemptedEntries
+--- PASS: TestFileOutboxUpgradesLegacyAttemptedEntries (0.00s)
+=== RUN   TestRetryPendingBlocksLaterSameKeyIntent
+--- PASS: TestRetryPendingBlocksLaterSameKeyIntent (0.00s)
+=== RUN   TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject
+--- PASS: TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedCommit
+--- PASS: TestFileOutboxPersistsPreparedCommit (0.00s)
+=== RUN   TestRetryReconcilesCommittedUpstreamPut
+--- PASS: TestRetryReconcilesCommittedUpstreamPut (1.11s)
+=== RUN   TestRetryReconcilesCommittedUpstreamDelete
+--- PASS: TestRetryReconcilesCommittedUpstreamDelete (1.11s)
+=== RUN   TestOutboxInspectionSnapshotsActiveAndPreparedEntries
+--- PASS: TestOutboxInspectionSnapshotsActiveAndPreparedEntries (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedIntentAcrossRestart
+--- PASS: TestFileOutboxPersistsPreparedIntentAcrossRestart (0.00s)
+=== RUN   TestRetryPendingCommitsPreparedIntentAfterLocalMutation
+--- PASS: TestRetryPendingCommitsPreparedIntentAfterLocalMutation (0.00s)
+=== RUN   TestRetryPendingDiscardsPreparedIntentWhenLocalMutationDidNotCommit
+--- PASS: TestRetryPendingDiscardsPreparedIntentWhenLocalMutationDidNotCommit (0.00s)
+=== RUN   TestRetryPendingDiscardsPreparedDeleteWhenLocalObjectRemains
+--- PASS: TestRetryPendingDiscardsPreparedDeleteWhenLocalObjectRemains (0.00s)
+=== RUN   TestPreparedRecoveryUncertainty
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown
+--- PASS: TestPreparedRecoveryUncertainty (0.33s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.01s)
+=== RUN   TestPreparedRecoveryConfirmedMissing
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true
+--- PASS: TestPreparedRecoveryConfirmedMissing (0.10s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.01s)
+=== RUN   TestPropagationOpeningFailureClosesSource
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true
+--- PASS: TestPropagationOpeningFailureClosesSource (0.22s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false (0.01s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true (0.01s)
+=== RUN   TestPropagationVersionConflictClosesSourceOnce
+--- PASS: TestPropagationVersionConflictClosesSourceOnce (0.00s)
+=== RUN   TestProvenanceSurvivesRestartAndEviction
+=== RUN   TestProvenanceSurvivesRestartAndEviction/read
+=== RUN   TestProvenanceSurvivesRestartAndEviction/write
+--- PASS: TestProvenanceSurvivesRestartAndEviction (0.01s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/read (0.00s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/write (0.01s)
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=3
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=15
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=0
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=3
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=15
+=== RUN   TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=0
+--- PASS: TestRefreshConcurrentCacheReadCapturesVersion (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=3 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=15 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=false/size=0 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=3 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=15 (0.00s)
+    --- PASS: TestRefreshConcurrentCacheReadCapturesVersion/runtime=true/size=0 (0.00s)
+=== RUN   TestRefreshOversizedStreamsObservedVersion
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true
+--- PASS: TestRefreshOversizedStreamsObservedVersion (0.02s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false (0.00s)
+    --- PASS: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true (0.00s)
+=== RUN   TestRefreshOversizedEvictionFailureClosesUpstreamReader
+=== RUN   TestRefreshOversizedEvictionFailureClosesUpstreamReader/adapter
+=== RUN   TestRefreshOversizedEvictionFailureClosesUpstreamReader/runtime
+--- PASS: TestRefreshOversizedEvictionFailureClosesUpstreamReader (0.00s)
+    --- PASS: TestRefreshOversizedEvictionFailureClosesUpstreamReader/adapter (0.00s)
+    --- PASS: TestRefreshOversizedEvictionFailureClosesUpstreamReader/runtime (0.00s)
+=== RUN   TestRefreshOversizedReaderSurvivesCacheReplacement
+--- PASS: TestRefreshOversizedReaderSurvivesCacheReplacement (0.00s)
+=== RUN   TestRefreshOversizedPreservesObservedWriteCondition
+--- PASS: TestRefreshOversizedPreservesObservedWriteCondition (0.01s)
+=== RUN   TestRefreshOversizedRevalidationDropsStaleCache
+--- PASS: TestRefreshOversizedRevalidationDropsStaleCache (0.00s)
+=== RUN   TestRefreshOversizedProvenanceFailureClosesStream
+--- PASS: TestRefreshOversizedProvenanceFailureClosesStream (0.00s)
+=== RUN   TestRefreshOversizedReaderOwnership
+--- PASS: TestRefreshOversizedReaderOwnership (0.00s)
+=== RUN   TestRefreshOversizedStreamErrorsReachCaller
+--- PASS: TestRefreshOversizedStreamErrorsReachCaller (0.00s)
+=== RUN   TestRefreshOversizedHeadDoesNotReadUncacheableBody
+--- PASS: TestRefreshOversizedHeadDoesNotReadUncacheableBody (0.00s)
+=== RUN   TestRefreshCacheAdmissionBoundary
+=== RUN   TestRefreshCacheAdmissionBoundary/0
+=== RUN   TestRefreshCacheAdmissionBoundary/1
+=== RUN   TestRefreshCacheAdmissionBoundary/2
+--- PASS: TestRefreshCacheAdmissionBoundary (0.00s)
+    --- PASS: TestRefreshCacheAdmissionBoundary/0 (0.00s)
+    --- PASS: TestRefreshCacheAdmissionBoundary/1 (0.00s)
+    --- PASS: TestRefreshCacheAdmissionBoundary/2 (0.00s)
+=== RUN   TestRefreshFallbackCapturesVersion
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body=""/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body=""/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body=""/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body=""/durable=true
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=false
+=== RUN   TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=true
+--- PASS: TestRefreshFallbackCapturesVersion (0.02s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body=""/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body=""/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body=""/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body=""/durable=true (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=false (0.00s)
+    --- PASS: TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=true (0.00s)
+=== RUN   TestRefreshFallbackProvenanceFailureClosesReader
+=== RUN   TestRefreshFallbackProvenanceFailureClosesReader/adapter
+=== RUN   TestRefreshFallbackProvenanceFailureClosesReader/runtime
+--- PASS: TestRefreshFallbackProvenanceFailureClosesReader (0.00s)
+    --- PASS: TestRefreshFallbackProvenanceFailureClosesReader/adapter (0.00s)
+    --- PASS: TestRefreshFallbackProvenanceFailureClosesReader/runtime (0.00s)
+=== RUN   TestRefreshFallbackRetainsStableVersion
+--- PASS: TestRefreshFallbackRetainsStableVersion (0.00s)
+=== RUN   TestRefreshFallbackMissingETagClosesReader
+--- PASS: TestRefreshFallbackMissingETagClosesReader (0.00s)
+=== RUN   TestRefreshHeadDoesNotRefetchEvictedBody
+--- PASS: TestRefreshHeadDoesNotRefetchEvictedBody (0.00s)
+=== RUN   TestRefreshFallbackDurableProvenanceSurvivesReopen
+--- PASS: TestRefreshFallbackDurableProvenanceSurvivesReopen (0.00s)
+=== RUN   TestRefreshFallbackObservationAuthorizesCurrentWrite
+--- PASS: TestRefreshFallbackObservationAuthorizesCurrentWrite (0.01s)
+=== RUN   TestRetryClassification
+=== RUN   TestRetryClassification/bad_request
+=== RUN   TestRetryClassification/throttled
+=== RUN   TestRetryClassification/unavailable
+=== RUN   TestRetryClassification/version_conflict
+--- PASS: TestRetryClassification (0.00s)
+    --- PASS: TestRetryClassification/bad_request (0.00s)
+    --- PASS: TestRetryClassification/throttled (0.00s)
+    --- PASS: TestRetryClassification/unavailable (0.00s)
+    --- PASS: TestRetryClassification/version_conflict (0.00s)
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata/content-type
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata/metadata
+=== RUN   TestRetryDoesNotRetireUnappliedSameBodyMetadata/checksum
+--- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata (0.02s)
+    --- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata/content-type (0.01s)
+    --- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata/metadata (0.01s)
+    --- PASS: TestRetryDoesNotRetireUnappliedSameBodyMetadata/checksum (0.01s)
+=== RUN   TestPreparedDeleteFailureDiscardsProductionIntent
+--- PASS: TestPreparedDeleteFailureDiscardsProductionIntent (0.00s)
+=== RUN   TestPropagationDoesNotOverwriteAConcurrentlyChangedObject
+--- PASS: TestPropagationDoesNotOverwriteAConcurrentlyChangedObject (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	9.812s
