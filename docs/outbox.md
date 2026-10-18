@@ -35,6 +35,7 @@ Reads that need to record upstream provenance fail until it can be saved durably
 A missing journal path is allowed when creating an outbox. An existing zero-byte
 journal is rejected as corrupt. Restore a valid journal before retrying; Stow does
 not reconstruct a truncated journal automatically.
+Legacy JSON journal snapshots must have an object root; `null` is rejected.
 Once a live handle has read or successfully written a journal, a missing-file reload
 returns an error and preserves its last known state. This per-handle check does not
 infer history across restarts or detect loss hidden by a valid replacement.

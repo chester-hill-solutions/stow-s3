@@ -93,3 +93,6 @@ passed. See the [normal reproduction](2026-10-17-outbox-missing/raw/next-finding
 and [race reproduction](2026-10-17-outbox-missing/raw/next-finding/null-journal-race.log).
 This finding is not fixed here. The next correction should reject a null root
 while preserving valid legacy object snapshots and the protobuf format.
+
+Follow-up: [null-root correction](2026-10-18-outbox-null.md) rejects JSON `null`
+without changing valid legacy object snapshots or protobuf snapshots.

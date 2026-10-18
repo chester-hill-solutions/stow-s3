@@ -70,6 +70,9 @@ func decodeLegacyOutboxState(data []byte) (outboxState, error) {
 		if err := json.Unmarshal(data, &legacy); err != nil {
 			return outboxState{}, fmt.Errorf("decode legacy outbox: %w", err)
 		}
+		if legacy == nil {
+			return outboxState{}, fmt.Errorf("decode legacy outbox: expected object snapshot")
+		}
 		persisted.Entries = legacy
 	}
 	return normalizeDecodedOutboxState(outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken})
