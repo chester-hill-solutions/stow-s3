@@ -1,0 +1,119 @@
+package runthrough
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
+	"testing"
+	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
+)
+
+type phaseSample struct {
+	Name string `json:"name"`
+	NS   int64  `json:"ns"`
+}
+
+func phaseFixture(depth int) outboxState {
+	s := newOutboxState()
+	for n := 0; n < depth; n++ {
+		id := fmt.Sprintf("seed-%06d", n)
+		s.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Version: "retained-version", CreatedAt: time.Unix(100, 0).UTC()}
+		id = "prepared-" + id
+		s.prepared[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Prepared: true, CreatedAt: time.Unix(100, 0).UTC()}
+	}
+	return s
+}
+func TestOutboxWritePhaseProbe(t *testing.T) {
+	for _, depth := range []int{0, 128, 4096} {
+		t.Run(fmt.Sprint(depth), func(t *testing.T) {
+			state := phaseFixture(depth)
+			path := filepath.Join(t.TempDir(), "outbox")
+			outbox, err := NewFileOutbox(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := outbox.withState(func(s *outboxState) error { *s = state; return nil }); err != nil {
+				t.Fatal(err)
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			runtime.GC()
+			for n := 0; n < 60; n++ {
+				phases := make([]phaseSample, 0, 48)
+				atomicfile.StowPhaseSink = func(name string, elapsed time.Duration) {
+					phases = append(phases, phaseSample{name, elapsed.Nanoseconds()})
+				}
+				start := time.Now()
+				entry, err := outbox.Prepare(OutboxEntry{ID: "benchmark-probe", Operation: OutboxPut, Bucket: "bucket", Key: "probe", Version: "probe-version", CreatedAt: time.Unix(100, 0).UTC()})
+				if err == nil {
+					err = outbox.DiscardPrepared(entry.ID)
+				}
+				elapsed := time.Since(start)
+				atomicfile.StowPhaseSink = nil
+				if err != nil {
+					t.Fatal(err)
+				}
+				row := struct {
+					Depth        int           `json:"depth"`
+					Cycle        int           `json:"cycle"`
+					NS           int64         `json:"ns"`
+					JournalBytes int           `json:"journalBytes"`
+					Phases       []phaseSample `json:"phases"`
+				}{depth, n, elapsed.Nanoseconds(), len(data), phases}
+				encoded, err := json.Marshal(row)
+				if err != nil {
+					t.Fatal(err)
+				}
+				fmt.Printf("STOWPHASE:%s\n", encoded)
+			}
+			reopened, err := NewFileOutbox(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(reopened.state, state) {
+				t.Fatal("phase probe changed retained state")
+			}
+		})
+	}
+}
+
+var phaseStateSink outboxState
+var phaseBytesSink []byte
+
+func BenchmarkOutboxWriteComponents(b *testing.B) {
+	for _, depth := range []int{0, 128, 4096} {
+		state := phaseFixture(depth)
+		data, err := encodeOutboxProto(state)
+		if err != nil {
+			b.Fatal(err)
+		}
+		for _, part := range []string{"clone", "decode", "encode"} {
+			b.Run(fmt.Sprintf("depth=%d/%s", depth, part), func(b *testing.B) {
+				b.ReportAllocs()
+				b.ResetTimer()
+				for n := 0; n < b.N; n++ {
+					switch part {
+					case "clone":
+						phaseStateSink = state.clone()
+					case "decode":
+						phaseStateSink, err = decodeOutboxState(data)
+					case "encode":
+						phaseBytesSink, err = encodeOutboxProto(state)
+					}
+					if err != nil {
+						b.Fatal(err)
+					}
+				}
+				b.StopTimer()
+				b.ReportMetric(float64(len(data)), "journal-B")
+			})
+		}
+	}
+}

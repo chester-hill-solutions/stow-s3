@@ -1,0 +1,53 @@
+from pathlib import Path
+import json,subprocess,shutil,hashlib
+p=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');old=Path('/private/tmp/stow-outbox-admission-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True)
+files=[x for x in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if x]
+for name in files:
+ f=r/name
+ if f.is_file():
+  d=c/name;d.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,d)
+b=c/'benchmark';b.mkdir(exist_ok=True)
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/name,b/name)
+d=b/'validation-previous-baselines';d.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:shutil.copy2(r/'scripts/baselines'/name,d/name)
+for name in ['control.py','export.py','remote.py','watch.py']:(p/name).write_text((old/name).read_text().replace(str(old),str(p)).replace('stow-outbox-admission-20261018','stow-outbox-write-phases-20261018'))
+manifest={name:hashlib.sha256((c/name).read_bytes()).hexdigest()for name in files if(c/name).is_file()}
+for f in [b/'validation-input-manifest.json',p/'source-manifest.json']:f.write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({k:subprocess.check_output(['git','rev-parse',v],cwd=r).decode().strip()for k,v in [('base','HEAD'),('before_admission','HEAD^'),('origin_main','origin/main')]},indent=2)+'\n')
+d=b/'phase-probe';d.mkdir(exist_ok=True)
+base={}
+for name in ['outbox.go','file_outbox.go']:
+ dest=d/('before-'+name+'.txt');dest.write_bytes(subprocess.check_output(['git','show','HEAD^:internal/runthrough/'+name],cwd=r));base['/app/internal/runthrough/'+name]='/app/benchmark/phase-probe/'+dest.name
+(b/'phase-baseline-overlay.json').write_text(json.dumps({'Replace':base},indent=2)+'\n')
+# Instrument only overlay copies. All actual IO, errors, ordering and fences remain.
+f=(r/'internal/atomicfile/atomicfile.go').read_text().replace('"runtime"','"runtime"\n "time"')
+f+='\n// Diagnostic-only overlay; never part of product source.\nvar StowPhaseSink func(string, time.Duration)\nfunc stowPhase(name string, start time.Time) { if StowPhaseSink != nil { StowPhaseSink(name,time.Since(start)) } }\n'
+def sub(s,a,b):
+ assert s.count(a)==1,(a,s.count(a));return s.replace(a,b)
+f=sub(f,'\tdir := filepath.Dir(path)\n','\tphase := time.Now()\n\tdir := filepath.Dir(path)\n')
+f=sub(f,'\ttmp, err := os.CreateTemp','\tstowPhase("atomic.mkdir", phase)\n phase=time.Now()\n\ttmp, err := os.CreateTemp')
+f=sub(f,'\ttmpName := tmp.Name()','\tstowPhase("atomic.create", phase)\n\ttmpName := tmp.Name()')
+f=sub(f,'\tif err := write(tmp);','\tphase=time.Now()\n\tif err := write(tmp);')
+f=sub(f,'\t// The permissions are set','\tstowPhase("atomic.write",phase)\n\tphase=time.Now()\n\t// The permissions are set')
+f=sub(f,'\tif err := tmp.Sync();','\tstowPhase("atomic.chmod",phase)\n phase=time.Now()\n\tif err := tmp.Sync();')
+f=sub(f,'\tif err := tmp.Close();','\tstowPhase("atomic.file_sync",phase)\n phase=time.Now()\n\tif err := tmp.Close();')
+f=sub(f,'\tif err := os.Rename','\tstowPhase("atomic.close",phase)\n phase=time.Now()\n\tif err := os.Rename')
+f=sub(f,'\trenamed = true','\tstowPhase("atomic.rename",phase)\n phase=time.Now()\n\trenamed = true')
+f=sub(f,'\tif err := syncDir(dir); err != nil {\n\t\treturn wrap(path, err)\n\t}\n\treturn nil','\tif err := syncDir(dir); err != nil {\n\t\treturn wrap(path, err)\n\t}\n stowPhase("atomic.dir_sync",phase)\n\treturn nil')
+(d/'trace-atomicfile.go.txt').write_text(f)
+f=(r/'internal/runthrough/file_outbox.go').read_text()
+f=sub(f,'\tdata, err := os.ReadFile(o.path)','\tphase := time.Now()\n\tdata, err := os.ReadFile(o.path)\n stowOutboxPhase("outbox.read",phase)')
+f=sub(f,'\tstate, err := decodeOutboxState(data)','\tphase=time.Now()\n\tstate, err := decodeOutboxState(data)\n stowOutboxPhase("outbox.decode",phase)')
+f=sub(f,'\t\tnext := state.clone()','\t\tphase:=time.Now()\n\t\tnext := state.clone()\n stowOutboxPhase("outbox.clone",phase)\n phase=time.Now()')
+f=sub(f,'\t\treturn o.commitState(next)','\t\tstowOutboxPhase("outbox.update",phase)\n\t\treturn o.commitState(next)')
+f=sub(f,'func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {\n\to.mu.Lock()','func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {\n phase:=time.Now()\n\to.mu.Lock()\n stowOutboxPhase("outbox.mutex_wait",phase)')
+f=sub(f,'\tdefer o.mu.Unlock()\n\tlock, err := acquireOutboxFileLock','\tdefer o.mu.Unlock()\n phase=time.Now()\n\tlock, err := acquireOutboxFileLock')
+f=sub(f,'\tdefer func() { _ = lock.release() }()','\tstowOutboxPhase("outbox.file_lock",phase)\n\tdefer func() { phase:=time.Now();_ = lock.release();stowOutboxPhase("outbox.unlock",phase) }()')
+f=sub(f,'\tif err := o.reloadLocked(); err != nil {\n\t\treturn err\n\t}\n\treturn operation(o.state)','\tphase=time.Now()\n\tif err := o.reloadLocked(); err != nil {\n\t\treturn err\n\t}\n stowOutboxPhase("outbox.reload",phase)\n\treturn operation(o.state)')
+f=sub(f,'\tdata, err := encodeOutboxProto(state)','\tphase:=time.Now()\n\tdata, err := encodeOutboxProto(state)\n stowOutboxPhase("outbox.encode",phase)')
+f=sub(f,'\treturn atomicfile.Write(o.path, data, 0o600)','\tphase=time.Now()\n err=atomicfile.Write(o.path,data,0o600)\n stowOutboxPhase("outbox.atomic",phase)\n return err')
+f+='\nfunc stowOutboxPhase(name string,start time.Time) {if atomicfile.StowPhaseSink!=nil {atomicfile.StowPhaseSink(name,time.Since(start))}}\n'
+(d/'trace-file_outbox.go.txt').write_text(f)
+overlay={'/app/internal/atomicfile/atomicfile.go':'/app/benchmark/phase-probe/trace-atomicfile.go.txt','/app/internal/runthrough/file_outbox.go':'/app/benchmark/phase-probe/trace-file_outbox.go.txt','/app/internal/runthrough/phase_probe_test.go':'/app/benchmark/phase-probe/phase_probe_test.go.txt'}
+(b/'phase-trace-overlay.json').write_text(json.dumps({'Replace':overlay},indent=2)+'\n')
+print('Prepared source context',len(files),'files, production unchanged; overlays only')

@@ -1,0 +1,14 @@
+const fs=require('node:fs'),crypto=require('node:crypto'),cp=require('node:child_process');
+const root='/results/b2a9cdee-aa9b-47e4-8cdb-1471b1fadbad';const run=JSON.parse(fs.readFileSync(root+'/run.json'));
+if(!run.complete||!run.success||run.railwayDeploymentId!==process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Completed successful measurement required');
+const manifest=JSON.parse(fs.readFileSync('benchmark/validation-input-manifest.json'));const files={};
+for(const[name,expected]of Object.entries(manifest))if(name.endsWith('.go')||name==='go.mod'||name==='go.sum'){
+ const actual=crypto.createHash('sha256').update(fs.readFileSync(name)).digest('hex');if(actual!==expected)throw Error('Source mismatch '+name);files[name]=actual;
+}
+fs.writeFileSync(root+'/product-source-verification.json',JSON.stringify({railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID,count:Object.keys(files).length,files},null,2)+'\n');
+const checks=fs.existsSync(root+'/post-checks.json')?JSON.parse(fs.readFileSync(root+'/post-checks.json')):[];
+for(const[name,args]of [['trace-contracts',['go','test','-overlay=benchmark/phase-trace-overlay.json','./internal/runthrough','./internal/atomicfile','-count=1']],['trace-race',['go','test','-race','-overlay=benchmark/phase-trace-overlay.json','./internal/runthrough','./internal/atomicfile','-count=1']]].slice(checks.length,checks.length+1)){
+ const log=fs.openSync(root+'/'+name+'.log','w');let result;try{result=cp.spawnSync('runuser',['-u','stow-validation','--',...args],{stdio:['ignore',log,log],timeout:120000,env:{...process.env,TMPDIR:root+'/fixture-tmp'}})}finally{fs.closeSync(log)}
+ checks.push({name,args,exitCode:result.status,signal:result.signal,error:result.error?.message});fs.writeFileSync(root+'/post-checks.json',JSON.stringify(checks,null,2)+'\n');if(result.status!==0)throw Error(name+' failed');
+}
+console.log(JSON.stringify({sourceFiles:Object.keys(files).length,checks}));

@@ -1,0 +1,27 @@
+from pathlib import Path
+import json,re,base64
+p=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');b=p/'context/benchmark';d=p/'export-b2a9cdee-aa9b-47e4-8cdb-1471b1fadbad'
+trace=(d/'source-trace-file_outbox.go.txt.txt').read_text();before=(b/'phase-probe/before-file_outbox.go.txt').read_text()
+for method in ['Enqueue','Prepare']:
+ pattern=r'func \(o \*FileOutbox\) '+method+r'\(entry OutboxEntry\) \(OutboxEntry, error\) \{.*?\n\}'
+ a=re.search(pattern,trace,re.S);z=re.search(pattern,before,re.S);assert a and z
+ trace=trace[:a.start()]+z[0]+trace[a.end():]
+(b/'phase-probe/trace-before-file_outbox.go.txt').write_text(trace)
+overlay=json.loads((b/'phase-trace-overlay.json').read_text());overlay['Replace']['/app/internal/runthrough/file_outbox.go']='/app/benchmark/phase-probe/trace-before-file_outbox.go.txt';overlay['Replace']['/app/internal/runthrough/outbox.go']='/app/benchmark/phase-probe/before-outbox.go.txt';(b/'phase-trace-before-overlay.json').write_text(json.dumps(overlay,indent=2)+'\n')
+s='''import {readFile,writeFile,open,mkdir,statfs,unlink}from'node:fs/promises';import{spawn}from'node:child_process';import{createHash}from'node:crypto';
+const root=process.env.STOW_RESULT_ROOT;if(!root?.startsWith('/results/')||process.getuid()!==10001||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway only');const temporaryDirectory=root+'/fixture-tmp';await mkdir(temporaryDirectory,{recursive:true});if((await statfs(temporaryDirectory)).type!==61267)throw Error('Ext4 required');await writeFile(root+'/fixture-filesystem.json',JSON.stringify({uid:process.getuid(),temporaryDirectory,statfsType:61267},null,2)+'\\n');
+const files={before:'/app/benchmark/paired-before.test',after:'/app/benchmark/paired-after.test'},binarySHA256={};for(const[name,file]of Object.entries(files))binarySHA256[name]=createHash('sha256').update(await readFile(file)).digest('hex');const runs=[];
+for(const[index,variant]of ['before','after','after','before','after','before','before','after'].entries()){
+ const args=[files[variant],'-test.run=^TestOutboxWritePhaseProbe$/(0|128)$','-test.v','-test.count=1'];const logName='paired-'+index+'-'+variant+'.log';const log=await open(root+'/'+logName,'w');let result;try{const child=spawn('python3',['benchmark/reap_validation.py',...args],{env:{...process.env,TMPDIR:temporaryDirectory},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(exitCode,signal)=>resolve({exitCode,signal}))})}finally{await log.close()}
+ runs.push({index,variant,args,log:logName,...result});await writeFile(root+'/comparison-runs.json',JSON.stringify({binarySHA256,runs},null,2)+'\\n');if(result.exitCode!==0)throw Error(logName+' failed');console.log(logName+' passed');
+}
+for(const file of Object.values(files))await unlink(file);await writeFile(root+'/comparison-cleanup.json',JSON.stringify({removed:Object.values(files),binarySHA256},null,2)+'\\n');
+'''
+(b/'paired-phase.mjs').write_text(s)
+sources=['internal/runthrough/outbox.go','internal/runthrough/file_outbox.go','internal/atomicfile/atomicfile.go','benchmark/phase-probe/trace-before-file_outbox.go.txt','benchmark/phase-trace-before-overlay.json','benchmark/phase-probe/trace-file_outbox.go.txt','benchmark/phase-probe/trace-atomicfile.go.txt','benchmark/phase-probe/phase_probe_test.go.txt','benchmark/paired-phase.mjs','benchmark/phase-probe/before-outbox.go.txt']
+plan={'phase':'paired-outbox-write-phases','sources':sources,'steps':[{'name':'format-probe','args':['gofmt','-w','benchmark/phase-probe/trace-before-file_outbox.go.txt']},{'name':'build-before','args':['go','test','-overlay=benchmark/phase-trace-before-overlay.json','-c','./internal/runthrough','-o','benchmark/paired-before.test']},{'name':'build-current','args':['go','test','-overlay=benchmark/phase-trace-overlay.json','-c','./internal/runthrough','-o','benchmark/paired-after.test']},{'name':'comparison','args':['node','benchmark/paired-phase.mjs']}]}
+(p/'paired-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+updates=['benchmark/phase-probe/trace-before-file_outbox.go.txt','benchmark/phase-trace-before-overlay.json','benchmark/paired-phase.mjs'];data={n:base64.b64encode((p/'context'/n).read_bytes()).decode()for n in updates};data['benchmark/active-plan.json']=base64.b64encode((p/'paired-plan.json').read_bytes()).decode()
+js="const fs=require('node:fs');const prior='/results/b2a9cdee-aa9b-47e4-8cdb-1471b1fadbad';const run=JSON.parse(fs.readFileSync(prior+'/run.json'));const post=JSON.parse(fs.readFileSync(prior+'/post-checks.json'));if(!run.complete||!run.success||post.length!==2||post.some(x=>x.exitCode!==0))throw Error('Predecessor validation required');const files="+json.dumps(data)+";for(const[name,encoded]of Object.entries(files))fs.writeFileSync(name,Buffer.from(encoded,'base64'));console.log('Installed paired phase plan after successful completed predecessor');"
+(p/'install-paired.js').write_text(js)
+print('Prepared paired instrumentation; original fields/IO/fences preserved')

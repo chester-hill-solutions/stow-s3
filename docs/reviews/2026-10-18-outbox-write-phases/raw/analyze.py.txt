@@ -1,0 +1,76 @@
+from pathlib import Path
+from collections import defaultdict,Counter
+from statistics import median,mean
+import json,re,hashlib,sys,math
+p=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');job=json.loads((p/'main-start.json').read_text());d=p/('export-'+job['id'])
+run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete'] and run['success'] and len(checks)==7 and all(x['passed']for x in checks)
+commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==50
+fs=json.loads((d/'fixture-filesystem.json').read_text());assert fs['uid']==10001 and fs['statfsType']==61267
+rx=re.compile(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$')
+def bench(file):
+ rows=[]
+ for line in file.read_text().splitlines():
+  m=rx.match(line)
+  if not m:continue
+  values=m[3].split();assert len(values)%2==0
+  row={'name':m[1],'iterations':int(m[2])}
+  for k in range(0,len(values),2):row[values[k+1]]=float(values[k])
+  rows.append(row)
+ return rows
+cells=defaultdict(lambda:defaultdict(list));components=[];samples=[]
+for command in commands['runs']:
+ assert command['exitCode']==0 and command['signal']is None
+ cohort=command['cohort'];rows=bench(d/command['log'])
+ if cohort in ['ab','aa','memory']:
+  assert len(rows)==2,(command,len(rows))
+  expected=commands['binarySHA256']['after'if cohort=='aa'else command['variant']];assert command['binarySHA256']==expected
+  for row in rows:
+   row.update({k:command[k]for k in ['cohort','index','variant','log']});cells[(cohort,row['name'])][command['variant']].append(row);samples.append(row)
+ elif cohort=='components':assert len(rows)==27;components=rows
+ elif cohort=='phase':
+  assert not rows
+  for line in (d/command['log']).read_text().splitlines():
+   if line.startswith('STOWPHASE:'):samples_row=json.loads(line.removeprefix('STOWPHASE:'));samples.append(dict(cohort='phase',**samples_row))
+ else:raise ValueError(cohort)
+results=[]
+for(cohort,name),variants in sorted(cells.items()):
+ count=16 if cohort=='ab'else 4
+ assert set(variants)=={'before','after'}and all(len(x)==count for x in variants.values())
+ detail={}
+ for label,rows in variants.items():
+  times=[x['ns/op']for x in rows]
+  detail[label]={'n':len(rows),'nsMedian':median(times),'nsMean':mean(times),'nsMin':min(times),'nsMax':max(times),'allocsMedian':median(x['allocs/op']for x in rows),'bytesMedian':median(x['B/op']for x in rows),'iterations':[x['iterations']for x in rows]}
+ blocks=[]
+ for start in range(0,32 if cohort=='ab'else 8,8):
+  before=median(x['ns/op']for x in variants['before']if start<=x['index']<start+8);after=median(x['ns/op']for x in variants['after']if start<=x['index']<start+8);blocks.append((after/before-1)*100)
+ results.append({'cohort':cohort,'name':name,**detail,'deltaPercent':(detail['after']['nsMedian']/detail['before']['nsMedian']-1)*100,'blockMedianDeltaPercent':blocks})
+phases=defaultdict(list)
+expected={'atomic.mkdir','atomic.create','atomic.write','atomic.chmod','atomic.file_sync','atomic.close','atomic.rename','atomic.dir_sync','outbox.read','outbox.decode','outbox.clone','outbox.update','outbox.mutex_wait','outbox.file_lock','outbox.unlock','outbox.reload','outbox.encode','outbox.atomic'}
+for row in samples:
+ if row['cohort']=='phase':
+  counts=Counter(x['name']for x in row['phases']);assert set(counts)==expected and set(counts.values())=={2},counts
+  phases[row['depth']].append(row)
+assert set(phases)=={0,128,4096}and all(len(x)==60 for x in phases.values())
+phase_summary=[]
+exclusive=['outbox.mutex_wait','outbox.file_lock','outbox.reload','outbox.clone','outbox.update','outbox.encode','outbox.atomic','outbox.unlock']
+for depth,rows in sorted(phases.items()):
+ assert {x['cycle']for x in rows}==set(range(60))
+ times=sorted(x['ns']for x in rows);total=sum(times);parts=defaultdict(list)
+ for row in rows:
+  sums=defaultdict(int)
+  for event in row['phases']:sums[event['name']]+=event['ns']
+  assert sum(sums[name]for name in exclusive)<=row['ns']
+  assert sum(sums[name]for name in expected if name.startswith('atomic.'))<=sums['outbox.atomic']
+  for name,value in sums.items():parts[name].append(value)
+ phase_summary.append({'depth':depth,'cycles':len(rows),'journalBytes':list({x['journalBytes']for x in rows}),'nsMedian':median(times),'nsMean':mean(times),'nsP95':times[math.ceil(.95*len(times))-1],'nsMax':max(times),'phases':{name:{'nsMedian':median(values),'nsMean':mean(values),'aggregateSharePercent':sum(values)/total*100}for name,values in sorted(parts.items())}})
+component_summary=[]
+for name in sorted({x['name']for x in components}):
+ rows=[x for x in components if x['name']==name];assert len(rows)==3
+ component_summary.append({'name':name,'n':3,**{k:median(x[k]for x in rows)for k in ['ns/op','B/op','allocs/op','journal-B']}})
+source=json.loads((d/'environment.json').read_text());r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow')
+for name,digest in source['sourceSHA256'].items():
+ if name.startswith('internal/'):assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+out={'baseline':json.loads((p/'baseline.json').read_text()),'railwayDeploymentId':job['deploymentId'],'filesystem':fs,'comparisons':results,'phaseSummary':phase_summary,'components':component_summary,'counts':{'comparativeObservations':96,'phaseCycles':180,'componentObservations':27},'samples':samples,'componentSamples':components}
+assert len([x for x in samples if x['cohort']!='phase'])==96
+(d/'analysis.json').write_text(json.dumps(out,indent=2)+'\n')
+print(json.dumps({k:out[k]for k in ['comparisons','phaseSummary','components','counts']},indent=2))
