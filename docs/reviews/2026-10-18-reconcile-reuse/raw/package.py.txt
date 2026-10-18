@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,subprocess,shutil,hashlib,tarfile
+p=Path('/private/tmp/stow-reconcile-reuse-2026-10-18');old=Path('/private/tmp/stow-ledger-fences-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True);manifest={}
+for n in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0'):
+ if not n:continue
+ f=r/n
+ if not f.is_file():continue
+ dst=c/n;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dst);manifest[n]=hashlib.sha256(f.read_bytes()).hexdigest()
+(p/'source-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');shutil.copy2(p/'source-manifest.json',c/'benchmark/validation-input-manifest.json')
+for n in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/n,c/'benchmark'/n)
+for n in ['ledger-reuse-bench.go.txt','mutation-reuse-bench.go.txt','reuse-measure.mjs','baseline-state.go.txt','baseline-admission.go.txt','before-overlay.json']:shutil.copy2(p/n,c/'benchmark'/n)
+shutil.copy2(old/'context/benchmark/measure-child.py',c/'benchmark/measure-child.py');shutil.copy2(p/'red-plan.json',c/'benchmark/active-plan.json')
+shutil.copy2(r/'internal/capacity/reconcile_unchanged_test.go',c/'internal/capacity/reconcile_unchanged_test.go')
+base=c/'benchmark/validation-previous-baselines';base.mkdir(exist_ok=True)
+for f in (r/'scripts/baselines').iterdir():
+ if f.is_file():shutil.copy2(f,base/f.name)
+u=p/'upload';(u/'benchmark').mkdir(parents=True,exist_ok=True);(u/'site').mkdir(exist_ok=True)
+for n in ['go.mod','go.sum','site/package.json','site/package-lock.json']:shutil.copy2(c/n,u/n)
+recipe=(old/'transport-Dockerfile.txt').read_text();(u/'benchmark/Dockerfile').write_text(recipe);(p/'transport-Dockerfile.txt').write_text(recipe)
+files=[f for f in sorted(c.rglob('*'))if f.is_file()];archive=u/'validation-source.tar.gz'
+with tarfile.open(archive,'w:gz',compresslevel=3)as t:
+ for f in files:t.add(f,arcname=str(f.relative_to(c)),recursive=False)
+(p/'transport-receipt.json').write_text(json.dumps({'archiveBytes':archive.stat().st_size,'archiveSHA256':hashlib.sha256(archive.read_bytes()).hexdigest(),'contentsFiles':len(files),'dockerfile':'transport-Dockerfile.txt'},indent=2)+'\n')
+print('Packaged',len(manifest),'tracked files;',len(files),'transport files;',archive.stat().st_size,'archive bytes')

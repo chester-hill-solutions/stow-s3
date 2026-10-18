@@ -1,0 +1,17 @@
+from pathlib import Path
+import json,hashlib,shutil
+p=Path('/private/tmp/stow-reconcile-reuse-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-reconcile-reuse/raw';raw.mkdir(parents=True,exist_ok=True)
+for phase,count in [('red',3),('prototype',15),('final',26),('diagnostic',9),('eligibility',3)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks);assert run['railwayDeploymentId']==job['deploymentId']=='cd70e535-3260-4baa-9e04-3767804a10d9'
+ dest=raw/phase;dest.mkdir(exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ for suffix in ['start.json','deployments.json','upload.log']:shutil.copy2(p/(phase+'-'+suffix),dest/suffix)
+ if phase=='final':
+  env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+  for n,h in env['sourceSHA256'].items():
+   if n.endswith('.go'):assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','baseline-state.go.txt','baseline-admission.go.txt','before-overlay.json','candidate-state.go.txt','candidate-admission.go.txt','candidate-overlay.json','ledger-reuse-bench.go.txt','mutation-reuse-bench.go.txt','reuse-measure.mjs','final-reuse-measure.mjs','diagnostic-admission.go.txt','diagnostic-overlay.json','reuse-trace.go.txt','toggle-measure.mjs','repeated-trace.go.txt','transport-Dockerfile.txt','transport-receipt.json','failed-transport-receipt.json','failed-attempt-upload.log','failed-attempt-deployments.json','failed-attempt-build.log']:shutil.copy2(p/n,raw/n)
+for n in ['package.py','control.py','remote.py','export.py','watch.py','analyze-red.py','analyze-prototype.py','analyze-final.py','analyze-diagnostic.py','analyze-eligibility.py','install-diagnostic.js','install-eligibility.js','collect.py','report.py','install-prototype.js','install-final.js']:shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs','measure-child.py']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-reconcile-reuse.md');print('Collected original proof, all candidate/final results and exact tested source hashes')

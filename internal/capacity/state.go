@@ -203,6 +203,10 @@ func encodeState(state *hostState) ([]byte, error) {
 }
 
 func (h *Host) write(state *hostState) error {
+	return h.persist(state, false)
+}
+
+func (h *Host) persist(state *hostState, unchanged bool) error {
 	data, err := encodeState(state)
 	if err != nil {
 		return err
@@ -213,8 +217,11 @@ func (h *Host) write(state *hostState) error {
 	if err := checkCapacity(state, int64(len(data))*2); err != nil {
 		return err
 	}
-	if err := atomicfile.Write(filepath.Join(h.dir, "capacity.json"), data, 0o600); err != nil {
-		return errors.Join(ErrUnknown, err)
+	path := filepath.Join(h.dir, "capacity.json")
+	if !unchanged || atomicfile.SyncExisting(path, 0o600) != nil {
+		if err := atomicfile.Write(path, data, 0o600); err != nil {
+			return errors.Join(ErrUnknown, err)
+		}
 	}
 	return syncAncestors(h.dir)
 }

@@ -1,0 +1,50 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-reconcile-reuse.md": "fd47f0cf76ffb2d1e971ba8d07c479b3e82d1af0e8f195744f1924ebaed7cf61"
+  },
+  "sourceSHA256": {
+    "internal/capacity/state.go": "e362026bc4c256fbe3da668ac2024d14a27b9f4bd67cbea92b16cc9f6902e666",
+    "internal/capacity/admission.go": "a6db5c91700ff0ec5d6842f29e22ee294480a4549d9478b6366b0ab2c5bd3c5f",
+    "internal/capacity/reconcile_unchanged_test.go": "11e122ac8f39e6242606dfa323a06b93a38bbe0750d6e8680cd30a5d8da4646f",
+    "benchmark/baseline-state.go.txt": "23eb98540568097e0ee6b0894b1d41e9d85418785fe009a8b0fb50ea0ae485c1",
+    "benchmark/baseline-admission.go.txt": "1ed69eeeca4afd558df4db019919d6c50700f14011b83135a1deab80b07ebcf4",
+    "benchmark/before-overlay.json": "72bd92153395757244f8025818152b886fedd3957acb1c595b886bf17504934f",
+    "benchmark/ledger-reuse-bench.go.txt": "04f55872a0ce5cba915085394da451de4e6dedaa5d6f61f3c6f0dc69d99e03cf",
+    "benchmark/mutation-reuse-bench.go.txt": "c035801f8e7c82d01e7a5148f940f155c962096f91be2c1fe95f22edbb8a1f41",
+    "benchmark/reuse-measure.mjs": "f3617a09ee30486efddec96fe47f8be2e62ac991c71c02dee02853c36180f1fb",
+    "benchmark/measure-child.py": "506589c7416291fa1ef36dc4c182b10ae84267b45a74bf9297e54ce8fcf77986"
+  },
+  "railwayDeploymentId": "cd70e535-3260-4baa-9e04-3767804a10d9"
+}

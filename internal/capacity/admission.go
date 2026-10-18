@@ -3,6 +3,7 @@ package capacity
 import (
 	"context"
 	"errors"
+	"slices"
 )
 
 func (n *Namespace) Reconcile(ctx context.Context, usage Usage) error {
@@ -17,9 +18,10 @@ func (n *Namespace) Reconcile(ctx context.Context, usage Usage) error {
 		if err := checkHeldProjection(ns, usage); err != nil {
 			return err
 		}
+		unchanged := store.Pending == nil && (store.Resources == nil) == (usage.Resources == nil) && slices.Equal(store.Resources, usage.Resources)
 		store.Resources = usage.Resources
 		store.Pending = nil
-		return n.host.write(state)
+		return n.host.persist(state, unchanged)
 	})
 }
 
