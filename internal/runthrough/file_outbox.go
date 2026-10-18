@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
 )
 
 type FileOutbox struct {
@@ -302,29 +304,5 @@ func (o *FileOutbox) persistState(state outboxState) error {
 	if err != nil {
 		return err
 	}
-	tmp, err := os.CreateTemp(filepath.Dir(o.path), ".outbox-*")
-	if err != nil {
-		return err
-	}
-	tmpName := tmp.Name()
-	defer os.Remove(tmpName)
-	if _, err := tmp.Write(data); err != nil {
-		_ = tmp.Close()
-		return err
-	}
-	if err := tmp.Sync(); err != nil {
-		_ = tmp.Close()
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		return err
-	}
-	if err := os.Rename(tmpName, o.path); err != nil {
-		return err
-	}
-	if dirFile, err := os.Open(filepath.Dir(o.path)); err == nil {
-		_ = dirFile.Sync()
-		_ = dirFile.Close()
-	}
-	return nil
+	return atomicfile.Write(o.path, data, 0o600)
 }

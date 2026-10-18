@@ -1,5 +1,7 @@
 # Avoid cache work for objects that cannot fit
 
+Follow-up: [outbox durability and journal-depth measurements](2026-10-17-outbox-durability.md).
+
 This change streams an oversized upstream GET after recording its provenance,
 instead of writing the object into a cache that immediately evicts it and fetches
 it again. Oversized HEAD/prewarm reads return the same observed metadata and close

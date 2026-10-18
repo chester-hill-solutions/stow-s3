@@ -1,0 +1,54 @@
+package runthrough_test
+
+import (
+	"context"
+	"errors"
+	"os"
+	"path/filepath"
+	"runtime"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestOutboxFenceFailureRefusesUnrecordedRead(t *testing.T) {
+	if runtime.GOOS == "windows" || os.Geteuid() == 0 {
+		t.Skip("requires Unix directory permissions as an unprivileged user")
+	}
+	for _, mode := range []string{"adapter", "runtime", "head"} {
+		t.Run(mode, func(t *testing.T) {
+			dir := t.TempDir()
+			outbox, err := runthrough.NewFileOutbox(filepath.Join(dir, "outbox.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			f := newVersionFixtureWithCache(t, "old", outbox, nil)
+			f.client.change = nil
+			if err := os.Chmod(dir, 0333); err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { _ = os.Chmod(dir, 0700) })
+			if mode == "head" {
+				_, err = f.adapter.HeadObject(context.Background(), "probe", "target")
+			} else {
+				_, _, err = observeVersion(f, mode)
+			}
+			if !errors.Is(err, os.ErrPermission) {
+				t.Fatalf("read accepted without durable provenance: %v", err)
+			}
+			if f.client.gets != 1 || f.client.closes != 1 {
+				t.Fatalf("upstream stream ownership: gets=%d closes=%d", f.client.gets, f.client.closes)
+			}
+			if _, err := f.cache.HeadObject(context.Background(), "probe", "target"); !errors.Is(err, storage.ErrObjectNotFound) {
+				t.Fatalf("failed observation cached: %v", err)
+			}
+			if err := os.Chmod(dir, 0700); err != nil {
+				t.Fatal(err)
+			}
+			if _, _, err := observeVersion(f, "adapter"); err != nil {
+				t.Fatalf("repaired retry failed: %v", err)
+			}
+		})
+	}
+}

@@ -1,0 +1,48 @@
+{
+  "phase": "outbox-directory-fence-before",
+  "sources": [
+    "internal/runthrough/file_outbox_provenance_test.go",
+    "internal/runthrough/file_outbox_fence_api_test.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go",
+    "internal/runthrough/file_outbox.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_provenance_test.go",
+        "internal/runthrough/file_outbox_fence_api_test.go",
+        "internal/runthrough/file_outbox_provenance_bench_test.go"
+      ]
+    },
+    {
+      "name": "reproduce-fence",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxReportsDirectoryFenceFailure|TestOutboxFenceFailureRefusesUnrecordedRead)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "reproduce-fence-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxReportsDirectoryFenceFailure|TestOutboxFenceFailureRefusesUnrecordedRead)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

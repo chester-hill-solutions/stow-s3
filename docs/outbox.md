@@ -28,6 +28,10 @@ retrying the same condition cannot resolve it.
 
 ## Retry and lost replies
 
+Filesystem outbox updates return an error if journal replacement cannot complete its durability fence.
+The replacement may already be visible when that error occurs; it does not prove the old journal was restored.
+Reads that need to record upstream provenance fail until it can be saved durably.
+
 Transient failures retry with bounded backoff. Deterministic failures remain available for inspection.
 
 After a lost put reply, recovery compares the upstream object with the recorded local version.
