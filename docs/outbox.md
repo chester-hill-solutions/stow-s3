@@ -24,6 +24,9 @@ intent. Completed IDs are not retained as an idempotency history.
 Automatic allocation returns an error on ID-sequence exhaustion instead of wrapping.
 Fencing-token allocation also fails at sequence exhaustion. Existing lease owners
 can still renew or finish their work without resetting that counter.
+Ownership-checked updates require a nonempty owner and a nonzero matching token.
+Unclaimed intents use the unowned update APIs. Expiry alone does not invalidate a
+current token; an already-committed prepared retry still returns the active intent.
 
 The write condition uses the upstream validator captured during a read or before the local mutation.
 A confirmed missing key uses an expected-absence condition.

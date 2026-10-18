@@ -108,6 +108,10 @@ func (s *outboxState) firstForKey(target OutboxEntry) bool {
 	return true
 }
 
+func outboxOwnershipMatches(storedOwner string, storedToken uint64, owner string, token uint64) bool {
+	return owner != "" && token != 0 && storedOwner == owner && storedToken == token
+}
+
 func (s *outboxState) renewClaim(id, owner string, token uint64, lease time.Duration) error {
 	if lease <= 0 {
 		return ErrOutboxClaimLease
@@ -116,7 +120,7 @@ func (s *outboxState) renewClaim(id, owner string, token uint64, lease time.Dura
 	if !ok {
 		return fmt.Errorf("outbox entry %q not found", id)
 	}
-	if entry.ClaimOwner != owner || entry.ClaimToken != token {
+	if !outboxOwnershipMatches(entry.ClaimOwner, entry.ClaimToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	entry.ClaimUntil = time.Now().UTC().Add(lease)
@@ -129,7 +133,7 @@ func (s *outboxState) releaseClaim(id, owner string, token uint64) error {
 	if !ok {
 		return nil
 	}
-	if entry.ClaimOwner != owner || entry.ClaimToken != token {
+	if !outboxOwnershipMatches(entry.ClaimOwner, entry.ClaimToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	entry.ClaimOwner = ""
@@ -144,7 +148,7 @@ func (s *outboxState) markClaimedSuccess(id, owner string, token uint64) error {
 	if !ok {
 		return fmt.Errorf("outbox entry %q not found", id)
 	}
-	if entry.ClaimOwner != owner || entry.ClaimToken != token {
+	if !outboxOwnershipMatches(entry.ClaimOwner, entry.ClaimToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	delete(s.entries, id)
@@ -156,7 +160,7 @@ func (s *outboxState) markClaimedFailure(id, owner string, token uint64, cause e
 	if !ok {
 		return fmt.Errorf("outbox entry %q not found", id)
 	}
-	if entry.ClaimOwner != owner || entry.ClaimToken != token {
+	if !outboxOwnershipMatches(entry.ClaimOwner, entry.ClaimToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	if err := s.markFailureUnchecked(entry, cause, retryAt); err != nil {

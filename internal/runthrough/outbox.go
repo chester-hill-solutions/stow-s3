@@ -230,7 +230,7 @@ func (s *outboxState) renewPrepared(id, owner string, token uint64, lease time.D
 	if !ok {
 		return fmt.Errorf("outbox prepared entry %q not found", id)
 	}
-	if entry.PreparedOwner != owner || entry.PreparedToken != token {
+	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	entry.PreparedUntil = time.Now().UTC().Add(lease)
@@ -250,7 +250,7 @@ func (s *outboxState) commitPrepared(id, owner string, token uint64, version str
 	// A live owner can finish a slow local mutation, and recovery can commit the
 	// expired intent after proving its owner is dead. New prepares stay blocked
 	// until this intent is resolved, so expiry alone cannot authorize a new writer.
-	if entry.PreparedOwner != owner || entry.PreparedToken != token {
+	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
 		return OutboxEntry{}, ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)
@@ -268,7 +268,7 @@ func (s *outboxState) discardPreparedOwned(id, owner string, token uint64) error
 	if !ok {
 		return nil
 	}
-	if entry.PreparedOwner != owner || entry.PreparedToken != token {
+	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)
