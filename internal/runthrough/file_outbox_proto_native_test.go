@@ -75,7 +75,8 @@ func checkNativeProtoSnapshot(t *testing.T, path string, want outboxState) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got, err := reopened.readState()
+	var got outboxState
+	err = reopened.withLockedState(func(state outboxState) error { got = state.clone(); return nil })
 	if err != nil || !reflect.DeepEqual(got, want) {
 		t.Fatalf("reopen lost outbox state: got=%+v want=%+v error=%v", got, want, err)
 	}

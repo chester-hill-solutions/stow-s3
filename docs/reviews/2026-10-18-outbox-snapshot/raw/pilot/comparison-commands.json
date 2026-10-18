@@ -1,0 +1,777 @@
+[
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-buildvcs=false",
+      "-o",
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "./internal/runthrough"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:52:30.949Z",
+    "elapsedMs": 19726,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "contracts-before",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox",
+      "-count=2",
+      "-v"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:52:50.689Z",
+    "elapsedMs": 1384,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "contracts-before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox",
+      "-count=2",
+      "-v"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:52:52.073Z",
+    "elapsedMs": 41905,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-buildvcs=false",
+      "-o",
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-overlay=/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after-overlay.json",
+      "./internal/runthrough"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:53:33.981Z",
+    "elapsedMs": 1765,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "contracts-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after-overlay.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox",
+      "-count=2",
+      "-v"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:53:35.759Z",
+    "elapsedMs": 1330,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "contracts-after-race",
+    "args": [
+      "go",
+      "test",
+      "-overlay=/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after-overlay.json",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox",
+      "-count=2",
+      "-v"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:53:37.089Z",
+    "elapsedMs": 6839,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "go-version",
+    "args": [
+      "go",
+      "version"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:53:43.929Z",
+    "elapsedMs": 6,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "seed",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^TestOutboxSnapshotSeed$",
+      "-test.count=1",
+      "-test.v"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_SEED": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:43.936Z",
+    "elapsedMs": 667,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-000-timed-before-cpu1-empty-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:44.625Z",
+    "elapsedMs": 204,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-001-timed-after-cpu1-empty-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:44.830Z",
+    "elapsedMs": 186,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-002-timed-after-cpu1-empty-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:45.018Z",
+    "elapsedMs": 187,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-003-timed-before-cpu1-empty-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:45.207Z",
+    "elapsedMs": 197,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-004-timed-before-cpu1-empty-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:45.405Z",
+    "elapsedMs": 193,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-005-timed-after-cpu1-empty-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:45.600Z",
+    "elapsedMs": 186,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-006-timed-after-cpu1-empty-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:45.788Z",
+    "elapsedMs": 185,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-007-timed-before-cpu1-empty-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^empty$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:45.974Z",
+    "elapsedMs": 192,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-008-timed-before-cpu1-provenance=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:46.167Z",
+    "elapsedMs": 153,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-009-timed-after-cpu1-provenance=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:46.324Z",
+    "elapsedMs": 174,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-010-timed-after-cpu1-provenance=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:46.500Z",
+    "elapsedMs": 170,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-011-timed-before-cpu1-provenance=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:46.672Z",
+    "elapsedMs": 123,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-012-timed-before-cpu1-provenance=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:46.796Z",
+    "elapsedMs": 146,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-013-timed-after-cpu1-provenance=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:46.943Z",
+    "elapsedMs": 157,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-014-timed-after-cpu1-provenance=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:47.102Z",
+    "elapsedMs": 169,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-015-timed-before-cpu1-provenance=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^provenance=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:47.272Z",
+    "elapsedMs": 144,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-016-timed-before-cpu1-active=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:47.419Z",
+    "elapsedMs": 224,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-017-timed-after-cpu1-active=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:47.646Z",
+    "elapsedMs": 291,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-018-timed-after-cpu1-active=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:47.940Z",
+    "elapsedMs": 288,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-019-timed-before-cpu1-active=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:48.230Z",
+    "elapsedMs": 212,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-020-timed-before-cpu1-active=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:48.443Z",
+    "elapsedMs": 236,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-021-timed-after-cpu1-active=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:48.682Z",
+    "elapsedMs": 273,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-022-timed-after-cpu1-active=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:48.957Z",
+    "elapsedMs": 271,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-023-timed-before-cpu1-active=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^active=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:49.230Z",
+    "elapsedMs": 195,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-024-timed-before-cpu1-prepared=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:49.427Z",
+    "elapsedMs": 228,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-025-timed-after-cpu1-prepared=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:49.659Z",
+    "elapsedMs": 232,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-026-timed-after-cpu1-prepared=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:49.893Z",
+    "elapsedMs": 530,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-027-timed-before-cpu1-prepared=16384-pending",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^pending$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:50.424Z",
+    "elapsedMs": 178,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-028-timed-before-cpu1-prepared=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:50.603Z",
+    "elapsedMs": 249,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-029-timed-after-cpu1-prepared=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:50.854Z",
+    "elapsedMs": 320,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-030-timed-after-cpu1-prepared=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/after.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:51.176Z",
+    "elapsedMs": 337,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-031-timed-before-cpu1-prepared=16384-prepared",
+    "args": [
+      "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/before.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxSnapshot$/^prepared=16384$/^prepared$",
+      "-test.benchtime=100ms",
+      "-test.count=1",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/522844e2-1245-48bf-9394-8dcb7ba0405e/fixtures"
+    },
+    "startedAt": "2026-10-18T05:53:51.514Z",
+    "elapsedMs": 272,
+    "exitCode": 0,
+    "signal": null
+  }
+]

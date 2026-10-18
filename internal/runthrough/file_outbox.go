@@ -174,11 +174,6 @@ func (o *FileOutbox) commitState(state outboxState) error {
 	return nil
 }
 
-func (o *FileOutbox) readState() (state outboxState, err error) {
-	err = o.withLockedState(func(current outboxState) error { state = current.clone(); return nil })
-	return state, err
-}
-
 func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
@@ -228,11 +223,12 @@ func (o *FileOutbox) Prepared() []OutboxEntry {
 }
 
 func (o *FileOutbox) PreparedSnapshot() ([]OutboxEntry, error) {
-	state, err := o.readState()
+	var entries []OutboxEntry
+	err := o.withLockedState(func(state outboxState) error { entries = copyOutboxEntries(state.prepared); return nil })
 	if err != nil {
 		return nil, err
 	}
-	return state.preparedEntries(), nil
+	return sortOutboxEntries(entries), nil
 }
 
 func (o *FileOutbox) Pending() []OutboxEntry {
@@ -246,11 +242,12 @@ func (o *FileOutbox) Pending() []OutboxEntry {
 }
 
 func (o *FileOutbox) PendingSnapshot() ([]OutboxEntry, error) {
-	state, err := o.readState()
+	var entries []OutboxEntry
+	err := o.withLockedState(func(state outboxState) error { entries = copyOutboxEntries(state.entries); return nil })
 	if err != nil {
 		return nil, err
 	}
-	return state.pending(), nil
+	return sortOutboxEntries(entries), nil
 }
 
 func (o *FileOutbox) MarkSuccess(id string) error {

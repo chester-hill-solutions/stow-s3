@@ -408,10 +408,18 @@ func (o *MemoryOutbox) Close() error { return nil }
 func (o *MemoryOutbox) Durable() bool { return false }
 
 func pendingEntries(entries map[string]OutboxEntry) []OutboxEntry {
+	return sortOutboxEntries(copyOutboxEntries(entries))
+}
+
+func copyOutboxEntries(entries map[string]OutboxEntry) []OutboxEntry {
 	out := make([]OutboxEntry, 0, len(entries))
 	for _, entry := range entries {
 		out = append(out, entry)
 	}
+	return out
+}
+
+func sortOutboxEntries(out []OutboxEntry) []OutboxEntry {
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].CreatedAt.Equal(out[j].CreatedAt) {
 			return outboxSequence(out[i].ID) < outboxSequence(out[j].ID)

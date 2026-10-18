@@ -1,0 +1,124 @@
+[
+  {
+    "name": "trace-format",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/_trace/before/file_outbox.go",
+      "benchmark/_trace/after/file_outbox.go",
+      "benchmark/_trace/probe_test.go"
+    ],
+    "env": {},
+    "exitCode": 0
+  },
+  {
+    "name": "trace-build-before",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-buildvcs=false",
+      "-overlay=/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/before-trace-overlay.json",
+      "-o",
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/before-trace.test",
+      "./internal/runthrough"
+    ],
+    "env": {},
+    "exitCode": 0
+  },
+  {
+    "name": "trace-build-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-buildvcs=false",
+      "-overlay=/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/after-trace-overlay.json",
+      "-o",
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/after-trace.test",
+      "./internal/runthrough"
+    ],
+    "env": {},
+    "exitCode": 0
+  },
+  {
+    "name": "trace-seed",
+    "args": [
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/before-trace.test",
+      "-test.run=^TestOutboxSnapshotSeed$",
+      "-test.v"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_SEED": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/fixtures"
+    },
+    "exitCode": 0
+  },
+  {
+    "name": "trace-cell-0",
+    "args": [
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/before-trace.test",
+      "-test.run=^TestOutboxSnapshotWriterPhases$",
+      "-test.v",
+      "-test.cpu=1",
+      "-test.count=1",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/fixtures",
+      "STOW_SNAPSHOT_TRACE_OUTPUT": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/write-phases-0-before.json",
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "name": "trace-cell-1",
+    "args": [
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/after-trace.test",
+      "-test.run=^TestOutboxSnapshotWriterPhases$",
+      "-test.v",
+      "-test.cpu=1",
+      "-test.count=1",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/fixtures",
+      "STOW_SNAPSHOT_TRACE_OUTPUT": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/write-phases-1-after.json",
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "name": "trace-cell-2",
+    "args": [
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/after-trace.test",
+      "-test.run=^TestOutboxSnapshotWriterPhases$",
+      "-test.v",
+      "-test.cpu=1",
+      "-test.count=1",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/fixtures",
+      "STOW_SNAPSHOT_TRACE_OUTPUT": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/write-phases-2-after.json",
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "name": "trace-cell-3",
+    "args": [
+      "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/before-trace.test",
+      "-test.run=^TestOutboxSnapshotWriterPhases$",
+      "-test.v",
+      "-test.cpu=1",
+      "-test.count=1",
+      "-test.timeout=120s"
+    ],
+    "env": {
+      "STOW_OUTBOX_SNAPSHOT_FIXTURES": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/fixtures",
+      "STOW_SNAPSHOT_TRACE_OUTPUT": "/results/d59c2d66-4914-4fd0-881a-2d5e00686cb4/write-phases-3-before.json",
+      "GOMAXPROCS": "1"
+    },
+    "exitCode": 0
+  }
+]
