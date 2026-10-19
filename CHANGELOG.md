@@ -5,7 +5,9 @@
 Combine PR #77 cleanup, multipart identity, read-only snapshot reconciliation
 and preparation/checkpoint resource admission with PR #78 core quality fixes.
 Report only a confirmed absence as an absent object, so a create-only write is
-refused over workspace bytes the store could not read.
+refused over workspace bytes the store could not read. A signed HTTP header now
+covers every value it carries, so a request that changes one after signing is
+refused.
 Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
 [release notes](docs/releases/v0.3.3.md) for compatibility and known issues.
 
