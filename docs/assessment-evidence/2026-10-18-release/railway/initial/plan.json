@@ -1,0 +1,61 @@
+{
+  "phase": "v0.3.2-release-qualification",
+  "sources": [
+    "internal/version/version.go",
+    "scripts/check-doc-links.mjs",
+    "docs/releases/v0.3.2.md"
+  ],
+  "steps": [
+    {
+      "name": "doc-inventory-baseline",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "build-wasm",
+      "args": [
+        "make",
+        "build-wasm"
+      ]
+    },
+    {
+      "name": "install-node",
+      "args": [
+        "bash",
+        "-c",
+        "cd packages/stow-s3 && npm ci --ignore-scripts && rm -rf node_modules/@chester-hill-solutions/stow-s3-{darwin-arm64,darwin-x64,linux-arm64,linux-x64}"
+      ]
+    },
+    {
+      "name": "generate-package",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "packages/stow-s3"
+      ]
+    },
+    {
+      "name": "release-plan",
+      "args": [
+        "node",
+        "scripts/release-plan.mjs"
+      ],
+      "env": {
+        "RELEASE_VERSION": "v0.3.2"
+      }
+    },
+    {
+      "name": "source-receipt",
+      "args": [
+        "node",
+        "-e",
+        "const fs=require('node:fs'),crypto=require('node:crypto');const input=JSON.parse(fs.readFileSync('benchmark/validation-input-manifest.json'));const rows={};for(const p of Object.keys(input)){const b=fs.readFileSync(p);rows[p]=crypto.createHash('sha256').update(b).digest('hex')}fs.writeFileSync(process.env.STOW_RESULT_ROOT+'/qualified-source.json',JSON.stringify(rows,null,2))"
+      ]
+    }
+  ]
+}
