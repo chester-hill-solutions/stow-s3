@@ -44,6 +44,9 @@ func partHashes(size int64) (string, string) {
 }
 func partStore(t *testing.T, bound bool, limit int64) (*fsstore.FilesystemStore, *capacity.Namespace, string) {
 	t.Helper()
+	if bound && !(&fsstore.FilesystemStore{}).SupportsGuardedWrites() {
+		t.Skip("namespace capacity admission requires Darwin or Linux")
+	}
 	dir := t.TempDir()
 	var ns *capacity.Namespace
 	var err error

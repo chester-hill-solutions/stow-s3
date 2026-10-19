@@ -32,6 +32,9 @@ func (capacityRepeatReader) Read(p []byte) (int, error) {
 
 func capacityPayloadFixture(t testing.TB, root, kind string, size int64) (*FilesystemStore, *capacity.Namespace, string) {
 	t.Helper()
+	if !(&FilesystemStore{}).SupportsGuardedWrites() {
+		t.Skip("namespace capacity admission requires Darwin or Linux")
+	}
 	var dir string
 	if root == "" {
 		dir = t.TempDir()
