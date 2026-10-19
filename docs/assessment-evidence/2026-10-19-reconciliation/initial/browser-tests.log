@@ -1,0 +1,54 @@
+
+> @chester-hill-solutions/stow-s3@0.3.3 test:browser
+> npm run build && playwright test --config scripts/browser-playwright.config.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.3.3 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.3.3 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+
+Running 37 tests using 1 worker
+
+[1/37] scripts/browser-tests/content.spec.mjs:12:1 › content persistence shares chunks, opens without payload reads, and reads ranges
+[2/37] scripts/browser-tests/content.spec.mjs:50:1 › publication rolls back the complete record batch on missing references or CAS conflict
+[3/37] scripts/browser-tests/content.spec.mjs:74:1 › staging survives page restart and collection protects and releases staging pins
+[4/37] scripts/browser-tests/content.spec.mjs:104:1 › quota includes staged content and namespaces have independent usage
+[5/37] scripts/browser-tests/content.spec.mjs:124:1 › exclusive Web Locks reject a competing tab and release on close
+[6/37] scripts/browser-tests/content.spec.mjs:147:1 › collection follows retained record references and releases unused assets
+[7/37] scripts/browser-tests/content.spec.mjs:175:1 › damaged stored payloads fail verified reads
+[8/37] scripts/browser-tests/content.spec.mjs:204:1 › metadata-only publication cannot bypass namespace capacity
+[9/37] scripts/browser-tests/content.spec.mjs:222:1 › owned reopen releases crashed read handles and preserves durable protections
+[10/37] scripts/browser-tests/content.spec.mjs:254:1 › publication captures caller-owned metadata and descriptors before awaiting storage
+[11/37] scripts/browser-tests/content.spec.mjs:277:1 › schema two upgrades existing content without replaying payloads
+[12/37] scripts/browser-tests/content.spec.mjs:320:1 › collection aborts preserve all original records, usage and payloads
+[13/37] scripts/browser-tests/editor.spec.mjs:3:1 › the editor reloads offline from its service worker and preserves edits and undo/redo
+[14/37] scripts/browser-tests/large-project.spec.mjs:8:1 › qualifies 1 GiB streaming assets and 100 retained document edits
+[15/37] scripts/browser-tests/project.spec.mjs:14:1 › project revisions share assets, replace only overlapping chunks, and reopen with undo
+[16/37] scripts/browser-tests/project.spec.mjs:57:1 › project commit failure preserves its complete prior revision
+[17/37] scripts/browser-tests/project.spec.mjs:82:1 › host object bridge persists streams lazily and protects active reads through overwrite
+[18/37] scripts/browser-tests/project.spec.mjs:132:1 › project sync permits local saves and reconciles a lost hosted reply
+[19/37] scripts/browser-tests/storage.spec.mjs:4:1 › real IndexedDB retains bytes, metadata, stages and the selected cursor after reload
+[20/37] scripts/browser-tests/storage.spec.mjs:17:1 › an actual IndexedDB transaction abort leaves no partial edit or stage
+[21/37] scripts/browser-tests/storage.spec.mjs:29:1 › WASM quota rejection rolls back with the real persistence adapter
+[22/37] scripts/browser-tests/storage.spec.mjs:38:1 › Web Locks excludes a competing tab and releases ownership when its page exits
+[23/37] scripts/browser-tests/storage.spec.mjs:52:1 › retention and an edit after undo remove abandoned redo objects
+[24/37] scripts/browser-tests/storage.spec.mjs:62:1 › malformed persisted history fails instead of replacing local work from upstream
+[25/37] scripts/browser-tests/storage.spec.mjs:70:1 › namespace reads and deletes never retrieve unrelated payloads
+[26/37] scripts/browser-tests/sync.spec.mjs:4:1 › selected stages publish through the host transport and cached reads stay offline
+[27/37] scripts/browser-tests/sync.spec.mjs:18:1 › a lost response after remote commit reconciles across page reload without another write
+[28/37] scripts/browser-tests/sync.spec.mjs:34:1 › an aborted IndexedDB acknowledgement recovers the real remote receipt after reload
+[29/37] scripts/browser-tests/sync.spec.mjs:44:1 › two isolated browser stores compete for one remote ETag and exactly one wins
+[30/37] scripts/browser-tests/sync.spec.mjs:57:1 › an existing remote key conflicts with an offline-created file, and explicit adoption retains undo
+[31/37] scripts/browser-tests/sync.spec.mjs:68:1 › HTTP 403 remains a failed read rather than a missing file
+[32/37] scripts/browser-tests/sync.spec.mjs:76:1 › direct Railway requests exercise CORS, conditional headers and exposed receipt metadata
+[33/37] scripts/browser-tests/worker.spec.mjs:3:1 › dedicated worker loads real WASM and carries binary objects without detaching ordinary saves
+[34/37] scripts/browser-tests/worker.spec.mjs:37:1 › persistent worker streams above transport limits, pins reads, and reopens without replay
+[35/37] scripts/browser-tests/worker.spec.mjs:87:1 › persistent worker releases concurrently closed readers and their content pins
+[36/37] scripts/browser-tests/worker.spec.mjs:116:1 › persistent worker inspects crashed stages, refuses live discard, and reclaims abandoned bytes
+[37/37] scripts/browser-tests/worker.spec.mjs:176:1 › browser WASM starts with streamed and fallback responses and keeps read chunks owned
+  2 skipped
+  35 passed (14.4s)

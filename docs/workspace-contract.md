@@ -522,6 +522,14 @@ are the first two cases written and the first two run.
   distinction is the whole answer available to a caller: an empty listing and a
   workspace whose objects cannot be opened look identical otherwise, and the
   second is how a caller concludes its work has been deleted.
+- **Only a confirmed absence is an absent object.** A path that could not be
+  examined — one the host will not let the store read, stat or list — leaves the
+  object's state unknown, and the store reports it as unknown rather than as
+  absent. A create-only write over such a path is refused, so the bytes that are
+  still there are not replaced. A path that names a symbolic link or another
+  non-regular file holds no object, and that remains an absence. The read path,
+  the path resolution and the listing surface apply the same rule, so a listing
+  never omits an object merely because the store could not read it.
 - **The Windows CI lane tests what Windows supports.** The
   `Filesystem tests (windows-latest)` job runs `internal/storage/fs` in full and
   `internal/storage/workspace` not at all: that package's `TestMain` skips,

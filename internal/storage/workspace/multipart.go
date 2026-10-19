@@ -229,6 +229,7 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 	}
 	meta.ETag = storage.CompletionETag(etags)
 	if entry, ok := s.objectIndex.entry(state.Bucket, state.Key); ok {
+		entry.ContentETag = entry.ETag
 		entry.ETag, entry.Multipart = meta.ETag, true
 		if err := s.recordLocked(state.Bucket, state.Key, entry); err != nil {
 			return meta, storage.CommittedError(errors.Join(publishErr, err))

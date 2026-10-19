@@ -1,0 +1,233 @@
+{
+  "phase": "pr77-pr78-reconciled-release",
+  "sources": [
+    "cmd/stow-wasm/host_store_io_js.go",
+    "cmd/stow-wasm/host_store_sessions_js.go",
+    "internal/runtime/stream_cleanup_reconcile_test.go",
+    "internal/runtime/streams.go",
+    "internal/runtime/streams_test.go",
+    "internal/storage/fs/capacity_publication_test.go",
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/workspace/manifest.go",
+    "internal/storage/workspace/multipart.go",
+    "internal/storage/workspace/multipart_host_edit_test.go",
+    "internal/storage/workspace/resolve.go",
+    "internal/storage/workspace/rooted_reads.go",
+    "internal/storage/workspace/snapshot.go",
+    "internal/storage/workspace/snapshot_reconcile_test.go",
+    "internal/version/version.go",
+    "pkg/stow/checkpoint.go",
+    "pkg/stow/checkpoint_capture.go",
+    "pkg/stow/checkpoint_portable_validation_test.go",
+    "pkg/stow/prepare.go",
+    "pkg/stow/prepare_git.go",
+    "pkg/stow/prepare_git_budget.go",
+    "pkg/stow/prepare_seed.go",
+    "pkg/stow/work_budget_test.go",
+    "pkg/stow/workspace_multipart_facade_test.go",
+    "docs/api/README.md",
+    "docs/api/browser-s3.md",
+    "docs/api/browser-wasm.md",
+    "docs/api/browser.md",
+    "docs/api/embedded.md",
+    "docs/api/go.md",
+    "docs/api/inventory.json",
+    "docs/api/mcp.md",
+    "docs/api/node-wasm.md",
+    "docs/api/project.md",
+    "docs/api/python.md",
+    "docs/api/typescript.md",
+    "docs/api/worker.md",
+    "docs/api/workspace.md"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "cmd/stow-wasm/host_store_io_js.go",
+        "cmd/stow-wasm/host_store_sessions_js.go",
+        "internal/runtime/stream_cleanup_reconcile_test.go",
+        "internal/runtime/streams.go",
+        "internal/runtime/streams_test.go",
+        "internal/storage/fs/capacity_publication_test.go",
+        "internal/storage/workspace/manifest.go",
+        "internal/storage/workspace/multipart.go",
+        "internal/storage/workspace/multipart_host_edit_test.go",
+        "internal/storage/workspace/resolve.go",
+        "internal/storage/workspace/rooted_reads.go",
+        "internal/storage/workspace/snapshot.go",
+        "internal/storage/workspace/snapshot_reconcile_test.go",
+        "internal/version/version.go",
+        "pkg/stow/checkpoint.go",
+        "pkg/stow/checkpoint_capture.go",
+        "pkg/stow/checkpoint_portable_validation_test.go",
+        "pkg/stow/prepare.go",
+        "pkg/stow/prepare_git.go",
+        "pkg/stow/prepare_git_budget.go",
+        "pkg/stow/prepare_seed.go",
+        "pkg/stow/work_budget_test.go",
+        "pkg/stow/workspace_multipart_facade_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/runtime",
+        "-run",
+        "^TestReadFailureRetainsRetryableCleanup$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/runtime",
+        "-run",
+        "^TestReadFailureRetainsRetryableCleanup$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "critical-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runtime",
+        "./internal/storage/workspace",
+        "./internal/storage/fs",
+        "./pkg/stow",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "critical-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runtime",
+        "./internal/storage/workspace",
+        "./internal/storage/fs",
+        "./pkg/stow",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "conformance",
+      "args": [
+        "make",
+        "test-conformance"
+      ]
+    },
+    {
+      "name": "build",
+      "args": [
+        "make",
+        "build",
+        "build-wasm"
+      ]
+    },
+    {
+      "name": "node-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "packages/stow-s3"
+      ]
+    },
+    {
+      "name": "browser-install",
+      "args": [
+        "bash",
+        "-c",
+        "cd packages/stow-s3 && npx playwright install chromium"
+      ]
+    },
+    {
+      "name": "browser-tests",
+      "args": [
+        "npm",
+        "run",
+        "test:browser",
+        "--prefix",
+        "packages/stow-s3"
+      ]
+    },
+    {
+      "name": "regenerate-reference",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs"
+      ]
+    },
+    {
+      "name": "verify-reference",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs",
+        "--check"
+      ]
+    },
+    {
+      "name": "verify-generated",
+      "args": [
+        "make",
+        "check-generated"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./internal/runtime",
+        "./internal/storage/workspace",
+        "./internal/storage/fs",
+        "./pkg/stow"
+      ]
+    },
+    {
+      "name": "release-plan",
+      "args": [
+        "node",
+        "scripts/release-plan.mjs"
+      ],
+      "env": {
+        "RELEASE_VERSION": "v0.3.3"
+      }
+    },
+    {
+      "name": "source-receipt",
+      "args": [
+        "node",
+        "-e",
+        "const fs=require('node:fs'),crypto=require('node:crypto');const input=JSON.parse(fs.readFileSync('benchmark/validation-input-manifest.json'));const rows={};for(const p of Object.keys(input)){const b=fs.readFileSync(p);rows[p]=crypto.createHash('sha256').update(b).digest('hex')}fs.writeFileSync(process.env.STOW_RESULT_ROOT+'/qualified-source.json',JSON.stringify(rows,null,2));const browser='.cache/browser-test-results/report.json';if(fs.existsSync(browser))fs.copyFileSync(browser,process.env.STOW_RESULT_ROOT+'/browser-report.json')"
+      ]
+    }
+  ]
+}

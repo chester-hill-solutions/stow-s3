@@ -93,6 +93,7 @@ Conditional writes and reads return different statuses:
 |---|---|---|
 | `PUT` | `If-None-Match: *` and the key exists | `412 PreconditionFailed` |
 | `PUT` | `If-None-Match: *` and the key does not exist | `200` (the create proceeds) |
+| `PUT` | `If-None-Match: *` and the key's state could not be determined | `500 InternalError` (the write is refused, not admitted) |
 | `PUT` | `If-Match: <etag>` and it does not match | `412 PreconditionFailed` |
 | `GET` / `HEAD` | `If-None-Match` matches the current validator | `304 Not Modified` |
 | `GET` / `HEAD` | `If-None-Match` does not match | `200` with the body |
@@ -563,6 +564,7 @@ Unauthorized requests return `404`. Without a configured token, outbox mutations
 | `409` | BucketNotEmpty |
 | `412` | Precondition failed (conditional copy/GET) |
 | `416` | Invalid range |
+| `500` | InternalError, including an object whose state the store could not determine |
 | `501` | Unsupported S3 API |
 
 ---

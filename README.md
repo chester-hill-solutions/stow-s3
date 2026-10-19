@@ -78,9 +78,13 @@ Stow implements the common S3 operations needed by application and test workload
 - list objects with prefixes and pagination;
 - range reads;
 - conditional writes and reads;
-- MD5, CRC32, CRC32C, SHA-1, and SHA-256 checksums;
+- MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256 checksums;
 - multipart uploads;
 - presigned requests.
+
+CRC64NVME applies to single objects. Multipart initiation with that algorithm is
+refused. The [S3 compatibility contract](docs/compat-contract.md) records the
+full detail.
 
 Stow implements a subset of Amazon S3. Versioning, ACLs, bucket policies, lifecycle rules, replication, notifications, tagging, object lock, S3 Select, and KMS-backed encryption are not implemented.
 
@@ -299,17 +303,17 @@ Removal coordinates with active storage operations.
 
 ## Install
 
-Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.2).
+Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
 Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
 against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
 Run `stow-s3 --version` to check the installed version. Use WSL on Windows.
 
 **TypeScript and Python clients are not yet published to npm or PyPI.**
 Use a source checkout for those clients. Registry publication is deferred for
-v0.3.2. See the [release notes](docs/releases/v0.3.2.md), including the filesystem
+v0.3.3. See the [release notes](docs/releases/v0.3.3.md), including the filesystem
 upgrade compatibility note.
 <!-- repo-only:start -->
-The [current release checkpoint](docs/release-verification-2026-10-18.md) records
+The [current release checkpoint](docs/release-verification-2026-10-19.md) records
 validation and distribution. The [October 3 checkpoint](docs/release-verification-2026-10-03.md)
 is historical; its registry blockers do not apply to native GitHub downloads.
 <!-- repo-only:end -->

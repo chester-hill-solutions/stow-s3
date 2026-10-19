@@ -41,8 +41,7 @@ func (s *Store) PutObject(ctx context.Context, bucket, key string, body io.Reade
 // non-reentrant mutex.
 func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (*storage.ObjectMeta, error) {
 	// peekLocked, not peek: the lock is already held, and peek would take it a
-	// second time whenever the key has no manifest entry or a stale one - which is
-	// every write over a file the host has touched, and every adoption.
+	// second time whenever the key has no manifest entry or a stale one.
 	existing, err := s.peekLocked(bucket, key)
 	if err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
 		return nil, err
@@ -62,7 +61,10 @@ func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader,
 		return nil, err
 	}
 
-	absPath, form := s.pathFor(bucket, key)
+	absPath, form, err := s.pathFor(bucket, key)
+	if err != nil {
+		return nil, err
+	}
 	if err := s.writeAtomic(absPath, prepared.Data); err != nil {
 		return nil, fmt.Errorf("workspace store: write %s: %w", key, err)
 	}
@@ -121,7 +123,7 @@ func (s *Store) GetObject(ctx context.Context, bucket, key string) (io.ReadClose
 	}
 	file, err := s.openRead(absPath, info)
 	if err != nil {
-		return nil, nil, storage.ErrObjectNotFound
+		return nil, nil, err
 	}
 	return file, s.metaFromEntry(bucket, key, entry, info), nil
 }
@@ -188,10 +190,9 @@ func (s *Store) DeleteObjects(ctx context.Context, bucket string, keys []string)
 	if !s.bucketExists(bucket) {
 		return nil, storage.ErrBucketNotFound
 	}
-	// The returned slice is the keys this call confirmed deleted. A key that was
-	// not there counts: S3 deletes idempotently and reports a missing key as
-	// deleted rather than as an error, so it belongs in the slice the S3 handler
-	// emits as <Deleted>. A committed delete is included even if indexing fails.
+	// The returned slice is the keys this call confirmed deleted. A key that was not
+	// there counts: S3 deletes idempotently and reports a missing key as deleted
+	// rather than as an error. A committed delete is included even if indexing fails.
 	var deleted []string
 	for _, key := range keys {
 		if err := s.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
@@ -218,8 +219,7 @@ func (s *Store) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, ds
 
 // CopyObjectCond captures the source and publishes the destination under one lock, and
 // evaluates the conditions against the version it captured. The read and the write
-// share one lock, so a source overwritten in between cannot be copied as the bytes of
-// one version with the metadata of another.
+// share one lock, so a source overwritten in between cannot be copied as one version.
 func (s *Store) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*storage.ObjectMeta, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
@@ -238,8 +238,7 @@ func (s *Store) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*s
 	defer s.mu.Unlock()
 
 	// resolveLocked, not resolve: the lock is already held, and resolve would
-	// take it a second time on this goroutine and hang along with every other
-	// goroutine behind it. See the note on resolveLocked.
+	// take it a second time on this goroutine and hang every goroutine behind it.
 	srcPath, info, entry, err := s.resolveLocked(req.SourceBucket, req.SourceKey)
 	if err != nil {
 		return nil, err
@@ -250,7 +249,7 @@ func (s *Store) CopyObjectCond(ctx context.Context, req storage.CopyRequest) (*s
 	}
 	data, err := s.readFile(srcPath, info)
 	if err != nil {
-		return nil, storage.ErrObjectNotFound
+		return nil, err
 	}
 	return s.putLocked(ctx, req.DestBucket, req.DestKey, bytes.NewReader(data), storage.PutOptions{
 		ContentType:       sourceMeta.ContentType,
@@ -313,7 +312,11 @@ func (s *Store) listAll(bucket string) ([]storage.ObjectMeta, error) {
 		return nil, err
 	}
 
-	for key, meta := range s.escapedObjects(bucket, byKey) {
+	escaped, err := s.escapedObjects(bucket, byKey)
+	if err != nil {
+		return nil, err
+	}
+	for key, meta := range escaped {
 		byKey[key] = meta
 	}
 
@@ -357,16 +360,13 @@ func (s *Store) metaFromEntry(bucket, key string, entry ManifestEntry, info ...o
 
 // escapedObjects returns the objects the walk in listAll cannot see.
 //
-// Escaped keys live under the internal directory, which the walk skips because the
-// walk skips everything internal. They come from the object index instead, and an entry
-// whose file is gone serves as absent rather than as a phantom object. A symlinked one
-// is absent for the same reason and not merely unmeasured: it would be listed and then
-// sniffed, and the read behind the sniff is one this package refuses everywhere else.
-//
-// It is a separate function because it is a separate question — what the index says —
-// and folding it into listAll pushed that function past its complexity ceiling for a
-// check the walk above already makes.
-func (s *Store) escapedObjects(bucket string, walked map[string]storage.ObjectMeta) map[string]storage.ObjectMeta {
+// Escaped keys live under the internal directory, which the walk skips. They come
+// from the object index instead, and an entry whose file is gone serves as absent
+// rather than as a phantom object. A symlinked one is absent for the same reason:
+// it would be listed and then sniffed, and the read behind the sniff is one this
+// package refuses everywhere else. It is a separate function because it is a
+// separate question — what the index says.
+func (s *Store) escapedObjects(bucket string, walked map[string]storage.ObjectMeta) (map[string]storage.ObjectMeta, error) {
 	found := map[string]storage.ObjectMeta{}
 	for key, entry := range s.objectIndex.Buckets[bucket] {
 		if entry.Form != FormEscaped {
@@ -375,34 +375,40 @@ func (s *Store) escapedObjects(bucket string, walked map[string]storage.ObjectMe
 		if _, alreadyWalked := walked[key]; alreadyWalked {
 			continue
 		}
-		info, err := os.Lstat(EscapedPath(s.root, bucket, key))
-		if err != nil || isLink(info) {
+		path := EscapedPath(s.root, bucket, key)
+		info, err := os.Lstat(path)
+		if err != nil {
+			if absence(err) {
+				continue
+			}
+			return nil, uncertain(err)
+		}
+		if isLink(info) {
 			continue
 		}
-		file, err := s.openRead(EscapedPath(s.root, bucket, key), info)
+		file, err := s.openRead(path, info)
 		if err != nil {
-			continue
+			if errors.Is(err, storage.ErrObjectNotFound) {
+				continue
+			}
+			return nil, err
 		}
 		file.Close()
 		found[key] = *s.metaFromEntry(bucket, key, entry)
 	}
-	return found
+	return found, nil
 }
 
-// isLink reports whether a stat describes a symbolic link.
-//
-// The one question every read path in this package asks before it opens anything. A
-// link is a pointer, not content, and its target is not part of the workspace, so
-// listAll must not report one and the reads behind a listing must not follow it.
+// isLink reports whether a stat describes a symbolic link. A link is a pointer,
+// not content, and its target is not part of the workspace, so listAll must not
+// report one and the reads behind a listing must not follow it.
 func isLink(info os.FileInfo) bool { return info.Mode()&os.ModeSymlink != 0 }
 
-// detectContentType sniffs a file's type from its first bytes, because a file
-// the host wrote has no declared content type and guessing from the extension
-// alone gets text/markdown and application/json wrong often enough to matter.
+// detectContentType sniffs a file's type from its first bytes: a file the host
+// wrote has no declared content type, and the extension alone guesses wrong.
 func detectContentType(path string) string {
-	// The same no-follow open GetObject uses. This reads workspace bytes too — the
-	// first 512 of them — and a sniff that crosses a link is a read that crosses a
-	// link, whatever the caller does with the resulting string.
+	// The same no-follow open GetObject uses. A sniff that crosses a link is a
+	// read that crosses a link, whatever the caller does with the string.
 	file, err := openNoFollow(path)
 	if err != nil {
 		return "application/octet-stream"

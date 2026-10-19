@@ -130,6 +130,7 @@ var storageErrorCases = []storageErrorCase{
 	{storage.ErrBucketNotFound, "NoSuchBucket", "The specified bucket does not exist", http.StatusNotFound},
 	{storage.ErrInvalidBucketName, "InvalidBucketName", "The specified bucket name is not valid", http.StatusBadRequest},
 	{storage.ErrObjectNotFound, "NoSuchKey", "The specified key does not exist", http.StatusNotFound},
+	{storage.ErrObjectUncertain, "InternalError", "The object could not be read, so its state is unknown; verify the outcome before retrying", http.StatusInternalServerError},
 	{storage.ErrBucketNotEmpty, "BucketNotEmpty", "The bucket you tried to delete is not empty", http.StatusConflict},
 	{storage.ErrInvalidKey, "InvalidArgument", "Invalid object key", http.StatusBadRequest},
 	{storage.ErrInvalidPart, "InvalidPart", "One or more of the specified parts could not be found", http.StatusBadRequest},

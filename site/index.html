@@ -264,7 +264,7 @@ try {
           </div>
           <div>
             <h3>Reject a stale update</h3>
-            <p>A conditional write compares the ETag you read with the object's current ETag and refuses the write if they differ, so two writers cannot clobber one another.</p>
+            <p>A conditional write compares the ETag you read with the object's current ETag and refuses the write if they differ, so two writers cannot clobber one another. A create-only write is refused when the store cannot confirm the object is absent, so it never replaces bytes it could not read.</p>
             <div class="fixture-code">
               <div class="fixture-code-heading"><span class="code-file">conditional-write.mjs</span><span class="code-language">TypeScript</span><button type="button" data-copy="#fixture-conditional-write" hidden>Copy</button></div>
               <pre tabindex="0" aria-label="Reject a stale update"><code id="fixture-conditional-write" data-language="typescript"><!-- include:examples/stow-recipes/conditional-write.mjs --></code></pre>
@@ -354,7 +354,7 @@ stow-s3 workspace destroy --id "$WORKSPACE_ID" \
 
     <section class="finale container" aria-labelledby="finale-title">
       <div class="finale-heading"><h2 id="finale-title">Build with storage you control.</h2><a class="btn btn-primary" href="/docs/">Read the documentation <span aria-hidden="true">→</span></a></div>
-      <p class="availability">Free and open source. The native server is available as <a href="https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.2">GitHub downloads</a>; the Go module is available now. TypeScript and Python clients are not yet published to npm or PyPI; build from a source checkout.</p>
+      <p class="availability">Free and open source. The native server is available as <a href="https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3">GitHub downloads</a>; the Go module is available now. TypeScript and Python clients are not yet published to npm or PyPI; build from a source checkout.</p>
       <div class="install-grid">
         <div><h3>Start from source</h3><div class="install"><code id="install-cmd">git clone https://github.com/chester-hill-solutions/stow-s3</code><button type="button" data-copy="#install-cmd" aria-label="Copy source checkout command">Copy</button></div></div>
         <div><h3>Add the Go module</h3><div class="install"><code id="go-install-cmd">go get github.com/chester-hill-solutions/stow-s3/pkg/stow</code><button type="button" data-copy="#go-install-cmd" aria-label="Copy Go install command">Copy</button></div></div>
