@@ -110,19 +110,23 @@ func keysOf(set map[string]bool) []string {
 
 // pathFor preserves a recorded escaped form; otherwise it chooses a natural
 // path when the layout permits it and no case-insensitively equal path is taken.
-func (s *Store) pathFor(bucket, key string) (string, Form) {
+// An error reports that the candidate path could not be examined.
+func (s *Store) pathFor(bucket, key string) (string, Form, error) {
 	// Changing an escaped form leaves stale bytes that can resurrect after deletion.
 	if entry, ok := s.objectIndex.entry(bucket, key); ok && entry.Form == FormEscaped {
-		return EscapedPath(s.root, bucket, key), FormEscaped
+		return EscapedPath(s.root, bucket, key), FormEscaped, nil
 	}
 	if s.layout.IsNatural(key) {
 		owner, taken := s.folded[foldKey(bucket, key)]
-		_, _, caseCollision := exactNaturalPath(s.bucketDir(bucket), key)
+		_, _, caseCollision, err := exactNaturalPath(s.bucketDir(bucket), key)
+		if err != nil {
+			return "", FormEscaped, err
+		}
 		if (!taken || owner == key) && !caseCollision {
-			return NaturalPath(s.bucketDir(bucket), key), FormNatural
+			return NaturalPath(s.bucketDir(bucket), key), FormNatural, nil
 		}
 	}
-	return EscapedPath(s.root, bucket, key), FormEscaped
+	return EscapedPath(s.root, bucket, key), FormEscaped, nil
 }
 
 // CreateBucket makes a bucket's directory. The workspace bucket needs none: the

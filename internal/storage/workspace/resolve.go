@@ -15,27 +15,38 @@ import (
 var ErrClosed = errors.New("workspace store is closed")
 
 // locate returns the path a key currently occupies, preferring the form the
-// manifest recorded and falling back to whichever file is actually there.
-//
-// The fallback is what makes adoption work: a file the host wrote has no
-// manifest entry, so the only way to find it is to look.
+// manifest recorded and falling back to whichever file is actually there. The
+// fallback is what makes adoption work: a file the host wrote has no manifest
+// entry, so the only way to find it is to look.
 func (s *Store) locate(bucket, key string) (string, error) {
 	recorded, hasEntry := s.objectIndex.entry(bucket, key)
 	if hasEntry && recorded.Form == FormEscaped {
 		path := EscapedPath(s.root, bucket, key)
-		if fileExists(path) {
+		exists, err := fileExists(path)
+		if err != nil {
+			return "", err
+		}
+		if exists {
 			return path, nil
 		}
 	}
 
 	if s.layout.IsNatural(key) {
-		if path, exists, _ := exactNaturalPath(s.bucketDir(bucket), key); exists {
+		path, exists, _, err := exactNaturalPath(s.bucketDir(bucket), key)
+		if err != nil {
+			return "", err
+		}
+		if exists {
 			return path, nil
 		}
 	}
 
 	escaped := EscapedPath(s.root, bucket, key)
-	if fileExists(escaped) {
+	exists, err := fileExists(escaped)
+	if err != nil {
+		return "", err
+	}
+	if exists {
 		return escaped, nil
 	}
 	return "", storage.ErrObjectNotFound
@@ -47,14 +58,17 @@ func (s *Store) locate(bucket, key string) (string, error) {
 // that is a path collision, not an exact match for the S3 key.
 //
 // The third result reports that a differently-cased segment occupies the
-// candidate path. Callers use it to choose the escaped form for a new object.
-func exactNaturalPath(root, key string) (path string, exists, caseCollision bool) {
-	path = root
+// candidate path. An error reports a path that could not be examined.
+func exactNaturalPath(root, key string) (string, bool, bool, error) {
+	path := root
 	segments := strings.Split(key, "/")
 	for i, segment := range segments {
 		entries, err := os.ReadDir(path)
 		if err != nil {
-			return "", false, false
+			if absence(err) {
+				return "", false, false, nil
+			}
+			return "", false, false, uncertain(err)
 		}
 		exactName := ""
 		foldedMatch := false
@@ -68,23 +82,24 @@ func exactNaturalPath(root, key string) (path string, exists, caseCollision bool
 			}
 		}
 		if exactName == "" {
-			return "", false, foldedMatch
+			return "", false, foldedMatch, nil
 		}
 		path = filepath.Join(path, exactName)
 		if i == len(segments)-1 {
-			return path, fileExists(path), false
+			exists, err := fileExists(path)
+			if err != nil {
+				return "", false, false, err
+			}
+			return path, exists, false, nil
 		}
 	}
-	return "", false, false
+	return "", false, false, nil
 }
 
 // resolve finds a key's file and its metadata, adopting the file when stow has
 // no manifest entry for it. It takes the write lock, because adopting means
-// writing a manifest entry.
-//
-// Adoption is not an import step. There is no separate registration pass,
-// because a workspace whose files need registering before they can be read is
-// not a working directory.
+// writing a manifest entry. Adoption is not an import step: a workspace whose
+// files need registering before they can be read is not a working directory.
 func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -100,7 +115,10 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	}
 	info, err := os.Lstat(absPath)
 	if err != nil {
-		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
+		if absence(err) {
+			return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
+		}
+		return "", nil, ManifestEntry{}, uncertain(err)
 	}
 	if info.Mode()&os.ModeSymlink != 0 {
 		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
@@ -206,7 +224,14 @@ func (s *Store) peekLocked(bucket, key string) (*storage.ObjectMeta, error) {
 	return s.metaFromEntry(bucket, key, entry, info), nil
 }
 
-func fileExists(path string) bool {
+// fileExists reports whether a path names a regular file. One that cannot be examined is not an absent path.
+func fileExists(path string) (bool, error) {
 	info, err := os.Stat(path)
-	return err == nil && !info.IsDir()
+	if err != nil {
+		if absence(err) {
+			return false, nil
+		}
+		return false, uncertain(err)
+	}
+	return !info.IsDir(), nil
 }

@@ -18,7 +18,11 @@ type naturalObjectListing struct {
 
 func (l *naturalObjectListing) visit(path string, entry fs.DirEntry, err error) error {
 	if err != nil {
-		return nil
+		// A directory that cannot be listed is not an empty directory.
+		if absence(err) {
+			return nil
+		}
+		return uncertain(err)
 	}
 	relative, err := filepath.Rel(l.start, path)
 	if err != nil {
@@ -47,14 +51,15 @@ func (l *naturalObjectListing) visit(path string, entry fs.DirEntry, err error) 
 	}
 	file, err := l.source.OpenRegularFile(path)
 	if err != nil {
-		// A file this host cannot open safely is omitted, since a listing including
-		// it would describe bytes nothing verified. A host that cannot do the open
-		// at all is the other case, and must not read as an empty workspace: that
-		// is how a caller concludes its work was deleted.
+		// A file this host cannot open is not a file that is not there. Omitting it
+		// would make a workspace whose objects cannot be read look like one that is gone.
 		if errors.Is(err, rooted.ErrUnsupported) {
 			return err
 		}
-		return nil
+		if absence(err) {
+			return nil
+		}
+		return uncertain(err)
 	}
 	file.Close()
 	manifestEntry, _ := l.store.objectIndex.entry(l.bucket, key)
