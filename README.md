@@ -299,17 +299,17 @@ Removal coordinates with active storage operations.
 
 ## Install
 
-Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.2).
+Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
 Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
 against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
 Run `stow-s3 --version` to check the installed version. Use WSL on Windows.
 
 **TypeScript and Python clients are not yet published to npm or PyPI.**
 Use a source checkout for those clients. Registry publication is deferred for
-v0.3.2. See the [release notes](docs/releases/v0.3.2.md), including the filesystem
+v0.3.3. See the [release notes](docs/releases/v0.3.3.md), including the filesystem
 upgrade compatibility note.
 <!-- repo-only:start -->
-The [current release checkpoint](docs/release-verification-2026-10-18.md) records
+The [current release checkpoint](docs/release-verification-2026-10-19.md) records
 validation and distribution. The [October 3 checkpoint](docs/release-verification-2026-10-03.md)
 is historical; its registry blockers do not apply to native GitHub downloads.
 <!-- repo-only:end -->

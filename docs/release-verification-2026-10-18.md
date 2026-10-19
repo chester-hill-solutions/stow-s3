@@ -1,3 +1,7 @@
+> Historical qualification for its named revision. PR #77 and PR #78 are being
+> reconciled for [v0.3.3](releases/v0.3.3.md). The v0.3.2 publication was cancelled;
+> these receipts do not qualify the combined source.
+
 # v0.3.2 release preparation — 2026-10-18
 
 Distribution remains native GitHub downloads for Linux and macOS on amd64 and

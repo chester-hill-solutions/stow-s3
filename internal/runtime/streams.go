@@ -134,11 +134,15 @@ func (r *objectStream) Read(buffer []byte) (int, error) {
 }
 
 func (r *objectStream) closeLocked() error {
-	if r.closed {
+	if r.reader == nil {
 		return nil
 	}
 	r.closed = true
-	return r.reader.Close()
+	if err := r.reader.Close(); err != nil {
+		return err
+	}
+	r.reader = nil
+	return nil
 }
 
 func (r *objectStream) Close() error {

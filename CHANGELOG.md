@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.3 — 2026-10-18
+
+Combine PR #77 cleanup, multipart identity, read-only snapshot reconciliation
+and preparation/checkpoint resource admission with PR #78 core quality fixes.
+Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
+[release notes](docs/releases/v0.3.3.md) for compatibility and known issues.
+
+The public v0.3.2 tag identifies #78 before reconciliation. Its publication was
+cancelled; no v0.3.2 GitHub release was published.
+
 ## 0.3.2 — 2026-10-18
 
 Correct conditional COPY snapshots, ambiguous storage outcomes, short reads,

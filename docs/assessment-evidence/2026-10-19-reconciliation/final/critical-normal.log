@@ -1,0 +1,2829 @@
+=== RUN   TestAbortPublicationAccounting
+=== RUN   TestAbortPublicationAccounting/exists=false/success
+=== RUN   TestAbortPublicationAccounting/exists=false/committed
+=== RUN   TestAbortPublicationAccounting/exists=false/committed-missing
+=== RUN   TestAbortPublicationAccounting/exists=false/refused
+=== RUN   TestAbortPublicationAccounting/exists=true/success
+=== RUN   TestAbortPublicationAccounting/exists=true/committed
+=== RUN   TestAbortPublicationAccounting/exists=true/committed-missing
+=== RUN   TestAbortPublicationAccounting/exists=true/refused
+--- PASS: TestAbortPublicationAccounting (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=false/success (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=false/committed (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=false/committed-missing (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=false/refused (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=true/success (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=true/committed (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=true/committed-missing (0.00s)
+    --- PASS: TestAbortPublicationAccounting/exists=true/refused (0.00s)
+=== RUN   TestCommittedAbortKeepsSharedReservation
+--- PASS: TestCommittedAbortKeepsSharedReservation (0.00s)
+=== RUN   TestAbortRetryAccounting
+=== RUN   TestAbortRetryAccounting/exists=false/missing
+=== RUN   TestAbortRetryAccounting/exists=false/wrapped-missing
+=== RUN   TestAbortRetryAccounting/exists=false/unknown
+=== RUN   TestAbortRetryAccounting/exists=false/refused
+=== RUN   TestAbortRetryAccounting/exists=true/missing
+=== RUN   TestAbortRetryAccounting/exists=true/wrapped-missing
+=== RUN   TestAbortRetryAccounting/exists=true/unknown
+=== RUN   TestAbortRetryAccounting/exists=true/refused
+--- PASS: TestAbortRetryAccounting (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=false/missing (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=false/wrapped-missing (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=false/unknown (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=false/refused (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=true/missing (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=true/wrapped-missing (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=true/unknown (0.00s)
+    --- PASS: TestAbortRetryAccounting/exists=true/refused (0.00s)
+=== RUN   TestMissingAbortKeepsSharedReservation
+--- PASS: TestMissingAbortKeepsSharedReservation (0.00s)
+=== RUN   TestConcurrentMissingAbortRecovery
+--- PASS: TestConcurrentMissingAbortRecovery (0.00s)
+=== RUN   TestStoreAdapterCoreContract
+--- PASS: TestStoreAdapterCoreContract (0.00s)
+=== RUN   TestStoreAdapterPreservesChecksumsAndConditionalWrites
+--- PASS: TestStoreAdapterPreservesChecksumsAndConditionalWrites (0.00s)
+=== RUN   TestStoreAdapterMultipartUsesRuntimeQuotas
+--- PASS: TestStoreAdapterMultipartUsesRuntimeQuotas (0.00s)
+=== RUN   TestOpenWithStoreRejectsInvalidOptionsAndInitializesUsage
+--- PASS: TestOpenWithStoreRejectsInvalidOptionsAndInitializesUsage (0.00s)
+=== RUN   TestOpenWithStoreLifecycleAndOwnership
+--- PASS: TestOpenWithStoreLifecycleAndOwnership (0.00s)
+=== RUN   TestOpenRemainsMemoryOnly
+--- PASS: TestOpenRemainsMemoryOnly (0.00s)
+=== RUN   TestMultipartCapabilityIsReadFromTheStoreNotTheConstructor
+--- PASS: TestMultipartCapabilityIsReadFromTheStoreNotTheConstructor (0.00s)
+=== RUN   TestPersistenceIsReportedForEveryKnownBackend
+--- PASS: TestPersistenceIsReportedForEveryKnownBackend (0.00s)
+=== RUN   TestFilesystemCompletionCleanupOutcome
+=== RUN   TestFilesystemCompletionCleanupOutcome/healthy
+=== RUN   TestFilesystemCompletionCleanupOutcome/cleanup-failure
+--- PASS: TestFilesystemCompletionCleanupOutcome (0.01s)
+    --- PASS: TestFilesystemCompletionCleanupOutcome/healthy (0.00s)
+    --- PASS: TestFilesystemCompletionCleanupOutcome/cleanup-failure (0.00s)
+=== RUN   TestCompletionLookupWorkspaceAmbiguity
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/marker-first
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/missing-first
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/wrapped-marker-first
+=== RUN   TestCompletionLookupWorkspaceAmbiguity/wrapped-missing-first
+--- PASS: TestCompletionLookupWorkspaceAmbiguity (0.04s)
+    --- PASS: TestCompletionLookupWorkspaceAmbiguity/marker-first (0.01s)
+    --- PASS: TestCompletionLookupWorkspaceAmbiguity/missing-first (0.01s)
+    --- PASS: TestCompletionLookupWorkspaceAmbiguity/wrapped-marker-first (0.01s)
+    --- PASS: TestCompletionLookupWorkspaceAmbiguity/wrapped-missing-first (0.01s)
+=== RUN   TestCompletionLookupReconciliation
+=== RUN   TestCompletionLookupReconciliation/exists=false/confirmed-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/wrapped-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/actual-missing
+=== RUN   TestCompletionLookupReconciliation/exists=false/unknown
+=== RUN   TestCompletionLookupReconciliation/exists=false/marker-only
+=== RUN   TestCompletionLookupReconciliation/exists=false/marker-first
+=== RUN   TestCompletionLookupReconciliation/exists=false/missing-first
+=== RUN   TestCompletionLookupReconciliation/exists=true/confirmed-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/wrapped-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/actual-missing
+=== RUN   TestCompletionLookupReconciliation/exists=true/unknown
+=== RUN   TestCompletionLookupReconciliation/exists=true/marker-only
+=== RUN   TestCompletionLookupReconciliation/exists=true/marker-first
+=== RUN   TestCompletionLookupReconciliation/exists=true/missing-first
+--- PASS: TestCompletionLookupReconciliation (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/confirmed-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/wrapped-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/actual-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/unknown (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/marker-only (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/marker-first (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=false/missing-first (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/confirmed-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/wrapped-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/actual-missing (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/unknown (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/marker-only (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/marker-first (0.00s)
+    --- PASS: TestCompletionLookupReconciliation/exists=true/missing-first (0.00s)
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication/plain/overwrite=false
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication/plain/overwrite=true
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication/etag/overwrite=false
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication/etag/overwrite=true
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication/date/overwrite=false
+=== RUN   TestStoreAdapterCopyPreservesCommittedPublication/date/overwrite=true
+--- PASS: TestStoreAdapterCopyPreservesCommittedPublication (0.07s)
+    --- PASS: TestStoreAdapterCopyPreservesCommittedPublication/plain/overwrite=false (0.01s)
+    --- PASS: TestStoreAdapterCopyPreservesCommittedPublication/plain/overwrite=true (0.01s)
+    --- PASS: TestStoreAdapterCopyPreservesCommittedPublication/etag/overwrite=false (0.01s)
+    --- PASS: TestStoreAdapterCopyPreservesCommittedPublication/etag/overwrite=true (0.01s)
+    --- PASS: TestStoreAdapterCopyPreservesCommittedPublication/date/overwrite=false (0.01s)
+    --- PASS: TestStoreAdapterCopyPreservesCommittedPublication/date/overwrite=true (0.01s)
+=== RUN   TestStoreAdapterCopyRefusalKeepsDestination
+=== RUN   TestStoreAdapterCopyRefusalKeepsDestination/plain
+=== RUN   TestStoreAdapterCopyRefusalKeepsDestination/etag
+=== RUN   TestStoreAdapterCopyRefusalKeepsDestination/date
+--- PASS: TestStoreAdapterCopyRefusalKeepsDestination (0.02s)
+    --- PASS: TestStoreAdapterCopyRefusalKeepsDestination/plain (0.01s)
+    --- PASS: TestStoreAdapterCopyRefusalKeepsDestination/etag (0.01s)
+    --- PASS: TestStoreAdapterCopyRefusalKeepsDestination/date (0.01s)
+=== RUN   TestExcessReadRejected
+=== RUN   TestExcessReadRejected/mode=stream/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=stream/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=stream/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=stream/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=copy/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=copy/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=copy/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=copy/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=adapter/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=adapter/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=adapter/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=adapter/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=get/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=get/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=get/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=get/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=guarded/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=guarded/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=guarded/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=guarded/size=2/together=true
+--- PASS: TestExcessReadRejected (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=2/together=true (0.00s)
+=== RUN   TestExcessReadPreservesProviderError
+=== RUN   TestExcessReadPreservesProviderError/body:_EOF
+=== RUN   TestExcessReadPreservesProviderError/object_not_found
+=== RUN   TestExcessReadPreservesProviderError/local_mutation_committed_object_not_found
+=== RUN   TestExcessReadPreservesProviderError/provider_unavailable
+--- PASS: TestExcessReadPreservesProviderError (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/body:_EOF (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/object_not_found (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/provider_unavailable (0.00s)
+=== RUN   TestExcessReadStopsLargeBody
+=== RUN   TestExcessReadStopsLargeBody/stream
+=== RUN   TestExcessReadStopsLargeBody/get
+=== RUN   TestExcessReadStopsLargeBody/guarded
+--- PASS: TestExcessReadStopsLargeBody (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/stream (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/get (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/guarded (0.00s)
+=== RUN   TestExcessReadAfterSeek
+=== RUN   TestExcessReadAfterSeek/offset=0
+=== RUN   TestExcessReadAfterSeek/offset=1
+=== RUN   TestExcessReadAfterSeek/offset=3
+=== RUN   TestExcessReadAfterSeek/offset=4
+--- PASS: TestExcessReadAfterSeek (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=0 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=1 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=3 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=4 (0.00s)
+=== RUN   TestExcessRangeRead
+=== RUN   TestExcessRangeRead/native=false/length=0
+=== RUN   TestExcessRangeRead/native=false/length=2
+=== RUN   TestExcessRangeRead/native=true/length=0
+=== RUN   TestExcessRangeRead/native=true/length=2
+--- PASS: TestExcessRangeRead (0.00s)
+    --- PASS: TestExcessRangeRead/native=false/length=0 (0.00s)
+    --- PASS: TestExcessRangeRead/native=false/length=2 (0.00s)
+    --- PASS: TestExcessRangeRead/native=true/length=0 (0.00s)
+    --- PASS: TestExcessRangeRead/native=true/length=2 (0.00s)
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory
+--- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest (0.01s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated (0.01s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing (0.01s)
+    --- PASS: TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory (0.00s)
+=== RUN   TestFilesystemMultipartValidationPreservesUnknownReservation
+--- PASS: TestFilesystemMultipartValidationPreservesUnknownReservation (0.00s)
+=== RUN   TestGuardedSaveUnexpectedErrorDoesNotClaimNoEffect
+=== RUN   TestGuardedSaveUnexpectedErrorDoesNotClaimNoEffect/unknown
+=== RUN   TestGuardedSaveUnexpectedErrorDoesNotClaimNoEffect/committed
+--- PASS: TestGuardedSaveUnexpectedErrorDoesNotClaimNoEffect (0.00s)
+    --- PASS: TestGuardedSaveUnexpectedErrorDoesNotClaimNoEffect/unknown (0.00s)
+    --- PASS: TestGuardedSaveUnexpectedErrorDoesNotClaimNoEffect/committed (0.00s)
+=== RUN   TestGuardedSavePreservesMultipartReservation
+--- PASS: TestGuardedSavePreservesMultipartReservation (0.00s)
+=== RUN   TestReadForSaveRequiresReadAuthority
+--- PASS: TestReadForSaveRequiresReadAuthority (0.00s)
+=== RUN   TestInitiationPublicationAccounting
+=== RUN   TestInitiationPublicationAccounting/exists=false/success
+=== RUN   TestInitiationPublicationAccounting/exists=false/committed
+=== RUN   TestInitiationPublicationAccounting/exists=false/committed-missing
+=== RUN   TestInitiationPublicationAccounting/exists=false/refused
+=== RUN   TestInitiationPublicationAccounting/exists=true/success
+=== RUN   TestInitiationPublicationAccounting/exists=true/committed
+=== RUN   TestInitiationPublicationAccounting/exists=true/committed-missing
+=== RUN   TestInitiationPublicationAccounting/exists=true/refused
+--- PASS: TestInitiationPublicationAccounting (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=false/success (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=false/committed (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=false/committed-missing (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=false/refused (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=true/success (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=true/committed (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=true/committed-missing (0.00s)
+    --- PASS: TestInitiationPublicationAccounting/exists=true/refused (0.00s)
+=== RUN   TestCommittedInitiationsShareTargetReservation
+--- PASS: TestCommittedInitiationsShareTargetReservation (0.00s)
+=== RUN   TestMultipartUploadReservesOneObjectSlotPerTarget
+--- PASS: TestMultipartUploadReservesOneObjectSlotPerTarget (0.00s)
+=== RUN   TestOpenNormalizesOptions
+--- PASS: TestOpenNormalizesOptions (0.00s)
+=== RUN   TestInstanceBucketLifecycle
+--- PASS: TestInstanceBucketLifecycle (0.00s)
+=== RUN   TestInstanceObjectReadLifecycle
+--- PASS: TestInstanceObjectReadLifecycle (0.00s)
+=== RUN   TestInstanceCopyLifecycle
+--- PASS: TestInstanceCopyLifecycle (0.00s)
+=== RUN   TestInstanceQuotaAndErrorPaths
+--- PASS: TestInstanceQuotaAndErrorPaths (0.00s)
+=== RUN   TestInstanceResetAndClosedErrors
+--- PASS: TestInstanceResetAndClosedErrors (0.00s)
+=== RUN   TestRuntimeHelpers
+--- PASS: TestRuntimeHelpers (0.00s)
+=== RUN   TestManagedFilesystemAccountsSuccessfulMutationsWithoutRescanning
+--- PASS: TestManagedFilesystemAccountsSuccessfulMutationsWithoutRescanning (0.00s)
+=== RUN   TestManagedFilesystemDetectsMutationsOutsideRuntime
+--- PASS: TestManagedFilesystemDetectsMutationsOutsideRuntime (0.00s)
+=== RUN   TestManagedFilesystemReconcilesCommittedWriteWithLostReply
+--- PASS: TestManagedFilesystemReconcilesCommittedWriteWithLostReply (0.00s)
+=== RUN   TestMultipartCountIncludesRepeatedTargetsAndReleases
+--- PASS: TestMultipartCountIncludesRepeatedTargetsAndReleases (0.00s)
+=== RUN   TestMultipartCountReopenRefusesOverLimitWithoutDeletingUploads
+--- PASS: TestMultipartCountReopenRefusesOverLimitWithoutDeletingUploads (0.00s)
+=== RUN   TestMultipartCountDefaultAndValidation
+--- PASS: TestMultipartCountDefaultAndValidation (0.00s)
+=== RUN   TestRuntimeMultipartCompletionInvariants
+=== RUN   TestRuntimeMultipartCompletionInvariants/a_part_never_uploaded_is_refused
+=== RUN   TestRuntimeMultipartCompletionInvariants/a_part_whose_ETag_is_stale_is_refused
+=== RUN   TestRuntimeMultipartCompletionInvariants/a_completion_after_an_abort_fails
+=== RUN   TestRuntimeMultipartCompletionInvariants/a_repeated_completion_fails_and_does_not_republish
+=== RUN   TestRuntimeMultipartCompletionInvariants/an_abort_after_a_completion_leaves_the_object
+--- PASS: TestRuntimeMultipartCompletionInvariants (0.08s)
+    --- PASS: TestRuntimeMultipartCompletionInvariants/a_part_never_uploaded_is_refused (0.01s)
+    --- PASS: TestRuntimeMultipartCompletionInvariants/a_part_whose_ETag_is_stale_is_refused (0.03s)
+    --- PASS: TestRuntimeMultipartCompletionInvariants/a_completion_after_an_abort_fails (0.01s)
+    --- PASS: TestRuntimeMultipartCompletionInvariants/a_repeated_completion_fails_and_does_not_republish (0.02s)
+    --- PASS: TestRuntimeMultipartCompletionInvariants/an_abort_after_a_completion_leaves_the_object (0.01s)
+=== RUN   TestRuntimeRefusesACompletionItCannotAccountFor
+--- PASS: TestRuntimeRefusesACompletionItCannotAccountFor (0.00s)
+=== RUN   TestRuntimeRefusesMultipartWithoutObjectWrite
+--- PASS: TestRuntimeRefusesMultipartWithoutObjectWrite (0.00s)
+=== RUN   TestWorkspaceCompletionPublicationFailureRetainsAccounting
+=== RUN   TestWorkspaceCompletionPublicationFailureRetainsAccounting/index
+=== RUN   TestWorkspaceCompletionPublicationFailureRetainsAccounting/cleanup
+--- PASS: TestWorkspaceCompletionPublicationFailureRetainsAccounting (0.03s)
+    --- PASS: TestWorkspaceCompletionPublicationFailureRetainsAccounting/index (0.01s)
+    --- PASS: TestWorkspaceCompletionPublicationFailureRetainsAccounting/cleanup (0.01s)
+=== RUN   TestWorkspaceCommittedCompletionCanAbortAfterRepair
+--- PASS: TestWorkspaceCommittedCompletionCanAbortAfterRepair (0.01s)
+=== RUN   TestCommittedCompletionRetainsReservationOnUnknownUpload
+--- PASS: TestCommittedCompletionRetainsReservationOnUnknownUpload (0.00s)
+=== RUN   TestCommittedCompletionWithRemovedUploadReleasesParts
+--- PASS: TestCommittedCompletionWithRemovedUploadReleasesParts (0.00s)
+=== RUN   TestCompletionReservesTheBufferItAssembles
+--- PASS: TestCompletionReservesTheBufferItAssembles (0.00s)
+=== RUN   TestCompletionIsRefusedWhenTheAssemblyDoesNotFit
+--- PASS: TestCompletionIsRefusedWhenTheAssemblyDoesNotFit (0.00s)
+=== RUN   TestUploadReservationsAreReleasedExactlyOnce
+=== RUN   TestUploadReservationsAreReleasedExactlyOnce/abort
+=== RUN   TestUploadReservationsAreReleasedExactlyOnce/a_completion_that_fails_on_a_bad_ETag,_then_an_abort
+--- PASS: TestUploadReservationsAreReleasedExactlyOnce (0.00s)
+    --- PASS: TestUploadReservationsAreReleasedExactlyOnce/abort (0.00s)
+    --- PASS: TestUploadReservationsAreReleasedExactlyOnce/a_completion_that_fails_on_a_bad_ETag,_then_an_abort (0.00s)
+=== RUN   TestReplacingAPartReleasesTheBytesItReplaced
+--- PASS: TestReplacingAPartReleasesTheBytesItReplaced (0.00s)
+=== RUN   TestCompletionOverAnExistingObjectReleasesTheOldBytes
+--- PASS: TestCompletionOverAnExistingObjectReleasesTheOldBytes (0.00s)
+=== RUN   TestConcurrentUploadsShareOneByteBudget
+--- PASS: TestConcurrentUploadsShareOneByteBudget (0.00s)
+=== RUN   TestMultipartValidationRecovery
+=== RUN   TestMultipartValidationRecovery/exists=false/missing
+=== RUN   TestMultipartValidationRecovery/exists=false/upload-missing
+=== RUN   TestMultipartValidationRecovery/exists=false/wrapped-missing
+=== RUN   TestMultipartValidationRecovery/exists=false/wrong-bucket
+=== RUN   TestMultipartValidationRecovery/exists=false/wrong-key
+=== RUN   TestMultipartValidationRecovery/exists=false/retained
+=== RUN   TestMultipartValidationRecovery/exists=false/lookup-unavailable
+=== RUN   TestMultipartValidationRecovery/exists=false/lookup-committed-missing
+=== RUN   TestMultipartValidationRecovery/exists=false/validation-unavailable
+=== RUN   TestMultipartValidationRecovery/exists=false/validation-committed-missing
+=== RUN   TestMultipartValidationRecovery/exists=false/head-unavailable
+=== RUN   TestMultipartValidationRecovery/exists=false/head-committed-missing
+=== RUN   TestMultipartValidationRecovery/exists=false/untracked
+=== RUN   TestMultipartValidationRecovery/exists=false/success
+=== RUN   TestMultipartValidationRecovery/exists=true/missing
+=== RUN   TestMultipartValidationRecovery/exists=true/upload-missing
+=== RUN   TestMultipartValidationRecovery/exists=true/wrapped-missing
+=== RUN   TestMultipartValidationRecovery/exists=true/wrong-bucket
+=== RUN   TestMultipartValidationRecovery/exists=true/wrong-key
+=== RUN   TestMultipartValidationRecovery/exists=true/retained
+=== RUN   TestMultipartValidationRecovery/exists=true/lookup-unavailable
+=== RUN   TestMultipartValidationRecovery/exists=true/lookup-committed-missing
+=== RUN   TestMultipartValidationRecovery/exists=true/validation-unavailable
+=== RUN   TestMultipartValidationRecovery/exists=true/validation-committed-missing
+=== RUN   TestMultipartValidationRecovery/exists=true/head-unavailable
+=== RUN   TestMultipartValidationRecovery/exists=true/head-committed-missing
+=== RUN   TestMultipartValidationRecovery/exists=true/untracked
+=== RUN   TestMultipartValidationRecovery/exists=true/success
+--- PASS: TestMultipartValidationRecovery (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/upload-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/wrapped-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/wrong-bucket (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/wrong-key (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/retained (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/lookup-unavailable (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/lookup-committed-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/validation-unavailable (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/validation-committed-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/head-unavailable (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/head-committed-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/untracked (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=false/success (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/upload-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/wrapped-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/wrong-bucket (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/wrong-key (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/retained (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/lookup-unavailable (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/lookup-committed-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/validation-unavailable (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/validation-committed-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/head-unavailable (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/head-committed-missing (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/untracked (0.00s)
+    --- PASS: TestMultipartValidationRecovery/exists=true/success (0.00s)
+=== RUN   TestMultipartValidationRecoveryAuthorization
+=== RUN   TestMultipartValidationRecoveryAuthorization/authority
+=== RUN   TestMultipartValidationRecoveryAuthorization/policy
+=== RUN   TestMultipartValidationRecoveryAuthorization/cancelled
+--- PASS: TestMultipartValidationRecoveryAuthorization (0.00s)
+    --- PASS: TestMultipartValidationRecoveryAuthorization/authority (0.00s)
+    --- PASS: TestMultipartValidationRecoveryAuthorization/policy (0.00s)
+    --- PASS: TestMultipartValidationRecoveryAuthorization/cancelled (0.00s)
+=== RUN   TestMultipartValidationRecoveryKeepsSharedTarget
+--- PASS: TestMultipartValidationRecoveryKeepsSharedTarget (0.00s)
+=== RUN   TestConcurrentMultipartValidationRecovery
+--- PASS: TestConcurrentMultipartValidationRecovery (0.00s)
+=== RUN   TestReadOnlyMultipartValidationCanReconcile
+--- PASS: TestReadOnlyMultipartValidationCanReconcile (0.00s)
+=== RUN   TestMultipartValidationPolicyDoesNotReadAnotherTarget
+--- PASS: TestMultipartValidationPolicyDoesNotReadAnotherTarget (0.00s)
+=== RUN   TestStoredObjectSizeHeadClassification
+=== RUN   TestStoredObjectSizeHeadClassification/present
+=== RUN   TestStoredObjectSizeHeadClassification/missing
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-missing
+=== RUN   TestStoredObjectSizeHeadClassification/unknown
+=== RUN   TestStoredObjectSizeHeadClassification/marker-only
+=== RUN   TestStoredObjectSizeHeadClassification/marker-first
+=== RUN   TestStoredObjectSizeHeadClassification/missing-first
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-marker-first
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-missing-first
+--- PASS: TestStoredObjectSizeHeadClassification (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/present (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/missing (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/wrapped-missing (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/unknown (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/marker-only (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/marker-first (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/missing-first (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/wrapped-marker-first (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/wrapped-missing-first (0.00s)
+=== RUN   TestObjectHeadAmbiguityStopsMutation
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/wrapped-missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/missing-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/wrapped-marker-first
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/wrapped-missing-first
+--- PASS: TestObjectHeadAmbiguityStopsMutation (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/delete/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/delete/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/delete/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/delete/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/batch-delete/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/batch-delete/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-delete/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-delete/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-batch/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-batch/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/buffered-put/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/buffered-put/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-put/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-put/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-recheck/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-recheck/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/copy/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/copy/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/copy/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/copy/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/initiate/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/initiate/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/complete/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/complete/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/complete/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/complete/wrapped-missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/abort/marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/abort/missing-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/abort/wrapped-marker-first (0.00s)
+    --- PASS: TestObjectHeadAmbiguityStopsMutation/abort/wrapped-missing-first (0.00s)
+=== RUN   TestObjectHeadConfirmedMissingBatch
+=== RUN   TestObjectHeadConfirmedMissingBatch/false
+=== RUN   TestObjectHeadConfirmedMissingBatch/true
+--- PASS: TestObjectHeadConfirmedMissingBatch (0.00s)
+    --- PASS: TestObjectHeadConfirmedMissingBatch/false (0.00s)
+    --- PASS: TestObjectHeadConfirmedMissingBatch/true (0.00s)
+=== RUN   TestOpeningErrorClosesReader
+=== RUN   TestOpeningErrorClosesReader/stream
+=== RUN   TestOpeningErrorClosesReader/get
+=== RUN   TestOpeningErrorClosesReader/guarded
+=== RUN   TestOpeningErrorClosesReader/adapter
+=== RUN   TestOpeningErrorClosesReader/fallback-range
+=== RUN   TestOpeningErrorClosesReader/native-range
+--- PASS: TestOpeningErrorClosesReader (0.00s)
+    --- PASS: TestOpeningErrorClosesReader/stream (0.00s)
+    --- PASS: TestOpeningErrorClosesReader/get (0.00s)
+    --- PASS: TestOpeningErrorClosesReader/guarded (0.00s)
+    --- PASS: TestOpeningErrorClosesReader/adapter (0.00s)
+    --- PASS: TestOpeningErrorClosesReader/fallback-range (0.00s)
+    --- PASS: TestOpeningErrorClosesReader/native-range (0.00s)
+=== RUN   TestOpeningErrorPreservesGuardClassification
+=== RUN   TestOpeningErrorPreservesGuardClassification/ordinary/reader
+=== RUN   TestOpeningErrorPreservesGuardClassification/ordinary/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/missing/reader
+=== RUN   TestOpeningErrorPreservesGuardClassification/missing/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/marked-missing/reader
+=== RUN   TestOpeningErrorPreservesGuardClassification/marked-missing/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/bucket-missing/reader
+=== RUN   TestOpeningErrorPreservesGuardClassification/bucket-missing/nil
+--- PASS: TestOpeningErrorPreservesGuardClassification (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/ordinary/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/ordinary/nil (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/missing/nil (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/marked-missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/marked-missing/nil (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/bucket-missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/bucket-missing/nil (0.00s)
+=== RUN   TestRuntimeNeverExposesCallerBytesToTheStore
+    ownership_internal_test.go:59: the store received *runtime.sizedObjectReader, which cannot expose bytes; the guard still holds
+--- PASS: TestRuntimeNeverExposesCallerBytesToTheStore (0.00s)
+=== RUN   TestPartPublicationAccounting
+=== RUN   TestPartPublicationAccounting/old=0/success
+=== RUN   TestPartPublicationAccounting/old=0/committed
+=== RUN   TestPartPublicationAccounting/old=0/committed-missing
+=== RUN   TestPartPublicationAccounting/old=0/refused
+=== RUN   TestPartPublicationAccounting/old=2/success
+=== RUN   TestPartPublicationAccounting/old=2/committed
+=== RUN   TestPartPublicationAccounting/old=2/committed-missing
+=== RUN   TestPartPublicationAccounting/old=2/refused
+=== RUN   TestPartPublicationAccounting/old=6/success
+=== RUN   TestPartPublicationAccounting/old=6/committed
+=== RUN   TestPartPublicationAccounting/old=6/committed-missing
+=== RUN   TestPartPublicationAccounting/old=6/refused
+--- PASS: TestPartPublicationAccounting (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=0/success (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=0/committed (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=0/committed-missing (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=0/refused (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=2/success (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=2/committed (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=2/committed-missing (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=2/refused (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=6/success (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=6/committed (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=6/committed-missing (0.00s)
+    --- PASS: TestPartPublicationAccounting/old=6/refused (0.00s)
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=false/cap=2
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=false/cap=3
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=false/cap=4
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=true/cap=2
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=true/cap=3
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=true/cap=4
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=false/cap=2
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=false/cap=3
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=false/cap=4
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=true/cap=2
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=true/cap=3
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=true/cap=4
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=false/cap=2
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=false/cap=3
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=false/cap=4
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=2
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=3
+=== RUN   TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=4
+--- PASS: TestReopenSharesObjectQuotaWithMultipartTargets (0.12s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=false/cap=2 (0.00s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=false/cap=3 (0.00s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=false/cap=4 (0.00s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=true/cap=2 (0.00s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=true/cap=3 (0.00s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/memory/uploadsFirst=true/cap=4 (0.00s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=false/cap=2 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=false/cap=3 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=false/cap=4 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=true/cap=2 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=true/cap=3 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/filesystem/uploadsFirst=true/cap=4 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=false/cap=2 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=false/cap=3 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=false/cap=4 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=2 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=3 (0.01s)
+    --- PASS: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=4 (0.01s)
+=== RUN   TestReopenCombinedObjectQuotaDoesNotOverflow
+=== RUN   TestReopenCombinedObjectQuotaDoesNotOverflow/reserved=1
+=== RUN   TestReopenCombinedObjectQuotaDoesNotOverflow/reserved=2
+--- PASS: TestReopenCombinedObjectQuotaDoesNotOverflow (0.00s)
+    --- PASS: TestReopenCombinedObjectQuotaDoesNotOverflow/reserved=1 (0.00s)
+    --- PASS: TestReopenCombinedObjectQuotaDoesNotOverflow/reserved=2 (0.00s)
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/memory/cap=8
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/memory/cap=11
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/memory/cap=12
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/memory/cap=13
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=8
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=11
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=12
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=13
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=8
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=11
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=12
+=== RUN   TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=13
+--- PASS: TestReopenSharesByteQuotaWithMultipartParts (0.07s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=8 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=11 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=12 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=13 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=8 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=11 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=12 (0.00s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=13 (0.01s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=8 (0.01s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=11 (0.01s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=12 (0.01s)
+    --- PASS: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=13 (0.01s)
+=== RUN   TestReopenCombinedByteQuotaDoesNotOverflow
+=== RUN   TestReopenCombinedByteQuotaDoesNotOverflow/part=1
+=== RUN   TestReopenCombinedByteQuotaDoesNotOverflow/part=2
+--- PASS: TestReopenCombinedByteQuotaDoesNotOverflow (0.00s)
+    --- PASS: TestReopenCombinedByteQuotaDoesNotOverflow/part=1 (0.00s)
+    --- PASS: TestReopenCombinedByteQuotaDoesNotOverflow/part=2 (0.00s)
+=== RUN   TestBufferedReadRejectsPrematureEOF
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true
+--- PASS: TestBufferedReadRejectsPrematureEOF (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true (0.00s)
+=== RUN   TestBufferedReadCompleteEOF
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true
+--- PASS: TestBufferedReadCompleteEOF (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true (0.00s)
+=== RUN   TestBufferedReadUnknownSize
+=== RUN   TestBufferedReadUnknownSize/guarded=false
+=== RUN   TestBufferedReadUnknownSize/guarded=true
+--- PASS: TestBufferedReadUnknownSize (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=false (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=true (0.00s)
+=== RUN   TestBufferedReadPreservesWrappedEOF
+--- PASS: TestBufferedReadPreservesWrappedEOF (0.00s)
+=== RUN   TestBufferedReadsOwnReturnedState
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=false
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=true
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=false
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=true
+--- PASS: TestBufferedReadsOwnReturnedState (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=false (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=true (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=false (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=true (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestDurableSaveLostReplyReconcilesEffectAndAccounting
+--- PASS: TestDurableSaveLostReplyReconcilesEffectAndAccounting (0.00s)
+=== RUN   TestDurableSaveUnknownReplyFollowedByMutationRefreshesUsage
+--- PASS: TestDurableSaveUnknownReplyFollowedByMutationRefreshesUsage (0.00s)
+=== RUN   TestDurableSaveResolutionKeepsCurrentObjectsAndMultipartReservations
+--- PASS: TestDurableSaveResolutionKeepsCurrentObjectsAndMultipartReservations (0.01s)
+=== RUN   TestStreamPutAllocationBounded
+--- PASS: TestStreamPutAllocationBounded (1.29s)
+=== RUN   TestStreamEOFCompleteness
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=3
+--- PASS: TestStreamEOFCompleteness (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamEOFControls
+=== RUN   TestStreamEOFControls/adapter=false/unknown-size
+=== RUN   TestStreamEOFControls/adapter=false/empty
+=== RUN   TestStreamEOFControls/adapter=false/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=false/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=read_failed
+=== RUN   TestStreamEOFControls/adapter=true/unknown-size
+=== RUN   TestStreamEOFControls/adapter=true/empty
+=== RUN   TestStreamEOFControls/adapter=true/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=true/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=read_failed
+--- PASS: TestStreamEOFControls (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=read_failed (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=read_failed (0.00s)
+=== RUN   TestStreamPartialCloseDoesNotRequireEOF
+--- PASS: TestStreamPartialCloseDoesNotRequireEOF (0.00s)
+=== RUN   TestStreamCopyEOFCompleteness
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=3
+--- PASS: TestStreamCopyEOFCompleteness (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamSeekCompleteness
+=== RUN   TestStreamSeekCompleteness/body=old/start
+=== RUN   TestStreamSeekCompleteness/body=old/current
+=== RUN   TestStreamSeekCompleteness/body=old/end
+=== RUN   TestStreamSeekCompleteness/body=old/rewind
+=== RUN   TestStreamSeekCompleteness/body=old/failed
+=== RUN   TestStreamSeekCompleteness/body=old/at-end
+=== RUN   TestStreamSeekCompleteness/body=old/beyond-end
+=== RUN   TestStreamSeekCompleteness/body=ol/start
+=== RUN   TestStreamSeekCompleteness/body=ol/current
+=== RUN   TestStreamSeekCompleteness/body=ol/end
+=== RUN   TestStreamSeekCompleteness/body=ol/rewind
+=== RUN   TestStreamSeekCompleteness/body=ol/failed
+=== RUN   TestStreamSeekCompleteness/body=ol/at-end
+=== RUN   TestStreamSeekCompleteness/body=ol/beyond-end
+--- PASS: TestStreamSeekCompleteness (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/beyond-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/beyond-end (0.00s)
+=== RUN   TestStreamRangeCompleteness
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0}
+--- PASS: TestStreamRangeCompleteness (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0} (0.00s)
+=== RUN   TestAbortKeepsExistingMultipartTargetUnreserved
+--- PASS: TestAbortKeepsExistingMultipartTargetUnreserved (0.00s)
+=== RUN   TestAnUnsetAuthorityPermitsEverything
+--- PASS: TestAnUnsetAuthorityPermitsEverything (0.00s)
+=== RUN   TestAnExplicitlyEmptyAuthorityPermitsNothing
+--- PASS: TestAnExplicitlyEmptyAuthorityPermitsNothing (0.00s)
+=== RUN   TestReadOnlyRefusesEveryMutation
+--- PASS: TestReadOnlyRefusesEveryMutation (0.00s)
+=== RUN   TestReadOnlyRefusesMultipartWrites
+--- PASS: TestReadOnlyRefusesMultipartWrites (0.00s)
+=== RUN   TestARefusedWriteStoresNothing
+--- PASS: TestARefusedWriteStoresNothing (0.00s)
+=== RUN   TestTheStoreAdapterInheritsTheSameRefusals
+--- PASS: TestTheStoreAdapterInheritsTheSameRefusals (0.00s)
+=== RUN   TestDisposalIsAlwaysPermitted
+--- PASS: TestDisposalIsAlwaysPermitted (0.00s)
+=== RUN   TestANarrowerAuthorityCanOpenItsOwnEnvironment
+--- PASS: TestANarrowerAuthorityCanOpenItsOwnEnvironment (0.00s)
+=== RUN   TestCompletionLookupS3Recovery
+=== RUN   TestCompletionLookupS3Recovery/marker-first
+2026/10/19 02:08:19 POST /s3 500 2.051088ms
+2026/10/19 02:08:19 DELETE /s3 204 210.107µs
+=== RUN   TestCompletionLookupS3Recovery/missing-first
+2026/10/19 02:08:19 POST /s3 500 1.550003ms
+2026/10/19 02:08:19 DELETE /s3 204 200.558µs
+--- PASS: TestCompletionLookupS3Recovery (0.01s)
+    --- PASS: TestCompletionLookupS3Recovery/marker-first (0.01s)
+    --- PASS: TestCompletionLookupS3Recovery/missing-first (0.01s)
+=== RUN   TestCopyQuotaWhileSourceOverwriteIsStaged
+=== RUN   TestCopyQuotaWhileSourceOverwriteIsStaged/memory/conditioned=false
+=== RUN   TestCopyQuotaWhileSourceOverwriteIsStaged/memory/conditioned=true
+=== RUN   TestCopyQuotaWhileSourceOverwriteIsStaged/filesystem/conditioned=false
+=== RUN   TestCopyQuotaWhileSourceOverwriteIsStaged/filesystem/conditioned=true
+--- PASS: TestCopyQuotaWhileSourceOverwriteIsStaged (0.01s)
+    --- PASS: TestCopyQuotaWhileSourceOverwriteIsStaged/memory/conditioned=false (0.00s)
+    --- PASS: TestCopyQuotaWhileSourceOverwriteIsStaged/memory/conditioned=true (0.00s)
+    --- PASS: TestCopyQuotaWhileSourceOverwriteIsStaged/filesystem/conditioned=false (0.00s)
+    --- PASS: TestCopyQuotaWhileSourceOverwriteIsStaged/filesystem/conditioned=true (0.01s)
+=== RUN   TestRuntimeDependencyBoundary
+    dependencies_test.go:51: non-standard runtime dependencies: github.com/chester-hill-solutions/stow-s3/internal/authority, github.com/chester-hill-solutions/stow-s3/internal/policy, github.com/chester-hill-solutions/stow-s3/internal/storage, github.com/chester-hill-solutions/stow-s3/internal/runtime
+--- PASS: TestRuntimeDependencyBoundary (0.09s)
+=== RUN   TestDiskStagingAllowsWorkAndRechecksQuota
+--- PASS: TestDiskStagingAllowsWorkAndRechecksQuota (0.00s)
+=== RUN   TestMemoryStreamPreparationDoesNotBlockReads
+--- PASS: TestMemoryStreamPreparationDoesNotBlockReads (0.00s)
+=== RUN   TestBufferedPutStagesAndRejectsReset
+--- PASS: TestBufferedPutStagesAndRejectsReset (0.00s)
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit/cancel
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit/close
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit/reset
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit/replace
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit/delete-bucket
+=== RUN   TestMemoryStagedWriteRechecksBeforeCommit/revoke
+--- PASS: TestMemoryStagedWriteRechecksBeforeCommit (0.00s)
+    --- PASS: TestMemoryStagedWriteRechecksBeforeCommit/cancel (0.00s)
+    --- PASS: TestMemoryStagedWriteRechecksBeforeCommit/close (0.00s)
+    --- PASS: TestMemoryStagedWriteRechecksBeforeCommit/reset (0.00s)
+    --- PASS: TestMemoryStagedWriteRechecksBeforeCommit/replace (0.00s)
+    --- PASS: TestMemoryStagedWriteRechecksBeforeCommit/delete-bucket (0.00s)
+    --- PASS: TestMemoryStagedWriteRechecksBeforeCommit/revoke (0.00s)
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=false
+2026/10/19 02:08:19 DELETE /s3 500 49.24µs
+2026/10/19 02:08:19 DELETE /s3 204 2.93µs
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=true
+2026/10/19 02:08:19 DELETE /s3 500 7.48µs
+2026/10/19 02:08:19 DELETE /s3 204 2.01µs
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=false
+2026/10/19 02:08:19 POST /s3 500 70.009µs
+2026/10/19 02:08:19 POST /s3 200 20.609µs
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=true
+2026/10/19 02:08:19 POST /s3 500 21.38µs
+2026/10/19 02:08:19 POST /s3 200 26.699µs
+--- PASS: TestObjectHeadS3DeletionRefusesAmbiguity (0.00s)
+    --- PASS: TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=false (0.00s)
+    --- PASS: TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=true (0.00s)
+    --- PASS: TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=false (0.00s)
+    --- PASS: TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=true (0.00s)
+=== RUN   TestOwnedBodyStillEnforcesDeclaredStreamSize
+--- PASS: TestOwnedBodyStillEnforcesDeclaredStreamSize (0.00s)
+=== RUN   TestPutObjectDoesNotAliasCallerBytes
+--- PASS: TestPutObjectDoesNotAliasCallerBytes (0.00s)
+=== RUN   TestStoreAdapterAdoptsAByteReaderWithoutCopying
+--- PASS: TestStoreAdapterAdoptsAByteReaderWithoutCopying (0.00s)
+=== RUN   TestStoreAdapterStillReadsAPlainReader
+--- PASS: TestStoreAdapterStillReadsAPlainReader (0.00s)
+=== RUN   TestStoreAdapterAcceptsANilBody
+--- PASS: TestStoreAdapterAcceptsANilBody (0.00s)
+=== RUN   TestScopedListingCursorDoesNotDiscloseDeniedKeys
+=== RUN   TestScopedListingCursorDoesNotDiscloseDeniedKeys/delimiter=
+=== RUN   TestScopedListingCursorDoesNotDiscloseDeniedKeys/delimiter=/
+--- PASS: TestScopedListingCursorDoesNotDiscloseDeniedKeys (0.00s)
+    --- PASS: TestScopedListingCursorDoesNotDiscloseDeniedKeys/delimiter= (0.00s)
+    --- PASS: TestScopedListingCursorDoesNotDiscloseDeniedKeys/delimiter=/ (0.00s)
+=== RUN   TestScopedListingWithOnlyDeniedKeysHasNoContinuation
+--- PASS: TestScopedListingWithOnlyDeniedKeysHasNoContinuation (0.00s)
+=== RUN   TestScopedListingCrossesDeniedBackendPages
+--- PASS: TestScopedListingCrossesDeniedBackendPages (0.00s)
+=== RUN   TestAListingOmitsAKeyThePolicyDeniesEnumerating
+--- PASS: TestAListingOmitsAKeyThePolicyDeniesEnumerating (0.00s)
+=== RUN   TestTheCountDescribesWhatWasReturnedNotWhatExists
+--- PASS: TestTheCountDescribesWhatWasReturnedNotWhatExists (0.00s)
+=== RUN   TestAListingAimedAtADeniedSubtreeYieldsNothing
+--- PASS: TestAListingAimedAtADeniedSubtreeYieldsNothing (0.00s)
+=== RUN   TestAnExactDenyCoversOneObjectAndNotItsSubtree
+--- PASS: TestAnExactDenyCoversOneObjectAndNotItsSubtree (0.00s)
+=== RUN   TestTheCountCoversRolledUpPrefixesToo
+--- PASS: TestTheCountCoversRolledUpPrefixesToo (0.00s)
+=== RUN   TestACommonPrefixIsAlsoFiltered
+--- PASS: TestACommonPrefixIsAlsoFiltered (0.00s)
+=== RUN   TestNoPolicyStillListsEverything
+--- PASS: TestNoPolicyStillListsEverything (0.00s)
+=== RUN   TestAPolicyThatWithholdsListRefusesTheListing
+--- PASS: TestAPolicyThatWithholdsListRefusesTheListing (0.00s)
+=== RUN   TestEveryOperationReachesThePolicy
+=== RUN   TestEveryOperationReachesThePolicy/environment.reset
+=== RUN   TestEveryOperationReachesThePolicy/object.read
+=== RUN   TestEveryOperationReachesThePolicy/object.write
+=== RUN   TestEveryOperationReachesThePolicy/object.delete
+=== RUN   TestEveryOperationReachesThePolicy/object.list
+=== RUN   TestEveryOperationReachesThePolicy/bucket.list
+=== RUN   TestEveryOperationReachesThePolicy/bucket.create
+=== RUN   TestEveryOperationReachesThePolicy/bucket.delete
+--- PASS: TestEveryOperationReachesThePolicy (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/environment.reset (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/object.read (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/object.write (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/object.delete (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/object.list (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/bucket.list (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/bucket.create (0.00s)
+    --- PASS: TestEveryOperationReachesThePolicy/bucket.delete (0.00s)
+=== RUN   TestAWideningPolicyRefusesEveryOperationNotJustTheOnesOnAResource
+--- PASS: TestAWideningPolicyRefusesEveryOperationNotJustTheOnesOnAResource (0.00s)
+=== RUN   TestARevocationTakesEffectWithoutARestart
+--- PASS: TestARevocationTakesEffectWithoutARestart (0.00s)
+=== RUN   TestTheSourceIsConsultedPerDecisionAndNotOnceAtOpen
+--- PASS: TestTheSourceIsConsultedPerDecisionAndNotOnceAtOpen (0.00s)
+=== RUN   TestAnUnknownPolicyIsReportedAndNotResolvedIntoADecision
+--- PASS: TestAnUnknownPolicyIsReportedAndNotResolvedIntoADecision (0.00s)
+=== RUN   TestAWidtheningRevisionIsRefusedWhenItIsReadNotWhenItIsWritten
+--- PASS: TestAWidtheningRevisionIsRefusedWhenItIsReadNotWhenItIsWritten (0.00s)
+=== RUN   TestAFixedSourceIgnoresATypedNilPolicy
+--- PASS: TestAFixedSourceIgnoresATypedNilPolicy (0.00s)
+=== RUN   TestAPolicyNarrowsAFullAuthorityToOnePrefix
+--- PASS: TestAPolicyNarrowsAFullAuthorityToOnePrefix (0.00s)
+=== RUN   TestAnObjectPrefixKeepsS3PrefixSemantics
+--- PASS: TestAnObjectPrefixKeepsS3PrefixSemantics (0.00s)
+=== RUN   TestAListIsScopedToTheCallersPrefix
+--- PASS: TestAListIsScopedToTheCallersPrefix (0.00s)
+=== RUN   TestACopyIsAuthorizedOnBothEnds
+--- PASS: TestACopyIsAuthorizedOnBothEnds (0.00s)
+=== RUN   TestACopyCannotCarryContentPastAPolicy
+--- PASS: TestACopyCannotCarryContentPastAPolicy (0.00s)
+=== RUN   TestAMultipartContinuationIsAuthorizedOnItsTarget
+--- PASS: TestAMultipartContinuationIsAuthorizedOnItsTarget (0.00s)
+=== RUN   TestAPolicyWiderThanTheEnvironmentRefusesEverything
+--- PASS: TestAPolicyWiderThanTheEnvironmentRefusesEverything (0.00s)
+=== RUN   TestAnExpiredPolicyIsUnknownRatherThanDenied
+--- PASS: TestAnExpiredPolicyIsUnknownRatherThanDenied (0.00s)
+=== RUN   TestAnExplicitDenyBeatsABroadAllow
+--- PASS: TestAnExplicitDenyBeatsABroadAllow (0.00s)
+=== RUN   TestABatchDeleteIsAuthorizedPerKey
+--- PASS: TestABatchDeleteIsAuthorizedPerKey (0.00s)
+=== RUN   TestObjectChecksNameAResource
+    policy_test.go:288: object_recovery.go checks ObjectRead through check: checkRecoveryAuthority's empty-refs branch: a hold named by ID alone has no resource to match, and an unattributable hold is not evidence the caller may act on it
+    policy_test.go:288: object_recovery.go checks ObjectWrite through check: checkRecoveryAuthority's empty-refs branch: a hold named by ID alone has no resource to match, and an unattributable hold is not evidence the caller may act on it
+--- PASS: TestObjectChecksNameAResource (0.00s)
+=== RUN   TestWholeObjectReadsOverlapAndCloseWaits
+--- PASS: TestWholeObjectReadsOverlapAndCloseWaits (0.02s)
+=== RUN   TestStagedReservationsSurvivePersistentReconciliation
+--- PASS: TestStagedReservationsSurvivePersistentReconciliation (0.00s)
+=== RUN   TestResetInvalidatesStagedPublicationWithoutLeakingReservations
+--- PASS: TestResetInvalidatesStagedPublicationWithoutLeakingReservations (0.00s)
+=== RUN   TestReadFailureRetainsRetryableCleanup
+=== RUN   TestReadFailureRetainsRetryableCleanup/premature
+=== RUN   TestReadFailureRetainsRetryableCleanup/excess
+--- PASS: TestReadFailureRetainsRetryableCleanup (0.00s)
+    --- PASS: TestReadFailureRetainsRetryableCleanup/premature (0.00s)
+    --- PASS: TestReadFailureRetainsRetryableCleanup/excess (0.00s)
+=== RUN   TestAdapterReturnsStreamBeforeReadingPayload
+--- PASS: TestAdapterReturnsStreamBeforeReadingPayload (0.00s)
+=== RUN   TestAdapterSeekUsesCapturedVersion
+--- PASS: TestAdapterSeekUsesCapturedVersion (0.00s)
+=== RUN   TestIndependentStreamsReadConcurrentlyAndCloseWaits
+--- PASS: TestIndependentStreamsReadConcurrentlyAndCloseWaits (0.02s)
+=== RUN   TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure
+=== RUN   TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure/explicit
+=== RUN   TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure/EOF
+--- PASS: TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure (0.00s)
+    --- PASS: TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure/explicit (0.00s)
+    --- PASS: TestStreamRetriesReleaseAfterExplicitAndAutomaticCloseFailure/EOF (0.00s)
+=== RUN   TestStreamRechecksPolicyBeforeReadingCapturedVersion
+--- PASS: TestStreamRechecksPolicyBeforeReadingCapturedVersion (0.00s)
+=== RUN   TestStreamWriteToRechecksPolicyBetweenChunks
+--- PASS: TestStreamWriteToRechecksPolicyBetweenChunks (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.941s
+=== RUN   TestConcurrentReadsAndWritesAreSafe
+--- PASS: TestConcurrentReadsAndWritesAreSafe (0.79s)
+=== RUN   TestDetectContentTypeRefusesASymlink
+--- PASS: TestDetectContentTypeRefusesASymlink (0.00s)
+=== RUN   TestDetectContentTypeSniffsAnOrdinaryFile
+--- PASS: TestDetectContentTypeSniffsAnOrdinaryFile (0.00s)
+=== RUN   TestSameSecondHostEditChangesETagAndWriteCondition
+--- PASS: TestSameSecondHostEditChangesETagAndWriteCondition (0.01s)
+=== RUN   TestHostEditWithPreservedTimestampChangesETag
+--- PASS: TestHostEditWithPreservedTimestampChangesETag (0.00s)
+=== RUN   TestCompactIndexRetainsExistingLayoutAndMetadata
+--- PASS: TestCompactIndexRetainsExistingLayoutAndMetadata (0.00s)
+=== RUN   TestAdoptionRewritesTheIndexAndNotTheIdentity
+--- PASS: TestAdoptionRewritesTheIndexAndNotTheIdentity (0.01s)
+=== RUN   TestIdentityAndIndexAreSeparateDocuments
+--- PASS: TestIdentityAndIndexAreSeparateDocuments (0.01s)
+=== RUN   TestMultipartHostEditInvalidatesIdentity
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=false/preserveTime=false
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=false/preserveTime=true
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=true/preserveTime=false
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=true/preserveTime=true
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=false/preserveTime=false
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=false/preserveTime=true
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=true/preserveTime=false
+=== RUN   TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=true/preserveTime=true
+--- PASS: TestMultipartHostEditInvalidatesIdentity (0.30s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=false/preserveTime=false (0.01s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=false/preserveTime=true (0.01s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=true/preserveTime=false (0.01s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=1/reopen=true/preserveTime=true (0.01s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=false/preserveTime=false (0.06s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=false/preserveTime=true (0.07s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=true/preserveTime=false (0.07s)
+    --- PASS: TestMultipartHostEditInvalidatesIdentity/parts=2/reopen=true/preserveTime=true (0.07s)
+=== RUN   TestLegacyMultipartHostEditFailsClosed
+--- PASS: TestLegacyMultipartHostEditFailsClosed (0.06s)
+=== RUN   TestMultipartTimestampOnlyChangePreservesIdentity
+--- PASS: TestMultipartTimestampOnlyChangePreservesIdentity (0.04s)
+=== RUN   TestOpenNoFollowRefusesASymlink
+--- PASS: TestOpenNoFollowRefusesASymlink (0.00s)
+=== RUN   TestOpenNoFollowOpensAnOrdinaryFile
+--- PASS: TestOpenNoFollowOpensAnOrdinaryFile (0.00s)
+=== RUN   TestOpenNoFollowRefusesADanglingSymlink
+--- PASS: TestOpenNoFollowRefusesADanglingSymlink (0.00s)
+=== RUN   TestOpenNoFollowAllowsAHardLink
+--- PASS: TestOpenNoFollowAllowsAHardLink (0.00s)
+=== RUN   TestPartRecordRoundTrip
+--- PASS: TestPartRecordRoundTrip (0.00s)
+=== RUN   TestPartRecordRejectsCorruption
+=== RUN   TestPartRecordRejectsCorruption/short-prefix
+=== RUN   TestPartRecordRejectsCorruption/magic
+=== RUN   TestPartRecordRejectsCorruption/short-payload
+=== RUN   TestPartRecordRejectsCorruption/extra-payload
+=== RUN   TestPartRecordRejectsCorruption/part-number
+=== RUN   TestPartRecordRejectsCorruption/negative-size
+=== RUN   TestPartRecordRejectsCorruption/huge-size
+=== RUN   TestPartRecordRejectsCorruption/nanoseconds
+=== RUN   TestPartRecordRejectsCorruption/timestamp
+=== RUN   TestPartRecordRejectsCorruption/old-raw-part
+--- PASS: TestPartRecordRejectsCorruption (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/short-prefix (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/magic (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/short-payload (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/extra-payload (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/part-number (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/negative-size (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/huge-size (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/nanoseconds (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/timestamp (0.00s)
+    --- PASS: TestPartRecordRejectsCorruption/old-raw-part (0.00s)
+=== RUN   TestProtectedReasonCatchesAncestors
+--- PASS: TestProtectedReasonCatchesAncestors (0.00s)
+=== RUN   TestProtectedReasonProtectsWorkingDirectory
+--- PASS: TestProtectedReasonProtectsWorkingDirectory (0.00s)
+=== RUN   TestProtectedReasonAllowsAnOrdinarySubdirectory
+--- PASS: TestProtectedReasonAllowsAnOrdinarySubdirectory (0.00s)
+=== RUN   TestProtectedReasonSeesThroughRelativePaths
+--- PASS: TestProtectedReasonSeesThroughRelativePaths (0.00s)
+=== RUN   TestIsAncestorOrSelf
+--- PASS: TestIsAncestorOrSelf (0.00s)
+=== RUN   TestDirectoryExists
+--- PASS: TestDirectoryExists (0.00s)
+=== RUN   TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads
+=== RUN   TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/none
+=== RUN   TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/timestamp
+=== RUN   TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/content
+=== RUN   TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/legacy
+--- PASS: TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads (0.02s)
+    --- PASS: TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/none (0.00s)
+    --- PASS: TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/timestamp (0.01s)
+    --- PASS: TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/content (0.01s)
+    --- PASS: TestSnapshotMultipartMetadataDoesNotDependOnPriorLiveReads/legacy (0.01s)
+=== RUN   TestRegistryLookupRejectsMismatchedAndUnsafeIdentity
+--- PASS: TestRegistryLookupRejectsMismatchedAndUnsafeIdentity (0.00s)
+=== RUN   TestCollectAndPruneRespectActiveCapture
+--- PASS: TestCollectAndPruneRespectActiveCapture (0.00s)
+=== RUN   TestCaptureLockFailsClosedOnInvalidLockDirectory
+--- PASS: TestCaptureLockFailsClosedOnInvalidLockDirectory (0.00s)
+=== RUN   TestWorkspaceDeleteOutcome
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=true
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=true
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=true
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=true
+--- PASS: TestWorkspaceDeleteOutcome (0.04s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=false (0.00s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=true (0.00s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=false (0.00s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=false (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=false (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=true (0.01s)
+=== RUN   TestWorkspaceDeleteRefusalHasNoCommittedOutcome
+--- PASS: TestWorkspaceDeleteRefusalHasNoCommittedOutcome (0.00s)
+=== RUN   TestDestroyRemovesAWorkspaceStowCreated
+--- PASS: TestDestroyRemovesAWorkspaceStowCreated (0.01s)
+=== RUN   TestDestroyRefusesAnAdoptedWorkspace
+--- PASS: TestDestroyRefusesAnAdoptedWorkspace (0.00s)
+=== RUN   TestAdoptedWorkspaceSurvivesReopening
+--- PASS: TestAdoptedWorkspaceSurvivesReopening (0.01s)
+=== RUN   TestCreatedWorkspaceStaysDestructibleAcrossReopening
+--- PASS: TestCreatedWorkspaceStaysDestructibleAcrossReopening (0.01s)
+=== RUN   TestDestroyIsIdempotent
+--- PASS: TestDestroyIsIdempotent (0.00s)
+=== RUN   TestDestroyRefusalExplainsItself
+--- PASS: TestDestroyRefusalExplainsItself (0.00s)
+=== RUN   TestAdoptedManifestDoesNotCarryOwnership
+--- PASS: TestAdoptedManifestDoesNotCarryOwnership (0.00s)
+=== RUN   TestOwnedWorkspaceSurvivesReopening
+--- PASS: TestOwnedWorkspaceSurvivesReopening (0.00s)
+=== RUN   TestASymlinkedEscapedKeyIsNotAnObject
+--- PASS: TestASymlinkedEscapedKeyIsNotAnObject (0.01s)
+=== RUN   TestCloseLeavesTheData
+--- PASS: TestCloseLeavesTheData (0.00s)
+=== RUN   TestCloseFlushesTheManifest
+--- PASS: TestCloseFlushesTheManifest (0.01s)
+=== RUN   TestCorruptManifestRefusesTheOpen
+--- PASS: TestCorruptManifestRefusesTheOpen (0.00s)
+=== RUN   TestNewerManifestVersionIsRefused
+--- PASS: TestNewerManifestVersionIsRefused (0.00s)
+=== RUN   TestOlderWorkspaceVersionsAreRefusedWithGuidance
+=== RUN   TestOlderWorkspaceVersionsAreRefusedWithGuidance/version_1
+=== RUN   TestOlderWorkspaceVersionsAreRefusedWithGuidance/version_2
+--- PASS: TestOlderWorkspaceVersionsAreRefusedWithGuidance (0.00s)
+    --- PASS: TestOlderWorkspaceVersionsAreRefusedWithGuidance/version_1 (0.00s)
+    --- PASS: TestOlderWorkspaceVersionsAreRefusedWithGuidance/version_2 (0.00s)
+=== RUN   TestIdentityIsStable
+--- PASS: TestIdentityIsStable (0.01s)
+=== RUN   TestTheInternalDirectoryIsNotAnObject
+    lifecycle_test.go:259: manifest does not mention the impostor key; form was escaped as expected
+--- PASS: TestTheInternalDirectoryIsNotAnObject (0.00s)
+=== RUN   TestPartListingRetainsIndependentDescriptors
+--- PASS: TestPartListingRetainsIndependentDescriptors (0.01s)
+=== RUN   TestPutObjectOverAFileTheHostChanged
+--- PASS: TestPutObjectOverAFileTheHostChanged (0.01s)
+=== RUN   TestPutObjectOverAFileTheHostOnlyTouched
+--- PASS: TestPutObjectOverAFileTheHostOnlyTouched (0.01s)
+=== RUN   TestPutObjectAdoptingAHostCreatedFile
+--- PASS: TestPutObjectAdoptingAHostCreatedFile (0.00s)
+=== RUN   TestAnUploadIsInvisibleUntilItCompletes
+--- PASS: TestAnUploadIsInvisibleUntilItCompletes (0.05s)
+=== RUN   TestAbortingAnUploadLeavesNothing
+--- PASS: TestAbortingAnUploadLeavesNothing (0.00s)
+=== RUN   TestBucketCreateHeadAndList
+--- PASS: TestBucketCreateHeadAndList (0.00s)
+=== RUN   TestBucketDeletionRefusesWorkInFlight
+--- PASS: TestBucketDeletionRefusesWorkInFlight (0.00s)
+=== RUN   TestDeleteBucketRefusesTheWorkspaceBucket
+--- PASS: TestDeleteBucketRefusesTheWorkspaceBucket (0.00s)
+=== RUN   TestCopyAndBatchDelete
+--- PASS: TestCopyAndBatchDelete (0.01s)
+=== RUN   TestWorkspaceMutationsRefuseAncestorSymlink
+=== RUN   TestWorkspaceMutationsRefuseAncestorSymlink/put
+=== RUN   TestWorkspaceMutationsRefuseAncestorSymlink/delete
+--- PASS: TestWorkspaceMutationsRefuseAncestorSymlink (0.00s)
+    --- PASS: TestWorkspaceMutationsRefuseAncestorSymlink/put (0.00s)
+    --- PASS: TestWorkspaceMutationsRefuseAncestorSymlink/delete (0.00s)
+=== RUN   TestCaseCollisionOverwriteDoesNotResurrect
+--- PASS: TestCaseCollisionOverwriteDoesNotResurrect (0.01s)
+=== RUN   TestWorkspaceMutationRejectsAncestorChangedDuringBodyRead
+--- PASS: TestWorkspaceMutationRejectsAncestorChangedDuringBodyRead (0.00s)
+=== RUN   TestEscapedKeysAreNamespacedByBucket
+=== RUN   TestEscapedKeysAreNamespacedByBucket/parent_segment
+=== RUN   TestEscapedKeysAreNamespacedByBucket/interior_parent_segment
+=== RUN   TestEscapedKeysAreNamespacedByBucket/looks_like_internal_bookkeeping
+=== RUN   TestEscapedKeysAreNamespacedByBucket/longer_than_a_path_may_be
+--- PASS: TestEscapedKeysAreNamespacedByBucket (0.03s)
+    --- PASS: TestEscapedKeysAreNamespacedByBucket/parent_segment (0.01s)
+    --- PASS: TestEscapedKeysAreNamespacedByBucket/interior_parent_segment (0.01s)
+    --- PASS: TestEscapedKeysAreNamespacedByBucket/looks_like_internal_bookkeeping (0.01s)
+    --- PASS: TestEscapedKeysAreNamespacedByBucket/longer_than_a_path_may_be (0.01s)
+=== RUN   TestEscapedKeyWriteInOneBucketLeavesTheOtherAlone
+--- PASS: TestEscapedKeyWriteInOneBucketLeavesTheOtherAlone (0.01s)
+=== RUN   TestNaturalKeysRemainPerBucket
+--- PASS: TestNaturalKeysRemainPerBucket (0.01s)
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/truncated
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/null
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/empty
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/invalid-bucket
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/invalid-key
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/wrong-id
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/missing
+=== RUN   TestWorkspaceMultipartOwnerFailuresPreserveParts/directory
+--- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts (0.07s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/truncated (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/null (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/empty (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/invalid-bucket (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/invalid-key (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/wrong-id (0.02s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/missing (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerFailuresPreserveParts/directory (0.01s)
+=== RUN   TestWorkspaceMultipartOwnerHealthyFiltering
+--- PASS: TestWorkspaceMultipartOwnerHealthyFiltering (0.00s)
+=== RUN   TestWorkspaceMultipartOwnerAbsent
+--- PASS: TestWorkspaceMultipartOwnerAbsent (0.01s)
+=== RUN   TestWorkspaceMultipartOwnerRecoveryRefusesUnknown
+=== RUN   TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/truncated
+=== RUN   TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/null
+=== RUN   TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/wrong-id
+=== RUN   TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/missing
+=== RUN   TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/directory
+--- PASS: TestWorkspaceMultipartOwnerRecoveryRefusesUnknown (0.04s)
+    --- PASS: TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/truncated (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/null (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/wrong-id (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/missing (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerRecoveryRefusesUnknown/directory (0.01s)
+=== RUN   TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota
+=== RUN   TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota/truncated
+=== RUN   TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota/missing
+=== RUN   TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota/directory
+--- PASS: TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota (0.02s)
+    --- PASS: TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota/truncated (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota/missing (0.01s)
+    --- PASS: TestWorkspaceMultipartOwnerLiveRecoveryRetainsQuota/directory (0.01s)
+=== RUN   TestWorkspaceMultipartOwnerFailedCreationCleansState
+--- PASS: TestWorkspaceMultipartOwnerFailedCreationCleansState (0.00s)
+=== RUN   TestMultipartCompletionVerifiesRecordedPayload
+--- PASS: TestMultipartCompletionVerifiesRecordedPayload (0.00s)
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/first/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/first/metadata-failure
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/larger/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/larger/metadata-failure
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/healthy
+    part_publication_test.go:100: replacement result error=<nil>
+=== RUN   TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/metadata-failure
+    part_publication_test.go:100: replacement result error=<nil>
+--- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure (0.06s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/first/healthy (0.01s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/first/metadata-failure (0.01s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/larger/healthy (0.01s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/larger/metadata-failure (0.01s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/healthy (0.01s)
+    --- PASS: TestMultipartPartDescriptorSurvivesMetadataFailure/same-size/metadata-failure (0.01s)
+=== RUN   TestMultipartPartRecoveryPreservesQuota
+    part_publication_test.go:129: replacement result error=<nil>
+--- PASS: TestMultipartPartRecoveryPreservesQuota (0.01s)
+=== RUN   TestPathRefusesASymlinkedAncestor
+--- PASS: TestPathRefusesASymlinkedAncestor (0.00s)
+=== RUN   TestPruneRemovesAnOwnedEntryWhoseDirectoryIsGone
+--- PASS: TestPruneRemovesAnOwnedEntryWhoseDirectoryIsGone (0.00s)
+=== RUN   TestPruneKeepsAnEntryWhoseDirectoryIsPresent
+--- PASS: TestPruneKeepsAnEntryWhoseDirectoryIsPresent (0.00s)
+=== RUN   TestPruneKeepsAGoneAdoptedEntryUnlessAsked
+--- PASS: TestPruneKeepsAGoneAdoptedEntryUnlessAsked (0.00s)
+=== RUN   TestPruneKeepsAnEntryWhoseDirectoryIsUnreadable
+--- PASS: TestPruneKeepsAnEntryWhoseDirectoryIsUnreadable (0.00s)
+=== RUN   TestPruneDoesNotCreateARegistryThatIsNotThere
+--- PASS: TestPruneDoesNotCreateARegistryThatIsNotThere (0.00s)
+=== RUN   TestAnExpiredRecoveryHoldStopsBlocking
+--- PASS: TestAnExpiredRecoveryHoldStopsBlocking (0.00s)
+=== RUN   TestCollectRemovesAnExpiredUnusedWorkspace
+--- PASS: TestCollectRemovesAnExpiredUnusedWorkspace (0.01s)
+=== RUN   TestCollectNeverRemovesALiveWorkspace
+--- PASS: TestCollectNeverRemovesALiveWorkspace (0.00s)
+=== RUN   TestCollectNeverRemovesAnAdoptedWorkspace
+--- PASS: TestCollectNeverRemovesAnAdoptedWorkspace (0.00s)
+=== RUN   TestCollectKeepsUnexpiredWorkspaces
+--- PASS: TestCollectKeepsUnexpiredWorkspaces (0.00s)
+=== RUN   TestCollectKeepsWorkspacesWithNoTTL
+--- PASS: TestCollectKeepsWorkspacesWithNoTTL (0.01s)
+=== RUN   TestCollectReportsEveryDecision
+--- PASS: TestCollectReportsEveryDecision (0.01s)
+=== RUN   TestLivenessIsReleasedWhenTheHolderExits
+--- PASS: TestLivenessIsReleasedWhenTheHolderExits (0.00s)
+=== RUN   TestLivenessIsPerProcessAndConcurrent
+--- PASS: TestLivenessIsPerProcessAndConcurrent (0.00s)
+=== RUN   TestUnsupportedLocksRefuseCollection
+--- PASS: TestUnsupportedLocksRefuseCollection (0.01s)
+=== RUN   TestWorkspaceReadsRefuseReplacedAncestorDirectory
+--- PASS: TestWorkspaceReadsRefuseReplacedAncestorDirectory (0.00s)
+=== RUN   TestWorkspaceRefusesReplacedRootIdentity
+--- PASS: TestWorkspaceRefusesReplacedRootIdentity (0.00s)
+=== RUN   TestLogicalSnapshotPreservesExactNaturalAndEscapedKeyIdentity
+--- PASS: TestLogicalSnapshotPreservesExactNaturalAndEscapedKeyIdentity (0.01s)
+=== RUN   TestLogicalSnapshotRefusesLinkedInternalDirectory
+--- PASS: TestLogicalSnapshotRefusesLinkedInternalDirectory (0.00s)
+=== RUN   TestASymlinkedKeyIsNotAnObject
+--- PASS: TestASymlinkedKeyIsNotAnObject (0.00s)
+=== RUN   TestWritingOverASymlinkReplacesItAndNotItsTarget
+--- PASS: TestWritingOverASymlinkReplacesItAndNotItsTarget (0.01s)
+=== RUN   TestWS03AdoptsAFileWithNoManifestEntry
+--- PASS: TestWS03AdoptsAFileWithNoManifestEntry (0.00s)
+=== RUN   TestWS08AdoptsAPreExistingDirectory
+--- PASS: TestWS08AdoptsAPreExistingDirectory (0.00s)
+=== RUN   TestAwkwardKeysRoundTrip
+=== RUN   TestAwkwardKeysRoundTrip/1024-byte_key
+=== RUN   TestAwkwardKeysRoundTrip/trailing_dot
+=== RUN   TestAwkwardKeysRoundTrip/reserved_internal
+=== RUN   TestAwkwardKeysRoundTrip/parent_traversal
+=== RUN   TestAwkwardKeysRoundTrip/current_dir_segment
+=== RUN   TestAwkwardKeysRoundTrip/leading_slash
+=== RUN   TestAwkwardKeysRoundTrip/escape_marker
+=== RUN   TestAwkwardKeysRoundTrip/windows_device_name
+=== RUN   TestAwkwardKeysRoundTrip/windows_illegal
+=== RUN   TestAwkwardKeysRoundTrip/trailing_space
+--- PASS: TestAwkwardKeysRoundTrip (0.04s)
+    --- PASS: TestAwkwardKeysRoundTrip/1024-byte_key (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/trailing_dot (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/reserved_internal (0.01s)
+    --- PASS: TestAwkwardKeysRoundTrip/parent_traversal (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/current_dir_segment (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/leading_slash (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/escape_marker (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/windows_device_name (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/windows_illegal (0.00s)
+    --- PASS: TestAwkwardKeysRoundTrip/trailing_space (0.00s)
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/reserved_internal
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/parent_traversal
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/leading_slash
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/escape_marker
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/trailing_space
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/trailing_dot
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/1024-byte_key
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/current_dir_segment
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/windows_device_name
+=== RUN   TestAwkwardKeysAreStoredInTheEscapedForm/windows_illegal
+--- PASS: TestAwkwardKeysAreStoredInTheEscapedForm (0.01s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/reserved_internal (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/parent_traversal (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/leading_slash (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/escape_marker (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/trailing_space (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/trailing_dot (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/1024-byte_key (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/current_dir_segment (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/windows_device_name (0.00s)
+    --- PASS: TestAwkwardKeysAreStoredInTheEscapedForm/windows_illegal (0.00s)
+=== RUN   TestNaturalKeysStayNatural
+--- PASS: TestNaturalKeysStayNatural (0.00s)
+=== RUN   TestKeysDifferingOnlyInCaseAreDistinct
+--- PASS: TestKeysDifferingOnlyInCaseAreDistinct (0.01s)
+=== RUN   TestCaseDistinctWriteDoesNotOverwriteAnAdoptedFile
+--- PASS: TestCaseDistinctWriteDoesNotOverwriteAnAdoptedFile (0.01s)
+=== RUN   TestDeleteObjectRemovesTheFile
+--- PASS: TestDeleteObjectRemovesTheFile (0.00s)
+=== RUN   TestDeleteObjectRemovesAnEscapedFile
+--- PASS: TestDeleteObjectRemovesAnEscapedFile (0.00s)
+=== RUN   TestMetadataIsDerivedForAForeignFile
+--- PASS: TestMetadataIsDerivedForAForeignFile (0.00s)
+=== RUN   TestOverwritingAForeignFileIsPickedUp
+--- PASS: TestOverwritingAForeignFileIsPickedUp (0.00s)
+=== RUN   TestAWriteCarriesItsMetadata
+--- PASS: TestAWriteCarriesItsMetadata (0.00s)
+=== RUN   TestABucketOtherThanTheWorkspaceIsIsolated
+--- PASS: TestABucketOtherThanTheWorkspaceIsIsolated (0.01s)
+=== RUN   TestMissingBucketAndObjectAreDistinguished
+--- PASS: TestMissingBucketAndObjectAreDistinguished (0.00s)
+=== RUN   TestListingSkipsTheInternalDirectory
+--- PASS: TestListingSkipsTheInternalDirectory (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	1.929s
+=== RUN   TestBucketCapacityConcurrentCreationRespectsReserve
+--- PASS: TestBucketCapacityConcurrentCreationRespectsReserve (0.08s)
+=== RUN   TestBucketCapacityFenceFailureRetainsMetadata
+--- PASS: TestBucketCapacityFenceFailureRetainsMetadata (0.01s)
+=== RUN   TestBucketCapacityCreationChargesMetadata
+--- PASS: TestBucketCapacityCreationChargesMetadata (0.01s)
+=== RUN   TestBucketCapacityDeletionReleasesAfterReopen
+--- PASS: TestBucketCapacityDeletionReleasesAfterReopen (0.01s)
+=== RUN   TestBucketCapacityRefusalLeavesNoBucket
+--- PASS: TestBucketCapacityRefusalLeavesNoBucket (0.05s)
+=== RUN   TestBucketCapacityHoldPreventsDeletion
+--- PASS: TestBucketCapacityHoldPreventsDeletion (0.01s)
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible=1500119 charged=1500119 pending=1500119
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+--- PASS: TestCapacityFenceFailureRetainsReservation (0.38s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.04s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.06s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.05s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.05s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.05s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.05s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.05s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.05s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+--- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile (0.05s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.02s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.02s)
+=== RUN   TestMultipartCompletionAdmissionRefusalRetainsUpload
+--- PASS: TestMultipartCompletionAdmissionRefusalRetainsUpload (0.02s)
+=== RUN   TestMultipartBoundCompletionCleanupPreservesCommittedOutcome
+--- PASS: TestMultipartBoundCompletionCleanupPreservesCommittedOutcome (0.02s)
+=== RUN   TestMultipartCapacityHoldProtectsPart
+--- PASS: TestMultipartCapacityHoldProtectsPart (0.02s)
+=== RUN   TestMultipartConcurrentNamespaceAdmission
+--- PASS: TestMultipartConcurrentNamespaceAdmission (0.03s)
+=== RUN   TestMultipartSharedHostAdmission
+--- PASS: TestMultipartSharedHostAdmission (0.04s)
+=== RUN   TestMultipartPartsRespectNamespaceBudget
+--- PASS: TestMultipartPartsRespectNamespaceBudget (0.02s)
+=== RUN   TestMultipartAbortReleasesNamespaceCapacity
+--- PASS: TestMultipartAbortReleasesNamespaceCapacity (0.02s)
+=== RUN   TestMultipartCompletionReleasesPartCapacity
+--- PASS: TestMultipartCompletionReleasesPartCapacity (0.02s)
+=== RUN   TestMultipartManifestRecoveryBudget
+--- PASS: TestMultipartManifestRecoveryBudget (0.01s)
+=== RUN   TestMultipartRejectedReplacementPreservesPart
+--- PASS: TestMultipartRejectedReplacementPreservesPart (0.02s)
+=== RUN   TestMultipartManifestChargeMatchesScan
+--- PASS: TestMultipartManifestChargeMatchesScan (0.01s)
+=== RUN   TestMultipartReplacementChargesOnePart
+--- PASS: TestMultipartReplacementChargesOnePart (0.03s)
+=== RUN   TestCapacityPayloadAllocationBound
+=== RUN   TestCapacityPayloadAllocationBound/object/8388608
+    capacity_payload_read_test.go:139: kind=object payload=8388608 binding allocated=145696 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/object/67108864
+    capacity_payload_read_test.go:139: kind=object payload=67108864 binding allocated=172048 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/8388608
+    capacity_payload_read_test.go:139: kind=part payload=8388608 binding allocated=172968 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/67108864
+    capacity_payload_read_test.go:139: kind=part payload=67108864 binding allocated=160544 budget=4194304
+--- PASS: TestCapacityPayloadAllocationBound (0.68s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/8388608 (0.05s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/67108864 (0.36s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/8388608 (0.04s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/67108864 (0.23s)
+=== RUN   TestCapacityPayloadIdentities
+=== RUN   TestCapacityPayloadIdentities/object/0
+=== RUN   TestCapacityPayloadIdentities/object/257
+=== RUN   TestCapacityPayloadIdentities/part/0
+=== RUN   TestCapacityPayloadIdentities/part/257
+=== RUN   TestCapacityPayloadIdentities/legacy
+--- PASS: TestCapacityPayloadIdentities (0.02s)
+    --- PASS: TestCapacityPayloadIdentities/object/0 (0.00s)
+    --- PASS: TestCapacityPayloadIdentities/object/257 (0.00s)
+    --- PASS: TestCapacityPayloadIdentities/part/0 (0.00s)
+    --- PASS: TestCapacityPayloadIdentities/part/257 (0.00s)
+    --- PASS: TestCapacityPayloadIdentities/legacy (0.00s)
+=== RUN   TestCapacityPayloadInvalidRecords
+=== RUN   TestCapacityPayloadInvalidRecords/prefix
+=== RUN   TestCapacityPayloadInvalidRecords/header
+=== RUN   TestCapacityPayloadInvalidRecords/short
+=== RUN   TestCapacityPayloadInvalidRecords/long
+--- PASS: TestCapacityPayloadInvalidRecords (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/prefix (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/header (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/short (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/long (0.00s)
+=== RUN   TestCapacityPayloadNativeRefusals
+=== RUN   TestCapacityPayloadNativeRefusals/permission
+=== RUN   TestCapacityPayloadNativeRefusals/symlink
+--- PASS: TestCapacityPayloadNativeRefusals (0.01s)
+    --- PASS: TestCapacityPayloadNativeRefusals/permission (0.00s)
+    --- PASS: TestCapacityPayloadNativeRefusals/symlink (0.00s)
+=== RUN   TestCapacityPayloadUnknownAllocation
+    capacity_payload_read_test.go:260: unknown bytes=67108864 allocated=11520
+--- PASS: TestCapacityPayloadUnknownAllocation (0.01s)
+=== RUN   TestOrdinaryWritesShareNamespaceAdmission
+--- PASS: TestOrdinaryWritesShareNamespaceAdmission (0.03s)
+=== RUN   TestOrdinaryOverwriteAndReopenChargeOneRecord
+--- PASS: TestOrdinaryOverwriteAndReopenChargeOneRecord (0.02s)
+=== RUN   TestOrdinaryWritesRespectSharedHostBudget
+--- PASS: TestOrdinaryWritesRespectSharedHostBudget (0.03s)
+=== RUN   TestResourceCountFilesystemRefusalLeavesNoBucket
+    capacity_resource_count_test.go:101: two native stores hold 4096 actual resources
+--- PASS: TestResourceCountFilesystemRefusalLeavesNoBucket (2.91s)
+=== RUN   TestSaveCapacityConcurrentAdmission
+--- PASS: TestSaveCapacityConcurrentAdmission (0.05s)
+=== RUN   TestSaveCapacitySharesHostBudget
+--- PASS: TestSaveCapacitySharesHostBudget (0.04s)
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt/key
+=== RUN   TestSaveCapacityProjectsExactRecordAndReceipt/lon
+--- PASS: TestSaveCapacityProjectsExactRecordAndReceipt (0.05s)
+    --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt/key (0.02s)
+    --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt/lon (0.02s)
+=== RUN   TestSaveCapacityRefusesBeforeIntent
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304
+--- PASS: TestSaveCapacityRefusesBeforeIntent (0.19s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000 (0.02s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304 (0.02s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000 (0.01s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304 (0.04s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000 (0.02s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304 (0.03s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000 (0.02s)
+    --- PASS: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304 (0.03s)
+=== RUN   TestSaveCapacityChargesSuccessAndReplay
+--- PASS: TestSaveCapacityChargesSuccessAndReplay (0.02s)
+=== RUN   TestSaveCapacitySharesNamespace
+--- PASS: TestSaveCapacitySharesNamespace (0.04s)
+=== RUN   TestSaveCapacityRetainsInterruptedReservation
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/prepared
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/publishing
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/published
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/sync
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/terminal
+--- PASS: TestSaveCapacityRetainsInterruptedReservation (0.20s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/prepared (0.04s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/publishing (0.03s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/published (0.04s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/sync (0.04s)
+    --- PASS: TestSaveCapacityRetainsInterruptedReservation/terminal (0.05s)
+=== RUN   TestSaveCapacityReservesReceiptSpace
+--- PASS: TestSaveCapacityReservesReceiptSpace (0.28s)
+=== RUN   TestSaveCapacityReopenSettlesReservation
+=== RUN   TestSaveCapacityReopenSettlesReservation/prepared
+=== RUN   TestSaveCapacityReopenSettlesReservation/published
+--- PASS: TestSaveCapacityReopenSettlesReservation (0.03s)
+    --- PASS: TestSaveCapacityReopenSettlesReservation/prepared (0.02s)
+    --- PASS: TestSaveCapacityReopenSettlesReservation/published (0.02s)
+=== RUN   TestCapacityMutationAllocation
+=== RUN   TestCapacityMutationAllocation/put
+    capacity_scan_test.go:92: put with 8 MiB of existing payload: 293696 allocated bytes/op
+=== RUN   TestCapacityMutationAllocation/save
+    capacity_scan_test.go:92: save with 8 MiB of existing payload: 428056 allocated bytes/op
+=== RUN   TestCapacityMutationAllocation/delete
+    capacity_scan_test.go:92: delete with 8 MiB of existing payload: 170120 allocated bytes/op
+--- PASS: TestCapacityMutationAllocation (0.20s)
+    --- PASS: TestCapacityMutationAllocation/put (0.07s)
+    --- PASS: TestCapacityMutationAllocation/save (0.06s)
+    --- PASS: TestCapacityMutationAllocation/delete (0.07s)
+=== RUN   TestMultipartCompletionCapacityVersion
+=== RUN   TestMultipartCompletionCapacityVersion/#00
+=== RUN   TestMultipartCompletionCapacityVersion/verified_payload
+--- PASS: TestMultipartCompletionCapacityVersion (0.04s)
+    --- PASS: TestMultipartCompletionCapacityVersion/#00 (0.02s)
+    --- PASS: TestMultipartCompletionCapacityVersion/verified_payload (0.02s)
+=== RUN   TestDiskPutAndCopyAllocationBounded
+=== RUN   TestDiskPutAndCopyAllocationBounded/put
+=== RUN   TestDiskPutAndCopyAllocationBounded/copy
+--- PASS: TestDiskPutAndCopyAllocationBounded (2.63s)
+    --- PASS: TestDiskPutAndCopyAllocationBounded/put (1.33s)
+    --- PASS: TestDiskPutAndCopyAllocationBounded/copy (1.20s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (0.03s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.00s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.00s)
+=== RUN   TestBinaryRecordRoundTrip
+--- PASS: TestBinaryRecordRoundTrip (0.00s)
+=== RUN   TestOpenRecordSurvivesOverwriteAndDelete
+--- PASS: TestOpenRecordSurvivesOverwriteAndDelete (0.00s)
+=== RUN   TestBinaryRecordSurvivesReopen
+--- PASS: TestBinaryRecordSurvivesReopen (0.00s)
+=== RUN   TestLegacyJSONRecordReadableAndRewritten
+--- PASS: TestLegacyJSONRecordReadableAndRewritten (0.00s)
+=== RUN   TestMalformedBinaryRecordRefused
+=== RUN   TestMalformedBinaryRecordRefused/prefix
+=== RUN   TestMalformedBinaryRecordRefused/header-size
+=== RUN   TestMalformedBinaryRecordRefused/truncated-payload
+=== RUN   TestMalformedBinaryRecordRefused/extra-payload
+=== RUN   TestMalformedBinaryRecordRefused/version
+--- PASS: TestMalformedBinaryRecordRefused (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/prefix (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/header-size (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/truncated-payload (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/extra-payload (0.00s)
+    --- PASS: TestMalformedBinaryRecordRefused/version (0.00s)
+=== RUN   TestHeadAllocationBounded
+--- PASS: TestHeadAllocationBounded (1.21s)
+=== RUN   TestRecordWriteToCopiesOnlyRemainingPayload
+--- PASS: TestRecordWriteToCopiesOnlyRemainingPayload (0.00s)
+=== RUN   TestRecoveryHoldBlocksMutationUntilRelease
+--- PASS: TestRecoveryHoldBlocksMutationUntilRelease (0.03s)
+=== RUN   TestRecoveryHoldOutlivesTheStore
+--- PASS: TestRecoveryHoldOutlivesTheStore (0.01s)
+=== RUN   TestRecoveryHoldIdentityIsEnforced
+--- PASS: TestRecoveryHoldIdentityIsEnforced (0.01s)
+=== RUN   TestRecoveryHoldRefusesAStaleObservation
+--- PASS: TestRecoveryHoldRefusesAStaleObservation (0.01s)
+=== RUN   TestRecoveryHoldRefusesAMalformedRequest
+--- PASS: TestRecoveryHoldRefusesAMalformedRequest (0.00s)
+=== RUN   TestRecoveryHoldRefusesUnreadableState
+--- PASS: TestRecoveryHoldRefusesUnreadableState (0.04s)
+=== RUN   TestRuntimeReopensAfterInterruptedPublishing
+--- PASS: TestRuntimeReopensAfterInterruptedPublishing (0.01s)
+=== RUN   TestComputedChecksumSaveReplay
+=== RUN   TestComputedChecksumSaveReplay/put
+=== RUN   TestComputedChecksumSaveReplay/receipt
+--- PASS: TestComputedChecksumSaveReplay (0.02s)
+    --- PASS: TestComputedChecksumSaveReplay/put (0.01s)
+    --- PASS: TestComputedChecksumSaveReplay/receipt (0.01s)
+=== RUN   TestSaveRecoveryAtPublicationBoundaries
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/prepared
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/publishing
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/published
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/sync
+=== RUN   TestSaveRecoveryAtPublicationBoundaries/terminal
+--- PASS: TestSaveRecoveryAtPublicationBoundaries (0.03s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/prepared (0.00s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/publishing (0.00s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/published (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/sync (0.01s)
+    --- PASS: TestSaveRecoveryAtPublicationBoundaries/terminal (0.01s)
+=== RUN   TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete
+--- PASS: TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete (0.01s)
+=== RUN   TestSaveJournalBoundedAdmission
+=== RUN   TestSaveJournalBoundedAdmission/count
+=== RUN   TestSaveJournalBoundedAdmission/bytes
+=== RUN   TestSaveJournalBoundedAdmission/entry
+--- PASS: TestSaveJournalBoundedAdmission (0.01s)
+    --- PASS: TestSaveJournalBoundedAdmission/count (0.00s)
+    --- PASS: TestSaveJournalBoundedAdmission/bytes (0.01s)
+    --- PASS: TestSaveJournalBoundedAdmission/entry (0.00s)
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity
+=== RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal
+--- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence (0.01s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed (0.00s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity (0.00s)
+    --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal (0.00s)
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-raw
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-valid
+=== RUN   TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw
+--- PASS: TestSaveEvidenceMetadataCorruptionRefuses (0.04s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/pending-raw (0.03s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/pending-valid (0.00s)
+    --- PASS: TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw (0.01s)
+=== RUN   TestSaveLegacyRecordAndUnkeyedPublication
+--- PASS: TestSaveLegacyRecordAndUnkeyedPublication (0.00s)
+=== RUN   TestSaveInvalidRequestKeyRefusesAndReopens
+--- PASS: TestSaveInvalidRequestKeyRefusesAndReopens (0.00s)
+=== RUN   TestSaveMalformedLogicalOptionsRefuseBeforeEvidence
+--- PASS: TestSaveMalformedLogicalOptionsRefuseBeforeEvidence (0.02s)
+=== RUN   TestSaveMalformedLookupResourceRefuses
+--- PASS: TestSaveMalformedLookupResourceRefuses (0.00s)
+=== RUN   TestPrefixFullReadRetainsUnderlyingFailure
+--- PASS: TestPrefixFullReadRetainsUnderlyingFailure (0.00s)
+=== RUN   TestDiskStageOwnsBytesAndChecksums
+--- PASS: TestDiskStageOwnsBytesAndChecksums (0.00s)
+=== RUN   TestDiskStageRechecksConditionsAndCleansAbort
+--- PASS: TestDiskStageRechecksConditionsAndCleansAbort (0.00s)
+=== RUN   TestDiskStageFailurePreservesPublishedObject
+--- PASS: TestDiskStageFailurePreservesPublishedObject (0.00s)
+=== RUN   TestDiskStaleStageRemovedOnReopen
+--- PASS: TestDiskStaleStageRemovedOnReopen (0.00s)
+=== RUN   TestDiskStagePreventsCapacityRebindingUntilFinished
+--- PASS: TestDiskStagePreventsCapacityRebindingUntilFinished (0.01s)
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32C
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA1
+=== RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA256
+--- PASS: TestDiskStageVerifiesLargeStreamChecksums (0.02s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32 (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32C (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME (0.01s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA1 (0.00s)
+    --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA256 (0.00s)
+=== RUN   TestCompletionBufferAllocation
+=== RUN   TestCompletionBufferAllocation/bound=false/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8418976 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=false/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8428184 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8622912 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8643032 budget=10485760
+--- PASS: TestCompletionBufferAllocation (0.52s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=false (0.09s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=true (0.10s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=false (0.17s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=true (0.16s)
+=== RUN   TestCompletionBufferChecksums
+=== RUN   TestCompletionBufferChecksums/CRC32
+=== RUN   TestCompletionBufferChecksums/CRC32C
+=== RUN   TestCompletionBufferChecksums/CRC64NVME
+=== RUN   TestCompletionBufferChecksums/SHA1
+=== RUN   TestCompletionBufferChecksums/SHA256
+--- PASS: TestCompletionBufferChecksums (0.21s)
+    --- PASS: TestCompletionBufferChecksums/CRC32 (0.06s)
+    --- PASS: TestCompletionBufferChecksums/CRC32C (0.03s)
+    --- PASS: TestCompletionBufferChecksums/CRC64NVME (0.04s)
+    --- PASS: TestCompletionBufferChecksums/SHA1 (0.05s)
+    --- PASS: TestCompletionBufferChecksums/SHA256 (0.04s)
+=== RUN   TestFilesystemStoreBucketContract
+--- PASS: TestFilesystemStoreBucketContract (0.00s)
+=== RUN   TestFilesystemStoreObjectContract
+--- PASS: TestFilesystemStoreObjectContract (0.01s)
+=== RUN   TestFilesystemStoreMultipartContract
+--- PASS: TestFilesystemStoreMultipartContract (0.00s)
+=== RUN   TestFilesystemStoreListHonorsCancellation
+--- PASS: TestFilesystemStoreListHonorsCancellation (0.00s)
+=== RUN   TestStoreLockAdmitsOneOwnerAtATime
+--- PASS: TestStoreLockAdmitsOneOwnerAtATime (0.00s)
+=== RUN   TestStoreLockExcludesAnotherProcess
+--- PASS: TestStoreLockExcludesAnotherProcess (0.01s)
+=== RUN   TestFilesystemStoreSingleOwnerLock
+--- PASS: TestFilesystemStoreSingleOwnerLock (0.00s)
+=== RUN   TestFilesystemStoreObjectLifecycle
+--- PASS: TestFilesystemStoreObjectLifecycle (0.01s)
+=== RUN   TestFilesystemStoreRemovesStaleAtomicTempsOnOpen
+--- PASS: TestFilesystemStoreRemovesStaleAtomicTempsOnOpen (0.00s)
+=== RUN   TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock
+--- PASS: TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock (0.00s)
+=== RUN   TestFilesystemStoreRecoversStaleLockBeforeCleanup
+--- PASS: TestFilesystemStoreRecoversStaleLockBeforeCleanup (0.00s)
+=== RUN   TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover
+--- PASS: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.00s)
+=== RUN   TestFilesystemStoreUsesSingleObjectRecord
+--- PASS: TestFilesystemStoreUsesSingleObjectRecord (0.00s)
+=== RUN   TestFilesystemStoreOpaqueKeys
+--- PASS: TestFilesystemStoreOpaqueKeys (0.00s)
+=== RUN   TestFilesystemStoreMultipart
+--- PASS: TestFilesystemStoreMultipart (0.04s)
+=== RUN   TestFilesystemStoreDeleteBucketNotEmpty
+--- PASS: TestFilesystemStoreDeleteBucketNotEmpty (0.00s)
+=== RUN   TestFilesystemStoreDeletePrunesShards
+--- PASS: TestFilesystemStoreDeletePrunesShards (0.00s)
+=== RUN   TestFilesystemStoreDeleteBucketRefusesLongKeyObjects
+--- PASS: TestFilesystemStoreDeleteBucketRefusesLongKeyObjects (0.00s)
+=== RUN   TestFilesystemStoreCopyLongKey
+--- PASS: TestFilesystemStoreCopyLongKey (0.00s)
+=== RUN   TestFilesystemStoreDeleteObjectsWithLongKeys
+--- PASS: TestFilesystemStoreDeleteObjectsWithLongKeys (0.00s)
+=== RUN   TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide
+--- PASS: TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide (0.01s)
+=== RUN   TestFilesystemStoreReadsLegacyLongKeyShards
+--- PASS: TestFilesystemStoreReadsLegacyLongKeyShards (0.00s)
+=== RUN   TestFilesystemStoreLongKeysRoundTrip
+--- PASS: TestFilesystemStoreLongKeysRoundTrip (0.01s)
+=== RUN   TestFilesystemStoreShortKeysStayFlat
+--- PASS: TestFilesystemStoreShortKeysStayFlat (0.00s)
+=== RUN   TestFilesystemStoreLongestKeysUseBoundedPaths
+--- PASS: TestFilesystemStoreLongestKeysUseBoundedPaths (0.00s)
+=== RUN   TestFilesystemStoreBoundedPathsWithLongRootAndReopen
+--- PASS: TestFilesystemStoreBoundedPathsWithLongRootAndReopen (0.01s)
+=== RUN   TestFilesystemStoreCompletesMultipartUploadToBoundedPath
+--- PASS: TestFilesystemStoreCompletesMultipartUploadToBoundedPath (0.00s)
+=== RUN   TestFilesystemStoreListsMixedKeyLengths
+--- PASS: TestFilesystemStoreListsMixedKeyLengths (0.00s)
+=== RUN   TestMultipartOwnedHTTPTransfer
+2026/10/19 02:08:33 PUT /s3 400 74.35µs
+2026/10/19 02:08:33 PUT /s3 400 19.51µs
+2026/10/19 02:08:33 PUT /s3 200 4.903087ms
+--- PASS: TestMultipartOwnedHTTPTransfer (0.01s)
+=== RUN   TestMultipartOwnedHTTPAllocation
+=== RUN   TestMultipartOwnedHTTPAllocation/bound=false
+2026/10/19 02:08:33 PUT /s3 200 52.222471ms
+    part_http_owned_test.go:184: 8 MiB S3 UploadPart allocated 34527136 bytes
+=== RUN   TestMultipartOwnedHTTPAllocation/bound=true
+2026/10/19 02:08:33 PUT /s3 200 46.120227ms
+    part_http_owned_test.go:184: 8 MiB S3 UploadPart allocated 34602000 bytes
+--- PASS: TestMultipartOwnedHTTPAllocation (0.27s)
+    --- PASS: TestMultipartOwnedHTTPAllocation/bound=false (0.10s)
+    --- PASS: TestMultipartOwnedHTTPAllocation/bound=true (0.14s)
+=== RUN   TestMultipartOwnedRefusalsPreservePart
+--- PASS: TestMultipartOwnedRefusalsPreservePart (0.03s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	11.065s
+=== RUN   TestCheckpointCopyRefusesAncestorReplacement
+--- PASS: TestCheckpointCopyRefusesAncestorReplacement (0.00s)
+=== RUN   TestCheckpointCopyWorkersCompleteBeforeReturning
+--- PASS: TestCheckpointCopyWorkersCompleteBeforeReturning (0.00s)
+=== RUN   TestCheckpointCopyCancellationBeforeAdmission
+--- PASS: TestCheckpointCopyCancellationBeforeAdmission (0.00s)
+=== RUN   TestCheckpointCopyBoundsGrowingFile
+--- PASS: TestCheckpointCopyBoundsGrowingFile (0.00s)
+=== RUN   TestCheckpointPhaseProfile
+    checkpoint_phase_profile_test.go:17: set STOW_PROFILE_CHECKPOINT=1
+--- SKIP: TestCheckpointPhaseProfile (0.00s)
+=== RUN   TestPortableCheckpointRoundTripObjectsAndEmptyBuckets
+--- PASS: TestPortableCheckpointRoundTripObjectsAndEmptyBuckets (0.05s)
+=== RUN   TestPortableMetadataDiffAndDeltaRefusal
+--- PASS: TestPortableMetadataDiffAndDeltaRefusal (0.02s)
+=== RUN   TestPortableReplayVerifiesDedicatedPayload
+--- PASS: TestPortableReplayVerifiesDedicatedPayload (0.01s)
+=== RUN   TestPortableHostEditUsesLiveMetadataPolicy
+--- PASS: TestPortableHostEditUsesLiveMetadataPolicy (0.02s)
+=== RUN   TestPortableSensitiveObjectsRequireSenderAndReceiverConsent
+--- PASS: TestPortableSensitiveObjectsRequireSenderAndReceiverConsent (0.01s)
+=== RUN   TestPortableManifestRefusesInvalidInventory
+=== RUN   TestPortableManifestRefusesInvalidInventory/payload_traversal
+=== RUN   TestPortableManifestRefusesInvalidInventory/wrong_payload_hash
+=== RUN   TestPortableManifestRefusesInvalidInventory/metadata_prefix
+=== RUN   TestPortableManifestRefusesInvalidInventory/private_key
+=== RUN   TestPortableManifestRefusesInvalidInventory/composite_checksum
+=== RUN   TestPortableManifestRefusesInvalidInventory/duplicate_object
+=== RUN   TestPortableManifestRefusesInvalidInventory/missing_payload
+=== RUN   TestPortableManifestRefusesInvalidInventory/v1_with_objects
+=== RUN   TestPortableManifestRefusesInvalidInventory/missing_primary
+=== RUN   TestPortableManifestRefusesInvalidInventory/duplicate_bucket
+--- PASS: TestPortableManifestRefusesInvalidInventory (0.01s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/payload_traversal (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/wrong_payload_hash (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/metadata_prefix (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/private_key (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/composite_checksum (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/duplicate_object (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/missing_payload (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/v1_with_objects (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/missing_primary (0.00s)
+    --- PASS: TestPortableManifestRefusesInvalidInventory/duplicate_bucket (0.00s)
+=== RUN   TestPortableRestoreRefusesInvalidChecksumBeforeCreatingDestination
+--- PASS: TestPortableRestoreRefusesInvalidChecksumBeforeCreatingDestination (0.01s)
+=== RUN   TestCheckpointPublicationCancellationBeforeRename
+--- PASS: TestCheckpointPublicationCancellationBeforeRename (0.00s)
+=== RUN   TestCheckpointPublicationSyncFailureAfterRenameIsUnknown
+--- PASS: TestCheckpointPublicationSyncFailureAfterRenameIsUnknown (0.00s)
+=== RUN   TestCheckpointScansAndReadsObserveCancellation
+--- PASS: TestCheckpointScansAndReadsObserveCancellation (0.00s)
+=== RUN   TestCheckpointSyncFilesBoundedBeforeDirectories
+--- PASS: TestCheckpointSyncFilesBoundedBeforeDirectories (0.00s)
+=== RUN   TestCheckpointSyncFailurePreventsPublication
+--- PASS: TestCheckpointSyncFailurePreventsPublication (0.00s)
+=== RUN   TestCheckpointSyncFilesAlreadyCanceled
+--- PASS: TestCheckpointSyncFilesAlreadyCanceled (0.00s)
+=== RUN   TestHandoffParentSyncFailureRetainsPublishedBundle
+--- PASS: TestHandoffParentSyncFailureRetainsPublishedBundle (0.00s)
+=== RUN   TestPrepareRejectsOversizedInputBeforeDestinationMutation
+--- PASS: TestPrepareRejectsOversizedInputBeforeDestinationMutation (0.00s)
+=== RUN   TestPrepareSharesBudgetAcrossInputs
+--- PASS: TestPrepareSharesBudgetAcrossInputs (0.00s)
+=== RUN   TestCheckpointAdmissionStopsBeforeLaterInvalidInputs
+--- PASS: TestCheckpointAdmissionStopsBeforeLaterInvalidInputs (0.01s)
+=== RUN   TestPrepareRechecksInputSizeBeforeCopy
+--- PASS: TestPrepareRechecksInputSizeBeforeCopy (0.00s)
+=== RUN   TestPrepareAdmitsGitTreeBeforeCheckout
+--- PASS: TestPrepareAdmitsGitTreeBeforeCheckout (0.01s)
+=== RUN   TestPrepareSharesBudgetBetweenGitAndFiles
+--- PASS: TestPrepareSharesBudgetBetweenGitAndFiles (0.04s)
+=== RUN   TestPrepareAdmitsGitMetadataBeforeCheckout
+--- PASS: TestPrepareAdmitsGitMetadataBeforeCheckout (0.04s)
+=== RUN   TestCheckpointVerificationRejectsGrowthBeforeLaterInputs
+--- PASS: TestCheckpointVerificationRejectsGrowthBeforeLaterInputs (0.00s)
+=== RUN   TestCustomAbortPublication
+=== RUN   TestCustomAbortPublication/exists=false/success
+=== RUN   TestCustomAbortPublication/exists=false/committed
+=== RUN   TestCustomAbortPublication/exists=false/committed-missing
+=== RUN   TestCustomAbortPublication/exists=false/refused
+=== RUN   TestCustomAbortPublication/exists=true/success
+=== RUN   TestCustomAbortPublication/exists=true/committed
+=== RUN   TestCustomAbortPublication/exists=true/committed-missing
+=== RUN   TestCustomAbortPublication/exists=true/refused
+--- PASS: TestCustomAbortPublication (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=false/success (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=false/committed (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=false/committed-missing (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=false/refused (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=true/success (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=true/committed (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=true/committed-missing (0.00s)
+    --- PASS: TestCustomAbortPublication/exists=true/refused (0.00s)
+=== RUN   TestCustomCommittedAbortS3Error
+2026/10/19 02:08:34 DELETE /s3 500 55.81µs
+--- PASS: TestCustomCommittedAbortS3Error (0.00s)
+=== RUN   TestCustomAbortRetryAccounting
+=== RUN   TestCustomAbortRetryAccounting/exists=false/wrapped=false
+=== RUN   TestCustomAbortRetryAccounting/exists=false/wrapped=true
+=== RUN   TestCustomAbortRetryAccounting/exists=true/wrapped=false
+=== RUN   TestCustomAbortRetryAccounting/exists=true/wrapped=true
+--- PASS: TestCustomAbortRetryAccounting (0.00s)
+    --- PASS: TestCustomAbortRetryAccounting/exists=false/wrapped=false (0.00s)
+    --- PASS: TestCustomAbortRetryAccounting/exists=false/wrapped=true (0.00s)
+    --- PASS: TestCustomAbortRetryAccounting/exists=true/wrapped=false (0.00s)
+    --- PASS: TestCustomAbortRetryAccounting/exists=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedRuntimeRefusesWhatItsAuthorityDoesNotGrant
+--- PASS: TestEmbeddedRuntimeRefusesWhatItsAuthorityDoesNotGrant (0.00s)
+=== RUN   TestAnEmbeddedRuntimeWithoutAnAuthorityIsUnrestricted
+--- PASS: TestAnEmbeddedRuntimeWithoutAnAuthorityIsUnrestricted (0.00s)
+=== RUN   TestReadWriteWithholdsUpstreamAndDisposal
+--- PASS: TestReadWriteWithholdsUpstreamAndDisposal (0.00s)
+=== RUN   TestADerivedAuthorityIsWeakerAndNeverStronger
+--- PASS: TestADerivedAuthorityIsWeakerAndNeverStronger (0.00s)
+=== RUN   TestACheckpointOfALiveWorkspaceDoesNotNeedTheSession
+--- PASS: TestACheckpointOfALiveWorkspaceDoesNotNeedTheSession (0.01s)
+=== RUN   TestAnExternalCheckpointAgreesWithTheHandleOnWhatIsCaptured
+--- PASS: TestAnExternalCheckpointAgreesWithTheHandleOnWhatIsCaptured (0.01s)
+=== RUN   TestConcurrentCapturesOfOneWorkspaceRespectTheRetentionCap
+--- PASS: TestConcurrentCapturesOfOneWorkspaceRespectTheRetentionCap (0.00s)
+=== RUN   TestTheCaptureLockIsPerWorkspaceAndNotGlobal
+--- PASS: TestTheCaptureLockIsPerWorkspaceAndNotGlobal (0.00s)
+=== RUN   TestTheCaptureLockDoesNotDisturbTheSessionLock
+--- PASS: TestTheCaptureLockDoesNotDisturbTheSessionLock (0.01s)
+=== RUN   TestCheckpointGitReconstructionPreservesDeletion
+--- PASS: TestCheckpointGitReconstructionPreservesDeletion (0.08s)
+=== RUN   TestAPolicyCanDenyCapturingAWorkspace
+--- PASS: TestAPolicyCanDenyCapturingAWorkspace (0.01s)
+=== RUN   TestTheSamePolicyWithAllowLeavesCaptureWorking
+--- PASS: TestTheSamePolicyWithAllowLeavesCaptureWorking (0.01s)
+=== RUN   TestCaptureStillNeedsTheEnvironmentGrant
+--- PASS: TestCaptureStillNeedsTheEnvironmentGrant (0.01s)
+=== RUN   TestACaptureDenialLeavesNoCheckpointBehind
+--- PASS: TestACaptureDenialLeavesNoCheckpointBehind (0.01s)
+=== RUN   TestAnExternalCaptureIsRefusedByAPolicy
+--- PASS: TestAnExternalCaptureIsRefusedByAPolicy (0.01s)
+=== RUN   TestTheSameExternalPolicyWithAllowCaptures
+--- PASS: TestTheSameExternalPolicyWithAllowCaptures (0.01s)
+=== RUN   TestAnExternalCaptureStillNeedsTheEnvironmentGrant
+--- PASS: TestAnExternalCaptureStillNeedsTheEnvironmentGrant (0.01s)
+=== RUN   TestALegacyExternalCaptureIsUnboundAndSaysSo
+--- PASS: TestALegacyExternalCaptureIsUnboundAndSaysSo (0.01s)
+=== RUN   TestASourceThatCannotSayIsNotARefusal
+--- PASS: TestASourceThatCannotSayIsNotARefusal (0.01s)
+=== RUN   TestCheckpointRequestReplaySurvivesReopenAndCapacity
+--- PASS: TestCheckpointRequestReplaySurvivesReopenAndCapacity (0.00s)
+=== RUN   TestCheckpointRequestConflictMissingAndCorruption
+--- PASS: TestCheckpointRequestConflictMissingAndCorruption (0.00s)
+=== RUN   TestCaptureGateCoversHandleRequestsDestroyAndCleanup
+--- PASS: TestCaptureGateCoversHandleRequestsDestroyAndCleanup (0.01s)
+=== RUN   TestLookupWorkspaceDoesNotCreateRegistryAndRejectsTraversal
+--- PASS: TestLookupWorkspaceDoesNotCreateRegistryAndRejectsTraversal (0.00s)
+=== RUN   TestCancelledCapturePublishesNothing
+--- PASS: TestCancelledCapturePublishesNothing (0.00s)
+=== RUN   TestCheckpointExcludesSensitiveAndGitFiles
+--- PASS: TestCheckpointExcludesSensitiveAndGitFiles (0.00s)
+=== RUN   TestCheckpointDiffCapturesAddedChangedAndDeletedFiles
+--- PASS: TestCheckpointDiffCapturesAddedChangedAndDeletedFiles (0.01s)
+=== RUN   TestRestoreCreatesANewWorkspaceFromImmutableCheckpoint
+--- PASS: TestRestoreCreatesANewWorkspaceFromImmutableCheckpoint (0.01s)
+=== RUN   TestCheckpointRefusesCorruptFilesAndEnforcesLimits
+--- PASS: TestCheckpointRefusesCorruptFilesAndEnforcesLimits (0.01s)
+=== RUN   TestWorkspaceCheckpointCountCapRejectsWithoutEviction
+--- PASS: TestWorkspaceCheckpointCountCapRejectsWithoutEviction (0.01s)
+=== RUN   TestWorkspaceCheckpointByteCapCountsRetainedPayload
+--- PASS: TestWorkspaceCheckpointByteCapCountsRetainedPayload (0.01s)
+=== RUN   TestConcurrentCheckpointsRespectCountCap
+--- PASS: TestConcurrentCheckpointsRespectCountCap (0.01s)
+=== RUN   TestConcurrentDuplicateImportsPublishOnlyOneCheckpoint
+--- PASS: TestConcurrentDuplicateImportsPublishOnlyOneCheckpoint (0.00s)
+=== RUN   TestCheckpointArchiveRoundTripsToAnotherRegistryAndRestores
+--- PASS: TestCheckpointArchiveRoundTripsToAnotherRegistryAndRestores (0.01s)
+=== RUN   TestCheckpointArchiveRequiresSensitivePathOptIn
+--- PASS: TestCheckpointArchiveRequiresSensitivePathOptIn (0.01s)
+=== RUN   TestCheckpointImportRejectsCorruptAndTraversingArchives
+--- PASS: TestCheckpointImportRejectsCorruptAndTraversingArchives (0.00s)
+=== RUN   TestConditionalPutRefusesStaleWrites
+=== RUN   TestConditionalPutRefusesStaleWrites/memory
+=== RUN   TestConditionalPutRefusesStaleWrites/workspace
+=== RUN   TestConditionalPutRefusesStaleWrites/supplied-runtime
+--- PASS: TestConditionalPutRefusesStaleWrites (0.01s)
+    --- PASS: TestConditionalPutRefusesStaleWrites/memory (0.00s)
+    --- PASS: TestConditionalPutRefusesStaleWrites/workspace (0.01s)
+    --- PASS: TestConditionalPutRefusesStaleWrites/supplied-runtime (0.00s)
+=== RUN   TestConditionalPutRequiresExpectedAbsence
+=== RUN   TestConditionalPutRequiresExpectedAbsence/memory
+=== RUN   TestConditionalPutRequiresExpectedAbsence/workspace
+=== RUN   TestConditionalPutRequiresExpectedAbsence/supplied-runtime
+--- PASS: TestConditionalPutRequiresExpectedAbsence (0.01s)
+    --- PASS: TestConditionalPutRequiresExpectedAbsence/memory (0.00s)
+    --- PASS: TestConditionalPutRequiresExpectedAbsence/workspace (0.01s)
+    --- PASS: TestConditionalPutRequiresExpectedAbsence/supplied-runtime (0.00s)
+=== RUN   TestConditionalPutAllowsOneConcurrentWriter
+=== RUN   TestConditionalPutAllowsOneConcurrentWriter/memory
+=== RUN   TestConditionalPutAllowsOneConcurrentWriter/workspace
+=== RUN   TestConditionalPutAllowsOneConcurrentWriter/supplied-runtime
+--- PASS: TestConditionalPutAllowsOneConcurrentWriter (0.01s)
+    --- PASS: TestConditionalPutAllowsOneConcurrentWriter/memory (0.00s)
+    --- PASS: TestConditionalPutAllowsOneConcurrentWriter/workspace (0.01s)
+    --- PASS: TestConditionalPutAllowsOneConcurrentWriter/supplied-runtime (0.00s)
+=== RUN   TestConditionalPutRefusesUnqualifiedSuppliedStore
+--- PASS: TestConditionalPutRefusesUnqualifiedSuppliedStore (0.00s)
+=== RUN   TestADeltaWithARenamedDestinationIsRefusedOnTheDocumentDigest
+--- PASS: TestADeltaWithARenamedDestinationIsRefusedOnTheDocumentDigest (0.00s)
+=== RUN   TestAnUnalteredDeltaPassesTheDocumentDigest
+--- PASS: TestAnUnalteredDeltaPassesTheDocumentDigest (0.00s)
+=== RUN   TestTheDocumentDigestIsCaseInsensitiveAndTrimmed
+--- PASS: TestTheDocumentDigestIsCaseInsensitiveAndTrimmed (0.00s)
+=== RUN   TestAnEmptyExpectedDigestIsNotARejection
+--- PASS: TestAnEmptyExpectedDigestIsNotARejection (0.00s)
+=== RUN   TestTheDigestRefusalNamesBothValues
+--- PASS: TestTheDigestRefusalNamesBothValues (0.00s)
+=== RUN   TestDeltaDocumentDigestIsOverTheEncodedBytes
+--- PASS: TestDeltaDocumentDigestIsOverTheEncodedBytes (0.00s)
+=== RUN   TestRegressionDeltaWireRoundTrip
+--- PASS: TestRegressionDeltaWireRoundTrip (0.01s)
+=== RUN   TestRegressionDeltaCannotModifyBaseThroughTraversal
+--- PASS: TestRegressionDeltaCannotModifyBaseThroughTraversal (0.01s)
+=== RUN   TestRegressionDeltaVerifiesDigest
+--- PASS: TestRegressionDeltaVerifiesDigest (0.01s)
+=== RUN   TestRegressionDeltaPreservesModeChange
+--- PASS: TestRegressionDeltaPreservesModeChange (0.01s)
+=== RUN   TestRegressionARenamedDestinationUsedToApply
+--- PASS: TestRegressionARenamedDestinationUsedToApply (0.01s)
+=== RUN   TestADigestRefusesARenamedDestinationBeforeAnythingIsWritten
+--- PASS: TestADigestRefusesARenamedDestinationBeforeAnythingIsWritten (0.01s)
+=== RUN   TestTheCorrectDigestStillApplies
+--- PASS: TestTheCorrectDigestStillApplies (0.01s)
+=== RUN   TestADigestMismatchOutranksAConflict
+--- PASS: TestADigestMismatchOutranksAConflict (0.01s)
+=== RUN   TestADeltaBringsAThirdPointToTheTarget
+--- PASS: TestADeltaBringsAThirdPointToTheTarget (0.01s)
+=== RUN   TestADeltaSurvivesEncodingAndDecoding
+--- PASS: TestADeltaSurvivesEncodingAndDecoding (0.01s)
+=== RUN   TestApplyingADeltaWithContentThatFailsItsDigestIsRefused
+--- PASS: TestApplyingADeltaWithContentThatFailsItsDigestIsRefused (0.01s)
+=== RUN   TestDecodeDeltaRefusesAnOversizedDocument
+--- PASS: TestDecodeDeltaRefusesAnOversizedDocument (0.22s)
+=== RUN   TestApplyingADeltaToADivergedTargetIsAConflict
+--- PASS: TestApplyingADeltaToADivergedTargetIsAConflict (0.01s)
+=== RUN   TestADeltaRefusesWhenAnAddedPathAlreadyExists
+--- PASS: TestADeltaRefusesWhenAnAddedPathAlreadyExists (0.01s)
+=== RUN   TestADeltaIsBoundedByTheSameCapsAsAnArchive
+--- PASS: TestADeltaIsBoundedByTheSameCapsAsAnArchive (0.01s)
+=== RUN   TestADeltaRefusesAnUnknownVersion
+--- PASS: TestADeltaRefusesAnUnknownVersion (0.01s)
+=== RUN   TestADeltaRefusesToCrossWorkspaces
+--- PASS: TestADeltaRefusesToCrossWorkspaces (0.01s)
+=== RUN   TestFilesystemUnresolvedPendingKeepsObservation
+--- PASS: TestFilesystemUnresolvedPendingKeepsObservation (0.01s)
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties/same-bytes
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties/metadata
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties/content-type
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties/ABA
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties/delete-recreate
+=== RUN   TestGuardedSaveDetectsChangedGenerationAndProperties/reset
+--- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties (0.00s)
+    --- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties/same-bytes (0.00s)
+    --- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties/metadata (0.00s)
+    --- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties/content-type (0.00s)
+    --- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties/ABA (0.00s)
+    --- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties/delete-recreate (0.00s)
+    --- PASS: TestGuardedSaveDetectsChangedGenerationAndProperties/reset (0.00s)
+=== RUN   TestGuardedSaveAbsenceAndExplicitReplacement
+--- PASS: TestGuardedSaveAbsenceAndExplicitReplacement (0.00s)
+=== RUN   TestGuardedSaveRejectsUnboundOrAmbiguousConditions
+=== RUN   TestGuardedSaveRejectsUnboundOrAmbiguousConditions/zero
+=== RUN   TestGuardedSaveRejectsUnboundOrAmbiguousConditions/other-key
+=== RUN   TestGuardedSaveRejectsUnboundOrAmbiguousConditions/other-runtime
+=== RUN   TestGuardedSaveRejectsUnboundOrAmbiguousConditions/extra-condition
+--- PASS: TestGuardedSaveRejectsUnboundOrAmbiguousConditions (0.00s)
+    --- PASS: TestGuardedSaveRejectsUnboundOrAmbiguousConditions/zero (0.00s)
+    --- PASS: TestGuardedSaveRejectsUnboundOrAmbiguousConditions/other-key (0.00s)
+    --- PASS: TestGuardedSaveRejectsUnboundOrAmbiguousConditions/other-runtime (0.00s)
+    --- PASS: TestGuardedSaveRejectsUnboundOrAmbiguousConditions/extra-condition (0.00s)
+=== RUN   TestGuardedSaveTwoWritersOneCommit
+--- PASS: TestGuardedSaveTwoWritersOneCommit (0.00s)
+=== RUN   TestGuardedSaveRefusesUnqualifiedStores
+=== RUN   TestGuardedSaveRefusesUnqualifiedStores/workspace
+=== RUN   TestGuardedSaveRefusesUnqualifiedStores/supplied-runtime
+--- PASS: TestGuardedSaveRefusesUnqualifiedStores (0.00s)
+    --- PASS: TestGuardedSaveRefusesUnqualifiedStores/workspace (0.00s)
+    --- PASS: TestGuardedSaveRefusesUnqualifiedStores/supplied-runtime (0.00s)
+=== RUN   TestGuardedSavePreservesQuotaCancellationCloseAndAuthority
+--- PASS: TestGuardedSavePreservesQuotaCancellationCloseAndAuthority (0.00s)
+=== RUN   TestAdoptRefusesAnArchiveThatDoesNotMatchThePublishedDigest
+--- PASS: TestAdoptRefusesAnArchiveThatDoesNotMatchThePublishedDigest (0.01s)
+=== RUN   TestHandoffBundleMovesWithoutEditing
+--- PASS: TestHandoffBundleMovesWithoutEditing (0.01s)
+=== RUN   TestHandoffExportRejectsWrongWorkspaceBeforeWriting
+--- PASS: TestHandoffExportRejectsWrongWorkspaceBeforeWriting (0.01s)
+=== RUN   TestAdoptOpenedArchiveDoesNotReopenChangedBundle
+--- PASS: TestAdoptOpenedArchiveDoesNotReopenChangedBundle (0.01s)
+=== RUN   TestCustomInitiationPublication
+=== RUN   TestCustomInitiationPublication/exists=false/success/abort
+=== RUN   TestCustomInitiationPublication/exists=false/success/complete
+=== RUN   TestCustomInitiationPublication/exists=false/committed/abort
+=== RUN   TestCustomInitiationPublication/exists=false/committed/complete
+=== RUN   TestCustomInitiationPublication/exists=false/committed-missing/abort
+=== RUN   TestCustomInitiationPublication/exists=false/committed-missing/complete
+=== RUN   TestCustomInitiationPublication/exists=false/refused/abort
+=== RUN   TestCustomInitiationPublication/exists=false/refused/complete
+=== RUN   TestCustomInitiationPublication/exists=true/success/abort
+=== RUN   TestCustomInitiationPublication/exists=true/success/complete
+=== RUN   TestCustomInitiationPublication/exists=true/committed/abort
+=== RUN   TestCustomInitiationPublication/exists=true/committed/complete
+=== RUN   TestCustomInitiationPublication/exists=true/committed-missing/abort
+=== RUN   TestCustomInitiationPublication/exists=true/committed-missing/complete
+=== RUN   TestCustomInitiationPublication/exists=true/refused/abort
+=== RUN   TestCustomInitiationPublication/exists=true/refused/complete
+--- PASS: TestCustomInitiationPublication (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/success/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/success/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/committed/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/committed/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/committed-missing/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/committed-missing/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/refused/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=false/refused/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/success/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/success/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/committed/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/committed/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/committed-missing/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/committed-missing/complete (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/refused/abort (0.00s)
+    --- PASS: TestCustomInitiationPublication/exists=true/refused/complete (0.00s)
+=== RUN   TestCustomCommittedInitiationS3Error
+2026/10/19 02:08:34 POST /s3 500 50.68µs
+--- PASS: TestCustomCommittedInitiationS3Error (0.00s)
+=== RUN   TestTheDefaultRegistryIsNotTheDevelopersOwn
+--- PASS: TestTheDefaultRegistryIsNotTheDevelopersOwn (0.00s)
+=== RUN   TestListNamesEveryWorkspaceWithoutResumingOne
+--- PASS: TestListNamesEveryWorkspaceWithoutResumingOne (0.01s)
+=== RUN   TestListReportsAWorkspaceWhoseDirectoryIsGone
+--- PASS: TestListReportsAWorkspaceWhoseDirectoryIsGone (0.01s)
+=== RUN   TestListIsOrderedByHowQuietEachWorkspaceIs
+--- PASS: TestListIsOrderedByHowQuietEachWorkspaceIs (1.11s)
+=== RUN   TestListOrdersByIdleSecondsUsingAnInjectedClock
+--- PASS: TestListOrdersByIdleSecondsUsingAnInjectedClock (0.01s)
+=== RUN   TestListDistinguishesNoLifetimeFromExpiringNow
+--- PASS: TestListDistinguishesNoLifetimeFromExpiringNow (0.00s)
+=== RUN   TestListKeepsTeamsApart
+--- PASS: TestListKeepsTeamsApart (0.01s)
+=== RUN   TestListReportsTheRegistryItActuallyRead
+--- PASS: TestListReportsTheRegistryItActuallyRead (0.00s)
+=== RUN   TestListOfAnEmptyRegistryIsEmptyRatherThanAnError
+--- PASS: TestListOfAnEmptyRegistryIsEmptyRatherThanAnError (0.00s)
+=== RUN   TestListNeverCreatesAnything
+--- PASS: TestListNeverCreatesAnything (0.00s)
+=== RUN   TestCustomMultipartCompletionPublication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/success
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/retained
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/removed
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/removed-wrapped
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/unknown
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/unknown-missing
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/refused
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/success
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/retained
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/removed
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/removed-wrapped
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/unknown
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/unknown-missing
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/refused
+--- PASS: TestCustomMultipartCompletionPublication (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/success (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/retained (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/removed (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/removed-wrapped (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/unknown (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/unknown-missing (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=false/refused (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/success (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/retained (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/removed (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/removed-wrapped (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/unknown (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/unknown-missing (0.00s)
+    --- PASS: TestCustomMultipartCompletionPublication/overwrite=true/refused (0.00s)
+=== RUN   TestCustomMultipartCommittedCompletionS3Error
+2026/10/19 02:08:35 POST /s3 500 118.389µs
+--- PASS: TestCustomMultipartCommittedCompletionS3Error (0.00s)
+=== RUN   TestCustomMissingUploadS3Status
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/upload-part
+2026/10/19 02:08:35 PUT /s3 404 21.689µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/complete
+2026/10/19 02:08:35 POST /s3 404 12.67µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/abort
+2026/10/19 02:08:35 DELETE /s3 404 11.21µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/list-parts
+2026/10/19 02:08:35 GET /s3 404 95.629µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/upload-part
+2026/10/19 02:08:35 PUT /s3 404 12.49µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/complete
+2026/10/19 02:08:35 POST /s3 404 10.39µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/abort
+2026/10/19 02:08:35 DELETE /s3 404 10.51µs
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/list-parts
+2026/10/19 02:08:35 GET /s3 404 9.11µs
+--- PASS: TestCustomMissingUploadS3Status (0.00s)
+    --- PASS: TestCustomMissingUploadS3Status/wrapped=false (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=false/upload-part (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=false/complete (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=false/abort (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=false/list-parts (0.00s)
+    --- PASS: TestCustomMissingUploadS3Status/wrapped=true (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=true/upload-part (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=true/complete (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=true/abort (0.00s)
+        --- PASS: TestCustomMissingUploadS3Status/wrapped=true/list-parts (0.00s)
+=== RUN   TestObjectRecoveryHoldsPreserveObservedBytesAfterReopen
+--- PASS: TestObjectRecoveryHoldsPreserveObservedBytesAfterReopen (0.02s)
+=== RUN   TestObjectRecoveryHoldConditionsAndAuthority
+--- PASS: TestObjectRecoveryHoldConditionsAndAuthority (0.01s)
+=== RUN   TestPublicOpeningErrorClosesReader
+=== RUN   TestPublicOpeningErrorClosesReader/stream/close-ok
+=== RUN   TestPublicOpeningErrorClosesReader/stream/close-error
+=== RUN   TestPublicOpeningErrorClosesReader/get/close-ok
+=== RUN   TestPublicOpeningErrorClosesReader/get/close-error
+=== RUN   TestPublicOpeningErrorClosesReader/fallback-range/close-ok
+=== RUN   TestPublicOpeningErrorClosesReader/fallback-range/close-error
+=== RUN   TestPublicOpeningErrorClosesReader/native-range/close-ok
+=== RUN   TestPublicOpeningErrorClosesReader/native-range/close-error
+--- PASS: TestPublicOpeningErrorClosesReader (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/stream/close-ok (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/stream/close-error (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/get/close-ok (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/get/close-error (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/fallback-range/close-ok (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/fallback-range/close-error (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/native-range/close-ok (0.00s)
+    --- PASS: TestPublicOpeningErrorClosesReader/native-range/close-error (0.00s)
+=== RUN   TestPublicOpeningRangeCleanupOnce
+=== RUN   TestPublicOpeningRangeCleanupOnce/invalid-range
+=== RUN   TestPublicOpeningRangeCleanupOnce/skip-error
+--- PASS: TestPublicOpeningRangeCleanupOnce (0.00s)
+    --- PASS: TestPublicOpeningRangeCleanupOnce/invalid-range (0.00s)
+    --- PASS: TestPublicOpeningRangeCleanupOnce/skip-error (0.00s)
+=== RUN   TestCustomPartPublication
+=== RUN   TestCustomPartPublication/old=0/success
+=== RUN   TestCustomPartPublication/old=0/committed
+=== RUN   TestCustomPartPublication/old=0/committed-missing
+=== RUN   TestCustomPartPublication/old=0/refused
+=== RUN   TestCustomPartPublication/old=2/success
+=== RUN   TestCustomPartPublication/old=2/committed
+=== RUN   TestCustomPartPublication/old=2/committed-missing
+=== RUN   TestCustomPartPublication/old=2/refused
+=== RUN   TestCustomPartPublication/old=6/success
+=== RUN   TestCustomPartPublication/old=6/committed
+=== RUN   TestCustomPartPublication/old=6/committed-missing
+=== RUN   TestCustomPartPublication/old=6/refused
+--- PASS: TestCustomPartPublication (0.00s)
+    --- PASS: TestCustomPartPublication/old=0/success (0.00s)
+    --- PASS: TestCustomPartPublication/old=0/committed (0.00s)
+    --- PASS: TestCustomPartPublication/old=0/committed-missing (0.00s)
+    --- PASS: TestCustomPartPublication/old=0/refused (0.00s)
+    --- PASS: TestCustomPartPublication/old=2/success (0.00s)
+    --- PASS: TestCustomPartPublication/old=2/committed (0.00s)
+    --- PASS: TestCustomPartPublication/old=2/committed-missing (0.00s)
+    --- PASS: TestCustomPartPublication/old=2/refused (0.00s)
+    --- PASS: TestCustomPartPublication/old=6/success (0.00s)
+    --- PASS: TestCustomPartPublication/old=6/committed (0.00s)
+    --- PASS: TestCustomPartPublication/old=6/committed-missing (0.00s)
+    --- PASS: TestCustomPartPublication/old=6/refused (0.00s)
+=== RUN   TestCustomCommittedPartS3Error
+2026/10/19 02:08:35 PUT /s3 500 47.669µs
+--- PASS: TestCustomCommittedPartS3Error (0.00s)
+=== RUN   TestPrepareWorkspaceCopiesInputsIntoOwnedWorkingDirectory
+--- PASS: TestPrepareWorkspaceCopiesInputsIntoOwnedWorkingDirectory (0.01s)
+=== RUN   TestPrepareWorkspaceClonesAnExplicitGitRefWithoutTouchingSource
+--- PASS: TestPrepareWorkspaceClonesAnExplicitGitRefWithoutTouchingSource (0.05s)
+=== RUN   TestPrepareWorkspaceRejectsUnknownGitRefAndCleansRoot
+--- PASS: TestPrepareWorkspaceRejectsUnknownGitRefAndCleansRoot (0.02s)
+=== RUN   TestPrepareWorkspaceRejectsTraversalAndCleansItsOwnedPartialRoot
+--- PASS: TestPrepareWorkspaceRejectsTraversalAndCleansItsOwnedPartialRoot (0.00s)
+=== RUN   TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions
+=== RUN   TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions/symlink
+=== RUN   TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions/collision
+--- PASS: TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions (0.01s)
+    --- PASS: TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions/symlink (0.00s)
+    --- PASS: TestPrepareWorkspaceRejectsSymlinkInputsAndCollisions/collision (0.01s)
+=== RUN   TestPrepareWorkspaceRejectsNonPortableDestinationSegments
+=== RUN   TestPrepareWorkspaceRejectsNonPortableDestinationSegments/CON/output.txt
+=== RUN   TestPrepareWorkspaceRejectsNonPortableDestinationSegments/folder./output.txt
+=== RUN   TestPrepareWorkspaceRejectsNonPortableDestinationSegments/bad?/output.txt
+--- PASS: TestPrepareWorkspaceRejectsNonPortableDestinationSegments (0.01s)
+    --- PASS: TestPrepareWorkspaceRejectsNonPortableDestinationSegments/CON/output.txt (0.00s)
+    --- PASS: TestPrepareWorkspaceRejectsNonPortableDestinationSegments/folder./output.txt (0.00s)
+    --- PASS: TestPrepareWorkspaceRejectsNonPortableDestinationSegments/bad?/output.txt (0.00s)
+=== RUN   TestPrepareWorkspaceRequiresExplicitSensitiveInputOptIn
+--- PASS: TestPrepareWorkspaceRequiresExplicitSensitiveInputOptIn (0.01s)
+=== RUN   TestDefaultWorkspaceRegistryDirIsUnderTheConfigDirectory
+--- PASS: TestDefaultWorkspaceRegistryDirIsUnderTheConfigDirectory (0.00s)
+=== RUN   TestDefaultWorkspaceRegistryDirForTeamPartitions
+--- PASS: TestDefaultWorkspaceRegistryDirForTeamPartitions (0.00s)
+=== RUN   TestAllowNonePermitsNothing
+--- PASS: TestAllowNonePermitsNothing (0.00s)
+=== RUN   TestGetObjectOwnsReturnedBytesAndMetadata
+--- PASS: TestGetObjectOwnsReturnedBytesAndMetadata (0.00s)
+=== RUN   TestEmbeddedGetAllocationBounded
+--- PASS: TestEmbeddedGetAllocationBounded (3.33s)
+=== RUN   TestRegistryPolicyPersistsAndCannotBeWidenedByPrepare
+--- PASS: TestRegistryPolicyPersistsAndCannotBeWidenedByPrepare (0.01s)
+=== RUN   TestRegistryAdmissionSerializesLastWorkspaceSlot
+--- PASS: TestRegistryAdmissionSerializesLastWorkspaceSlot (0.01s)
+=== RUN   TestRegistryCheckpointCapsCoverCaptureImportAndDeletion
+--- PASS: TestRegistryCheckpointCapsCoverCaptureImportAndDeletion (0.01s)
+=== RUN   TestDeleteCheckpointRespectsReaderGateAndLineage
+--- PASS: TestDeleteCheckpointRespectsReaderGateAndLineage (0.01s)
+=== RUN   TestRegistryPolicyRejectsCorruptEntriesAndIgnoresStaging
+--- PASS: TestRegistryPolicyRejectsCorruptEntriesAndIgnoresStaging (0.00s)
+=== RUN   TestResumeRecoversAfterHolderIsKilled
+--- PASS: TestResumeRecoversAfterHolderIsKilled (0.03s)
+=== RUN   TestResumeReturnsTheSameWorkspace
+--- PASS: TestResumeReturnsTheSameWorkspace (0.01s)
+=== RUN   TestResumePreservesAuthorityAndQuotaAndRejectsWidening
+--- PASS: TestResumePreservesAuthorityAndQuotaAndRejectsWidening (0.01s)
+=== RUN   TestResumePreservesCheckpointRetentionLimits
+--- PASS: TestResumePreservesCheckpointRetentionLimits (0.01s)
+=== RUN   TestResumeRefusesLegacyRegistryEntryWithoutPolicy
+--- PASS: TestResumeRefusesLegacyRegistryEntryWithoutPolicy (0.00s)
+=== RUN   TestResumeRejectsAnUnknownID
+--- PASS: TestResumeRejectsAnUnknownID (0.00s)
+=== RUN   TestCollectRemovesAnExpiredUnusedWorkspace
+--- PASS: TestCollectRemovesAnExpiredUnusedWorkspace (0.01s)
+=== RUN   TestCollectNeverRemovesALiveWorkspace
+--- PASS: TestCollectNeverRemovesALiveWorkspace (0.01s)
+=== RUN   TestCollectNeverRemovesAnAdoptedWorkspace
+--- PASS: TestCollectNeverRemovesAnAdoptedWorkspace (0.00s)
+=== RUN   TestCollectKeepsAnUnexpiredWorkspace
+--- PASS: TestCollectKeepsAnUnexpiredWorkspace (0.00s)
+=== RUN   TestDestroyForgetsTheRegistryEntry
+--- PASS: TestDestroyForgetsTheRegistryEntry (0.01s)
+=== RUN   TestTouchMovesTheWindow
+--- PASS: TestTouchMovesTheWindow (0.02s)
+=== RUN   TestRuntimeDirectObjectLifecycle
+--- PASS: TestRuntimeDirectObjectLifecycle (0.00s)
+=== RUN   TestRuntimeObjectDeletion
+--- PASS: TestRuntimeObjectDeletion (0.00s)
+=== RUN   TestRuntimeEnforcesQuotas
+--- PASS: TestRuntimeEnforcesQuotas (0.00s)
+=== RUN   TestRuntimeInstancesAreIsolatedAndResettable
+--- PASS: TestRuntimeInstancesAreIsolatedAndResettable (0.00s)
+=== RUN   TestRuntimeListObjectsReturnsCursorPage
+--- PASS: TestRuntimeListObjectsReturnsCursorPage (0.00s)
+=== RUN   TestOpenRejectsUnsupportedBackend
+--- PASS: TestOpenRejectsUnsupportedBackend (0.00s)
+=== RUN   TestS3AbortRetryRecovery
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=false/abort
+2026/10/19 02:08:39 DELETE /s3 500 78.969µs
+2026/10/19 02:08:39 DELETE /s3 404 12.99µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=false/upload-part
+2026/10/19 02:08:39 DELETE /s3 500 6.16µs
+2026/10/19 02:08:39 PUT /s3 404 11.45µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=false/complete
+2026/10/19 02:08:39 DELETE /s3 500 5.34µs
+2026/10/19 02:08:39 POST /s3 404 8.97µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=false/list-parts
+2026/10/19 02:08:39 DELETE /s3 500 7.44µs
+2026/10/19 02:08:39 GET /s3 404 5.9µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=true/abort
+2026/10/19 02:08:39 DELETE /s3 500 7.72µs
+2026/10/19 02:08:39 DELETE /s3 404 6.14µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=true/upload-part
+2026/10/19 02:08:39 DELETE /s3 500 19.59µs
+2026/10/19 02:08:39 PUT /s3 404 13.14µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=true/complete
+2026/10/19 02:08:39 DELETE /s3 500 6.839µs
+2026/10/19 02:08:39 POST /s3 404 7.41µs
+=== RUN   TestS3AbortRetryRecovery/exists=false/wrapped=true/list-parts
+2026/10/19 02:08:39 DELETE /s3 500 7.5µs
+2026/10/19 02:08:39 GET /s3 404 7.249µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=false/abort
+2026/10/19 02:08:39 DELETE /s3 500 8.44µs
+2026/10/19 02:08:39 DELETE /s3 404 7.68µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=false/upload-part
+2026/10/19 02:08:39 DELETE /s3 500 7µs
+2026/10/19 02:08:39 PUT /s3 404 8.43µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=false/complete
+2026/10/19 02:08:39 DELETE /s3 500 4.74µs
+2026/10/19 02:08:39 POST /s3 404 5.22µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=false/list-parts
+2026/10/19 02:08:39 DELETE /s3 500 5.99µs
+2026/10/19 02:08:39 GET /s3 404 5.18µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=true/abort
+2026/10/19 02:08:39 DELETE /s3 500 4.93µs
+2026/10/19 02:08:39 DELETE /s3 404 4.6µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=true/upload-part
+2026/10/19 02:08:39 DELETE /s3 500 4.3µs
+2026/10/19 02:08:39 PUT /s3 404 5.59µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=true/complete
+2026/10/19 02:08:39 DELETE /s3 500 4.37µs
+2026/10/19 02:08:39 POST /s3 404 4.66µs
+=== RUN   TestS3AbortRetryRecovery/exists=true/wrapped=true/list-parts
+2026/10/19 02:08:39 DELETE /s3 500 4.86µs
+2026/10/19 02:08:39 GET /s3 404 85.129µs
+--- PASS: TestS3AbortRetryRecovery (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=false/abort (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=false/upload-part (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=false/complete (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=false/list-parts (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=true/abort (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=true/upload-part (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=true/complete (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=false/wrapped=true/list-parts (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=false/abort (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=false/upload-part (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=false/complete (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=false/list-parts (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=true/abort (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=true/upload-part (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=true/complete (0.00s)
+    --- PASS: TestS3AbortRetryRecovery/exists=true/wrapped=true/list-parts (0.00s)
+=== RUN   TestDurableSaveReplayRetainsOriginalEffect
+--- PASS: TestDurableSaveReplayRetainsOriginalEffect (0.01s)
+=== RUN   TestDurableSaveRequestCannotChangeMeaning
+=== RUN   TestDurableSaveRequestCannotChangeMeaning/bytes
+=== RUN   TestDurableSaveRequestCannotChangeMeaning/metadata
+=== RUN   TestDurableSaveRequestCannotChangeMeaning/content-type
+=== RUN   TestDurableSaveRequestCannotChangeMeaning/condition
+=== RUN   TestDurableSaveRequestCannotChangeMeaning/resource
+--- PASS: TestDurableSaveRequestCannotChangeMeaning (0.01s)
+    --- PASS: TestDurableSaveRequestCannotChangeMeaning/bytes (0.00s)
+    --- PASS: TestDurableSaveRequestCannotChangeMeaning/metadata (0.00s)
+    --- PASS: TestDurableSaveRequestCannotChangeMeaning/content-type (0.00s)
+    --- PASS: TestDurableSaveRequestCannotChangeMeaning/condition (0.00s)
+    --- PASS: TestDurableSaveRequestCannotChangeMeaning/resource (0.00s)
+=== RUN   TestFilesystemGuardComparesGenerationAndMetadata
+--- PASS: TestFilesystemGuardComparesGenerationAndMetadata (0.01s)
+=== RUN   TestDurableSaveReplayPrecedesChangedQuotaAdmission
+--- PASS: TestDurableSaveReplayPrecedesChangedQuotaAdmission (0.01s)
+=== RUN   TestDurableSaveCurrentAuthorityAndLifecycle
+--- PASS: TestDurableSaveCurrentAuthorityAndLifecycle (0.01s)
+=== RUN   TestSaveRequestUnqualifiedProfilesRefuseBeforeMutation
+=== RUN   TestSaveRequestUnqualifiedProfilesRefuseBeforeMutation/workspace
+=== RUN   TestSaveRequestUnqualifiedProfilesRefuseBeforeMutation/supplied-runtime
+--- PASS: TestSaveRequestUnqualifiedProfilesRefuseBeforeMutation (0.00s)
+    --- PASS: TestSaveRequestUnqualifiedProfilesRefuseBeforeMutation/workspace (0.00s)
+    --- PASS: TestSaveRequestUnqualifiedProfilesRefuseBeforeMutation/supplied-runtime (0.00s)
+=== RUN   TestFilesystemConstructorValidationOwnershipAndLockCleanup
+--- PASS: TestFilesystemConstructorValidationOwnershipAndLockCleanup (0.00s)
+=== RUN   TestDurableSaveConcurrentWritersPublishOneEffect
+--- PASS: TestDurableSaveConcurrentWritersPublishOneEffect (0.01s)
+=== RUN   TestStagedWriteReservesQuotaWithoutBlockingReads
+--- PASS: TestStagedWriteReservesQuotaWithoutBlockingReads (0.00s)
+=== RUN   TestStreamDeclaredSizeMismatchLeavesPreviousObjectAndQuotaIntact
+=== RUN   TestStreamDeclaredSizeMismatchLeavesPreviousObjectAndQuotaIntact/short
+=== RUN   TestStreamDeclaredSizeMismatchLeavesPreviousObjectAndQuotaIntact/too_long
+--- PASS: TestStreamDeclaredSizeMismatchLeavesPreviousObjectAndQuotaIntact (0.00s)
+    --- PASS: TestStreamDeclaredSizeMismatchLeavesPreviousObjectAndQuotaIntact/short (0.00s)
+    --- PASS: TestStreamDeclaredSizeMismatchLeavesPreviousObjectAndQuotaIntact/too_long (0.00s)
+=== RUN   TestCustomStoreCopyPublication
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=false/success
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=false/committed
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=false/committed-missing
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=false/refused
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=true/success
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=true/committed
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=true/committed-missing
+=== RUN   TestCustomStoreCopyPublication/optional=false/overwrite=true/refused
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=false/success
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=false/committed
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=false/committed-missing
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=false/refused
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=true/success
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=true/committed
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=true/committed-missing
+=== RUN   TestCustomStoreCopyPublication/optional=true/overwrite=true/refused
+--- PASS: TestCustomStoreCopyPublication (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=false/success (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=false/committed (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=false/committed-missing (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=false/refused (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=true/success (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=true/committed (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=true/committed-missing (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=false/overwrite=true/refused (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=false/success (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=false/committed (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=false/committed-missing (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=false/refused (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=true/success (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=true/committed (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=true/committed-missing (0.00s)
+    --- PASS: TestCustomStoreCopyPublication/optional=true/overwrite=true/refused (0.00s)
+=== RUN   TestAStoreWithMultipartIsAdvertisedAsSupportingIt
+--- PASS: TestAStoreWithMultipartIsAdvertisedAsSupportingIt (0.00s)
+=== RUN   TestAStoreWithoutMultipartStillServesEverythingElse
+--- PASS: TestAStoreWithoutMultipartStillServesEverythingElse (0.00s)
+=== RUN   TestCustomStoreBufferedPutPublication
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=false/success
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=false/committed
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=false/committed-missing
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=false/refused
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=true/success
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=true/committed
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=true/committed-missing
+=== RUN   TestCustomStoreBufferedPutPublication/overwrite=true/refused
+--- PASS: TestCustomStoreBufferedPutPublication (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=false/success (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=false/committed (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=false/committed-missing (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=false/refused (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=true/success (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=true/committed (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=true/committed-missing (0.00s)
+    --- PASS: TestCustomStoreBufferedPutPublication/overwrite=true/refused (0.00s)
+=== RUN   TestOpenAcceptsACallerSuppliedStore
+--- PASS: TestOpenAcceptsACallerSuppliedStore (0.00s)
+=== RUN   TestTheAdapterCarriesPrefixAndLimitAcross
+--- PASS: TestTheAdapterCarriesPrefixAndLimitAcross (0.00s)
+=== RUN   TestAStoreWithoutMultipartIsAdvertisedAsNotSupportingIt
+--- PASS: TestAStoreWithoutMultipartIsAdvertisedAsNotSupportingIt (0.00s)
+=== RUN   TestAStoreWithNoMultipartStillOpensWhenItAlreadyHasBuckets
+--- PASS: TestAStoreWithNoMultipartStillOpensWhenItAlreadyHasBuckets (0.00s)
+=== RUN   TestAuthorityStillAppliesOverASuppliedStore
+--- PASS: TestAuthorityStillAppliesOverASuppliedStore (0.00s)
+=== RUN   TestClosingTheEnvironmentClosesTheSuppliedStore
+--- PASS: TestClosingTheEnvironmentClosesTheSuppliedStore (0.00s)
+=== RUN   TestANilStoreIsStillTheMemoryBackend
+--- PASS: TestANilStoreIsStillTheMemoryBackend (0.00s)
+=== RUN   TestDifferentStoresAreDifferentConfigurationsOfOneConstructor
+--- PASS: TestDifferentStoresAreDifferentConfigurationsOfOneConstructor (0.00s)
+=== RUN   TestOpenObjectUsesMetadataOnlyInitializationAndLazyReads
+--- PASS: TestOpenObjectUsesMetadataOnlyInitializationAndLazyReads (0.00s)
+=== RUN   TestObjectStreamsHonorCancellationAndClosedRuntime
+=== RUN   TestObjectStreamsHonorCancellationAndClosedRuntime/cancel
+=== RUN   TestObjectStreamsHonorCancellationAndClosedRuntime/close
+--- PASS: TestObjectStreamsHonorCancellationAndClosedRuntime (0.00s)
+    --- PASS: TestObjectStreamsHonorCancellationAndClosedRuntime/cancel (0.00s)
+    --- PASS: TestObjectStreamsHonorCancellationAndClosedRuntime/close (0.00s)
+=== RUN   TestObjectRangeReturnsRequestedBytesAndWholeObjectMetadata
+--- PASS: TestObjectRangeReturnsRequestedBytesAndWholeObjectMetadata (0.00s)
+=== RUN   TestATeamsWorkspacesLiveInSeparatePartitions
+--- PASS: TestATeamsWorkspacesLiveInSeparatePartitions (0.01s)
+=== RUN   TestASweepInOneTeamCannotRemoveAnotherTeamsWorkspace
+--- PASS: TestASweepInOneTeamCannotRemoveAnotherTeamsWorkspace (0.01s)
+=== RUN   TestResumingATeamWorkspaceRequiresTheTeam
+--- PASS: TestResumingATeamWorkspaceRequiresTheTeam (0.01s)
+=== RUN   TestARegistryRootAndATeamCompose
+--- PASS: TestARegistryRootAndATeamCompose (0.00s)
+=== RUN   TestTeamNamesAreValidatedRatherThanRewritten
+--- PASS: TestTeamNamesAreValidatedRatherThanRewritten (0.03s)
+=== RUN   TestWasmExcludesNativeDependencies
+--- PASS: TestWasmExcludesNativeDependencies (0.13s)
+=== RUN   TestAdministrativeDestroyRefusesLiveRestrictedActorAndDeletesAfterClose
+=== RUN   TestAdministrativeDestroyRefusesLiveRestrictedActorAndDeletesAfterClose/bucket.list,_object.list,_object.read
+=== RUN   TestAdministrativeDestroyRefusesLiveRestrictedActorAndDeletesAfterClose/bucket.create,_bucket.delete,_bucket.list,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_workspace.capture
+--- PASS: TestAdministrativeDestroyRefusesLiveRestrictedActorAndDeletesAfterClose (0.02s)
+    --- PASS: TestAdministrativeDestroyRefusesLiveRestrictedActorAndDeletesAfterClose/bucket.list,_object.list,_object.read (0.01s)
+    --- PASS: TestAdministrativeDestroyRefusesLiveRestrictedActorAndDeletesAfterClose/bucket.create,_bucket.delete,_bucket.list,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_workspace.capture (0.01s)
+=== RUN   TestAdministrativeDestroyRefusesAdoptedDirectoryWithoutPolicyChange
+--- PASS: TestAdministrativeDestroyRefusesAdoptedDirectoryWithoutPolicyChange (0.01s)
+=== RUN   TestAdministrativeDestroyRefusesProtectedDirectoryWithoutPolicyChange
+--- PASS: TestAdministrativeDestroyRefusesProtectedDirectoryWithoutPolicyChange (0.01s)
+=== RUN   TestAdministrativeDestroyRefusesMismatchedWorkspaceIdentity
+--- PASS: TestAdministrativeDestroyRefusesMismatchedWorkspaceIdentity (0.01s)
+=== RUN   TestAdministrativeDestroyHonorsCancellationCaptureAndCheckpointCleanup
+--- PASS: TestAdministrativeDestroyHonorsCancellationCaptureAndCheckpointCleanup (0.01s)
+=== RUN   TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt
+=== RUN   TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt/bucket.list,_object.list,_object.read
+=== RUN   TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt/bucket.create,_bucket.delete,_bucket.list,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_workspace.capture
+=== RUN   TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt/bucket.create,_bucket.delete,_bucket.list,_environment.promote,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_upstream.read,_upstream.write,_workspace.capture
+--- PASS: TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt (0.01s)
+    --- PASS: TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt/bucket.list,_object.list,_object.read (0.00s)
+    --- PASS: TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt/bucket.create,_bucket.delete,_bucket.list,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_workspace.capture (0.00s)
+    --- PASS: TestDestroyRefusesRestrictedOwnedWorkspaceWithoutChangingIt/bucket.create,_bucket.delete,_bucket.list,_environment.promote,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_upstream.read,_upstream.write,_workspace.capture (0.00s)
+=== RUN   TestDestroyConsultsResolvedAuthorityAfterClose
+--- PASS: TestDestroyConsultsResolvedAuthorityAfterClose (0.00s)
+=== RUN   TestExplicitDestroyGrantDoesNotRequireObjectWrite
+--- PASS: TestExplicitDestroyGrantDoesNotRequireObjectWrite (0.00s)
+=== RUN   TestPrepareRollbackCleansRestrictedStagingWithoutGrantingDestroy
+=== RUN   TestPrepareRollbackCleansRestrictedStagingWithoutGrantingDestroy/bucket.list,_object.list,_object.read
+=== RUN   TestPrepareRollbackCleansRestrictedStagingWithoutGrantingDestroy/bucket.create,_bucket.delete,_bucket.list,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_workspace.capture
+--- PASS: TestPrepareRollbackCleansRestrictedStagingWithoutGrantingDestroy (0.01s)
+    --- PASS: TestPrepareRollbackCleansRestrictedStagingWithoutGrantingDestroy/bucket.list,_object.list,_object.read (0.01s)
+    --- PASS: TestPrepareRollbackCleansRestrictedStagingWithoutGrantingDestroy/bucket.create,_bucket.delete,_bucket.list,_environment.reset,_object.delete,_object.list,_object.read,_object.write,_workspace.capture (0.01s)
+=== RUN   TestWorkspaceFacadeSharesRuntimeAndRefreshesHostWrites
+2026/10/19 02:08:39 PUT /s3 200 1.541083ms
+2026/10/19 02:08:39 PUT /s3 200 1.659182ms
+2026/10/19 02:08:39 PUT /s3 507 187.579µs
+2026/10/19 02:08:39 PUT /s3 200 1.198587ms
+2026/10/19 02:08:39 GET /s3 403 45.32µs
+--- PASS: TestWorkspaceFacadeSharesRuntimeAndRefreshesHostWrites (1.59s)
+=== RUN   TestWorkspaceFacadeConcurrentLifecycle
+--- PASS: TestWorkspaceFacadeConcurrentLifecycle (0.00s)
+=== RUN   TestPreparedWorkspaceCountsSeedUsage
+--- PASS: TestPreparedWorkspaceCountsSeedUsage (0.00s)
+=== RUN   TestWorkspaceFacadeReadOnlyAuthority
+2026/10/19 02:08:41 GET /s3 200 1.380656ms
+2026/10/19 02:08:41 PUT /s3 403 115.308µs
+--- PASS: TestWorkspaceFacadeReadOnlyAuthority (0.01s)
+=== RUN   TestZeroMaxWorkspacesIsUnlimited
+--- PASS: TestZeroMaxWorkspacesIsUnlimited (0.02s)
+=== RUN   TestPrepareRefusesWhenTheRegistryIsFull
+--- PASS: TestPrepareRefusesWhenTheRegistryIsFull (0.01s)
+=== RUN   TestTheBoundIsOnTheTeamPartitionNotTheRoot
+--- PASS: TestTheBoundIsOnTheTeamPartitionNotTheRoot (0.01s)
+=== RUN   TestTheBoundCountsRecordsWhoseDirectoriesAreGone
+--- PASS: TestTheBoundCountsRecordsWhoseDirectoriesAreGone (0.00s)
+=== RUN   TestWorkspaceFacadeRejectsStaleMultipartWriteAfterHostEdit
+2026/10/19 02:08:41 POST /s3 200 928.361µs
+2026/10/19 02:08:41 PUT /s3 200 735.842µs
+2026/10/19 02:08:41 POST /s3 200 1.986648ms
+2026/10/19 02:08:41 PUT /s3 412 931.609µs
+2026/10/19 02:08:41 GET /s3 200 120.468µs
+--- PASS: TestWorkspaceFacadeRejectsStaleMultipartWriteAfterHostEdit (0.01s)
+=== RUN   TestAPolicyCanDenyDestroyWhereTheEnvironmentGrantsIt
+--- PASS: TestAPolicyCanDenyDestroyWhereTheEnvironmentGrantsIt (0.01s)
+=== RUN   TestTheSamePolicyWithAllowLeavesDestroyWorking
+--- PASS: TestTheSamePolicyWithAllowLeavesDestroyWorking (0.01s)
+=== RUN   TestAPolicyIsACompleteStatementAboutAKindNotAPatch
+--- PASS: TestAPolicyIsACompleteStatementAboutAKindNotAPatch (0.01s)
+=== RUN   TestAWholeWorkspaceDestroyIsNotNarrowedToAGrantedSubtree
+--- PASS: TestAWholeWorkspaceDestroyIsNotNarrowedToAGrantedSubtree (0.01s)
+=== RUN   TestAPolicyThatSaysNothingAboutWorkspacesStillRefusesDestroy
+--- PASS: TestAPolicyThatSaysNothingAboutWorkspacesStillRefusesDestroy (0.01s)
+=== RUN   TestAPolicyNamingNoKindGrantsNothingAtAll
+--- PASS: TestAPolicyNamingNoKindGrantsNothingAtAll (0.00s)
+=== RUN   TestDestroyStillNeedsTheEnvironmentGrant
+--- PASS: TestDestroyStillNeedsTheEnvironmentGrant (0.01s)
+=== RUN   TestNoPolicyMeansDestroyBehavesAsItDid
+--- PASS: TestNoPolicyMeansDestroyBehavesAsItDid (0.00s)
+=== RUN   TestWorkspaceIndexFailureReportsCommittedPublication
+--- PASS: TestWorkspaceIndexFailureReportsCommittedPublication (0.01s)
+=== RUN   TestParallelPreparedWorkspacesStayIsolatedAndCleanUp
+--- PASS: TestParallelPreparedWorkspacesStayIsolatedAndCleanUp (0.10s)
+=== RUN   TestWorkspaceServesAFileTheHostWrote
+--- PASS: TestWorkspaceServesAFileTheHostWrote (0.00s)
+=== RUN   TestWorkspaceWritesARealFile
+--- PASS: TestWorkspaceWritesARealFile (0.01s)
+=== RUN   TestWorkspacePathAnswersWithoutReading
+--- PASS: TestWorkspacePathAnswersWithoutReading (0.01s)
+=== RUN   TestWorkspaceIsPersistentAndBounded
+--- PASS: TestWorkspaceIsPersistentAndBounded (0.01s)
+=== RUN   TestCloseLeavesTheData
+--- PASS: TestCloseLeavesTheData (0.00s)
+=== RUN   TestOpenWorkspaceRequiresADirectory
+--- PASS: TestOpenWorkspaceRequiresADirectory (0.00s)
+=== RUN   TestOpenWorkspaceAcceptsAReadOnlyAuthorityAndRefusesWrites
+--- PASS: TestOpenWorkspaceAcceptsAReadOnlyAuthorityAndRefusesWrites (0.00s)
+=== RUN   TestOpenRefusesTheWorkspaceBackend
+--- PASS: TestOpenRefusesTheWorkspaceBackend (0.00s)
+=== RUN   TestOpenStillServesMemory
+--- PASS: TestOpenStillServesMemory (0.00s)
+=== RUN   TestAdoptingAnExistingDirectory
+--- PASS: TestAdoptingAnExistingDirectory (0.00s)
+=== RUN   TestDestroyRemovesAWorkspaceStowCreated
+--- PASS: TestDestroyRemovesAWorkspaceStowCreated (0.01s)
+=== RUN   TestDestroyRefusesAnAdoptedWorkspace
+--- PASS: TestDestroyRefusesAnAdoptedWorkspace (0.00s)
+=== RUN   TestDestroyIsIdempotent
+--- PASS: TestDestroyIsIdempotent (0.01s)
+=== RUN   TestCloseThenDestroy
+--- PASS: TestCloseThenDestroy (0.01s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	7.901s

@@ -4,9 +4,21 @@ import { test } from "node:test";
 import { AsyncEmbeddedStow } from "../dist/async-embedded.js";
 import { decodeEmbeddedResponse, type EmbeddedCapabilities } from "../dist/embedded.js";
 import { loadNodeWasmHost } from "../dist/node-wasm-host.js";
+import { BrowserPersistenceError } from "../src/browser-types.js";
 import { ContentObjectHost } from "../src/content-object-host.js";
 import { ContentStore } from "../src/content-store.js";
 import { MemoryContentAdapter } from "./content-fixtures.js";
+
+async function openHostStreams(adapter: MemoryContentAdapter) {
+  const wasm = await loadNodeWasmHost();
+  await adapter.open("stream-test");
+  const content = new ContentStore(adapter, { cacheBytes: 262_144, chunkBytes: 262_144 });
+  const storage = new ContentObjectHost(content, { maxStreams: 64 });
+  const receipt = await wasm.openHost(JSON.stringify({ version: 2, op: "open", options: { maxBytes: 10_000_000, maxObjects: 5 } }), storage);
+  const opened = decodeEmbeddedResponse<{ handle: number; capabilities: EmbeddedCapabilities }>(JSON.parse(receipt.metadata), 2);
+  const runtime = AsyncEmbeddedStow.attach({ callBinary: (request, data) => wasm.callBinaryAsync(request, data) }, opened.handle, opened.capabilities);
+  return { wasm, content, runtime };
+}
 
 test("real Go host streams preserve snapshots, avoid lifetime locks, and free reservations on cancellation", async (t) => {
   try { await access(new URL("../dist/stow-runtime.wasm", import.meta.url)); } catch {
@@ -14,14 +26,8 @@ test("real Go host streams preserve snapshots, avoid lifetime locks, and free re
     t.skip("WASM asset is built by the WASM test target");
     return;
   }
-  const wasm = await loadNodeWasmHost();
   const adapter = new MemoryContentAdapter();
-  await adapter.open("stream-test");
-  const content = new ContentStore(adapter, { cacheBytes: 262_144, chunkBytes: 262_144 });
-  const storage = new ContentObjectHost(content, { maxStreams: 64 });
-  const receipt = await wasm.openHost(JSON.stringify({ version: 2, op: "open", options: { maxBytes: 10_000_000, maxObjects: 5 } }), storage);
-  const opened = decodeEmbeddedResponse<{ handle: number; capabilities: EmbeddedCapabilities }>(JSON.parse(receipt.metadata), 2);
-  const runtime = AsyncEmbeddedStow.attach({ callBinary: (request, data) => wasm.callBinaryAsync(request, data) }, opened.handle, opened.capabilities);
+  const { wasm, content, runtime } = await openHostStreams(adapter);
   try {
     await runtime.createBucket("assets");
     await runtime.putObject("assets", "base", new Uint8Array([1, 2, 3, 4]));
@@ -59,6 +65,49 @@ test("real Go host streams preserve snapshots, avoid lifetime locks, and free re
     const reopened = await runtime.getObjectStream("assets", "base");
     await reopened.close();
     assert.equal(adapter.database.get("stream-test")?.protections.size, 0);
+  } finally {
+    await runtime.close();
+    await adapter.close();
+    await wasm.close();
+  }
+});
+
+class FailingReleaseAdapter extends MemoryContentAdapter {
+  releaseFailures = 0;
+  releaseAttempts = 0;
+
+  override async protect(name: string, ids: string[], options: { lifetime?: "handle" | "durable" } = {}): Promise<void> {
+    if (options.lifetime === "handle" && ids.length === 0) {
+      this.releaseAttempts++;
+      if (this.releaseFailures > 0) {
+        this.releaseFailures--;
+        throw new BrowserPersistenceError("persistence_error", "injected protection release failure");
+      }
+    }
+    await super.protect(name, ids, options);
+  }
+}
+
+test("real Go host retains failed read releases until storage acknowledges cleanup", async () => {
+  const adapter = new FailingReleaseAdapter();
+  const { wasm, runtime } = await openHostStreams(adapter);
+  try {
+    await runtime.createBucket("assets");
+    await runtime.putObject("assets", "base", new Uint8Array([1, 2, 3, 4]));
+    const readers = await Promise.all(Array.from({ length: 16 }, () => runtime.getObjectStream("assets", "base")));
+    const reader = readers[0];
+    assert.ok(reader);
+    adapter.releaseFailures = 1;
+    await assert.rejects(reader.close(), { code: "runtime_error", message: /injected protection release failure/ });
+    assert.equal((await adapter.listProtections()).length, 16);
+    await assert.rejects(runtime.getObjectStream("assets", "base"), { code: "quota_exceeded" });
+    await Promise.all([reader.close(), reader.close()]);
+    assert.equal(adapter.releaseAttempts, 2);
+    assert.equal((await adapter.listProtections()).length, 15);
+    const reopened = await runtime.getObjectStream("assets", "base");
+    await reopened.close();
+    await Promise.all(readers.map((stream) => stream.close()));
+    assert.equal((await adapter.listProtections()).length, 0);
   } finally {
     await runtime.close();
     await adapter.close();
