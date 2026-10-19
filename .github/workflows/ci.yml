@@ -37,11 +37,16 @@ jobs:
       # resolves the main module's requirements while pinning its own. A bump
       # in the main module therefore breaks its checksum file, and the harness
       # image fails at go mod download with nothing else pointing at it.
+      #
+      # The test compile is the part that finds it. The benchmark's own packages
+      # do not import the SDK, so go build alone passes; the tests do, through
+      # the main module, and they are what go.sum has to cover.
       - name: Build the benchmark module
         working-directory: benchmark/go
         run: |
           go mod download
           go build ./...
+          go test -run '^$' ./...
 
   test:
     name: Test
