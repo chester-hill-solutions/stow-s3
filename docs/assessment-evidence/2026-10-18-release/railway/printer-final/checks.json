@@ -1,0 +1,104 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "tools/api-reference/main.go",
+      "tools/api-reference/main_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 23,
+    "passed": true
+  },
+  {
+    "name": "printer-normal",
+    "args": [
+      "go",
+      "test",
+      "./tools/api-reference",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 234,
+    "passed": true
+  },
+  {
+    "name": "printer-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./tools/api-reference",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1308,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 435,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./tools/api-reference"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1215,
+    "passed": true
+  },
+  {
+    "name": "regenerate-reference",
+    "args": [
+      "node",
+      "scripts/generate-api-reference.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1897,
+    "passed": true
+  },
+  {
+    "name": "verify-reference",
+    "args": [
+      "node",
+      "scripts/generate-api-reference.mjs",
+      "--check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1977,
+    "passed": true
+  },
+  {
+    "name": "verify-reference-repeat",
+    "args": [
+      "node",
+      "scripts/generate-api-reference.mjs",
+      "--check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1866,
+    "passed": true
+  }
+]
