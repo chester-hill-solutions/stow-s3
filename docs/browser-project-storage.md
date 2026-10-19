@@ -13,7 +13,7 @@ The development package provides:
 - `/browser-wasm`: memory and persistent WASM worker loaders.
 
 These APIs are implemented in the source checkout. The TypeScript package is not
-yet published to npm; v0.3.1 GitHub downloads contain the native server.
+yet published to npm; v0.3.3 GitHub downloads contain the native server.
 
 ## A project with reusable assets
 

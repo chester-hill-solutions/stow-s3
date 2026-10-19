@@ -78,9 +78,13 @@ Stow implements the common S3 operations needed by application and test workload
 - list objects with prefixes and pagination;
 - range reads;
 - conditional writes and reads;
-- MD5, CRC32, CRC32C, SHA-1, and SHA-256 checksums;
+- MD5, CRC32, CRC32C, CRC64NVME, SHA-1, and SHA-256 checksums;
 - multipart uploads;
 - presigned requests.
+
+CRC64NVME applies to single objects. Multipart initiation with that algorithm is
+refused. The [S3 compatibility contract](docs/compat-contract.md) records the
+full detail.
 
 Stow implements a subset of Amazon S3. Versioning, ACLs, bucket policies, lifecycle rules, replication, notifications, tagging, object lock, S3 Select, and KMS-backed encryption are not implemented.
 
