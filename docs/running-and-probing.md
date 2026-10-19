@@ -31,7 +31,7 @@ exactly one JSON object to that inherited descriptor instead of printing
 credentials to stdout:
 
 ```json
-{"protocolVersion":1,"binaryVersion":"0.2.0","endpoint":"http://127.0.0.1:39115",
+{"protocolVersion":1,"binaryVersion":"0.3.3","endpoint":"http://127.0.0.1:39115",
  "region":"us-east-1","accessKeyId":"...","secretAccessKey":"...","mode":"local",
  "backend":"memory","capabilities":{"persistent":false,"multipart":true,
  "upstream":false,"conditionalWrites":true,"presignedUrls":true,"maxBytes":0,
