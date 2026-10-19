@@ -1,0 +1,24 @@
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	5.347s
+--- FAIL: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.00s)
+    fs_test.go:224: completion ignored staging cleanup failure
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	5.092s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	2.691s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	3.702s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/embedded	1.019s
+--- FAIL: TestPathStylePutsTheBucketInThePath (0.01s)
+    addressing_wire_test.go:84: request path = "", want "/photos/report.pdf"
+--- FAIL: TestVirtualHostedPutsTheBucketInTheHost (0.01s)
+    addressing_wire_test.go:103: request host = "", want "photos.endpoint.localhost:33005"
+--- FAIL: TestBothStylesAreSignedForTheConfiguredRegion (0.01s)
+    --- FAIL: TestBothStylesAreSignedForTheConfiguredRegion/path (0.00s)
+        addressing_wire_test.go:183: request carried no Authorization header
+    --- FAIL: TestBothStylesAreSignedForTheConfiguredRegion/virtual-hosted (0.01s)
+        addressing_wire_test.go:183: request carried no Authorization header
+2026/10/16 20:34:44 GET /s3 200 100.208µs
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	13.427s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	3.859s
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	12.121s
+FAIL

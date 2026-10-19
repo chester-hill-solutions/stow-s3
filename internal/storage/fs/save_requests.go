@@ -131,6 +131,10 @@ func (s *FilesystemStore) commitSaveLocked(bucket, key string, record objectReco
 	if err != nil || len(s.saves.entries) >= maxSaveEntries || s.saves.bytes+reserve > maxSaveJournalBytes {
 		return nil, storage.ErrSaveRequestFull
 	}
+	return s.admitSaveLocked(entry, record, reserve)
+}
+
+func (s *FilesystemStore) publishSaveLocked(entry saveEntry, record objectRecord) (*storage.ObjectMeta, error) {
 	s.saves.pending = &entry
 	if _, err := s.writeSaveEntry(s.pendingPath(), entry); err != nil {
 		return nil, errors.Join(storage.ErrSaveRequestUnknown, err)
@@ -147,7 +151,7 @@ func (s *FilesystemStore) commitSaveLocked(bucket, key string, record objectReco
 	}
 	record.SaveRequest = entry.RequestKey
 	record.SaveMeaning = entry.Meaning
-	if err := s.writeObjectRaw(bucket, key, record); err != nil {
+	if err := s.writeObjectRaw(entry.Bucket, entry.Key, record); err != nil {
 		return nil, errors.Join(storage.ErrSaveRequestUnknown, err)
 	}
 	if err := s.faultSave("published"); err != nil {
@@ -157,9 +161,9 @@ func (s *FilesystemStore) commitSaveLocked(bucket, key string, record objectReco
 		return nil, err
 	}
 	if err := s.faultSave("terminal"); err != nil {
-		return &meta, storage.CommittedError(err)
+		return entry.Meta, storage.CommittedError(err)
 	}
-	return &meta, nil
+	return entry.Meta, nil
 }
 
 func saveEntryReservation(entry saveEntry) (int, error) {
@@ -240,6 +244,9 @@ func (s *FilesystemStore) finalizeSaveLocked(entry saveEntry) error {
 		return errors.Join(storage.ErrSaveRequestUnknown, err)
 	}
 	s.saves.pending = nil
+	if err := s.reconcileCapacityLocked(); err != nil {
+		return errors.Join(storage.ErrSaveRequestUnknown, err)
+	}
 	return nil
 }
 

@@ -1,0 +1,873 @@
+COMMAND ["go", "test", "./internal/runtime", "./internal/embedded", "-run", "^Test(Excess|EmbeddedExcess|Stream(EOF|CopyEOF|Seek|Range|Partial)|EmbeddedStreamRejects|BufferedRead|ReadForSave|EmbeddedReadForSave|EmbeddedBufferedRead)", "-count=2", "-v"]
+=== RUN   TestExcessReadRejected
+=== RUN   TestExcessReadRejected/mode=stream/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=stream/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=stream/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=stream/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=copy/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=copy/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=copy/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=copy/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=adapter/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=adapter/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=adapter/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=adapter/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=get/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=get/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=get/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=get/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=guarded/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=guarded/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=guarded/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=guarded/size=2/together=true
+--- PASS: TestExcessReadRejected (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=2/together=true (0.00s)
+=== RUN   TestExcessReadPreservesProviderError
+=== RUN   TestExcessReadPreservesProviderError/body:_EOF
+=== RUN   TestExcessReadPreservesProviderError/object_not_found
+=== RUN   TestExcessReadPreservesProviderError/local_mutation_committed_object_not_found
+=== RUN   TestExcessReadPreservesProviderError/provider_unavailable
+--- PASS: TestExcessReadPreservesProviderError (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/body:_EOF (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/object_not_found (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/provider_unavailable (0.00s)
+=== RUN   TestExcessReadStopsLargeBody
+=== RUN   TestExcessReadStopsLargeBody/stream
+=== RUN   TestExcessReadStopsLargeBody/get
+=== RUN   TestExcessReadStopsLargeBody/guarded
+--- PASS: TestExcessReadStopsLargeBody (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/stream (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/get (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/guarded (0.00s)
+=== RUN   TestExcessReadAfterSeek
+=== RUN   TestExcessReadAfterSeek/offset=0
+=== RUN   TestExcessReadAfterSeek/offset=1
+=== RUN   TestExcessReadAfterSeek/offset=3
+=== RUN   TestExcessReadAfterSeek/offset=4
+--- PASS: TestExcessReadAfterSeek (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=0 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=1 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=3 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=4 (0.00s)
+=== RUN   TestExcessRangeRead
+=== RUN   TestExcessRangeRead/native=false/length=0
+=== RUN   TestExcessRangeRead/native=false/length=2
+=== RUN   TestExcessRangeRead/native=true/length=0
+=== RUN   TestExcessRangeRead/native=true/length=2
+--- PASS: TestExcessRangeRead (0.00s)
+    --- PASS: TestExcessRangeRead/native=false/length=0 (0.00s)
+    --- PASS: TestExcessRangeRead/native=false/length=2 (0.00s)
+    --- PASS: TestExcessRangeRead/native=true/length=0 (0.00s)
+    --- PASS: TestExcessRangeRead/native=true/length=2 (0.00s)
+=== RUN   TestReadForSaveRequiresReadAuthority
+--- PASS: TestReadForSaveRequiresReadAuthority (0.00s)
+=== RUN   TestBufferedReadRejectsPrematureEOF
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true
+--- PASS: TestBufferedReadRejectsPrematureEOF (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true (0.00s)
+=== RUN   TestBufferedReadCompleteEOF
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true
+--- PASS: TestBufferedReadCompleteEOF (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true (0.00s)
+=== RUN   TestBufferedReadUnknownSize
+=== RUN   TestBufferedReadUnknownSize/guarded=false
+=== RUN   TestBufferedReadUnknownSize/guarded=true
+--- PASS: TestBufferedReadUnknownSize (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=false (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=true (0.00s)
+=== RUN   TestBufferedReadPreservesWrappedEOF
+--- PASS: TestBufferedReadPreservesWrappedEOF (0.00s)
+=== RUN   TestBufferedReadsOwnReturnedState
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=false
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=true
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=false
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=true
+--- PASS: TestBufferedReadsOwnReturnedState (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=false (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=true (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=false (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=true (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestStreamEOFCompleteness
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=3
+--- PASS: TestStreamEOFCompleteness (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamEOFControls
+=== RUN   TestStreamEOFControls/adapter=false/unknown-size
+=== RUN   TestStreamEOFControls/adapter=false/empty
+=== RUN   TestStreamEOFControls/adapter=false/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=false/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=read_failed
+=== RUN   TestStreamEOFControls/adapter=true/unknown-size
+=== RUN   TestStreamEOFControls/adapter=true/empty
+=== RUN   TestStreamEOFControls/adapter=true/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=true/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=read_failed
+--- PASS: TestStreamEOFControls (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=read_failed (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=read_failed (0.00s)
+=== RUN   TestStreamPartialCloseDoesNotRequireEOF
+--- PASS: TestStreamPartialCloseDoesNotRequireEOF (0.00s)
+=== RUN   TestStreamCopyEOFCompleteness
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=3
+--- PASS: TestStreamCopyEOFCompleteness (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamSeekCompleteness
+=== RUN   TestStreamSeekCompleteness/body=old/start
+=== RUN   TestStreamSeekCompleteness/body=old/current
+=== RUN   TestStreamSeekCompleteness/body=old/end
+=== RUN   TestStreamSeekCompleteness/body=old/rewind
+=== RUN   TestStreamSeekCompleteness/body=old/failed
+=== RUN   TestStreamSeekCompleteness/body=old/at-end
+=== RUN   TestStreamSeekCompleteness/body=old/beyond-end
+=== RUN   TestStreamSeekCompleteness/body=ol/start
+=== RUN   TestStreamSeekCompleteness/body=ol/current
+=== RUN   TestStreamSeekCompleteness/body=ol/end
+=== RUN   TestStreamSeekCompleteness/body=ol/rewind
+=== RUN   TestStreamSeekCompleteness/body=ol/failed
+=== RUN   TestStreamSeekCompleteness/body=ol/at-end
+=== RUN   TestStreamSeekCompleteness/body=ol/beyond-end
+--- PASS: TestStreamSeekCompleteness (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/beyond-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/beyond-end (0.00s)
+=== RUN   TestStreamRangeCompleteness
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0}
+--- PASS: TestStreamRangeCompleteness (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0} (0.00s)
+=== RUN   TestExcessReadRejected
+=== RUN   TestExcessReadRejected/mode=stream/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=stream/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=stream/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=stream/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=copy/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=copy/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=copy/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=copy/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=adapter/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=adapter/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=adapter/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=adapter/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=get/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=get/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=get/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=get/size=2/together=true
+=== RUN   TestExcessReadRejected/mode=guarded/size=0/together=false
+=== RUN   TestExcessReadRejected/mode=guarded/size=0/together=true
+=== RUN   TestExcessReadRejected/mode=guarded/size=2/together=false
+=== RUN   TestExcessReadRejected/mode=guarded/size=2/together=true
+--- PASS: TestExcessReadRejected (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=stream/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=copy/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=adapter/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=get/size=2/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=0/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=0/together=true (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=2/together=false (0.00s)
+    --- PASS: TestExcessReadRejected/mode=guarded/size=2/together=true (0.00s)
+=== RUN   TestExcessReadPreservesProviderError
+=== RUN   TestExcessReadPreservesProviderError/body:_EOF
+=== RUN   TestExcessReadPreservesProviderError/object_not_found
+=== RUN   TestExcessReadPreservesProviderError/local_mutation_committed_object_not_found
+=== RUN   TestExcessReadPreservesProviderError/provider_unavailable
+--- PASS: TestExcessReadPreservesProviderError (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/body:_EOF (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/object_not_found (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestExcessReadPreservesProviderError/provider_unavailable (0.00s)
+=== RUN   TestExcessReadStopsLargeBody
+=== RUN   TestExcessReadStopsLargeBody/stream
+=== RUN   TestExcessReadStopsLargeBody/get
+=== RUN   TestExcessReadStopsLargeBody/guarded
+--- PASS: TestExcessReadStopsLargeBody (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/stream (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/get (0.00s)
+    --- PASS: TestExcessReadStopsLargeBody/guarded (0.00s)
+=== RUN   TestExcessReadAfterSeek
+=== RUN   TestExcessReadAfterSeek/offset=0
+=== RUN   TestExcessReadAfterSeek/offset=1
+=== RUN   TestExcessReadAfterSeek/offset=3
+=== RUN   TestExcessReadAfterSeek/offset=4
+--- PASS: TestExcessReadAfterSeek (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=0 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=1 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=3 (0.00s)
+    --- PASS: TestExcessReadAfterSeek/offset=4 (0.00s)
+=== RUN   TestExcessRangeRead
+=== RUN   TestExcessRangeRead/native=false/length=0
+=== RUN   TestExcessRangeRead/native=false/length=2
+=== RUN   TestExcessRangeRead/native=true/length=0
+=== RUN   TestExcessRangeRead/native=true/length=2
+--- PASS: TestExcessRangeRead (0.00s)
+    --- PASS: TestExcessRangeRead/native=false/length=0 (0.00s)
+    --- PASS: TestExcessRangeRead/native=false/length=2 (0.00s)
+    --- PASS: TestExcessRangeRead/native=true/length=0 (0.00s)
+    --- PASS: TestExcessRangeRead/native=true/length=2 (0.00s)
+=== RUN   TestReadForSaveRequiresReadAuthority
+--- PASS: TestReadForSaveRequiresReadAuthority (0.00s)
+=== RUN   TestBufferedReadRejectsPrematureEOF
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false
+=== RUN   TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true
+--- PASS: TestBufferedReadRejectsPrematureEOF (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=0/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=1/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=false/after=2/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=0/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=1/together=true (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=false (0.00s)
+    --- PASS: TestBufferedReadRejectsPrematureEOF/guarded=true/after=2/together=true (0.00s)
+=== RUN   TestBufferedReadCompleteEOF
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false
+=== RUN   TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true
+--- PASS: TestBufferedReadCompleteEOF (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=false/empty=true/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=false/together=true (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=false (0.00s)
+    --- PASS: TestBufferedReadCompleteEOF/guarded=true/empty=true/together=true (0.00s)
+=== RUN   TestBufferedReadUnknownSize
+=== RUN   TestBufferedReadUnknownSize/guarded=false
+=== RUN   TestBufferedReadUnknownSize/guarded=true
+--- PASS: TestBufferedReadUnknownSize (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=false (0.00s)
+    --- PASS: TestBufferedReadUnknownSize/guarded=true (0.00s)
+=== RUN   TestBufferedReadPreservesWrappedEOF
+--- PASS: TestBufferedReadPreservesWrappedEOF (0.00s)
+=== RUN   TestBufferedReadsOwnReturnedState
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=false
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=true
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=false
+=== RUN   TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=true
+--- PASS: TestBufferedReadsOwnReturnedState (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=false (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=false/second-guarded=true (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=false (0.00s)
+    --- PASS: TestBufferedReadsOwnReturnedState/first-guarded=true/second-guarded=true (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestStreamEOFCompleteness
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=0
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=1
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=2
+=== RUN   TestStreamEOFCompleteness/adapter=true/together=true/after=3
+--- PASS: TestStreamEOFCompleteness (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=2 (0.00s)
+    --- PASS: TestStreamEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamEOFControls
+=== RUN   TestStreamEOFControls/adapter=false/unknown-size
+=== RUN   TestStreamEOFControls/adapter=false/empty
+=== RUN   TestStreamEOFControls/adapter=false/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=false/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=false/error=read_failed
+=== RUN   TestStreamEOFControls/adapter=true/unknown-size
+=== RUN   TestStreamEOFControls/adapter=true/empty
+=== RUN   TestStreamEOFControls/adapter=true/error=body:_EOF
+=== RUN   TestStreamEOFControls/adapter=true/error=object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found
+=== RUN   TestStreamEOFControls/adapter=true/error=read_failed
+--- PASS: TestStreamEOFControls (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=false/error=read_failed (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/unknown-size (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/empty (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=body:_EOF (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=local_mutation_committed_object_not_found (0.00s)
+    --- PASS: TestStreamEOFControls/adapter=true/error=read_failed (0.00s)
+=== RUN   TestStreamPartialCloseDoesNotRequireEOF
+--- PASS: TestStreamPartialCloseDoesNotRequireEOF (0.00s)
+=== RUN   TestStreamCopyEOFCompleteness
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=false/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=false/together=true/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=false/after=3
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=0
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=1
+=== RUN   TestStreamCopyEOFCompleteness/adapter=true/together=true/after=3
+--- PASS: TestStreamCopyEOFCompleteness (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=false/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=false/together=true/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=false/after=3 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=0 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=1 (0.00s)
+    --- PASS: TestStreamCopyEOFCompleteness/adapter=true/together=true/after=3 (0.00s)
+=== RUN   TestStreamSeekCompleteness
+=== RUN   TestStreamSeekCompleteness/body=old/start
+=== RUN   TestStreamSeekCompleteness/body=old/current
+=== RUN   TestStreamSeekCompleteness/body=old/end
+=== RUN   TestStreamSeekCompleteness/body=old/rewind
+=== RUN   TestStreamSeekCompleteness/body=old/failed
+=== RUN   TestStreamSeekCompleteness/body=old/at-end
+=== RUN   TestStreamSeekCompleteness/body=old/beyond-end
+=== RUN   TestStreamSeekCompleteness/body=ol/start
+=== RUN   TestStreamSeekCompleteness/body=ol/current
+=== RUN   TestStreamSeekCompleteness/body=ol/end
+=== RUN   TestStreamSeekCompleteness/body=ol/rewind
+=== RUN   TestStreamSeekCompleteness/body=ol/failed
+=== RUN   TestStreamSeekCompleteness/body=ol/at-end
+=== RUN   TestStreamSeekCompleteness/body=ol/beyond-end
+--- PASS: TestStreamSeekCompleteness (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=old/beyond-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/start (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/current (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/rewind (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/failed (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/at-end (0.00s)
+    --- PASS: TestStreamSeekCompleteness/body=ol/beyond-end (0.00s)
+=== RUN   TestStreamRangeCompleteness
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1}
+=== RUN   TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0}
+--- PASS: TestStreamRangeCompleteness (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=old/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=false/body=ol/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=old/span={Offset:3_Length:0} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:2} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:1_Length:1} (0.00s)
+    --- PASS: TestStreamRangeCompleteness/native=true/body=ol/span={Offset:3_Length:0} (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.289s
+=== RUN   TestEmbeddedExcessRead
+=== RUN   TestEmbeddedExcessRead/mode=stream/together=false
+=== RUN   TestEmbeddedExcessRead/mode=stream/together=true
+=== RUN   TestEmbeddedExcessRead/mode=get/together=false
+=== RUN   TestEmbeddedExcessRead/mode=get/together=true
+=== RUN   TestEmbeddedExcessRead/mode=guarded/together=false
+=== RUN   TestEmbeddedExcessRead/mode=guarded/together=true
+--- PASS: TestEmbeddedExcessRead (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=stream/together=false (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=stream/together=true (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=get/together=false (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=get/together=true (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=guarded/together=false (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=guarded/together=true (0.00s)
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true
+--- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=false
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=true
+--- PASS: TestEmbeddedStreamRejectsPrematureEOF (0.00s)
+    --- PASS: TestEmbeddedStreamRejectsPrematureEOF/together=false (0.00s)
+    --- PASS: TestEmbeddedStreamRejectsPrematureEOF/together=true (0.00s)
+=== RUN   TestEmbeddedExcessRead
+=== RUN   TestEmbeddedExcessRead/mode=stream/together=false
+=== RUN   TestEmbeddedExcessRead/mode=stream/together=true
+=== RUN   TestEmbeddedExcessRead/mode=get/together=false
+=== RUN   TestEmbeddedExcessRead/mode=get/together=true
+=== RUN   TestEmbeddedExcessRead/mode=guarded/together=false
+=== RUN   TestEmbeddedExcessRead/mode=guarded/together=true
+--- PASS: TestEmbeddedExcessRead (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=stream/together=false (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=stream/together=true (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=get/together=false (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=get/together=true (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=guarded/together=false (0.00s)
+    --- PASS: TestEmbeddedExcessRead/mode=guarded/together=true (0.00s)
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false
+=== RUN   TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true
+--- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=false (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=false/together=true (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=false (0.00s)
+    --- PASS: TestEmbeddedBufferedReadRejectsPrematureEOF/guarded=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=false
+=== RUN   TestEmbeddedStreamRejectsPrematureEOF/together=true
+--- PASS: TestEmbeddedStreamRejectsPrematureEOF (0.00s)
+    --- PASS: TestEmbeddedStreamRejectsPrematureEOF/together=false (0.00s)
+    --- PASS: TestEmbeddedStreamRejectsPrematureEOF/together=true (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.456s

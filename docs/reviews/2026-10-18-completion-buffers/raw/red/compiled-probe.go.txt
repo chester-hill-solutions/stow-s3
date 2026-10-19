@@ -1,0 +1,86 @@
+package fs_test
+
+import (
+	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strconv"
+	"strings"
+	"syscall"
+	"testing"
+	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestCompletionMemoryComparison(t *testing.T) {
+	root := os.Getenv("STOW_BENCH_ROOT")
+	if os.Getuid() != 10001 || os.Getenv("RAILWAY_SERVICE_ID") != "83497842-c51d-420e-8ba1-181589730ad4" || !strings.HasPrefix(root, "/results/") {
+		t.Fatal("Railway scratch required")
+	}
+	var disk syscall.Statfs_t
+	if err := syscall.Statfs(root, &disk); err != nil || disk.Type != 61267 {
+		t.Fatal("ext4 required", err)
+	}
+	size, err := strconv.ParseInt(os.Getenv("STOW_PROBE_SIZE"), 10, 64)
+	if err != nil || size < 8<<20 || size > 64<<20 {
+		t.Fatal("invalid size")
+	}
+	count, err := strconv.Atoi(os.Getenv("STOW_PROBE_PARTS"))
+	if err != nil || (count != 1 && count != 2) {
+		t.Fatal("invalid part count")
+	}
+	bound := os.Getenv("STOW_PROBE_PROFILE") == "bound"
+	store, ns, path := partStore(t, bound, 1<<30)
+	ctx := context.Background()
+	u := partUpload(t, store)
+	sizes := []int64{size}
+	if count == 2 {
+		sizes = []int64{5 << 20, size - (5 << 20)}
+	}
+	parts := make([]storage.PartInfo, 0, len(sizes))
+	scratch := make([]byte, 32<<10)
+	for i, n := range sizes {
+		f, e := os.Create(filepath.Join(path, ".multipart", u.UploadID, fmt.Sprintf("part-%05d", i+1)))
+		if e != nil {
+			t.Fatal(e)
+		}
+		h := md5.New()
+		written, e := io.CopyBuffer(io.MultiWriter(f, h), &partRepeatReader{remaining: n}, scratch)
+		closeErr := f.Close()
+		if e != nil || closeErr != nil || written != n {
+			t.Fatal(e, closeErr)
+		}
+		parts = append(parts, storage.PartInfo{PartNumber: i + 1, Size: n, ETag: hex.EncodeToString(h.Sum(nil))})
+	}
+	_, digest := partHashes(size)
+	runtime.GC()
+	var a, b runtime.MemStats
+	runtime.ReadMemStats(&a)
+	start := time.Now()
+	meta, err := store.CompleteMultipartUpload(ctx, u.UploadID, parts)
+	elapsed := time.Since(start).Nanoseconds()
+	runtime.ReadMemStats(&b)
+	if err != nil || meta.Size != size {
+		t.Fatal(meta, err)
+	}
+	row := map[string]any{"profile": os.Getenv("STOW_PROBE_PROFILE"), "size": size, "parts": count, "allocatedBytes": b.TotalAlloc - a.TotalAlloc, "allocations": b.Mallocs - a.Mallocs, "ns": elapsed}
+	encoded, _ := json.Marshal(row)
+	fmt.Println("STOW_COMPLETION:" + string(encoded))
+	reader, _, err := store.GetObject(ctx, "bucket", "payload")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Verify the file's bytes without materializing the result.
+	_ = reader.Close()
+	if err := store.Close(); err != nil {
+		t.Fatal(err)
+	}
+	verifyCompletionBuffer(t, path, ns, meta, digest)
+}

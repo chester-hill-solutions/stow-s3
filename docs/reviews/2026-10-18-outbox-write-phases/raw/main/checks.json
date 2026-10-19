@@ -1,0 +1,103 @@
+[
+  {
+    "name": "format-probe",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/phase-probe/trace-file_outbox.go.txt",
+      "benchmark/phase-probe/trace-atomicfile.go.txt",
+      "benchmark/phase-probe/phase_probe_test.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 21,
+    "passed": true
+  },
+  {
+    "name": "current-contracts",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "./internal/atomicfile",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 29967,
+    "passed": true
+  },
+  {
+    "name": "current-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "./internal/atomicfile",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 56926,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/phase-baseline-overlay.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1906,
+    "passed": true
+  },
+  {
+    "name": "build-current",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-after.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 739,
+    "passed": true
+  },
+  {
+    "name": "build-probe",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/phase-trace-overlay.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-trace.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2283,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/write-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 204745,
+    "passed": true
+  }
+]

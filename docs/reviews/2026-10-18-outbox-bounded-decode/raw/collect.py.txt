@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-decode-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-bounded-decode/raw';raw.mkdir(parents=True,exist_ok=True);base=json.loads((p/'baseline.json').read_text())['base'];deployment='0c2710b0-fe71-4fa7-b98d-bdb44ed287de';original=hashlib.sha256(subprocess.check_output(['git','show',base+':internal/runthrough/file_outbox_proto.go'],cwd=r)).hexdigest()
+for phase,count in [('before',5),('prototype',5),('comparison',4),('proof',5),('confirmation',6),('extra',6),('final',14)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks);assert job['deploymentId']==run['railwayDeploymentId']==deployment
+ env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ expected=hashlib.sha256((r/'internal/runthrough/file_outbox_proto.go').read_bytes()).hexdigest()if phase in ['final','extra']else original
+ assert env['sourceSHA256']['internal/runthrough/file_outbox_proto.go']==expected
+ dest=raw/phase
+ if dest.exists():shutil.rmtree(dest)
+ dest.mkdir()
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ shutil.copy2(p/(phase+'-start.json'),dest/'start.json')
+for name in ['baseline.json','source-manifest.json']:shutil.copy2(p/name,raw/name)
+for f in p.iterdir():
+ if f.is_file()and f.suffix in ['.py','.js','.mjs']and f.name not in ['watch.js','peek-resources.js','peek-performance.js','live-comparison.js','live-provenance.js','live-confirmation.js','inspect-errors.js']and not f.name.startswith('publish-'):shutil.copy2(f,raw/(f.name+'.txt'))
+for name in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/name,raw/(name+'.txt'))
+print('Retained all seven jobs including excluded harness mistake, profiles and 348 timing observations')

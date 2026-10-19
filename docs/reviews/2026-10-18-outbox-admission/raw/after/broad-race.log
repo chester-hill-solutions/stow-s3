@@ -1,0 +1,22 @@
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	4.468s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	7.056s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	2.927s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	3.869s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/embedded	1.016s
+2026/10/18 07:54:41 GET /s3 200 97.179µs
+--- FAIL: TestFileOutboxSnapshotsOwnValuesAndPreserveOrder (0.01s)
+    --- FAIL: TestFileOutboxSnapshotsOwnValuesAndPreserveOrder/false (0.01s)
+        file_outbox_snapshot_test.go:72: outbox entry "outbox-3" already exists
+    --- FAIL: TestFileOutboxSnapshotsOwnValuesAndPreserveOrder/true (0.00s)
+        file_outbox_snapshot_test.go:72: outbox entry "outbox-13" already exists
+--- FAIL: TestFileOutboxConcurrentSnapshotsAndWriter (0.01s)
+    --- FAIL: TestFileOutboxConcurrentSnapshotsAndWriter/false (0.00s)
+        file_outbox_snapshot_test.go:153: outbox entry "outbox-3" already exists
+    --- FAIL: TestFileOutboxConcurrentSnapshotsAndWriter/true (0.00s)
+        file_outbox_snapshot_test.go:153: outbox entry "outbox-13" already exists
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	13.980s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	3.957s
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	9.444s
+FAIL

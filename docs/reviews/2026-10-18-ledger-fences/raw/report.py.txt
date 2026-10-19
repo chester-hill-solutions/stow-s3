@@ -1,0 +1,62 @@
+from pathlib import Path
+import json,hashlib
+p=Path('/private/tmp/stow-ledger-fences-2026-10-18');j=json.loads((p/'probe-start.json').read_text());e=p/('export-'+j['id']);rows=json.loads((e/'comparison-analysis.json').read_text());base='2026-10-18-ledger-fences/raw/'
+def table(prefix):
+ lines=['| Cell | Original time | Diagnostic time | Time change | Bytes/op, original → diagnostic | Objects/op, original → diagnostic | Child peak RSS, original → diagnostic | Same-binary time change |','| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |']
+ for c in rows:
+  if not c['name'].startswith(prefix):continue
+  a,b=c['labels']['A'],c['labels']['B'];n=c['name'].removeprefix(prefix+'/').removesuffix('-4')
+  lines.append(f"| {n} | {a['ns']['median']/1e6:.4f} ms | {b['ns']['median']/1e6:.4f} ms | {c['changePercent']['ns']:+.2f}% | {a['bytes']['median']:,.1f} → {b['bytes']['median']:,.1f} | {a['allocs']['median']:,.1f} → {b['allocs']['median']:,.1f} | {a['maxRSSBytes']['median']/1048576:.2f} → {b['maxRSSBytes']['median']/1048576:.2f} MiB | {c['sameBinaryControlTimePercent']:+.2f}% |")
+ return '\n'.join(lines)
+compiled=json.loads((e/'compiled-source-receipt.json').read_text())
+for pkg,v in compiled.items():
+ b=(e/('compiled-'+pkg+'-bench.go.txt')).read_bytes();assert len(b)==v['bytes']and hashlib.sha256(b).hexdigest()==v['sha256']
+text=f'''# Measure ledger replacement and ancestor fences before optimizing
+
+**Keep the production durability path unchanged.** On this Railway fixture, a small ledger's ancestor chain costs about **0.14 ms**, a durable replacement **3.56 ms**, and fencing an existing valid ledger **0.24 ms**. Replacing unchanged reconciliation state is the stronger next investigation. This report records diagnosis and comparative evidence; it introduces no runtime optimization, dependency, public API, format, index, checkpoint or storage abstraction.
+
+## Baseline and hypotheses
+
+The checkout starts clean at `871e5f57171375d652ae8165773f994378eccaba`; fetching `origin/main` returns unchanged `219d1dcfff9807b04660a40313b32127e5be2933`. The previous checksum-copy reduction and all correctness repairs remain in force. The [prior change](2026-10-18-ledger-digest.md) has already passed its 22-step Railway validation, including broad race coverage and all four conformance profiles. No completed repair is repeated or bypassed in production here.
+
+Three ranked, falsifiable hypotheses guide the comparison: omitting ledger ancestor syncs should materially reduce native mutation latency if those dominate; actual ledger replacements should dominate if the write-ahead/settlement sequence is more expensive; scanning/hashing should remain a substantial additional cost as existing payload grows. Inspection confirms a typical bound mutation performs **three ledger replacements**: authoritative reconciliation, a pending reservation before the effect, and settlement afterward. `Host.write` encodes and checks capacity, uses `atomicfile.Write`, then syncs ancestors from the host directory to root. `atomicfile.Write` already syncs the file and its immediate parent.
+
+The current publication contract in [ADR 0020](../adr/0020-binary-object-records.md) requires file and immediate-parent sync for every publication and fresh ancestor fencing for relevant lifetime/reopen/failure cases. The pending reservation and verified reconciliation contracts from prior repairs must also remain. An expensive write or fence is not, by itself, evidence that its guarantee can be discarded.
+
+## Diagnostic design
+
+The original binary uses exact production source. A temporary Go overlay changes **only** the final `return syncAncestors(h.dir)` in `Host.write` to `return nil`. All encoding, integrity, admission checks, file syncs and immediate-parent syncs remain. Restoring that one call reconstructs the original source byte for byte. This deliberately relaxed build is an attribution experiment, **not a production candidate or a claim of equivalent crash guarantees**. It is never copied into an implementation file or committed as runtime code.
+
+Four binaries cover capacity and filesystem packages, original and diagnostic. Each observation runs one isolated benchmark child process with ten timed operations. ABBA/BAAB ordering provides four observations for each original/diagnostic cell; C/D labels run the identical original binary as controls. There are **23 cells and 368 observations**, all successful and retained. Exact compiled benchmark source is saved after Railway formatting and all four builds, before cleanup, with a separate hash receipt. [Plan]({base}probe/plan.json), [all commands and observations]({base}probe/measurements.json), [ranges]({base}probe/comparison-analysis.json), [compiled source receipt]({base}probe/compiled-source-receipt.json).
+
+Capacity fixtures use real canonical ledgers with 16 or 4,096 declared one-byte resources across two bound stores. They are ledger-scale fixtures, not a claim that every declared resource is a physical object file. Stages separately measure encoding, `atomicfile.Write`, the complete ancestor chain, `atomicfile.SyncExisting` plus ancestors, native `Host.write`, native unchanged `Reconcile`, and native `WithAdmission` with a counted no-op effect. Final ledger bytes must equal the starting bytes, payload charges must match resource counts, pending charges must be zero, and admission effect counts must match timed operations. Primitive stages isolate component costs; they do not substitute for complete namespace validation or recovery semantics.
+
+Filesystem fixtures reuse the existing scan benchmark: ordinary 64 KiB PUT, request-keyed save, and empty-bucket deletion over zero or eight existing 1 MiB objects. Additional cells measure standalone scan/reconciliation and unbound bucket creation. Fixtures, binding, empty-bucket preparation, accounting verification and cleanup are outside timing/allocation counters. All fixtures explicitly fence initial host directory ancestors before timing in both builds. Each original/diagnostic case therefore starts from a fully fenced directory tree, despite the diagnostic build's omitted setup calls. Native post-operation reconciliation must confirm exact namespace accounting.
+
+All formatting, compilation and benchmark execution occurs only on authorized Railway scratch deployment `a4b41a42-fdde-49d3-ba75-08b7d97cd7d9`, job `34ba9c01-d1ec-408d-98bb-0389586f61bc`. Go 1.25.6, Linux amd64, UID 10001, GOMAXPROCS 4, 4 CPU/4 GiB. Benchmark ledgers and payloads reside on verified ext4 `/results` (statfs 61267). Linux child maximum RSS includes startup, calibration and fixtures; it is neither per-operation RSS nor cgroup/page-cache usage. Fixtures are recently created; no cold-cache or production-throughput claim is made. Positive time changes mean slower. Independent stage medians must not be summed as an exact decomposition of a native operation.
+
+## Capacity measurements
+
+{table('BenchmarkLedgerFence')}
+
+The original 16-resource unchanged reconciliation takes **3.44 ms**, and its admission with two ledger transitions takes **7.13 ms**. At 4,096 resources those become **12.85 ms** and **21.62 ms**. Encoding alone grows from roughly **0.0085 ms** to **1.29 ms**. Direct full ancestor-chain measurements are only **0.14–0.17 ms** in the original build, while `atomicfile.Write` takes **3.56–4.64 ms**. `atomicfile.SyncExisting` plus the full ancestor chain takes **0.20–0.24 ms**. These observations identify durable file replacement as a substantial component and an existing primitive worth investigating for unchanged state; they do not establish a safe complete reconciliation shortcut.
+
+The omitted ancestor call saves about 1.2 KiB of direct per-write bookkeeping in small-ledger cells. Large aggregate allocation samples still reflect JSON pool/GC variation: diagnostic 4,096-resource admission allocates more, and diagnostic large `Host.write` also allocates more despite omitting the call. No general memory or RSS improvement is inferred from this diagnostic build. Every sample and range is preserved.
+
+## Native filesystem measurements
+
+{table('BenchmarkCapacityFenceMutation')}
+
+The diagnostic build measures some large native improvements, including **51.01 → 39.39 ms** for the populated-store save. However, unchanged paths also move: the small primitive `atomicfile.Write` cell is **19.99% faster** despite using exactly the same atomic writer; the scan-only cell is **4.87% faster**; unbound creation is **7.56% slower**. Same-binary control changes include **+10.03%** for populated saves and **+15.79%** for unbound creation. The populated standalone reconciliation is adverse at **+6.12%**. These are retained observations, not discarded samples or proven consequences of ancestor omission.
+
+The direct ancestor-chain cost is much smaller than some macro deltas. This experiment therefore does **not** establish that removing ledger ancestor syncs causes the observed 11–23% populated-mutation gains. It supplies no basis to relax durability guarantees or promise those speedups. The 8 MiB scan remains about **5.65 ms** and allocates **8.49 MB**, consistent with the already documented remaining full verified payload pass; no index or incremental accounting is introduced.
+
+## Decision, validation and next finding
+
+Production source remains byte-identical to the baseline. All nine diagnostic steps pass: install both temporary benchmark fixtures, format, compile all four binaries, measure every cell, and remove temporary Go benchmark files. Each sampled command exits successfully and checks its final outcomes. [Checks]({base}probe/checks.json), [receipt]({base}probe/validation-receipt.json). This is a measurement-only change, so the earlier baseline's conformance/race evidence is referenced rather than represented as a new test run for the deliberately weakened diagnostic. Additional Railway site build/tests, documentation links and source/evidence hashes validate this saved report before teardown. No local project formatting, builds, tests or benchmarks run.
+
+The source and authorized historical reports/evidence are transported in one compressed archive; [transport receipt]({base}transport-receipt.json) records bytes, file count and SHA-256. Both the [actual transport Dockerfile]({base}transport-Dockerfile.txt) and [original validation recipe]({base}Dockerfile.txt) are retained. No upload retry or failed diagnostic run occurs in this investigation. Runtime/source identities, every observation, compiled-source hashes and scratch-runner teardown are preserved in the [artifact manifest]({base}artifact-manifest.json). The target service remains unchanged.
+
+**The next independently reviewable change should investigate avoiding replacement when reconciliation finds unchanged settled usage, using the existing durable-file fencing primitive if the full contract can be preserved.** It must still verify capacity and holds, clear pending reservations only after authoritative reconciliation, fence the correct current file, handle permissions/replacement errors, and preserve failure/reopen behavior. A measured candidate and a deterministic regression must precede any implementation. The primitive **3.56 ms versus 0.24 ms** contrast motivates that investigation; it is not an end-to-end speedup claim. No such shortcut, ancestor-cache change or other optimization is implemented here. The broader product-quality goal remains active.
+'''
+(p/'report.md').write_text(text);print('Generated measurement-only report',len(text.encode()),'bytes')

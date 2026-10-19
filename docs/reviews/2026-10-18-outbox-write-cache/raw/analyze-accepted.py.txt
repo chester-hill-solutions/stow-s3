@@ -1,0 +1,19 @@
+from pathlib import Path
+from collections import Counter
+import json,re,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');job=json.loads((p/'final-start.json').read_text());d=p/('export-'+job['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==15 and all(x['passed']for x in checks)
+expected=json.loads((p/'final-expected-sources.json').read_text());assert json.loads((d/'accepted-source-verification.json').read_text())==expected
+for name,digest in expected.items():assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+base=json.loads((p/'baseline.json').read_text())['base']
+for name in ['internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go']:assert (r/name).read_bytes()==subprocess.check_output(['git','show',base+':'+name],cwd=r)
+rx=re.compile(r'^--- (PASS|FAIL|SKIP): (TestFileOutbox(?:OwnWrite\S+|ReleasesCallerStringBuffers))')
+receipt={}
+for log in ['focused-normal','focused-race']:
+ counts=Counter()
+ for line in(d/(log+'.log')).read_text(errors='replace').splitlines():
+  m=rx.match(line.strip())
+  if m:counts[(m[1],m[2])]+=1
+ leaves={name for status,name in counts if not any(other.startswith(name+'/')for _,other in counts)}
+ assert len(leaves)==18 and all(counts.get(('PASS',name))==2 for name in leaves);assert not any(status in ['FAIL','SKIP']for status,name in counts)
+ receipt[log]={'distinctCases':18,'passes':36,'failed':0,'skipped':0,'cases':sorted(leaves)}
+out={'productionSourceUnchanged':True,'sourceSHA256':expected,'regressions':receipt,'allChecksPassed':True,'checks':15};(d/'accepted-receipt.json').write_text(json.dumps(out,indent=2)+'\n');print('Verified unchanged production source, 15 accepted checks, 18 regressions twice per focused mode')

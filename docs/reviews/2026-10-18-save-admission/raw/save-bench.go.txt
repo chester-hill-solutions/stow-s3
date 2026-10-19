@@ -1,0 +1,54 @@
+package fs
+
+import (
+ "context"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "testing"
+ "syscall"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/capacity"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func BenchmarkSaveAdmission(b *testing.B) {
+ root := os.Getenv("STOW_BENCH_ROOT")
+ if root == "" || !strings.HasPrefix(root, "/results/") { b.Fatal("Railway volume required") }
+ var stat syscall.Statfs_t
+ if err := syscall.Statfs(root, &stat); err != nil || stat.Type != 61267 { b.Fatalf("ext4 volume required: %v type=%d", err, stat.Type) }
+ for _, bound := range []bool{false,true} {
+  for _, size := range []int{0,65536,1048576} {
+   b.Run(fmt.Sprintf("bound=%t/bytes=%d",bound,size),func(b *testing.B){
+    body := strings.Repeat("x",size)
+    opts := storage.PutOptions{RequestKey:"benchmark", Guard:&storage.WriteGuard{Absent:true}}
+    b.ReportAllocs()
+    b.SetBytes(int64(size))
+    b.ResetTimer()
+    for n:=0;n<b.N;n++ {
+     b.StopTimer()
+     dir,err:=os.MkdirTemp(root,"save-");if err!=nil { b.Fatal(err) }
+     var ns *capacity.Namespace
+     if bound {
+      host,err:=capacity.Open(capacity.HostOptions{Dir:filepath.Join(dir,"host"),MaxBytes:64<<20});if err!=nil { b.Fatal(err) }
+      ns,err=host.Bind(capacity.NamespaceOptions{ID:"benchmark",MaxBytes:32<<20,RecoveryReserveBytes:4<<20});if err!=nil { b.Fatal(err) }
+     }
+     var store *FilesystemStore
+     if bound { store,err=NewFilesystemStoreWithNamespace(filepath.Join(dir,"store"),ns) } else { store,err=NewFilesystemStore(filepath.Join(dir,"store")) };if err!=nil { b.Fatal(err) }
+     if err:=store.CreateBucket(context.Background(),"bucket");err!=nil { b.Fatal(err) }
+     b.StartTimer()
+     meta,err:=store.PutObject(context.Background(),"bucket","key",strings.NewReader(body),opts)
+     b.StopTimer()
+     if err!=nil || meta==nil || meta.Size!=int64(size) { b.Fatalf("save=%+v, %v",meta,err) }
+     if bound && os.Getenv("STOW_BENCH_EXPECT_CHARGE")=="1" {
+      snap,err:=ns.Snapshot(context.Background());if err!=nil || snap.PayloadBytes<int64(size)||snap.PendingBytes!=0 { b.Fatalf("charge=%+v, %v",snap,err) }
+     }
+     if err:=store.Close();err!=nil { b.Fatal(err) }
+     if err:=os.RemoveAll(dir);err!=nil { b.Fatal(err) }
+     b.StartTimer()
+    }
+   })
+  }
+ }
+}

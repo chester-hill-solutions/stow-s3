@@ -1,0 +1,32 @@
+COMMAND ['npm', 'run', 'build', '--prefix', 'site']
+
+> build
+> node build.mjs
+
+Built Stow site and 32 documentation pages
+COMMAND ['npm', 'test', '--prefix', 'site']
+
+> test
+> node --test test/*.test.mjs
+
+✔ public guides omit repository commentary, retain code examples and reject broken markers (5.820458ms)
+✔ published guides render examples and turn repo documentation links into site routes (69.776875ms)
+✔ public output contains complete guides and excludes build tools, source files and credentials (3074.052125ms)
+✔ every example include resolves and expands away (44.178ms)
+✔ every example file parses (989.061917ms)
+✔ every example uses symbols the clients export (38.017625ms)
+✔ the built homepage carries the example code (2695.750542ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4132.026667
+COMMAND ['node', 'scripts/check-doc-links.mjs']
+Local documentation links OK (227 Markdown files)
+COMMAND ['git', 'diff', '--check']
+FINAL COMMAND ['node', 'scripts/check-doc-links.mjs']
+Local documentation links OK (227 Markdown files)
+FINAL COMMAND ['git', 'diff', '--check']

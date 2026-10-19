@@ -1,0 +1,63 @@
+=== RUN   TestReviewS3AbortRetryAccounting
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=false
+2026/10/15 18:51:04 DELETE /s3 500 121.584µs
+2026/10/15 18:51:04 DELETE /s3 404 9.833µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=true
+2026/10/15 18:51:04 DELETE /s3 500 6.5µs
+2026/10/15 18:51:04 DELETE /s3 404 6.125µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=false
+2026/10/15 18:51:04 DELETE /s3 500 5.917µs
+2026/10/15 18:51:04 DELETE /s3 404 6µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=true
+2026/10/15 18:51:04 DELETE /s3 500 8.5µs
+2026/10/15 18:51:04 DELETE /s3 404 6.375µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+--- FAIL: TestReviewS3AbortRetryAccounting (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=false/wrapped=false (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=false/wrapped=true (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=true/wrapped=false (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=true/wrapped=true (0.00s)
+=== RUN   TestReviewS3AbortRetryAccounting
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=false
+2026/10/15 18:51:04 DELETE /s3 500 5.375µs
+2026/10/15 18:51:04 DELETE /s3 404 4.292µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewS3AbortRetryAccounting/exists=false/wrapped=true
+2026/10/15 18:51:04 DELETE /s3 500 7.792µs
+2026/10/15 18:51:04 DELETE /s3 404 4.917µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=false
+2026/10/15 18:51:04 DELETE /s3 500 13µs
+2026/10/15 18:51:04 DELETE /s3 404 6.333µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewS3AbortRetryAccounting/exists=true/wrapped=true
+2026/10/15 18:51:04 DELETE /s3 500 19.25µs
+2026/10/15 18:51:04 DELETE /s3 404 9.084µs
+    s3_abort_retry_review_probe_test.go:48: provider abort attempts after HTTP retry: 1
+    s3_abort_retry_review_probe_test.go:50: S3-confirmed absence strands bytes: stow: runtime quota exceeded
+    s3_abort_retry_review_probe_test.go:53: S3-confirmed absence strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+--- FAIL: TestReviewS3AbortRetryAccounting (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=false/wrapped=false (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=false/wrapped=true (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=true/wrapped=false (0.00s)
+    --- FAIL: TestReviewS3AbortRetryAccounting/exists=true/wrapped=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.276s
+FAIL

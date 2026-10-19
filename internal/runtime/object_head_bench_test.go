@@ -1,0 +1,90 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func BenchmarkStoredObjectHeadClassification(b *testing.B) {
+	cases := []struct {
+		name string
+		meta *storage.ObjectMeta
+		err  error
+	}{
+		{name: "present", meta: &storage.ObjectMeta{Size: 3}},
+		{name: "missing", err: storage.ErrObjectNotFound},
+		{name: "wrapped-missing", err: fmt.Errorf("head: %w", storage.ErrObjectNotFound)},
+		{name: "unknown", err: errors.New("head unavailable")},
+		{name: "marker-first", err: objectHeadAmbiguity("marker-first")},
+		{name: "missing-first", err: objectHeadAmbiguity("missing-first")},
+	}
+	for _, item := range cases {
+		b.Run(item.name, func(b *testing.B) {
+			store := &objectSizeLookup{meta: item.meta, err: item.err}
+			ctx := context.Background()
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				size, exists, err := storedObjectSize(ctx, store, "probe", "target")
+				if err != nil && err != item.err {
+					b.Fatal(err)
+				}
+				if exists && size != 3 {
+					b.Fatal(size)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkMemoryDeleteHeadLifecycle(b *testing.B) {
+	ctx := context.Background()
+	instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 8, MaxObjects: 1}, storage.NewMemoryStore(), nil)
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.Cleanup(func() { _ = instance.Close() })
+	if err := instance.CreateBucket(ctx, "probe"); err != nil {
+		b.Fatal(err)
+	}
+	data := []byte("body")
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		if _, err := instance.PutObject(ctx, "probe", "target", data, PutOptions{}); err != nil {
+			b.Fatal(err)
+		}
+		if err := instance.DeleteObject(ctx, "probe", "target"); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkMemoryBatchDeleteHeadLifecycle(b *testing.B) {
+	ctx := context.Background()
+	instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 8, MaxObjects: 1}, storage.NewMemoryStore(), nil)
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.Cleanup(func() { _ = instance.Close() })
+	if err := instance.CreateBucket(ctx, "probe"); err != nil {
+		b.Fatal(err)
+	}
+	data := []byte("body")
+	keys := []string{"target", "missing", "target"}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		if _, err := instance.PutObject(ctx, "probe", "target", data, PutOptions{}); err != nil {
+			b.Fatal(err)
+		}
+		deleted, err := instance.DeleteObjects(ctx, "probe", keys)
+		if err != nil || len(deleted) != len(keys) {
+			b.Fatalf("deleted=%v error=%v", deleted, err)
+		}
+	}
+}

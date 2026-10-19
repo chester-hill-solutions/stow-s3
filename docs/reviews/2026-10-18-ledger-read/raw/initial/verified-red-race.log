@@ -1,0 +1,23 @@
+=== RUN   TestLedgerReadAllocationBound
+=== RUN   TestLedgerReadAllocationBound/16777217
+    state_read_test.go:58: ledger bytes=16777217 allocated bytes=16786648
+    state_read_test.go:60: oversized ledger was materialized: size=16777217 allocated=16786648 budget=9437184
+=== RUN   TestLedgerReadAllocationBound/67108865
+    state_read_test.go:58: ledger bytes=67108865 allocated bytes=67118296
+    state_read_test.go:60: oversized ledger was materialized: size=67108865 allocated=67118296 budget=9437184
+--- FAIL: TestLedgerReadAllocationBound (0.10s)
+    --- FAIL: TestLedgerReadAllocationBound/16777217 (0.03s)
+    --- FAIL: TestLedgerReadAllocationBound/67108865 (0.07s)
+=== RUN   TestLedgerReadCanonicalSizeBoundary
+--- PASS: TestLedgerReadCanonicalSizeBoundary (1.44s)
+=== RUN   TestLedgerReadMissingAndEmpty
+--- PASS: TestLedgerReadMissingAndEmpty (0.00s)
+=== RUN   TestLedgerReadNativeErrors
+=== RUN   TestLedgerReadNativeErrors/directory
+=== RUN   TestLedgerReadNativeErrors/permission
+--- PASS: TestLedgerReadNativeErrors (0.00s)
+    --- PASS: TestLedgerReadNativeErrors/directory (0.00s)
+    --- PASS: TestLedgerReadNativeErrors/permission (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/capacity	1.566s
+FAIL

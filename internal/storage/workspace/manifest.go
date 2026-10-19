@@ -177,8 +177,8 @@ func (m *Manifest) saveIdentity() error {
 
 // writeFileAtomic delegates to internal/atomicfile.
 //
-// All five callers in this package go through here, so the guarantee is now
-// shared rather than per-file.
+// Byte-slice writes here and compound part records use the same atomicfile
+// publication guarantee.
 func writeFileAtomic(path string, data []byte) error {
 	return atomicfile.Write(path, data, 0o644)
 }

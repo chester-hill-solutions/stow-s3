@@ -37,10 +37,9 @@ var (
 	ErrOutboxFormatVersion = errors.New("outbox file format version is not supported by this writer")
 )
 
-// outboxFormatVersion is the on-disk schema revision written by this build.
-// Version 0 (unversioned) files are migrated on read; anything newer is
-// rejected rather than downgraded.
-const outboxFormatVersion = 3
+// outboxLegacyJSONVersion is the newest JSON schema accepted for migration.
+// New writes use the framed protobuf format in file_outbox_proto.go.
+const outboxLegacyJSONVersion = 3
 
 const (
 	OutboxPut       OutboxOperation = "put"
@@ -139,52 +138,77 @@ func (s outboxState) clone() outboxState {
 	return outboxState{provenance: provenance, entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
 }
 
-func (s *outboxState) assignID(entry OutboxEntry) OutboxEntry {
+func (s *outboxState) assignID(entry *OutboxEntry) error {
+	nextSeq := s.seq
 	if entry.ID == "" {
-		s.seq++
-		entry.ID = fmt.Sprintf("outbox-%d", s.seq)
-	} else if strings.HasPrefix(entry.ID, "outbox-") {
-		if sequence, err := strconv.ParseUint(strings.TrimPrefix(entry.ID, "outbox-"), 10, 64); err == nil && sequence > s.seq {
-			s.seq = sequence
+		if nextSeq == ^uint64(0) {
+			return fmt.Errorf("outbox ID sequence exhausted")
+		}
+		nextSeq++
+		entry.ID = fmt.Sprintf("outbox-%d", nextSeq)
+	} else {
+		_, active := s.entries[entry.ID]
+		_, prepared := s.prepared[entry.ID]
+		if active || prepared {
+			return fmt.Errorf("outbox entry %q already exists", entry.ID)
+		}
+		if strings.HasPrefix(entry.ID, "outbox-") {
+			if sequence, err := strconv.ParseUint(strings.TrimPrefix(entry.ID, "outbox-"), 10, 64); err == nil && sequence > nextSeq {
+				nextSeq = sequence
+			}
 		}
 	}
+	s.seq = nextSeq
 	if entry.CreatedAt.IsZero() {
 		entry.CreatedAt = time.Now().UTC()
 	}
-	return entry
+	return nil
 }
 
-func (s *outboxState) assignToken() uint64 {
-	s.nextToken++
-	return s.nextToken
+func (s *outboxState) nextFencingToken() (uint64, error) {
+	if s.nextToken == ^uint64(0) {
+		return 0, fmt.Errorf("outbox fencing token sequence exhausted")
+	}
+	return s.nextToken + 1, nil
 }
 
-func (s *outboxState) enqueue(entry OutboxEntry) OutboxEntry {
-	entry = s.assignID(entry)
+func (s *outboxState) enqueue(entry OutboxEntry) (OutboxEntry, error) {
+	if err := s.assignID(&entry); err != nil {
+		return OutboxEntry{}, err
+	}
 	entry.Prepared = false
 	s.entries[entry.ID] = entry
-	return entry
+	return entry, nil
 }
 
-func (s *outboxState) prepare(entry OutboxEntry) OutboxEntry {
-	entry = s.assignID(entry)
+func (s *outboxState) prepare(entry OutboxEntry) (OutboxEntry, error) {
+	if err := s.assignID(&entry); err != nil {
+		return OutboxEntry{}, err
+	}
 	entry.Prepared = true
 	s.prepared[entry.ID] = entry
-	return entry
+	return entry, nil
 }
 
 func (s *outboxState) prepareOwned(entry OutboxEntry, owner string, lease time.Duration) (OutboxEntry, error) {
 	if owner == "" || lease <= 0 {
 		return OutboxEntry{}, ErrOutboxClaimLease
 	}
-	entry = s.assignID(entry)
 	if s.hasPreparedKey(entry) {
 		return OutboxEntry{}, ErrOutboxPreparedUnresolved
+	}
+	token, err := s.nextFencingToken()
+	if err != nil {
+		return OutboxEntry{}, err
+	}
+	if err := s.assignID(&entry); err != nil {
+		return OutboxEntry{}, err
 	}
 	entry.Prepared = true
 	entry.PreparedOwner = owner
 	entry.PreparedUntil = time.Now().UTC().Add(lease)
-	entry.PreparedToken = s.assignToken()
+	entry.PreparedToken = token
+	s.nextToken = token
 	s.prepared[entry.ID] = entry
 	return entry, nil
 }
@@ -206,7 +230,7 @@ func (s *outboxState) renewPrepared(id, owner string, token uint64, lease time.D
 	if !ok {
 		return fmt.Errorf("outbox prepared entry %q not found", id)
 	}
-	if entry.PreparedOwner != owner || entry.PreparedToken != token {
+	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	entry.PreparedUntil = time.Now().UTC().Add(lease)
@@ -226,7 +250,7 @@ func (s *outboxState) commitPrepared(id, owner string, token uint64, version str
 	// A live owner can finish a slow local mutation, and recovery can commit the
 	// expired intent after proving its owner is dead. New prepares stay blocked
 	// until this intent is resolved, so expiry alone cannot authorize a new writer.
-	if entry.PreparedOwner != owner || entry.PreparedToken != token {
+	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
 		return OutboxEntry{}, ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)
@@ -244,7 +268,7 @@ func (s *outboxState) discardPreparedOwned(id, owner string, token uint64) error
 	if !ok {
 		return nil
 	}
-	if entry.PreparedOwner != owner || entry.PreparedToken != token {
+	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
 		return ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)
@@ -353,13 +377,13 @@ func NewMemoryOutbox() *MemoryOutbox {
 func (o *MemoryOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	return o.state.enqueue(entry), nil
+	return o.state.enqueue(entry)
 }
 
 func (o *MemoryOutbox) Prepare(entry OutboxEntry) (OutboxEntry, error) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	return o.state.prepare(entry), nil
+	return o.state.prepare(entry)
 }
 
 func (o *MemoryOutbox) Prepared() []OutboxEntry {
@@ -409,10 +433,18 @@ func (o *MemoryOutbox) Close() error { return nil }
 func (o *MemoryOutbox) Durable() bool { return false }
 
 func pendingEntries(entries map[string]OutboxEntry) []OutboxEntry {
+	return sortOutboxEntries(copyOutboxEntries(entries))
+}
+
+func copyOutboxEntries(entries map[string]OutboxEntry) []OutboxEntry {
 	out := make([]OutboxEntry, 0, len(entries))
 	for _, entry := range entries {
 		out = append(out, entry)
 	}
+	return out
+}
+
+func sortOutboxEntries(out []OutboxEntry) []OutboxEntry {
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].CreatedAt.Equal(out[j].CreatedAt) {
 			return outboxSequence(out[i].ID) < outboxSequence(out[j].ID)

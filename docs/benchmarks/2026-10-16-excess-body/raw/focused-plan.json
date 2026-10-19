@@ -1,0 +1,29 @@
+{
+  "cpus": [
+    1,
+    8
+  ],
+  "cycles": 10,
+  "order": "alternating ABBA/BAAB",
+  "cases": [
+    [
+      "get-tiny",
+      "^BenchmarkOpenedObjectRead$/^get-tiny$",
+      100000
+    ],
+    [
+      "get-64KiB",
+      "^BenchmarkOpenedObjectRead$/^get-64KiB$",
+      10000
+    ],
+    [
+      "stream-64KiB-1KiB",
+      "^BenchmarkStreamCompleteness$/^64KiB-1KiB$",
+      50000
+    ]
+  ],
+  "code": "same original before.test and after.test binaries; duplicate labels execute identical binaries",
+  "cpu_time": "RUSAGE_CHILDREN delta, includes process startup and fixture setup outside benchmark time",
+  "all_samples_retained": true,
+  "no_concurrent_agent_builds_or_tests": true
+}

@@ -1,0 +1,59 @@
+=== RUN   TestContractAuditDiskCompletion
+=== RUN   TestContractAuditDiskCompletion/healthy
+    contract_audit_probe_test.go:72: returned meta=&{Bucket:probe Key:target VersionID:b20ce373e0a8996271b3bd73f68d1c11 Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType: LastModified:2026-10-16 19:11:48.578579 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=<nil> committed=false; actual=&{Bucket:probe Key:target VersionID:b20ce373e0a8996271b3bd73f68d1c11 Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType: LastModified:2026-10-16 19:11:48.578579 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} usage={Bytes:4 Objects:1} reserved=0
+    contract_audit_probe_test.go:87: after repair+refresh: usage={Bytes:4 Objects:1} reserved=0
+=== RUN   TestContractAuditDiskCompletion/cleanup-failure
+    contract_audit_probe_test.go:72: returned meta=<nil> error=cleanup multipart upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditDiskCompletioncleanup-failure300791341/001/.multipart/30a8ae8c5fdffad3acc5c332b79b7e42/manifest.json: permission denied committed=false; actual=&{Bucket:probe Key:target VersionID:08c585a6db15f6cf9f98c2566abdfd33 Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType: LastModified:2026-10-16 19:11:48.69682 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} usage={Bytes:0 Objects:0} reserved=4
+    contract_audit_probe_test.go:74: published completion lost committed identity/outcome
+    contract_audit_probe_test.go:77: published object missing from immediate usage: {Bytes:0 Objects:0}
+    contract_audit_probe_test.go:87: after repair+refresh: usage={Bytes:4 Objects:1} reserved=4
+--- FAIL: TestContractAuditDiskCompletion (0.28s)
+    --- PASS: TestContractAuditDiskCompletion/healthy (0.16s)
+    --- FAIL: TestContractAuditDiskCompletion/cleanup-failure (0.12s)
+=== RUN   TestContractAuditDiskCorruptUpload
+=== RUN   TestContractAuditDiskCorruptUpload/healthy
+    contract_audit_probe_test.go:127: lookup=<nil> list=&{Uploads:[{UploadID:fca6edde81a80b6014956cb73f9d9684 Bucket:probe Key:target Initiated:2026-10-16 19:11:48.833121 +0000 UTC Options:{ContentType: Metadata:map[] ChecksumAlgorithm: ChecksumValue:}}] Prefix: Delimiter: KeyMarker: UploadIDMarker: NextKeyMarker: NextUploadIDMarker: MaxUploads:1000 IsTruncated:false} list error=<nil>
+    contract_audit_probe_test.go:135: runtime reopen error=<nil>
+    contract_audit_probe_test.go:151: new 4-byte write error=runtime quota exceeded; retained part bytes=3 object usage={Bytes:0 Objects:0} reserved=3 cap=4
+=== RUN   TestContractAuditDiskCorruptUpload/corrupt-manifest
+    contract_audit_probe_test.go:127: lookup=multipart upload not found list=&{Uploads:[] Prefix: Delimiter: KeyMarker: UploadIDMarker: NextKeyMarker: NextUploadIDMarker: MaxUploads:1000 IsTruncated:false} list error=<nil>
+    contract_audit_probe_test.go:129: corrupt existing upload misreported as absent
+    contract_audit_probe_test.go:132: listing silently omitted corrupt existing upload
+    contract_audit_probe_test.go:135: runtime reopen error=<nil>
+    contract_audit_probe_test.go:144: runtime admitted unreadable upload state instead of refusing reconciliation
+    contract_audit_probe_test.go:151: new 4-byte write error=<nil>; retained part bytes=3 object usage={Bytes:4 Objects:1} reserved=0 cap=4
+    contract_audit_probe_test.go:153: retained 3-byte part escaped 4-byte quota: write error=<nil>
+--- FAIL: TestContractAuditDiskCorruptUpload (0.40s)
+    --- PASS: TestContractAuditDiskCorruptUpload/healthy (0.16s)
+    --- FAIL: TestContractAuditDiskCorruptUpload/corrupt-manifest (0.25s)
+=== RUN   TestContractAuditDiskCompletion
+=== RUN   TestContractAuditDiskCompletion/healthy
+    contract_audit_probe_test.go:72: returned meta=&{Bucket:probe Key:target VersionID:bb2d805d6ce1132456dc4476e9a1e828 Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType: LastModified:2026-10-16 19:11:49.233093 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=<nil> committed=false; actual=&{Bucket:probe Key:target VersionID:bb2d805d6ce1132456dc4476e9a1e828 Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType: LastModified:2026-10-16 19:11:49.233093 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} usage={Bytes:4 Objects:1} reserved=0
+    contract_audit_probe_test.go:87: after repair+refresh: usage={Bytes:4 Objects:1} reserved=0
+=== RUN   TestContractAuditDiskCompletion/cleanup-failure
+    contract_audit_probe_test.go:72: returned meta=<nil> error=cleanup multipart upload: unlinkat /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditDiskCompletioncleanup-failure1887191635/001/.multipart/9d8a530ff07afd96d629d5e15ed0536b/manifest.json: permission denied committed=false; actual=&{Bucket:probe Key:target VersionID:c695519398049b46dcdb8df9db006f72 Size:4 ETag:"841a2d689ad86bd1611447453c22c6fc" ContentType: LastModified:2026-10-16 19:11:49.385909 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} usage={Bytes:0 Objects:0} reserved=4
+    contract_audit_probe_test.go:74: published completion lost committed identity/outcome
+    contract_audit_probe_test.go:77: published object missing from immediate usage: {Bytes:0 Objects:0}
+    contract_audit_probe_test.go:87: after repair+refresh: usage={Bytes:4 Objects:1} reserved=4
+--- FAIL: TestContractAuditDiskCompletion (0.29s)
+    --- PASS: TestContractAuditDiskCompletion/healthy (0.13s)
+    --- FAIL: TestContractAuditDiskCompletion/cleanup-failure (0.16s)
+=== RUN   TestContractAuditDiskCorruptUpload
+=== RUN   TestContractAuditDiskCorruptUpload/healthy
+    contract_audit_probe_test.go:127: lookup=<nil> list=&{Uploads:[{UploadID:9cf0ef5b60d6a6251cc345d348aa0b9b Bucket:probe Key:target Initiated:2026-10-16 19:11:49.522898 +0000 UTC Options:{ContentType: Metadata:map[] ChecksumAlgorithm: ChecksumValue:}}] Prefix: Delimiter: KeyMarker: UploadIDMarker: NextKeyMarker: NextUploadIDMarker: MaxUploads:1000 IsTruncated:false} list error=<nil>
+    contract_audit_probe_test.go:135: runtime reopen error=<nil>
+    contract_audit_probe_test.go:151: new 4-byte write error=runtime quota exceeded; retained part bytes=3 object usage={Bytes:0 Objects:0} reserved=3 cap=4
+=== RUN   TestContractAuditDiskCorruptUpload/corrupt-manifest
+    contract_audit_probe_test.go:127: lookup=multipart upload not found list=&{Uploads:[] Prefix: Delimiter: KeyMarker: UploadIDMarker: NextKeyMarker: NextUploadIDMarker: MaxUploads:1000 IsTruncated:false} list error=<nil>
+    contract_audit_probe_test.go:129: corrupt existing upload misreported as absent
+    contract_audit_probe_test.go:132: listing silently omitted corrupt existing upload
+    contract_audit_probe_test.go:135: runtime reopen error=<nil>
+    contract_audit_probe_test.go:144: runtime admitted unreadable upload state instead of refusing reconciliation
+    contract_audit_probe_test.go:151: new 4-byte write error=<nil>; retained part bytes=3 object usage={Bytes:4 Objects:1} reserved=0 cap=4
+    contract_audit_probe_test.go:153: retained 3-byte part escaped 4-byte quota: write error=<nil>
+--- FAIL: TestContractAuditDiskCorruptUpload (0.43s)
+    --- PASS: TestContractAuditDiskCorruptUpload/healthy (0.14s)
+    --- FAIL: TestContractAuditDiskCorruptUpload/corrupt-manifest (0.28s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.701s
+FAIL

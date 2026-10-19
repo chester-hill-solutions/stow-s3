@@ -1,0 +1,30 @@
+COMMAND ["/private/tmp/stow-save-read-uncertainty/before.test", "-test.run=^$", "-test.bench=^BenchmarkReadForSaveObservation$/^present$", "-test.benchmem", "-test.benchtime=250000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkReadForSaveObservation/present         	  250000	      5217 ns/op	    1619 B/op	      19 allocs/op
+BenchmarkReadForSaveObservation/present         	  250000	      5298 ns/op	    1619 B/op	      19 allocs/op
+BenchmarkReadForSaveObservation/present         	  250000	      6283 ns/op	    1619 B/op	      19 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-save-read-uncertainty/before.test", "-test.run=^$", "-test.bench=^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$", "-test.benchmem", "-test.benchtime=2000000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkReadForSaveObservation/missing         	 2000000	       378.3 ns/op	      48 B/op	       1 allocs/op
+BenchmarkReadForSaveObservation/missing         	 2000000	       472.6 ns/op	      48 B/op	       1 allocs/op
+BenchmarkReadForSaveObservation/missing         	 2000000	       515.6 ns/op	      48 B/op	       1 allocs/op
+BenchmarkReadForSaveObservation/wrapped-missing 	 2000000	       322.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/wrapped-missing 	 2000000	       288.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/wrapped-missing 	 2000000	       280.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/unknown         	 2000000	       296.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/unknown         	 2000000	       329.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/unknown         	 2000000	       243.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/marker-first    	 2000000	       321.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/marker-first    	 2000000	       292.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/marker-first    	 2000000	       333.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/missing-first   	 2000000	       206.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/missing-first   	 2000000	       196.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/missing-first   	 2000000	       162.0 ns/op	       0 B/op	       0 allocs/op
+PASS

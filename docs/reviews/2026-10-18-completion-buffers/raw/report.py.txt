@@ -1,0 +1,163 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');e=p/('export-'+json.loads((p/'full-start.json').read_text())['id']);a=json.loads((e/'comparison-analysis.json').read_text());rows=a['rows'];table=[]
+for r in rows:
+ b,c=r['before'],r['after'];size='empty'if r['size']==0 else('4 KiB'if r['size']==4096 else str(r['size']//1048576)+' MiB')
+ table.append(f"| {r['profile']} | {size} / {r['parts']} | {b['allocatedBytes']['median']/1e6:.3f} → {c['allocatedBytes']['median']/1e6:.3f} | {b['maxRSSBytes']['median']/1048576:.2f} → {c['maxRSSBytes']['median']/1048576:.2f} | {b['ns']['median']/1e6:.2f} → {c['ns']['median']/1e6:.2f} | {r['changePercent']['ns']:+.2f}% |")
+report='''# Remove duplicate payload copies from filesystem multipart completion
+
+Baseline `271b89f` includes the completed UploadPart ownership fix. Fresh
+`origin/main` remains `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
+The existing COPY, recovery, capacity and ownership remediations are retained.
+[Baseline](2026-10-18-completion-buffers/raw/baseline.json).
+
+## Demonstrated problem
+
+Completion retained every selected part, concatenated another complete payload,
+and, when namespace-bound, encoded a third payload-sized buffer for admission.
+A request-body cap does not bound the sum of a completed multipart object's parts.
+This review establishes material resource amplification on supported workloads;
+it does not establish a documented constant-memory completion guarantee or an
+S3 correctness failure in this particular path.
+
+Before changing production code, the new real-store allocation test fails in all
+four cells: one/two parts, unbound/namespace-bound. An 8 MiB completion allocates
+about 16.8 MB unbound and 25.4 MB bound. Eight normal leaf executions and four race
+leaf executions fail only their allocation assertions; content, reopened metadata
+and capacity checks continue. There are no skips or compilation failures.
+[Normal](2026-10-18-completion-buffers/raw/red/red-normal.log),
+[race](2026-10-18-completion-buffers/raw/red/red-race.log),
+[verified proof](2026-10-18-completion-buffers/raw/red/validation-receipt.json).
+A separate pre-change run measures 16 fresh children, confirming approximately
+134.3 MB unbound and 201.6 MB bound for 64 MiB completion.
+[Original measurements](2026-10-18-completion-buffers/raw/red/measurements.json).
+
+## Change and preserved contracts
+
+The filesystem completion passes its already-verified part buffers directly to
+`atomicfile.WriteParts` through the existing private object/capacity writers.
+The existing record's `payloadSize` supplies the header size. Whole-object
+checksums consume the selected buffers in order through the existing digest
+interface. Capacity admission hashes the identical header-plus-parts sequence and
+counts its full physical length; it no longer needs a contiguous encoded copy.
+Private writer arguments accept multiple slices; no public API, dependency,
+format, staging abstraction, cache or index is added.
+
+Each source file is read once through the existing `os.ReadFile` path. Publication
+uses those same captured bytes, so it cannot validate one source version and then
+reopen another. ETag checks, actual stored part sizes, minimum sizes, checksum
+refusal, recovery holds and checksum/metadata normalization keep their ordering.
+The atomic writer still creates a same-directory temporary file, writes, chmods,
+syncs, closes, renames and syncs its directory. Capacity reservation precedes those
+side effects, physical resource identity includes the header, uncertain effects
+retain `ErrUnknown`, and committed cleanup failures retain metadata plus
+`ErrMutationCommitted`. Cleanup and reopened capacity behavior remain unchanged.
+
+Regression coverage includes allocation bounds at 8 MiB, one/two parts, both
+capacity modes, reopened byte hashes and metadata, and final physical capacity.
+Empty/nonempty SHA-256 completions produce usable full-record capacity dependencies.
+A further test completes two differently populated parts with a correct whole-object
+checksum for each of CRC32, CRC32C, CRC64NVME, SHA1 and SHA256, then rechecks the
+published stream. Existing corruption, checksum refusal, minimum-size, order,
+quota, hold, atomic failure and recovery suites also pass.
+
+## Railway measurements
+
+All formatting, builds, tests, vet, quality, conformance, Node/site/docs execution
+and measurements run only on the existing Railway scratch runner. Go 1.25.6,
+Node 25.9.0, Linux amd64, UID 10001, GOMAXPROCS=4, GOFLAGS=-p=1, cgroup 4 CPU/4 GiB;
+fixtures are on `/results` ext4 (statfs 61267). The pinned transport recipe,
+source inventory, actual source and executable hashes are preserved.
+[Environment](2026-10-18-completion-buffers/raw/full/environment.json),
+[recipe](2026-10-18-completion-buffers/raw/transport-Dockerfile.txt),
+[compiled probe](2026-10-18-completion-buffers/raw/full/compiled-probe.go.txt).
+
+The comparison uses exact original-production overlays and the same probe/test
+fixtures. Twelve cells execute in 96 fresh Go children, four samples per variant
+per cell, in A/C/B/D/D/B/C/A order (A/C original, B/D candidate), reversing cell
+order on alternate rounds. Raw part fixtures are generated with bounded scratch
+before counters; their manifests use the real initiation path. Completion itself
+reconciles real capacity and publishes normally. Every child verifies the reopened
+object's bytes and metadata. This isolates completion from HTTP/upload ingestion;
+it is not an end-to-end upload benchmark. Later test-only formatting and ordered
+checksum coverage leave all four measured production hashes unchanged.
+
+Allocation is cumulative bytes allocated during completion, not live heap.
+RSS is whole-child `ru_maxrss`, including setup and verification; it does not
+measure cgroup page cache, per-operation resident memory or an OOM threshold.
+The table uses medians. MB is decimal; MiB is binary. Lower time is better.
+
+| Capacity | Payload / parts | Allocated MB before → after | RSS MiB before → after | Time ms before → after | Time change |
+| --- | --- | --- | --- | --- | --- |
+'''+ '\n'.join(table)+'''
+
+The large-object allocation savings are approximately one payload unbound and two
+payloads bound, with RSS falling by roughly one payload. Timing is mostly flat.
+Adverse medians are retained: bound empty +1.89%, bound single-part 8 MiB +0.98%,
+unbound two-part 64 MiB +0.06%. Ranges overlap in those cells. Same-binary timing
+controls are noisy, including -49.97% in one original 8 MiB split cell, so the
+8 MiB time reductions are not a reliable general speedup claim. The bound 64 MiB
+one-part medians improve 2.17%; this remains a four-sample measurement, not a
+universal latency guarantee. All ranges, allocation counts, raw samples and A/C,
+B/D control differences remain available.
+[Raw comparison](2026-10-18-completion-buffers/raw/full/measurements.json),
+[analysis](2026-10-18-completion-buffers/raw/full/comparison-analysis.json).
+
+## Validation and evidence
+
+The full 23-step run passes the original-overlay reproduction, focused normal/race
+suites twice, full `go test ./...`, broad storage/capacity/runtime/embedded/run-through/
+public API race, all four conformance profiles, vet, paired measurements, site build,
+site tests and documentation links. Its two failed checks are preserved: formatting
+could not rewrite a newly root-owned scratch test, and quality required lowering
+the stale production-comment baseline from 4077 to 4076. No test failure is hidden
+behind the runner's process exit status.
+[Full checks](2026-10-18-completion-buffers/raw/full/checks.json).
+
+After that job finishes, the test file is made writable by UID 10001 and its
+capacity-dependency comment is clarified; ordered checksum controls are added.
+The final six checks pass format, focused regressions twice normally and under
+race, the generated baseline reduction, quality/file-size/format, and relevant
+vet. No complexity, parameter-count or type allowance is raised. The recorded
+comment density updates with the reduced code/comment counts.
+[Final checks](2026-10-18-completion-buffers/raw/final/checks.json),
+[final source hashes](2026-10-18-completion-buffers/raw/final/environment.json).
+Existing live-upstream/mirror conformance skips remain; the new regressions do not
+skip. Production hashes are identical between full qualification and final checks;
+Railway-formatted/tested bytes are copied back and verified before committing.
+
+The stock documentation checker retains its known 1 MiB `git ls-files` capture
+limit. The validation preload raises only that inventory capture to 16 MiB; the
+checker source is unchanged. This is a documented capture workaround, not a claim
+that the stock invocation passes. The final report/evidence receive separate site
+build/tests and link checks on Railway before teardown.
+[Preload](2026-10-18-completion-buffers/raw/doc-links-capture.mjs),
+[report evidence](2026-10-18-completion-buffers/raw/final/).
+Only scratch deployment `392a795b-7d2c-4afa-869a-2f5323c0c185` is used. Its removal
+and unchanged removed target are verified after evidence export.
+The stop receipt is saved as `raw/runner-stop-status.json`.
+
+## Costs, limits and next finding
+
+Completion still materializes every selected part: working memory remains O(total
+selected payload), with O(part count) slice descriptors. This is not a streaming
+completion or a new RAM quota. The writer now issues one payload write per part
+instead of one write for the concatenation. Checksums and capacity hashing process
+the same bytes incrementally; digest state and slice descriptors have small fixed/
+per-part costs. Shared private single-slice writers also acquire the variadic
+argument representation and incremental hash path; small-object controls above
+expose fixed-cost effects but do not qualify every unrelated writer workload.
+No extra part reads, descriptors, files, sync stages or migrations are introduced.
+
+The next highest-priority measured memory path is namespace-bound incoming PUT
+staging: `StageObject` deliberately chooses `PreparePut` buffering, and buffered
+commit can encode another full payload. The previous incoming-memory review records
+about 393.5 MB stage allocations plus 67.2 MB commit allocations for a 64 MiB bound
+streaming-reader input, including full staging before small-quota refusal. Those
+older measurements need current-path qualification before changing that path.
+The runtime multipart quota adapter also still buffers and forwards a borrowed
+reader. No next fix, broader storage abstraction or indexing work is implemented.
+[Prior assessment](2026-10-18-incoming-memory.md),
+[ownership controls](2026-10-18-part-ownership.md).
+'''
+(p/'report.md').write_text(report);print('Prepared report:',len(report.split()),'words')

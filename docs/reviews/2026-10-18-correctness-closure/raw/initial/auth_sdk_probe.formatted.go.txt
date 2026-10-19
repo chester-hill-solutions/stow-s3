@@ -1,0 +1,106 @@
+package auth_test
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"os"
+	"testing"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
+	"github.com/chester-hill-solutions/stow-s3/internal/auth"
+)
+
+func closureSDKRequest(t *testing.T, values []string, payload string) (*http.Request, time.Time) {
+	t.Helper()
+	now := time.Date(2026, 10, 18, 12, 0, 0, 0, time.UTC)
+	req, err := http.NewRequest(http.MethodPut, "http://localhost/bucket/key", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("X-Amz-Content-Sha256", payload)
+	for _, v := range values {
+		req.Header.Add("X-Amz-Meta-Label", v)
+	}
+	err = v4.NewSigner().SignHTTP(context.Background(), aws.Credentials{AccessKeyID: strictCreds.AccessKeyID, SecretAccessKey: strictCreds.SecretAccessKey}, req, payload, "s3", "us-east-1", now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return req, now
+}
+func TestClosureRepeatedHeaderValidSDK(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		values []string
+	}{{"single", []string{"first"}}, {"repeated", []string{"first", "second"}}} {
+		t.Run(tc.name, func(t *testing.T) {
+			req, now := closureSDKRequest(t, tc.values, "UNSIGNED-PAYLOAD")
+			err := auth.NewVerifier("us-east-1").AuthenticateAt(req, strictCreds, now)
+			t.Logf("official SDK signed values=%q auth=%v", tc.values, err)
+			if err != nil {
+				t.Errorf("valid SDK repeated-header signature refused: %v", err)
+			}
+		})
+	}
+}
+func TestClosureRepeatedHeaderMutation(t *testing.T) {
+	req, now := closureSDKRequest(t, []string{"first"}, "UNSIGNED-PAYLOAD")
+	verifier := auth.NewVerifier("us-east-1")
+	if err := verifier.AuthenticateAt(req, strictCreds, now); err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Add("X-Amz-Meta-Label", "unsigned second")
+	err := verifier.AuthenticateAt(req, strictCreds, now)
+	t.Logf("append signed-header value without resigning: auth=%v", err)
+	if err == nil {
+		t.Error("altered signed multi-value header authenticated")
+	}
+}
+func TestClosureUnsignedPayloadCase(t *testing.T) {
+	for _, payload := range []string{"UNSIGNED-PAYLOAD", "unsigned-payload"} {
+		t.Run(payload, func(t *testing.T) {
+			req, now := closureSDKRequest(t, []string{"first"}, payload)
+			err := auth.NewVerifier("us-east-1").AuthenticateAt(req, strictCreds, now)
+			t.Logf("signed payload marker=%q auth=%v", payload, err)
+			if payload == "UNSIGNED-PAYLOAD" && err != nil {
+				t.Fatal(err)
+			}
+			if payload != "UNSIGNED-PAYLOAD" && err == nil {
+				t.Error("noncanonical unsigned payload marker accepted with valid credentials")
+			}
+		})
+	}
+}
+
+func TestClosureNodeSDKQuery(t *testing.T) {
+	data, err := os.ReadFile(os.Getenv("STOW_RESULT_ROOT") + "/node-sdk-signatures.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fixtures []struct {
+		Name    string            `json:"name"`
+		URL     string            `json:"url"`
+		Headers map[string]string `json:"headers"`
+	}
+	if err := json.Unmarshal(data, &fixtures); err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range fixtures {
+		t.Run(f.Name, func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, f.URL, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for k, v := range f.Headers {
+				req.Header.Set(k, v)
+			}
+			err = auth.NewVerifier("us-east-1").AuthenticateAt(req, strictCreds, time.Date(2026, 10, 18, 12, 0, 0, 0, time.UTC))
+			t.Logf("Node SDK signed query=%s auth=%v", req.URL.RawQuery, err)
+			if err != nil {
+				t.Errorf("valid pinned Node SDK query signature refused: %v", err)
+			}
+		})
+	}
+}

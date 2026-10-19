@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,statistics,sys
+p=Path('/private/tmp/stow-outbox-readcost-2026-10-18');phase=sys.argv[1]if len(sys.argv)>1 else 'final';job=json.loads((p/(phase+'-start.json')).read_text())['id'];e=p/('export-'+job);samples=json.loads((e/'samples.json').read_text());groups={}
+for row in samples:
+ key=(row['cpu'],row['fixture'],row['stage']);groups.setdefault(key,[]).append(row)
+summary=[]
+for (cpu,fixture,stage),rows in sorted(groups.items()):
+ metrics={name:{'median':statistics.median([row['metrics'][name]for row in rows]),'min':min(row['metrics'][name]for row in rows),'max':max(row['metrics'][name]for row in rows)}for name in rows[0]['metrics']}
+ summary.append(dict(cpu=cpu,fixture=fixture,stage=stage,observations=len(rows),metrics=metrics))
+(e/'analysis.json').write_text(json.dumps(summary,indent=2)+'\n')
+for row in summary:
+ if row['cpu']==1:
+  m=row['metrics'];print(row['fixture'],row['stage'],'ms',round(m['ns/op']['median']/1e6,3),'MB/op',round(m['B/op']['median']/1e6,3),'allocs',m['allocs/op']['median'],'HWM MiB',round(m['process-HWM-B']['median']/2**20,1))
+print('Total observations',len(samples))

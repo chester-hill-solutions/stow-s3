@@ -1,0 +1,17 @@
+from pathlib import Path
+import subprocess,json,shutil,hashlib
+p=Path('/private/tmp/stow-resource-count-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');old=Path('/private/tmp/stow-admission-scan-2026-10-18');c=p/'context';c.mkdir(exist_ok=True)
+manifest={}
+for n in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0'):
+ if not n:continue
+ f=r/n
+ if not f.is_file():continue
+ dest=c/n;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dest);manifest[n]=hashlib.sha256(f.read_bytes()).hexdigest()
+for name in ['control.py','remote.py','export.py','watch.py']:(p/name).write_text((old/name).read_text().replace(str(old),str(p)).replace('stow-scan-20261018','stow-count-20261018'))
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/name,c/'benchmark'/name)
+base=c/'benchmark/validation-previous-baselines';base.mkdir(exist_ok=True)
+for f in (r/'scripts/baselines').iterdir():
+ if f.is_file():shutil.copy2(f,base/f.name)
+(p/'source-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');shutil.copy2(p/'source-manifest.json',c/'benchmark/validation-input-manifest.json')
+(p/'baseline.json').write_text(json.dumps({'base':subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip(),'origin_main':subprocess.check_output(['git','rev-parse','origin/main'],cwd=r).decode().strip()},indent=2)+'\n')
+print('Packaged',len(manifest),'tracked files')

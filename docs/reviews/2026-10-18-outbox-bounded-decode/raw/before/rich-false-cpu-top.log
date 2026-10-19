@@ -1,0 +1,44 @@
+File: decode-before.test
+Build ID: 4d7ea1b106cb3c1d6bea8b46b3dddc2c51e9864f
+Type: cpu
+Time: 2026-10-18 12:28:38 UTC
+Duration: 4.17s, Total samples = 3.96s (94.88%)
+Showing nodes accounting for 2.86s, 72.22% of 3.96s total
+Dropped 58 nodes (cum <= 0.02s)
+Showing top 35 nodes out of 147
+      flat  flat%   sum%        cum   cum%
+     0.49s 12.37% 12.37%      1.04s 26.26%  runtime.scanobject
+     0.29s  7.32% 19.70%      1.89s 47.73%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.25s  6.31% 26.01%      0.25s  6.31%  runtime.(*mspan).base (inline)
+     0.18s  4.55% 30.56%      0.18s  4.55%  runtime.duffcopy
+     0.10s  2.53% 33.08%      0.27s  6.82%  runtime.findObject
+     0.10s  2.53% 35.61%      0.10s  2.53%  runtime.nextFreeFast (inline)
+     0.10s  2.53% 38.13%      0.14s  3.54%  runtime.spanOf (inline)
+     0.09s  2.27% 40.40%      0.09s  2.27%  runtime.(*sweepLocker).tryAcquire
+     0.09s  2.27% 42.68%      0.09s  2.27%  runtime.memclrNoHeapPointers
+     0.08s  2.02% 44.70%      0.08s  2.02%  runtime.(*mspan).heapBitsSmallForAddr
+     0.08s  2.02% 46.72%      0.18s  4.55%  runtime.mallocgcTiny
+     0.07s  1.77% 48.48%      0.07s  1.77%  unicode/utf8.Valid
+     0.06s  1.52% 50.00%      0.29s  7.32%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoEntry
+     0.06s  1.52% 51.52%      2.01s 50.76%  runtime.mallocgc
+     0.06s  1.52% 53.03%      0.06s  1.52%  runtime.typePointers.next
+     0.05s  1.26% 54.29%      0.17s  4.29%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.normalizeOutboxEntries
+     0.05s  1.26% 55.56%      0.06s  1.52%  runtime.(*mspan).writeHeapBitsSmall
+     0.05s  1.26% 56.82%      0.21s  5.30%  runtime.greyobject
+     0.05s  1.26% 58.08%      0.05s  1.26%  runtime.typePointers.nextFast (inline)
+     0.04s  1.01% 59.09%      0.04s  1.01%  aeshashbody
+     0.04s  1.01% 60.10%      1.51s 38.13%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoEntries
+     0.04s  1.01% 61.11%      0.34s  8.59%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.normalizeDecodedOutboxState
+     0.04s  1.01% 62.12%      0.04s  1.01%  runtime.arenaIndex (inline)
+     0.04s  1.01% 63.13%      0.04s  1.01%  runtime.bool2int (inline)
+     0.04s  1.01% 64.14%      0.80s 20.20%  runtime.mapassign
+     0.04s  1.01% 65.15%      0.22s  5.56%  time.parseRFC3339[go.shape.string]
+     0.04s  1.01% 66.16%      0.04s  1.01%  time.parseRFC3339[go.shape.string].func1 (inline)
+     0.03s  0.76% 66.92%      0.09s  2.27%  gcWriteBarrier
+     0.03s  0.76% 67.68%      0.03s  0.76%  google.golang.org/protobuf/internal/impl.(*messageState).GetUnknown
+     0.03s  0.76% 68.43%      0.67s 16.92%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+     0.03s  0.76% 69.19%      0.03s  0.76%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     0.03s  0.76% 69.95%      0.03s  0.76%  memeqbody
+     0.03s  0.76% 70.71%      0.04s  1.01%  runtime.(*gcBits).bitp (inline)
+     0.03s  0.76% 71.46%      0.36s  9.09%  runtime.(*mcache).refill
+     0.03s  0.76% 72.22%      0.11s  2.78%  runtime.(*sweepLocked).sweep

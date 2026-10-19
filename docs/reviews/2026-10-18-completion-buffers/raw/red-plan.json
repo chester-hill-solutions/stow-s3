@@ -1,0 +1,100 @@
+{
+  "phase": "completion-buffer-original",
+  "sources": [
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/completion_buffer_test.go",
+    "internal/storage/fs/completion_buffer_verify_test.go",
+    "benchmark/completion-probe.go.txt",
+    "benchmark/measure.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format-tests",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/completion_buffer_test.go",
+        "internal/storage/fs/completion_buffer_verify_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCompletionBufferAllocation$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCompletionBufferAllocation$",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "install-probe",
+      "args": [
+        "cp",
+        "benchmark/completion-probe.go.txt",
+        "internal/storage/fs/completion_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "format-probe",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/completion_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "snapshot-probe",
+      "args": [
+        "node",
+        "-e",
+        "require('node:fs').copyFileSync('internal/storage/fs/completion_memory_probe_test.go',process.env.STOW_RESULT_ROOT+'/compiled-probe.go.txt')"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/completion-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure-baseline",
+      "args": [
+        "node",
+        "benchmark/measure.mjs"
+      ],
+      "env": {
+        "STOW_BASELINE_ONLY": "1"
+      }
+    },
+    {
+      "name": "cleanup-probe",
+      "args": [
+        "rm",
+        "internal/storage/fs/completion_memory_probe_test.go"
+      ]
+    }
+  ]
+}

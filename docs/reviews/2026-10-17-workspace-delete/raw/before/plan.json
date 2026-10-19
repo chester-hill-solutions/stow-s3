@@ -1,0 +1,44 @@
+{
+  "phase": "workspace-delete-before-correct-error-assertion",
+  "sources": [
+    "internal/storage/workspace/objects.go",
+    "internal/storage/workspace/delete_outcome_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/workspace/delete_outcome_test.go"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/workspace",
+        "-run",
+        "^TestWorkspaceDelete",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/workspace",
+        "-run",
+        "^TestWorkspaceDelete",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

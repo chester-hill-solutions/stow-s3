@@ -1,0 +1,96 @@
+{
+  "phase": "capacity-payload-original",
+  "sources": [
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/capacity_payload_read_test.go",
+    "benchmark/scan-bench.go.txt",
+    "benchmark/baseline-measure.mjs",
+    "benchmark/measure-child.py"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_payload_read_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityPayload",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityPayload",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "install-benchmark",
+      "args": [
+        "cp",
+        "benchmark/scan-bench.go.txt",
+        "internal/storage/fs/capacity_payload_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmark",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_payload_bench_test.go"
+      ]
+    },
+    {
+      "name": "snapshot-benchmark",
+      "args": [
+        "node",
+        "-e",
+        "require('node:fs').copyFileSync('internal/storage/fs/capacity_payload_bench_test.go',process.env.STOW_RESULT_ROOT+'/compiled-benchmark.go.txt')"
+      ]
+    },
+    {
+      "name": "build",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/scan-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/baseline-measure.mjs"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "args": [
+        "rm",
+        "internal/storage/fs/capacity_payload_bench_test.go"
+      ]
+    }
+  ]
+}

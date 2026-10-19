@@ -1,0 +1,7 @@
+internal/runtime/objects.go:38:6: cannot inline readOpenedObject: unhandled op DEFER
+internal/runtime/objects.go:39:2: can inline readOpenedObject.deferwrap1 with cost 60 as: func() { .autotmp_3.Close() }
+internal/runtime/objects.go:39:2: readOpenedObject capturing by value: .autotmp_3 (addr=false assign=false width=16)
+internal/runtime/objects.go:38:23: parameter reader leaks to {heap} for readOpenedObject with derefs=0:
+internal/runtime/objects.go:47:27: &bytes.Buffer{...} escapes to heap in readOpenedObject:
+internal/runtime/objects.go:47:32: make([]byte, 0, int(size)) escapes to heap in readOpenedObject:
+internal/runtime/objects.go:38:45: object does not escape

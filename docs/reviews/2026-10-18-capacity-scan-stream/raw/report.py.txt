@@ -1,0 +1,86 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-scan-memory-2026-10-18');base='2026-10-18-capacity-scan-stream/raw/'
+def analysis(phase):
+ j=json.loads((p/(phase+'-start.json')).read_text());return json.loads((p/('export-'+j['id'])/'comparison-analysis.json').read_text())
+def table(phase):
+ out=['| Cell | Time, original → fixed | Time change | Bytes/op, original → fixed | Objects/op, original → fixed | Child peak RSS, original → fixed | Same-binary time change |','| --- | ---: | ---: | ---: | ---: | ---: | ---: |']
+ for c in analysis(phase):
+  a,b=c['labels']['A'],c['labels']['B'];n=c['name'].removeprefix('BenchmarkCapacityPayloadScan/').removesuffix('-4')
+  out.append(f"| {n} | {a['ns']['median']/1e6:.4f} → {b['ns']['median']/1e6:.4f} ms | {c['changePercent']['ns']:+.2f}% | {a['bytes']['median']:,.1f} → {b['bytes']['median']:,.1f} | {a['allocs']['median']:,.1f} → {b['allocs']['median']:,.1f} | {a['maxRSSBytes']['median']/1048576:.2f} → {b['maxRSSBytes']['median']/1048576:.2f} MiB | {c['sameBinaryControlTimePercent']:+.2f}% |")
+ return '\n'.join(out)
+text=f'''# Stream capacity-scan hashing instead of materializing payloads
+
+**Capacity scans now hash through open files using reusable scratch capped at 32 KiB, rather than first allocating each complete file.** Native binding of a 64 MiB binary object allocates about 146 KB in the initial fixed proof, compared with about 134 MB originally. Multipart raw parts show the same improvement. Unknown paths are refused before their contents are read. Existing resource IDs, full-file SHA-256 versions, physical byte charges and validation remain. No index, checkpoint, retained cache, format, dependency, public API or storage abstraction is introduced.
+
+## Baseline and proof before implementation
+
+The checkout starts clean at `fd92db7c3dfa470144e4e4294cb0e046b4ae5add`. Fetching main returns unchanged `219d1dcfff9807b04660a40313b32127e5be2933`. The preceding reconciliation, reader, checksum and admission fixes are complete and retained. The prior report identifies remaining whole-file capacity reads; this change does not repeat the scan-reuse repair or alter ledger persistence/fences.
+
+Three falsifiable hypotheses guide the measurement: payload-sized allocation should grow with an existing object or part; header parsing might add another payload-sized read; streaming the same bytes should retain resource identity while reducing scratch. Source inspection finds `os.ReadFile` for every walked file before classification, followed by `sha256.Sum256(data)`. Object validation then opens the path separately to read its header.
+
+Before writing candidate implementation code, the new native regressions run on exact original source. Ordinary binary objects are created through the unbound streaming store from a limited repeating reader, so fixture setup does not hold a payload-sized client slice. Multipart manifests are created through the native API; raw part bytes are written through the existing durable streaming writer. That fixture matches the existing on-disk part format and isolates scanning from `UploadPart`'s separate buffering behavior. It does not claim that multipart ingestion is streamed.
+
+The measured operation is public `BindNamespace`, including its real scans and ledger/binding work. Fixtures contain one 8 MiB or 64 MiB object or raw part under a namespace with ample existing supported quota. After GC, `runtime.MemStats.TotalAlloc` covers only binding. A 4 MiB internal regression ceiling allows bookkeeping and parsed metadata but rejects payload materialization; it is not a new public total-memory guarantee. Payload inode, mtime, byte charge and independent full-file SHA-256 identity must remain correct.
+
+Original normal allocations are **16,909,960 / 134,348,000 bytes** for 8/64 MiB objects and **16,904,728 / 134,354,960 bytes** for parts. A sparse unknown 64 MiB file is refused with `ErrUnknown`, but allocates **67,137,632 bytes** before refusal. All five allocation leaves fail normally and under race instrumentation. Independent identity controls, malformed-record refusal and native permission/symlink refusal already pass. Root failure names, actual allocation messages, no compile errors/data races, and absence of permission skips are verified. [Original normal proof]({base}red/red-normal.log), [original race proof]({base}red/red-race.log), [receipt]({base}red/validation-receipt.json).
+
+The unchanged-code baseline also measures 30 isolated observations. A 64 MiB object scan allocates **67.14 MB/op**, and binding **134.35 MB/op**. Header reads allocate **1,360 bytes/op** for both 1 MiB and 64 MiB objects. This falsifies payload materialization by the ordinary binary header reader and identifies the full-file scan buffer as the unnecessary cost. [Baseline observations]({base}red/measurements.json), [baseline analysis]({base}red/baseline-analysis.json).
+
+## Implementation and storage contracts
+
+The existing walk retains its error, symlink, directory and lock-file handling. It keeps a local scratch slice for the scan and delegates each file to a private reader. The reader opens and stats the file, then validates its class before allocating hash scratch. An unknown path returns the existing refusal without reading its potentially large contents. Invalid negative sizes are refused.
+
+Ordinary object headers are parsed with the existing `readRecordHeader` through that same descriptor. Header parsing uses positional reads, so the later hash starts at byte zero. Bucket JSON is validated through that descriptor and rewound afterward. Save-entry and multipart-manifest validators retain their existing validation helpers. No payload-format checks are dropped; version, header length, declared payload length, malformed record, manifest, JSON and native read errors remain in the relevant paths.
+
+The scratch starts small for small files, grows geometrically when needed and never exceeds 32 KiB. It is reused across files only within the current scan. `io.CopyBuffer` hashes through a limited reader, so the file's optional `WriterTo` path cannot ignore the supplied buffer. The limit is the captured encoded file size plus one probe byte, saturating at MaxInt64 to avoid overflow. A read error is propagated; a byte count different from the captured size returns `ErrUnknown`. Growth cannot grow the scratch or be silently treated as a valid captured prefix; truncation is refused.
+
+The shared resource builder preserves SHA-256 of the cleaned pathname as ID, lowercase hex SHA-256 of the **entire encoded file** as version, actual encoded bytes as charge, and the existing payload/recovery class. The stream includes object magic, header length, protobuf metadata and payload; it is not a payload-only ETag. The existing byte-slice `resourceFor` interface remains for projected admissions and uses the same builder. Independent tests calculate expected IDs and hashes without that shared helper.
+
+The store's existing managed-operation mutex/ownership qualification still applies. The scan adds no cross-operation state, partial index or cached usage. Object header validation and hashing now use one descriptor, strengthening captured-file consistency without promising safety against unsupported concurrent raw in-place host edits. Namespace admission, pending reservations, resource slots, quota accounting, holds, journal behavior and all durability fences are unchanged.
+
+Legacy JSON object decoding and metadata parsing retain their existing allocations. Bucket JSON, multipart manifests and save-entry validation are not replaced by new formats or decoders. Large metadata can still cost memory. The 32 KiB cap describes hash scratch, not decoded metadata, legacy payloads, resource arrays, all publication paths or total process memory. The initial unknown-file read now fails earlier; native permission/open identity and symlink refusal remain covered.
+
+## Candidate measurement before production edits
+
+The temporary two-file candidate overlays pass all five regression groups normally and under race instrumentation. Original-source replay still produces exactly the allocation failures. Native fixed binding allocates **156,600 / 145,968 bytes** for 8/64 MiB objects and **172,920 / 173,032 bytes** for parts; the unknown-file refusal allocates **19,736 bytes**. Race-instrumented binding remains below 240 KB and the unknown refusal below 45 KB. These results verify that allocation no longer scales with the ordinary payload sizes in these fixtures.
+
+All 12 prototype steps and 240 paired observations pass before production source is changed. An empty Go stub exists only in original-source overlays to suppress the newly added private reader file, avoiding duplicate helper definitions. It is not a compatibility format or a second implementation. Only the exact Railway-formatted/tested candidate files are selected afterward. [Candidate normal]({base}prototype/prototype-normal.log), [candidate race]({base}prototype/prototype-race.log), [candidate checks]({base}prototype/checks.json).
+
+All Go formatting, builds, tests, race/conformance, quality, vet, site/docs checks and benchmarks run only on authorized Railway scratch deployment `3a2c61df-2837-418b-bae3-4bff53fc6359`. Go 1.25.6, Linux amd64, UID 10001, GOMAXPROCS 4, 4 CPU/4 GiB. Benchmark payloads and ledgers reside on verified ext4 `/results` (statfs 61267). The target service is not started or changed.
+
+Each cell runs in a separate benchmark child. Initial creation, binding where applicable, independent reference hashing, empty-bucket preparation, final identity/charge checks and cleanup are outside Go timing/allocation counters. Cells cover scan, public binding and native empty-bucket deletion over a 1 MiB or 64 MiB object or part, plus header-only and empty-store controls. The deletion is a supported small mutation whose admission still verifies existing data. It does not change the large payload. A later scan confirms its exact charge/version and the deleted bucket's absence.
+
+Each comparison uses ABBA/BAAB order with four original/fixed observations per cell and four observations per identical-original-binary control label C/D. Peak RSS is Linux child maximum usage, including startup, calibration, fixtures and final checks, not isolated per-operation RSS or cgroup/page-cache memory. Setup streams payloads and reference hashing to avoid masking the improvement with a large client-side slice. Recently written files do not establish cold-cache storage throughput. Positive time changes mean slower.
+
+Prototype measurements use three timed operations per process:
+
+{table('prototype')}
+
+The 64 MiB object scan reduces allocated bytes **67.13 MB → 44.7 KB**, with child peak RSS **137.86 → 12.04 MiB**. Binding peak RSS is **170.43 → 12.31 MiB**. Large object/part operation medians improve roughly 7–10% in this run. The empty-store scan is adverse at **+12.20%**, about **55.8 → 62.7 microseconds**, with a **+0.80%** same-binary control change. Its allocated object count rises from 111 to 117 despite fewer bytes. These costs are retained, not dismissed or hidden. Header-only control timings also move despite unchanged reader code, limiting attribution for small timing differences.
+
+## Final comparison and new costs
+
+The final run uses actual selected production files and exact original-source overlays, with five timed operations per process. It repeats 240 observations after all final validation gates: **480 paired observations plus 30 original baseline observations**. Binding's first versus subsequent calls have different setup work, so absolute 3x/5x results are not treated as identical workloads; original/fixed counts match within each comparison.
+
+{table('final')}
+
+The final 64 MiB object scan allocates **67,133,422.5 → 45,549 bytes/op**, with child peak RSS **138.47 → 12.19 MiB**. Object binding improves **107.91 → 97.25 ms** and deletion **57.06 → 51.80 ms**. The final empty scan is faster by **4.82%**, against a **+4.32%** same-binary control change, but still allocates **117 versus 111 objects/op**. The earlier **+12.20%** empty-scan result remains adverse evidence; the final timing does not establish that its cost has disappeared. No lower allocation-count claim is made for all small files.
+
+[Final observations]({base}final/measurements.json), [final ranges]({base}final/comparison-analysis.json), [prototype observations]({base}prototype/measurements.json), [prototype ranges]({base}prototype/comparison-analysis.json). Every observation, binary hash, command and range is retained. The regression counters establish payload-independent allocation in the tested binary/part fixtures; child RSS establishes the measured process footprint for this harness. No universal latency, statistical-significance or global constant-memory claim is made.
+
+Streaming adds bounded-buffer and incremental hash bookkeeping and more small reads in place of one large materialization. Metadata-only files now pass through streaming hash state; bucket JSON also rewinds its descriptor after validation. Those costs can increase small-scan time and allocation count. Resource collection remains linear in file count; all data is still read and hashed, so hashing/I/O time remains linear in payload bytes. No pool or retained buffer hides memory between operations. The implementation primarily removes unnecessary full-file input allocation and its GC pressure. Existing buffered incoming capacity-bound/guarded publication and multipart ingestion are separate remaining costs.
+
+## Validation and provenance
+
+All **23 final steps** pass: formatting; quality/file-size/format ratchets; exact-original normal/race red replays; filesystem/capacity normal and race suites twice; full Go tests; broad capacity/storage/runtime/embedded/runthrough/S3/public-package race tests; four conformance profiles; vet; site build/tests; documentation links; temporary benchmark installation/formatting and exact source snapshot; both binary builds; final comparison; cleanup. [Final checks]({base}final/checks.json), [receipt]({base}final/validation-receipt.json), [normal suites]({base}final/focused-normal.log), [race suites]({base}final/focused-race.log). Native permission cases execute without a root skip. No quality baseline is raised. The temporary Go benchmark is removed. The shared record reader remains unchanged. Additional Railway report/site/docs and exact-source/evidence checks run before scratch teardown; committed Go bytes must match those actually tested.
+
+The first upload fails before an associated build, deployment `a49b8ef7-a60a-48c2-a950-1dbdeeef2b03`. Its error, terminal state and no-build evidence remain saved. Only after that confirmation is source retried with stronger gzip compression: **65,398,107 → 64,469,839 bytes**. Streaming hashes prove byte-identical uncompressed tar contents. Both transport receipts, the source inventory, actual transport Dockerfile and original validation recipe remain. No local project execution substitutes for Railway validation.
+
+The [artifact manifest]({base}artifact-manifest.json) records original/candidate/final sources, tests, every measurement, failure provenance and scratch-runner teardown. No stored data is rewritten by scanning and no migration or caller action is required.
+
+## Next finding
+
+Capacity-bound/guarded incoming publication and multipart ingestion still materialize their input; legacy and metadata decoding can also retain size-dependent memory. The buffered admission paths need separate native allocation/RSS measurements and a correctness proof for staging, reservations, failure/recovery and receipt semantics before changing publication. Do not infer that this scan fix solves those paths. No next optimization is implemented here, and no indexing or checkpoint machinery is introduced. The product-quality goal remains active.
+'''
+(p/'report.md').write_text(text);print('Generated report',len(text.encode()),'bytes')

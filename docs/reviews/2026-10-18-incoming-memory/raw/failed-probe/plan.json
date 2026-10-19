@@ -1,0 +1,146 @@
+{
+  "phase": "incoming-memory-baseline",
+  "sources": [
+    "internal/storage/fs/staged_put.go",
+    "internal/storage/fs/fs_put.go",
+    "internal/storage/fs/fs_records.go",
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/capacity_read.go",
+    "internal/storage/put_body.go",
+    "internal/storage/owned_body.go",
+    "internal/s3api/server.go",
+    "internal/s3api/request.go",
+    "benchmark/incoming-probe.go.txt",
+    "benchmark/measure.mjs",
+    "benchmark/measure-child.py"
+  ],
+  "steps": [
+    {
+      "name": "install-probe",
+      "args": [
+        "cp",
+        "benchmark/incoming-probe.go.txt",
+        "internal/storage/fs/incoming_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "format-probe",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/incoming_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "snapshot-probe",
+      "args": [
+        "node",
+        "-e",
+        "require('node:fs').copyFileSync('internal/storage/fs/incoming_memory_probe_test.go',process.env.STOW_RESULT_ROOT+'/compiled-probe.go.txt')"
+      ]
+    },
+    {
+      "name": "build-probe",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/incoming.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/measure.mjs"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "args": [
+        "rm",
+        "internal/storage/fs/incoming_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "./internal/capacity",
+        "./internal/s3api",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "./internal/capacity",
+        "./internal/s3api",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "conformance-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "conformance-runtime-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-runtime-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+      }
+    }
+  ]
+}

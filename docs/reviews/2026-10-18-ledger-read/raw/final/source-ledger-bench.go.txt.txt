@@ -1,0 +1,43 @@
+package capacity
+
+import (
+ "context"
+ "errors"
+ "fmt"
+ "os"
+ "strings"
+ "syscall"
+ "testing"
+)
+
+func BenchmarkLedgerRead(b *testing.B) {
+ root:=os.Getenv("STOW_BENCH_ROOT")
+ if !strings.HasPrefix(root,"/results/") { b.Fatal("Railway ext4 fixture required") }
+ b.Setenv("TMPDIR",root)
+ for _,count:=range []int{16,maxResources} {
+  b.Run(fmt.Sprintf("valid=%d",count),func(b *testing.B){
+   ns,_:=resourceCountNamespace(b,[2]int{count/2,count-count/2})
+   assertLedgerBenchmarkDisk(b,ns.host)
+   b.ReportAllocs();b.ResetTimer()
+   for i:=0;i<b.N;i++ {
+    snapshot,err:=ns.Snapshot(context.Background())
+    if err!=nil||snapshot.PayloadBytes!=int64(count) { b.Fatalf("snapshot=%+v err=%v",snapshot,err) }
+   }
+  })
+ }
+ for _,size:=range []int64{2*maxStateBytes+1,8*maxStateBytes+1} {
+  b.Run(fmt.Sprintf("oversized=%d",size),func(b *testing.B){
+   host:=ledgerReadHost(b);sparseLedger(b,host,size);assertLedgerBenchmarkDisk(b,host)
+   b.ReportAllocs();b.ResetTimer()
+   for i:=0;i<b.N;i++ { if _,err:=Open(host.options);!errors.Is(err,ErrUnknown) { b.Fatalf("oversized Open=%v",err) } }
+  })
+ }
+}
+
+func assertLedgerBenchmarkDisk(b *testing.B,host *Host) {
+ b.Helper()
+ var disk syscall.Statfs_t
+ if err:=syscall.Statfs(host.dir,&disk);err!=nil||disk.Type!=61267 { b.Fatalf("ext4 ledger required: %v type=%d",err,disk.Type) }
+ info,err:=os.Stat(host.dir+"/capacity.json");if err!=nil { b.Fatal(err) }
+ b.Logf("ledger file bytes=%d",info.Size())
+}

@@ -1,0 +1,132 @@
+package runthrough
+
+import (
+	"errors"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestOutboxOwnershipCurrentOwner(t *testing.T) {
+	for _, action := range ownershipActions {
+		for _, expiry := range []string{"future", "expired"} {
+			t.Run(action+"/"+expiry, func(t *testing.T) { checkCurrentOwnership(t, action, expiry) })
+		}
+	}
+}
+
+func checkCurrentOwnership(t *testing.T, action, expiry string) {
+	t.Helper()
+	f := newOwnershipFixture(t, "native", action, ownershipCredentials{})
+	var entry OutboxEntry
+	var err error
+	prepared := strings.HasSuffix(action, "-prepared")
+	if prepared {
+		if err := f.outbox.DiscardPrepared("intent"); err != nil {
+			t.Fatal(err)
+		}
+		entry, err = f.outbox.PrepareOwned(OutboxEntry{ID: "intent", Operation: OutboxPut, Bucket: "bucket", Key: "key", Version: "original"}, "worker", time.Hour)
+	} else {
+		var claimed ClaimedEntry
+		var acquired bool
+		claimed, acquired, err = f.outbox.Claim("intent", "worker", time.Hour)
+		entry = claimed.Entry
+		if !acquired {
+			t.Fatal("could not acquire eligible intent")
+		}
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	credentials := ownershipCredentials{owner: entry.ClaimOwner, token: entry.ClaimToken}
+	if prepared {
+		credentials = ownershipCredentials{owner: entry.PreparedOwner, token: entry.PreparedToken}
+	}
+	if credentials.owner == "" || credentials.token == 0 {
+		t.Fatal("allocator returned invalid credentials")
+	}
+	if expiry == "expired" {
+		err = f.outbox.withState(func(s *outboxState) error {
+			if prepared {
+				entry.PreparedUntil = time.Unix(100, 0).UTC()
+				s.prepared[entry.ID] = entry
+			} else {
+				entry.ClaimUntil = time.Unix(100, 0).UTC()
+				s.entries[entry.ID] = entry
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	got, err := ownershipAction(f.outbox, action, "intent", credentials)
+	if err != nil {
+		t.Fatalf("current owner refused: %v", err)
+	}
+	peer, err := NewFileOutbox(f.path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	verifyOwnershipResult(t, peer.state, action, got)
+}
+
+func verifyOwnershipResult(t *testing.T, state outboxState, action string, got OutboxEntry) {
+	t.Helper()
+	active, activeOK := state.entries["intent"]
+	prepared, preparedOK := state.prepared["intent"]
+	switch action {
+	case "success", "discard-prepared":
+		if activeOK || preparedOK {
+			t.Error("completed intent remains queued")
+		}
+	case "commit-prepared":
+		if !activeOK || preparedOK || active != got || active.Version != "committed" || active.PreparedOwner != "" || active.PreparedToken != 0 {
+			t.Error("owned commit did not publish expected active intent")
+		}
+	case "renew":
+		if !activeOK || active.ClaimOwner != "worker" || active.ClaimToken == 0 || !active.ClaimUntil.After(time.Now()) {
+			t.Error("claim was not renewed")
+		}
+	case "renew-prepared":
+		if !preparedOK || prepared.PreparedOwner != "worker" || prepared.PreparedToken == 0 || !prepared.PreparedUntil.After(time.Now()) {
+			t.Error("prepared lease was not renewed")
+		}
+	case "release", "failure":
+		if !activeOK || active.ClaimOwner != "" || active.ClaimToken != 0 || !active.ClaimUntil.IsZero() {
+			t.Error("claim was not cleared")
+		}
+		if action == "failure" && (active.Attempts != 1 || active.LastError != "failed propagation" || active.NextAttempt.IsZero() || active.Terminal) {
+			t.Error("retry fields changed")
+		}
+	}
+}
+
+func TestOutboxOwnershipMissingAndCommittedRetries(t *testing.T) {
+	for _, action := range ownershipActions {
+		t.Run(action, func(t *testing.T) {
+			f := newOwnershipFixture(t, "native", action, ownershipCredentials{})
+			before := f.outbox.state.clone()
+			got, err := ownershipAction(f.outbox, action, "missing", ownershipCredentials{})
+			noOp := action == "release" || action == "discard-prepared"
+			if noOp && err != nil {
+				t.Errorf("missing idempotent operation failed: %v", err)
+			}
+			if !noOp && (err == nil || errors.Is(err, ErrOutboxClaimLost)) {
+				t.Errorf("missing intent error changed: %v", err)
+			}
+			if got != (OutboxEntry{}) || !reflect.DeepEqual(before, f.outbox.state) {
+				t.Error("missing intent operation changed state")
+			}
+		})
+	}
+	t.Run("already-committed", func(t *testing.T) {
+		f := newOwnershipFixture(t, "native", "success", ownershipCredentials{})
+		before := f.outbox.state.clone()
+		got, err := f.outbox.CommitPrepared("intent", "", 0, "ignored")
+		if err != nil || got != before.entries["intent"] || !reflect.DeepEqual(before, f.outbox.state) {
+			t.Fatalf("idempotent committed retry changed: %+v %v", got, err)
+		}
+	})
+}

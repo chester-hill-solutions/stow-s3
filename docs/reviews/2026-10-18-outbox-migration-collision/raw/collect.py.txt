@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,shutil,hashlib
+p=Path('/private/tmp/stow-outbox-collision-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');dest=r/'docs/reviews/2026-10-18-outbox-migration-collision/raw';dest.mkdir(parents=True,exist_ok=True)
+for phase in ['before','after']:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());assert run['complete']and run['success'];checks=json.loads((src/'checks.json').read_text());assert all(c['passed']for c in checks)
+ env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ d=dest/phase;d.mkdir(exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,d/f.name)
+ for suffix in ['start.json','sync-receipt.json']:
+  f=p/(phase+'-'+suffix)
+  if f.exists():shutil.copy2(f,d/suffix)
+ if phase=='after':
+  for name,digest in env['sourceSHA256'].items():assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+for n in ['baseline.json','source-manifest.json']:shutil.copy2(p/n,dest/n)
+for n in ['Dockerfile','resources.mjs','runner.mjs','http.mjs','diagnosis.mjs','diagnosis-validation.mjs','reap_validation.py']:shutil.copy2(p/'context/benchmark'/n,dest/(n+'.txt'))
+for n in ['verify_red.py','verify_green.py','collect.py']:shutil.copy2(p/n,dest/(n+'.txt'))
+print('Retained both complete Railway runs, baseline, hashes, harness and exact verification scripts')

@@ -1,0 +1,128 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_duplicate_boundary_test.go",
+      "benchmark/insert-bench.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1988,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4509,
+    "passed": true
+  },
+  {
+    "name": "candidate-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1900,
+    "passed": true
+  },
+  {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 3537,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-before.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/insert-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2072,
+    "passed": true
+  },
+  {
+    "name": "candidate-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-candidate.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/insert-candidate.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2136,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/boundary-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 28693,
+    "passed": true
+  }
+]

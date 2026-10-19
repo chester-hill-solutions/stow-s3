@@ -1,0 +1,7 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-part-ownership-2026-10-18');j=json.loads((p/'compact-red-start.json').read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert v['complete']and v['success']and len(checks)==5 and all(c['passed']for c in checks)
+for n in ['candidate-retention-normal.log','candidate-retention-race.log']:
+ s=(e/n).read_text();assert '--- FAIL: TestPartMemoryKeepsCompactPayload'in s and 'len=257 cap=4194304'in s and '[build failed]'not in s
+for n in ['original-retention-normal.log','original-retention-race.log']:assert '--- PASS: TestPartMemoryKeepsCompactPayload'in (e/n).read_text()
+(e/'validation-receipt.json').write_text(json.dumps({'success':True,'demonstratedCandidateRetentionRegression':True,'originalPassed':True,'checks':5,'railwayDeploymentId':j['deploymentId']},indent=2)+'\n');print('Verified candidate retains 4 MiB for a 257-byte part; exact original passes normal and race')

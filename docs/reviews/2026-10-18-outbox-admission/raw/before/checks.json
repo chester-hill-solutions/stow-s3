@@ -1,0 +1,78 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_admission_test.go",
+      "internal/runthrough/outbox_admission_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "regression-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxAdmissionRejectsOccupiedIDs|TestOutboxAdmissionConcurrentSameID|TestOutboxAdmissionAllowsAvailableIDs)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 23482,
+    "passed": true
+  },
+  {
+    "name": "regression-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxAdmissionRejectsOccupiedIDs|TestOutboxAdmissionConcurrentSameID|TestOutboxAdmissionAllowsAvailableIDs)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 39725,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 441,
+    "passed": true
+  },
+  {
+    "name": "benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/outbox-admission-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 824,
+    "passed": true
+  }
+]

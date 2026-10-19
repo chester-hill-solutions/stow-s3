@@ -1,0 +1,33 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxDecodeCycle/depth=0/enqueue           	      66	   6804955 ns/op	         0 cached-B	        14.00 journal-B	  14786560 process-HWM-B	    395872 process-live-heap-B	    9731 B/op	      85 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/enqueue-4         	      66	   7107109 ns/op	         0 cached-B	        14.00 journal-B	  16990208 process-HWM-B	    404336 process-live-heap-B	    9731 B/op	      85 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/prepare           	      70	   8148367 ns/op	         0 cached-B	        14.00 journal-B	  16568320 process-HWM-B	    401488 process-live-heap-B	    9732 B/op	      85 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/prepare-4         	      58	   8216717 ns/op	         0 cached-B	        14.00 journal-B	  16580608 process-HWM-B	    404448 process-live-heap-B	    9731 B/op	      85 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/provenance        	     100	   4115399 ns/op	         0 cached-B	        34.00 journal-B	  16392192 process-HWM-B	    406088 process-live-heap-B	    4465 B/op	      41 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/provenance-4      	     136	   3576150 ns/op	         0 cached-B	        34.00 journal-B	  16904192 process-HWM-B	    415208 process-live-heap-B	    4474 B/op	      42 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/renew             	     171	   4337196 ns/op	         0 cached-B	       151.0 journal-B	  17227776 process-HWM-B	    411904 process-live-heap-B	    5716 B/op	      52 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=0/renew-4           	     174	   3070204 ns/op	         0 cached-B	       151.0 journal-B	  16990208 process-HWM-B	    414768 process-live-heap-B	    5696 B/op	      52 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/enqueue         	      58	   7313176 ns/op	         0 cached-B	     25486 journal-B	  19144704 process-HWM-B	    646992 process-live-heap-B	 1005854 B/op	    5995 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/enqueue-4       	      74	   8091673 ns/op	         0 cached-B	     25486 journal-B	  19513344 process-HWM-B	    650096 process-live-heap-B	 1006724 B/op	    6003 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/prepare         	      58	   8363787 ns/op	         0 cached-B	     25486 journal-B	  18894848 process-HWM-B	    647072 process-live-heap-B	 1005854 B/op	    5995 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/prepare-4       	      78	   6929059 ns/op	         0 cached-B	     25486 journal-B	  21401600 process-HWM-B	    650064 process-live-heap-B	 1006884 B/op	    6004 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/provenance      	     146	   3120496 ns/op	         0 cached-B	     25506 journal-B	  20914176 process-HWM-B	    647392 process-live-heap-B	  503355 B/op	    3003 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/provenance-4    	     141	   4623637 ns/op	         0 cached-B	     25506 journal-B	  21147648 process-HWM-B	    651608 process-live-heap-B	  503406 B/op	    3003 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/renew           	     151	   4057548 ns/op	         0 cached-B	     25623 journal-B	  20992000 process-HWM-B	    647472 process-live-heap-B	  504065 B/op	    3010 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=128/renew-4         	     100	   4738410 ns/op	         0 cached-B	     25623 journal-B	  21544960 process-HWM-B	    650448 process-live-heap-B	  503280 B/op	    3002 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/enqueue        	       9	  44906081 ns/op	         0 cached-B	    815118 journal-B	  56483840 process-HWM-B	   7587528 process-live-heap-B	31386366 B/op	  180960 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/enqueue-4      	      12	  44665869 ns/op	         0 cached-B	    815118 journal-B	  56483840 process-HWM-B	   7590808 process-live-heap-B	31597672 B/op	  182896 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/prepare        	      12	  45660751 ns/op	         0 cached-B	    815118 journal-B	  56483840 process-HWM-B	   7587720 process-live-heap-B	31597644 B/op	  182896 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/prepare-4      	      14	  48488625 ns/op	         0 cached-B	    815118 journal-B	  56483840 process-HWM-B	   7590728 process-live-heap-B	31688216 B/op	  183726 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/provenance     	      27	  23738853 ns/op	         0 cached-B	    815138 journal-B	  56483840 process-HWM-B	   7588328 process-live-heap-B	15825975 B/op	   91774 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/provenance-4   	      27	  22808715 ns/op	         0 cached-B	    815138 journal-B	  56483840 process-HWM-B	   7591512 process-live-heap-B	15826527 B/op	   91775 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/renew          	      28	  24704105 ns/op	         0 cached-B	    815254 journal-B	  56483840 process-HWM-B	   7596520 process-live-heap-B	15852926 B/op	   91871 allocs/op
+BenchmarkFileOutboxDecodeCycle/depth=4096/renew-4        	      30	  23213733 ns/op	         0 cached-B	    815255 journal-B	  56483840 process-HWM-B	   7599848 process-live-heap-B	15871058 B/op	   92037 allocs/op
+BenchmarkOutboxDecodeProfile/rich=false                  	      76	   7350794 ns/op	    908400 frame-B	 7682520 B/op	   69702 allocs/op
+BenchmarkOutboxDecodeProfile/rich=false-4                	      66	   7098518 ns/op	    908400 frame-B	 7682528 B/op	   69702 allocs/op
+BenchmarkOutboxDecodeProfile/rich=true                   	      42	  11208714 ns/op	   2698344 frame-B	10229384 B/op	  168039 allocs/op
+BenchmarkOutboxDecodeProfile/rich=true-4                 	      40	  11464506 ns/op	   2698344 frame-B	10229392 B/op	  168039 allocs/op
+PASS

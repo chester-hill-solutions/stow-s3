@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,shutil,hashlib
+p=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-write-phases/raw';raw.mkdir(parents=True,exist_ok=True)
+for phase,count in [('main',7),('paired',4)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(c['passed']for c in checks)
+ assert run['railwayDeploymentId']==job['deploymentId']=='e2aa1875-8a12-48ab-a612-c69b1f1c4e50'
+ env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ for name,digest in env['sourceSHA256'].items():
+  if name.startswith('internal/'):assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+ dest=raw/phase;dest.mkdir(exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ shutil.copy2(p/(phase+'-start.json'),dest/'start.json')
+source=json.loads((raw/'main/product-source-verification.json').read_text());assert source['count']==len(source['files'])==695
+for name,digest in source['files'].items():assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+assert len(json.loads((raw/'main/post-checks.json').read_text()))==2
+assert all(x['exitCode']==0 for x in json.loads((raw/'main/post-checks.json').read_text()))
+for name in ['baseline.json','source-manifest.json','diagnostic-inputs.json']:shutil.copy2(p/name,raw/name)
+for name in ['prepare.py','plan.py','analyze.py','analyze-paired.py','prepare-paired.py','report.py','collect.py','post-checks.js','export.py','remote.py','control.py','watch.py','stop.py','manifest.py','publish.py']:shutil.copy2(p/name,raw/(name+'.txt'))
+for name in ['Dockerfile','resources.mjs','runner.mjs','http.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/name,raw/(name+'.txt'))
+print('Collected both terminal jobs, all diagnostic sources and verification scripts; all 695 product files match')

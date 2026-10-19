@@ -1,0 +1,130 @@
+[
+  {
+    "name": "install-capacity-benchmark",
+    "args": [
+      "cp",
+      "benchmark/ledger-reuse-bench.go.txt",
+      "internal/capacity/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "install-mutation-benchmark",
+    "args": [
+      "cp",
+      "benchmark/mutation-reuse-bench.go.txt",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  },
+  {
+    "name": "install-trace",
+    "args": [
+      "cp",
+      "benchmark/reuse-trace.go.txt",
+      "internal/storage/fs/reuse_trace_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13,
+    "passed": true
+  },
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/diagnostic-admission.go.txt",
+      "internal/capacity/ledger_reuse_bench_test.go",
+      "internal/storage/fs/ledger_reuse_bench_test.go",
+      "internal/storage/fs/reuse_trace_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "trace",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/diagnostic-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestReconcileEligibilityTrace$",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_REUSE_DIAGNOSTIC": "on",
+      "STOW_REUSE_TRACE": "1"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 835,
+    "passed": true
+  },
+  {
+    "name": "build-capacity",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/diagnostic-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/capacity-toggle.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 482,
+    "passed": true
+  },
+  {
+    "name": "build-fs",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/diagnostic-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/fs-toggle.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 504,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/toggle-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 31220,
+    "passed": true
+  },
+  {
+    "name": "cleanup",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_reuse_bench_test.go",
+      "internal/storage/fs/ledger_reuse_bench_test.go",
+      "internal/storage/fs/reuse_trace_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  }
+]

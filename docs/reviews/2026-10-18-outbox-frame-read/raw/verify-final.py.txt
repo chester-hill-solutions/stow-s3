@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-postprofile-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-frame-read/raw';receipt=json.loads((raw/'final/report-receipt.json').read_text());stop=json.loads((p/'runner-stop-status.json').read_text());base=json.loads((p/'baseline.json').read_text());assert receipt['exitCode']==0 and stop['stopVerified']and all(x['exitCode']==0 for x in receipt['checks'])
+for n,h in {**receipt['documentSHA256'],**receipt['sourceSHA256']}.items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+confirmed=json.loads((raw/'candidate/environment.json').read_text())['sourceSHA256']
+for n in ['file_outbox.go','file_outbox_read.go']:assert confirmed['benchmark/candidate-'+n+'.txt']==receipt['sourceSHA256']['internal/runthrough/'+n]
+a=subprocess.check_output(['git','show',base['base']+':internal/runthrough/file_outbox.go'],cwd=r);b=(r/'internal/runthrough/file_outbox.go').read_bytes();assert b==a.replace(b'data, err := os.ReadFile(o.path)',b'data, err := readOutboxFile(o.path)')
+for n in ['internal/runthrough/file_outbox_proto.go','internal/runthrough/file_outbox_proto_decode.go','go.mod','go.sum']:assert subprocess.check_output(['git','show',base['base']+':'+n],cwd=r)==(r/n).read_bytes(),n
+assert json.loads((raw/'final/green-receipt.json').read_text())['focused-race']['passed']==80
+for phase,count in [('before',5),('initial',6),('partial',6),('candidate',6),('final',14)]:
+ checks=json.loads((raw/phase/'checks.json').read_text());run=json.loads((raw/phase/'run.json').read_text());expected=['candidate-normal','candidate-race','candidate-build','comparison']if phase=='initial'else[];assert run['complete']and run['success']==(not expected)and len(checks)==count and [x['name']for x in checks if not x['passed']]==expected
+for phase in ['partial','candidate']:assert json.loads((raw/phase/'comparison-analysis.json').read_text())['observations']==192
+assert json.loads((raw/'before/profile-analysis.json').read_text())['uninstrumentedObservations']==42
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip()==base['base']
+shutil.copy2(p/'runner-stop-status.json',raw/'runner-stop-status.json');shutil.copy2(p/'verify-final.py',raw/'verify-final.py.txt')
+result={'verified':True,'base':base,'sourceSHA256':receipt['sourceSHA256'],'documentSHA256':receipt['documentSHA256'],'productionMatchesMeasuredCandidate':True,'loaderOnlyCallChanged':True,'codecAndDependenciesUnchanged':True,'pairedAndControlObservations':384,'freshUninstrumentedObservations':42,'excludedBuildJob':'e939cf4d-0101-42aa-a95d-9a4af15e517b','newDistinctCases':40,'passesPerMode':80,'teardown':stop};(raw/'review-verification.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified exact measured reader/report, one-call loader change, unchanged codec/dependencies, all gates, observations and teardown')

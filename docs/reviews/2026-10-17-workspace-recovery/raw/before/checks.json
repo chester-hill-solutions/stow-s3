@@ -1,0 +1,52 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/workspace/owner_recovery_test.go",
+      "internal/s3api/workspace_owner_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 26,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/workspace",
+      "./internal/s3api",
+      "-run",
+      "^TestWorkspaceMultipartOwner",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 24284,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/workspace",
+      "./internal/s3api",
+      "-run",
+      "^TestWorkspaceMultipartOwner",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 38695,
+    "passed": true
+  }
+]

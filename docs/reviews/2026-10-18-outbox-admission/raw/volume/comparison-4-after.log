@@ -1,0 +1,21 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkOutboxAdmission/file/depth=0/enqueue/auto           	      48	   6660438 ns/op	    9745 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/auto-4         	      56	   6671696 ns/op	    9751 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/explicit       	      55	   9818161 ns/op	    9832 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/enqueue/explicit-4     	      55	   6392606 ns/op	    9831 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/auto           	      73	   5752607 ns/op	    9749 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/auto-4         	      67	   7735448 ns/op	    9756 B/op	      87 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/explicit       	      51	   7370784 ns/op	    9832 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=0/prepare/explicit-4     	      79	   7254765 ns/op	    9832 B/op	      86 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/auto         	      45	   7898116 ns/op	 1009920 B/op	    6034 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/auto-4       	      44	   8376365 ns/op	 1010089 B/op	    6035 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/explicit     	      38	   8969234 ns/op	 1009984 B/op	    6033 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/enqueue/explicit-4   	      57	   9855446 ns/op	 1010086 B/op	    6033 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/auto         	      50	   9034283 ns/op	 1009920 B/op	    6034 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/auto-4       	      44	   7548836 ns/op	 1010115 B/op	    6035 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/explicit     	      50	   7787263 ns/op	 1009984 B/op	    6033 allocs/op
+BenchmarkOutboxAdmission/file/depth=128/prepare/explicit-4   	      49	   7874141 ns/op	 1009992 B/op	    6033 allocs/op
+PASS

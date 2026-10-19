@@ -1,0 +1,46 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-null.md": "69ac3c5ab2206c91a1fb4d478652db984646db8493e279cd9458a1c139598bc6",
+    "docs/outbox.md": "c16cd3744eaf4a9d8e7d772bb91bbb991865ef0df574ab6651e9f01adcb0b549",
+    "docs/reviews/2026-10-17-outbox-missing.md": "43104f6c02b6efe88e5e5158ff43a52403dc7a5dc1de7a2b9d859341c2104f0b"
+  },
+  "reportSHA256": "69ac3c5ab2206c91a1fb4d478652db984646db8493e279cd9458a1c139598bc6",
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox.go": "f0c0071ae1671c1f5deec5e7a8b825d3a72b45efb4b94f06f09ffc2ae6e2604d",
+    "internal/runthrough/file_outbox_null_test.go": "a5967bfda7ae4225d05f008d007f35ddf123fbe422ca1e394e02b27681788261",
+    "internal/runthrough/file_outbox_lookup_test.go": "f8c9f854a672f711917f0935ce6a51b8d82e3e785d52ed736753e3528fba8fec"
+  },
+  "railwayDeploymentId": "73f32d5e-da79-4735-b861-daccf14afc89"
+}

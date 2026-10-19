@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-insert-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-insert/raw';receipt=json.loads((raw/'final/report-receipt.json').read_text());stop=json.loads((p/'runner-stop-status.json').read_text());base=json.loads((p/'baseline.json').read_text());assert receipt['exitCode']==0 and stop['stopVerified']and all(x['exitCode']==0 for x in receipt['checks'])
+for n,h in {**receipt['documentSHA256'],**receipt['sourceSHA256']}.items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+name='internal/runthrough/file_outbox_proto_decode.go';original=subprocess.check_output(['git','show',base['base']+':'+name],cwd=r);assert original==(r/name).read_bytes();assert subprocess.check_output(['git','diff','--name-only',base['base'],'--','*.go','go.mod','go.sum','*.proto'],cwd=r)==b''
+assert json.loads((raw/'final/green-receipt.json').read_text())['focused-race']['passed']==18
+for phase,count in [('pilot',8),('boundary',8),('proof',5),('final',14)]:
+ checks=json.loads((raw/phase/'checks.json').read_text());run=json.loads((raw/phase/'run.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks)
+ assert json.loads((raw/phase/'environment.json').read_text())['sourceSHA256'][name]==hashlib.sha256(original).hexdigest()
+assert json.loads((raw/'pilot/comparison-analysis.json').read_text())['observations']==168 and json.loads((raw/'boundary/comparison-analysis.json').read_text())['observations']==48
+proof=json.loads((raw/'proof/boundary-receipt.json').read_text());assert all(v['counts']==({'PASS':6}if k.startswith('before-')else{'FAIL':6})for k,v in proof.items())
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip()==base['base'];shutil.copy2(p/'runner-stop-status.json',raw/'runner-stop-status.json');shutil.copy2(p/'verify-final.py',raw/'verify-final.py.txt')
+result={'verified':True,'base':base,'sourceSHA256':receipt['sourceSHA256'],'documentSHA256':receipt['documentSHA256'],'productionUnchanged':True,'dependenciesAndFormatsUnchanged':True,'observations':216,'newDistinctCases':9,'passesPerMode':18,'candidateAllocationFailuresPerMode':6,'teardown':stop};(raw/'review-verification.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified unchanged production, exact tests/report, rejected candidate proof, all 216 observations and isolated teardown')

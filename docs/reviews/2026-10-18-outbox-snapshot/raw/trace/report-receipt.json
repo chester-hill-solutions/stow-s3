@@ -1,0 +1,48 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-snapshot.md": "6fc552e070fa0e66c3bdbfb0e8ac7988b63b41f77c0d17b3b6bd979864a975a6",
+    "docs/outbox.md": "5123e4fe86e095147ab56e71647af43984fa776ab8baf14ef6034829926293e4"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox.go": "360d5e4c4fc8487ca0f4ad192b1caf3cf18f2c8afb93437e5cf60b314bed68e4",
+    "internal/runthrough/outbox.go": "9991aa79b04e8654f7a988166f0715ff62d91459bd7db30c085fd980381f5526",
+    "internal/runthrough/file_outbox_proto_native_test.go": "d25b486ec11fbd6c428c9b839dcf4eee4475bb6022dae98e682d3e77ffb6b450",
+    "internal/runthrough/file_outbox_snapshot_test.go": "44c86929e5e379478b51a71e881bb576960d3b1a08957a90e7a218ecce41a3ad",
+    "internal/runthrough/file_outbox_snapshot_bench_test.go": "43df8c35095a546fcdaefe2ac8169ebc287eb38f6b06633733758f14b41aa8c5",
+    "internal/runthrough/file_outbox_snapshot_writer_bench_test.go": "a580381fdec59c04d8f33acef6cd4068fa6dda612b4e0832242a39121ce5ed30",
+    "internal/runthrough/file_outbox_snapshot_matched_bench_test.go": "ecae0bdd63bb07a75a1b9c18968f6ad2ac87c909a549da20c8b516158cd5c7ce"
+  },
+  "railwayDeploymentId": "bbf021fb-ef6d-4748-974b-e549f4d38910"
+}

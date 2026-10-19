@@ -1,0 +1,20 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from statistics import median
+import json,re
+p=Path('/private/tmp/stow-outbox-postprofile-2026-10-18');d=p/('export-'+json.loads((p/'before-start.json').read_text())['id']);assert json.loads((d/'run.json').read_text())['success'];result={}
+for name in ['resource-normal','resource-race']:
+ text=(d/(name+'.log')).read_text();counts=Counter((m[1],m[2])for line in text.splitlines()if(m:=re.match(r'\s*--- (PASS|FAIL|SKIP): (TestFileOutboxFrameReadResourceBudget/\S+)',line)))
+ assert sum(n for(s,k),n in counts.items()if s=='FAIL')==4 and sum(n for(s,k),n in counts.items()if s=='PASS')==4 and not any(s=='SKIP'for s,k in counts)
+ samples=[json.loads(x.removeprefix('STOWFRAMEREAD: '))for x in text.splitlines()if x.startswith('STOWFRAMEREAD: ')];assert len(samples)==8
+ for x in samples:assert (x['allocatedBytes']>1<<20)==(x['fileBytes']==8<<20)
+ result[name]={'passed':4,'failed':4,'skipped':0,'samples':samples}
+(d/'red-receipt.json').write_text(json.dumps(result,indent=2)+'\n');samples=[];cells=defaultdict(list)
+for name in ['uninstrumented.log','file-uninstrumented.log']:
+ for line in(d/name).read_text().splitlines():
+  m=re.match(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$',line)
+  if m:
+   parts=m[3].split();row={'name':m[1],'iterations':int(m[2]),'log':name,**{parts[i+1]:float(parts[i])for i in range(0,len(parts),2)}};samples.append(row);cells[m[1]].append(row)
+assert len(samples)==42 and len(cells)==14 and all(len(v)==3 for v in cells.values())
+summary={k:{metric:median(x[metric]for x in v)for metric in ['ns/op','B/op','allocs/op']}for k,v in cells.items()}
+(d/'profile-analysis.json').write_text(json.dumps({'uninstrumentedObservations':42,'profileTimingExcluded':True,'samples':samples,'medians':summary},indent=2)+'\n');print('Verified original resource failures, controls and all 42 baseline observations')

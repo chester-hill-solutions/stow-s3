@@ -1,0 +1,22 @@
+{
+  "completed": 3,
+  "total": 3,
+  "last": {
+    "name": "reproduce-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutbox(PersistsProtobufAndReopens|MigratesJSONToProtobuf|RefusesFutureProtobufWithoutReplacement)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 2644,
+    "passed": true
+  }
+}

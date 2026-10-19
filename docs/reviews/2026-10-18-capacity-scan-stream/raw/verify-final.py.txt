@@ -1,0 +1,15 @@
+from pathlib import Path
+import json,hashlib,subprocess
+p=Path('/private/tmp/stow-scan-memory-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-capacity-scan-stream/raw';j=json.loads((p/'final-start.json').read_text());e=p/('export-'+j['id']);receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0
+for n,h in receipt['documentSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,h in receipt['sourceSHA256'].items():
+ if n.endswith('.go'):assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,v in json.loads((raw/'artifact-manifest.json').read_text()).items():
+ b=(raw/n).read_bytes();assert len(b)==v['bytes']and hashlib.sha256(b).hexdigest()==v['sha256'],n
+stop=json.loads((raw/'runner-stop-status.json').read_text());assert stop['stopVerified']and stop['runner']['id']==j['deploymentId']and stop['target']['id']=='e09d0550-2eaf-454b-883d-16a3d38e2ccb'and stop['target']['status']=='REMOVED'
+assert not(r/'internal/storage/fs/capacity_payload_bench_test.go').exists()
+base=json.loads((p/'baseline.json').read_text())['base'];assert subprocess.check_output(['git','show',base+':internal/storage/fs/capacity.go'],cwd=r)==(p/'baseline-capacity.go.txt').read_bytes()
+assert subprocess.check_output(['git','show',base+':internal/storage/fs/record_io.go'],cwd=r)==(r/'internal/storage/fs/record_io.go').read_bytes()
+allowed={'internal/storage/fs/capacity.go','internal/storage/fs/capacity_read.go','internal/storage/fs/capacity_payload_read_test.go','docs/reviews/2026-10-18-capacity-scan-stream.md'}
+for n in subprocess.check_output(['git','diff','--name-only',base],cwd=r).decode().splitlines():assert n in allowed or n.startswith('docs/reviews/2026-10-18-capacity-scan-stream/raw/'),n
+print('Verified report, tested Go bytes, shared reader identity, every artifact hash and exact scratch teardown')

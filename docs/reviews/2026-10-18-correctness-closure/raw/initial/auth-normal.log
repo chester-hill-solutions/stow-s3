@@ -1,0 +1,101 @@
+=== RUN   TestClosureEncodedQuery
+=== RUN   TestClosureEncodedQuery/ascii
+    closure_query_probe_test.go:18: canonical query actual=a=first&z=last expected=a=first&z=last
+=== RUN   TestClosureEncodedQuery/encoded-key
+    closure_query_probe_test.go:18: canonical query actual=z=last&%C3%A9=first expected=%C3%A9=first&z=last
+    closure_query_probe_test.go:20: query sorted before URI encoding: z=last&%C3%A9=first
+--- FAIL: TestClosureEncodedQuery (0.00s)
+    --- PASS: TestClosureEncodedQuery/ascii (0.00s)
+    --- FAIL: TestClosureEncodedQuery/encoded-key (0.00s)
+=== RUN   TestClosureReferenceSignedQuery
+=== RUN   TestClosureReferenceSignedQuery/ascii
+    closure_query_probe_test.go:51: reference encoded-sort signature auth=<nil>
+=== RUN   TestClosureReferenceSignedQuery/encoded-key
+    closure_query_probe_test.go:51: reference encoded-sort signature auth=signature mismatch
+    closure_query_probe_test.go:53: correctly encoded-sort signature refused: signature mismatch
+--- FAIL: TestClosureReferenceSignedQuery (0.00s)
+    --- PASS: TestClosureReferenceSignedQuery/ascii (0.00s)
+    --- FAIL: TestClosureReferenceSignedQuery/encoded-key (0.00s)
+=== RUN   TestClosureRepeatedHeaderValidSDK
+=== RUN   TestClosureRepeatedHeaderValidSDK/single
+    closure_sdk_probe_test.go:41: official SDK signed values=["first"] auth=<nil>
+=== RUN   TestClosureRepeatedHeaderValidSDK/repeated
+    closure_sdk_probe_test.go:41: official SDK signed values=["first" "second"] auth=signature mismatch
+    closure_sdk_probe_test.go:43: valid SDK repeated-header signature refused: signature mismatch
+--- FAIL: TestClosureRepeatedHeaderValidSDK (0.00s)
+    --- PASS: TestClosureRepeatedHeaderValidSDK/single (0.00s)
+    --- FAIL: TestClosureRepeatedHeaderValidSDK/repeated (0.00s)
+=== RUN   TestClosureRepeatedHeaderMutation
+    closure_sdk_probe_test.go:56: append signed-header value without resigning: auth=<nil>
+    closure_sdk_probe_test.go:58: altered signed multi-value header authenticated
+--- FAIL: TestClosureRepeatedHeaderMutation (0.00s)
+=== RUN   TestClosureUnsignedPayloadCase
+=== RUN   TestClosureUnsignedPayloadCase/UNSIGNED-PAYLOAD
+    closure_sdk_probe_test.go:66: signed payload marker="UNSIGNED-PAYLOAD" auth=<nil>
+=== RUN   TestClosureUnsignedPayloadCase/unsigned-payload
+    closure_sdk_probe_test.go:66: signed payload marker="unsigned-payload" auth=<nil>
+    closure_sdk_probe_test.go:71: noncanonical unsigned payload marker accepted with valid credentials
+--- FAIL: TestClosureUnsignedPayloadCase (0.00s)
+    --- PASS: TestClosureUnsignedPayloadCase/UNSIGNED-PAYLOAD (0.00s)
+    --- FAIL: TestClosureUnsignedPayloadCase/unsigned-payload (0.00s)
+=== RUN   TestClosureNodeSDKQuery
+=== RUN   TestClosureNodeSDKQuery/ascii
+    closure_sdk_probe_test.go:100: Node SDK signed query=z=last&a=first auth=<nil>
+=== RUN   TestClosureNodeSDKQuery/encoded-key
+    closure_sdk_probe_test.go:100: Node SDK signed query=z=last&%C3%A9=first auth=signature mismatch
+    closure_sdk_probe_test.go:102: valid pinned Node SDK query signature refused: signature mismatch
+--- FAIL: TestClosureNodeSDKQuery (0.00s)
+    --- PASS: TestClosureNodeSDKQuery/ascii (0.00s)
+    --- FAIL: TestClosureNodeSDKQuery/encoded-key (0.00s)
+=== RUN   TestClosureEncodedQuery
+=== RUN   TestClosureEncodedQuery/ascii
+    closure_query_probe_test.go:18: canonical query actual=a=first&z=last expected=a=first&z=last
+=== RUN   TestClosureEncodedQuery/encoded-key
+    closure_query_probe_test.go:18: canonical query actual=z=last&%C3%A9=first expected=%C3%A9=first&z=last
+    closure_query_probe_test.go:20: query sorted before URI encoding: z=last&%C3%A9=first
+--- FAIL: TestClosureEncodedQuery (0.00s)
+    --- PASS: TestClosureEncodedQuery/ascii (0.00s)
+    --- FAIL: TestClosureEncodedQuery/encoded-key (0.00s)
+=== RUN   TestClosureReferenceSignedQuery
+=== RUN   TestClosureReferenceSignedQuery/ascii
+    closure_query_probe_test.go:51: reference encoded-sort signature auth=<nil>
+=== RUN   TestClosureReferenceSignedQuery/encoded-key
+    closure_query_probe_test.go:51: reference encoded-sort signature auth=signature mismatch
+    closure_query_probe_test.go:53: correctly encoded-sort signature refused: signature mismatch
+--- FAIL: TestClosureReferenceSignedQuery (0.00s)
+    --- PASS: TestClosureReferenceSignedQuery/ascii (0.00s)
+    --- FAIL: TestClosureReferenceSignedQuery/encoded-key (0.00s)
+=== RUN   TestClosureRepeatedHeaderValidSDK
+=== RUN   TestClosureRepeatedHeaderValidSDK/single
+    closure_sdk_probe_test.go:41: official SDK signed values=["first"] auth=<nil>
+=== RUN   TestClosureRepeatedHeaderValidSDK/repeated
+    closure_sdk_probe_test.go:41: official SDK signed values=["first" "second"] auth=signature mismatch
+    closure_sdk_probe_test.go:43: valid SDK repeated-header signature refused: signature mismatch
+--- FAIL: TestClosureRepeatedHeaderValidSDK (0.00s)
+    --- PASS: TestClosureRepeatedHeaderValidSDK/single (0.00s)
+    --- FAIL: TestClosureRepeatedHeaderValidSDK/repeated (0.00s)
+=== RUN   TestClosureRepeatedHeaderMutation
+    closure_sdk_probe_test.go:56: append signed-header value without resigning: auth=<nil>
+    closure_sdk_probe_test.go:58: altered signed multi-value header authenticated
+--- FAIL: TestClosureRepeatedHeaderMutation (0.00s)
+=== RUN   TestClosureUnsignedPayloadCase
+=== RUN   TestClosureUnsignedPayloadCase/UNSIGNED-PAYLOAD
+    closure_sdk_probe_test.go:66: signed payload marker="UNSIGNED-PAYLOAD" auth=<nil>
+=== RUN   TestClosureUnsignedPayloadCase/unsigned-payload
+    closure_sdk_probe_test.go:66: signed payload marker="unsigned-payload" auth=<nil>
+    closure_sdk_probe_test.go:71: noncanonical unsigned payload marker accepted with valid credentials
+--- FAIL: TestClosureUnsignedPayloadCase (0.00s)
+    --- PASS: TestClosureUnsignedPayloadCase/UNSIGNED-PAYLOAD (0.00s)
+    --- FAIL: TestClosureUnsignedPayloadCase/unsigned-payload (0.00s)
+=== RUN   TestClosureNodeSDKQuery
+=== RUN   TestClosureNodeSDKQuery/ascii
+    closure_sdk_probe_test.go:100: Node SDK signed query=z=last&a=first auth=<nil>
+=== RUN   TestClosureNodeSDKQuery/encoded-key
+    closure_sdk_probe_test.go:100: Node SDK signed query=z=last&%C3%A9=first auth=signature mismatch
+    closure_sdk_probe_test.go:102: valid pinned Node SDK query signature refused: signature mismatch
+--- FAIL: TestClosureNodeSDKQuery (0.00s)
+    --- PASS: TestClosureNodeSDKQuery/ascii (0.00s)
+    --- FAIL: TestClosureNodeSDKQuery/encoded-key (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/auth	0.006s
+FAIL

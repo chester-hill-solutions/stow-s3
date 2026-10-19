@@ -1,0 +1,47 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-ledger-read.md": "237816009f2aeeb0fb57923c1ba1839951cccf2808d60c0fa7c0143017316a40"
+  },
+  "sourceSHA256": {
+    "internal/capacity/state.go": "eabc64fb5fb0e1e79cc4c2154f2e0b3acc657f4745b8c23e387a3a62a4949dc2",
+    "internal/capacity/state_read_test.go": "daf7cf0921ab744f05c0a637cdf2ca748408ff7b5b8c1ea7ddbfe60a717c30d5",
+    "benchmark/ledger-bench.go.txt": "5e7432044df569e71eec7fbd2a248a71eb6c60b4752a5f53ae29577bafe2c42e",
+    "benchmark/ledger-measure.mjs": "3d427fd980180bd41dff6356d4efa88277ae6b7c9f65849dcb9fca94930e693d",
+    "benchmark/measure-child.py": "506589c7416291fa1ef36dc4c182b10ae84267b45a74bf9297e54ce8fcf77986",
+    "benchmark/before-overlay.json": "fe564b6ee1f684827d17feb1ebb326c91bd280c97d750482a38dfac9dcd107c0",
+    "benchmark/baseline-state.go.txt": "6c3094fbbbae7a3211178c11a73e31cfef869f0551e3522f16446b8148cbe560"
+  },
+  "railwayDeploymentId": "9ab6875d-76da-40be-ae20-d7c14e5887a0"
+}

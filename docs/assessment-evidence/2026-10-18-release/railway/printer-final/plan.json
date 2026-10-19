@@ -1,0 +1,93 @@
+{
+  "phase": "release-api-printer-final",
+  "sources": [
+    "tools/api-reference/main.go",
+    "tools/api-reference/main_test.go",
+    "docs/api/README.md",
+    "docs/api/browser-s3.md",
+    "docs/api/browser-wasm.md",
+    "docs/api/browser.md",
+    "docs/api/embedded.md",
+    "docs/api/go.md",
+    "docs/api/inventory.json",
+    "docs/api/mcp.md",
+    "docs/api/node-wasm.md",
+    "docs/api/project.md",
+    "docs/api/python.md",
+    "docs/api/typescript.md",
+    "docs/api/worker.md",
+    "docs/api/workspace.md"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "tools/api-reference/main.go",
+        "tools/api-reference/main_test.go"
+      ]
+    },
+    {
+      "name": "printer-normal",
+      "args": [
+        "go",
+        "test",
+        "./tools/api-reference",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "printer-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./tools/api-reference",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./tools/api-reference"
+      ]
+    },
+    {
+      "name": "regenerate-reference",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs"
+      ]
+    },
+    {
+      "name": "verify-reference",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs",
+        "--check"
+      ]
+    },
+    {
+      "name": "verify-reference-repeat",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs",
+        "--check"
+      ]
+    }
+  ]
+}

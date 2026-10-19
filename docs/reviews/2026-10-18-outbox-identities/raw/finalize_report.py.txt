@@ -1,0 +1,29 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-outbox-identities-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow')
+def exported(phase):return p/('export-'+json.loads((p/(phase+'-start.json')).read_text())['id'])
+a=json.loads((exported('after')/'comparison-analysis.json').read_text());f=json.loads((exported('final')/'comparison-analysis.json').read_text());assert a['observations']==f['observations']==96
+keys=['depth','operation','cpu'];table=['Values are per-cell medians. Each cohort has its own baseline; initial and final samples are not pooled.','', '| Depth per collection | Operation | CPU | Initial lookup guard Δ | Final µs before → after | Final Δ |','| ---: | --- | ---: | ---: | ---: | ---: |'];max_bytes=0;alloc_changes=[]
+for row in f['summary']:
+ prior=next(x for x in a['summary']if all(x[k]==row[k]for k in keys));before=row['before'];after=row['after'];table.append(f"| {row['depth']:,} | {row['operation']} | {row['cpu']} | {prior['timeChangePercent']:+.2f}% | {before['nsPerOp']['median']/1000:,.3f} → {after['nsPerOp']['median']/1000:,.3f} | {row['timeChangePercent']:+.2f}% |")
+ max_bytes=max(max_bytes,abs(after['bytesPerOp']['median']-before['bytesPerOp']['median']))
+ if before['allocsPerOp']['median']!=after['allocsPerOp']['median']:alloc_changes.append({k:row[k]for k in keys})
+if not alloc_changes:table.extend(['','Allocation counts are unchanged in every final cell. The largest absolute','difference between median allocated bytes is '+str(max_bytes)+' B/op; exact values','and ranges for every cell remain in the analysis.'])
+else:table.extend(['','Allocation-count changes: '+json.dumps(alloc_changes)+'. See exact byte/count results in the analysis.'])
+validation='''All 52 originally failing cases now pass twice normally and twice under race
+detection, plus the distinct-identity control twice in each mode: **106 passing
+cases per mode** using byte-identical regression/benchmark source from the red
+run. The [final green receipt](2026-10-18-outbox-identities/raw/final/green-receipt.json)
+verifies exact cases and source hashes.
+
+All **17 final Railway stages** pass: formatting; focused outbox tests twice
+normally and twice with race detection; full Go suite; broad storage/runtime/
+embedded/run-through/S3/public-package race tests; four conformance profiles
+(memory, filesystem, runtime-memory, runtime-filesystem); vet; site build/tests;
+documentation links; quality/file-size/format gates; two benchmark builds; and
+interleaved comparison. The initial lookup implementation also passed all 16 of
+its stages. [Final commands/results](2026-10-18-outbox-identities/raw/final/checks.json)
+and [initial commands/results](2026-10-18-outbox-identities/raw/after/checks.json)
+are retained alongside the original red job and its separate build repair.'''
+s=(p/'report.md').read_text();assert s.count('VALIDATION')==s.count('PERFORMANCE')==1;s=s.replace('VALIDATION',validation).replace('PERFORMANCE','\n'.join(table));(r/'docs/reviews/2026-10-18-outbox-identities.md').write_text(s)
+print('Generated report for both full benchmark cohorts; maximum median byte difference',max_bytes,'allocation-count changes',alloc_changes)

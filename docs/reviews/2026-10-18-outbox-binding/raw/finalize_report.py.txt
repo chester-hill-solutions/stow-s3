@@ -1,0 +1,22 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-outbox-binding-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');e=p/('export-'+json.loads((p/'after-start.json').read_text())['id']);a=json.loads((e/'comparison-analysis.json').read_text());assert a['observations']==96
+rows=['All values are per-cell medians; CPU means GOMAXPROCS.','', '| Depth per collection | Operation | CPU | µs before → after | Time change | Allocs/op before → after |','| ---: | --- | ---: | ---: | ---: | ---: |'];byte_delta=0
+for x in a['summary']:
+ b=x['before'];f=x['after'];rows.append(f"| {x['depth']:,} | {x['operation']} | {x['cpu']} | {b['nsPerOp']['median']/1000:,.3f} → {f['nsPerOp']['median']/1000:,.3f} | {x['timeChangePercent']:+.2f}% | {b['allocsPerOp']['median']:,.0f} → {f['allocsPerOp']['median']:,.0f} |");byte_delta=max(byte_delta,abs(f['bytesPerOp']['median']-b['bytesPerOp']['median']))
+rows+=['','The largest absolute difference between median allocated bytes is '+str(byte_delta)+' B/op.','Exact byte/allocation values and timing ranges for every cell remain in the analysis.']
+validation='''All **72 regressions and 12 valid controls pass twice normally and twice under
+race detection**, 168 passing cases in the new matrix per mode, using byte-identical new regression
+and benchmark source from the red run.
+[Green receipt](2026-10-18-outbox-binding/raw/after/green-receipt.json) verifies exact cases and source hashes.
+
+All **16 Railway stages pass**: formatting; focused outbox tests twice normally
+and twice with race detection; full Go suite; broad storage/runtime/embedded/
+run-through/S3/public-package race tests; four conformance profiles (memory,
+filesystem, runtime-memory, runtime-filesystem); vet; site build/tests; documentation
+links; quality/file-size/format gates; final benchmark build; and interleaved
+comparison. [Final commands/results](2026-10-18-outbox-binding/raw/after/checks.json)
+and [baseline commands/results](2026-10-18-outbox-binding/raw/before/checks.json)
+retain every step. No baseline or tolerance was raised.'''
+s=(p/'report.md').read_text();assert s.count('VALIDATION')==s.count('PERFORMANCE\n')==1;s=s.replace('VALIDATION',validation).replace('PERFORMANCE\n','\n'.join(rows)+'\n');(r/'docs/reviews/2026-10-18-outbox-binding.md').write_text(s)
+print('Generated measured-cost report for',a['observations'],'observations; maximum median byte difference',byte_delta)

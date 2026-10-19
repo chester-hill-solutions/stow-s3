@@ -1,0 +1,45 @@
+{
+  "phase": "outbox-lookup-original-contracts",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/provenance.go",
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/file_outbox_lookup_test.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_lookup_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxLookup",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxLookup",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

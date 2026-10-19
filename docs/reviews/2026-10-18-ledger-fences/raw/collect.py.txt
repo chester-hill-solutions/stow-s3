@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib,shutil
+p=Path('/private/tmp/stow-ledger-fences-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-ledger-fences/raw';raw.mkdir(parents=True,exist_ok=True);job=json.loads((p/'probe-start.json').read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==9 and all(x['passed']for x in checks);assert job['deploymentId']==run['railwayDeploymentId']=='a4b41a42-fdde-49d3-ba75-08b7d97cd7d9'
+dest=raw/'probe';dest.mkdir(exist_ok=True)
+for f in src.iterdir():
+ if f.is_file():shutil.copy2(f,dest/f.name)
+for suffix,name in [('start.json','start.json'),('deployments.json','deployments.json'),('upload.log','upload.log')]:shutil.copy2(p/('probe-'+suffix),dest/name)
+env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+for n,h in env['sourceSHA256'].items():
+ if n.endswith('.go'):assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','baseline-state.go.txt','diagnostic-state.go.txt','diagnostic-overlay.json','ledger-fence-bench.go.txt','mutation-fence-bench.go.txt','fence-measure.mjs','transport-Dockerfile.txt','transport-receipt.json','probe-build.log']:shutil.copy2(p/n,raw/n)
+for n in ['package.py','control.py','remote.py','export.py','watch.py','analyze.py','collect.py','report.py','capture-compiled.js']:shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs','measure-child.py']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-ledger-fences.md');print('Collected all isolation evidence; production source matches unchanged Railway bytes')

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -21,13 +22,25 @@ type provenanceOutbox interface {
 }
 
 func (o *FileOutbox) UpstreamState(bucket, key string) (UpstreamState, bool, error) {
-	s, err := o.readState()
-	value, ok := s.provenance[outboxIdentity(bucket, key)]
-	return value, ok, err
+	var value UpstreamState
+	var known bool
+	err := o.withLockedState(func(s outboxState) error { value, known = s.provenance[outboxIdentity(bucket, key)]; return nil })
+	return value, known, err
 }
 
 func (o *FileOutbox) SaveUpstreamState(bucket, key string, value UpstreamState) error {
-	return o.withState(func(s *outboxState) error { s.provenance[outboxIdentity(bucket, key)] = value; return nil })
+	return o.withLockedState(func(state outboxState) error {
+		id := outboxIdentity(bucket, key)
+		if previous, known := state.provenance[id]; known && previous == value && o.nativeJournal {
+			if err := atomicfile.SyncExisting(o.path, 0o600); err == nil {
+				return nil
+			}
+		}
+		// Full replacement also repairs incompatible files or a failed existing-file fence.
+		next := state.clone()
+		next.provenance[id] = value
+		return o.commitState(next)
+	})
 }
 
 func (o *MemoryOutbox) UpstreamState(bucket, key string) (UpstreamState, bool, error) {

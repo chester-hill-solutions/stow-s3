@@ -1,0 +1,45 @@
+{
+  "versions": {
+    "before": "/private/tmp/stow-save-body-failure/after.test",
+    "after": "/private/tmp/stow-read-matched-2026-10-16/after-clean.test"
+  },
+  "binaries_sha256": {
+    "before": "34e7566c334eeb38f3281016cffcd4adae5c6045503e4c493f6c13de6327a31e",
+    "after": "bbab0d667fb4380c8be726504030ac92aa6ce52aefc9acd078fe69b07d6df37e"
+  },
+  "groups": [
+    [
+      "^BenchmarkReadForSaveObservation$/^present$",
+      250000
+    ],
+    [
+      "^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$",
+      1000000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^get-tiny$",
+      250000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$",
+      50000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$",
+      100000
+    ]
+  ],
+  "cpu": [
+    1,
+    8
+  ],
+  "order": [
+    "before",
+    "after",
+    "after",
+    "before"
+  ],
+  "samples_per_case_version_cpu": 6,
+  "flags": "ordinary go test -c",
+  "all_samples_retained": true
+}

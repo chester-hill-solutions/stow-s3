@@ -1,0 +1,36 @@
+COMMAND make check-doc-links
+npm ci --ignore-scripts --prefix site
+
+added 2 packages, and audited 3 packages in 7s
+
+found 0 vulnerabilities
+npm run build --prefix site
+
+> build
+> node build.mjs
+
+Built Stow site and 32 documentation pages
+npm test --prefix site
+
+> test
+> node --test test/*.test.mjs
+
+✔ public guides omit repository commentary, retain code examples and reject broken markers (2.331833ms)
+✔ published guides render examples and turn repo documentation links into site routes (33.699625ms)
+✔ public output contains complete guides and excludes build tools, source files and credentials (481.770417ms)
+✔ every example include resolves and expands away (6.948792ms)
+✔ every example file parses (479.624292ms)
+✔ every example uses symbols the clients export (4.90975ms)
+✔ the built homepage carries the example code (522.250458ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1238.353375
+node scripts/check-doc-links.mjs
+Local documentation links OK (225 Markdown files)
+COMMAND node scripts/check-doc-links.mjs (after log display normalization)
+Local documentation links OK (225 Markdown files)

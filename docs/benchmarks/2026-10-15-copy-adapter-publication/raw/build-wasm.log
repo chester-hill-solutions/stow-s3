@@ -1,0 +1,2 @@
+mkdir -p bin
+GOTOOLCHAIN=go1.25.6 GOOS=js GOARCH=wasm go build -buildvcs=false -trimpath -ldflags "-s -w" -o bin/stow-runtime.wasm ./cmd/stow-wasm

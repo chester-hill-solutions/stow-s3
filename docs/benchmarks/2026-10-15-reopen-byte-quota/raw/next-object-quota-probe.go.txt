@@ -1,0 +1,53 @@
+package runtime_test
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+)
+
+func TestReopenCombinesObjectSlotsAcrossBuckets(t *testing.T) {
+	ctx := context.Background()
+	root := t.TempDir()
+	disk, err := fs.NewFilesystemStore(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	instance, err := runtime.OpenWithStore(runtime.Options{Backend: runtime.BackendFilesystem, MaxBytes: 32, MaxObjects: 3}, disk, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer instance.Close()
+	for _, bucket := range []string{"aaa", "zzz"} {
+		if err := instance.CreateBucket(ctx, bucket); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := instance.CreateMultipartUpload(ctx, "aaa", "pending", storage.MultipartOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"one", "two"} {
+		if _, err := instance.PutObject(ctx, "zzz", key, []byte("x"), runtime.PutOptions{}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := instance.Close(); err != nil {
+		t.Fatal(err)
+	}
+	disk, err = fs.NewFilesystemStore(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer disk.Close()
+	reopened, err := runtime.OpenWithStore(runtime.Options{Backend: runtime.BackendFilesystem, MaxBytes: 32, MaxObjects: 2}, disk, nil)
+	if reopened != nil {
+		defer reopened.Close()
+	}
+	if !errors.Is(err, runtime.ErrQuotaExceeded) {
+		t.Fatalf("reopened 2 committed + 1 reserved object slots under cap 2: %v", err)
+	}
+}

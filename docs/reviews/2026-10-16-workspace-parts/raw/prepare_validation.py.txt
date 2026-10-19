@@ -1,0 +1,53 @@
+from pathlib import Path
+import subprocess,shutil,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-workspace-parts-2026-10-16');c=p/'railway-validation';assert not c.exists();c.mkdir()
+files=[f for f in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if f]
+files+=['internal/storage/workspace/'+n for n in ['part_record.go','part_publication_test.go','part_record_test.go','part_integrity_test.go','part_comparison_bench_test.go']]
+files+=['docs/reviews/2026-10-16-workspace-parts.md']+[str(f.relative_to(r))for f in (r/'docs/reviews/2026-10-16-workspace-parts').rglob('*')if f.is_file()]
+for name in sorted(set(files)):
+ src=r/name;dst=c/name
+ if not src.exists():continue
+ dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst);shutil.copymode(src,dst)
+b=c/'benchmark';previous=b/'validation-previous-baselines';previous.mkdir()
+for name in ['go-quality.json','file-size.json']:
+ (previous/name).write_bytes(subprocess.check_output(['git','show','HEAD^:scripts/baselines/'+name],cwd=r))
+for name in ['runner.mjs','http.mjs','resources.mjs']:shutil.copyfile(p/'railway-context-fixed/benchmark'/name,b/name)
+(b/'Dockerfile').write_text('''FROM node:25.9.0-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370 AS node
+FROM golang:1.25.6-bookworm@sha256:f4490d7b261d73af4543c46ac6597d7d101b6e1755bcdd8c5159fda7046b6b3e
+COPY --from=node /usr/local /usr/local
+ENV GOTOOLCHAIN=local GOFLAGS=-p=1 GOMAXPROCS=4 STOW_BASELINE_REF=HEAD
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY site/package.json site/package-lock.json ./site/
+RUN npm ci --ignore-scripts --prefix site
+COPY . .
+RUN cp -r scripts/baselines /tmp/current-baselines && cp benchmark/validation-previous-baselines/* scripts/baselines/ && git init && git config user.email validation@localhost && git config user.name RailwayValidation && git add scripts/baselines && git commit -m 'Validation fixture: original parent quality baselines' && cp /tmp/current-baselines/* scripts/baselines/
+CMD ["node","benchmark/runner.mjs"]
+''')
+(b/'diagnosis.mjs').write_text('''import{readFile,writeFile,mkdir,open}from'node:fs/promises';import{spawn}from'node:child_process';import{join}from'node:path';import{systemMetadata}from'./resources.mjs';
+if(process.platform!=='linux'||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4'||process.env.RAILWAY_ENVIRONMENT_ID!=='3cd200cb-c94f-4e4d-9335-0f6c1b7e9411'||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway runner only');
+const root=process.argv[2];if(!root?.startsWith('/results/'))throw Error('Results volume required');await mkdir(root,{recursive:false});
+const save=(name,value)=>writeFile(join(root,name),typeof value==='string'?value:JSON.stringify(value,null,2)+'\\n');
+const tests='^(TestMultipartPart|TestPartRecord|TestMultipartCompletionVerifiesRecordedPayload)';
+const plan=[
+ ['focused-normal',['go','test','./internal/storage/workspace','-run',tests,'-count=2','-v']],
+ ['focused-race',['go','test','-race','./internal/storage/workspace','-run',tests,'-count=2','-v']],
+ ['full-go',['go','test','./...']],
+ ['broad-race',['go','test','-race','./internal/storage/...','./internal/runtime','./internal/embedded','./internal/runthrough','./internal/s3api','./pkg/stow']],
+ ...['memory','filesystem','runtime-memory','runtime-filesystem'].map(profile=>['conformance-'+profile,['go','test','./conformance/...','-count=1','-v'],{STOW_CONFORMANCE_BACKEND:profile.startsWith('runtime')?'runtime':profile,...(profile.startsWith('runtime')?{STOW_CONFORMANCE_RUNTIME_BACKEND:profile.slice(8)}:{})}]),
+ ['vet',['go','vet','./...']],
+ ['quality',['make','check-go-quality','check-file-size','format-check']],
+ ['site-build',['npm','run','build','--prefix','site']],
+ ['site-tests',['npm','test','--prefix','site']],
+ ['doc-links',['node','scripts/check-doc-links.mjs']]
+];const results=[];
+async function run(name,args,extra={}){const log=await open(join(root,name+'.log'),'w');const start=Date.now();let result;try{const child=spawn(args[0],args.slice(1),{env:{...process.env,...extra},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({exitCode:code,signal}))});}finally{await log.close()}return{name,args,extra,...result,elapsedMs:Date.now()-start};}
+try{await save('environment.json',{provider:'Railway',start:await systemMetadata(),sourceManifest:JSON.parse(await readFile('benchmark/validation-input-manifest.json'))});await save('plan.json',plan);
+for(const[name,args,extra]of plan){console.log('Starting '+name);results.push(await run(name,args,extra));await save('checks.json',results);await save('progress.json',{completed:results.length,total:plan.length,last:results.at(-1)});console.log(JSON.stringify(results.at(-1)));}
+await save('run.json',{complete:true,success:results.every(r=>r.exitCode===0),railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID,checks:results.length});
+}catch(error){await save('run.json',{complete:false,error:error.stack});throw error;}
+''')
+manifest={str(f.relative_to(c)):hashlib.sha256(f.read_bytes()).hexdigest()for f in sorted(c.rglob('*'))if f.is_file()}
+(b/'validation-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');(p/'validation-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print('Prepared Railway validation snapshot',len(manifest),'files',sum(f.stat().st_size for f in c.rglob('*')if f.is_file()),'bytes')

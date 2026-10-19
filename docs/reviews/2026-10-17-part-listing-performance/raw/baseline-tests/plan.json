@@ -1,0 +1,42 @@
+{
+  "sources": [
+    "internal/storage/workspace/part_record.go",
+    "internal/storage/workspace/listing_descriptor_test.go"
+  ],
+  "phase": "listing-descriptor-before-optimization",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/workspace/listing_descriptor_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/workspace",
+        "-run",
+        "TestPart|TestWorkspaceMultipartOwner",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/workspace",
+        "-run",
+        "TestPart|TestWorkspaceMultipartOwner",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

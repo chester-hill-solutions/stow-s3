@@ -1,0 +1,31 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-write-cache/raw';raw.mkdir(parents=True,exist_ok=True)
+base=json.loads((p/'baseline.json').read_text())['base'];candidate_hashes=json.loads((p/'candidate-expected-sources.json').read_text());proof=p/'export-f7288dff-81a1-41c3-a2ea-f3bc714592fe';mapping=json.loads((p/'adoption-source-map.json').read_text())
+for phase,count in [('proof',9),('confirmation',3),('initial-final',15),('candidate-final',18),('final',15)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']==(phase!='initial-final')and len(checks)==count
+ assert [x['name']for x in checks if not x['passed']]==(['quality']if phase=='initial-final'else[])
+ assert job['deploymentId']==run['railwayDeploymentId']=='8fb6e6de-de0b-4adf-9041-d29c24308347'
+ env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ for name,digest in env['sourceSHA256'].items():
+  if not name.startswith('internal/'):continue
+  if phase=='final':expected=hashlib.sha256((r/name).read_bytes()).hexdigest()
+  elif phase=='candidate-final':expected=candidate_hashes[name]
+  elif phase=='initial-final':expected=hashlib.sha256((proof/('source-'+Path(mapping[name]).name+'.txt')).read_bytes()).hexdigest()
+  else:expected=hashlib.sha256(subprocess.check_output(['git','show',base+':'+name],cwd=r)).hexdigest()
+  assert digest==expected,(phase,name)
+ dest=raw/phase
+ if dest.exists():shutil.rmtree(dest)
+ dest.mkdir(exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ shutil.copy2(p/(phase+'-start.json'),dest/'start.json')
+expected=json.loads((p/'final-expected-sources.json').read_text());assert json.loads((raw/'final/accepted-source-verification.json').read_text())==expected
+for name in ['internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go']:assert (r/name).read_bytes()==subprocess.check_output(['git','show',base+':'+name],cwd=r)
+mem=json.loads((raw/'candidate-final/retention-receipt.json').read_text());assert mem['samples']['candidate']['heapGrowth']>60<<20 and mem['samples']['before']['heapGrowth']<16<<20
+assert all(x['passed']for x in json.loads((raw/'candidate-final/retention-regression-receipt.json').read_text())['checks'])
+for name in ['baseline.json','source-manifest.json','prototype-inputs.json','prototype-inputs-final.json','adoption-source-map.json','final-expected-sources.json','candidate-expected-sources.json','comment-only-repair.json']:shutil.copy2(p/name,raw/name)
+for name in ['prepare.py','refine-probes.py','make-plan.py','analyze.py','analyze-confirmation.py','analyze-final.py','analyze-accepted.py','repair-final.py','restore-baseline.py','prepare-final.py','confirmation-plan.py','report-rejected.py','collect.py','export.py','remote.py','control.py','watch.py','measure-capacity.js','measure-retention.js','prove-retention.js','install-proof.js','install-confirmation.js','install-final.js','install-repaired-final.js','install-baseline.js','manifest.py','publish.py','stop.py']:shutil.copy2(p/name,raw/(name+'.txt'))
+for name in ['candidate-report.md.txt','candidate-report-generator.py.txt','collect-candidate.py.txt']:shutil.copy2(p/name,raw/name)
+for name in ['Dockerfile','resources.mjs','runner.mjs','http.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/name,raw/(name+'.txt'))
+print('Collected five jobs, all rejected-candidate failures/measurements and accepted baseline proof')

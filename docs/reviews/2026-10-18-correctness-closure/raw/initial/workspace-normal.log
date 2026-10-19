@@ -1,0 +1,31 @@
+=== RUN   TestClosureWorkspaceUnreadable
+=== RUN   TestClosureWorkspaceUnreadable/healthy
+    closure_probe_test.go:64: restricted=false HEAD=<nil> GET=<nil> conditional PUT meta=<nil> err=precondition failed
+    closure_probe_test.go:74: retained bytes="old"
+=== RUN   TestClosureWorkspaceUnreadable/unreadable
+    closure_probe_test.go:55: unreadable existing HEAD became absence/success: object not found
+    closure_probe_test.go:58: unreadable existing GET became absence/success: object not found
+    closure_probe_test.go:64: restricted=true HEAD=object not found GET=object not found conditional PUT meta=&{Bucket:bucket Key:victim VersionID:22346ca97e7fd687e0d3739a753cef50 Size:3 ETag:"22af645d1859cb5ca6da0c484f1f37ea" ContentType: LastModified:2026-10-19 00:18:33 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} err=<nil>
+    closure_probe_test.go:74: retained bytes="new"
+    closure_probe_test.go:76: create-only PUT replaced an existing object
+    closure_probe_test.go:79: failed absence observation permitted data overwrite
+--- FAIL: TestClosureWorkspaceUnreadable (0.09s)
+    --- PASS: TestClosureWorkspaceUnreadable/healthy (0.03s)
+    --- FAIL: TestClosureWorkspaceUnreadable/unreadable (0.06s)
+=== RUN   TestClosureWorkspaceUnreadable
+=== RUN   TestClosureWorkspaceUnreadable/healthy
+    closure_probe_test.go:64: restricted=false HEAD=<nil> GET=<nil> conditional PUT meta=<nil> err=precondition failed
+    closure_probe_test.go:74: retained bytes="old"
+=== RUN   TestClosureWorkspaceUnreadable/unreadable
+    closure_probe_test.go:55: unreadable existing HEAD became absence/success: object not found
+    closure_probe_test.go:58: unreadable existing GET became absence/success: object not found
+    closure_probe_test.go:64: restricted=true HEAD=object not found GET=object not found conditional PUT meta=&{Bucket:bucket Key:victim VersionID:a3d2e6613d97d2fdcbec3f7bfc20eaa9 Size:3 ETag:"22af645d1859cb5ca6da0c484f1f37ea" ContentType: LastModified:2026-10-19 00:18:33 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} err=<nil>
+    closure_probe_test.go:74: retained bytes="new"
+    closure_probe_test.go:76: create-only PUT replaced an existing object
+    closure_probe_test.go:79: failed absence observation permitted data overwrite
+--- FAIL: TestClosureWorkspaceUnreadable (0.08s)
+    --- PASS: TestClosureWorkspaceUnreadable/healthy (0.04s)
+    --- FAIL: TestClosureWorkspaceUnreadable/unreadable (0.04s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	0.171s
+FAIL

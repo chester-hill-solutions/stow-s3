@@ -1,0 +1,7 @@
+COMMAND go test -c -gcflags=github.com/chester-hill-solutions/stow-s3/internal/runtime=-m=2 -o /private/tmp/stow-save-body-perf-repeat/phase.test ./internal/runtime
+internal/runtime/objects.go:33:6: cannot inline (*Instance).getObject: unhandled op DEFER
+internal/runtime/objects.go:38:2: can inline (*Instance).getObject.deferwrap1 with cost 60 as: func() { .autotmp_13.Close() }
+internal/runtime/objects.go:27:6: can inline (*Instance).GetObject with cost 73 as: method(*Instance) func(context.Context, string, string) (Object, error) { object, _, err := Object(.autotmp_8), .autotmp_9, .autotmp_10; return object, err }
+internal/runtime/save_body_bench_test.go:52:36: inlining call to (*Instance).GetObject
+internal/runtime/save_body_failure_test.go:97:36: inlining call to (*Instance).GetObject
+internal/runtime/save_body_failure_test.go:140:37: inlining call to (*Instance).GetObject

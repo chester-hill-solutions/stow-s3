@@ -1,0 +1,51 @@
+gofmt: all five Go source/test/benchmark files clean.
+
+COMMAND ["make", "check-go-quality", "check-file-size", "check-doc-links"]
+node scripts/check-go-quality.mjs
+Go quality ratchet OK (15 baseline entries)
+node scripts/check-file-size.mjs
+File-size ratchet OK (0 baseline entries; maximum 500 lines)
+npm ci --ignore-scripts --prefix site
+
+added 2 packages, and audited 3 packages in 2s
+
+found 0 vulnerabilities
+npm run build --prefix site
+
+> build
+> node build.mjs
+
+Built Stow site and 32 documentation pages
+npm test --prefix site
+
+> test
+> node --test test/*.test.mjs
+
+✔ public guides omit repository commentary, retain code examples and reject broken markers (2.12675ms)
+✔ published guides render examples and turn repo documentation links into site routes (111.708ms)
+✔ public output contains complete guides and excludes build tools, source files and credentials (632.892208ms)
+✔ every example include resolves and expands away (40.693375ms)
+✔ every example file parses (651.56675ms)
+✔ every example uses symbols the clients export (7.859625ms)
+✔ the built homepage carries the example code (686.363166ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1647.962416
+node scripts/check-doc-links.mjs
+Local documentation links OK (220 Markdown files)
+EXIT 0
+
+PROVENANCE: all five source SHA-256 values and shipped WASM bytes/hash match the measured and validated candidate.
+
+EVIDENCE: 990 focused race passes; 1,952 applicable observations retained, including all adverse timings and original process-CPU samples.
+
+CLEANUP: temporary probes and package dependency symlink absent; baseline comparisons used overlays/frozen methods without replacing production files.
+
+COMMAND ["git", "diff", "--check"]
+
+EXIT 0

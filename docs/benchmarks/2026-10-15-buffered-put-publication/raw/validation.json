@@ -1,0 +1,28 @@
+{
+  "baseline": "7172a99",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "branch": "codex/core-copy-quality",
+  "commands": {
+    "full_go": "GOTOOLCHAIN=go1.25.6 go test ./...",
+    "race": "GOTOOLCHAIN=go1.25.6 go test -race ./internal/runtime ./internal/storage/... ./internal/s3api ./internal/runthrough ./internal/embedded ./pkg/stow",
+    "conformance": "make test-conformance",
+    "regression": "GOTOOLCHAIN=go1.25.6 go test ./pkg/stow -run ^TestCustomStoreBufferedPutPublication$ -count=2 -v",
+    "regression_race": "same selection with -race -count=5",
+    "original_probe": "go test ./pkg/stow -run ^TestReviewBufferedPutPreservesCommittedIdentity$ -count=2 -v (also with -race)",
+    "benchmark": "standalone binaries: -test.run=^$ -test.bench=^BenchmarkCustomStoreBufferedPutPublication$ -test.benchmem -test.benchtime=1s -test.count=3",
+    "vet": "GOTOOLCHAIN=go1.25.6 go vet ./internal/embedded ./pkg/stow",
+    "generated": "node scripts/check-generated.mjs",
+    "wasm": "node --test wasm/runtime.test.mjs",
+    "package": "node --import tsx --test test/embedded.test.ts test/node-wasm-host.test.ts test/wasm-assets.test.ts test/host-backed-streams.test.ts"
+  },
+  "notes": [
+    "Final regression assertions failed before production modifications.",
+    "Baseline and final benchmark harnesses were identical.",
+    "No agent tests or builds ran concurrently with serial performance measurements.",
+    "Synthetic committed errors are returned only after successful real PUT.",
+    "Temporary probes and dependency symlink removed after use.",
+    "Next multipart probe reproduces a post-publication panic and remains text; its implementation is unchanged.",
+    "Log trailing whitespace normalized for repository checks.",
+    "Conformance verbose output summarized by backend invocation and final result."
+  ]
+}

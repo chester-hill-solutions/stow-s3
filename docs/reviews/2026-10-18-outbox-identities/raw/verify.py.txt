@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,re,collections,hashlib,sys
+p=Path('/private/tmp/stow-outbox-identities-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');phase=sys.argv[1];job=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+job['id']);expected=set()
+for collection in ['entries','prepared','provenance']:
+ for identical in ['false','true']:
+  for reverse in ['false','true']:
+   suffix=f'/{collection}/identical={identical}/reverse={reverse}'
+   for test in ['TestOutboxProtoRejectsDuplicateIdentities','TestFileOutboxRefusesDuplicateProtoIdentityOnOpen']:expected.add(test+suffix)
+ for op in ['pending','prepared','lookup','enqueue','prepare','save','close']:expected.add('TestFileOutboxRefusesDuplicateProtoIdentityOnReload/'+collection+'/'+op)
+ for collision in ['false','true']:expected.add('TestOutboxProtoRefusesLossyIdentityEncoding/'+collection+'/collision='+collision)
+public='TestFileOutboxRefusesLossyProvenanceIdentity';expected.add(public);control='TestOutboxProtoPreservesDistinctIdentities';receipt={}
+for mode in ['normal','race']:
+ text=(e/(('regression-'if phase=='before'else'focused-')+mode+'.log')).read_text(errors='replace')
+ label='FAIL'if phase=='before'else'PASS';counts=collections.Counter(n for n in re.findall(r'^\s*--- '+label+r': (\S+) \(',text,re.M)if n in expected);assert set(counts)==expected,(mode,expected-set(counts));assert all(n==2 for n in counts.values()),counts
+ fails=[n for n in re.findall(r'^\s*--- FAIL: (\S+) \(',text,re.M)if '/'in n or n==public];assert (set(fails)==expected if phase=='before'else not fails),fails
+ passes=collections.Counter(re.findall(r'^\s*--- PASS: (\S+) \(',text,re.M));assert passes[control]==2
+ if phase=='before':assert len(re.findall(r'accepted duplicate \w+: pending=',text))==24 and text.count('rewritten=true')==24
+ receipt[mode]={'uniqueRegressions':len(expected),'casesWithCount2':sum(counts.values()),'validControlWithCount2':passes[control]}
+run=json.loads((e/'run.json').read_text());assert run['complete'];checks=json.loads((e/'checks.json').read_text());failed=[x['name']for x in checks if not x['passed']];assert failed==(['benchmark-build']if phase=='before'else[]);assert (not run['success']if phase=='before'else run['success']);env=json.loads((e/'environment.json').read_text());assert len(checks)==(5 if phase=='before'else (16 if phase=='after'else 17));receipt['checksPassed']=sum(c['passed']for c in checks);receipt['failedInfrastructureStages']=failed;receipt['sourceSHA256']=env['sourceSHA256'];receipt['railwayDeploymentId']=job['deploymentId']
+if phase!='before':
+ before=json.loads((p/('export-'+json.loads((p/'before-start.json').read_text())['id'])/'environment.json').read_text())
+ for n,h in env['sourceSHA256'].items():
+  assert hashlib.sha256((e/('source-'+Path(n).name+'.txt')).read_bytes()).hexdigest()==h,n
+  if phase=='final':assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+  if 'identity' in n:assert before['sourceSHA256'][n]==h,n
+(e/('red-receipt.json'if phase=='before'else'green-receipt.json')).write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

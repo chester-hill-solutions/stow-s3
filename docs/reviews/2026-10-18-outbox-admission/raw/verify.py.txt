@@ -1,0 +1,36 @@
+from pathlib import Path
+import json,re,collections,hashlib,sys
+p=Path('/private/tmp/stow-outbox-admission-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');phase=sys.argv[1];e=p/('export-'+json.loads((p/(phase+'-start.json')).read_text())['id']);expected=set();controls=set()
+for backend in ['memory','file']:
+ states=['active','prepared']if backend=='memory'else['active','claimed','prepared','owned'];methods=['enqueue','prepare']if backend=='memory'else['enqueue','prepare','owned']
+ for state in states:
+  for method in methods:
+   for identical in ['false','true']:
+    name=f'TestOutboxAdmissionRejectsOccupiedIDs/{backend}/{state}/{method}/identical={identical}'
+    (controls if backend=='file'and state in ['prepared','owned']and method=='owned'and identical=='true'else expected).add(name)
+ for method in methods:controls.add(f'TestOutboxAdmissionAllowsAvailableIDs/{backend}/{method}')
+for backend in ['memory','file','peer']:
+ methods=['enqueue','prepare']if backend=='memory'else['enqueue','prepare','owned']
+ for a in methods:
+  for b in methods:expected.add(f'TestOutboxAdmissionConcurrentSameID/{backend}/{a}/{b}')
+receipt={}
+for mode in ['normal','race']:
+ text=(e/(('regression-'if phase=='before'else'focused-')+mode+'.log')).read_text();label='FAIL'if phase=='before'else'PASS';counts=collections.Counter(n for n in re.findall(r'^\s*--- '+label+r': (\S+) \(',text,re.M)if n in expected);assert set(counts)==expected,(mode,expected-set(counts));assert all(n==2 for n in counts.values()),counts
+ fails=[n for n in re.findall(r'^\s*--- FAIL: (\S+) \(',text,re.M)if'/'in n];snapshotFailures={test+'/'+v for test in ['TestFileOutboxSnapshotsOwnValuesAndPreserveOrder','TestFileOutboxConcurrentSnapshotsAndWriter']for v in ['false','true']};assert set(fails)==(expected if phase=='before'else snapshotFailures if phase=='after'else set()),fails
+ passes=collections.Counter(re.findall(r'^\s*--- PASS: (\S+) \(',text,re.M));assert all(passes[c]==2 for c in controls),[(c,passes[c])for c in controls]
+ receipt[mode]={'uniqueRegressions':len(expected),'casesWithCount2':sum(counts.values()),'uniqueValidControls':len(controls),'passedControlsWithCount2':sum(passes[c]for c in controls),'unreadableJournalDiagnostics':text.count('journal cannot reopen:')}
+run=json.loads((e/'run.json').read_text());assert run['complete'];checks=json.loads((e/'checks.json').read_text());failed=[c['name']for c in checks if not c['passed']];assert failed==(['focused-normal','focused-race','full-go','broad-race']if phase=='after'else[]);assert run['success']==(phase!='after');assert len(checks)==(5 if phase=='before'else 16 if phase=='after'else 17);env=json.loads((e/'environment.json').read_text());receipt.update(checksPassed=sum(c['passed']for c in checks),failedStages=failed,sourceSHA256=env['sourceSHA256'],railwayDeploymentId=run['railwayDeploymentId'])
+for n,h in env['sourceSHA256'].items():
+ assert hashlib.sha256((e/('source-'+Path(n).name+'.txt')).read_bytes()).hexdigest()==h,n
+ if phase=='final':assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+if phase!='before':
+ before=json.loads((p/('export-'+json.loads((p/'before-start.json').read_text())['id'])/'environment.json').read_text())
+ for n,h in env['sourceSHA256'].items():
+  if n in before['sourceSHA256']and n.endswith('_test.go'):assert before['sourceSHA256'][n]==h,n
+if phase=='final':
+ for mode in ['normal','race']:
+  text=(e/('focused-'+mode+'.log')).read_text();passes=collections.Counter(re.findall(r'^\s*--- PASS: (\S+) \(',text,re.M));assert all(passes['TestOutboxAdmissionRejectsExhaustedSequence/'+backend]==2 for backend in ['memory','file']);receipt[mode]['sequenceRegressions']=2;receipt[mode]['passedSequenceCasesWithCount2']=4
+  for test in ['TestFileOutboxSnapshotsOwnValuesAndPreserveOrder','TestFileOutboxConcurrentSnapshotsAndWriter','TestFileOutboxHeldSnapshotsSurviveRecordMutation']:
+   assert all(passes[test+'/'+v]==2 for v in ['false','true'])
+ preflight=p/('export-'+json.loads((p/'preflight-start.json').read_text())['id']);assert json.loads((preflight/'run.json').read_text())['success']
+(e/('red-receipt.json'if phase=='before'else'green-receipt.json')).write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

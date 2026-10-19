@@ -1,0 +1,43 @@
+from pathlib import Path
+import os,json,subprocess,resource,re,statistics
+p=Path('/private/tmp/stow-propagation-open-2026-10-16')
+rows=[];combined=[]
+for cpu in [1,8]:
+ for mode in ['success','conflict','nil-error','reader-error']:
+  for path in ['first','reconcile']:
+   case=mode+'/'+path
+   n=1000000 if mode in ['success','conflict'] else 20000000
+   for cycle in range(2):
+    order=['before','after','after','before'] if cycle==0 else ['after','before','before','after']
+    for pos,version in enumerate(order):
+     cmd=[str(p/(version+'.test')),'-test.run=^$','-test.bench=^BenchmarkPropagationSourceOpen$/^'+mode+'$/^'+path+'$','-test.benchmem','-test.benchtime='+str(n)+'x','-test.count=1','-test.cpu='+str(cpu)]
+     start=resource.getrusage(resource.RUSAGE_CHILDREN)
+     q=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,check=True)
+     end=resource.getrusage(resource.RUSAGE_CHILDREN)
+     combined.append('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+     lines=[s for s in q.stdout.splitlines() if s.startswith('Benchmark')]
+     assert len(lines)==1,(cmd,q.stdout)
+     tokens=lines[0].split();assert int(tokens[1])==n
+     metrics={tokens[j+1]:float(tokens[j]) for j in range(2,len(tokens)-1,2)}
+     rows.append(dict(cpu=cpu,name=case,cycle=cycle,position=pos,version=version,iterations=n,metrics=metrics,process_cpu_ns_per_op=((end.ru_utime-start.ru_utime)+(end.ru_stime-start.ru_stime))*1e9/n))
+   print(cpu,case,'done',flush=True)
+assert len(rows)==128
+(p/'cpu-samples.json').write_text(json.dumps(rows,indent=2)+'\n')
+(p/'cpu-measurements.log').write_text('\n'.join(combined))
+summary=[]
+for cpu in [1,8]:
+ for case in sorted({r['name'] for r in rows}):
+  row=dict(cpu=cpu,name=case)
+  for version in ['before','after']:
+   values=[r['process_cpu_ns_per_op'] for r in rows if r['cpu']==cpu and r['name']==case and r['version']==version]
+   row[version]=dict(median=statistics.median(values),min=min(values),max=max(values))
+  row['change_percent']=(row['after']['median']/row['before']['median']-1)*100
+  controls=[];changes=[]
+  for cycle in range(2):
+   vals={v:[r['process_cpu_ns_per_op'] for r in rows if r['cpu']==cpu and r['name']==case and r['version']==v and r['cycle']==cycle] for v in ['before','after']}
+   controls.extend(abs((v[1]/v[0]-1)*100) for v in vals.values())
+   changes.append((statistics.mean(vals['after'])/statistics.mean(vals['before'])-1)*100)
+  row['same_code_absolute_changes_percent']=controls;row['paired_cycle_changes_percent']=changes
+  summary.append(row)
+(p/'cpu-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+for r in summary: print(r['cpu'],r['name'],r['before']['median'],r['after']['median'],r['change_percent'],flush=True)

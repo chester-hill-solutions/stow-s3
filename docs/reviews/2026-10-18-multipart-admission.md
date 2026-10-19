@@ -1,0 +1,52 @@
+# Requalify multipart namespace admission
+
+**Multipart manifests and parts bypassed namespace admission on this branch.** Adopt the existing scoped fix from sibling commit `29897c891d39766d856fd3ff9b0e4e80036eb8e3`, preserving the newer committed-cleanup-error behavior. Production changes only `internal/storage/fs/fs_multipart.go`: existing capacity helpers now admit manifest/part writes and account for abort/completion cleanup. No dependency, format, public API, indexing or storage abstraction is added.
+
+## Baseline and existing work
+
+This turn starts clean at `8bafae0f49ace05872dfd9e0024c9c8dc8b05a0c`. Fetching `origin/main` returns unchanged `219d1dcfff9807b04660a40313b32127e5be2933`. Guarded-save admission from the preceding commit is preserved. The earlier [codebase map](2026-10-15-codebase-map.md) already records multipart capacity work on `codex/patch-0.3.2`; inspecting that branch finds the two-file fix `29897c8`. It was absent from this branch and main. The [original patch](2026-10-18-multipart-admission/raw/sibling-original.patch.txt) is retained for attribution and comparison. This is integration and requalification of completed implementation work, not a newly invented fix.
+
+The three original regression functions are reused in a separate test file. Additional tests cover manifest reserve, refused replacement, exact scan agreement, repeated replacement, reopen, concurrent writers, shared-host release, held parts, completion refusal and committed cleanup recovery. The newer filesystem cleanup contract from `5f8f484` is retained: an object already published before cleanup fails returns metadata with `ErrMutationCommitted`.
+
+## Native reproduction and change
+
+The baseline tests call `NewFilesystemStoreWithNamespace`, `CreateMultipartUpload`, `UploadPart`, `CompleteMultipartUpload` and `AbortMultipartUpload` on real owned directories. A namespace has 4 MiB total capacity and 1 MiB recovery reserve. A **5 MiB part succeeds** despite a 3 MiB payload allowance; the ledger still reports **zero payload bytes**. Two concurrent 1,100,000-byte parts both succeed when staging permits only one. Separate namespaces also bypass the shared host budget. Oversized manifests consume recovery space without admission, and an over-budget replacement overwrites its old part instead of being refused.
+
+Completion already admits the resulting object, but raw part cleanup leaves the part bytes charged: a four-byte part remains in the ledger after it is removed. Abort likewise does not settle namespace accounting. Tests verify refusal leaves the old part/manifest intact and no destination object, and that successful abort or completion releases the correct bytes immediately across stores and after reopening.
+
+The [final original-source normal proof](2026-10-18-multipart-admission/raw/final/verified-red-normal.log) and [race proof](2026-10-18-multipart-admission/raw/final/verified-red-race.log) use an overlay containing the exact parent production file. Both fail twice with the expected native symptoms; existing manifest/error and completion-refusal controls pass. Exit 1 is intentionally expected by the harness, and actual failure messages are independently checked. The initial logs printed large metadata values; they are retained losslessly as gzip files rather than repeated megabyte text. Final test diagnostics omit that redundant value.
+
+The port uses `writeCapacityFile` for manifest and part publication and `removeCapacityPath` for abort and completion cleanup. JSON encoding remains the same encoding previously performed by `writeJSONAtomic`. Existing locks, multipart identity, ETags, ordering, metadata/checksums, part-size validation, journal recovery, and object publication remain intact. Quota refusal does not replace an existing part. Native namespace dependency holds now protect admitted part versions from replacement or abort.
+
+[Fixed normal results](2026-10-18-multipart-admission/raw/final/focused-normal.log) and [race results](2026-10-18-multipart-admission/raw/final/focused-race.log) pass twice, including all 12 retained multipart capacity tests. A real permission failure during bound completion verifies the committed object/metadata and upload evidence survive, then abort after restoring permissions releases only staging and leaves the object charged.
+
+## Railway measurements and costs
+
+All formatting, builds, tests, race/conformance, vet, quality/site/documentation checks and benchmarks run only on the authorized Railway scratch runner, deployment `cd966cae-b626-4589-882d-7005a75b47d4`. Go 1.25.6, Linux amd64, UID 10001, GOMAXPROCS 4, 4 CPU/4 GiB. Writes use the mounted ext4 `/results` volume (statfs 61267). The target service is not started or modified.
+
+Temporary benchmarks time a single create, part upload, abort or completion. Fixtures, earlier lifecycle operations and cleanup are outside timing/allocation accounting; API errors are checked outside timing. Bound cases cover create, 64 KiB/1 MiB part upload, 64 KiB abort, and 64 KiB/1 MiB completion. Unbound 64 KiB part/completion cases are controls. Each cell uses exactly ten timed operations per invocation, avoiding calibration dominated by untimed fixture preparation. ABBA/BAAB original/fixed runs and identical-binary control runs yield four observations per label/cell: **128 complete observations**. The earlier 200 ms calibration attempt timed out during the original fast-abort case; its three completed unpaired samples and error output are retained separately and excluded from these medians because the method differs. The rerun uses the same compiled binaries. Original/fixed binary hashes, every command, sample, median and range are retained. The controls are limited timing-noise observations, not statistical-significance or production-throughput evidence. Allocations are bytes/objects per operation, not peak heap or RSS.
+
+The baseline omits required accounting. Positive deltas below mean more/slower; all adverse cells are retained. In particular, abort originally performed direct removal, so relative cost can be large when durable accounting and fencing are restored.
+
+| Operation | Median time, original → fixed | Time change | Bytes/op, original → fixed | Objects/op, original → fixed | Same-binary control time change |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| bound=false/op=complete/bytes=65536 | 4.769 → 5.638 ms | +18.21% | 150,579.5 → 150,588.0 | 127.0 → 127.0 | -2.10% |
+| bound=false/op=part/bytes=65536 | 3.950 → 4.018 ms | +1.70% | 76,509.0 → 76,497.5 | 27.0 → 27.0 | -11.94% |
+| bound=true/op=abort/bytes=65536 | 0.089 → 16.527 ms | +18377.55% | 1,395.5 → 236,583.5 | 21.0 → 699.0 | +5.96% |
+| bound=true/op=complete/bytes=1048576 | 26.359 → 48.707 ms | +84.78% | 5,394,260.0 → 9,734,407.5 | 810.0 → 1,572.5 | -6.64% |
+| bound=true/op=complete/bytes=65536 | 18.393 → 35.569 ms | +93.38% | 461,123.5 → 855,256.5 | 783.5 → 1,527.5 | -7.19% |
+| bound=true/op=create/bytes=0 | 4.198 → 18.954 ms | +351.54% | 3,837.5 → 73,051.0 | 33.0 → 587.0 | +7.66% |
+| bound=true/op=part/bytes=1048576 | 7.988 → 22.532 ms | +182.09% | 1,059,808.5 → 1,145,021.0 | 28.5 → 658.5 | -12.54% |
+| bound=true/op=part/bytes=65536 | 4.712 → 21.642 ms | +359.28% | 76,496.0 → 159,137.0 | 27.0 → 651.0 | -4.33% |
+
+[All measured observations and binary identities](2026-10-18-multipart-admission/raw/measure/measurements.json), [analysis with full ranges](2026-10-18-multipart-admission/raw/measure/comparison-analysis.json), [benchmark fixture](2026-10-18-multipart-admission/raw/multipart-bench.go.txt).
+
+Costs are the existing authoritative scans/hashes, durable capacity-ledger replacements, ancestor fences and host admission serialization. Scans read complete owned files and allocate accordingly; scaling with a populated store and multi-writer contention is not quantified by these fresh-fixture measurements. This change does not claim bounded-memory streaming or physical disk reservation. Enforcing staging/recovery limits may refuse work previously accepted by the bypass. No optimization or performance improvement is claimed; the measured costs remain inputs for later work.
+
+## Validation and next priority
+
+All standard 14 correctness/quality gates pass: formatting; quality/file-size/format ratchets; focused tests twice normally/race; full Go suite; broad capacity/storage/runtime/embedded/runthrough/S3/public-package race tests; four conformance configurations; vet; site build/tests; documentation links. Original-source normal/race proofs also produce the expected native failures. Benchmark setup and both builds pass, and the temporary Go benchmark file is removed. The initial measurement step times out; a separate fixed-iteration measurement job passes. Production and test hashes match between the two jobs. No correctness check is repeated merely for this harness change. [Contract checks, including the retained pilot failure](2026-10-18-multipart-admission/raw/final/checks.json), [successful measurement check](2026-10-18-multipart-admission/raw/measure/checks.json), [independent validation receipt](2026-10-18-multipart-admission/raw/measure/validation-receipt.json). Report/evidence receive further Railway documentation and source-hash checks before teardown. Committed source is compared with the exact Railway-formatted/tested bytes.
+
+The next priority is a native reproduction of **post-rename sync failure in the shared capacity writer**. `writeCapacityFile` still returns generic write/fence errors; `WithAdmission` withdraws an ordinary error reservation even though atomic-file replacement can already be visible. The existing `ErrUnknown` retention mechanism is available, but that native failure path needs proof before another implementation change. Bucket metadata admission also remains an audit lead. No next fix is implemented here.
+
+The [artifact manifest](2026-10-18-multipart-admission/raw/artifact-manifest.json) covers source snapshots, original implementation provenance, regression proofs, all measurements, validation, report checks and teardown receipts.

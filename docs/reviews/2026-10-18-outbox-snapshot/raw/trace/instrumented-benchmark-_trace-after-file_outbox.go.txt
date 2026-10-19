@@ -1,0 +1,322 @@
+package runthrough
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
+)
+
+type FileOutbox struct {
+	path          string
+	lockPath      string
+	mu            sync.Mutex
+	state         outboxState
+	journalSeen   bool
+	nativeJournal bool
+	validatedData []byte
+}
+
+type persistedOutbox struct {
+	Provenance map[string]UpstreamState `json:"provenance,omitempty"`
+	Version    int                      `json:"version,omitempty"`
+	Entries    map[string]OutboxEntry   `json:"entries"`
+	Prepared   map[string]OutboxEntry   `json:"prepared,omitempty"`
+	Seq        uint64                   `json:"seq"`
+	NextToken  uint64                   `json:"next_token,omitempty"`
+}
+
+func NewFileOutbox(path string) (*FileOutbox, error) {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return nil, err
+	}
+	o := &FileOutbox{path: path, lockPath: path + ".lock", state: newOutboxState()}
+	lock, err := acquireOutboxFileLock(o.lockPath)
+	if err != nil {
+		return nil, err
+	}
+	if err := o.reloadLocked(); err != nil {
+		_ = lock.release()
+		return nil, err
+	}
+	if err := lock.release(); err != nil {
+		return nil, err
+	}
+	return o, nil
+}
+
+func decodeOutboxState(data []byte) (outboxState, error) {
+	if len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic {
+		return decodeOutboxProto(data)
+	}
+	return decodeLegacyOutboxState(data)
+}
+
+func decodeLegacyOutboxState(data []byte) (outboxState, error) {
+	var persisted persistedOutbox
+	if err := json.Unmarshal(data, &persisted); err != nil {
+		return outboxState{}, fmt.Errorf("decode outbox: %w", err)
+	}
+	if persisted.Version < 0 || persisted.Version > outboxLegacyJSONVersion {
+		return outboxState{}, fmt.Errorf("%w: file declares version %d, this writer supports 0-%d",
+			ErrOutboxFormatVersion, persisted.Version, outboxLegacyJSONVersion)
+	}
+	if persisted.Entries == nil && persisted.Prepared == nil {
+		var legacy map[string]OutboxEntry
+		if err := json.Unmarshal(data, &legacy); err != nil {
+			return outboxState{}, fmt.Errorf("decode legacy outbox: %w", err)
+		}
+		if legacy == nil {
+			return outboxState{}, fmt.Errorf("decode legacy outbox: expected object snapshot")
+		}
+		persisted.Entries = legacy
+	}
+	return normalizeDecodedOutboxState(outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken})
+}
+
+// migrateOutboxAttempts marks entries written by a format that kept an attempt count
+// but no marker of whether the attempt reached upstream, so the next claim reconciles
+// them against upstream before propagating again.
+func migrateOutboxAttempts(entries map[string]OutboxEntry) {
+	for id, entry := range entries {
+		if !entry.Attempted && entry.Attempts > 0 {
+			entry.Attempted = true
+			entries[id] = entry
+		}
+	}
+}
+
+func (o *FileOutbox) reloadLocked() error {
+	data, err := os.ReadFile(o.path)
+	if os.IsNotExist(err) && !o.journalSeen {
+		o.state = newOutboxState()
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if o.validatedData != nil && bytes.Equal(data, o.validatedData) {
+		return nil
+	}
+	state, err := decodeOutboxState(data)
+	if err != nil {
+		return err
+	}
+	o.state = state
+	o.journalSeen = true
+	o.nativeJournal = len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic
+	o.updateSequences()
+	o.updateTokens()
+	o.validatedData = data
+	return nil
+}
+
+func (o *FileOutbox) updateSequences() {
+	for id := range o.state.entries {
+		o.updateSequence(id)
+	}
+	for id := range o.state.prepared {
+		o.updateSequence(id)
+	}
+}
+
+func (o *FileOutbox) updateTokens() {
+	for _, entry := range o.state.entries {
+		if entry.ClaimToken > o.state.nextToken {
+			o.state.nextToken = entry.ClaimToken
+		}
+		if entry.PreparedToken > o.state.nextToken {
+			o.state.nextToken = entry.PreparedToken
+		}
+	}
+	for _, entry := range o.state.prepared {
+		if entry.PreparedToken > o.state.nextToken {
+			o.state.nextToken = entry.PreparedToken
+		}
+	}
+}
+
+func (o *FileOutbox) updateSequence(id string) {
+	if !strings.HasPrefix(id, "outbox-") {
+		return
+	}
+	sequence, err := strconv.ParseUint(strings.TrimPrefix(id, "outbox-"), 10, 64)
+	if err == nil && sequence > o.state.seq {
+		o.state.seq = sequence
+	}
+}
+
+func (o *FileOutbox) withState(update func(*outboxState) error) error {
+	return o.withLockedState(func(state outboxState) error {
+		next := state.clone()
+		if err := update(&next); err != nil {
+			return err
+		}
+		return o.commitState(next)
+	})
+}
+
+func (o *FileOutbox) commitState(state outboxState) error {
+	o.validatedData = nil
+	if err := o.persistState(state); err != nil {
+		return err
+	}
+	o.state = state
+	o.journalSeen = true
+	o.nativeJournal = true
+	return nil
+}
+
+func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {
+	phaseStart := time.Now()
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	lock, err := acquireOutboxFileLock(o.lockPath)
+	if err != nil {
+		return err
+	}
+	emitOutboxPhase(o, "wait", phaseStart)
+	defer func() { _ = lock.release() }()
+	phaseStart = time.Now()
+	if err := o.reloadLocked(); err != nil {
+		return err
+	}
+	emitOutboxPhase(o, "reload", phaseStart)
+	phaseStart = time.Now()
+	err = operation(o.state)
+	emitOutboxPhase(o, "operation", phaseStart)
+	return err
+}
+
+func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
+	var enqueued OutboxEntry
+	err := o.withState(func(state *outboxState) error {
+		enqueued = state.enqueue(entry)
+		return nil
+	})
+	if err != nil {
+		return OutboxEntry{}, err
+	}
+	return enqueued, nil
+}
+
+func (o *FileOutbox) Prepare(entry OutboxEntry) (OutboxEntry, error) {
+	var prepared OutboxEntry
+	err := o.withState(func(state *outboxState) error {
+		prepared = state.prepare(entry)
+		return nil
+	})
+	if err != nil {
+		return OutboxEntry{}, err
+	}
+	return prepared, nil
+}
+
+func (o *FileOutbox) Prepared() []OutboxEntry {
+	entries, err := o.PreparedSnapshot()
+	if err != nil {
+		o.mu.Lock()
+		defer o.mu.Unlock()
+		return o.state.preparedEntries()
+	}
+	return entries
+}
+
+func (o *FileOutbox) PreparedSnapshot() ([]OutboxEntry, error) {
+	var entries []OutboxEntry
+	err := o.withLockedState(func(state outboxState) error { entries = copyOutboxEntries(state.prepared); return nil })
+	if err != nil {
+		return nil, err
+	}
+	return sortOutboxEntries(entries), nil
+}
+
+func (o *FileOutbox) Pending() []OutboxEntry {
+	entries, err := o.PendingSnapshot()
+	if err != nil {
+		o.mu.Lock()
+		defer o.mu.Unlock()
+		return o.state.pending()
+	}
+	return entries
+}
+
+func (o *FileOutbox) PendingSnapshot() ([]OutboxEntry, error) {
+	var entries []OutboxEntry
+	err := o.withLockedState(func(state outboxState) error { entries = copyOutboxEntries(state.entries); return nil })
+	if err != nil {
+		return nil, err
+	}
+	return sortOutboxEntries(entries), nil
+}
+
+func (o *FileOutbox) MarkSuccess(id string) error {
+	return o.withState(func(state *outboxState) error {
+		return state.markSuccess(id)
+	})
+}
+
+func (o *FileOutbox) MarkFailure(id string, cause error, retryAt time.Time) error {
+	return o.withState(func(state *outboxState) error {
+		return state.markFailure(id, cause, retryAt)
+	})
+}
+
+func (o *FileOutbox) Commit(id, version string) (OutboxEntry, error) {
+	var committed OutboxEntry
+	err := o.withState(func(state *outboxState) error {
+		var err error
+		committed, err = state.commit(id, version)
+		return err
+	})
+	if err != nil {
+		return OutboxEntry{}, err
+	}
+	return committed, nil
+}
+
+func (o *FileOutbox) DiscardPrepared(id string) error {
+	return o.withState(func(state *outboxState) error {
+		return state.discardPrepared(id)
+	})
+}
+
+func (o *FileOutbox) Discard(id string) error {
+	return o.withState(func(state *outboxState) error {
+		return state.discard(id)
+	})
+}
+
+func (o *FileOutbox) Durable() bool { return true }
+
+func (o *FileOutbox) Close() error {
+	return o.withState(func(*outboxState) error { return nil })
+}
+
+func (o *FileOutbox) persistState(state outboxState) error {
+	phaseStart := time.Now()
+	data, err := encodeOutboxProto(state)
+	emitOutboxPhase(o, "encode", phaseStart)
+	if err != nil {
+		return err
+	}
+	phaseStart = time.Now()
+	err = atomicfile.Write(o.path, data, 0o600)
+	emitOutboxPhase(o, "atomic-write", phaseStart)
+	return err
+}
+
+var outboxPhaseHook func(*FileOutbox, string, time.Duration)
+
+func emitOutboxPhase(outbox *FileOutbox, phase string, began time.Time) {
+	if outboxPhaseHook != nil {
+		outboxPhaseHook(outbox, phase, time.Since(began))
+	}
+}

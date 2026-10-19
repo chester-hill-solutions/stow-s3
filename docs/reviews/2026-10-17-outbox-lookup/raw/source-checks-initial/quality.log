@@ -1,0 +1,9 @@
+node scripts/check-go-quality.mjs
+Go quality ratchet violation
+  new debt: complexity: 6 > 2
+  new: internal/runthrough/file_outbox_lookup_test.go:TestFileOutboxLookupConcurrentReadersAndWriter#1
+  new: internal/runthrough/file_outbox_lookup_test.go:TestFileOutboxLookupFailsClosedAndRecovers#1
+  new: internal/runthrough/file_outbox_lookup_test.go:TestFileOutboxLookupFailsClosedAndRecovers/func-literal-1#1
+  new: internal/runthrough/file_outbox_lookup_test.go:TestFileOutboxLookupReloadsSharedProvenance#1
+Fix the violation; do not raise the baseline to pass.
+make: *** [Makefile:113: check-go-quality] Error 1

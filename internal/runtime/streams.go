@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"sync"
@@ -10,6 +11,8 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/policy"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
+
+var errObjectSizeExceeded = errors.New("object stream exceeds declared size")
 
 func (i *Instance) OpenObject(ctx context.Context, bucket, key string) (io.ReadCloser, Object, error) {
 	return i.openObject(ctx, bucket, key, nil)
@@ -36,9 +39,16 @@ func (i *Instance) openObject(ctx context.Context, bucket, key string, span *sto
 	}
 	reader, meta, err := i.openStoreRange(ctx, bucket, key, span)
 	if err != nil {
+		if reader != nil {
+			_ = reader.Close()
+		}
 		return nil, Object{}, err
 	}
-	stream := &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader}
+	size := meta.Size
+	if span != nil {
+		size = span.Length
+	}
+	stream := &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader, size: size}
 	if seeker, ok := reader.(io.Seeker); ok {
 		return &seekableObjectStream{objectStream: stream, seeker: seeker}, objectFromMeta(meta, nil), nil
 	}
@@ -85,6 +95,8 @@ type objectStream struct {
 	key      string
 	reader   io.ReadCloser
 	closed   bool
+	size     int64
+	position int64
 }
 
 func (r *objectStream) Read(buffer []byte) (int, error) {
@@ -100,7 +112,21 @@ func (r *objectStream) Read(buffer []byte) (int, error) {
 		_ = r.closeLocked()
 		return 0, err
 	}
+	remaining := max(r.size-r.position, 0)
+	if r.size >= 0 && int64(len(buffer)) > remaining {
+		buffer = buffer[:remaining+1]
+	}
 	n, err := r.reader.Read(buffer)
+	r.position += int64(n)
+	if r.size >= 0 && int64(n) > remaining {
+		n = int(remaining)
+		if err == nil || err == io.EOF {
+			err = errObjectSizeExceeded
+		}
+	}
+	if err == io.EOF && r.position < r.size {
+		err = io.ErrUnexpectedEOF
+	}
 	if err != nil {
 		_ = r.closeLocked()
 	}
@@ -149,5 +175,9 @@ func (r *seekableObjectStream) Seek(offset int64, whence int) (int64, error) {
 		_ = r.closeLocked()
 		return 0, err
 	}
-	return r.seeker.Seek(offset, whence)
+	position, err := r.seeker.Seek(offset, whence)
+	if err == nil {
+		r.position = position
+	}
+	return position, err
 }

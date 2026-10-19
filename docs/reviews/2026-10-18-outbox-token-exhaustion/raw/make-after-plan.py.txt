@@ -1,0 +1,4 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-outbox-token-exhaustion-2026-10-18');before=json.loads((p/'before-plan.json').read_text());template=json.loads((Path('/private/tmp/stow-outbox-admission-2026-10-18')/'final-plan.json').read_text());steps=[x for x in template['steps']if x['name']not in ['baseline-benchmark-build','benchmark-build','comparison']];steps[0]['args']=['gofmt','-w',*before['sources']];steps += [{'name':'benchmark-build','args':['go','test','-c','./internal/runthrough','-o','benchmark/token-after.test']},{'name':'comparison','args':['node','benchmark/token-comparison.mjs']}]
+plan={'phase':'outbox-token-exhaustion-after','sources':before['sources']+['benchmark/token-comparison.mjs'],'steps':steps};(p/'after-plan.json').write_text(json.dumps(plan,indent=2)+'\n')

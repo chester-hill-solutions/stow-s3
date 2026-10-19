@@ -1,0 +1,69 @@
+from pathlib import Path
+import json,subprocess,shutil,hashlib
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');old=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True)
+files=[x for x in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if x]
+for name in files:
+ f=r/name
+ if f.is_file():dest=c/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dest)
+b=c/'benchmark';d=b/'write-cache';d.mkdir(parents=True,exist_ok=True)
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/name,b/name)
+z=b/'validation-previous-baselines';z.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:shutil.copy2(r/'scripts/baselines'/name,z/name)
+for name in ['control.py','export.py','remote.py','watch.py']:(p/name).write_text((old/name).read_text().replace(str(old),str(p)).replace('stow-outbox-write-phases-20261018','stow-outbox-write-cache-20261018'))
+manifest={name:hashlib.sha256((c/name).read_bytes()).hexdigest()for name in files if(c/name).is_file()}
+for file in [b/'validation-input-manifest.json',p/'source-manifest.json']:file.write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({k:subprocess.check_output(['git','rev-parse',v],cwd=r).decode().strip()for k,v in [('base','HEAD'),('origin_main','origin/main')]},indent=2)+'\n')
+shutil.copy2(p/'tests.go.txt',d/'contract_test.go.txt')
+f=(r/'internal/runthrough/file_outbox.go').read_text()
+naive=f.replace('return atomicfile.Write(o.path, data, 0o600)','if err := atomicfile.Write(o.path, data, 0o600); err != nil {return err}; o.validatedData=data;return nil')
+(d/'naive-file_outbox.go.txt').write_text(naive)
+safe=f.replace('if err := o.persistState(state); err != nil {','data,err:=o.persistState(state)\n if err != nil {').replace('o.state = state\n\to.journalSeen = true\n\to.nativeJournal = true','o.state = state\n o.validatedData=data\n\to.journalSeen = true\n\to.nativeJournal = true')
+safe=safe.replace('func (o *FileOutbox) persistState(state outboxState) error {\n\tdata, err := encodeOutboxProto(state)\n\tif err != nil {\n\t\treturn err\n\t}\n\treturn atomicfile.Write(o.path, data, 0o600)\n}', '''func (o *FileOutbox) persistState(state outboxState) ([]byte,error) {
+ data,message,err:=marshalOutboxProto(state)
+ if err != nil {return nil,err}
+ if err:=atomicfile.Write(o.path,data,0o600);err!=nil{return nil,err}
+ if !reusableOutboxProtoState(state,message){return nil,nil}
+ return data,nil
+}''')
+assert safe!=f and '([]byte,error)'in safe
+(d/'safe-file_outbox.go.txt').write_text(safe)
+f=(r/'internal/runthrough/file_outbox_proto.go').read_text()
+start=f.index('func encodeOutboxProto(');end=f.index('\nfunc outboxProtoText(',start)
+body=f[start:end].replace('func encodeOutboxProto(state outboxState) ([]byte, error) {','func marshalOutboxProto(state outboxState) ([]byte, *outboxpb.Outbox, error) {').replace('return nil, err','return nil, nil, err').replace('return nil, fmt.Errorf','return nil, nil, fmt.Errorf').replace('return data, nil','return data, message, nil')
+f=f[:start]+'''func encodeOutboxProto(state outboxState) ([]byte,error) {
+ data,_,err:=marshalOutboxProto(state)
+ return data,err
+}
+
+'''+body+f[end:]
+f+='''
+// Reuse only a state that a fresh native decode would leave unchanged. Unusual
+// caller values keep the existing reload path, including text/time normalization,
+// historical-attempt reconciliation, prepared migration and counter clamping.
+func reusableOutboxProtoState(state outboxState,message *outboxpb.Outbox) bool {
+ if state.entries==nil||state.prepared==nil||state.provenance==nil{return false}
+ for _,value:=range message.Provenance {
+  if state.provenance[value.Identity].ETag!=value.Etag{return false}
+ }
+ for _,group:=range []struct{entries map[string]OutboxEntry;written []*outboxpb.Entry;prepared bool}{
+  {state.entries,message.Entries,false},{state.prepared,message.Prepared,true},
+ }{
+  for _,written:=range group.written {
+   entry:=group.entries[written.Identity]
+   decoded,err:=decodeOutboxProtoEntry(written)
+   if err!=nil||entry!=decoded||(entry.Attempts>0&&!entry.Attempted)||(!group.prepared&&entry.Prepared)||entry.ClaimToken>state.nextToken||entry.PreparedToken>state.nextToken{return false}
+   if sequence,_:=outboxSequenceOK(entry.ID);sequence>state.seq{return false}
+   if group.prepared {if _,exists:=state.entries[entry.ID];exists{return false}}
+  }
+ }
+ return true
+}
+'''
+(d/'safe-file_outbox_proto.go.txt').write_text(f)
+overlay={'/app/internal/runthrough/write_cache_contract_test.go':'/app/benchmark/write-cache/contract_test.go.txt','/app/internal/runthrough/write_cache_bench_test.go':'/app/benchmark/write-cache/bench_test.go.txt'}
+for variant in ['before','naive','safe']:
+ updates=dict(overlay)
+ if variant!='before':updates['/app/internal/runthrough/file_outbox.go']='/app/benchmark/write-cache/'+variant+'-file_outbox.go.txt'
+ if variant=='safe':updates['/app/internal/runthrough/file_outbox_proto.go']='/app/benchmark/write-cache/safe-file_outbox_proto.go.txt'
+ (b/('write-cache-'+variant+'.json')).write_text(json.dumps({'Replace':updates},indent=2)+'\n')
+print('Prepared current-source context and separate before/naive/safe overlays; product unchanged')

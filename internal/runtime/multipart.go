@@ -3,6 +3,7 @@ package runtime
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
@@ -44,7 +45,7 @@ func (i *Instance) CreateMultipartUpload(ctx context.Context, bucket, key string
 		return nil, err
 	}
 	clone := storage.CloneMultipartUpload(*upload)
-	return &clone, nil
+	return &clone, err
 }
 
 func (i *Instance) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {
@@ -99,7 +100,7 @@ func (i *Instance) UploadPart(ctx context.Context, uploadID string, partNumber i
 		return nil, err
 	}
 	clone := *part
-	return &clone, nil
+	return &clone, err
 }
 
 func (i *Instance) ListPartsPage(ctx context.Context, uploadID string, opts storage.ListPartsOptions) (*storage.ListPartsResult, error) {
@@ -162,8 +163,20 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if !i.finishCompletion(uploadID, oldSize, meta, exists, err) {
 		return nil, err
 	}
+	if err != nil {
+		err = i.reconcileCompletionError(ctx, uploadID, err)
+	}
 	clone := *meta
 	return &clone, err
+}
+
+func (i *Instance) reconcileCompletionError(ctx context.Context, uploadID string, cause error) error {
+	_, err := i.multipartStore.GetMultipartUpload(ctx, uploadID)
+	if errors.Is(err, storage.ErrUploadNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
+		i.removeUpload(uploadID, true)
+		return cause
+	}
+	return errors.Join(cause, err)
 }
 
 func (i *Instance) AbortMultipartUpload(ctx context.Context, uploadID string) error {
@@ -225,7 +238,30 @@ func (i *Instance) ValidateMultipartUpload(ctx context.Context, uploadID, bucket
 	if err := i.checkMultipartOpen(); err != nil {
 		return err
 	}
-	return i.multipartStore.ValidateMultipartUpload(ctx, uploadID, bucket, key)
+	err := i.multipartStore.ValidateMultipartUpload(ctx, uploadID, bucket, key)
+	if err != nil {
+		i.reconcileMissingMultipartUpload(ctx, uploadID, bucket, key, err)
+	}
+	return err
+}
+
+func (i *Instance) reconcileMissingMultipartUpload(ctx context.Context, uploadID, bucket, key string, cause error) {
+	upload, ok := i.multipart[uploadID]
+	if !ok || upload.upload.Bucket != bucket || upload.upload.Key != key {
+		return
+	}
+	if (!errors.Is(cause, storage.ErrUploadNotFound) && !errors.Is(cause, storage.ErrNoSuchUpload)) || errors.Is(cause, storage.ErrMutationCommitted) {
+		return
+	}
+	_, err := i.multipartStore.GetMultipartUpload(ctx, uploadID)
+	if !errors.Is(err, storage.ErrUploadNotFound) || errors.Is(err, storage.ErrMutationCommitted) {
+		return
+	}
+	_, err = i.quotaStore().HeadObject(ctx, bucket, key)
+	if err != nil && (!errors.Is(err, storage.ErrObjectNotFound) || errors.Is(err, storage.ErrMutationCommitted)) {
+		return
+	}
+	i.removeUpload(uploadID, err == nil)
 }
 
 func (i *Instance) ListMultipartUploads(ctx context.Context, bucket string, opts storage.MultipartListOptions) (*storage.MultipartListResult, error) {

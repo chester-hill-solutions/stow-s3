@@ -1,0 +1,28 @@
+{
+  "baseline": "b531f15",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "branch": "codex/core-copy-quality",
+  "commands": {
+    "full_go": "GOTOOLCHAIN=go1.25.6 go test ./...",
+    "race": "GOTOOLCHAIN=go1.25.6 go test -race ./internal/runtime ./internal/storage/... ./internal/s3api ./internal/runthrough ./internal/embedded ./pkg/stow",
+    "conformance": "make test-conformance",
+    "regression": "GOTOOLCHAIN=go1.25.6 go test ./internal/runtime -run ^TestStoreAdapterCopy(PreservesCommittedPublication|RefusalKeepsDestination)$ -count=2 -v",
+    "regression_race": "same selection with -race -count=5",
+    "original_probes": "go test ./internal/runtime ./internal/embedded -run ^TestMap -count=2 -v (also with -race)",
+    "benchmark": "standalone binaries: -test.run=^$ -test.bench=^BenchmarkStoreAdapterCopyPublication$ -test.benchmem -test.benchtime=1s -test.count=3",
+    "vet": "GOTOOLCHAIN=go1.25.6 go vet ./internal/runtime ./internal/s3api ./internal/embedded",
+    "generated": "node scripts/check-generated.mjs",
+    "wasm": "node --test wasm/runtime.test.mjs",
+    "package": "node --import tsx --test test/embedded.test.ts test/node-wasm-host.test.ts test/wasm-assets.test.ts test/host-backed-streams.test.ts"
+  },
+  "notes": [
+    "Baseline regressions failed before production modifications.",
+    "Baseline and final benchmark harnesses were identical.",
+    "No agent builds or tests ran concurrently with serial benchmark measurements.",
+    "Committed-error benchmarks report error only after a real local memory COPY.",
+    "Temporary probes and dependency symlink removed after use.",
+    "Next buffered-PUT probe is intentionally failing and stored as text; its implementation remains unchanged.",
+    "Log trailing whitespace normalized for repository checks.",
+    "Conformance verbose output summarized by backend invocation and final result."
+  ]
+}

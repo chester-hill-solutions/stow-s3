@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-token-exhaustion-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-token-exhaustion/raw';raw.mkdir(parents=True,exist_ok=True);base=json.loads((p/'baseline.json').read_text())['base']
+for phase,count in [('initial-before',4),('before',4),('after',16)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks)
+ assert job['deploymentId']==run['railwayDeploymentId']=='80f6d3b5-62b2-4157-8bd6-51f8c68a5896'
+ env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ for name,digest in env['sourceSHA256'].items():
+  if not name.startswith('internal/'):continue
+  if phase=='after':assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+  elif not name.endswith('_test.go'):assert hashlib.sha256(subprocess.check_output(['git','show',base+':'+name],cwd=r)).hexdigest()==digest,name
+ dest=raw/phase
+ if dest.exists():shutil.rmtree(dest)
+ dest.mkdir()
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ shutil.copy2(p/(phase+'-start.json'),dest/'start.json')
+for name in ['baseline.json','source-manifest.json','after-upload-source-hashes.json']:shutil.copy2(p/name,raw/name)
+for name in ['prepare.py','retry-before.py','verify-red.py','install-after.py','make-after-plan.py','analyze.py','collect.py','report.py','export.py','remote.py','control.py','watch.py','install-tests.js','install-before-retry.js','install-after.js','manifest.py','publish.py','stop.py']:shutil.copy2(p/name,raw/(name+'.txt'))
+for name in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/name,raw/(name+'.txt'))
+print('Retained both original-code runs, corrected red/green results, all comparisons and source/harness proofs')

@@ -1,0 +1,914 @@
+{
+  "before-normal": {
+    "distinctCases": 50,
+    "passes": 100,
+    "expectedFailures": 0,
+    "skipped": 0,
+    "cases": [
+      "TestFileOutboxOwnWriteCanonicalizesProvenance",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+      "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+      "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+      "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+      "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+      "TestFileOutboxReleasesCallerStringBuffers",
+      "TestOutboxProtoBlockConcurrentOwnership",
+      "TestOutboxProtoBlockEarlyErrorAllocation",
+      "TestOutboxProtoBlockReleasesInputBuffers",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+      "TestOutboxProtoMatchesJSONState/complete",
+      "TestOutboxProtoMatchesJSONState/empty",
+      "TestOutboxProtoMatchesJSONState/invalid-utf8",
+      "TestOutboxProtoMatchesJSONState/legacy-attempt",
+      "TestOutboxProtoPreservesTimestampErrors",
+      "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+      "TestOutboxStateCloneIndependence/empty-nonnil",
+      "TestOutboxStateCloneIndependence/maps-0",
+      "TestOutboxStateCloneIndependence/maps-1",
+      "TestOutboxStateCloneIndependence/maps-2",
+      "TestOutboxStateCloneIndependence/maps-3",
+      "TestOutboxStateCloneIndependence/maps-4",
+      "TestOutboxStateCloneIndependence/maps-5",
+      "TestOutboxStateCloneIndependence/maps-6",
+      "TestOutboxStateCloneIndependence/maps-7"
+    ],
+    "frames": {
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+        "sha256": "1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e",
+        "bytes": 54
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+        "sha256": "9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9",
+        "bytes": 85
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+        "sha256": "296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb",
+        "bytes": 4315
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+        "sha256": "b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e",
+        "bytes": 4348
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+        "sha256": "56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e",
+        "bytes": 4383
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+        "sha256": "06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827",
+        "bytes": 8821
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+        "sha256": "2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565",
+        "bytes": 654
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+        "sha256": "7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59",
+        "bytes": 1279
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+        "sha256": "ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549",
+        "bytes": 81375
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+        "sha256": "ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a",
+        "bytes": 82022
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+        "sha256": "18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae",
+        "bytes": 82681
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+        "sha256": "6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58",
+        "bytes": 166179
+      }
+    },
+    "earlyError": [
+      {
+        "allocatedBytes": 98528,
+        "entries": 4096
+      },
+      {
+        "allocatedBytes": 98528,
+        "entries": 4096
+      }
+    ],
+    "retention": [
+      {
+        "heapBefore": 453424,
+        "heapAfter": 419448,
+        "frameBytes": 3706
+      },
+      {
+        "heapBefore": 464472,
+        "heapAfter": 430800,
+        "frameBytes": 3706
+      }
+    ]
+  },
+  "before-race": {
+    "distinctCases": 50,
+    "passes": 100,
+    "expectedFailures": 0,
+    "skipped": 0,
+    "cases": [
+      "TestFileOutboxOwnWriteCanonicalizesProvenance",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+      "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+      "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+      "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+      "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+      "TestFileOutboxReleasesCallerStringBuffers",
+      "TestOutboxProtoBlockConcurrentOwnership",
+      "TestOutboxProtoBlockEarlyErrorAllocation",
+      "TestOutboxProtoBlockReleasesInputBuffers",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+      "TestOutboxProtoMatchesJSONState/complete",
+      "TestOutboxProtoMatchesJSONState/empty",
+      "TestOutboxProtoMatchesJSONState/invalid-utf8",
+      "TestOutboxProtoMatchesJSONState/legacy-attempt",
+      "TestOutboxProtoPreservesTimestampErrors",
+      "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+      "TestOutboxStateCloneIndependence/empty-nonnil",
+      "TestOutboxStateCloneIndependence/maps-0",
+      "TestOutboxStateCloneIndependence/maps-1",
+      "TestOutboxStateCloneIndependence/maps-2",
+      "TestOutboxStateCloneIndependence/maps-3",
+      "TestOutboxStateCloneIndependence/maps-4",
+      "TestOutboxStateCloneIndependence/maps-5",
+      "TestOutboxStateCloneIndependence/maps-6",
+      "TestOutboxStateCloneIndependence/maps-7"
+    ],
+    "frames": {
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+        "sha256": "1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e",
+        "bytes": 54
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+        "sha256": "9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9",
+        "bytes": 85
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+        "sha256": "296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb",
+        "bytes": 4315
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+        "sha256": "b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e",
+        "bytes": 4348
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+        "sha256": "56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e",
+        "bytes": 4383
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+        "sha256": "06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827",
+        "bytes": 8821
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+        "sha256": "2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565",
+        "bytes": 654
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+        "sha256": "7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59",
+        "bytes": 1279
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+        "sha256": "ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549",
+        "bytes": 81375
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+        "sha256": "ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a",
+        "bytes": 82022
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+        "sha256": "18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae",
+        "bytes": 82681
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+        "sha256": "6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58",
+        "bytes": 166179
+      }
+    },
+    "earlyError": [
+      {
+        "allocatedBytes": 98528,
+        "entries": 4096
+      },
+      {
+        "allocatedBytes": 98528,
+        "entries": 4096
+      }
+    ],
+    "retention": [
+      {
+        "heapBefore": 459792,
+        "heapAfter": 426488,
+        "frameBytes": 3706
+      },
+      {
+        "heapBefore": 464936,
+        "heapAfter": 431568,
+        "frameBytes": 3706
+      }
+    ]
+  },
+  "bulk-normal": {
+    "distinctCases": 50,
+    "passes": 98,
+    "expectedFailures": 2,
+    "skipped": 0,
+    "cases": [
+      "TestFileOutboxOwnWriteCanonicalizesProvenance",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+      "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+      "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+      "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+      "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+      "TestFileOutboxReleasesCallerStringBuffers",
+      "TestOutboxProtoBlockConcurrentOwnership",
+      "TestOutboxProtoBlockEarlyErrorAllocation",
+      "TestOutboxProtoBlockReleasesInputBuffers",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+      "TestOutboxProtoMatchesJSONState/complete",
+      "TestOutboxProtoMatchesJSONState/empty",
+      "TestOutboxProtoMatchesJSONState/invalid-utf8",
+      "TestOutboxProtoMatchesJSONState/legacy-attempt",
+      "TestOutboxProtoPreservesTimestampErrors",
+      "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+      "TestOutboxStateCloneIndependence/empty-nonnil",
+      "TestOutboxStateCloneIndependence/maps-0",
+      "TestOutboxStateCloneIndependence/maps-1",
+      "TestOutboxStateCloneIndependence/maps-2",
+      "TestOutboxStateCloneIndependence/maps-3",
+      "TestOutboxStateCloneIndependence/maps-4",
+      "TestOutboxStateCloneIndependence/maps-5",
+      "TestOutboxStateCloneIndependence/maps-6",
+      "TestOutboxStateCloneIndependence/maps-7"
+    ],
+    "frames": {
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+        "sha256": "1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e",
+        "bytes": 54
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+        "sha256": "9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9",
+        "bytes": 85
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+        "sha256": "296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb",
+        "bytes": 4315
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+        "sha256": "b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e",
+        "bytes": 4348
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+        "sha256": "56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e",
+        "bytes": 4383
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+        "sha256": "06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827",
+        "bytes": 8821
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+        "sha256": "2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565",
+        "bytes": 654
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+        "sha256": "7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59",
+        "bytes": 1279
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+        "sha256": "ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549",
+        "bytes": 81375
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+        "sha256": "ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a",
+        "bytes": 82022
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+        "sha256": "18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae",
+        "bytes": 82681
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+        "sha256": "6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58",
+        "bytes": 166179
+      }
+    },
+    "earlyError": [
+      {
+        "allocatedBytes": 1573120,
+        "entries": 4096
+      },
+      {
+        "allocatedBytes": 1573088,
+        "entries": 4096
+      }
+    ],
+    "retention": [
+      {
+        "heapBefore": 453184,
+        "heapAfter": 419640,
+        "frameBytes": 3706
+      },
+      {
+        "heapBefore": 463640,
+        "heapAfter": 430096,
+        "frameBytes": 3706
+      }
+    ]
+  },
+  "bulk-race": {
+    "distinctCases": 50,
+    "passes": 98,
+    "expectedFailures": 2,
+    "skipped": 0,
+    "cases": [
+      "TestFileOutboxOwnWriteCanonicalizesProvenance",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+      "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+      "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+      "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+      "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+      "TestFileOutboxReleasesCallerStringBuffers",
+      "TestOutboxProtoBlockConcurrentOwnership",
+      "TestOutboxProtoBlockEarlyErrorAllocation",
+      "TestOutboxProtoBlockReleasesInputBuffers",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+      "TestOutboxProtoMatchesJSONState/complete",
+      "TestOutboxProtoMatchesJSONState/empty",
+      "TestOutboxProtoMatchesJSONState/invalid-utf8",
+      "TestOutboxProtoMatchesJSONState/legacy-attempt",
+      "TestOutboxProtoPreservesTimestampErrors",
+      "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+      "TestOutboxStateCloneIndependence/empty-nonnil",
+      "TestOutboxStateCloneIndependence/maps-0",
+      "TestOutboxStateCloneIndependence/maps-1",
+      "TestOutboxStateCloneIndependence/maps-2",
+      "TestOutboxStateCloneIndependence/maps-3",
+      "TestOutboxStateCloneIndependence/maps-4",
+      "TestOutboxStateCloneIndependence/maps-5",
+      "TestOutboxStateCloneIndependence/maps-6",
+      "TestOutboxStateCloneIndependence/maps-7"
+    ],
+    "frames": {
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+        "sha256": "1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e",
+        "bytes": 54
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+        "sha256": "9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9",
+        "bytes": 85
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+        "sha256": "296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb",
+        "bytes": 4315
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+        "sha256": "b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e",
+        "bytes": 4348
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+        "sha256": "56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e",
+        "bytes": 4383
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+        "sha256": "06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827",
+        "bytes": 8821
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+        "sha256": "2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565",
+        "bytes": 654
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+        "sha256": "7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59",
+        "bytes": 1279
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+        "sha256": "ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549",
+        "bytes": 81375
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+        "sha256": "ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a",
+        "bytes": 82022
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+        "sha256": "18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae",
+        "bytes": 82681
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+        "sha256": "6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58",
+        "bytes": 166179
+      }
+    },
+    "earlyError": [
+      {
+        "allocatedBytes": 1573088,
+        "entries": 4096
+      },
+      {
+        "allocatedBytes": 1573088,
+        "entries": 4096
+      }
+    ],
+    "retention": [
+      {
+        "heapBefore": 422304,
+        "heapAfter": 426328,
+        "frameBytes": 3706
+      },
+      {
+        "heapBefore": 427464,
+        "heapAfter": 430960,
+        "frameBytes": 3706
+      }
+    ]
+  },
+  "bounded-normal": {
+    "distinctCases": 50,
+    "passes": 100,
+    "expectedFailures": 0,
+    "skipped": 0,
+    "cases": [
+      "TestFileOutboxOwnWriteCanonicalizesProvenance",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+      "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+      "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+      "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+      "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+      "TestFileOutboxReleasesCallerStringBuffers",
+      "TestOutboxProtoBlockConcurrentOwnership",
+      "TestOutboxProtoBlockEarlyErrorAllocation",
+      "TestOutboxProtoBlockReleasesInputBuffers",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+      "TestOutboxProtoMatchesJSONState/complete",
+      "TestOutboxProtoMatchesJSONState/empty",
+      "TestOutboxProtoMatchesJSONState/invalid-utf8",
+      "TestOutboxProtoMatchesJSONState/legacy-attempt",
+      "TestOutboxProtoPreservesTimestampErrors",
+      "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+      "TestOutboxStateCloneIndependence/empty-nonnil",
+      "TestOutboxStateCloneIndependence/maps-0",
+      "TestOutboxStateCloneIndependence/maps-1",
+      "TestOutboxStateCloneIndependence/maps-2",
+      "TestOutboxStateCloneIndependence/maps-3",
+      "TestOutboxStateCloneIndependence/maps-4",
+      "TestOutboxStateCloneIndependence/maps-5",
+      "TestOutboxStateCloneIndependence/maps-6",
+      "TestOutboxStateCloneIndependence/maps-7"
+    ],
+    "frames": {
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+        "sha256": "1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e",
+        "bytes": 54
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+        "sha256": "9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9",
+        "bytes": 85
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+        "sha256": "296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb",
+        "bytes": 4315
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+        "sha256": "b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e",
+        "bytes": 4348
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+        "sha256": "56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e",
+        "bytes": 4383
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+        "sha256": "06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827",
+        "bytes": 8821
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+        "sha256": "2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565",
+        "bytes": 654
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+        "sha256": "7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59",
+        "bytes": 1279
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+        "sha256": "ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549",
+        "bytes": 81375
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+        "sha256": "ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a",
+        "bytes": 82022
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+        "sha256": "18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae",
+        "bytes": 82681
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+        "sha256": "6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58",
+        "bytes": 166179
+      }
+    },
+    "earlyError": [
+      {
+        "allocatedBytes": 147680,
+        "entries": 4096
+      },
+      {
+        "allocatedBytes": 147680,
+        "entries": 4096
+      }
+    ],
+    "retention": [
+      {
+        "heapBefore": 458208,
+        "heapAfter": 424792,
+        "frameBytes": 3706
+      },
+      {
+        "heapBefore": 463960,
+        "heapAfter": 430608,
+        "frameBytes": 3706
+      }
+    ]
+  },
+  "bounded-race": {
+    "distinctCases": 50,
+    "passes": 100,
+    "expectedFailures": 0,
+    "skipped": 0,
+    "cases": [
+      "TestFileOutboxOwnWriteCanonicalizesProvenance",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+      "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+      "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+      "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+      "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+      "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+      "TestFileOutboxReleasesCallerStringBuffers",
+      "TestOutboxProtoBlockConcurrentOwnership",
+      "TestOutboxProtoBlockEarlyErrorAllocation",
+      "TestOutboxProtoBlockReleasesInputBuffers",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+      "TestOutboxProtoMatchesJSONState/complete",
+      "TestOutboxProtoMatchesJSONState/empty",
+      "TestOutboxProtoMatchesJSONState/invalid-utf8",
+      "TestOutboxProtoMatchesJSONState/legacy-attempt",
+      "TestOutboxProtoPreservesTimestampErrors",
+      "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+      "TestOutboxStateCloneIndependence/empty-nonnil",
+      "TestOutboxStateCloneIndependence/maps-0",
+      "TestOutboxStateCloneIndependence/maps-1",
+      "TestOutboxStateCloneIndependence/maps-2",
+      "TestOutboxStateCloneIndependence/maps-3",
+      "TestOutboxStateCloneIndependence/maps-4",
+      "TestOutboxStateCloneIndependence/maps-5",
+      "TestOutboxStateCloneIndependence/maps-6",
+      "TestOutboxStateCloneIndependence/maps-7"
+    ],
+    "frames": {
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=1",
+        "sha256": "1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e",
+        "bytes": 54
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=2",
+        "sha256": "9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9",
+        "bytes": 85
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=127",
+        "sha256": "296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb",
+        "bytes": 4315
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=128",
+        "sha256": "b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e",
+        "bytes": 4348
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=129",
+        "sha256": "56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e",
+        "bytes": 4383
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=false/depth=257",
+        "sha256": "06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827",
+        "bytes": 8821
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=0",
+        "sha256": "1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947",
+        "bytes": 19
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=1",
+        "sha256": "2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565",
+        "bytes": 654
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=2",
+        "sha256": "7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59",
+        "bytes": 1279
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=127",
+        "sha256": "ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549",
+        "bytes": 81375
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=128",
+        "sha256": "ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a",
+        "bytes": 82022
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=129",
+        "sha256": "18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae",
+        "bytes": 82681
+      },
+      "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257": {
+        "name": "TestOutboxProtoBlockRoundTrip/mixed=true/depth=257",
+        "sha256": "6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58",
+        "bytes": 166179
+      }
+    },
+    "earlyError": [
+      {
+        "allocatedBytes": 147680,
+        "entries": 4096
+      },
+      {
+        "allocatedBytes": 147680,
+        "entries": 4096
+      }
+    ],
+    "retention": [
+      {
+        "heapBefore": 454128,
+        "heapAfter": 421000,
+        "frameBytes": 3706
+      },
+      {
+        "heapBefore": 426808,
+        "heapAfter": 430752,
+        "frameBytes": 3706
+      }
+    ]
+  }
+}

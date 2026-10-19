@@ -1,0 +1,1 @@
+const fs=require('node:fs');const t=fs.readFileSync('/usr/local/go/src/sync/pool.go','utf8');const i=t.indexOf('func (p *Pool) Put');console.log(t.slice(i,i+650));

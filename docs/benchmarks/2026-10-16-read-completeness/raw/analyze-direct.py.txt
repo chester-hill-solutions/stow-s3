@@ -1,0 +1,14 @@
+from pathlib import Path
+import re,json,statistics
+p=Path('/private/tmp/stow-read-completeness-2026-10-16/direct');data={}
+for f in sorted(p.glob('cpu*.log')):
+ cpu,block,version=re.match(r'cpu(\d+)-(\d+)-(before|after)',f.stem).groups()
+ for m in re.finditer(r'(Benchmark\S+)\s+(\d+)\s+([\d.]+) ns/op\s+(\d+) B/op\s+(\d+) allocs/op',f.read_text()):
+  name,n,ns,b,a=m.groups();name=re.sub(r'-\d+$','',name);data.setdefault((int(cpu),name),{}).setdefault(version,[]).append({'block':int(block),'n':int(n),'ns':float(ns),'bytes':int(b),'allocs':int(a),'source':f.name})
+rows=[]
+for (cpu,name),versions in sorted(data.items()):
+ assert set(versions)=={'before','after'} and all(len(v)==6 for v in versions.values())
+ summaries={v:{'median':statistics.median(s['ns'] for s in ss),'min':min(s['ns'] for s in ss),'max':max(s['ns'] for s in ss),'bytes':sorted(set(s['bytes'] for s in ss)),'allocs':sorted(set(s['allocs'] for s in ss))} for v,ss in versions.items()}
+ row={'cpu':cpu,'case':name,'samples':versions,'summary':summaries,'median_change_pct':100*(summaries['after']['median']/summaries['before']['median']-1)};rows.append(row);print(cpu,name,summaries['before']['median'],summaries['after']['median'],round(row['median_change_pct'],2), 'after range',summaries['after']['min'],summaries['after']['max'])
+assert len(rows)==34
+(p/'measurements.json').write_text(json.dumps(rows,indent=2)+'\n')

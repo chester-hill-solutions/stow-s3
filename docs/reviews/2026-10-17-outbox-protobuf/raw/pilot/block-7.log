@@ -1,0 +1,25 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkOutboxEncoding/provenance=0/encode         	  129866	      1041 ns/op	       153.0 journal-B	     504 B/op	       6 allocs/op
+BenchmarkOutboxEncoding/provenance=0/decode         	   71030	      1584 ns/op	       153.0 journal-B	     960 B/op	      17 allocs/op
+BenchmarkOutboxEncoding/provenance=0/unchanged      	      28	   3690328 ns/op	       153.0 journal-B	       153.0 written-B/op	    4624 B/op	      52 allocs/op
+BenchmarkOutboxEncoding/provenance=0/changed        	      32	   3728339 ns/op	       153.0 journal-B	       153.0 written-B/op	    4624 B/op	      52 allocs/op
+BenchmarkOutboxEncoding/provenance=128/encode       	    1586	     68926 ns/op	     11545 journal-B	   38491 B/op	     262 allocs/op
+BenchmarkOutboxEncoding/provenance=128/decode       	    1428	     82658 ns/op	     11545 journal-B	   35496 B/op	     540 allocs/op
+BenchmarkOutboxEncoding/provenance=128/unchanged    	      28	   4215830 ns/op	     11545 journal-B	     11545 written-B/op	   99498 B/op	     833 allocs/op
+BenchmarkOutboxEncoding/provenance=128/changed      	      22	   5529190 ns/op	     11545 journal-B	     11545 written-B/op	   99488 B/op	     833 allocs/op
+BenchmarkOutboxEncoding/provenance=2048/encode      	      94	   1369248 ns/op	    182425 journal-B	  614554 B/op	    4102 allocs/op
+BenchmarkOutboxEncoding/provenance=2048/decode      	      85	   1380276 ns/op	    182425 journal-B	  601304 B/op	    8238 allocs/op
+BenchmarkOutboxEncoding/provenance=2048/unchanged   	      13	   7744634 ns/op	    182425 journal-B	    182425 written-B/op	 1603470 B/op	   12379 allocs/op
+BenchmarkOutboxEncoding/provenance=2048/changed     	      14	   7295250 ns/op	    182425 journal-B	    182425 written-B/op	 1603476 B/op	   12379 allocs/op
+BenchmarkOutboxEncoding/provenance=16384/encode     	       8	  12563157 ns/op	   1458329 journal-B	 4776269 B/op	   32777 allocs/op
+BenchmarkOutboxEncoding/provenance=16384/decode     	      10	  11677174 ns/op	   1458329 journal-B	 4847001 B/op	   65697 allocs/op
+BenchmarkOutboxEncoding/provenance=16384/unchanged  	       3	  34667721 ns/op	   1458329 journal-B	   1458329 written-B/op	14064584 B/op	   98583 allocs/op
+BenchmarkOutboxEncoding/provenance=16384/changed    	       3	  34803566 ns/op	   1458329 journal-B	   1458329 written-B/op	14064656 B/op	   98585 allocs/op
+BenchmarkOutboxEncoding/mixed=1024/encode           	      38	   3289075 ns/op	    508920 journal-B	 1876328 B/op	    8202 allocs/op
+BenchmarkOutboxEncoding/mixed=1024/decode           	      31	   3290006 ns/op	    508920 journal-B	  858137 B/op	   12347 allocs/op
+BenchmarkOutboxEncoding/mixed=1024/unchanged        	       8	  17034503 ns/op	    508920 journal-B	    508920 written-B/op	 4028738 B/op	   21621 allocs/op
+BenchmarkOutboxEncoding/mixed=1024/changed          	       8	  14006741 ns/op	    508920 journal-B	    508920 written-B/op	 3897551 B/op	   21618 allocs/op
+PASS

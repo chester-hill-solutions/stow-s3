@@ -1,0 +1,24 @@
+COMMAND ["gofmt", "-l", "internal/runtime/objects.go", "internal/runtime/guarded_save.go"]
+
+COMMAND ["make", "check-go-quality", "check-file-size"]
+node scripts/check-go-quality.mjs
+Go quality ratchet OK (15 baseline entries)
+node scripts/check-file-size.mjs
+File-size ratchet OK (0 baseline entries; maximum 500 lines)
+
+COMMAND ["node", "scripts/check-doc-links.mjs"]
+Local documentation links OK (216 Markdown files)
+
+COMMAND ["git", "diff", "--check"]
+
+All production source and shipped WASM digests match c614a2b; temporary dependency links and probes absent.
+
+COMMAND ["git", "apply", "--check", "--unidiff-zero", "/Users/ladmin/.codex/worktrees/core-copy-quality/stow/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/narrow-prototype.patch.txt"]
+
+COMMAND ["git", "apply", "--check", "--unidiff-zero", "/Users/ladmin/.codex/worktrees/core-copy-quality/stow/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-prototype.patch.txt"]
+
+COMMAND ["node", "scripts/check-doc-links.mjs"]
+Local documentation links OK (216 Markdown files)
+COMMAND ["git", "diff", "--cached", "--check"]
+
+All 1,252 measurements retained; JSON summaries equal original captures; production source/artifact restoration hashes still match.

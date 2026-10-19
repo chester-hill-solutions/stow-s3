@@ -1,0 +1,16 @@
+from pathlib import Path
+import hashlib,json,subprocess
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-capacity-fence-2026-10-18');raw=r/'docs/reviews/2026-10-18-capacity-fence/raw';e=p/'export-25a7c64f-44ee-4098-b781-378451b43d6b';receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0
+for n,h in receipt['documentSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,h in receipt['sourceSHA256'].items():
+ if n.endswith('.go'):assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,v in json.loads((raw/'artifact-manifest.json').read_text()).items():
+ data=(raw/n).read_bytes();assert len(data)==v['bytes']and hashlib.sha256(data).hexdigest()==v['sha256'],n
+base=json.loads((p/'baseline.json').read_text())['base']
+for n in ['internal/storage/fs/capacity.go']:
+ original=subprocess.check_output(['git','show',base+':'+n],cwd=r);assert original==(p/('baseline-'+Path(n).name+'.txt')).read_bytes(),n
+stop=json.loads((raw/'runner-stop-status.json').read_text());assert stop['stopVerified']and stop['target']['status']=='REMOVED'
+assert not (r/'internal/storage/fs/capacity_fence_bench_test.go').exists()
+modified=subprocess.check_output(['git','diff','--name-only',base],cwd=r).decode().splitlines();allowed={'internal/storage/fs/capacity.go','internal/storage/fs/capacity_fence_test.go'}
+for n in modified:assert n in allowed or n=='docs/reviews/2026-10-18-capacity-fence.md' or n.startswith('docs/reviews/2026-10-18-capacity-fence/raw/'),n
+print('Verified final report, two tested Go files, original overlays, all evidence hashes and runner teardown')

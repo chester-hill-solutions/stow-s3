@@ -1,0 +1,150 @@
+{
+  "phase": "capacity-payload-stream-prototype",
+  "sources": [
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/capacity_read.go",
+    "internal/storage/fs/capacity_payload_read_test.go",
+    "internal/storage/fs/record_io.go",
+    "benchmark/candidate-capacity.go.txt",
+    "benchmark/candidate-read.go.txt",
+    "benchmark/candidate-overlay.json",
+    "benchmark/baseline-capacity.go.txt",
+    "benchmark/empty-read.go.txt",
+    "benchmark/before-overlay.json",
+    "benchmark/scan-bench.go.txt",
+    "benchmark/scan-measure.mjs",
+    "benchmark/measure-child.py"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_payload_read_test.go",
+        "benchmark/candidate-capacity.go.txt",
+        "benchmark/candidate-read.go.txt"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityPayload",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityPayload",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "prototype-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/candidate-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityPayload",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 0
+    },
+    {
+      "name": "prototype-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/candidate-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityPayload",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 0
+    },
+    {
+      "name": "install-benchmark",
+      "args": [
+        "cp",
+        "benchmark/scan-bench.go.txt",
+        "internal/storage/fs/capacity_payload_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmark",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_payload_bench_test.go"
+      ]
+    },
+    {
+      "name": "snapshot-benchmark",
+      "args": [
+        "node",
+        "-e",
+        "require('node:fs').copyFileSync('internal/storage/fs/capacity_payload_bench_test.go',process.env.STOW_RESULT_ROOT+'/compiled-benchmark.go.txt')"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/scan-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/candidate-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/scan-after.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/scan-measure.mjs"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "args": [
+        "rm",
+        "internal/storage/fs/capacity_payload_bench_test.go"
+      ]
+    }
+  ]
+}

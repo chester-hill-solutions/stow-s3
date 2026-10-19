@@ -1,0 +1,19 @@
+import {readFile,writeFile,open,unlink} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
+const root=process.env.STOW_RESULT_ROOT;
+if(!root?.startsWith('/results/')||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway results required');
+const variants={before:'/app/benchmark/outbox-admission-before.test',after:'/app/benchmark/outbox-admission-after.test'};
+const hashes={};for(const[n,p]of Object.entries(variants))hashes[n]=createHash('sha256').update(await readFile(p)).digest('hex');
+const runs=[];
+for(const[index,variant]of ['before','after','after','before','after','before','before','after'].entries()){
+ const args=[variants[variant],'-test.run=^$','-test.bench=^BenchmarkOutboxAdmission$','-test.benchmem','-test.benchtime=300ms','-test.count=1','-test.cpu=1,4'];
+ const name='comparison-'+index+'-'+variant+'.log';const log=await open(root+'/'+name,'w');let result;
+ try{const child=spawn('python3',['benchmark/reap_validation.py',...args],{env:{...process.env},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(exitCode,signal)=>resolve({exitCode,signal}))})}finally{await log.close()}
+ runs.push({index,variant,args,log:name,...result});await writeFile(root+'/comparison-runs.json',JSON.stringify({order:'ABBA BAAB',binarySHA256:hashes,runs},null,2)+'\n');
+ if(result.exitCode!==0)throw Error(name+' failed '+JSON.stringify(result));
+ console.log(name+' passed');
+}
+
+for(const file of Object.values(variants))await unlink(file);
+await writeFile(root+'/comparison-cleanup.json',JSON.stringify({removed:Object.values(variants),binarySHA256:hashes},null,2)+'\n');

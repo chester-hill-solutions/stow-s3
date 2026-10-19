@@ -29,6 +29,13 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 	if err != nil {
 		return Object{}, err
 	}
+	if err := readOpenedObject(reader, &object); err != nil {
+		return Object{}, err
+	}
+	return object, nil
+}
+
+func readOpenedObject(reader io.ReadCloser, object *Object) error {
 	defer reader.Close()
 	size := object.Size
 	if size < 0 {
@@ -38,12 +45,15 @@ func (i *Instance) GetObject(ctx context.Context, bucket, key string) (Object, e
 		size = 32 << 20
 	}
 	buffer := bytes.NewBuffer(make([]byte, 0, int(size)))
-	_, err = io.Copy(buffer, reader)
+	n, err := io.Copy(buffer, reader)
 	if err != nil {
-		return Object{}, err
+		return err
+	}
+	if n < object.Size {
+		return io.ErrUnexpectedEOF
 	}
 	object.Data = buffer.Bytes()
-	return object, nil
+	return nil
 }
 
 func (i *Instance) HeadObject(ctx context.Context, bucket, key string) (Object, error) {
@@ -195,7 +205,7 @@ func (i *Instance) DeleteObjects(ctx context.Context, bucket string, keys []stri
 		meta, err := i.quotaStore().HeadObject(ctx, bucket, key)
 		if err == nil {
 			sizes[key] = meta.Size
-		} else if !errors.Is(err, storage.ErrObjectNotFound) {
+		} else if !errors.Is(err, storage.ErrObjectNotFound) || errors.Is(err, storage.ErrMutationCommitted) {
 			return nil, err
 		}
 	}
@@ -333,7 +343,7 @@ func storedObjectSize(ctx context.Context, store storage.Store, bucket, key stri
 	if err == nil {
 		return meta.Size, true, nil
 	}
-	if errors.Is(err, storage.ErrObjectNotFound) {
+	if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
 		return 0, false, nil
 	}
 	return 0, false, err

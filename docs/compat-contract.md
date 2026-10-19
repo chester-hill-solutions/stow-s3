@@ -631,6 +631,24 @@ server's unlimited byte/object storage profile remains unlimited unless explicit
 storage quotas are configured; its upload count still defaults to 1,024. Neither
 request limit replaces storage quotas or bounds operating-system memory.
 
+Native filesystem and workspace multipart recovery distinguish a missing upload
+directory from an existing upload whose owner metadata is missing, unreadable or
+invalid. Unknown upload state returns an error and preserves acknowledged parts;
+enumeration must not omit it from runtime quota reconciliation. Workspace owner
+identity must match its upload directory and contain a valid bucket and key.
+Repairing the metadata permits reconciliation to resume. Valid uploads for other
+buckets remain excluded from each bucket listing. A failed workspace initiation
+attempts to remove only its newly created staging directory; if cleanup also
+fails, that unknown state still blocks incomplete reconciliation.
+
+Workspace staged parts publish their descriptor and payload in one atomic file
+replacement. Listing and quota reconstruction read that file's descriptor and
+validate its payload length; completion reads and verifies the payload. The
+upload owner document retains initiation options and is not rewritten for each
+part. The private staged-part encoding is not backward compatible: old raw part
+files are refused, with no migration or automatic deletion. Finish or abort old
+uploads before changing builds. Completed objects retain their existing layout.
+
 Workspace file reads and checkpoint input scans/copies pin an `os.OpenRoot`
 directory, refuse symbolic-link components and root identity replacement, and
 bound captured bytes to the measured file size plus one change-detection byte.
@@ -667,3 +685,36 @@ metadata recovery. Stop writers and preserve both files before repairing an inde
 obstruction. A live handle retains the intended metadata and can persist it on a
 successful close after repair; reopening an invalid index fails closed. If that
 handle was lost, current bytes alone cannot reconstruct all original metadata.
+
+Workspace multipart completion likewise returns the known object identity and a
+committed-mutation error if index persistence or upload cleanup fails after
+content publication. The live result retains the composite multipart ETag.
+Accounting includes the published object and retains part bytes and the upload
+session until upload absence is confirmed. An unavailable lookup conservatively
+retains those reservations. After repair, retry completion or abort the retained
+upload; abort preserves the published object. HTTP returns `500 InternalError`,
+and the same separate-publication and metadata-recovery limits above apply.
+
+Filesystem multipart completion also returns the known published object metadata
+and `ErrMutationCommitted` when staging cleanup fails after object publication.
+The original cleanup error remains discoverable. Accounting includes the object
+and retains staging reservations until upload absence is confirmed; repairing
+permissions and retrying completion or aborting staging preserves recovery.
+The object record already contains its metadata, and HTTP still returns
+`500 InternalError` for the cleanup failure.
+
+Workspace DELETE that removes the file but cannot persist the object index
+returns `ErrMutationCommitted` with the original index error. Batch deletion
+includes that key in its confirmed-deleted results and stops at that error,
+preserving earlier progress and leaving later keys untouched. Runtime accounting
+reflects confirmed deletions immediately. Index repair and successful persistence
+are still required; a committed marker does not promise crash-safe recovery.
+
+For custom-store COPY, a published destination returned with
+`ErrMutationCommitted` is preserved through the fallback and public runtime, and
+usage includes that object. The committed marker takes precedence over a joined
+missing-object or precondition failure; its original error chain is retained.
+Stores must supply an accurate destination object with the committed marker.
+Ordinary refusals retain their empty result and existing sentinel translation.
+The base-store fallback continues to use GET and PUT with its existing consistency
+and buffering limits; optional COPY capability remains preferred.

@@ -1,0 +1,204 @@
+{
+  "baseline_commit": "452f590",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "go": "go version go1.25.6 darwin/arm64",
+  "platform": "macOS-14.5-arm64-arm-64bit",
+  "binary_sha256": {
+    "baseline": "cb3ce3cdd8e7cd1addca2fb6bbf4efecea79b63437e168b5d4214106dce03999",
+    "candidate": "fe2d41ea166e86f90edebd9d8fa35d97aae8e4113c421b0ee8bb2cfa6ae08f99"
+  },
+  "blocks": [
+    {
+      "cpu": 1,
+      "block": 1,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-initiation-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=1"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu1-1-baseline.log"
+    },
+    {
+      "cpu": 1,
+      "block": 2,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-initiation-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=1"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu1-2-candidate.log"
+    },
+    {
+      "cpu": 1,
+      "block": 3,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-initiation-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=1"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu1-3-candidate.log"
+    },
+    {
+      "cpu": 1,
+      "block": 4,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-initiation-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=1"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu1-4-baseline.log"
+    },
+    {
+      "cpu": 8,
+      "block": 1,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-initiation-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu8-1-baseline.log"
+    },
+    {
+      "cpu": 8,
+      "block": 2,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-initiation-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu8-2-candidate.log"
+    },
+    {
+      "cpu": 8,
+      "block": 3,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-initiation-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu8-3-candidate.log"
+    },
+    {
+      "cpu": 8,
+      "block": 4,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-initiation-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "benchmark-cpu8-4-baseline.log"
+    }
+  ],
+  "concurrent_agent_tests_or_builds": false,
+  "committed_recovery_limit": "The old runtime cannot abort its unregistered upload; only that benchmark case falls back to provider cleanup. Both versions physically create and remove one upload per iteration. The new version also executes the existing runtime abort reconciliation.",
+  "repeat_blocks": [
+    {
+      "block": 1,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-initiation-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "repeat-cpu8-1-candidate.log"
+    },
+    {
+      "block": 2,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-initiation-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "repeat-cpu8-2-baseline.log"
+    },
+    {
+      "block": 3,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-initiation-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "repeat-cpu8-3-baseline.log"
+    },
+    {
+      "block": 4,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-initiation-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomInitiationLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "exit": 0,
+      "log": "repeat-cpu8-4-candidate.log"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "phase": "outbox-decode-confirmation",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/outbox_decode_resource_test.go",
+    "internal/runthrough/outbox_decode_reference_test.go",
+    "internal/runthrough/outbox_decode_equivalence_test.go",
+    "benchmark/candidate-file_outbox_proto.go.txt",
+    "benchmark/candidate-file_outbox_proto_decode.go.txt",
+    "benchmark/decode-candidate.json",
+    "internal/runthrough/outbox_decode_recovery_test.go",
+    "benchmark/decode-confirmation.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/candidate-file_outbox_proto_decode.go.txt"
+      ]
+    },
+    {
+      "name": "candidate-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/decode-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxDecode|TestFileOutboxDuplicateFlood)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/decode-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxDecode|TestFileOutboxDuplicateFlood)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/decode-before-measure.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/decode-before.test"
+      ]
+    },
+    {
+      "name": "candidate-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/decode-candidate-measure.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/decode-candidate.test"
+      ]
+    },
+    {
+      "name": "confirmation",
+      "args": [
+        "node",
+        "benchmark/decode-confirmation.mjs"
+      ]
+    }
+  ]
+}

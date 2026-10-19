@@ -1,0 +1,56 @@
+File: bounded-reader.test
+Build ID: ab04645e5f4aae9d5be58cccdbea704fd0d40d1f
+Type: alloc_space
+Time: 2026-10-18 19:38:41 UTC
+Showing nodes accounting for 103202848B, 99.54% of 103684016B total
+Dropped 293 nodes (cum <= 518420B)
+      flat  flat%   sum%        cum   cum%
+ 24600256B 23.73% 23.73%  46692952B 45.03%  encoding/json.Marshal
+ 23456000B 22.62% 46.35%  23456000B 22.62%  reflect.growslice
+ 22017408B 21.24% 67.58%  22017408B 21.24%  bytes.growSlice
+ 10898800B 10.51% 78.10%  10898800B 10.51%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateResources
+  8408384B  8.11% 86.21%  44167952B 42.60%  github.com/chester-hill-solutions/stow-s3/internal/capacity.encodeState
+  7161728B  6.91% 93.11%   7176776B  6.92%  github.com/chester-hill-solutions/stow-s3/internal/capacity.readBoundedStateFile
+  3141472B  3.03% 96.14%   3141472B  3.03%  github.com/chester-hill-solutions/stow-s3/internal/capacity.checkHeldProjection (inline)
+  2194608B  2.12% 98.26%   2194608B  2.12%  encoding/json.(*decodeState).literalStore
+   675840B  0.65% 98.91%  17348424B 16.73%  github.com/chester-hill-solutions/stow-s3/internal/capacity.resourceCountNamespace
+   622592B   0.6% 99.51%    622592B   0.6%  os.readFileContents
+    11024B 0.011% 99.52%  22032112B 21.25%  encoding/json.mapEncoder.encode
+     5760B 0.0056% 99.53%  25680328B 24.77%  encoding/json.(*decodeState).object
+     4752B 0.0046% 99.53%  25688968B 24.78%  encoding/json.Unmarshal
+     1680B 0.0016% 99.53%  79140968B 76.33%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).read
+     1344B 0.0013% 99.53%  22018752B 21.24%  bytes.(*Buffer).grow
+      608B 0.00059% 99.54%   1264384B  1.22%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).BindStore.func1
+      416B 0.0004% 99.54% 103437376B 99.76%  github.com/chester-hill-solutions/stow-s3/internal/capacity.BenchmarkLedgerIsolation.func1
+      176B 0.00017% 99.54% 103635064B   100%  testing.(*B).runN
+         0     0% 99.54%   8145664B  7.86%  bytes.(*Buffer).Write
+         0     0% 99.54%  13668224B 13.18%  bytes.(*Buffer).WriteString
+         0     0% 99.54%  25640560B 24.73%  encoding/json.(*decodeState).array
+         0     0% 99.54%  25680328B 24.77%  encoding/json.(*decodeState).unmarshal
+         0     0% 99.54%  25680328B 24.77%  encoding/json.(*decodeState).value
+         0     0% 99.54%  22064848B 21.28%  encoding/json.(*encodeState).marshal
+         0     0% 99.54%  22064848B 21.28%  encoding/json.(*encodeState).reflectValue
+         0     0% 99.54%  21999488B 21.22%  encoding/json.arrayEncoder.encode
+         0     0% 99.54%  22037744B 21.25%  encoding/json.ptrEncoder.encode
+         0     0% 99.54%  21999488B 21.22%  encoding/json.sliceEncoder.encode
+         0     0% 99.54%   8146096B  7.86%  encoding/json.stringEncoder
+         0     0% 99.54%  22037744B 21.25%  encoding/json.structEncoder.encode
+         0     0% 99.54%  99170520B 95.65%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).access
+         0     0% 99.54%   7158696B  6.90%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).write
+         0     0% 99.54%   3987520B  3.85%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).BindStore
+         0     0% 99.54%  12587232B 12.14%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Reconcile
+         0     0% 99.54%   8990296B  8.67%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Reconcile.func1
+         0     0% 99.54%  83410232B 80.45%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Snapshot
+         0     0% 99.54%   9692040B  9.35%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Snapshot.func1
+         0     0% 99.54%  99113080B 95.59%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).access
+         0     0% 99.54%  19946720B 19.24%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).access.func1
+         0     0% 99.54%   1246848B  1.20%  github.com/chester-hill-solutions/stow-s3/internal/capacity.checkCapacity
+         0     0% 99.54%  10938888B 10.55%  github.com/chester-hill-solutions/stow-s3/internal/capacity.namespaceCharge
+         0     0% 99.54%  10026896B  9.67%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateNamespace
+         0     0% 99.54%  10026896B  9.67%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateState
+         0     0% 99.54%  10026896B  9.67%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateStore
+         0     0% 99.54%    623536B   0.6%  os.ReadFile
+         0     0% 99.54%  23456000B 22.62%  reflect.Value.Grow
+         0     0% 99.54%  23456000B 22.62%  reflect.Value.grow
+         0     0% 99.54%  89348568B 86.17%  testing.(*B).launch
+         0     0% 99.54%  14283232B 13.78%  testing.(*B).run1.func1

@@ -1,0 +1,49 @@
+{
+  "phase": "bucket-admission-red",
+  "sources": [
+    "internal/storage/fs/fs.go",
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/capacity_bucket_test.go",
+    "internal/storage/fs/capacity_bucket_concurrent_test.go",
+    "internal/storage/fs/capacity_bucket_fence_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_bucket_test.go",
+        "internal/storage/fs/capacity_bucket_concurrent_test.go",
+        "internal/storage/fs/capacity_bucket_fence_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^TestBucketCapacity",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^TestBucketCapacity",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

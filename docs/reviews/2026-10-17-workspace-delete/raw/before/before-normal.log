@@ -1,0 +1,59 @@
+=== RUN   TestWorkspaceDeleteOutcome
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-3d91f631259f0041809857aba4b06d50 .stow/index.json: is a directory
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-2282d7273d68947a764005392953777d .stow/index.json: is a directory
+    delete_outcome_test.go:21: confirmed keys=[] want=[victim]
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-8108706da1d7a25e4d13dd2053f5a505 .stow/index.json: is a directory
+    delete_outcome_test.go:21: immediate accounting={Bytes:7 Objects:2} want={Bytes:3 Objects:1}
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-d262364f7e0c0ae624aad4aa746c72a4 .stow/index.json: is a directory
+    delete_outcome_test.go:21: confirmed keys=[] want=[victim]
+    delete_outcome_test.go:21: immediate accounting={Bytes:7 Objects:2} want={Bytes:3 Objects:1}
+--- FAIL: TestWorkspaceDeleteOutcome (0.05s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=true (0.01s)
+=== RUN   TestWorkspaceDeleteRefusalHasNoCommittedOutcome
+--- PASS: TestWorkspaceDeleteRefusalHasNoCommittedOutcome (0.01s)
+=== RUN   TestWorkspaceDeleteOutcome
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-4ae143d573dedeb52c8e40c2b5bb3f1f .stow/index.json: is a directory
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-3bf574be08db62552c468af8758ae9f2 .stow/index.json: is a directory
+    delete_outcome_test.go:21: confirmed keys=[] want=[victim]
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-719a5512ae807f55053e8a85f8a3cc1b .stow/index.json: is a directory
+    delete_outcome_test.go:21: immediate accounting={Bytes:7 Objects:2} want={Bytes:3 Objects:1}
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=false
+=== RUN   TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=true
+    delete_outcome_test.go:21: deleted file lost committed outcome: atomicfile: write .stow/index.json: renameat .stow/.tmp-3b05812927064e5c710fba646c38d2a2 .stow/index.json: is a directory
+    delete_outcome_test.go:21: confirmed keys=[] want=[victim]
+    delete_outcome_test.go:21: immediate accounting={Bytes:7 Objects:2} want={Bytes:3 Objects:1}
+--- FAIL: TestWorkspaceDeleteOutcome (0.05s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=false/batch=false/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=false/batch=true/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=true/batch=false/fault=true (0.01s)
+    --- PASS: TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=false (0.01s)
+    --- FAIL: TestWorkspaceDeleteOutcome/runtime=true/batch=true/fault=true (0.01s)
+=== RUN   TestWorkspaceDeleteRefusalHasNoCommittedOutcome
+--- PASS: TestWorkspaceDeleteRefusalHasNoCommittedOutcome (0.01s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	0.128s
+FAIL

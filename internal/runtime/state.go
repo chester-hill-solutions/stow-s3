@@ -85,7 +85,7 @@ func scanStoredUsage(ctx context.Context, options Options, store storage.Store, 
 			return usageState{}, err
 		}
 	}
-	if i.usage.Objects > i.options.MaxObjects || i.usage.Bytes > i.options.MaxBytes || i.reservedObjects > i.options.MaxObjects || i.reservedBytes > i.options.MaxBytes {
+	if i.usage.Objects > i.options.MaxObjects-i.reservedObjects || i.usage.Bytes > i.options.MaxBytes-i.reservedBytes || i.reservedObjects > i.options.MaxObjects || i.reservedBytes > i.options.MaxBytes {
 		return usageState{}, ErrQuotaExceeded
 	}
 	return i.usageState, nil

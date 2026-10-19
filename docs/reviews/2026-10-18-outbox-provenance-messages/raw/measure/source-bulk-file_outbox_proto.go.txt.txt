@@ -1,0 +1,211 @@
+package runthrough
+
+import (
+	"encoding/binary"
+	"fmt"
+	"math"
+	"slices"
+	"time"
+	"unicode/utf8"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb"
+	"google.golang.org/protobuf/proto"
+)
+
+const outboxProtoMagic = "STOWOUT4"
+const outboxProtoPrefixSize = len(outboxProtoMagic) + 4
+const outboxProtoVersion = 4
+
+func encodeOutboxProto(state outboxState) ([]byte, error) {
+	message := &outboxpb.Outbox{Version: outboxProtoVersion, Seq: state.seq, NextToken: state.nextToken, Provenance: make([]*outboxpb.Provenance, 0, len(state.provenance))}
+	keys := make([]string, 0, len(state.provenance))
+	for key := range state.provenance {
+		keys = append(keys, key)
+	}
+	slices.Sort(keys)
+	values := make([]outboxpb.Provenance, len(keys))
+	for index, key := range keys {
+		value := state.provenance[key]
+		target := &values[index]
+		*target = outboxpb.Provenance{Identity: key, Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown}
+		message.Provenance = append(message.Provenance, target)
+	}
+	var err error
+	message.Entries, err = outboxProtoEntries(state.entries)
+	if err != nil {
+		return nil, err
+	}
+	message.Prepared, err = outboxProtoEntries(state.prepared)
+	if err != nil {
+		return nil, err
+	}
+	data, err := (proto.MarshalOptions{Deterministic: true}).MarshalAppend(make([]byte, outboxProtoPrefixSize), message)
+	if err != nil {
+		return nil, err
+	}
+	if uint64(len(data)-outboxProtoPrefixSize) > math.MaxUint32 {
+		return nil, fmt.Errorf("outbox exceeds format size limit")
+	}
+	copy(data, outboxProtoMagic)
+	binary.LittleEndian.PutUint32(data[len(outboxProtoMagic):], uint32(len(data)-outboxProtoPrefixSize))
+	return data, nil
+}
+
+func outboxProtoText(value string) string {
+	if utf8.ValidString(value) {
+		return value
+	}
+	return string([]rune(value))
+}
+
+func outboxProtoEntries(entries map[string]OutboxEntry) ([]*outboxpb.Entry, error) {
+	result := make([]*outboxpb.Entry, 0, len(entries))
+	keys := make([]string, 0, len(entries))
+	for key := range entries {
+		keys = append(keys, key)
+	}
+	slices.Sort(keys)
+	values := make([]outboxpb.Entry, len(keys))
+	for index, key := range keys {
+		target := &values[index]
+		if err := outboxProtoEntry(key, entries[key], target); err != nil {
+			return nil, err
+		}
+		result = append(result, target)
+	}
+	return result, nil
+}
+
+func outboxProtoEntry(key string, e OutboxEntry, target *outboxpb.Entry) error {
+	times := [4]string{}
+	for i, value := range [4]time.Time{e.CreatedAt, e.NextAttempt, e.ClaimUntil, e.PreparedUntil} {
+		if value == (time.Time{}) {
+			continue
+		}
+		var buffer [64]byte
+		data, err := value.AppendText(buffer[:0])
+		if err != nil {
+			return err
+		}
+		times[i] = string(data)
+	}
+	*target = outboxpb.Entry{
+		Identity: key, Id: outboxProtoText(e.ID), Operation: outboxProtoText(string(e.Operation)), Bucket: outboxProtoText(e.Bucket), Key: outboxProtoText(e.Key),
+		SourceBucket: outboxProtoText(e.SourceBucket), SourceKey: outboxProtoText(e.SourceKey), Version: outboxProtoText(e.Version), PreviousVersion: outboxProtoText(e.PreviousVersion),
+		UpstreamVersion: outboxProtoText(e.UpstreamVersion), UpstreamAbsent: e.UpstreamAbsent, Prepared: e.Prepared,
+		CreatedAt: times[0], Attempts: int64(e.Attempts), NextAttempt: times[1], LastError: outboxProtoText(e.LastError), Terminal: e.Terminal,
+		ClaimOwner: outboxProtoText(e.ClaimOwner), ClaimUntil: times[2], ClaimToken: e.ClaimToken, Attempted: e.Attempted,
+		PreparedOwner: outboxProtoText(e.PreparedOwner), PreparedUntil: times[3], PreparedToken: e.PreparedToken,
+	}
+	return nil
+}
+
+func decodeOutboxProto(data []byte) (outboxState, error) {
+	if len(data) < outboxProtoPrefixSize || string(data[:len(outboxProtoMagic)]) != outboxProtoMagic {
+		return outboxState{}, fmt.Errorf("invalid protobuf outbox prefix")
+	}
+	size := binary.LittleEndian.Uint32(data[len(outboxProtoMagic):outboxProtoPrefixSize])
+	if uint64(size) != uint64(len(data)-outboxProtoPrefixSize) {
+		return outboxState{}, fmt.Errorf("invalid protobuf outbox length")
+	}
+	message := &outboxpb.Outbox{}
+	if err := proto.Unmarshal(data[outboxProtoPrefixSize:], message); err != nil {
+		return outboxState{}, fmt.Errorf("decode protobuf outbox: %w", err)
+	}
+	if message.Version != outboxProtoVersion || len(message.ProtoReflect().GetUnknown()) != 0 {
+		return outboxState{}, fmt.Errorf("%w: protobuf version %d or unknown fields", ErrOutboxFormatVersion, message.Version)
+	}
+	state := outboxState{provenance: make(map[string]UpstreamState, len(message.Provenance)), seq: message.Seq, nextToken: message.NextToken}
+	for index, value := range message.Provenance {
+		if len(value.ProtoReflect().GetUnknown()) != 0 {
+			return outboxState{}, fmt.Errorf("%w: unknown provenance fields", ErrOutboxFormatVersion)
+		}
+		state.provenance[value.Identity] = UpstreamState{ETag: value.Etag, Absent: value.Absent, Unknown: value.Unknown}
+		if len(state.provenance) != index+1 {
+			return outboxState{}, fmt.Errorf("duplicate outbox provenance identity %q", value.Identity)
+		}
+	}
+	var err error
+	state.entries, err = decodeOutboxProtoEntries(message.Entries)
+	if err != nil {
+		return outboxState{}, err
+	}
+	state.prepared, err = decodeOutboxProtoEntries(message.Prepared)
+	if err != nil {
+		return outboxState{}, err
+	}
+	return normalizeDecodedOutboxState(state)
+}
+
+func decodeOutboxProtoEntries(entries []*outboxpb.Entry) (map[string]OutboxEntry, error) {
+	result := make(map[string]OutboxEntry, len(entries))
+	for index, entry := range entries {
+		if len(entry.ProtoReflect().GetUnknown()) != 0 {
+			return nil, fmt.Errorf("%w: unknown entry fields", ErrOutboxFormatVersion)
+		}
+		decoded, err := decodeOutboxProtoEntry(entry)
+		if err != nil {
+			return nil, err
+		}
+		result[entry.Identity] = decoded
+		if len(result) != index+1 {
+			return nil, fmt.Errorf("duplicate outbox entry identity %q", entry.Identity)
+		}
+	}
+	return result, nil
+}
+
+func decodeOutboxProtoEntry(e *outboxpb.Entry) (OutboxEntry, error) {
+	times := [4]time.Time{}
+	for i, value := range [4]string{e.CreatedAt, e.NextAttempt, e.ClaimUntil, e.PreparedUntil} {
+		if value == "" {
+			continue
+		}
+		parsed, err := time.Parse(time.RFC3339Nano, value)
+		if err != nil {
+			return OutboxEntry{}, fmt.Errorf("decode outbox timestamp: %w", err)
+		}
+		times[i] = parsed
+	}
+	if int64(int(e.Attempts)) != e.Attempts {
+		return OutboxEntry{}, fmt.Errorf("outbox attempt count exceeds integer range")
+	}
+	return OutboxEntry{
+		ID: e.Id, Operation: OutboxOperation(e.Operation), Bucket: e.Bucket, Key: e.Key, SourceBucket: e.SourceBucket, SourceKey: e.SourceKey,
+		Version: e.Version, PreviousVersion: e.PreviousVersion, UpstreamVersion: e.UpstreamVersion, UpstreamAbsent: e.UpstreamAbsent, Prepared: e.Prepared,
+		CreatedAt: times[0], Attempts: int(e.Attempts), NextAttempt: times[1], LastError: e.LastError, Terminal: e.Terminal,
+		ClaimOwner: e.ClaimOwner, ClaimUntil: times[2], ClaimToken: e.ClaimToken, Attempted: e.Attempted,
+		PreparedOwner: e.PreparedOwner, PreparedUntil: times[3], PreparedToken: e.PreparedToken,
+	}, nil
+}
+
+func normalizeDecodedOutboxState(state outboxState) (outboxState, error) {
+	if state.entries == nil {
+		state.entries = make(map[string]OutboxEntry)
+	}
+	if state.prepared == nil {
+		state.prepared = make(map[string]OutboxEntry)
+	}
+	for id := range state.prepared {
+		if _, exists := state.entries[id]; exists {
+			return outboxState{}, fmt.Errorf("outbox entry %q is both prepared and active", id)
+		}
+	}
+	for id, entry := range state.entries {
+		if !entry.Prepared {
+			continue
+		}
+		delete(state.entries, id)
+		state.prepared[id] = entry
+	}
+	if state.provenance == nil {
+		state.provenance = make(map[string]UpstreamState)
+	}
+	if err := normalizeOutboxEntries(state.entries); err != nil {
+		return outboxState{}, err
+	}
+	if err := normalizeOutboxEntries(state.prepared); err != nil {
+		return outboxState{}, err
+	}
+	return state, nil
+}

@@ -1,0 +1,17 @@
+from pathlib import Path
+from collections import Counter
+import re,json
+p=Path('/private/tmp/stow-outbox-decode-2026-10-18');d=p/('export-'+json.loads((p/'proof-start.json').read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==5 and all(x['passed']for x in checks)
+rx=re.compile(r'^--- (PASS|FAIL|SKIP): ((?:TestOutboxDecode|TestFileOutboxDuplicateFlood)\S*)');result={}
+for variant in ['before','candidate']:
+ for mode in ['normal','race']:
+  name=variant+'-'+mode;text=(d/(name+'.log')).read_text();counts=Counter()
+  for line in text.splitlines():
+   m=rx.match(line.strip())
+   if m:counts[(m[1],m[2])]+=1
+  leaves={n for _,n in counts if not any(other.startswith(n+'/')for _,other in counts)}
+  summary={s:sum(counts.get((s,n),0)for n in leaves)for s in ['PASS','FAIL','SKIP']};assert len(leaves)==34,(name,len(leaves));assert summary==({'PASS':60,'FAIL':8,'SKIP':0}if variant=='before'else{'PASS':68,'FAIL':0,'SKIP':0}),(name,summary)
+  assert text.count('STOWMUTATION: cases=6000 seed=81173')==2 and text.count('STOWFIELDORDER: cases=2000 seed=81174')==2
+  samples=[json.loads(line.removeprefix('STOWDECODEFLOOD: '))for line in text.splitlines()if line.startswith('STOWDECODEFLOOD: ')];assert len(samples)==6 and all((x['allocatedBytes']>1<<20)==(variant=='before')for x in samples)
+  result[name]={'distinctCases':34,'counts':summary,'samples':samples,'mutationsPerRun':6000,'fieldOrdersPerRun':2000,'repeats':2,'cases':sorted(leaves)}
+(d/'proof-receipt.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified four original failures and 30 controls twice per mode; candidate passes all 34 twice with 8000 seeded differential inputs per run')

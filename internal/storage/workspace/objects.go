@@ -179,11 +179,11 @@ func (s *Store) DeleteObject(ctx context.Context, bucket, key string) error {
 	}
 	s.pruneEmptyParents(bucket, absPath)
 	s.forget(bucket, key)
-	return s.objectIndex.save()
+	return storage.CommittedError(s.objectIndex.save())
 }
 
-// DeleteObjects removes several keys and returns the ones that were not
-// removed, which is the S3 delete-many shape.
+// DeleteObjects removes several keys and returns the ones confirmed deleted,
+// including missing keys, which is the S3 delete-many shape.
 func (s *Store) DeleteObjects(ctx context.Context, bucket string, keys []string) ([]string, error) {
 	if !s.bucketExists(bucket) {
 		return nil, storage.ErrBucketNotFound
@@ -191,10 +191,13 @@ func (s *Store) DeleteObjects(ctx context.Context, bucket string, keys []string)
 	// The returned slice is the keys this call confirmed deleted. A key that was
 	// not there counts: S3 deletes idempotently and reports a missing key as
 	// deleted rather than as an error, so it belongs in the slice the S3 handler
-	// emits as <Deleted>. Only a key whose delete failed is left out.
+	// emits as <Deleted>. A committed delete is included even if indexing fails.
 	var deleted []string
 	for _, key := range keys {
 		if err := s.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
+			if errors.Is(err, storage.ErrMutationCommitted) {
+				deleted = append(deleted, key)
+			}
 			return deleted, err
 		}
 		deleted = append(deleted, key)

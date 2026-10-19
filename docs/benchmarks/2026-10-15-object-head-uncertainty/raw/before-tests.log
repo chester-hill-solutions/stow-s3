@@ -1,0 +1,892 @@
+COMMAND ['go', 'test', './internal/runtime', '-run', '^TestStoredObjectSizeHeadClassification$|^TestObjectHead', '-count=2', '-v']
+=== RUN   TestStoredObjectSizeHeadClassification
+=== RUN   TestStoredObjectSizeHeadClassification/present
+=== RUN   TestStoredObjectSizeHeadClassification/missing
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-missing
+=== RUN   TestStoredObjectSizeHeadClassification/unknown
+=== RUN   TestStoredObjectSizeHeadClassification/marker-only
+=== RUN   TestStoredObjectSizeHeadClassification/marker-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=local mutation committed
+        object not found
+        head observation unavailable
+=== RUN   TestStoredObjectSizeHeadClassification/missing-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=object not found
+        head observation unavailable
+        local mutation committed
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-marker-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=head: local mutation committed
+        object not found
+        head observation unavailable
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-missing-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=head: object not found
+        head observation unavailable
+        local mutation committed
+--- FAIL: TestStoredObjectSizeHeadClassification (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/present (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/missing (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/wrapped-missing (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/unknown (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/marker-only (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/marker-first (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/missing-first (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/wrapped-marker-first (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/wrapped-missing-first (0.00s)
+=== RUN   TestObjectHeadAmbiguityStopsMutation
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:886ff1922ab42e7a4d664bc7f62328ca Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.945755 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:216c8c2d1b4bb8753adc1a6eedb95e59 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.945841 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:226f4f0396edc0b74e3301c2b19ee4f4 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.945946 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:65da398aa6d72445c7b9e4ec08a77ccd Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946048 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:ce8ff484c3880659fd3395beec9b8ba5 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946117 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:32b164310e9c6d8e8e63a73f9a5c796b Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946186 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:f6fd804a57cef185ff4a5add6fd415da Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946255 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:818ef8ee98b96a5ba955854b61fcea65 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946318 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:8ef38ffba16bf2e68969289adddb7847 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.94643 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:d4c2f3d2f39762f79be42d41b93640b9 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946532 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:fa4891fe0ecd29b153fd032e04477571 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.946608 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:8289c7b0396fc1125d93bad87a473de1 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.94667 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:ccb96159daccd9dc5397899f15501bbc Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.946761 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:d26cf1bf0d4a5727f6827ac7c0f18591 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.946828 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:d3642eb5db13987ad67e048565498b7c Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.946884 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:573235074d5e2b8886d59066d5c8a2e4 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.946939 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:e08727dbc83e067e2f9de772db4a9010 Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.947241 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:f781d97110e51d35100ad2cc5ea4d83d Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.947309 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:c0b758137890e53d9a62807ebac8c256 Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.947461 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:ff7e35c5fa511a788a65617475720a18 Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.947564 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+--- FAIL: TestObjectHeadAmbiguityStopsMutation (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/wrapped-missing-first (0.00s)
+=== RUN   TestObjectHeadConfirmedMissingBatch
+=== RUN   TestObjectHeadConfirmedMissingBatch/false
+=== RUN   TestObjectHeadConfirmedMissingBatch/true
+--- PASS: TestObjectHeadConfirmedMissingBatch (0.00s)
+    --- PASS: TestObjectHeadConfirmedMissingBatch/false (0.00s)
+    --- PASS: TestObjectHeadConfirmedMissingBatch/true (0.00s)
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=false
+2026/10/15 20:13:38 DELETE /s3 204 46.584µs
+    object_head_http_test.go:32: uncertain HEAD: status=204 body=
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 DELETE /s3 204 3.5µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=true
+2026/10/15 20:13:38 DELETE /s3 204 2.417µs
+    object_head_http_test.go:32: uncertain HEAD: status=204 body=
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 DELETE /s3 204 2.125µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=false
+2026/10/15 20:13:38 POST /s3 200 142.792µs
+    object_head_http_test.go:32: uncertain HEAD: status=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <DeleteResult><Deleted><Key>target</Key></Deleted></DeleteResult>
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 POST /s3 200 8.458µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=true
+2026/10/15 20:13:38 POST /s3 200 14.041µs
+    object_head_http_test.go:32: uncertain HEAD: status=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <DeleteResult><Deleted><Key>target</Key></Deleted></DeleteResult>
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 POST /s3 200 8.208µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+--- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=false (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=true (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=false (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=true (0.00s)
+=== RUN   TestStoredObjectSizeHeadClassification
+=== RUN   TestStoredObjectSizeHeadClassification/present
+=== RUN   TestStoredObjectSizeHeadClassification/missing
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-missing
+=== RUN   TestStoredObjectSizeHeadClassification/unknown
+=== RUN   TestStoredObjectSizeHeadClassification/marker-only
+=== RUN   TestStoredObjectSizeHeadClassification/marker-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=local mutation committed
+        object not found
+        head observation unavailable
+=== RUN   TestStoredObjectSizeHeadClassification/missing-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=object not found
+        head observation unavailable
+        local mutation committed
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-marker-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=head: local mutation committed
+        object not found
+        head observation unavailable
+=== RUN   TestStoredObjectSizeHeadClassification/wrapped-missing-first
+    object_head_classification_test.go:66: observation: size=0 exists=false error=<nil> want=head: object not found
+        head observation unavailable
+        local mutation committed
+--- FAIL: TestStoredObjectSizeHeadClassification (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/present (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/missing (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/wrapped-missing (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/unknown (0.00s)
+    --- PASS: TestStoredObjectSizeHeadClassification/marker-only (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/marker-first (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/missing-first (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/wrapped-marker-first (0.00s)
+    --- FAIL: TestStoredObjectSizeHeadClassification/wrapped-missing-first (0.00s)
+=== RUN   TestObjectHeadAmbiguityStopsMutation
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/delete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: deletion called before reliable HEAD: 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: object not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: source changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: target changed after unknown HEAD: object not found
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:3 Objects:1} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:ac7eef6c4ab219194e78cbcd0ad2beae Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.951641 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:ac89a938f6046a83d1e952f137e9935e Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.951712 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:2a081bf5e348366e38ef72e0509544e9 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.951777 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:8910db9f9fe27bcf076a3acffddedb98 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.951835 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:a2ba36517feab99c22ae4adb2f86521c Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.951894 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:9fec1210d35c0ea511e813934a471878 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.951955 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:a68ab4ff2f2d558cb11d93fbd2a21904 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.952013 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:4a2631414ee8c189e4833ce100e3d9b2 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.952072 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: target HEAD calls=2 want 1
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:08b9b86fe7616857178e2dbb27ab5660 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.952134 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:5c49fdf960a7c9aa397dddb3e8f84d99 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.952189 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:eaf6260f7180dd0a0588f3d9b89a025f Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.952242 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:f5e0d16c97bdbde0780b06198bec4de1 Size:8 ETag:"91bb248359043fe98416e259c9bdf10d" ContentType: LastModified:2026-10-16 00:13:38.952328 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=replaced error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:14 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:8323761b260bcb1ac9140eade55001f4 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.952407 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:c6b73b632e71b25e188671ee12664cd9 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.952529 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:f22f10ce86a485f3af591c5924f8e5b8 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.952599 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/copy/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:b67cfdde2559edc84a6e02e38bec4d26 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 00:13:38.952671 +0000 UTC Metadata:map[state:source] ChecksumAlgorithm: ChecksumValue:} data=old error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:9 Objects:3} revision=4 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=4 reserved=0/1 sessions=1 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:136: healthy retry: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:ac9d618759be98488c3371234464c991 Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.95301 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:84aaa00b1c87cc52677db3ace5ee71b3 Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.953093 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:b89d32d56a1011d68edce20d5bb24900 Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.95319 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/complete/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: target changed: meta=&{Bucket:probe Key:target VersionID:bbbd095720a6d4eb6166175b64c0048d Size:4 ETag:"f4c9385f1902f7334b00b9b4ecd164de" ContentType: LastModified:2026-10-16 00:13:38.953259 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} data=part error=<nil>
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:10 Objects:3} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/wrapped-marker-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+=== RUN   TestObjectHeadAmbiguityStopsMutation/abort/wrapped-missing-first
+    object_head_mutation_test.go:133: observation error lost: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    object_head_mutation_test.go:135: ledger changed: usage={Bytes:6 Objects:2} revision=6 reserved=0/0 sessions=0 staged={bytes:0 objects:0}
+    object_head_mutation_test.go:135: retained upload changed: parts=[] error=multipart upload not found
+    object_head_mutation_test.go:136: healthy retry: multipart upload not found
+--- FAIL: TestObjectHeadAmbiguityStopsMutation (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/delete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/batch-delete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-delete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/quota-batch/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/buffered-put/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-put/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/staged-recheck/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/copy/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/initiate/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/complete/wrapped-missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/missing-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/wrapped-marker-first (0.00s)
+    --- FAIL: TestObjectHeadAmbiguityStopsMutation/abort/wrapped-missing-first (0.00s)
+=== RUN   TestObjectHeadConfirmedMissingBatch
+=== RUN   TestObjectHeadConfirmedMissingBatch/false
+=== RUN   TestObjectHeadConfirmedMissingBatch/true
+--- PASS: TestObjectHeadConfirmedMissingBatch (0.00s)
+    --- PASS: TestObjectHeadConfirmedMissingBatch/false (0.00s)
+    --- PASS: TestObjectHeadConfirmedMissingBatch/true (0.00s)
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=false
+2026/10/15 20:13:38 DELETE /s3 204 8.167µs
+    object_head_http_test.go:32: uncertain HEAD: status=204 body=
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 DELETE /s3 204 2.833µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=true
+2026/10/15 20:13:38 DELETE /s3 204 2.375µs
+    object_head_http_test.go:32: uncertain HEAD: status=204 body=
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 DELETE /s3 204 2µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=false
+2026/10/15 20:13:38 POST /s3 200 29.25µs
+    object_head_http_test.go:32: uncertain HEAD: status=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <DeleteResult><Deleted><Key>target</Key></Deleted></DeleteResult>
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 POST /s3 200 8.167µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+=== RUN   TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=true
+2026/10/15 20:13:38 POST /s3 200 45.5µs
+    object_head_http_test.go:32: uncertain HEAD: status=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <DeleteResult><Deleted><Key>target</Key></Deleted></DeleteResult>
+    object_head_http_test.go:32: unknown HEAD allowed deletion: object={Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} error=object not found
+2026/10/15 20:13:38 POST /s3 200 7.125µs
+    object_head_http_test.go:32: capacity stranded: runtime quota exceeded usage={Bytes:3 Objects:1}
+--- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=false (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=false/missingFirst=true (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=false (0.00s)
+    --- FAIL: TestObjectHeadS3DeletionRefusesAmbiguity/batch=true/missingFirst=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.263s
+FAIL

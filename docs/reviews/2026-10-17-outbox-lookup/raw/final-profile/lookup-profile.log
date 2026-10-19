@@ -1,0 +1,109 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxLookup/provenance=16384         	     100	 131144117 ns/op	    917569 journal-B	         0 written-B/op	 5301600 B/op	   49253 allocs/op
+PASS
+PROFILE alloc_space
+File: lookup.test
+Build ID: eb350027b2c954995f0f1048a2f2c76945255747
+Type: alloc_space
+Time: 2026-10-18 03:22:36 UTC
+Showing nodes accounting for 532596.95kB, 99.38% of 535923.40kB total
+Dropped 295 nodes (cum <= 2679.62kB)
+      flat  flat%   sum%        cum   cum%
+155281.19kB 28.97% 28.97% 431550.12kB 80.52%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+129287.89kB 24.12% 53.10% 129287.89kB 24.12%  reflect.New
+   91306kB 17.04% 70.14% 91309.50kB 17.04%  os.readFileContents
+90500.73kB 16.89% 87.02% 90500.73kB 16.89%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+56470.84kB 10.54% 97.56% 56470.84kB 10.54%  google.golang.org/protobuf/internal/impl.pointer.AppendPointerSlice (inline)
+ 6389.61kB  1.19% 98.75%  7669.91kB  1.43%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.seedProvenanceBenchmark.func1
+ 3360.47kB  0.63% 99.38%  5201.90kB  0.97%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.encodeOutboxProto
+    0.12kB 2.3e-05% 99.38% 535889.43kB   100%  testing.(*B).runN
+    0.09kB 1.7e-05% 99.38% 12875.62kB  2.40%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withState
+         0     0% 99.38% 522911.72kB 97.57%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).UpstreamState
+         0     0% 99.38%  5204.43kB  0.97%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).persistState
+         0     0% 99.38% 522893.84kB 97.57%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).reloadLocked
+         0     0% 99.38% 522911.72kB 97.57%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withReadState
+         0     0% 99.38% 535800.66kB   100%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkFileOutboxLookup.func1
+         0     0% 99.38% 431550.12kB 80.52%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxState
+         0     0% 99.38% 12880.53kB  2.40%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.seedProvenanceBenchmark
+         0     0% 99.38% 276259.46kB 51.55%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 99.38% 276259.46kB 51.55%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 99.38% 276259.46kB 51.55%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+         0     0% 99.38% 276259.46kB 51.55%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0% 99.38% 276259.46kB 51.55%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 99.38% 276259.46kB 51.55%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 99.38% 91349.95kB 17.05%  os.ReadFile
+         0     0% 99.38% 524171.43kB 97.81%  testing.(*B).launch
+         0     0% 99.38% 11715.42kB  2.19%  testing.(*B).run1.func1
+CLONE alloc_space
+Total: 523.36MB
+ROUTINE ======================== github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxState.clone in /app/internal/runthrough/outbox.go
+      288B       288B (flat, cum) 5.2e-05% of Total
+         .          .    125:func (s outboxState) clone() outboxState {
+       96B        96B    126:	entries := make(map[string]OutboxEntry, len(s.entries))
+         .          .    127:	for id, entry := range s.entries {
+         .          .    128:		entries[id] = entry
+         .          .    129:	}
+       96B        96B    130:	prepared := make(map[string]OutboxEntry, len(s.prepared))
+         .          .    131:	for id, entry := range s.prepared {
+         .          .    132:		prepared[id] = entry
+         .          .    133:	}
+       96B        96B    134:	provenance := make(map[string]UpstreamState, len(s.provenance))
+         .          .    135:	for key, value := range s.provenance {
+         .          .    136:		provenance[key] = value
+         .          .    137:	}
+         .          .    138:	return outboxState{provenance: provenance, entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
+         .          .    139:}
+PROFILE alloc_objects
+File: lookup.test
+Build ID: eb350027b2c954995f0f1048a2f2c76945255747
+Type: alloc_objects
+Time: 2026-10-18 03:22:36 UTC
+Showing nodes accounting for 5086163, 99.91% of 5090797 total
+Dropped 296 nodes (cum <= 25453)
+      flat  flat%   sum%        cum   cum%
+   3309770 65.01% 65.01%    3309770 65.01%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+   1654885 32.51% 97.52%    1654885 32.51%  reflect.New
+     32778  0.64% 98.17%      33011  0.65%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.encodeOutboxProto
+     32771  0.64% 98.81%      32781  0.64%  fmt.Sprintf
+     32770  0.64% 99.45%      32770  0.64%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxIdentity (inline)
+     16418  0.32% 99.78%      81960  1.61%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.seedProvenanceBenchmark.func1
+      6767  0.13% 99.91%    4973644 97.70%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+         2 3.9e-05% 99.91%     115029  2.26%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withState
+         2 3.9e-05% 99.91%    5090341   100%  testing.(*B).runN
+         0     0% 99.91%    4974553 97.72%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).UpstreamState
+         0     0% 99.91%      33043  0.65%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).persistState
+         0     0% 99.91%    4974169 97.71%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).reloadLocked
+         0     0% 99.91%    4974553 97.72%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*FileOutbox).withReadState
+         0     0% 99.91%    5089690   100%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkFileOutboxLookup.func1
+         0     0% 99.91%    4973644 97.70%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxState
+         0     0% 99.91%     115097  2.26%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.seedProvenanceBenchmark
+         0     0% 99.91%    4966675 97.56%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 99.91%    4966675 97.56%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 99.91%    4966675 97.56%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+         0     0% 99.91%    4966675 97.56%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0% 99.91%    4966675 97.56%  google.golang.org/protobuf/proto.Unmarshal
+         0     0% 99.91%    4966675 97.56%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 99.91%    4982782 97.88%  testing.(*B).launch
+         0     0% 99.91%     107543  2.11%  testing.(*B).run1.func1
+CLONE alloc_objects
+Total: 5090797
+ROUTINE ======================== github.com/chester-hill-solutions/stow-s3/internal/runthrough.outboxState.clone in /app/internal/runthrough/outbox.go
+         6          6 (flat, cum) 0.00012% of Total
+         .          .    125:func (s outboxState) clone() outboxState {
+         2          2    126:	entries := make(map[string]OutboxEntry, len(s.entries))
+         .          .    127:	for id, entry := range s.entries {
+         .          .    128:		entries[id] = entry
+         .          .    129:	}
+         2          2    130:	prepared := make(map[string]OutboxEntry, len(s.prepared))
+         .          .    131:	for id, entry := range s.prepared {
+         .          .    132:		prepared[id] = entry
+         .          .    133:	}
+         2          2    134:	provenance := make(map[string]UpstreamState, len(s.provenance))
+         .          .    135:	for key, value := range s.provenance {
+         .          .    136:		provenance[key] = value
+         .          .    137:	}
+         .          .    138:	return outboxState{provenance: provenance, entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
+         .          .    139:}

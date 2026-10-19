@@ -1,0 +1,67 @@
+{
+  "phase": "outbox-identities-before",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_test.go",
+    "internal/runthrough/file_outbox_identity_test.go",
+    "internal/runthrough/file_outbox_identity_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_identity_test.go",
+        "internal/runthrough/file_outbox_identity_bench_test.go"
+      ]
+    },
+    {
+      "name": "regression-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoRejectsDuplicateIdentities|TestFileOutboxRefusesDuplicateProtoIdentityOnOpen|TestFileOutboxRefusesDuplicateProtoIdentityOnReload|TestOutboxProtoRefusesLossyIdentityEncoding|TestFileOutboxRefusesLossyProvenanceIdentity|TestOutboxProtoPreservesDistinctIdentities)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "regression-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProtoRejectsDuplicateIdentities|TestFileOutboxRefusesDuplicateProtoIdentityOnOpen|TestFileOutboxRefusesDuplicateProtoIdentityOnReload|TestOutboxProtoRefusesLossyIdentityEncoding|TestFileOutboxRefusesLossyProvenanceIdentity|TestOutboxProtoPreservesDistinctIdentities)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "benchmark-build",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "/results/outbox-identities-before.test"
+      ]
+    }
+  ]
+}

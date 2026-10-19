@@ -1,0 +1,62 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_save_test.go",
+      "internal/capacity/admission_unknown_test.go",
+      "internal/storage/fs/capacity_save.go",
+      "internal/storage/fs/save_requests.go",
+      "internal/capacity/admission.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 2,
+    "signal": null,
+    "elapsedMs": 340,
+    "passed": false
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13030,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22696,
+    "passed": true
+  }
+]

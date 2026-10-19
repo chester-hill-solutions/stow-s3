@@ -1,0 +1,180 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_payload_read_test.go",
+      "benchmark/candidate-capacity.go.txt",
+      "benchmark/candidate-read.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityPayload",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1529,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityPayload",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 3187,
+    "passed": true
+  },
+  {
+    "name": "prototype-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/candidate-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityPayload",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1503,
+    "passed": true
+  },
+  {
+    "name": "prototype-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/candidate-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityPayload",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3978,
+    "passed": true
+  },
+  {
+    "name": "install-benchmark",
+    "args": [
+      "cp",
+      "benchmark/scan-bench.go.txt",
+      "internal/storage/fs/capacity_payload_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  },
+  {
+    "name": "format-benchmark",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_payload_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  },
+  {
+    "name": "snapshot-benchmark",
+    "args": [
+      "node",
+      "-e",
+      "require('node:fs').copyFileSync('internal/storage/fs/capacity_payload_bench_test.go',process.env.STOW_RESULT_ROOT+'/compiled-benchmark.go.txt')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 33,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/scan-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 819,
+    "passed": true
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/candidate-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/scan-after.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 968,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/scan-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 317169,
+    "passed": true
+  },
+  {
+    "name": "cleanup",
+    "args": [
+      "rm",
+      "internal/storage/fs/capacity_payload_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  }
+]

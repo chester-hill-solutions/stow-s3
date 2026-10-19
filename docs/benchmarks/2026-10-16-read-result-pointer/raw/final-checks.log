@@ -1,0 +1,23 @@
+COMMAND ["gofmt", "-l", "internal/runtime/objects.go", "internal/runtime/guarded_save.go", "internal/runtime/read_result_ownership_test.go"]
+
+
+
+COMMAND ["make", "check-go-quality", "check-file-size"]
+
+node scripts/check-go-quality.mjs
+Go quality ratchet OK (15 baseline entries)
+node scripts/check-file-size.mjs
+File-size ratchet OK (0 baseline entries; maximum 500 lines)
+
+COMMAND ["node", "scripts/check-doc-links.mjs"]
+
+Local documentation links OK (217 Markdown files)
+
+COMMAND ["git", "diff", "--check"]
+
+
+
+All 4,104 measured observations retained; summaries equal original captures; source digests match measured production; temporary probes and dependency links absent.
+
+COMMAND ["git", "diff", "--cached", "--check"]
+Passed.

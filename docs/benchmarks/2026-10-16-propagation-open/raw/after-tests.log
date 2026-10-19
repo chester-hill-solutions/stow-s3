@@ -1,0 +1,139 @@
+COMMAND ["go", "test", "./internal/runthrough", "-run", "^TestPropagation(OpeningFailure|VersionConflictCloses)", "-count=2", "-v"]
+=== RUN   TestPropagationOpeningFailureClosesSource
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true
+--- PASS: TestPropagationOpeningFailureClosesSource (3.21s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false (0.16s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true (0.12s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false (0.12s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true (0.14s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false (0.13s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false (0.14s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true (0.12s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true (0.13s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true (0.07s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true (0.10s)
+=== RUN   TestPropagationVersionConflictClosesSourceOnce
+--- PASS: TestPropagationVersionConflictClosesSourceOnce (0.05s)
+=== RUN   TestPropagationOpeningFailureClosesSource
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false
+=== RUN   TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true
+--- PASS: TestPropagationOpeningFailureClosesSource (3.17s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false (0.19s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true (0.13s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true (0.11s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true (0.08s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true (0.10s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false (0.09s)
+    --- PASS: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true (0.09s)
+=== RUN   TestPropagationVersionConflictClosesSourceOnce
+--- PASS: TestPropagationVersionConflictClosesSourceOnce (0.05s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	6.846s

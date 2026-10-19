@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib,subprocess
+p=Path('/private/tmp/stow-correctness-closure-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-correctness-closure/raw';j=json.loads((p/'final-start.json').read_text());e=p/('export-'+j['id']);receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0 and receipt['railwayDeploymentId']==j['deploymentId'];assert all(v['exitCode']==0 for v in receipt['checks'])
+capture=receipt['validationCaptureOnly'];assert capture['inventoryMaxBufferBytes']==16*1024*1024 and capture['preloadSHA256']==hashlib.sha256((p/'doc-links-capture.mjs').read_bytes()).hexdigest();assert capture['stockCheckerSHA256']==hashlib.sha256((r/'scripts/check-doc-links.mjs').read_bytes()).hexdigest()
+for n,h in receipt['documentSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,h in receipt['productionSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,v in json.loads((raw/'artifact-manifest.json').read_text()).items():
+ data=(raw/n).read_bytes();assert len(data)==v['bytes']and hashlib.sha256(data).hexdigest()==v['sha256'],n
+stop=json.loads((raw/'runner-stop-status.json').read_text());assert stop['stopVerified']and stop['runner']['id']==j['deploymentId']and stop['target']['id']=='e09d0550-2eaf-454b-883d-16a3d38e2ccb'and stop['target']['status']=='REMOVED'
+base=json.loads((p/'baseline.json').read_text())['base'];allowed={'docs/reviews/2026-10-18-correctness-closure.md','docs/remediation-plan-2026-10-14.md','docs/reviews/2026-10-16-storage-contract-audit.md','docs/reviews/2026-10-15-codebase-map.md','docs/reviews/2026-10-18-correctness-closure/register.json'}
+for n in subprocess.check_output(['git','diff','--name-only',base],cwd=r).decode().splitlines():assert n in allowed or n.startswith('docs/reviews/2026-10-18-correctness-closure/raw/'),n
+for f in ['internal/storage/workspace/closure_probe_test.go','internal/auth/closure_sdk_probe_test.go','internal/auth/closure_query_probe_test.go','internal/s3api/closure_etag_probe_test.go']:assert not(r/f).exists()
+register=json.loads((r/'docs/reviews/2026-10-18-correctness-closure/register.json').read_text());assert len(register['leads'])==9 and register['requiredFixes']==4 and register['closedLeads']==4 and register['optionalStrictness']==1
+print('Verified nine-lead disposition, unchanged tested source/dependencies, documentation/evidence hashes, scope and exact scratch teardown')

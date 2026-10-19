@@ -1,0 +1,85 @@
+=== RUN   TestSaveCapacityRefusesBeforeIntent
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary
+    capacity_save_test.go:46: refusal changed charge: before={PayloadBytes:0 RecoveryBytes:1832 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2241 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard
+    capacity_save_test.go:46: refusal changed charge: before={PayloadBytes:0 RecoveryBytes:1823 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2232 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request
+    capacity_save_test.go:33: over-budget request write: <nil>
+    capacity_save_test.go:36: refused object visible: <nil>
+    capacity_save_test.go:42: refused save retained receipts: 1
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard
+    capacity_save_test.go:33: over-budget request-guard write: <nil>
+    capacity_save_test.go:36: refused object visible: <nil>
+    capacity_save_test.go:42: refused save retained receipts: 1
+--- FAIL: TestSaveCapacityRefusesBeforeIntent (0.11s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/ordinary (0.03s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/guard (0.02s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/request (0.03s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/request-guard (0.03s)
+=== RUN   TestSaveCapacityChargesSuccessAndReplay
+    capacity_save_test.go:61: charge={PayloadBytes:0 RecoveryBytes:1820 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} record=198
+--- FAIL: TestSaveCapacityChargesSuccessAndReplay (0.01s)
+=== RUN   TestSaveCapacitySharesNamespace
+    capacity_save_test.go:94: shared quota ignored: <nil>
+--- FAIL: TestSaveCapacitySharesNamespace (0.05s)
+=== RUN   TestSaveCapacityRetainsInterruptedReservation
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/prepared
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3432 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/publishing
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3444 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/published
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3438 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/sync
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3408 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/terminal
+    capacity_save_test.go:125: charge={PayloadBytes:0 RecoveryBytes:3432 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} record=1000199
+--- FAIL: TestSaveCapacityRetainsInterruptedReservation (0.14s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/prepared (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/publishing (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/published (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/sync (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/terminal (0.03s)
+=== RUN   TestSaveCapacityRefusesBeforeIntent
+=== RUN   TestSaveCapacityRefusesBeforeIntent/ordinary
+    capacity_save_test.go:46: refusal changed charge: before={PayloadBytes:0 RecoveryBytes:1832 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2241 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+=== RUN   TestSaveCapacityRefusesBeforeIntent/guard
+    capacity_save_test.go:46: refusal changed charge: before={PayloadBytes:0 RecoveryBytes:1823 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2232 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request
+    capacity_save_test.go:33: over-budget request write: <nil>
+    capacity_save_test.go:36: refused object visible: <nil>
+    capacity_save_test.go:42: refused save retained receipts: 1
+=== RUN   TestSaveCapacityRefusesBeforeIntent/request-guard
+    capacity_save_test.go:33: over-budget request-guard write: <nil>
+    capacity_save_test.go:36: refused object visible: <nil>
+    capacity_save_test.go:42: refused save retained receipts: 1
+--- FAIL: TestSaveCapacityRefusesBeforeIntent (0.11s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/ordinary (0.02s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/guard (0.02s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/request (0.03s)
+    --- FAIL: TestSaveCapacityRefusesBeforeIntent/request-guard (0.03s)
+=== RUN   TestSaveCapacityChargesSuccessAndReplay
+    capacity_save_test.go:61: charge={PayloadBytes:0 RecoveryBytes:1817 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} record=198
+--- FAIL: TestSaveCapacityChargesSuccessAndReplay (0.01s)
+=== RUN   TestSaveCapacitySharesNamespace
+    capacity_save_test.go:94: shared quota ignored: <nil>
+--- FAIL: TestSaveCapacitySharesNamespace (0.05s)
+=== RUN   TestSaveCapacityRetainsInterruptedReservation
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/prepared
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3432 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/publishing
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3444 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/published
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3438 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/sync
+    capacity_save_test.go:127: interrupted save released reservation: {PayloadBytes:0 RecoveryBytes:3408 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+=== RUN   TestSaveCapacityRetainsInterruptedReservation/terminal
+    capacity_save_test.go:125: charge={PayloadBytes:0 RecoveryBytes:3426 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} record=1000199
+--- FAIL: TestSaveCapacityRetainsInterruptedReservation (0.15s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/prepared (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/publishing (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/published (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/sync (0.03s)
+    --- FAIL: TestSaveCapacityRetainsInterruptedReservation/terminal (0.04s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	0.650s
+FAIL

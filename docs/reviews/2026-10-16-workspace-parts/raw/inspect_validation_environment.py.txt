@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,os
+cli='/Users/ladmin/.npm/_npx/840d6e3429277c8b/node_modules/@railway/cli/bin/railway'
+env=dict(os.environ,RAILWAY_CALLER='skill:use-railway@1.6.1',RAILWAY_AGENT_SESSION='stow-workspace-parts-20261016')
+js="const fs=require('node:fs'),cp=require('node:child_process');const report={uid:process.getuid(),pid1:fs.readFileSync('/proc/1/comm','utf8'),watched:fs.existsSync('/proc/8384/status')?fs.readFileSync('/proc/8384/status','utf8').split('\\n').slice(0,8):null,hosts:fs.readFileSync('/etc/hosts','utf8'),tools:cp.spawnSync('sh',['-c','command -v tini; command -v runuser; command -v cc; command -v python3'],{encoding:'utf8'}).stdout};console.log(JSON.stringify(report,null,2));"
+q=subprocess.run([cli,'ssh','--project','8d90188e-0f1e-4c47-9379-9399ae06e6fa','--environment','3cd200cb-c94f-4e4d-9335-0f6c1b7e9411','--service','83497842-c51d-420e-8ba1-181589730ad4','--','node','-e',js],env=env,text=True,capture_output=True,timeout=55)
+print(q.stdout);assert q.returncode==0,q.stderr
+Path('/private/tmp/stow-workspace-parts-2026-10-16/railway-validation-environment-inspection.log').write_text(q.stdout)

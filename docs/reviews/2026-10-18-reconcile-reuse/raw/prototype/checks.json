@@ -1,0 +1,226 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/reconcile_unchanged_test.go",
+      "benchmark/candidate-state.go.txt",
+      "benchmark/candidate-admission.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestReconcileUnchanged",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 317,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestReconcileUnchanged",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 438,
+    "passed": true
+  },
+  {
+    "name": "prototype-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/candidate-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestReconcileUnchanged",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 429,
+    "passed": true
+  },
+  {
+    "name": "prototype-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/candidate-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestReconcileUnchanged",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 0,
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1576,
+    "passed": true
+  },
+  {
+    "name": "install-capacity-benchmark",
+    "args": [
+      "cp",
+      "benchmark/ledger-reuse-bench.go.txt",
+      "internal/capacity/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "install-mutation-benchmark",
+    "args": [
+      "cp",
+      "benchmark/mutation-reuse-bench.go.txt",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "format-benchmarks",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/ledger_reuse_bench_test.go",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "snapshot-benchmarks",
+    "args": [
+      "node",
+      "-e",
+      "const fs=require('node:fs');for(const[p,n]of [['capacity','internal/capacity/ledger_reuse_bench_test.go'],['fs','internal/storage/fs/ledger_reuse_bench_test.go']])fs.copyFileSync(n,process.env.STOW_RESULT_ROOT+'/compiled-'+p+'-bench.go.txt')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 39,
+    "passed": true
+  },
+  {
+    "name": "build-capacity-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/capacity-before.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 473,
+    "passed": true
+  },
+  {
+    "name": "build-capacity-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/candidate-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/capacity-after.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 431,
+    "passed": true
+  },
+  {
+    "name": "build-fs-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/fs-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2804,
+    "passed": true
+  },
+  {
+    "name": "build-fs-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/candidate-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/fs-after.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 907,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/reuse-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 88558,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmarks",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_reuse_bench_test.go",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  }
+]

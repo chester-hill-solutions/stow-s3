@@ -1,0 +1,20 @@
+import {readFile,writeFile,open,unlink,mkdir,statfs} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
+const root=process.env.STOW_RESULT_ROOT;
+if(!root?.startsWith('/results/')||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway results required');
+const temporaryDirectory=root+'/fixture-tmp';await mkdir(temporaryDirectory,{recursive:true});if((await statfs(temporaryDirectory)).type!==61267)throw Error('Ext4 fixtures required');await writeFile(root+'/fixture-filesystem.json',JSON.stringify({uid:process.getuid(),temporaryDirectory,temporaryFilesystemType:'ext4',resultsFilesystemType:'ext4',railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID},null,2)+'\n');
+const variants={before:'/app/benchmark/outbox-admission-after.test',after:'/app/benchmark/outbox-admission-after.test'};
+const hashes={};for(const[n,p]of Object.entries(variants))hashes[n]=createHash('sha256').update(await readFile(p)).digest('hex');
+const runs=[];
+for(const[index,variant]of ['before','after','after','before','after','before','before','after'].entries()){
+ const args=[variants[variant],'-test.run=^$','-test.bench=^BenchmarkOutboxAdmission/file/depth=.*/prepare/explicit$','-test.benchmem','-test.benchtime=300ms','-test.count=1','-test.cpu=4'];
+ const name='comparison-'+index+'-'+variant+'.log';const log=await open(root+'/'+name,'w');let result;
+ try{const child=spawn('python3',['benchmark/reap_validation.py',...args],{env:{...process.env,TMPDIR:temporaryDirectory},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(exitCode,signal)=>resolve({exitCode,signal}))})}finally{await log.close()}
+ runs.push({index,variant,args,log:name,...result});await writeFile(root+'/comparison-runs.json',JSON.stringify({order:'ABBA BAAB',binarySHA256:hashes,runs},null,2)+'\n');
+ if(result.exitCode!==0)throw Error(name+' failed '+JSON.stringify(result));
+ console.log(name+' passed');
+}
+
+for(const file of new Set(Object.values(variants)))await unlink(file);
+await writeFile(root+'/comparison-cleanup.json',JSON.stringify({removed:Object.values(variants),binarySHA256:hashes},null,2)+'\n');

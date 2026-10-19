@@ -1,0 +1,162 @@
+{
+  "phase": "workspace-delete-after",
+  "sources": [
+    "internal/storage/workspace/objects.go",
+    "internal/storage/workspace/delete_outcome_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/workspace/objects.go",
+        "internal/storage/workspace/delete_outcome_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/workspace",
+        "-run",
+        "^TestWorkspaceDelete",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/workspace",
+        "-run",
+        "^TestWorkspaceDelete",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "go",
+        "test",
+        "./..."
+      ]
+    },
+    {
+      "name": "broad-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/...",
+        "./internal/runtime",
+        "./internal/embedded",
+        "./internal/runthrough",
+        "./internal/s3api",
+        "./pkg/stow"
+      ]
+    },
+    {
+      "name": "conformance-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "conformance-runtime-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-runtime-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "doc-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ]
+    }
+  ]
+}

@@ -117,7 +117,7 @@ func (s *Server) handleUploadPart(ctx context.Context, w http.ResponseWriter, r 
 		writeError(w, r, s3Error{Code: code, Message: err.Error(), Resource: resourcePath(bucket, key), StatusCode: http.StatusBadRequest})
 		return
 	}
-	part, err := s.multipart.UploadPart(ctx, uploadID, partNum, newBodyReader(body))
+	part, err := s.multipart.UploadPart(ctx, uploadID, partNum, takeRequestBody(r, body))
 	if err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
 		return

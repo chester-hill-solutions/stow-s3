@@ -1,0 +1,29 @@
+from pathlib import Path
+import subprocess,shutil,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-performance-2026-10-17');c=p/'context';c.mkdir(exist_ok=True)
+files=[x for x in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if x]
+for name in files:
+ src=r/name;dst=c/name
+ if not src.is_file():continue
+ dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst)
+b=c/'benchmark';old=Path('/private/tmp/stow-workspace-parts-2026-10-16/railway-validation/benchmark')
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py']:shutil.copyfile(old/name,b/name)
+shutil.copyfile(old/'diagnosis.mjs',b/'diagnosis-validation.mjs')
+d=b/'validation-previous-baselines';d.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:(d/name).write_bytes(subprocess.check_output(['git','show','HEAD^:scripts/baselines/'+name],cwd=r))
+variants={
+'parts-legacy':{'package':'./internal/storage/workspace','ref':'91e8ba0501aaab5c3d221f6dde9f3bf52786425d','files':['internal/storage/workspace/multipart.go']},
+'parts-current':{'package':'./internal/storage/workspace','ref':'5f8f4844f5cfd987eb8e6d7cdb5a1d9af7f98bc2','files':[]},
+'fallback-legacy':{'package':'./internal/runthrough','ref':'67db556d2a817c75ad4154d52ce65e8c7a26fc17','files':['internal/runthrough/adapter.go','internal/runthrough/cache_read.go']},
+'fallback-current':{'package':'./internal/runthrough','ref':'5f8f4844f5cfd987eb8e6d7cdb5a1d9af7f98bc2','files':[]}}
+for variant,config in variants.items():
+ for name in config['files']:
+  dst=b/'perf-variants'/variant/name;dst.parent.mkdir(parents=True,exist_ok=True);dst.write_bytes(subprocess.check_output(['git','show',config['ref']+':'+name],cwd=r))
+(b/'perf-variants.json').write_text(json.dumps(variants,indent=2)+'\n')
+(b/'active-plan.json').write_text(json.dumps({'kind':'measure','cohort':'railway-requalification','families':['parts','fallback'],'variants':{'parts':['parts-legacy','parts-current'],'fallback':['fallback-legacy','fallback-current']},'cpu':[1,4],'benchtime':'200ms','count':2,'profile':True},indent=2)+'\n')
+(b/'diagnosis.mjs').write_text("import{readFile}from'node:fs/promises';const plan=JSON.parse(await readFile('benchmark/active-plan.json'));if(plan.kind==='measure'){const{run}=await import('./perf-run.mjs');await run(process.argv[2],plan)}else{await import('./diagnosis-validation.mjs')}\n")
+shutil.copyfile(p/'perf-run.mjs',b/'perf-run.mjs')
+manifest={name:hashlib.sha256((c/name).read_bytes()).hexdigest()for name in files if(c/name).is_file()}
+(b/'validation-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');(p/'source-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({'base':'5f8f4844f5cfd987eb8e6d7cdb5a1d9af7f98bc2','origin_main':'219d1dcfff9807b04660a40313b32127e5be2933','variants':variants},indent=2)+'\n')
+print('Prepared',len(files),'tracked files,',sum(f.stat().st_size for f in c.rglob('*')if f.is_file()),'bytes')

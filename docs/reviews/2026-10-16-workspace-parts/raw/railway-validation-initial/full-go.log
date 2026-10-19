@@ -1,0 +1,47 @@
+ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	1.997s
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	6.048s
+ok  	github.com/chester-hill-solutions/stow-s3/examples/resumable-transfer	0.285s
+?   	github.com/chester-hill-solutions/stow-s3/examples/storage-dogfood	[no test files]
+?   	github.com/chester-hill-solutions/stow-s3/examples/stow-recipes/go/start-small	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	0.015s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	0.006s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	0.070s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/capacity	0.737s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.006s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/mcpstorage	0.352s
+--- FAIL: TestChildExitsWhenParentIsKilled (10.05s)
+    parentwatch_test.go:114: watched process 8384 was still alive 10s after its parent was killed; child output:
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	10.050s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policy	0.002s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policystore	0.012s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	0.002s
+?   	github.com/chester-hill-solutions/stow-s3/internal/recoveryerrors	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/rooted	0.103s
+--- FAIL: TestPathStylePutsTheBucketInThePath (0.01s)
+    addressing_wire_test.go:84: request path = "", want "/photos/report.pdf"
+--- FAIL: TestVirtualHostedPutsTheBucketInTheHost (0.01s)
+    addressing_wire_test.go:103: request host = "", want "photos.endpoint.localhost:32951"
+--- FAIL: TestBothStylesAreSignedForTheConfiguredRegion (0.00s)
+    --- FAIL: TestBothStylesAreSignedForTheConfiguredRegion/path (0.00s)
+        addressing_wire_test.go:183: request carried no Authorization header
+    --- FAIL: TestBothStylesAreSignedForTheConfiguredRegion/virtual-hosted (0.00s)
+        addressing_wire_test.go:183: request carried no Authorization header
+2026/10/16 20:33:29 GET /s3 200 54.069µs
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	7.801s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.936s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	2.556s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage	1.549s
+--- FAIL: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.00s)
+    fs_test.go:224: completion ignored staging cleanup failure
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	4.173s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	1.289s
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/pkg/stow	6.021s
+?   	github.com/chester-hill-solutions/stow-s3/tools/api-reference	[no test files]
+?   	github.com/chester-hill-solutions/stow-s3/tools/mcp-browser-pack	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/tools/quality	0.139s
+FAIL

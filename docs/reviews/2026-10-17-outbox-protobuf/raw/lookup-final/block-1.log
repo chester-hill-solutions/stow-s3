@@ -1,0 +1,15 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxLookup/provenance=0         	   33310	      7607 ns/op	        65.00 journal-B	         0 written-B/op	    2416 B/op	      22 allocs/op
+BenchmarkFileOutboxLookup/provenance=0         	   31885	      7384 ns/op	        65.00 journal-B	         0 written-B/op	    2416 B/op	      22 allocs/op
+BenchmarkFileOutboxLookup/provenance=128       	    7741	     29190 ns/op	      7233 journal-B	         0 written-B/op	   50800 B/op	     417 allocs/op
+BenchmarkFileOutboxLookup/provenance=128       	    7708	     32285 ns/op	      7233 journal-B	         0 written-B/op	   50800 B/op	     417 allocs/op
+BenchmarkFileOutboxLookup/provenance=2048      	     654	    352145 ns/op	    114753 journal-B	         0 written-B/op	  844400 B/op	    6194 allocs/op
+BenchmarkFileOutboxLookup/provenance=2048      	     620	    368049 ns/op	    114753 journal-B	         0 written-B/op	  844400 B/op	    6194 allocs/op
+BenchmarkFileOutboxLookup/provenance=16384     	      61	   4004499 ns/op	    917569 journal-B	         0 written-B/op	 6875952 B/op	   49321 allocs/op
+BenchmarkFileOutboxLookup/provenance=16384     	      61	   3844064 ns/op	    917569 journal-B	         0 written-B/op	 6875952 B/op	   49321 allocs/op
+BenchmarkFileOutboxLookup/mixed=1024           	     247	    978066 ns/op	    157598 journal-B	         0 written-B/op	 1882549 B/op	   13375 allocs/op
+BenchmarkFileOutboxLookup/mixed=1024           	     241	   1077467 ns/op	    157598 journal-B	         0 written-B/op	 1882549 B/op	   13375 allocs/op
+PASS

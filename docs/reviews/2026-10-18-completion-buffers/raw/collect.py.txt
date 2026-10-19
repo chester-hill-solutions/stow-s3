@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,shutil,hashlib
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-completion-buffers/raw';raw.mkdir(parents=True,exist_ok=True)
+for phase,count in [('red',9),('full',23),('final',6)]:
+ j=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+j['id']);v=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert v['complete']and len(checks)==count
+ failed=[c['name']for c in checks if not c['passed']];assert failed==(['format','quality']if phase=='full'else[]),failed
+ assert v['railwayDeploymentId']==j['deploymentId']=='392a795b-7d2c-4afa-869a-2f5323c0c185'
+ dest=raw/phase;dest.mkdir(exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ for suffix in ['start.json','deployments.json','upload.log']:shutil.copy2(p/(phase+'-'+suffix),dest/suffix)
+ if phase=='final':
+  env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+  full=json.loads((p/('export-'+json.loads((p/'full-start.json').read_text())['id'])/'environment.json').read_text())
+  for n,h in env['sourceSHA256'].items():
+   if n.endswith('.go'):
+    assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+    if not n.endswith(('completion_capacity_version_test.go','completion_checksum_test.go')):assert full['sourceSHA256'][n]==h,n
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','transport-receipt.json','transport-Dockerfile.txt','red-plan.json','full-plan.json','recheck-plan.json','before-overlay.json','baseline-fs_multipart.go.txt','baseline-fs_records.go.txt','baseline-fs_atomic.go.txt','baseline-capacity.go.txt','baseline-go-quality.json','completion-probe.go.txt','measure.mjs','doc-links-capture.mjs','install-final.js','install-recheck.js']:shutil.copy2(p/n,raw/n)
+for n in ['preflight.py','package.py','deploy.py','control.py','watch.py','remote.py','export.py','analyze.py','prepare-recheck.py','apply.py','sync-tested.py','collect.py','report.py','publish.py','manifest.py','stop.py','verify.py']:
+ if(p/n).exists():shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['runner.mjs','http.mjs','resources.mjs','diagnosis.mjs','diagnosis-validation.mjs','reap_validation.py','measure-child.py']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-completion-buffers.md');print('Collected original proof, complete qualification, paired measurements, formatting repair and exact source hashes')

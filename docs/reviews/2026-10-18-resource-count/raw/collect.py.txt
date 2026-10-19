@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-resource-count-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-resource-count/raw';raw.mkdir(parents=True,exist_ok=True);deployment=json.loads((p/'red-start.json').read_text())['deploymentId']
+for phase,count in [('red',3),('final',22)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks);assert job['deploymentId']==run['railwayDeploymentId']==deployment
+ dest=raw/phase;dest.mkdir(parents=True,exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ shutil.copy2(p/(phase+'-start.json'),dest/'start.json')
+ shutil.copy2(p/(phase+'-deployments.json'),dest/'deployments.json')
+ shutil.copy2(p/(phase+'-upload.log'),dest/'upload.log')
+ if phase=='final':
+  env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+  for n,h in env['sourceSHA256'].items():
+   if n.endswith('.go'):
+    data=(src/('source-'+Path(n).name+'.txt')).read_bytes();assert hashlib.sha256(data).hexdigest()==h;(r/n).write_bytes(data)
+
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','count-bench.go.txt','count-measure.mjs','baseline-accounting.go.txt','before-overlay.json']:shutil.copy2(p/n,raw/n)
+for n in ['setup.py','control.py','remote.py','export.py','watch.py','analyze.py','collect.py','report.py']:shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-resource-count.md');print('Collected native pre-effect/reopen proof, pending admission cases, exact tested bytes and all 80 observations')

@@ -1,0 +1,367 @@
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1556839	       149.4 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1627275	       148.4 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	14519982	        16.61 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	14480155	        16.51 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	10553378	        23.06 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 9969326	        22.82 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	17010426	        13.23 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	17586123	        13.39 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2150484	       111.3 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2193908	       110.2 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5953543	        41.51 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5902858	        41.60 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 4961817	        48.86 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 5037242	        48.63 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	18787762	        12.80 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	18858612	        13.20 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1755721	       143.7 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1723329	       143.0 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	12088610	        19.87 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	11794308	        20.43 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8862150	        28.65 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8762803	        27.24 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	19202196	        12.68 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18583011	        12.61 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2177533	       111.9 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2060124	       114.8 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5141076	        44.98 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5397879	        44.36 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 8583885	        27.78 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 8659846	        28.79 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17465338	        13.81 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17437358	        13.39 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1695639	       140.9 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1686112	       146.2 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	12071464	        20.20 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	12080919	        20.01 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8888860	        27.20 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8861666	        28.44 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	19313889	        12.82 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18656150	        13.07 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 1952078	       129.9 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2165247	       119.5 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5301547	        47.61 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 4654052	        49.00 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 8331775	        30.19 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 7818328	        29.60 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	18123136	        13.82 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17768748	        14.97 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1741909	       141.0 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1733612	       140.8 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	15306813	        15.51 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	15138114	        15.29 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	10753551	        22.07 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	10852369	        22.21 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18617440	        12.96 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18821624	        13.16 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2116136	       114.0 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2119254	       112.4 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5525670	        44.38 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5714792	        40.28 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 5248812	        46.47 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 5204234	        46.34 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	18774540	        12.97 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	18554482	        13.65 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1562305	       146.6 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1723059	       137.8 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	12172444	        19.86 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	12162649	        19.88 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8680762	        27.73 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8692876	        28.33 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18154670	        13.32 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	17455068	        13.85 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2172100	       108.7 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2149840	       113.4 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5010260	        46.28 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5413870	        49.29 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 8724224	        27.31 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 8789924	        28.23 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17449533	        13.29 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17787331	        12.94 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1638638	       139.9 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1655156	       140.8 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	15760006	        16.15 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	15054724	        16.27 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 9984526	        24.69 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 9908496	        25.22 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18571413	        13.29 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	17566372	        13.59 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2008611	       120.3 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 1864898	       122.4 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5628465	        41.46 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5868387	        40.61 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 4957884	        47.94 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 4977534	        47.81 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17020384	        13.99 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17610416	        13.78 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1609521	       141.5 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1545498	       145.1 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	13517120	        15.62 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	15627850	        15.57 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	10709269	        22.52 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	10714690	        22.64 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	17264948	        13.29 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18767056	        12.88 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2223651	       110.6 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 1806336	       110.9 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5792551	        42.24 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 5993662	        43.10 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 4899148	        55.09 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 4726218	        53.78 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	18044560	        13.78 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17672779	        13.23 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present         	 1597003	       146.7 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present         	 1626072	       144.0 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	10739926	        21.36 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing         	11459965	        20.69 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8510655	        28.01 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked          	 8861433	        29.32 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	19443267	        13.21 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown         	18114403	        13.18 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 2035120	       124.0 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present      	 1815094	       137.7 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 4725140	        51.43 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing      	 4448708	        53.74 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 8262529	        30.41 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked       	 7117567	        33.67 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	15894949	        15.29 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown      	17961804	        14.02 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1681267	       145.2 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1661512	       139.5 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	15309396	        16.01 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	12427380	        17.05 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 7794494	        27.30 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	10901287	        24.50 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	17813953	        13.22 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	18170602	        12.94 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 1864623	       112.4 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2383213	       108.7 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5788428	        42.58 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5569952	        46.44 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4675626	        53.23 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4985655	        57.62 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	18202910	        15.39 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	18674202	        13.69 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1721827	       140.9 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1637605	       143.0 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	11510202	        20.90 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	10857081	        20.75 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 8864413	        28.04 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 8036179	        28.33 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	17745186	        15.27 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	16095720	        14.42 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2112188	       118.1 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2100601	       123.2 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5276877	        45.72 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5358050	        44.81 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 8415708	        27.91 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 8599466	        30.28 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	16532678	        14.04 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	18453498	        13.63 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1674571	       138.9 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1694245	       143.2 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	11963335	        25.02 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	 8742538	        25.52 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 7819311	        26.79 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 8834378	        27.32 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	16169707	        14.65 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	15785511	        14.00 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2200084	       115.7 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2051985	       129.3 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 4803052	        49.51 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5221204	        48.22 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 7294152	        31.73 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 8201851	        30.92 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	17608316	        13.81 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	15352048	        14.14 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1722799	       144.8 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1510179	       143.5 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	14217902	        17.59 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	14357167	        16.24 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 9759984	        24.82 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	10023142	        23.29 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	16184871	        13.14 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	16847528	        12.70 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 1952950	       123.3 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2040296	       129.1 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5829306	        43.11 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5549718	        42.19 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4897174	        48.94 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4490268	        49.19 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	18309231	        13.93 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	16186084	        13.47 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1717387	       144.4 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1529964	       153.6 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	11527696	        21.14 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	12035224	        23.45 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 8762253	        27.75 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 7820428	        28.93 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	18050826	        12.74 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	18509647	        15.85 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2029562	       120.8 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2146381	       117.5 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5067085	        49.94 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 4975449	        49.62 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 8233188	        31.24 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 7561635	        29.79 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	16863867	        15.05 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	17336944	        15.78 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1402814	       177.9 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1335627	       152.1 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	13770327	        20.76 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	14313633	        17.80 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	10275141	        22.73 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 9725954	        25.20 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	18506822	        14.81 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	18816032	        12.89 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 1940803	       119.9 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2007525	       128.7 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5782410	        43.38 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5435565	        41.48 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4604736	        56.68 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4613938	        49.46 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	16795479	        13.48 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	18086576	        13.45 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/before.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1573580	       148.1 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1668211	       154.6 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	14562170	        18.65 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	13486806	        15.85 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 9718783	        25.60 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 9864218	        26.49 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	18883051	        13.19 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	17567463	        13.83 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 1879405	       119.0 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2170360	       109.0 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 4704286	        46.18 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 4604532	        48.18 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4002163	        51.59 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 4969357	        55.64 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	16466431	        14.36 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	17127285	        13.56 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS
+
+COMMAND ["benchmark/after.test","-test.run=^$","-test.bench=^BenchmarkPreparedRecoveryClassification$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=4"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1658638	       134.3 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/present-4         	 1662520	       152.7 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	11399265	        25.61 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/missing-4         	11719053	        21.05 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 7517134	        30.12 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/marked-4          	 8623100	        32.93 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	14527249	        14.06 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/put/unknown-4         	17753503	        15.47 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2072175	       118.7 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/present-4      	 2249508	       116.4 ns/op	         0 commits/op	         1.000 discards/op	         0 errors/op	         1.000 heads/op	     208 B/op	       2 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5084907	        48.74 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/missing-4      	 5138299	        52.31 ns/op	         1.000 commits/op	         0 discards/op	         0 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 7978602	        31.48 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/marked-4       	 8146746	        31.46 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	15897220	        16.65 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+BenchmarkPreparedRecoveryClassification/delete/unknown-4      	17205241	        14.17 ns/op	         0 commits/op	         0 discards/op	         1.000 errors/op	         1.000 heads/op	       0 B/op	       0 allocs/op
+PASS

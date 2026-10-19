@@ -1,0 +1,88 @@
+from pathlib import Path
+p=Path('/private/tmp/stow-outbox-decode-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');s=(r/'internal/runthrough/file_outbox_proto.go').read_text();a=s.index('\tmessage := &outboxpb.Outbox{}',s.index('func decodeOutboxProto('));b=s.index('\nfunc decodeOutboxProtoEntry(',a);s=s[:a]+'\treturn decodeOutboxProtoRecords(data[outboxProtoPrefixSize:])\n}\n'+s[b:];(p/'candidate-file_outbox_proto.go.txt').write_text(s)
+(p/'candidate-file_outbox_proto_decode.go.txt').write_text('''package runthrough
+
+import (
+    "fmt"
+    "github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb"
+    "google.golang.org/protobuf/encoding/protowire"
+    "google.golang.org/protobuf/proto"
+)
+
+type outboxProtoRecordDecoder struct {
+    state outboxState
+    metadata outboxpb.Outbox
+    entry outboxpb.Entry
+    provenance outboxpb.Provenance
+    faults [3]error
+}
+
+func decodeOutboxProtoRecords(data []byte) (outboxState,error) {
+    decoder:=outboxProtoRecordDecoder{state:newOutboxState()}
+    for len(data)>0 {
+        n,err:=decoder.consume(data)
+        if err!=nil {return outboxState{},fmt.Errorf("decode protobuf outbox: %w",err)}
+        data=data[n:]
+    }
+    return decoder.finish()
+}
+
+func (d *outboxProtoRecordDecoder) consume(data []byte) (int,error) {
+    number,kind,tagSize:=protowire.ConsumeTag(data)
+    if tagSize<0 {return 0,d.wireError(data,tagSize)}
+    valueSize:=protowire.ConsumeFieldValue(number,kind,data[tagSize:])
+    if valueSize<0 {return 0,d.wireError(data,valueSize)}
+    size:=tagSize+valueSize
+    if kind==protowire.BytesType && number>=2 && number<=4 {
+        value,_:=protowire.ConsumeBytes(data[tagSize:size])
+        return size,d.record(number,value)
+    }
+    return size,(proto.UnmarshalOptions{Merge:true}).Unmarshal(data[:size],&d.metadata)
+}
+
+func (d *outboxProtoRecordDecoder) wireError(data []byte,code int) error {
+    if err:=(proto.UnmarshalOptions{Merge:true}).Unmarshal(data,&d.metadata);err!=nil {return err}
+    return fmt.Errorf("%w: %v",proto.Error,protowire.ParseError(code))
+}
+
+func (d *outboxProtoRecordDecoder) record(number protowire.Number,data []byte) error {
+    options:=proto.UnmarshalOptions{RecursionLimit:protowire.DefaultRecursionLimit-1}
+    if number==2 {
+        if err:=options.Unmarshal(data,&d.provenance);err!=nil {return err}
+        if d.faults[0]==nil {d.faults[0]=d.addProvenance()}
+        return nil
+    }
+    if err:=options.Unmarshal(data,&d.entry);err!=nil {return err}
+    index:=int(number)-2
+    if d.faults[index]==nil {d.faults[index]=d.addEntry(number==4)}
+    return nil
+}
+
+func (d *outboxProtoRecordDecoder) addProvenance() error {
+    value:=&d.provenance
+    if len(value.ProtoReflect().GetUnknown())!=0 {return fmt.Errorf("%w: unknown provenance fields",ErrOutboxFormatVersion)}
+    if _,exists:=d.state.provenance[value.Identity];exists {return fmt.Errorf("duplicate outbox provenance identity %q",value.Identity)}
+    d.state.provenance[value.Identity]=UpstreamState{ETag:value.Etag,Absent:value.Absent,Unknown:value.Unknown}
+    return nil
+}
+
+func (d *outboxProtoRecordDecoder) addEntry(prepared bool) error {
+    value:=&d.entry
+    if len(value.ProtoReflect().GetUnknown())!=0 {return fmt.Errorf("%w: unknown entry fields",ErrOutboxFormatVersion)}
+    decoded,err:=decodeOutboxProtoEntry(value)
+    if err!=nil {return err}
+    target:=d.state.entries
+    if prepared {target=d.state.prepared}
+    if _,exists:=target[value.Identity];exists {return fmt.Errorf("duplicate outbox entry identity %q",value.Identity)}
+    target[value.Identity]=decoded
+    return nil
+}
+
+func (d *outboxProtoRecordDecoder) finish() (outboxState,error) {
+    if d.metadata.Version!=outboxProtoVersion || len(d.metadata.ProtoReflect().GetUnknown())!=0 {return outboxState{},fmt.Errorf("%w: protobuf version %d or unknown fields",ErrOutboxFormatVersion,d.metadata.Version)}
+    for _,err:=range d.faults {if err!=nil {return outboxState{},err}}
+    d.state.seq,d.state.nextToken=d.metadata.Seq,d.metadata.NextToken
+    return normalizeDecodedOutboxState(d.state)
+}
+''')
+print('Prepared bounded record decoder using generated protobuf child/scalar decoding; production unchanged')

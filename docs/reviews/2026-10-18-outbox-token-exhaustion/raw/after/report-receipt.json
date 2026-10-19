@@ -1,0 +1,47 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-token-exhaustion.md": "f0f02cf2063cd408aa3e160e8eec9d8c3c2b61cab01c7b6b9cc406d4cdf20793",
+    "docs/outbox.md": "b681c57be37c5536d9a9c8b87e0697405fb5aaee4e86abb55caf4a55fd918e61"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/outbox.go": "70c6a49e74f4be2e51afc0db13dcdf8bf138a1e860477372b9a069864af7f109",
+    "internal/runthrough/outbox_claims.go": "7af3b6fc2a9ffb0f91341be9e17bd65b0d584cbc746a0c55d6f0f500603d8705",
+    "internal/runthrough/outbox_token_exhaustion_test.go": "411005acb52c27effc429e26c38a95cc2ff5bd2a942e036617ccc122de9fc974",
+    "internal/runthrough/outbox_token_exhaustion_controls_test.go": "598440c4f07b3389a046acbdeda45bb8ec0e039c6bbbc5ce0fdd7d5ce0c6c4dc",
+    "internal/runthrough/outbox_token_exhaustion_bench_test.go": "64f82c2a241fa136094a0df9b2395f5d25f4241187cd0cb83617b5a4e35c4449",
+    "benchmark/token-comparison.mjs": "db6409df6f6d0d8a2b563573115d9a9ba4963dbf25b5a41c00e4f20059abed69"
+  },
+  "railwayDeploymentId": "80f6d3b5-62b2-4157-8bd6-51f8c68a5896"
+}

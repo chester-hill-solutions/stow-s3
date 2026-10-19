@@ -1,0 +1,60 @@
+package fs
+
+import (
+ "context"
+ "errors"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "syscall"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/capacity"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func BenchmarkBucketAdmission(b *testing.B) {
+ root:=os.Getenv("STOW_BENCH_ROOT")
+ if !strings.HasPrefix(root,"/results/") { b.Fatal("Railway volume required") }
+ var disk syscall.Statfs_t
+ if err:=syscall.Statfs(root,&disk);err!=nil||disk.Type!=61267 { b.Fatalf("ext4 volume required: %v type=%d",err,disk.Type) }
+ cases:=[]struct{bound bool;op string}{{false,"create"},{false,"delete"},{true,"create"},{true,"delete"},{true,"put"}}
+ for _,c:=range cases {
+  b.Run(fmt.Sprintf("bound=%t/op=%s",c.bound,c.op),func(b *testing.B){
+   body:=strings.Repeat("x",65536)
+   b.ReportAllocs();b.ResetTimer()
+   for i:=0;i<b.N;i++ {
+    b.StopTimer()
+    dir,err:=os.MkdirTemp(root,"bucket-");if err!=nil { b.Fatal(err) }
+    var ns *capacity.Namespace
+    var store *FilesystemStore
+    if c.bound {
+     host,e:=capacity.Open(capacity.HostOptions{Dir:filepath.Join(dir,"host"),MaxBytes:64<<20});if e!=nil { b.Fatal(e) }
+     ns,e=host.Bind(capacity.NamespaceOptions{ID:"benchmark",MaxBytes:32<<20,RecoveryReserveBytes:4<<20});if e!=nil { b.Fatal(e) }
+     store,err=NewFilesystemStoreWithNamespace(filepath.Join(dir,"store"),ns)
+    } else { store,err=NewFilesystemStore(filepath.Join(dir,"store")) }
+    if err!=nil { b.Fatal(err) }
+    if c.op!="create" { if err:=store.CreateBucket(context.Background(),"bucket");err!=nil { b.Fatal(err) } }
+    b.StartTimer()
+    switch c.op {
+    case "create":err=store.CreateBucket(context.Background(),"bucket")
+    case "delete":err=store.DeleteBucket(context.Background(),"bucket")
+    case "put":_,err=store.PutObject(context.Background(),"bucket","key",strings.NewReader(body),storage.PutOptions{})
+    }
+    b.StopTimer()
+    if err!=nil { b.Fatal(err) }
+    _,err=store.HeadBucket(context.Background(),"bucket")
+    if c.op=="delete" { if !errors.Is(err,storage.ErrBucketNotFound) { b.Fatalf("deleted bucket visible: %v",err) } } else if err!=nil { b.Fatal(err) }
+    if c.bound&&os.Getenv("STOW_BENCH_EXPECT_CHARGE")=="1" {
+     before,err:=ns.Snapshot(context.Background());if err!=nil { b.Fatal(err) }
+     if err:=store.reconcileCapacityLocked();err!=nil { b.Fatal(err) }
+     after,err:=ns.Snapshot(context.Background());if err!=nil||before!=after { b.Fatalf("stale accounting: before=%+v after=%+v err=%v",before,after,err) }
+    }
+    if err:=store.Close();err!=nil { b.Fatal(err) }
+    if err:=os.RemoveAll(dir);err!=nil { b.Fatal(err) }
+    b.StartTimer()
+   }
+  })
+ }
+}

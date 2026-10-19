@@ -1,0 +1,38 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from statistics import median
+import json,re,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-clone-2026-10-18');job=json.loads((p/'measure-start.json').read_text());d=p/('export-'+job['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==8 and all(x['passed']for x in checks)
+receipts={};rx=re.compile(r'^--- (PASS|FAIL|SKIP): ((?:TestOutboxStateClone|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers)\S*)')
+for variant in ['before','candidate']:
+ for mode in ['normal','race']:
+  name=variant+'-'+mode;counts=Counter();contents=(d/(name+'.log')).read_text()
+  for line in contents.splitlines():
+   m=rx.match(line.strip())
+   if m:counts[(m[1],m[2])]+=1
+  leaves={label for status,label in counts if not any(other.startswith(label+'/')for _,other in counts)};assert len(leaves)==27 and all(counts.get(('PASS',label))==2 for label in leaves),(name,len(leaves));assert not any(status in ['FAIL','SKIP']for status,label in counts)
+  memory=[json.loads(line.removeprefix('STOWRETENTION:'))for line in contents.splitlines()if line.startswith('STOWRETENTION:')];assert len(memory)==2 and all(x['heapAfter']-x['heapBefore']<16<<20 for x in memory)
+  receipts[name]={'distinctCases':27,'passes':54,'failed':0,'skipped':0,'cases':sorted(leaves),'retention':memory}
+commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==8;assert json.loads((d/'fixture-filesystem.json').read_text())['statfsType']==61267
+cells=defaultdict(lambda:defaultdict(list));samples=[];pattern=re.compile(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$')
+for command in commands['runs']:
+ assert command['exitCode']==0 and command['signal']is None
+ rows=[]
+ for line in(d/command['log']).read_text().splitlines():
+  m=pattern.match(line)
+  if not m:continue
+  row={'name':m[1],'iterations':int(m[2]),'index':command['index'],'variant':command['variant'],'log':command['log']};parts=m[3].split();assert len(parts)%2==0
+  for n in range(0,len(parts),2):row[parts[n+1]]=float(parts[n])
+  rows.append(row);samples.append(row);cells[row['name']][row['variant']].append(row)
+ assert len(rows)==36,(command,len(rows))
+assert len(samples)==288 and len(cells)==36
+summary=[]
+for name,variants in sorted(cells.items()):
+ assert set(variants)=={'before','candidate'}and all(len(x)==4 for x in variants.values());stats={}
+ for label,rows in variants.items():
+  keys=[k for k in rows[0]if k not in ['name','iterations','index','variant','log']];stats[label]={key:median(x[key]for x in rows)for key in keys};stats[label]['nsMin']=min(x['ns/op']for x in rows);stats[label]['nsMax']=max(x['ns/op']for x in rows)
+ summary.append({'name':name,**stats,'timeDeltaPercent':(stats['candidate']['ns/op']/stats['before']['ns/op']-1)*100,'allocDeltaPercent':(stats['candidate']['allocs/op']/stats['before']['allocs/op']-1)*100,'byteDeltaPercent':(stats['candidate']['B/op']/stats['before']['B/op']-1)*100})
+source=json.loads((d/'environment.json').read_text())['sourceSHA256'];r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');base=json.loads((p/'baseline.json').read_text())['base'];assert hashlib.sha256(subprocess.check_output(['git','show',base+':internal/runthrough/outbox.go'],cwd=r)).hexdigest()==source['internal/runthrough/outbox.go']
+(d/'contract-receipt.json').write_text(json.dumps(receipts,indent=2)+'\n');(d/'comparison-analysis.json').write_text(json.dumps({'observations':288,'comparisons':summary,'samples':samples},indent=2)+'\n')
+print('Verified 27 contract/resource cases twice in each of four variant/modes, unchanged baseline and 288 comparison observations')
+for row in summary:print(row['name'],'time%=',round(row['timeDeltaPercent'],2),'alloc%=',round(row['allocDeltaPercent'],2),'B%=',round(row['byteDeltaPercent'],2),'B/cycle=',row['before']['B/op'],'->',row['candidate']['B/op'])

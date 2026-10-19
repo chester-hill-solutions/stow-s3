@@ -1,0 +1,258 @@
+=== RUN   TestOutboxProtoMatchesJSONState
+=== RUN   TestOutboxProtoMatchesJSONState/empty
+=== RUN   TestOutboxProtoMatchesJSONState/complete
+=== RUN   TestOutboxProtoMatchesJSONState/invalid-utf8
+=== RUN   TestOutboxProtoMatchesJSONState/legacy-attempt
+--- PASS: TestOutboxProtoMatchesJSONState (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/empty (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/complete (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/invalid-utf8 (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/legacy-attempt (0.00s)
+=== RUN   TestOutboxProtoPreservesTimestampErrors
+--- PASS: TestOutboxProtoPreservesTimestampErrors (0.00s)
+=== RUN   TestOutboxStateCloneDoesNotDuplicateDeletedCapacity
+STOWCLONECAPACITY: {"heapBefore":7150688,"heapAfter":7264096,"growth":113408}
+--- PASS: TestOutboxStateCloneDoesNotDuplicateDeletedCapacity (0.17s)
+=== RUN   TestOutboxStateCloneIndependence
+=== RUN   TestOutboxStateCloneIndependence/maps-0
+=== RUN   TestOutboxStateCloneIndependence/maps-1
+=== RUN   TestOutboxStateCloneIndependence/maps-2
+=== RUN   TestOutboxStateCloneIndependence/maps-3
+=== RUN   TestOutboxStateCloneIndependence/maps-4
+=== RUN   TestOutboxStateCloneIndependence/maps-5
+=== RUN   TestOutboxStateCloneIndependence/maps-6
+=== RUN   TestOutboxStateCloneIndependence/maps-7
+=== RUN   TestOutboxStateCloneIndependence/empty-nonnil
+--- PASS: TestOutboxStateCloneIndependence (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-0 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-1 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-2 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-3 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-4 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-5 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-6 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-7 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/empty-nonnil (0.00s)
+=== RUN   TestOutboxProtoBlockEarlyErrorAllocation
+STOWPROTOERROR: {"allocatedBytes":98528,"entries":4096}
+--- PASS: TestOutboxProtoBlockEarlyErrorAllocation (0.01s)
+=== RUN   TestOutboxProtoBlockReleasesInputBuffers
+STOWPROTOHEAP: {"heapBefore":423088,"heapAfter":428328,"frameBytes":6074}
+--- PASS: TestOutboxProtoBlockReleasesInputBuffers (0.10s)
+=== RUN   TestOutboxProtoBlockRoundTrip
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=0
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=0","sha256":"1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947","bytes":19}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=1
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=1","sha256":"1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e","bytes":54}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=2
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=2","sha256":"9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9","bytes":85}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=127
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=127","sha256":"296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb","bytes":4315}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=128
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=128","sha256":"b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e","bytes":4348}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=129
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=129","sha256":"56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e","bytes":4383}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=257
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=257","sha256":"06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827","bytes":8821}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=0
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=0","sha256":"1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947","bytes":19}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=1
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=1","sha256":"2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565","bytes":654}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=2
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=2","sha256":"7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59","bytes":1279}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=127
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=127","sha256":"ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549","bytes":81375}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=128
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=128","sha256":"ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a","bytes":82022}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=129
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=129","sha256":"18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae","bytes":82681}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=257
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=257","sha256":"6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58","bytes":166179}
+--- PASS: TestOutboxProtoBlockRoundTrip (0.08s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=0 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=1 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=2 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=127 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=128 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=129 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=257 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=0 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=1 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=2 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=127 (0.02s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=128 (0.01s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=129 (0.01s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=257 (0.03s)
+=== RUN   TestOutboxProtoBlockConcurrentOwnership
+--- PASS: TestOutboxProtoBlockConcurrentOwnership (0.02s)
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/text
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields
+--- PASS: TestFileOutboxOwnWriteMatchesReopenedState (0.01s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/text (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields (0.00s)
+=== RUN   TestFileOutboxOwnWritePreservesCounterFences
+=== RUN   TestFileOutboxOwnWritePreservesCounterFences/enqueue
+=== RUN   TestFileOutboxOwnWritePreservesCounterFences/prepare
+--- PASS: TestFileOutboxOwnWritePreservesCounterFences (0.00s)
+    --- PASS: TestFileOutboxOwnWritePreservesCounterFences/enqueue (0.00s)
+    --- PASS: TestFileOutboxOwnWritePreservesCounterFences/prepare (0.00s)
+=== RUN   TestFileOutboxOwnWriteCanonicalizesProvenance
+--- PASS: TestFileOutboxOwnWriteCanonicalizesProvenance (0.00s)
+=== RUN   TestFileOutboxOwnWriteRejectsChangedPeerBytes
+--- PASS: TestFileOutboxOwnWriteRejectsChangedPeerBytes (0.00s)
+=== RUN   TestFileOutboxOwnWriteReloadsAfterUncertainFence
+--- PASS: TestFileOutboxOwnWriteReloadsAfterUncertainFence (0.00s)
+=== RUN   TestFileOutboxReleasesCallerStringBuffers
+STOWRETENTION:{"cachedLength":5246,"entries":64,"heapAfter":468552,"heapBefore":431624,"heapGrowth":36928,"sourceBytesPerEntry":1048576}
+--- PASS: TestFileOutboxReleasesCallerStringBuffers (0.16s)
+=== RUN   TestOutboxProtoMatchesJSONState
+=== RUN   TestOutboxProtoMatchesJSONState/empty
+=== RUN   TestOutboxProtoMatchesJSONState/complete
+=== RUN   TestOutboxProtoMatchesJSONState/invalid-utf8
+=== RUN   TestOutboxProtoMatchesJSONState/legacy-attempt
+--- PASS: TestOutboxProtoMatchesJSONState (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/empty (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/complete (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/invalid-utf8 (0.00s)
+    --- PASS: TestOutboxProtoMatchesJSONState/legacy-attempt (0.00s)
+=== RUN   TestOutboxProtoPreservesTimestampErrors
+--- PASS: TestOutboxProtoPreservesTimestampErrors (0.00s)
+=== RUN   TestOutboxStateCloneDoesNotDuplicateDeletedCapacity
+STOWCLONECAPACITY: {"heapBefore":7162424,"heapAfter":7275768,"growth":113344}
+--- PASS: TestOutboxStateCloneDoesNotDuplicateDeletedCapacity (0.15s)
+=== RUN   TestOutboxStateCloneIndependence
+=== RUN   TestOutboxStateCloneIndependence/maps-0
+=== RUN   TestOutboxStateCloneIndependence/maps-1
+=== RUN   TestOutboxStateCloneIndependence/maps-2
+=== RUN   TestOutboxStateCloneIndependence/maps-3
+=== RUN   TestOutboxStateCloneIndependence/maps-4
+=== RUN   TestOutboxStateCloneIndependence/maps-5
+=== RUN   TestOutboxStateCloneIndependence/maps-6
+=== RUN   TestOutboxStateCloneIndependence/maps-7
+=== RUN   TestOutboxStateCloneIndependence/empty-nonnil
+--- PASS: TestOutboxStateCloneIndependence (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-0 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-1 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-2 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-3 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-4 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-5 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-6 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/maps-7 (0.00s)
+    --- PASS: TestOutboxStateCloneIndependence/empty-nonnil (0.00s)
+=== RUN   TestOutboxProtoBlockEarlyErrorAllocation
+STOWPROTOERROR: {"allocatedBytes":98528,"entries":4096}
+--- PASS: TestOutboxProtoBlockEarlyErrorAllocation (0.01s)
+=== RUN   TestOutboxProtoBlockReleasesInputBuffers
+STOWPROTOHEAP: {"heapBefore":464712,"heapAfter":433296,"frameBytes":6074}
+--- PASS: TestOutboxProtoBlockReleasesInputBuffers (0.09s)
+=== RUN   TestOutboxProtoBlockRoundTrip
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=0
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=0","sha256":"1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947","bytes":19}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=1
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=1","sha256":"1bc95097f6e850af86c5b11d60dfbf030879f94d880cb86a7813e4d99f93a75e","bytes":54}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=2
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=2","sha256":"9c595672e072c4c7bff585665090dbae9703b5978f43b599094bc97ef7920fe9","bytes":85}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=127
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=127","sha256":"296260471f58a6e1dfcb4cb55de24163dfdf86bed2476fad4c4636f1856546cb","bytes":4315}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=128
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=128","sha256":"b151c5e1100dc6aa50744ef8de57610200ede4ce04b078fafa7c38cfd5cc463e","bytes":4348}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=129
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=129","sha256":"56833eb751efa9210d4f30cc9f00787aa34bee5240ff79503bdc6ba86777f99e","bytes":4383}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=false/depth=257
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=false/depth=257","sha256":"06341bb163f81aba013fab6300277ab41c0d01c0e031a521fd5e4c3e00ec8827","bytes":8821}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=0
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=0","sha256":"1497fb0df42ccd20e47078610996793e8e691b7ee38b2defdaf90769d5b59947","bytes":19}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=1
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=1","sha256":"2b2739308d0e395cc8bd02809a6f785b80cdfbe0e237945f54866c107db66565","bytes":654}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=2
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=2","sha256":"7d19a380551c052bc539220c594398ccc3644b5db52caa3ce791f8307e59fd59","bytes":1279}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=127
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=127","sha256":"ac5f35c476a1c0abe1e1373718f451d41cbd264969e023e5f7df6f5dea956549","bytes":81375}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=128
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=128","sha256":"ea841c186d3d0bf27198ba9edc9bb97dc13f8b58ca9cc5e6a71215a952967a8a","bytes":82022}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=129
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=129","sha256":"18f0aa0c935e23c00905a76febc5da00af32a02c4ef3018e7eab50802eb646ae","bytes":82681}
+=== RUN   TestOutboxProtoBlockRoundTrip/mixed=true/depth=257
+STOWPROTOFRAME: {"name":"TestOutboxProtoBlockRoundTrip/mixed=true/depth=257","sha256":"6862d991939c9af3b8cc4eaf672737b829b0d969a1540cc498724798b5eaea58","bytes":166179}
+--- PASS: TestOutboxProtoBlockRoundTrip (0.10s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=0 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=1 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=2 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=127 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=128 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=129 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=false/depth=257 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=0 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=1 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=2 (0.00s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=127 (0.01s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=128 (0.02s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=129 (0.02s)
+    --- PASS: TestOutboxProtoBlockRoundTrip/mixed=true/depth=257 (0.03s)
+=== RUN   TestOutboxProtoBlockConcurrentOwnership
+--- PASS: TestOutboxProtoBlockConcurrentOwnership (0.02s)
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/text
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt
+=== RUN   TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields
+--- PASS: TestFileOutboxOwnWriteMatchesReopenedState (0.02s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/text (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt (0.00s)
+    --- PASS: TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields (0.00s)
+=== RUN   TestFileOutboxOwnWritePreservesCounterFences
+=== RUN   TestFileOutboxOwnWritePreservesCounterFences/enqueue
+=== RUN   TestFileOutboxOwnWritePreservesCounterFences/prepare
+--- PASS: TestFileOutboxOwnWritePreservesCounterFences (0.00s)
+    --- PASS: TestFileOutboxOwnWritePreservesCounterFences/enqueue (0.00s)
+    --- PASS: TestFileOutboxOwnWritePreservesCounterFences/prepare (0.00s)
+=== RUN   TestFileOutboxOwnWriteCanonicalizesProvenance
+--- PASS: TestFileOutboxOwnWriteCanonicalizesProvenance (0.00s)
+=== RUN   TestFileOutboxOwnWriteRejectsChangedPeerBytes
+--- PASS: TestFileOutboxOwnWriteRejectsChangedPeerBytes (0.00s)
+=== RUN   TestFileOutboxOwnWriteReloadsAfterUncertainFence
+--- PASS: TestFileOutboxOwnWriteReloadsAfterUncertainFence (0.00s)
+=== RUN   TestFileOutboxReleasesCallerStringBuffers
+STOWRETENTION:{"cachedLength":5246,"entries":64,"heapAfter":471920,"heapBefore":451440,"heapGrowth":20480,"sourceBytesPerEntry":1048576}
+--- PASS: TestFileOutboxReleasesCallerStringBuffers (0.19s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	2.157s

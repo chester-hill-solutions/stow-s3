@@ -78,13 +78,13 @@ Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
 ## Install
 
-Native v0.3.1 binaries for Linux and macOS are distributed through
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.1).
+Native v0.3.2 binaries for Linux and macOS are distributed through
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.2).
 Verify the archive with the release checksum manifest and run `stow-s3 --version`.
 npm and PyPI publication are deferred; use source checkouts for those clients.
 
 
-The 0.3.1 TypeScript and Python clients are not yet published. Use a source checkout.
+The 0.3.2 TypeScript and Python clients are not yet published. Use a source checkout.
 Native package targets are Linux and macOS on x64 and arm64. Use WSL on Windows.
 
 Go, published and installable now:

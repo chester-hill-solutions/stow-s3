@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,statistics,sys
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');phase=sys.argv[1];j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'measurements.json').read_text());rows=v['observations'];expected=16 if phase=='red'else 96
+assert len(rows)==len(v['commands'])==expected and all(x['exitCode']==0 for x in v['commands'])
+fields=['allocatedBytes','allocations','ns','maxRSSBytes'];out=[]
+for cell in v['cases']:
+ subsets={name:[x for x in rows if x['variant']==name and all(x[k]==val for k,val in cell.items())]for name in ['before','after']};r=dict(cell)
+ for name,items in subsets.items():
+  if not items:continue
+  r[name]={'samples':len(items)}
+  for key in fields:
+   vals=[x[key]for x in items];r[name][key]={'median':statistics.median(vals),'min':min(vals),'max':max(vals),'values':vals}
+ if subsets['after']:
+  r['changePercent']={key:100*(r['after'][key]['median']/r['before'][key]['median']-1)if r['before'][key]['median']else None for key in fields}
+  r['controls']={}
+  for a,b in [('A','C'),('B','D')]:
+   ar=[x['ns']for x in subsets['before'if a=='A'else'after']if x['label']==a];br=[x['ns']for x in subsets['before'if a=='A'else'after']if x['label']==b];r['controls'][a+'-'+b]=100*(statistics.median(br)/statistics.median(ar)-1)
+ out.append(r)
+(e/'comparison-analysis.json').write_text(json.dumps({'rows':out,'children':expected,'binaries':v['binaries'],'order':v['order'],'method':'fresh children; median/min/max; whole-child ru_maxrss includes setup and content verification; ns/allocations cover completion only'},indent=2)+'\n')
+for r in out:
+ a=r['before'];b=r.get('after');print(r['profile'],r['size'],r['parts'],'alloc',a['allocatedBytes']['median'],'->',b['allocatedBytes']['median']if b else'', 'RSSMiB',round(a['maxRSSBytes']['median']/1048576,2),'->',round(b['maxRSSBytes']['median']/1048576,2)if b else'', 'time%',round(r['changePercent']['ns'],2)if b else'')

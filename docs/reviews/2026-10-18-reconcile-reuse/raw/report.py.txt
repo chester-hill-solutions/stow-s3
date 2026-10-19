@@ -1,0 +1,92 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-reconcile-reuse-2026-10-18');base='2026-10-18-reconcile-reuse/raw/'
+def analysis(phase):
+ j=json.loads((p/(phase+'-start.json')).read_text());return json.loads((p/('export-'+j['id'])/'comparison-analysis.json').read_text())
+def table(phase):
+ rows=['| Cell | Time, original → fixed | Time change | Bytes/op, original → fixed | Objects/op, original → fixed | Child peak RSS, original → fixed | Same-binary time change |','| --- | ---: | ---: | ---: | ---: | ---: | ---: |']
+ for c in analysis(phase):
+  a,b=c['labels']['A'],c['labels']['B'];n=c['name'].replace('BenchmarkLedgerReconcile/','ledger/').replace('BenchmarkReconcileMutation/','filesystem/').removesuffix('-4')
+  rows.append(f"| {n} | {a['ns']['median']/1e6:.4f} → {b['ns']['median']/1e6:.4f} ms | {c['changePercent']['ns']:+.2f}% | {a['bytes']['median']:,.1f} → {b['bytes']['median']:,.1f} | {a['allocs']['median']:,.1f} → {b['allocs']['median']:,.1f} | {a['maxRSSBytes']['median']/1048576:.2f} → {b['maxRSSBytes']['median']/1048576:.2f} MiB | {c['sameBinaryControlTimePercent']:+.2f}% |")
+ return '\n'.join(rows)
+final=analysis('final');adverse=[f"{c['name'].removeprefix('BenchmarkReconcileMutation/').removesuffix('-4')} {c['changePercent']['ns']:+.2f}%"for c in final if c['name'].startswith('BenchmarkReconcileMutation/objects=')and c['changePercent']['ns']>0]
+adverseText='Final adverse native filesystem timing cells: **'+', '.join(adverse)+'**.'if adverse else 'All six native filesystem operation medians improve in the final run; the earlier adverse save results remain retained and limit generalization.'
+text=f'''# Fence unchanged reconciled ledgers without replacing them
+
+**Unchanged reconciliation no longer creates and publishes an identical replacement ledger.** It still reloads and validates state under the host/capture gates, checks holds, encoding limits and capacity, then syncs the existing compatible file, its immediate parent and every ancestor. Failed existing-file fencing falls back to the former replacement path. Pending settlement and changed usage still require replacement. The production diff is 12 insertions and three deletions across two files: a net nine lines, with no dependency, format, public API, retained cache, index, checkpoint or storage abstraction.
+
+## Baseline and deterministic proof
+
+The checkout begins clean at `3a41b9dd824313bdfac6ba9e5e1ab611f488fb75`; fetching main returns unchanged `219d1dcfff9807b04660a40313b32127e5be2933`, which is an ancestor of the checkout. The previous bounded-reader, checksum, scan-reuse and admission/recovery fixes remain complete. The [preceding isolation](2026-10-18-ledger-fences.md) measures a small-ledger durable replacement at about 3.56 ms, compared with 0.24 ms for the existing durable-file fence plus all ancestors. Its diagnostic ancestor omission was not adopted. This change targets the measured unchanged reconciliation write while retaining the fences.
+
+Before writing candidate implementation code, native tests run against the exact original source on Railway. A real namespace with two resources is reconciled, and an open descriptor keeps the original ledger inode alive. Reconciliation with a separately cloned but value-identical resource slice replaces that inode on the original implementation. Bytes and logical usage are identical; the replacement is unnecessary physical I/O. A second native test makes the existing ledger directory non-writable while keeping a valid mode-0600 ledger and all required read/traverse permissions. The original unchanged reconciliation fails because it attempts a temporary replacement. Both failures reproduce normally and under race instrumentation, with no compile error, data race or root-permission skip.
+
+Five safety-control groups already pass on the original source: changed resource fields/order/nil representation require replacement; incompatible file permissions are repaired by replacement or refused when replacement cannot occur; pending reservations cannot be cleared without a write; unreadable ancestors still cause the native fence error; an integrity-valid but over-quota state is refused even when supplied usage matches. [Original normal proof]({base}red/red-normal.log), [original race proof]({base}red/red-race.log), [verified original receipt]({base}red/validation-receipt.json). Root failure names are checked exactly, not inferred from exit 1.
+
+## Implementation and preserved contracts
+
+`Reconcile` computes an unchanged flag only after the existing fresh state read, store binding and held-projection checks. It requires no pending admission, equal nil-versus-empty representation, and value equality of the complete ordered resource slices. The comparison includes `StoreID`, ID, version, byte charge and class. A new usage slice with the same values qualifies; a pointer identity or byte-count-only comparison does not. Nil versus empty and ordering remain distinct so their prior encoded representation changes are still persisted.
+
+A small private `Host.persist` method contains the former writer's encoding, maximum-size and aggregate quota checks. Existing `Host.write` callers delegate with unchanged=false. Only the checked reconciliation call can request reuse. The existing conservative staging charge of twice the encoded length remains even when the temporary file is avoided; this does not expand quota admission. All other writes, including startup, namespace/store binding, operation state, pending reservations and settlement, retain full replacement.
+
+For an unchanged ledger, `atomicfile.SyncExisting` verifies a regular file with mode 0600, opens it for syncing and checks its identity, syncs the file, closes it and syncs its parent. This is the same existing primitive already used by outbox provenance persistence. On any probe/fence failure, the original `atomicfile.Write` path performs a complete replacement, preserving permission repair and its `ErrUnknown` plus native-error behavior. A successful replacement is allowed to supersede a failed reuse attempt, as with the existing outbox pattern. The complete `syncAncestors` chain remains after either successful path; its native ancestor errors remain visible.
+
+The host mutex and capture lock remain held throughout comparison and persistence, excluding managed concurrent writers. No durable state, checksum bytes or descriptors are cached between operations. Every reconciliation still rereads and verifies the ledger, encodes it and recomputes capacity. This retains the existing owned-storage coordination qualification rather than adding protection against unsupported concurrent raw host edits. Canonical managed ledgers keep identical bytes when reused; changes continue using the same version-one writer.
+
+The regression suite has seven top-level tests. It checks inode/mtime/byte preservation, all resource fields and order, nil-to-empty persistence, read-only directory behavior, successful and failed permission fallback, pending-reservation retention and later settlement, exact native ancestor-error identity, and quota refusal without changing the ledger. Existing concurrency, holds, slot limits, tampering, exact input-size boundaries, uncertain publication, reopen/recovery and S3 tests remain in the full validation scope. The new tests use native files and permissions rather than injected success stubs.
+
+## Comparative measurements before production edits
+
+The temporary candidate overlay passes all seven groups normally and under race instrumentation before production source is changed. The identical old-source replay still produces exactly the two expected failures. Four newly built binaries cover capacity and filesystem packages, original and candidate; stale binaries are deleted first. All **15 prototype steps** and **240 observations** pass. Only afterward are the exact Railway-formatted and hashed candidate bytes copied into production files.
+
+Each cell runs in a separate child process. ABBA/BAAB ordering supplies four original/fixed observations per cell; C/D labels run the identical original binary as controls. Original and candidate receive equivalent native fixtures. All commands, binary identities, samples and min/max ranges are preserved. Positive timing percentages mean slower. Linux child peak RSS includes startup, calibration and fixtures; it is not per-operation memory or a cgroup/page-cache measurement. Allocation counters exclude fixture setup, later outcome/accounting checks and cleanup.
+
+Ledger cells use 16 or 4,096 declared one-byte resources and separately measure native unchanged reconciliation, direct full writing, and admission with a counted no-op effect. Final ledger bytes, payload charges and pending charges must match expectations. Full-write and admission cells remain controls that do not request reuse. Filesystem cells measure a 64 KiB PUT, request-keyed save and empty-bucket deletion over zero or eight existing 1 MiB objects, plus standalone scan/reconciliation and unbound creation. Native scans/reconciliation verify exact final accounting. Initial fixture ancestors are explicitly fenced outside timing in both variants.
+
+The prototype uses ten timed operations per process:
+
+{table('prototype')}
+
+Direct unchanged reconciliation improves **3.794 → 0.218 ms (-94.25%)** at 16 resources and **12.849 → 7.744 ms (-39.73%)** at 4,096. The populated-store reconciliation stage improves **10.212 → 6.012 ms**. Native deletion and PUT show benefits, but request-keyed saves are adverse: **+6.80%** for the empty fixture and **+2.05%** for the populated fixture, with same-binary controls **+7.81%** and **+3.53%**. These results are retained, not dismissed or omitted. The large admission control also allocates **+3.92%** despite not using reuse. Aggregate JSON-pool/GC and runtime variation remain part of the measured paths; no exact causal attribution is made for these differences.
+
+## Final Railway comparison
+
+All formatting, builds, tests, race/conformance, quality, vet, site/docs checks and benchmarks run only on authorized Railway scratch deployment `cd70e535-3260-4baa-9e04-3767804a10d9`. Go 1.25.6, Linux amd64, UID 10001, GOMAXPROCS 4, 4 CPU/4 GiB. Timed ledgers/payloads use verified ext4 `/results` (statfs 61267). The target service is not started or changed.
+
+The final comparison uses the actual selected production files rather than a candidate overlay, with exact original-source overlays for before binaries. It increases each process to **20 timed operations**, yielding a further **240 observations**, 480 including the prototype. Request-keyed saves accumulate more receipts at 20 operations than at ten, so absolute prototype/final timings are not identical workloads; original/fixed fixtures match within each comparison. The same fixed-operation design remains bounded below existing resource limits.
+
+{table('final')}
+
+{adverseText} All observations and controls remain visible. Timing results are fixture- and runner-specific; no statistical-significance, universal speedup, constant-memory or general S3 throughput claim is made. Direct tests establish avoided replacement and retained safety behavior. [Final observations]({base}final/measurements.json), [final ranges]({base}final/comparison-analysis.json), [prototype observations]({base}prototype/measurements.json), [prototype ranges]({base}prototype/comparison-analysis.json).
+
+## Adverse timing follow-up
+
+A separate nine-step diagnostic rebuilds each package once and toggles reuse on/off in that same binary. All **80 additional observations** pass, with before/after binary paths and SHA-256 verified identical. C/D controls both force replacement. The temporary overlay adds environment checks in both modes; it is not a replacement for the uninstrumented original/fixed comparison and is never copied into production.
+
+For this table, original means reuse disabled and fixed means reuse enabled within the identical diagnostic binary:
+
+{table('diagnostic')}
+
+The direct unchanged-reconciliation gain reproduces. Yet the direct admission control also shifts about **-12.39%** even though it does not call the reuse decision, and empty request-keyed save is adverse at about **+6.84%**. These observations limit attribution; they do not erase the original/fixed adverse samples or establish a general save gain. [Same-binary measurements]({base}diagnostic/measurements.json), [ranges]({base}diagnostic/comparison-analysis.json).
+
+The first-operation trace finds no eligible reconciliation for either first PUT or first save. A further three-step trace follows the actual **20-operation pattern on the Railway volume**, with accounting checked afterward. It finds **19 eligible and one ineligible reconciliation for ordinary PUT**, but **zero eligible and 20 ineligible reconciliations for distinct request-keyed saves**. The first-call observation alone would have misrepresented PUT coverage. These are eligibility counts, not latency measurements. Both traces remain preserved. [Repeated trace]({base}eligibility/trace.log), [per-operation eligibility]({base}eligibility/eligibility.json), [initial trace]({base}diagnostic/trace.log).
+
+The save fixture therefore has no demonstrated benefit from this shortcut. Its repeated original/fixed adverse timings remain unresolved and are not attributed conclusively to the change or dismissed as noise. The same-binary follow-up isolates shortcut activation from whole-binary differences without claiming to explain every timing shift. All diagnostic Go files and trace hooks are removed; production bytes remain the exact 26-step validated candidate.
+
+Final costs also include **+5.05% allocated bytes** in large unchanged reconciliation and **+9.93% child peak RSS** in populated PUT, despite reduced replacement work. Those observations remain visible alongside the lower small-ledger allocation count and operation timings. This optimization targets replacement I/O; it does not establish a process-memory improvement.
+
+The new comparison is linear in the resource count and adds value comparisons before changed-state replacement. It allocates no comparison map or persistent cache. Incompatible/failing existing-file probes add their metadata/open/sync attempt before the original replacement fallback; that error-path overhead is not separately benchmarked. Encoding and quota accounting remain, so the shortcut has diminishing benefit as those dominate. Whole-object capacity scans still allocate and hash the existing payload, and no reliable process peak-RSS reduction is claimed. Unchanged reconciliation can now succeed without directory write permission when its existing ledger and required fences are usable; actual changes and pending settlement still need replacement permission. The native tests cover this intended availability difference.
+
+## Validation and provenance
+
+All **26 final steps** pass: formatting; quality/file-size/format ratchets; original-source normal/race red replays; filesystem/capacity normal and race suites twice; full Go tests; broad capacity/storage/runtime/embedded/runthrough/S3/public-package race tests; four conformance profiles; vet; site build/tests; documentation links; two benchmark installs, formatting and exact source snapshots; all four binary builds; measurement; cleanup. [Final checks]({base}final/checks.json), [final receipt]({base}final/validation-receipt.json), [normal suites]({base}final/focused-normal.log), [race suites]({base}final/focused-race.log). All native permission controls execute without root skips. No quality baseline is raised. Both temporary Go benchmark files are removed. Additional Railway site/docs and exact-source/evidence checks validate the saved report before scratch teardown; committed Go files must match the formatted/tested bytes.
+
+The first upload terminates before an associated build, deployment `39e23475-0cb7-4501-aa93-8c8eb6a1466a`. Its error, terminal state and no-build log remain preserved. Only after verifying that state is the same source retried with stronger gzip compression: **68,126,808 → 64,549,806 bytes**. Streaming hashes verify byte-identical uncompressed tar data; both transport receipts and source inventory remain. The [actual transport recipe]({base}transport-Dockerfile.txt) and [validation Dockerfile]({base}Dockerfile.txt) are saved. No local project execution substitutes for Railway validation.
+
+The [artifact manifest]({base}artifact-manifest.json) records the baseline, original proof, complete prototype/final results, exact compiled benchmark sources, source hashes, failed upload and runner teardown evidence. The implementation uses existing interfaces and the existing file-fencing primitive; no journal migration or caller action is required.
+
+## Next finding
+
+Capacity scanning still uses whole-file reads while validating and hashing existing objects. The 8 MiB fixtures continue to allocate roughly 8.5 MB for a scan. Measure allocation and child peak RSS with larger supported individual objects, then assess streaming verification through existing interfaces before considering an index or new accounting machinery. The two required pending/settled ledger transitions and remaining payload/directory fences also retain real costs. No next optimization is implemented here. The broader product-quality goal remains active.
+'''
+(p/'report.md').write_text(text);print('Generated evidence report',len(text.encode()),'bytes')

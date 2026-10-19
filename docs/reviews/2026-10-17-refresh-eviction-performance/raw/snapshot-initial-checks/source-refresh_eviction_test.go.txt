@@ -1,0 +1,153 @@
+package runthrough_test
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	fsstore "github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+)
+
+func TestRefreshEvictionRetainsOpenedVersion(t *testing.T) {
+	for _, kind := range []string{"memory", "filesystem"} {
+		for _, mode := range []string{"adapter", "runtime"} {
+			for _, durable := range []bool{false, true} {
+				t.Run(fmt.Sprintf("%s/%s/durable=%t", kind, mode, durable), func(t *testing.T) { checkEvictionVersion(t, kind, mode, durable) })
+			}
+		}
+	}
+}
+
+func checkEvictionVersion(t *testing.T, kind, mode string, durable bool) {
+	t.Helper()
+	var cache storage.Store = storage.NewMemoryStore()
+	if kind == "filesystem" {
+		var err error
+		cache, err = fsstore.NewFilesystemStore(t.TempDir())
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	path := filepath.Join(t.TempDir(), "outbox.json")
+	var delegate runthrough.Outbox = runthrough.NewMemoryOutbox()
+	if durable {
+		var err error
+		delegate, err = runthrough.NewFileOutbox(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	outbox := &versionCostOutbox{Outbox: delegate}
+	f := newVersionFixtureWithCache(t, "old", outbox, cache)
+	f.client.change = nil
+	if err := versionPut(context.Background(), f.client.mockUpstream, "old"); err != nil {
+		t.Fatal(err)
+	}
+	usage := f.instance.Usage()
+	data, meta, err := observeVersion(f, mode)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertVersionResult(t, f, data, meta)
+	if f.client.gets != 1 || f.client.closes != 1 || outbox.saves != 1 {
+		t.Errorf("eviction refetched the same object: gets=%d closes=%d saves=%d want=1/1/1", f.client.gets, f.client.closes, outbox.saves)
+	}
+	if _, err := cache.HeadObject(context.Background(), "probe", "target"); !errors.Is(err, storage.ErrObjectNotFound) {
+		t.Fatalf("cache retained oversized object: %v", err)
+	}
+	if f.adapter.CacheEvictions() != 1 || f.instance.Usage() != usage {
+		t.Fatal("eviction or authoritative accounting changed")
+	}
+	if !durable {
+		return
+	}
+	if err := f.instance.Close(); err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.Close()
+	state, known, err := reopened.UpstreamState("probe", "target")
+	if err != nil || !known || state.ETag != meta.ETag {
+		t.Fatalf("reopened provenance=%+v known=%t error=%v", state, known, err)
+	}
+}
+
+type evictionFailureCache struct {
+	storage.Store
+	failure        error
+	opened, closed int
+}
+
+func (s *evictionFailureCache) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := s.Store.GetObject(ctx, bucket, key)
+	if reader != nil {
+		s.opened++
+		reader = &evictionReader{ReadCloser: reader, cache: s}
+	}
+	return reader, meta, err
+}
+func (s *evictionFailureCache) DeleteObject(ctx context.Context, bucket, key string) error {
+	if s.failure != nil {
+		return s.failure
+	}
+	return s.Store.DeleteObject(ctx, bucket, key)
+}
+
+type evictionReader struct {
+	io.ReadCloser
+	cache *evictionFailureCache
+}
+
+func (r *evictionReader) Close() error { r.cache.closed++; return r.ReadCloser.Close() }
+
+func TestRefreshEvictionFailureClosesOpenedReader(t *testing.T) {
+	for _, mode := range []string{"adapter", "runtime"} {
+		t.Run(mode, func(t *testing.T) {
+			failure := errors.New("cannot evict cache entry")
+			cache := &evictionFailureCache{Store: storage.NewMemoryStore(), failure: failure}
+			f := newVersionFixtureWithCache(t, "old", nil, cache)
+			f.client.change = nil
+			_, _, err := observeVersion(f, mode)
+			if err != failure {
+				t.Fatalf("error=%v want=%v", err, failure)
+			}
+			if cache.opened != 1 || cache.closed != cache.opened || f.client.closes != 1 {
+				t.Fatalf("reader leak: opened=%d closed=%d upstream closed=%d", cache.opened, cache.closed, f.client.closes)
+			}
+			cache.failure = nil
+			if _, _, err := observeVersion(f, mode); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestRefreshEvictionReaderSurvivesReplacement(t *testing.T) {
+	cache, err := fsstore.NewFilesystemStore(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := newVersionFixtureWithCache(t, "old", nil, cache)
+	f.client.change = nil
+	reader, meta, err := f.adapter.GetObject(context.Background(), "probe", "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reader.Close()
+	if _, err := cache.PutObject(context.Background(), "probe", "target", strings.NewReader("replacement"), storage.PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	data, err := io.ReadAll(reader)
+	if err != nil || string(data) != "old" || meta.Size != 3 {
+		t.Fatalf("captured version changed: body=%q meta=%+v error=%v", data, meta, err)
+	}
+}

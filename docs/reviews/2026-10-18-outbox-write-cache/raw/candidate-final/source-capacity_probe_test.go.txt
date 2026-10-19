@@ -1,0 +1,37 @@
+package runthrough
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+)
+
+func TestOutboxWriteCacheCapacityProbe(t *testing.T) {
+	if os.Geteuid() != 10001 {
+		t.Fatal("Railway validation user required")
+	}
+	for _, depth := range []int{0, 128, 4096} {
+		t.Run(fmt.Sprint(depth), func(t *testing.T) {
+			state := newOutboxState()
+			for n := 0; n < depth; n++ {
+				id := fmt.Sprintf("seed-%06d", n)
+				state.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Version: "retained-version", CreatedAt: time.Unix(100, 0).UTC()}
+				id = "prepared-" + id
+				state.prepared[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Prepared: true, CreatedAt: time.Unix(100, 0).UTC()}
+			}
+			outbox, err := NewFileOutbox(filepath.Join(t.TempDir(), "outbox"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := outbox.withState(func(s *outboxState) error { *s = state; return nil }); err != nil {
+				t.Fatal(err)
+			}
+			if len(outbox.validatedData) == 0 {
+				t.Fatal("own-write frame not retained")
+			}
+			fmt.Printf("STOWCAPACITY:{\"depth\":%d,\"length\":%d,\"capacity\":%d}\n", depth, len(outbox.validatedData), cap(outbox.validatedData))
+		})
+	}
+}

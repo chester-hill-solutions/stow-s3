@@ -1,0 +1,47 @@
+=== RUN   TestCapacityPayloadAllocationBound
+=== RUN   TestCapacityPayloadAllocationBound/object/8388608
+    capacity_payload_read_test.go:136: kind=object payload=8388608 binding allocated=209800 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/object/67108864
+    capacity_payload_read_test.go:136: kind=object payload=67108864 binding allocated=189560 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/8388608
+    capacity_payload_read_test.go:136: kind=part payload=8388608 binding allocated=239992 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/67108864
+    capacity_payload_read_test.go:136: kind=part payload=67108864 binding allocated=235096 budget=4194304
+--- PASS: TestCapacityPayloadAllocationBound (1.53s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/8388608 (0.11s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/67108864 (0.69s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/8388608 (0.08s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/67108864 (0.65s)
+=== RUN   TestCapacityPayloadIdentities
+=== RUN   TestCapacityPayloadIdentities/object/0
+=== RUN   TestCapacityPayloadIdentities/object/257
+=== RUN   TestCapacityPayloadIdentities/part/0
+=== RUN   TestCapacityPayloadIdentities/part/257
+=== RUN   TestCapacityPayloadIdentities/legacy
+--- PASS: TestCapacityPayloadIdentities (0.03s)
+    --- PASS: TestCapacityPayloadIdentities/object/0 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/object/257 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/part/0 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/part/257 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/legacy (0.01s)
+=== RUN   TestCapacityPayloadInvalidRecords
+=== RUN   TestCapacityPayloadInvalidRecords/prefix
+=== RUN   TestCapacityPayloadInvalidRecords/header
+=== RUN   TestCapacityPayloadInvalidRecords/short
+=== RUN   TestCapacityPayloadInvalidRecords/long
+--- PASS: TestCapacityPayloadInvalidRecords (0.01s)
+    --- PASS: TestCapacityPayloadInvalidRecords/prefix (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/header (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/short (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/long (0.00s)
+=== RUN   TestCapacityPayloadNativeRefusals
+=== RUN   TestCapacityPayloadNativeRefusals/permission
+=== RUN   TestCapacityPayloadNativeRefusals/symlink
+--- PASS: TestCapacityPayloadNativeRefusals (0.01s)
+    --- PASS: TestCapacityPayloadNativeRefusals/permission (0.01s)
+    --- PASS: TestCapacityPayloadNativeRefusals/symlink (0.00s)
+=== RUN   TestCapacityPayloadUnknownAllocation
+    capacity_payload_read_test.go:257: unknown bytes=67108864 allocated=44416
+--- PASS: TestCapacityPayloadUnknownAllocation (0.01s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	2.596s

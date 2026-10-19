@@ -1,0 +1,23 @@
+{
+  "sources": [
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-create-signed-request.html",
+      "rules": [
+        "Query parameters sort after URI encoding",
+        "Multi-value signed headers include comma-separated values",
+        "S3 uses the literal UNSIGNED-PAYLOAD"
+      ]
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3.2",
+      "rules": [
+        "Strong and weak opaque entity-tag comparison is character-for-character"
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/smithy-lang/smithy-typescript/main/packages/signature-v4/src/getCanonicalQuery.ts",
+      "role": "background only; the installed pinned Node signer is qualified separately"
+    }
+  ],
+  "privateCredentialsUsed": false
+}

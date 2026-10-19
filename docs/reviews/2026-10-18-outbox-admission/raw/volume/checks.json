@@ -1,0 +1,45 @@
+[
+  {
+    "name": "baseline-benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-overlay",
+      "benchmark/admission-baseline-overlay.json",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/outbox-admission-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 715,
+    "passed": true
+  },
+  {
+    "name": "benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/outbox-admission-after.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 819,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/admission-volume-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 63892,
+    "passed": true
+  }
+]

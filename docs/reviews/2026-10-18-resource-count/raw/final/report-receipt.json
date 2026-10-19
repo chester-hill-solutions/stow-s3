@@ -1,0 +1,47 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-resource-count.md": "050b657c8a8e24effcf54bd076420d201299241e3c380f203c0295ddf4000974"
+  },
+  "sourceSHA256": {
+    "internal/capacity/accounting.go": "646c3b1c2e6e8b9ec623813df781b2705fac9cf9bb00cd6807d27c8d2cc810f3",
+    "internal/capacity/resource_count_test.go": "94177105325d74fc2994637523d252f85a0ce01d81209a9ca2780f8cbe4801ae",
+    "internal/storage/fs/capacity_resource_count_test.go": "f94e48fa749acacc6d9a38e2d389153cc6dc5cb32ac6d191f4cadf6a98aef7a7",
+    "benchmark/count-bench.go.txt": "aca12a2912d9f98fa466d19a30779661554529ee80ae6b36510b2e757ba6c92e",
+    "benchmark/count-measure.mjs": "57476a08f07d4cde3b799106b0ceab74dcda55292683cab056231cc8744dafef",
+    "benchmark/before-overlay.json": "ac54bc8cd5fc895d4c9980d36704c52696faa17a3e8711961a884c8ad6e64a22",
+    "benchmark/baseline-accounting.go.txt": "e00634c5a3ee11592cb1d268bd333f8cebe69fee98c2157b0233dfa65a586e25"
+  },
+  "railwayDeploymentId": "43591a64-7c02-472f-8c6e-2efd25f76d10"
+}

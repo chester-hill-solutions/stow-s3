@@ -1,0 +1,44 @@
+{
+  "paired_command": [
+    "/private/tmp/stow-excess-body-2026-10-16/paired.test",
+    "-test.run=^TestReviewStreamPairedCosts$",
+    "-test.v",
+    "-test.count=2",
+    "-test.cpu=1,8"
+  ],
+  "paired_cycles": 10,
+  "paired_order": "alternating ABBA/BAAB",
+  "paired_complete_reader_method_set_checked": true,
+  "direct_order": [
+    "before",
+    "after",
+    "after",
+    "before"
+  ],
+  "direct_groups": [
+    [
+      "^BenchmarkStreamCompleteness$",
+      100000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$",
+      50000
+    ],
+    [
+      "^BenchmarkExcessRead$/^size=3$",
+      100000
+    ],
+    [
+      "^BenchmarkExcessRead$/^size=1048576$",
+      100
+    ]
+  ],
+  "direct_samples_per_case_cpu_version": 6,
+  "cpus": [
+    1,
+    8
+  ],
+  "ordinary_compiler_flags": true,
+  "all_samples_retained": true,
+  "no_concurrent_agent_builds_or_tests": true
+}

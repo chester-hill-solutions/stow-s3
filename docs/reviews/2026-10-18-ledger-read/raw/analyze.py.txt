@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,statistics,re,hashlib
+p=Path('/private/tmp/stow-ledger-read-2026-10-18');phase='final';j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert v['complete'] and v['success'] and all(x['passed']for x in checks) and len(checks)==22
+for root,names in [(e,['verified-red-normal','verified-red-race']),(p/('export-'+json.loads((p/'red-start.json').read_text())['id']),['red-normal','red-race'])]:
+ for n in names:
+  t=(root/(n+'.log')).read_text();assert 'build failed'not in t and 'DATA RACE'not in t and '--- SKIP:'not in t
+  assert len(re.findall(r'^--- FAIL: TestLedgerReadAllocationBound \(',t,re.M))==1,n
+  for size in [16777217,67108865]:
+   m=re.search(r'ledger bytes='+str(size)+r' allocated bytes=(\d+)',t);assert m and int(m.group(1))>size,(n,size)
+   assert 'oversized ledger was materialized: size='+str(size)in t,(n,size)
+  for name in ['TestLedgerReadCanonicalSizeBoundary','TestLedgerReadMissingAndEmpty','TestLedgerReadNativeErrors']:
+   assert len(re.findall(r'^--- PASS: '+name+r' \(',t,re.M))==1,(n,name)
+for n in ['focused-normal','focused-race']:
+ t=(e/(n+'.log')).read_text();assert '--- FAIL:'not in t and 'DATA RACE'not in t and '--- SKIP: TestLedgerRead'not in t
+ for name in ['TestLedgerReadAllocationBound','TestLedgerReadCanonicalSizeBoundary','TestLedgerReadMissingAndEmpty','TestLedgerReadNativeErrors','TestHostStateSurvivesReopenAndRefusesTampering','TestResourceCountUnknownGrowthRetainsSlot','TestResourceCountUnknownDeletionRetainsSlot','TestResourceCountFilesystemRefusalLeavesNoBucket','TestCapacityFenceFailureRetainsReservation','TestCapacityMutationAllocation','TestSaveCapacityConcurrentAdmission','TestMultipartPartsRespectNamespaceBudget']:
+  assert len(re.findall(r'^--- PASS: '+name+r' \(',t,re.M))==2,(n,name)
+ for size in [16777217,67108865]:
+  values=[int(v)for v in re.findall(r'ledger bytes='+str(size)+r' allocated bytes=(\d+)',t)];assert len(values)==2 and all(v<9437184 for v in values),(n,size,values)
+red=p/('export-'+json.loads((p/'red-start.json').read_text())['id']);expected=hashlib.sha256((p/'baseline-state.go.txt').read_bytes()).hexdigest();assert json.loads((red/'environment.json').read_text())['sourceSHA256']['internal/capacity/state.go']==expected;assert json.loads((e/'environment.json').read_text())['sourceSHA256']['benchmark/baseline-state.go.txt']==expected
+initial=p/('export-'+json.loads((p/'initial-start.json').read_text())['id']);oldSource=(initial/'source-state.go.txt').read_text().replace("// readStateFile caps allocation using the opened file's size and probes one\n// extra byte, refusing size changes instead of accepting a truncated prefix.\n",'').replace('readStateFile','readBoundedStateFile');assert oldSource==(e/'source-state.go.txt').read_text(),'Initial and final code differ beyond the documented comment/name adjustment'
+rows=json.loads((e/'measurements.json').read_text());assert len(rows['observations'])==64 and len(rows['commands'])==64 and all(r['iterations']==10 and r['maxRSSBytes']>0 for r in rows['observations'])
+analysis=[]
+for name in sorted({r['name']for r in rows['observations']}):
+ cell={'name':name,'labels':{}}
+ for label in ['A','B','C','D']:
+  values=[r for r in rows['observations']if r['name']==name and r['label']==label];assert len(values)==4
+  cell['labels'][label]={k:{'median':statistics.median(r[k]for r in values),'min':min(r[k]for r in values),'max':max(r[k]for r in values)}for k in ['ns','bytes','allocs','maxRSSBytes']}
+ cell['changePercent']={k:(100*(cell['labels']['B'][k]['median']/cell['labels']['A'][k]['median']-1)if cell['labels']['A'][k]['median'] else (0 if not cell['labels']['B'][k]['median']else None))for k in ['ns','bytes','allocs','maxRSSBytes']}
+ cell['sameBinaryControlTimePercent']=100*(cell['labels']['D']['ns']['median']/cell['labels']['C']['ns']['median']-1)
+ analysis.append(cell)
+(e/'comparison-analysis.json').write_text(json.dumps(analysis,indent=2)+'\n')
+(e/'validation-receipt.json').write_text(json.dumps({'checks':len(checks),'allPassed':True,'measurements':64,'regressionTopLevelTests':4,'nativeLeafCases':6,'ledgerInputLimitBytes':8388608,'oversizedAllocationBudgetBytes':9437184,'normalRepeats':2,'raceRepeats':2,'parentNormalRepeats':1,'parentRaceRepeats':1,'sources':json.loads((e/'environment.json').read_text())['sourceSHA256']},indent=2)+'\n')
+for c in analysis:
+ a,b=c['labels']['A'],c['labels']['B'];print(c['name'],f"time {a['ns']['median']/1e6:.3f}->{b['ns']['median']/1e6:.3f} ms ({c['changePercent']['ns']:+.2f}%)",f"bytes {a['bytes']['median']}->{b['bytes']['median']}",f"allocs {a['allocs']['median']}->{b['allocs']['median']}",f"AA {c['sameBinaryControlTimePercent']:+.2f}%")

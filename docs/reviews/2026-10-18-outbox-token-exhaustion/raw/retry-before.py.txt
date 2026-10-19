@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,base64,shutil
+p=Path('/private/tmp/stow-outbox-token-exhaustion-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');src=p/'export-cb725ebd-08c7-4461-a356-edfdff344e7d'
+plan=json.loads((p/'before-plan.json').read_text())
+for name in plan['sources']:
+ if name.endswith('_test.go'):(r/name).write_bytes((src/('source-'+Path(name).name+'.txt')).read_bytes())
+f=r/'internal/runthrough/outbox_token_exhaustion_controls_test.go';s=f.read_text();needle='\tcheckTokenPreconditionResult(t, f, kind)\n\tf.unchanged(t)';assert needle in s;s=s.replace(needle,'''\tcheckTokenPreconditionResult(t, f, kind)
+ if kind=="missing"||kind=="held"||kind=="terminal" {
+  var err error
+  f.data,err=os.ReadFile(f.path)
+  if err!=nil{t.Fatal(err)}
+ }
+\tf.unchanged(t)''');f.write_text(s)
+for suffix in ['start.json','plan.json','upload.log','deployments.json']:shutil.copy2(p/('before-'+suffix),p/('initial-before-'+suffix))
+plan['phase']='outbox-token-exhaustion-before-corrected-migration-control';(p/'before-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+updates={'internal/runthrough/outbox_token_exhaustion_controls_test.go':f.read_bytes(),'benchmark/active-plan.json':(p/'before-plan.json').read_bytes()}
+js="const fs=require('node:fs');const result=JSON.parse(fs.readFileSync('/results/cb725ebd-08c7-4461-a356-edfdff344e7d/run.json'));if(!result.complete)throw Error('Predecessor active');for(const[n,b]of Object.entries("+json.dumps({n:base64.b64encode(data).decode()for n,data in updates.items()})+"))fs.writeFileSync(n,Buffer.from(b,'base64'));console.log('Corrected only successful no-op migration expectation; allocator unchanged');"
+(p/'install-before-retry.js').write_text(js)

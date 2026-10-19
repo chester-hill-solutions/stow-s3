@@ -1,0 +1,15 @@
+node:internal/fs/promises:1281
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: EACCES: permission denied, open '/results/5520643d-d2cf-4ae1-b6a6-5452ca43e4d9/negative-control.log'
+    at async open (node:internal/fs/promises:1281:25)
+    at async writeFile (node:internal/fs/promises:1899:14)
+    at async file:///app/benchmark/negative-control.mjs:6:2 {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'open',
+  path: '/results/5520643d-d2cf-4ae1-b6a6-5452ca43e4d9/negative-control.log'
+}
+
+Node.js v25.9.0

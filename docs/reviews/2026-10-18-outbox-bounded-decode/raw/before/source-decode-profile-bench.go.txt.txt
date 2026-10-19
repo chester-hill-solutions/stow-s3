@@ -1,0 +1,49 @@
+package runthrough
+
+import (
+	"fmt"
+	"reflect"
+	"testing"
+	"time"
+)
+
+var decodeProfileSink outboxState
+
+func decodeProfileFixture(depth int, rich bool) outboxState {
+	if rich {
+		return protoBlockFixture(depth, true)
+	}
+	s := newOutboxState()
+	for n := 0; n < depth; n++ {
+		id := fmt.Sprintf("active-%08d", n)
+		s.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Version: "retained-version", CreatedAt: time.Unix(100+int64(n), int64(n)).UTC()}
+		id = fmt.Sprintf("prepared-%08d", n)
+		s.prepared[id] = OutboxEntry{ID: id, Prepared: true, Operation: OutboxPut, Bucket: "bucket", Key: id, CreatedAt: time.Unix(100+int64(n), int64(n)).UTC()}
+	}
+	return s
+}
+func BenchmarkOutboxDecodeProfile(b *testing.B) {
+	for _, rich := range []bool{false, true} {
+		b.Run(fmt.Sprintf("rich=%t", rich), func(b *testing.B) {
+			state := decodeProfileFixture(4096, rich)
+			data, err := encodeOutboxProto(state)
+			if err != nil {
+				b.Fatal(err)
+			}
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				decodeProfileSink, err = decodeOutboxProto(data)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+			b.StopTimer()
+			b.ReportMetric(float64(len(data)), "frame-B")
+			if !reflect.DeepEqual(decodeProfileSink, state) {
+				b.Fatal("profile fixture changed")
+			}
+			decodeProfileSink = outboxState{}
+		})
+	}
+}

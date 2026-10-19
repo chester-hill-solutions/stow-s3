@@ -1,0 +1,47 @@
+=== RUN   TestBucketCapacityConcurrentCreationRespectsReserve
+    capacity_bucket_concurrent_test.go:41: concurrent bucket admission: accepted=32 refused=0
+    capacity_bucket_concurrent_test.go:44: bucket accounting required later reconciliation: before={PayloadBytes:0 RecoveryBytes:3416 ReservedRecoveryBytes:16384 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:9959 ReservedRecoveryBytes:16384 PendingBytes:0 Operations:0} err=<nil>
+    capacity_bucket_concurrent_test.go:44: namespace capacity exhausted
+--- FAIL: TestBucketCapacityConcurrentCreationRespectsReserve (0.02s)
+=== RUN   TestBucketCapacityFenceFailureRetainsMetadata
+    capacity_bucket_fence_test.go:29: bucket fence result=<nil>
+--- FAIL: TestBucketCapacityFenceFailureRetainsMetadata (0.01s)
+=== RUN   TestBucketCapacityCreationChargesMetadata
+    capacity_bucket_test.go:61: bucket accounting required later reconciliation: before={PayloadBytes:0 RecoveryBytes:1826 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2235 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+--- FAIL: TestBucketCapacityCreationChargesMetadata (0.01s)
+=== RUN   TestBucketCapacityDeletionReleasesAfterReopen
+    capacity_bucket_test.go:97: bucket deletion retained metadata charge: before={PayloadBytes:0 RecoveryBytes:2247 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2247 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+    capacity_bucket_test.go:99: bucket accounting required later reconciliation: before={PayloadBytes:0 RecoveryBytes:2247 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:1838 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+--- FAIL: TestBucketCapacityDeletionReleasesAfterReopen (0.01s)
+=== RUN   TestBucketCapacityRefusalLeavesNoBucket
+    capacity_bucket_test.go:130: bucket creation bypassed the namespace recovery reserve
+--- FAIL: TestBucketCapacityRefusalLeavesNoBucket (0.07s)
+=== RUN   TestBucketCapacityHoldPreventsDeletion
+    capacity_bucket_test.go:170: held bucket was deleted: <nil>
+    capacity_bucket_test.go:173: held bucket disappeared: bucket not found
+--- FAIL: TestBucketCapacityHoldPreventsDeletion (0.01s)
+=== RUN   TestBucketCapacityConcurrentCreationRespectsReserve
+    capacity_bucket_concurrent_test.go:41: concurrent bucket admission: accepted=32 refused=0
+    capacity_bucket_concurrent_test.go:44: bucket accounting required later reconciliation: before={PayloadBytes:0 RecoveryBytes:3416 ReservedRecoveryBytes:16384 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:9958 ReservedRecoveryBytes:16384 PendingBytes:0 Operations:0} err=<nil>
+    capacity_bucket_concurrent_test.go:44: namespace capacity exhausted
+--- FAIL: TestBucketCapacityConcurrentCreationRespectsReserve (0.03s)
+=== RUN   TestBucketCapacityFenceFailureRetainsMetadata
+    capacity_bucket_fence_test.go:29: bucket fence result=<nil>
+--- FAIL: TestBucketCapacityFenceFailureRetainsMetadata (0.01s)
+=== RUN   TestBucketCapacityCreationChargesMetadata
+    capacity_bucket_test.go:61: bucket accounting required later reconciliation: before={PayloadBytes:0 RecoveryBytes:1826 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2235 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+--- FAIL: TestBucketCapacityCreationChargesMetadata (0.01s)
+=== RUN   TestBucketCapacityDeletionReleasesAfterReopen
+    capacity_bucket_test.go:97: bucket deletion retained metadata charge: before={PayloadBytes:0 RecoveryBytes:2247 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2247 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+    capacity_bucket_test.go:99: bucket accounting required later reconciliation: before={PayloadBytes:0 RecoveryBytes:2247 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:1838 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+--- FAIL: TestBucketCapacityDeletionReleasesAfterReopen (0.01s)
+=== RUN   TestBucketCapacityRefusalLeavesNoBucket
+    capacity_bucket_test.go:130: bucket creation bypassed the namespace recovery reserve
+--- FAIL: TestBucketCapacityRefusalLeavesNoBucket (0.10s)
+=== RUN   TestBucketCapacityHoldPreventsDeletion
+    capacity_bucket_test.go:170: held bucket was deleted: <nil>
+    capacity_bucket_test.go:173: held bucket disappeared: bucket not found
+--- FAIL: TestBucketCapacityHoldPreventsDeletion (0.01s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	0.299s
+FAIL

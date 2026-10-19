@@ -1,5 +1,10 @@
 # Remediation plan: code evaluation findings
 
+Current core correctness status: the [bounded closure register](reviews/2026-10-18-correctness-closure.md)
+evaluates nine historical leads: four reproduced fixes remain, four leads are
+closed, and one is optional strictness. Older follow-ups below are historical;
+they do not imply the current queue is empty.
+
 **Date:** 2026-10-14. **Baseline:** `main` @ `9cb61c2`, tag `v0.3.1`,
 `internal/version/version.go` = `0.3.1`, `stow-s3 0.3.1`.
 **Source of findings:** independent code evaluation (not the project's own

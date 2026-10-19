@@ -1,0 +1,3 @@
+package fs
+import("bytes";"context";"fmt";"os";"testing";"github.com/chester-hill-solutions/stow-s3/internal/storage")
+func TestReconcileEligibilityTrace(t *testing.T){for _,op:=range []string{"put","save"}{t.Run(op,func(t *testing.T){store,ns:=capacityScanFixture(t,"",0);_ = ns;fmt.Fprintln(os.Stderr,"STOW_REUSE_TRACE_BEGIN",op);opts:=storage.PutOptions{};if op=="save"{opts.RequestKey="trace"};_,err:=store.PutObject(context.Background(),"bucket","target",bytes.NewReader(bytes.Repeat([]byte("x"),64<<10)),opts);fmt.Fprintln(os.Stderr,"STOW_REUSE_TRACE_END",op);if err!=nil{t.Fatal(err)}})}}

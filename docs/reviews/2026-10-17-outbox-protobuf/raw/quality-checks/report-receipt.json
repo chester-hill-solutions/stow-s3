@@ -1,0 +1,58 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-17-outbox-protobuf.md": "c7472caa5bb79d4882cd4a2aa9adaf71a58ea33a0d06cb354640d045f04f8d0e",
+    "docs/outbox.md": "edbc48103417d708befb5e134e68226f3b0cdeda1326d9805e37b9f00f8a38b0",
+    "docs/reviews/2026-10-17-outbox-durability.md": "ef004b8f51899b9404b5c03c784703b1180f1fbb417489d9e0e2c0849fbc4982"
+  },
+  "reportSHA256": "c7472caa5bb79d4882cd4a2aa9adaf71a58ea33a0d06cb354640d045f04f8d0e",
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox.go": "cc0d821ca1d1e97b3d8861877a38128f1b13e28360568d744737f570989c86a1",
+    "internal/runthrough/outbox.go": "88d159c62ad454acbc87f9b85cf6bcc83bf83458aa496f9287d8450a3b7b172d",
+    "internal/runthrough/file_outbox_proto.go": "130d35e4180a35f27c975f320cfbac15b136c54db63c3119294adf59ee915860",
+    "internal/runthrough/file_outbox_proto_selector_test.go": "a9e8b753a652cdc681d5f757021817b89a725bb45124d899eb992e2b7a38fafb",
+    "internal/runthrough/file_outbox_proto_bench_test.go": "8f17fddf6a349f1133d515858e0f65384d521a04a038ea599880f2928dd651aa",
+    "internal/runthrough/file_outbox_proto_test.go": "ca5b1b0c28ddfa61109b8a504ec8fe4488f030d9480c9ea5eacb8c37fc8f5f5c",
+    "internal/runthrough/file_outbox_proto_native_test.go": "e6ae0c400d7b5658b731d8e19a0dd67fe65d29f55d98abb221f316dca00f323b",
+    "internal/runthrough/outbox_test.go": "14a9d97df02224434e6ee0ed0bd38a0c471ea14949d46eb10a791bb6f1af79bc",
+    "internal/runthrough/outbox_claim_test.go": "9942914a1d87c317e3bdf3839d1b49aa98d3a15aa555e51ff4ef465b343b2484",
+    "internal/runthrough/outboxpb/entry.proto": "a74a0a816ab8f6746ad15e3560bf5b3fafe954877bf8a6afc4180cdb78a3fad3",
+    "internal/runthrough/outboxpb/entry.pb.go": "6e01278e29f46eb7dc7161170ecdb85dfeb16511b9e20f38ff39fdfcf416926d",
+    "internal/runthrough/outboxpb/outbox.proto": "854204b8d38a6986194b6d72cb962892b855a86bd43f2093d2358c8d220d8dd1",
+    "internal/runthrough/outboxpb/outbox.pb.go": "2b3f36e4b2b327728f06b7ad0380c3ffa2f6a7628646e0b2b22f85e4b171b7e9",
+    "internal/runthrough/file_outbox_provenance_bench_test.go": "1a0fab94ebedcf41b7b7fa7eae4404ab40cffe26e3b151009ab668421263da62",
+    "scripts/baselines/go-quality.json": "e66a58afbdce004659586cfe71ddd1c4628b70ccf8b4250133aff6bc71877c65"
+  },
+  "railwayDeploymentId": "5d3249fc-74b1-40d0-80c7-69e2b2505937"
+}

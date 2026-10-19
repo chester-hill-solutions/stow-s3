@@ -1,0 +1,299 @@
+=== RUN   TestRunthroughOpeningErrorClosesReader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/reader
+    open_error_test.go:17: failed opening returned a reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error
+    open_error_test.go:17: failed opening returned a reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/nil
+--- FAIL: TestRunthroughOpeningErrorClosesReader (0.06s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/cached/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/adapter/reader (0.01s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/nil (0.00s)
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/reader
+    open_error_test.go:24: reader failed=true closes=0 want=1
+    open_error_test.go:24: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/close-error
+    open_error_test.go:24: reader failed=true closes=0 want=1
+    open_error_test.go:24: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/nil
+--- FAIL: TestRunthroughHeadOpeningErrorClosesReader (0.01s)
+    --- FAIL: TestRunthroughHeadOpeningErrorClosesReader/reader (0.00s)
+    --- FAIL: TestRunthroughHeadOpeningErrorClosesReader/close-error (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/nil (0.00s)
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+--- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback (0.01s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error (0.00s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error (0.00s)
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached
+--- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached (0.00s)
+=== RUN   TestRunthroughCommittedOpeningErrorPreserved
+    open_error_test.go:108: reader failed=true closes=0 want=1
+    open_error_test.go:108: reader failed=true file still open: <nil>
+--- FAIL: TestRunthroughCommittedOpeningErrorPreserved (0.00s)
+=== RUN   TestRunthroughOpeningErrorClosesReader
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/local/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/reader
+    open_error_test.go:17: failed opening returned a reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error
+    open_error_test.go:17: failed opening returned a reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/reader
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error
+=== RUN   TestRunthroughOpeningErrorClosesReader/cached/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/adapter/nil
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/reader
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+    open_error_test.go:17: reader failed=true closes=0 want=1
+    open_error_test.go:17: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughOpeningErrorClosesReader/retry/runtime/nil
+--- FAIL: TestRunthroughOpeningErrorClosesReader (0.04s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/local/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/local/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/cached/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/cached/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/adapter/nil (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/reader (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/cached/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/upstream/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/upstream/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/reopen/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/reopen/runtime/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/adapter/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/adapter/nil (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughOpeningErrorClosesReader/retry/runtime/close-error (0.00s)
+    --- PASS: TestRunthroughOpeningErrorClosesReader/retry/runtime/nil (0.00s)
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/reader
+    open_error_test.go:24: reader failed=true closes=0 want=1
+    open_error_test.go:24: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/close-error
+    open_error_test.go:24: reader failed=true closes=0 want=1
+    open_error_test.go:24: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughHeadOpeningErrorClosesReader/nil
+--- FAIL: TestRunthroughHeadOpeningErrorClosesReader (0.00s)
+    --- FAIL: TestRunthroughHeadOpeningErrorClosesReader/reader (0.00s)
+    --- FAIL: TestRunthroughHeadOpeningErrorClosesReader/close-error (0.00s)
+    --- PASS: TestRunthroughHeadOpeningErrorClosesReader/nil (0.00s)
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+=== RUN   TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error
+    open_error_test.go:81: reader failed=true closes=0 want=1
+    open_error_test.go:81: reader failed=true file still open: <nil>
+--- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback (0.01s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/reader (0.00s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/adapter/close-error (0.00s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/reader (0.00s)
+    --- FAIL: TestRunthroughMissingCacheReaderClosedBeforeFallback/runtime/close-error (0.00s)
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local
+=== RUN   TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached
+--- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/local (0.00s)
+    --- PASS: TestRunthroughHeadDoesNotOpenLocalOrCachedBodies/cached (0.00s)
+=== RUN   TestRunthroughCommittedOpeningErrorPreserved
+    open_error_test.go:108: reader failed=true closes=0 want=1
+    open_error_test.go:108: reader failed=true file still open: <nil>
+--- FAIL: TestRunthroughCommittedOpeningErrorPreserved (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.517s
+FAIL

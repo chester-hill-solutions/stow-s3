@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-clone-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-clone/raw';receipt=json.loads((raw/'final/report-receipt.json').read_text());stop=json.loads((p/'runner-stop-status.json').read_text());base=json.loads((p/'baseline.json').read_text())['base'];assert receipt['exitCode']==0 and stop['stopVerified']and all(x['exitCode']==0 for x in receipt['checks'])
+for n,h in {**receipt['documentSHA256'],**receipt['sourceSHA256']}.items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+assert hashlib.sha256(subprocess.check_output(['git','show',base+':internal/runthrough/outbox.go'],cwd=r)).hexdigest()==receipt['sourceSHA256']['internal/runthrough/outbox.go']
+assert subprocess.check_output(['git','diff','--name-only',base,'--','*.go','go.mod','go.sum'],cwd=r)==b''
+for n in ['internal/runthrough/outbox_clone_bench_test.go','internal/runthrough/outbox_clone_capacity_test.go']:
+ assert receipt['sourceSHA256'][n]==json.loads((raw/'proof/environment.json').read_text())['sourceSHA256'][n]
+a=json.loads((raw/'measure/comparison-analysis.json').read_text());assert a['observations']==288 and len(a['comparisons'])==36
+for variant in ['before','candidate']:
+ for mode in ['normal','race']:
+  rows=json.loads((raw/'proof/capacity-receipt.json').read_text())[variant+'-'+mode];assert rows['outcome']==('PASS'if variant=='before'else'FAIL')and len(rows['samples'])==2
+assert json.loads((raw/'final/green-receipt.json').read_text())['regressions']['focused-race']['passes']==56
+shutil.copy2(p/'runner-stop-status.json',raw/'runner-stop-status.json');shutil.copy2(p/'verify-final.py',raw/'verify-final.py.txt')
+result={'verified':True,'productionUnchanged':True,'base':json.loads((p/'baseline.json').read_text()),'sourceSHA256':receipt['sourceSHA256'],'documentSHA256':receipt['documentSHA256'],'comparisonObservations':288,'comparisonCells':36,'finalContractResourceCases':28,'passesPerMode':56,'teardown':stop}
+(raw/'review-verification.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified baseline production, exact final source/docs, capacity red/green evidence, all comparison cells and isolated teardown')

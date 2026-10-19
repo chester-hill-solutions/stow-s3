@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,hashlib,subprocess
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-completion-buffers/raw';j=json.loads((p/'final-start.json').read_text());e=p/('export-'+j['id']);receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0 and receipt['railwayDeploymentId']==j['deploymentId'];assert all(v['exitCode']==0 for v in receipt['checks'])
+capture=receipt['validationCaptureOnly'];assert capture['inventoryMaxBufferBytes']==16*1024*1024 and capture['preloadSHA256']==hashlib.sha256((p/'doc-links-capture.mjs').read_bytes()).hexdigest();assert capture['stockCheckerSHA256']==hashlib.sha256((r/'scripts/check-doc-links.mjs').read_bytes()).hexdigest()
+for n,h in receipt['documentSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,h in receipt['productionSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,v in json.loads((raw/'artifact-manifest.json').read_text()).items():
+ data=(raw/n).read_bytes();assert len(data)==v['bytes']and hashlib.sha256(data).hexdigest()==v['sha256'],n
+stop=json.loads((raw/'runner-stop-status.json').read_text());assert stop['stopVerified']and stop['runner']['id']==j['deploymentId']and stop['target']['id']=='e09d0550-2eaf-454b-883d-16a3d38e2ccb'and stop['target']['status']=='REMOVED'
+base=json.loads((p/'baseline.json').read_text())['base'];allowed={'internal/storage/fs/'+n for n in ['fs_multipart.go','fs_records.go','fs_atomic.go','capacity.go','completion_buffer_test.go','completion_buffer_verify_test.go','completion_capacity_version_test.go','completion_checksum_test.go']}|{'docs/reviews/2026-10-18-completion-buffers.md','scripts/baselines/go-quality.json'};assert not(r/'internal/storage/fs/completion_memory_probe_test.go').exists()
+for n in subprocess.check_output(['git','diff','--name-only',base],cwd=r).decode().splitlines():assert n in allowed or n.startswith('docs/reviews/2026-10-18-completion-buffers/raw/'),n
+for n in ['internal/storage/fs/'+n for n in ['fs_multipart.go','fs_records.go','fs_atomic.go','capacity.go']]:assert subprocess.check_output(['git','show',base+':'+n],cwd=r)==(p/('baseline-'+Path(n).name+'.txt')).read_bytes(),n
+print('Verified tested Go bytes, documentation, all source/evidence hashes, original source identity, scope and exact scratch teardown')

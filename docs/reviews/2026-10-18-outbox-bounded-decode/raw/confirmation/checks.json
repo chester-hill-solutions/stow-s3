@@ -1,0 +1,92 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/candidate-file_outbox_proto_decode.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "candidate-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/decode-candidate.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxDecode|TestFileOutboxDuplicateFlood)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2004,
+    "passed": true
+  },
+  {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/decode-candidate.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxDecode|TestFileOutboxDuplicateFlood)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 5100,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/decode-before-measure.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/decode-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1989,
+    "passed": true
+  },
+  {
+    "name": "candidate-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/decode-candidate-measure.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/decode-candidate.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2066,
+    "passed": true
+  },
+  {
+    "name": "confirmation",
+    "args": [
+      "node",
+      "benchmark/decode-confirmation.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 196482,
+    "passed": true
+  }
+]

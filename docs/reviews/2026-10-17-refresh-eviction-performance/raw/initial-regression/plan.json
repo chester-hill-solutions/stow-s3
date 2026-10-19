@@ -1,0 +1,47 @@
+{
+  "phase": "eviction-order-test-before",
+  "sources": [
+    "internal/runthrough/adapter.go",
+    "internal/runthrough/refresh_version_fixture_test.go",
+    "internal/runthrough/refresh_version_bench_test.go",
+    "internal/runthrough/refresh_eviction_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-tests",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/refresh_version_fixture_test.go",
+        "internal/runthrough/refresh_version_bench_test.go",
+        "internal/runthrough/refresh_eviction_test.go"
+      ]
+    },
+    {
+      "name": "reproduce",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestRefreshEviction(RetainsOpenedVersion|FailureClosesOpenedReader)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "fallback-controls",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestRefreshFallback|TestRefreshHead|TestRefreshConcurrent|TestRunthroughOpening|TestRunthroughMissing)",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

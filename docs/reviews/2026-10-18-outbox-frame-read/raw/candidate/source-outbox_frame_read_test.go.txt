@@ -1,0 +1,115 @@
+package runthrough
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
+)
+
+func TestOutboxFrameReaderStateParity(t *testing.T) {
+	frame, err := encodeOutboxProto(protoOutboxFixture())
+	if err != nil {
+		t.Fatal(err)
+	}
+	cases := map[string][]byte{"native": frame, "json": []byte(`{"version":3,"entries":{}}`), "legacy-map": []byte(`{}`), "null": []byte(`null`), "array": []byte(`[]`)}
+	for n := 0; n < outboxProtoPrefixSize; n++ {
+		cases[fmt.Sprintf("prefix-%d", n)] = frame[:n]
+	}
+	for n := 1; n <= 16; n++ {
+		cases[fmt.Sprintf("tail-%d", n)] = frame[:len(frame)-n]
+	}
+	for name, data := range cases {
+		t.Run(name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "outbox")
+			if err := os.WriteFile(path, data, 0600); err != nil {
+				t.Fatal(err)
+			}
+			want, oldErr := decodeOutboxState(data)
+			raw, readErr := readOutboxFile(path)
+			var got outboxState
+			err := readErr
+			if err == nil {
+				got, err = decodeOutboxState(raw)
+			}
+			if decodeErrorClass(err) != decodeErrorClass(oldErr) {
+				t.Fatalf("read changed error: old=%v new=%v", oldErr, err)
+			}
+			if err == nil && (!reflect.DeepEqual(got, want) || !bytes.Equal(raw, data)) {
+				t.Fatal("read changed bytes or state")
+			}
+		})
+	}
+}
+
+func frameRemainderFile(t *testing.T, data []byte) (*os.File, []byte) {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "outbox")
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { file.Close() })
+	prefix := make([]byte, outboxProtoPrefixSize)
+	if _, err := io.ReadFull(file, prefix); err != nil {
+		t.Fatal(err)
+	}
+	return file, prefix
+}
+
+func TestOutboxFrameReaderRejectsGrowthWithinBudget(t *testing.T) {
+	data := decodeFrame([]byte{8, 4})
+	file, _ := frameRemainderFile(t, data)
+	if err := os.Truncate(file.Name(), 8<<20); err != nil {
+		t.Fatal(err)
+	}
+	runtime.GC()
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	_, err := readOutboxRemainder(file, int64(len(data)), true)
+	runtime.ReadMemStats(&after)
+	if err == nil || !strings.Contains(err.Error(), "length") {
+		t.Fatalf("growing native frame accepted: %v", err)
+	}
+	if after.TotalAlloc-before.TotalAlloc > 1<<20 {
+		t.Fatal("growing native frame exceeded allocation budget")
+	}
+}
+
+func TestOutboxFrameReaderKeepsOpenedVersion(t *testing.T) {
+	data := decodeFrame([]byte{8, 4})
+	file, _ := frameRemainderFile(t, data)
+	replacement := decodeFrame(append([]byte{8, 4}, decodeVarint(5, 73)...))
+	temp := file.Name() + ".replacement"
+	if err := os.WriteFile(temp, replacement, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(temp, file.Name()); err != nil {
+		t.Fatal(err)
+	}
+	got, err := readOutboxRemainder(file, int64(len(data)), true)
+	if err != nil || !bytes.Equal(got, data) {
+		t.Fatalf("read mixed replacement versions: %v", err)
+	}
+}
+
+func TestOutboxFrameReaderLegacyGrowth(t *testing.T) {
+	data := []byte(`{"version":3,"entries":{}}`)
+	file, _ := frameRemainderFile(t, data)
+	want := append(append([]byte(nil), data...), bytes.Repeat([]byte(" "), 100)...)
+	if err := os.WriteFile(file.Name(), want, 0600); err != nil {
+		t.Fatal(err)
+	}
+	got, err := readOutboxRemainder(file, int64(len(data)), false)
+	if err != nil || !bytes.Equal(got, want) {
+		t.Fatalf("legacy read lost growing bytes: %v", err)
+	}
+}

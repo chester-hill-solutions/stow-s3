@@ -1,0 +1,52 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/resource_count_test.go",
+      "internal/storage/fs/capacity_resource_count_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 21,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/capacity",
+      "./internal/storage/fs",
+      "-run",
+      "^TestResourceCount",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 19015,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/capacity",
+      "./internal/storage/fs",
+      "-run",
+      "^TestResourceCount",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 37032,
+    "passed": true
+  }
+]

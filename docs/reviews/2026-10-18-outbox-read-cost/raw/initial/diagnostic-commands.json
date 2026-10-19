@@ -1,0 +1,1829 @@
+[
+  {
+    "name": "diagnostic-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-buildvcs=false",
+      "-o",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "./internal/runthrough"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:00:06.368Z",
+    "elapsedMs": 785,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "diagnostic-seed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^TestOutboxReadCostSeed$",
+      "-test.v",
+      "-test.count=1"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_SEED": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:07.153Z",
+    "elapsedMs": 585,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "diagnostic-race-smoke",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^$",
+      "-bench",
+      "^BenchmarkFileOutboxReadCost$",
+      "-benchtime=1x",
+      "-count=1",
+      "-cpu=4",
+      "-timeout=180s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:07.757Z",
+    "elapsedMs": 17022,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=1024-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:24.781Z",
+    "elapsedMs": 2575,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=1024-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:27.357Z",
+    "elapsedMs": 2466,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=1024-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:29.825Z",
+    "elapsedMs": 2709,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=1024-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:32.535Z",
+    "elapsedMs": 2557,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=1024-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:35.096Z",
+    "elapsedMs": 2447,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=1024-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:37.546Z",
+    "elapsedMs": 4385,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=16384-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:41.935Z",
+    "elapsedMs": 2386,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=16384-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:44.324Z",
+    "elapsedMs": 2198,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=16384-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:46.527Z",
+    "elapsedMs": 2654,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=16384-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:49.183Z",
+    "elapsedMs": 3140,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=16384-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:52.325Z",
+    "elapsedMs": 3366,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-mixed=16384-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:55.692Z",
+    "elapsedMs": 3244,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=0-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:00:58.938Z",
+    "elapsedMs": 2343,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=0-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:01.282Z",
+    "elapsedMs": 2991,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=0-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:04.275Z",
+    "elapsedMs": 3346,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=0-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:07.622Z",
+    "elapsedMs": 2386,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=0-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:10.009Z",
+    "elapsedMs": 5108,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=0-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:15.119Z",
+    "elapsedMs": 3373,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=16384-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:18.493Z",
+    "elapsedMs": 3858,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=16384-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:22.352Z",
+    "elapsedMs": 2886,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=16384-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:25.242Z",
+    "elapsedMs": 3002,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=16384-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:28.245Z",
+    "elapsedMs": 4181,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=16384-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:32.427Z",
+    "elapsedMs": 3408,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=16384-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:35.837Z",
+    "elapsedMs": 2680,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=2048-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:38.519Z",
+    "elapsedMs": 2659,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=2048-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:41.181Z",
+    "elapsedMs": 2528,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=2048-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:43.711Z",
+    "elapsedMs": 2617,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=2048-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:46.329Z",
+    "elapsedMs": 2328,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=2048-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:48.658Z",
+    "elapsedMs": 2675,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=2048-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:51.335Z",
+    "elapsedMs": 3735,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=262144-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:55.072Z",
+    "elapsedMs": 2532,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=262144-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:01:57.605Z",
+    "elapsedMs": 3258,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=262144-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:00.865Z",
+    "elapsedMs": 2737,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=262144-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:03.607Z",
+    "elapsedMs": 4430,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=262144-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:08.038Z",
+    "elapsedMs": 3950,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=262144-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:11.990Z",
+    "elapsedMs": 6822,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=65536-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:18.814Z",
+    "elapsedMs": 2329,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=65536-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:21.144Z",
+    "elapsedMs": 3372,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=65536-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:24.524Z",
+    "elapsedMs": 2860,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=65536-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:27.386Z",
+    "elapsedMs": 2959,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=65536-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:30.346Z",
+    "elapsedMs": 4163,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu1-provenance=65536-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=1",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:34.511Z",
+    "elapsedMs": 3057,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=65536-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:37.570Z",
+    "elapsedMs": 2926,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=65536-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:40.498Z",
+    "elapsedMs": 4019,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=65536-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:44.525Z",
+    "elapsedMs": 3402,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=65536-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:47.929Z",
+    "elapsedMs": 4328,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=65536-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:52.259Z",
+    "elapsedMs": 3273,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=65536-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:55.534Z",
+    "elapsedMs": 3095,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=262144-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:02:58.631Z",
+    "elapsedMs": 6985,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=262144-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:05.618Z",
+    "elapsedMs": 3801,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=262144-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:09.421Z",
+    "elapsedMs": 3177,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=262144-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:12.600Z",
+    "elapsedMs": 3759,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=262144-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:16.364Z",
+    "elapsedMs": 2802,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=262144-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=262144$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:19.167Z",
+    "elapsedMs": 2569,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=2048-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:21.740Z",
+    "elapsedMs": 3720,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=2048-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:25.462Z",
+    "elapsedMs": 3117,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=2048-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:28.581Z",
+    "elapsedMs": 3308,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=2048-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:31.891Z",
+    "elapsedMs": 2423,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=2048-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:34.315Z",
+    "elapsedMs": 2529,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=2048-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=2048$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:36.847Z",
+    "elapsedMs": 2677,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=16384-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:39.526Z",
+    "elapsedMs": 2629,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=16384-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:42.158Z",
+    "elapsedMs": 3310,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=16384-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:45.474Z",
+    "elapsedMs": 3370,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=16384-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:48.846Z",
+    "elapsedMs": 3296,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=16384-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:52.145Z",
+    "elapsedMs": 3323,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=16384-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:55.470Z",
+    "elapsedMs": 2581,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=0-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:03:58.053Z",
+    "elapsedMs": 3414,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=0-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:01.469Z",
+    "elapsedMs": 5090,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=0-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:06.560Z",
+    "elapsedMs": 2733,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=0-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:09.295Z",
+    "elapsedMs": 3516,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=0-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:12.813Z",
+    "elapsedMs": 2858,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-provenance=0-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=0$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:15.673Z",
+    "elapsedMs": 2425,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=16384-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:18.099Z",
+    "elapsedMs": 2907,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=16384-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:21.007Z",
+    "elapsedMs": 2565,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=16384-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:23.573Z",
+    "elapsedMs": 3434,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=16384-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:27.009Z",
+    "elapsedMs": 2310,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=16384-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:29.321Z",
+    "elapsedMs": 3184,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=16384-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=16384$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:32.506Z",
+    "elapsedMs": 4844,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=1024-changed",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^changed$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:37.352Z",
+    "elapsedMs": 4327,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=1024-unchanged",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^unchanged$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:41.680Z",
+    "elapsedMs": 3854,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=1024-lookup",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^lookup$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:45.537Z",
+    "elapsedMs": 2716,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=1024-decode",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^decode$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:48.255Z",
+    "elapsedMs": 2965,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=1024-unmarshal",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^unmarshal$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:51.222Z",
+    "elapsedMs": 2560,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "cell-cpu4-mixed=1024-read",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^mixed=1024$/^read$",
+      "-test.benchtime=1s",
+      "-test.count=2",
+      "-test.cpu=4",
+      "-test.benchmem",
+      "-test.timeout=90s"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:53.786Z",
+    "elapsedMs": 2932,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "lookup-cpu-profile",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=65536$/^lookup$",
+      "-test.benchtime=5s",
+      "-test.cpu=1",
+      "-test.cpuprofile=/results/fb39d2f6-6c73-42a3-a592-807992c1103a/lookup-cpu.pprof"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:04:56.720Z",
+    "elapsedMs": 8454,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "lookup-cpu-top",
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-nodecount=35",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/lookup-cpu.pprof"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:05:05.174Z",
+    "elapsedMs": 2349,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "lookup-alloc-profile",
+    "args": [
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "-test.run=^$",
+      "-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^lookup$",
+      "-test.benchtime=20x",
+      "-test.cpu=1",
+      "-test.memprofilerate=1",
+      "-test.memprofile=/results/fb39d2f6-6c73-42a3-a592-807992c1103a/lookup-alloc.pprof"
+    ],
+    "env": {
+      "STOW_OUTBOX_READ_COST_FIXTURES": "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/fixtures"
+    },
+    "startedAt": "2026-10-18T05:05:07.524Z",
+    "elapsedMs": 2924,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "lookup-alloc-space",
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-alloc_space",
+      "-nodecount=30",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/lookup-alloc.pprof"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:05:10.449Z",
+    "elapsedMs": 79,
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "lookup-alloc-objects",
+    "args": [
+      "go",
+      "tool",
+      "pprof",
+      "-top",
+      "-alloc_objects",
+      "-nodecount=30",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/readcost.test",
+      "/results/fb39d2f6-6c73-42a3-a592-807992c1103a/lookup-alloc.pprof"
+    ],
+    "env": {},
+    "startedAt": "2026-10-18T05:05:10.529Z",
+    "elapsedMs": 75,
+    "exitCode": 0,
+    "signal": null
+  }
+]

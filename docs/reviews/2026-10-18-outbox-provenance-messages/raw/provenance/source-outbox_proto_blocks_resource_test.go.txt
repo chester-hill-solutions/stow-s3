@@ -1,0 +1,65 @@
+package runthrough
+
+import (
+	"fmt"
+	"runtime"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestOutboxProtoBlockEarlyErrorAllocation(t *testing.T) {
+	state := newOutboxState()
+	for n := 0; n < 4096; n++ {
+		id := fmt.Sprintf("entry-%06d", n)
+		state.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id}
+	}
+	invalid := state.entries["entry-000000"]
+	invalid.CreatedAt = time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC)
+	state.entries[invalid.ID] = invalid
+	runtime.GC()
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	data, err := encodeOutboxProto(state)
+	runtime.ReadMemStats(&after)
+	allocated := after.TotalAlloc - before.TotalAlloc
+	fmt.Printf("STOWPROTOERROR: {\"allocatedBytes\":%d,\"entries\":4096}\n", allocated)
+	if err == nil || data != nil {
+		t.Fatal("invalid timestamp produced a frame")
+	}
+	if allocated > 512<<10 {
+		t.Fatal("early error allocated the whole message collection")
+	}
+	runtime.KeepAlive(state)
+}
+
+func TestOutboxProtoBlockReleasesInputBuffers(t *testing.T) {
+	runtime.GC()
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	frame, err := encodeProtoBlockStringViews()
+	if err != nil {
+		t.Fatal(err)
+	}
+	runtime.GC()
+	runtime.ReadMemStats(&after)
+	fmt.Printf("STOWPROTOHEAP: {\"heapBefore\":%d,\"heapAfter\":%d,\"frameBytes\":%d}\n", before.HeapAlloc, after.HeapAlloc, len(frame))
+	if after.HeapAlloc > before.HeapAlloc && after.HeapAlloc-before.HeapAlloc > 16<<20 {
+		t.Fatal("encoded frame retains caller backing buffers")
+	}
+	state, err := decodeOutboxProto(frame)
+	if err != nil || len(state.entries) != 64 {
+		t.Fatalf("retained frame changed: %v", err)
+	}
+	runtime.KeepAlive(frame)
+}
+
+func encodeProtoBlockStringViews() ([]byte, error) {
+	state := newOutboxState()
+	for n := 0; n < 64; n++ {
+		value := fmt.Sprintf("key-%08d", n) + strings.Repeat("x", 1<<20)
+		id := fmt.Sprintf("entry-%d", n)
+		state.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: value[:12], Version: "version"}
+	}
+	return encodeOutboxProto(state)
+}

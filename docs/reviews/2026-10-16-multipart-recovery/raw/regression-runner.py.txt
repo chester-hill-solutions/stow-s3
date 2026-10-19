@@ -1,0 +1,27 @@
+from pathlib import Path
+import os,subprocess,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-multipart-recovery-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+target=r/'internal/storage/fs/fs_multipart.go';candidate=target.read_bytes()
+pattern='TestMultipartManifestFailuresPreserveUpload|TestMultipartAbsentUploadKeepsNotFound|TestFilesystemMultipart(RecoveryRefusesDamagedManifest|ValidationPreservesUnknownReservation|ManifestWireErrors)'
+def run(name,cmd,want):
+ with (p/name).open('w') as f:
+  f.write('COMMAND '+repr(cmd)+'\n');f.flush()
+  q=subprocess.run(cmd,cwd=r,env=env,stdout=f,stderr=subprocess.STDOUT)
+ print(name,'exit',q.returncode,flush=True)
+ assert q.returncode==want,(name,q.returncode,want)
+try:
+ target.write_bytes((p/'fs_multipart.go.before.txt').read_bytes())
+ for name,flags in [('before-wire.log',[]),('before-race.log',['-race'])]:
+  run(name,['go','test',*flags,'./internal/storage/fs','./internal/runtime','./internal/s3api','-run',pattern,'-count=2','-v'],1)
+finally:target.write_bytes(candidate)
+for name,flags in [('after-tests.log',[]),('after-race.log',['-race'])]:
+ run(name,['go','test',*flags,'./internal/storage/fs','./internal/runtime','./internal/s3api','-run',pattern,'-count=2','-v'],0)
+probe=r/'internal/runtime/contract_audit_probe_test.go'
+assert not probe.exists()
+try:
+ probe.write_bytes((r/'docs/reviews/2026-10-16-storage-contract-audit/raw/filesystem-probes.go.txt').read_bytes())
+ for name,flags in [('original-after.log',[]),('original-after-race.log',['-race'])]:
+  run(name,['go','test',*flags,'./internal/runtime','-run','^TestContractAuditDiskCorruptUpload$','-count=2','-v'],0)
+finally:probe.unlink(missing_ok=True)
+files=['internal/storage/fs/fs_multipart.go','internal/storage/fs/multipart_manifest_test.go','internal/runtime/filesystem_multipart_recovery_test.go','internal/s3api/multipart_manifest_test.go','docs/compat-contract.md']
+(p/'source-freeze.json').write_text(json.dumps({name:dict(bytes=(r/name).stat().st_size,sha256=hashlib.sha256((r/name).read_bytes()).hexdigest())for name in files},indent=2)+'\n')

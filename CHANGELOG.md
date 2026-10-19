@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.2 — 2026-10-18
+
+Correct conditional COPY snapshots, ambiguous storage outcomes, short reads,
+recovery and namespace capacity accounting. Reduce measured COPY, read, multipart
+and outbox allocation costs. Outbox writes now use framed protobuf; older JSON
+journals migrate on write and older releases cannot read the new format.
+
+Four confirmed correctness limitations remain, including workspace create-only
+overwrite on an unreadable destination. See the [release notes](docs/releases/v0.3.2.md)
+for distribution, compatibility and the complete known-issue list.
+
 ## 0.3.1 — 2026-10-14
 
 Adds reproducible performance measurement tools and carefully scoped benchmark

@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,hashlib,base64,shutil,subprocess
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');candidate=p/'export-87fa5834-7457-46c3-965f-27f5ae181091';proof=p/'export-f7288dff-81a1-41c3-a2ea-f3bc714592fe'
+mem=json.loads((candidate/'retention-receipt.json').read_text());assert mem['samples']['candidate']['heapGrowth']>60<<20 and mem['samples']['before']['heapGrowth']<16<<20
+assert all(x['passed']for x in json.loads((candidate/'retention-regression-receipt.json').read_text())['checks'])
+for suffix in ['start.json','plan.json','upload.log','deployments.json']:shutil.copy2(p/('final-'+suffix),p/('candidate-final-'+suffix))
+shutil.copy2(p/'final-expected-sources.json',p/'candidate-expected-sources.json')
+old_expected=json.loads((p/'candidate-expected-sources.json').read_text());base=json.loads((p/'baseline.json').read_text())['base']
+updates={}
+for name in ['internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go']:
+ assert hashlib.sha256((r/name).read_bytes()).hexdigest()==old_expected[name]
+ data=subprocess.check_output(['git','show',base+':'+name],cwd=r);assert hashlib.sha256(data).hexdigest()==json.loads((proof/'environment.json').read_text())['sourceSHA256'][name]
+ (r/name).write_bytes(data);updates[name]=data
+name='internal/runthrough/write_cache_retention_test.go';data=(candidate/'source-retention_regression_test.go.txt').read_bytes();(r/name).write_bytes(data);updates[name]=data
+sources=['internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go','internal/runthrough/write_cache_contract_test.go','internal/runthrough/write_cache_retention_test.go'];expected={name:hashlib.sha256((r/name).read_bytes()).hexdigest()for name in sources};(p/'final-expected-sources.json').write_text(json.dumps(expected,indent=2)+'\n')
+plan=json.loads((p/'initial-final-plan.json').read_text());plan['phase']='outbox-write-cache-rejected-baseline-protected';plan['sources']=sources;plan['steps'][0]['args']=['gofmt','-w',*sources]
+verify="const fs=require('node:fs'),crypto=require('node:crypto');const expected="+json.dumps(expected)+";for(const[n,h]of Object.entries(expected))if(crypto.createHash('sha256').update(fs.readFileSync(n)).digest('hex')!==h)throw Error('Accepted source mismatch '+n);fs.writeFileSync(process.env.STOW_RESULT_ROOT+'/accepted-source-verification.json',JSON.stringify(expected,null,2)+'\\n');console.log('Original production source restored; both regression files verified');"
+plan['steps'][1]={'name':'accepted-source-verification','args':['node','-e',verify]};(p/'final-plan.json').write_text(json.dumps(plan,indent=2)+'\n');updates['benchmark/active-plan.json']=(p/'final-plan.json').read_bytes()
+js="const fs=require('node:fs'),crypto=require('node:crypto');const receipt=JSON.parse(fs.readFileSync('/results/87fa5834-7457-46c3-965f-27f5ae181091/retention-regression-receipt.json'));if(receipt.checks.some(x=>!x.passed))throw Error('Retention rejection proof required');const old="+json.dumps(old_expected)+";for(const n of ['internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go'])if(crypto.createHash('sha256').update(fs.readFileSync(n)).digest('hex')!==old[n])throw Error('Unexpected source edit '+n);for(const[n,b]of Object.entries("+json.dumps({n:base64.b64encode(b).decode()for n,b in updates.items()})+"))fs.writeFileSync(n,Buffer.from(b,'base64'));console.log('Restored byte-identical baseline production code and added measured retention regression');"
+(p/'install-baseline.js').write_text(js)
+print('Rejected runtime optimization; baseline production bytes restored; added measured retention regression')

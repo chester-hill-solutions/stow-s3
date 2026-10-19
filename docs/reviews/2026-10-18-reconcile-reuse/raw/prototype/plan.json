@@ -1,0 +1,184 @@
+{
+  "phase": "reconcile-reuse-prototype",
+  "sources": [
+    "internal/capacity/state.go",
+    "internal/capacity/admission.go",
+    "internal/capacity/reconcile_unchanged_test.go",
+    "benchmark/candidate-state.go.txt",
+    "benchmark/candidate-admission.go.txt",
+    "benchmark/candidate-overlay.json",
+    "benchmark/baseline-state.go.txt",
+    "benchmark/baseline-admission.go.txt",
+    "benchmark/before-overlay.json",
+    "benchmark/ledger-reuse-bench.go.txt",
+    "benchmark/mutation-reuse-bench.go.txt",
+    "benchmark/reuse-measure.mjs",
+    "benchmark/measure-child.py"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/reconcile_unchanged_test.go",
+        "benchmark/candidate-state.go.txt",
+        "benchmark/candidate-admission.go.txt"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/capacity",
+        "-run",
+        "^TestReconcileUnchanged",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/capacity",
+        "-run",
+        "^TestReconcileUnchanged",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "prototype-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/candidate-overlay.json",
+        "./internal/capacity",
+        "-run",
+        "^TestReconcileUnchanged",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 0
+    },
+    {
+      "name": "prototype-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/candidate-overlay.json",
+        "./internal/capacity",
+        "-run",
+        "^TestReconcileUnchanged",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 0
+    },
+    {
+      "name": "install-capacity-benchmark",
+      "args": [
+        "cp",
+        "benchmark/ledger-reuse-bench.go.txt",
+        "internal/capacity/ledger_reuse_bench_test.go"
+      ]
+    },
+    {
+      "name": "install-mutation-benchmark",
+      "args": [
+        "cp",
+        "benchmark/mutation-reuse-bench.go.txt",
+        "internal/storage/fs/ledger_reuse_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmarks",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/ledger_reuse_bench_test.go",
+        "internal/storage/fs/ledger_reuse_bench_test.go"
+      ]
+    },
+    {
+      "name": "snapshot-benchmarks",
+      "args": [
+        "node",
+        "-e",
+        "const fs=require('node:fs');for(const[p,n]of [['capacity','internal/capacity/ledger_reuse_bench_test.go'],['fs','internal/storage/fs/ledger_reuse_bench_test.go']])fs.copyFileSync(n,process.env.STOW_RESULT_ROOT+'/compiled-'+p+'-bench.go.txt')"
+      ]
+    },
+    {
+      "name": "build-capacity-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/capacity-before.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "build-capacity-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/candidate-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/capacity-after.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "build-fs-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/fs-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "build-fs-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/candidate-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/fs-after.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/reuse-measure.mjs"
+      ]
+    },
+    {
+      "name": "remove-benchmarks",
+      "args": [
+        "rm",
+        "internal/capacity/ledger_reuse_bench_test.go",
+        "internal/storage/fs/ledger_reuse_bench_test.go"
+      ]
+    }
+  ]
+}

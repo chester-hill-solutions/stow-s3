@@ -1,0 +1,76 @@
+{
+  "orders": [
+    [
+      "original",
+      "committed",
+      "phase"
+    ],
+    [
+      "original",
+      "phase",
+      "committed"
+    ],
+    [
+      "committed",
+      "original",
+      "phase"
+    ],
+    [
+      "committed",
+      "phase",
+      "original"
+    ],
+    [
+      "phase",
+      "original",
+      "committed"
+    ],
+    [
+      "phase",
+      "committed",
+      "original"
+    ]
+  ],
+  "groups": [
+    [
+      "^BenchmarkReadForSaveObservation$/^present$",
+      250000
+    ],
+    [
+      "^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$",
+      1000000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^get-tiny$",
+      250000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$",
+      50000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$",
+      100000
+    ]
+  ],
+  "cpus": [
+    1,
+    8
+  ],
+  "binaries": {
+    "original": {
+      "path": "/private/tmp/stow-save-body-failure/before.test",
+      "sha256": "2ff106bfb23ed1820e35d14b668b1773d5a5e48e2c63031288782dcc5cac07b3"
+    },
+    "committed": {
+      "path": "/private/tmp/stow-save-body-failure/after.test",
+      "sha256": "34e7566c334eeb38f3281016cffcd4adae5c6045503e4c493f6c13de6327a31e"
+    },
+    "phase": {
+      "path": "/private/tmp/stow-save-body-perf-repeat/final.test",
+      "sha256": "fe5ea5e08cb7a9f01947e5a086a596850fae4aa72163e1027734a1a370f802d5"
+    }
+  },
+  "samples_per_case_version_cpu": 6,
+  "excluded_samples": 0
+}

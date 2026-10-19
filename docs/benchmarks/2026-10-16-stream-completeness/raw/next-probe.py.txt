@@ -1,0 +1,14 @@
+from pathlib import Path
+import subprocess,os,json
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');out=Path('/private/tmp/stow-stream-completeness-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+probe=r/'internal/runtime/excess_body_review_probe_test.go';probe.write_text((out/'next-excess-probe.go.txt').read_text())
+try:
+ for baseline in [True,False]:
+  for race in [False,True]:
+   name='next-excess-'+('before' if baseline else 'after')+('-race' if race else '')+'.log'
+   cmd=['go','test']+(['-overlay',str(out/'baseline-overlay.json')] if baseline else [])+(['-race'] if race else [])+['./internal/runtime','-run','^TestReviewExcessObjectBody$','-count=2','-v']
+   p=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(out/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+p.stdout)
+   assert p.returncode==1 and p.stdout.count('excess body accepted:')==6,(name,p.stdout)
+   assert '[build failed]' not in p.stdout and 'DATA RACE' not in p.stdout
+   print(name,'six expected semantic failures',flush=True)
+finally:probe.unlink()

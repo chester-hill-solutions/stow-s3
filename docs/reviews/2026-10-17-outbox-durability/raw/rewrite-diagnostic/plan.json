@@ -1,0 +1,48 @@
+{
+  "phase": "outbox-provenance-before",
+  "sources": [
+    "internal/runthrough/file_outbox_provenance_test.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go",
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/provenance.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_provenance_test.go",
+        "internal/runthrough/file_outbox_provenance_bench_test.go"
+      ]
+    },
+    {
+      "name": "reproduce",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxUnchangedProvenanceDoesNotRewrite$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "outbox-controls",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestProvenance|TestPrepared|TestOutbox)",
+        "-skip",
+        "^TestFileOutboxUnchangedProvenanceDoesNotRewrite$",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+COMMAND ["make", "test-conformance"]
+STOW_CONFORMANCE_BACKEND=memory GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	20.450s
+STOW_CONFORMANCE_BACKEND=filesystem GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	92.720s
+STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=memory GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	20.719s
+STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=filesystem GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	39.282s
+Conformance failed cases: 0
