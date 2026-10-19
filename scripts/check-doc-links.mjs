@@ -36,9 +36,14 @@ export function linkProblems(markdown, source, directory = root) {
   return problems;
 }
 
+export function documentationFiles(directory = root) {
+  return [...new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
+    cwd: directory, encoding: "utf8", maxBuffer: 16 * 1024 * 1024,
+  }).split("\0"))].filter((path) => path.endsWith(".md") && existsSync(resolve(directory, path)));
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const files = [...new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: root, encoding: "utf8" }).split("\0"))]
-    .filter((path) => path.endsWith(".md") && existsSync(resolve(root, path)));
+  const files = documentationFiles();
   const problems = files.flatMap((path) => linkProblems(readFileSync(resolve(root, path), "utf8"), path));
   if (problems.length) {
     console.error(problems.join("\n"));
