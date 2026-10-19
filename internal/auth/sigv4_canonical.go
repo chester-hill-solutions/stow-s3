@@ -83,7 +83,7 @@ func canonicalHeaders(r *http.Request, signed []string) (string, string, error) 
 		if err != nil {
 			return "", "", err
 		}
-		headerMap[name] = normalizeHeaderValue(value)
+		headerMap[name] = value
 	}
 
 	ordered := make([]string, len(signed))
@@ -100,6 +100,10 @@ func canonicalHeaders(r *http.Request, signed []string) (string, string, error) 
 	return b.String(), strings.Join(ordered, ";"), nil
 }
 
+// signedHeaderValue returns the value a signed header contributes to the
+// canonical request: every value the request carries, each trimmed with its
+// inner whitespace collapsed, joined with a comma. The AWS SDK signs the whole
+// set, so a request carrying a value the signature did not cover must not verify.
 func signedHeaderValue(r *http.Request, name string) (string, error) {
 	switch name {
 	case "host":
@@ -110,13 +114,17 @@ func signedHeaderValue(r *http.Request, name string) (string, error) {
 		if host == "" {
 			return "", authError("AccessDenied", "missing host header")
 		}
-		return host, nil
+		return normalizeHeaderValue(host), nil
 	default:
-		value := headerValue(r.Header, name)
-		if value == "" {
+		values := headerValues(r.Header, name)
+		if len(values) == 0 {
 			return "", authError("AccessDenied", "missing signed header %q", name)
 		}
-		return value, nil
+		cleaned := make([]string, 0, len(values))
+		for _, value := range values {
+			cleaned = append(cleaned, normalizeHeaderValue(value))
+		}
+		return strings.Join(cleaned, ","), nil
 	}
 }
 

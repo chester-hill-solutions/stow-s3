@@ -39,13 +39,11 @@ type credentialScope struct {
 	service     string
 }
 
-// The Authorization header is the same material on every request and is parsed
-// by hand, which makes the parse a security boundary: everything downstream
-// trusts the access key, the signed headers and the signature it returns. A parse
-// that accepts what it should refuse is a hole, and so is one that repairs what
-// it should refuse — repairing means interpreting something the client did not
-// send, and a verifier that guesses at the client's intent is verifying something
-// other than what the client signed.
+// The Authorization header is parsed by hand, which makes the parse a security
+// boundary: everything downstream trusts the access key, the signed headers and
+// the signature it returns. Accepting what it should refuse is a hole, and so is
+// repairing it — repairing guesses at the client's intent, and a verifier that
+// guesses is verifying something other than what the client signed.
 func parseAuthorizationHeader(value string) (signedRequest, error) {
 	value = strings.TrimSpace(value)
 	if value == "" {
@@ -62,11 +60,10 @@ func parseAuthorizationHeader(value string) (signedRequest, error) {
 
 	// The grammar has exactly three components, and each may appear once.
 	//
-	// A repeat is not a variant to reconcile; it is a header that says two
-	// different things. Last-one-wins, which is what this did, means the meaning
-	// of the header depends on the order the components happen to arrive in: a
-	// request carrying a valid Credential and a substituted Signature is read as
-	// whichever of the two Signatures came last.
+	// A repeat is not a variant to reconcile; it is a header that says two different
+	// things. Last-one-wins, which is what this did, makes the meaning of the header
+	// depend on the order the components arrive in: a request carrying a valid
+	// Credential and a substituted Signature reads as whichever came last.
 	seen := make(map[string]struct{}, len(authorizationComponents))
 	for _, segment := range strings.Split(parts[1], ",") {
 		key, value, err := splitAuthorizationComponent(segment)
@@ -154,15 +151,13 @@ func parseCredentialScope(raw string) (credentialScope, error) {
 
 // parseSignedHeaders reads the SignedHeaders list strictly, or refuses it.
 //
-// The list is the client's statement of which headers it covered, and the signature
-// is computed over a canonical request naming exactly those. Every leniency here
-// authenticates a request against headers the client did not commit to, so all four
-// are refused: empty entries, which make "host;;x-amz-date" the same list as
-// "host;x-amz-date"; trimming and lowercasing; duplicates; and sorting, since the
-// canonical request embeds the list verbatim.
-//
-// AWS's own signer emits lower-case, semicolon-separated, ascending and
-// duplicate-free, so a conforming client is unaffected.
+// The list names the headers the signature covers, and the signature is computed
+// over a canonical request naming exactly those. Every leniency here
+// authenticates a request against headers the client did not commit to, so all
+// four are refused: empty entries, which make "host;;x-amz-date" the same list
+// as "host;x-amz-date"; trimming and lowercasing; duplicates; and sorting,
+// since the canonical request embeds the list verbatim. AWS's own signer emits
+// conforming lists, so a conforming client is unaffected.
 func parseSignedHeaders(raw string) ([]string, error) {
 	if raw == "" {
 		return nil, authError("AccessDenied", "malformed SignedHeaders")
@@ -255,6 +250,23 @@ func headerValue(headers http.Header, name string) string {
 	return ""
 }
 
+// headerValues returns every value a header carries, in request order. Two
+// spellings of one name are read alphabetically, so the order is stable.
+func headerValues(headers http.Header, name string) []string {
+	var keys []string
+	for k := range headers {
+		if strings.EqualFold(k, name) {
+			keys = append(keys, k)
+		}
+	}
+	sort.Strings(keys)
+	var values []string
+	for _, k := range keys {
+		values = append(values, headers[k]...)
+	}
+	return values
+}
+
 func verifySignedRequest(r *http.Request, creds Credentials, region string, maxSkew time.Duration, now time.Time) error {
 	sr, err := detectSignedRequest(r)
 	if err != nil {
@@ -277,8 +289,7 @@ func verifySignedRequest(r *http.Request, creds Credentials, region string, maxS
 		return err
 	}
 	// A signature is hex, so the comparison is over the hex. Case-folding it
-	// first would accept a signature that differs from the computed one only in
-	// case, which is not a signature anyone computed.
+	// first would accept a signature nobody computed.
 	if !hmac.Equal([]byte(sr.signature), []byte(expected)) {
 		return authError("SignatureDoesNotMatch", "signature mismatch")
 	}

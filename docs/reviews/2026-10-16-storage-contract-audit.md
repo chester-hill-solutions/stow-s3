@@ -1,7 +1,7 @@
 # Bounded storage contract audit — 2026-10-16
 
 Current core correctness status: the [bounded closure register](2026-10-18-correctness-closure.md)
-evaluates nine historical leads: three reproduced fixes remain, five leads are
+evaluates nine historical leads: two reproduced fixes remain, six leads are
 closed, and one is optional strictness. Older follow-ups below are historical;
 they do not imply the current queue is empty.
 
