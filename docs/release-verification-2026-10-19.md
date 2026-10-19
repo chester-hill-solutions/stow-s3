@@ -1,12 +1,13 @@
-# v0.3.3 reconciliation qualification — 2026-10-19 UTC
+# v0.3.3 qualification — 2026-10-19 UTC
 
 PR #78 was merged without PR #77's cleanup and snapshot fixes. The v0.3.2
 publication workflow was cancelled; the public tag remains fixed at
 `c97aa67c0697bec91f46cdcef82b814e5311fee8`. No GitHub release was published for
 that tag. This candidate combines that main revision with PR #77 head
-`e03efc95fe038b4f60958b85a5bf6138ea95e99f` and prepares
-[v0.3.3](releases/v0.3.3.md). Historical October 15/18 receipts qualify their
-named revisions only.
+`e03efc95fe038b4f60958b85a5bf6138ea95e99f` and the
+[workspace uncertainty correction](reviews/2026-10-19-workspace-uncertainty.md),
+and prepares [v0.3.3](releases/v0.3.3.md). Historical October 15/18 receipts
+qualify their named revisions only.
 
 ## Reconciliation
 
@@ -27,6 +28,23 @@ underlying close. The combined implementation passes. The initial validation als
 caught duplicate test declarations and excessive branching in the new test;
 both failures are preserved. The test assertions were separated into small
 helpers; the quality baseline is unchanged.
+
+## Workspace uncertainty correction
+
+C04 from the [bounded closure register](reviews/2026-10-18-correctness-closure.md)
+is closed on this candidate. A workspace path that could not be read was
+reported as an absent object, and a create-only write over that answer replaced
+bytes that were still there. Only a confirmed absence is reported as absence
+now; a path that could not be examined returns `storage.ErrObjectUncertain`
+with its cause joined, and the read path, the path resolution and the listing
+surface all carry the distinction.
+
+The red reproduction runs the pre-fix revisions of the changed files through a
+Go overlay, so the failure it reports is the product's answer and not a build
+error. The green steps run the corrected code. Both the workspace store and the
+HTTP boundary are covered, and the healthy controls — a readable object
+refusing a create-only write, a genuinely absent key staying absent, and a
+symlinked key staying absent — are retained.
 
 ## Qualification
 
@@ -56,6 +74,24 @@ comparison is not a timing or memory benchmark. The
 [scratch runner is verified removed](assessment-evidence/2026-10-19-reconciliation/runner-stop-status.json);
 the target service remains unchanged and stopped.
 
+The workspace uncertainty correction is qualified separately, because it changes
+the source the receipts above describe. Railway deployment
+`7200db6c-86a3-47a0-ba7b-6fa3925c383c` runs the same scratch service with the
+corrected tree: the pre-fix revisions behind a Go overlay for the red
+reproduction, the corrected code for the green run, the whole Go suite normally
+and under race, the four conformance profiles, vet, the quality, size and format
+gates, the site build and tests, and the documentation links. Its receipts and
+exact qualified source hashes are preserved under
+[workspace uncertainty evidence](assessment-evidence/2026-10-19-workspace-uncertainty/).
+The receipts above qualify `98d35cb` and are not reissued for this revision.
+
+That container does not deliver the parent-death signal, so the
+`internal/parentwatch` package is run as a separate step that expects the
+failure, beside a standard-library probe that shows the same fact directly. The
+package depends on nothing outside the standard library, so it cannot be
+affected by this change, and its test passes in the GitHub Actions lanes. The
+limitation is recorded rather than assumed.
+
 ## Costs, contracts and limitations
 
 Snapshot reconciliation now computes MD5 alongside its existing SHA-256 in a
@@ -72,9 +108,9 @@ measurement is claimed for the combined release. Earlier individual Railway
 measurements retain their original scope; historical benchmark attempts and
 failures imported from #77 remain unchanged. `git diff --check` reports carriage
 returns in those original session logs; the evidence bytes are intentionally
-preserved. All four known correctness findings remain disclosed in the
-[release notes](releases/v0.3.3.md), with workspace I/O mistaken for absence the
-highest-priority follow-up. No physical-crash or executed-live-provider claim is made.
+preserved. Three known correctness findings remain disclosed in the
+[release notes](releases/v0.3.3.md); the workspace I/O mistaken for absence is
+no longer among them. No physical-crash or executed-live-provider claim is made.
 
 Native GitHub downloads remain the selected publication channel. npm/PyPI
 publication remains deferred by the existing release policy. The required full

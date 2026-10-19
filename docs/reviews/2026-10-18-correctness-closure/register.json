@@ -1,7 +1,7 @@
 {
   "baseline": "b6d37430d731e03da3209f38b9737a99053765fe",
   "scopeFrozen": true,
-  "requiredFixes": 4,
+  "requiredFixes": 3,
   "closedLeads": 4,
   "optionalStrictness": 1,
   "leads": [
@@ -29,11 +29,14 @@
     {
       "id": "C04",
       "lead": "Workspace I/O uncertainty becomes absence and permits create-only overwrite",
-      "status": "open",
+      "status": "closed",
       "priority": 1,
       "severity": "high",
-      "evidence": "TestClosureWorkspaceUnreadable/unreadable",
-      "closureCriteria": [
+      "evidence": "TestACreateOnlyWriteDoesNotReplaceAnObjectItCannotRead; TestAListingDoesNotReportAnObjectItCannotReadAsAbsent; TestAnUnreadableObjectIsNotReportedAsMissing",
+      "closed": "2026-10-19",
+      "closureEvidence": "docs/reviews/2026-10-19-workspace-uncertainty.md",
+      "reason": "Only a confirmed absence is reported as absence. A path that cannot be examined returns storage.ErrObjectUncertain with its cause, so a create-only write is refused over bytes that are still there. Symlink confinement and true absence keep their existing answers.",
+      "closureCriteriaMet": [
         "Unreadable and otherwise uncertain native reads do not report confirmed absence.",
         "Create-only PUT does not replace an existing unreadable object; original bytes survive refusal and permission repair.",
         "True absence, healthy existing-object preconditions and symlink confinement remain correct.",

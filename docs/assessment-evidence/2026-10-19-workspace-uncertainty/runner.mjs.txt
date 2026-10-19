@@ -1,0 +1,153 @@
+// Plan runner for the C04 workspace-uncertainty qualification.
+//
+// It runs each step of the active plan as the unprivileged validation user, so
+// a file with no permissions is genuinely unreadable: a root process can read
+// it, and the reproduction would then pass without proving anything.
+//
+// Results land in $STOW_RESULT_ROOT/<job>/ so they can be collected over SSH
+// after the run finishes.
+import { createServer } from "node:http";
+import { spawn } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
+
+const resultsRoot = process.env.STOW_RESULT_ROOT || "/results";
+const planPath = process.env.STOW_PLAN || "/app/benchmark/active-plan.json";
+const token = process.env.BENCH_CONTROL_TOKEN || "";
+const uid = process.env.STOW_TEST_UID ? Number(process.env.STOW_TEST_UID) : 0;
+
+const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
+const job = crypto.randomUUID();
+const jobRoot = path.join(resultsRoot, job);
+fs.mkdirSync(jobRoot, { recursive: true });
+
+// The run-through addressing tests address a stub through "*.localhost", which
+// RFC 6761 reserves for loopback. A container's resolver does not always
+// answer for that name, and a request that never leaves the process looks
+// exactly like a client that addressed the request wrongly. The names are
+// mapped to loopback here so the test exercises the addressing it is about.
+try {
+  const hosts = fs.readFileSync("/etc/hosts", "utf8");
+  if (!hosts.includes("endpoint.localhost")) {
+    fs.appendFileSync("/etc/hosts", "127.0.0.1 endpoint.localhost photos.endpoint.localhost\n");
+    console.log("STOWRUNNER:hosts endpoint.localhost mapped to loopback");
+  }
+  const { lookup } = await import("node:dns");
+  for (const name of ["endpoint.localhost", "photos.endpoint.localhost"]) {
+    const addresses = await lookup(name, { all: true }).catch((error) => [{ address: `unresolved: ${error.code}` }]);
+    console.log(`STOWRUNNER:resolve ${name} ${addresses.map((a) => a.address).join(",")}`);
+  }
+} catch (error) {
+  console.log(`STOWRUNNER:hosts ${error && error.message}`);
+}
+
+let running = false;
+const results = [];
+
+function writeJSON(name, value) {
+  fs.writeFileSync(path.join(jobRoot, name), JSON.stringify(value, null, 2) + "\n");
+}
+
+function runStep(step) {
+  const [cmd, ...args] = step.args;
+  const logPath = path.join(jobRoot, `${step.name}.log`);
+  const fd = fs.openSync(logPath, "w");
+  const started = new Date().toISOString();
+  const options = {
+    cwd: step.cwd || "/app",
+    env: {
+      ...process.env,
+      // The steps run as the unprivileged validation user, so the Go build
+      // cache and home have to belong to that user: the container's root home
+      // is not writable by it.
+      HOME: "/home/stow-validation",
+      GOCACHE: "/home/stow-validation/.cache/go-build",
+      GOPATH: "/go",
+      GOMODCACHE: "/go/pkg/mod",
+      // The validation repository is owned by the validation user, and the
+      // steps are the ones that read it.
+      GIT_CONFIG_COUNT: "1",
+      GIT_CONFIG_KEY_0: "safe.directory",
+      GIT_CONFIG_VALUE_0: "/app",
+      ...(step.env || {}),
+    },
+    stdio: ["ignore", fd, fd],
+  };
+  if (uid && process.getuid && process.getuid() === 0) {
+    options.uid = uid;
+    options.gid = uid;
+  }
+  return new Promise((resolve) => {
+    const child = spawn(cmd, args, options);
+    child.on("error", (error) => {
+      fs.writeSync(fd, `\nrunner could not start ${step.name}: ${error}\n`);
+      fs.closeSync(fd);
+      resolve({ name: step.name, exit: 127, expected: step.expected ?? 0, started, finished: new Date().toISOString() });
+    });
+    child.on("close", (code) => {
+      fs.closeSync(fd);
+      resolve({ name: step.name, exit: code, expected: step.expected ?? 0, started, finished: new Date().toISOString() });
+    });
+  });
+}
+
+async function runAll() {
+  writeJSON("progress.json", { job, phase: plan.phase, started: new Date().toISOString(), results });
+  for (const step of plan.steps) {
+    const result = await runStep(step);
+    results.push(result);
+    writeJSON("progress.json", { job, phase: plan.phase, started: new Date().toISOString(), results });
+  }
+  const success = results.every((r) => r.exit === r.expected);
+  writeJSON("run.json", {
+    complete: true,
+    success,
+    job,
+    phase: plan.phase,
+    checks: results.length,
+    results,
+    finished: new Date().toISOString(),
+  });
+  writeJSON("progress.json", { job, phase: plan.phase, complete: true, success, results });
+}
+
+const server = createServer((req, res) => {
+  // The platform healthcheck carries no token, so it is answered first and
+  // unauthenticated. It reports that the runner is up, nothing about the plan.
+  if (req.url === "/health") {
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ status: "ok", job, steps: plan.steps.length }));
+    return;
+  }
+  if (token && req.headers.authorization !== `Bearer ${token}`) {
+    res.writeHead(401);
+    res.end("unauthorized");
+    return;
+  }
+  if (req.url === "/run") {
+    if (running) {
+      res.writeHead(409);
+      res.end("a run is already in progress");
+      return;
+    }
+    running = true;
+    runAll().catch((error) => {
+      writeJSON("run.json", { complete: true, success: false, job, error: String((error && error.stack) || error), results });
+    });
+    res.writeHead(202, { "content-type": "application/json" });
+    res.end(JSON.stringify({ job }));
+    return;
+  }
+  if (req.url === "/status") {
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ job, running, results }));
+    return;
+  }
+  res.writeHead(404);
+  res.end();
+});
+
+server.listen(Number(process.env.PORT || 8082), "0.0.0.0", () => {
+  console.log(`STOWRUNNER:ready job=${job} steps=${plan.steps.length}`);
+});
