@@ -1,5 +1,10 @@
 # Stow codebase map and immediate correctness review
 
+Current core correctness status: the [bounded closure register](2026-10-18-correctness-closure.md)
+evaluates nine historical leads: four reproduced fixes remain, four leads are
+closed, and one is optional strictness. Older follow-ups below are historical;
+they do not imply the current queue is empty.
+
 Follow-up: **the confirmed native A1–A3 correctness queue is now corrected**.
 The final [filesystem completion change](2026-10-17-filesystem-completion.md) retains
 published metadata and accounting after cleanup failure, validated on Railway.

@@ -1,5 +1,10 @@
 # Bounded storage contract audit — 2026-10-16
 
+Current core correctness status: the [bounded closure register](2026-10-18-correctness-closure.md)
+evaluates nine historical leads: four reproduced fixes remain, four leads are
+closed, and one is optional strictness. Older follow-ups below are historical;
+they do not imply the current queue is empty.
+
 Performance follow-up: [oversized cache admission](2026-10-17-refresh-eviction-performance.md) removes a measured cache fill/evict/refetch cycle without reopening the completed correctness queue.
 
 Follow-up: [Railway performance requalification and directory-path reuse](2026-10-17-part-listing-performance.md)

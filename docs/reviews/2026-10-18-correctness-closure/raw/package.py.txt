@@ -1,0 +1,31 @@
+from pathlib import Path
+import json,subprocess,shutil,hashlib,tarfile
+p=Path('/private/tmp/stow-correctness-closure-2026-10-18');old=Path('/private/tmp/stow-completion-buffer-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True);manifest={}
+for n in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0'):
+ if not n:continue
+ f=r/n
+ if not f.is_file():continue
+ dst=c/n;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dst);manifest[n]=hashlib.sha256(f.read_bytes()).hexdigest()
+(p/'source-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');shutil.copy2(p/'source-manifest.json',c/'benchmark/validation-input-manifest.json')
+for n in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs','measure-child.py']:shutil.copy2(old/'context/benchmark'/n,c/'benchmark'/n)
+shutil.copy2(p/'doc-links-capture.mjs',c/'benchmark/doc-links-capture.mjs')
+probes={'workspace_probe':'internal/storage/workspace/closure_probe_test.go','auth_sdk_probe':'internal/auth/closure_sdk_probe_test.go','auth_query_probe':'internal/auth/closure_query_probe_test.go','etag_probe':'internal/s3api/closure_etag_probe_test.go'}
+for n,dst in probes.items():shutil.copy2(p/(n+'.go.txt'),c/'benchmark'/(n+'.go.txt'))
+steps=[{'name':'closed-normal','args':['go','test','./internal/policystore','./internal/storage/workspace','./internal/runthrough','./internal/storage/fs','./internal/auth','-run','^(TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead|TestAnExpiredRecoveryHoldStopsBlocking|TestEffectiveWritePolicy.*|TestStartupBannerReflectsEffectiveWritePolicy|TestCapacityFenceFailureRetainsReservation|TestCapacityWriteFailureBeforeRenameCanReconcile|TestMalformedSignedHeadersAreRefused|TestRepeatedAuthorizationComponentsAreRefused|TestOrdinaryRepeatedQueryParametersStillCanonicalize)$','-count=2','-v']},{'name':'closed-race','args':['go','test','-race','./internal/policystore','./internal/storage/workspace','./internal/runthrough','./internal/storage/fs','./internal/auth','-run','^(TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead|TestAnExpiredRecoveryHoldStopsBlocking|TestEffectiveWritePolicy.*|TestStartupBannerReflectsEffectiveWritePolicy|TestCapacityFenceFailureRetainsReservation|TestCapacityWriteFailureBeforeRenameCanReconcile|TestMalformedSignedHeadersAreRefused|TestRepeatedAuthorizationComponentsAreRefused|TestOrdinaryRepeatedQueryParametersStillCanonicalize)$','-count=2','-v']}]
+for n,dst in probes.items():steps.append({'name':'install-'+n,'args':['cp','benchmark/'+n+'.go.txt',dst]})
+steps.append({'name':'format-probes','args':['gofmt','-w',*probes.values()]})
+steps.append({'name':'capture-probes','args':['node','-e',"const fs=require('node:fs'),p="+json.dumps(probes)+";for(const[n,f]of Object.entries(p))fs.copyFileSync(f,process.env.STOW_RESULT_ROOT+'/'+n+'.formatted.go.txt');fs.copyFileSync('/go/pkg/mod/github.com/aws/aws-sdk-go-v2@v1.47.2/aws/signer/v4/v4.go',process.env.STOW_RESULT_ROOT+'/sdk-v4.go.txt')"]})
+for package,pattern in [('workspace','^TestClosureWorkspaceUnreadable$'),('auth','^TestClosure'),('s3api','^TestClosureETagCase$')]:
+ for race in [False,True]:
+  args=['go','test']+(['-race']if race else[])+['./internal/'+('storage/workspace'if package=='workspace'else package),'-run',pattern,'-count=2','-v'];steps.append({'name':package+('-race'if race else'-normal'),'args':args,'expected':1})
+steps.extend([{'name':'cleanup-probes','args':['rm',*probes.values()]},{'name':'vet','args':['go','vet','./internal/auth','./internal/storage/workspace','./internal/storage/fs','./internal/policystore','./internal/runthrough','./internal/s3api']},{'name':'quality','args':['make','check-go-quality','check-file-size','format-check']},{'name':'site-build','args':['npm','run','build','--prefix','site']},{'name':'site-tests','args':['npm','test','--prefix','site']},{'name':'doc-links','args':['node','--import','./benchmark/doc-links-capture.mjs','scripts/check-doc-links.mjs']}])
+plan={'phase':'bounded-correctness-closure','sources':['internal/storage/workspace/resolve.go','internal/storage/workspace/rooted_reads.go','internal/storage/workspace/objects.go','internal/storage/preconditions.go','internal/auth/sigv4.go','internal/auth/sigv4_canonical.go','internal/policystore/store.go','internal/runthrough/writepolicy.go','internal/storage/workspace/recovery_holds.go']+['benchmark/'+n+'.go.txt'for n in probes]+['benchmark/doc-links-capture.mjs'],'steps':steps};(p/'red-plan.json').write_text(json.dumps(plan,indent=2)+'\n');shutil.copy2(p/'red-plan.json',c/'benchmark/active-plan.json')
+base=c/'benchmark/validation-previous-baselines';base.mkdir(exist_ok=True)
+for f in (r/'scripts/baselines').iterdir():
+ if f.is_file():shutil.copy2(f,base/f.name)
+u=p/'upload';(u/'benchmark').mkdir(parents=True,exist_ok=True);(u/'site').mkdir(exist_ok=True)
+for n in ['go.mod','go.sum','site/package.json','site/package-lock.json']:shutil.copy2(c/n,u/n)
+shutil.copy2(p/'transport-Dockerfile.txt',u/'benchmark/Dockerfile');archive=u/'validation-source.tar.gz';files=[f for f in sorted(c.rglob('*'))if f.is_file()]
+with tarfile.open(archive,'w:gz',compresslevel=9)as t:
+ for f in files:t.add(f,arcname=str(f.relative_to(c)),recursive=False)
+(p/'transport-receipt.json').write_text(json.dumps({'archiveBytes':archive.stat().st_size,'archiveSHA256':hashlib.sha256(archive.read_bytes()).hexdigest(),'contentsFiles':len(files)},indent=2)+'\n');print('Packaged',len(manifest),'tracked files;',len(steps),'steps;',archive.stat().st_size,'bytes')

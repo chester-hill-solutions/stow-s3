@@ -1,0 +1,27 @@
+from pathlib import Path
+import json,hashlib
+p=Path('/private/tmp/stow-correctness-closure-2026-10-18');jobs={n:p/('export-'+json.loads((p/(n+'-start.json')).read_text())['id'])for n in ['red','final']};receipt={'scopeLeads':9,'requiredFixes':4,'closedLeads':4,'optionalStrictness':1,'productionChanged':False,'normalAndRaceRepeats':2,'checks':{}}
+for phase,count in [('red',22),('final',7)]:
+ e=jobs[phase];run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(c['passed']for c in checks);receipt['checks'][phase]=count
+ for name in (['workspace-normal','workspace-race','auth-normal','auth-race','closed-normal','closed-race']if phase=='red'else['s3api-normal','s3api-race']):
+  text=(e/(name+'.log')).read_text();assert '[build failed]'not in text and '--- SKIP:'not in text and 'WARNING: DATA RACE'not in text,name
+  if name.startswith('closed-'):assert '--- FAIL:'not in text
+  if name.startswith('workspace-'):
+   for disposition,case in [('PASS','healthy'),('FAIL','unreadable')]:assert text.count('--- '+disposition+': TestClosureWorkspaceUnreadable/'+case+' ')==2
+   assert text.count('retained bytes="old"')==2 and text.count('retained bytes="new"')==2
+  if name.startswith('auth-'):
+   for case in ['TestClosureRepeatedHeaderValidSDK/single','TestClosureUnsignedPayloadCase/UNSIGNED-PAYLOAD','TestClosureEncodedQuery/ascii','TestClosureReferenceSignedQuery/ascii','TestClosureNodeSDKQuery/ascii']:assert text.count('--- PASS: '+case+' ')==2
+   for case in ['TestClosureRepeatedHeaderValidSDK/repeated','TestClosureUnsignedPayloadCase/unsigned-payload','TestClosureEncodedQuery/encoded-key','TestClosureReferenceSignedQuery/encoded-key','TestClosureNodeSDKQuery/encoded-key','TestClosureRepeatedHeaderMutation']:assert text.count('--- FAIL: '+case+' ')==2
+  if name.startswith('s3api-'):
+   assert 'Content-Length required'not in text
+   for case in ['put-match','put-none','copy-match','copy-none']:
+    assert text.count('--- PASS: TestClosureETagCase/'+case+'/caseChanged=false ')==2,(name,case,'control')
+    assert text.count('--- FAIL: TestClosureETagCase/'+case+'/caseChanged=true ')==2,(name,case,'adverse')
+   assert text.count('opaque ETag comparison folded case:')==8
+ ehash=json.loads((e/'environment.json').read_text());inputs=json.loads((p/'source-manifest.json').read_text())
+ for n,h in ehash['sourceSHA256'].items():
+  if n.endswith('.go'):assert inputs[n]==h,n
+sdk=json.loads((jobs['red']/'node-sdk-receipt.json').read_text());assert sdk['version']=='5.7.4' and sdk['signatures']==2
+assert hashlib.sha256((jobs['red']/'node-sdk-signer.js.txt').read_bytes()).hexdigest()==sdk['sourceSHA256']
+receipt.update({'nodeSignerVersion':sdk['version'],'nodeSignerSHA256':sdk['sourceSHA256'],'requiredDefectFailingLeafExecutionsPerMode':20,'healthyLeafExecutionsPerMode':20,'optionalStrictnessFailingLeavesPerMode':2,'initialS3PutQualified':False,'correctedS3PutQualified':True,'raceReports':0,'probeSkips':0})
+(p/'validation-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

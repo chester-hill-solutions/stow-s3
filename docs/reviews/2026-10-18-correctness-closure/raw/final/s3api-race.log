@@ -1,0 +1,87 @@
+=== RUN   TestClosureETagCase
+=== RUN   TestClosureETagCase/put-match/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 200 164.138µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=200 expected=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <PutObjectResult><ETag>&#34;f5300127f646a4550bc4a04fbe393e79&#34;</ETag></PutObjectResult>
+=== RUN   TestClosureETagCase/put-match/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 200 72.729µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=200 expected=412 body=<?xml version="1.0" encoding="UTF-8"?>
+        <PutObjectResult><ETag>&#34;f5300127f646a4550bc4a04fbe393e79&#34;</ETag></PutObjectResult>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=200 want=412
+=== RUN   TestClosureETagCase/put-none/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 412 102.109µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=412 expected=412 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/source</Resource><RequestId>b8abeebfd5b107b416d33e464219d9a3</RequestId></Error>
+=== RUN   TestClosureETagCase/put-none/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 412 59.81µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=412 expected=200 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/source</Resource><RequestId>9cd9273349b1e531997dc31ced0af517</RequestId></Error>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=412 want=200
+=== RUN   TestClosureETagCase/copy-match/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 200 84.649µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=200 expected=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:21:04Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+=== RUN   TestClosureETagCase/copy-match/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 200 49.099µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=200 expected=412 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:21:04Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=200 want=412
+=== RUN   TestClosureETagCase/copy-none/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 412 70.999µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=412 expected=412 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>36869a22e3133e9cd8c6d017683e9dd8</RequestId></Error>
+=== RUN   TestClosureETagCase/copy-none/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 412 62.289µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=412 expected=200 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>fec1526804f8fd6a8baf7f63b53d94be</RequestId></Error>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=412 want=200
+--- FAIL: TestClosureETagCase (0.00s)
+    --- PASS: TestClosureETagCase/put-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-match/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/put-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-none/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-match/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-none/caseChanged=true (0.00s)
+=== RUN   TestClosureETagCase
+=== RUN   TestClosureETagCase/put-match/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 200 51.799µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=200 expected=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <PutObjectResult><ETag>&#34;f5300127f646a4550bc4a04fbe393e79&#34;</ETag></PutObjectResult>
+=== RUN   TestClosureETagCase/put-match/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 200 52.22µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=200 expected=412 body=<?xml version="1.0" encoding="UTF-8"?>
+        <PutObjectResult><ETag>&#34;f5300127f646a4550bc4a04fbe393e79&#34;</ETag></PutObjectResult>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=200 want=412
+=== RUN   TestClosureETagCase/put-none/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 412 58µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=412 expected=412 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/source</Resource><RequestId>22bc19ca13ea62164733250a4c56761d</RequestId></Error>
+=== RUN   TestClosureETagCase/put-none/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 412 56.109µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=412 expected=200 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/source</Resource><RequestId>833eaf3833a49e9eebaa68d2134ad9ad</RequestId></Error>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=412 want=200
+=== RUN   TestClosureETagCase/copy-match/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 200 75.179µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=200 expected=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:21:04Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+=== RUN   TestClosureETagCase/copy-match/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 200 40.54µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=200 expected=412 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:21:04Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=200 want=412
+=== RUN   TestClosureETagCase/copy-none/caseChanged=false
+2026/10/19 00:21:04 PUT /s3 412 50.849µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=412 expected=412 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>1bdc1950f70fa5f53a9f364494f696cc</RequestId></Error>
+=== RUN   TestClosureETagCase/copy-none/caseChanged=true
+2026/10/19 00:21:04 PUT /s3 412 43.92µs
+    closure_etag_probe_test.go:65: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=412 expected=200 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>5657594e22cbe7c47f6c52bab061829a</RequestId></Error>
+    closure_etag_probe_test.go:67: opaque ETag comparison folded case: got=412 want=200
+--- FAIL: TestClosureETagCase (0.00s)
+    --- PASS: TestClosureETagCase/put-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-match/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/put-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-none/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-match/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-none/caseChanged=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/s3api	0.012s
+FAIL

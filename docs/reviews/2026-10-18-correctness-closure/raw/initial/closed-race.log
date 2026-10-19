@@ -1,0 +1,206 @@
+=== RUN   TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead
+--- PASS: TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead (0.00s)
+=== RUN   TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead
+--- PASS: TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policystore	1.015s
+=== RUN   TestAnExpiredRecoveryHoldStopsBlocking
+--- PASS: TestAnExpiredRecoveryHoldStopsBlocking (0.02s)
+=== RUN   TestAnExpiredRecoveryHoldStopsBlocking
+--- PASS: TestAnExpiredRecoveryHoldStopsBlocking (0.01s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	1.040s
+=== RUN   TestEffectiveWritePolicy
+=== RUN   TestEffectiveWritePolicy/read-through_without_consent_stays_local
+=== RUN   TestEffectiveWritePolicy/read-through_with_consent_propagates
+=== RUN   TestEffectiveWritePolicy/mirrorWrites_without_consent_stays_local
+=== RUN   TestEffectiveWritePolicy/mirrorWrites_with_consent_propagates
+=== RUN   TestEffectiveWritePolicy/no_policy_with_consent_propagates
+--- PASS: TestEffectiveWritePolicy (0.00s)
+    --- PASS: TestEffectiveWritePolicy/read-through_without_consent_stays_local (0.00s)
+    --- PASS: TestEffectiveWritePolicy/read-through_with_consent_propagates (0.00s)
+    --- PASS: TestEffectiveWritePolicy/mirrorWrites_without_consent_stays_local (0.00s)
+    --- PASS: TestEffectiveWritePolicy/mirrorWrites_with_consent_propagates (0.00s)
+    --- PASS: TestEffectiveWritePolicy/no_policy_with_consent_propagates (0.00s)
+=== RUN   TestEffectiveWritePolicyHonoursAWithheldGrant
+--- PASS: TestEffectiveWritePolicyHonoursAWithheldGrant (0.00s)
+=== RUN   TestStartupBannerReflectsEffectiveWritePolicy
+--- PASS: TestStartupBannerReflectsEffectiveWritePolicy (0.00s)
+=== RUN   TestEffectiveWritePolicy
+=== RUN   TestEffectiveWritePolicy/read-through_without_consent_stays_local
+=== RUN   TestEffectiveWritePolicy/read-through_with_consent_propagates
+=== RUN   TestEffectiveWritePolicy/mirrorWrites_without_consent_stays_local
+=== RUN   TestEffectiveWritePolicy/mirrorWrites_with_consent_propagates
+=== RUN   TestEffectiveWritePolicy/no_policy_with_consent_propagates
+--- PASS: TestEffectiveWritePolicy (0.00s)
+    --- PASS: TestEffectiveWritePolicy/read-through_without_consent_stays_local (0.00s)
+    --- PASS: TestEffectiveWritePolicy/read-through_with_consent_propagates (0.00s)
+    --- PASS: TestEffectiveWritePolicy/mirrorWrites_without_consent_stays_local (0.00s)
+    --- PASS: TestEffectiveWritePolicy/mirrorWrites_with_consent_propagates (0.00s)
+    --- PASS: TestEffectiveWritePolicy/no_policy_with_consent_propagates (0.00s)
+=== RUN   TestEffectiveWritePolicyHonoursAWithheldGrant
+--- PASS: TestEffectiveWritePolicyHonoursAWithheldGrant (0.00s)
+=== RUN   TestStartupBannerReflectsEffectiveWritePolicy
+--- PASS: TestStartupBannerReflectsEffectiveWritePolicy (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	1.013s
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+--- PASS: TestCapacityFenceFailureRetainsReservation (0.76s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.10s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.09s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+--- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile (0.09s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.05s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.04s)
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500120 charged=1500120 pending=1500120
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible=1500000 charged=1500000 pending=1500000
+--- PASS: TestCapacityFenceFailureRetainsReservation (0.71s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.08s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.08s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.09s)
+    --- PASS: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.09s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+--- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile (0.08s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.04s)
+    --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.04s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	2.656s
+=== RUN   TestMalformedSignedHeadersAreRefused
+=== RUN   TestMalformedSignedHeadersAreRefused/an_empty_entry
+=== RUN   TestMalformedSignedHeadersAreRefused/a_trailing_separator
+=== RUN   TestMalformedSignedHeadersAreRefused/a_leading_separator
+=== RUN   TestMalformedSignedHeadersAreRefused/an_empty_entry_in_the_middle
+=== RUN   TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_last_name
+=== RUN   TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_first_name
+=== RUN   TestMalformedSignedHeadersAreRefused/one_upper-case_name
+=== RUN   TestMalformedSignedHeadersAreRefused/an_upper-case_host
+=== RUN   TestMalformedSignedHeadersAreRefused/one_inversion_in_a_longer_list
+=== RUN   TestMalformedSignedHeadersAreRefused/fully_reversed
+=== RUN   TestMalformedSignedHeadersAreRefused/a_space_inside_a_name
+=== RUN   TestMalformedSignedHeadersAreRefused/a_padded_name
+=== RUN   TestMalformedSignedHeadersAreRefused/a_colon
+=== RUN   TestMalformedSignedHeadersAreRefused/no_host
+=== RUN   TestMalformedSignedHeadersAreRefused/empty
+--- PASS: TestMalformedSignedHeadersAreRefused (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/an_empty_entry (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_trailing_separator (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_leading_separator (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/an_empty_entry_in_the_middle (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_last_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_first_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/one_upper-case_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/an_upper-case_host (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/one_inversion_in_a_longer_list (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/fully_reversed (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_space_inside_a_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_padded_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_colon (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/no_host (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/empty (0.00s)
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/two_credentials
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/two_signed_header_lists
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/two_signatures
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/an_unknown_component
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/an_empty_component
+--- PASS: TestRepeatedAuthorizationComponentsAreRefused (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/two_credentials (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/two_signed_header_lists (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/two_signatures (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/an_unknown_component (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/an_empty_component (0.00s)
+=== RUN   TestOrdinaryRepeatedQueryParametersStillCanonicalize
+--- PASS: TestOrdinaryRepeatedQueryParametersStillCanonicalize (0.00s)
+=== RUN   TestMalformedSignedHeadersAreRefused
+=== RUN   TestMalformedSignedHeadersAreRefused/an_empty_entry
+=== RUN   TestMalformedSignedHeadersAreRefused/a_trailing_separator
+=== RUN   TestMalformedSignedHeadersAreRefused/a_leading_separator
+=== RUN   TestMalformedSignedHeadersAreRefused/an_empty_entry_in_the_middle
+=== RUN   TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_last_name
+=== RUN   TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_first_name
+=== RUN   TestMalformedSignedHeadersAreRefused/one_upper-case_name
+=== RUN   TestMalformedSignedHeadersAreRefused/an_upper-case_host
+=== RUN   TestMalformedSignedHeadersAreRefused/one_inversion_in_a_longer_list
+=== RUN   TestMalformedSignedHeadersAreRefused/fully_reversed
+=== RUN   TestMalformedSignedHeadersAreRefused/a_space_inside_a_name
+=== RUN   TestMalformedSignedHeadersAreRefused/a_padded_name
+=== RUN   TestMalformedSignedHeadersAreRefused/a_colon
+=== RUN   TestMalformedSignedHeadersAreRefused/no_host
+=== RUN   TestMalformedSignedHeadersAreRefused/empty
+--- PASS: TestMalformedSignedHeadersAreRefused (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/an_empty_entry (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_trailing_separator (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_leading_separator (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/an_empty_entry_in_the_middle (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_last_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_duplicate_of_the_first_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/one_upper-case_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/an_upper-case_host (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/one_inversion_in_a_longer_list (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/fully_reversed (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_space_inside_a_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_padded_name (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/a_colon (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/no_host (0.00s)
+    --- PASS: TestMalformedSignedHeadersAreRefused/empty (0.00s)
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/two_credentials
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/two_signed_header_lists
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/two_signatures
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/an_unknown_component
+=== RUN   TestRepeatedAuthorizationComponentsAreRefused/an_empty_component
+--- PASS: TestRepeatedAuthorizationComponentsAreRefused (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/two_credentials (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/two_signed_header_lists (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/two_signatures (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/an_unknown_component (0.00s)
+    --- PASS: TestRepeatedAuthorizationComponentsAreRefused/an_empty_component (0.00s)
+=== RUN   TestOrdinaryRepeatedQueryParametersStillCanonicalize
+--- PASS: TestOrdinaryRepeatedQueryParametersStillCanonicalize (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	1.013s

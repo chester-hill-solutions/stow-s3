@@ -1,0 +1,112 @@
+{
+  "baseline": "b6d37430d731e03da3209f38b9737a99053765fe",
+  "scopeFrozen": true,
+  "requiredFixes": 4,
+  "closedLeads": 4,
+  "optionalStrictness": 1,
+  "leads": [
+    {
+      "id": "C01",
+      "lead": "Persisted policy read under a narrowed environment",
+      "status": "closed",
+      "evidence": "TestAPolicyWiderThanTheEnvironmentIsRefusedOnRead",
+      "reason": "Policy calls policy.New(set, env), refusing widening on read."
+    },
+    {
+      "id": "C02",
+      "lead": "Expired registry recovery hold",
+      "status": "closed",
+      "evidence": "TestAnExpiredRecoveryHoldStopsBlocking",
+      "reason": "Registry hold checks skip expired pending holds; a live hold still blocks."
+    },
+    {
+      "id": "C03",
+      "lead": "Effective write-policy status ignores authority",
+      "status": "closed",
+      "evidence": "TestEffectiveWritePolicy* and TestStartupBannerReflectsEffectiveWritePolicy",
+      "reason": "Status derives propagation from effectiveAuthority().Allows(UpstreamWrite)."
+    },
+    {
+      "id": "C04",
+      "lead": "Workspace I/O uncertainty becomes absence and permits create-only overwrite",
+      "status": "open",
+      "priority": 1,
+      "severity": "high",
+      "evidence": "TestClosureWorkspaceUnreadable/unreadable",
+      "closureCriteria": [
+        "Unreadable and otherwise uncertain native reads do not report confirmed absence.",
+        "Create-only PUT does not replace an existing unreadable object; original bytes survive refusal and permission repair.",
+        "True absence, healthy existing-object preconditions and symlink confinement remain correct.",
+        "Promote the native reproduction to regression coverage and qualify normal/race/conformance on Railway."
+      ]
+    },
+    {
+      "id": "C05",
+      "lead": "Post-rename uncertainty loses namespace reservation",
+      "status": "closed",
+      "evidence": "TestCapacityFenceFailureRetainsReservation; TestCapacityWriteFailureBeforeRenameCanReconcile",
+      "reason": "Existing managed capacity writer retains ErrUnknown reservations on uncertain errors; native permission regressions pass. This does not certify physical crash behavior."
+    },
+    {
+      "id": "C06",
+      "lead": "SigV4 omits later values of a signed header",
+      "status": "open",
+      "priority": 2,
+      "severity": "medium",
+      "evidence": "TestClosureRepeatedHeaderValidSDK/repeated; TestClosureRepeatedHeaderMutation",
+      "closureCriteria": [
+        "A valid repeated-header request signed by the pinned AWS Go signer authenticates.",
+        "Adding or changing a later signed-header value without resigning is refused.",
+        "Preserve name-case handling, per-value whitespace normalization and existing authentication/operation-header refusal tests."
+      ]
+    },
+    {
+      "id": "C07",
+      "lead": "SigV4 sorts query names before URI encoding",
+      "status": "open",
+      "priority": 4,
+      "severity": "low",
+      "evidence": "TestClosureEncodedQuery/encoded-key; TestClosureReferenceSignedQuery/encoded-key; TestClosureNodeSDKQuery/encoded-key",
+      "closureCriteria": [
+        "Canonical query order matches the encoded-key reference.",
+        "Pinned Node signer requests authenticate for ASCII and encoded-name fixtures.",
+        "Existing SDK, malformed-query and repeated ordinary-query cases remain qualified; no new request feature or signature fallback is added."
+      ]
+    },
+    {
+      "id": "C08",
+      "lead": "Lowercase unsigned-payload marker accepted with valid credentials",
+      "status": "optional",
+      "severity": "informational",
+      "evidence": "TestClosureUnsignedPayloadCase/unsigned-payload",
+      "reason": "Confirmed noncanonical input acceptance, requiring a valid HMAC. The same credential holder can already select canonical UNSIGNED-PAYLOAD. No additional authority or body-integrity bypass is demonstrated. Stricter spelling is not counted as a required core correctness fix."
+    },
+    {
+      "id": "C09",
+      "lead": "S3 write/COPY preconditions fold opaque ETag case",
+      "status": "open",
+      "priority": 3,
+      "severity": "medium",
+      "evidence": "TestClosureETagCase/{put-match,put-none,copy-match,copy-none}/caseChanged=true",
+      "closureCriteria": [
+        "Case-changed opaque tags compare unequal in the qualified PUT/COPY matrix.",
+        "Exact tags, wildcard and weak-validator contracts remain correct.",
+        "Cover the shared storage matcher and corresponding HTTP validator path without changing ETag generation or storage formats."
+      ]
+    }
+  ],
+  "qualificationGaps": [
+    "Physical crash/power-loss/disk-fault certification",
+    "Broader Windows/macOS parity",
+    "Live upstream/provider conformance",
+    "Browser persistence and exhaustive security review"
+  ],
+  "excludedWork": [
+    "Performance optimization",
+    "Filesystem indexing",
+    "Incremental checkpointing",
+    "New storage abstraction",
+    "Feature expansion"
+  ],
+  "nextAuthorizedReviewRecommendation": "Implement C04 as one independently reviewable correction; do not automatically implement the next finding."
+}
