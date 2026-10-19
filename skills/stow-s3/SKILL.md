@@ -248,7 +248,8 @@ notifications, object tagging, object lock, S3 Select, KMS-backed encryption.
 
 Implemented: bucket CRUD, object put/get/head/copy/delete, prefix listing with
 pagination, range reads, conditional reads and writes, MD5/CRC32/CRC32C/CRC64NVME/
-SHA-1/SHA-256 checksums, multipart uploads, presigned requests, SigV4.
+SHA-1/SHA-256 checksums, multipart uploads, presigned requests, SigV4. CRC64NVME
+applies to single objects; multipart initiation with it is refused.
 
 ## Reporting problems
 
