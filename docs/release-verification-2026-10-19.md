@@ -92,6 +92,11 @@ package depends on nothing outside the standard library, so it cannot be
 affected by this change, and its test passes in the GitHub Actions lanes. The
 limitation is recorded rather than assumed.
 
+The full GitHub CI is green on `ed082cc`, and the release rehearsal runs green
+on the same revision: four platform builds, four packed consumers and the
+rehearsal job itself, which publishes nothing.
+[Rehearsal receipt](assessment-evidence/2026-10-19-workspace-uncertainty/release-rehearsal-run.json).
+
 ## Costs, contracts and limitations
 
 Snapshot reconciliation now computes MD5 alongside its existing SHA-256 in a

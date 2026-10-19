@@ -84,6 +84,10 @@ affected by this change, and its test passes in the GitHub Actions lanes. The
 package is run as a separate step that expects the failure, and the probe is
 run beside it, so the limitation is recorded rather than assumed.
 
+The full GitHub CI is green on the same revision, and the release rehearsal
+runs green there too: four platform builds, four packed consumers, and the
+rehearsal job itself, which publishes nothing.
+
 [Evidence](../assessment-evidence/2026-10-19-workspace-uncertainty/).
 
 ## Limitations
