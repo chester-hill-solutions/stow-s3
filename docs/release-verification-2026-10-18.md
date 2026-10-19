@@ -36,6 +36,32 @@ the target service remains unchanged and stopped.
 [artifact export](assessment-evidence/2026-10-18-release/generated-receipt.json),
 [evidence hashes](assessment-evidence/2026-10-18-release/SHA256.json).
 
+## Follow-up release gate corrections
+
+The first GitHub attempt passes all four native builds and their wheel consumers,
+but Windows test setup fails for an unsupported namespace capability and the
+standards/rehearsal jobs refuse a stale Go API reference. Those failed logs are
+preserved; packed npm consumers are skipped in that failed rehearsal.
+
+Two existing test helpers now apply the established native-capability predicate,
+retaining unbound Windows coverage. A deterministic API printer regression then
+reproduces incorrect imported-file positions twice normally and twice under race.
+The one-line printer correction, stable Go reference and Python release-version
+reference pass Railway formatting, focused normal/race tests, quality and vet;
+the reference check passes twice independently. The symbol inventory and all other
+reference pages remain unchanged.
+[Fixture report](reviews/2026-10-18-native-fixtures.md),
+[printer report](reviews/2026-10-18-api-reference-positions.md).
+
+The combined [source receipt](assessment-evidence/2026-10-18-release/followup-source-equivalence.json)
+verifies 1,024 Go/module/package/generated inputs against the original and follow-up
+Railway receipts. These follow-ups change test/tool source and generated docs;
+runtime source and the packaged WASM remain identical to the original qualification.
+The second scratch runner is also
+[verified removed](assessment-evidence/2026-10-18-release/fixtures-runner-stop-status.json).
+Corrected GitHub CI and the complete packed-consumer rehearsal remain required
+before tagging; no failed gate is waived.
+
 ## Publication gates
 
 The existing release workflow requires full tests, race/conformance, standards,
