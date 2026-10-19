@@ -1,16 +1,21 @@
 # Bounded correctness closure register — 2026-10-18
 
-**Four demonstrated fixes remain: one high, two medium, one low.** Of nine named
-historical leads, four are closed by existing implementations and fresh regressions;
-one is optional input strictness with no demonstrated security consequence.
+**Three demonstrated fixes remain: two medium, one low.** Of nine named
+historical leads, five are closed by existing implementations and fresh
+regressions; one is optional input strictness with no demonstrated security
+consequence.
 There are no unclassified leads in this bounded register. This does not certify
 all code or every storage fault. [Machine-readable register](2026-10-18-correctness-closure/register.json).
+
+C04 was closed on 2026-10-19 by the
+[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md). The other
+three dispositions below stand unchanged.
 
 The earlier statement that the *reproduced* core queue was closed described the
 completed A1–A3/capacity work. It did not resolve the explicitly unverified older
 leads. This closure pass reproduces four of those, including a native overwrite;
-correctness work is therefore not finished. Their scope is now finite rather than
-another sequence of speculative “next bugs.”
+correctness work was therefore not finished at the time of that pass. Their scope
+is now finite rather than another sequence of speculative “next bugs.”
 
 Baseline is clean `b6d37430d731e03da3209f38b9737a99053765fe`. Fetching `origin/main`
 again returns `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
@@ -28,7 +33,7 @@ test tree. No performance benchmarks run.
 | C01 | Policy read ignores the current environment | Closed: read-side authority validation and its regression already exist. |
 | C02 | Persisted recovery-hold expiry never takes effect | Closed for registry holds: expired holds stop blocking; live holds block. |
 | C03 | Effective write-policy reporting ignores the resolved grant | Closed: reporting uses effective authority. |
-| C04 | Workspace I/O errors are interpreted as absence | **Open, high:** create-only write overwrites a real unreadable object. |
+| C04 | Workspace I/O errors are interpreted as absence | **Closed 2026-10-19:** only a confirmed absence is reported as absence, so a create-only write is refused over bytes the store could not read. |
 | C05 | Post-rename uncertainty withdraws namespace reservation | Closed in the corrected managed writer: native fence/unknown regressions pass. |
 | C06 | SigV4 only signs/verifies the first repeated header value | **Open, medium:** valid Go SDK signature is refused; an appended unsigned value is accepted. |
 | C07 | SigV4 query sorting occurs before URI encoding | **Open, low:** a valid pinned Node signer request is refused for an encoded-name query. |
@@ -38,6 +43,12 @@ test tree. No performance benchmarks run.
 ## Required fixes, in priority order
 
 ### 1. C04 — Existing workspace bytes can be overwritten by a create-only request
+
+**Closed 2026-10-19.** The
+[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md) reports only a
+confirmed absence as an absent object, so a create-only write over a path the
+store could not read is refused rather than admitted. The reproduction below
+still describes the defect as it stood at this baseline.
 
 The native workspace stores `victim=old`. With the file mode changed to 000 by
 its owner, both HEAD and GET return `ErrObjectNotFound`. A subsequent native
@@ -205,8 +216,10 @@ remain qualification gaps. They are not four more reproduced defect tickets and
 do not reopen the closed A1–A3 findings. The native workspace/HTTP/protocol scope
 here is intentionally bounded to the nine listed leads.
 
-The next independently reviewable correction is **C04, workspace uncertainty and
-create-only overwrite**. The other three required fixes have explicit acceptance
-criteria in the register. Incoming-write memory amplification, listing/indexing
-and other performance work remain separate. No next fix or optimization is
-implemented automatically in this closure review.
+The next independently reviewable correction is **C06, later values of a signed
+HTTP header**. C04 was closed on 2026-10-19 by the
+[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md); the other two
+required fixes have explicit acceptance criteria in the register. Incoming-write
+memory amplification, listing/indexing and other performance work remain
+separate. No next fix or optimization is implemented automatically in this
+closure review.

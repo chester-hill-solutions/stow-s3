@@ -1,0 +1,240 @@
+
+> @chester-hill-solutions/stow-s3@0.3.3 test
+> npm run build && tsx --test test/integration.test.ts test/lifecycle.test.ts test/embedded.test.ts test/node-wasm-host.test.ts test/browser.test.ts test/file-history.test.ts test/browser-s3.test.ts test/ready.test.ts test/session.test.ts test/session-lifecycle.test.ts test/session-close.test.ts test/doctor.test.ts test/ownership.test.ts test/ready-framing.test.ts test/startup-options.test.ts test/wasm-assets.test.ts test/workspace.test.ts test/persistence-format.test.ts test/worker-host.test.ts test/content-store.test.ts test/project.test.ts test/content-object-host.test.ts test/host-backed-streams.test.ts test/project-migration.test.ts test/lint-config.test.ts
+
+
+> @chester-hill-solutions/stow-s3@0.3.3 build
+> npm run clean && tsc && node scripts/copy-wasm-assets.mjs
+
+
+> @chester-hill-solutions/stow-s3@0.3.3 clean
+> node -e "require('node:fs').rmSync('dist', { recursive: true, force: true })"
+
+✔ S3 transport serializes signed conditional writes and receipt metadata (18.002586ms)
+✔ S3 reads preserve bytes and ETag, separating receipt from application metadata (2.835699ms)
+✔ S3 HTTP 403 retains its appropriate failure meaning (4.958986ms)
+✔ S3 HTTP 404 retains its appropriate failure meaning (3.173926ms)
+✔ S3 HTTP 409 retains its appropriate failure meaning (3.024237ms)
+✔ S3 HTTP 412 retains its appropriate failure meaning (3.004708ms)
+✔ application metadata cannot replace the S3 reconciliation receipt (2.373525ms)
+✔ S3 chunk transport supplies and reads provider-verified full-object SHA-256 (3.983607ms)
+✔ S3 COMPOSITE checksums and copied metadata do not establish a chunk digest (2.113148ms)
+✔ S3 unspecified checksums and copied metadata do not establish a chunk digest (4.002937ms)
+▶ openBrowserEmbeddedStow
+  ✔ commits mutations before resolving and serializes them FIFO (8.36492ms)
+  ✔ restores the last durable generation when a commit fails (1.571923ms)
+  ✔ captures queued writes and persists their bytes without reading them back (0.400736ms)
+  ✔ isolates durable recovery buffers from adapters and returned objects (0.508096ms)
+  ✔ clears persisted state on reset and keeps the profile usable (0.99675ms)
+  ✔ closes idempotently, retains data, and rejects later operations (0.299757ms)
+  ✔ rejects a second live opener of the same namespace (0.173008ms)
+  ✔ rejects persisted data that exceeds requested quotas (0.157128ms)
+✔ openBrowserEmbeddedStow (13.150608ms)
+▶ IndexedDbPersistenceAdapter
+  ✔ rejects a missing IndexedDB host as unsupported (0.576604ms)
+✔ IndexedDbPersistenceAdapter (0.655803ms)
+✔ persistent object host stages without visibility, reads pinned ranges, and opens from metadata (28.094707ms)
+✔ conditional host commit is atomic and aborted stages can be reclaimed (3.368494ms)
+✔ copy shares payloads and bucket deletion refuses nonempty data (1.050818ms)
+✔ streaming stage rechunks input and deduplicates unchanged chunks (6.679327ms)
+✔ ranges read only intersecting chunks and LRU remains bounded (1.074598ms)
+✔ content reads fail closed for missing, corrupt or conflicting descriptors (0.807361ms)
+✔ empty content and cancellation do not write payloads (0.277477ms)
+✔ streaming returns detached copies of retained cache bytes (0.585764ms)
+▶ stow doctor
+  ✔ reports the client facts the binary cannot observe (24.750913ms)
+  ✔ never marks the optional upstream check required (22.130192ms)
+  ✔ merges the binary's own checks with the client's (21.967003ms)
+  ✔ succeeds on a machine that can run a session (21.680927ms)
+  ✔ fails with an actionable message when no binary can be found (0.95008ms)
+  ✔ reports a binary that does not speak the protocol instead of throwing (4.740038ms)
+  ✔ renders required failures as failures and optional ones as warnings (0.305538ms)
+  ✔ keeps a multi-line error from breaking the report layout (0.141619ms)
+✔ stow doctor (97.644686ms)
+▶ EmbeddedStow
+  ✔ adapts the host bridge with byte-safe object operations (1.609012ms)
+  ✔ refuses write conditions on an older host without sending a write (0.202167ms)
+  ✔ rejects protocol version mismatches (0.096129ms)
+  ✔ preserves structured bridge error codes (0.099488ms)
+✔ EmbeddedStow (2.586102ms)
+✔ real WASM file history survives reopen with its undo/redo cursor (78.898748ms)
+✔ read miss fetches remote, then cached reads and edits work offline (13.100859ms)
+✔ sync coalesces stages and publishes only the selected version (5.053106ms)
+✔ remote conflict keeps local history; adoption and undo permit explicit replacement (5.012126ms)
+✔ an offline-created file cannot silently overwrite an existing remote key (2.405913ms)
+✔ lost network reply reconciles after reopen without duplicating the remote write (3.916838ms)
+✔ failed acknowledgement commit reconciles after reopen without duplicating the remote write (3.841028ms)
+✔ an uncertain older write survives history pruning and later edits (5.476272ms)
+✔ same bytes with a different receipt do not acknowledge an uncertain write (2.335565ms)
+✔ a copied receipt with changed metadata does not acknowledge the attempted version (4.828627ms)
+✔ conflicting pruned attempts release their protected object after reconciliation (3.381024ms)
+✔ failed history commit restores both stages and cursor (2.592172ms)
+✔ a WASM quota failure midway through a batch restores the original state (2.69367ms)
+✔ retention bounds and branching release unreachable revision objects (4.389482ms)
+✔ facades over the same browser store serialize concurrent edits (1.938799ms)
+✔ queued saves capture caller bytes and metadata (21.670337ms)
+✔ corrupt history fails closed rather than fetching over local edits (2.368475ms)
+✔ invalid options and missing remote do not cause implicit network writes (1.979098ms)
+✔ save receipts commit without reading revision bytes back (2.280176ms)
+✔ a slow file sync permits saves and preserves newer pending revisions (4.374963ms)
+✔ real Go host streams preserve snapshots, avoid lifetime locks, and free reservations on cancellation (202.308387ms)
+✔ real Go host retains failed read releases until storage acknowledges cleanup (22.284701ms)
+▶ parseReadyLine
+  ✔ parses the STOW_READY banner line (0.478014ms)
+✔ parseReadyLine (0.984009ms)
+▶ stow binary discovery
+  ✔ resolves a platform package binary without PATH or environment setup (30.536881ms)
+  ✔ falls back cleanly when no platform package is installed (9.925283ms)
+  ✔ finds an executable on PATH (10.417947ms)
+  ✔ prefers STOW_BIN over PATH, because a pinned build outranks a floating one (16.71142ms)
+✔ stow binary discovery (68.038167ms)
+Are you using a Stream of unknown length as the Body of a PutObject request? Consider using Upload instead from @aws-sdk/lib-storage.
+▶ shared conformance corpus
+  ✔ runs every corpus case against the filesystem backend (1999.095823ms)
+Are you using a Stream of unknown length as the Body of a PutObject request? Consider using Upload instead from @aws-sdk/lib-storage.
+  ✔ runs every corpus case against the memory backend (1627.611705ms)
+✔ shared conformance corpus (3626.997825ms)
+▶ external connections
+  ✔ connects without taking ownership of a process (25.11556ms)
+✔ external connections (25.267538ms)
+▶ integration
+  ✔ starts, writes, reads, and stops (33.516058ms)
+  ✔ resets a data directory stow created, and refuses one it did not (58.604138ms)
+✔ integration (92.326205ms)
+▶ startup lifecycle
+  ✔ reports a missing server binary instead of a bare ENOENT (10.057742ms)
+  ✔ cleans up when the child exits before readiness (9.705245ms)
+  ✔ rejects negative cache limits before starting a child (0.223288ms)
+  ✔ kills and awaits a child when post-ready initialization fails (219.413672ms)
+✔ startup lifecycle (240.174429ms)
+▶ fixture client lifecycle
+  ✔ paginates through the shared iterator and destroys clients on errors (283.718049ms)
+✔ fixture client lifecycle (283.902947ms)
+▶ optional SDK credentials
+  ✔ refuses a configuration whose credentials are empty strings (0.316687ms)
+  ✔ preserves static credentials and passes through a session token or provider (0.724073ms)
+✔ optional SDK credentials (1.244257ms)
+✔ the migrated import plugin still rejects duplicate imports (821.669276ms)
+✔ loadNodeWasmHost starts the packaged memory runtime (46.515538ms)
+▶ resetOwnedData
+  ✔ deletes a directory stow created (7.275521ms)
+  ✔ refuses a directory stow did not create, and leaves it intact (3.057467ms)
+  ✔ treats an absent directory as already reset (0.305437ms)
+  ✔ refuses the home directory (0.163088ms)
+  ✔ refuses the filesystem root (0.471096ms)
+  ✔ refuses the working directory (0.185028ms)
+  ✔ refuses a relative path that climbs to a protected directory (0.631412ms)
+  ✔ still allows a subdirectory of the working directory (1.425615ms)
+✔ resetOwnedData (14.370325ms)
+✔ reuses unchanged owned buffers and isolates new changes from their caller (6.854227ms)
+✔ legacy migration preserves retained stages and cursor and is repeatable (73.420389ms)
+✔ migration refuses insufficient retention before changing the destination (7.881395ms)
+✔ migration leaves uncertain original remote saves intact (15.537243ms)
+✔ project commits multiple files atomically and rolls back a failed publication (16.139957ms)
+✔ large unchanged assets share chunks through document history and lazy reopen (7.781596ms)
+✔ fixed range edits stage only changed chunks and preserve the old revision (13.729562ms)
+✔ stream pins survive pruning and GC until the reader releases them (2.122468ms)
+✔ slow publication permits local edits and acknowledges only its captured revision (2.457344ms)
+✔ uncertain manifest attempts remain protected after restart and pruning (5.088795ms)
+✔ repeated project sync uploads unchanged chunks once and refuses a competing manifest (3.378314ms)
+✔ streamed input stays chunked, range materialization is bounded, and failed quota leaves the head intact (1.319646ms)
+✔ remote content cannot be reused by copying unverified hash metadata (2.357494ms)
+✔ migration tokens are own data properties even when named __proto__ (0.847321ms)
+▶ readiness record framing
+  ✔ does not treat an unterminated fragment as a complete record (0.698992ms)
+  ✔ reassembles a record delivered one byte at a time (0.159679ms)
+  ✔ recovers records after each newline, not before it (0.434325ms)
+  ✔ keeps a CRLF record intact (0.066889ms)
+  ✔ carries a record split across a CRLF pair (0.064339ms)
+  ✔ reports a parse failure rather than escaping it (0.871541ms)
+✔ readiness record framing (3.010577ms)
+▶ StowProtocolError codes
+  ✔ distinguishes cancellation from an internal failure (0.166808ms)
+✔ StowProtocolError codes (0.242537ms)
+▶ ready protocol
+  ✔ parses a complete message (0.696173ms)
+  ✔ rejects an unknown protocol version with a specific error (0.393495ms)
+  ✔ rejects malformed JSON and non-objects (0.146828ms)
+  ✔ rejects a message missing a required field (0.271608ms)
+  ✔ rejects a message missing capabilities (0.116379ms)
+  ✔ rejects a capability with the wrong type (0.117498ms)
+✔ ready protocol (2.519213ms)
+▶ session close releases everything even when a step fails
+  ✔ still stops the server and removes the directory when the client fails to destroy (61.844662ms)
+  ✔ still removes the directory when stopping the server fails (26.618944ms)
+  ✔ reports every failure rather than only the first (28.036587ms)
+  ✔ stays closed and does not retry after a failed close (31.907885ms)
+✔ session close releases everything even when a step fails (149.31544ms)
+▶ session lifecycle
+  ✔ leaks no processes or directories across 100 sequential sessions (2760.140289ms)
+  ✔ gives 100 parallel sessions unique endpoints, buckets, and credentials (914.467117ms)
+✔ session lifecycle (3675.509636ms)
+▶ the child environment of a session's server
+  ✔ runs a session's server with a tighter collector target than the Go default (1.038498ms)
+  ✔ keeps a collector target the caller set themselves (0.250047ms)
+  ✔ leaves a long-lived server's collector alone (0.276707ms)
+  ✔ still strips ambient cloud configuration from a session (0.215548ms)
+✔ the child environment of a session's server (2.639532ms)
+▶ stow session
+  ✔ runs a round trip in one callback (55.446242ms)
+  ✔ creates a generated bucket and a local endpoint before the callback runs (34.502449ms)
+  ✔ reports capabilities from the server rather than from local assumptions (28.107916ms)
+  ✔ persists through a caller-supplied data directory (74.987041ms)
+  ✔ enforces the session byte quota (29.061936ms)
+  ✔ hands a child process a fresh environment without mutating the parent (31.948755ms)
+  ✔ closes once, is idempotent, and rejects later use (28.477253ms)
+  ✔ rejects the callback error and still cleans up (26.582364ms)
+  ✔ preserves both errors and the cleanup cause when callback and cleanup fail (27.7876ms)
+  ✔ removes the session directory it created (22.993132ms)
+  ✔ keeps a caller-supplied directory (29.245954ms)
+  ✔ rejects nonsensical limits before starting anything (0.349606ms)
+✔ stow session (390.321131ms)
+▶ startup options
+  ✔ honors timeoutMs rather than a built-in default (11.461057ms)
+  ✔ rejects immediately when the signal is already aborted (0.789692ms)
+  ✔ stops the child when aborted during startup (7.907215ms)
+  ✔ uses the region the server reports (42.735269ms)
+✔ startup options (63.649054ms)
+▶ session options
+  ✔ reports cancellation as cancelled, not internal (0.304697ms)
+✔ session options (0.402855ms)
+▶ request body limits
+  ✔ reports a configured request limit from the native server (34.181422ms)
+  ✔ rejects nonpositive and fractional explicit request limits (0.398106ms)
+✔ request body limits (34.778025ms)
+✔ copied wasm assets take a fixed mode regardless of the source mode (8.30802ms)
+✔ worker binary transport preserves default buffers and explicitly transfers whole buffers (13.521803ms)
+✔ cancelled calls retain their admission lease until the worker finishes (4.482922ms)
+✔ worker rejects oversized admission and response and releases failed calls (0.537853ms)
+✔ cancellation during initialization skips dispatch and close releases pending callers (2.363015ms)
+✔ async runtime uses the binary envelope and propagates structured failures (1.123718ms)
+✔ cleanup controls have a bounded reserved lane when normal admission is full (0.771542ms)
+✔ async streams split large input into bounded owned transfers and close readers early (1.794571ms)
+✔ concurrent stream closes release every real WASM reader slot (47.631747ms)
+✔ failed stream cleanup remains visible and can be retried (0.345536ms)
+✔ queued cleanup is bounded, skips cancelled calls, and closes pending callers (1.294416ms)
+✔ cancelling undispatched cleanup immediately frees every reserved slot (2.184676ms)
+▶ workspace CLI adapter
+  ✔ passes arguments without a shell and parses the JSON response (59.903334ms)
+  ✔ rejects a non-object JSON result (6.606369ms)
+  ✔ runs prepare, handoff-to-file, resume, and destroy against the native CLI (49.583755ms)
+✔ workspace CLI adapter (116.87127ms)
+▶ workspace delta and handoff
+  ✔ names both ends and the destination when writing a delta (29.76793ms)
+  ✔ never invents the base an applied delta applies to (28.230496ms)
+  ✔ omits limits the caller did not ask for (51.131759ms)
+  ✔ carries the archive path so a handoff can be adopted elsewhere (56.891766ms)
+✔ workspace delta and handoff (166.540355ms)
+ℹ tests 163
+ℹ suites 25
+ℹ pass 163
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6338.138692
+npm notice
+npm notice New minor version of npm available! 11.12.1 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice

@@ -13,6 +13,12 @@ import (
 // symbolic link, atomically. Reporting absence instead is the answer guaranteed wrong.
 var ErrUnsupported = errors.New("rooted: safe regular-file opening is unsupported on this platform")
 
+// ErrSymlink reports a path component that is a symbolic link. Its target is not part of the workspace, so a caller may treat it as absence.
+var ErrSymlink = errors.New("rooted: symbolic links are not readable")
+
+// ErrNotRegular reports a path that is not a regular file. It holds no object.
+var ErrNotRegular = errors.New("rooted: file must be regular")
+
 // Supported reports whether this host can do that open.
 func Supported() bool { return safeRegularOpenSupported }
 
@@ -78,7 +84,7 @@ func (r *Root) openFile(relative string, regular bool) (*os.File, error) {
 		return nil, err
 	}
 	if regular && !info.Mode().IsRegular() {
-		return nil, fmt.Errorf("rooted: file must be regular")
+		return nil, ErrNotRegular
 	}
 	file, err := r.open(relative, regular)
 	if err != nil {
@@ -113,7 +119,7 @@ func (r *Root) statWithoutLinks(relative string) (os.FileInfo, error) {
 			return nil, err
 		}
 		if info.Mode()&os.ModeSymlink != 0 {
-			return nil, fmt.Errorf("rooted: symbolic links are not readable")
+			return nil, ErrSymlink
 		}
 	}
 	return info, nil

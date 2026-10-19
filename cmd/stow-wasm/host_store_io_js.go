@@ -199,13 +199,16 @@ func (r *hostReader) Read(buffer []byte) (int, error) {
 func (r *hostReader) Close() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if r.closed {
+	if r.token == "" {
 		return nil
 	}
 	r.closed = true
+	if _, _, err := r.store.invoke(context.Background(), hostRequest{Op: "closeObject", Token: r.token}, nil); err != nil {
+		return err
+	}
 	r.store.mu.Lock()
 	delete(r.store.readers, r.token)
 	r.store.mu.Unlock()
-	_, _, err := r.store.invoke(context.Background(), hostRequest{Op: "closeObject", Token: r.token}, nil)
-	return err
+	r.token = ""
+	return nil
 }

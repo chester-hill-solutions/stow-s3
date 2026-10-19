@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""Wait for the scratch deployment, run the plan, export the results, tear down."""
+from pathlib import Path
+import json
+import subprocess
+import sys
+import time
+
+WORK = Path("/private/tmp/stow-c04-2026-10-19")
+ENV = {
+    "RAILWAY_CALLER": "skill:use-railway@1.7.0",
+    "RAILWAY_AGENT_SESSION": "stow-c04-20261019",
+    "PATH": "/Users/ladmin/.nvm/versions/node/v25.9.0/bin:/usr/local/bin:/usr/bin:/bin",
+    "HOME": "/Users/ladmin",
+}
+RAILWAY = "/Users/ladmin/.nvm/versions/node/v25.9.0/bin/railway"
+
+
+def railway(*args, timeout=180):
+    result = subprocess.run(
+        [RAILWAY, *args], env=ENV, cwd=WORK, text=True, capture_output=True, timeout=timeout
+    )
+    if result.returncode != 0:
+        print(result.stdout[-2000:], result.stderr[-2000:], flush=True)
+        raise SystemExit(f"railway {' '.join(args)} failed: {result.returncode}")
+    return result.stdout
+
+
+def control(mode):
+    result = subprocess.run(
+        [sys.executable, str(WORK / "control.py"), mode], env=ENV, cwd=WORK, text=True, capture_output=True
+    )
+    print(result.stdout[-2500:], flush=True)
+    if result.returncode != 0:
+        print(result.stderr[-2500:], flush=True)
+        raise SystemExit(f"control {mode} failed: {result.returncode}")
+    return result.stdout
+
+
+SCOPE = [
+    "--project", "8d90188e-0f1e-4c47-9379-9399ae06e6fa",
+    "--environment", "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411",
+    "--service", "83497842-c51d-420e-8ba1-181589730ad4",
+]
+DEPLOYMENT = None
+
+
+def newest_deployment():
+    rows = json.loads(railway("deployment", "list", *SCOPE, "--limit", "5", "--json"))
+    return rows[0]["id"] if rows else None
+
+
+# 1. Wait for the deployment to serve.
+deadline = time.time() + 1800
+deployment = DEPLOYMENT
+while True:
+    rows = json.loads(railway("deployment", "list", *SCOPE, "--limit", "3", "--json"))
+    if deployment is None:
+        deployment = newest_deployment()
+    status = next((r["status"] for r in rows if r["id"] == deployment), "ABSENT")
+    print(f"deployment {deployment} {status}", flush=True)
+    if status == "SUCCESS":
+        break
+    if status in ("FAILED", "CRASHED"):
+        raise SystemExit(f"deployment {status}")
+    if time.time() > deadline:
+        raise SystemExit("deployment did not become ready")
+    time.sleep(20)
+
+# 2. Start the plan.
+control("start")
+
+# 3. Wait for the plan to finish.
+deadline = time.time() + 5400
+while True:
+    out = control("status")
+    if "run.json:" in out:
+        payload = out.split("run.json:", 1)[1]
+        payload = payload.split("progress.json:", 1)[0]
+        try:
+            run = json.loads(payload)
+        except json.JSONDecodeError:
+            run = {}
+        if run.get("complete"):
+            print("RUN COMPLETE", json.dumps({k: run.get(k) for k in ("complete", "success", "checks")}), flush=True)
+            (WORK / "run-summary.json").write_text(json.dumps(run, indent=2) + "\n")
+            break
+    if time.time() > deadline:
+        raise SystemExit("plan did not finish in time")
+    time.sleep(45)
+
+# 4. Export the results, then tear the runner down.
+control("export")
+control("stop")
+print("DONE", flush=True)

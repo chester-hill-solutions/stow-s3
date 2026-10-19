@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-func TestPortableHostEditDropsStaleChecksumAndKeepsDeclaredMetadata(t *testing.T) {
+func TestPortableHostEditUsesLiveMetadataPolicy(t *testing.T) {
 	w, registry := portableFixture(t)
 	ctx := context.Background()
 	_, err := w.store.PutObject(ctx, "primary", "normal.txt", strings.NewReader("hello world"), storage.PutOptions{ContentType: "application/custom", Metadata: map[string]string{"project": "stow"}, ChecksumAlgorithm: "CRC64NVME", ChecksumValue: "jSnVw/bqjr4="})
@@ -42,12 +43,21 @@ func TestPortableHostEditDropsStaleChecksumAndKeepsDeclaredMetadata(t *testing.T
 		if object.Bucket != "primary" || object.Key != "normal.txt" {
 			continue
 		}
-		if object.ChecksumAlgorithm != "" || object.Metadata["project"] != "stow" || object.ContentType != "application/custom" {
+		if object.ChecksumAlgorithm != "" || len(object.Metadata) != 0 || object.ContentType != "text/plain; charset=utf-8" {
 			t.Fatalf("host edit = %+v", object)
 		}
+		assertPortableMetadataMatchesLive(t, w, object)
 		return
 	}
 	t.Fatal("edited object missing")
+}
+
+func assertPortableMetadataMatchesLive(t *testing.T, w *Workspace, object CheckpointObject) {
+	t.Helper()
+	live, err := w.store.HeadObject(context.Background(), object.Bucket, object.Key)
+	if err != nil || live.ContentType != object.ContentType || !reflect.DeepEqual(live.Metadata, object.Metadata) {
+		t.Fatalf("live=%+v portable=%+v err=%v", live, object, err)
+	}
 }
 
 func TestPortableSensitiveObjectsRequireSenderAndReceiverConsent(t *testing.T) {

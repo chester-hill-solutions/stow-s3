@@ -15,27 +15,38 @@ import (
 var ErrClosed = errors.New("workspace store is closed")
 
 // locate returns the path a key currently occupies, preferring the form the
-// manifest recorded and falling back to whichever file is actually there.
-//
-// The fallback is what makes adoption work: a file the host wrote has no
-// manifest entry, so the only way to find it is to look.
+// manifest recorded and falling back to whichever file is actually there. The
+// fallback is what makes adoption work: a file the host wrote has no manifest
+// entry, so the only way to find it is to look.
 func (s *Store) locate(bucket, key string) (string, error) {
 	recorded, hasEntry := s.objectIndex.entry(bucket, key)
 	if hasEntry && recorded.Form == FormEscaped {
 		path := EscapedPath(s.root, bucket, key)
-		if fileExists(path) {
+		exists, err := fileExists(path)
+		if err != nil {
+			return "", err
+		}
+		if exists {
 			return path, nil
 		}
 	}
 
 	if s.layout.IsNatural(key) {
-		if path, exists, _ := exactNaturalPath(s.bucketDir(bucket), key); exists {
+		path, exists, _, err := exactNaturalPath(s.bucketDir(bucket), key)
+		if err != nil {
+			return "", err
+		}
+		if exists {
 			return path, nil
 		}
 	}
 
 	escaped := EscapedPath(s.root, bucket, key)
-	if fileExists(escaped) {
+	exists, err := fileExists(escaped)
+	if err != nil {
+		return "", err
+	}
+	if exists {
 		return escaped, nil
 	}
 	return "", storage.ErrObjectNotFound
@@ -47,14 +58,17 @@ func (s *Store) locate(bucket, key string) (string, error) {
 // that is a path collision, not an exact match for the S3 key.
 //
 // The third result reports that a differently-cased segment occupies the
-// candidate path. Callers use it to choose the escaped form for a new object.
-func exactNaturalPath(root, key string) (path string, exists, caseCollision bool) {
-	path = root
+// candidate path. An error reports a path that could not be examined.
+func exactNaturalPath(root, key string) (string, bool, bool, error) {
+	path := root
 	segments := strings.Split(key, "/")
 	for i, segment := range segments {
 		entries, err := os.ReadDir(path)
 		if err != nil {
-			return "", false, false
+			if absence(err) {
+				return "", false, false, nil
+			}
+			return "", false, false, uncertain(err)
 		}
 		exactName := ""
 		foldedMatch := false
@@ -68,36 +82,32 @@ func exactNaturalPath(root, key string) (path string, exists, caseCollision bool
 			}
 		}
 		if exactName == "" {
-			return "", false, foldedMatch
+			return "", false, foldedMatch, nil
 		}
 		path = filepath.Join(path, exactName)
 		if i == len(segments)-1 {
-			return path, fileExists(path), false
+			exists, err := fileExists(path)
+			if err != nil {
+				return "", false, false, err
+			}
+			return path, exists, false, nil
 		}
 	}
-	return "", false, false
+	return "", false, false, nil
 }
 
 // resolve finds a key's file and its metadata, adopting the file when stow has
 // no manifest entry for it. It takes the write lock, because adopting means
-// writing a manifest entry.
-//
-// Adoption is not an import step. There is no separate registration pass,
-// because a workspace whose files need registering before they can be read is
-// not a working directory.
+// writing a manifest entry. Adoption is not an import step: a workspace whose
+// files need registering before they can be read is not a working directory.
 func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.resolveLocked(bucket, key)
 }
 
-// resolveLocked is resolve for a caller that already holds the write lock.
-//
-// It exists because the lock is not reentrant and the write path has to look at an
-// object while holding it: PutObject peeks to evaluate its preconditions before it
-// knows what it is overwriting, and that peek may need to re-derive and persist an
-// entry that has gone stale. Reaching resolve from there takes the lock a second
-// time on the same goroutine and hangs every goroutine behind it, Close included.
+// resolveLocked also persists stale metadata while holding the caller's write lock.
+// Conditional writes use it to avoid reacquiring the non-reentrant lock via resolve.
 func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
 	absPath, err := s.locate(bucket, key)
 	if err != nil {
@@ -105,7 +115,10 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	}
 	info, err := os.Lstat(absPath)
 	if err != nil {
-		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
+		if absence(err) {
+			return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
+		}
+		return "", nil, ManifestEntry{}, uncertain(err)
 	}
 	if info.Mode()&os.ModeSymlink != 0 {
 		return "", nil, ManifestEntry{}, storage.ErrObjectNotFound
@@ -115,17 +128,14 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	derived, err := deriveReadFile(checked, info)
+	defer checked.Close()
+	derived, err := deriveFileMetadata(checked, info)
 	if err != nil {
 		return "", nil, ManifestEntry{}, err
 	}
-	entry, recorded := s.objectIndex.entry(bucket, key)
-	if !recorded || entryNeedsRederivation(entry, derived, info) {
-		if recorded && entry.ETag == derived.ETag {
-			entry.Size, entry.Modified = derived.Size, derived.Modified
-		} else {
-			entry = derived
-		}
+	entry, _ := s.objectIndex.entry(bucket, key)
+	entry, changed := reconcileEntry(entry, derived)
+	if changed {
 		entry.Form = s.formOf(bucket, key, absPath)
 		if entry.Form == FormEscaped {
 			entry.Digest = Digest(key)
@@ -137,11 +147,23 @@ func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, Manifest
 	return absPath, info, entry, nil
 }
 
-func entryNeedsRederivation(entry, derived ManifestEntry, info os.FileInfo) bool {
-	if entry.stale(info.Size(), info.ModTime()) {
-		return true
+// reconcileEntry applies the same byte-identity policy to live reads and snapshots.
+func reconcileEntry(entry, derived ManifestEntry) (ManifestEntry, bool) {
+	// Older multipart records have no content fingerprint. Re-derive them once
+	// instead of blessing potentially edited bytes with an unverified old ETag.
+	if entry.contentETag() != derived.ETag {
+		return derived, true
 	}
-	return entry.ETag != derived.ETag && !entry.Multipart
+	changed := entry.stale(derived.Size, derived.Modified)
+	entry.Size, entry.Modified = derived.Size, derived.Modified
+	return entry, changed
+}
+
+func (e ManifestEntry) contentETag() string {
+	if e.Multipart {
+		return e.ContentETag
+	}
+	return e.ETag
 }
 
 // formOf reports which form a path is in, by asking the layout where the key
@@ -202,7 +224,14 @@ func (s *Store) peekLocked(bucket, key string) (*storage.ObjectMeta, error) {
 	return s.metaFromEntry(bucket, key, entry, info), nil
 }
 
-func fileExists(path string) bool {
+// fileExists reports whether a path names a regular file. One that cannot be examined is not an absent path.
+func fileExists(path string) (bool, error) {
 	info, err := os.Stat(path)
-	return err == nil && !info.IsDir()
+	if err != nil {
+		if absence(err) {
+			return false, nil
+		}
+		return false, uncertain(err)
+	}
+	return !info.IsDir(), nil
 }

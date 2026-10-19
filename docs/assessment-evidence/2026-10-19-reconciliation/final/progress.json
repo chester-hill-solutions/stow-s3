@@ -1,0 +1,16 @@
+{
+  "completed": 11,
+  "total": 11,
+  "last": {
+    "name": "source-receipt",
+    "args": [
+      "node",
+      "-e",
+      "const fs=require('node:fs'),crypto=require('node:crypto');const input=JSON.parse(fs.readFileSync('benchmark/validation-input-manifest.json'));const rows={};for(const p of Object.keys(input)){const b=fs.readFileSync(p);rows[p]=crypto.createHash('sha256').update(b).digest('hex')}fs.writeFileSync(process.env.STOW_RESULT_ROOT+'/qualified-source.json',JSON.stringify(rows,null,2));const browser='.cache/browser-test-results/report.json';if(fs.existsSync(browser))fs.copyFileSync(browser,process.env.STOW_RESULT_ROOT+'/browser-report.json')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 324,
+    "passed": true
+  }
+}
