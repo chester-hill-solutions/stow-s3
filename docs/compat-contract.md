@@ -33,6 +33,11 @@ Every supplied `x-amz-*` header must appear in `SignedHeaders`, including copy
 source, source conditions, user metadata and checksum headers. Adding an unsigned
 copy-source header to a presigned PUT cannot change the authenticated operation.
 
+A signed header may carry more than one value, and the signature covers all of
+them. Each value is normalized on its own and the values are joined with a comma,
+as the AWS SDK signs them. A request whose signed-header values changed after it
+was signed is refused, whether a value was added, changed or removed.
+
 Stow validates authentication material without rewriting it.
 Noncanonical `SignedHeaders`, repeated or unknown `Authorization` components, and duplicate or differently spelled authentication query parameters return `403`.
 Sections 4.1 and 4.2 define the accepted grammar.

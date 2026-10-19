@@ -1,7 +1,7 @@
 {
   "baseline": "b6d37430d731e03da3209f38b9737a99053765fe",
   "scopeFrozen": true,
-  "requiredFixes": 3,
+  "requiredFixes": 2,
   "closedLeads": 4,
   "optionalStrictness": 1,
   "leads": [
@@ -53,11 +53,14 @@
     {
       "id": "C06",
       "lead": "SigV4 omits later values of a signed header",
-      "status": "open",
+      "status": "closed",
       "priority": 2,
       "severity": "medium",
-      "evidence": "TestClosureRepeatedHeaderValidSDK/repeated; TestClosureRepeatedHeaderMutation",
-      "closureCriteria": [
+      "evidence": "TestARepeatedSignedHeaderAuthenticates; TestChangingASignedHeaderValueWithoutResigningIsRefused; TestRepeatedSignedHeaderValuesAreNormalizedPerValue",
+      "closed": "2026-10-19",
+      "closureEvidence": "docs/reviews/2026-10-19-sigv4-repeated-header.md",
+      "reason": "A signed header contributes every value it carries, each normalized on its own and joined with a comma, as the AWS SDK signs them. A request whose signed-header values changed after signing is refused, and a request the SDK signed over repeated values authenticates.",
+      "closureCriteriaMet": [
         "A valid repeated-header request signed by the pinned AWS Go signer authenticates.",
         "Adding or changing a later signed-header value without resigning is refused.",
         "Preserve name-case handling, per-value whitespace normalization and existing authentication/operation-header refusal tests."

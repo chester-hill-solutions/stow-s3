@@ -25,7 +25,10 @@ await withStow(async ({ s3, bucket }) => {
   }));
 
   // The second writer still holds the original ETag, so its update is refused.
-  let rejected = false;
+  // The refusal has to be the precondition failure and not some other error:
+  // a request that failed for another reason has proved nothing about the
+  // write it was supposed to make.
+  let rejection;
   try {
     await s3.send(new PutObjectCommand({
       Bucket: bucket,
@@ -34,11 +37,20 @@ await withStow(async ({ s3, bucket }) => {
       IfMatch: created.ETag,
     }));
   } catch (error) {
-    rejected = true;
-    console.log("stale update rejected:", error.name, error.$metadata?.httpStatusCode);
+    rejection = error;
   }
-  if (!rejected) throw new Error("the stale update was accepted");
+  if (!rejection) throw new Error("the stale update was accepted");
+  if (rejection.name !== "PreconditionFailed" && rejection.$metadata?.httpStatusCode !== 412) {
+    throw rejection;
+  }
+  console.log("stale update rejected:", rejection.name, rejection.$metadata?.httpStatusCode);
 
+  // The version that was saved is still the one that is stored. A refusal is
+  // only worth anything if the object it refused to replace is intact.
   const stored = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: "config.json" }));
-  console.log("retained:", await stored.Body.transformToString());
+  const retained = await stored.Body.transformToString();
+  if (retained !== '{"version":2}') {
+    throw new Error(`the stored object is ${retained}, want the version that was saved`);
+  }
+  console.log("retained:", retained);
 });
