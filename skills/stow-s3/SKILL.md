@@ -43,7 +43,7 @@ behaviour you care about, a plain in-memory fake is less machinery. Stow is
 worth it when the code exercises the SDK itself — signing, multipart, range
 reads, error shapes.
 
-## Checkpoints for agent work (0.3.0 development tree)
+## Checkpoints for agent work (0.3.3)
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent
 works. Before saving, stop known writers and write objective, progress and next
@@ -67,13 +67,15 @@ publishing its platform packages. PyPI was not published. Do not try those
 install commands first. The Go module is published and is the shortest working
 path.
 
-The next candidate, **0.3.0**, targets public npmjs distribution for the main
-package and all four platform carriers. It has **not yet been published**.
-Publisher setup, live-provider gates and anonymous exact-version installation
-must pass before availability is announced. The partial 0.2.0 GitHub Packages
-release is historical; its existing artifacts remain immutable. For the new
-candidate, remove any old scope override to `npm.pkg.github.com`; it would send
-installation requests to the wrong registry.
+The current release, **0.3.3**, publishes native downloads for Linux and macOS
+on x86_64 and ARM64 at
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
+npm and PyPI publication is **deferred by the release policy**, not pending:
+publisher setup, live-provider gates and anonymous exact-version installation
+have to pass before it is attempted. The partial 0.2.0 GitHub Packages release
+is historical; its existing artifacts remain immutable. If a publication is
+ever resumed, remove any old scope override to `npm.pkg.github.com`; it would
+send installation requests to the wrong registry.
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
@@ -245,8 +247,8 @@ Versioning, ACLs, bucket policies, lifecycle rules, replication, event
 notifications, object tagging, object lock, S3 Select, KMS-backed encryption.
 
 Implemented: bucket CRUD, object put/get/head/copy/delete, prefix listing with
-pagination, range reads, conditional reads and writes, MD5/CRC32/CRC32C/SHA-1/
-SHA-256 checksums, multipart uploads, presigned requests, SigV4.
+pagination, range reads, conditional reads and writes, MD5/CRC32/CRC32C/CRC64NVME/
+SHA-1/SHA-256 checksums, multipart uploads, presigned requests, SigV4.
 
 ## Reporting problems
 
