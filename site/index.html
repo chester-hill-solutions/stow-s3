@@ -264,7 +264,7 @@ try {
           </div>
           <div>
             <h3>Reject a stale update</h3>
-            <p>A conditional write compares the ETag you read with the object's current ETag and refuses the write if they differ, so two writers cannot clobber one another.</p>
+            <p>A conditional write compares the ETag you read with the object's current ETag and refuses the write if they differ, so two writers cannot clobber one another. A create-only write is refused when the store cannot confirm the object is absent, so it never replaces bytes it could not read.</p>
             <div class="fixture-code">
               <div class="fixture-code-heading"><span class="code-file">conditional-write.mjs</span><span class="code-language">TypeScript</span><button type="button" data-copy="#fixture-conditional-write" hidden>Copy</button></div>
               <pre tabindex="0" aria-label="Reject a stale update"><code id="fixture-conditional-write" data-language="typescript"><!-- include:examples/stow-recipes/conditional-write.mjs --></code></pre>
