@@ -1,7 +1,7 @@
 {
   "baseline": "b6d37430d731e03da3209f38b9737a99053765fe",
   "scopeFrozen": true,
-  "requiredFixes": 1,
+  "requiredFixes": 0,
   "closedLeads": 4,
   "optionalStrictness": 1,
   "leads": [
@@ -69,11 +69,14 @@
     {
       "id": "C07",
       "lead": "SigV4 sorts query names before URI encoding",
-      "status": "open",
+      "status": "closed",
       "priority": 4,
       "severity": "low",
-      "evidence": "TestClosureEncodedQuery/encoded-key; TestClosureReferenceSignedQuery/encoded-key; TestClosureNodeSDKQuery/encoded-key",
-      "closureCriteria": [
+      "evidence": "TestCanonicalQueryOrderFollowsTheEncodedNames; TestPinnedNodeSignerRequestsAuthenticate",
+      "closed": "2026-10-19",
+      "closureEvidence": "docs/reviews/2026-10-19-sigv4-query-order.md",
+      "reason": "The canonical query encodes the names and values first and sorts the encoded names, which is the order the signing rules use and the order the pinned Node signer produces.",
+      "closureCriteriaMet": [
         "Canonical query order matches the encoded-key reference.",
         "Pinned Node signer requests authenticate for ASCII and encoded-name fixtures.",
         "Existing SDK, malformed-query and repeated ordinary-query cases remain qualified; no new request feature or signature fallback is added."

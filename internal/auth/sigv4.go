@@ -156,8 +156,8 @@ func parseCredentialScope(raw string) (credentialScope, error) {
 // authenticates a request against headers the client did not commit to, so all
 // four are refused: empty entries, which make "host;;x-amz-date" the same list
 // as "host;x-amz-date"; trimming and lowercasing; duplicates; and sorting,
-// since the canonical request embeds the list verbatim. AWS's own signer emits
-// conforming lists, so a conforming client is unaffected.
+// since the canonical request embeds the list verbatim. A conforming signer
+// emits a conforming list, so a conforming client is unaffected.
 func parseSignedHeaders(raw string) ([]string, error) {
 	if raw == "" {
 		return nil, authError("AccessDenied", "malformed SignedHeaders")
@@ -364,8 +364,7 @@ func validatePresignedTime(r *http.Request, sr signedRequest, requestTime, now t
 	//
 	// An ordinary signed request has no such freedom, because its date is a header the
 	// client cannot choose freely without invalidating the signature, and stow checks
-	// that header's skew in both directions. Both are now bounded by the verifier's
-	// configured allowance.
+	// that header's skew in both directions.
 	if requestTime.After(now.Add(maxSkew)) {
 		return authError("RequestTimeTooSkewed", "request time skew too large")
 	}
