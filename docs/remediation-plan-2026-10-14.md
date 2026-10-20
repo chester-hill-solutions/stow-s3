@@ -1,7 +1,7 @@
 # Remediation plan: code evaluation findings
 
 Current core correctness status: the [bounded closure register](reviews/2026-10-18-correctness-closure.md)
-evaluates nine historical leads: two reproduced fixes remain, six leads are
+evaluates nine historical leads: one reproduced fix remains, seven leads are
 closed, and one is optional strictness. Older follow-ups below are historical;
 they do not imply the current queue is empty.
 

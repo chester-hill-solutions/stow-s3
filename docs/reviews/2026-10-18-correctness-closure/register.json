@@ -1,7 +1,7 @@
 {
   "baseline": "b6d37430d731e03da3209f38b9737a99053765fe",
   "scopeFrozen": true,
-  "requiredFixes": 2,
+  "requiredFixes": 1,
   "closedLeads": 4,
   "optionalStrictness": 1,
   "leads": [
@@ -90,11 +90,14 @@
     {
       "id": "C09",
       "lead": "S3 write/COPY preconditions fold opaque ETag case",
-      "status": "open",
+      "status": "closed",
       "priority": 3,
       "severity": "medium",
-      "evidence": "TestClosureETagCase/{put-match,put-none,copy-match,copy-none}/caseChanged=true",
-      "closureCriteria": [
+      "evidence": "TestOpaqueEntityTagsAreNotFoldedByCase; TestWildcardEntityTagsStillMatch; TestAnOpaqueEntityTagIsNotFoldedByCase",
+      "closed": "2026-10-19",
+      "closureEvidence": "docs/reviews/2026-10-19-opaque-etag.md",
+      "reason": "An entity tag is opaque and compares character for character. The shared matcher and the HTTP validator path now use one rule, so a tag that differs only in case does not match.",
+      "closureCriteriaMet": [
         "Case-changed opaque tags compare unequal in the qualified PUT/COPY matrix.",
         "Exact tags, wildcard and weak-validator contracts remain correct.",
         "Cover the shared storage matcher and corresponding HTTP validator path without changing ETag generation or storage formats."

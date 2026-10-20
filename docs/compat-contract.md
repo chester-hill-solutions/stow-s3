@@ -106,6 +106,11 @@ Conditional writes and reads return different statuses:
 
 A matching `If-None-Match` read returns `304` without a body or S3 error code.
 SDKs may report different local error names: Go reports `NotModified`; the TypeScript SDK reports `Unknown`.
+
+An entity tag is opaque. It identifies a representation, so a tag that differs
+only in case identifies a different one and does not match. A weak validator is
+accepted by `If-None-Match` and not by `If-Match`, and `*` names every
+representation rather than one.
 <!-- repo-only:start -->
 The shared corpus checks status only, because those names are not wire properties.
 <!-- repo-only:end -->

@@ -125,11 +125,8 @@ func ValidateMultipartPartNumbers(parts []PartInfo) error {
 // A completion with exactly one part produced a single-part object, and S3 gives
 // it that part's own ETag verbatim. The `-{partCount}` suffix belongs to
 // genuinely multipart objects, where the digest covers the concatenated part
-// digests. So one part is not "a multipart object with a count of one": it is
-// the part.
-//
-// A client returns this value on its next conditional write, so the two forms
-// are not interchangeable behind the API.
+// digests. A client returns this value on its next conditional write, so the two
+// forms are not interchangeable behind the API.
 func CompletionETag(partETags []string) string {
 	if len(partETags) == 1 {
 		return partETags[0]

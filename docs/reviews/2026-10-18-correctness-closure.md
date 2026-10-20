@@ -1,16 +1,16 @@
 # Bounded correctness closure register — 2026-10-18
 
-**Two demonstrated fixes remain: one medium, one low.** Of nine named
-historical leads, six are closed by existing implementations and fresh
-regressions; one is optional input strictness with no demonstrated security
-consequence.
+**One demonstrated fix remains: one low.** Of nine named historical leads, seven
+are closed by existing implementations and fresh regressions; one is optional
+input strictness with no demonstrated security consequence.
 There are no unclassified leads in this bounded register. This does not certify
 all code or every storage fault. [Machine-readable register](2026-10-18-correctness-closure/register.json).
 
 C04 was closed on 2026-10-19 by the
-[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md), and C06 by the
-[repeated signed header fix](2026-10-19-sigv4-repeated-header.md). The other two
-dispositions below stand unchanged.
+[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md), C06 by the
+[repeated signed header fix](2026-10-19-sigv4-repeated-header.md), and C09 by
+the [opaque entity tag fix](2026-10-19-opaque-etag.md). The last disposition
+below stands unchanged.
 
 The earlier statement that the *reproduced* core queue was closed described the
 completed A1–A3/capacity work. It did not resolve the explicitly unverified older
@@ -39,7 +39,7 @@ test tree. No performance benchmarks run.
 | C06 | SigV4 only signs/verifies the first repeated header value | **Closed 2026-10-19:** a signed header contributes every value it carries, joined as the SDK joins them, and a changed set is refused. |
 | C07 | SigV4 query sorting occurs before URI encoding | **Open, low:** a valid pinned Node signer request is refused for an encoded-name query. |
 | C08 | Case-insensitive unsigned-payload marker | Optional strictness: accepted with a valid HMAC; no additional access demonstrated. |
-| C09 | Opaque ETag preconditions compare case-insensitively | **Open, medium:** PUT/COPY predicates return the wrong outcome for case-changed tags. |
+| C09 | Opaque ETag preconditions compare case-insensitively | **Closed 2026-10-19:** an entity tag is opaque and compares character for character, in one shared rule for writes, copies and reads. |
 
 ## Required fixes, in priority order
 
@@ -108,6 +108,11 @@ attacker additional authority through the built-in consumer.
 [actual Go signer source](2026-10-18-correctness-closure/raw/initial/sdk-v4.go.txt).
 
 ### 3. C09 — Case-changed opaque ETags produce incorrect conditional outcomes
+
+**Closed 2026-10-19.** The
+[opaque entity tag fix](2026-10-19-opaque-etag.md) compares the tag character for
+character, in one shared rule for the write, copy-source and read paths. The
+reproduction below still describes the defect as it stood at this baseline.
 
 The native S3 route over a memory store reports the tag
 `"149603e6c03516362a8da23f624db945"`. Supplying its uppercase spelling produces:
@@ -222,11 +227,11 @@ remain qualification gaps. They are not four more reproduced defect tickets and
 do not reopen the closed A1–A3 findings. The native workspace/HTTP/protocol scope
 here is intentionally bounded to the nine listed leads.
 
-The next independently reviewable correction is **C09, case-changed opaque ETags**.
-C04 was closed on 2026-10-19 by the
-[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md) and C06 by the
-[repeated signed header fix](2026-10-19-sigv4-repeated-header.md); the other
-required fix has explicit acceptance criteria in the register. Incoming-write
-memory amplification, listing/indexing and other performance work remain
-separate. No next fix or optimization is implemented automatically in this
-closure review.
+The next independently reviewable correction is **C07, the ordering of query names
+before URI encoding**. C04 was closed on 2026-10-19 by the
+[workspace uncertainty fix](2026-10-19-workspace-uncertainty.md), C06 by the
+[repeated signed header fix](2026-10-19-sigv4-repeated-header.md) and C09 by the
+[opaque entity tag fix](2026-10-19-opaque-etag.md); the last required fix has
+explicit acceptance criteria in the register. Incoming-write memory amplification,
+listing/indexing and other performance work remain separate. No next fix or
+optimization is implemented automatically in this closure review.
