@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	storage "github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -29,15 +30,121 @@ func (s *FilesystemStore) ListObjectsV2(ctx context.Context, bucket string, opts
 	if _, err := os.Stat(s.bucketDir(bucket)); os.IsNotExist(err) {
 		return nil, storage.ErrBucketNotFound
 	}
-	items := make([]storage.ObjectMeta, 0)
-	walk := objectListWalk{ctx: ctx, prefix: opts.Prefix, collect: func(meta storage.ObjectMeta) error {
-		items = append(items, meta)
-		return nil
-	}}
-	if err := s.walkObjects(bucket, s.objectsDir(bucket), walk); err != nil {
+	candidates := make([]listedObjectCandidate, 0)
+	if err := s.walkListCandidates(ctx, s.objectsDir(bucket), nil, opts.Prefix, &candidates); err != nil {
 		return nil, err
 	}
-	return storage.PaginateObjects(items, opts), nil
+	sort.Slice(candidates, func(i, j int) bool {
+		if candidates[i].key != candidates[j].key {
+			return candidates[i].key < candidates[j].key
+		}
+		return candidates[i].path < candidates[j].path
+	})
+	items := make([]storage.ObjectMeta, 0, len(candidates))
+	byKey := make(map[string]listedObjectCandidate, len(candidates))
+	for _, candidate := range candidates {
+		items = append(items, storage.ObjectMeta{Bucket: bucket, Key: candidate.key})
+		byKey[candidate.key] = candidate
+	}
+	result := storage.PaginateObjects(items, opts)
+	for i := range result.Objects {
+		if ctx != nil && ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+		candidate := byKey[result.Objects[i].Key]
+		record := objectRecord{}
+		if candidate.record != nil {
+			record = *candidate.record
+		} else {
+			var err error
+			record, err = readObjectHeader(candidate.path)
+			if err != nil {
+				return nil, err
+			}
+			if record.Key != "" {
+				key, ok := keyFromListedRecord(record, candidate.segments, candidate.name)
+				if !ok || key != candidate.key {
+					return nil, fmt.Errorf("object record key does not match path %q", candidate.path)
+				}
+			}
+		}
+		result.Objects[i] = record.meta(bucket, candidate.key)
+	}
+	return result, nil
+}
+
+type listedObjectCandidate struct {
+	key      string
+	path     string
+	name     string
+	segments []string
+	record   *objectRecord
+}
+
+func (s *FilesystemStore) walkListCandidates(ctx context.Context, dir string, segments []string, prefix string, candidates *[]listedObjectCandidate) error {
+	entries, err := os.ReadDir(dir)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if ctx != nil && ctx.Err() != nil {
+			return ctx.Err()
+		}
+		entryPath := filepath.Join(dir, entry.Name())
+		if entry.IsDir() {
+			if !isListDirectory(entry.Name(), segments) {
+				continue
+			}
+			childSegments := append(append([]string(nil), segments...), entry.Name())
+			if err := s.walkListCandidates(ctx, entryPath, childSegments, prefix, candidates); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := s.appendListCandidate(segments, entry.Name(), entryPath, prefix, candidates); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *FilesystemStore) appendListCandidate(segments []string, name, path, prefix string, candidates *[]listedObjectCandidate) error {
+	if strings.HasSuffix(name, legacyMetaSuffix) {
+		return nil
+	}
+	if len(segments) == 2 && segments[0] == boundedPathPrefix {
+		return s.appendBoundedListCandidate(segments, name, path, prefix, candidates)
+	}
+	return appendReversibleListCandidate(segments, name, path, prefix, candidates)
+}
+
+func (s *FilesystemStore) appendBoundedListCandidate(segments []string, name, path, prefix string, candidates *[]listedObjectCandidate) error {
+	record, err := readObjectHeader(path)
+	if err != nil {
+		return err
+	}
+	key, ok := keyFromListedRecord(record, segments, name)
+	if !ok || !strings.HasPrefix(key, prefix) {
+		return nil
+	}
+	*candidates = append(*candidates, listedObjectCandidate{
+		key: key, path: path, name: name, segments: append([]string(nil), segments...), record: &record,
+	})
+	return nil
+}
+
+func appendReversibleListCandidate(segments []string, name, path, prefix string, candidates *[]listedObjectCandidate) error {
+	key, ok := objectKeyFromSegments(append(append([]string(nil), segments...), name))
+	if !ok || !strings.HasPrefix(key, prefix) {
+		return nil
+	}
+	*candidates = append(*candidates, listedObjectCandidate{
+		key: key, path: path, name: name, segments: append([]string(nil), segments...),
+	})
+	return nil
 }
 
 func (s *FilesystemStore) walkObjects(bucket, dir string, walk objectListWalk) error {
