@@ -53,6 +53,12 @@ Against the previous implementation all six case-changed routes fail and the
 exact-tag controls pass. Against the corrected implementation every case
 behaves as the contract requires.
 
+The TypeScript client had the same defect recorded as expected behaviour: its
+host-backed stream test required an `If-Match` carrying an upper-cased tag to be
+satisfied, which is what the folded comparison did. The test now requires that
+write to be refused, and the packaged WASM is regenerated because the storage
+matcher is in its closure.
+
 ## Scope
 
 This is a bounded correction of one reproduced defect. No public API,
