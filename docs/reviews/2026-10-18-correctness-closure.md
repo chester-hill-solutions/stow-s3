@@ -12,6 +12,11 @@ C04 was closed on 2026-10-19 by the
 [opaque entity tag fix](2026-10-19-opaque-etag.md) and C07 by the
 [query order fix](2026-10-19-sigv4-query-order.md). C08 remains optional.
 
+This register describes the tree on `main`. The published v0.3.3 archives were
+tagged before three of those fixes, so they carry the issues their
+[release notes](releases/v0.3.3.md) list. A lead closed here is closed in the
+current build; it is not a statement about a download.
+
 The earlier statement that the *reproduced* core queue was closed described the
 completed A1–A3/capacity work. It did not resolve the explicitly unverified older
 leads. This closure pass reproduces four of those, including a native overwrite;
