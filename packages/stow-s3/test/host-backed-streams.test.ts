@@ -35,7 +35,10 @@ test("real Go host streams preserve snapshots, avoid lifetime locks, and free re
     for (const conditions of [{ ifNoneMatch: base.etag }, { ifNoneMatch: `W/${base.etag}` }, { ifMatch: `W/${base.etag}` }]) {
       await assert.rejects(runtime.putObject("assets", "base", new Uint8Array([1, 2, 3, 4]), conditions), { code: "precondition_failed" });
     }
-    for (const ifMatch of ["*", `"other", ${base.etag}`, base.etag.slice(1, -1).toUpperCase()]) {
+    // A tag is opaque: a case-changed one names a different representation, so
+    // it does not satisfy If-Match.
+    await assert.rejects(runtime.putObject("assets", "base", new Uint8Array([1, 2, 3, 4]), { ifMatch: base.etag.slice(1, -1).toUpperCase() }), { code: "precondition_failed" });
+    for (const ifMatch of ["*", `"other", ${base.etag}`]) {
       await runtime.putObject("assets", "base", new Uint8Array([1, 2, 3, 4]), { ifMatch });
     }
     async function* data() {
