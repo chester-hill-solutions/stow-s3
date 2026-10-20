@@ -14,7 +14,7 @@ C04 was closed on 2026-10-19 by the
 
 This register describes the tree on `main`. The published v0.3.3 archives were
 tagged before three of those fixes, so they carry the issues their
-[release notes](releases/v0.3.3.md) list. A lead closed here is closed in the
+[release notes](../releases/v0.3.3.md) list. A lead closed here is closed in the
 current build; it is not a statement about a download.
 
 The earlier statement that the *reproduced* core queue was closed described the
