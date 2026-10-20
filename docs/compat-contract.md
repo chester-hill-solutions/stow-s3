@@ -29,6 +29,10 @@ Bucket names use 3–63 characters from `[a-z0-9._-]`. This local extension perm
 
 Header authentication may use the SDK-compatible `Date` header when `X-Amz-Date` is absent, provided the selected date header is in `SignedHeaders` and the signature validates. Presigned URLs still require `X-Amz-Date`. Presigned methods are GET, PUT, and HEAD; `X-Amz-Expires` must be in `1..604800`.
 
+The canonical query is ordered by the encoded parameter names, with the encoded
+values ordered within a name. A name that needs encoding can therefore come
+first, and a query signed that way is the one the verifier accepts.
+
 Every supplied `x-amz-*` header must appear in `SignedHeaders`, including copy
 source, source conditions, user metadata and checksum headers. Adding an unsigned
 copy-source header to a presigned PUT cannot change the authenticated operation.

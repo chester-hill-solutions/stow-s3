@@ -40,6 +40,11 @@ func uriEncode(value string, encodeSlash bool) string {
 	return b.String()
 }
 
+// canonicalQueryString builds the canonical query string of a request.
+//
+// The names and values are encoded first and sorted after, because that is the
+// order the signing rules use. Sorting the decoded names can put a name ahead
+// of another one that the encoded order reverses.
 func canonicalQueryString(rawQuery string) string {
 	if rawQuery == "" {
 		return ""
@@ -50,20 +55,23 @@ func canonicalQueryString(rawQuery string) string {
 	}
 	deleteCaseInsensitive(values, "X-Amz-Signature")
 
-	keys := make([]string, 0, len(values))
-	for key := range values {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-
-	var parts []string
-	for _, key := range keys {
-		vals := values[key]
-		sort.Strings(vals)
+	type parameter struct{ key, value string }
+	parameters := make([]parameter, 0, len(values))
+	for key, vals := range values {
 		encodedKey := uriEncode(key, true)
 		for _, val := range vals {
-			parts = append(parts, encodedKey+"="+uriEncode(val, true))
+			parameters = append(parameters, parameter{encodedKey, uriEncode(val, true)})
 		}
+	}
+	sort.Slice(parameters, func(i, j int) bool {
+		if parameters[i].key != parameters[j].key {
+			return parameters[i].key < parameters[j].key
+		}
+		return parameters[i].value < parameters[j].value
+	})
+	parts := make([]string, 0, len(parameters))
+	for _, p := range parameters {
+		parts = append(parts, p.key+"="+p.value)
 	}
 	return strings.Join(parts, "&")
 }

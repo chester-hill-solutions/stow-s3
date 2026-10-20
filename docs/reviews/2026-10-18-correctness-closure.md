@@ -1,16 +1,16 @@
 # Bounded correctness closure register — 2026-10-18
 
-**One demonstrated fix remains: one low.** Of nine named historical leads, seven
-are closed by existing implementations and fresh regressions; one is optional
-input strictness with no demonstrated security consequence.
+**No required fix remains.** Of nine named historical leads, eight are closed by
+existing implementations and fresh regressions; one is optional input
+strictness with no demonstrated security consequence.
 There are no unclassified leads in this bounded register. This does not certify
 all code or every storage fault. [Machine-readable register](2026-10-18-correctness-closure/register.json).
 
 C04 was closed on 2026-10-19 by the
 [workspace uncertainty fix](2026-10-19-workspace-uncertainty.md), C06 by the
-[repeated signed header fix](2026-10-19-sigv4-repeated-header.md), and C09 by
-the [opaque entity tag fix](2026-10-19-opaque-etag.md). The last disposition
-below stands unchanged.
+[repeated signed header fix](2026-10-19-sigv4-repeated-header.md), C09 by the
+[opaque entity tag fix](2026-10-19-opaque-etag.md) and C07 by the
+[query order fix](2026-10-19-sigv4-query-order.md). C08 remains optional.
 
 The earlier statement that the *reproduced* core queue was closed described the
 completed A1–A3/capacity work. It did not resolve the explicitly unverified older
@@ -37,7 +37,7 @@ test tree. No performance benchmarks run.
 | C04 | Workspace I/O errors are interpreted as absence | **Closed 2026-10-19:** only a confirmed absence is reported as absence, so a create-only write is refused over bytes the store could not read. |
 | C05 | Post-rename uncertainty withdraws namespace reservation | Closed in the corrected managed writer: native fence/unknown regressions pass. |
 | C06 | SigV4 only signs/verifies the first repeated header value | **Closed 2026-10-19:** a signed header contributes every value it carries, joined as the SDK joins them, and a changed set is refused. |
-| C07 | SigV4 query sorting occurs before URI encoding | **Open, low:** a valid pinned Node signer request is refused for an encoded-name query. |
+| C07 | SigV4 query sorting occurs before URI encoding | **Closed 2026-10-19:** the canonical query encodes the names and values first and sorts the encoded names, as the signing rules and the pinned Node signer do. |
 | C08 | Case-insensitive unsigned-payload marker | Optional strictness: accepted with a valid HMAC; no additional access demonstrated. |
 | C09 | Opaque ETag preconditions compare case-insensitively | **Closed 2026-10-19:** an entity tag is opaque and compares character for character, in one shared rule for writes, copies and reads. |
 
@@ -143,6 +143,11 @@ when the comparison is corrected. No ETag-generation or format change is needed.
 
 ### 4. C07 — Encoded query names disagree with the pinned Node signer
 
+**Closed 2026-10-19.** The
+[query order fix](2026-10-19-sigv4-query-order.md) encodes the query names and
+values first and sorts the encoded names. The reproduction below still describes
+the defect as it stood at this baseline.
+
 For `z=last&%C3%A9=first`, Stow canonicalizes `z` before the encoded name. The
 correct encoded ordering is `%C3%A9=first&z=last`. An independent literal canonical
 request/HMAC fixture and the actual pinned Node `@smithy/signature-v4` 5.7.4 signer
@@ -227,11 +232,15 @@ remain qualification gaps. They are not four more reproduced defect tickets and
 do not reopen the closed A1–A3 findings. The native workspace/HTTP/protocol scope
 here is intentionally bounded to the nine listed leads.
 
-The next independently reviewable correction is **C07, the ordering of query names
-before URI encoding**. C04 was closed on 2026-10-19 by the
+The next independently reviewable correction is none: every required fix in this
+register is closed. C04 was closed on 2026-10-19 by the
 [workspace uncertainty fix](2026-10-19-workspace-uncertainty.md), C06 by the
-[repeated signed header fix](2026-10-19-sigv4-repeated-header.md) and C09 by the
-[opaque entity tag fix](2026-10-19-opaque-etag.md); the last required fix has
-explicit acceptance criteria in the register. Incoming-write memory amplification,
-listing/indexing and other performance work remain separate. No next fix or
-optimization is implemented automatically in this closure review.
+[repeated signed header fix](2026-10-19-sigv4-repeated-header.md), C09 by the
+[opaque entity tag fix](2026-10-19-opaque-etag.md) and C07 by the
+[query order fix](2026-10-19-sigv4-query-order.md).
+
+The register is a bounded view of nine named leads, not of the codebase. A
+closed lead means that lead is corrected and covered; it is not a claim that
+every code path is correct. Incoming-write memory amplification,
+listing/indexing and other performance work remain separate, and no next fix or
+optimization is implied by this closure review.

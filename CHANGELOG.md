@@ -8,7 +8,8 @@ Report only a confirmed absence as an absent object, so a create-only write is
 refused over workspace bytes the store could not read. A signed HTTP header now
 covers every value it carries, so a request that changes one after signing is
 refused, and an entity tag is compared as the opaque identifier it is rather
-than folded by case.
+than folded by case. The canonical query is ordered by the encoded
+parameter names, as the signing rules require.
 Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
 [release notes](docs/releases/v0.3.3.md) for compatibility and known issues.
 

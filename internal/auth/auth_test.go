@@ -431,19 +431,23 @@ func canonicalQuery(rawQuery string) string {
 			delete(values, key)
 		}
 	}
-	keys := make([]string, 0, len(values))
-	for key := range values {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	var parts []string
-	for _, key := range keys {
-		vals := values[key]
-		sort.Strings(vals)
+	type parameter struct{ key, value string }
+	parameters := make([]parameter, 0, len(values))
+	for key, vals := range values {
 		encodedKey := uriEncode(key, true)
 		for _, val := range vals {
-			parts = append(parts, encodedKey+"="+uriEncode(val, true))
+			parameters = append(parameters, parameter{encodedKey, uriEncode(val, true)})
 		}
+	}
+	sort.Slice(parameters, func(i, j int) bool {
+		if parameters[i].key != parameters[j].key {
+			return parameters[i].key < parameters[j].key
+		}
+		return parameters[i].value < parameters[j].value
+	})
+	parts := make([]string, 0, len(parameters))
+	for _, p := range parameters {
+		parts = append(parts, p.key+"="+p.value)
 	}
 	return strings.Join(parts, "&")
 }
