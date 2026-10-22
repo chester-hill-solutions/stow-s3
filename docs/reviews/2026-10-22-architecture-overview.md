@@ -200,9 +200,14 @@ radius of being wrong; `overall` never exceeds it.
 
 This review's register was produced by re-deriving facts from source. Acting on the
 findings exposed what that method cannot see: **whether the behaviour it describes
-was chosen on purpose.** In five of the six findings below, the answer was yes, and
-the evidence was in the tests or the surrounding structure rather than in the code
-the finding cited.
+was chosen on purpose.**
+
+Of the nine findings below, **four were real and are fixed, and five were refuted,
+unresolved, or not actionable** — and in every one of the five, the evidence was in
+a test, a comment, or the surrounding structure rather than in the code the finding
+cited. Two of the five had their answer already written in the source: `sigv4.go:291`
+states why the signature comparison must not case-fold, and `workspace_owner_test.go`
+pins the 500 for a corrupt stored record.
 
 **Treat this section as a correction to the register above, and read the tests
 before acting on any remaining row.**
@@ -216,6 +221,8 @@ before acting on any remaining row.**
 | `capacity.ErrFull` reaches a client as a 500 | **A real defect.** Fixed: 507 InsufficientStorage, matching the runtime's own quota refusal directly above it. |
 | `uploadDir` joins a caller-supplied upload ID into a path (`internal/storage/workspace/multipart.go:54-56`) | **A real defect, and it was in both stores.** `internal/storage/fs/fs.go:201` had the same exposure. Fixed by validating the ID's shape before a path is built. Two placements the suites required and the finding did not anticipate: the guard must sit *after* the filesystem store's pending-save gate, because `save_requests_test.go` pins that gate as winning over everything including a multipart mutation; and `ValidateMultipartUpload` must keep answering `ErrNoSuchUpload` rather than introducing a third vocabulary. |
 | Run-through mode silently loses guarded saves, durable save requests and recovery holds | **Not a defect, or not yet a defect — unresolved, and the strongest case for leaving it alone.** The adapter holds a narrow field per capability it forwards (`localMultipart` in `multipart_adapter.go`) and refuses the rest explicitly, so the omission is a choice rather than an oversight. `storage.GuardedWriteStore` is only a capability predicate, and `SaveOptions` carries a `RequestKey`, so the guarded-save workflow is entangled with durable replay — which the outbox already journals for the same question. Enabling both in run-through mode would give one question two journals, which is the shape the author repeatedly removes ("one mechanism rather than two", ADR 0010). Nothing pins or documents it either way, so the finding is recorded as **unresolved rather than confirmed**. |
+| The auth path compares the access key with `!=` and the payload hash with `strings.EqualFold`, while the signature uses `hmac.Equal` | **Not a defect, and the source already says why.** `sigv4.go:291` documents that the signature comparison must not case-fold, because "case-folding it first would accept a signature nobody computed" — the signature is the secret comparison and it is constant-time. The access key is an identifier, not a secret, and the payload hash is a digest of a body the client already holds, so case-folding it is interoperability rather than exposure. Neither non-constant-time comparison involves a secret, so there is nothing for their timing to leak. The review read the inconsistency as the finding; the inconsistency is the point. |
+| The encoded-name query ordering is "guarded only by one unit test" | **Not actionable.** Sorting the encoded names is a correctness property, not something a runtime check can add a guard to: either the implementation does it or it does not. `query_order_test.go` and the pinned Node signer fixture are the right instruments for a compatibility boundary of this shape, and they caught the defect that produced them. |
 | Workspace listing returns `.git`, `node_modules` and swap files that the capture path excludes | **Possibly deliberate, unexamined.** Listing a workspace bucket is documented as listing the caller's directory; the capture path filters because a capture must be portable. The two rules may be correct for their two purposes, which would make the divergence a documentation gap rather than a defect. Not acted on. |
 
 ### The lesson worth carrying forward
@@ -252,9 +259,10 @@ The review performed none of these; two have since been done, and are marked so.
    assertions and the `Supports*` predicates together, routed through the ~two dozen inline sites;
    and either give `SaveRequestStore` and `RecoveryHoldStore` a second adapter or stop declaring
    them as interfaces.
-5. **Close the two non-constant-time comparisons in the auth path, or state them.** Move the payload
-   hash to `hmac.Equal` or document that it is not a secret comparison; likewise the access-key
-   comparison. Give the encoded-name query ordering a runtime guard rather than one unit test.
+5. **No change to the auth comparisons.** Examined and refuted: the signature is the secret
+   comparison, it is constant-time, and `sigv4.go:291` already states why it must not case-fold. The
+   access key is an identifier and the payload hash is a digest of a body the client holds, so
+   neither involves a secret. See the re-diagnosis above.
 6. **Document the two exclusion rules rather than unifying them.** Listing a workspace bucket is
    listing the caller's directory; a capture must be portable. Both may be right for their purpose,
    so the divergence is a documentation gap until someone decides otherwise.
