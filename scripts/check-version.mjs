@@ -219,6 +219,77 @@ if (!goProtocol) {
   problems.push(`readiness protocol version differs between writer and readers: Go ${goProtocol}, TypeScript ${tsProtocol}, Python ${pyProtocol}`);
 }
 
+// Go writes the readiness record's capability set and both clients read it. Each
+// side restates the field names independently, and the record is the only place a
+// caller learns what the server will enforce, so a field the writer publishes and
+// a reader never declares is a capability no client can report. One had already
+// gone missing this way before the gate existed: maxMultipartUploads.
+//
+// Names are compared case- and separator-insensitively because the wire is
+// camelCase while the Python dataclass is snake_case, which is a convention
+// difference rather than a disagreement.
+function capabilityBlock(source, marker, terminators) {
+  const start = source.indexOf(marker);
+  if (start === -1) return null;
+  let end = source.length;
+  for (const terminator of terminators) {
+    const at = source.indexOf(terminator, start + marker.length);
+    if (at !== -1 && at < end) end = at;
+  }
+  return source.slice(start, end);
+}
+
+const capabilitySources = [
+  {
+    language: "Go",
+    text: capabilityBlock(
+      readFileSync(resolve(root, "internal/ready/ready.go"), "utf8"),
+      "type Capabilities struct {",
+      ["\n}"],
+    ),
+    names: (block) => [...block.matchAll(/json:"([A-Za-z0-9_]+)"/g)].map((m) => m[1]),
+  },
+  {
+    language: "TypeScript",
+    text: capabilityBlock(
+      readFileSync(resolve(root, "packages/stow-s3/src/ready.ts"), "utf8"),
+      "export interface StowReadyCapabilities {",
+      ["\n}"],
+    ),
+    names: (block) => [...block.matchAll(/^\s{2}([A-Za-z][A-Za-z0-9_]*)\??:/gm)].map((m) => m[1]),
+  },
+  {
+    language: "Python",
+    text: capabilityBlock(
+      readFileSync(resolve(root, "packages/stow-s3-py/src/stow_s3/ready.py"), "utf8"),
+      "class StowCapabilities:",
+      ["\n@dataclass", "\ndef ", "\nclass "],
+    ),
+    names: (block) => [...block.matchAll(/^\s{4}([a-z][a-z0-9_]*):/gm)].map((m) => m[1]),
+  },
+];
+
+const normalize = (name) => name.toLowerCase().replace(/_/g, "");
+const capabilitySets = [];
+for (const source of capabilitySources) {
+  if (source.text === null) {
+    problems.push(`the readiness capability set is no longer declared in ${source.language}`);
+    continue;
+  }
+  capabilitySets.push({ language: source.language, names: new Set(source.names(source.text).map(normalize)) });
+}
+if (capabilitySets.length === capabilitySources.length) {
+  const declared = new Set(capabilitySets.flatMap((s) => [...s.names]));
+  for (const name of declared) {
+    const missingFrom = capabilitySets.filter((s) => !s.names.has(name)).map((s) => s.language);
+    if (missingFrom.length > 0) {
+      problems.push(
+        `readiness capability ${name} is declared in ${capabilitySets.filter((s) => s.names.has(name)).map((s) => s.language).join(", ")} but not in ${missingFrom.join(", ")}`,
+      );
+    }
+  }
+}
+
 if (problems.length > 0) {
   for (const problem of problems) console.error(problem);
   process.exit(1);
