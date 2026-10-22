@@ -197,6 +197,28 @@ if (!goMarker) {
   problems.push(`data directory ownership marker differs between writer and reader: Go ${goMarker}, TypeScript ${tsMarker}`);
 }
 
+// Go writes the versioned readiness record and both clients read it. Each side
+// restates the protocol version independently and each reader rejects any other
+// value, so a drift would leave one client refusing a server the other accepts -
+// and the two would disagree about a record whose fields they may no longer
+// understand. The build version is gated above; this is the wire version, which
+// can move on its own.
+const goReady = readFileSync(resolve(root, "internal/ready/ready.go"), "utf8");
+const goProtocol = goReady.match(/^const ProtocolVersion = (\d+)/m)?.[1];
+const tsReady = readFileSync(resolve(root, "packages/stow-s3/src/ready.ts"), "utf8");
+const tsProtocol = tsReady.match(/^export const READY_PROTOCOL_VERSION = (\d+);/m)?.[1];
+const pyReady = readFileSync(resolve(root, "packages/stow-s3-py/src/stow_s3/ready.py"), "utf8");
+const pyProtocol = pyReady.match(/^READY_PROTOCOL_VERSION = (\d+)/m)?.[1];
+if (!goProtocol) {
+  problems.push("internal/ready/ready.go no longer declares ProtocolVersion");
+} else if (!tsProtocol) {
+  problems.push("packages/stow-s3/src/ready.ts no longer declares READY_PROTOCOL_VERSION");
+} else if (!pyProtocol) {
+  problems.push("packages/stow-s3-py/src/stow_s3/ready.py no longer declares READY_PROTOCOL_VERSION");
+} else if (goProtocol !== tsProtocol || goProtocol !== pyProtocol) {
+  problems.push(`readiness protocol version differs between writer and readers: Go ${goProtocol}, TypeScript ${tsProtocol}, Python ${pyProtocol}`);
+}
+
 if (problems.length > 0) {
   for (const problem of problems) console.error(problem);
   process.exit(1);
