@@ -3237,6 +3237,64 @@
     ]
   },
   {
+    "coverage_id": "rooted%20file%20access%20primitive::seam%3Ainternal%2Frooted::internal%2Frooted::Module",
+    "canonical_refs": {
+      "surface": "rooted file access primitive",
+      "boundary": "seam:internal/rooted",
+      "subsystem": "internal/rooted",
+      "overview_class": "Module"
+    },
+    "surface": "rooted file access primitive",
+    "boundary": "seam:internal/rooted",
+    "subsystem": "internal/rooted",
+    "overview_class": "Module",
+    "starting_paths": [
+      "internal/rooted/root.go",
+      "internal/rooted/mutations.go",
+      "internal/rooted/regular_unix.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Module",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Module"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
     "coverage_id": "run-through%20adapter::seam%3Ainternal%2Frunthrough::internal%2Frunthrough::Module",
     "canonical_refs": {
       "surface": "run-through adapter",
@@ -4680,6 +4738,434 @@
     "unresolved": []
   },
   {
+    "coverage_id": "the%20CLI%20out-of-session%20checkpoint%20capture%20policy%20flow::seam%3Acmd%2Fstow-s3%2Fworkspace_archive.go::cmd%2Fstow-s3::Data%20flow",
+    "canonical_refs": {
+      "surface": "the CLI out-of-session checkpoint capture policy flow",
+      "boundary": "seam:cmd/stow-s3/workspace_archive.go",
+      "subsystem": "cmd/stow-s3",
+      "overview_class": "Data flow"
+    },
+    "surface": "the CLI out-of-session checkpoint capture policy flow",
+    "boundary": "seam:cmd/stow-s3/workspace_archive.go",
+    "subsystem": "cmd/stow-s3",
+    "overview_class": "Data flow",
+    "starting_paths": [
+      "cmd/stow-s3/workspace_archive.go",
+      "cmd/stow-s3/workspace.go",
+      "internal/policystore/store.go",
+      "internal/policy/source.go",
+      "pkg/stow/checkpoint_external.go",
+      "cmd/stow-s3/workspace_policy_test.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Data flow",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Data flow"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20GOOS-selected%20safe-filesystem%20primitive%20seam::seam%3Ainternal%2Frooted%2Fregular_other.go::internal%2Frooted::Seam",
+    "canonical_refs": {
+      "surface": "the GOOS-selected safe-filesystem primitive seam",
+      "boundary": "seam:internal/rooted/regular_other.go",
+      "subsystem": "internal/rooted",
+      "overview_class": "Seam"
+    },
+    "surface": "the GOOS-selected safe-filesystem primitive seam",
+    "boundary": "seam:internal/rooted/regular_other.go",
+    "subsystem": "internal/rooted",
+    "overview_class": "Seam",
+    "starting_paths": [
+      "internal/rooted/regular_unix.go",
+      "internal/rooted/regular_other.go",
+      "internal/atomicfile/lock_unix.go",
+      "internal/atomicfile/lock_windows.go",
+      "internal/atomicfile/lock_other.go",
+      "internal/storage/fs/fs_lock_unix.go",
+      "internal/storage/fs/fs_lock_other.go",
+      "internal/storage/workspace/open_nofollow_unix.go",
+      "internal/storage/workspace/open_nofollow_other.go",
+      "internal/runthrough/file_outbox_lock_unsupported.go",
+      "pkg/stow/handoff_rename_other.go",
+      "pkg/stow/filesystem_unsupported.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Seam",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Seam"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20MCP%20browser%20bundle%20pipeline%20from%20the%20extension%20UI%20to%20the%20embedded%20MCP%20resource::seam%3Aextensions%2Fstow%2Fbuild.mjs::extensions%2Fstow::Data%20flow",
+    "canonical_refs": {
+      "surface": "the MCP browser bundle pipeline from the extension UI to the embedded MCP resource",
+      "boundary": "seam:extensions/stow/build.mjs",
+      "subsystem": "extensions/stow",
+      "overview_class": "Data flow"
+    },
+    "surface": "the MCP browser bundle pipeline from the extension UI to the embedded MCP resource",
+    "boundary": "seam:extensions/stow/build.mjs",
+    "subsystem": "extensions/stow",
+    "overview_class": "Data flow",
+    "starting_paths": [
+      "extensions/stow/build.mjs",
+      "extensions/stow/src/app.ts",
+      "tools/mcp-browser-pack/main.go",
+      "internal/mcpstorage/browser.go",
+      "internal/mcpstorage/browser_ui.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Data flow",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Data flow"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20WASM%20runtime%20asset%20shipping%20flow::seam%3Apackages%2Fstow-s3%2Fscripts%2Fcopy-wasm-assets.mjs::packages%2Fstow-s3::Data%20flow",
+    "canonical_refs": {
+      "surface": "the WASM runtime asset shipping flow",
+      "boundary": "seam:packages/stow-s3/scripts/copy-wasm-assets.mjs",
+      "subsystem": "packages/stow-s3",
+      "overview_class": "Data flow"
+    },
+    "surface": "the WASM runtime asset shipping flow",
+    "boundary": "seam:packages/stow-s3/scripts/copy-wasm-assets.mjs",
+    "subsystem": "packages/stow-s3",
+    "overview_class": "Data flow",
+    "starting_paths": [
+      "Makefile",
+      "cmd/stow-wasm/main.go",
+      "packages/stow-s3/scripts/copy-wasm-assets.mjs",
+      "packages/stow-s3/src/node-wasm-host.ts",
+      "packages/stow-s3/src/browser-wasm-host.ts",
+      "packages/stow-s3/package.json"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Data flow",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Data flow"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20build%20version%20constant%20and%20its%20cross-language%20agreement::seam%3Ainternal%2Fversion%2Fversion.go::internal%2Fversion::Dependency",
+    "canonical_refs": {
+      "surface": "the build version constant and its cross-language agreement",
+      "boundary": "seam:internal/version/version.go",
+      "subsystem": "internal/version",
+      "overview_class": "Dependency"
+    },
+    "surface": "the build version constant and its cross-language agreement",
+    "boundary": "seam:internal/version/version.go",
+    "subsystem": "internal/version",
+    "overview_class": "Dependency",
+    "starting_paths": [
+      "internal/version/version.go",
+      "scripts/check-version.mjs",
+      "cmd/stow-s3/version.go",
+      "cmd/stow-s3/main.go",
+      "cmd/stow-s3/doctor.go",
+      "internal/s3api/admin.go",
+      "internal/ready/ready.go",
+      "packages/stow-s3/package.json",
+      "packages/stow-s3-py/pyproject.toml"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Dependency",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Dependency"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20machine%20registry%27s%20recovery-hold%20journal%20and%20its%20identity%20sidecar::seam%3Ainternal%2Fstorage%2Fworkspace%2Frecovery-holds::internal%2Fstorage%2Fworkspace::Module",
+    "canonical_refs": {
+      "surface": "the machine registry's recovery-hold journal and its identity sidecar",
+      "boundary": "seam:internal/storage/workspace/recovery-holds",
+      "subsystem": "internal/storage/workspace",
+      "overview_class": "Module"
+    },
+    "surface": "the machine registry's recovery-hold journal and its identity sidecar",
+    "boundary": "seam:internal/storage/workspace/recovery-holds",
+    "subsystem": "internal/storage/workspace",
+    "overview_class": "Module",
+    "starting_paths": [
+      "internal/storage/workspace/recovery_hold_journal.go",
+      "internal/storage/workspace/recovery_hold_mutation.go",
+      "internal/storage/workspace/recovery_holds.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Module",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Module"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20object-record%20protobuf%20header%20schema%20and%20its%20checked-in%20generated%20Go::seam%3Ainternal%2Fstorage%2Ffs%2Frecordpb::internal%2Fstorage%2Ffs%2Frecordpb::Module",
+    "canonical_refs": {
+      "surface": "the object-record protobuf header schema and its checked-in generated Go",
+      "boundary": "seam:internal/storage/fs/recordpb",
+      "subsystem": "internal/storage/fs/recordpb",
+      "overview_class": "Module"
+    },
+    "surface": "the object-record protobuf header schema and its checked-in generated Go",
+    "boundary": "seam:internal/storage/fs/recordpb",
+    "subsystem": "internal/storage/fs/recordpb",
+    "overview_class": "Module",
+    "starting_paths": [
+      "internal/storage/fs/recordpb/record.proto",
+      "internal/storage/fs/recordpb/record.pb.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Module",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Module"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
     "coverage_id": "the%20optional%20put-checksum%20and%20guarded-write%20capability%20seams%20on%20internal%2Fstorage%27s%20Store::seam%3Ainternal%2Fstorage%2Fstore.go::internal%2Fstorage::Seam",
     "canonical_refs": {
       "surface": "the optional put-checksum and guarded-write capability seams on internal/storage's Store",
@@ -4793,6 +5279,186 @@
     "result_fingerprints": [],
     "unresolved": [
       "budget_cannot_reserve_critics_and_validation: the 45-agent budget was consumed by reconnaissance, wave 1 (5 units), wave 2 (4 units) and the wave-1 critic; the harness then reached its subagent limit, so wave 3 was never launched and no unit from it was assigned."
+    ]
+  },
+  {
+    "coverage_id": "the%20shared%20recovery-hold%20error%20markers::seam%3Ainternal%2Frecoveryerrors%2Ferrors.go::internal%2Frecoveryerrors::Dependency",
+    "canonical_refs": {
+      "surface": "the shared recovery-hold error markers",
+      "boundary": "seam:internal/recoveryerrors/errors.go",
+      "subsystem": "internal/recoveryerrors",
+      "overview_class": "Dependency"
+    },
+    "surface": "the shared recovery-hold error markers",
+    "boundary": "seam:internal/recoveryerrors/errors.go",
+    "subsystem": "internal/recoveryerrors",
+    "overview_class": "Dependency",
+    "starting_paths": [
+      "internal/recoveryerrors/errors.go",
+      "internal/embedded/object_recovery.go",
+      "internal/storage/workspace/recovery_holds.go",
+      "internal/storage/recovery.go",
+      "internal/storage/fs/recovery_holds.go",
+      "internal/runtime/guarded_save.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Dependency",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Dependency"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20web-worker%20message%20protocol%20between%20the%20embedded%20host%20and%20the%20worker%20server::seam%3Apackages%2Fstow-s3%2Fsrc%2Fworker-protocol.ts::packages%2Fstow-s3::Data%20flow",
+    "canonical_refs": {
+      "surface": "the web-worker message protocol between the embedded host and the worker server",
+      "boundary": "seam:packages/stow-s3/src/worker-protocol.ts",
+      "subsystem": "packages/stow-s3",
+      "overview_class": "Data flow"
+    },
+    "surface": "the web-worker message protocol between the embedded host and the worker server",
+    "boundary": "seam:packages/stow-s3/src/worker-protocol.ts",
+    "subsystem": "packages/stow-s3",
+    "overview_class": "Data flow",
+    "starting_paths": [
+      "packages/stow-s3/src/worker-protocol.ts",
+      "packages/stow-s3/src/worker-host.ts",
+      "packages/stow-s3/src/worker-server.ts",
+      "packages/stow-s3/src/worker.ts",
+      "packages/stow-s3/src/browser-wasm-worker.ts",
+      "packages/stow-s3/src/browser-content-worker.ts",
+      "packages/stow-s3/src/async-embedded.ts"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Data flow",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Data flow"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Module",
+        "reason": "This unit's subject is not the module itself; the module it describes is carried by the dedicated Module unit for the same subsystem, so a separate Module unit here would duplicate that record."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
+    ]
+  },
+  {
+    "coverage_id": "the%20workspace%20multipart%20staging%20area%20and%20its%20private%20part-record%20format::seam%3Ainternal%2Fstorage%2Fworkspace%2Fmultipart::internal%2Fstorage%2Fworkspace::Module",
+    "canonical_refs": {
+      "surface": "the workspace multipart staging area and its private part-record format",
+      "boundary": "seam:internal/storage/workspace/multipart",
+      "subsystem": "internal/storage/workspace",
+      "overview_class": "Module"
+    },
+    "surface": "the workspace multipart staging area and its private part-record format",
+    "boundary": "seam:internal/storage/workspace/multipart",
+    "subsystem": "internal/storage/workspace",
+    "overview_class": "Module",
+    "starting_paths": [
+      "internal/storage/workspace/multipart.go",
+      "internal/storage/workspace/part_record.go"
+    ],
+    "primary_block": "OVERVIEW-CLASSES.md#Module",
+    "selected_blocks": [
+      "OVERVIEW-CLASSES.md#Core discipline",
+      "OVERVIEW-CLASSES.md#Universal moves",
+      "OVERVIEW-CLASSES.md#Validation rules",
+      "OVERVIEW-CLASSES.md#Module"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "OVERVIEW-CLASSES.md#Seam",
+        "reason": "The substitutability of this unit is carried by a dedicated Seam unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Data flow",
+        "reason": "The value flow of this unit is carried by a dedicated Data flow unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Dependency",
+        "reason": "The dependency relationships of this unit are carried by a dedicated Dependency unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Extension point",
+        "reason": "The variation point of this unit is carried by a dedicated Extension point unit."
+      },
+      {
+        "block": "OVERVIEW-CLASSES.md#Risk",
+        "reason": "The risk of this unit is carried by a dedicated Risk unit; describing it here would duplicate a record."
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "proposed by the whole-run coverage critic after the waves closed; not assigned within the run's budget"
     ]
   },
   {

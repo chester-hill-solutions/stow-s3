@@ -274,16 +274,48 @@ The review performed none of these; two have since been done, and are marked so.
     default, splitting `pkg/stow` off `internal/s3api` — are listed with their interfaces in the
     full report.
 
+## The whole-run coverage critic, and what examining its proposals found
+
+The coverage critic that never ran during the original waves has now run over the
+whole map, asked for coverage the *ledger itself* did not contain rather than for
+the 26 deferred units it already names. It proposed seven, and the ledger is now
+52 units.
+
+The three highest-value proposals were examined against source, and **none is a
+defect**:
+
+| Proposed gap | What examining it found |
+|---|---|
+| The build version constant and its cross-language agreement | **Already gated.** `scripts/check-version.mjs` compares the Go constant in `internal/version/version.go` against `packages/stow-s3/package.json`, `packages/stow-s3-py/pyproject.toml` and the Python `__init__`, plus the four platform packages. The agreement exists and a gate holds it. |
+| The web-worker message protocol between the embedded host and the worker server | **Single-sourced and validated.** `worker-protocol.ts` declares the envelope once and ships runtime validators (`isWorkerRequest`, `isWorkerReply`), and the payload inside it is the WASM protocol the WASM record already covers. |
+| The GOOS-selected safe-filesystem primitive seam | **A capability gate, correctly built.** `regular_unix.go` opens and refuses a non-regular file; `regular_other.go` refuses outright with `ErrUnsupported` and `safeRegularOpenSupported` makes `Supported()` report false. It declines rather than opening a path it cannot prove is not a link, and it exposes the predicate so a caller can branch. |
+
+This is the shape to expect from a coverage critic: it proposes coverage by design,
+so finding three working mechanisms rather than three bugs is a result about the
+code rather than a criticism of the critic. It also sharpens the picture the
+register above gives — the areas this map did not reach are not obviously worse
+than the areas it did.
+
+The four remaining proposals (the shared recovery-hold error markers, the MCP
+browser bundle pipeline, the WASM asset shipping flow, and the CLI out-of-session
+checkpoint capture policy flow) are coverage still to buy, not findings.
+
 ## Where the map is thin
 
-Coverage is fifteen of forty-one units. The deferred set includes the seams inside
+Coverage is fifteen of fifty-two units. The deferred set includes the seams inside
 `internal/storage` (staged writes, guarded writes, the put-checksum capability, the propagation
 outbox), the durable-file primitives `internal/atomicfile` and `internal/rooted` that every store's
 atomic publication and confinement route through, the extension points, the peripheral trees
 (`site`, `examples`, `conformance`, `scripts`, `tools`), and `internal/authority`,
-`internal/policy` and `internal/capacity`. **No coverage critic ran after the second wave**, so
-nothing independently states what the later waves missed.
-[OPEN-QUESTIONS.md](2026-10-22-architecture-overview/OPEN-QUESTIONS.md) lists the whole set.
+`internal/policy` and `internal/capacity`.
+
+A whole-run coverage critic has now run, and its seven proposals are in the ledger; the three
+examined were working mechanisms rather than defects. What no critic settles is whether the
+uncovered areas are *sound*: the sections above describe the parts of the system this run read, and
+silence about the rest is silence.
+
+[OPEN-QUESTIONS.md](2026-10-22-architecture-overview/OPEN-QUESTIONS.md) lists the deferred set as it
+stood at 41 units; the ledger carries the later additions.
 
 ## Evidence
 
@@ -294,6 +326,6 @@ nothing independently states what the later waves missed.
 | [VALIDATION-LOG.md](2026-10-22-architecture-overview/VALIDATION-LOG.md) | What validation and verification found, including all 27 refuted claims. |
 | [OPEN-QUESTIONS.md](2026-10-22-architecture-overview/OPEN-QUESTIONS.md) | The deferred coverage set. |
 | [SITUATION.md](2026-10-22-architecture-overview/SITUATION.md) | The reconnaissance summary, with corrections appended as they were established. |
-| [coverage-ledger.json](2026-10-22-architecture-overview/coverage-ledger.json) | The coverage claim: 41 units with their state, the 15 worked and the 26 deferred. |
+| [coverage-ledger.json](2026-10-22-architecture-overview/coverage-ledger.json) | The coverage claim: 52 units with their state - the 15 worked, and 37 not reached, of which 26 were seeded and 11 were proposed by the whole-run coverage critic after the waves closed. |
 | [citation-check.json](2026-10-22-architecture-overview/citation-check.json) | Per-record citation resolution: every cited path and line. |
 | [metadata.json](2026-10-22-architecture-overview/metadata.json) | Revision, method, counts and integrity results. |
