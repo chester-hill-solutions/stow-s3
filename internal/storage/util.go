@@ -72,6 +72,23 @@ func NewUploadID() (string, error) {
 	return hex.EncodeToString(id[:]), nil
 }
 
+const uploadIDHexLen = 32
+
+// ValidateUploadID reports whether id has the shape NewUploadID produces. A store
+// checks it before joining an upload ID into a path, because filepath.Join cleans
+// ".." and an unvalidated ID can address a directory outside the upload area.
+func ValidateUploadID(id string) error {
+	if len(id) != uploadIDHexLen {
+		return ErrInvalidUpload
+	}
+	for i := 0; i < len(id); i++ {
+		if c := id[i]; (c < '0' || c > '9') && (c < 'a' || c > 'f') {
+			return ErrInvalidUpload
+		}
+	}
+	return nil
+}
+
 // ETagForBytes returns the storage ETag for a byte slice.
 func ETagForBytes(data []byte) string {
 	sum := md5.Sum(data)
@@ -99,10 +116,9 @@ func CompositeETag(partETags []string) string {
 // ascending order, with no duplicate part numbers, and that there is at least
 // one of them.
 //
-// An empty completion returns ErrInvalidPart rather than ErrInvalidUpload
-// because ErrInvalidPart is the sentinel the S3 surface maps; ErrInvalidUpload is
-// unmapped and would reach a client as a 500, which reports a malformed request
-// as a server fault and invites a retry that cannot succeed.
+// An empty completion is ErrInvalidPart rather than ErrInvalidUpload: ErrInvalidPart
+// is the sentinel the S3 surface maps, while ErrInvalidUpload reaches a client as a
+// 500, which is right for a corrupt stored record and wrong for a malformed request.
 func ValidateMultipartPartNumbers(parts []PartInfo) error {
 	if len(parts) == 0 {
 		return ErrInvalidPart

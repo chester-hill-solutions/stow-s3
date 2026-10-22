@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -72,5 +73,40 @@ func TestPaginateObjects_Continuation(t *testing.T) {
 	}
 	if result.ContinuationToken != "a" {
 		t.Fatalf("ContinuationToken = %q", result.ContinuationToken)
+	}
+}
+
+// An upload ID is joined into a path by the path-backed stores, so this shape
+// check is a traversal defence rather than a tidiness rule. NewUploadID emits 16
+// random bytes in lowercase hexadecimal, and nothing else can pass.
+func TestValidateUploadIDRefusesAnythingNewUploadIDWouldNotMint(t *testing.T) {
+	minted, err := NewUploadID()
+	if err != nil {
+		t.Fatalf("NewUploadID: %v", err)
+	}
+	if err := ValidateUploadID(minted); err != nil {
+		t.Fatalf("ValidateUploadID(%q) = %v, want nil for an ID this package minted", minted, err)
+	}
+
+	refused := []struct {
+		id  string
+		why string
+	}{
+		{"", "empty"},
+		{"..", "a parent reference"},
+		{"../../etc", "a traversal"},
+		{"/etc/passwd", "an absolute path"},
+		{"nested/id", "a path separator"},
+		{strings.Repeat("a", 31), "one character short"},
+		{strings.Repeat("a", 33), "one character long"},
+		{strings.Repeat("g", 32), "not hexadecimal"},
+		{strings.Repeat("A", 32), "uppercase, which NewUploadID never emits"},
+		{strings.Repeat("a", 32) + "\n", "a trailing newline"},
+		{strings.Repeat("a", 32) + "\x00", "a trailing NUL"},
+	}
+	for _, testCase := range refused {
+		if err := ValidateUploadID(testCase.id); err == nil {
+			t.Errorf("ValidateUploadID(%q) = nil, want a refusal: it is %s", testCase.id, testCase.why)
+		}
 	}
 }
