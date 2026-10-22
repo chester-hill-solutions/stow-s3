@@ -13,7 +13,7 @@ import (
 // from one a developer happened to point at, so it is what makes it safe for a
 // client to delete a data directory on the caller's behalf.
 //
-// The value is duplicated in packages/stow/src/ownership.ts, which reads it
+// The value is duplicated in packages/stow-s3/src/ownership.ts, which reads it
 // before deleting anything. scripts/check-version.mjs fails if the two drift.
 const OwnerMarkerName = ".stow-owner"
 

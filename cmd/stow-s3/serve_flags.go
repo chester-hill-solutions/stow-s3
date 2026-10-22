@@ -54,7 +54,7 @@ func parseServeFlags(args []string) serveFlags {
 	allowInsecureUpstream := flags.Bool("allow-insecure-upstream", false, "Permit HTTP upstream endpoints beyond literal loopback addresses")
 	port := flags.Int("port", 9000, "HTTP listen port (0 = ephemeral)")
 	dataDir := flags.String("data-dir", ".stow", "Data directory for object storage")
-	backendFlag := flags.String("backend", "filesystem", "Storage backend (filesystem or memory)")
+	backendFlag := flags.String("backend", "filesystem", "Storage backend (filesystem or memory; the workspace backend is available through the embedded API)")
 	accessKey := flags.String("access-key", "", "Access key (generated if omitted)")
 	secretKey := flags.String("secret-key", "", "Secret key (generated if omitted)")
 	host := flags.String("host", "127.0.0.1", "Listen host")

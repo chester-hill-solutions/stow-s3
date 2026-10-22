@@ -329,32 +329,53 @@ caller having asked for that key by name.
 
 ## 4. The manifest
 
-One file: `<dir>/.stow/manifest.json`.
+Two versioned documents under `<dir>/.stow/`, at layout version 3.
+
+`manifest.json` carries the workspace's identity:
 
 ```json
 {
-  "version": 1,
+  "version": 3,
   "workspace_id": "ws_9f2c...",
   "bucket": "stow-workspace-9f2c...",
   "created": "2026-09-25T18:04:11Z",
   "last_used": "2026-09-25T18:31:02Z",
   "ttl_seconds": 21600,
-  "entries": {
-    "output/report.pdf": {
-      "form": "natural",
-      "size": 182344,
-      "etag": "9b2c...",
-      "content_type": "application/pdf",
-      "modified": "2026-09-25T18:30:58Z"
-    },
-    "weird/../key": {
-      "form": "escaped",
-      "digest": "3f0a...",
-      "size": 12
+  "owned": true
+}
+```
+
+`index.json` carries what stow knows about each key it has seen, nested by bucket
+rather than flat. It is the only document on the hot write path, and it is
+rewritten whenever an object is adopted, updated or forgotten — which is why it
+is not the identity document:
+
+```json
+{
+  "version": 3,
+  "buckets": {
+    "stow-workspace-9f2c...": {
+      "output/report.pdf": {
+        "form": "natural",
+        "size": 182344,
+        "etag": "9b2c...",
+        "content_type": "application/pdf",
+        "modified": "2026-09-25T18:30:58Z"
+      },
+      "weird/../key": {
+        "form": "escaped",
+        "digest": "3f0a...",
+        "size": 12
+      }
     }
   }
 }
 ```
+
+An entry may also carry `multipart`, `content_etag`, `version_id`, `metadata`,
+`checksum_algorithm` and `checksum_value`. An escaped key's bytes live at
+`.stow/keys/<sha256(bucket)>/<sha256(key)>` rather than at a path derived from
+the key.
 
 Rules:
 
@@ -362,8 +383,8 @@ Rules:
   migrated on read. The outbox already established that pattern for durable
   files, and a manifest that silently downgrades is a manifest that loses
   entries.
-- **Atomically written.** Temporary file in `.stow/`, then rename. A manifest
-  is never observed half-written.
+- **Atomically written.** Temporary file in `.stow/`, then rename. Neither
+  document is ever observed half-written.
 - **Not the source of truth for existence.** The filesystem is. A manifest
   entry pointing at a missing file serves as absent; a file with no entry
   exists. The manifest carries metadata and identity, and losing it degrades
@@ -375,12 +396,12 @@ Rules:
 
 ### 4.1 Staleness
 
-A manifest records size and modification time. Reads and write preconditions
+A manifest entry records size and modification time. Reads and write preconditions
 also hash the current bytes, so a same-size edit within one timestamp tick or an
 edit preserving the timestamp changes the ETag. Changed content gets a new
 content identity and drops stale declared checksums and metadata; unchanged
 content retains its recorded identity and declarations. This costs a file read
-when resolving metadata. The manifest is
+when resolving metadata. The index is
 updated opportunistically.
 
 This is accepted rather than engineered away, per ADR 0008 section 5: an

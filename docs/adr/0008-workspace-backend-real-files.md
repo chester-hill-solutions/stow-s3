@@ -1,7 +1,7 @@
 ---
 status: accepted
-amended: 2026-10-14
-decision_digest: 8e5136907576da20
+amended: 2026-10-22
+decision_digest: f26afc1fecec8741
 ---
 
 # A workspace stores objects as real files, with metadata in one manifest
@@ -68,15 +68,18 @@ needed and why it is total.
 
 ### 3. Metadata lives in one manifest per workspace, never per-object sidecars
 
-One `stow-workspace.json` at the workspace root maps key to content type,
-ETag, checksums, last-modified, and relative path. A missing entry is legal
-and is the normal case for a file Stow did not write.
+Two versioned documents under `<workspace>/.stow/`: `manifest.json` carries
+identity (version, workspace_id, bucket, created, last_used, ttl_seconds,
+owned), and `index.json` maps bucket then key to an entry recording form, size,
+ETag, content type, checksums, metadata and last-modified. A missing entry is
+legal and is the normal case for a file Stow did not write.
 
 Per-object sidecar files are specifically rejected. That format already
 existed and was abandoned: `.stowmeta` survives in the tree only so the
 filesystem store can recognise and refuse it
-(`internal/storage/fs/fs.go:20`). A single manifest also makes a workspace
-inspectable with `cat`, which is the point of the product.
+(`internal/storage/fs/fs.go:20`). Metadata in a workspace-level document rather
+than in per-object sidecars also makes a workspace inspectable with `cat`,
+which is the point of the product.
 
 ### 4. The backend adopts files it did not write
 
@@ -130,6 +133,13 @@ removed without an explicit destroy.
   later port.
 
 ## Amendments
+
+- 2026-10-22: The decision said one `stow-workspace.json` at the workspace root.
+  The layout is two versioned documents under `<workspace>/.stow/` —
+  `manifest.json` for identity and `index.json` for the object index — so that
+  the document rewritten on every object write is not the document that carries
+  workspace identity. The decision is otherwise unchanged: metadata lives in a
+  workspace-level document, never in per-object sidecars.
 
 - 2026-10-14: Hot object-index updates use compact JSON with the same fields
   and version. Existing indented documents remain readable. Index replacement

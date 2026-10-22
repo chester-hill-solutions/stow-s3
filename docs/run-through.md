@@ -136,7 +136,8 @@ Local data is authoritative. Upstream propagation requires all of these:
 - a durable coordinated outbox.
 
 `STOW_POLICY=mirrorWrites` selects routing policy; it does not authorize upstream writes.
-Without live-write consent, writes stay local.
+Without live-write consent a mirror-writes mutation is refused when an upstream is reachable,
+and stays local when none is; a read-through policy without consent always writes locally.
 An explicit `STOW_ALLOW_LIVE_WRITES=false` also prevents propagation.
 See the [outbox guide](outbox.md) for retries and conflict recovery.
 
