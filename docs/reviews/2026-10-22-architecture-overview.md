@@ -196,19 +196,58 @@ radius of being wrong; `overall` never exceeds it.
 | P3 | `pkg/stow` (filesystem entry) | Platform limits discovered at the call rather than at compile time. |
 | P3 | `pkg/stow` (registry policy) | A public administrative surface with no caller at all; a staging-prefix rule inlined in three places. |
 
+## Re-diagnosis: what happened when the defects were acted on
+
+This review's register was produced by re-deriving facts from source. Acting on the
+findings exposed what that method cannot see: **whether the behaviour it describes
+was chosen on purpose.** In five of the six findings below, the answer was yes, and
+the evidence was in the tests or the surrounding structure rather than in the code
+the finding cited.
+
+**Treat this section as a correction to the register above, and read the tests
+before acting on any remaining row.**
+
+| Finding | What acting on it revealed |
+|---|---|
+| Run-through write policy contradicts the code (ADR 0005 and the banner say writes stay local; the adapter refuses) | **The refusal is right and the words were wrong.** `547b3a51` (2026-09-26) wrote the refusal with the rationale "a mirror-writes policy is not satisfied by keeping the local write", *before* ADR 0005 was published. The ADR, the banner and the policy doc comment were corrected; the behaviour was not touched. |
+| `storage.ErrInvalidUpload` reaches a client as a 500 | **The 500 is deliberate.** `s3api/workspace_owner_test.go` pins it for a corrupt or truncated stored upload record, which is a server-side integrity problem, not a client error. The workaround the finding cited — `ValidateMultipartPartNumbers` returning `ErrInvalidPart` instead — is deliberate for the same reason. Left unmapped. |
+| `storage.ErrResourceUnresolved` reaches a client as a 500 | **A real defect.** Fixed: 404 NoSuchUpload. The same condition had answered both 500 and 404 depending on whether a policy was configured. |
+| `runthrough.ErrLiveWritesDisabled` reaches a client as a 500 | **A real defect.** Fixed: 403 AccessDenied, following the authority refusal already in the same table. |
+| `capacity.ErrFull` reaches a client as a 500 | **A real defect.** Fixed: 507 InsufficientStorage, matching the runtime's own quota refusal directly above it. |
+| `uploadDir` joins a caller-supplied upload ID into a path (`internal/storage/workspace/multipart.go:54-56`) | **A real defect, and it was in both stores.** `internal/storage/fs/fs.go:201` had the same exposure. Fixed by validating the ID's shape before a path is built. Two placements the suites required and the finding did not anticipate: the guard must sit *after* the filesystem store's pending-save gate, because `save_requests_test.go` pins that gate as winning over everything including a multipart mutation; and `ValidateMultipartUpload` must keep answering `ErrNoSuchUpload` rather than introducing a third vocabulary. |
+| Run-through mode silently loses guarded saves, durable save requests and recovery holds | **Not a defect, or not yet a defect — unresolved, and the strongest case for leaving it alone.** The adapter holds a narrow field per capability it forwards (`localMultipart` in `multipart_adapter.go`) and refuses the rest explicitly, so the omission is a choice rather than an oversight. `storage.GuardedWriteStore` is only a capability predicate, and `SaveOptions` carries a `RequestKey`, so the guarded-save workflow is entangled with durable replay — which the outbox already journals for the same question. Enabling both in run-through mode would give one question two journals, which is the shape the author repeatedly removes ("one mechanism rather than two", ADR 0010). Nothing pins or documents it either way, so the finding is recorded as **unresolved rather than confirmed**. |
+| Workspace listing returns `.git`, `node_modules` and swap files that the capture path excludes | **Possibly deliberate, unexamined.** Listing a workspace bucket is documented as listing the caller's directory; the capture path filters because a capture must be portable. The two rules may be correct for their two purposes, which would make the divergence a documentation gap rather than a defect. Not acted on. |
+
+### The lesson worth carrying forward
+
+A source-grounded review can establish *what the code does* and cannot establish
+*why*. Where the two disagree with the prose around them, the code is the product
+and the prose is the defect — that held in five of six cases here. The test suite
+is the closest thing to a specification this repository has, so it belongs in the
+first pass of a review, not the last: each of the four real defects above still
+required a *second* correction after the gate failed, because the finding had not
+read the tests that pinned the surrounding behaviour.
+
+Two open questions the register cannot settle, both now recorded as questions
+rather than defects: whether run-through mode should carry guarded saves and
+durable replay, and whether the workspace listing exclusion should match the
+capture path.
+
 ## Actions, in order
 
-None was performed by the review. Each names the interface that should change.
+The review performed none of these; two have since been done, and are marked so.
 
 1. **Make the readiness protocol one source of truth.** Generate the TypeScript and Python field
    sets and the version constant from `internal/ready/ready.go`, and extend
    `scripts/check-version.mjs` to gate `READY_PROTOCOL_VERSION` and the capability field names.
    Reconcile `capabilities.maxMultipartUploads`, which the writer publishes and neither reader
    declares.
-2. **Map the unmapped refusals.** Add `ErrLiveWritesDisabled`, `ErrResourceUnresolved` and
-   `capacity.ErrFull` to `internal/s3api/errors.go` so a refusal is a 403/404/507 rather than a 500.
-3. **Stop `runthrough.Adapter` erasing the capabilities of the store it wraps.** Forward
-   `GuardedWriteStore`, `SaveRequestStore`, `RecoveryHoldStore` and `PutChecksumStore`.
+2. **Map the unmapped refusals. DONE** for `ErrLiveWritesDisabled`, `ErrResourceUnresolved` and
+   `capacity.ErrFull`. `storage.ErrInvalidUpload` is deliberately excluded: the 500 is pinned by
+   the workspace-owner wire test for a corrupt stored record. See the re-diagnosis above.
+3. **Do not forward the adapter's missing capabilities without a decision.** The omission looks
+   deliberate, and enabling guarded saves and durable replay in run-through mode would give one
+   question two journals. Recorded as an open question, not an action.
 4. **Give capability discovery a protocol.** One probe in `internal/storage` that performs the
    assertions and the `Supports*` predicates together, routed through the ~two dozen inline sites;
    and either give `SaveRequestStore` and `RecoveryHoldStore` a second adapter or stop declaring
@@ -216,10 +255,11 @@ None was performed by the review. Each names the interface that should change.
 5. **Close the two non-constant-time comparisons in the auth path, or state them.** Move the payload
    hash to `hmac.Equal` or document that it is not a secret comparison; likewise the access-key
    comparison. Give the encoded-name query ordering a runtime guard rather than one unit test.
-6. **Decide the workspace exclusion policy once** and share it between the listing surface and the
-   capture path, so one workspace cannot yield two object sets.
-7. **Validate the upload ID** in `internal/storage/workspace/multipart.go:54-56`, so the direct
-   `storage.Store` path gets the confinement the S3 path gets from the runtime map.
+6. **Document the two exclusion rules rather than unifying them.** Listing a workspace bucket is
+   listing the caller's directory; a capture must be portable. Both may be right for their purpose,
+   so the divergence is a documentation gap until someone decides otherwise.
+7. **Validate the upload ID before it becomes a path. DONE**, in both path-backed stores, with the
+   guard placed after the filesystem store's pending-save gate.
 8. **Reconcile the two clients**, or make the drift visible: the descriptor, the legacy fallback,
    the environment-strip scope, the serve argv, and the meaning of a zero limit.
 9. **Make the WASM host capability honest** — a declared property checked at `openHost` rather than
