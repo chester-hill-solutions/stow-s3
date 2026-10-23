@@ -46,7 +46,6 @@ type ListOptions struct {
 	StartAfter        string
 }
 
-// ListResult is the result of ListObjectsV2.
 type ListResult struct {
 	Objects               []ObjectMeta
 	CommonPrefixes        []string

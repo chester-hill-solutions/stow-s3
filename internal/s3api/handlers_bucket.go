@@ -91,12 +91,7 @@ func (s *Server) handleListObjectsV2(ctx context.Context, w http.ResponseWriter,
 	}
 	startAfter := q.Get("start-after")
 	encodingType := q.Get("encoding-type")
-	maxKeys := 1000
-	if mk := q.Get("max-keys"); mk != "" {
-		if n, err := strconv.Atoi(mk); err == nil && n > 0 {
-			maxKeys = n
-		}
-	}
+	maxKeys := listMaxKeys(q)
 
 	result, err := s.store.ListObjectsV2(ctx, bucket, storage.ListOptions{
 		Prefix:            prefix,
@@ -137,6 +132,77 @@ func (s *Server) handleListObjectsV2(ctx context.Context, w http.ResponseWriter,
 	}
 	for _, o := range result.Objects {
 		resp.Contents = append(resp.Contents, objectToEntry(objectMeta{
+			Key: o.Key, Size: o.Size, ETag: o.ETag, LastModified: o.LastModified,
+		}, encodeURL))
+	}
+	for _, cp := range result.CommonPrefixes {
+		p := cp
+		if encodeURL {
+			p = urlEncodeKey(cp)
+		}
+		resp.CommonPrefixes = append(resp.CommonPrefixes, commonPrefix{Prefix: p})
+	}
+	writeXML(w, r, http.StatusOK, resp)
+}
+
+func listMaxKeys(q url.Values) int {
+	if mk := q.Get("max-keys"); mk != "" {
+		if n, err := strconv.Atoi(mk); err == nil && n > 0 {
+			return n
+		}
+	}
+	return 1000
+}
+
+// handleListObjectsV1 answers the classic GET bucket listing. Its marker names a
+// row of the listing, not a key: a marker inside a delimiter group skips that
+// whole group, because re-emitting the group's remaining keys on every page is
+// the duplicate-row loop a sync or mount client falls into.
+func (s *Server) handleListObjectsV1(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket string, q url.Values) {
+	prefix := q.Get("prefix")
+	delimiter := q.Get("delimiter")
+	marker := q.Get("marker")
+	encodingType := q.Get("encoding-type")
+	maxKeys := listMaxKeys(q)
+
+	startAfter := marker
+	if group := storage.CommonPrefixFor(marker, prefix, delimiter); group != "" {
+		startAfter = group
+	}
+
+	result, err := s.store.ListObjectsV2(ctx, bucket, storage.ListOptions{
+		Prefix:     prefix,
+		Delimiter:  delimiter,
+		MaxKeys:    maxKeys,
+		StartAfter: startAfter,
+	})
+	if err != nil {
+		writeError(w, r, mapStorageError(err, "/"+bucket))
+		return
+	}
+
+	encodeURL := encodingType == "url"
+	resp := listBucketResultV1{
+		Xmlns:       xmlNS,
+		Name:        bucket,
+		Prefix:      prefix,
+		Marker:      marker,
+		MaxKeys:     maxKeys,
+		Delimiter:   delimiter,
+		IsTruncated: result.IsTruncated,
+	}
+	if result.IsTruncated {
+		resp.NextMarker = result.NextContinuationToken
+	}
+	if encodeURL {
+		resp.EncodingType = "url"
+		resp.Prefix = urlEncodeKey(resp.Prefix)
+		resp.Marker = urlEncodeKey(resp.Marker)
+		resp.Delimiter = urlEncodeKey(resp.Delimiter)
+		resp.NextMarker = urlEncodeKey(resp.NextMarker)
+	}
+	for _, o := range result.Objects {
+		resp.Contents = append(resp.Contents, objectToEntryV1(objectMeta{
 			Key: o.Key, Size: o.Size, ETag: o.ETag, LastModified: o.LastModified,
 		}, encodeURL))
 	}

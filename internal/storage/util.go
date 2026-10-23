@@ -46,7 +46,6 @@ func ValidBucketName(name string) bool {
 	return ValidateBucketName(name) == nil
 }
 
-// ValidateKey validates an object key for all storage backends.
 func ValidateKey(key string) error {
 	if key == "" || len(key) > 1024 || !utf8.ValidString(key) || strings.IndexByte(key, 0) >= 0 {
 		return ErrInvalidKey
@@ -54,7 +53,6 @@ func ValidateKey(key string) error {
 	return nil
 }
 
-// NewRecordVersion returns an opaque immutable object version identifier.
 func NewRecordVersion() (string, error) {
 	var version [16]byte
 	if _, err := rand.Read(version[:]); err != nil {
@@ -63,7 +61,6 @@ func NewRecordVersion() (string, error) {
 	return hex.EncodeToString(version[:]), nil
 }
 
-// NewUploadID returns an opaque multipart upload identifier.
 func NewUploadID() (string, error) {
 	var id [16]byte
 	if _, err := rand.Read(id[:]); err != nil {
@@ -72,18 +69,15 @@ func NewUploadID() (string, error) {
 	return hex.EncodeToString(id[:]), nil
 }
 
-// ETagForBytes returns the storage ETag for a byte slice.
 func ETagForBytes(data []byte) string {
 	sum := md5.Sum(data)
 	return fmt.Sprintf("\"%s\"", hex.EncodeToString(sum[:]))
 }
 
-// ETagEqual compares two storage ETags.
 func ETagEqual(left, right string) bool {
 	return strings.Trim(left, "\"") == strings.Trim(right, "\"")
 }
 
-// CompositeETag returns the ETag for a completed multipart upload.
 func CompositeETag(partETags []string) string {
 	h := md5.New()
 	for _, etag := range partETags {
@@ -134,7 +128,6 @@ func CompletionETag(partETags []string) string {
 	return CompositeETag(partETags)
 }
 
-// ETagForReader reads an object and returns its ETag and bytes.
 func ETagForReader(r io.Reader) (string, []byte, error) {
 	data, err := readOwnedBytes(r)
 	if err != nil {
@@ -155,7 +148,9 @@ func CloneMetadata(m map[string]string) map[string]string {
 	return out
 }
 
-func commonPrefixFor(key, prefix, delimiter string) string {
+// CommonPrefixFor names the delimiter group a key belongs to, or "" when it is
+// not inside one. The paginator and the V1 marker rule must agree on it.
+func CommonPrefixFor(key, prefix, delimiter string) string {
 	if delimiter == "" {
 		return ""
 	}
@@ -286,7 +281,7 @@ func PaginateObjects(items []ObjectMeta, opts ListOptions) *ListResult {
 	prefixes := make(map[string]struct{})
 	for i := range items {
 		meta := items[i]
-		if cp := commonPrefixFor(meta.Key, opts.Prefix, opts.Delimiter); cp != "" {
+		if cp := CommonPrefixFor(meta.Key, opts.Prefix, opts.Delimiter); cp != "" {
 			if _, seen := prefixes[cp]; !seen {
 				prefixes[cp] = struct{}{}
 				entries = append(entries, logicalEntry{value: cp, prefix: true})
