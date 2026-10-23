@@ -182,7 +182,6 @@ func (r Record) seal() Record {
 	return canonical
 }
 
-// Encode renders a record for storage.
 func (r Record) Encode() ([]byte, error) {
 	sealed := r.seal()
 	return json.Marshal(sealed)

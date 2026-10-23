@@ -10,7 +10,6 @@ import (
 // AuthFunc validates an incoming request. Return nil to allow.
 type AuthFunc func(r *http.Request) error
 
-// DevBypass skips authentication (for tests).
 func DevBypass(_ *http.Request) error {
 	return nil
 }

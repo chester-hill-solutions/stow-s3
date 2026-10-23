@@ -1,3 +1,4 @@
+import type { EmbeddedSaveObservation, EmbeddedSaveOptions, EmbeddedSaveResult } from "./embedded-saves.js";
 export declare const EMBEDDED_PROTOCOL_VERSION = 1;
 export declare const EMBEDDED_BINARY_PROTOCOL_VERSION = 2;
 export interface EmbeddedBinaryResponse {
@@ -114,6 +115,25 @@ export declare class EmbeddedStow {
     headObject(bucket: string, key: string): EmbeddedObject;
     listObjects(bucket: string, options?: EmbeddedListOptions): EmbeddedObjectPage;
     deleteObject(bucket: string, key: string): void;
+    /**
+     * Observe an object, or its absence, before changing it.
+     *
+     * The bytes come back with the observation, so a caller cannot read one version
+     * and save against another.
+     */
+    readForSave(bucket: string, key: string): EmbeddedSaveObservation;
+    /**
+     * Publish a save that compares at publication, or replaces deliberately.
+     *
+     * A replacement is still a save with a request key: consent to replace is not
+     * consent to write twice.
+     */
+    saveObject(bucket: string, key: string, data: Uint8Array, options?: EmbeddedSaveOptions): EmbeddedSaveResult;
+    /** Ask what a request key did, instead of writing again. */
+    resolveSave(bucket: string, key: string, requestKey: string): EmbeddedSaveResult;
+    /** Drop a token this caller will not use, rather than waiting for its expiry. */
+    releaseObservation(observationToken: string): void;
+    private requireGuardedSaves;
     copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, destinationKey: string): EmbeddedObject;
     reset(): void;
     close(): void;

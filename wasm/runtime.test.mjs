@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import { test } from "node:test";
+import { after, test } from "node:test";
 import vm from "node:vm";
 
 const goroot = execFileSync("go", ["env", "GOROOT"], { encoding: "utf8" }).trim();
@@ -87,7 +87,83 @@ test("EmbeddedStow drives the real memory runtime", async () => {
     } catch {
       // The test may fail before the public close operation is reached.
     }
-    globalThis.stow.exit();
-    await runPromise;
   }
+});
+
+// A refusal is identified by its code, not by prose: the message is for a human
+// and the code is what a caller branches on.
+const refusedWith = (code) => (error) => error?.code === code;
+
+// Guarded saves over the real runtime: observe, publish against the observation,
+// refuse a stale one without touching the bytes, and replace only on request.
+test("guarded saves observe, publish, refuse a stale observation, and replace", async () => {
+  const host = { call: (request) => globalThis.stow.call(request) };
+  const text = new TextEncoder();
+  let embedded;
+  try {
+    embedded = EmbeddedStow.open(host, { maxBytes: 1 << 20, maxObjects: 100 });
+    embedded.createBucket("saves");
+
+    const absent = embedded.readForSave("saves", "doc.txt");
+    assert.equal(absent.absent, true);
+    assert.equal(typeof absent.observationToken, "string");
+    const created = embedded.saveObject("saves", "doc.txt", text.encode("first"), {
+      observationToken: absent.observationToken,
+    });
+    assert.equal(created.outcome, "committed");
+
+    const observed = embedded.readForSave("saves", "doc.txt");
+    assert.deepEqual(observed.object.data, text.encode("first"));
+    embedded.putObject("saves", "doc.txt", text.encode("interloper"));
+    assert.throws(
+      () => embedded.saveObject("saves", "doc.txt", text.encode("second"), {
+        observationToken: observed.observationToken,
+      }),
+      refusedWith("save_conflict"),
+    );
+    // The refused save did not overwrite what the other writer published.
+    assert.deepEqual(embedded.getObject("saves", "doc.txt").data, text.encode("interloper"));
+
+    const fresh = embedded.readForSave("saves", "doc.txt");
+    assert.equal(
+      embedded.saveObject("saves", "doc.txt", text.encode("third"), {
+        observationToken: fresh.observationToken,
+      }).outcome,
+      "committed",
+    );
+
+    assert.throws(
+      () => embedded.saveObject("saves", "doc.txt", text.encode("unobserved"), {}),
+      refusedWith("invalid_save_condition"),
+    );
+    assert.throws(
+      () => embedded.saveObject("saves", "doc.txt", text.encode("keyed"), { replace: true, requestKey: "rk-1" }),
+      refusedWith("save_requests_unsupported"),
+    );
+
+    const released = embedded.readForSave("saves", "doc.txt");
+    embedded.releaseObservation(released.observationToken);
+    assert.throws(
+      () => embedded.saveObject("saves", "doc.txt", text.encode("after release"), {
+        observationToken: released.observationToken,
+      }),
+      refusedWith("invalid_observation"),
+    );
+
+    assert.equal(embedded.saveObject("saves", "doc.txt", text.encode("replaced"), { replace: true }).outcome, "committed");
+    assert.deepEqual(embedded.getObject("saves", "doc.txt").data, text.encode("replaced"));
+  } finally {
+    try {
+      embedded?.close();
+    } catch {
+      // The test may fail before the public close operation is reached.
+    }
+  }
+});
+
+// One shutdown for the whole file: the runtime is a single Go program, so a test
+// that ended it would leave the next one with nothing to talk to.
+after(async () => {
+  globalThis.stow.exit();
+  await runPromise;
 });

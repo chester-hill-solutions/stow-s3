@@ -66,6 +66,41 @@ export class AsyncEmbeddedStow {
     async getObjectRange(bucket, key, range, options) {
         return fromBridgeObject(await this.invoke({ op: "getObjectRange", bucket, key, range }, undefined, options));
     }
+    async readForSave(bucket, key, call) {
+        this.requireGuardedSaves();
+        const result = await this.invoke({ op: "readForSave", bucket, key }, undefined, call);
+        return {
+            object: fromBridgeObject(result.object),
+            absent: result.absent,
+            observationToken: result.observationToken,
+        };
+    }
+    async saveObject(bucket, key, data, options = {}, call) {
+        this.requireGuardedSaves();
+        if (options.replace !== true && !options.observationToken) {
+            throw new EmbeddedStowError("invalid_save_condition", "a save needs an observation token, or replace: true");
+        }
+        if (options.requestKey && this.runtimeCapabilities.durableSaveRequests !== true) {
+            throw new EmbeddedStowError("save_requests_unsupported", "a request key needs a host that retains save requests");
+        }
+        const result = await this.invoke({ op: "saveObject", bucket, key, replace: options.replace === true, observationToken: options.observationToken, contentType: options.contentType, metadata: options.metadata, requestKey: options.requestKey }, data, call);
+        return { object: fromBridgeObject(result.object), outcome: result.outcome, replayed: result.replayed };
+    }
+    async resolveSave(bucket, key, requestKey, call) {
+        if (this.runtimeCapabilities.durableSaveRequests !== true) {
+            throw new EmbeddedStowError("save_requests_unsupported", "host does not retain save requests");
+        }
+        const result = await this.invoke({ op: "resolveSave", bucket, key, requestKey }, undefined, call);
+        return { object: fromBridgeObject(result.object), outcome: result.outcome, replayed: result.replayed };
+    }
+    async releaseObservation(observationToken, call) {
+        await this.invoke({ op: "releaseObservation", observationToken }, undefined, call);
+    }
+    requireGuardedSaves() {
+        if (this.runtimeCapabilities.guardedSaves !== true) {
+            throw new EmbeddedStowError("guarded_saves_unsupported", "host does not support observation-based saves");
+        }
+    }
     putObjectStream(bucket, key, source, options) {
         if ((options.ifMatch || options.ifNoneMatch) && this.runtimeCapabilities.conditionalWrites !== true) {
             return Promise.reject(new EmbeddedStowError("conditional_write_unsupported", "host does not support conditional writes"));

@@ -1,6 +1,7 @@
 import { type EmbeddedObjectStream, type EmbeddedStreamPutOptions } from "./async-streams.js";
 import type { ContentProtection, ContentUsage } from "./content-types.js";
 import { type EmbeddedBucket, type EmbeddedCapabilities, type EmbeddedListOptions, type EmbeddedObject, type EmbeddedObjectPage, type EmbeddedPutOptions, type EmbeddedStowOptions, type EmbeddedUsage } from "./embedded.js";
+import type { EmbeddedSaveObservation, EmbeddedSaveOptions, EmbeddedSaveResult } from "./embedded-saves.js";
 import type { AsyncEmbeddedHost, WorkerCallOptions } from "./worker-host.js";
 export interface PersistentAsyncEmbeddedOptions extends EmbeddedStowOptions {
     namespace: string;
@@ -39,6 +40,11 @@ export declare class AsyncEmbeddedStow {
         offset: number;
         length: number;
     }, options?: WorkerCallOptions): Promise<EmbeddedObject>;
+    readForSave(bucket: string, key: string, call?: WorkerCallOptions): Promise<EmbeddedSaveObservation>;
+    saveObject(bucket: string, key: string, data: Uint8Array, options?: EmbeddedSaveOptions, call?: WorkerCallOptions): Promise<EmbeddedSaveResult>;
+    resolveSave(bucket: string, key: string, requestKey: string, call?: WorkerCallOptions): Promise<EmbeddedSaveResult>;
+    releaseObservation(observationToken: string, call?: WorkerCallOptions): Promise<void>;
+    private requireGuardedSaves;
     putObjectStream(bucket: string, key: string, source: Uint8Array | AsyncIterable<Uint8Array>, options: EmbeddedStreamPutOptions): Promise<EmbeddedObject>;
     getObjectStream(bucket: string, key: string, options?: {
         signal?: AbortSignal;

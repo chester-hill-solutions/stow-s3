@@ -54,7 +54,6 @@ type CachePolicy struct {
 	TTL        time.Duration
 }
 
-// Config is the full run-through adapter configuration.
 type Config struct {
 	Policy Policy
 	// Authority is the environment's grant. It is an input to the effective
@@ -301,7 +300,6 @@ func applyCacheEnv(cfg *Config) error {
 	return nil
 }
 
-// ParsePolicy maps a string to a known public Policy.
 func ParsePolicy(raw string) (Policy, bool) {
 	switch Policy(strings.TrimSpace(raw)) {
 	case PolicyReadThroughCache, PolicyMirrorWrites:

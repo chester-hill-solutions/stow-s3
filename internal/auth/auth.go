@@ -20,7 +20,6 @@ type Verifier struct {
 	MaxSkew time.Duration
 }
 
-// NewVerifier returns a verifier with defaults applied.
 func NewVerifier(region string) *Verifier {
 	if region == "" {
 		region = DefaultRegion
