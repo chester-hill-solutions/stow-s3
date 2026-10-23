@@ -32,7 +32,10 @@ A refused address is refused before the listener opens.
 
 The surface holds one workspace or one bucket for the life of the process, so the
 caller identity and the resource scope are fixed at startup.
-Per-caller scoped access is not implemented ([ADR 0016](adr/0016-scoped-access-encrypted-cache.md)).
+Per-caller scoped access is not implemented.
+<!-- repo-only:start -->
+Per-caller scoped access is [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+<!-- repo-only:end -->
 
 ## Owned profile
 
