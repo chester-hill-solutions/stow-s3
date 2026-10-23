@@ -78,7 +78,6 @@ const (
 	WriteTimeout = 5 * time.Minute
 )
 
-// isRequestTooLarge reports whether err came from the request body limit.
 func isRequestTooLarge(err error) bool {
 	var tooLarge *http.MaxBytesError
 	return errors.As(err, &tooLarge)

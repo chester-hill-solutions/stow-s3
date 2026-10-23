@@ -155,9 +155,8 @@ func listMaxKeys(q url.Values) int {
 }
 
 // handleListObjectsV1 answers the classic GET bucket listing. Its marker names a
-// row of the listing, not a key: a marker inside a delimiter group skips that
-// whole group, because re-emitting the group's remaining keys on every page is
-// the duplicate-row loop a sync or mount client falls into.
+// row of the listing rather than an opaque token, so it may be a common prefix:
+// the store collapses a delimiter group into one row, which is what bounds it.
 func (s *Server) handleListObjectsV1(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket string, q url.Values) {
 	prefix := q.Get("prefix")
 	delimiter := q.Get("delimiter")
@@ -165,16 +164,11 @@ func (s *Server) handleListObjectsV1(ctx context.Context, w http.ResponseWriter,
 	encodingType := q.Get("encoding-type")
 	maxKeys := listMaxKeys(q)
 
-	startAfter := marker
-	if group := storage.CommonPrefixFor(marker, prefix, delimiter); group != "" {
-		startAfter = group
-	}
-
 	result, err := s.store.ListObjectsV2(ctx, bucket, storage.ListOptions{
 		Prefix:     prefix,
 		Delimiter:  delimiter,
 		MaxKeys:    maxKeys,
-		StartAfter: startAfter,
+		StartAfter: marker,
 	})
 	if err != nil {
 		writeError(w, r, mapStorageError(err, "/"+bucket))

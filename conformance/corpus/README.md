@@ -22,6 +22,7 @@ operation; an omitted setup bucket means the case bucket.
 | `conditionalPut` / `conditionalGet` | `ifMatch` and/or `ifNoneMatch` | status and S3 error code, or the stored result |
 | `checksumPut` | `contentMD5` or `checksumAlgorithm`/`checksumValue` | status/error code, body, and returned checksum |
 | `listObjectsV2` | `prefix`, `delimiter`, `maxKeys`, `encodingType`, optional `continuationToken` | ordered `expect.pages` with contents, common prefixes, key count, and truncation |
+| `listObjectsV1` | `prefix`, `delimiter`, `maxKeys`, `encodingType`, optional `marker` | ordered `expect.pages` with contents, common prefixes, truncation and `nextMarker`; a page that is truncated must state the cursor a client pages with |
 | `copyObject` | source/destination fields, optional directive and source preconditions | status/error code, ETag, destination object |
 | `multipartUpload` | `parts` (`number`, `body`, optional `repeat`) and optional upload listing | create/upload/list/complete, concatenated body, composite ETag |
 

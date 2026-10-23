@@ -38,6 +38,8 @@ func runSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		runCorpusPutWithOptions(corpusContext)
 	case "listObjectsV2":
 		runCorpusListObjects(corpusContext)
+	case "listObjectsV1":
+		runCorpusListObjectsV1(corpusContext)
 	case "copyObject":
 		runCorpusCopyObject(corpusContext)
 	case "multipartUpload":

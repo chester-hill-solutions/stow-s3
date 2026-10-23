@@ -10,15 +10,12 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListMultipartUploadsCommand,
-  ListObjectsV2Command,
   ListPartsCommand,
   PutObjectCommand,
   UploadPartCommand,
   type CompletedPart,
   type CopyObjectCommandOutput,
-  type EncodingType,
   type GetObjectCommandOutput,
-  type ListObjectsV2CommandOutput,
   type MetadataDirective,
   type PutObjectCommandInput,
   type PutObjectCommandOutput,
@@ -31,11 +28,11 @@ import { runBucketLifecycle, runBatchDelete } from "./shared-corpus-buckets.js";
 import { runMultipartFailure } from "./shared-corpus-multipart-negative.js";
 import { runSignedRequest } from "./shared-corpus-signed.js";
 import { runRangeGet } from "./shared-corpus-range.js";
+import { runListObjects, runListObjectsV1 } from "./shared-corpus-list.js";
 import type {
   Corpus,
   CorpusCase,
   CorpusExpectation,
-  CorpusPage,
   CorpusPart,
 } from "./shared-corpus-types.js";
 
@@ -140,6 +137,9 @@ async function runCorpusOperation(client: S3Client, testCase: CorpusCase): Promi
       return;
     case "listObjectsV2":
       await runListObjects(client, testCase);
+      return;
+    case "listObjectsV1":
+      await runListObjectsV1(client, testCase);
       return;
     case "copyObject":
       await runCopyObject(client, testCase);
@@ -249,49 +249,6 @@ function applyChecksum(input: PutObjectCommandInput, testCase: CorpusCase): void
     default:
       assert.fail(`unsupported corpus checksum ${algorithm}`);
   }
-}
-
-async function runListObjects(client: S3Client, testCase: CorpusCase): Promise<void> {
-  if (testCase.expect.status >= 400) {
-    await assertFailure(() => client.send(new ListObjectsV2Command({ Bucket: testCase.bucket, ContinuationToken: testCase.continuationToken })), testCase.expect, testCase.id);
-    return;
-  }
-  const pages = testCase.expect.pages ?? [{
-    contents: testCase.expect.contents,
-    commonPrefixes: testCase.expect.commonPrefixes,
-    keyCount: testCase.expect.keyCount ?? 0,
-    isTruncated: testCase.expect.isTruncated ?? false,
-  }];
-  let continuationToken: string | undefined = testCase.continuationToken;
-  for (let index = 0; index < pages.length; index += 1) {
-    const expected = pages[index];
-    assert.ok(expected, `missing expected list page ${index + 1}`);
-    const output = await client.send(new ListObjectsV2Command({
-      Bucket: testCase.bucket,
-      Prefix: testCase.prefix,
-      Delimiter: testCase.delimiter,
-      MaxKeys: testCase.maxKeys,
-      ContinuationToken: continuationToken,
-      EncodingType: testCase.encodingType as EncodingType | undefined,
-    }));
-    assertListPage(output, expected, index);
-    if (index < pages.length - 1) {
-      assert.equal(output.IsTruncated, true, `page ${index + 1} must be truncated`);
-      assert.ok(output.NextContinuationToken, `page ${index + 1} needs a continuation token`);
-      continuationToken = output.NextContinuationToken;
-    } else {
-      assert.equal(output.IsTruncated, false, `final page ${index + 1} must not be truncated`);
-    }
-  }
-}
-
-function assertListPage(output: ListObjectsV2CommandOutput, expected: CorpusPage, index: number): void {
-  assert.equal(output.$metadata.httpStatusCode, 200);
-  const contents = (output.Contents ?? []).flatMap((object) => object.Key ?? []);
-  const prefixes = (output.CommonPrefixes ?? []).flatMap((entry) => entry.Prefix ?? []);
-  assert.deepEqual(contents, expected.contents ?? [], `page ${index + 1} contents`);
-  assert.deepEqual(prefixes, expected.commonPrefixes ?? [], `page ${index + 1} common prefixes`);
-  assert.equal(output.KeyCount, expected.keyCount, `page ${index + 1} key count`);
 }
 
 async function runCopyObject(client: S3Client, testCase: CorpusCase): Promise<void> {
