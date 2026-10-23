@@ -43,8 +43,7 @@ type Config struct {
 	// discard actions on a network interface to any client that could reach the port.
 	AdminToken string
 	// AllowPublicAdmin is retained for source compatibility and no longer
-	// grants access by itself. Remote admin routes require AdminToken. The
-	// server logs a deprecation warning when this is set.
+	// grants access by itself. Remote admin routes require AdminToken.
 	//
 	// Deprecated: use AdminToken.
 	AllowPublicAdmin bool

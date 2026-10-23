@@ -101,7 +101,16 @@ A real directory, a bucket over those files through the embedded workspace API, 
 
 ### Workspace Manifest
 
-The single `stow-workspace.json` at a workspace root mapping key to content type, ETag, checksums, last-modified, and relative path. One manifest per workspace, never per-object sidecar files. A missing entry is legal and is the normal case for a file stow did not write. See ADR 0008.
+Two versioned documents under `<workspace>/.stow/`, never per-object sidecar
+files. `manifest.json` carries the workspace's identity: `version`,
+`workspace_id`, `bucket`, `created`, `last_used`, `ttl_seconds` and `owned`.
+`index.json` carries the object index, mapping bucket then key to an entry that
+records form, size, ETag, content type, checksums, metadata and last-modified.
+The two are separate because identity changes once per workspace and the index
+changes on every object write. A missing entry is legal and is the normal case
+for a file stow did not write. An escaped key lives at
+`.stow/keys/<sha256(bucket)>/<sha256(key)>`. See ADR 0008 and the workspace
+contract.
 
 ### S3 Facade
 

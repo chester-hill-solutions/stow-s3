@@ -463,9 +463,9 @@ See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001
 |--------|-------|--------|
 | **local mode** (the default, always) | Local store only | Local store only |
 | **readThroughCache** | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
-| **mirrorWrites** | Same read-through behavior | Local first; upstream requires live-write consent and durable outbox; startup warning required |
+| **mirrorWrites** | Same read-through behavior | Refused when an upstream is reachable and consent is absent; local otherwise; upstream requires live-write consent and durable outbox; startup warning required |
 
-A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local.
+A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled`: a mutation is refused when an upstream is reachable, and stays local when none is.
 
 <!-- repo-only:start -->
 See `docs/adr/0005-live-write-requires-explicit-consent.md`.

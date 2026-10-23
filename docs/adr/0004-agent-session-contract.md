@@ -1,7 +1,7 @@
 ---
 status: accepted
-amended: 2026-10-12
-decision_digest: 2cf8847363076fe3
+amended: 2026-10-22
+decision_digest: 03e64e2e7cf17761
 ---
 
 # Agent session contract
@@ -102,8 +102,10 @@ to that descriptor with logs on stderr.
     "conditionalWrites": true,
     "presignedUrls": true,
     "maxBytes": 16777216,
+    "maxMultipartUploads": 1024,
     "maxObjects": 1000,
-    "maxRequestBytes": 8388608
+    "maxRequestBytes": 8388608,
+    "maxConcurrentRequests": 16
   }
 }
 ```
@@ -179,5 +181,9 @@ Recorded as explicit non-goals, not oversights:
 
 ## Amendments
 
+- 2026-10-22: The ready-protocol example omitted two capability fields the writer
+  publishes, `maxMultipartUploads` and `maxConcurrentRequests`, so a client built
+  from this example could not report the multipart limit the server applies. The
+  example now carries both. The decision is unchanged.
 
 - 2026-10-12: Update links after retiring old work orders into the history directory. The decision is unchanged.

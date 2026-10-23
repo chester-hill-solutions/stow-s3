@@ -14,7 +14,8 @@ const (
 	// under the read-through policy.
 	WritePolicyAllowLiveWrites = "allowLiveWrites"
 	// WritePolicyMirrorWritesDisabled means a mirrorWrites policy is configured
-	// but propagation is not permitted, so writes still stay local.
+	// but consent is absent: a mutation whose upstream is reachable is refused
+	// with ErrLiveWritesDisabled, and stays local when there is no upstream.
 	WritePolicyMirrorWritesDisabled = "mirrorWrites-disabled"
 )
 
