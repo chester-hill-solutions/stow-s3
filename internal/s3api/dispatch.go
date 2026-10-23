@@ -66,7 +66,8 @@ func (s *Server) dispatchBucket(ctx context.Context, w http.ResponseWriter, r *h
 			s.handleListMultipartUploads(ctx, w, r, bucket, q)
 			return
 		}
-		writeError(w, r, s3Error{Code: "InvalidRequest", Message: "Invalid request", StatusCode: http.StatusBadRequest})
+		// Everything else on a bucket is the classic listing (V1).
+		s.handleListObjectsV1(ctx, w, r, bucket, q)
 	case http.MethodPost:
 		if q.Has("delete") {
 			s.handleDeleteObjects(ctx, w, r, bucket)
@@ -157,7 +158,7 @@ func (s *Server) requireMultipart(w http.ResponseWriter, r *http.Request, resour
 
 func unsupportedSemanticMarker(r *http.Request, q url.Values) (code, message string, ok bool) {
 	for _, marker := range []string{
-		"versioning", "acl", "policy", "lifecycle", "replication", "notification",
+		"versioning", "versions", "acl", "policy", "lifecycle", "replication", "notification",
 		"tagging", "website", "logging", "accelerate", "requestPayment", "encryption",
 		"object-lock", "inventory", "metrics", "analytics", "intelligent-tiering", "select",
 	} {

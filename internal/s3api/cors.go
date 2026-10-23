@@ -44,7 +44,6 @@ func originAllowed(configured []string, origin string) bool {
 	return false
 }
 
-// isLoopbackOrigin reports whether an Origin header names a loopback host.
 func isLoopbackOrigin(origin string) bool {
 	parsed, err := url.Parse(origin)
 	if err != nil {

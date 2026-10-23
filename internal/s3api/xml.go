@@ -63,6 +63,46 @@ type objectEntry struct {
 	StorageClass string `xml:"StorageClass"`
 }
 
+// listBucketResultV1 is the ListObjects (V1) response.
+type listBucketResultV1 struct {
+	XMLName        xml.Name        `xml:"ListBucketResult"`
+	Xmlns          string          `xml:"xmlns,attr"`
+	Name           string          `xml:"Name"`
+	Prefix         string          `xml:"Prefix"`
+	Marker         string          `xml:"Marker"`
+	NextMarker     string          `xml:"NextMarker,omitempty"`
+	MaxKeys        int             `xml:"MaxKeys"`
+	Delimiter      string          `xml:"Delimiter,omitempty"`
+	IsTruncated    bool            `xml:"IsTruncated"`
+	Contents       []objectEntryV1 `xml:"Contents"`
+	CommonPrefixes []commonPrefix  `xml:"CommonPrefixes"`
+	EncodingType   string          `xml:"EncodingType,omitempty"`
+}
+
+type objectEntryV1 struct {
+	Key          string `xml:"Key"`
+	LastModified string `xml:"LastModified"`
+	ETag         string `xml:"ETag"`
+	Size         int64  `xml:"Size"`
+	Owner        owner  `xml:"Owner"`
+	StorageClass string `xml:"StorageClass"`
+}
+
+func objectToEntryV1(o objectMeta, encodeURL bool) objectEntryV1 {
+	key := o.Key
+	if encodeURL {
+		key = urlEncodeKey(key)
+	}
+	return objectEntryV1{
+		Key:          key,
+		LastModified: formatTime(o.LastModified),
+		ETag:         o.ETag,
+		Size:         o.Size,
+		Owner:        owner{ID: "stow", DisplayName: "stow"},
+		StorageClass: "STANDARD",
+	}
+}
+
 type commonPrefix struct {
 	Prefix string `xml:"Prefix"`
 }

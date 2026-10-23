@@ -1016,6 +1016,162 @@
         "status": 400,
         "errorCode": "InvalidArgument"
       }
+    },
+    {
+      "id": "list-v1-delimiter-rows",
+      "operation": "listObjectsV1",
+      "bucket": "contract-list-v1-rows",
+      "delimiter": "/",
+      "setup": [
+        {
+          "key": "root.txt",
+          "body": "root"
+        },
+        {
+          "key": "a/1",
+          "body": "a/1"
+        },
+        {
+          "key": "a/2",
+          "body": "a/2"
+        },
+        {
+          "key": "b/1",
+          "body": "b/1"
+        }
+      ],
+      "expect": {
+        "status": 200,
+        "pages": [
+          {
+            "contents": [
+              "root.txt"
+            ],
+            "commonPrefixes": [
+              "a/",
+              "b/"
+            ],
+            "isTruncated": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "list-v1-marker-skips-the-group",
+      "operation": "listObjectsV1",
+      "bucket": "contract-list-v1-marker",
+      "delimiter": "/",
+      "marker": "a/1",
+      "setup": [
+        {
+          "key": "root.txt",
+          "body": "root"
+        },
+        {
+          "key": "a/1",
+          "body": "a/1"
+        },
+        {
+          "key": "a/2",
+          "body": "a/2"
+        },
+        {
+          "key": "b/1",
+          "body": "b/1"
+        }
+      ],
+      "expect": {
+        "status": 200,
+        "pages": [
+          {
+            "contents": [
+              "root.txt"
+            ],
+            "commonPrefixes": [
+              "b/"
+            ],
+            "isTruncated": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "list-v1-marker-pagination",
+      "operation": "listObjectsV1",
+      "bucket": "contract-list-v1-pages",
+      "delimiter": "/",
+      "maxKeys": 1,
+      "setup": [
+        {
+          "key": "root.txt",
+          "body": "root"
+        },
+        {
+          "key": "a/1",
+          "body": "a/1"
+        },
+        {
+          "key": "b/1",
+          "body": "b/1"
+        }
+      ],
+      "expect": {
+        "status": 200,
+        "pages": [
+          {
+            "commonPrefixes": [
+              "a/"
+            ],
+            "isTruncated": true,
+            "nextMarker": "a/"
+          },
+          {
+            "commonPrefixes": [
+              "b/"
+            ],
+            "isTruncated": true,
+            "nextMarker": "b/"
+          },
+          {
+            "contents": [
+              "root.txt"
+            ],
+            "isTruncated": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "list-v1-marker-without-delimiter",
+      "operation": "listObjectsV1",
+      "bucket": "contract-list-v1-flat",
+      "marker": "a.txt",
+      "setup": [
+        {
+          "key": "a.txt",
+          "body": "a"
+        },
+        {
+          "key": "b.txt",
+          "body": "b"
+        },
+        {
+          "key": "c.txt",
+          "body": "c"
+        }
+      ],
+      "expect": {
+        "status": 200,
+        "pages": [
+          {
+            "contents": [
+              "b.txt",
+              "c.txt"
+            ],
+            "isTruncated": false
+          }
+        ]
+      }
     }
   ]
 }
