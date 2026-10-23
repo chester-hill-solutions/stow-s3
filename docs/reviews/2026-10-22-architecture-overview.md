@@ -14,8 +14,8 @@ The run used the `architecture-overview` pipeline: reconnaissance, coverage-led 
 per-wave coverage critic, then per-candidate validation and per-record verification. Seventy-nine
 agent invocations, all read-only — no build, test, process start or network access.
 
-Two properties matter for reading it. First, **the map is partial**: fifteen of forty-one seeded
-units were worked, and the twenty-six deferred ones include the seams inside `internal/storage`,
+Two properties matter for reading it. First, **the map is partial**: fifteen of fifty-two
+units were worked, and the thirty-seven deferred ones include the seams inside `internal/storage`,
 the durable-file primitives, and `internal/authority`, `internal/policy` and `internal/capacity` —
 the three modules the runtime record names as co-owners of decisions it also makes. Silence about a
 subsystem is not a finding that it is sound. Second, **the defects below are defects, not style

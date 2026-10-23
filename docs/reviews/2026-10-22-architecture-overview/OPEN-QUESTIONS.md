@@ -5,7 +5,7 @@ and claims no independent agent checked. The third is the largest and the most i
 
 ---
 
-## 1. Coverage never reached (32 deferred units)
+## 1. Coverage never reached (37 deferred units)
 
 Deferral reason, identical for all of them, recorded per unit in `coverage-ledger.json`:
 
@@ -140,7 +140,7 @@ Four rejected candidates passed Phase 3 and needed no verification.
 
 ### What remains open
 
-Not confidence — **coverage**. Twenty-six of 41 units were never assigned a worker:
+Not confidence — **coverage**. Thirty-seven of 52 units were never assigned a worker:
 
 - the durable-file primitives (`internal/atomicfile`, `internal/rooted`) that every store's atomic
   publication and confinement route through;
@@ -164,7 +164,7 @@ final-clean critic also never ran.
 
 ### How to finish
 
-Against `coverage-ledger.json`: the 26 deferred units. The highest-value order is the seams inside
+Against `coverage-ledger.json`: the 37 deferred units. The highest-value order is the seams inside
 `internal/storage` and the three modules the runtime names as co-owners, then the durable-file
 primitives, then the peripheral trees. A coverage critic should run first to confirm the unit set
 before more workers are spent.

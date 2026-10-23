@@ -2,7 +2,7 @@
 
 A source-grounded map of the modules, seams, flows and dependencies the run reached. Derived
 from `records.json`; every claim here is stated in a record with a file and line, and every record
-passed independent validation and verification. Coverage is 15 of 41 units — see §8 and
+passed independent validation and verification. Coverage is 15 of 52 units — see §8 and
 `OPEN-QUESTIONS.md`.
 
 ## 1. The shape
@@ -273,7 +273,7 @@ and a policy source hook; both were deferred.
 
 ## 8. Where this map is thin
 
-Fifteen of 41 units were worked. The gaps that remain:
+Fifteen of 52 units were worked. The gaps that remain:
 
 - **The durable-file primitives are unmapped.** `internal/atomicfile` and `internal/rooted` are
   what every store's atomic publication and symlink-free confinement route through. Their

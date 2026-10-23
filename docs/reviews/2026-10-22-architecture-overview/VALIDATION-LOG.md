@@ -98,7 +98,7 @@ harnesses in the WASM record.
 
 Not confidence — **coverage**.
 
-- **26 of 41 units were never assigned a worker.** The highest-value gaps: the seams inside
+- **37 of 52 units were never assigned a worker.** The highest-value gaps: the seams inside
   `internal/storage` (staged writes, guarded writes, put-checksum, the propagation outbox); the
   durable-file primitives `internal/atomicfile` and `internal/rooted`; and `internal/authority`,
   `internal/policy` and `internal/capacity` — the three modules the runtime record names as
@@ -113,7 +113,10 @@ Not confidence — **coverage**.
   every path exists, every cited line is in range. **0 failures.**
 - **95 inline prose references** in the reports resolved the same way. **0 failures.**
 - All 31 records validate against `RECORDS-SCHEMA.json`; the ledger validates against
-  `LEDGER-PROFILE.json`; every record fingerprint is claimed by exactly one ledger unit.
+  `LEDGER-PROFILE.json`. 30 of the 31 record fingerprints are claimed by exactly one ledger
+  unit. The exception is `mod:internal/s3api:s3-http-server`: the `S3 HTTP surface` unit that
+  corresponds to it is marked `covered` and carries an empty `result_fingerprints`, so no unit
+  claims that record.
 - **6 citation fixes** the verifiers requested were applied, each re-checked against source first
   (`apply-corrections.cjs`).
 
