@@ -6,6 +6,34 @@ They support read-for-save, keyed save, resolution, observation release and capa
 The [dated test record](implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
 <!-- repo-only:end -->
 
+## Serving the surface over HTTP
+
+`stow-s3 mcp` speaks stdio by default, which is what a host that launched the
+process expects.
+`--http-addr host:port` serves the same tools over the MCP streamable HTTP
+transport instead, for a caller that is not the process that started it.
+
+```sh
+stow-s3 mcp --object-dir /srv/objects --bucket datasets \
+  --http-addr 127.0.0.1:8765
+```
+
+The transport runs sessionless and answers with a JSON body rather than a
+per-request event stream.
+The tools, their inputs and their results are the ones this document describes;
+only the transport changes.
+
+Exposure follows the S3 listener: loopback is the default and needs no decision.
+An address beyond loopback needs `--allow-insecure-remote`, and a token in
+`--mcp-token` or `STOW_MCP_TOKEN` that callers send as `Authorization: Bearer`.
+The token is separate from the admin token because it is a caller credential, not
+an operations one.
+A refused address is refused before the listener opens.
+
+The surface holds one workspace or one bucket for the life of the process, so the
+caller identity and the resource scope are fixed at startup.
+Per-caller scoped access is not implemented ([ADR 0016](adr/0016-scoped-access-encrypted-cache.md)).
+
 ## Owned profile
 
 The host launches the existing native binary with one object directory and one

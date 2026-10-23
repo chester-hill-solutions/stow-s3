@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/mcpstorage"
@@ -16,6 +17,11 @@ import (
 type mcpCommandOptions struct {
 	workspace mcpstorage.Config
 	objects   mcpstorage.ObjectConfig
+
+	// The HTTP transport and its exposure decision. Empty httpAddr keeps stdio.
+	httpAddr            string
+	token               string
+	allowInsecureRemote bool
 }
 
 func mcpCommand(args []string) error {
@@ -38,15 +44,21 @@ func mcpCommand(args []string) error {
 	if err != nil {
 		return err
 	}
+	if options.token == "" {
+		options.token = strings.TrimSpace(os.Getenv("STOW_MCP_TOKEN"))
+	}
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
-	if objectMode {
-		options.objects.MaxBytes = options.workspace.MaxBytes
-		return runObjectMCP(ctx, options.objects)
-	}
-	server, err := mcpstorage.New(options.workspace)
+	server, closer, err := mcpServerFor(objectMode, options)
 	if err != nil {
 		return err
+	}
+	defer func() { _ = closer() }()
+	if options.httpAddr != "" {
+		if err := validateMCPExposure(options.httpAddr, options.token, options.allowInsecureRemote); err != nil {
+			return err
+		}
+		return runMCPHTTP(ctx, server, options.httpAddr, options.token)
 	}
 	return server.Run(ctx, &mcp.StdioTransport{MaxLineLength: 1 << 20})
 }
@@ -68,6 +80,9 @@ func registerMCPFlags(flags *flag.FlagSet) *mcpCommandOptions {
 	flags.BoolVar(&options.objects.CreateBucket, "create-bucket", false, "Explicitly create the configured bucket if absent (object mode)")
 	flags.BoolVar(&options.objects.ReadOnly, "read-only", false, "Refuse object saves and bucket creation (object mode)")
 	flags.BoolVar(&options.objects.Browser, "browser", false, "Enable the read-only MCP App browser and resource mentions (object mode)")
+	flags.StringVar(&options.httpAddr, "http-addr", "", "Serve MCP over streamable HTTP at host:port instead of stdio")
+	flags.StringVar(&options.token, "mcp-token", "", "Bearer token required from callers that are not loopback; prefer STOW_MCP_TOKEN")
+	flags.BoolVar(&options.allowInsecureRemote, "allow-insecure-remote", false, "Permit an HTTP address beyond loopback; requires TLS in front of this process")
 	return options
 }
 
@@ -87,11 +102,20 @@ func validateMCPMode(flags *flag.FlagSet) (bool, error) {
 	return objectMode, nil
 }
 
-func runObjectMCP(ctx context.Context, config mcpstorage.ObjectConfig) (err error) {
-	objects, err := mcpstorage.NewObjects(config)
-	if err != nil {
-		return err
+// mcpServerFor builds the surface for the selected mode. Both transports share it,
+// so a tool is reachable the same way whether it is served over stdio or HTTP.
+func mcpServerFor(objectMode bool, options *mcpCommandOptions) (*mcp.Server, func() error, error) {
+	if objectMode {
+		options.objects.MaxBytes = options.workspace.MaxBytes
+		objects, err := mcpstorage.NewObjects(options.objects)
+		if err != nil {
+			return nil, nil, err
+		}
+		return objects.Server, objects.Close, nil
 	}
-	defer func() { err = errors.Join(err, objects.Close()) }()
-	return objects.Server.Run(ctx, &mcp.StdioTransport{MaxLineLength: 1 << 20})
+	server, err := mcpstorage.New(options.workspace)
+	if err != nil {
+		return nil, nil, err
+	}
+	return server, func() error { return nil }, nil
 }
