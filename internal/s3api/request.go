@@ -40,7 +40,6 @@ func (b bodyReader) Bytes() []byte { return b.data }
 
 type bodyCacheKey struct{}
 
-// withBodyCache returns a request carrying a fresh body cache.
 func withBodyCache(r *http.Request) *http.Request {
 	return r.WithContext(context.WithValue(r.Context(), bodyCacheKey{}, &bodyCache{}))
 }

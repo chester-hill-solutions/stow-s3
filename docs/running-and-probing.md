@@ -115,6 +115,7 @@ Without an admin token the diagnostic routes answer `404` to every caller that i
 
 Prefer keeping the process on loopback and terminating TLS in a proxy on the same host: that shape needs no consent flag and exposes no other interface.
 [Run-through mode](run-through.md#serving-a-shared-cache-node) describes that deployment as a shared cache node.
+The [MCP surface](object-mcp-contract.md#serving-the-surface-over-http) can be served over HTTP with the same posture, and its token is separate because it is a caller credential rather than an operations one.
 
 One server serves one credential pair and one environment authority: every client shares them.
 Scoped per-caller principals are not implemented yet.

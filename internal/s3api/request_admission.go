@@ -5,7 +5,6 @@ import (
 	"net/http"
 )
 
-// DefaultMaxConcurrentRequests bounds active handlers before body buffering and authentication.
 const DefaultMaxConcurrentRequests = 16
 
 func normalizeRequestLimits(cfg *Config) error {

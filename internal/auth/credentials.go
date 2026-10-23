@@ -11,13 +11,11 @@ const (
 	secretAccessKeyLength = 40
 )
 
-// Credentials are the local dev access key pair issued by stow.
 type Credentials struct {
 	AccessKeyID     string
 	SecretAccessKey string
 }
 
-// GenerateCredentials creates a random ephemeral access key and secret key pair.
 func GenerateCredentials() (Credentials, error) {
 	accessKey, err := randomAlphanumeric(accessKeyIDLength)
 	if err != nil {
