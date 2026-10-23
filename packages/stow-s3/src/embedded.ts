@@ -41,6 +41,19 @@ export interface EmbeddedCapabilities {
   upstream: boolean;
   /** Absent on older bridges, which cannot safely accept write conditions. */
   conditionalWrites?: boolean;
+  /**
+   * Whether this runtime can observe an object and publish against that
+   * observation, so a save can be retried without writing twice.
+   *
+   * Absent on older bridges, and `false` on a host whose store cannot compare at
+   * publication. Treat absent as `false`: it is the same answer for the caller,
+   * which then reads before writing and reconciles by key instead.
+   */
+  guardedSaves?: boolean;
+  /** Whether a save request key is retained, so a lost reply can be resolved. */
+  durableSaveRequests?: boolean;
+  /** Whether an observed object's bytes can be protected from mutation until release. */
+  recoveryHolds?: boolean;
   /** Caller-owned maintenance operations offered by the ready-made persistent worker. */
   hostMaintenance?: boolean;
 }
