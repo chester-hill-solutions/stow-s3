@@ -149,7 +149,10 @@ A live write is accepted locally and propagated by the outbox, so `outbox_termin
 Operational limits to plan around:
 
 - One process owns one data directory. The directory carries an exclusive lock, so a node scales by serving more clients, not by running several processes over the same directory.
-- Upstream credentials live on the node, which is why the node is the only thing that reaches upstream. Per-client scoped credentials are not implemented yet ([ADR 0016](adr/0016-scoped-access-encrypted-cache.md)); every client of a node shares one identity.
+- Upstream credentials live on the node, which is why the node is the only thing that reaches upstream. Per-client scoped credentials are not implemented yet: every client of a node shares one identity.
+<!-- repo-only:start -->
+Scoped per-caller principals are [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+<!-- repo-only:end -->
 - The MCP surface is stdio-only, so an agent on another host reaches the node over S3 rather than through MCP.
 
 ## Upstream configuration

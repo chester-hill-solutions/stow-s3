@@ -117,9 +117,11 @@ Prefer keeping the process on loopback and terminating TLS in a proxy on the sam
 [Run-through mode](run-through.md#serving-a-shared-cache-node) describes that deployment as a shared cache node.
 
 One server serves one credential pair and one environment authority: every client shares them.
-Scoped per-caller principals are the remaining work of
-[ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+Scoped per-caller principals are not implemented yet.
 A browser client also needs its origin in `--cors-origin`, which permits loopback origins only by default.
+<!-- repo-only:start -->
+Scoped per-caller principals are the remaining work of [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+<!-- repo-only:end -->
 
 ## Platform support
 
