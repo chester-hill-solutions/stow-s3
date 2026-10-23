@@ -6,6 +6,7 @@ export interface StowReadyCapabilities {
     conditionalWrites: boolean;
     presignedUrls: boolean;
     maxBytes: number;
+    maxMultipartUploads?: number;
     maxObjects: number;
     maxRequestBytes: number;
     maxConcurrentRequests?: number;

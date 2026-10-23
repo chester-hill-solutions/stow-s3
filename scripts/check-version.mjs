@@ -52,6 +52,81 @@ export function registryProblems(manifest) {
    ? [] : [`${manifest.name} must declare the public npmjs publish destination`];
 }
 
+// readinessProtocolProblems compares the wire protocol version the server writes
+// with the value each client accepts.
+//
+// It is a pure function of the discovered strings, like versionProblems above, so a
+// test can drive it. This version is separate from the build version: the record
+// can gain a field while the build number stays where it is.
+export function readinessProtocolProblems({ goProtocol, typescriptProtocol, pythonProtocol }) {
+  if (!goProtocol) {
+    return ["internal/ready/ready.go no longer declares ProtocolVersion"];
+  }
+  if (!typescriptProtocol) {
+    return ["packages/stow-s3/src/ready.ts no longer declares READY_PROTOCOL_VERSION"];
+  }
+  if (!pythonProtocol) {
+    return ["packages/stow-s3-py/src/stow_s3/ready.py no longer declares READY_PROTOCOL_VERSION"];
+  }
+  if (goProtocol !== typescriptProtocol || goProtocol !== pythonProtocol) {
+    return [
+      `readiness protocol version differs between writer and readers: Go ${goProtocol}, TypeScript ${typescriptProtocol}, Python ${pythonProtocol}`,
+    ];
+  }
+  return [];
+}
+
+// capabilityFieldNames reads the field names out of one declaration block.
+//
+// A missing marker returns null rather than an empty list, so the caller reports
+// an unreadable declaration instead of comparing nothing and calling it agreement.
+export function capabilityFieldNames({ text, marker, terminators, pattern }) {
+  const start = text.indexOf(marker);
+  if (start === -1) return null;
+  let end = text.length;
+  for (const terminator of terminators) {
+    const at = text.indexOf(terminator, start + marker.length);
+    if (at !== -1 && at < end) end = at;
+  }
+  return [...text.slice(start, end).matchAll(pattern)].map((match) => match[1]);
+}
+
+// capabilityProblems compares the capability field names across the writer and both
+// readers.
+//
+// The record is the only place a caller learns what the server enforces. Both
+// directions fail: a field the writer publishes and a reader never declares is a
+// capability no client can report, and a field a reader declares and the writer
+// never sends is one the reader cannot rely on.
+//
+// Names compare case- and separator-insensitively. The wire is camelCase and the
+// Python dataclass is snake_case, which is a convention difference rather than a
+// disagreement.
+export function capabilityProblems({ sets }) {
+  const problems = [];
+  const undiscovered = sets.filter((set) => set.names === null);
+  for (const set of undiscovered) {
+    problems.push(`the readiness capability set is no longer declared in ${set.language}`);
+  }
+  if (undiscovered.length > 0) return problems;
+  const normalize = (name) => name.toLowerCase().replace(/_/g, "");
+  const normalized = sets.map((set) => ({
+    language: set.language,
+    names: new Set(set.names.map(normalize)),
+  }));
+  const declared = new Set(normalized.flatMap((set) => [...set.names]));
+  for (const name of declared) {
+    const present = normalized.filter((set) => set.names.has(name)).map((set) => set.language);
+    const missing = normalized.filter((set) => !set.names.has(name)).map((set) => set.language);
+    if (missing.length > 0) {
+      problems.push(
+        `readiness capability ${name} is declared in ${present.join(", ")} but not in ${missing.join(", ")}`,
+      );
+    }
+  }
+  return problems;
+}
+
 const root = resolve(import.meta.dirname, "..");
 const goSource = readFileSync(resolve(root, "internal/version/version.go"), "utf8");
 const goVersion = goSource.match(/const Version = "([^"]+)"/)?.[1];
@@ -196,6 +271,58 @@ if (!goMarker) {
 } else if (goMarker !== tsMarker) {
   problems.push(`data directory ownership marker differs between writer and reader: Go ${goMarker}, TypeScript ${tsMarker}`);
 }
+
+// Go writes the versioned readiness record and both clients read it. Each side
+// restates the protocol version and each reader rejects any other value. A drift
+// would leave one client refusing a server the other accepts. The build version is
+// gated above; this is the wire version, which moves on its own.
+const goReady = readFileSync(resolve(root, "internal/ready/ready.go"), "utf8");
+const tsReady = readFileSync(resolve(root, "packages/stow-s3/src/ready.ts"), "utf8");
+const pyReady = readFileSync(resolve(root, "packages/stow-s3-py/src/stow_s3/ready.py"), "utf8");
+problems.push(
+  ...readinessProtocolProblems({
+    goProtocol: goReady.match(/^const ProtocolVersion = (\d+)/m)?.[1],
+    typescriptProtocol: tsReady.match(/^export const READY_PROTOCOL_VERSION = (\d+);/m)?.[1],
+    pythonProtocol: pyReady.match(/^READY_PROTOCOL_VERSION = (\d+)/m)?.[1],
+  }),
+);
+
+// Go writes the readiness record's capability set and both clients read it. Each
+// side restates the field names and there is no shared schema, so the three
+// declarations are compared here.
+problems.push(
+  ...capabilityProblems({
+    sets: [
+      {
+        language: "Go",
+        names: capabilityFieldNames({
+          text: goReady,
+          marker: "type Capabilities struct {",
+          terminators: ["\n}"],
+          pattern: /json:"([A-Za-z0-9_]+)"/g,
+        }),
+      },
+      {
+        language: "TypeScript",
+        names: capabilityFieldNames({
+          text: tsReady,
+          marker: "export interface StowReadyCapabilities {",
+          terminators: ["\n}"],
+          pattern: /^\s{2}([A-Za-z][A-Za-z0-9_]*)\??:/gm,
+        }),
+      },
+      {
+        language: "Python",
+        names: capabilityFieldNames({
+          text: pyReady,
+          marker: "class StowCapabilities:",
+          terminators: ["\n@dataclass", "\ndef ", "\nclass "],
+          pattern: /^\s{4}([a-z][a-z0-9_]*):/gm,
+        }),
+      },
+    ],
+  }),
+);
 
 if (problems.length > 0) {
   for (const problem of problems) console.error(problem);

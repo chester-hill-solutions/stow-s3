@@ -22,6 +22,7 @@ const VALID = {
     conditionalWrites: true,
     presignedUrls: true,
     maxBytes: 16777216,
+    maxMultipartUploads: 1024,
     maxObjects: 1000,
     maxRequestBytes: 8388608,
   },
@@ -33,6 +34,7 @@ describe("ready protocol", () => {
     assert.equal(message.endpoint, VALID.endpoint);
     assert.equal(message.mode, "local");
     assert.equal(message.capabilities.maxBytes, 16777216);
+    assert.equal(message.capabilities.maxMultipartUploads, 1024);
     assert.equal(message.capabilities.persistent, false);
   });
 

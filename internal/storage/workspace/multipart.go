@@ -137,6 +137,9 @@ func (s *Store) GetMultipartUpload(_ context.Context, uploadID string) (*storage
 	if err := s.checkOpen(); err != nil {
 		return nil, err
 	}
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	state, err := s.loadUpload(uploadID)
 	if err != nil {
 		return nil, err
@@ -149,6 +152,9 @@ func (s *Store) GetMultipartUpload(_ context.Context, uploadID string) (*storage
 // ValidateMultipartUpload confirms an upload exists and belongs to the bucket
 // and key it is being completed against.
 func (s *Store) ValidateMultipartUpload(_ context.Context, uploadID, bucket, key string) error {
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return storage.ErrUploadNotFound
+	}
 	state, err := s.loadUpload(uploadID)
 	if err != nil {
 		return err
@@ -163,6 +169,9 @@ func (s *Store) ValidateMultipartUpload(_ context.Context, uploadID, bucket, key
 func (s *Store) UploadPart(ctx context.Context, uploadID string, partNumber int, body io.Reader) (*storage.PartInfo, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
+	}
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
 	}
 	if partNumber < 1 || partNumber > 10000 {
 		return nil, storage.ErrInvalidPart
@@ -198,6 +207,9 @@ func (s *Store) UploadPart(ctx context.Context, uploadID string, partNumber int,
 func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
+	}
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
 	}
 	if err := storage.ValidateMultipartPartNumbers(parts); err != nil {
 		return nil, err
@@ -291,6 +303,9 @@ func (s *Store) AbortMultipartUpload(_ context.Context, uploadID string) error {
 	if err := s.checkOpen(); err != nil {
 		return err
 	}
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return storage.ErrUploadNotFound
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, err := s.loadUpload(uploadID); err != nil {
@@ -303,6 +318,9 @@ func (s *Store) AbortMultipartUpload(_ context.Context, uploadID string) error {
 // paginated form the S3 layer uses; ListParts returns everything, which is what
 // the storage.Store contract asks for.
 func (s *Store) ListPartsPage(ctx context.Context, uploadID string, opts storage.ListPartsOptions) (*storage.ListPartsResult, error) {
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	parts, err := s.ListParts(ctx, uploadID)
 	if err != nil {
 		return nil, err
@@ -314,6 +332,9 @@ func (s *Store) ListPartsPage(ctx context.Context, uploadID string, opts storage
 func (s *Store) ListParts(ctx context.Context, uploadID string) ([]storage.PartInfo, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
+	}
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err

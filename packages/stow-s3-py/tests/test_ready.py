@@ -31,6 +31,7 @@ def ready_payload(**overrides: object) -> str:
             "conditionalWrites": True,
             "presignedUrls": True,
             "maxBytes": 16 * 1024 * 1024,
+            "maxMultipartUploads": 1024,
             "maxObjects": 1000,
             "maxRequestBytes": 8 * 1024 * 1024,
         },
@@ -44,6 +45,7 @@ def test_parses_a_complete_message() -> None:
     assert ready.endpoint == "http://127.0.0.1:9000"
     assert ready.backend == "filesystem"
     assert ready.capabilities.max_bytes == 16 * 1024 * 1024
+    assert ready.capabilities.max_multipart_uploads == 1024
     assert ready.capabilities.max_objects == 1000
     assert ready.capabilities.upstream is False
 
