@@ -69,3 +69,47 @@ test("copy shares payloads and bucket deletion refuses nonempty data", async () 
   assert.equal((await adapter.usage()).chunks, count);
   assert.equal((await call(host, { op: "deleteBucket", bucket: "objects" })).error?.code, "bucket_not_empty");
 });
+
+test("a delimiter groups keys into directory rows the host can page over", async () => {
+  const { host } = await fixture();
+  assert.ok((await call(host, { op: "createBucket", bucket: "objects" })).ok);
+  for (const key of ["root.txt", "docs/a.txt", "docs/b.txt", "docs/deep/c.txt", "img/logo.png"]) {
+    assert.ok((await put(host, key, key)).ok);
+  }
+
+  const flat = await call(host, { op: "listObjects", bucket: "objects", list: {} });
+  const flatPage = flat.result as { objects: { key: string }[] };
+  assert.equal(flatPage.objects.length, 5);
+
+  const top = await call(host, { op: "listObjects", bucket: "objects", list: { delimiter: "/" } });
+  const topPage = top.result as { objects: { key: string }[]; commonPrefixes: string[] };
+  assert.deepEqual(topPage.objects.map((object) => object.key), ["root.txt"]);
+  assert.deepEqual(topPage.commonPrefixes, ["docs/", "img/"]);
+
+  const docs = await call(host, { op: "listObjects", bucket: "objects", list: { prefix: "docs/", delimiter: "/" } });
+  const docsPage = docs.result as { objects: { key: string }[]; commonPrefixes: string[] };
+  assert.deepEqual(docsPage.objects.map((object) => object.key), ["docs/a.txt", "docs/b.txt"]);
+  assert.deepEqual(docsPage.commonPrefixes, ["docs/deep/"]);
+
+  // A page ends on a group, and the cursor names that group rather than a key in it.
+  const first = await call(host, { op: "listObjects", bucket: "objects", list: { delimiter: "/", limit: 1 } });
+  const firstPage = first.result as { commonPrefixes: string[]; truncated: boolean; nextCursor: string };
+  assert.deepEqual(firstPage.commonPrefixes, ["docs/"]);
+  assert.equal(firstPage.truncated, true);
+  assert.equal(firstPage.nextCursor, "docs/");
+  const second = await call(host, {
+    op: "listObjects",
+    bucket: "objects",
+    list: { delimiter: "/", limit: 1, cursor: firstPage.nextCursor },
+  });
+  const secondPage = second.result as { commonPrefixes: string[]; objects: { key: string }[]; truncated: boolean; nextCursor?: string };
+  assert.deepEqual(secondPage.commonPrefixes, ["img/"]);
+  const third = await call(host, {
+    op: "listObjects",
+    bucket: "objects",
+    list: { delimiter: "/", limit: 1, cursor: secondPage.nextCursor },
+  });
+  const thirdPage = third.result as { objects: { key: string }[]; truncated: boolean };
+  assert.deepEqual(thirdPage.objects.map((object) => object.key), ["root.txt"]);
+  assert.equal(thirdPage.truncated, false);
+});

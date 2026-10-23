@@ -80,6 +80,8 @@ type ObjectPage struct {
 	Objects    []Object
 	Truncated  bool
 	NextCursor string
+	// CommonPrefixes are the delimiter groups this page collapsed, in row order.
+	CommonPrefixes []string
 }
 
 type PutOptions struct {
@@ -93,8 +95,11 @@ type PutOptions struct {
 
 type ListOptions struct {
 	Prefix string
-	Cursor string
-	Limit  int
+	// Delimiter groups keys that share it into CommonPrefixes, which is how one
+	// directory level is listed. Empty means a flat listing of every key.
+	Delimiter string
+	Cursor    string
+	Limit     int
 }
 
 var (
