@@ -234,6 +234,9 @@ interface EmbeddedCapabilities {
   multipart: boolean;
   upstream: boolean;
   conditionalWrites?: boolean | undefined;
+  guardedSaves?: boolean | undefined;
+  durableSaveRequests?: boolean | undefined;
+  recoveryHolds?: boolean | undefined;
   hostMaintenance?: boolean | undefined;
 }
 ```
@@ -247,6 +250,9 @@ interface EmbeddedCapabilities {
 | `multipart` | `boolean` | No | Whether this handle supports multipart operations. |
 | `upstream` | `boolean` | No | Whether this handle can use an upstream provider. |
 | `conditionalWrites` | `boolean \| undefined` | Yes | Whether atomic ETag write conditions are supported. |
+| `guardedSaves` | `boolean \| undefined` | Yes | Whether this runtime can observe an object and publish against that observation, so a save can be retried without writing twice. |
+| `durableSaveRequests` | `boolean \| undefined` | Yes | Whether a save request key is retained, so a lost reply can be resolved. |
+| `recoveryHolds` | `boolean \| undefined` | Yes | Whether an observed object's bytes can be protected from mutation until release. |
 | `hostMaintenance` | `boolean \| undefined` | Yes | Whether namespace recovery inspection and garbage collection are supported. |
 
 ## EmbeddedHost
