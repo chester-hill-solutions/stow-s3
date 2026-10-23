@@ -34,6 +34,9 @@ type request struct {
 	List              stow.ListOptions  `json:"list"`
 	Range             stow.ObjectRange  `json:"range"`
 	Token             string            `json:"token"`
+	ObservationToken  string            `json:"observationToken"`
+	RequestKey        string            `json:"requestKey"`
+	Replace           bool              `json:"replace"`
 	Length            int               `json:"length"`
 	Size              *int64            `json:"size"`
 	SourceBucket      string            `json:"sourceBucket"`
@@ -103,13 +106,48 @@ type usageResult struct {
 	Objects int64 `json:"objects"`
 }
 
+type readForSaveResult struct {
+	Object           objectResult `json:"object"`
+	Absent           bool         `json:"absent"`
+	ObservationToken string       `json:"observationToken"`
+}
+
+type saveResult struct {
+	Object   objectResult `json:"object"`
+	Outcome  string       `json:"outcome"`
+	Replayed bool         `json:"replayed"`
+}
+
 type handler func(context.Context, *stow.Runtime, request) (json.RawMessage, error)
 
 var state = struct {
 	sync.Mutex
-	next      int
-	instances map[int]*stow.Runtime
-}{instances: make(map[int]*stow.Runtime)}
+	next         int
+	instances    map[int]*stow.Runtime
+	observations map[int]*observationTable
+}{instances: make(map[int]*stow.Runtime), observations: make(map[int]*observationTable)}
+
+// observationsFor is the retained conditions of one runtime. A condition is bound
+// to the instance that observed it, so the table is per handle.
+func observationsFor(handle int) *observationTable {
+	state.Lock()
+	defer state.Unlock()
+	table, ok := state.observations[handle]
+	if !ok {
+		table = newObservationTable()
+		state.observations[handle] = table
+	}
+	return table
+}
+
+func dropObservations(handle int) {
+	state.Lock()
+	defer state.Unlock()
+	if table, ok := state.observations[handle]; ok {
+		table.clear()
+		delete(state.observations, handle)
+	}
+}
 
 func main() {
 	state.Lock()
@@ -177,6 +215,7 @@ func openRuntime(req request) (json.RawMessage, error) {
 	handle := state.next
 	state.next++
 	state.instances[handle] = instance
+	state.observations[handle] = newObservationTable()
 	return marshalResult(openResult{Handle: handle, Capabilities: capabilities(instance.Capabilities())})
 }
 
@@ -199,35 +238,45 @@ func failure(code, message string) response {
 	return response{Version: protocolVersion, Error: &errorPayload{Code: code, Message: message}}
 }
 
+// errorCodeTable maps a sentinel to the code a caller branches on. A table, not a
+// switch: the save vocabulary grows, and a switch would grow errorResponse's
+// complexity one case at a time until the ratchet objected to a new error code.
+var errorCodeTable = []struct {
+	err  error
+	code string
+}{
+	{stow.ErrQuotaExceeded, "quota_exceeded"},
+	{stow.ErrClosed, "closed"},
+	{stow.ErrInvalidListLimit, "invalid_list_limit"},
+	{stow.ErrUnsupportedBackend, "unsupported_backend"},
+	{stow.ErrBucketNotFound, "bucket_not_found"},
+	{stow.ErrBucketExists, "bucket_exists"},
+	{stow.ErrBucketNotEmpty, "bucket_not_empty"},
+	{stow.ErrObjectNotFound, "object_not_found"},
+	{stow.ErrInvalidBucket, "invalid_bucket"},
+	{stow.ErrInvalidKey, "invalid_key"},
+	{stow.ErrPreconditionFailed, "precondition_failed"},
+	{stow.ErrConditionalWritesUnsupported, "conditional_write_unsupported"},
+	{errUnknownObservation, "invalid_observation"},
+	{errObservationExpired, "observation_expired"},
+	{stow.ErrGuardedSavesUnsupported, "guarded_saves_unsupported"},
+	{stow.ErrSaveConflict, "save_conflict"},
+	{stow.ErrInvalidSaveCondition, "invalid_save_condition"},
+	{stow.ErrSaveRequestsUnsupported, "save_requests_unsupported"},
+	{stow.ErrSaveRequestNotFound, "save_request_not_found"},
+	{stow.ErrSaveRequestConflict, "save_request_conflict"},
+	{stow.ErrInvalidSaveRequest, "invalid_save_request"},
+	{stow.ErrSaveRequestNotCommitted, "save_request_not_committed"},
+	{stow.ErrSaveRequestUnknown, "save_request_unknown"},
+}
+
 func errorResponse(err error) response {
-	code := "runtime_error"
-	switch {
-	case errors.Is(err, stow.ErrQuotaExceeded):
-		code = "quota_exceeded"
-	case errors.Is(err, stow.ErrClosed):
-		code = "closed"
-	case errors.Is(err, stow.ErrInvalidListLimit):
-		code = "invalid_list_limit"
-	case errors.Is(err, stow.ErrUnsupportedBackend):
-		code = "unsupported_backend"
-	case errors.Is(err, stow.ErrBucketNotFound):
-		code = "bucket_not_found"
-	case errors.Is(err, stow.ErrBucketExists):
-		code = "bucket_exists"
-	case errors.Is(err, stow.ErrBucketNotEmpty):
-		code = "bucket_not_empty"
-	case errors.Is(err, stow.ErrObjectNotFound):
-		code = "object_not_found"
-	case errors.Is(err, stow.ErrInvalidBucket):
-		code = "invalid_bucket"
-	case errors.Is(err, stow.ErrInvalidKey):
-		code = "invalid_key"
-	case errors.Is(err, stow.ErrPreconditionFailed):
-		code = "precondition_failed"
-	case errors.Is(err, stow.ErrConditionalWritesUnsupported):
-		code = "conditional_write_unsupported"
+	for _, entry := range errorCodeTable {
+		if errors.Is(err, entry.err) {
+			return failure(entry.code, err.Error())
+		}
 	}
-	return failure(code, err.Error())
+	return failure("runtime_error", err.Error())
 }
 
 func encodeResponse(value response) string {

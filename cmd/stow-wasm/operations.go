@@ -12,27 +12,31 @@ import (
 )
 
 var operationHandlers = map[string]handler{
-	"createBucket":      handleCreateBucket,
-	"deleteBucket":      handleDeleteBucket,
-	"listBuckets":       handleListBuckets,
-	"putObject":         handlePutObject,
-	"getObject":         handleGetObject,
-	"getObjectRange":    handleGetObjectRange,
-	"openObjectRead":    handleOpenObjectRead,
-	"readObjectChunk":   handleReadObjectChunk,
-	"closeObjectRead":   handleCloseObjectRead,
-	"openObjectWrite":   handleOpenObjectWrite,
-	"writeObjectChunk":  handleWriteObjectChunk,
-	"commitObjectWrite": handleCommitObjectWrite,
-	"abortObjectWrite":  handleAbortObjectWrite,
-	"headObject":        handleHeadObject,
-	"listObjects":       handleListObjects,
-	"deleteObject":      handleDeleteObject,
-	"copyObject":        handleCopyObject,
-	"reset":             handleReset,
-	"close":             handleClose,
-	"usage":             handleUsage,
-	"capabilities":      handleCapabilities,
+	"createBucket":       handleCreateBucket,
+	"deleteBucket":       handleDeleteBucket,
+	"listBuckets":        handleListBuckets,
+	"putObject":          handlePutObject,
+	"getObject":          handleGetObject,
+	"getObjectRange":     handleGetObjectRange,
+	"openObjectRead":     handleOpenObjectRead,
+	"readObjectChunk":    handleReadObjectChunk,
+	"closeObjectRead":    handleCloseObjectRead,
+	"openObjectWrite":    handleOpenObjectWrite,
+	"writeObjectChunk":   handleWriteObjectChunk,
+	"commitObjectWrite":  handleCommitObjectWrite,
+	"abortObjectWrite":   handleAbortObjectWrite,
+	"headObject":         handleHeadObject,
+	"listObjects":        handleListObjects,
+	"deleteObject":       handleDeleteObject,
+	"copyObject":         handleCopyObject,
+	"reset":              handleReset,
+	"close":              handleClose,
+	"usage":              handleUsage,
+	"capabilities":       handleCapabilities,
+	"readForSave":        handleReadForSave,
+	"saveObject":         handleSaveObject,
+	"resolveSave":        handleResolveSave,
+	"releaseObservation": handleReleaseObservation,
 }
 
 func handleCreateBucket(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
@@ -131,6 +135,71 @@ func handleCopyObject(ctx context.Context, instance *stow.Runtime, req request) 
 	return marshalObjectResult(object, req)
 }
 
+// handleReadForSave observes an object, or its absence, and returns the token a
+// save publishes against. The bytes travel with it, so a caller cannot observe one
+// version and save against another.
+func handleReadForSave(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
+	object, condition, err := instance.ReadForSave(ctx, req.Bucket, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	token, err := observationsFor(req.Handle).add(condition)
+	if err != nil {
+		return nil, err
+	}
+	result := readForSaveResult{
+		Object:           objectResultOf(object),
+		Absent:           condition.ObservedAbsence(),
+		ObservationToken: token,
+	}
+	return marshalReadForSave(object, result, req)
+}
+
+// handleSaveObject publishes against an observation, or replaces deliberately: a
+// replacement is a choice the caller states, and it still carries the request key.
+func handleSaveObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
+	condition := stow.ReplacementCondition()
+	if !req.Replace {
+		retained, err := observationsFor(req.Handle).get(req.ObservationToken)
+		if err != nil {
+			return nil, err
+		}
+		condition = retained
+	}
+	data := req.binaryData
+	if req.binaryOutput == nil {
+		var err error
+		data, err = base64.StdEncoding.DecodeString(req.Data)
+		if err != nil {
+			return nil, fmt.Errorf("decode object data: %w", err)
+		}
+	}
+	result, err := instance.SaveObject(ctx, req.Bucket, req.Key, data, stow.SaveOptions{
+		Condition:  condition,
+		PutOptions: stow.PutOptions{ContentType: req.ContentType, Metadata: req.Metadata},
+		RequestKey: req.RequestKey,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return marshalSaveResult(result, req)
+}
+
+// handleResolveSave answers what a request key did, which turns a lost reply into
+// an answer instead of a duplicate write.
+func handleResolveSave(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
+	result, err := instance.ResolveSave(ctx, req.Bucket, req.Key, req.RequestKey)
+	if err != nil {
+		return nil, err
+	}
+	return marshalSaveResult(result, req)
+}
+
+func handleReleaseObservation(_ context.Context, _ *stow.Runtime, req request) (json.RawMessage, error) {
+	observationsFor(req.Handle).release(req.ObservationToken)
+	return nil, nil
+}
+
 func handleReset(ctx context.Context, instance *stow.Runtime, _ request) (json.RawMessage, error) {
 	return nil, instance.Reset(ctx)
 }
@@ -141,6 +210,7 @@ func handleClose(_ context.Context, instance *stow.Runtime, req request) (json.R
 	state.Lock()
 	delete(state.instances, req.Handle)
 	state.Unlock()
+	dropObservations(req.Handle)
 	releaseRuntimeStreamHandle(req.Handle)
 	return nil, err
 }
@@ -177,4 +247,27 @@ func marshalObjectResult(object stow.Object, req request) (json.RawMessage, erro
 	}
 	object.Data = nil
 	return marshalResult(objectResultOf(object))
+}
+
+func marshalReadForSave(object stow.Object, result readForSaveResult, req request) (json.RawMessage, error) {
+	if req.binaryOutput == nil {
+		return marshalResult(result)
+	}
+	*req.binaryOutput = object.Data
+	result.Object.Data = ""
+	return marshalResult(result)
+}
+
+func marshalSaveResult(result stow.SaveResult, req request) (json.RawMessage, error) {
+	saved := saveResult{
+		Object:   objectResultOf(result.Object),
+		Outcome:  string(result.Outcome),
+		Replayed: result.Replayed,
+	}
+	if req.binaryOutput == nil {
+		return marshalResult(saved)
+	}
+	*req.binaryOutput = result.Object.Data
+	saved.Object.Data = ""
+	return marshalResult(saved)
 }

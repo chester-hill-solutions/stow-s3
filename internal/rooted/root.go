@@ -19,7 +19,6 @@ var ErrSymlink = errors.New("rooted: symbolic links are not readable")
 // ErrNotRegular reports a path that is not a regular file. It holds no object.
 var ErrNotRegular = errors.New("rooted: file must be regular")
 
-// Supported reports whether this host can do that open.
 func Supported() bool { return safeRegularOpenSupported }
 
 // Root pins a directory identity and refuses symbolic links in paths it reads.

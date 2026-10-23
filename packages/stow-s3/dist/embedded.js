@@ -88,6 +88,73 @@ export class EmbeddedStow {
     deleteObject(bucket, key) {
         this.invoke({ op: "deleteObject", bucket, key });
     }
+    /**
+     * Observe an object, or its absence, before changing it.
+     *
+     * The bytes come back with the observation, so a caller cannot read one version
+     * and save against another.
+     */
+    readForSave(bucket, key) {
+        this.requireGuardedSaves();
+        const result = this.invoke({ op: "readForSave", bucket, key });
+        return {
+            object: fromBridgeObject(result.object),
+            absent: result.absent,
+            observationToken: result.observationToken,
+        };
+    }
+    /**
+     * Publish a save that compares at publication, or replaces deliberately.
+     *
+     * A replacement is still a save with a request key: consent to replace is not
+     * consent to write twice.
+     */
+    saveObject(bucket, key, data, options = {}) {
+        this.requireGuardedSaves();
+        if (options.replace !== true && !options.observationToken) {
+            throw new EmbeddedStowError("invalid_save_condition", "a save needs an observation token, or replace: true");
+        }
+        if (options.requestKey && this.runtimeCapabilities.durableSaveRequests !== true) {
+            throw new EmbeddedStowError("save_requests_unsupported", "a request key needs a host that retains save requests");
+        }
+        const result = this.invoke({
+            op: "saveObject",
+            bucket,
+            key,
+            data: this.host.callBinary === undefined ? bytesToBase64(data) : undefined,
+            observationToken: options.observationToken,
+            replace: options.replace === true,
+            contentType: options.contentType,
+            metadata: options.metadata,
+            requestKey: options.requestKey,
+        }, data);
+        return {
+            object: fromBridgeObject(result.object),
+            outcome: result.outcome,
+            replayed: result.replayed,
+        };
+    }
+    /** Ask what a request key did, instead of writing again. */
+    resolveSave(bucket, key, requestKey) {
+        if (this.runtimeCapabilities.durableSaveRequests !== true) {
+            throw new EmbeddedStowError("save_requests_unsupported", "host does not retain save requests");
+        }
+        const result = this.invoke({ op: "resolveSave", bucket, key, requestKey });
+        return {
+            object: fromBridgeObject(result.object),
+            outcome: result.outcome,
+            replayed: result.replayed,
+        };
+    }
+    /** Drop a token this caller will not use, rather than waiting for its expiry. */
+    releaseObservation(observationToken) {
+        this.invoke({ op: "releaseObservation", observationToken });
+    }
+    requireGuardedSaves() {
+        if (this.runtimeCapabilities.guardedSaves !== true) {
+            throw new EmbeddedStowError("guarded_saves_unsupported", "host does not support observation-based saves");
+        }
+    }
     copyObject(sourceBucket, sourceKey, destinationBucket, destinationKey) {
         return fromBridgeObject(this.invoke({
             op: "copyObject",

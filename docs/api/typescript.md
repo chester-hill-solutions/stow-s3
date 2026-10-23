@@ -43,7 +43,7 @@ await withStow(async ({ s3, bucket }) => {
 
 ## Symbols
 
-[AwsSdkV3ConfigOptions](#awssdkv3configoptions) · [checkpointWorkspace](#checkpointworkspace) · [collectWorkspaces](#collectworkspaces) · [ConnectOptions](#connectoptions) · [default](#default) · [DEFAULT_SESSION_MAX_BYTES](#default_session_max_bytes) · [DEFAULT_SESSION_MAX_OBJECTS](#default_session_max_objects) · [destroyWorkspace](#destroyworkspace) · [diffWorkspaces](#diffworkspaces) · [EMBEDDED_PROTOCOL_VERSION](#embedded_protocol_version) · [EmbeddedBucket](#embeddedbucket) · [EmbeddedCapabilities](#embeddedcapabilities) · [EmbeddedHost](#embeddedhost) · [EmbeddedListOptions](#embeddedlistoptions) · [EmbeddedObject](#embeddedobject) · [EmbeddedObjectPage](#embeddedobjectpage) · [EmbeddedPutOptions](#embeddedputoptions) · [EmbeddedStow](#embeddedstow) · [EmbeddedStowError](#embeddedstowerror) · [EmbeddedStowOptions](#embeddedstowoptions) · [EmbeddedUsage](#embeddedusage) · [EphemeralStowOptions](#ephemeralstowoptions) · [exportWorkspaceCheckpoint](#exportworkspacecheckpoint) · [handoffWorkspace](#handoffworkspace) · [importWorkspaceCheckpoint](#importworkspacecheckpoint) · [loadNodeWasmHost](#loadnodewasmhost) · [NodeWasmHost](#nodewasmhost) · [ObjectSnapshot](#objectsnapshot) · [openStow](#openstow) · [parseReadyLine](#parsereadyline) · [parseReadyMessage](#parsereadymessage) · [prepareWorkspace](#prepareworkspace) · [pruneWorkspaces](#pruneworkspaces) · [PutFixtureOptions](#putfixtureoptions) · [READY_PROTOCOL_VERSION](#ready_protocol_version) · [resetOwnedData](#resetowneddata) · [resolveStowBinary](#resolvestowbinary) · [restoreWorkspaceCheckpoint](#restoreworkspacecheckpoint) · [resumeWorkspace](#resumeworkspace) · [ResumeWorkspaceOptions](#resumeworkspaceoptions) · [runWorkspaceCommand](#runworkspacecommand) · [ServedWorkspace](#servedworkspace) · [serveWorkspace](#serveworkspace) · [ServeWorkspaceOptions](#serveworkspaceoptions) · [StartOptions](#startoptions) · [Stow](#stow) · [STOW_OWNER_MARKER](#stow_owner_marker) · [stowBinaryAvailable](#stowbinaryavailable) · [StowBinaryNotFoundError](#stowbinarynotfounderror) · [StowConnection](#stowconnection) · [StowInstance](#stowinstance) · [StowMode](#stowmode) · [StowOwnershipError](#stowownershiperror) · [StowProtocolError](#stowprotocolerror) · [StowReady](#stowready) · [StowReadyCapabilities](#stowreadycapabilities) · [StowSession](#stowsession) · [StowSessionCapabilities](#stowsessioncapabilities) · [UpstreamConfig](#upstreamconfig) · [upstreamFromEnv](#upstreamfromenv) · [withStow](#withstow) · [WorkspaceArchiveOptions](#workspacearchiveoptions) · [WorkspaceCheckpointOptions](#workspacecheckpointoptions) · [WorkspaceJSON](#workspacejson)
+[AwsSdkV3ConfigOptions](#awssdkv3configoptions) · [checkpointWorkspace](#checkpointworkspace) · [collectWorkspaces](#collectworkspaces) · [ConnectOptions](#connectoptions) · [default](#default) · [DEFAULT_SESSION_MAX_BYTES](#default_session_max_bytes) · [DEFAULT_SESSION_MAX_OBJECTS](#default_session_max_objects) · [destroyWorkspace](#destroyworkspace) · [diffWorkspaces](#diffworkspaces) · [EMBEDDED_PROTOCOL_VERSION](#embedded_protocol_version) · [EmbeddedBucket](#embeddedbucket) · [EmbeddedCapabilities](#embeddedcapabilities) · [EmbeddedHost](#embeddedhost) · [EmbeddedListOptions](#embeddedlistoptions) · [EmbeddedObject](#embeddedobject) · [EmbeddedObjectPage](#embeddedobjectpage) · [EmbeddedPutOptions](#embeddedputoptions) · [EmbeddedSaveObservation](#embeddedsaveobservation) · [EmbeddedSaveOptions](#embeddedsaveoptions) · [EmbeddedSaveResult](#embeddedsaveresult) · [EmbeddedStow](#embeddedstow) · [EmbeddedStowError](#embeddedstowerror) · [EmbeddedStowOptions](#embeddedstowoptions) · [EmbeddedUsage](#embeddedusage) · [EphemeralStowOptions](#ephemeralstowoptions) · [exportWorkspaceCheckpoint](#exportworkspacecheckpoint) · [handoffWorkspace](#handoffworkspace) · [importWorkspaceCheckpoint](#importworkspacecheckpoint) · [loadNodeWasmHost](#loadnodewasmhost) · [NodeWasmHost](#nodewasmhost) · [ObjectSnapshot](#objectsnapshot) · [openStow](#openstow) · [parseReadyLine](#parsereadyline) · [parseReadyMessage](#parsereadymessage) · [prepareWorkspace](#prepareworkspace) · [pruneWorkspaces](#pruneworkspaces) · [PutFixtureOptions](#putfixtureoptions) · [READY_PROTOCOL_VERSION](#ready_protocol_version) · [resetOwnedData](#resetowneddata) · [resolveStowBinary](#resolvestowbinary) · [restoreWorkspaceCheckpoint](#restoreworkspacecheckpoint) · [resumeWorkspace](#resumeworkspace) · [ResumeWorkspaceOptions](#resumeworkspaceoptions) · [runWorkspaceCommand](#runworkspacecommand) · [ServedWorkspace](#servedworkspace) · [serveWorkspace](#serveworkspace) · [ServeWorkspaceOptions](#serveworkspaceoptions) · [StartOptions](#startoptions) · [Stow](#stow) · [STOW_OWNER_MARKER](#stow_owner_marker) · [stowBinaryAvailable](#stowbinaryavailable) · [StowBinaryNotFoundError](#stowbinarynotfounderror) · [StowConnection](#stowconnection) · [StowInstance](#stowinstance) · [StowMode](#stowmode) · [StowOwnershipError](#stowownershiperror) · [StowProtocolError](#stowprotocolerror) · [StowReady](#stowready) · [StowReadyCapabilities](#stowreadycapabilities) · [StowSession](#stowsession) · [StowSessionCapabilities](#stowsessioncapabilities) · [UpstreamConfig](#upstreamconfig) · [upstreamFromEnv](#upstreamfromenv) · [withStow](#withstow) · [WorkspaceArchiveOptions](#workspacearchiveoptions) · [WorkspaceCheckpointOptions](#workspacecheckpointoptions) · [WorkspaceJSON](#workspacejson)
 
 ## AwsSdkV3ConfigOptions
 
@@ -379,6 +379,64 @@ interface EmbeddedPutOptions {
 | `ifMatch` | `string \| undefined` | Yes | Write only when the current content ETag matches; empty means unset. |
 | `ifNoneMatch` | `string \| undefined` | Yes | Use * to create only when absent; empty means unset. |
 
+## EmbeddedSaveObservation
+
+What a read-for-save observed: the bytes, whether the key was absent, and the token a save compares against.
+
+```ts
+interface EmbeddedSaveObservation {
+  object: EmbeddedObject;
+  absent: boolean;
+  observationToken: string;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `object` | `EmbeddedObject` | No |  |
+| `absent` | `boolean` | No |  |
+| `observationToken` | `string` | No |  |
+
+## EmbeddedSaveOptions
+
+
+
+```ts
+interface EmbeddedSaveOptions {
+  observationToken?: string | undefined;
+  replace?: boolean | undefined;
+  contentType?: string | undefined;
+  metadata?: Record<string, string> | undefined;
+  requestKey?: string | undefined;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `observationToken` | `string \| undefined` | Yes | The token from readForSave. |
+| `replace` | `boolean \| undefined` | Yes | Publish without comparing, deliberately replacing whatever is stored. |
+| `contentType` | `string \| undefined` | Yes | MIME content type attached to the object or file. |
+| `metadata` | `Record<string, string> \| undefined` | Yes | User metadata included in storage and sync comparisons. |
+| `requestKey` | `string \| undefined` | Yes | Unique persisted request identity for capture or save recovery. |
+
+## EmbeddedSaveResult
+
+The outcome of a save or of resolving one.
+
+```ts
+interface EmbeddedSaveResult {
+  object: EmbeddedObject;
+  outcome: "committed" | "not_committed" | "unknown";
+  replayed: boolean;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `object` | `EmbeddedObject` | No |  |
+| `outcome` | `"committed" \| "not_committed" \| "unknown"` | No |  |
+| `replayed` | `boolean` | No | True when a retained request answered instead of the write being attempted. |
+
 ## EmbeddedStow
 
 
@@ -397,6 +455,10 @@ class EmbeddedStow {
   headObject(bucket: string, key: string): EmbeddedObject;
   listObjects(bucket: string, options?: EmbeddedListOptions): EmbeddedObjectPage;
   deleteObject(bucket: string, key: string): void;
+  readForSave(bucket: string, key: string): EmbeddedSaveObservation;
+  saveObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedSaveOptions): EmbeddedSaveResult;
+  resolveSave(bucket: string, key: string, requestKey: string): EmbeddedSaveResult;
+  releaseObservation(observationToken: string): void;
   copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, destinationKey: string): EmbeddedObject;
   reset(): void;
   close(): void;
@@ -554,6 +616,68 @@ deleteObject(bucket: string, key: string): void
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `void`.
+
+### EmbeddedStow.readForSave
+
+Observe an object, or its absence, before changing it.
+
+```ts
+readForSave(bucket: string, key: string): EmbeddedSaveObservation
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `EmbeddedSaveObservation`.
+
+### EmbeddedStow.saveObject
+
+Publish a save that compares at publication, or replaces deliberately.
+
+```ts
+saveObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedSaveOptions): EmbeddedSaveResult
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `EmbeddedSaveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `EmbeddedSaveResult`.
+
+### EmbeddedStow.resolveSave
+
+Ask what a request key did, instead of writing again.
+
+```ts
+resolveSave(bucket: string, key: string, requestKey: string): EmbeddedSaveResult
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `requestKey` | `string` | Yes | — | Unique persisted request identity for capture or save recovery. |
+
+Returns: `EmbeddedSaveResult`.
+
+### EmbeddedStow.releaseObservation
+
+Drop a token this caller will not use, rather than waiting for its expiry.
+
+```ts
+releaseObservation(observationToken: string): void
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `observationToken` | `string` | Yes | — |  |
 
 Returns: `void`.
 

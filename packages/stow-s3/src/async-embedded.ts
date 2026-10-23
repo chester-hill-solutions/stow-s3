@@ -15,6 +15,13 @@ import {
   type EmbeddedStowOptions,
   type EmbeddedUsage,
 } from "./embedded.js";
+import type {
+  BridgeSaveObservation,
+  BridgeSaveResult,
+  EmbeddedSaveObservation,
+  EmbeddedSaveOptions,
+  EmbeddedSaveResult,
+} from "./embedded-saves.js";
 import type { AsyncEmbeddedHost, WorkerCallOptions } from "./worker-host.js";
 
 export interface PersistentAsyncEmbeddedOptions extends EmbeddedStowOptions {
@@ -102,6 +109,52 @@ export class AsyncEmbeddedStow {
 
   async getObjectRange(bucket: string, key: string, range: { offset: number; length: number }, options?: WorkerCallOptions): Promise<EmbeddedObject> {
     return fromBridgeObject(await this.invoke<BridgeObject>({ op: "getObjectRange", bucket, key, range }, undefined, options));
+  }
+
+  async readForSave(bucket: string, key: string, call?: WorkerCallOptions): Promise<EmbeddedSaveObservation> {
+    this.requireGuardedSaves();
+    const result = await this.invoke<BridgeSaveObservation>({ op: "readForSave", bucket, key }, undefined, call);
+    return {
+      object: fromBridgeObject(result.object),
+      absent: result.absent,
+      observationToken: result.observationToken,
+    };
+  }
+
+  async saveObject(
+    bucket: string,
+    key: string,
+    data: Uint8Array,
+    options: EmbeddedSaveOptions = {},
+    call?: WorkerCallOptions,
+  ): Promise<EmbeddedSaveResult> {
+    this.requireGuardedSaves();
+    if (options.replace !== true && !options.observationToken) {
+      throw new EmbeddedStowError("invalid_save_condition", "a save needs an observation token, or replace: true");
+    }
+    if (options.requestKey && this.runtimeCapabilities.durableSaveRequests !== true) {
+      throw new EmbeddedStowError("save_requests_unsupported", "a request key needs a host that retains save requests");
+    }
+    const result = await this.invoke<BridgeSaveResult>({ op: "saveObject", bucket, key, replace: options.replace === true, observationToken: options.observationToken, contentType: options.contentType, metadata: options.metadata, requestKey: options.requestKey }, data, call);
+    return { object: fromBridgeObject(result.object), outcome: result.outcome, replayed: result.replayed };
+  }
+
+  async resolveSave(bucket: string, key: string, requestKey: string, call?: WorkerCallOptions): Promise<EmbeddedSaveResult> {
+    if (this.runtimeCapabilities.durableSaveRequests !== true) {
+      throw new EmbeddedStowError("save_requests_unsupported", "host does not retain save requests");
+    }
+    const result = await this.invoke<BridgeSaveResult>({ op: "resolveSave", bucket, key, requestKey }, undefined, call);
+    return { object: fromBridgeObject(result.object), outcome: result.outcome, replayed: result.replayed };
+  }
+
+  async releaseObservation(observationToken: string, call?: WorkerCallOptions): Promise<void> {
+    await this.invoke<void>({ op: "releaseObservation", observationToken }, undefined, call);
+  }
+
+  private requireGuardedSaves(): void {
+    if (this.runtimeCapabilities.guardedSaves !== true) {
+      throw new EmbeddedStowError("guarded_saves_unsupported", "host does not support observation-based saves");
+    }
   }
 
   putObjectStream(bucket: string, key: string, source: Uint8Array | AsyncIterable<Uint8Array>, options: EmbeddedStreamPutOptions): Promise<EmbeddedObject> {

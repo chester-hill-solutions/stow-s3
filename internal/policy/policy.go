@@ -54,7 +54,6 @@ func (r Resource) String() string {
 	return r.Namespace + ":" + name
 }
 
-// Selector matches a set of resources of one kind.
 type Selector struct {
 	Kind Kind
 	// Exact is a full-key equality test for an object and a full-path test for a
@@ -90,7 +89,6 @@ func (s Selector) String() string {
 	return string(s.Kind) + "~" + s.Prefix
 }
 
-// Effect is whether an entry grants or withholds.
 type Effect string
 
 const (
