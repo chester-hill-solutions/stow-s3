@@ -28,6 +28,7 @@ Use the [usage guides](../README.md) for supported APIs and the
 | [0018](0018-snapshot-isolation-enforced-egress.md) | Isolation by snapshot and enforced egress, not by asking agents to cooperate | `accepted` | — | — |
 | [0019](0019-browser-project-content.md) | Browser projects use durable content references and the shared embedded runtime | `accepted` | — | — |
 | [0020](0020-binary-object-records.md) | Filesystem objects use protobuf metadata and raw payloads | `accepted` | — | — |
+| [0021](0021-remote-exposure-requires-consent.md) | A bind beyond loopback needs consent, and the service does not terminate TLS | `accepted` | — | — |
 
 ## Status vocabulary
 

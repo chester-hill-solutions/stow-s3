@@ -307,6 +307,11 @@ func serve(args []string) {
 		AllowLiveWrites: opts.allowLiveWrites, AllowPublicAdmin: opts.allowPublicAdmin,
 		CacheDir: opts.cacheDir,
 	})
+	// After serveRunThroughConfig, which resolves credentials and the admin token
+	// from the environment: the check has to see the effective values.
+	if err := validateRemoteExposure(opts); err != nil {
+		log.Fatal(err)
+	}
 	rtCfg.Upstream.AllowInsecureHTTP = opts.allowInsecureUpstream
 	mode := resolveMode(opts.modeFlag)
 	backend, err := parseBackend(opts.backendFlag)

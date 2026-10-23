@@ -37,13 +37,11 @@ type memBucket struct {
 	multipart map[string]*memMultipart
 }
 
-// MemoryStore is an in-memory Store implementation for tests.
 type MemoryStore struct {
 	mu      sync.RWMutex
 	buckets map[string]*memBucket
 }
 
-// NewMemoryStore creates an empty in-memory store.
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{buckets: make(map[string]*memBucket)}
 }

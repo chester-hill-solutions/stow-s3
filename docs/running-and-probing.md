@@ -76,8 +76,10 @@ An unsigned request returns `403 AccessDenied`; this does not indicate server he
 
 ## What the defaults will not do
 
-`stow-s3 serve` binds `127.0.0.1` by default.
-Pass `--host` to accept connections through another interface.
+`stow-s3 serve` binds `127.0.0.1` by default, which only the machine that started it can reach.
+`--host` selects another interface.
+Any host that is not loopback is refused unless `--allow-insecure-remote` is passed, and the refusal happens before the listener opens, so a mistake exposes no port.
+See [serving beyond loopback](#serving-beyond-loopback) for what a remote bind requires.
 
 Local mode is the default. Upstream credentials alone do not enable run-through mode.
 Use `--mode run-through` or `STOW_MODE=run-through` to select an upstream.
@@ -95,6 +97,26 @@ In local mode, the banner says `upstream: not in use`.
 Run-through mode reports an `override:` note.
 A `mirrorWrites` policy without live-write consent keeps writes local and reports this in the banner.
 Set `--mode local` explicitly in launchers that require local-only storage.
+
+## Serving beyond loopback
+
+This process does not terminate TLS.
+Terminate TLS in front of it, then pass the consent flag, which says the cleartext socket behind the proxy is deliberate:
+
+```bash
+stow-s3 serve --host 0.0.0.0 --allow-insecure-remote \
+  --access-key "$ACCESS_KEY" --secret-key "$SECRET_KEY" --admin-token "$ADMIN_TOKEN"
+```
+
+A remote bind requires those three values, from flags or from
+`STOW_LOCAL_ACCESS_KEY_ID`, `STOW_LOCAL_SECRET_ACCESS_KEY` and `STOW_ADMIN_TOKEN`.
+Without credentials the process generates a pair and reports it only to its own stdout, which no remote client can read.
+Without an admin token the diagnostic routes answer `404` to every caller that is not loopback.
+
+One server serves one credential pair and one environment authority: every client shares them.
+Scoped per-caller principals are the remaining work of
+[ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+A browser client also needs its origin in `--cors-origin`, which permits loopback origins only by default.
 
 ## Platform support
 
