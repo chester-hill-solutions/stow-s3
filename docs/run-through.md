@@ -111,6 +111,47 @@ Check `has_expiry` before interpreting `expires_at`; a zero timestamp can mean n
 The listing accepts `?bucket=`, `?prefix=` and `?limit=`. Invalid limits are rejected.
 `cached_key_count` counts the whole cache, including entries outside the returned page.
 
+## Serving a shared cache node
+
+A cache node serves several machines instead of one: a team, a build fleet, or a group of agents that share one warm copy of upstream data.
+Each client uses the node with the same S3 client it already uses, and the upstream credentials stay on the node.
+
+The safest shape keeps the process on loopback and terminates TLS in a proxy on the same host, so the store is never exposed on another interface:
+
+```sh
+# The proxy holds the certificate and forwards to this process on loopback.
+STOW_ENDPOINT=https://s3.example.com STOW_BUCKET=datasets \
+STOW_ADMIN_TOKEN="$ADMIN_TOKEN" \
+stow-s3 serve --mode run-through \
+  --data-dir /srv/cache-node/data \
+  --cache-dir /srv/cache-node/cache \
+  --access-key "$ACCESS_KEY" --secret-key "$SECRET_KEY"
+```
+
+A process that must listen on another interface needs the consent flag and provisioned credentials that [the server guide](running-and-probing.md#serving-beyond-loopback) describes.
+That shape is for a network you control, and the proxy shape above is still the one to prefer.
+
+Prepare the node the way a single machine is prepared:
+
+1. Create each served bucket locally first. A bucket that exists only upstream returns `NoSuchBucket`, and Stow does not create upstream buckets.
+2. Warm the keys the fleet reads first, with `prewarm`, so the first cold window is paid once instead of per client.
+3. Raise `--max-concurrent-requests` above the default 16 when many clients share the node.
+
+Watch a running node through its diagnostics, which need the admin token from another address:
+
+- `/_stow/status` for mode, policy, version and uptime.
+- `/_stow/inspect` for cache hits, misses and evictions, the cached keys themselves, and the outbox entries with their last error class.
+- `/_stow/metrics` for the same counters in Prometheus form.
+
+A read that the node cannot fetch returns an error; a read it can serve from cache keeps working while the upstream is unreachable.
+A live write is accepted locally and propagated by the outbox, so `outbox_terminal` and `last_upstream_error` are the two numbers that say whether the node is still keeping its half of that promise.
+
+Operational limits to plan around:
+
+- One process owns one data directory. The directory carries an exclusive lock, so a node scales by serving more clients, not by running several processes over the same directory.
+- Upstream credentials live on the node, which is why the node is the only thing that reaches upstream. Per-client scoped credentials are not implemented yet ([ADR 0016](adr/0016-scoped-access-encrypted-cache.md)); every client of a node shares one identity.
+- The MCP surface is stdio-only, so an agent on another host reaches the node over S3 rather than through MCP.
+
 ## Upstream configuration
 
 Upstream settings come from command-line options or `STOW_*`, `S3_*` and `AWS_*` environment variables.

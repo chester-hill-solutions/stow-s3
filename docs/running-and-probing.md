@@ -113,6 +113,9 @@ A remote bind requires those three values, from flags or from
 Without credentials the process generates a pair and reports it only to its own stdout, which no remote client can read.
 Without an admin token the diagnostic routes answer `404` to every caller that is not loopback.
 
+Prefer keeping the process on loopback and terminating TLS in a proxy on the same host: that shape needs no consent flag and exposes no other interface.
+[Run-through mode](run-through.md#serving-a-shared-cache-node) describes that deployment as a shared cache node.
+
 One server serves one credential pair and one environment authority: every client shares them.
 Scoped per-caller principals are the remaining work of
 [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
