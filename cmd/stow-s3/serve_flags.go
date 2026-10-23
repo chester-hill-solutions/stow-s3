@@ -12,6 +12,7 @@ type serveFlags struct {
 	maxConcurrentRequests int
 	maxRequestBytes       int64
 	allowInsecureUpstream bool
+	allowInsecureRemote   bool
 	port                  int
 	dataDir               string
 	backendFlag           string
@@ -75,6 +76,7 @@ func parseServeFlags(args []string) serveFlags {
 	// string flag, and that is a trap: `--offline` as a string consumed the next
 	// argument, so `--offline --ready-fd 3` failed with "invalid --offline
 	offline := registerOfflineFlag(flags)
+	allowInsecureRemote := flags.Bool("allow-insecure-remote", false, "Permit a listen host beyond loopback; requires TLS in front of this process and provisioned credentials")
 	showVersion := versionFlag(flags)
 	maxBytes := flags.Int64("max-bytes", 0, "Maximum stored object bytes enforced on every native S3 request (0 disables the limit)")
 	maxObjects := flags.Int64("max-objects", 0, "Maximum stored object count enforced on every native S3 request (0 disables the limit)")
@@ -85,30 +87,31 @@ func parseServeFlags(args []string) serveFlags {
 	flags.Parse(args)
 	return serveFlags{
 		maxConcurrentRequests: *maxConcurrentRequests, maxRequestBytes: *maxRequestBytes, allowInsecureUpstream: *allowInsecureUpstream,
-		port:             *port,
-		dataDir:          *dataDir,
-		backendFlag:      *backendFlag,
-		accessKey:        *accessKey,
-		secretKey:        *secretKey,
-		host:             *host,
-		baseHost:         *baseHost,
-		allowPublicAdmin: *allowPublicAdmin,
-		adminToken:       *adminToken,
-		modeFlag:         *modeFlag,
-		regionFlag:       *regionFlag,
-		allowLiveWrites:  *allowLiveWrites,
-		readOnly:         *readOnly,
-		cacheDir:         *cacheDir,
-		cacheMaxBytes:    *cacheMaxBytes,
-		cacheMaxObjects:  *cacheMaxObjects,
-		cacheTTL:         *cacheTTL,
-		offline:          offline,
-		showVersion:      *showVersion,
-		maxBytes:         *maxBytes,
-		maxObjects:       *maxObjects,
-		readyFd:          *readyFd,
-		parentPid:        *parentPid,
-		corsOrigins:      corsOrigins,
+		allowInsecureRemote: *allowInsecureRemote,
+		port:                *port,
+		dataDir:             *dataDir,
+		backendFlag:         *backendFlag,
+		accessKey:           *accessKey,
+		secretKey:           *secretKey,
+		host:                *host,
+		baseHost:            *baseHost,
+		allowPublicAdmin:    *allowPublicAdmin,
+		adminToken:          *adminToken,
+		modeFlag:            *modeFlag,
+		regionFlag:          *regionFlag,
+		allowLiveWrites:     *allowLiveWrites,
+		readOnly:            *readOnly,
+		cacheDir:            *cacheDir,
+		cacheMaxBytes:       *cacheMaxBytes,
+		cacheMaxObjects:     *cacheMaxObjects,
+		cacheTTL:            *cacheTTL,
+		offline:             offline,
+		showVersion:         *showVersion,
+		maxBytes:            *maxBytes,
+		maxObjects:          *maxObjects,
+		readyFd:             *readyFd,
+		parentPid:           *parentPid,
+		corsOrigins:         corsOrigins,
 	}
 }
 

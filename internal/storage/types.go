@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// ObjectMeta describes a stored object.
 type ObjectMeta struct {
 	Bucket            string
 	Key               string
@@ -18,13 +17,11 @@ type ObjectMeta struct {
 	ChecksumValue     string
 }
 
-// BucketInfo describes a bucket.
 type BucketInfo struct {
 	Name         string
 	CreationDate time.Time
 }
 
-// PutOptions configures object writes.
 type PutOptions struct {
 	ComputeChecksum   bool
 	ContentType       string
@@ -37,7 +34,6 @@ type PutOptions struct {
 	RequestKey        string
 }
 
-// ListOptions configures object listing.
 type ListOptions struct {
 	Prefix            string
 	Delimiter         string
@@ -56,7 +52,6 @@ type ListResult struct {
 	KeyCount              int
 }
 
-// MultipartUpload describes an in-progress multipart upload.
 type MultipartUpload struct {
 	UploadID  string
 	Bucket    string
@@ -124,13 +119,11 @@ type MultipartListResult struct {
 	IsTruncated        bool
 }
 
-// ListPartsOptions configures a page of uploaded parts.
 type ListPartsOptions struct {
 	PartNumberMarker int
 	MaxParts         int
 }
 
-// ListPartsResult describes one page of uploaded parts.
 type ListPartsResult struct {
 	Parts                []PartInfo
 	PartNumberMarker     int
@@ -139,7 +132,6 @@ type ListPartsResult struct {
 	IsTruncated          bool
 }
 
-// PartInfo describes a single uploaded part.
 type PartInfo struct {
 	PartNumber   int
 	ETag         string
