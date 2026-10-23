@@ -98,6 +98,8 @@ export interface EmbeddedPutOptions {
 
 export interface EmbeddedListOptions {
   prefix?: string;
+  /** Groups keys that share it into `commonPrefixes`; empty lists every key. */
+  delimiter?: string;
   cursor?: string;
   limit?: number;
 }
@@ -106,6 +108,8 @@ export interface EmbeddedObjectPage {
   objects: EmbeddedObject[];
   truncated: boolean;
   nextCursor?: string;
+  /** The delimiter groups this page collapsed, in row order. */
+  commonPrefixes?: string[];
 }
 
 export interface BridgeObject extends Omit<EmbeddedObject, "data"> {
@@ -116,6 +120,7 @@ interface BridgeObjectPage {
   objects: BridgeObject[];
   truncated: boolean;
   nextCursor?: string;
+  commonPrefixes?: string[];
 }
 
 interface OpenResult {
@@ -224,12 +229,18 @@ export class EmbeddedStow {
     const result = this.invoke<BridgeObjectPage>({
       op: "listObjects",
       bucket,
-      list: { prefix: options.prefix, cursor: options.cursor, limit: options.limit },
+      list: {
+        prefix: options.prefix,
+        delimiter: options.delimiter,
+        cursor: options.cursor,
+        limit: options.limit,
+      },
     });
     return {
       objects: result.objects.map(fromBridgeObject),
       truncated: result.truncated,
       nextCursor: result.nextCursor,
+      commonPrefixes: result.commonPrefixes ?? [],
     };
   }
 

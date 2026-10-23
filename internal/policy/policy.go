@@ -180,7 +180,6 @@ func (s Set) Authorize(env authority.Authority, r Resource, op authority.Operati
 	return env.Intersect(permitted), nil
 }
 
-// Allows is Authorize reduced to what a check site needs.
 func (s Set) Allows(env authority.Authority, r Resource, op authority.Operation) error {
 	_, err := s.Authorize(env, r, op)
 	return err

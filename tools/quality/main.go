@@ -103,7 +103,6 @@ func run(args []string, stdout, stderr io.Writer, scan func() (report, error)) i
 	return 0
 }
 
-// writeBaselineFile creates the baseline and its directory.
 func writeBaselineFile(path string, current report) error {
 	data, err := json.MarshalIndent(current, "", "  ")
 	if err != nil {

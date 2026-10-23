@@ -161,6 +161,49 @@ test("guarded saves observe, publish, refuse a stale observation, and replace", 
   }
 });
 
+// A delimiter lists one level: the keys that share it become rows, and a page can
+// end on a group, which the cursor then names.
+test("a delimiter groups keys into directory rows", async () => {
+  const host = { call: (request) => globalThis.stow.call(request) };
+  const text = new TextEncoder();
+  let embedded;
+  try {
+    embedded = EmbeddedStow.open(host, { maxBytes: 1 << 20, maxObjects: 100 });
+    embedded.createBucket("tree");
+    for (const key of ["root.txt", "docs/a.txt", "docs/b.txt", "docs/deep/c.txt", "img/logo.png"]) {
+      embedded.putObject("tree", key, text.encode(key));
+    }
+
+    const flat = embedded.listObjects("tree", {});
+    assert.equal(flat.objects.length, 5);
+    assert.deepEqual(flat.commonPrefixes, []);
+
+    const top = embedded.listObjects("tree", { delimiter: "/" });
+    assert.deepEqual(top.objects.map((object) => object.key), ["root.txt"]);
+    assert.deepEqual(top.commonPrefixes, ["docs/", "img/"]);
+
+    const docs = embedded.listObjects("tree", { prefix: "docs/", delimiter: "/" });
+    assert.deepEqual(docs.objects.map((object) => object.key), ["docs/a.txt", "docs/b.txt"]);
+    assert.deepEqual(docs.commonPrefixes, ["docs/deep/"]);
+
+    const first = embedded.listObjects("tree", { delimiter: "/", limit: 1 });
+    assert.equal(first.truncated, true);
+    assert.deepEqual(first.commonPrefixes, ["docs/"]);
+    assert.equal(first.nextCursor, "docs/");
+    const second = embedded.listObjects("tree", { delimiter: "/", limit: 1, cursor: first.nextCursor });
+    assert.deepEqual(second.commonPrefixes, ["img/"]);
+    const third = embedded.listObjects("tree", { delimiter: "/", limit: 1, cursor: second.nextCursor });
+    assert.deepEqual(third.objects.map((object) => object.key), ["root.txt"]);
+    assert.equal(third.truncated, false);
+  } finally {
+    try {
+      embedded?.close();
+    } catch {
+      // The test may fail before the public close operation is reached.
+    }
+  }
+});
+
 // One shutdown for the whole file: the runtime is a single Go program, so a test
 // that ended it would leave the next one with nothing to talk to.
 after(async () => {

@@ -81,9 +81,10 @@ type hostRequest struct {
 }
 
 type hostListOptions struct {
-	Prefix string `json:"prefix"`
-	Cursor string `json:"cursor"`
-	Limit  int    `json:"limit"`
+	Prefix    string `json:"prefix"`
+	Delimiter string `json:"delimiter"`
+	Cursor    string `json:"cursor"`
+	Limit     int    `json:"limit"`
 }
 
 func (s *hostStore) invoke(ctx context.Context, req hostRequest, data []byte) (json.RawMessage, []byte, error) {
@@ -240,7 +241,7 @@ func (s *hostStore) ListObjects(ctx context.Context, bucket string, options stow
 	if err := storage.ValidateBucketName(bucket); err != nil {
 		return stow.ObjectPage{}, stow.ErrInvalidBucket
 	}
-	listOptions := hostListOptions{Prefix: options.Prefix, Cursor: options.Cursor, Limit: options.Limit}
+	listOptions := hostListOptions{Prefix: options.Prefix, Delimiter: options.Delimiter, Cursor: options.Cursor, Limit: options.Limit}
 	result, _, err := s.invoke(ctx, hostRequest{Op: "listObjects", Bucket: bucket, List: &listOptions}, nil)
 	if err != nil {
 		return stow.ObjectPage{}, err
@@ -249,7 +250,7 @@ func (s *hostStore) ListObjects(ctx context.Context, bucket string, options stow
 	if err := json.Unmarshal(result, &list); err != nil {
 		return stow.ObjectPage{}, err
 	}
-	page := stow.ObjectPage{Truncated: list.Truncated, NextCursor: list.NextCursor}
+	page := stow.ObjectPage{Truncated: list.Truncated, NextCursor: list.NextCursor, CommonPrefixes: append([]string(nil), list.CommonPrefixes...)}
 	for _, item := range list.Objects {
 		encoded, err := json.Marshal(item)
 		if err != nil {

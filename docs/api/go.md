@@ -1610,9 +1610,10 @@ Returns: `WorkspaceListing, error`.
 
 ```go
 type ListOptions struct {
-	Prefix	string
-	Cursor	string
-	Limit	int
+	Prefix		string
+	Delimiter	string
+	Cursor		string
+	Limit		int
 }
 ```
 
@@ -1798,6 +1799,7 @@ type ObjectPage struct {
 	Objects		[]Object
 	Truncated	bool
 	NextCursor	string
+	CommonPrefixes	[]string
 }
 ```
 
