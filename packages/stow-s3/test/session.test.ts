@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { access, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { GetObjectCommand, ListBucketsCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { openStow, withStow, DEFAULT_SESSION_MAX_BYTES } from "../dist/session.js";
 import { stowBinaryAvailable } from "../dist/bin.js";
 import { buildChildEnv, SESSION_GOGC } from "../dist/start.js";
@@ -64,6 +66,50 @@ describe("the child environment of a session's server", () => {
       delete process.env.S3_ENDPOINT_URL;
     }
   });
+});
+
+describe("SDK checksum and signing compatibility", session, () => {
+  for (const { algorithm, field, expected } of [
+    { algorithm: "CRC32C", field: "ChecksumCRC32C", expected: "4waSgw==" },
+    { algorithm: "SHA256", field: "ChecksumSHA256", expected: createHash("sha256").update("123456789").digest("base64") },
+  ] as const) {
+    it(`round-trips the SDK's ${algorithm} checksum against the local server`, async () => {
+      await withStow(async (env) => {
+        const target = { Bucket: env.bucket, Key: `checksum-${algorithm}` };
+        const put = await env.s3.send(new PutObjectCommand({ ...target, Body: Buffer.from("123456789"), ChecksumAlgorithm: algorithm }));
+        assert.equal(put[field], expected);
+        const get = await env.s3.send(new GetObjectCommand({ ...target, ChecksumMode: "ENABLED" }));
+        assert.equal(get[field], expected);
+        assert.equal(await get.Body?.transformToString(), "123456789");
+      });
+    });
+  }
+
+  it("rejects an explicit SDK checksum that disagrees with the payload", async () => {
+    await withStow(async (env) => {
+      await assert.rejects(env.s3.send(new PutObjectCommand({
+        Bucket: env.bucket, Key: "bad-checksum", Body: Buffer.from("123456789"),
+        ChecksumSHA256: Buffer.alloc(32).toString("base64"),
+      })), (error: unknown) => error instanceof Error && error.name === "BadDigest");
+    });
+  });
+
+  it("uses the supported presigner with escaped keys and rejects a substituted query", async () => {
+    await withStow(async (env) => {
+      const target = { Bucket: env.bucket, Key: "資料/report + %.txt" };
+      await env.s3.send(new PutObjectCommand({ ...target, Body: "signed bytes" }));
+      const signed = await getSignedUrl(env.s3, new GetObjectCommand(target), { expiresIn: 60 });
+      const response = await fetch(signed);
+      assert.equal(response.status, 200);
+      assert.equal(await response.text(), "signed bytes");
+      const substituted = new URL(signed);
+      substituted.searchParams.set("response-content-type", "text/html");
+      const refused = await fetch(substituted);
+      assert.equal(refused.status, 403);
+      await refused.arrayBuffer();
+    });
+  });
+
 });
 
 describe("stow session", session, () => {
