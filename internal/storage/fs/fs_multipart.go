@@ -331,7 +331,6 @@ func (s *FilesystemStore) listParts(_ context.Context, uploadID string) ([]stora
 	return parts, nil
 }
 
-// ListPartsPage returns a marker-paginated page of uploaded parts.
 func (s *FilesystemStore) ListPartsPage(ctx context.Context, uploadID string, opts storage.ListPartsOptions) (*storage.ListPartsResult, error) {
 	parts, err := s.listParts(ctx, uploadID)
 	if err != nil {
