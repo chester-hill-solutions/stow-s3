@@ -58,6 +58,7 @@ class StowCapabilities:
     max_bytes: int
     max_objects: int
     max_request_bytes: int
+    max_multipart_uploads: int = 0
     max_concurrent_requests: int = 0
 
 
@@ -145,6 +146,7 @@ def parse_ready_message(line: str) -> StowReady:
             max_bytes=int(_require_number(capabilities, "maxBytes")),
             max_objects=int(_require_number(capabilities, "maxObjects")),
             max_request_bytes=int(_require_number(capabilities, "maxRequestBytes")),
+            max_multipart_uploads=int(_require_number(capabilities, "maxMultipartUploads")) if "maxMultipartUploads" in capabilities else 0,
             max_concurrent_requests=int(_require_number(capabilities, "maxConcurrentRequests")) if "maxConcurrentRequests" in capabilities else 0,
         ),
     )
