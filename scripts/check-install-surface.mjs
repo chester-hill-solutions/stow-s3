@@ -126,10 +126,11 @@ export { SURFACE, DOCS };
 // that decides whether the gate passes should not only be reachable by running the
 // gate against the network.
 export function reachabilityProblems(check, reachable, detail) {
-  if (reachable === check.published) return [];
+  const unknownNpm = check.ecosystem === "npm" && !reachable && detail !== "HTTP 404";
+  if (!unknownNpm && reachable === check.published) return [];
   const problems = [
-    `${check.ecosystem} ${check.name} is ${reachable ? "reachable" : "not reachable"} (${detail}) ` +
-      `but is declared published=${check.published}`,
+    unknownNpm ? `${check.name}: npm availability is unverified (${detail}); this is not evidence of absence` :
+      `${check.ecosystem} ${check.name} is ${reachable ? "reachable" : "not reachable"} (${detail}) but is declared published=${check.published}`,
   ];
   if (check.ecosystem === "npm" && detail === "HTTP 401") {
     problems.push(`  ${check.name}: anonymous registry access returned 401; verify the public npmjs destination and access configuration before claiming availability.`);
@@ -191,8 +192,9 @@ if (process.argv.includes("--online")) {
     } catch (error) {
       detail = error.message;
     }
-    if (reachable !== check.published) {
-      problems.push(...reachabilityProblems(check, reachable, detail));
+    const observedProblems = reachabilityProblems(check, reachable, detail);
+    if (observedProblems.length) {
+      problems.push(...observedProblems);
     } else {
       console.log(
         `  ${reachable ? "ok" : "unpublished"}  ${check.ecosystem} ${check.name} (${detail})`,
