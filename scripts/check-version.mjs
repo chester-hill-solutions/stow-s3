@@ -2,6 +2,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { manifestProblems } from "./npm-publication.mjs";
 
 // versionProblems compares the versions this repository declares in four places
 // and reports every disagreement.
@@ -45,11 +46,7 @@ export function versionProblems({ goVersion, packageVersion, pythonProjectVersio
 }
 
 export function registryProblems(manifest) {
- // The registry is the check; access is not. GitHub Packages reads visibility from a
-  // package setting rather than from the manifest, so asserting access: public here
-  // refused every manifest that was actually correct for this registry.
-  return manifest.publishConfig?.registry === "https://npm.pkg.github.com"
-   ? [] : [`${manifest.name} must declare the public npmjs publish destination`];
+  return manifestProblems(manifest);
 }
 
 const root = resolve(import.meta.dirname, "..");

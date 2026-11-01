@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
-import {openStow,serveWorkspace,prepareWorkspace} from '@chester-hill-solutions/stow-s3';
+import {openStow,serveWorkspace,prepareWorkspace,resolveStowBinary} from '@chester-hill-solutions/stow-s3';
+import {assertConsumerBinary} from './assert-consumer-binary.mjs';
 import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+assertConsumerBinary(resolveStowBinary,import.meta.url);
 const session=await openStow();
 try {
  assert.ok(session.endpoint.startsWith('http://127.0.0.1:'));
