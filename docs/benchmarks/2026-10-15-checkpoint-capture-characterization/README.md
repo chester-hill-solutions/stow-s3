@@ -22,7 +22,7 @@ and restore latency, and checkpoint-directory sizes. Capture, recovery and
 process metrics are one or two runs per scenario, not a statistically stable
 benchmark.
 
-| Workload | Files and bytes | Changed for measured capture | Capture time range | Payload read estimate per capture | Payload copied | Added checkpoint storage (logical / allocated) | Verify range | Restore range | Process CPU (user + system) | Peak RSS range |
+| Workload | Files and bytes | Changed for measured capture | Capture time range | Payload read estimate per capture | Payload copied | Added checkpoint storage (logical / allocated) | Source-verification range | Restore range | Process CPU (user + system) | Peak RSS range |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Small, many files | 4,096 × 16 KiB = 64 MiB | First capture | 1.00–1.55 s | 192 MiB | 64 MiB | 67,793,056 / 67,796,992 B | 153–161 ms | 1.70–1.73 s | 6.43–7.93 s | 239.7–245.7 MB |
 | Large, mostly unchanged | 16 × 16 MiB = 256 MiB | 0 of 16 | 0.65–2.28 s | 768 MiB | 256 MiB | 268,438,382 / 268,439,552 B | 137–140 ms | 1.44–4.51 s | 4.13–5.92 s | 245.5–248.2 MB |
