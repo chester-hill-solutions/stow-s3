@@ -1076,6 +1076,8 @@ interface StartOptions {
   buckets?: string[] | undefined;
   port?: number | undefined;
   host?: string | undefined;
+  allowInsecureRemote?: boolean | undefined;
+  adminToken?: string | undefined;
   timeoutMs?: number | undefined;
   signal?: AbortSignal | undefined;
   region?: string | undefined;
@@ -1108,6 +1110,8 @@ interface StartOptions {
 | `buckets` | `string[] \| undefined` | Yes | Buckets to create before startup resolves, or buckets returned by inspection. |
 | `port` | `number \| undefined` | Yes | Requested native TCP port; zero selects an ephemeral port. |
 | `host` | `string \| undefined` | Yes | Bind address; native default is 127.0.0.1. |
+| `allowInsecureRemote` | `boolean \| undefined` | Yes | Explicit consent to bind beyond loopback; requires provisioned credentials and adminToken. |
+| `adminToken` | `string \| undefined` | Yes | Credential for admin routes, passed only to the child environment. |
 | `timeoutMs` | `number \| undefined` | Yes | Startup deadline in milliseconds; see the defaults table for this interface. |
 | `signal` | `AbortSignal \| undefined` | Yes | AbortSignal for cancellation. A started write can still commit. |
 | `region` | `string \| undefined` | Yes | Region used for S3 signing; native default is us-east-1. |
