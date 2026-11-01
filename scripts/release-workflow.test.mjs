@@ -22,6 +22,8 @@ test("anonymous npm verification stays required when registry publication is sel
   assert.equal(condition(npm), "startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true'");
   assert.match(npm, /npm install .*--userconfig=.*stow-s3@\$version/);
   assert.match(npm, /node smoke-npm-consumer\.mjs "\$version"/);
+  assert.match(npm, /--cache="\$RUNNER_TEMP\/anonymous-npm-cache"/);
+  assert.match(npm, /cp scripts\/smoke-npm-consumer\.mjs scripts\/assert-consumer-binary\.mjs/);
   assert.doesNotMatch(npm, /pip install|smoke-python-consumer/);
 });
 

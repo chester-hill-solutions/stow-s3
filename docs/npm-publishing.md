@@ -94,8 +94,9 @@ never imports this exception. No trusted publisher is configured by this script.
    receives it. Only HTTP 404 counts as absence; unavailable or denied reads stop.
 6. A partial failure stops the run. Repeat only with the identical source, run and
    tarballs; identical registry bytes are skipped and conflicting versions fail.
-   After publication, anonymous installs cover all five exact versions and the
-   core consumer runs on the current native host. A failed verification is a
+   After publication, anonymous installs use fresh disposable caches for all five
+   exact versions. The core consumer verifies its actual installed host carrier
+   before starting; PATH and environment fallbacks cannot pass. A failed verification is a
    partial release, not proof of success. Do not replace immutable version bytes.
 
 This preparation does not execute step 4. Account ownership and enabled 2FA do
