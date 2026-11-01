@@ -5,6 +5,7 @@ import {
   capabilityFieldNames,
   capabilityProblems,
   readinessProtocolProblems,
+  readinessCapabilitySets,
   versionProblems,
 } from "./check-version.mjs";
 
@@ -210,4 +211,22 @@ test("an undiscovered capability set fails rather than comparing as empty", () =
   });
   assert.equal(problems.length, 1);
   assert.match(problems[0], /no longer declared in Go/);
+});
+
+
+test("capability extraction rejects unterminated and empty declarations", () => {
+  for (const text of ['type Capabilities struct {\n A bool `json:"a"`', 'type Capabilities struct {\n}']) {
+    assert.equal(capabilityFieldNames({ text, marker: "type Capabilities struct {", terminators: ["\n}"], pattern: /json:"([A-Za-z0-9_]+)"/g }), null);
+  }
+  assert.equal(capabilityProblems({ sets: [{ language: "Go", names: [] }] }).length, 1);
+});
+
+test("the real readiness extractor includes Go fields with JSON tag options", () => {
+  const sets = readinessCapabilitySets({
+    goReady: 'type Capabilities struct {\n A bool `json:"a,omitempty"`\n}\n',
+    tsReady: 'export interface StowReadyCapabilities {\n  a: boolean;\n}\n',
+    pyReady: 'class StowCapabilities:\n    a: bool\n\n@dataclass\nclass Other:\n',
+  });
+  assert.deepEqual(sets[0].names, ["a"]);
+  assert.deepEqual(capabilityProblems({ sets }), []);
 });

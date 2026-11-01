@@ -58,8 +58,8 @@ class StowCapabilities:
     max_bytes: int
     max_objects: int
     max_request_bytes: int
-    max_multipart_uploads: int = 0
     max_concurrent_requests: int = 0
+    max_multipart_uploads: int = 0
 
 
 @dataclass(frozen=True)

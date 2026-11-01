@@ -85,7 +85,41 @@ export function capabilityFieldNames({ text, marker, terminators, pattern }) {
     const at = text.indexOf(terminator, start + marker.length);
     if (at !== -1 && at < end) end = at;
   }
-  return [...text.slice(start, end).matchAll(pattern)].map((match) => match[1]);
+  if (end === text.length) return null;
+  const names = [...text.slice(start + marker.length, end).matchAll(pattern)].map((match) => match[1]);
+  return names.length > 0 ? names : null;
+}
+
+export function readinessCapabilitySets({ goReady, tsReady, pyReady }) {
+  return [
+      {
+        language: "Go",
+        names: capabilityFieldNames({
+          text: goReady,
+          marker: "type Capabilities struct {",
+          terminators: ["\n}"],
+          pattern: /json:"([A-Za-z0-9_]+)(?:,[^"]*)?"/g,
+        }),
+      },
+      {
+        language: "TypeScript",
+        names: capabilityFieldNames({
+          text: tsReady,
+          marker: "export interface StowReadyCapabilities {",
+          terminators: ["\n}"],
+          pattern: /^\s{2}([A-Za-z][A-Za-z0-9_]*)\??:/gm,
+        }),
+      },
+      {
+        language: "Python",
+        names: capabilityFieldNames({
+          text: pyReady,
+          marker: "class StowCapabilities:",
+          terminators: ["\n@dataclass", "\ndef ", "\nclass "],
+          pattern: /^\s{4}([a-z][a-z0-9_]*):/gm,
+        }),
+      },
+    ];
 }
 
 // capabilityProblems compares the capability field names across the writer and both
@@ -101,7 +135,7 @@ export function capabilityFieldNames({ text, marker, terminators, pattern }) {
 // disagreement.
 export function capabilityProblems({ sets }) {
   const problems = [];
-  const undiscovered = sets.filter((set) => set.names === null);
+  const undiscovered = sets.filter((set) => !set.names || set.names.length === 0);
   for (const set of undiscovered) {
     problems.push(`the readiness capability set is no longer declared in ${set.language}`);
   }
@@ -289,35 +323,7 @@ problems.push(
 // declarations are compared here.
 problems.push(
   ...capabilityProblems({
-    sets: [
-      {
-        language: "Go",
-        names: capabilityFieldNames({
-          text: goReady,
-          marker: "type Capabilities struct {",
-          terminators: ["\n}"],
-          pattern: /json:"([A-Za-z0-9_]+)"/g,
-        }),
-      },
-      {
-        language: "TypeScript",
-        names: capabilityFieldNames({
-          text: tsReady,
-          marker: "export interface StowReadyCapabilities {",
-          terminators: ["\n}"],
-          pattern: /^\s{2}([A-Za-z][A-Za-z0-9_]*)\??:/gm,
-        }),
-      },
-      {
-        language: "Python",
-        names: capabilityFieldNames({
-          text: pyReady,
-          marker: "class StowCapabilities:",
-          terminators: ["\n@dataclass", "\ndef ", "\nclass "],
-          pattern: /^\s{4}([a-z][a-z0-9_]*):/gm,
-        }),
-      },
-    ],
+    sets: readinessCapabilitySets({ goReady, tsReady, pyReady }),
   }),
 );
 
