@@ -129,7 +129,7 @@ jobs:
       # that platform rather than left as py3-none-any, because a pure-python tag
       # would let pip install a Linux binary on macOS and fail at run time.
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
 
@@ -477,7 +477,7 @@ jobs:
 
       - name: Publish to PyPI
         if: startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true' && steps.pypi.outputs.status == 'enabled'
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: dist/wheel
           # attestations prove the wheel came from this workflow rather than
