@@ -60,3 +60,22 @@ test("downloads retain build, test and consumer gates when live-provider job is 
   assert.equal(condition(step("Publish release")), "startsWith(github.ref, 'refs/tags/v')");
   assert.match(step("Publish release"), /body_path: \$\{\{ needs\.plan\.outputs\.notes_file \}\}/);
 });
+
+test("future npm publication uses npmjs OIDC without a legacy token or added permissions", () => {
+  assert.doesNotMatch(workflow, /npm\.pkg\.github\.com|secrets\.NPM_TOKEN|STOW_NPM_PUBLISH_READY/);
+  const publishingJob = workflow.slice(workflow.indexOf("  release:"));
+  assert.match(publishingJob, /node-version: 24\n\s+registry-url: https:\/\/registry\.npmjs\.org\n\s+package-manager-cache: false/);
+  assert.match(step("Require release account setup"), /node scripts\/check-npm-publish-readiness\.mjs/);
+  assert.doesNotMatch(step("Require release account setup"), /warning|REHEARSING|NPM_READY/);
+  assert.match(workflow, /permissions:\n  contents: write\n  id-token: write/);
+  assert.doesNotMatch(workflow, /packages: write|npm stage|npm trust/);
+});
+
+test("packed and anonymous consumers use empty configuration and no GitHub scope binding", () => {
+  for (const block of [step("Install packed packages outside the checkout"), step("Verify exact published npm versions as anonymous consumers")]) {
+    assert.match(block, /env -u NODE_AUTH_TOKEN -u NPM_TOKEN/);
+    assert.match(block, /--registry=https:\/\/registry\.npmjs\.org/);
+    assert.match(block, /--userconfig=/); assert.match(block, /--globalconfig=/);
+    assert.doesNotMatch(block, /--@chester-hill-solutions:registry|npm\.pkg\.github\.com/);
+  }
+});

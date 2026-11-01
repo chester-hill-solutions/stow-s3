@@ -144,13 +144,10 @@ test("a genuinely reachable package declared unpublished is still a problem", ()
   assert.match(problems[0], /published=false/);
 });
 
-// The registry has to be the one the release publishes to, read from the manifest rather
-// than written here. Hardcoding npmjs made this check ask npmjs about packages that live
-// on GitHub Packages, so after the retarget it would have reported the entire npm surface
-// as unreachable.
+// Availability is still a separately maintained claim, checked on the publish registry.
 test("the online check looks where the release publishes", () => {
   const registry = publishRegistry();
   const manifest = JSON.parse(readFileSync(join(resolve(import.meta.dirname, ".."), "packages/stow-s3/package.json"), "utf8"));
   assert.equal(registry, manifest.publishConfig.registry);
-  assert.notEqual(registry, "https://registry.npmjs.org", "a hardcoded npmjs registry is what this replaced");
+  assert.equal(registry, "https://registry.npmjs.org");
 });

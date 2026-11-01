@@ -48,6 +48,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 - [Contributing](../CONTRIBUTING.md) and [code standards](CODE_STANDARDS.md).
 - [Release verification](release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
   not evidence that a later candidate was published.
+- [npm publishing preparation](npm-publishing.md) describes the disabled npmjs/OIDC path and separately authorized bootstrap.
 
 ## Evidence and history
 
