@@ -240,7 +240,7 @@ jobs:
         run: |
           node scripts/pack-platform-package.mjs "dist/native/stow-${{ matrix.target }}.tar.gz" dist/platform
           mkdir -p "$RUNNER_TEMP/npm-consumer"
-          cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/npm-consumer/"
+          cp scripts/smoke-npm-consumer.mjs scripts/assert-consumer-binary.mjs "$RUNNER_TEMP/npm-consumer/"
           cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
           cd "$RUNNER_TEMP/npm-consumer"
           touch "$RUNNER_TEMP/packed-user-npmrc" "$RUNNER_TEMP/packed-global-npmrc"
@@ -476,10 +476,10 @@ jobs:
         run: |
           version="${RELEASE_VERSION#v}"
           mkdir -p "$RUNNER_TEMP/anonymous-npm-consumer"
-          cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/anonymous-npm-consumer/"
+          cp scripts/smoke-npm-consumer.mjs scripts/assert-consumer-binary.mjs "$RUNNER_TEMP/anonymous-npm-consumer/"
           cd "$RUNNER_TEMP/anonymous-npm-consumer"
           touch "$RUNNER_TEMP/empty-npmrc" "$RUNNER_TEMP/empty-global-npmrc"
-          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/empty-npmrc" --globalconfig="$RUNNER_TEMP/empty-global-npmrc" "@chester-hill-solutions/stow-s3@$version"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/empty-npmrc" --globalconfig="$RUNNER_TEMP/empty-global-npmrc" --cache="$RUNNER_TEMP/anonymous-npm-cache" "@chester-hill-solutions/stow-s3@$version"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "$version"
 
       - name: Verify exact published PyPI version as anonymous consumer

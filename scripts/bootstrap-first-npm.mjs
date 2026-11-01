@@ -19,9 +19,10 @@ export function assertInteractive({ env, stdinTTY, stdoutTTY, username }) {
   if (username !== ACCOUNT) throw Error(`npm account must be ${ACCOUNT}`);
 }
 
-export function anonymousInstallArgs(prefix, name, userconfig, globalconfig) {
+export function anonymousInstallArgs(prefix, name, userconfig, globalconfig, cache) {
   if (!PUBLICATION_ORDER.includes(name)) throw Error("unexpected consumer package");
-  return ["install", "--prefix", prefix, "--ignore-scripts", "--force", "--no-audit", "--no-fund", `--registry=${REGISTRY}`, `--userconfig=${userconfig}`, `--globalconfig=${globalconfig}`, `${name}@${FIRST_VERSION}`];
+  if (!cache) throw Error("fresh anonymous cache required");
+  return ["install", "--prefix", prefix, "--ignore-scripts", "--force", "--no-audit", "--no-fund", `--registry=${REGISTRY}`, `--userconfig=${userconfig}`, `--globalconfig=${globalconfig}`, `--cache=${cache}`, `${name}@${FIRST_VERSION}`];
 }
 
 export async function main(args) {
@@ -62,10 +63,11 @@ export async function main(args) {
         // Explicitly install every identity at the exact version, even carriers
         // for other hosts. None of their install scripts execute.
         for (const [index, step] of steps.entries()) {
-          run("npm", anonymousInstallArgs(join(directory, `consumer-${index}`), step.name, empty, globalconfig), { env, cwd: directory, timeout: 120_000, stdio: "inherit" });
+          run("npm", anonymousInstallArgs(join(directory, `consumer-${index}`), step.name, empty, globalconfig, join(directory, `anonymous-cache-${index}`)), { env, cwd: directory, timeout: 120_000, stdio: "inherit" });
         }
         const consumer = join(directory, "consumer-4");
         copyFileSync(join(root, "scripts/smoke-npm-consumer.mjs"), join(consumer, "smoke.mjs"));
+        copyFileSync(join(root, "scripts/assert-consumer-binary.mjs"), join(consumer, "assert-consumer-binary.mjs"));
         const clean = { ...env }; delete clean.STOW_BIN; delete clean.NODE_PATH;
         run("node", ["smoke.mjs", FIRST_VERSION], { env: clean, cwd: consumer, timeout: 120_000, stdio: "inherit" });
       },

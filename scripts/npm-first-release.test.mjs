@@ -24,14 +24,16 @@ const quiet = () => {};
 
 test("anonymous consumers need no scope or authentication override", () => {
   for (const name of PACKAGE_NAMES) {
-    const args = anonymousInstallArgs("consumer", name, "empty-user", "empty-global");
+    const args = anonymousInstallArgs("consumer", name, "empty-user", "empty-global", "fresh-cache");
     assert.equal(args.at(-1), `${name}@0.3.5`);
     assert.ok(args.includes("--registry=https://registry.npmjs.org"));
     assert.ok(args.includes("--userconfig=empty-user")); assert.ok(args.includes("--globalconfig=empty-global"));
+    assert.ok(args.includes("--cache=fresh-cache"));
     assert.ok(args.includes("--ignore-scripts"));
     assert.ok(!args.some(arg => arg.includes(":registry") || /auth|token|github\.com/i.test(arg)));
   }
   assert.throws(() => anonymousInstallArgs("consumer", "unrelated", "empty-user", "empty-global"));
+  assert.throws(() => anonymousInstallArgs("consumer", PACKAGE_NAMES[0], "empty-user", "empty-global"), /fresh anonymous cache/);
 });
 
 test("waiver is exclusively five canonical public npm 0.3.5 identities", () => {
