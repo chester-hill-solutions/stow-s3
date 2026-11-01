@@ -11,8 +11,9 @@ import type { CorpusCase, CorpusPage } from "./shared-corpus-types.js";
 type CorpusListPage = {
   contents: string[];
   commonPrefixes: string[];
-  isTruncated: boolean;
+  isTruncated: boolean | undefined;
   nextCursor: string | undefined;
+  nextMarker?: string;
   keyCount: number | undefined;
 };
 
@@ -43,17 +44,26 @@ function listInput(testCase: CorpusCase): { Bucket: string; Prefix?: string; Del
   };
 }
 
-function toListPage(
+export function toListPage(
   output: { Contents?: { Key?: string }[]; CommonPrefixes?: { Prefix?: string }[]; IsTruncated?: boolean },
   nextCursor: string | undefined,
   keyCount: number | undefined,
 ): CorpusListPage {
   return {
     ...listRows(output),
-    isTruncated: output.IsTruncated ?? false,
+    isTruncated: output.IsTruncated,
     nextCursor,
     keyCount,
   };
+}
+
+export function assertListPage(page: CorpusListPage, expected: CorpusPage, index: number, version: "v1" | "v2"): void {
+  assert.deepEqual(page.contents, expected.contents ?? [], `page ${index + 1} contents`);
+  assert.deepEqual(page.commonPrefixes, expected.commonPrefixes ?? [], `page ${index + 1} common prefixes`);
+  assert.equal(page.isTruncated, expected.isTruncated, `page ${index + 1} truncation`);
+  if (version === "v2") {
+    assert.equal(page.keyCount, expected.keyCount, `page ${index + 1} key count`);
+  }
 }
 
 /**
@@ -67,6 +77,7 @@ function toListPage(
 async function runListPaging(
   testCase: CorpusCase,
   initialCursor: string | undefined,
+  version: "v1" | "v2",
   send: (cursor: string | undefined) => Promise<CorpusListPage>,
   assertCursor?: (page: CorpusListPage, expected: CorpusPage, index: number) => void,
 ): Promise<void> {
@@ -76,12 +87,7 @@ async function runListPaging(
     const expected = pages[index];
     assert.ok(expected, `missing expected list page ${index + 1}`);
     const page = await send(cursor);
-    assert.deepEqual(page.contents, expected.contents ?? [], `page ${index + 1} contents`);
-    assert.deepEqual(page.commonPrefixes, expected.commonPrefixes ?? [], `page ${index + 1} common prefixes`);
-    assert.equal(page.isTruncated, expected.isTruncated, `page ${index + 1} truncation`);
-    if (page.keyCount !== undefined) {
-      assert.equal(page.keyCount, expected.keyCount, `page ${index + 1} key count`);
-    }
+    assertListPage(page, expected, index, version);
     assertCursor?.(page, expected, index);
     if (index < pages.length - 1) {
       assert.ok(page.nextCursor, `page ${index + 1} needs a cursor for the next page`);
@@ -95,7 +101,7 @@ export async function runListObjects(client: S3Client, testCase: CorpusCase): Pr
     await assertFailure(() => client.send(new ListObjectsV2Command({ Bucket: testCase.bucket, ContinuationToken: testCase.continuationToken })), testCase.expect, testCase.id);
     return;
   }
-  await runListPaging(testCase, testCase.continuationToken, async (cursor) => {
+  await runListPaging(testCase, testCase.continuationToken, "v2", async (cursor) => {
     const output = await client.send(new ListObjectsV2Command({ ...listInput(testCase), ContinuationToken: cursor }));
     assert.equal(output.$metadata.httpStatusCode, 200);
     return toListPage(output, output.NextContinuationToken, output.KeyCount);
@@ -107,13 +113,14 @@ export async function runListObjectsV1(client: S3Client, testCase: CorpusCase): 
     await assertFailure(() => client.send(new ListObjectsCommand({ Bucket: testCase.bucket, Marker: testCase.marker })), testCase.expect, testCase.id);
     return;
   }
-  await runListPaging(testCase, testCase.marker, async (cursor) => {
+  await runListPaging(testCase, testCase.marker, "v1", async (cursor) => {
     const output = await client.send(new ListObjectsCommand({ ...listInput(testCase), Marker: cursor }));
     assert.equal(output.$metadata.httpStatusCode, 200);
     // No keyCount: ListObjects (V1) does not return one, and leaving it undefined
     // is what tells the driver not to assert it.
-    return toListPage(output, output.NextMarker, undefined);
+    const nextCursor = output.NextMarker ?? (output.IsTruncated ? output.Contents?.at(-1)?.Key : undefined);
+    return { ...toListPage(output, nextCursor, undefined), nextMarker: output.NextMarker };
   }, (page, expected, index) => {
-    assert.equal(page.nextCursor ?? "", expected.nextMarker ?? "", `page ${index + 1} next marker`);
+    assert.equal(page.nextMarker ?? "", expected.nextMarker ?? "", `page ${index + 1} next marker`);
   });
 }

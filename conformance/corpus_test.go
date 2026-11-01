@@ -168,8 +168,8 @@ func validateListCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 
 // validateListV1CorpusCase refuses a V1 list case that could pass without the
 // cursor working. Two things distinguish V1 from V2 and both are required here:
-// a page that reports it is truncated must state the NextMarker a client pages
-// with, and V1 has no KeyCount, so a case that states one would be asserting a
+// a truncated page must supply NextMarker with a delimiter or a last Key without
+// one, and V1 has no KeyCount, so a case that states one would be asserting a
 // field the response does not carry.
 func validateListV1CorpusCase(t *testing.T, testCase sharedCorpusCase) {
 	t.Helper()
@@ -187,11 +187,8 @@ func validateListV1CorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		if page.KeyCount != 0 {
 			t.Fatalf("list case %q page %d states keyCount, which ListObjects (V1) does not return", testCase.ID, index+1)
 		}
-		if page.IsTruncated && page.NextMarker == "" {
-			t.Fatalf("list case %q page %d is truncated without a nextMarker, so it cannot be paged", testCase.ID, index+1)
-		}
-		if !page.IsTruncated && page.NextMarker != "" {
-			t.Fatalf("list case %q page %d is not truncated and must not report a nextMarker", testCase.ID, index+1)
+		if problem := listV1CursorProblem(testCase.Delimiter, page); problem != "" {
+			t.Fatalf("list case %q page %d: %s", testCase.ID, index+1, problem)
 		}
 	}
 }

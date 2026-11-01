@@ -185,7 +185,7 @@ func (s *Server) handleListObjectsV1(ctx context.Context, w http.ResponseWriter,
 		Delimiter:   delimiter,
 		IsTruncated: result.IsTruncated,
 	}
-	if result.IsTruncated {
+	if result.IsTruncated && delimiter != "" {
 		resp.NextMarker = result.NextContinuationToken
 	}
 	if encodeURL {

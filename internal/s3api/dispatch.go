@@ -66,7 +66,7 @@ func (s *Server) dispatchBucket(ctx context.Context, w http.ResponseWriter, r *h
 			s.handleListMultipartUploads(ctx, w, r, bucket, q)
 			return
 		}
-		// Everything else on a bucket is the classic listing (V1).
+		// With unsupported semantic selectors refused, this is the classic listing.
 		s.handleListObjectsV1(ctx, w, r, bucket, q)
 	case http.MethodPost:
 		if q.Has("delete") {
@@ -158,13 +158,17 @@ func (s *Server) requireMultipart(w http.ResponseWriter, r *http.Request, resour
 
 func unsupportedSemanticMarker(r *http.Request, q url.Values) (code, message string, ok bool) {
 	for _, marker := range []string{
-		"versioning", "versions", "acl", "policy", "lifecycle", "replication", "notification",
+		"versioning", "versions", "acl", "policy", "policyStatus", "lifecycle", "replication", "notification",
+		"cors", "publicAccessBlock", "ownershipControls",
 		"tagging", "website", "logging", "accelerate", "requestPayment", "encryption",
 		"object-lock", "inventory", "metrics", "analytics", "intelligent-tiering", "select",
 	} {
 		if q.Has(marker) {
 			return "NotImplemented", "operation is not implemented", true
 		}
+	}
+	if q.Has("list-type") && q.Get("list-type") != "2" {
+		return "InvalidArgument", "list-type must be 2 when supplied", true
 	}
 	if q.Has("versionId") {
 		return "InvalidArgument", "versionId is not supported", true

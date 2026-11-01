@@ -329,10 +329,7 @@ func TestListObjectsV1PagingCoversEveryRowOnce(t *testing.T) {
 							}
 							break
 						}
-						if listing.NextMarker == "" {
-							t.Fatalf("page %d is truncated with no NextMarker, so a client has nothing to page with", page)
-						}
-						marker = listing.NextMarker
+						marker = v1NextPageMarker(t, listing, request.delimiter)
 					}
 					slices.Sort(rows)
 					if !slices.Equal(rows, testCase.want) {

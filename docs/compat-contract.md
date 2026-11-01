@@ -181,15 +181,27 @@ All S3 operations use **AWS Signature Version 4 (SigV4)** unless served via a **
 - `x-amz-copy-source-if-match`, `if-none-match`, `if-modified-since`, `if-unmodified-since` supported; failed precondition → `412 Precondition Failed`.
 - SSE/KMS copy headers ignored (no encryption at rest in v1).
 
-### 1.3 Listing — ListObjectsV2
+### 1.3 Listing — ListObjects and ListObjectsV2
 
 | Operation | HTTP | Path pattern | Query params | Required headers | Success response |
 |-----------|------|--------------|--------------|------------------|------------------|
+| **ListObjects (V1)** | `GET` | `/{bucket}` | no `list-type`; optional `prefix`, `delimiter`, `max-keys`, `marker`, `encoding-type=url` | `Authorization` | `200 OK`, XML `ListBucketResult` with `Marker`, per-object `Owner`, and no `KeyCount` |
 | **ListObjectsV2** | `GET` | `/{bucket}` | `list-type=2`, optional `prefix`, `delimiter`, `max-keys`, `continuation-token`, `start-after`, `encoding-type=url` | `Authorization` | `200 OK`, XML `ListBucketResult` |
 
-**Required response fields:** `Name`, `Prefix`, `KeyCount`, `MaxKeys`, `IsTruncated`, `Contents[]` (when non-empty: `Key`, `LastModified`, `ETag`, `Size`, `StorageClass` = `STANDARD`), optional `CommonPrefixes[]` (`Prefix`), `ContinuationToken` (echo if sent), `NextContinuationToken` (if truncated), `Delimiter`, `EncodingType`.
+V1 pages after `marker`. With a delimiter, a truncated page returns `NextMarker`,
+which may name a common-prefix row; a marker inside a group skips that group.
+Without a delimiter, `NextMarker` is omitted and the client uses the last returned
+`Key`. URL encoding applies to keys, prefixes, delimiters and marker fields.
+As with the existing V2 implementation, zero, negative or unparseable `max-keys`
+selects the default page size of 1,000; this is a deliberate local compatibility
+convention, not a claim of exact Amazon-service limit validation.
+Unsupported selectors such as `versions`, `cors`, `ownershipControls`,
+`publicAccessBlock` and `policyStatus` return S3 XML errors instead of listing.
+An explicitly supplied `list-type` other than `2` is refused.
 
-**Pagination contract:**
+**V2 required response fields:** `Name`, `Prefix`, `KeyCount`, `MaxKeys`, `IsTruncated`, `Contents[]` (when non-empty: `Key`, `LastModified`, `ETag`, `Size`, `StorageClass` = `STANDARD`), optional `CommonPrefixes[]` (`Prefix`), `ContinuationToken` (echo if sent), `NextContinuationToken` (if truncated), `Delimiter`, `EncodingType`.
+
+**V2 pagination contract:**
 - Default `max-keys` = 1000; server MAY use a lower internal page size but MUST honor `IsTruncated` + `NextContinuationToken` semantics.
 - `continuation-token` is opaque; clients MUST round-trip the token verbatim.
 - Listing is **lexicographic UTF-8 byte order** by key.

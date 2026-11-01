@@ -1146,6 +1146,7 @@
       "operation": "listObjectsV1",
       "bucket": "contract-list-v1-flat",
       "marker": "a.txt",
+      "maxKeys": 1,
       "setup": [
         {
           "key": "a.txt",
@@ -1165,7 +1166,12 @@
         "pages": [
           {
             "contents": [
-              "b.txt",
+              "b.txt"
+            ],
+            "isTruncated": true
+          },
+          {
+            "contents": [
               "c.txt"
             ],
             "isTruncated": false
