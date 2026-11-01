@@ -55,8 +55,9 @@ export function publishTarball(step, run = execFileSync, env = process.env) {
   try {
     const artifact = join(directory, "package.tgz");
     copyFileSync(step.tarball, artifact);
+    if (integrityOf(artifact) !== step.integrity) throw new Error("artifact changed after publication preflight");
     const manifest = manifestOf(artifact);
-    if (integrityOf(artifact) !== step.integrity || manifest.name !== step.name || manifest.version !== step.version) {
+    if (manifest.name !== step.name || manifest.version !== step.version) {
       throw new Error("artifact changed after publication preflight");
     }
     const userconfig = join(directory, "user.npmrc"), globalconfig = join(directory, "global.npmrc");
