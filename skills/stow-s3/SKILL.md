@@ -77,6 +77,10 @@ is historical; its existing artifacts remain immutable. If a publication is
 ever resumed, remove any old scope override to `npm.pkg.github.com`; it would
 send installation requests to the wrong registry.
 
+The [npmjs/OIDC preparation guide](../../docs/npm-publishing.md) records the
+future public registry path and separately authorized bootstrap. It does not
+make npm installation available or configure a trusted publisher.
+
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
 ```

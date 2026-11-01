@@ -1,119 +1,95 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { test } from "node:test";
+import { after, test } from "node:test";
+import { integrityOf, isPublished, main, manifestOf, publishEnvironment, publishPlan, publishTarball, registryResult } from "./publish-if-absent.mjs";
+import { PACKAGE_NAMES, REGISTRY } from "./npm-publication.mjs";
 
-// The re-runnability claim, tested without a registry.
-//
-// publish-if-absent.mjs exists because a release is several independent writes and
-// any of them can fail after an earlier one has already landed. Re-running the
-// whole release then fails on the packages that succeeded, which turns one
-// transient error into a version that can never be completed. These cases pin the
-// plan that makes the second run publish only what is missing.
-
-// The registry lookup is injected, so no case here contacts npm.
-import { integrityOf, registryResult } from "./publish-if-absent.mjs";
-const nothingPublished = () => null;
-const everythingPublished = (_name, _version, tarball) => ({integrity:integrityOf(tarball)});
-const publishedSet = (names) => (name, version, tarball) => names.has(name) ? everythingPublished(name,version,tarball) : null;
-
-// A tarball is a real gzipped tar in production, so these fixtures build one with
-// tar rather than faking the reader. The script's own manifestOf is what reads it,
-// which means these cases also cover that.
-const TARBALLS = [
-  ["@chester-hill-solutions/stow-s3-linux-x64", "0.2.0"],
-  ["@chester-hill-solutions/stow-s3-linux-arm64", "0.2.0"],
-  ["@chester-hill-solutions/stow-s3-darwin-x64", "0.2.0"],
-];
-
-let fixtures = null;
-
-function tarballs() {
-  if (fixtures !== null) {
-    return fixtures;
-  }
-  const dir = mkdtempSync(join(tmpdir(), "publish-plan-"));
-  fixtures = TARBALLS.map(([name, version]) => {
-    const stage = join(dir, `${name.replace(/[^a-z0-9]/gi, "-")}-${version}`);
-    mkdirSync(join(stage, "package"), { recursive: true });
-    writeFileSync(
-      join(stage, "package", "package.json"),
-      JSON.stringify({ name, version, publishConfig: {registry:"https://npm.pkg.github.com"} }),
-    );
-    const tarball = `${stage}.tgz`;
-    execFileSync("tar", ["-czf", tarball, "-C", stage, "package"]);
-    return tarball;
-  });
-  return fixtures;
+const directory = mkdtempSync(join(tmpdir(), "stow-publish-test-"));
+after(() => rmSync(directory, { recursive: true, force: true }));
+let count = 0;
+function fixture(manifest) {
+  const stage = join(directory, String(count++)); mkdirSync(join(stage, "package"), { recursive: true });
+  writeFileSync(join(stage, "package/package.json"), JSON.stringify(manifest));
+  const path = `${stage}.tgz`; execFileSync("tar", ["-czf", path, "-C", stage, "package"]); return path;
 }
+const manifests = PACKAGE_NAMES.map(name => JSON.parse(readFileSync(new URL(`../packages/${name.split("/")[1]}/package.json`, import.meta.url))));
+const tarballs = manifests.map(fixture);
+const receipt = (_name, _version, path) => ({ integrity: integrityOf(path) });
 
-test("a first run publishes everything", async () => {
-  const { publishPlan } = await import("./publish-if-absent.mjs");
-  const plan = publishPlan(tarballs(), nothingPublished);
-  assert.equal(plan.length, 3);
-  assert.deepEqual(
-    plan.map((step) => step.action),
-    ["publish", "publish", "publish"],
-  );
+test("all five packed identities are verified before a registry lookup", async () => {
+  assert.deepEqual(tarballs.map(path => manifestOf(path).name), PACKAGE_NAMES);
+  for (const change of [m => { m.publishConfig.registry = "https://npm.pkg.github.com"; }, m => { delete m.publishConfig.access; }, m => { m.repository.url = "wrong"; }]) {
+    const manifest = structuredClone(manifests[0]); change(manifest);
+    await assert.rejects(() => publishPlan([fixture(manifest)], () => { throw Error("lookup should not run"); }), /must target|public access|must identify/);
+  }
 });
 
-// The property the script exists for: a second run publishes nothing, rather than
-// failing on the packages the first run already landed.
-test("a second run after a complete first run publishes nothing", async () => {
-  const { publishPlan } = await import("./publish-if-absent.mjs");
-  const plan = publishPlan(tarballs(), everythingPublished);
-  assert.deepEqual(
-    plan.map((step) => step.action),
-    ["skip", "skip", "skip"],
-  );
+test("initial, complete and partial retries preserve order and immutable bytes", async () => {
+  assert.deepEqual((await publishPlan(tarballs, () => null)).map(s => s.action), Array(5).fill("publish"));
+  assert.deepEqual((await publishPlan(tarballs, receipt)).map(s => s.action), Array(5).fill("skip"));
+  const plan = await publishPlan([...tarballs].reverse(), (name, version, path) => name === PACKAGE_NAMES[2] ? null : receipt(name, version, path));
+  assert.deepEqual(plan.map(s => s.tarball), [...tarballs].reverse());
+  assert.deepEqual(plan.filter(s => s.action === "publish").map(s => s.name), [PACKAGE_NAMES[2]]);
+  await assert.rejects(() => publishPlan(tarballs, () => ({ integrity: integrityOf(tarballs[1]) })), /immutable version conflict/);
+  await assert.rejects(() => publishPlan([tarballs[0], tarballs[0]], () => null), /duplicate package/);
 });
 
-// The realistic failure: the third package failed and the first two landed. The
-// retry must publish exactly the third.
-test("a partial release retries only what is missing", async () => {
-  const { publishPlan } = await import("./publish-if-absent.mjs");
-  const landed = new Set([TARBALLS[0][0], TARBALLS[1][0]]);
-  const plan = publishPlan(tarballs(), publishedSet(landed));
-  assert.deepEqual(
-    plan.map((step) => step.action),
-    ["skip", "skip", "publish"],
-  );
-  const retry = plan.find((step) => step.action === "publish");
-  assert.equal(retry.name, TARBALLS[2][0]);
+test("only HTTP 404 is exact-version absence; read failures cannot authorize a write", async () => {
+  assert.equal(registryResult({ status: 404 }), null);
+  for (const status of [401, 403, 429, 500, 503, 302]) assert.throws(() => registryResult({ status }), /lookup failed/);
+  for (const document of [{}, { name: PACKAGE_NAMES[0], version: "wrong", dist: { integrity: integrityOf(tarballs[0]) } }]) {
+    assert.throws(() => registryResult({ status: 200, document }, PACKAGE_NAMES[0], "0.3.4"), /invalid identity/);
+  }
+  await assert.rejects(() => isPublished(PACKAGE_NAMES[0], "0.3.4", null, async () => { throw Error("ETIMEDOUT"); }), /ETIMEDOUT/);
+  await assert.rejects(() => isPublished(PACKAGE_NAMES[0], "0.3.4", null, async () => ({ status: 200, json: async () => { throw Error("invalid JSON"); } })), /invalid JSON/);
+  let writes = 0;
+  await assert.rejects(() => main(["node", "script", ...tarballs], { authorize: () => {}, lookup: () => { throw Error("offline"); }, publish: () => { writes++; } }), /offline/);
+  assert.equal(writes, 0);
 });
 
-// A name and version have to come out of the tarball, or the registry lookup
-// cannot be made and the publish is aimed at the wrong thing.
-test("the plan carries the name and version read from each tarball", async () => {
-  const { publishPlan } = await import("./publish-if-absent.mjs");
-  const plan = publishPlan(tarballs(), nothingPublished);
-  assert.deepEqual(
-    plan.map((step) => `${step.name}@${step.version}`),
-    TARBALLS.map(([name, version]) => `${name}@${version}`),
-  );
+test("version preflight uses anonymous public-registry metadata with exact artifact identity", async () => {
+  const result = await isPublished(PACKAGE_NAMES[0], "0.3.4", null, async (url, options) => {
+    assert.equal(url, `${REGISTRY}/%40chester-hill-solutions%2Fstow-s3/0.3.4`);
+    assert.equal(options.credentials, "omit"); assert.equal(options.redirect, "manual");
+    assert.deepEqual(options.headers, { accept: "application/json" });
+    return { status: 200, json: async () => ({ name: PACKAGE_NAMES[0], version: "0.3.4", dist: receipt(null, null, tarballs[0]) }) };
+  });
+  assert.equal(result.integrity, integrityOf(tarballs[0]));
 });
 
-// Order is preserved, because the platform packages are published in the order
-// the release built them and a reordering would change what a failure interrupts.
-test("the plan preserves the order it was given", async () => {
-  const { publishPlan } = await import("./publish-if-absent.mjs");
-  const reversed = [...tarballs()].reverse();
-  const plan = publishPlan(reversed, nothingPublished);
-  assert.deepEqual(
-    plan.map((step) => step.tarball),
-    reversed,
-  );
+test("preflight and script dry-run never call publish, stage or authorization", async () => {
+  for (const flag of ["--check", "--dry-run"]) {
+    assert.equal(await main(["node", "script", flag, ...tarballs], { lookup: () => null, log: () => {},
+      publish: () => { throw Error("must not publish"); }, authorize: () => { throw Error("must not authorize"); } }), 0);
+  }
+  await assert.rejects(() => main(["node", "script", tarballs[0]]), /disabled by release policy/);
 });
 
- test("only an explicit E404 means absent", () => {
-   assert.equal(registryResult({status:1,stdout:JSON.stringify({error:{code:"E404"}})}),null);
-   for (const code of ["E401","E403","E429","E500","ETIMEDOUT"]) {
-     assert.throws(()=>registryResult({status:1,stdout:JSON.stringify({error:{code}})}),new RegExp(code));
-   }
- });
- test("rerun refuses different bytes under the same version",async()=>{
-   const {publishPlan}=await import("./publish-if-absent.mjs");
-   assert.throws(()=>publishPlan(tarballs(),()=>({integrity:"sha512-different"})),/immutable version conflict/);
- });
+test("a mocked publish confirms the exact receipt and a rerun does no write", async () => {
+  const landed = new Map(); let writes = 0;
+  const options = { authorize: () => {}, log: () => {}, lookup: name => landed.get(name) ?? null,
+    publish: step => { writes++; landed.set(step.name, { integrity: step.integrity }); } };
+  assert.equal(await main(["node", "script", ...tarballs], options), 0); assert.equal(writes, 5);
+  assert.equal(await main(["node", "script", ...tarballs], options), 0); assert.equal(writes, 5);
+  await assert.rejects(() => main(["node", "script", tarballs[0]], { ...options, lookup: () => null }), /integrity not confirmed/);
+});
+
+test("future npm writes use a private verified copy and empty auth configuration", async () => {
+  const [step] = await publishPlan([tarballs[0]], () => null);
+  let calls = 0;
+  publishTarball(step, (command, args, options) => {
+    calls++; assert.equal(command, "npm"); assert.equal(args[0], "publish");
+    assert.ok(args.includes("--access=public")); assert.ok(args.includes(`--registry=${REGISTRY}`));
+    assert.notEqual(args.at(-1), step.tarball); assert.equal(integrityOf(args.at(-1)), step.integrity);
+    for (const prefix of ["--userconfig=", "--globalconfig="]) assert.equal(readFileSync(args.find(a => a.startsWith(prefix)).slice(prefix.length), "utf8"), "");
+    assert.deepEqual(options.env, { GITHUB_ACTIONS: "true" });
+  }, { NODE_AUTH_TOKEN: "fixture", NPM_TOKEN: "fixture", npm_config_registry: "wrong", GITHUB_ACTIONS: "true" });
+  assert.equal(calls, 1);
+  assert.deepEqual(publishEnvironment({ NPM_CONFIG_USERCONFIG: "wrong", PATH: "bin" }), { PATH: "bin" });
+  const changed = fixture(manifests[0]), [snapshot] = await publishPlan([changed], () => null);
+  appendFileSync(changed, "changed");
+  assert.throws(() => publishTarball(snapshot, () => { throw Error("must not run npm"); }), /artifact changed/);
+});
