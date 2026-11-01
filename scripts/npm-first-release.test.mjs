@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { after, test } from "node:test";
 import { artifactReceipt, assertRun, executePlan, firstPlan, PUBLICATION_ORDER, runFirstPlan } from "./npm-first-release.mjs";
-import { assertInteractive } from "./bootstrap-first-npm.mjs";
+import { anonymousInstallArgs, assertInteractive } from "./bootstrap-first-npm.mjs";
 import { PACKAGE_NAMES, readReadiness, readinessProblems } from "./npm-publication.mjs";
 import { integrityOf, main as oidcMain, registryResult } from "./publish-if-absent.mjs";
 
@@ -21,6 +21,18 @@ const manifests = PACKAGE_NAMES.map(name => JSON.parse(readFileSync(new URL(`../
 const tarballs = manifests.map(pack), source = "a".repeat(40), run = "123";
 const receipt = artifactReceipt(tarballs, source, run);
 const quiet = () => {};
+
+test("anonymous consumers need no scope or authentication override", () => {
+  for (const name of PACKAGE_NAMES) {
+    const args = anonymousInstallArgs("consumer", name, "empty-user", "empty-global");
+    assert.equal(args.at(-1), `${name}@0.3.5`);
+    assert.ok(args.includes("--registry=https://registry.npmjs.org"));
+    assert.ok(args.includes("--userconfig=empty-user")); assert.ok(args.includes("--globalconfig=empty-global"));
+    assert.ok(args.includes("--ignore-scripts"));
+    assert.ok(!args.some(arg => arg.includes(":registry") || /auth|token|github\.com/i.test(arg)));
+  }
+  assert.throws(() => anonymousInstallArgs("consumer", "unrelated", "empty-user", "empty-global"));
+});
 
 test("waiver is exclusively five canonical public npm 0.3.5 identities", () => {
   assert.equal(receipt.version, "0.3.5");
