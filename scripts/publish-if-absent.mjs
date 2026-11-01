@@ -50,7 +50,7 @@ export async function publishPlan(tarballs, lookup) {
 export function publishEnvironment(env) {
   return Object.fromEntries(Object.entries(env).filter(([key]) => !/^npm_config_/i.test(key) && !["NPM_TOKEN", "NODE_AUTH_TOKEN"].includes(key)));
 }
-export function publishTarball(step, run = execFileSync, env = process.env) {
+export function withVerifiedArtifact(step, consume) {
   const directory = mkdtempSync(join(tmpdir(), "stow-npm-publish-"));
   try {
     const artifact = join(directory, "package.tgz");
@@ -60,12 +60,17 @@ export function publishTarball(step, run = execFileSync, env = process.env) {
     if (manifest.name !== step.name || manifest.version !== step.version) {
       throw new Error("artifact changed after publication preflight");
     }
+    return consume(artifact, directory);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+}
+export function publishTarball(step, run = execFileSync, env = process.env) {
+  return withVerifiedArtifact(step, (artifact, directory) => {
     const userconfig = join(directory, "user.npmrc"), globalconfig = join(directory, "global.npmrc");
     writeFileSync(userconfig, ""); writeFileSync(globalconfig, "");
     run("npm", ["publish", "--ignore-scripts", "--access=public", `--registry=${REGISTRY}`, `--userconfig=${userconfig}`, `--globalconfig=${globalconfig}`, artifact], {
       cwd: directory, env: publishEnvironment(env), stdio: "inherit",
     });
-  } finally { rmSync(directory, { recursive: true, force: true }); }
+  });
 }
 async function authorizePublication(tarballs) {
   const policy = JSON.parse(readFileSync(new URL("./release-policy.json", import.meta.url), "utf8"));

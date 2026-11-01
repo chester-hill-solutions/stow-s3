@@ -61,3 +61,45 @@ not a no-side-effect dry run. Staged publishing needs npm 11.15.0+ and Node
 Local `publish-if-absent.mjs --check` and `--dry-run` only plan registry reads;
 they never invoke npm publish, stage or trust commands. Tests inject registry
 responses and publication callbacks. No bootstrap action is part of those tests.
+
+## First npm 0.3.5 bootstrap
+
+Live-provider compatibility is **NOT verified for 0.3.5**. The owner waived the
+three provider receipts only for this first interactive npm release. No verified
+receipt is fabricated. Future automated publication still requires the existing
+provider evidence, readiness assertions and enabled release policy. PyPI is off.
+
+The separate `scripts/bootstrap-first-npm.mjs` accepts only all five Stow packages
+at 0.3.5. It cannot publish from CI or another version. The default OIDC publisher
+never imports this exception. No trusted publisher is configured by this script.
+
+1. Review and merge the preparation through normal PR gates.
+2. Rehearse version 0.3.5 on the exact merged main commit. Require successful
+   push CI and the completed four-platform nonpublishing Release rehearsal.
+   The rehearsal uploads `npm-first-0.3.5`: five real tarballs and a receipt
+   recording source, run, canonical package identities and SHA-512 hashes.
+3. Use a clean checkout of that current main commit. Invoke the bootstrap script
+   with `--check`, the approved 40-character commit, rehearsal run ID and push CI
+   run ID. It downloads that run's artifact and performs anonymous registry reads.
+   It never publishes, stages, configures trust or accesses the login credential.
+4. Obtain separate approval for actual public publication of these exact bytes.
+   Only then replace `--check` with `--publish` in a local interactive terminal.
+   Node 22.14+ and npm 11.5.1+ are required. The script verifies account `wra-sol`
+   against npmjs and asks for the exact approved source commit. npm handles human
+   2FA directly; never put an OTP or credential in arguments, logs or this repo.
+   The previously authorized default local npm login is used without reading it.
+5. The script verifies every identity, hash and immutable registry version before
+   the first write. It publishes platform packages before core, with public access
+   and canonical registry overrides. Each private copy is rehashed before npm
+   receives it. Only HTTP 404 counts as absence; unavailable or denied reads stop.
+6. A partial failure stops the run. Repeat only with the identical source, run and
+   tarballs; identical registry bytes are skipped and conflicting versions fail.
+   After publication, anonymous installs cover all five exact versions and the
+   core consumer runs on the current native host. A failed verification is a
+   partial release, not proof of success. Do not replace immutable version bytes.
+
+This preparation does not execute step 4. Account ownership and enabled 2FA do
+not prove package existence, organization publishing rights or OIDC trust.
+Trust configuration and future automated publication require separate approval.
+The install-surface declaration stays `published: false` until public installs
+are actually verified. Staged placeholder publication is not used here.

@@ -357,6 +357,20 @@ jobs:
           done
           ls -l dist/npm-platform
 
+      - name: Prepare first npm 0.3.5 bootstrap artifacts (publishes nothing)
+        if: github.event_name == 'workflow_dispatch' && inputs.version == '0.3.5'
+        run: |
+          mkdir -p dist/npm-first
+          cp dist/npm-platform/*.tgz dist/npm/*.tgz dist/npm-first/
+          node scripts/npm-first-release.mjs dist/npm-first/receipt.json dist/npm-first/*.tgz
+      - name: Upload first npm 0.3.5 bootstrap artifacts
+        if: github.event_name == 'workflow_dispatch' && inputs.version == '0.3.5'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm-first-0.3.5
+          path: dist/npm-first/*
+          if-no-files-found: error
+
       - name: Preflight exact npm artifacts
         if: needs.plan.outputs.publish_packages == 'true'
         run: node scripts/publish-if-absent.mjs --check ./dist/npm-platform/*.tgz ./dist/npm/*.tgz
