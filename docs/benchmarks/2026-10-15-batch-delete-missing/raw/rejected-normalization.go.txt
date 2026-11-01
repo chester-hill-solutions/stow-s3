@@ -1,0 +1,10 @@
+func (a *storeAdapter) DeleteObjects(ctx context.Context, bucket string, keys []string) ([]string, error) {
+	deleted := make([]string, 0, len(keys))
+	for _, key := range keys {
+		if err := a.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
+			return deleted, err
+		}
+		deleted = append(deleted, key)
+	}
+	return deleted, nil
+}

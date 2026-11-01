@@ -1,5 +1,9 @@
 # Measure Stow performance
 
+Run performance benchmarks only on the dedicated [Railway benchmark environment](railway-performance.md).
+Local correctness and race tests remain permitted. Build both comparison variants
+on Railway before measurement and record their source identities and resource limits.
+
 Run reproducible storage workloads before publishing capacity claims.
 The suite measures embedded Go storage, the S3 endpoint and a simulated quarantine workflow.
 It does not run a DPI engine or block network traffic.
@@ -27,7 +31,7 @@ Ambient upstream credentials are removed from their environments.
 The suite uses private temporary directories and removes them on normal completion or errors.
 Interrupted benchmark processes can leave temporary directories behind.
 
-## Local baseline
+## Baseline profile on Railway
 
 ```sh
 make benchmark-performance
@@ -67,7 +71,7 @@ They disqualify a rate from a zero-loss capacity claim.
 
 ## Sustained qualification
 
-Use a quiet, dedicated machine for publishable measurements:
+Use the dedicated Railway runner for publishable measurements:
 
 ```sh
 make benchmark-performance PERF_CONFIG=docs/benchmarks/performance-qualification.json

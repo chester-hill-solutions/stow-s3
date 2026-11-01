@@ -1,0 +1,22 @@
+syntax = "proto3";
+package stow.runthrough;
+option go_package = "github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb";
+
+import "internal/runthrough/outboxpb/entry.proto";
+
+message Outbox {
+  uint32 version = 1;
+  repeated Provenance provenance = 2;
+  repeated Entry entries = 3;
+  repeated Entry prepared = 4;
+  uint64 seq = 5;
+  uint64 next_token = 6;
+}
+
+message Provenance {
+  string identity = 1;
+  string etag = 2;
+  bool absent = 3;
+  bool unknown = 4;
+}
+

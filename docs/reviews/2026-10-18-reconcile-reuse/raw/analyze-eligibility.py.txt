@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,re
+p=Path('/private/tmp/stow-reconcile-reuse-2026-10-18');j=json.loads((p/'eligibility-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==3 and all(x['passed']for x in checks);trace=(e/'trace.log').read_text();assert '--- FAIL:'not in trace and '--- SKIP:'not in trace
+out={}
+for op in ['put','save']:
+ rows=[]
+ for i in range(20):
+  segment=trace.split('STOW_REUSE_TRACE_BEGIN '+op+' '+str(i)+'\n')[1].split('STOW_REUSE_TRACE_END '+op+' '+str(i)+'\n')[0]
+  rows.append({'iteration':i,'eligible':re.findall(r'STOW_REUSE_ELIGIBLE (true|false)',segment)})
+ out[op]={'operations':rows,'eligibleCalls':sum(x['eligible'].count('true')for x in rows),'ineligibleCalls':sum(x['eligible'].count('false')for x in rows)}
+ print(op,out[op]['eligibleCalls'],out[op]['ineligibleCalls'])
+(e/'eligibility.json').write_text(json.dumps(out,indent=2)+'\n');(e/'validation-receipt.json').write_text(json.dumps({'checks':3,'allPassed':True,'operationsPerKind':20,'volume':'Railway /results','productionUnchanged':True},indent=2)+'\n')

@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,re,collections,hashlib
+p=Path('/private/tmp/stow-outbox-collision-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');job=json.loads((p/'after-start.json').read_text());e=p/('export-'+job['id']);run=json.loads((e/'run.json').read_text());assert run['complete'] and run['success'];checks=json.loads((e/'checks.json').read_text());assert len(checks)==14 and all(c['passed']for c in checks),checks
+formats=['json-0','json-1','json-2','json-3','protobuf'];expected=set()
+for marked in ['false','true']:
+ for identical in ['false','true']:expected.add('TestOutboxMigrationRejectsOverlappingPreparedIDs/marked='+marked+'/identical='+identical)
+for f in formats:
+ for identical in ['false','true']:expected.add('TestFileOutboxRefusesCollidingPreparedMigrationOnOpen/'+f+'/identical='+identical)
+ for op in ['pending','prepared','lookup','enqueue','prepare','save','close']:expected.add('TestFileOutboxRefusesCollidingPreparedMigrationOnReload/'+f+'/'+op)
+for f in [*formats,'flat']:expected.add('TestOutboxMigrationPreservesNonOverlappingRecords/'+f)
+receipt={}
+for mode in ['normal','race']:
+ text=(e/('focused-'+mode+'.log')).read_text();assert not re.search(r'^\s*--- FAIL:',text,re.M)
+ passes=collections.Counter(re.findall(r'^\s*--- PASS: (\S+) \(',text,re.M));assert all(passes[n]==2 for n in expected),[(n,passes[n])for n in expected if passes[n]!=2]
+ receipt[mode]={'uniqueMigrationCases':len(expected),'passedCasesWithCount2':sum(passes[n]for n in expected)}
+env=json.loads((e/'environment.json').read_text());before=json.loads((p/('export-'+json.loads((p/'before-start.json').read_text())['id'])/'environment.json').read_text());assert before['sourceSHA256']['internal/runthrough/file_outbox_migration_collision_test.go']==env['sourceSHA256']['internal/runthrough/file_outbox_migration_collision_test.go']
+for name,digest in env['sourceSHA256'].items():assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+receipt.update(checksPassed=len(checks),sourceSHA256=env['sourceSHA256'],railwayDeploymentId=job['deploymentId']);(e/'green-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

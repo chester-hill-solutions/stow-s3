@@ -1,0 +1,28 @@
+# Correctness repros only; expected to fail until their findings are fixed.
+# Usage: python3 replay.py.txt CHECKOUT OUTPUT_DIRECTORY
+from pathlib import Path
+import os, subprocess, sys
+
+repo = Path(sys.argv[1]).resolve()
+out = Path(sys.argv[2]).resolve()
+out.mkdir(parents=True, exist_ok=True)
+raw = Path(__file__).resolve().parent
+env = dict(os.environ, GOTOOLCHAIN="go1.25.6")
+for source, package, pattern, stem in [
+    ("workspace-probes.go.txt", "internal/storage/workspace", "^TestContractAudit", "native-probes"),
+    ("filesystem-probes.go.txt", "internal/runtime", "^TestContractAuditDisk", "filesystem-probes"),
+]:
+    target = repo / package / "contract_audit_probe_test.go"
+    if target.exists():
+        raise SystemExit(f"Refusing to replace {target}")
+    try:
+        target.write_bytes((raw / source).read_bytes())
+        for suffix, flags in [("", []), ("-race", ["-race"])]:
+            with (out / (stem + suffix + ".log")).open("w") as log:
+                result = subprocess.run(
+                    ["go", "test", *flags, "./" + package, "-run", pattern, "-count=2", "-v"],
+                    cwd=repo, env=env, stdout=log, stderr=subprocess.STDOUT,
+                )
+            print(stem + suffix, "exit", result.returncode, flush=True)
+    finally:
+        target.unlink(missing_ok=True)

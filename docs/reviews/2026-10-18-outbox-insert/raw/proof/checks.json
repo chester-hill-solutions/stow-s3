@@ -1,0 +1,84 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_duplicate_boundary_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1918,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4739,
+    "passed": true
+  },
+  {
+    "name": "candidate-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1901,
+    "passed": true
+  },
+  {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 3604,
+    "passed": true
+  }
+]

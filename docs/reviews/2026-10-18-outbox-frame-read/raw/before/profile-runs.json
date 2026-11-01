@@ -1,0 +1,333 @@
+{
+  "binarySHA256": "035beaba2056d885368e6778bd978aa2ff329fb2a6370237438a628cb5095c0f",
+  "runs": [
+    {
+      "name": "uninstrumented",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^(BenchmarkOutboxDecodeProfile|BenchmarkOutboxDecodeDomain)$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3",
+        "-test.cpu=1,4"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "file-uninstrumented",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkFileOutboxDecodeCycle$/depth=(0|128|4096)/^enqueue$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3",
+        "-test.cpu=1,4"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-minimal-cpu",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=false$",
+        "-test.benchtime=3s",
+        "-test.cpu=1",
+        "-test.cpuprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-minimal-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-minimal-memory",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=false$",
+        "-test.benchtime=10x",
+        "-test.cpu=1",
+        "-test.memprofilerate=1",
+        "-test.memprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-minimal-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-minimal-cpu-top",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=40",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-minimal-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-minimal-alloc_objects",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_objects",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-minimal-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-minimal-alloc_space",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_space",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-minimal-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-rich-cpu",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=true$",
+        "-test.benchtime=3s",
+        "-test.cpu=1",
+        "-test.cpuprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-rich-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-rich-memory",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=true$",
+        "-test.benchtime=10x",
+        "-test.cpu=1",
+        "-test.memprofilerate=1",
+        "-test.memprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-rich-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-rich-cpu-top",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=40",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-rich-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-rich-alloc_objects",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_objects",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-rich-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "decode-rich-alloc_space",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_space",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/decode-rich-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "domain-rich-cpu",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeDomain$/rich=true$",
+        "-test.benchtime=3s",
+        "-test.cpu=1",
+        "-test.cpuprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/domain-rich-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "domain-rich-memory",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeDomain$/rich=true$",
+        "-test.benchtime=10x",
+        "-test.cpu=1",
+        "-test.memprofilerate=1",
+        "-test.memprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/domain-rich-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "domain-rich-cpu-top",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=40",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/domain-rich-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "domain-rich-alloc_objects",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_objects",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=decodeDomainFixture",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/domain-rich-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "domain-rich-alloc_space",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_space",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=decodeDomainFixture",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/domain-rich-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "file-enqueue-cpu",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkFileOutboxDecodeCycle$/depth=4096/^enqueue$",
+        "-test.benchtime=3s",
+        "-test.cpu=4",
+        "-test.cpuprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/file-enqueue-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "file-enqueue-memory",
+      "args": [
+        "/app/benchmark/post-profile.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkFileOutboxDecodeCycle$/depth=4096/^enqueue$",
+        "-test.benchtime=10x",
+        "-test.cpu=4",
+        "-test.memprofilerate=1",
+        "-test.memprofile=/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/file-enqueue-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "file-enqueue-cpu-top",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=40",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/file-enqueue-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "file-enqueue-alloc_objects",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_objects",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=benchmarkDecodeCycle",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/file-enqueue-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "file-enqueue-alloc_space",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_space",
+        "-top",
+        "-cum",
+        "-nodecount=35",
+        "-focus=benchmarkDecodeCycle",
+        "/app/benchmark/post-profile.test",
+        "/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/file-enqueue-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

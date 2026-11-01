@@ -1,0 +1,49 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_fence_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 23,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacity(Fence|WriteFailure)",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 19239,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacity(Fence|WriteFailure)",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 30631,
+    "passed": true
+  }
+]

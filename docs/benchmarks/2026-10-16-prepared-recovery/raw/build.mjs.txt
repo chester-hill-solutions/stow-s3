@@ -1,0 +1,16 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+const inputManifest=JSON.parse(await readFile('benchmark/input-manifest.json','utf8'));
+for(const [name,want]of Object.entries(inputManifest)){if(hash(await readFile(name))!==want)throw Error('Input payload mismatch: '+name)}
+const sources=JSON.parse(await readFile('benchmark/source-freeze.json','utf8'));
+for(const [name,identity] of Object.entries(sources)){
+ const bytes=await readFile(name);
+ if(bytes.length!==identity.bytes||hash(bytes)!==identity.sha256)throw Error('Source mismatch: '+name);
+}
+await mkdir('/out',{recursive:true});
+await writeFile('benchmark/baseline-overlay.json',JSON.stringify({Replace:{'/src/internal/runthrough/outbox_adapter.go':'/src/benchmark/outbox_adapter.go.before.txt'}}));
+for(const version of ['before','after'])execFileSync('go',['test',...(version==='before'?['-overlay=benchmark/baseline-overlay.json']:[]),'-c','-buildvcs=false','-o','/out/'+version+'.test','./internal/runthrough'],{stdio:'inherit'});
+const binaries={};for(const version of ['before','after']){const bytes=await readFile('/out/'+version+'.test');binaries[version]={bytes:bytes.length,sha256:hash(bytes)}}
+await writeFile('/out/build-identity.json',JSON.stringify({...(JSON.parse(await readFile('benchmark/environment-base.json','utf8'))),sources,binaries,go:execFileSync('go',['version'],{encoding:'utf8'}).trim(),compiler:JSON.parse(execFileSync('go',['env','-json','GOFLAGS','GOEXPERIMENT','GOOS','GOARCH','GOTOOLCHAIN','GOAMD64','CGO_ENABLED'],{encoding:'utf8'})),input_manifest_sha256:hash(await readFile('benchmark/input-manifest.json')),baseline_source_sha256:hash(await readFile('benchmark/outbox_adapter.go.before.txt'))},null,2)+'\n');

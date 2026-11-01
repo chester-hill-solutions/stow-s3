@@ -1,0 +1,529 @@
+{
+  "baseline": "b531f15",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "payload_bytes": 1048576,
+  "scope": "runtime adapter over immutable memory COPY; synthetic committed outcome after real local copy",
+  "benchtime": "1s",
+  "go": "go version go1.25.6 darwin/arm64",
+  "platform": "macOS-14.5-arm64-arm-64bit",
+  "binaries": {
+    "baseline": "b8ebc3c1e36251c8de066ae3f06405f1af6f48b84273de2ccd280e8c68401251",
+    "candidate": "f6e257e50643562f2d273b74e8a6e6ccedfb9798791e0087c684a0560c2a2eba"
+  },
+  "summary": {
+    "etag/committed=false": {
+      "baseline": {
+        "median_ns": 2502.5,
+        "ns/op": [
+          2263.0,
+          2959.0
+        ],
+        "B/op": [
+          3424,
+          3424
+        ],
+        "allocs/op": [
+          26,
+          26
+        ]
+      },
+      "candidate": {
+        "median_ns": 2342.5,
+        "ns/op": [
+          2244.0,
+          3790.0
+        ],
+        "B/op": [
+          3424,
+          3424
+        ],
+        "allocs/op": [
+          26,
+          26
+        ]
+      }
+    },
+    "etag/committed=true": {
+      "baseline": {
+        "median_ns": 2413.5,
+        "ns/op": [
+          2286.0,
+          2736.0
+        ],
+        "B/op": [
+          2928,
+          2928
+        ],
+        "allocs/op": [
+          23,
+          23
+        ]
+      },
+      "candidate": {
+        "median_ns": 2279.0,
+        "ns/op": [
+          2251.0,
+          3890.0
+        ],
+        "B/op": [
+          3424,
+          3424
+        ],
+        "allocs/op": [
+          26,
+          26
+        ]
+      }
+    },
+    "plain/committed=false": {
+      "baseline": {
+        "median_ns": 2147.5,
+        "ns/op": [
+          2124.0,
+          2478.0
+        ],
+        "B/op": [
+          3408,
+          3408
+        ],
+        "allocs/op": [
+          25,
+          25
+        ]
+      },
+      "candidate": {
+        "median_ns": 2347.0,
+        "ns/op": [
+          2196.0,
+          3810.0
+        ],
+        "B/op": [
+          3408,
+          3408
+        ],
+        "allocs/op": [
+          25,
+          25
+        ]
+      }
+    },
+    "plain/committed=true": {
+      "baseline": {
+        "median_ns": 2093.0,
+        "ns/op": [
+          1980.0,
+          2483.0
+        ],
+        "B/op": [
+          2912,
+          2912
+        ],
+        "allocs/op": [
+          22,
+          22
+        ]
+      },
+      "candidate": {
+        "median_ns": 2291.5,
+        "ns/op": [
+          2167.0,
+          2948.0
+        ],
+        "B/op": [
+          3408,
+          3408
+        ],
+        "allocs/op": [
+          25,
+          25
+        ]
+      }
+    }
+  },
+  "samples": [
+    {
+      "version": "baseline",
+      "kind": "plain/committed=false",
+      "iterations": 547856,
+      "ns/op": 2478.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=false",
+      "iterations": 575042,
+      "ns/op": 2142.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=false",
+      "iterations": 576652,
+      "ns/op": 2153.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=true",
+      "iterations": 588432,
+      "ns/op": 1980.0,
+      "B/op": 2912,
+      "allocs/op": 22
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=true",
+      "iterations": 609483,
+      "ns/op": 2055.0,
+      "B/op": 2912,
+      "allocs/op": 22
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=true",
+      "iterations": 580483,
+      "ns/op": 2054.0,
+      "B/op": 2912,
+      "allocs/op": 22
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=false",
+      "iterations": 524770,
+      "ns/op": 2363.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=false",
+      "iterations": 533311,
+      "ns/op": 2285.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=false",
+      "iterations": 510706,
+      "ns/op": 2263.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=true",
+      "iterations": 567672,
+      "ns/op": 2286.0,
+      "B/op": 2928,
+      "allocs/op": 23
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=true",
+      "iterations": 485340,
+      "ns/op": 2290.0,
+      "B/op": 2928,
+      "allocs/op": 23
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=true",
+      "iterations": 513403,
+      "ns/op": 2736.0,
+      "B/op": 2928,
+      "allocs/op": 23
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=false",
+      "iterations": 303650,
+      "ns/op": 3810.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=false",
+      "iterations": 456423,
+      "ns/op": 2499.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=false",
+      "iterations": 526518,
+      "ns/op": 2225.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=true",
+      "iterations": 552757,
+      "ns/op": 2376.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=true",
+      "iterations": 522340,
+      "ns/op": 2948.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=true",
+      "iterations": 449994,
+      "ns/op": 2795.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=false",
+      "iterations": 437156,
+      "ns/op": 2384.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=false",
+      "iterations": 529453,
+      "ns/op": 2969.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=false",
+      "iterations": 313830,
+      "ns/op": 3790.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=true",
+      "iterations": 319742,
+      "ns/op": 3890.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=true",
+      "iterations": 482642,
+      "ns/op": 2283.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=true",
+      "iterations": 480838,
+      "ns/op": 2443.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=false",
+      "iterations": 542197,
+      "ns/op": 2450.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=false",
+      "iterations": 558640,
+      "ns/op": 2196.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=false",
+      "iterations": 539768,
+      "ns/op": 2244.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=true",
+      "iterations": 514434,
+      "ns/op": 2167.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=true",
+      "iterations": 552564,
+      "ns/op": 2172.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "plain/committed=true",
+      "iterations": 542685,
+      "ns/op": 2207.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=false",
+      "iterations": 521125,
+      "ns/op": 2244.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=false",
+      "iterations": 543885,
+      "ns/op": 2301.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=false",
+      "iterations": 530174,
+      "ns/op": 2271.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=true",
+      "iterations": 540495,
+      "ns/op": 2275.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=true",
+      "iterations": 520082,
+      "ns/op": 2251.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "candidate",
+      "kind": "etag/committed=true",
+      "iterations": 533629,
+      "ns/op": 2260.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=false",
+      "iterations": 542436,
+      "ns/op": 2188.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=false",
+      "iterations": 575006,
+      "ns/op": 2135.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=false",
+      "iterations": 547726,
+      "ns/op": 2124.0,
+      "B/op": 3408,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=true",
+      "iterations": 584038,
+      "ns/op": 2483.0,
+      "B/op": 2912,
+      "allocs/op": 22
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=true",
+      "iterations": 535114,
+      "ns/op": 2190.0,
+      "B/op": 2912,
+      "allocs/op": 22
+    },
+    {
+      "version": "baseline",
+      "kind": "plain/committed=true",
+      "iterations": 555964,
+      "ns/op": 2131.0,
+      "B/op": 2912,
+      "allocs/op": 22
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=false",
+      "iterations": 466452,
+      "ns/op": 2959.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=false",
+      "iterations": 501028,
+      "ns/op": 2953.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=false",
+      "iterations": 463582,
+      "ns/op": 2642.0,
+      "B/op": 3424,
+      "allocs/op": 26
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=true",
+      "iterations": 502606,
+      "ns/op": 2648.0,
+      "B/op": 2928,
+      "allocs/op": 23
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=true",
+      "iterations": 498668,
+      "ns/op": 2459.0,
+      "B/op": 2928,
+      "allocs/op": 23
+    },
+    {
+      "version": "baseline",
+      "kind": "etag/committed=true",
+      "iterations": 551590,
+      "ns/op": 2368.0,
+      "B/op": 2928,
+      "allocs/op": 23
+    }
+  ]
+}

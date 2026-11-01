@@ -1,0 +1,106 @@
+{
+  "regressions": {
+    "focused-normal": {
+      "distinctCases": 28,
+      "passes": 56,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "TestFileOutboxOwnWriteCanonicalizesProvenance",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+        "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+        "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+        "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+        "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+        "TestFileOutboxReleasesCallerStringBuffers",
+        "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+        "TestOutboxStateCloneIndependence/empty-nonnil",
+        "TestOutboxStateCloneIndependence/maps-0",
+        "TestOutboxStateCloneIndependence/maps-1",
+        "TestOutboxStateCloneIndependence/maps-2",
+        "TestOutboxStateCloneIndependence/maps-3",
+        "TestOutboxStateCloneIndependence/maps-4",
+        "TestOutboxStateCloneIndependence/maps-5",
+        "TestOutboxStateCloneIndependence/maps-6",
+        "TestOutboxStateCloneIndependence/maps-7"
+      ],
+      "capacity": [
+        {
+          "heapBefore": 7186808,
+          "heapAfter": 7299912,
+          "growth": 113104
+        },
+        {
+          "heapBefore": 7192688,
+          "heapAfter": 7305568,
+          "growth": 112880
+        }
+      ]
+    },
+    "focused-race": {
+      "distinctCases": 28,
+      "passes": 56,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "TestFileOutboxOwnWriteCanonicalizesProvenance",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+        "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+        "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+        "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+        "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+        "TestFileOutboxReleasesCallerStringBuffers",
+        "TestOutboxStateCloneDoesNotDuplicateDeletedCapacity",
+        "TestOutboxStateCloneIndependence/empty-nonnil",
+        "TestOutboxStateCloneIndependence/maps-0",
+        "TestOutboxStateCloneIndependence/maps-1",
+        "TestOutboxStateCloneIndependence/maps-2",
+        "TestOutboxStateCloneIndependence/maps-3",
+        "TestOutboxStateCloneIndependence/maps-4",
+        "TestOutboxStateCloneIndependence/maps-5",
+        "TestOutboxStateCloneIndependence/maps-6",
+        "TestOutboxStateCloneIndependence/maps-7"
+      ],
+      "capacity": [
+        {
+          "heapBefore": 7183848,
+          "heapAfter": 7297016,
+          "growth": 113168
+        },
+        {
+          "heapBefore": 7195520,
+          "heapAfter": 7309088,
+          "growth": 113568
+        }
+      ]
+    }
+  },
+  "sourceSHA256": {
+    "internal/runthrough/outbox.go": "627fd1c86758d3ade6c0182e8eea142d623845677136af26c4119c6dfffb9f19",
+    "internal/runthrough/outbox_clone_test.go": "279828f4f81166db5b9ef0c5d617cc2654a0201f8439d331c917bf28c84d2eed",
+    "internal/runthrough/outbox_clone_bench_test.go": "a73bb0dbb34e9d5e8f86d215c62f4e68d09d03ce91c5dc568714ce1e2b8d06b3",
+    "internal/runthrough/outbox_clone_capacity_test.go": "f6e572752c82e0b49fd64e58754bd9b4226d3f4c72b8b2b38fad37ad40f7e50c"
+  }
+}

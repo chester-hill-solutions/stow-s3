@@ -1,0 +1,87 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_decode_reference_test.go",
+      "internal/runthrough/outbox_decode_equivalence_test.go",
+      "benchmark/candidate-file_outbox_proto.go.txt",
+      "benchmark/candidate-file_outbox_proto_decode.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxDecode|TestOutboxProto|TestFileOutbox)",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 2649,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxDecode|TestOutboxProto|TestFileOutbox)",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 5848,
+    "passed": true
+  },
+  {
+    "name": "candidate-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/decode-candidate.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxDecode|TestOutboxProto|TestFileOutbox)",
+      "-count=1",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2694,
+    "passed": true
+  },
+  {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/decode-candidate.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxDecode|TestOutboxProto|TestFileOutbox)",
+      "-count=1",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7071,
+    "passed": true
+  }
+]

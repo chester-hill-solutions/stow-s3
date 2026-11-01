@@ -1,0 +1,88 @@
+package storage
+
+import (
+	"bytes"
+	"errors"
+	"io"
+	"sync"
+	"testing"
+)
+
+func TestPartReaderAdoptsOwnedRemainder(t *testing.T) {
+	for _, prefix := range []int{0, 3, 7} {
+		t.Run(string(rune('0'+prefix)), func(t *testing.T) {
+			original := []byte("payload")
+			body := NewOwnedBody(original)
+			if _, err := io.ReadFull(body, make([]byte, prefix)); err != nil {
+				t.Fatal(err)
+			}
+			etag, data, err := ETagForReader(body)
+			if err != nil || !bytes.Equal(data, original[prefix:]) || etag != ETagForBytes(original[prefix:]) {
+				t.Fatalf("remainder %q %s %v", data, etag, err)
+			}
+			if len(data) > 0 && &data[0] != &original[prefix] {
+				t.Fatal("part reader copied explicitly transferred bytes")
+			}
+			if _, _, err := ETagForReader(body); !errors.Is(err, errOwnedBodyTaken) {
+				t.Fatalf("part ownership reused: %v", err)
+			}
+		})
+	}
+}
+
+func TestPartReaderBorrowedIsolationAndErrors(t *testing.T) {
+	original := []byte("prefix-payload")
+	reader := borrowedBodyForPreparation{bytes.NewReader(original), original}
+	if _, err := reader.Seek(7, io.SeekStart); err != nil {
+		t.Fatal(err)
+	}
+	etag, data, err := ETagForReader(reader)
+	if err != nil || string(data) != "payload" || etag != ETagForBytes([]byte("payload")) {
+		t.Fatalf("borrowed remainder %q %v", data, err)
+	}
+	original[7] = 'X'
+	if string(data) != "payload" {
+		t.Fatal("borrowed bytes were retained")
+	}
+	if etag, data, err := ETagForReader(failedReader{}); !errors.Is(err, io.ErrUnexpectedEOF) || etag != "" || data != nil {
+		t.Fatalf("read error %q %q %v", etag, data, err)
+	}
+}
+
+func TestPartReaderHasOneConcurrentOwner(t *testing.T) {
+	body := NewOwnedBody([]byte("part"))
+	errs := make(chan error, 2)
+	var wg sync.WaitGroup
+	for range 2 {
+		wg.Add(1)
+		go func() { defer wg.Done(); _, _, err := ETagForReader(body); errs <- err }()
+	}
+	wg.Wait()
+	close(errs)
+	accepted := 0
+	for err := range errs {
+		if err == nil {
+			accepted++
+		} else if !errors.Is(err, errOwnedBodyTaken) {
+			t.Fatal(err)
+		}
+	}
+	if accepted != 1 {
+		t.Fatalf("part ownership recipients=%d", accepted)
+	}
+}
+
+func TestPartBytesOfConsumesOwnedOnce(t *testing.T) {
+	original := []byte("part")
+	body := NewOwnedBody(original)
+	data, err := BytesOf(body)
+	if err != nil || !bytes.Equal(data, original) {
+		t.Fatal(err)
+	}
+	if &data[0] != &original[0] {
+		t.Fatal("owned bytes were copied")
+	}
+	if _, err := BytesOf(body); !errors.Is(err, errOwnedBodyTaken) {
+		t.Fatalf("owned BytesOf reused: %v", err)
+	}
+}

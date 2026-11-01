@@ -1,0 +1,656 @@
+SOURCE direct-cpu1-1-before-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny         	  100000	      1399 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1365 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1245 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      4044 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      2454 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      5233 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      4674 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5049 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      4702 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      2360 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      1690 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      1594 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      2655 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      2428 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      2374 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1226 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1423 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1508 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	       855.2 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	       985.4 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	       902.4 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu1-1-before-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1048 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1045 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1014 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     12355 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     12181 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     14702 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     65663 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     81596 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     82614 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1952 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      2442 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      3167 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      2847 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      2832 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      2216 ns/op	    1163 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-1-before-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      5985 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      2658 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      2227 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      1826 ns/op	    1168 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      1799 ns/op	    1168 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      2206 ns/op	    1168 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      3400 ns/op	    1648 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	     33521 ns/op	    1648 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      6555 ns/op	    1648 B/op	      20 allocs/op
+PASS
+SOURCE direct-cpu1-1-before-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	   1763320 ns/op	 5242160 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	   2435358 ns/op	 5242160 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	   1928701 ns/op	 5242160 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	    634772 ns/op	 1968693 B/op	      20 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	    544871 ns/op	 1968606 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	    748645 ns/op	 1968607 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	   2010432 ns/op	 1969327 B/op	      27 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	    957990 ns/op	 1969161 B/op	      24 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	   1264079 ns/op	 1969158 B/op	      24 allocs/op
+PASS
+SOURCE direct-cpu1-2-after-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny         	  100000	       887.6 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1036 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1625 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      2528 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      2904 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      3368 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5524 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      6994 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5257 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      2177 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      2108 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      3081 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      3042 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      4002 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      7093 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1820 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      3049 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1914 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	      1642 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	      1275 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	      2056 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu1-2-after-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      3253 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      2076 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1877 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     43809 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     29913 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     24353 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     82903 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     79080 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     77248 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1481 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      4701 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1294 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1477 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      2148 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1612 ns/op	    1163 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-2-after-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      2859 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      2504 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      2426 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      2999 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      2967 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      9474 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      2307 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      2312 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      1759 ns/op	    1154 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-2-after-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	      1814 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	      1075 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	      1628 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	       961.2 ns/op	    1156 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	      1395 ns/op	    1156 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	      1418 ns/op	    1156 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	      1199 ns/op	    1157 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	      1103 ns/op	    1157 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	      1066 ns/op	    1156 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-3-after-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny         	  100000	      1696 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1419 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1329 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      3723 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      4136 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      3721 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5889 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	     10934 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	     11139 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      3971 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      2435 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      2205 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      3103 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      3499 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      3765 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1822 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1784 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1791 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	      1336 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	      1568 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	      1705 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu1-3-after-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      3221 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      3449 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1855 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     29097 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     21599 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     17431 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     59445 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     57196 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     61679 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1368 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1385 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1112 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1399 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1336 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1227 ns/op	    1163 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-3-after-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      1469 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      1369 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      1461 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      2233 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      2187 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      1890 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      1416 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      1237 ns/op	    1154 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      1339 ns/op	    1154 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-3-after-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	      2143 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	      1031 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	      1008 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	      2701 ns/op	    1156 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	       960.8 ns/op	    1157 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	      1545 ns/op	    1156 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	      1124 ns/op	    1156 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	       952.1 ns/op	    1157 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	       910.0 ns/op	    1156 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-4-before-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny         	  100000	      1198 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1041 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny         	  100000	      1029 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      2595 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      3713 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB  	  100000	      3341 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5455 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5090 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB   	  100000	      5682 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      2739 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      4187 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek         	  100000	      5151 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      4421 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      2562 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range        	  100000	      3029 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1415 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1339 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter      	  100000	      1211 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	       970.0 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	       943.9 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short        	  100000	       951.9 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu1-4-before-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1498 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1478 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	   50000	      1449 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     16576 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     17612 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB        	   50000	     20785 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     91539 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     80856 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB       	   50000	     66627 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      4598 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1664 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing 	   50000	      1190 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1225 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1675 ns/op	    1163 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing         	   50000	      1753 ns/op	    1163 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu1-4-before-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      1561 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      1457 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream         	  100000	      1434 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      1333 ns/op	    1168 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      2071 ns/op	    1168 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get            	  100000	      1662 ns/op	    1168 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      3078 ns/op	    1648 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      3542 ns/op	    1648 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded        	  100000	      3254 ns/op	    1648 B/op	      20 allocs/op
+PASS
+SOURCE direct-cpu1-4-before-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	    920805 ns/op	 5242160 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	   2105435 ns/op	 5242160 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream         	     100	   2745948 ns/op	 5242160 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	    496293 ns/op	 1968693 B/op	      20 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	    738978 ns/op	 1968606 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get            	     100	    490348 ns/op	 1968607 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	   1450335 ns/op	 1969327 B/op	      27 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	    949256 ns/op	 1969158 B/op	      24 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded        	     100	   1144794 ns/op	 1969158 B/op	      24 allocs/op
+PASS
+SOURCE direct-cpu8-1-before-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny-8         	  100000	       871.3 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	      1950 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	      1827 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      5652 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      5034 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      4929 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      9870 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      5640 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      7451 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      5371 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      6151 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      2194 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2776 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      3133 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      3057 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1804 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1210 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1367 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       870.2 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	      1041 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       824.8 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu8-1-before-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      2261 ns/op	    1208 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1246 ns/op	    1229 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1410 ns/op	    1200 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     22390 ns/op	   68662 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     41948 ns/op	   68500 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     22482 ns/op	   68570 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     58071 ns/op	   69808 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     60788 ns/op	   69925 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	    113204 ns/op	   69725 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      5951 ns/op	    1195 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      5363 ns/op	    1203 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      4467 ns/op	    1200 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      2446 ns/op	    1216 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      2120 ns/op	    1221 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	     10426 ns/op	    1187 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-1-before-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      2177 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      2624 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1828 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      4882 ns/op	    1205 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1848 ns/op	    1209 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      4030 ns/op	    1210 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      6118 ns/op	    1707 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      3262 ns/op	    1723 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      5915 ns/op	    1728 B/op	      20 allocs/op
+PASS
+SOURCE direct-cpu8-1-before-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	   1589309 ns/op	 5242306 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	   1185623 ns/op	 5242228 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	    858918 ns/op	 5242192 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	    421280 ns/op	 1970881 B/op	      19 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	    502217 ns/op	 1971620 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	    309899 ns/op	 1975587 B/op	      19 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	   1401082 ns/op	 1984116 B/op	      27 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	    976459 ns/op	 1988787 B/op	      27 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	   1789004 ns/op	 1970428 B/op	      26 allocs/op
+PASS
+SOURCE direct-cpu8-2-after-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny-8         	  100000	      1427 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	      1360 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	       896.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2695 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	     10639 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      9133 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4544 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4585 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4104 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      1710 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      2388 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      1702 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2426 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2361 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      7708 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1481 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1425 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      5104 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	      1359 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	      1545 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       732.3 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu8-2-after-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      2244 ns/op	    1200 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1634 ns/op	    1208 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      5188 ns/op	    1202 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     26989 ns/op	   68588 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     24408 ns/op	   68793 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     18461 ns/op	   68827 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     84774 ns/op	   69695 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	    114899 ns/op	   69872 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     57675 ns/op	   69850 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      1061 ns/op	    1197 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      1318 ns/op	    1218 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      1330 ns/op	    1205 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1059 ns/op	    1226 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1055 ns/op	    1224 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1089 ns/op	    1216 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-2-after-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1572 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1021 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1305 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	       988.6 ns/op	    1204 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1105 ns/op	    1208 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1052 ns/op	    1193 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      1101 ns/op	    1216 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      1172 ns/op	    1210 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      1119 ns/op	    1206 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-2-after-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	      1048 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	      1464 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	      1015 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	      2172 ns/op	    2478 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	       893.8 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	       864.2 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	      1138 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	      1110 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	      1395 ns/op	    2478 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-3-after-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny-8         	  100000	       763.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	       803.0 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	       962.2 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2420 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2547 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2327 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4320 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4147 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4041 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      1468 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      1625 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      1523 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2242 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      3715 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2241 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1062 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1106 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1030 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       763.0 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       950.0 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       863.3 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu8-3-after-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1329 ns/op	    1210 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1173 ns/op	    1200 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	       991.4 ns/op	    1202 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     18780 ns/op	   68672 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     16331 ns/op	   68676 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     16631 ns/op	   68751 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     51058 ns/op	   69855 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     51566 ns/op	   69882 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     65290 ns/op	   69639 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      1016 ns/op	    1216 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      1038 ns/op	    1213 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	       915.0 ns/op	    1224 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1020 ns/op	    1231 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	       943.0 ns/op	    1221 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1004 ns/op	    1210 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-3-after-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1097 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	       953.9 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	       956.1 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1154 ns/op	    1214 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	       948.4 ns/op	    1214 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1032 ns/op	    1195 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      1161 ns/op	    1221 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      1035 ns/op	    1199 B/op	      14 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      1077 ns/op	    1222 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-3-after-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/after.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	      3309 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	      1712 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	      1968 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	      1782 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	      1448 ns/op	    1167 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	      1089 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	      1843 ns/op	    1166 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	      1155 ns/op	    2477 B/op	      14 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	      1012 ns/op	    1166 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-4-before-0.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkStreamCompleteness$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStreamCompleteness/tiny-8         	  100000	       909.9 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	       728.6 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8         	  100000	       807.9 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2171 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2489 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-32KiB-8  	  100000	      2697 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4459 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4073 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/64KiB-1KiB-8   	  100000	      4752 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      1939 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	     11411 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/seek-8         	  100000	      2896 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2974 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      3317 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8        	  100000	      2574 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1176 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1987 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8      	  100000	      1770 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	       793.6 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	      1014 ns/op	    1080 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/short-8        	  100000	      4727 ns/op	    1080 B/op	      10 allocs/op
+PASS
+SOURCE direct-cpu8-4-before-1.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1532 ns/op	    1221 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      1160 ns/op	    1208 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   50000	      2105 ns/op	    1195 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     31112 ns/op	   68574 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     62846 ns/op	   68507 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   50000	     17066 ns/op	   68922 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     89313 ns/op	   69832 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	     92143 ns/op	   69661 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	   50000	    116367 ns/op	   69170 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      2697 ns/op	    1203 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      1191 ns/op	    1213 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing-8 	   50000	      4209 ns/op	    1200 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1656 ns/op	    1213 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      2090 ns/op	    1192 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing-8         	   50000	      1885 ns/op	    1205 B/op	      14 allocs/op
+PASS
+SOURCE direct-cpu8-4-before-2.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=3$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      2044 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1699 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=stream-8         	  100000	      1982 ns/op	    1584 B/op	      11 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      4254 ns/op	    1203 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1533 ns/op	    1220 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=get-8            	  100000	      1817 ns/op	    1201 B/op	      15 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      4233 ns/op	    1723 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      4278 ns/op	    1720 B/op	      20 allocs/op
+BenchmarkExcessRead/size=3/mode=guarded-8        	  100000	      3714 ns/op	    1704 B/op	      20 allocs/op
+PASS
+SOURCE direct-cpu8-4-before-3.log
+COMMAND ["/private/tmp/stow-excess-body-2026-10-16/before.test", "-test.run=^$", "-test.bench=^BenchmarkExcessRead$/^size=1048576$", "-test.benchmem", "-test.benchtime=100x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	   3679314 ns/op	 5242248 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	   2121442 ns/op	 5242176 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=stream-8         	     100	   1921369 ns/op	 5242179 B/op	      37 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	    801811 ns/op	 1969391 B/op	      19 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	   1184232 ns/op	 1971558 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=get-8            	     100	    966452 ns/op	 1972784 B/op	      18 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	   1542932 ns/op	 1979033 B/op	      28 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	   1269152 ns/op	 1983491 B/op	      26 allocs/op
+BenchmarkExcessRead/size=1048576/mode=guarded-8        	     100	   1442190 ns/op	 1984691 B/op	      26 allocs/op
+PASS

@@ -1,0 +1,47 @@
+{
+  "phase": "bucket-admission-naive-proof",
+  "sources": [
+    "internal/storage/fs/fs.go",
+    "benchmark/naive-fs.go.txt",
+    "internal/storage/fs/capacity_bucket_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-overlay",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/naive-fs.go.txt"
+      ]
+    },
+    {
+      "name": "naive-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/naive-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestBucketCapacityRefusalLeavesNoBucket$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "naive-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/naive-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestBucketCapacityRefusalLeavesNoBucket$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

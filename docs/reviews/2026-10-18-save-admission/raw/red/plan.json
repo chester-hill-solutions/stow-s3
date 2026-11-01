@@ -1,0 +1,45 @@
+{
+  "phase": "save-admission-red",
+  "sources": [
+    "internal/storage/fs/fs_records.go",
+    "internal/storage/fs/save_requests.go",
+    "internal/storage/fs/capacity_save_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_save_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^TestSaveCapacity",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^TestSaveCapacity",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

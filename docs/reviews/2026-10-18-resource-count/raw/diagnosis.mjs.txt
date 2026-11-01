@@ -1,0 +1,1 @@
+import{readFile}from'node:fs/promises';const plan=JSON.parse(await readFile('benchmark/active-plan.json'));if(plan.kind==='measure'){const{run}=await import('./perf-run.mjs');await run(process.argv[2],plan)}else{await import('./diagnosis-validation.mjs')}

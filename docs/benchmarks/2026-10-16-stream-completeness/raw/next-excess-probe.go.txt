@@ -1,0 +1,44 @@
+package runtime
+
+import (
+ "context"
+ "errors"
+ "io"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestReviewExcessObjectBody(t *testing.T){
+ for _,mode:=range []string{"stream","get","guarded"}{
+  t.Run(mode,func(t *testing.T){
+   f,store:=saveBodyFixture(t)
+   f.instance.store=&completionSeekStore{saveBodyStore:store,body:"old!"}
+   usage:=f.instance.Usage()
+   var object Object
+   var condition SaveCondition
+   var data []byte
+   var err error
+   if mode=="stream"{
+    var reader io.ReadCloser
+    reader,object,err=f.instance.OpenObject(context.Background(),"probe","target")
+    if err!=nil{t.Fatal(err)}
+    data,err=io.ReadAll(reader)
+    if closeErr:=reader.Close();closeErr!=nil{t.Fatal(closeErr)}
+   }else if mode=="get"{
+    object,err=f.instance.GetObject(context.Background(),"probe","target");data=object.Data
+   }else{
+    object,condition,err=f.instance.ReadForSave(context.Background(),"probe","target");data=object.Data
+   }
+   if err==nil{t.Errorf("excess body accepted: mode=%s bytes=%d advertised=%d guard=%t",mode,len(data),object.Size,condition.owner!=nil)}
+   if store.bytes!=4 || store.closes!=1 || store.gets!=1 || object.Size!=3 || string(data)!="old!"{t.Fatalf("probe counts/results changed: bytes=%d closes=%d gets=%d data=%q object=%+v",store.bytes,store.closes,store.gets,data,object)}
+   if f.instance.Usage()!=usage{t.Fatal("read changed accounting")}
+   f.instance.store=store
+   if condition.owner!=nil{
+    result,err:=f.instance.SaveObject(context.Background(),"probe","target",[]byte("bad"),SaveOptions{Condition:condition})
+    if !errors.Is(err,storage.ErrSaveConflict) || result.Outcome!=SaveNotCommitted{t.Fatalf("incomplete identity accepted: result=%+v error=%v",result,err)}
+   }
+   verifySaveReadRecovery(t,f)
+  })
+ }
+}

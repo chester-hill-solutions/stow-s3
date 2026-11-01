@@ -1,0 +1,39 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestReviewUnknownAbortRetry(t *testing.T) {
+	for _, exists := range []bool{false, true} {
+		t.Run(fmt.Sprintf("exists=%t", exists), func(t *testing.T) {
+			ctx := context.Background()
+			store, instance := newAbortFaultInstance(t, exists, 1)
+			id := nativeAbortUpload(t, instance, "part")
+			store.failure = errors.New("abort acknowledgement unavailable")
+			if err := instance.AbortMultipartUpload(ctx, id); err != store.failure {
+				t.Fatal(err)
+			}
+			if _, err := store.GetMultipartUpload(ctx, id); !errors.Is(err, storage.ErrUploadNotFound) {
+				t.Fatalf("backing upload still present: %v", err)
+			}
+			if err := instance.AbortMultipartUpload(ctx, id); !errors.Is(err, storage.ErrUploadNotFound) {
+				t.Fatalf("retry did not confirm absence: %v", err)
+			}
+			if instance.reservedBytes != 0 || instance.reservedObjects != 0 || len(instance.multipart) != 0 {
+				t.Errorf("confirmed absent upload retains bytes=%d objects=%d sessions=%d", instance.reservedBytes, instance.reservedObjects, len(instance.multipart))
+			}
+			if _, err := instance.PutObject(ctx, "probe", "target", []byte("12345678"), PutOptions{}); err != nil {
+				t.Errorf("confirmed absent part strands byte capacity: %v", err)
+			}
+			if _, err := instance.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{}); err != nil {
+				t.Errorf("confirmed absent upload strands session: %v", err)
+			}
+		})
+	}
+}

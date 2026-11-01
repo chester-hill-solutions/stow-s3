@@ -1,0 +1,40 @@
+from pathlib import Path
+from collections import defaultdict,Counter
+from statistics import median
+import json,re,hashlib
+p=Path('/private/tmp/stow-outbox-ownership-2026-10-18');job=json.loads((p/'final-start.json').read_text());d=p/('export-'+job['id']);before=json.loads((p/'before-final-start.json').read_text());b=p/('export-'+before['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==4 and all(x['passed']for x in checks)
+receipts={};rx=re.compile(r'^--- (PASS|FAIL|SKIP): (TestOutboxOwnership\S+)')
+for name in ['focused-normal','focused-race']:
+ counts=Counter()
+ for line in(d/(name+'.log')).read_text().splitlines():
+  m=rx.match(line.strip())
+  if m:counts[(m[1],m[2])]+=1
+ leaves={label for status,label in counts if not any(other.startswith(label+'/')for _,other in counts)};assert len(leaves)==114 and all(counts.get(('PASS',label))==2 for label in leaves);assert not any(status in ['FAIL','SKIP']for status,label in counts)
+ receipts[name]={'distinctCases':114,'passes':228,'failed':0,'skipped':0,'cases':sorted(leaves)}
+source=json.loads((d/'environment.json').read_text());original=json.loads((b/'environment.json').read_text());r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');manifest=json.loads((p/'source-manifest.json').read_text())
+for name,digest in source['sourceSHA256'].items():
+ if name.startswith('internal/'):
+  assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+  if name.endswith('_test.go'):assert digest==original['sourceSHA256'].get(name,manifest[name]),name
+measurement=p/('export-'+json.loads((p/'after-start.json').read_text())['id']);original_binary=p/('export-'+json.loads((p/'before-start.json').read_text())['id']);measurement_source=json.loads((measurement/'environment.json').read_text())['sourceSHA256'];assert all(measurement_source[n]==source['sourceSHA256'][n]for n in ['internal/runthrough/outbox.go','internal/runthrough/outbox_claims.go','internal/runthrough/outbox_token_exhaustion_bench_test.go','benchmark/ownership-comparison.mjs']);commands=json.loads((measurement/'comparison-runs.json').read_text());assert len(commands['runs'])==8;assert commands['binarySHA256']['before']==json.loads((original_binary/'benchmark-binary.json').read_text())['sha256'];assert json.loads((measurement/'fixture-filesystem.json').read_text())['statfsType']==61267
+cells=defaultdict(lambda:defaultdict(list));samples=[];pattern=re.compile(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$')
+for command in commands['runs']:
+ assert command['exitCode']==0 and command['signal']is None
+ rows=[]
+ for line in(measurement/command['log']).read_text().splitlines():
+  m=pattern.match(line)
+  if not m:continue
+  row={'name':m[1],'iterations':int(m[2]),'index':command['index'],'variant':command['variant'],'log':command['log']};parts=m[3].split();assert len(parts)%2==0
+  for n in range(0,len(parts),2):row[parts[n+1]]=float(parts[n])
+  rows.append(row);samples.append(row);cells[row['name']][row['variant']].append(row)
+ assert len(rows)==16,(command,len(rows))
+assert len(samples)==128 and len(cells)==16
+summary=[]
+for name,variants in sorted(cells.items()):
+ assert set(variants)=={'before','after'}and all(len(x)==4 for x in variants.values());stats={}
+ for label,rows in variants.items():
+  stats[label]={key:median(x[key]for x in rows)for key in ['ns/op','B/op','allocs/op']};stats[label]['nsMin']=min(x['ns/op']for x in rows);stats[label]['nsMax']=max(x['ns/op']for x in rows)
+ summary.append({'name':name,**stats,'timeDeltaPercent':(stats['after']['ns/op']/stats['before']['ns/op']-1)*100,'allocDelta':stats['after']['allocs/op']-stats['before']['allocs/op']})
+(d/'green-receipt.json').write_text(json.dumps({'regressions':receipts,'sourceSHA256':source['sourceSHA256']},indent=2)+'\n');(measurement/'comparison-analysis.json').write_text(json.dumps({'observations':128,'comparisons':summary,'samples':samples},indent=2)+'\n')
+print('Verified 114 cases twice per focused mode, unchanged regression/benchmark bytes and 128 ext4/state observations')
+for row in summary:print(row['name'],'time%=',round(row['timeDeltaPercent'],2),'allocDelta=',row['allocDelta'])

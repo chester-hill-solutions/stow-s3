@@ -1,0 +1,94 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type reviewShortStore struct {
+	*storage.MemoryStore
+	limit         int64
+	shortened     bool
+	bytes, closes int
+}
+
+func (s *reviewShortStore) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := s.MemoryStore.GetObject(ctx, bucket, key)
+	if err != nil || !s.shortened {
+		return reader, meta, err
+	}
+	return &reviewShortBody{Reader: io.LimitReader(reader, s.limit), Closer: reader, store: s}, meta, nil
+}
+
+type reviewShortBody struct {
+	io.Reader
+	io.Closer
+	store *reviewShortStore
+}
+
+func (r *reviewShortBody) Read(p []byte) (int, error) {
+	n, err := r.Reader.Read(p)
+	r.store.bytes += n
+	return n, err
+}
+func (r *reviewShortBody) Close() error { r.store.closes++; return r.Closer.Close() }
+
+func TestReviewShortObjectReadReportsSuccess(t *testing.T) {
+	for _, guarded := range []bool{false, true} {
+		for _, limit := range []int64{0, 1} {
+			t.Run(fmt.Sprintf("guarded=%t/limit=%d", guarded, limit), func(t *testing.T) {
+				ctx := context.Background()
+				store := &reviewShortStore{MemoryStore: storage.NewMemoryStore(), limit: limit}
+				instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 8, MaxObjects: 1}, store, nil)
+				if err != nil {
+					t.Fatal(err)
+				}
+				t.Cleanup(func() { _ = instance.Close() })
+				if err := instance.CreateBucket(ctx, "probe"); err != nil {
+					t.Fatal(err)
+				}
+				before, err := instance.PutObject(ctx, "probe", "target", []byte("old"), PutOptions{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				store.shortened = true
+				var object Object
+				var condition SaveCondition
+				if guarded {
+					object, condition, err = instance.ReadForSave(ctx, "probe", "target")
+				} else {
+					object, err = instance.GetObject(ctx, "probe", "target")
+				}
+				if !errors.Is(err, io.ErrUnexpectedEOF) {
+					t.Errorf("short object reported success/wrong error: bytes=%d metadata-size=%d error=%v", len(object.Data), object.Size, err)
+				}
+				if guarded && condition.owner != nil {
+					t.Errorf("short body issued usable observation token")
+				}
+				if store.bytes != int(limit) || store.closes != 1 {
+					t.Fatalf("reader bytes=%d closes=%d", store.bytes, store.closes)
+				}
+				store.shortened = false
+				if guarded && condition.owner != nil {
+					result, err := instance.SaveObject(ctx, "probe", "target", []byte("bad"), SaveOptions{Condition: condition})
+					if !errors.Is(err, storage.ErrSaveConflict) || result.Outcome != SaveNotCommitted {
+						t.Fatalf("backend accepted truncated fingerprint: result=%+v error=%v", result, err)
+					}
+				}
+				healthy, condition, err := instance.ReadForSave(ctx, "probe", "target")
+				if err != nil || string(healthy.Data) != "old" || healthy.VersionID != before.VersionID || condition.ObservedAbsence() {
+					t.Fatalf("healthy read changed: object=%+v error=%v", healthy, err)
+				}
+				result, err := instance.SaveObject(ctx, "probe", "target", []byte("new"), SaveOptions{Condition: condition})
+				if err != nil || result.Outcome != SaveCommitted {
+					t.Fatalf("healthy retry: result=%+v error=%v", result, err)
+				}
+			})
+		}
+	}
+}

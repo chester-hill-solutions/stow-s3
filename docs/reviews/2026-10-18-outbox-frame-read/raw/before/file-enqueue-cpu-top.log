@@ -1,0 +1,49 @@
+File: post-profile.test
+Build ID: d891571500456aead629a84f12762f47e25c566a
+Type: cpu
+Time: 2026-10-18 13:11:33 UTC
+Duration: 3.61s, Total samples = 3.36s (92.97%)
+Showing nodes accounting for 2.50s, 74.40% of 3.36s total
+Dropped 108 nodes (cum <= 0.02s)
+Showing top 40 nodes out of 188
+      flat  flat%   sum%        cum   cum%
+     0.46s 13.69% 13.69%      0.91s 27.08%  runtime.scanobject
+     0.20s  5.95% 19.64%      0.20s  5.95%  runtime.duffcopy
+     0.14s  4.17% 23.81%      0.14s  4.17%  runtime.(*mspan).base (inline)
+     0.12s  3.57% 27.38%      0.12s  3.57%  internal/runtime/syscall.Syscall6
+     0.12s  3.57% 30.95%      0.16s  4.76%  runtime.findObject
+     0.10s  2.98% 33.93%      0.17s  5.06%  google.golang.org/protobuf/internal/impl.(*MessageInfo).marshalAppendPointer
+     0.08s  2.38% 36.31%      0.08s  2.38%  runtime.memclrNoHeapPointers
+     0.07s  2.08% 38.39%      0.07s  2.08%  cmpbody
+     0.07s  2.08% 40.48%      0.29s  8.63%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.07s  2.08% 42.56%      0.13s  3.87%  slices.partitionOrdered[go.shape.string]
+     0.05s  1.49% 44.05%      0.08s  2.38%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+     0.05s  1.49% 45.54%      0.41s 12.20%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+     0.05s  1.49% 47.02%      0.08s  2.38%  internal/runtime/maps.(*Iter).Next
+     0.05s  1.49% 48.51%      0.05s  1.49%  runtime.(*mspan).heapBitsSmallForAddr
+     0.05s  1.49% 50.00%      0.27s  8.04%  runtime.mallocgcSmallScanNoHeader
+     0.04s  1.19% 51.19%      0.80s 23.81%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).record
+     0.04s  1.19% 52.38%      0.04s  1.19%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     0.04s  1.19% 53.57%      0.04s  1.19%  memeqbody
+     0.04s  1.19% 54.76%      0.04s  1.19%  runtime.(*mspan).init
+     0.04s  1.19% 55.95%      0.13s  3.87%  runtime.(*sweepLocked).sweep
+     0.04s  1.19% 57.14%      0.20s  5.95%  runtime.greyobject
+     0.04s  1.19% 58.33%      0.04s  1.19%  runtime.memmove
+     0.04s  1.19% 59.52%      0.17s  5.06%  runtime.slicebytetostring
+     0.03s  0.89% 60.42%      0.03s  0.89%  aeshashbody
+     0.03s  0.89% 61.31%      0.03s  0.89%  github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb.(*Entry).ProtoReflect
+     0.03s  0.89% 62.20%      0.03s  0.89%  runtime.(*gcBits).bitp (inline)
+     0.03s  0.89% 63.10%      0.15s  4.46%  runtime.(*mcache).nextFree
+     0.03s  0.89% 63.99%      0.03s  0.89%  runtime.(*mspan).divideByElemSize (inline)
+     0.03s  0.89% 64.88%      0.03s  0.89%  runtime.(*mspan).writeHeapBitsSmall
+     0.03s  0.89% 65.77%      0.03s  0.89%  runtime.duffzero
+     0.03s  0.89% 66.67%      0.08s  2.38%  runtime.mapaccess1
+     0.03s  0.89% 67.56%      0.06s  1.79%  runtime.mapaccess2
+     0.03s  0.89% 68.45%      0.03s  0.89%  runtime.nextFreeFast (inline)
+     0.03s  0.89% 69.35%      0.03s  0.89%  runtime.strequal
+     0.03s  0.89% 70.24%      0.03s  0.89%  runtime.typePointers.nextFast (inline)
+     0.03s  0.89% 71.13%      0.19s  5.65%  slices.pdqsortOrdered[go.shape.string]
+     0.03s  0.89% 72.02%      0.03s  0.89%  sync/atomic.StorePointer
+     0.03s  0.89% 72.92%      0.03s  0.89%  unicode/utf8.Valid
+     0.03s  0.89% 73.81%      0.03s  0.89%  unicode/utf8.ValidString
+     0.02s   0.6% 74.40%      0.32s  9.52%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).addEntry

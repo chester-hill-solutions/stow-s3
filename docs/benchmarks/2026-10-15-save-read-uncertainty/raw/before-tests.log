@@ -1,0 +1,282 @@
+COMMAND ['go', 'test', './internal/runtime', './internal/embedded', '-run', '^TestReadForSaveMarkedMissingObservation$|^TestReadForSaveObservationControls$|^TestReadForSaveRefusalDoesNotRead$|^TestEmbeddedReadForSavePreservesMarkedMissing$', '-count=2', '-v']
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a9a0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ab00 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:bec91dd3e9a7340dc14678a68933951a ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400103 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:bec91dd3e9a7340dc14678a68933951a ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400103 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ab00 bucket:probe key:target guard:{Absent:false Fingerprint:[60 65 179 74 171 83 59 161 193 161 115 5 203 250 110 24 94 226 76 231 50 206 62 177 70 99 130 56 123 140 215 178]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ac60 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018adc0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018af20 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:9a190bc1659e901a2b00ab595425b8dc ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400397 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:9a190bc1659e901a2b00ab595425b8dc ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400397 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018af20 bucket:probe key:target guard:{Absent:false Fingerprint:[255 122 4 146 121 68 99 66 37 130 140 19 191 67 2 29 253 169 143 93 207 49 195 167 144 68 248 244 152 32 175 1]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b080 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b1e0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b340 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:89d39084a83eade46b756950928cdf20 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400695 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:89d39084a83eade46b756950928cdf20 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400695 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b340 bucket:probe key:target guard:{Absent:false Fingerprint:[247 145 49 245 245 93 90 36 233 134 171 207 227 175 153 176 38 216 204 176 158 226 138 197 118 28 122 223 10 15 131 57]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b4a0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b600 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b760 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:87cee1d0e856c94568e5dab08cc41335 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400895 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:87cee1d0e856c94568e5dab08cc41335 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.400895 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b760 bucket:probe key:target guard:{Absent:false Fingerprint:[181 19 168 132 99 167 235 251 133 252 233 110 63 123 254 68 75 12 255 111 33 32 10 24 228 78 188 182 126 218 143 120]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b8c0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+--- FAIL: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a9a0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ab00 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:e66ada37f09fd7ecc0b27e835c5bbeae ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.406862 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:e66ada37f09fd7ecc0b27e835c5bbeae ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.406862 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ab00 bucket:probe key:target guard:{Absent:false Fingerprint:[79 173 226 0 57 188 51 20 132 13 156 22 240 219 79 40 58 207 212 97 210 63 54 65 28 86 113 212 78 149 201 174]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ac60 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018adc0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018af20 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:0c5b1c4b2cb985ecc10b6ec34ca1fec3 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.407044 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:0c5b1c4b2cb985ecc10b6ec34ca1fec3 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.407044 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018af20 bucket:probe key:target guard:{Absent:false Fingerprint:[95 222 175 255 229 241 20 59 242 85 254 116 79 203 226 148 65 214 152 11 83 48 235 234 100 144 151 179 6 236 113 187]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b080 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b1e0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b340 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:cc3e4beaf67f2b409986d62350f34b14 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.407163 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:cc3e4beaf67f2b409986d62350f34b14 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.407163 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b340 bucket:probe key:target guard:{Absent:false Fingerprint:[210 50 192 106 240 170 141 62 50 31 208 203 179 122 181 186 63 156 244 108 51 227 240 206 176 252 33 242 43 36 100 130]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: local mutation committed
+        object not found
+        head observation unavailable
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b4a0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b600 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+    save_read_observation_test.go:82: read lost original error: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b760 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket:probe Key:target Data:[] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:6eda88c25d4e87e32ee4e031195b2ba9 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.407275 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:committed Replayed:false} error=<nil>
+    save_read_observation_test.go:82: healthy observation: object={Bucket:probe Key:target Data:[98 97 100] Size:3 ETag:"bae60998ffe4923b131e3d6e4c19993e" VersionID:6eda88c25d4e87e32ee4e031195b2ba9 ContentType: Metadata:map[] LastModified:2026-10-16 00:29:33.407275 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b760 bucket:probe key:target guard:{Absent:false Fingerprint:[169 116 183 4 188 154 49 50 226 3 103 141 179 70 120 185 236 237 251 154 106 164 57 104 40 17 117 128 72 62 211 79]} replace:false} error=<nil>
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+    save_read_observation_test.go:82: read lost original error: <nil> want head: object not found
+        head observation unavailable
+        local mutation committed
+    save_read_observation_test.go:82: unknown read issued object/condition: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b8c0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false}
+    save_read_observation_test.go:82: uncertain read produced usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+--- FAIL: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- FAIL: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.486s
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+--- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+    save_read_observation_test.go:29: public read lost uncertainty: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_read_observation_test.go:29: public invalid condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+--- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.234s
+FAIL

@@ -1,0 +1,44 @@
+File: readcost.test
+Build ID: c96b49f8f0c7fdaf0439146b85fb0ff90b65bf49
+Type: cpu
+Time: 2026-10-18 05:04:56 UTC
+Duration: 8.44s, Total samples = 8.17s (96.82%)
+Showing nodes accounting for 6.55s, 80.17% of 8.17s total
+Dropped 128 nodes (cum <= 0.04s)
+Showing top 35 nodes out of 117
+      flat  flat%   sum%        cum   cum%
+     0.57s  6.98%  6.98%      0.61s  7.47%  sync/atomic.StorePointer
+     0.56s  6.85% 13.83%      0.56s  6.85%  runtime.memclrNoHeapPointers
+     0.50s  6.12% 19.95%      0.83s 10.16%  runtime.findObject
+     0.46s  5.63% 25.58%      4.59s 56.18%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.44s  5.39% 30.97%      0.44s  5.39%  runtime.(*mspan).base (inline)
+     0.38s  4.65% 35.62%      0.38s  4.65%  runtime.nextFreeFast (inline)
+     0.35s  4.28% 39.90%      0.35s  4.28%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     0.35s  4.28% 44.19%      0.99s 12.12%  runtime.mapassign_faststr
+     0.30s  3.67% 47.86%      1.59s 19.46%  runtime.scanobject
+     0.20s  2.45% 50.31%      3.62s 44.31%  runtime.mallocgc
+     0.20s  2.45% 52.75%      0.66s  8.08%  runtime.mallocgcSmallNoscan
+     0.19s  2.33% 55.08%      0.21s  2.57%  runtime.spanOf (inline)
+     0.14s  1.71% 56.79%      0.18s  2.20%  google.golang.org/protobuf/encoding/protowire.ConsumeBytes
+     0.13s  1.59% 58.38%      0.13s  1.59%  runtime.madvise
+     0.13s  1.59% 59.98%      0.13s  1.59%  runtime.memmove
+     0.13s  1.59% 61.57%      0.13s  1.59%  unicode/utf8.Valid
+     0.12s  1.47% 63.04%      7.13s 87.27%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+     0.12s  1.47% 64.50%      0.14s  1.71%  runtime.typePointers.next
+     0.11s  1.35% 65.85%      0.90s 11.02%  runtime.mallocgcSmallScanNoHeader
+     0.10s  1.22% 67.07%      0.50s  6.12%  runtime.greyobject
+     0.10s  1.22% 68.30%      0.10s  1.22%  runtime.typePointers.nextFast (inline)
+     0.10s  1.22% 69.52%      0.45s  5.51%  runtime.wbBufFlush1
+     0.09s  1.10% 70.62%      1.60s 19.58%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+     0.09s  1.10% 71.73%      0.09s  1.10%  runtime.(*mspan).divideByElemSize (inline)
+     0.09s  1.10% 72.83%      0.10s  1.22%  runtime.(*mspan).writeHeapBitsSmall
+     0.08s  0.98% 73.81%      0.08s  0.98%  aeshashbody
+     0.07s  0.86% 74.66%      0.07s  0.86%  runtime.getMCache (inline)
+     0.06s  0.73% 75.40%      0.06s  0.73%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeUnknownFieldsFunc.func1
+     0.06s  0.73% 76.13%      0.06s  0.73%  internal/runtime/syscall.Syscall6
+     0.06s  0.73% 76.87%      1.33s 16.28%  reflect.unsafe_New
+     0.06s  0.73% 77.60%      0.13s  1.59%  runtime.(*gcBits).bitp (inline)
+     0.06s  0.73% 78.34%      0.16s  1.96%  runtime.sweepone
+     0.05s  0.61% 78.95%      0.31s  3.79%  gcWriteBarrier
+     0.05s  0.61% 79.56%      0.71s  8.69%  google.golang.org/protobuf/internal/impl.pointer.AppendPointerSlice (inline)
+     0.05s  0.61% 80.17%      0.10s  1.22%  runtime.(*sweepLocked).sweep

@@ -1,0 +1,28 @@
+{
+  "kind": "measure",
+  "cohort": "outbox-changed-128-followup",
+  "families": [
+    "native"
+  ],
+  "variants": {
+    "native": [
+      "before",
+      "after"
+    ]
+  },
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/provenance.go",
+    "internal/atomicfile/atomicfile.go",
+    "internal/runthrough/file_outbox_unchanged_test.go"
+  ],
+  "cpu": [
+    1
+  ],
+  "benchtime": "2s",
+  "count": 4,
+  "caseCount": 1,
+  "pattern": "^BenchmarkFileOutboxProvenance$/^provenance=128$/^changed$",
+  "stepwise": false,
+  "profile": false
+}

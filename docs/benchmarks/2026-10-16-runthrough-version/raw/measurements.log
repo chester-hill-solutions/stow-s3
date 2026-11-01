@@ -1,0 +1,399 @@
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  387616	       391.4 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  386260	       336.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  223165	       604.0 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  219020	       600.7 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   56895	      2071 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   60206	      2060 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   70448	      1788 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   68019	      1764 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  359630	       351.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  353577	       349.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   32002	      3357 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   37918	      3257 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22188	      5305 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22456	      5260 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      10	  10792804 ns/op	         1.000 state-writes/op	    7878 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      10	  10726192 ns/op	         1.000 state-writes/op	    7878 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      13	  10155667 ns/op	         1.000 state-writes/op	   10350 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      13	  10001958 ns/op	         1.000 state-writes/op	   10350 B/op	     109 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  415698	       332.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  392862	       332.4 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  220237	       600.6 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  193441	       602.6 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   61046	      1973 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   62841	      1979 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   67983	      1785 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   68768	      1833 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  336361	       355.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  355770	       356.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   37315	      3296 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   35678	      3284 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   21578	      5352 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22296	      5390 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  10016622 ns/op	         1.000 state-writes/op	    7872 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  11429906 ns/op	         1.000 state-writes/op	    7857 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  20257840 ns/op	         2.000 state-writes/op	   15272 B/op	     164 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  17571757 ns/op	         2.000 state-writes/op	   15274 B/op	     164 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  328942	       372.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  368728	       364.3 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  215665	       619.4 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  208069	       617.2 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   62025	      2105 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   59780	      1972 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   68236	      1773 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   67810	      1784 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  397806	       353.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  397279	       348.3 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   36027	      3278 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   35648	      3193 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   21234	      7378 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22551	      5323 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      10	  11121421 ns/op	         1.000 state-writes/op	    7878 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      13	   9623083 ns/op	         1.000 state-writes/op	    7854 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  19010521 ns/op	         2.000 state-writes/op	   15274 B/op	     164 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  19589118 ns/op	         2.000 state-writes/op	   15274 B/op	     164 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  433042	       336.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  389594	       346.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  220587	       593.2 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  219430	       605.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   58020	      1996 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   63637	      1987 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   68911	      1790 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   65514	      1795 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  339870	       341.4 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  358676	       342.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   39531	      3143 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   33500	      3085 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22528	      5228 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   23199	      5196 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  10328715 ns/op	         1.000 state-writes/op	    7873 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  11825691 ns/op	         1.000 state-writes/op	    7856 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      10	  11140108 ns/op	         1.000 state-writes/op	   10358 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      13	  10329372 ns/op	         1.000 state-writes/op	   10349 B/op	     109 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  378937	       348.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  384357	       342.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  207879	       602.9 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  212565	       616.2 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   61010	      2011 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   61639	      2002 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   65990	      1936 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   65310	      2010 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  365133	       356.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  382500	       337.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   37722	      3361 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   35809	      3204 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   21193	      5392 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   21992	      5310 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  10958681 ns/op	         1.000 state-writes/op	    7873 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  10260042 ns/op	         1.000 state-writes/op	    7856 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  20051069 ns/op	         2.000 state-writes/op	   15274 B/op	     164 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       7	  18677095 ns/op	         2.000 state-writes/op	   15267 B/op	     164 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  410005	       384.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  360801	       384.7 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  214159	       603.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  209790	       601.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   60910	      2011 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   59268	      2222 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   64870	      1808 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   69016	      1808 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  341005	       359.9 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  355152	       386.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   33384	      3931 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   37310	      3129 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   21540	      5504 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22779	      5293 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	   9958496 ns/op	         1.000 state-writes/op	    7873 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      13	  10341058 ns/op	         1.000 state-writes/op	    7854 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      12	  10746483 ns/op	         1.000 state-writes/op	   10353 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      13	  10740375 ns/op	         1.000 state-writes/op	   10350 B/op	     109 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  385140	       347.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  367791	       370.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  211454	       591.9 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  217782	       584.1 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   58470	      2065 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   61496	      1976 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   67677	      1880 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   70464	      1772 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  373090	       343.1 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  377967	       337.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   36681	      3229 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   37154	      3131 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   20436	      5467 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   22370	      5338 ns/op	         1.000 state-writes/op	    5448 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	   9970760 ns/op	         1.000 state-writes/op	    7857 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      10	  10499396 ns/op	         1.000 state-writes/op	    7862 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      14	  10717884 ns/op	         1.000 state-writes/op	   10349 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	      14	   9572982 ns/op	         1.000 state-writes/op	   10349 B/op	     109 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local         	  394363	       346.1 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local         	  392798	       329.9 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  222642	       579.9 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached        	  215926	       607.0 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   61520	      1945 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh       	   62529	      2012 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   65347	      1803 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh  	   70756	      1831 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  361327	       340.9 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB   	  382576	       333.4 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   38322	      3195 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable  	   38127	      3310 ns/op	         1.000 state-writes/op	    2968 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   23316	      5369 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed 	   20635	      5348 ns/op	         2.000 state-writes/op	    5464 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  10445934 ns/op	         1.000 state-writes/op	    7873 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable    	      12	  10309344 ns/op	         1.000 state-writes/op	    7873 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  19449521 ns/op	         2.000 state-writes/op	   15272 B/op	     164 allocs/op
+BenchmarkRefreshVersionFallback/file/changed   	       6	  30555430 ns/op	         2.000 state-writes/op	   15274 B/op	     164 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  375451	       276.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  409252	       293.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  248928	       493.3 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  237132	       493.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   67360	      1705 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   70566	      1674 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   77859	      1601 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   78774	      1550 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  460983	       304.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  456541	       280.9 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   47386	      2706 ns/op	         1.000 state-writes/op	    2978 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   45496	      2789 ns/op	         1.000 state-writes/op	    2976 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   27411	      4493 ns/op	         1.000 state-writes/op	    5466 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   23752	      4329 ns/op	         1.000 state-writes/op	    5463 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      13	  11316942 ns/op	         1.000 state-writes/op	    8776 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      12	  10482486 ns/op	         1.000 state-writes/op	    8852 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      13	  10555657 ns/op	         1.000 state-writes/op	   10592 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      12	  11615993 ns/op	         1.000 state-writes/op	   11332 B/op	     110 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  361544	       307.5 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  459710	       298.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  253710	       479.6 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  226378	       478.0 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   73268	      1661 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   71660	      1667 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   79531	      1503 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   76782	      1514 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  448304	       270.3 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  473364	       278.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   44977	      2750 ns/op	         1.000 state-writes/op	    2978 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   45475	      2741 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   26768	      4514 ns/op	         2.000 state-writes/op	    5482 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   26306	      4609 ns/op	         2.000 state-writes/op	    5485 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      13	   9834804 ns/op	         1.000 state-writes/op	    8774 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      12	   9732007 ns/op	         1.000 state-writes/op	    8852 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       6	  18519306 ns/op	         2.000 state-writes/op	   15784 B/op	     164 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       8	  19254255 ns/op	         2.000 state-writes/op	   15644 B/op	     164 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  398654	       279.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  460748	       268.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  246747	       503.2 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  225980	       497.0 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   68869	      1721 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   67796	      1669 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   76672	      1508 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   79294	      1580 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  442354	       273.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  472820	       291.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   43982	      2732 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   45375	      2827 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   27189	      4411 ns/op	         2.000 state-writes/op	    5482 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   27022	      4645 ns/op	         2.000 state-writes/op	    5478 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      13	  10151446 ns/op	         1.000 state-writes/op	    8776 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      13	   9369157 ns/op	         1.000 state-writes/op	    8776 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       6	  18090250 ns/op	         2.000 state-writes/op	   17233 B/op	     165 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       6	  17949271 ns/op	         2.000 state-writes/op	   17233 B/op	     165 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  387174	       279.7 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  470110	       267.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  241527	       492.0 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  256281	       494.2 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   72327	      1698 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   67818	      1689 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   74761	      1512 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   76954	      1523 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  449304	       274.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  448989	       289.9 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   43393	      3072 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   41536	      2803 ns/op	         1.000 state-writes/op	    2979 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   26535	      4613 ns/op	         1.000 state-writes/op	    5468 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   24046	      4698 ns/op	         1.000 state-writes/op	    5471 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      12	  10311462 ns/op	         1.000 state-writes/op	    8852 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	       9	  11887611 ns/op	         1.000 state-writes/op	    9188 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       9	  12212292 ns/op	         1.000 state-writes/op	   10702 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      15	   9799767 ns/op	         1.000 state-writes/op	   11131 B/op	     110 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  336583	       301.5 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  406245	       285.4 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  241755	       508.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  221716	       512.3 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   68389	      1744 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   68158	      1827 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   72734	      1601 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   76908	      1606 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  429760	       283.1 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  370965	       281.3 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   42378	      2771 ns/op	         1.000 state-writes/op	    2978 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   44626	      2682 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   23547	      4884 ns/op	         2.000 state-writes/op	    5486 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   26821	      4585 ns/op	         2.000 state-writes/op	    5480 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      13	  10285372 ns/op	         1.000 state-writes/op	    8107 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      16	  10399234 ns/op	         1.000 state-writes/op	    8585 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       6	  18859618 ns/op	         2.000 state-writes/op	   17233 B/op	     165 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       6	  21309951 ns/op	         2.000 state-writes/op	   17233 B/op	     165 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  419690	       291.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  445489	       267.5 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  259372	       528.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  258994	       484.0 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   65908	      1861 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   65790	      1741 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   80242	      1508 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   78922	      1529 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  444486	       283.0 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  428086	       295.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   42735	      2831 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   42537	      2653 ns/op	         1.000 state-writes/op	    2976 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   27634	      4532 ns/op	         1.000 state-writes/op	    5461 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   27474	      4429 ns/op	         1.000 state-writes/op	    5463 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	       1	 107932917 ns/op	         1.000 state-writes/op	   43360 B/op	     379 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	       9	  18555968 ns/op	         1.000 state-writes/op	    8204 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      13	   9520327 ns/op	         1.000 state-writes/op	   10587 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      12	   8992455 ns/op	         1.000 state-writes/op	   11332 B/op	     110 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  433394	       276.8 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  402886	       361.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  251661	       495.5 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  247170	       476.1 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   67234	      1700 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   66006	      1684 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   80504	      1522 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   80205	      1534 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  433056	       272.3 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  446545	       288.2 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   44409	      2687 ns/op	         1.000 state-writes/op	    2979 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   44306	      2645 ns/op	         1.000 state-writes/op	    2979 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   27648	      4581 ns/op	         1.000 state-writes/op	    5468 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   26864	      4714 ns/op	         1.000 state-writes/op	    5465 B/op	      56 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      10	  10195283 ns/op	         1.000 state-writes/op	    8185 B/op	      84 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      19	   8687386 ns/op	         1.000 state-writes/op	    8482 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      15	   8681036 ns/op	         1.000 state-writes/op	   10552 B/op	     109 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	      13	   9337974 ns/op	         1.000 state-writes/op	   10587 B/op	     109 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-runthrough-version-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(RefreshVersionFallback|RunthroughReadOwnership)$/^(memory|file|local|cached|refresh|head-refresh|local-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=2", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: Apple M1 Pro
+BenchmarkRunthroughReadOwnership/local-8         	  403270	       266.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-8         	  437882	       269.6 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  240121	       509.1 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/cached-8        	  235844	       639.2 ns/op	         0 failed-close/op	     536 B/op	       8 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   69644	      1764 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/refresh-8       	   68773	      1724 ns/op	         0 failed-close/op	    1392 B/op	      22 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   74851	      1545 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/head-refresh-8  	   78567	      1640 ns/op	         0 failed-close/op	    1128 B/op	      18 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  443007	       274.1 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRunthroughReadOwnership/local-64KiB-8   	  416798	       271.4 ns/op	         0 failed-close/op	     472 B/op	       6 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   44192	      2747 ns/op	         1.000 state-writes/op	    2977 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-8  	   44700	      2734 ns/op	         1.000 state-writes/op	    2978 B/op	      31 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   23529	      4666 ns/op	         2.000 state-writes/op	    5483 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-8 	   26238	      4569 ns/op	         2.000 state-writes/op	    5482 B/op	      57 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      12	  10419490 ns/op	         1.000 state-writes/op	    8852 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-8    	      13	  10427567 ns/op	         1.000 state-writes/op	    8776 B/op	      85 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       7	  22441518 ns/op	         2.000 state-writes/op	   15706 B/op	     164 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-8   	       7	  21778476 ns/op	         2.000 state-writes/op	   15704 B/op	     164 allocs/op
+PASS

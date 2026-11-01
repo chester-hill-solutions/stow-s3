@@ -1,0 +1,37 @@
+=== RUN   TestResourceCountGrowthRefusesBeforeEffect
+    resource_count_test.go:83: resource-limit refusal ran effect: err=namespace capacity exhausted called=true
+    resource_count_test.go:86: resource-limit refusal published marker: <nil>
+    resource_count_test.go:93: resource-limit refusal changed durable ledger
+    resource_count_test.go:95: resource admission left a pending projection
+    resource_count_test.go:95: resource snapshot={PayloadBytes:4097 RecoveryBytes:926662 ReservedRecoveryBytes:16777216 PendingBytes:0 Operations:0}, want payload=4096: <nil>
+--- FAIL: TestResourceCountGrowthRefusesBeforeEffect (0.04s)
+=== RUN   TestResourceCountConcurrentAdmissions
+    resource_count_test.go:126: last resource slot: accepted=1 refused=1 effects=2
+    resource_count_test.go:128: resource admission left a pending projection
+    resource_count_test.go:128: resource snapshot={PayloadBytes:4097 RecoveryBytes:926648 ReservedRecoveryBytes:16777216 PendingBytes:0 Operations:0}, want payload=4096: <nil>
+--- FAIL: TestResourceCountConcurrentAdmissions (0.06s)
+=== RUN   TestResourceCountUnknownGrowthRetainsSlot
+    resource_count_test.go:155: unknown growth allowed competing publication: err=<nil> called=true
+--- FAIL: TestResourceCountUnknownGrowthRetainsSlot (0.10s)
+=== RUN   TestResourceCountUnknownDeletionRetainsSlot
+    resource_count_test.go:178: unknown deletion freed resource slot before verification: err=namespace capacity exhausted called=true
+    resource_count_test.go:184: verified deletion did not release resource slot: namespace admission requires verified reconciliation
+--- FAIL: TestResourceCountUnknownDeletionRetainsSlot (0.10s)
+=== RUN   TestResourceCountReplacementAndDeletionAtLimit
+=== RUN   TestResourceCountReplacementAndDeletionAtLimit/[4096_0]
+=== RUN   TestResourceCountReplacementAndDeletionAtLimit/[2048_2048]
+--- PASS: TestResourceCountReplacementAndDeletionAtLimit (0.15s)
+    --- PASS: TestResourceCountReplacementAndDeletionAtLimit/[4096_0] (0.08s)
+    --- PASS: TestResourceCountReplacementAndDeletionAtLimit/[2048_2048] (0.08s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/capacity	0.460s
+=== RUN   TestResourceCountFilesystemRefusalLeavesNoBucket
+    capacity_resource_count_test.go:101: two native stores hold 4096 actual resources
+    capacity_resource_count_test.go:114: resource-limit refusal published bucket: <nil>
+    capacity_resource_count_test.go:117: resource-limit refusal left bucket directory: <nil>
+    capacity_resource_count_test.go:124: native resource-limit refusal changed durable ledger
+    capacity_resource_count_test.go:132: resource-limit refusal prevented reopen: namespace capacity exhausted
+--- FAIL: TestResourceCountFilesystemRefusalLeavesNoBucket (2.39s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	2.396s
+FAIL

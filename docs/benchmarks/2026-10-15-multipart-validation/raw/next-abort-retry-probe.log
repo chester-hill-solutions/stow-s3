@@ -1,0 +1,27 @@
+=== RUN   TestReviewUnknownAbortRetry
+=== RUN   TestReviewUnknownAbortRetry/exists=false
+    abort_retry_review_probe_test.go:29: confirmed absent upload retains bytes=4 objects=1 sessions=1
+    abort_retry_review_probe_test.go:32: confirmed absent part strands byte capacity: runtime quota exceeded
+    abort_retry_review_probe_test.go:35: confirmed absent upload strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewUnknownAbortRetry/exists=true
+    abort_retry_review_probe_test.go:29: confirmed absent upload retains bytes=4 objects=0 sessions=1
+    abort_retry_review_probe_test.go:32: confirmed absent part strands byte capacity: runtime quota exceeded
+    abort_retry_review_probe_test.go:35: confirmed absent upload strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+--- FAIL: TestReviewUnknownAbortRetry (0.00s)
+    --- FAIL: TestReviewUnknownAbortRetry/exists=false (0.00s)
+    --- FAIL: TestReviewUnknownAbortRetry/exists=true (0.00s)
+=== RUN   TestReviewUnknownAbortRetry
+=== RUN   TestReviewUnknownAbortRetry/exists=false
+    abort_retry_review_probe_test.go:29: confirmed absent upload retains bytes=4 objects=1 sessions=1
+    abort_retry_review_probe_test.go:32: confirmed absent part strands byte capacity: runtime quota exceeded
+    abort_retry_review_probe_test.go:35: confirmed absent upload strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+=== RUN   TestReviewUnknownAbortRetry/exists=true
+    abort_retry_review_probe_test.go:29: confirmed absent upload retains bytes=4 objects=0 sessions=1
+    abort_retry_review_probe_test.go:32: confirmed absent part strands byte capacity: runtime quota exceeded
+    abort_retry_review_probe_test.go:35: confirmed absent upload strands session: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+--- FAIL: TestReviewUnknownAbortRetry (0.00s)
+    --- FAIL: TestReviewUnknownAbortRetry/exists=false (0.00s)
+    --- FAIL: TestReviewUnknownAbortRetry/exists=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.226s
+FAIL

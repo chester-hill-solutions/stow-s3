@@ -1,0 +1,55 @@
+{
+  "phase": "outbox-identical-reload-pilot",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_read_cost_bench_test.go",
+    "internal/runthrough/file_outbox_reuse_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_read_cost_bench_test.go",
+        "internal/runthrough/file_outbox_reuse_test.go",
+        "benchmark/prototype/file_outbox.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/compare.mjs"
+      ]
+    }
+  ],
+  "compare": {
+    "fixtures": [
+      "provenance=0",
+      "provenance=16384",
+      "mixed=1024"
+    ],
+    "stages": [
+      "lookup",
+      "unchanged",
+      "changed"
+    ],
+    "cpu": [
+      1
+    ],
+    "cycles": 1,
+    "benchtime": "100ms",
+    "contracts": true,
+    "fixed": false
+  }
+}

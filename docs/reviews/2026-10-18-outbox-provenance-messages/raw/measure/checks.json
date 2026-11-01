@@ -1,0 +1,169 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_proto_blocks_test.go",
+      "internal/runthrough/outbox_proto_blocks_resource_test.go",
+      "internal/runthrough/outbox_proto_blocks_bench_test.go",
+      "benchmark/bulk-file_outbox_proto.go.txt",
+      "benchmark/bounded-file_outbox_proto.go.txt",
+      "benchmark/proto-block-file-bench.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 25,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-before.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 24215,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/proto-block-before.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 41855,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-before.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/proto-block-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 803,
+    "passed": true
+  },
+  {
+    "name": "bulk-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-bulk.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 2373,
+    "passed": true
+  },
+  {
+    "name": "bulk-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/proto-block-bulk.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 4715,
+    "passed": true
+  },
+  {
+    "name": "bounded-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-bounded.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2171,
+    "passed": true
+  },
+  {
+    "name": "bounded-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/proto-block-bounded.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 5627,
+    "passed": true
+  },
+  {
+    "name": "bounded-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-bounded.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/proto-block-bounded.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 838,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/proto-block-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 266757,
+    "passed": true
+  }
+]

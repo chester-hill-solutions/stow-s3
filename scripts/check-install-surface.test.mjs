@@ -128,10 +128,17 @@ test("a 401 remedy is not offered for a registry that does not use one", () => {
   assert.equal(problems.length, 1, "only the mismatch: a PyPI 401 means something else entirely");
 });
 
-test("a matching answer is never a problem, in either direction", () => {
+test("confirmed absence and confirmed availability can match the declaration", () => {
   const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
-  assert.deepEqual(reachabilityProblems(npm, false, "HTTP 401"), []);
+  assert.deepEqual(reachabilityProblems(npm, false, "HTTP 404"), []);
   assert.deepEqual(reachabilityProblems({ ...npm, published: true }, true, "HTTP 200"), []);
+});
+
+test("unpublished npm declarations cannot turn denied or failed reads into absence", () => {
+  const npm = SURFACE.find(entry => entry.ecosystem === "npm");
+  for (const detail of ["HTTP 401", "HTTP 403", "HTTP 429", "HTTP 500", "HTTP 503", "ETIMEDOUT"]) {
+    assert.match(reachabilityProblems(npm, false, detail)[0], /not evidence of absence/);
+  }
 });
 
 test("a genuinely reachable package declared unpublished is still a problem", () => {
@@ -144,13 +151,10 @@ test("a genuinely reachable package declared unpublished is still a problem", ()
   assert.match(problems[0], /published=false/);
 });
 
-// The registry has to be the one the release publishes to, read from the manifest rather
-// than written here. Hardcoding npmjs made this check ask npmjs about packages that live
-// on GitHub Packages, so after the retarget it would have reported the entire npm surface
-// as unreachable.
+// Availability is still a separately maintained claim, checked on the publish registry.
 test("the online check looks where the release publishes", () => {
   const registry = publishRegistry();
   const manifest = JSON.parse(readFileSync(join(resolve(import.meta.dirname, ".."), "packages/stow-s3/package.json"), "utf8"));
   assert.equal(registry, manifest.publishConfig.registry);
-  assert.notEqual(registry, "https://registry.npmjs.org", "a hardcoded npmjs registry is what this replaced");
+  assert.equal(registry, "https://registry.npmjs.org");
 });

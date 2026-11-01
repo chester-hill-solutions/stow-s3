@@ -1,0 +1,346 @@
+=== RUN   TestFileOutboxSharedInstancesReloadBeforeMutation
+--- PASS: TestFileOutboxSharedInstancesReloadBeforeMutation (0.00s)
+=== RUN   TestFileOutboxProcessHelper
+--- PASS: TestFileOutboxProcessHelper (0.00s)
+=== RUN   TestFileOutboxConcurrentProcessesDoNotLoseEntries
+--- PASS: TestFileOutboxConcurrentProcessesDoNotLoseEntries (1.01s)
+=== RUN   TestFileOutboxClaimIsExclusiveAndExpires
+--- PASS: TestFileOutboxClaimIsExclusiveAndExpires (0.01s)
+=== RUN   TestPreparedIntentIsOwnedAndRejectsDuplicateKey
+--- PASS: TestPreparedIntentIsOwnedAndRejectsDuplicateKey (0.00s)
+=== RUN   TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxRestartsWithMonotonicIDs
+--- PASS: TestFileOutboxRestartsWithMonotonicIDs (0.00s)
+=== RUN   TestFileOutboxRejectsNewerFormatVersion
+--- PASS: TestFileOutboxRejectsNewerFormatVersion (0.00s)
+=== RUN   TestFileOutboxUpgradesLegacyAttemptedEntries
+--- PASS: TestFileOutboxUpgradesLegacyAttemptedEntries (0.00s)
+=== RUN   TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject
+--- PASS: TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedCommit
+--- PASS: TestFileOutboxPersistsPreparedCommit (0.00s)
+=== RUN   TestOutboxInspectionSnapshotsActiveAndPreparedEntries
+--- PASS: TestOutboxInspectionSnapshotsActiveAndPreparedEntries (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedIntentAcrossRestart
+--- PASS: TestFileOutboxPersistsPreparedIntentAcrossRestart (0.00s)
+=== RUN   TestPreparedRecoveryUncertainty
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown
+--- PASS: TestPreparedRecoveryUncertainty (0.38s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.01s)
+=== RUN   TestPreparedRecoveryConfirmedMissing
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true
+--- PASS: TestPreparedRecoveryConfirmedMissing (0.13s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.01s)
+=== RUN   TestProvenanceSurvivesRestartAndEviction
+=== RUN   TestProvenanceSurvivesRestartAndEviction/read
+=== RUN   TestProvenanceSurvivesRestartAndEviction/write
+--- PASS: TestProvenanceSurvivesRestartAndEviction (0.02s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/read (0.01s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/write (0.01s)
+=== RUN   TestPreparedDeleteFailureDiscardsProductionIntent
+--- PASS: TestPreparedDeleteFailureDiscardsProductionIntent (0.00s)
+=== RUN   TestFileOutboxSharedInstancesReloadBeforeMutation
+--- PASS: TestFileOutboxSharedInstancesReloadBeforeMutation (0.00s)
+=== RUN   TestFileOutboxProcessHelper
+--- PASS: TestFileOutboxProcessHelper (0.00s)
+=== RUN   TestFileOutboxConcurrentProcessesDoNotLoseEntries
+--- PASS: TestFileOutboxConcurrentProcessesDoNotLoseEntries (1.01s)
+=== RUN   TestFileOutboxClaimIsExclusiveAndExpires
+--- PASS: TestFileOutboxClaimIsExclusiveAndExpires (0.01s)
+=== RUN   TestPreparedIntentIsOwnedAndRejectsDuplicateKey
+--- PASS: TestPreparedIntentIsOwnedAndRejectsDuplicateKey (0.00s)
+=== RUN   TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxEnqueueDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkFailureDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxMarkSuccessDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails
+--- PASS: TestFileOutboxDiscardDoesNotSwapMemoryWhenPersistenceFails (0.00s)
+=== RUN   TestFileOutboxRestartsWithMonotonicIDs
+--- PASS: TestFileOutboxRestartsWithMonotonicIDs (0.00s)
+=== RUN   TestFileOutboxRejectsNewerFormatVersion
+--- PASS: TestFileOutboxRejectsNewerFormatVersion (0.00s)
+=== RUN   TestFileOutboxUpgradesLegacyAttemptedEntries
+--- PASS: TestFileOutboxUpgradesLegacyAttemptedEntries (0.00s)
+=== RUN   TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject
+--- PASS: TestOutboxDeleteDoesNotRemoveRecreatedSameETagObject (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedCommit
+--- PASS: TestFileOutboxPersistsPreparedCommit (0.00s)
+=== RUN   TestOutboxInspectionSnapshotsActiveAndPreparedEntries
+--- PASS: TestOutboxInspectionSnapshotsActiveAndPreparedEntries (0.00s)
+=== RUN   TestFileOutboxPersistsPreparedIntentAcrossRestart
+--- PASS: TestFileOutboxPersistsPreparedIntentAcrossRestart (0.00s)
+=== RUN   TestPreparedRecoveryUncertainty
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/memory/delete/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked
+=== RUN   TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown
+--- PASS: TestPreparedRecoveryUncertainty (0.39s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/put/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/multipart/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/recover/unknown (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/marked-missing (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/wrapped-marked (0.00s)
+    --- PASS: TestPreparedRecoveryUncertainty/memory/delete/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/put/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/copy/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/multipart/retry/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/recover/unknown (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/marked-missing (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.01s)
+    --- PASS: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.01s)
+=== RUN   TestPreparedRecoveryConfirmedMissing
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false
+=== RUN   TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true
+--- PASS: TestPreparedRecoveryConfirmedMissing (0.11s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.00s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.01s)
+    --- PASS: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.01s)
+=== RUN   TestProvenanceSurvivesRestartAndEviction
+=== RUN   TestProvenanceSurvivesRestartAndEviction/read
+=== RUN   TestProvenanceSurvivesRestartAndEviction/write
+--- PASS: TestProvenanceSurvivesRestartAndEviction (0.02s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/read (0.01s)
+    --- PASS: TestProvenanceSurvivesRestartAndEviction/write (0.01s)
+=== RUN   TestPreparedDeleteFailureDiscardsProductionIntent
+--- PASS: TestPreparedDeleteFailureDiscardsProductionIntent (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	4.154s

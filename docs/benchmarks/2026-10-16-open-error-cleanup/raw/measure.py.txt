@@ -1,0 +1,49 @@
+from pathlib import Path
+import subprocess,os,json,hashlib,re,statistics,platform
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');os.chdir(r)
+p=Path('/private/tmp/stow-open-error-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+def run(cmd,name):
+ q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==0,(name,q.stdout[-3000:])
+ print(name,'PASS',flush=True)
+overlay={'Replace':{str(r/f):str(p/(f.replace('/','_')+'.before.txt')) for f in ['internal/runtime/streams.go','internal/embedded/streams.go']}}
+(p/'baseline-overlay.json').write_text(json.dumps(overlay,indent=2)+'\n')
+# Recheck the final regression sources against unchanged baseline production code.
+for race,name in [(False,'final-before.log'),(True,'final-before-race.log')]:
+ cmd=['go','test','-overlay='+str(p/'baseline-overlay.json')]+(['-race'] if race else [])+['./internal/runtime','./pkg/stow','-run','^Test(OpeningError|PublicOpening)','-count=2','-v']
+ q=subprocess.run(cmd,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==1 and '[build failed]' not in q.stdout and q.stdout.count('--- FAIL:')==42,(name,q.stdout[-3000:])
+ print(name,'EXPECTED FAIL',flush=True)
+run(['go','test','-overlay='+str(p/'baseline-overlay.json'),'-c','-o',str(p/'before.test'),'./internal/runtime'],'before-build.log')
+run(['go','test','-c','-o',str(p/'after.test'),'./internal/runtime'],'after-build.log')
+plan=[]
+for cpu in [1,8]:
+ for version in ['before','after','after','before']:
+  plan.append({'cpu':cpu,'version':version})
+(p/'measurement-plan.json').write_text(json.dumps({'blocks':plan,'count':3,'benchtime':'100ms','regex':'^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$'},indent=2)+'\n')
+observations=[];combined=[]
+for index,block in enumerate(plan):
+ cmd=[str(p/(block['version']+'.test')),'-test.run=^$','-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$','-test.benchmem','-test.benchtime=100ms','-test.count=3','-test.cpu='+str(block['cpu'])]
+ run(cmd,'block-'+str(index)+'.log')
+ s=(p/('block-'+str(index)+'.log')).read_text();combined.append(s)
+ for line in s.splitlines():
+  if not line.startswith('Benchmark'):continue
+  tokens=line.split();metrics={tokens[j+1]:float(tokens[j]) for j in range(2,len(tokens)-1,2)}
+  observations.append(dict(block,block=index,name=re.sub(r'-\d+$','',tokens[0]),iterations=int(tokens[1]),metrics=metrics))
+(p/'measurements.log').write_text('\n'.join(combined))
+(p/'samples.json').write_text(json.dumps(observations,indent=2)+'\n')
+summary=[]
+for cpu in [1,8]:
+ for name in sorted({x['name'] for x in observations}):
+  row={'cpu':cpu,'name':name}
+  for version in ['before','after']:
+   data=[x['metrics'] for x in observations if x['cpu']==cpu and x['name']==name and x['version']==version]
+   row[version]={metric:{'median':statistics.median(x[metric] for x in data),'min':min(x[metric] for x in data),'max':max(x[metric] for x in data)} for metric in data[0]}
+  row['ns_change_percent']=(row['after']['ns/op']['median']/row['before']['ns/op']['median']-1)*100
+  summary.append(row)
+(p/'performance-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+identity=lambda path:{'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+(p/'environment.json').write_text(json.dumps({'base':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'origin_main':subprocess.check_output(['git','rev-parse','origin/main'],text=True).strip(),'go':subprocess.check_output(['go','version'],env=env,text=True).strip(),'platform':platform.platform(),'host_load_at_end':os.getloadavg(),'binaries':{name:identity(p/(name+'.test')) for name in ['before','after']},'sources':{f:identity(r/f) for f in ['internal/runtime/streams.go','internal/embedded/streams.go','internal/runtime/open_error_test.go','internal/runtime/open_error_bench_test.go','pkg/stow/open_error_test.go']}},indent=2)+'\n')
+for x in summary:print(x['cpu'],x['name'],round(x['ns_change_percent'],2),x['before']['B/op']['median'],x['after']['B/op']['median'],x['before']['allocs/op']['median'],x['after']['allocs/op']['median'])

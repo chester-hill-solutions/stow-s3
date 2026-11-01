@@ -1,0 +1,79 @@
+=== RUN   TestReviewCustomMissingUploadS3Status
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/upload-part
+2026/10/15 17:56:08 PUT /s3 500 193.083µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>1098f0e32218d569d0f186b54806b279</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/complete
+2026/10/15 17:56:08 POST /s3 500 29.458µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>ae1bb58a7ea148dcd52731b2873386c8</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/abort
+2026/10/15 17:56:08 DELETE /s3 500 8.875µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>764b2e4f349500e85aa8afd45419ccec</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/list-parts
+2026/10/15 17:56:08 GET /s3 500 9.75µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>37e6fdbff44e9b712e88d970f036041f</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/upload-part
+2026/10/15 17:56:08 PUT /s3 500 11.167µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>c7d0dc629ce359b014571f7d2d7b4272</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/complete
+2026/10/15 17:56:08 POST /s3 500 7.542µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>fb19cf11e07dea6ade6b6fd908f9db04</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/abort
+2026/10/15 17:56:08 DELETE /s3 500 7.458µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>dd9ab6bb937fecfd4f3ba29a763215ec</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/list-parts
+2026/10/15 17:56:08 GET /s3 500 7.083µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>67180b2b72f7f6eddccaf9f59e569087</RequestId></Error>
+--- FAIL: TestReviewCustomMissingUploadS3Status (0.00s)
+    --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/upload-part (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/complete (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/abort (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/list-parts (0.00s)
+    --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/upload-part (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/complete (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/abort (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/list-parts (0.00s)
+=== RUN   TestReviewCustomMissingUploadS3Status
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/upload-part
+2026/10/15 17:56:08 PUT /s3 500 7.75µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>064100d2bbc6ef9668e11c6b86bad3f1</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/complete
+2026/10/15 17:56:08 POST /s3 500 7.417µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>c99636ed8adb5e3fdaff1855cc53922d</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/abort
+2026/10/15 17:56:08 DELETE /s3 500 7.209µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>0ff833b4895b1910cd843a959fdc4fb7</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=false/list-parts
+2026/10/15 17:56:08 GET /s3 500 6.208µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>0e1414981e0047d39c26632aaa0cd04b</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/upload-part
+2026/10/15 17:56:08 PUT /s3 500 7.584µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>2ba1cc91320ba54ee0663fe9918b2790</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/complete
+2026/10/15 17:56:08 POST /s3 500 7.167µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>e68bd72c19cc27b92979cd3c3b3ab5e9</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/abort
+2026/10/15 17:56:08 DELETE /s3 500 8.917µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>6cc3ef2f934410ee54093dee92a52a28</RequestId></Error>
+=== RUN   TestReviewCustomMissingUploadS3Status/wrapped=true/list-parts
+2026/10/15 17:56:08 GET /s3 500 6.334µs
+    missing_upload_review_probe_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>ff988f03d4dce57a5da5bcd69b53d26d</RequestId></Error>
+--- FAIL: TestReviewCustomMissingUploadS3Status (0.00s)
+    --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/upload-part (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/complete (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/abort (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=false/list-parts (0.00s)
+    --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/upload-part (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/complete (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/abort (0.00s)
+        --- FAIL: TestReviewCustomMissingUploadS3Status/wrapped=true/list-parts (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.256s
+FAIL

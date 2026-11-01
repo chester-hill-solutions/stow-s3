@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -151,7 +152,7 @@ func checkpointInputs(ctx context.Context, root *rooted.Root, options Checkpoint
 	if options.MaxBytes < 0 || options.MaxFiles < 0 {
 		return nil, nil, 0, fmt.Errorf("stow: checkpoint limits must not be negative")
 	}
-	files, excluded, size, err := scanCheckpointRoot(ctx, root, options.IncludeSensitiveFiles)
+	files, excluded, size, err := scanCheckpointRootWithOptions(ctx, root, options)
 	if err != nil {
 		return nil, nil, 0, err
 	}
@@ -177,8 +178,18 @@ func stageCheckpointDirectory(registryDir string) (string, string, error) {
 }
 
 func verifyCheckpointCapture(ctx context.Context, root *rooted.Root, expected []CheckpointFile, excluded []string, includeSensitive bool) error {
-	actual, actualExcluded, _, err := scanCheckpointRoot(ctx, root, includeSensitive)
+	var bytes int64
+	for _, file := range expected {
+		bytes += file.Size
+	}
+	actual, actualExcluded, _, err := scanCheckpointRootWithOptions(ctx, root, CheckpointOptions{
+		IncludeSensitiveFiles: includeSensitive, MaxBytes: max(1, bytes), MaxFiles: max(1, int64(len(expected))),
+	})
 	if err != nil {
+		var failure *CheckpointError
+		if errors.As(err, &failure) && failure.Code == "capacity_exceeded" {
+			return checkpointFailure("workspace_changed", "verify", "not_committed", err)
+		}
 		return err
 	}
 	if !sameCheckpointFiles(expected, actual) || !sameStrings(excluded, actualExcluded) {

@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,re,hashlib
+p=Path('/private/tmp/stow-reconcile-reuse-2026-10-18');j=json.loads((p/'red-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==3 and all(x['passed']for x in checks)
+failed={'TestReconcileUnchangedKeepsLedger','TestReconcileUnchangedReadOnlyDirectory'}
+for name in ['red-normal','red-race']:
+ t=(e/(name+'.log')).read_text();assert 'build failed'not in t and 'DATA RACE'not in t and '--- SKIP:'not in t
+ actual=set(re.findall(r'^--- FAIL: (\S+) \(',t,re.M));assert actual==failed,(name,actual)
+ for control in ['ChangesReplaceLedger','Fallback','PendingStillWrites','AncestorError','ChecksQuota']:assert '--- PASS: TestReconcileUnchanged'+control+' 'in t,(name,control)
+ assert 'unchanged reconciliation replaced the ledger'in t and 'unchanged reconciliation required replacement:'in t
+ for text in ['permission denied','namespace admission requires verified reconciliation']:assert text in t
+sources=json.loads((e/'environment.json').read_text())['sourceSHA256']
+for n in ['state.go','admission.go']:assert sources['internal/capacity/'+n]==hashlib.sha256((p/('baseline-'+n+'.txt')).read_bytes()).hexdigest()
+(e/'validation-receipt.json').write_text(json.dumps({'checks':3,'allPassed':True,'expectedOriginalFailures':sorted(failed),'normalRepeats':1,'raceRepeats':1,'controlTopLevelTests':5,'productionSourceUnchanged':True},indent=2)+'\n');print('Verified original normal/race inode and read-only failures, all five safety controls, exact baseline source')

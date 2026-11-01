@@ -1,0 +1,77 @@
+package embedded
+
+import (
+	"context"
+	"errors"
+	"testing"
+)
+
+type mapReviewMissingStore struct{ Store }
+
+func (s *mapReviewMissingStore) DeleteObject(ctx context.Context, bucket, key string) error {
+	if _, err := s.HeadObject(ctx, bucket, key); err != nil {
+		return err
+	}
+	return s.Store.DeleteObject(ctx, bucket, key)
+}
+
+func TestMapCustomStoreBatchDeleteTreatsMissingAsDeleted(t *testing.T) {
+	ctx := context.Background()
+	memory, err := Open(Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer memory.Close()
+	if err := memory.CreateBucket(ctx, "probe"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := memory.PutObject(ctx, "probe", "existing", []byte("body"), PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	adapted := adaptStore(&mapReviewMissingStore{Store: memory})
+	deleted, err := adapted.DeleteObjects(ctx, "probe", []string{"missing", "existing"})
+	_, headErr := memory.HeadObject(ctx, "probe", "existing")
+	if err != nil || len(deleted) != 2 || !errors.Is(headErr, ErrObjectNotFound) {
+		t.Fatalf("batch stopped at missing public sentinel: deleted=%v error=%v existing-head=%v", deleted, err, headErr)
+	}
+}
+
+type mapReviewCommittedStore struct{ Store }
+
+func (s *mapReviewCommittedStore) PutObject(ctx context.Context, bucket, key string, data []byte, opts PutOptions) (Object, error) {
+	object, err := s.Store.PutObject(ctx, bucket, key, data, opts)
+	if err != nil {
+		return object, err
+	}
+	return object, errors.Join(ErrMutationCommitted, errors.New("post-publication failure"))
+}
+
+func TestMapCustomStoreCopyCommittedErrorDoesNotPanic(t *testing.T) {
+	ctx := context.Background()
+	memory, err := Open(Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer memory.Close()
+	if err := memory.CreateBucket(ctx, "probe"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := memory.PutObject(ctx, "probe", "source", []byte("body"), PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	outer, err := Open(Options{Store: &mapReviewCommittedStore{Store: memory}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outer.Close()
+	defer func() {
+		if value := recover(); value != nil {
+			object, readErr := memory.GetObject(ctx, "probe", "target")
+			t.Errorf("custom COPY panicked: %v; published=%q read-error=%v usage=%+v", value, object.Data, readErr, outer.Usage())
+		}
+	}()
+	object, err := outer.CopyObject(ctx, "probe", "source", "probe", "target")
+	if !errors.Is(err, ErrMutationCommitted) || object.Key != "target" {
+		t.Fatalf("committed result lost: %+v %v", object, err)
+	}
+}

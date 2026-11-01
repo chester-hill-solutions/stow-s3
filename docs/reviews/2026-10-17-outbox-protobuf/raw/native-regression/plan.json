@@ -1,0 +1,44 @@
+{
+  "phase": "outbox-native-protobuf-before",
+  "sources": [
+    "internal/runthrough/file_outbox_proto_native_test.go",
+    "internal/runthrough/file_outbox.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_proto_native_test.go"
+      ]
+    },
+    {
+      "name": "reproduce-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutbox(PersistsProtobufAndReopens|MigratesJSONToProtobuf|RefusesFutureProtobufWithoutReplacement)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "reproduce-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutbox(PersistsProtobufAndReopens|MigratesJSONToProtobuf|RefusesFutureProtobufWithoutReplacement)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

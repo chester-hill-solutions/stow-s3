@@ -1,0 +1,109 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_payload_read_test.go",
+      "internal/storage/fs/part_http_owned_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 25,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "-run",
+      "^(TestCapacityPayload.*|TestCompletionBuffer.*|TestMultipartOwned.*)$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 30947,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "-run",
+      "^(TestCapacityPayload.*|TestCompletionBuffer.*|TestMultipartOwned.*)$",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 47583,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 500,
+    "passed": true
+  },
+  {
+    "name": "install-reference-tools",
+    "args": [
+      "bash",
+      "-c",
+      "cd packages/stow-s3 && npm ci --ignore-scripts && rm -rf node_modules/@chester-hill-solutions/stow-s3-{darwin-arm64,darwin-x64,linux-arm64,linux-x64}"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2678,
+    "passed": true
+  },
+  {
+    "name": "api-reference-before",
+    "args": [
+      "node",
+      "scripts/generate-api-reference.mjs",
+      "--check"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 7883,
+    "passed": true
+  },
+  {
+    "name": "regenerate-api-reference",
+    "args": [
+      "node",
+      "scripts/generate-api-reference.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1788,
+    "passed": true
+  },
+  {
+    "name": "api-reference-after",
+    "args": [
+      "node",
+      "scripts/generate-api-reference.mjs",
+      "--check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1855,
+    "passed": true
+  }
+]

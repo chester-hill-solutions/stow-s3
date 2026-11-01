@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,statistics,hashlib,re,sys
+p=Path('/private/tmp/stow-part-ownership-2026-10-18');phase=sys.argv[1]if len(sys.argv)>1 else 'final';j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert v['complete']and len(checks)==23;assert (v['success']and all(c['passed']for c in checks))if phase=='final'else(not v['success']and [c['name']for c in checks if not c['passed']]==['quality']);assert v['railwayDeploymentId']==j['deploymentId'];d=json.loads((e/'measurements.json').read_text());assert len(d['cases'])==11 and len(d['commands'])==88 and len(d['observations'])==88 and all(c['exitCode']==0 for c in d['commands']);assert d['diskType']==61267
+for n in ['red-normal.log','red-race.log']:
+ s=(e/n).read_text();assert '[build failed]'not in s and '--- FAIL: TestMultipartOwnedHTTPAllocation'in s and '--- FAIL: TestPartReaderAdoptsOwnedRemainder'in s;assert '--- PASS: TestMultipartOwnedRefusalsPreservePart'in s
+for n in ['focused-normal.log','focused-race.log']:
+ s=(e/n).read_text();assert '--- FAIL:'not in s
+ for name in ['TestPartReaderAdoptsOwnedRemainder','TestPartReaderBorrowedIsolationAndErrors','TestPartReaderHasOneConcurrentOwner','TestPartBytesOfConsumesOwnedOnce','TestPartMemoryKeepsCompactPayload','TestMultipartOwnedHTTPTransfer','TestMultipartOwnedHTTPAllocation','TestMultipartOwnedRefusalsPreservePart']:assert s.count('--- PASS: '+name+' ')>=2,(n,name)
+ amounts=[int(x)for x in re.findall(r'8 MiB S3 UploadPart allocated (\d+) bytes',s)];assert len(amounts)==4 and all(x<36<<20 for x in amounts);print(n,'fixed S3 allocation bytes',amounts)
+summary=[]
+for cell in d['cases']:
+ selected=[o for o in d['observations']if o['profile']==cell['profile']and o['size']==cell['size']];assert len(selected)==8
+ row=dict(cell)
+ for variant in ['before','after']:
+  obs=[o for o in selected if o['variant']==variant];assert len(obs)==4;row[variant]={key:{'median':statistics.median([o[key]for o in obs]),'min':min(o[key]for o in obs),'max':max(o[key]for o in obs)}for key in ['allocatedBytes','allocations','ns','retainedHeapDelta','maxRSSBytes']}
+ row['timeChangePercent']=(row['after']['ns']['median']/row['before']['ns']['median']-1)*100
+ for left,right,key in [('A','C','sameBeforeTimeChangePercent'),('B','D','sameAfterTimeChangePercent')]:
+  a=statistics.median(o['ns']for o in selected if o['label']==left);b=statistics.median(o['ns']for o in selected if o['label']==right);row[key]=(b/a-1)*100
+ summary.append(row)
+ print(cell['profile'],cell['size'],'B/op',row['before']['allocatedBytes']['median'],'->',row['after']['allocatedBytes']['median'],'RSSMiB',round(row['before']['maxRSSBytes']['median']/(1<<20),2),'->',round(row['after']['maxRSSBytes']['median']/(1<<20),2),'time%',round(row['timeChangePercent'],2),'AA%',round(row['sameBeforeTimeChangePercent'],2))
+(e/'comparison-analysis.json').write_text(json.dumps(summary,indent=2)+'\n');env=json.loads((e/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+for n in ['owned_reader.go','handlers_multipart.go','memory.go']:assert env['sourceSHA256']['benchmark/baseline-'+n+'.txt']==hashlib.sha256((p/('baseline-'+n+'.txt')).read_bytes()).hexdigest()
+(e/'validation-receipt.json').write_text(json.dumps({'success':v['success'],'qualityOnlyFailure':phase=='pilot','checks':23,'commands':88,'observations':88,'railwayDeploymentId':j['deploymentId'],'sourceSHA256':env['sourceSHA256'],'binaries':d['binaries']},indent=2)+'\n');print('Verified original replays, passing regressions and paired observations; job success:',v['success'])

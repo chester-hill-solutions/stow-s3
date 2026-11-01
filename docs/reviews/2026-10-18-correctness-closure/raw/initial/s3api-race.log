@@ -1,0 +1,87 @@
+=== RUN   TestClosureETagCase
+=== RUN   TestClosureETagCase/put-match/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 400 141.719µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=400 expected=200 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>848b91ff71bd924479e6d3c32c20908f</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=200
+=== RUN   TestClosureETagCase/put-match/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 400 52.37µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=400 expected=412 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>493b37fea63577a0fefa89d47c32881b</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=412
+=== RUN   TestClosureETagCase/put-none/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 400 41.47µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=400 expected=412 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>c5e8de2289a4e06f3f6b32f5cf3f81f4</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=412
+=== RUN   TestClosureETagCase/put-none/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 400 37.589µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=400 expected=200 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>51dff4bdc3eef846fe13b481f7bd1e44</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=200
+=== RUN   TestClosureETagCase/copy-match/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 200 68.86µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=200 expected=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:18:38Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+=== RUN   TestClosureETagCase/copy-match/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 200 48.09µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=200 expected=412 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:18:38Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=200 want=412
+=== RUN   TestClosureETagCase/copy-none/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 412 66.839µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=412 expected=412 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>1f686d1e02d819d3a4fb4b7130f11395</RequestId></Error>
+=== RUN   TestClosureETagCase/copy-none/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 412 56.849µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=412 expected=200 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>e7a89b617a17b68b63f1c353f299dbe0</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=412 want=200
+--- FAIL: TestClosureETagCase (0.00s)
+    --- FAIL: TestClosureETagCase/put-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-match/caseChanged=true (0.00s)
+    --- FAIL: TestClosureETagCase/put-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-none/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-match/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-none/caseChanged=true (0.00s)
+=== RUN   TestClosureETagCase
+=== RUN   TestClosureETagCase/put-match/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 400 38.13µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=400 expected=200 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>4b98c563612979f9e3d7e156d20a9d76</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=200
+=== RUN   TestClosureETagCase/put-match/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 400 31.77µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=400 expected=412 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>822814d6397585b1021869fcb7af903d</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=412
+=== RUN   TestClosureETagCase/put-none/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 400 33.359µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=400 expected=412 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>612aaaeb334ec756f33be698cd309bf2</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=412
+=== RUN   TestClosureETagCase/put-none/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 400 36.13µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=400 expected=200 body=<Error><Code>InvalidArgument</Code><Message>Content-Length required</Message><Resource>/bucket/source</Resource><RequestId>31040199fdd5516b640370d9021c3e37</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=400 want=200
+=== RUN   TestClosureETagCase/copy-match/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 200 43.519µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=200 expected=200 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:18:38Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+=== RUN   TestClosureETagCase/copy-match/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 200 47.16µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=200 expected=412 body=<?xml version="1.0" encoding="UTF-8"?>
+        <CopyObjectResult><LastModified>2026-10-19T00:18:38Z</LastModified><ETag>&#34;149603e6c03516362a8da23f624db945&#34;</ETag></CopyObjectResult>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=200 want=412
+=== RUN   TestClosureETagCase/copy-none/caseChanged=false
+2026/10/19 00:18:38 PUT /s3 412 51.29µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603e6c03516362a8da23f624db945" status=412 expected=412 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>f0d185a77a82dc64870950fd5a930227</RequestId></Error>
+=== RUN   TestClosureETagCase/copy-none/caseChanged=true
+2026/10/19 00:18:38 PUT /s3 412 47.179µs
+    closure_etag_probe_test.go:64: actual ETag="149603e6c03516362a8da23f624db945" supplied="149603E6C03516362A8DA23F624DB945" status=412 expected=200 body=<Error><Code>PreconditionFailed</Code><Message>At least one of the pre-conditions you specified did not hold</Message><Resource>/bucket/destination</Resource><RequestId>bccad9b7c9b5c48d57e5a50d999c08e4</RequestId></Error>
+    closure_etag_probe_test.go:66: opaque ETag comparison folded case: got=412 want=200
+--- FAIL: TestClosureETagCase (0.00s)
+    --- FAIL: TestClosureETagCase/put-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-match/caseChanged=true (0.00s)
+    --- FAIL: TestClosureETagCase/put-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/put-none/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-match/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-match/caseChanged=true (0.00s)
+    --- PASS: TestClosureETagCase/copy-none/caseChanged=false (0.00s)
+    --- FAIL: TestClosureETagCase/copy-none/caseChanged=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/s3api	0.014s
+FAIL

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { pages } from "../site/docs.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -21,7 +22,10 @@ export function linkProblems(markdown, source, directory = root) {
     let target;
     if (path.startsWith("/") && source.startsWith("site/")) {
       const asset = resolve(directory, "site", path.slice(1));
-      target = existsSync(asset) ? asset : resolve(directory, "site/.build", path.slice(1));
+      const page = pages.find((page) => page.route === path);
+      if (existsSync(asset)) target = asset;
+      else if (page) target = resolve(directory, page.source);
+      else target = resolve(directory, "site/.build", path.slice(1));
     } else if (isAbsolute(path)) {
       problems.push(`${source}: machine-specific link ${href}`);
       continue;
@@ -32,9 +36,14 @@ export function linkProblems(markdown, source, directory = root) {
   return problems;
 }
 
+export function documentationFiles(directory = root) {
+  return [...new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
+    cwd: directory, encoding: "utf8", maxBuffer: 16 * 1024 * 1024,
+  }).split("\0"))].filter((path) => path.endsWith(".md") && existsSync(resolve(directory, path)));
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const files = [...new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: root, encoding: "utf8" }).split("\0"))]
-    .filter((path) => path.endsWith(".md") && existsSync(resolve(root, path)));
+  const files = documentationFiles();
   const problems = files.flatMap((path) => linkProblems(readFileSync(resolve(root, path), "utf8"), path));
   if (problems.length) {
     console.error(problems.join("\n"));

@@ -1,0 +1,7 @@
+import {execFileSync} from 'node:child_process';import{join}from'node:path';import{copyFileSync,unlinkSync}from'node:fs';
+const root=process.env.STOW_RESULT_ROOT;if(!root?.startsWith('/results/'))throw Error('Missing Railway result directory');
+const binary=join(root,'lookup.test'),profile=join(root,'lookup-alloc.pprof');
+execFileSync('go',['test','-c','-buildvcs=false','-o',binary,'./internal/runthrough'],{stdio:'inherit'});
+execFileSync(binary,['-test.run=^$','-test.bench=^BenchmarkFileOutboxLookup$/^provenance=16384$','-test.benchtime=100x','-test.cpu=1','-test.benchmem','-test.memprofilerate=1','-test.memprofile='+profile],{stdio:'inherit'});
+for(const metric of ['alloc_space','alloc_objects']){console.log('PROFILE '+metric);execFileSync('go',['tool','pprof','-top','-'+metric,binary,profile],{stdio:'inherit'});console.log('CLONE '+metric);execFileSync('go',['tool','pprof','-list=outboxState.*clone','-'+metric,binary,profile],{stdio:'inherit'});}
+unlinkSync(binary);

@@ -39,15 +39,26 @@ func (s *Store) openRead(path string, expected os.FileInfo) (*os.File, error) {
 	}
 	file, err := root.OpenRegularFile(relative)
 	if err != nil {
-		// A host that cannot open safely has not answered the question, and
-		// absence is the guess that loses data.
+		// A host that cannot open safely has not answered the question, and absence
+		// is the guess that loses data. Only a confirmed absence is reported as one.
 		if errors.Is(err, rooted.ErrUnsupported) {
 			return nil, err
 		}
-		return nil, storage.ErrObjectNotFound
+		if absence(err) {
+			return nil, storage.ErrObjectNotFound
+		}
+		return nil, uncertain(err)
 	}
 	actual, err := file.Stat()
-	if err != nil || !actual.Mode().IsRegular() || expected != nil && !os.SameFile(expected, actual) {
+	if err != nil {
+		file.Close()
+		return nil, uncertain(err)
+	}
+	if !actual.Mode().IsRegular() {
+		file.Close()
+		return nil, storage.ErrObjectNotFound
+	}
+	if expected != nil && !os.SameFile(expected, actual) {
 		file.Close()
 		return nil, storage.ErrObjectNotFound
 	}
@@ -70,10 +81,9 @@ func (s *Store) readFile(path string, expected os.FileInfo) ([]byte, error) {
 	return data, nil
 }
 
-func deriveReadFile(file *os.File, info os.FileInfo) (ManifestEntry, error) {
-	defer file.Close()
+func deriveFileMetadata(input io.Reader, info os.FileInfo) (ManifestEntry, error) {
 	hash := md5.New()
-	reader := io.TeeReader(io.LimitReader(file, info.Size()+1), hash)
+	reader := io.TeeReader(io.LimitReader(input, info.Size()+1), hash)
 	head := make([]byte, 512)
 	n, err := io.ReadFull(reader, head)
 	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {

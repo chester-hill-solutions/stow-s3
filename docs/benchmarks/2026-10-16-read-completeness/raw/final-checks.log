@@ -1,0 +1,53 @@
+COMMAND ["git", "diff", "--check"]
+
+EXIT 0
+
+gofmt: all four Go files clean
+
+COMMAND ["make", "check-go-quality", "check-file-size"]
+node scripts/check-go-quality.mjs
+Go quality ratchet OK (15 baseline entries)
+node scripts/check-file-size.mjs
+File-size ratchet OK (0 baseline entries; maximum 500 lines)
+EXIT 0
+
+COMMAND ["make", "check-doc-links"]
+npm ci --ignore-scripts --prefix site
+
+added 2 packages, and audited 3 packages in 1s
+
+found 0 vulnerabilities
+npm run build --prefix site
+
+> build
+> node build.mjs
+
+Built Stow site and 32 documentation pages
+npm test --prefix site
+
+> test
+> node --test test/*.test.mjs
+
+✔ public guides omit repository commentary, retain code examples and reject broken markers (3.803291ms)
+✔ published guides render examples and turn repo documentation links into site routes (31.502541ms)
+✔ public output contains complete guides and excludes build tools, source files and credentials (725.733417ms)
+✔ every example include resolves and expands away (14.532333ms)
+✔ every example file parses (644.806959ms)
+✔ every example uses symbols the clients export (6.628125ms)
+✔ the built homepage carries the example code (406.104667ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1210.615958
+node scripts/check-doc-links.mjs
+Local documentation links OK (218 Markdown files)
+EXIT 0
+
+SOURCE hashes: all four match measured candidate; WASM metadata {"before": {"bytes": 4618016, "sha256": "640c56f4ea9bbd944bc42b7183242567abcdf7602d3ab9f185edda1f87ef5943"}, "after": {"bytes": 4618255, "sha256": "db3c2b8bf172188fa1d7ca18fa58246cecd8146abd43e9ff9f24719d307408b3"}}
+
+PROVENANCE/CLEANUP: 1,688 measurements retained; direct parsed capture identical; temporary probes and dependency symlink absent.
+WASM bytes and SHA-256: match measured artifact.

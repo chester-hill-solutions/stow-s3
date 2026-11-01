@@ -1,0 +1,83 @@
+package workspace_test
+
+import (
+	"context"
+	"errors"
+	"os"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
+)
+
+func TestClosureWorkspaceUnreadable(t *testing.T) {
+	if os.Getuid() == 0 {
+		t.Fatal("unprivileged Railway qualification required")
+	}
+	root := os.Getenv("STOW_RESULT_ROOT")
+	if !strings.HasPrefix(root, "/results/") {
+		t.Fatal("Railway results volume required")
+	}
+	t.Setenv("TMPDIR", root)
+	for _, restricted := range []bool{false, true} {
+		name := "healthy"
+		if restricted {
+			name = "unreadable"
+		}
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			s, err := workspace.New(workspace.Options{Root: t.TempDir(), Bucket: "bucket"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer s.Close()
+			if _, err := s.PutObject(ctx, "bucket", "victim", strings.NewReader("old"), storage.PutOptions{}); err != nil {
+				t.Fatal(err)
+			}
+			path, ok := s.Path("bucket", "victim")
+			if !ok {
+				t.Fatal("no stored path")
+			}
+			if restricted {
+				if err := os.Chmod(path, 0); err != nil {
+					t.Fatal(err)
+				}
+				defer os.Chmod(path, 0644)
+			}
+			_, headErr := s.HeadObject(ctx, "bucket", "victim")
+			reader, _, getErr := s.GetObject(ctx, "bucket", "victim")
+			if reader != nil {
+				reader.Close()
+			}
+			if restricted {
+				if headErr == nil || errors.Is(headErr, storage.ErrObjectNotFound) {
+					t.Errorf("unreadable existing HEAD became absence/success: %v", headErr)
+				}
+				if getErr == nil || errors.Is(getErr, storage.ErrObjectNotFound) {
+					t.Errorf("unreadable existing GET became absence/success: %v", getErr)
+				}
+			} else if headErr != nil || getErr != nil {
+				t.Fatal(headErr, getErr)
+			}
+			meta, putErr := s.PutObject(ctx, "bucket", "victim", strings.NewReader("new"), storage.PutOptions{IfNoneMatch: "*"})
+			t.Logf("restricted=%t HEAD=%v GET=%v conditional PUT meta=%+v err=%v", restricted, headErr, getErr, meta, putErr)
+			if restricted {
+				if err := os.Chmod(path, 0644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			data, readErr := os.ReadFile(path)
+			if readErr != nil {
+				t.Fatal(readErr)
+			}
+			t.Logf("retained bytes=%q", data)
+			if !errors.Is(putErr, storage.ErrPreconditionFailed) && putErr == nil {
+				t.Error("create-only PUT replaced an existing object")
+			}
+			if string(data) != "old" {
+				t.Error("failed absence observation permitted data overwrite")
+			}
+		})
+	}
+}

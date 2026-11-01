@@ -1,0 +1,65 @@
+[
+  {
+    "name": "format-tests",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_ownership_test.go",
+      "internal/runthrough/outbox_ownership_controls_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "regression-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxOwnership",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 22578,
+    "passed": true
+  },
+  {
+    "name": "regression-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxOwnership",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 37986,
+    "passed": true
+  },
+  {
+    "name": "benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/ownership-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 754,
+    "passed": true
+  }
+]

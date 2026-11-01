@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""Drive the Railway scratch runner for the C04 qualification.
+
+Deploy the packaged source, start the plan, watch it, export the results and
+remove the deployment afterwards. The runner's own state lives on the service's
+volume, so the results survive the run and are read back over SSH.
+"""
+from pathlib import Path
+import base64
+import hashlib
+import json
+import os
+import subprocess
+import sys
+
+WORK = Path("/private/tmp/stow-c04-2026-10-19")
+CLI = "/Users/ladmin/.nvm/versions/node/v25.9.0/bin/railway"
+SCOPE = [
+    "--project", "8d90188e-0f1e-4c47-9379-9399ae06e6fa",
+    "--environment", "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411",
+    "--service", "83497842-c51d-420e-8ba1-181589730ad4",
+]
+ENV = dict(
+    os.environ,
+    RAILWAY_CALLER="skill:use-railway@1.7.0",
+    RAILWAY_AGENT_SESSION="stow-c04-20261019",
+)
+
+
+def run(args, cwd=None, timeout=120):
+    print(f"$ railway {' '.join(args)}", flush=True)
+    result = subprocess.run(
+        [CLI, *args], env=ENV, cwd=cwd, text=True, capture_output=True, timeout=timeout
+    )
+    if result.returncode != 0:
+        print(result.stdout[-3000:])
+        print(result.stderr[-3000:], file=sys.stderr)
+        raise SystemExit(f"railway {' '.join(args)} failed with {result.returncode}")
+    return result.stdout
+
+
+def ssh(script, timeout=90):
+    return run(["ssh", *SCOPE, "--", "node", "-e", script], timeout=timeout)
+
+
+def main() -> None:
+    mode = sys.argv[1]
+    if mode == "deploy":
+        out = run(
+            ["up", *SCOPE, "--detach", "--json", "-m", "C04 workspace uncertainty qualification"],
+            cwd=WORK / "upload",
+            timeout=300,
+        )
+        (WORK / "upload.log").write_text(out)
+        rows = json.loads(run(["deployment", "list", *SCOPE, "--limit", "3", "--json"]))
+        (WORK / "deployments.json").write_text(json.dumps(rows, indent=2) + "\n")
+        print(json.dumps(rows, indent=2)[:1200])
+
+    elif mode == "start":
+        script = (
+            "const base='http://127.0.0.1:'+(process.env.PORT||8082);"
+            "fetch(base+'/run',{method:'POST',headers:{authorization:'Bearer '+process.env.BENCH_CONTROL_TOKEN,"
+            "'content-type':'application/json'},body:JSON.stringify({profile:'c04'})})"
+            ".then(async r=>{if(!r.ok)throw Error(await r.text());"
+            "console.log('STOWJOB:'+JSON.stringify(await r.json()))}).catch(e=>{console.error(e);process.exit(1)})"
+        )
+        out = ssh(script)
+        row = json.loads(next(x.removeprefix("STOWJOB:") for x in out.splitlines() if x.startswith("STOWJOB:")))
+        row["deploymentId"] = json.loads((WORK / "deployments.json").read_text())[0]["id"]
+        (WORK / "start.json").write_text(json.dumps(row, indent=2) + "\n")
+        print(json.dumps(row))
+
+    elif mode == "status":
+        job = json.loads((WORK / "start.json").read_text())["job"]
+        root = "/results/" + job
+        script = (
+            "const fs=require('node:fs'),root=" + json.dumps(root) + ";"
+            "for(const name of ['progress.json','run.json']){try{"
+            "console.log(name+':'+fs.readFileSync(root+'/'+name,'utf8'))}catch(e){"
+            "if(e.code!=='ENOENT')throw e}}"
+        )
+        out = ssh(script)
+        (WORK / "progress.log").write_text(out)
+        print(out[-3000:])
+
+    elif mode == "export":
+        job = json.loads((WORK / "start.json").read_text())["job"]
+        root = "/results/" + job
+        script = (
+            "const fs=require('node:fs'),crypto=require('node:crypto');const root=" + json.dumps(root) + ";"
+            "const run=JSON.parse(fs.readFileSync(root+'/run.json','utf8'));"
+            "if(!run.complete&&!run.error)throw Error(JSON.stringify(run));"
+            "for(const entry of fs.readdirSync(root,{withFileTypes:true})){if(!entry.isFile())continue;"
+            "const data=fs.readFileSync(root+'/'+entry.name);"
+            "console.log('STOWEXPORT:'+JSON.stringify({name:entry.name,bytes:data.length,"
+            "sha256:crypto.createHash('sha256').update(data).digest('hex'),data:data.toString('base64')}))}"
+        )
+        out = ssh(script, timeout=900)
+        destination = WORK / "export"
+        if destination.exists():
+            for stale in destination.iterdir():
+                stale.unlink()
+        else:
+            destination.mkdir(parents=True)
+        receipt = []
+        for line in out.splitlines():
+            if not line.startswith("STOWEXPORT:"):
+                continue
+            row = json.loads(line.removeprefix("STOWEXPORT:"))
+            name = row.pop("name")
+            data = base64.b64decode(row.pop("data"))
+            assert Path(name).name == name
+            assert len(data) == row["bytes"] and hashlib.sha256(data).hexdigest() == row["sha256"]
+            (destination / name).write_bytes(data)
+            receipt.append(dict(name=name, **row))
+        assert any(x["name"] == "run.json" for x in receipt), receipt
+        (destination / "export-receipt.json").write_text(json.dumps(dict(root=root, files=receipt), indent=2) + "\n")
+        print(f"Exported {len(receipt)} files from {root}")
+
+    elif mode == "stop":
+        print(run(["down", *SCOPE, "--yes"], timeout=180))
+        rows = json.loads(run(["deployment", "list", *SCOPE, "--limit", "5", "--json"]))
+        (WORK / "stop-status.json").write_text(json.dumps(rows, indent=2) + "\n")
+        print(json.dumps([{k: r.get(k) for k in ("id", "status", "deploymentStopped")} for r in rows], indent=2))
+
+    else:
+        raise SystemExit(f"unknown mode {mode}")
+
+
+if __name__ == "__main__":
+    main()

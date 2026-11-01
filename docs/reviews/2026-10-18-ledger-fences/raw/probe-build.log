@@ -1,0 +1,54 @@
+[INFO] [stage-1  5/10] RUN go mod download
+[INFO] [stage-1  4/10] COPY go.mod go.sum ./
+[INFO] [internal] load build context
+[INFO] [stage-1  3/10] WORKDIR /app
+[INFO] [stage-1  2/10] COPY --from=node /usr/local /usr/local
+[INFO] [node 1/1] FROM docker.io/library/node:25.9.0-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370
+[INFO] [stage-1  1/10] FROM docker.io/library/golang:1.25.6-bookworm@sha256:f4490d7b261d73af4543c46ac6597d7d101b6e1755bcdd8c5159fda7046b6b3e
+[INFO] [node 1/1] FROM docker.io/library/node:25.9.0-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370
+[INFO] [internal] load build context
+[INFO] [stage-1  1/10] FROM docker.io/library/golang:1.25.6-bookworm@sha256:f4490d7b261d73af4543c46ac6597d7d101b6e1755bcdd8c5159fda7046b6b3e
+[INFO] [node 1/1] FROM docker.io/library/node:25.9.0-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370
+[INFO] [stage-1  1/10] FROM docker.io/library/golang:1.25.6-bookworm@sha256:f4490d7b261d73af4543c46ac6597d7d101b6e1755bcdd8c5159fda7046b6b3e
+[INFO] [internal] load build context
+[INFO] [internal] load build context
+[INFO] [stage-1  2/10] COPY --from=node /usr/local /usr/local
+[INFO] [stage-1  3/10] WORKDIR /app
+[INFO] [stage-1  4/10] COPY go.mod go.sum ./
+[INFO] [stage-1  5/10] RUN go mod download
+[INFO] [stage-1  6/10] COPY site/package.json site/package-lock.json ./site/
+[INFO] [stage-1  7/10] RUN npm ci --ignore-scripts --prefix site
+[INFO] [stage-1  8/10] COPY validation-source.tar.gz /tmp/validation-source.tar.gz
+[INFO] [stage-1  8/10] COPY validation-source.tar.gz /tmp/validation-source.tar.gz
+[INFO] [stage-1  9/10] RUN tar -xzf /tmp/validation-source.tar.gz -C /app && rm /tmp/validation-source.tar.gz
+[INFO] [stage-1  9/10] RUN tar -xzf /tmp/validation-source.tar.gz -C /app && rm /tmp/validation-source.tar.gz
+[INFO] [stage-1 10/10] RUN cp -r scripts/baselines /tmp/current-baselines && cp benchmark/validation-previous-baselines/* scripts/baselines/ && git init && git config user.email validation@localhost && git config user.name RailwayValidation && git add scripts/baselines && git commit -m 'Validation fixture: original parent quality baselines' && cp /tmp/current-baselines/* scripts/baselines/ && useradd --uid 10001 --create-home --shell /bin/sh stow-validation && chown -R stow-validation:stow-validation /app /go/pkg/mod
+[INFO] hint: Using 'master' as the name for the initial branch. This default branch name
+hint: is subject to change. To configure the initial branch name to use in all
+hint: of your new repositories, which will suppress this warning, call:
+hint: 
+hint: 	git config --global init.defaultBranch <name>
+hint: 
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint: 
+hint: 	git branch -m <name>
+
+[INFO] Initialized empty Git repository in /app/.git/
+
+[INFO] [master (root-commit) b14a185] Validation fixture: original parent quality baselines
+ 6 files changed, 205 insertions(+)
+ create mode 100644 scripts/baselines/dry.json
+ create mode 100644 scripts/baselines/file-size.json
+ create mode 100644 scripts/baselines/go-coverage.json
+ create mode 100644 scripts/baselines/go-quality.json
+ create mode 100644 scripts/baselines/lint-ratchet.json
+ create mode 100644 scripts/baselines/type-escapes.json
+
+[INFO] [stage-1 10/10] RUN cp -r scripts/baselines /tmp/current-baselines && cp benchmark/validation-previous-baselines/* scripts/baselines/ && git init && git config user.email validation@localhost && git config user.name RailwayValidation && git add scripts/baselines && git commit -m 'Validation fixture: original parent quality baselines' && cp /tmp/current-baselines/* scripts/baselines/ && useradd --uid 10001 --create-home --shell /bin/sh stow-validation && chown -R stow-validation:stow-validation /app /go/pkg/mod
+[INFO] exporting to docker image format
+[INFO] exporting to docker image format
+containerimage.descriptor: eyJtZWRpYVR5cGUiOiJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLm1hbmlmZXN0LnYxK2pzb24iLCJkaWdlc3QiOiJzaGEyNTY6MzYyNDFjNjkyODkwMTZjMTVlZDM4ZDkxOTc5ZTU3NjRlNDY1YzgzNTg1NWIzNDhlYTEwYTk2NzUyYTI4Y2RmMyIsInNpemUiOjMzNTAsImFubm90YXRpb25zIjp7Im9yZy5vcGVuY29udGFpbmVycy5pbWFnZS5jcmVhdGVkIjoiMjAyNi0xMC0xOFQyMDowNTo1NVoifSwicGxhdGZvcm0iOnsiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJvcyI6ImxpbnV4In19
+containerimage.config.digest: sha256:958d59ab49dd17b9fbf9ed5557ca7f1ca89b0087cf35321404201400195aae48
+containerimage.digest: sha256:36241c69289016c15ed38d91979e5764e465c835855b348ea10a96752a28cdf3
+[INFO] image push

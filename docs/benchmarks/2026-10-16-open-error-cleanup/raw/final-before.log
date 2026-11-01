@@ -1,0 +1,162 @@
+COMMAND ["go", "test", "-overlay=/private/tmp/stow-open-error-2026-10-16/baseline-overlay.json", "./internal/runtime", "./pkg/stow", "-run", "^Test(OpeningError|PublicOpening)", "-count=2", "-v"]
+=== RUN   TestOpeningErrorClosesReader
+=== RUN   TestOpeningErrorClosesReader/stream
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/get
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/guarded
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/adapter
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/fallback-range
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/native-range
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+--- FAIL: TestOpeningErrorClosesReader (0.01s)
+    --- FAIL: TestOpeningErrorClosesReader/stream (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/get (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/guarded (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/adapter (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/fallback-range (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/native-range (0.00s)
+=== RUN   TestOpeningErrorPreservesGuardClassification
+=== RUN   TestOpeningErrorPreservesGuardClassification/ordinary/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/ordinary/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/missing/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/missing/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/marked-missing/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/marked-missing/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/bucket-missing/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/bucket-missing/nil
+--- FAIL: TestOpeningErrorPreservesGuardClassification (0.01s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/ordinary/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/ordinary/nil (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/missing/nil (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/marked-missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/marked-missing/nil (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/bucket-missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/bucket-missing/nil (0.00s)
+=== RUN   TestOpeningErrorClosesReader
+=== RUN   TestOpeningErrorClosesReader/stream
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/get
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/guarded
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/adapter
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/fallback-range
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestOpeningErrorClosesReader/native-range
+    open_error_test.go:104: opening error discarded reader: closes=0 file_still_open=true
+--- FAIL: TestOpeningErrorClosesReader (0.01s)
+    --- FAIL: TestOpeningErrorClosesReader/stream (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/get (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/guarded (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/adapter (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/fallback-range (0.00s)
+    --- FAIL: TestOpeningErrorClosesReader/native-range (0.00s)
+=== RUN   TestOpeningErrorPreservesGuardClassification
+=== RUN   TestOpeningErrorPreservesGuardClassification/ordinary/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/ordinary/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/missing/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/missing/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/marked-missing/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/marked-missing/nil
+=== RUN   TestOpeningErrorPreservesGuardClassification/bucket-missing/reader
+    open_error_test.go:135: closes=0 want=1 reads=0
+    open_error_test.go:135: file remains open: <nil>
+=== RUN   TestOpeningErrorPreservesGuardClassification/bucket-missing/nil
+--- FAIL: TestOpeningErrorPreservesGuardClassification (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/ordinary/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/ordinary/nil (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/missing/nil (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/marked-missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/marked-missing/nil (0.00s)
+    --- FAIL: TestOpeningErrorPreservesGuardClassification/bucket-missing/reader (0.00s)
+    --- PASS: TestOpeningErrorPreservesGuardClassification/bucket-missing/nil (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.440s
+=== RUN   TestPublicOpeningErrorClosesReader
+=== RUN   TestPublicOpeningErrorClosesReader/stream/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/stream/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/get/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/get/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/fallback-range/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/fallback-range/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/native-range/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/native-range/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+--- FAIL: TestPublicOpeningErrorClosesReader (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/stream/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/stream/close-error (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/get/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/get/close-error (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/fallback-range/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/fallback-range/close-error (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/native-range/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/native-range/close-error (0.00s)
+=== RUN   TestPublicOpeningRangeCleanupOnce
+=== RUN   TestPublicOpeningRangeCleanupOnce/invalid-range
+=== RUN   TestPublicOpeningRangeCleanupOnce/skip-error
+--- PASS: TestPublicOpeningRangeCleanupOnce (0.00s)
+    --- PASS: TestPublicOpeningRangeCleanupOnce/invalid-range (0.00s)
+    --- PASS: TestPublicOpeningRangeCleanupOnce/skip-error (0.00s)
+=== RUN   TestPublicOpeningErrorClosesReader
+=== RUN   TestPublicOpeningErrorClosesReader/stream/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/stream/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/get/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/get/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/fallback-range/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/fallback-range/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/native-range/close-ok
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+=== RUN   TestPublicOpeningErrorClosesReader/native-range/close-error
+    open_error_test.go:60: calls=0 closes=0 reads=0 opens=1
+--- FAIL: TestPublicOpeningErrorClosesReader (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/stream/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/stream/close-error (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/get/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/get/close-error (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/fallback-range/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/fallback-range/close-error (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/native-range/close-ok (0.00s)
+    --- FAIL: TestPublicOpeningErrorClosesReader/native-range/close-error (0.00s)
+=== RUN   TestPublicOpeningRangeCleanupOnce
+=== RUN   TestPublicOpeningRangeCleanupOnce/invalid-range
+=== RUN   TestPublicOpeningRangeCleanupOnce/skip-error
+--- PASS: TestPublicOpeningRangeCleanupOnce (0.00s)
+    --- PASS: TestPublicOpeningRangeCleanupOnce/invalid-range (0.00s)
+    --- PASS: TestPublicOpeningRangeCleanupOnce/skip-error (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.376s
+FAIL

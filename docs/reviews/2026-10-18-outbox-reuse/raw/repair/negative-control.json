@@ -1,0 +1,34 @@
+{
+  "sourceSHA256": "c1ba7e4505c3f69f7759838d9ecb11b8c82ed767c47e29d47b52392a5f87dfb6",
+  "results": [
+    {
+      "race": false,
+      "args": [
+        "test",
+        "-overlay=/results/62b2e7a3-d295-4800-940f-51052a2d52e6/unsafe-overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxReloadAfterCommitAndHistoricalRestore$",
+        "-count=2",
+        "-v"
+      ],
+      "exitCode": 1,
+      "expectedStaleStateFailure": true
+    },
+    {
+      "race": true,
+      "args": [
+        "test",
+        "-overlay=/results/62b2e7a3-d295-4800-940f-51052a2d52e6/unsafe-overlay.json",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxReloadAfterCommitAndHistoricalRestore$",
+        "-count=2",
+        "-v"
+      ],
+      "exitCode": 1,
+      "expectedStaleStateFailure": true
+    }
+  ]
+}

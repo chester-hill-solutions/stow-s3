@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""Build the C04 qualification package for the Railway scratch runner.
+
+It stages the tracked source, restores the pre-fix revisions of the changed
+files behind a Go overlay so the red reproduction runs against the code that
+had the defect, and writes the plan the runner executes.
+"""
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import subprocess
+import tarfile
+
+REPO = Path("/Users/ladmin/WebProjects/stow")
+WORK = Path("/private/tmp/stow-c04-2026-10-19")
+BASE = "98d35cb182e6bbda99f41df95db4cc1271cac373"
+CONTEXT = WORK / "context"
+UPLOAD = WORK / "upload"
+
+# The production files this change replaces, and the one it adds. The overlay
+# restores each of them from the pre-fix revision for the red reproduction.
+CHANGED = [
+    "internal/rooted/root.go",
+    "internal/rooted/regular_unix.go",
+    "internal/storage/errors.go",
+    "internal/storage/workspace/buckets.go",
+    "internal/storage/workspace/list_rooted.go",
+    "internal/storage/workspace/objects.go",
+    "internal/storage/workspace/resolve.go",
+    "internal/storage/workspace/rooted_reads.go",
+]
+ADDED = ["internal/storage/workspace/absence.go"]
+NEW_TESTS = [
+    "internal/storage/workspace/uncertain_absence_test.go",
+    "internal/s3api/uncertain_absence_test.go",
+]
+
+UNCERTAIN_TESTS = (
+    "^(TestACreateOnlyWriteDoesNotReplaceAnObjectItCannotRead"
+    "|TestAListingDoesNotReportAnObjectItCannotReadAsAbsent"
+    "|TestACreateOnlyWriteUnderAnUnreadableDirectoryIsRefused"
+    "|TestAReadableObjectStillRefusesACreateOnlyWriteAndAnAbsentKeyIsAbsent"
+    "|TestAnUnreadableObjectIsNotReportedAsMissing)$"
+)
+
+
+def main() -> None:
+    if CONTEXT.exists():
+        shutil.rmtree(CONTEXT)
+    CONTEXT.mkdir(parents=True)
+
+    tracked = subprocess.check_output(["git", "ls-files", "-z"], cwd=REPO).decode().split("\0")
+    manifest = {}
+    for name in tracked:
+        if not name:
+            continue
+        source = REPO / name
+        if not source.is_file():
+            continue
+        destination = CONTEXT / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        manifest[name] = hashlib.sha256(source.read_bytes()).hexdigest()
+
+    # The pre-fix revisions, for the red reproduction. The overlay names the
+    # paths as they will exist inside the container, not on this machine. The
+    # replacements carry a .txt suffix so the package walk does not find two
+    # packages in one directory.
+    before = CONTEXT / "benchmark" / "before"
+    before.mkdir(parents=True, exist_ok=True)
+    overlay = {"Replace": {}}
+    for name in CHANGED:
+        target = before / (name.replace("/", "__") + ".go.txt")
+        target.write_bytes(subprocess.check_output(["git", "show", f"{BASE}:{name}"], cwd=REPO))
+        overlay["Replace"][f"/app/{name}"] = f"/app/benchmark/before/{target.name}"
+
+    # The added file has no pre-fix revision, so the overlay replaces it with an
+    # empty file: the package then holds exactly the pre-fix files.
+    stub = before / "absence_stub.go.txt"
+    stub.write_text("package workspace\n")
+    overlay["Replace"]["/app/internal/storage/workspace/absence.go"] = f"/app/benchmark/before/{stub.name}"
+
+    # The regression test names the new sentinel, so the red run compiles the
+    # self-contained probe instead.
+    probe = before / "closure_probe_test.go.txt"
+    probe.write_bytes((WORK / "closure_probe_test.go.txt").read_bytes())
+    overlay["Replace"]["/app/internal/storage/workspace/uncertain_absence_test.go"] = f"/app/benchmark/before/{probe.name}"
+
+    overlay_path = CONTEXT / "benchmark" / "before-overlay.json"
+    overlay_path.write_text(json.dumps(overlay, indent=2) + "\n")
+
+    plan = {
+        "phase": "c04-workspace-uncertainty",
+        "sources": CHANGED + ADDED + NEW_TESTS,
+        "steps": [
+            {"name": "format", "args": ["gofmt", "-l", "internal/rooted", "internal/storage", "internal/s3api"]},
+            {"name": "red-normal", "expected": 1, "args": [
+                "go", "test", "-overlay=benchmark/before-overlay.json", "./internal/storage/workspace",
+                "-run", "^TestClosureWorkspaceUnreadable$", "-count=2", "-v"]},
+            {"name": "red-race", "expected": 1, "args": [
+                "go", "test", "-race", "-overlay=benchmark/before-overlay.json", "./internal/storage/workspace",
+                "-run", "^TestClosureWorkspaceUnreadable$", "-count=2", "-v"]},
+            {"name": "uncertain-normal", "args": [
+                "go", "test", "./internal/storage/workspace", "./internal/s3api",
+                "-run", UNCERTAIN_TESTS, "-count=2", "-v"]},
+            {"name": "uncertain-race", "args": [
+                "go", "test", "-race", "./internal/storage/workspace", "./internal/s3api",
+                "-run", UNCERTAIN_TESTS, "-count=2", "-v"]},
+            {"name": "workspace-normal", "args": [
+                "go", "test", "./internal/storage/workspace", "./internal/rooted", "./internal/s3api", "-count=1"]},
+            {"name": "workspace-race", "args": [
+                "go", "test", "-race", "./internal/storage/workspace", "./internal/rooted", "./internal/s3api", "-count=1"]},
+            # The parentwatch package is left out of the suite because this
+            # container does not deliver the parent-death signal it tests, and
+            # the two steps below record that fact rather than assume it.
+            {"name": "full-go", "args": [
+                "/bin/sh", "-c", "go list ./... | grep -v 'internal/parentwatch$' | xargs go test"]},
+            {"name": "full-race", "args": [
+                "/bin/sh", "-c", "go list ./... | grep -v 'internal/parentwatch$' | xargs go test -race"]},
+            {"name": "parentwatch", "expected": 1, "args": [
+                "go", "test", "./internal/parentwatch/", "-count=1", "-v"]},
+            {"name": "pdeathsig", "expected": 1, "args": [
+                "/bin/sh", "-c", "cd benchmark/pdeathsig && go run ."]},
+            {"name": "conformance", "args": ["make", "test-conformance"]},
+            {"name": "vet", "args": ["go", "vet", "./..."]},
+            {"name": "quality", "args": ["make", "check-go-quality", "check-file-size", "format-check"]},
+            {"name": "site-build", "args": ["npm", "run", "build", "--prefix", "site"]},
+            {"name": "site-tests", "args": ["npm", "test", "--prefix", "site"]},
+            {"name": "doc-links", "args": ["node", "scripts/check-doc-links.mjs"]},
+        ],
+    }
+    (CONTEXT / "benchmark" / "active-plan.json").write_text(json.dumps(plan, indent=2) + "\n")
+    # The runner is part of the image, not just the plan: the container's start
+    # command runs it, and a stale one from an earlier build would answer the
+    # control endpoint with the wrong protocol.
+    shutil.copy2(WORK / "runner.mjs", CONTEXT / "benchmark" / "runner.mjs")
+
+    # The parent-death probe is its own module, so the package walk does not
+    # build it and the suite is not changed by it.
+    probe = CONTEXT / "benchmark" / "pdeathsig"
+    probe.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(WORK / "pdeathsig" / "main.go", probe / "main.go")
+    (probe / "go.mod").write_text("module stowpdeathsig\n\ngo 1.25\n")
+
+    # The quality and documentation gates read a Git baseline, so the container
+    # gets a repository whose HEAD holds the parent's baseline. The current
+    # baseline stays in the working tree, and the gate compares the two.
+    previous = CONTEXT / "benchmark" / "validation-previous-baselines"
+    previous.mkdir(parents=True, exist_ok=True)
+    for name in sorted((REPO / "scripts" / "baselines").iterdir()):
+        if name.is_file():
+            target = previous / name.name
+            target.write_bytes(subprocess.check_output(["git", "show", f"{BASE}:scripts/baselines/{name.name}"], cwd=REPO))
+
+    if UPLOAD.exists():
+        shutil.rmtree(UPLOAD)
+    (UPLOAD / "benchmark").mkdir(parents=True)
+    for name in ["go.mod", "go.sum", "site/package.json", "site/package-lock.json"]:
+        destination = UPLOAD / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CONTEXT / name, destination)
+    shutil.copy2(WORK / "Dockerfile", UPLOAD / "benchmark" / "Dockerfile")
+
+    files = [f for f in sorted(CONTEXT.rglob("*")) if f.is_file()]
+    archive = UPLOAD / "validation-source.tar.gz"
+    with tarfile.open(archive, "w:gz", compresslevel=9) as tar:
+        for f in files:
+            tar.add(f, arcname=str(f.relative_to(CONTEXT)), recursive=False)
+
+    # The manifest ties the evidence to the exact bytes that were qualified.
+    qualified = {
+        str(f.relative_to(CONTEXT)): hashlib.sha256(f.read_bytes()).hexdigest()
+        for f in files
+    }
+    (WORK / "qualified-source.json").write_text(json.dumps(qualified, indent=2) + "\n")
+    (CONTEXT / "benchmark" / "qualified-source.json").write_text(json.dumps(qualified, indent=2) + "\n")
+    archive = UPLOAD / "validation-source.tar.gz"
+    with tarfile.open(archive, "w:gz", compresslevel=9) as tar:
+        for f in [x for x in sorted(CONTEXT.rglob("*")) if x.is_file()]:
+            tar.add(f, arcname=str(f.relative_to(CONTEXT)), recursive=False)
+    receipt = {
+        "archiveBytes": archive.stat().st_size,
+        "archiveSHA256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+        "contentsFiles": len(qualified) + 1,
+        "trackedFiles": len(manifest),
+        "base": BASE,
+        "changed": CHANGED,
+        "added": ADDED,
+        "newTests": NEW_TESTS,
+        "steps": len(plan["steps"]),
+    }
+    (WORK / "transport-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    print(json.dumps(receipt, indent=2))
+
+
+if __name__ == "__main__":
+    main()

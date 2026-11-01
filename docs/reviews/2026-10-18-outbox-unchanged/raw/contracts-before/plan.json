@@ -1,0 +1,55 @@
+{
+  "phase": "outbox-unchanged-save-contracts-before",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/provenance.go",
+    "internal/atomicfile/atomicfile.go",
+    "internal/runthrough/file_outbox_unchanged_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_unchanged_test.go"
+      ]
+    },
+    {
+      "name": "contracts-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutbox(UnchangedProvenanceDoesNotReplace|EmptyProvenanceCreatesKnownRow|ProvenanceFlagsAreChanges|ProvenanceSaveReloadsPeerValue|EqualLegacyProvenanceStillMigrates|EqualSaveRepairsPermissions|EqualSaveReplacesSymlink)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "contracts-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutbox(UnchangedProvenanceDoesNotReplace|EmptyProvenanceCreatesKnownRow|ProvenanceFlagsAreChanges|ProvenanceSaveReloadsPeerValue|EqualLegacyProvenanceStillMigrates|EqualSaveRepairsPermissions|EqualSaveReplacesSymlink)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+internal/runtime/read_perf_review_probe_test.go:183:6: cannot inline reviewReadOpenedPointer: unhandled op DEFER
+internal/runtime/read_perf_review_probe_test.go:184:2: can inline reviewReadOpenedPointer.deferwrap1 with cost 60 as: func() { .autotmp_3.Close() }
+internal/runtime/read_perf_review_probe_test.go:184:2: reviewReadOpenedPointer capturing by value: .autotmp_3 (addr=false assign=false width=16)
+internal/runtime/read_perf_review_probe_test.go:183:30: parameter reader leaks to {heap} for reviewReadOpenedPointer with derefs=0:
+internal/runtime/read_perf_review_probe_test.go:192:27: &bytes.Buffer{...} escapes to heap in reviewReadOpenedPointer:
+internal/runtime/read_perf_review_probe_test.go:192:32: make([]byte, 0, int(size)) escapes to heap in reviewReadOpenedPointer:
+internal/runtime/read_perf_review_probe_test.go:183:52: object does not escape

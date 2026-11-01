@@ -141,12 +141,12 @@ func (a *storeAdapter) DeleteBucket(ctx context.Context, name string) error {
 	return translate(a.store.DeleteBucket(ctx, name))
 }
 
-// translate maps public sentinels onto internal ones, preserving missing-object
-// and conditional-write failures for runtime accounting and protocol handling.
+// translate preserves committed outcomes and maps public refusal sentinels onto
+// internal ones for runtime accounting and protocol handling.
 func translate(err error) error {
 	switch {
-	case err == nil:
-		return nil
+	case err == nil || errors.Is(err, ErrMutationCommitted):
+		return err
 	case errors.Is(err, ErrBucketNotFound):
 		return storage.ErrBucketNotFound
 	case errors.Is(err, ErrObjectNotFound):
@@ -217,10 +217,10 @@ func (a *storeAdapter) PutObject(ctx context.Context, bucket, key string, body i
 		IfMatch:     options.IfMatch,
 		IfNoneMatch: options.IfNoneMatch,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, translate(err)
 	}
-	return objectMetaOf(object), nil
+	return objectMetaOf(object), translate(err)
 }
 
 func (a *storeAdapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
@@ -279,7 +279,9 @@ func (a *storeAdapter) DeleteObjects(ctx context.Context, bucket string, keys []
 	deleted := make([]string, 0, len(keys))
 	for _, key := range keys {
 		if err := a.store.DeleteObject(ctx, bucket, key); err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
-			return deleted, translate(err)
+			if !errors.Is(err, ErrObjectNotFound) || errors.Is(err, ErrMutationCommitted) {
+				return deleted, translate(err)
+			}
 		}
 		deleted = append(deleted, key)
 	}
@@ -299,10 +301,10 @@ func (a *storeAdapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBuc
 		ContentType: source.ContentType,
 		Metadata:    source.Metadata,
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, translate(err)
 	}
-	return objectMetaOf(copied), nil
+	return objectMetaOf(copied), translate(err)
 }
 
 func (a *storeAdapter) Close() error { return a.store.Close() }
@@ -322,15 +324,18 @@ func (a multipartAdapter) CreateMultipartUpload(ctx context.Context, bucket, key
 		ContentType: opts.ContentType,
 		Metadata:    storage.CloneMetadata(opts.Metadata),
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, err
 	}
-	return uploadMetaOf(upload), nil
+	return uploadMetaOf(upload), err
 }
 
 func (a multipartAdapter) GetMultipartUpload(ctx context.Context, uploadID string) (*storage.MultipartUpload, error) {
 	upload, err := a.multi.GetMultipartUpload(ctx, uploadID)
 	if err != nil {
+		if errors.Is(err, ErrObjectNotFound) && !errors.Is(err, ErrMutationCommitted) {
+			return nil, storage.ErrUploadNotFound
+		}
 		return nil, err
 	}
 	return uploadMetaOf(upload), nil
@@ -342,10 +347,10 @@ func (a multipartAdapter) UploadPart(ctx context.Context, uploadID string, partN
 		return nil, err
 	}
 	part, err := a.multi.UploadPart(ctx, uploadID, partNumber, data)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, err
 	}
-	return partInfoOf(part), nil
+	return partInfoOf(part), err
 }
 
 func (a multipartAdapter) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
@@ -354,14 +359,18 @@ func (a multipartAdapter) CompleteMultipartUpload(ctx context.Context, uploadID 
 		supplied = append(supplied, Part{PartNumber: part.PartNumber, ETag: part.ETag, Size: part.Size})
 	}
 	object, err := a.multi.CompleteMultipartUpload(ctx, uploadID, supplied)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrMutationCommitted) {
 		return nil, err
 	}
-	return objectMetaOf(object), nil
+	return objectMetaOf(object), err
 }
 
 func (a multipartAdapter) AbortMultipartUpload(ctx context.Context, uploadID string) error {
-	return a.multi.AbortMultipartUpload(ctx, uploadID)
+	err := a.multi.AbortMultipartUpload(ctx, uploadID)
+	if err != nil && errors.Is(err, ErrObjectNotFound) && !errors.Is(err, ErrMutationCommitted) {
+		return storage.ErrUploadNotFound
+	}
+	return err
 }
 
 func (a multipartAdapter) ListParts(ctx context.Context, uploadID string) ([]storage.PartInfo, error) {
@@ -382,6 +391,9 @@ func (a multipartAdapter) ListParts(ctx context.Context, uploadID string) ([]sto
 func (a multipartAdapter) ValidateMultipartUpload(ctx context.Context, uploadID, bucket, key string) error {
 	upload, err := a.multi.GetMultipartUpload(ctx, uploadID)
 	if err != nil {
+		if errors.Is(err, ErrObjectNotFound) && !errors.Is(err, ErrMutationCommitted) {
+			return storage.ErrUploadNotFound
+		}
 		return err
 	}
 	if upload.Bucket != bucket || upload.Key != key {

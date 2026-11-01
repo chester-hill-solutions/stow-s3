@@ -1,0 +1,119 @@
+=== RUN   TestCustomMultipartCompletionPublication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/success
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/retained
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/removed
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/removed-wrapped
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/unknown
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/refused
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/success
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/retained
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/removed
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/removed-wrapped
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/unknown
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/refused
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+--- FAIL: TestCustomMultipartCompletionPublication (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/success (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/retained (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/removed (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/removed-wrapped (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/unknown (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/refused (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/success (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/retained (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/removed (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/removed-wrapped (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/unknown (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/refused (0.00s)
+=== RUN   TestCustomMultipartCommittedCompletionS3Error
+    multipart_publication_test.go:187: S3 multipart completion panicked: runtime error: invalid memory address or nil pointer dereference
+    multipart_publication_test.go:175: S3 completion status=200 body=
+--- FAIL: TestCustomMultipartCommittedCompletionS3Error (0.00s)
+=== RUN   TestCustomMultipartCompletionPublication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/success
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/retained
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/removed
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/removed-wrapped
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/unknown
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:0 Objects:0}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=false/refused
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/success
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/retained
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/removed
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/removed-wrapped
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/unknown
+    multipart_publication_store_test.go:143: completion panicked after publication: runtime error: invalid memory address or nil pointer dereference; actual="body" error=<nil> usage={Bytes:3 Objects:1}
+    multipart_publication_test.go:32: completion lost error: <nil>, want local mutation committed
+        after multipart publication
+=== RUN   TestCustomMultipartCompletionPublication/overwrite=true/refused
+    multipart_publication_test.go:32: removed upload lookup=stow: object not found, want ErrUploadNotFound
+--- FAIL: TestCustomMultipartCompletionPublication (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/success (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/retained (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/removed (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/removed-wrapped (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/unknown (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=false/refused (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/success (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/retained (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/removed (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/removed-wrapped (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/unknown (0.00s)
+    --- FAIL: TestCustomMultipartCompletionPublication/overwrite=true/refused (0.00s)
+=== RUN   TestCustomMultipartCommittedCompletionS3Error
+    multipart_publication_test.go:187: S3 multipart completion panicked: runtime error: invalid memory address or nil pointer dereference
+    multipart_publication_test.go:175: S3 completion status=200 body=
+--- FAIL: TestCustomMultipartCommittedCompletionS3Error (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.291s
+FAIL

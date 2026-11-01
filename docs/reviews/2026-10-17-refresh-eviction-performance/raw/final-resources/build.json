@@ -1,0 +1,51 @@
+{
+  "sources": {
+    "benchmark/_fallback-variants/resource-before/internal/runthrough/adapter.go": "f266f8cdd768b8c68e193aa44b9445a40eb49dc6de6f102038d9ae01f8371b2b",
+    "benchmark/_fallback-variants/resource-before/internal/runthrough/refresh_resource_probe_test.go": "65e911f5eb68696a54402268fac43056f2530786d6038c5cbbfcfd61a418201f",
+    "benchmark/_fallback-variants/resource-after/internal/runthrough/refresh_resource_probe_test.go": "65e911f5eb68696a54402268fac43056f2530786d6038c5cbbfcfd61a418201f",
+    "internal/storage/workspace/multipart.go": "610bff2d0e2517cd1058d1e5c6e3a800b2fad85d78531447889d323d36715a10",
+    "internal/storage/workspace/part_record.go": "72e9e3404515408f59af526b89b4732f170aa34670cfbcfba2f21cd7ead1112c",
+    "internal/storage/workspace/part_comparison_bench_test.go": "e2bc1c58fa1d2e9487034bb28bbf331a7c5230e800ec1039c1e3acce248a9a78",
+    "internal/storage/workspace/listing_descriptor_test.go": "4960c622fba8c654f5eeb401c07f6bf2578c9fb4b5e646da6495c688a43c668f",
+    "internal/runthrough/adapter.go": "2bf4f48f5fa9a95bc3bfc51510c2a29882428bee26237ca550e511f98edd46f5",
+    "internal/runthrough/cache_read.go": "154f961ef20e969ef40e978523ae45e8cdd908aa36424abfe4ddf47da5d305ca",
+    "internal/runthrough/refresh_version_bench_test.go": "4b23c769b401439904abe6e7a6a252ad4c8a5142f191c9587e675398f7ea9e2c",
+    "internal/runthrough/refresh_version_fixture_test.go": "419e1b2c3640b2f45defeb7d7d5121740084b8071c7b834779acbffffa17416c"
+  },
+  "binaries": {
+    "resource-before": {
+      "bytes": 18670618,
+      "sha256": "710cda952bc3bfd4d9fc930907ba08fe7b19385164fe6b48edc7c066123a240e"
+    },
+    "resource-after": {
+      "bytes": 18675542,
+      "sha256": "f9f3dedc6d640de8dcf7defcdec1b04dda717ee6294b39f86b9df538159899ae"
+    }
+  },
+  "variants": {
+    "fallback-before": {
+      "package": "./internal/runthrough",
+      "ref": "488378bb29dff15865cba4bddbad3238e9f3bbb3",
+      "files": [
+        "internal/runthrough/adapter.go"
+      ]
+    },
+    "fallback-after": {
+      "package": "./internal/runthrough",
+      "files": []
+    },
+    "resource-before": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/adapter.go",
+        "internal/runthrough/refresh_resource_probe_test.go"
+      ]
+    },
+    "resource-after": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/refresh_resource_probe_test.go"
+      ]
+    }
+  }
+}

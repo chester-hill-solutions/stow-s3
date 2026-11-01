@@ -1,0 +1,206 @@
+{
+  "phase": "outbox-write-cache-final-repaired",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/write_cache_contract_test.go",
+    "benchmark/cache-final-comparison.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox.go",
+        "internal/runthrough/file_outbox_proto.go",
+        "internal/runthrough/write_cache_contract_test.go"
+      ]
+    },
+    {
+      "name": "measured-source-equivalence",
+      "args": [
+        "node",
+        "-e",
+        "const fs=require('node:fs'),crypto=require('node:crypto');const expected={\"internal/runthrough/file_outbox.go\": \"05e35d441d10784adcbd7027a8cd829e7ceda43f92c254406c1b8b4823def7e0\", \"internal/runthrough/file_outbox_proto.go\": \"65355853d3b460bd1865749af32681ba65a68dbe6849e4f27d267fb566a3e854\", \"internal/runthrough/write_cache_contract_test.go\": \"4b6f95cb60cf2ce81ae05faac1415bcbaf0796faff4b18f26b9365e909489e10\"};for(const[n,h]of Object.entries(expected))if(crypto.createHash('sha256').update(fs.readFileSync(n)).digest('hex')!==h)throw Error('Final source mismatch '+n);fs.writeFileSync(process.env.STOW_RESULT_ROOT+'/measured-source-equivalence.json',JSON.stringify(expected,null,2)+'\\n');console.log('Exact final source hashes checked before tests and final comparison');"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestOutbox)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestOutbox)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "go",
+        "test",
+        "./...",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "broad-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/...",
+        "./internal/runtime",
+        "./internal/embedded",
+        "./internal/runthrough",
+        "./internal/s3api",
+        "./pkg/stow",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "conformance-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "conformance-runtime-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-runtime-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "doc-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "final-before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/write-cache-original.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/write-cache-before.test"
+      ]
+    },
+    {
+      "name": "final-after-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/write-cache-before.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/write-cache-safe.test"
+      ]
+    },
+    {
+      "name": "final-comparison",
+      "args": [
+        "node",
+        "benchmark/cache-final-comparison.mjs"
+      ]
+    }
+  ]
+}

@@ -143,31 +143,11 @@ type copySourceError struct{ msg string }
 func (e *copySourceError) Error() string { return e.msg }
 
 func etagHeaderMatchesStrong(header, actual string) bool {
-	return etagHeaderMatchesMode(header, actual, false)
+	return storage.ETagHeaderMatches(header, actual, false)
 }
 
 func etagHeaderMatchesWeak(header, actual string) bool {
-	return etagHeaderMatchesMode(header, actual, true)
-}
-
-func etagHeaderMatchesMode(header, actual string, weak bool) bool {
-	for _, candidate := range strings.Split(header, ",") {
-		candidate = strings.TrimSpace(candidate)
-		if candidate == "*" {
-			return true
-		}
-		candidateValue := candidate
-		if strings.HasPrefix(strings.ToLower(candidateValue), "w/") {
-			if !weak {
-				continue
-			}
-			candidateValue = candidateValue[2:]
-		}
-		if strings.EqualFold(strings.Trim(candidateValue, "\""), strings.Trim(actual, "\"")) {
-			return true
-		}
-	}
-	return false
+	return storage.ETagHeaderMatches(header, actual, true)
 }
 
 // errNotModified is a matching If-None-Match on a read: a successful answer

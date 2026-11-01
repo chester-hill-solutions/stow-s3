@@ -229,26 +229,17 @@ func (s *logicalSnapshotReader) snapshotObject(ctx context.Context, bucket, key 
 		return SnapshotObject{}, fmt.Errorf("workspace: snapshot bytes exceed limit")
 	}
 	digest := sha256.New()
-	size, err := io.Copy(digest, io.LimitReader(snapshotReader{ctx: ctx, reader: input}, info.Size()+1))
+	derived, err := deriveFileMetadata(io.TeeReader(snapshotReader{ctx: ctx, reader: input}, digest), info)
 	if err != nil {
 		return SnapshotObject{}, err
 	}
-	if size != info.Size() {
-		return SnapshotObject{}, fmt.Errorf("workspace: object changed during snapshot")
-	}
-
 	entry, _ := s.objectIndex.entry(bucket, key)
+	entry, _ = reconcileEntry(entry, derived)
 	metadata, err := storage.NormalizeUserMetadata(entry.Metadata)
 	if err != nil {
 		return SnapshotObject{}, err
 	}
-	object := SnapshotObject{Bucket: bucket, Key: key, Source: source, Size: size, SHA256: hex.EncodeToString(digest.Sum(nil)), Mode: uint32(info.Mode().Perm()), ContentType: entry.ContentType, Metadata: metadata}
-	if object.ContentType == "" {
-		object.ContentType, err = snapshotContentType(input)
-		if err != nil {
-			return SnapshotObject{}, err
-		}
-	}
+	object := SnapshotObject{Bucket: bucket, Key: key, Source: source, Size: derived.Size, SHA256: hex.EncodeToString(digest.Sum(nil)), Mode: uint32(info.Mode().Perm()), ContentType: entry.ContentType, Metadata: metadata}
 	object.ChecksumAlgorithm, object.ChecksumValue, err = snapshotChecksum(ctx, input, entry)
 	if err != nil {
 		return SnapshotObject{}, err
@@ -271,18 +262,6 @@ func snapshotChecksum(ctx context.Context, input *os.File, entry ManifestEntry) 
 		return "", "", nil
 	}
 	return storage.NormalizeChecksumAlgorithm(entry.ChecksumAlgorithm), value, nil
-}
-
-func snapshotContentType(input *os.File) (string, error) {
-	if _, err := input.Seek(0, io.SeekStart); err != nil {
-		return "", err
-	}
-	data := make([]byte, 512)
-	n, err := input.Read(data)
-	if err != nil && err != io.EOF {
-		return "", err
-	}
-	return detectContentTypeFromBytes(data[:n]), nil
 }
 
 type snapshotReader struct {

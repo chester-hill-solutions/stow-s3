@@ -1,0 +1,18 @@
+from pathlib import Path
+from collections import Counter
+import re,json,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');d=p/('export-'+json.loads((p/'final-start.json').read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==14 and all(x['passed']for x in checks)
+rx=re.compile(r'^--- (PASS|FAIL|SKIP): ((?:TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)\S*)');out={};initial=p/('export-'+json.loads((p/'measure-start.json').read_text())['id']);ref=json.loads((initial/'contract-receipt.json').read_text())['before-normal']['frames']
+for name in ['focused-normal','focused-race']:
+ counts=Counter();text=(d/(name+'.log')).read_text()
+ for line in text.splitlines():
+  m=rx.match(line.strip())
+  if m:counts[(m[1],m[2])]+=1
+ leaves={n for s,n in counts if not any(other.startswith(n+'/')for _,other in counts)};assert len(leaves)==50 and all(counts.get(('PASS',n))==2 for n in leaves);assert not any(s in ['FAIL','SKIP']for s,n in counts)
+ frames=[json.loads(line.removeprefix('STOWPROTOFRAME: '))for line in text.splitlines()if line.startswith('STOWPROTOFRAME: ')];assert len(frames)==28 and {f['name']:f for f in frames}==ref
+ heap=[json.loads(line.removeprefix('STOWPROTOHEAP: '))for line in text.splitlines()if line.startswith('STOWPROTOHEAP: ')];error=[json.loads(line.removeprefix('STOWPROTOERROR: '))for line in text.splitlines()if line.startswith('STOWPROTOERROR: ')];assert len(heap)==len(error)==2 and all(x['allocatedBytes']<=512<<10 for x in error)and all(x['heapAfter']-x['heapBefore']<16<<20 for x in heap)
+ out[name]={'distinctCases':50,'passes':100,'failed':0,'skipped':0,'cases':sorted(leaves),'frames':ref,'retention':heap,'earlyError':error}
+env=json.loads((d/'environment.json').read_text());confirmation=p/('export-'+json.loads((p/'confirmation-start.json').read_text())['id']);measured=json.loads((confirmation/'environment.json').read_text())['sourceSHA256'];assert env['sourceSHA256']['internal/runthrough/file_outbox_proto.go']==measured['benchmark/provenance-file_outbox_proto.go.txt']
+for n,h in env['sourceSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+base=json.loads((p/'baseline.json').read_text())['base'];a=subprocess.check_output(['git','show',base+':internal/runthrough/file_outbox_proto.go'],cwd=r);b=(r/'internal/runthrough/file_outbox_proto.go').read_bytes();assert a[a.index(b'\nfunc outboxProtoText'):]==b[b.index(b'\nfunc outboxProtoText'):]
+(d/'green-receipt.json').write_text(json.dumps({'regressions':out,'sourceSHA256':env['sourceSHA256'],'measuredProductionMatch':True,'entryDecoderSuffixUnchanged':True},indent=2)+'\n');print('Verified 50 cases twice per mode, all original frame hashes and exact measured production; all 14 final gates passed')

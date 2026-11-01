@@ -1,0 +1,45 @@
+package capacity
+
+import (
+ "bytes"
+ "context"
+ "fmt"
+ "os"
+ "strings"
+ "syscall"
+ "testing"
+
+)
+
+func BenchmarkLedgerReconcile(b *testing.B) {
+ root:=os.Getenv("STOW_BENCH_ROOT")
+ if !strings.HasPrefix(root,"/results/") { b.Fatal("Railway volume required") }
+ b.Setenv("TMPDIR",root)
+ for _,count:=range []int{16,maxResources} {
+  for _,stage:=range []string{"write","reconcile","admission"} {
+   b.Run(fmt.Sprintf("resources=%d/stage=%s",count,stage),func(b *testing.B){
+    ns,usages:=resourceCountNamespace(b,[2]int{count/2,count-count/2})
+    if err:=syncAncestors(ns.host.dir);err!=nil { b.Fatal(err) }
+    path:=ns.host.dir+"/capacity.json"
+    var disk syscall.Statfs_t
+    if err:=syscall.Statfs(path,&disk);err!=nil||disk.Type!=61267 { b.Fatalf("ext4 required: %v type=%d",err,disk.Type) }
+    expected,err:=os.ReadFile(path);if err!=nil { b.Fatal(err) }
+    state,err:=ns.host.read();if err!=nil { b.Fatal(err) }
+    effects:=0
+    b.ReportAllocs();b.ResetTimer()
+    for i:=0;i<b.N;i++ {
+     switch stage {
+     case "write":err=ns.host.write(state)
+     case "reconcile":err=ns.Reconcile(context.Background(),usages[0])
+     case "admission":err=ns.WithAdmission(context.Background(),Admission{Usage:usages[0]},func()error{effects++;return nil})
+     }
+     if err!=nil { b.Fatal(err) }
+    }
+    b.StopTimer()
+    if stage=="admission"&&effects!=b.N { b.Fatal("wrong effect count") }
+    got,err:=os.ReadFile(path);if err!=nil||!bytes.Equal(got,expected) { b.Fatalf("ledger changed: %v",err) }
+    snapshot,err:=ns.Snapshot(context.Background());if err!=nil||snapshot.PayloadBytes!=int64(count)||snapshot.PendingBytes!=0 { b.Fatalf("wrong final snapshot: %+v %v",snapshot,err) }
+   })
+  }
+ }
+}

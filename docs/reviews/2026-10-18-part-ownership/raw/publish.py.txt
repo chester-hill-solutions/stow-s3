@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,base64,subprocess
+p=Path('/private/tmp/stow-part-ownership-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');report='docs/reviews/2026-10-18-part-ownership.md';raw='docs/reviews/2026-10-18-part-ownership/raw';job=json.loads((p/'final-start.json').read_text());root='/results/'+job['id']
+def remote(code,name):
+ f=p/name;f.write_text(code);q=subprocess.run(['python3',str(p/'remote.py'),str(f)],text=True,capture_output=True,timeout=60);print(q.stdout);assert q.returncode==0,q.stdout+q.stderr
+jobs={'red':'/results/'+json.loads((p/'red-start.json').read_text())['id'],'pilot':'/results/'+json.loads((p/'pilot-start.json').read_text())['id'],'retention':'/results/'+json.loads((p/'retention-start.json').read_text())['id'],'compact-red':'/results/'+json.loads((p/'compact-red-start.json').read_text())['id'],'final':root}
+remote("const fs=require('node:fs');for(const[name,src]of Object.entries("+json.dumps(jobs)+")){const run=JSON.parse(fs.readFileSync(src+'/run.json'));if(!run.complete)throw Error('Job not terminal');const dst='/app/"+raw+"/'+name;fs.mkdirSync(dst,{recursive:true});for(const ent of fs.readdirSync(src,{withFileTypes:true}))if(ent.isFile())fs.copyFileSync(src+'/'+ent.name,dst+'/'+ent.name)}fs.copyFileSync('/app/benchmark/validation-input-manifest.json','/app/"+raw+"/source-manifest.json');console.log('Copied terminal results and source inventory');",'publish-copy.js')
+names=[report]+[str(f.relative_to(r))for f in (r/raw).iterdir()if f.is_file()and f.name!='source-manifest.json']
+for name in jobs:
+ for f in (r/raw/name).iterdir():
+  if f.is_file()and f.name in ['comparison-analysis.json','validation-receipt.json','export-receipt.json','start.json','deployments.json','upload.log']:names.append(str(f.relative_to(r)))
+batch={};size=0;index=0
+def flush():
+ global batch,size,index
+ if not batch:return
+ remote("const fs=require('node:fs'),path=require('node:path');for(const[n,b]of Object.entries("+json.dumps(batch)+")){fs.mkdirSync(path.dirname('/app/'+n),{recursive:true});fs.writeFileSync('/app/'+n,Buffer.from(b,'base64'))}console.log('Published report artifact batch');",'publish-batch-'+str(index)+'.js');index+=1;batch={};size=0
+for name in names:
+ data=base64.b64encode((r/name).read_bytes()).decode()
+ if len(data)>80000:
+  flush()
+  for offset in range(0,len(data),60000):remote("const fs=require('node:fs'),path=require('node:path');const f='/app/'+"+json.dumps(name)+";fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,Buffer.from("+json.dumps(data[offset:offset+60000])+",'base64'),{flag:"+json.dumps('w'if offset==0 else'a')+"});console.log('Published large artifact chunk');",'publish-chunk-'+str(index)+'-'+str(offset)+'.js')
+  index+=1;continue
+ if size+len(data)>80000:flush()
+ batch[name]=data;size+=len(data)
+flush()
+code="""const fs=require('node:fs'),cp=require('node:child_process'),crypto=require('node:crypto');const root=ROOT,raw='/app/'+RAW,report=REPORT;const inventory=JSON.parse(fs.readFileSync('/app/benchmark/validation-input-manifest.json'));const tested=JSON.parse(fs.readFileSync(root+'/environment.json')).sourceSHA256;const expected={...inventory,...Object.fromEntries(Object.entries(tested).filter(([n])=>n.endsWith('.go')))},productionSHA256={};for(const[n,h]of Object.entries(expected)){if(!n.endsWith('.go')&&!['go.mod','go.sum'].includes(n))continue;const actual=crypto.createHash('sha256').update(fs.readFileSync('/app/'+n)).digest('hex');if(actual!==h)throw Error('Production source changed '+n);productionSHA256[n]=actual}if(fs.existsSync('/app/internal/storage/fs/part_memory_probe_test.go'))throw Error('Temporary probe remains');for(const[n,v]of Object.entries(JSON.parse(fs.readFileSync(raw+'/artifact-manifest.json')))){const data=fs.readFileSync(raw+'/'+n);if(data.length!==v.bytes||crypto.createHash('sha256').update(data).digest('hex')!==v.sha256)throw Error('Evidence changed '+n)}
+const checkerSHA256=crypto.createHash('sha256').update(fs.readFileSync('/app/scripts/check-doc-links.mjs')).digest('hex');if(checkerSHA256!==inventory['scripts/check-doc-links.mjs'])throw Error('Documentation checker changed');const validationCaptureOnly={preloadSHA256:crypto.createHash('sha256').update(fs.readFileSync('/app/benchmark/doc-links-capture.mjs')).digest('hex'),inventoryMaxBufferBytes:16*1024*1024,stockCheckerSHA256:checkerSHA256};const checks=[];for(const[name,args]of [['site-build',['npm','run','build','--prefix','site']],['site-tests',['npm','test','--prefix','site']],['report-links',['node','--import','./benchmark/doc-links-capture.mjs','scripts/check-doc-links.mjs']]]){const q=cp.spawnSync('python3',['benchmark/reap_validation.py','runuser','-u','stow-validation','--',...args],{cwd:'/app',encoding:'utf8',timeout:45000,maxBuffer:4000000});fs.writeFileSync(root+'/report-'+name+'.log',q.stdout+q.stderr);checks.push({name,args,exitCode:q.status});console.log(name+': '+q.status);if(q.status!==0){console.log(q.stdout+q.stderr);process.exit(1)}}const documentSHA256={};documentSHA256[report]=crypto.createHash('sha256').update(fs.readFileSync('/app/'+report)).digest('hex');fs.writeFileSync(root+'/report-receipt.json',JSON.stringify({exitCode:0,checks,documentSHA256,productionSHA256,validationCaptureOnly,railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID},null,2));console.log('Verified report, all production Go sources and evidence; '+Object.keys(productionSHA256).length+' verified source files');""".replace('ROOT',json.dumps(root)).replace('RAW',json.dumps(raw)).replace('REPORT',json.dumps(report))
+remote(code,'publish-check.js')

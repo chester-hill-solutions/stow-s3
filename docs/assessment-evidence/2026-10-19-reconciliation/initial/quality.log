@@ -1,0 +1,7 @@
+node scripts/check-go-quality.mjs
+Go quality ratchet violation
+  new debt: complexity: 4 > 2
+  new: internal/runtime/stream_cleanup_reconcile_test.go:TestReadFailureRetainsRetryableCleanup#1
+  new: internal/runtime/stream_cleanup_reconcile_test.go:TestReadFailureRetainsRetryableCleanup/func-literal-1#1
+Fix the violation; do not raise the baseline to pass.
+make: *** [Makefile:113: check-go-quality] Error 1

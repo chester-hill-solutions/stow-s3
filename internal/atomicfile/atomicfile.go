@@ -8,22 +8,17 @@
 package atomicfile
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
-// Write replaces path with data, atomically and durably.
-//
-// The sequence is temp file, write, fsync the file, close, rename, fsync the
-// parent directory. The last step is the one that is easy to leave out and the one
-// that decides whether the rename itself survives a power loss: the file's data
-// can be on disk while the directory entry naming it is not.
-//
-// Every error is returned. A caller that cannot be told the write did not happen
-// cannot decide what to do about it, and the common response — retry, or carry on — is
-// wrong in both directions. The parent directory is created if missing.
+// Write replaces path atomically and durably, creating the parent if missing.
+// File data and permissions are synced before rename, then the parent is synced.
+// Every error is returned; a failed directory fence may leave replacement visible.
 func Write(path string, data []byte, perm os.FileMode) error {
 	return WriteParts(path, perm, data)
 }
@@ -95,6 +90,34 @@ func writeFile(path string, perm os.FileMode, write func(*os.File) error) error 
 		return wrap(path, err)
 	}
 	return nil
+}
+
+// SyncExisting fences a compatible file without replacing it.
+// It requires a regular file with the requested permissions. Callers can replace
+// the file using Write if this fence fails.
+func SyncExisting(path string, perm os.FileMode) error {
+	before, err := os.Lstat(path)
+	if err != nil {
+		return wrap(path, err)
+	}
+	if !before.Mode().IsRegular() || (runtime.GOOS != "windows" && before.Mode() != perm) {
+		return wrap(path, fmt.Errorf("existing file requires replacement"))
+	}
+	file, err := os.OpenFile(path, os.O_RDWR, 0)
+	if err != nil {
+		return wrap(path, err)
+	}
+	actual, err := file.Stat()
+	if err == nil && !os.SameFile(before, actual) {
+		err = fmt.Errorf("existing file changed during fence")
+	}
+	if err == nil {
+		err = file.Sync()
+	}
+	if err := errors.Join(err, file.Close()); err != nil {
+		return wrap(path, err)
+	}
+	return wrapIfError(path, syncDir(filepath.Dir(path)))
 }
 
 func wrap(path string, err error) error {

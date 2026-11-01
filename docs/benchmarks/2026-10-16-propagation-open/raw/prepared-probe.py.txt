@@ -1,0 +1,18 @@
+from pathlib import Path
+import subprocess,json,os
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-propagation-open-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+source=r/'internal/runthrough/prepared_review_probe_test.go'
+assert not source.exists()
+source.write_bytes((p/'next-prepared-probe.go.txt').read_bytes())
+try:
+ subprocess.run(['gofmt','-w',str(source)],check=True,env=env,cwd=r)
+ (p/'next-prepared-probe.go.txt').write_bytes(source.read_bytes())
+ for version in ['before','after']:
+  for race in [False,True]:
+   cmd=['go','test']+(['-overlay='+str(p/'baseline-overlay.json')] if version=='before' else [])+(['-race'] if race else [])+['./internal/runthrough','-run','^TestReviewPreparedAmbiguousMissing$','-count=2','-v']
+   q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+   name='next-'+version+('-race' if race else '')+'.log'
+   (p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+   assert q.returncode==1 and '[build failed]' not in q.stdout,(name,q.stdout)
+   print(name,'EXPECTED FAILURE',flush=True)
+finally:source.unlink()

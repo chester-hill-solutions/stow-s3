@@ -1,0 +1,77 @@
+File: legacy-reader.test
+Build ID: b151de0c5cd22f00d24b10dc8e2f36ecf7119d85
+Type: alloc_space
+Time: 2026-10-18 19:38:37 UTC
+Showing nodes accounting for 107286112B, 99.45% of 107879136B total
+Dropped 519 nodes (cum <= 539395B)
+      flat  flat%   sum%        cum   cum%
+ 26211072B 24.30% 24.30%  26211072B 24.30%  bytes.growSlice /usr/local/go/src/bytes/buffer.go:255
+ 24600352B 22.80% 47.10%  24600352B 22.80%  encoding/json.Marshal /usr/local/go/src/encoding/json/encode.go:213
+ 23456000B 21.74% 68.84%  23456000B 21.74%  reflect.growslice /usr/local/go/src/runtime/slice.go:336
+ 10898800B 10.10% 78.95%  10898800B 10.10%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateResources /app/internal/capacity/accounting.go:149
+  8408384B  7.79% 86.74%   8408384B  7.79%  github.com/chester-hill-solutions/stow-s3/internal/capacity.encodeState /app/internal/capacity/state.go:193
+  7785472B  7.22% 93.96%   7785472B  7.22%  os.readFileContents /usr/local/go/src/os/file.go:909
+  3141472B  2.91% 96.87%   3141472B  2.91%  github.com/chester-hill-solutions/stow-s3/internal/capacity.checkHeldProjection /app/internal/capacity/admission.go:68 (inline)
+  2194736B  2.03% 98.90%   2194736B  2.03%  encoding/json.(*decodeState).literalStore /usr/local/go/src/encoding/json/decode.go:958
+   589824B  0.55% 99.45%    589824B  0.55%  github.com/chester-hill-solutions/stow-s3/internal/capacity.resourceCountNamespace /app/internal/capacity/resource_count_test.go:31
+         0     0% 99.45%  10789120B 10.00%  bytes.(*Buffer).Write /usr/local/go/src/bytes/buffer.go:185
+         0     0% 99.45%    556416B  0.52%  bytes.(*Buffer).WriteByte /usr/local/go/src/bytes/buffer.go:295
+         0     0% 99.45%  14867200B 13.78%  bytes.(*Buffer).WriteString /usr/local/go/src/bytes/buffer.go:197
+         0     0% 99.45%  26211072B 24.30%  bytes.(*Buffer).grow /usr/local/go/src/bytes/buffer.go:157
+         0     0% 99.45%  23456000B 21.74%  encoding/json.(*decodeState).array /usr/local/go/src/encoding/json/decode.go:552
+         0     0% 99.45%   2184720B  2.03%  encoding/json.(*decodeState).array /usr/local/go/src/encoding/json/decode.go:561
+         0     0% 99.45%  25678168B 23.80%  encoding/json.(*decodeState).object /usr/local/go/src/encoding/json/decode.go:767
+         0     0% 99.45%  25680280B 23.80%  encoding/json.(*decodeState).unmarshal /usr/local/go/src/encoding/json/decode.go:183
+         0     0% 99.45%  25640720B 23.77%  encoding/json.(*decodeState).value /usr/local/go/src/encoding/json/decode.go:370
+         0     0% 99.45%  25680280B 23.80%  encoding/json.(*decodeState).value /usr/local/go/src/encoding/json/decode.go:380
+         0     0% 99.45%   2194736B  2.03%  encoding/json.(*decodeState).value /usr/local/go/src/encoding/json/decode.go:394
+         0     0% 99.45%  26259936B 24.34%  encoding/json.(*encodeState).marshal /usr/local/go/src/encoding/json/encode.go:343
+         0     0% 99.45%  26259936B 24.34%  encoding/json.(*encodeState).reflectValue /usr/local/go/src/encoding/json/encode.go:367
+         0     0% 99.45%  26259936B 24.34%  encoding/json.Marshal /usr/local/go/src/encoding/json/encode.go:209
+         0     0% 99.45%  25680280B 23.80%  encoding/json.Unmarshal /usr/local/go/src/encoding/json/decode.go:113
+         0     0% 99.45%  26188864B 24.28%  encoding/json.arrayEncoder.encode /usr/local/go/src/encoding/json/encode.go:901
+         0     0% 99.45%   1838080B  1.70%  encoding/json.intEncoder /usr/local/go/src/encoding/json/encode.go:558
+         0     0% 99.45%  26215728B 24.30%  encoding/json.mapEncoder.encode /usr/local/go/src/encoding/json/encode.go:815
+         0     0% 99.45%  26232832B 24.32%  encoding/json.ptrEncoder.encode /usr/local/go/src/encoding/json/encode.go:930
+         0     0% 99.45%  26188864B 24.28%  encoding/json.sliceEncoder.encode /usr/local/go/src/encoding/json/encode.go:874
+         0     0% 99.45%   8955904B  8.30%  encoding/json.stringEncoder /usr/local/go/src/encoding/json/encode.go:632
+         0     0% 99.45%    554624B  0.51%  encoding/json.structEncoder.encode /usr/local/go/src/encoding/json/encode.go:750
+         0     0% 99.45%  14867200B 13.78%  encoding/json.structEncoder.encode /usr/local/go/src/encoding/json/encode.go:753
+         0     0% 99.45%  26227712B 24.31%  encoding/json.structEncoder.encode /usr/local/go/src/encoding/json/encode.go:758
+         0     0% 99.45%  79142720B 73.36%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).access /app/internal/capacity/state.go:125
+         0     0% 99.45%  24189672B 22.42%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).access /app/internal/capacity/state.go:129
+         0     0% 99.45%   7177928B  6.65%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).read /app/internal/capacity/state.go:159
+         0     0% 99.45%  23634472B 21.91%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).read /app/internal/capacity/state.go:170
+         0     0% 99.45%  38296464B 35.50%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).read /app/internal/capacity/state.go:174
+         0     0% 99.45%  10026896B  9.29%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).read /app/internal/capacity/state.go:181
+         0     0% 99.45%   5871600B  5.44%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).write /app/internal/capacity/state.go:199
+         0     0% 99.45%   1246848B  1.16%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Host).write /app/internal/capacity/state.go:206
+         0     0% 99.45%   4512208B  4.18%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).BindStore /app/internal/capacity/state.go:76
+         0     0% 99.45%   1263776B  1.17%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).BindStore.func1 /app/internal/capacity/state.go:91
+         0     0% 99.45%  12240360B 11.35%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Reconcile /app/internal/capacity/admission.go:12
+         0     0% 99.45%    871904B  0.81%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Reconcile /app/internal/capacity/admission.go:9
+         0     0% 99.45%   3141472B  2.91%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Reconcile.func1 /app/internal/capacity/admission.go:17
+         0     0% 99.45%   5848288B  5.42%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Reconcile.func1 /app/internal/capacity/admission.go:22
+         0     0% 99.45%  86557696B 80.24%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Snapshot /app/internal/capacity/accounting.go:132
+         0     0% 99.45%  13888712B 12.87%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).Snapshot.func1 /app/internal/capacity/accounting.go:134
+         0     0% 99.45% 103310264B 95.76%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).access /app/internal/capacity/state.go:105
+         0     0% 99.45%  24142856B 22.38%  github.com/chester-hill-solutions/stow-s3/internal/capacity.(*Namespace).access.func1 /app/internal/capacity/state.go:110
+         0     0% 99.45%  18398224B 17.05%  github.com/chester-hill-solutions/stow-s3/internal/capacity.BenchmarkLedgerIsolation.func1 /app/internal/capacity/ledger_isolate_bench_test.go:24
+         0     0% 99.45%    623536B  0.58%  github.com/chester-hill-solutions/stow-s3/internal/capacity.BenchmarkLedgerIsolation.func1 /app/internal/capacity/ledger_isolate_bench_test.go:30
+         0     0% 99.45%   2054448B  1.90%  github.com/chester-hill-solutions/stow-s3/internal/capacity.BenchmarkLedgerIsolation.func1 /app/internal/capacity/ledger_isolate_bench_test.go:35
+         0     0% 99.45%  86557696B 80.24%  github.com/chester-hill-solutions/stow-s3/internal/capacity.BenchmarkLedgerIsolation.func1 /app/internal/capacity/ledger_isolate_bench_test.go:57
+         0     0% 99.45%   1246848B  1.16%  github.com/chester-hill-solutions/stow-s3/internal/capacity.checkCapacity /app/internal/capacity/accounting.go:103
+         0     0% 99.45%  22087912B 20.47%  github.com/chester-hill-solutions/stow-s3/internal/capacity.encodeState /app/internal/capacity/state.go:189
+         0     0% 99.45%  13666264B 12.67%  github.com/chester-hill-solutions/stow-s3/internal/capacity.encodeState /app/internal/capacity/state.go:195
+         0     0% 99.45%  15135560B 14.03%  github.com/chester-hill-solutions/stow-s3/internal/capacity.namespaceCharge /app/internal/capacity/accounting.go:47
+         0     0% 99.45%   4512784B  4.18%  github.com/chester-hill-solutions/stow-s3/internal/capacity.resourceCountNamespace /app/internal/capacity/resource_count_test.go:28
+         0     0% 99.45%  13112264B 12.15%  github.com/chester-hill-solutions/stow-s3/internal/capacity.resourceCountNamespace /app/internal/capacity/resource_count_test.go:36
+         0     0% 99.45%  10026896B  9.29%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateNamespace /app/internal/capacity/accounting.go:178
+         0     0% 99.45%  10026896B  9.29%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateState /app/internal/capacity/accounting.go:163
+         0     0% 99.45%  10026896B  9.29%  github.com/chester-hill-solutions/stow-s3/internal/capacity.validateStore /app/internal/capacity/accounting.go:191
+         0     0% 99.45%   7792336B  7.22%  os.ReadFile /usr/local/go/src/os/file.go:874
+         0     0% 99.45%  23456000B 21.74%  reflect.Value.Grow /usr/local/go/src/reflect/value.go:2664
+         0     0% 99.45%  23456000B 21.74%  reflect.Value.grow /usr/local/go/src/reflect/value.go:2677
+         0     0% 99.45%  92496536B 85.74%  testing.(*B).launch /usr/local/go/src/testing/benchmark.go:344
+         0     0% 99.45%  15332624B 14.21%  testing.(*B).run1.func1 /usr/local/go/src/testing/benchmark.go:245
+         0     0% 99.45% 107807360B 99.93%  testing.(*B).runN /usr/local/go/src/testing/benchmark.go:219

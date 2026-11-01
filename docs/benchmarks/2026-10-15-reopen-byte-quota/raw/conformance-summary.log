@@ -1,0 +1,8 @@
+STOW_CONFORMANCE_BACKEND=memory GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	24.592s
+STOW_CONFORMANCE_BACKEND=filesystem GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	42.615s
+STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=memory GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	18.274s
+STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=filesystem GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	16.492s

@@ -1,0 +1,67 @@
+{
+  "sources": {
+    "benchmark/_outbox-variants/native-before/internal/runthrough/file_outbox.go": "26e168cc363219b5211195820868ea472dc71146dc2c470d5ab869efdd5bb95a",
+    "benchmark/_outbox-variants/native-before/internal/runthrough/outbox.go": "480cd2db6e5a61a65fa49da1ef9d6230607f316f914e21588eac2193f49564c3",
+    "internal/runthrough/file_outbox.go": "cc0d821ca1d1e97b3d8861877a38128f1b13e28360568d744737f570989c86a1",
+    "internal/runthrough/provenance.go": "ef34e04309c594cb671c8020433701d9b7eef2a8f72ceab408a4fa41b4d1522e",
+    "internal/runthrough/outbox.go": "88d159c62ad454acbc87f9b85cf6bcc83bf83458aa496f9287d8450a3b7b172d",
+    "internal/runthrough/file_outbox_provenance_bench_test.go": "1a0fab94ebedcf41b7b7fa7eae4404ab40cffe26e3b151009ab668421263da62",
+    "internal/runthrough/file_outbox_provenance_test.go": "9566db9edb2e37df7a0807c5a5fe7a0a29bc663ac205b31996f9342cb1a5486b",
+    "internal/runthrough/file_outbox_fence_api_test.go": "9c6d833d7e270e6f026707912ed7b41b5211fa6cec21c090502b6b086203a1f2",
+    "internal/runthrough/file_outbox_proto.go": "130d35e4180a35f27c975f320cfbac15b136c54db63c3119294adf59ee915860",
+    "internal/runthrough/file_outbox_proto_test.go": "ca5b1b0c28ddfa61109b8a504ec8fe4488f030d9480c9ea5eacb8c37fc8f5f5c",
+    "internal/runthrough/file_outbox_proto_bench_test.go": "8f17fddf6a349f1133d515858e0f65384d521a04a038ea599880f2928dd651aa",
+    "internal/runthrough/file_outbox_proto_selector_test.go": "a9e8b753a652cdc681d5f757021817b89a725bb45124d899eb992e2b7a38fafb",
+    "internal/runthrough/outboxpb/outbox.pb.go": "2b3f36e4b2b327728f06b7ad0380c3ffa2f6a7628646e0b2b22f85e4b171b7e9",
+    "internal/runthrough/outboxpb/outbox.proto": "854204b8d38a6986194b6d72cb962892b855a86bd43f2093d2358c8d220d8dd1",
+    "internal/runthrough/outboxpb/entry.proto": "a74a0a816ab8f6746ad15e3560bf5b3fafe954877bf8a6afc4180cdb78a3fad3",
+    "internal/runthrough/outboxpb/entry.pb.go": "6e01278e29f46eb7dc7161170ecdb85dfeb16511b9e20f38ff39fdfcf416926d",
+    "internal/runthrough/file_outbox_proto_native_test.go": "e6ae0c400d7b5658b731d8e19a0dd67fe65d29f55d98abb221f316dca00f323b",
+    "internal/runthrough/outbox_test.go": "14a9d97df02224434e6ee0ed0bd38a0c471ea14949d46eb10a791bb6f1af79bc",
+    "internal/runthrough/outbox_claim_test.go": "9942914a1d87c317e3bdf3839d1b49aa98d3a15aa555e51ff4ef465b343b2484"
+  },
+  "binaries": {
+    "native-before": {
+      "bytes": 18785794,
+      "sha256": "e4cfa0a25fb201dd140574579efe5552032cdbe1b411aad08fa51a00061e204b"
+    },
+    "native-after": {
+      "bytes": 18785192,
+      "sha256": "40fd930ce2b10bf5dabed8ed4313304cc0499d05238f75d697e89c7c7d01abaf"
+    }
+  },
+  "variants": {
+    "json-indented": {
+      "package": "./internal/runthrough",
+      "files": []
+    },
+    "json-compact": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/file_outbox_proto_selector_test.go"
+      ]
+    },
+    "json-same": {
+      "package": "./internal/runthrough",
+      "alias": "json-indented",
+      "files": []
+    },
+    "protobuf": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/file_outbox_proto_selector_test.go"
+      ]
+    },
+    "native-before": {
+      "package": "./internal/runthrough",
+      "files": [
+        "internal/runthrough/file_outbox.go",
+        "internal/runthrough/outbox.go"
+      ]
+    },
+    "native-after": {
+      "package": "./internal/runthrough",
+      "files": []
+    }
+  }
+}

@@ -1,0 +1,42 @@
+package auth
+
+import (
+ "crypto/hmac"
+ "crypto/sha256"
+ "encoding/hex"
+ "fmt"
+ "net/http"
+ "strings"
+ "testing"
+ "time"
+)
+func TestClosureEncodedQuery(t *testing.T) {
+ for _,tc:=range []struct{name,raw,want string}{{"ascii","z=last&a=first","a=first&z=last"},{"encoded-key","z=last&%C3%A9=first","%C3%A9=first&z=last"}}{
+  t.Run(tc.name,func(t *testing.T){
+   got:=canonicalQueryString(tc.raw);t.Logf("canonical query actual=%s expected=%s",got,tc.want)
+   if got!=tc.want{t.Errorf("query sorted before URI encoding: %s",got)}
+  })
+ }
+}
+func closureMAC(key []byte,value string) []byte{h:=hmac.New(sha256.New,key);_,_=h.Write([]byte(value));return h.Sum(nil)}
+func TestClosureReferenceSignedQuery(t *testing.T) {
+ const secret="SECRETKEYEXAMPLESECRETKEYEXAMPLE12"
+ const date="20261018"
+ const stamp="20261018T120000Z"
+ const signed="host;x-amz-content-sha256;x-amz-date"
+ for _,tc:=range []struct{name,raw,canonical string}{{"ascii","z=last&a=first","a=first&z=last"},{"encoded-key","z=last&%C3%A9=first","%C3%A9=first&z=last"}}{
+  t.Run(tc.name,func(t *testing.T){
+   req,err:=http.NewRequest(http.MethodGet,"http://localhost/bucket/key?"+tc.raw,nil);if err!=nil{t.Fatal(err)}
+   req.Header.Set("X-Amz-Date",stamp);req.Header.Set("X-Amz-Content-Sha256",emptyPayloadHash)
+   headers:="host:localhost\nx-amz-content-sha256:"+emptyPayloadHash+"\nx-amz-date:"+stamp+"\n"
+   canonical:=strings.Join([]string{"GET","/bucket/key",tc.canonical,headers,signed,emptyPayloadHash},"\n")
+   digest:=sha256.Sum256([]byte(canonical));scope:=date+"/us-east-1/s3/aws4_request"
+   signingKey:=closureMAC(closureMAC(closureMAC(closureMAC([]byte("AWS4"+secret),date),"us-east-1"),"s3"),"aws4_request")
+   signature:=hex.EncodeToString(closureMAC(signingKey,"AWS4-HMAC-SHA256\n"+stamp+"\n"+scope+"\n"+hex.EncodeToString(digest[:])))
+   req.Header.Set("Authorization",fmt.Sprintf("AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE/%s, SignedHeaders=%s, Signature=%s",scope,signed,signature))
+   err=NewVerifier("us-east-1").AuthenticateAt(req,Credentials{AccessKeyID:"AKIAEXAMPLE",SecretAccessKey:secret},time.Date(2026,10,18,12,0,0,0,time.UTC))
+   t.Logf("reference encoded-sort signature auth=%v",err)
+   if err!=nil{t.Errorf("correctly encoded-sort signature refused: %v",err)}
+  })
+ }
+}

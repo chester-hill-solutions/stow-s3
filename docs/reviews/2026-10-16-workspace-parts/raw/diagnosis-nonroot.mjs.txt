@@ -1,0 +1,22 @@
+import{readFile,writeFile,mkdir,open}from'node:fs/promises';import{spawn}from'node:child_process';import{join}from'node:path';import{systemMetadata}from'./resources.mjs';
+if(process.platform!=='linux'||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4'||process.env.RAILWAY_ENVIRONMENT_ID!=='3cd200cb-c94f-4e4d-9335-0f6c1b7e9411'||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway runner only');
+const root=process.argv[2];if(!root?.startsWith('/results/'))throw Error('Results volume required');await mkdir(root,{recursive:false});
+const save=(name,value)=>writeFile(join(root,name),typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');
+const tests='^(TestMultipartPart|TestPartRecord|TestMultipartCompletionVerifiesRecordedPayload)';
+const plan=[
+ ['focused-normal',['go','test','./internal/storage/workspace','-run',tests,'-count=2','-v']],
+ ['focused-race',['go','test','-race','./internal/storage/workspace','-run',tests,'-count=2','-v']],
+ ['full-go',['go','test','./...']],
+ ['broad-race',['go','test','-race','./internal/storage/...','./internal/runtime','./internal/embedded','./internal/runthrough','./internal/s3api','./pkg/stow']],
+ ...['memory','filesystem','runtime-memory','runtime-filesystem'].map(profile=>['conformance-'+profile,['go','test','./conformance/...','-count=1','-v'],{STOW_CONFORMANCE_BACKEND:profile.startsWith('runtime')?'runtime':profile,...(profile.startsWith('runtime')?{STOW_CONFORMANCE_RUNTIME_BACKEND:profile.slice(8)}:{})}]),
+ ['vet',['go','vet','./...']],
+ ['quality',['make','check-go-quality','check-file-size','format-check']],
+ ['site-build',['npm','run','build','--prefix','site']],
+ ['site-tests',['npm','test','--prefix','site']],
+ ['doc-links',['node','scripts/check-doc-links.mjs']]
+];const results=[];
+async function run(name,args,extra={}){const log=await open(join(root,name+'.log'),'w');const start=Date.now();let result;try{const child=spawn('python3',['benchmark/reap_validation.py','runuser','-u','stow-validation','--',...args],{env:{...process.env,...extra},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({exitCode:code,signal}))});}finally{await log.close()}return{name,args,extra,...result,elapsedMs:Date.now()-start};}
+try{await save('environment.json',{provider:'Railway',start:await systemMetadata(),sourceManifest:JSON.parse(await readFile('benchmark/validation-input-manifest.json'))});await save('plan.json',plan);
+for(const[name,args,extra]of plan){console.log('Starting '+name);results.push(await run(name,args,extra));await save('checks.json',results);await save('progress.json',{completed:results.length,total:plan.length,last:results.at(-1)});console.log(JSON.stringify(results.at(-1)));}
+await save('run.json',{complete:true,success:results.every(r=>r.exitCode===0),railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID,checks:results.length});
+}catch(error){await save('run.json',{complete:false,error:error.stack});throw error;}

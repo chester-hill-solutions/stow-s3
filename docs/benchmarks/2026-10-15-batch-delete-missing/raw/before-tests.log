@@ -1,0 +1,81 @@
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/0
+    batch_delete_test.go:73: deleted=[] calls=[missing] error=object not found, want [missing first first last missing]
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/1
+    batch_delete_test.go:73: deleted=[] calls=[missing] error=object not found, want [missing first first last missing]
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/2
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/3
+--- FAIL: TestCustomStoreBatchDeleteMissingAndDuplicates (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteMissingAndDuplicates/0 (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteMissingAndDuplicates/1 (0.00s)
+    --- PASS: TestCustomStoreBatchDeleteMissingAndDuplicates/2 (0.00s)
+    --- PASS: TestCustomStoreBatchDeleteMissingAndDuplicates/3 (0.00s)
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/storage
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error delete unavailable
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/precondition
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error precondition failed
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/bucket
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error bucket not found
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/cancellation
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error context canceled
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/committed
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error local mutation committed
+--- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/storage (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/precondition (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/bucket (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/cancellation (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/committed (0.00s)
+=== RUN   TestCustomStoreBatchDeleteS3MissingKey
+=== RUN   TestCustomStoreBatchDeleteS3MissingKey/false
+2026/10/15 16:13:21 POST /s3 404 119.25µs
+    batch_delete_test.go:148: S3 delete status=404 body=<Error><Code>NoSuchKey</Code><Message>The specified key does not exist</Message><Resource>/probe</Resource><RequestId>5773b16a57cfc9583fbab9ee2740848c</RequestId></Error>
+=== RUN   TestCustomStoreBatchDeleteS3MissingKey/true
+2026/10/15 16:13:21 POST /s3 404 19.125µs
+    batch_delete_test.go:148: S3 delete status=404 body=<Error><Code>NoSuchKey</Code><Message>The specified key does not exist</Message><Resource>/probe</Resource><RequestId>758443e7d77784491b2639ab6a9eada2</RequestId></Error>
+--- FAIL: TestCustomStoreBatchDeleteS3MissingKey (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteS3MissingKey/false (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteS3MissingKey/true (0.00s)
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/0
+    batch_delete_test.go:73: deleted=[] calls=[missing] error=object not found, want [missing first first last missing]
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/1
+    batch_delete_test.go:73: deleted=[] calls=[missing] error=object not found, want [missing first first last missing]
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/2
+=== RUN   TestCustomStoreBatchDeleteMissingAndDuplicates/3
+--- FAIL: TestCustomStoreBatchDeleteMissingAndDuplicates (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteMissingAndDuplicates/0 (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteMissingAndDuplicates/1 (0.00s)
+    --- PASS: TestCustomStoreBatchDeleteMissingAndDuplicates/2 (0.00s)
+    --- PASS: TestCustomStoreBatchDeleteMissingAndDuplicates/3 (0.00s)
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/storage
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error delete unavailable
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/precondition
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error precondition failed
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/bucket
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error bucket not found
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/cancellation
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error context canceled
+=== RUN   TestCustomStoreBatchDeletePreservesFailurePrefix/committed
+    batch_delete_test.go:99: deleted=[] calls=[missing] error=object not found, want prefix [missing first] error local mutation committed
+--- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/storage (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/precondition (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/bucket (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/cancellation (0.00s)
+    --- FAIL: TestCustomStoreBatchDeletePreservesFailurePrefix/committed (0.00s)
+=== RUN   TestCustomStoreBatchDeleteS3MissingKey
+=== RUN   TestCustomStoreBatchDeleteS3MissingKey/false
+2026/10/15 16:13:21 POST /s3 404 27.5µs
+    batch_delete_test.go:148: S3 delete status=404 body=<Error><Code>NoSuchKey</Code><Message>The specified key does not exist</Message><Resource>/probe</Resource><RequestId>5b86ba58f6be9e91288a6e360268de7d</RequestId></Error>
+=== RUN   TestCustomStoreBatchDeleteS3MissingKey/true
+2026/10/15 16:13:21 POST /s3 404 16.291µs
+    batch_delete_test.go:148: S3 delete status=404 body=<Error><Code>NoSuchKey</Code><Message>The specified key does not exist</Message><Resource>/probe</Resource><RequestId>a5f4ef9862673c7f2307a9435b09d2eb</RequestId></Error>
+--- FAIL: TestCustomStoreBatchDeleteS3MissingKey (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteS3MissingKey/false (0.00s)
+    --- FAIL: TestCustomStoreBatchDeleteS3MissingKey/true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.232s
+FAIL

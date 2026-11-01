@@ -1,0 +1,55 @@
+{
+  "phase": "empty-journal-recovery-caller-before",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_recovery_test.go",
+    "internal/runthrough/file_outbox_lookup_test.go",
+    "internal/runthrough/file_outbox_empty_api_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_empty_api_test.go"
+      ]
+    },
+    {
+      "name": "caller-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestRetryPendingRefusesEmptyJournal$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "caller-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestRetryPendingRefusesEmptyJournal$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

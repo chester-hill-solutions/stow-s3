@@ -1,0 +1,31 @@
+=== RUN   TestSignatureIgnoresUnrelatedFilePositions
+    main_test.go:34: unrelated positions split a selector: "type Record struct {\n\tCreated\ttime.\n\t\tTime\n\n\tName\tstring\n}"
+    main_test.go:40: signature depends on unrelated positions:
+        first: type Record struct {
+        	Created	time.Time
+        	Name	string
+        }
+        second: type Record struct {
+        	Created	time.
+        		Time
+        
+        	Name	string
+        }
+--- FAIL: TestSignatureIgnoresUnrelatedFilePositions (0.00s)
+=== RUN   TestSignatureIgnoresUnrelatedFilePositions
+    main_test.go:34: unrelated positions split a selector: "type Record struct {\n\tCreated\ttime.\n\t\tTime\n\n\tName\tstring\n}"
+    main_test.go:40: signature depends on unrelated positions:
+        first: type Record struct {
+        	Created	time.Time
+        	Name	string
+        }
+        second: type Record struct {
+        	Created	time.
+        		Time
+        
+        	Name	string
+        }
+--- FAIL: TestSignatureIgnoresUnrelatedFilePositions (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/tools/api-reference	0.009s
+FAIL

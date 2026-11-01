@@ -1,0 +1,98 @@
+{
+  "phase": "release-native-capacity-fixtures",
+  "sources": [
+    "internal/storage/fs/capacity_payload_read_test.go",
+    "internal/storage/fs/part_http_owned_test.go",
+    "docs/api/README.md",
+    "docs/api/browser-s3.md",
+    "docs/api/browser-wasm.md",
+    "docs/api/browser.md",
+    "docs/api/embedded.md",
+    "docs/api/go.md",
+    "docs/api/inventory.json",
+    "docs/api/mcp.md",
+    "docs/api/node-wasm.md",
+    "docs/api/project.md",
+    "docs/api/python.md",
+    "docs/api/typescript.md",
+    "docs/api/worker.md",
+    "docs/api/workspace.md"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_payload_read_test.go",
+        "internal/storage/fs/part_http_owned_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^(TestCapacityPayload.*|TestCompletionBuffer.*|TestMultipartOwned.*)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^(TestCapacityPayload.*|TestCompletionBuffer.*|TestMultipartOwned.*)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "install-reference-tools",
+      "args": [
+        "bash",
+        "-c",
+        "cd packages/stow-s3 && npm ci --ignore-scripts && rm -rf node_modules/@chester-hill-solutions/stow-s3-{darwin-arm64,darwin-x64,linux-arm64,linux-x64}"
+      ]
+    },
+    {
+      "name": "api-reference-before",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs",
+        "--check"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "regenerate-api-reference",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs"
+      ]
+    },
+    {
+      "name": "api-reference-after",
+      "args": [
+        "node",
+        "scripts/generate-api-reference.mjs",
+        "--check"
+      ]
+    }
+  ]
+}

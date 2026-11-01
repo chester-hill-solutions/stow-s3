@@ -81,7 +81,7 @@ func (c *catalog) signature(node ast.Node) string {
 		return true
 	})
 	var result bytes.Buffer
-	if err := printer.Fprint(&result, c.set, node); err != nil {
+	if err := printer.Fprint(&result, token.NewFileSet(), node); err != nil {
 		c.err = err
 	}
 	return result.String()

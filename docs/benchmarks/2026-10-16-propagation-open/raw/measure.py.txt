@@ -1,0 +1,54 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,re,statistics,platform
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-propagation-open-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+def run(cmd,name):
+ q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==0,(name,q.stdout[-3000:]);print(name,'PASS',flush=True)
+overlay={'Replace':{str(r/'internal/runthrough'/f):str(p/(f+'.before.txt')) for f in ['outbox_adapter.go']}}
+(p/'baseline-overlay.json').write_text(json.dumps(overlay,indent=2)+'\n')
+for race in [False,True]:
+ cmd=['go','test','-overlay='+str(p/'baseline-overlay.json')]+(['-race'] if race else [])+['./internal/runthrough','-run','^TestPropagation(OpeningFailure|VersionConflictCloses)','-count=2','-v']
+ q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);name='final-before'+('-race' if race else '')+'.log';(p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==1 and '[build failed]' not in q.stdout,(name,q.stdout[-3000:]);print(name,'EXPECTED FAILURE',flush=True)
+run(['go','test','-overlay='+str(p/'baseline-overlay.json'),'-c','-o',str(p/'before.test'),'./internal/runthrough'],'before-build.log')
+run(['go','test','-c','-o',str(p/'after.test'),'./internal/runthrough'],'after-build.log')
+plan=[]
+for cpu in [1,8]:
+ for cycle in range(2):
+  order=['before','after','after','before'] if cycle==0 else ['after','before','before','after']
+  for position,version in enumerate(order):plan.append(dict(cpu=cpu,cycle=cycle,position=position,version=version))
+(p/'plan.json').write_text(json.dumps({'blocks':plan,'benchtime':'100ms','count':2,'host_load_at_start':os.getloadavg()},indent=2)+'\n')
+rows=[];combined=[]
+for index,block in enumerate(plan):
+ cmd=[str(p/(block['version']+'.test')),'-test.run=^$','-test.bench=^BenchmarkPropagationSourceOpen$','-test.benchmem','-test.benchtime=100ms','-test.count=2','-test.cpu='+str(block['cpu'])]
+ run(cmd,'block-'+str(index)+'.log');s=(p/('block-'+str(index)+'.log')).read_text();combined.append(s)
+ for line in s.splitlines():
+  if not line.startswith('Benchmark'):continue
+  tokens=line.split();metrics={tokens[j+1]:float(tokens[j]) for j in range(2,len(tokens)-1,2)}
+  rows.append(dict(block,block=index,name=re.sub(r'-\d+$','',tokens[0]),iterations=int(tokens[1]),metrics=metrics))
+assert len(rows)==256,len(rows)
+(p/'measurements.log').write_text('\n'.join(combined));(p/'samples.json').write_text(json.dumps(rows,indent=2)+'\n')
+summary=[]
+for cpu in [1,8]:
+ for name in sorted({x['name'] for x in rows}):
+  row={'cpu':cpu,'name':name}
+  for version in ['before','after']:
+   values=[x['metrics'] for x in rows if x['cpu']==cpu and x['name']==name and x['version']==version]
+   row[version]={key:{'median':statistics.median(x[key] for x in values),'min':min(x[key] for x in values),'max':max(x[key] for x in values)} for key in values[0]}
+  row['ns_change_percent']=(row['after']['ns/op']['median']/row['before']['ns/op']['median']-1)*100
+  changes=[];aa=[]
+  for cycle in range(2):
+   blocks={}
+   for version in ['before','after']:
+    ids=sorted({x['block'] for x in rows if x['cpu']==cpu and x['name']==name and x['cycle']==cycle and x['version']==version})
+    blocks[version]=[statistics.median(x['metrics']['ns/op'] for x in rows if x['block']==block and x['name']==name) for block in ids]
+    aa.append(abs((blocks[version][1]/blocks[version][0]-1)*100))
+   changes.append((statistics.mean(blocks['after'])/statistics.mean(blocks['before'])-1)*100)
+  row['paired_cycle_changes_percent']=changes;row['same_code_absolute_changes_percent']=aa
+  summary.append(row)
+(p/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+identity=lambda path:dict(bytes=path.stat().st_size,sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+meta=json.loads((p/'environment-base.json').read_text());meta.update({'go':subprocess.check_output(['go','version'],env=env,text=True).strip(),'platform':platform.platform(),'host_load_at_end':os.getloadavg(),'binaries':{name:identity(p/(name+'.test')) for name in ['before','after']},'sources':{name:identity(r/name) for name in ['internal/runthrough/outbox_adapter.go','internal/runthrough/propagation_open_test.go','internal/runthrough/propagation_open_bench_test.go']}})
+(p/'environment.json').write_text(json.dumps(meta,indent=2)+'\n')
+(p/'compiler-environment.json').write_text(subprocess.check_output(['go','env','-json','GOFLAGS','GOEXPERIMENT','GOARM64','GOOS','GOARCH','GOTOOLCHAIN'],env=env,text=True))
+for row in summary:print(row['cpu'],row['name'],round(row['ns_change_percent'],2),row['before']['B/op']['median'],row['after']['B/op']['median'],row['before']['allocs/op']['median'],row['after']['allocs/op']['median'])
