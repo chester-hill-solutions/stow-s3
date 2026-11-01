@@ -243,7 +243,8 @@ jobs:
           cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/npm-consumer/"
           cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
           cd "$RUNNER_TEMP/npm-consumer"
-          npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com ./*.tgz
+          touch "$RUNNER_TEMP/packed-user-npmrc" "$RUNNER_TEMP/packed-global-npmrc"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/packed-user-npmrc" --globalconfig="$RUNNER_TEMP/packed-global-npmrc" ./*.tgz
           env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${RELEASE_VERSION#v}"
 
   live_gate:
@@ -290,39 +291,13 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-          registry-url: https://npm.pkg.github.com
-      # npm is required to publish; PyPI is not. The step further down named
-      # "Record PyPI publishing status" is written for PyPI being off — it records
-      # the skip and prints a warning in the release notes — so requiring it here
-      # made that step unreachable and turned an optional target into a release
-      # blocker. docs/foss-readiness-plan.md A3 tracks configuring the trusted
-      # publisher, and until that is done this gate must not be what stops a
-      # release.
-      #
-      # A rehearsal reports an unready account and carries on, because the point
-      # of a rehearsal is to validate everything after this step, and stopping
-      # here would leave the tail unexercised for a reason that is a settings
-      # change rather than a defect. A tagged release still refuses to publish.
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      # This is a reviewed local assertion, not proof from account ownership or 2FA.
       - name: Require release account setup
         if: needs.plan.outputs.publish_packages == 'true'
-        id: account
-        env:
-          NPM_READY: ${{ vars.STOW_NPM_PUBLISH_READY }}
-          REHEARSING: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          set -euo pipefail
-          if [[ "$NPM_READY" == "true" ]]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "ready=false" >> "$GITHUB_OUTPUT"
-          message='Configure npmjs scope ownership and OIDC/token publishing, then set STOW_NPM_PUBLISH_READY=true'
-          if [[ "$REHEARSING" == "true" ]]; then
-            echo "::warning title=Release account not ready::$message A rehearsal reports this and continues; a tagged release stops here."
-          else
-            echo "$message" >&2
-            exit 1
-          fi
+        run: node scripts/check-npm-publish-readiness.mjs
+
       - name: Verify npm package artifact
         shell: bash
         run: |
@@ -446,13 +421,9 @@ jobs:
       # Everything from here to the end of the job publishes. Each step says so.
       - name: Publish platform packages
         if: startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node scripts/publish-if-absent.mjs ./dist/npm-platform/*.tgz
       - name: Publish npm package
         if: startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node scripts/publish-if-absent.mjs ./dist/npm/*.tgz
 
       # PyPI is off until a trusted publisher is configured for this project on
@@ -493,8 +464,8 @@ jobs:
           mkdir -p "$RUNNER_TEMP/anonymous-npm-consumer"
           cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/anonymous-npm-consumer/"
           cd "$RUNNER_TEMP/anonymous-npm-consumer"
-          touch "$RUNNER_TEMP/empty-npmrc"
-          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
+          touch "$RUNNER_TEMP/empty-npmrc" "$RUNNER_TEMP/empty-global-npmrc"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/empty-npmrc" --globalconfig="$RUNNER_TEMP/empty-global-npmrc" "@chester-hill-solutions/stow-s3@$version"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "$version"
 
       - name: Verify exact published PyPI version as anonymous consumer

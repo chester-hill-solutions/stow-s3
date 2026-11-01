@@ -165,11 +165,7 @@ export function publishRegistry(repoRoot = resolve(import.meta.dirname, "..")) {
 }
 
 if (process.argv.includes("--online")) {
-  // The registry comes from the manifest's own publishConfig rather than being written
-  // here. Hardcoding npmjs meant that after the release moved to GitHub Packages this
-  // check asked npmjs about packages that are not there, so it would report the whole
-  // npm surface as unreachable - a false failure caused by the gate looking in the wrong
-  // place, which is the failure this repository has now paid for three times.
+  // Keep availability probes on the same registry as the reviewed manifests.
   const npmRegistry = publishRegistry();
   const checks = [
     ...SURFACE.filter((e) => e.ecosystem === "npm").map((e) => ({
