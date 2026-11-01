@@ -1,6 +1,7 @@
 ---
 status: accepted
-decision_digest: 445807cb27281b47
+amended: 2026-11-01
+decision_digest: bd91ebfb2b7a718d
 relates_to: 0016, 0005, 0011
 ---
 
@@ -22,9 +23,9 @@ service's.
 
 ## Decision
 
-The service refuses a listen host that is not loopback unless
+The native `serve` launcher refuses a listen host that is not loopback unless
 `--allow-insecure-remote` is passed. The refusal happens before the listener
-opens. The flag is consent, not configuration: it says that TLS terminates in
+opens. An empty host retains the HTTP server's loopback default. The flag is consent, not configuration: it says that TLS terminates in
 front of this process, or that the operator accepts cleartext for a store they
 alone can reach.
 
@@ -34,6 +35,10 @@ an admin token, from flags or `STOW_LOCAL_ACCESS_KEY_ID`,
 reported only to the process's own stdout, so it cannot authenticate a remote
 client, and an absent admin token makes the diagnostic routes answer `404` to
 every caller that is not loopback, including a health probe.
+
+TypeScript launchers expose the same consent through `allowInsecureRemote` and
+provision the admin credential through `adminToken` in the child environment.
+Embedded hosts continue to own their own transport policy.
 
 The service does not terminate TLS, per ADR 0016. It accepts one credential pair
 and one environment authority for all clients. Per-caller principals, scoping and
@@ -51,6 +56,9 @@ transports remain ADR 0016's work.
   shares one identity across callers.
 
 ## Amendments
+
+- 2026-11-01: Clarified the launcher scope, empty-host loopback default, and
+  explicit TypeScript consent/admin provisioning. Blank admin tokens are absent.
 
 - 2026-10-23: Accepted the consent flag, the provisioning requirements, and the
   split that leaves TLS termination with the host adapter per ADR 0016.

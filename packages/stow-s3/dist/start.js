@@ -188,6 +188,8 @@ export function buildChildEnv(options) {
     if (options.secretKey) {
         childEnv.STOW_LOCAL_SECRET_ACCESS_KEY = options.secretKey;
     }
+    if (options.adminToken !== undefined)
+        childEnv.STOW_ADMIN_TOKEN = options.adminToken;
     return childEnv;
 }
 async function createStartupBuckets(instance, buckets, remainingStartupMs) {
@@ -280,6 +282,8 @@ export function assertRequestLimit(limit, label = "maxRequestBytes") {
     }
 }
 function appendTransportLimits(args, options) {
+    if (options.allowInsecureRemote)
+        args.push("--allow-insecure-remote");
     if (options.allowInsecureUpstream)
         args.push("--allow-insecure-upstream");
     if (options.maxConcurrentRequests !== undefined)
