@@ -17,7 +17,7 @@ function pack(manifest) {
   writeFileSync(join(stage, "package/package.json"), JSON.stringify(manifest));
   const file = `${stage}.tgz`; execFileSync("tar", ["-czf", file, "-C", stage, "package"]); return file;
 }
-const manifests = PACKAGE_NAMES.map(name => JSON.parse(readFileSync(new URL(`../packages/${name.split("/")[1]}/package.json`, import.meta.url))));
+const manifests = PACKAGE_NAMES.map(name => ({ ...JSON.parse(readFileSync(new URL(`../packages/${name.split("/")[1]}/package.json`, import.meta.url))), version: "0.3.5" }));
 const tarballs = manifests.map(pack), source = "a".repeat(40), run = "123";
 const receipt = artifactReceipt(tarballs, source, run);
 const quiet = () => {};
