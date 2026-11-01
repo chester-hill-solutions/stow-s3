@@ -57,10 +57,13 @@ function atLeast(actual, minimum) {
   return true;
 }
 
-export function assertPublisherContext(env, nodeVersion, npmVersion, version) {
+export function assertClientVersions(nodeVersion, npmVersion) {
   if (!atLeast(nodeVersion, [22, 14, 0]) || !atLeast(npmVersion, [11, 5, 1])) {
     throw new Error("npm OIDC publication requires Node >=22.14.0 and npm >=11.5.1");
   }
+}
+export function assertPublisherContext(env, nodeVersion, npmVersion, version) {
+  assertClientVersions(nodeVersion, npmVersion);
   const ref = `refs/tags/v${version}`;
   if (env.GITHUB_ACTIONS !== "true" || env.RUNNER_ENVIRONMENT !== "github-hosted" ||
       env.GITHUB_REPOSITORY !== REPOSITORY || env.GITHUB_EVENT_NAME !== "push" || env.GITHUB_REF !== ref ||
