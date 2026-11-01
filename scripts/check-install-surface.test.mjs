@@ -128,10 +128,17 @@ test("a 401 remedy is not offered for a registry that does not use one", () => {
   assert.equal(problems.length, 1, "only the mismatch: a PyPI 401 means something else entirely");
 });
 
-test("a matching answer is never a problem, in either direction", () => {
+test("confirmed absence and confirmed availability can match the declaration", () => {
   const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
-  assert.deepEqual(reachabilityProblems(npm, false, "HTTP 401"), []);
+  assert.deepEqual(reachabilityProblems(npm, false, "HTTP 404"), []);
   assert.deepEqual(reachabilityProblems({ ...npm, published: true }, true, "HTTP 200"), []);
+});
+
+test("unpublished npm declarations cannot turn denied or failed reads into absence", () => {
+  const npm = SURFACE.find(entry => entry.ecosystem === "npm");
+  for (const detail of ["HTTP 401", "HTTP 403", "HTTP 429", "HTTP 500", "HTTP 503", "ETIMEDOUT"]) {
+    assert.match(reachabilityProblems(npm, false, detail)[0], /not evidence of absence/);
+  }
 });
 
 test("a genuinely reachable package declared unpublished is still a problem", () => {
