@@ -1,12 +1,31 @@
-# Architecture overview, and a verified defect register
+# Architecture review: historical observations and dispositions
 
-**A read-only, source-grounded map of stow-s3 in which every claim was independently re-derived.**
+**A historical source map whose initial proposals include refuted and unresolved claims.**
 Thirty-one records across fifteen subsystems, each citing repository-relative source, each reviewed
 by an agent that did not write it, and each of the twenty-seven that describes a module or seam
 verified by a second agent that did neither. That review refuted **twenty-seven** claims the first
 pass had asserted, and corrected three verdicts. No production file was changed by the run.
 
 Reviewed `main` at `3066d37747aaa56b29a39961801c0116c39600fa`, working tree clean.
+
+## Read the dispositions first
+
+Reconciliation on 2026-11-01 checked the proposals against current source and tests.
+The original map describes `3066d377`; it is not a current security advisory or an
+instruction to implement every recommendation in the archived records.
+
+| Proposal | Disposition |
+|---|---|
+| Constant-time access-key/payload-hash comparisons | Refuted as a security defect: the signature uses `hmac.Equal`; the other values are an identifier and a body digest. Preserve signature verification. |
+| Query ordering guarded by tests | A compatibility property already covered by regression fixtures; no additional runtime mechanism is proposed. |
+| Run-through guarded-save/recovery capabilities | Unresolved contract decision. Do not forward capabilities or introduce a second journal merely to clear this review. |
+| Different listing/capture exclusions | Unresolved documentation/contract question; the two surfaces serve different purposes. |
+| Mandatory delta digest | A contract-change proposal, not a confirmed defect. `DeltaOptions` documents the optional trusted digest, and `TestAnEmptyExpectedDigestIsNotARejection` pins the no-digest case. |
+| Error mappings, upload-ID confinement, readiness parity | Implemented in open [PR #96](https://github.com/chester-hill-solutions/stow-s3/pull/96), awaiting independent review and merge; not yet on main at reconciliation. |
+
+The [later re-diagnosis](#re-diagnosis-what-happened-when-the-defects-were-acted-on)
+and the `reconciliation` fields in `records.json` supersede original defect labels
+and proposed actions. Raw review evidence remains historical.
 
 ## Method and what it is not
 
@@ -18,9 +37,8 @@ Two properties matter for reading it. First, **the map is partial**: fifteen of 
 units were worked, and the thirty-seven deferred ones include the seams inside `internal/storage`,
 the durable-file primitives, and `internal/authority`, `internal/policy` and `internal/capacity` —
 the three modules the runtime record names as co-owners of decisions it also makes. Silence about a
-subsystem is not a finding that it is sound. Second, **the defects below are defects, not style
-notes**: each is a place where the source does something other than what a caller, a reader or
-another layer of the same system believes it does.
+subsystem is not a finding that it is sound. Second, the observations below include defects, contract questions and proposals later refuted.
+Source mapping alone did not establish that every proposed change was warranted.
 
 The findings cluster in one shape: *a decision that two layers both believe they own, where the
 disagreement is invisible to the type system.* The optional-capability interfaces, the readiness
@@ -32,7 +50,7 @@ records, the two clients and the write policy are all instances of it.
 |---|---|
 | Candidate validation | 31 of 31, each by a fresh reviewer that did not produce it |
 | Record verification | 27 of 27 mapped records, each by a second fresh agent |
-| Verdicts upheld | All 27 `mapped` and 4 `rejected`. **No false positive.** |
+| Verdicts upheld | 27 `mapped` and 4 `rejected` source-map verdicts; these do not establish that all defect proposals were correct. |
 | Claims refuted | 27, plus line/scope/caller corrections |
 | Citation integrity | 814 structured citations and 95 prose references resolved, 0 failures |
 
@@ -46,36 +64,23 @@ entry point.
 
 ## The authentication boundary
 
-`internal/auth` is the single gate every non-admin request passes, so a defect there admits
-unauthenticated access rather than degrading one feature. Four findings, all verified:
+The original review described comparison choices and query-order tests as verified
+findings. Later source review refuted those defect interpretations: signature
+verification uses `hmac.Equal`, access keys are identifiers, and payload digests
+are not secret comparisons. Encoded-name query ordering is already exercised by
+`query_order_test.go` and the pinned Node signer fixture.
 
-- **The access key is compared with a plain `!=`** (`internal/auth/sigv4.go:313`) while the
-  signature uses `hmac.Equal` (`:293`). Access-key identifiers are semi-public, so the practical
-  timing risk is low; the finding is that the path is not uniformly constant-time and a reader
-  would reasonably assume it is.
-- **The payload hash is compared with `strings.EqualFold`** (`:382`, `:392`) while the signature is
-  deliberately *not* case-folded. Both values are hex, so the two comparisons are inconsistent with
-  each other, and the payload-hash path is not constant-time either.
-- **The canonical query ordering by encoded names is a signing-compatibility boundary with no
-  runtime fallback** (`sigv4_canonical.go:61-71`). An SDK that sorts decoded names produces a
-  signature this verifier refuses, and reverting the ordering would silently reject conforming SDKs.
-  It is guarded only by one unit test and a pinned Node fixture — not by the conformance corpus.
-  This was the subject of [the earlier query-order change](2026-10-19-sigv4-query-order.md); the
-  finding now is that nothing but a test holds it.
-- **Payload verification requires the caller to have made the body replayable.** A streaming body
-  yields `AccessDenied` "cannot verify signed payload without request body" (`:404`) rather than an
-  authentication decision — an ordering requirement on the host that the interface does not state.
-  Separately, presigned URLs have no lower bound on the signing time beyond the expiry
-  (`:354-376`): a URL signed at any past time is accepted until it expires.
+Body replayability and presigned validity remain interface-documentation questions;
+this source-only review did not demonstrate an authentication bypass.
 
-## Defects in the storage path
+## Historical storage observations
 
-- **Run-through mode silently loses durability.** `runthrough.Adapter` forwards `MultipartStore`,
+- **Run-through capability forwarding is an unresolved contract question.** `runthrough.Adapter` forwards `MultipartStore`,
   `ConditionalCopyStore` and `QuotaStoreProvider` and implements none of the other eight optional
   interfaces, while the CLI binds the *adapter* — not the local store — into the runtime
   (`cmd/stow-s3/main.go:343`, `:349`). Guarded saves, durable save requests and recovery holds are
   therefore refused in run-through mode even though the filesystem store underneath supports them.
-  A caller cannot observe this from the type.
+  This does not establish data loss or permission to enable a second journal.
 - **Three refusals reach an S3 client as a 500.** `internal/s3api/errors.go` maps
   `ErrQuotaExceeded` (`:141`) and nothing else in this family: `ErrLiveWritesDisabled`,
   `ErrResourceUnresolved` and `capacity.ErrFull` have no entry. A 500 invites a retry that cannot
@@ -97,7 +102,7 @@ unauthenticated access rather than degrading one feature. Four findings, all ver
   `<root>/.stow/multipart`. The S3 and library paths are covered by the runtime's own in-memory
   upload map; a store used directly as a `storage.Store` is not. This is the one item here with a
   security shape.
-- **Listing a workspace returns files the capture path excludes.**
+- **Listing and capture have different exclusion rules; intent remains unresolved.**
   `internal/storage/workspace/list_rooted.go:32` skips only the `.stow` subtree, so `.git`,
   `node_modules` and editor swap files come back as objects, while
   `pkg/stow/checkpoint_portable.go:87-95` filters `.git` and `.stow` separately. The same workspace
@@ -107,9 +112,9 @@ unauthenticated access rather than degrading one feature. Four findings, all ver
   (`internal/storage/workspace/registry.go:238-243`); `Collect` *creates* the registry while `List`
   and `Prune` open it read-only (`pkg/stow/resume.go:213`); and a corrupt recovery-hold journal makes
   every hold query fail with no repair or quarantine path.
-- **`VerifyDeltaDigest` treats an empty expected digest as a pass** (`pkg/stow/delta.go:378`), so
-  the change-list binding is optional and silently absent when a receiver forgets it. Per-file
-  digests do not cover the paths a document names.
+- **Delta digest verification is optional by contract** (`pkg/stow/delta.go`, `DeltaOptions` and
+  `VerifyDeltaDigest`). Per-file digests do not bind paths, but mandatory trusted-digest input
+  would change the documented and tested no-digest contract; it requires a separate decision.
 
 The full register, with callers, error modes and ordering constraints per module, is in
 [the architecture map](2026-10-22-architecture-overview/ARCHITECTURE.md) and
@@ -168,7 +173,7 @@ radius of being wrong; `overall` never exceeds it.
 
 | Priority | Record | The risk in one line |
 |---|---|---|
-| P1 | `internal/auth` | The single authentication gate: non-constant-time comparisons, and a query ordering guarded only by a test. |
+| Reviewed | `internal/auth` | Comparison and query-order proposals refuted as defects; preserve the existing signature check and regression fixtures. |
 | P1 | `internal/runthrough` | A reported write policy that describes the opposite of what the code does, on the one boolean that decides whether a mutation leaves the machine. |
 | P1 | `internal/storage` (contract) | Optional capabilities discovered by unstated type assertions; wrappers and platforms silently remove them. |
 | P1 | `internal/storage` (seam) | Nine implementations behind one interface, selection spread over three surfaces, capability coupling no type records. |
@@ -202,8 +207,8 @@ This review's register was produced by re-deriving facts from source. Acting on 
 findings exposed what that method cannot see: **whether the behaviour it describes
 was chosen on purpose.**
 
-Of the nine findings below, **four were real and are fixed, and five were refuted,
-unresolved, or not actionable** — and in every one of the five, the evidence was in
+Of the nine findings below, **four were real and are implemented in PR #96 (pending merge),
+and five were refuted, unresolved, or not actionable** — and in every one of the five, the evidence was in
 a test, a comment, or the surrounding structure rather than in the code the finding
 cited. Two of the five had their answer already written in the source: `sigv4.go:291`
 states why the signature comparison must not case-fold, and `workspace_owner_test.go`
@@ -216,10 +221,10 @@ before acting on any remaining row.**
 |---|---|
 | Run-through write policy contradicts the code (ADR 0005 and the banner say writes stay local; the adapter refuses) | **The refusal is right and the words were wrong.** `547b3a51` (2026-09-26) wrote the refusal with the rationale "a mirror-writes policy is not satisfied by keeping the local write", *before* ADR 0005 was published. The ADR, the banner and the policy doc comment were corrected; the behaviour was not touched. |
 | `storage.ErrInvalidUpload` reaches a client as a 500 | **The 500 is deliberate.** `s3api/workspace_owner_test.go` pins it for a corrupt or truncated stored upload record, which is a server-side integrity problem, not a client error. The workaround the finding cited — `ValidateMultipartPartNumbers` returning `ErrInvalidPart` instead — is deliberate for the same reason. Left unmapped. |
-| `storage.ErrResourceUnresolved` reaches a client as a 500 | **A real defect.** Fixed: 404 NoSuchUpload. The same condition had answered both 500 and 404 depending on whether a policy was configured. |
-| `runthrough.ErrLiveWritesDisabled` reaches a client as a 500 | **A real defect.** Fixed: 403 AccessDenied, following the authority refusal already in the same table. |
-| `capacity.ErrFull` reaches a client as a 500 | **A real defect.** Fixed: 507 InsufficientStorage, matching the runtime's own quota refusal directly above it. |
-| `uploadDir` joins a caller-supplied upload ID into a path (`internal/storage/workspace/multipart.go:54-56`) | **A real defect, and it was in both stores.** `internal/storage/fs/fs.go:201` had the same exposure. Fixed by validating the ID's shape before a path is built. Two placements the suites required and the finding did not anticipate: the guard must sit *after* the filesystem store's pending-save gate, because `save_requests_test.go` pins that gate as winning over everything including a multipart mutation; and `ValidateMultipartUpload` must keep answering `ErrNoSuchUpload` rather than introducing a third vocabulary. |
+| `storage.ErrResourceUnresolved` reaches a client as a 500 | **A real defect.** Proposed fix in PR #96: 404 NoSuchUpload. The same condition had answered both 500 and 404 depending on whether a policy was configured. |
+| `runthrough.ErrLiveWritesDisabled` reaches a client as a 500 | **A real defect.** Proposed fix in PR #96: 403 AccessDenied, following the authority refusal already in the same table. |
+| `capacity.ErrFull` reaches a client as a 500 | **A real defect.** Proposed fix in PR #96: 507 InsufficientStorage, matching the runtime's own quota refusal directly above it. |
+| `uploadDir` joins a caller-supplied upload ID into a path (`internal/storage/workspace/multipart.go:54-56`) | **A real defect, and it was in both stores.** The fix is proposed in PR #96, not yet merged. `internal/storage/fs/fs.go:201` had the same exposure. PR #96 validates the ID's shape before a path is built. Two placements the suites required and the finding did not anticipate: the guard must sit *after* the filesystem store's pending-save gate, because `save_requests_test.go` pins that gate as winning over everything including a multipart mutation; and `ValidateMultipartUpload` must keep answering `ErrNoSuchUpload` rather than introducing a third vocabulary. |
 | Run-through mode silently loses guarded saves, durable save requests and recovery holds | **Not a defect, or not yet a defect — unresolved, and the strongest case for leaving it alone.** The adapter holds a narrow field per capability it forwards (`localMultipart` in `multipart_adapter.go`) and refuses the rest explicitly, so the omission is a choice rather than an oversight. `storage.GuardedWriteStore` is only a capability predicate, and `SaveOptions` carries a `RequestKey`, so the guarded-save workflow is entangled with durable replay — which the outbox already journals for the same question. Enabling both in run-through mode would give one question two journals, which is the shape the author repeatedly removes ("one mechanism rather than two", ADR 0010). Nothing pins or documents it either way, so the finding is recorded as **unresolved rather than confirmed**. |
 | The auth path compares the access key with `!=` and the payload hash with `strings.EqualFold`, while the signature uses `hmac.Equal` | **Not a defect, and the source already says why.** `sigv4.go:291` documents that the signature comparison must not case-fold, because "case-folding it first would accept a signature nobody computed" — the signature is the secret comparison and it is constant-time. The access key is an identifier, not a secret, and the payload hash is a digest of a body the client already holds, so case-folding it is interoperability rather than exposure. Neither non-constant-time comparison involves a secret, so there is nothing for their timing to leak. The review read the inconsistency as the finding; the inconsistency is the point. |
 | The encoded-name query ordering is "guarded only by one unit test" | **Not actionable.** Sorting the encoded names is a correctness property, not something a runtime check can add a guard to: either the implementation does it or it does not. `query_order_test.go` and the pinned Node signer fixture are the right instruments for a compatibility boundary of this shape, and they caught the defect that produced them. |
@@ -242,14 +247,15 @@ capture path.
 
 ## Actions, in order
 
-The review performed none of these; two have since been done, and are marked so.
+These are historical proposals. PR #96 implements the bounded error, upload-ID and
+readiness fixes but remains unmerged; unresolved contract changes require a separate decision.
 
 1. **Make the readiness protocol one source of truth.** Generate the TypeScript and Python field
    sets and the version constant from `internal/ready/ready.go`, and extend
    `scripts/check-version.mjs` to gate `READY_PROTOCOL_VERSION` and the capability field names.
    Reconcile `capabilities.maxMultipartUploads`, which the writer publishes and neither reader
    declares.
-2. **Map the unmapped refusals. DONE** for `ErrLiveWritesDisabled`, `ErrResourceUnresolved` and
+2. **Map the unmapped refusals. Implemented in PR #96, pending merge** for `ErrLiveWritesDisabled`, `ErrResourceUnresolved` and
    `capacity.ErrFull`. `storage.ErrInvalidUpload` is deliberately excluded: the 500 is pinned by
    the workspace-owner wire test for a corrupt stored record. See the re-diagnosis above.
 3. **Do not forward the adapter's missing capabilities without a decision.** The omission looks
@@ -266,7 +272,7 @@ The review performed none of these; two have since been done, and are marked so.
 6. **Document the two exclusion rules rather than unifying them.** Listing a workspace bucket is
    listing the caller's directory; a capture must be portable. Both may be right for their purpose,
    so the divergence is a documentation gap until someone decides otherwise.
-7. **Validate the upload ID before it becomes a path. DONE**, in both path-backed stores, with the
+7. **Validate the upload ID before it becomes a path. Implemented in PR #96, pending merge**, in both path-backed stores, with the
    guard placed after the filesystem store's pending-save gate.
 8. **Reconcile the two clients**, or make the drift visible: the descriptor, the legacy fallback,
    the environment-strip scope, the serve argv, and the meaning of a zero limit.
@@ -278,8 +284,7 @@ The review performed none of these; two have since been done, and are marked so.
     reported meta on both the put and copy paths, and state on `Instance.Close` that it closes the
     bound store.
 12. The remaining per-module actions — `Workspace.Touch` returning a named error, `Collect` opening
-    the registry read-only, `All` reporting the entries it skipped, the delta digest becoming the
-    default, splitting `pkg/stow` off `internal/s3api` — are listed with their interfaces in the
+    the registry read-only, `All` reporting the entries it skipped, and splitting `pkg/stow` off `internal/s3api` — are listed with their interfaces in the
     full report.
 
 ## The whole-run coverage critic, and what examining its proposals found

@@ -1020,9 +1020,24 @@
       "impact": "P1",
       "rationale": "Blast radius is the entire S3 HTTP surface: this is the single gate every non-admin request passes, so a defect admits unauthenticated reads and writes rather than degrading one feature. The demonstrated risks (non-constant-time access-key and payload-hash comparisons, and the encoded-name query ordering that is a silent compatibility boundary guarded only by tests) are interface-level and reachable, which keeps impact at P1 rather than lower; nothing here is demonstrated broken, so it stays below P0."
     },
-    "next_action": "Document the exact signing contract and reconcile the two comparison inconsistencies. Add a doc comment on Verifier.AuthenticateAt enumerating the canonical request rules a client must satisfy — encoded-name query ordering, the required host/date signed headers, the every-x-amz-header-must-be-signed rule, the payload-hash default and the presigned parameter uniqueness and expiry ceiling — because callers today must infer them from the test suite. If the inconsistencies are to be fixed, change the internal comparison helpers so the payload hash is compared with the same constant-time primitive as the signature (hmac.Equal), and either make the access-key comparison constant-time or state in the interface that it is not a secret comparison; the only exported interface that would change is the documented behaviour of Verifier.AuthenticateAt.",
+    "next_action": "Preserve the existing signature comparison and query-order regression fixtures. Treat body replayability and expiry documentation as interface questions; no authentication bypass was reproduced by this source review.",
     "confidence": "high",
-    "verdict": "mapped"
+    "verdict": "mapped",
+    "reconciliation": {
+      "date": "2026-11-01",
+      "disposition": "The comparison/query-order defect interpretations and their P1 rationale are refuted. Signature comparison already uses hmac.Equal; access keys and body digests are not secrets. Existing query-order fixtures are appropriate compatibility evidence.",
+      "source": [
+        "internal/auth/sigv4.go",
+        "internal/auth/query_order_test.go"
+      ],
+      "supersedes": [
+        "risks[0]",
+        "risks[1]",
+        "risks[2]",
+        "priority.rationale",
+        "next_action"
+      ]
+    }
   },
   {
     "verdict": "mapped",
@@ -4155,8 +4170,21 @@
       "impact": "P1",
       "rationale": "The blast radius is the whole system: nine concrete implementations and every surface (S3 HTTP, embedded runtime, run-through adapter, embedded public library, CLI, and the WASM bridge through embedded.storeAdapter) bind to this one interface, so a change to the core twelve methods or to the shared value rules moves all of them. The unclear seam is the optional-capability mechanism, which is declared nowhere and re-derived at roughly two dozen sites, and the hidden coupling is demonstrated: the run-through adapter drops eight of the optional capabilities the filesystem store has, so run-through mode silently loses guarded saves, durable save requests and recovery holds, and the filesystem backend drops three of them on Windows (internal/storage/fs/save_journal.go:46). This is not P0 because nothing is currently broken in the common path and the core contract is well covered by a shared property suite run against three backends (internal/storage/backend_contract_test.go:64); it is P1 because the degradation is silent, the affected features are the durability and recovery ones, and the discovery protocol has no single place to be fixed."
     },
-    "next_action": "State the capability-discovery protocol once, in internal/storage, and route every call site through it: add a single probe (for example a Capabilities struct returned by one helper such as storage.CapabilitiesOf(store)) that performs the type assertions and the Supports* predicates together, then replace the inline assertions in internal/runtime/guarded_save.go:50, internal/runtime/save_requests.go:13, internal/runtime/object_recovery.go:24, internal/runtime/state.go:109, internal/runtime/streams.go:59, internal/runtime/usage_recovery.go:17, internal/s3api/copy.go:85 and internal/s3api/request.go:280 with it. Separately, make runthrough.Adapter forward the optional capabilities of the store it wraps (GuardedWriteStore, SaveRequestStore, RecoveryHoldStore, PutChecksumStore) instead of dropping them, so the runtime's probes find the capabilities the local store actually has (internal/runthrough/adapter.go:39-41, cmd/stow-s3/main.go:349). The interface that should change is the optional-capability half of internal/storage/store.go and a new discovery helper beside it — not the core twelve methods, which are correct and well tested.",
-    "confidence": "high"
+    "next_action": "Document capability discovery and resolve run-through durability ownership before considering forwarding additional optional interfaces. Do not introduce a second journal merely to implement this historical proposal.",
+    "confidence": "high",
+    "reconciliation": {
+      "date": "2026-11-01",
+      "disposition": "Capability omission is observed, but silent durability loss is not established. Forwarding guarded saves, save requests and recovery holds is an unresolved contract decision because the outbox already owns durable propagation.",
+      "source": [
+        "internal/runthrough/multipart_adapter.go",
+        "internal/storage/guarded.go",
+        "internal/storage/save_requests.go"
+      ],
+      "supersedes": [
+        "priority.rationale",
+        "next_action"
+      ]
+    }
   },
   {
     "verdict": "mapped",
@@ -5613,8 +5641,20 @@
       "impact": "P2",
       "rationale": "Impact is P2 because the module has one production caller pair — the CLI's delta and apply verbs — and its blast radius is the exchange of working sets between machines, which is a narrow but consequential path. Overall is P2 because the risks are all about a caller that does not use an option it could, and about a format ceiling that is a deliberate limit rather than a defect."
     },
-    "next_action": "Make the digest check the default path rather than an option: VerifyDeltaDigest treats an empty expected digest as a pass (pkg/stow/delta.go:378) and DeltaOptions carries the pair as an optional field (pkg/stow/delta.go:123), so a receiver that forgets it gets no change-list binding. The interface that should change is DeltaOptions: Encoded and ExpectSHA256 are two fields that must be set together and mean nothing apart, and a caller that sets only one gets a silent no-op rather than a refusal.",
-    "confidence": "high"
+    "next_action": "Preserve the optional trusted-digest contract and its tests. Any mandatory digest proposal needs a separate compatibility and trust-model decision.",
+    "confidence": "high",
+    "reconciliation": {
+      "date": "2026-11-01",
+      "disposition": "Mandatory digest verification would change the explicit optional-trusted-digest contract. The empty-digest no-op is documented and tested, not a confirmed defect.",
+      "source": [
+        "pkg/stow/delta.go",
+        "pkg/stow/delta_digest_test.go"
+      ],
+      "supersedes": [
+        "risks",
+        "next_action"
+      ]
+    }
   },
   {
     "verdict": "rejected",

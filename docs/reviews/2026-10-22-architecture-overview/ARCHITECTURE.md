@@ -1,6 +1,8 @@
 # Architecture — stow-s3
 
-A source-grounded map of the modules, seams, flows and dependencies the run reached. Derived
+A historical source-grounded map of the modules, seams, flows and dependencies the run reached.
+Read the [later dispositions](../2026-10-22-architecture-overview.md#read-the-dispositions-first)
+before treating a proposed defect or next action as current guidance. Derived
 from `records.json`; every claim here is stated in a record with a file and line, and every record
 passed independent validation and verification. Coverage is 15 of 52 units — see §8 and
 `OPEN-QUESTIONS.md`.

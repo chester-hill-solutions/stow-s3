@@ -1,5 +1,11 @@
 # Open questions — architecture-overview / stow-s3 / run 1
 
+**Historical snapshot.** This file records the state before later review waves and the
+whole-run critic. The final ledger and the [overview dispositions](../2026-10-22-architecture-overview.md#read-the-dispositions-first)
+supersede its unworked-entry-point and no-later-critic statements. In particular,
+the clients, auth, WASM, MCP and readiness received later records. Deferred storage
+seams remain questions, not permission to forward durability capabilities.
+
 Three kinds of open item: coverage the run never reached, facts the workers could not establish,
 and claims no independent agent checked. The third is the largest and the most important.
 
@@ -39,8 +45,9 @@ Deferral reason, identical for all of them, recorded per unit in `coverage-ledge
 | Browser persistence adapter (`packages/stow-s3/src/browser-types.ts`) | Extension point |
 
 The outbox, staged-write and guarded-write seams are the ones to examine first: the run already
-established that `runthrough.Adapter` erases the guarded-write and save-request capabilities of
-the store it wraps, and the outbox is the mechanism that makes propagation durable.
+observed that `runthrough.Adapter` does not expose guarded-write and save-request capabilities of
+the store it wraps. Whether forwarding them is appropriate remains unresolved; the outbox
+already owns durable propagation.
 
 ### Modules, flows and cross-cutting units proposed and not examined
 

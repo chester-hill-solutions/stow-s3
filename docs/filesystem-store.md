@@ -41,8 +41,9 @@ format change without a reader for the old records makes an existing data direct
 rather than partially readable, which is the diagnosable failure rather than a silent one. Records
 written before the binary format carry no magic and are read through the legacy path.
 
-The generated protobuf types live in the `recordpb` subpackage and are checked in. A field-number
-change is caught by the regeneration gate rather than by a failing read.
+The generated protobuf types live in the `recordpb` subpackage and are checked in. The regeneration gate
+checks that generated Go matches the current schema. It does not prove wire compatibility
+when both are changed; preserving field numbers remains a separate format obligation.
 
 ## Ownership and concurrency
 
