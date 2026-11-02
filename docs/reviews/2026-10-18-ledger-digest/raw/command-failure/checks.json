@@ -1,0 +1,165 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/state_digest_test.go",
+      "benchmark/stream-state.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "-overlay=benchmark/digest-baseline-overlay.json",
+      "test",
+      "./internal/capacity",
+      "-run",
+      "^TestStateDigest",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 2,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": false
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/digest-baseline-overlay.json",
+      "-race",
+      "./internal/capacity",
+      "-run",
+      "^TestStateDigest",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 963,
+    "passed": true
+  },
+  {
+    "name": "prototype-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/stream-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestStateDigest",
+      "-count=1",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 400,
+    "passed": true
+  },
+  {
+    "name": "prototype-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/stream-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestStateDigest",
+      "-count=1",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1919,
+    "passed": true
+  },
+  {
+    "name": "install-benchmark",
+    "args": [
+      "cp",
+      "benchmark/isolate-bench.go.txt",
+      "internal/capacity/ledger_isolate_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "format-benchmark",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/ledger_isolate_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "-overlay=benchmark/digest-baseline-overlay.json",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/digest-before.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 2,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": false
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/stream-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/digest-after.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 446,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/digest-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7510,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmark",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_isolate_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  }
+]

@@ -1,0 +1,17 @@
+from pathlib import Path
+import subprocess,json,time,os,hashlib
+p=Path('/private/tmp/stow-read-matched-2026-10-16')
+cmd=[str(p/'production-matched.test'),'-test.run=^TestReviewMatchedPointerCosts$','-test.v','-test.count=2','-test.cpu=1,8']
+(p/'production-matched-plan.json').write_text(json.dumps({'command':cmd,'reference':'exact frozen c614a2b value-based methods in same binary','candidate':'actual production pointer-based methods','flags':'ordinary go test -c, no diagnostic flags','selected_environment':{k:os.environ.get(k) for k in ['GOGC','GOMEMLIMIT','GOMAXPROCS']},'all_samples_retained':True,'no_concurrent_agent_builds_or_tests':True},indent=2)+'\n')
+r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(p/'production-matched.log').write_text('COMMAND '+json.dumps(cmd)+'\n'+r.stdout);assert r.returncode==0,r.stdout[-3000:];print('production matched comparison complete',flush=True)
+out=p/'direct';out.mkdir(exist_ok=True)
+bins={'before':'/private/tmp/stow-save-body-failure/after.test','after':str(p/'after-clean.test')}
+groups=[('^BenchmarkReadForSaveObservation$/^present$',250000),('^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$',1000000),('^BenchmarkOpenedObjectRead$/^get-tiny$',250000),('^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$',50000),('^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$',100000)]
+order=['before','after','after','before'];(out/'plan.json').write_text(json.dumps({'versions':bins,'binaries_sha256':{v:hashlib.sha256(Path(binary).read_bytes()).hexdigest() for v,binary in bins.items()},'groups':groups,'cpu':[1,8],'order':order,'samples_per_case_version_cpu':6,'flags':'ordinary go test -c','all_samples_retained':True},indent=2)+'\n')
+for cpu in [1,8]:
+ for block,v in enumerate(order,1):
+  output=[];start=time.time()
+  for pattern,n in groups:
+   cmd=[bins[v],'-test.run=^$','-test.bench='+pattern,'-test.benchmem',f'-test.benchtime={n}x','-test.count=3',f'-test.cpu={cpu}'];r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);output.extend(['COMMAND '+json.dumps(cmd),r.stdout]);assert r.returncode==0,r.stdout
+  (out/f'cpu{cpu}-{block}-{v}.log').write_text('\n'.join(output));print('direct',cpu,block,v,round(time.time()-start,2),flush=True)
+print('COMPLETE',flush=True)

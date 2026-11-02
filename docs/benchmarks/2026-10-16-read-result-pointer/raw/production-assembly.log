@@ -1,0 +1,1236 @@
+COMMAND ["go", "tool", "objdump", "-s", "runtime\\.\\(\\*Instance\\)\\.(GetObject|reviewValueGetObject|ReadForSave|reviewValueReadForSave)$|runtime\\.(readOpenedObject|reviewReadOpenedValue)$", "/private/tmp/stow-read-matched-2026-10-16/production-matched.test"]
+TEXT github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).ReadForSave(SB) /Users/ladmin/.codex/worktrees/core-copy-quality/stow/internal/runtime/guarded_save.go
+  guarded_save.go:61	0x1002d9950		f9400b90		MOVD 16(R28), R16
+  guarded_save.go:61	0x1002d9954		d10943f1		SUB $592, RSP, R17
+  guarded_save.go:61	0x1002d9958		eb10023f		CMP R16, R17
+  guarded_save.go:61	0x1002d995c		54002a49		BLS 338(PC)
+  guarded_save.go:61	0x1002d9960		d10b43f4		SUB $720, RSP, R20
+  guarded_save.go:61	0x1002d9964		a93ffa9d		STP (R29, R30), -8(R20)
+  guarded_save.go:61	0x1002d9968		9100029f		MOVD R20, RSP
+  guarded_save.go:61	0x1002d996c		d10023fd		SUB $8, RSP, R29
+  instance.go:178	0x1002d9970		f901efe0		MOVD R0, 984(RSP)
+  instance.go:178	0x1002d9974		f90207e6		MOVD R6, 1032(RSP)
+  instance.go:178	0x1002d9978		f90203e5		MOVD R5, 1024(RSP)
+  instance.go:178	0x1002d997c		f901ffe4		MOVD R4, 1016(RSP)
+  instance.go:178	0x1002d9980		f901fbe3		MOVD R3, 1008(RSP)
+  instance.go:178	0x1002d9984		f901f7e2		MOVD R2, 1000(RSP)
+  instance.go:178	0x1002d9988		f901f3e1		MOVD R1, 992(RSP)
+  guarded_save.go:61	0x1002d998c		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:61	0x1002d9990		1000009b		ADR 16(PC), R27
+  guarded_save.go:61	0x1002d9994		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:61	0x1002d9998		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:61	0x1002d999c		97f68cc2		CALL -619326(PC)
+  guarded_save.go:61	0x1002d99a0		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:61	0x1002d99a4		910e23f4		ADD $904, RSP, R20
+  guarded_save.go:61	0x1002d99a8		1000009b		ADR 16(PC), R27
+  guarded_save.go:61	0x1002d99ac		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:61	0x1002d99b0		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:61	0x1002d99b4		97f68cc2		CALL -619326(PC)
+  guarded_save.go:61	0x1002d99b8		d10023fd		SUB $8, RSP, R29
+  instance.go:178	0x1002d99bc		b5000081		CBNZ R1, 4(PC)
+  guarded_save.go:62	0x1002d99c0		aa1f03e7		MOVD ZR, R7
+  guarded_save.go:62	0x1002d99c4		aa1f03e8		MOVD ZR, R8
+  guarded_save.go:62	0x1002d99c8		1400000d		JMP 13(PC)
+  instance.go:181	0x1002d99cc		f9401421		MOVD 40(R1), R1
+  instance.go:181	0x1002d99d0		aa0203e0		MOVD R2, R0
+  instance.go:181	0x1002d99d4		d63f0020		CALL (R1)
+  streams.go:15		0x1002d99d8		f941f7e2		MOVD 1000(RSP), R2
+  policy.go:36		0x1002d99dc		f941fbe3		MOVD 1008(RSP), R3
+  policy.go:36		0x1002d99e0		f941ffe4		MOVD 1016(RSP), R4
+  policy.go:36		0x1002d99e4		f94203e5		MOVD 1024(RSP), R5
+  policy.go:36		0x1002d99e8		f94207e6		MOVD 1032(RSP), R6
+  guarded_save.go:62	0x1002d99ec		aa0003e7		MOVD R0, R7
+  guarded_save.go:62	0x1002d99f0		aa0103e8		MOVD R1, R8
+  guarded_save.go:65	0x1002d99f4		f941efe0		MOVD 984(RSP), R0
+  streams.go:15		0x1002d99f8		f941f3e1		MOVD 992(RSP), R1
+  guarded_save.go:62	0x1002d99fc		b5002327		CBNZ R7, 281(PC)
+  guarded_save.go:65	0x1002d9a00		910863f4		ADD $536, RSP, R20
+  guarded_save.go:65	0x1002d9a04		1000009b		ADR 16(PC), R27
+  guarded_save.go:65	0x1002d9a08		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:65	0x1002d9a0c		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:65	0x1002d9a10		97f68cab		CALL -619349(PC)
+  guarded_save.go:65	0x1002d9a14		d10023fd		SUB $8, RSP, R29
+  policy.go:36		0x1002d9a18		9000074d		ADRP 950272(PC), R13
+  policy.go:36		0x1002d9a1c		911f41ad		ADD $2000, R13, R13
+  policy.go:36		0x1002d9a20		b2400bee		ORR $7, ZR, R14
+  policy.go:36		0x1002d9a24		910863fb		ADD $536, RSP, R27
+  policy.go:36		0x1002d9a28		a9003b6d		STP (R13, R14), (R27)
+  policy.go:36		0x1002d9a2c		9108a3fb		ADD $552, RSP, R27
+  policy.go:36		0x1002d9a30		a9001363		STP (R3, R4), (R27)
+  policy.go:36		0x1002d9a34		90000747		ADRP 950272(PC), R7
+  policy.go:36		0x1002d9a38		9105c0e7		ADD $368, R7, R7
+  policy.go:36		0x1002d9a3c		b27f07e8		ORR $6, ZR, R8
+  policy.go:36		0x1002d9a40		9108e3fb		ADD $568, RSP, R27
+  policy.go:36		0x1002d9a44		a9002367		STP (R7, R8), (R27)
+  policy.go:36		0x1002d9a48		910923fb		ADD $584, RSP, R27
+  policy.go:36		0x1002d9a4c		a9001b65		STP (R5, R6), (R27)
+  guarded_save.go:65	0x1002d9a50		910863fb		ADD $536, RSP, R27
+  guarded_save.go:65	0x1002d9a54		a9401363		LDP (R27), (R3, R4)
+  guarded_save.go:65	0x1002d9a58		9108a3fb		ADD $552, RSP, R27
+  guarded_save.go:65	0x1002d9a5c		a9403b6d		LDP (R27), (R13, R14)
+  guarded_save.go:65	0x1002d9a60		910963fb		ADD $600, RSP, R27
+  guarded_save.go:65	0x1002d9a64		a940336b		LDP (R27), (R11, R12)
+  guarded_save.go:65	0x1002d9a68		d0000741		ADRP 958464(PC), R1
+  guarded_save.go:65	0x1002d9a6c		911dd421		ADD $1909, R1, R1
+  guarded_save.go:65	0x1002d9a70		d2800162		MOVD $11, R2
+  guarded_save.go:65	0x1002d9a74		aa0503e9		MOVD R5, R9
+  guarded_save.go:65	0x1002d9a78		aa0603ea		MOVD R6, R10
+  guarded_save.go:65	0x1002d9a7c		aa0d03e5		MOVD R13, R5
+  guarded_save.go:65	0x1002d9a80		aa0e03e6		MOVD R14, R6
+  guarded_save.go:65	0x1002d9a84		9400076b		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).checkResource(SB)
+  guarded_save.go:65	0x1002d9a88		b5001ce0		CBNZ R0, 231(PC)
+  guarded_save.go:68	0x1002d9a8c		f941efe0		MOVD 984(RSP), R0
+  guarded_save.go:68	0x1002d9a90		97ffff4c		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).SupportsGuardedSaves(SB)
+  guarded_save.go:68	0x1002d9a94		36001a40		TBZ $0, R0, 210(PC)
+  streams.go:15		0x1002d9a98		910863f4		ADD $536, RSP, R20
+  streams.go:15		0x1002d9a9c		1000009b		ADR 16(PC), R27
+  streams.go:15		0x1002d9aa0		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15		0x1002d9aa4		d10063fd		SUB $24, RSP, R29
+  streams.go:15		0x1002d9aa8		97f68c7f		CALL -619393(PC)
+  streams.go:15		0x1002d9aac		d10023fd		SUB $8, RSP, R29
+  streams.go:15		0x1002d9ab0		f941efe0		MOVD 984(RSP), R0
+  streams.go:15		0x1002d9ab4		f941f3e1		MOVD 992(RSP), R1
+  streams.go:15		0x1002d9ab8		f941f7e2		MOVD 1000(RSP), R2
+  streams.go:15		0x1002d9abc		f941fbe3		MOVD 1008(RSP), R3
+  streams.go:15		0x1002d9ac0		f941ffe4		MOVD 1016(RSP), R4
+  streams.go:15		0x1002d9ac4		f94203e5		MOVD 1024(RSP), R5
+  streams.go:15		0x1002d9ac8		f94207e6		MOVD 1032(RSP), R6
+  streams.go:15		0x1002d9acc		aa1f03e7		MOVD ZR, R7
+  streams.go:15		0x1002d9ad0		940033f8		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).openObject(SB)
+  streams.go:15		0x1002d9ad4		f9007fe2		MOVD R2, 248(RSP)
+  streams.go:15		0x1002d9ad8		f90087e3		MOVD R3, 264(RSP)
+  streams.go:15		0x1002d9adc		f90083e0		MOVD R0, 256(RSP)
+  streams.go:15		0x1002d9ae0		f9008be1		MOVD R1, 272(RSP)
+  streams.go:15		0x1002d9ae4		910863f5		ADD $536, RSP, R21
+  streams.go:15		0x1002d9ae8		910023f4		ADD $8, RSP, R20
+  streams.go:15		0x1002d9aec		1000009b		ADR 16(PC), R27
+  streams.go:15		0x1002d9af0		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15		0x1002d9af4		d10063fd		SUB $24, RSP, R29
+  streams.go:15		0x1002d9af8		97f68ce4		CALL -619292(PC)
+  streams.go:15		0x1002d9afc		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:71	0x1002d9b00		910463f5		ADD $280, RSP, R21
+  guarded_save.go:71	0x1002d9b04		910863f4		ADD $536, RSP, R20
+  guarded_save.go:71	0x1002d9b08		1000009b		ADR 16(PC), R27
+  guarded_save.go:71	0x1002d9b0c		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:71	0x1002d9b10		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:71	0x1002d9b14		97f68cdd		CALL -619299(PC)
+  guarded_save.go:71	0x1002d9b18		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:72	0x1002d9b1c		910723f4		ADD $456, RSP, R20
+  guarded_save.go:72	0x1002d9b20		1000009b		ADR 16(PC), R27
+  guarded_save.go:72	0x1002d9b24		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:72	0x1002d9b28		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:72	0x1002d9b2c		97f68c64		CALL -619420(PC)
+  guarded_save.go:72	0x1002d9b30		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:72	0x1002d9b34		f941efe8		MOVD 984(RSP), R8
+  guarded_save.go:72	0x1002d9b38		f900e7e8		MOVD R8, 456(RSP)
+  guarded_save.go:72	0x1002d9b3c		f941fbe8		MOVD 1008(RSP), R8
+  guarded_save.go:72	0x1002d9b40		f941ffe9		MOVD 1016(RSP), R9
+  guarded_save.go:72	0x1002d9b44		a91d27e8		STP (R8, R9), 464(RSP)
+  guarded_save.go:72	0x1002d9b48		f94203e8		MOVD 1024(RSP), R8
+  guarded_save.go:72	0x1002d9b4c		f94207e9		MOVD 1032(RSP), R9
+  guarded_save.go:72	0x1002d9b50		a91e27e8		STP (R8, R9), 480(RSP)
+  guarded_save.go:73	0x1002d9b54		b0002d1b		ADRP 5902336(PC), R27
+  guarded_save.go:73	0x1002d9b58		9123437b		ADD $2256, R27, R27
+  guarded_save.go:73	0x1002d9b5c		a9402768		LDP (R27), (R8, R9)
+  guarded_save.go:73	0x1002d9b60		aa0203e0		MOVD R2, R0
+  guarded_save.go:73	0x1002d9b64		aa0303e1		MOVD R3, R1
+  guarded_save.go:73	0x1002d9b68		aa0803e2		MOVD R8, R2
+  guarded_save.go:73	0x1002d9b6c		aa0903e3		MOVD R9, R3
+  guarded_save.go:73	0x1002d9b70		97f6a520		CALL errors.Is(SB)
+  guarded_save.go:73	0x1002d9b74		36000100		TBZ $0, R0, 8(PC)
+  guarded_save.go:73	0x1002d9b78		b0002d1b		ADRP 5902336(PC), R27
+  guarded_save.go:73	0x1002d9b7c		9122437b		ADD $2192, R27, R27
+  guarded_save.go:73	0x1002d9b80		a9400f62		LDP (R27), (R2, R3)
+  guarded_save.go:73	0x1002d9b84		f9407fe0		MOVD 248(RSP), R0
+  guarded_save.go:73	0x1002d9b88		f94087e1		MOVD 264(RSP), R1
+  guarded_save.go:73	0x1002d9b8c		97f6a519		CALL errors.Is(SB)
+  guarded_save.go:73	0x1002d9b90		36000e00		TBZ $0, R0, 112(PC)
+  guarded_save.go:77	0x1002d9b94		f9407fe0		MOVD 248(RSP), R0
+  guarded_save.go:77	0x1002d9b98		b5000bc0		CBNZ R0, 94(PC)
+  guarded_save.go:80	0x1002d9b9c		f94083e0		MOVD 256(RSP), R0
+  guarded_save.go:80	0x1002d9ba0		f9408be1		MOVD 272(RSP), R1
+  guarded_save.go:80	0x1002d9ba4		910463e2		ADD $280, RSP, R2
+  guarded_save.go:80	0x1002d9ba8		940018ee		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.readOpenedObject(SB)
+  guarded_save.go:81	0x1002d9bac		b4000200		CBZ R0, 16(PC)
+  guarded_save.go:82	0x1002d9bb0		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:82	0x1002d9bb4		1000009b		ADR 16(PC), R27
+  guarded_save.go:82	0x1002d9bb8		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:82	0x1002d9bbc		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:82	0x1002d9bc0		97f68c39		CALL -619463(PC)
+  guarded_save.go:82	0x1002d9bc4		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:82	0x1002d9bc8		910e23f4		ADD $904, RSP, R20
+  guarded_save.go:82	0x1002d9bcc		1000009b		ADR 16(PC), R27
+  guarded_save.go:82	0x1002d9bd0		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:82	0x1002d9bd4		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:82	0x1002d9bd8		97f68c39		CALL -619463(PC)
+  guarded_save.go:82	0x1002d9bdc		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:82	0x1002d9be0		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:82	0x1002d9be4		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:82	0x1002d9be8		d65f03c0		RET
+  guarded_save.go:86	0x1002d9bec		910863f4		ADD $536, RSP, R20
+  guarded_save.go:86	0x1002d9bf0		1000009b		ADR 16(PC), R27
+  guarded_save.go:86	0x1002d9bf4		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:86	0x1002d9bf8		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:86	0x1002d9bfc		97f68c2c		CALL -619476(PC)
+  guarded_save.go:86	0x1002d9c00		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:86	0x1002d9c04		f90157ff		MOVD ZR, 680(RSP)
+  guarded_save.go:85	0x1002d9c08		a95693e3		LDP 360(RSP), (R3, R4)
+  guarded_save.go:85	0x1002d9c0c		9108e3fb		ADD $568, RSP, R27
+  guarded_save.go:85	0x1002d9c10		a9001363		STP (R3, R4), (R27)
+  guarded_save.go:85	0x1002d9c14		a95793e3		LDP 376(RSP), (R3, R4)
+  guarded_save.go:85	0x1002d9c18		910983fb		ADD $608, RSP, R27
+  guarded_save.go:85	0x1002d9c1c		a9001363		STP (R3, R4), (R27)
+  guarded_save.go:86	0x1002d9c20		f940c7e3		MOVD 392(RSP), R3
+  guarded_save.go:86	0x1002d9c24		f90147e3		MOVD R3, 648(RSP)
+  guarded_save.go:86	0x1002d9c28		a95a93e3		LDP 424(RSP), (R3, R4)
+  guarded_save.go:86	0x1002d9c2c		910a43fb		ADD $656, RSP, R27
+  guarded_save.go:86	0x1002d9c30		a9001363		STP (R3, R4), (R27)
+  guarded_save.go:86	0x1002d9c34		a95b93e3		LDP 440(RSP), (R3, R4)
+  guarded_save.go:86	0x1002d9c38		910a83fb		ADD $672, RSP, R27
+  guarded_save.go:86	0x1002d9c3c		a9001363		STP (R3, R4), (R27)
+  guarded_save.go:87	0x1002d9c40		a95387e0		LDP 312(RSP), (R0, R1)
+  guarded_save.go:87	0x1002d9c44		f940a7e2		MOVD 328(RSP), R2
+  guarded_save.go:84	0x1002d9c48		910023f5		ADD $8, RSP, R21
+  guarded_save.go:84	0x1002d9c4c		910863f4		ADD $536, RSP, R20
+  guarded_save.go:84	0x1002d9c50		1000009b		ADR 16(PC), R27
+  guarded_save.go:84	0x1002d9c54		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:84	0x1002d9c58		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:84	0x1002d9c5c		97f68c8f		CALL -619377(PC)
+  guarded_save.go:84	0x1002d9c60		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:84	0x1002d9c64		f94157e3		MOVD 680(RSP), R3
+  guarded_save.go:84	0x1002d9c68		f9004fe3		MOVD R3, 152(RSP)
+  guarded_save.go:84	0x1002d9c6c		97fb5429		CALL github.com/chester-hill-solutions/stow-s3/internal/storage.ObjectFingerprint(SB)
+  guarded_save.go:84	0x1002d9c70		a94a13e3		LDP 160(RSP), (R3, R4)
+  guarded_save.go:84	0x1002d9c74		a94b1be5		LDP 176(RSP), (R5, R6)
+  guarded_save.go:84	0x1002d9c78		910863fb		ADD $536, RSP, R27
+  guarded_save.go:84	0x1002d9c7c		a9001363		STP (R3, R4), (R27)
+  guarded_save.go:84	0x1002d9c80		9108a3fb		ADD $552, RSP, R27
+  guarded_save.go:84	0x1002d9c84		a9001b65		STP (R5, R6), (R27)
+  guarded_save.go:84	0x1002d9c88		910863fb		ADD $536, RSP, R27
+  guarded_save.go:84	0x1002d9c8c		a9401363		LDP (R27), (R3, R4)
+  guarded_save.go:84	0x1002d9c90		9108a3fb		ADD $552, RSP, R27
+  guarded_save.go:84	0x1002d9c94		a9401b65		LDP (R27), (R5, R6)
+  guarded_save.go:84	0x1002d9c98		9107c7fb		ADD $497, RSP, R27
+  guarded_save.go:84	0x1002d9c9c		a9001363		STP (R3, R4), (R27)
+  guarded_save.go:84	0x1002d9ca0		910807fb		ADD $513, RSP, R27
+  guarded_save.go:84	0x1002d9ca4		a9001b65		STP (R5, R6), (R27)
+  guarded_save.go:88	0x1002d9ca8		910b63f5		ADD $728, RSP, R21
+  guarded_save.go:88	0x1002d9cac		910463f4		ADD $280, RSP, R20
+  guarded_save.go:88	0x1002d9cb0		1000009b		ADR 16(PC), R27
+  guarded_save.go:88	0x1002d9cb4		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:88	0x1002d9cb8		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:88	0x1002d9cbc		97f68c73		CALL -619405(PC)
+  guarded_save.go:88	0x1002d9cc0		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:88	0x1002d9cc4		910e23f5		ADD $904, RSP, R21
+  guarded_save.go:88	0x1002d9cc8		910723f4		ADD $456, RSP, R20
+  guarded_save.go:88	0x1002d9ccc		1000009b		ADR 16(PC), R27
+  guarded_save.go:88	0x1002d9cd0		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:88	0x1002d9cd4		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:88	0x1002d9cd8		97f68c78		CALL -619400(PC)
+  guarded_save.go:88	0x1002d9cdc		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:88	0x1002d9ce0		910e23f5		ADD $904, RSP, R21
+  guarded_save.go:88	0x1002d9ce4		910723f4		ADD $456, RSP, R20
+  guarded_save.go:88	0x1002d9ce8		1000009b		ADR 16(PC), R27
+  guarded_save.go:88	0x1002d9cec		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:88	0x1002d9cf0		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:88	0x1002d9cf4		97f68c71		CALL -619407(PC)
+  guarded_save.go:88	0x1002d9cf8		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:88	0x1002d9cfc		aa1f03e0		MOVD ZR, R0
+  guarded_save.go:88	0x1002d9d00		aa1f03e1		MOVD ZR, R1
+  guarded_save.go:88	0x1002d9d04		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:88	0x1002d9d08		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:88	0x1002d9d0c		d65f03c0		RET
+  guarded_save.go:78	0x1002d9d10		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:78	0x1002d9d14		1000009b		ADR 16(PC), R27
+  guarded_save.go:78	0x1002d9d18		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:78	0x1002d9d1c		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:78	0x1002d9d20		97f68be1		CALL -619551(PC)
+  guarded_save.go:78	0x1002d9d24		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:78	0x1002d9d28		910e23f4		ADD $904, RSP, R20
+  guarded_save.go:78	0x1002d9d2c		1000009b		ADR 16(PC), R27
+  guarded_save.go:78	0x1002d9d30		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:78	0x1002d9d34		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:78	0x1002d9d38		97f68be1		CALL -619551(PC)
+  guarded_save.go:78	0x1002d9d3c		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:78	0x1002d9d40		f94087e1		MOVD 264(RSP), R1
+  guarded_save.go:78	0x1002d9d44		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:78	0x1002d9d48		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:78	0x1002d9d4c		d65f03c0		RET
+  guarded_save.go:74	0x1002d9d50		b24003e2		ORR $1, ZR, R2
+  guarded_save.go:74	0x1002d9d54		3907c3e2		MOVB R2, 496(RSP)
+  guarded_save.go:75	0x1002d9d58		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:75	0x1002d9d5c		1000009b		ADR 16(PC), R27
+  guarded_save.go:75	0x1002d9d60		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:75	0x1002d9d64		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:75	0x1002d9d68		97f68bcf		CALL -619569(PC)
+  guarded_save.go:75	0x1002d9d6c		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:75	0x1002d9d70		f941fbe2		MOVD 1008(RSP), R2
+  guarded_save.go:75	0x1002d9d74		f941ffe3		MOVD 1016(RSP), R3
+  guarded_save.go:75	0x1002d9d78		910b63fb		ADD $728, RSP, R27
+  guarded_save.go:75	0x1002d9d7c		a9000f62		STP (R2, R3), (R27)
+  guarded_save.go:75	0x1002d9d80		f94203e2		MOVD 1024(RSP), R2
+  guarded_save.go:75	0x1002d9d84		f94207e3		MOVD 1032(RSP), R3
+  guarded_save.go:75	0x1002d9d88		910ba3fb		ADD $744, RSP, R27
+  guarded_save.go:75	0x1002d9d8c		a9000f62		STP (R2, R3), (R27)
+  guarded_save.go:75	0x1002d9d90		910e23f5		ADD $904, RSP, R21
+  guarded_save.go:75	0x1002d9d94		910723f4		ADD $456, RSP, R20
+  guarded_save.go:75	0x1002d9d98		1000009b		ADR 16(PC), R27
+  guarded_save.go:75	0x1002d9d9c		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:75	0x1002d9da0		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:75	0x1002d9da4		97f68c45		CALL -619451(PC)
+  guarded_save.go:75	0x1002d9da8		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:75	0x1002d9dac		910e23f5		ADD $904, RSP, R21
+  guarded_save.go:75	0x1002d9db0		910723f4		ADD $456, RSP, R20
+  guarded_save.go:75	0x1002d9db4		1000009b		ADR 16(PC), R27
+  guarded_save.go:75	0x1002d9db8		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:75	0x1002d9dbc		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:75	0x1002d9dc0		97f68c3e		CALL -619458(PC)
+  guarded_save.go:75	0x1002d9dc4		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:75	0x1002d9dc8		aa1f03e0		MOVD ZR, R0
+  guarded_save.go:75	0x1002d9dcc		aa1f03e1		MOVD ZR, R1
+  guarded_save.go:75	0x1002d9dd0		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:75	0x1002d9dd4		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:75	0x1002d9dd8		d65f03c0		RET
+  guarded_save.go:69	0x1002d9ddc		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:69	0x1002d9de0		1000009b		ADR 16(PC), R27
+  guarded_save.go:69	0x1002d9de4		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:69	0x1002d9de8		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:69	0x1002d9dec		97f68bae		CALL -619602(PC)
+  guarded_save.go:69	0x1002d9df0		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:69	0x1002d9df4		910e23f4		ADD $904, RSP, R20
+  guarded_save.go:69	0x1002d9df8		1000009b		ADR 16(PC), R27
+  guarded_save.go:69	0x1002d9dfc		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:69	0x1002d9e00		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:69	0x1002d9e04		97f68bae		CALL -619602(PC)
+  guarded_save.go:69	0x1002d9e08		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:69	0x1002d9e0c		b0002d1b		ADRP 5902336(PC), R27
+  guarded_save.go:69	0x1002d9e10		9100037b		ADD $0, R27, R27
+  guarded_save.go:69	0x1002d9e14		a9400760		LDP (R27), (R0, R1)
+  guarded_save.go:69	0x1002d9e18		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:69	0x1002d9e1c		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:69	0x1002d9e20		d65f03c0		RET
+  guarded_save.go:66	0x1002d9e24		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:66	0x1002d9e28		1000009b		ADR 16(PC), R27
+  guarded_save.go:66	0x1002d9e2c		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:66	0x1002d9e30		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:66	0x1002d9e34		97f68b9c		CALL -619620(PC)
+  guarded_save.go:66	0x1002d9e38		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:66	0x1002d9e3c		910e23f4		ADD $904, RSP, R20
+  guarded_save.go:66	0x1002d9e40		1000009b		ADR 16(PC), R27
+  guarded_save.go:66	0x1002d9e44		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:66	0x1002d9e48		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:66	0x1002d9e4c		97f68b9c		CALL -619620(PC)
+  guarded_save.go:66	0x1002d9e50		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:66	0x1002d9e54		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:66	0x1002d9e58		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:66	0x1002d9e5c		d65f03c0		RET
+  guarded_save.go:63	0x1002d9e60		910b63f4		ADD $728, RSP, R20
+  guarded_save.go:63	0x1002d9e64		1000009b		ADR 16(PC), R27
+  guarded_save.go:63	0x1002d9e68		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:63	0x1002d9e6c		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:63	0x1002d9e70		97f68b8d		CALL -619635(PC)
+  guarded_save.go:63	0x1002d9e74		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:63	0x1002d9e78		910e23f4		ADD $904, RSP, R20
+  guarded_save.go:63	0x1002d9e7c		1000009b		ADR 16(PC), R27
+  guarded_save.go:63	0x1002d9e80		a93eeffd		STP (R29, R27), -24(RSP)
+  guarded_save.go:63	0x1002d9e84		d10063fd		SUB $24, RSP, R29
+  guarded_save.go:63	0x1002d9e88		97f68b8d		CALL -619635(PC)
+  guarded_save.go:63	0x1002d9e8c		d10023fd		SUB $8, RSP, R29
+  guarded_save.go:63	0x1002d9e90		aa0703e0		MOVD R7, R0
+  guarded_save.go:63	0x1002d9e94		aa0803e1		MOVD R8, R1
+  guarded_save.go:63	0x1002d9e98		a97ffbfd		LDP -8(RSP), (R29, R30)
+  guarded_save.go:63	0x1002d9e9c		910b43ff		ADD $720, RSP, RSP
+  guarded_save.go:63	0x1002d9ea0		d65f03c0		RET
+  guarded_save.go:61	0x1002d9ea4		a91087e0		STP (R0, R1), 264(RSP)
+  guarded_save.go:61	0x1002d9ea8		a9118fe2		STP (R2, R3), 280(RSP)
+  guarded_save.go:61	0x1002d9eac		a91297e4		STP (R4, R5), 296(RSP)
+  guarded_save.go:61	0x1002d9eb0		f9009fe6		MOVD R6, 312(RSP)
+  guarded_save.go:61	0x1002d9eb4		aa1e03e3		MOVD R30, R3
+  guarded_save.go:61	0x1002d9eb8		97f681b6		CALL runtime.morestack_noctxt.abi0(SB)
+  guarded_save.go:61	0x1002d9ebc		a95087e0		LDP 264(RSP), (R0, R1)
+  guarded_save.go:61	0x1002d9ec0		a9518fe2		LDP 280(RSP), (R2, R3)
+  guarded_save.go:61	0x1002d9ec4		a95297e4		LDP 296(RSP), (R4, R5)
+  guarded_save.go:61	0x1002d9ec8		f9409fe6		MOVD 312(RSP), R6
+  guarded_save.go:61	0x1002d9ecc		17fffea1		JMP github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).ReadForSave(SB)
+
+TEXT github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).GetObject(SB) /Users/ladmin/.codex/worktrees/core-copy-quality/stow/internal/runtime/objects.go
+  objects.go:27		0x1002dfde0		f9400b90		MOVD 16(R28), R16
+  objects.go:27		0x1002dfde4		d10783f1		SUB $480, RSP, R17
+  objects.go:27		0x1002dfde8		eb10023f		CMP R16, R17
+  objects.go:27		0x1002dfdec		54000a09		BLS 80(PC)
+  objects.go:27		0x1002dfdf0		d10983f4		SUB $608, RSP, R20
+  objects.go:27		0x1002dfdf4		a93ffa9d		STP (R29, R30), -8(R20)
+  objects.go:27		0x1002dfdf8		9100029f		MOVD R20, RSP
+  objects.go:27		0x1002dfdfc		d10023fd		SUB $8, RSP, R29
+  objects.go:27		0x1002dfe00		f90193e1		MOVD R1, 800(RSP)
+  objects.go:27		0x1002dfe04		f90197e2		MOVD R2, 808(RSP)
+  objects.go:27		0x1002dfe08		f9019be3		MOVD R3, 816(RSP)
+  objects.go:27		0x1002dfe0c		f901a3e5		MOVD R5, 832(RSP)
+  objects.go:27		0x1002dfe10		9109a3f4		ADD $616, RSP, R20
+  objects.go:27		0x1002dfe14		1000009b		ADR 16(PC), R27
+  objects.go:27		0x1002dfe18		a93eeffd		STP (R29, R27), -24(RSP)
+  objects.go:27		0x1002dfe1c		d10063fd		SUB $24, RSP, R29
+  objects.go:27		0x1002dfe20		97f673a1		CALL -625759(PC)
+  objects.go:27		0x1002dfe24		d10023fd		SUB $8, RSP, R29
+  streams.go:15		0x1002dfe28		9106a3f4		ADD $424, RSP, R20
+  streams.go:15		0x1002dfe2c		1000009b		ADR 16(PC), R27
+  streams.go:15		0x1002dfe30		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15		0x1002dfe34		d10063fd		SUB $24, RSP, R29
+  streams.go:15		0x1002dfe38		97f6739b		CALL -625765(PC)
+  streams.go:15		0x1002dfe3c		d10023fd		SUB $8, RSP, R29
+  streams.go:15		0x1002dfe40		aa1f03e7		MOVD ZR, R7
+  streams.go:15		0x1002dfe44		94001b1b		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).openObject(SB)
+  streams.go:15		0x1002dfe48		9106a3f5		ADD $424, RSP, R21
+  streams.go:15		0x1002dfe4c		910023f4		ADD $8, RSP, R20
+  streams.go:15		0x1002dfe50		1000009b		ADR 16(PC), R27
+  streams.go:15		0x1002dfe54		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15		0x1002dfe58		d10063fd		SUB $24, RSP, R29
+  streams.go:15		0x1002dfe5c		97f6740b		CALL -625653(PC)
+  streams.go:15		0x1002dfe60		d10023fd		SUB $8, RSP, R29
+  objects.go:28		0x1002dfe64		9103e3f5		ADD $248, RSP, R21
+  objects.go:28		0x1002dfe68		9106a3f4		ADD $424, RSP, R20
+  objects.go:28		0x1002dfe6c		1000009b		ADR 16(PC), R27
+  objects.go:28		0x1002dfe70		a93eeffd		STP (R29, R27), -24(RSP)
+  objects.go:28		0x1002dfe74		d10063fd		SUB $24, RSP, R29
+  objects.go:28		0x1002dfe78		97f67404		CALL -625660(PC)
+  objects.go:28		0x1002dfe7c		d10023fd		SUB $8, RSP, R29
+  objects.go:29		0x1002dfe80		b5000402		CBNZ R2, 32(PC)
+  objects.go:32		0x1002dfe84		9103e3e2		ADD $248, RSP, R2
+  objects.go:32		0x1002dfe88		94000036		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.readOpenedObject(SB)
+  objects.go:32		0x1002dfe8c		b4000140		CBZ R0, 10(PC)
+  objects.go:33		0x1002dfe90		9109a3f4		ADD $616, RSP, R20
+  objects.go:33		0x1002dfe94		1000009b		ADR 16(PC), R27
+  objects.go:33		0x1002dfe98		a93eeffd		STP (R29, R27), -24(RSP)
+  objects.go:33		0x1002dfe9c		d10063fd		SUB $24, RSP, R29
+  objects.go:33		0x1002dfea0		97f67381		CALL -625791(PC)
+  objects.go:33		0x1002dfea4		d10023fd		SUB $8, RSP, R29
+  objects.go:33		0x1002dfea8		a97ffbfd		LDP -8(RSP), (R29, R30)
+  objects.go:33		0x1002dfeac		910983ff		ADD $608, RSP, RSP
+  objects.go:33		0x1002dfeb0		d65f03c0		RET
+  objects.go:35		0x1002dfeb4		9109a3f5		ADD $616, RSP, R21
+  objects.go:35		0x1002dfeb8		9103e3f4		ADD $248, RSP, R20
+  objects.go:35		0x1002dfebc		1000009b		ADR 16(PC), R27
+  objects.go:35		0x1002dfec0		a93eeffd		STP (R29, R27), -24(RSP)
+  objects.go:35		0x1002dfec4		d10063fd		SUB $24, RSP, R29
+  objects.go:35		0x1002dfec8		97f673f0		CALL -625680(PC)
+  objects.go:35		0x1002dfecc		d10023fd		SUB $8, RSP, R29
+  objects.go:35		0x1002dfed0		9109a3f5		ADD $616, RSP, R21
+  objects.go:35		0x1002dfed4		9103e3f4		ADD $248, RSP, R20
+  objects.go:35		0x1002dfed8		1000009b		ADR 16(PC), R27
+  objects.go:35		0x1002dfedc		a93eeffd		STP (R29, R27), -24(RSP)
+  objects.go:35		0x1002dfee0		d10063fd		SUB $24, RSP, R29
+  objects.go:35		0x1002dfee4		97f673e9		CALL -625687(PC)
+  objects.go:35		0x1002dfee8		d10023fd		SUB $8, RSP, R29
+  objects.go:35		0x1002dfeec		aa1f03e0		MOVD ZR, R0
+  objects.go:35		0x1002dfef0		aa1f03e1		MOVD ZR, R1
+  objects.go:35		0x1002dfef4		a97ffbfd		LDP -8(RSP), (R29, R30)
+  objects.go:35		0x1002dfef8		910983ff		ADD $608, RSP, RSP
+  objects.go:35		0x1002dfefc		d65f03c0		RET
+  objects.go:30		0x1002dff00		9109a3f4		ADD $616, RSP, R20
+  objects.go:30		0x1002dff04		1000009b		ADR 16(PC), R27
+  objects.go:30		0x1002dff08		a93eeffd		STP (R29, R27), -24(RSP)
+  objects.go:30		0x1002dff0c		d10063fd		SUB $24, RSP, R29
+  objects.go:30		0x1002dff10		97f67365		CALL -625819(PC)
+  objects.go:30		0x1002dff14		d10023fd		SUB $8, RSP, R29
+  objects.go:30		0x1002dff18		aa0203e0		MOVD R2, R0
+  objects.go:30		0x1002dff1c		aa0303e1		MOVD R3, R1
+  objects.go:30		0x1002dff20		a97ffbfd		LDP -8(RSP), (R29, R30)
+  objects.go:30		0x1002dff24		910983ff		ADD $608, RSP, RSP
+  objects.go:30		0x1002dff28		d65f03c0		RET
+  objects.go:27		0x1002dff2c		a90b87e0		STP (R0, R1), 184(RSP)
+  objects.go:27		0x1002dff30		a90c8fe2		STP (R2, R3), 200(RSP)
+  objects.go:27		0x1002dff34		a90d97e4		STP (R4, R5), 216(RSP)
+  objects.go:27		0x1002dff38		f90077e6		MOVD R6, 232(RSP)
+  objects.go:27		0x1002dff3c		aa1e03e3		MOVD R30, R3
+  objects.go:27		0x1002dff40		97f66994		CALL runtime.morestack_noctxt.abi0(SB)
+  objects.go:27		0x1002dff44		a94b87e0		LDP 184(RSP), (R0, R1)
+  objects.go:27		0x1002dff48		a94c8fe2		LDP 200(RSP), (R2, R3)
+  objects.go:27		0x1002dff4c		a94d97e4		LDP 216(RSP), (R4, R5)
+  objects.go:27		0x1002dff50		f94077e6		MOVD 232(RSP), R6
+  objects.go:27		0x1002dff54		17ffffa3		JMP github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).GetObject(SB)
+  objects.go:27		0x1002dff58		00000000		?
+  objects.go:27		0x1002dff5c		00000000		?
+
+TEXT github.com/chester-hill-solutions/stow-s3/internal/runtime.readOpenedObject(SB) /Users/ladmin/.codex/worktrees/core-copy-quality/stow/internal/runtime/objects.go
+  objects.go:38		0x1002dff60		f9400b90		MOVD 16(R28), R16
+  objects.go:38		0x1002dff64		d10083f1		SUB $32, RSP, R17
+  objects.go:38		0x1002dff68		eb10023f		CMP R16, R17
+  objects.go:38		0x1002dff6c		54000fe9		BLS 127(PC)
+  objects.go:38		0x1002dff70		f8160ffe		MOVD.W R30, -160(RSP)
+  objects.go:38		0x1002dff74		f81f83fd		MOVD R29, -8(RSP)
+  objects.go:38		0x1002dff78		d10023fd		SUB $8, RSP, R29
+  objects.go:38		0x1002dff7c		f9004bff		MOVD ZR, 144(RSP)
+  objects.go:41		0x1002dff80		f9005fe2		MOVD R2, 184(RSP)
+  objects.go:41		0x1002dff84		f9005be1		MOVD R1, 176(RSP)
+  objects.go:41		0x1002dff88		f90057e0		MOVD R0, 168(RSP)
+  objects.go:38		0x1002dff8c		39013fff		MOVB ZR, 79(RSP)
+  objects.go:38		0x1002dff90		a905ffff		STP (ZR, ZR), 88(RSP)
+  objects.go:39		0x1002dff94		3980001b		MOVB (R0), R27
+  objects.go:39		0x1002dff98		b0000003		ADRP 4096(PC), R3
+  objects.go:39		0x1002dff9c		91064063		ADD $400, R3, R3
+  objects.go:39		0x1002dffa0		f9003fe3		MOVD R3, 120(RSP)
+  objects.go:39		0x1002dffa4		a90807e0		STP (R0, R1), 128(RSP)
+  objects.go:39		0x1002dffa8		9101e3e3		ADD $120, RSP, R3
+  objects.go:39		0x1002dffac		f9004be3		MOVD R3, 144(RSP)
+  objects.go:39		0x1002dffb0		b24003e3		ORR $1, ZR, R3
+  objects.go:39		0x1002dffb4		39013fe3		MOVB R3, 79(RSP)
+  objects.go:40		0x1002dffb8		f9401c43		MOVD 56(R2), R3
+  objects.go:41		0x1002dffbc		f100007f		CMP $0, R3
+  objects.go:44		0x1002dffc0		9a9fa063		CSEL GE, R3, ZR, R3
+  objects.go:44		0x1002dffc4		d2a04004		MOVD $33554432, R4
+  objects.go:44		0x1002dffc8		eb04007f		CMP R4, R3
+  objects.go:47		0x1002dffcc		d2a04004		MOVD $33554432, R4
+  objects.go:47		0x1002dffd0		9a83c082		CSEL GT, R4, R3, R2
+  objects.go:47		0x1002dffd4		f9002be2		MOVD R2, 80(RSP)
+  objects.go:47		0x1002dffd8		b0000e60		ADRP 1888256(PC), R0
+  objects.go:47		0x1002dffdc		91060000		ADD $384, R0, R0
+  objects.go:47		0x1002dffe0		aa1f03e1		MOVD ZR, R1
+  objects.go:47		0x1002dffe4		97f65a67		CALL runtime.makeslice(SB)
+  objects.go:47		0x1002dffe8		f9003be0		MOVD R0, 112(RSP)
+  buffer.go:478		0x1002dffec		90001120		ADRP 2244608(PC), R0
+  buffer.go:478		0x1002dfff0		91160000		ADD $1408, R0, R0
+  buffer.go:478		0x1002dfff4		97f4d09b		CALL runtime.newobject(SB)
+  buffer.go:478		0x1002dfff8		f9402be3		MOVD 80(RSP), R3
+  buffer.go:478		0x1002dfffc		f9000803		MOVD R3, 16(R0)
+  buffer.go:478		0x1002e0000		d0002edb		ADRP 6135808(PC), R27
+  buffer.go:478		0x1002e0004		b94a5363		MOVWU 2640(R27), R3
+  buffer.go:478		0x1002e0008		35000063		CBNZW R3, 3(PC)
+  buffer.go:478		0x1002e000c		f9403be7		MOVD 112(RSP), R7
+  buffer.go:478		0x1002e0010		14000004		JMP 4(PC)
+  buffer.go:478		0x1002e0014		97f671fb		CALL runtime.gcWriteBarrier1(SB)
+  buffer.go:478		0x1002e0018		f9403be7		MOVD 112(RSP), R7
+  buffer.go:478		0x1002e001c		f9000327		MOVD R7, (R25)
+  buffer.go:478		0x1002e0020		f90037e0		MOVD R0, 104(RSP)
+  buffer.go:478		0x1002e0024		f9000007		MOVD R7, (R0)
+  objects.go:41		0x1002e0028		f94057e1		MOVD 168(RSP), R1
+  objects.go:41		0x1002e002c		b4000101		CBZ R1, 8(PC)
+  objects.go:48		0x1002e0030		f9400427		MOVD 8(R1), R7
+  objects.go:48		0x1002e0034		f0002cc8		ADRP 5877760(PC), R8
+  objects.go:48		0x1002e0038		91274108		ADD $2512, R8, R8
+  objects.go:48		0x1002e003c		c8dffd09		LDAR (R8), R9
+  objects.go:48		0x1002e0040		b940102a		MOVWU 16(R1), R10
+  objects.go:48		0x1002e0044		f940012b		MOVD (R9), R11
+  objects.go:48		0x1002e0048		14000031		JMP 49(PC)
+  io.go:388		0x1002e004c		aa0103e2		MOVD R1, R2
+  io.go:388		0x1002e0050		f9405be3		MOVD 176(RSP), R3
+  io.go:388		0x1002e0054		aa1f03e4		MOVD ZR, R4
+  io.go:388		0x1002e0058		aa1f03e5		MOVD ZR, R5
+  io.go:388		0x1002e005c		aa0503e6		MOVD R5, R6
+  io.go:388		0x1002e0060		aa0003e1		MOVD R0, R1
+  io.go:388		0x1002e0064		900013e0		ADRP 2605056(PC), R0
+  io.go:388		0x1002e0068		91058000		ADD $352, R0, R0
+  io.go:388		0x1002e006c		97f712fd		CALL io.copyBuffer(SB)
+  objects.go:49		0x1002e0070		b50003a1		CBNZ R1, 29(PC)
+  buffer.go:60		0x1002e0074		f94037e2		MOVD 104(RSP), R2
+  buffer.go:60		0x1002e0078		a9400443		LDP (R2), (R3, R1)
+  buffer.go:60		0x1002e007c		a9410042		LDP 16(R2), (R2, R0)
+  buffer.go:60		0x1002e0080		eb01001f		CMP R1, R0
+  buffer.go:60		0x1002e0084		54000428		BHI 33(PC)
+  buffer.go:60		0x1002e0088		cb020004		SUB R2, R0, R4
+  buffer.go:60		0x1002e008c		cb000021		SUB R0, R1, R1
+  buffer.go:60		0x1002e0090		cb000042		SUB R0, R2, R2
+  objects.go:52		0x1002e0094		f9405fe5		MOVD 184(RSP), R5
+  objects.go:52		0x1002e0098		a90288a1		STP (R1, R2), 40(R5)
+  buffer.go:60		0x1002e009c		8a84fc00		AND R4->63, R0, R0
+  buffer.go:60		0x1002e00a0		8b000060		ADD R0, R3, R0
+  objects.go:52		0x1002e00a4		d0002edb		ADRP 6135808(PC), R27
+  objects.go:52		0x1002e00a8		b94a5361		MOVWU 2640(R27), R1
+  objects.go:52		0x1002e00ac		34000081		CBZW R1, 4(PC)
+  objects.go:52		0x1002e00b0		f94010a1		MOVD 32(R5), R1
+  objects.go:52		0x1002e00b4		97f671d7		CALL runtime.gcWriteBarrier2(SB)
+  objects.go:52		0x1002e00b8		a9000720		STP (R0, R1), (R25)
+  objects.go:52		0x1002e00bc		f90010a0		MOVD R0, 32(R5)
+  objects.go:53		0x1002e00c0		a905ffff		STP (ZR, ZR), 88(RSP)
+  objects.go:53		0x1002e00c4		39013fff		MOVB ZR, 79(RSP)
+  objects.go:53		0x1002e00c8		f9404bfa		MOVD 144(RSP), R26
+  objects.go:53		0x1002e00cc		f9400340		MOVD (R26), R0
+  objects.go:53		0x1002e00d0		d63f0000		CALL (R0)
+  objects.go:53		0x1002e00d4		a94587e0		LDP 88(RSP), (R0, R1)
+  objects.go:53		0x1002e00d8		f85f83fd		MOVD -8(RSP), R29
+  objects.go:53		0x1002e00dc		f84a07fe		MOVD.P 160(RSP), R30
+  objects.go:53		0x1002e00e0		d65f03c0		RET
+  objects.go:50		0x1002e00e4		a9058be1		STP (R1, R2), 88(RSP)
+  objects.go:50		0x1002e00e8		39013fff		MOVB ZR, 79(RSP)
+  objects.go:50		0x1002e00ec		f9404bfa		MOVD 144(RSP), R26
+  objects.go:50		0x1002e00f0		f9400340		MOVD (R26), R0
+  objects.go:50		0x1002e00f4		d63f0000		CALL (R0)
+  objects.go:50		0x1002e00f8		a94587e0		LDP 88(RSP), (R0, R1)
+  objects.go:50		0x1002e00fc		f85f83fd		MOVD -8(RSP), R29
+  objects.go:50		0x1002e0100		f84a07fe		MOVD.P 160(RSP), R30
+  objects.go:50		0x1002e0104		d65f03c0		RET
+  buffer.go:60		0x1002e0108		97f6728e		CALL runtime.panicSliceB(SB)
+  objects.go:48		0x1002e010c		8a0b014c		AND R11, R10, R12
+  objects.go:48		0x1002e0110		d37ced8c		LSL $4, R12, R12
+  objects.go:48		0x1002e0114		9100218c		ADD $8, R12, R12
+  objects.go:48		0x1002e0118		f86c692d		MOVD (R9)(R12), R13
+  objects.go:48		0x1002e011c		8b0c012c		ADD R12, R9, R12
+  objects.go:48		0x1002e0120		eb0701bf		CMP R7, R13
+  objects.go:48		0x1002e0124		54000120		BEQ 9(PC)
+  objects.go:48		0x1002e0128		9100054a		ADD $1, R10, R10
+  objects.go:48		0x1002e012c		b5ffff0d		CBNZ R13, -8(PC)
+  objects.go:48		0x1002e0130		aa0803e0		MOVD R8, R0
+  objects.go:48		0x1002e0134		aa0703e1		MOVD R7, R1
+  objects.go:48		0x1002e0138		97f4c1c2		CALL runtime.typeAssert(SB)
+  objects.go:48		0x1002e013c		aa0003e1		MOVD R0, R1
+  io.go:388		0x1002e0140		f94037e0		MOVD 104(RSP), R0
+  objects.go:48		0x1002e0144		17ffffc2		JMP -62(PC)
+  objects.go:48		0x1002e0148		f9400581		MOVD 8(R12), R1
+  objects.go:48		0x1002e014c		17ffffc0		JMP -64(PC)
+  objects.go:48		0x1002e0150		97f57070		CALL runtime.deferreturn(SB)
+  objects.go:48		0x1002e0154		f9402fe0		MOVD 88(RSP), R0
+  objects.go:48		0x1002e0158		f94033e1		MOVD 96(RSP), R1
+  objects.go:48		0x1002e015c		f85f83fd		MOVD -8(RSP), R29
+  objects.go:48		0x1002e0160		f84a07fe		MOVD.P 160(RSP), R30
+  objects.go:48		0x1002e0164		d65f03c0		RET
+  objects.go:38		0x1002e0168		a90087e0		STP (R0, R1), 8(RSP)
+  objects.go:38		0x1002e016c		f9000fe2		MOVD R2, 24(RSP)
+  objects.go:38		0x1002e0170		aa1e03e3		MOVD R30, R3
+  objects.go:38		0x1002e0174		97f66907		CALL runtime.morestack_noctxt.abi0(SB)
+  objects.go:38		0x1002e0178		a94087e0		LDP 8(RSP), (R0, R1)
+  objects.go:38		0x1002e017c		f9400fe2		MOVD 24(RSP), R2
+  objects.go:38		0x1002e0180		17ffff78		JMP github.com/chester-hill-solutions/stow-s3/internal/runtime.readOpenedObject(SB)
+  objects.go:38		0x1002e0184		00000000		?
+  objects.go:38		0x1002e0188		00000000		?
+  objects.go:38		0x1002e018c		00000000		?
+
+TEXT github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).reviewValueGetObject(SB) /Users/ladmin/.codex/worktrees/core-copy-quality/stow/internal/runtime/read_perf_review_probe_test.go
+  read_perf_review_probe_test.go:124	0x100314db0		f9400b90		MOVD 16(R28), R16
+  read_perf_review_probe_test.go:124	0x100314db4		d10983f1		SUB $608, RSP, R17
+  read_perf_review_probe_test.go:124	0x100314db8		eb10023f		CMP R16, R17
+  read_perf_review_probe_test.go:124	0x100314dbc		54000ae9		BLS 87(PC)
+  read_perf_review_probe_test.go:124	0x100314dc0		d10b83f4		SUB $736, RSP, R20
+  read_perf_review_probe_test.go:124	0x100314dc4		a93ffa9d		STP (R29, R30), -8(R20)
+  read_perf_review_probe_test.go:124	0x100314dc8		9100029f		MOVD R20, RSP
+  read_perf_review_probe_test.go:124	0x100314dcc		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:124	0x100314dd0		f901d3e1		MOVD R1, 928(RSP)
+  read_perf_review_probe_test.go:124	0x100314dd4		f901d7e2		MOVD R2, 936(RSP)
+  read_perf_review_probe_test.go:124	0x100314dd8		f901dbe3		MOVD R3, 944(RSP)
+  read_perf_review_probe_test.go:124	0x100314ddc		f901e3e5		MOVD R5, 960(RSP)
+  read_perf_review_probe_test.go:124	0x100314de0		910ba3f4		ADD $744, RSP, R20
+  read_perf_review_probe_test.go:124	0x100314de4		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:124	0x100314de8		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:124	0x100314dec		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:124	0x100314df0		97f59fad		CALL -680019(PC)
+  read_perf_review_probe_test.go:124	0x100314df4		d10023fd		SUB $8, RSP, R29
+  streams.go:15				0x100314df8		9108a3f4		ADD $552, RSP, R20
+  streams.go:15				0x100314dfc		1000009b		ADR 16(PC), R27
+  streams.go:15				0x100314e00		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15				0x100314e04		d10063fd		SUB $24, RSP, R29
+  streams.go:15				0x100314e08		97f59fa7		CALL -680025(PC)
+  streams.go:15				0x100314e0c		d10023fd		SUB $8, RSP, R29
+  streams.go:15				0x100314e10		aa1f03e7		MOVD ZR, R7
+  streams.go:15				0x100314e14		97ff4727		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).openObject(SB)
+  streams.go:15				0x100314e18		9108a3f5		ADD $552, RSP, R21
+  streams.go:15				0x100314e1c		910023f4		ADD $8, RSP, R20
+  streams.go:15				0x100314e20		1000009b		ADR 16(PC), R27
+  streams.go:15				0x100314e24		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15				0x100314e28		d10063fd		SUB $24, RSP, R29
+  streams.go:15				0x100314e2c		97f5a017		CALL -679913(PC)
+  streams.go:15				0x100314e30		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:125	0x100314e34		9105e3f5		ADD $376, RSP, R21
+  read_perf_review_probe_test.go:125	0x100314e38		9108a3f4		ADD $552, RSP, R20
+  read_perf_review_probe_test.go:125	0x100314e3c		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:125	0x100314e40		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:125	0x100314e44		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:125	0x100314e48		97f5a010		CALL -679920(PC)
+  read_perf_review_probe_test.go:125	0x100314e4c		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:126	0x100314e50		b4000182		CBZ R2, 12(PC)
+  read_perf_review_probe_test.go:127	0x100314e54		910ba3f4		ADD $744, RSP, R20
+  read_perf_review_probe_test.go:127	0x100314e58		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:127	0x100314e5c		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:127	0x100314e60		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:127	0x100314e64		97f59f90		CALL -680048(PC)
+  read_perf_review_probe_test.go:127	0x100314e68		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:127	0x100314e6c		aa0203e0		MOVD R2, R0
+  read_perf_review_probe_test.go:127	0x100314e70		aa0303e1		MOVD R3, R1
+  read_perf_review_probe_test.go:127	0x100314e74		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:127	0x100314e78		910b83ff		ADD $736, RSP, RSP
+  read_perf_review_probe_test.go:127	0x100314e7c		d65f03c0		RET
+  read_perf_review_probe_test.go:129	0x100314e80		9108a3f4		ADD $552, RSP, R20
+  read_perf_review_probe_test.go:129	0x100314e84		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:129	0x100314e88		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:129	0x100314e8c		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314e90		97f59f85		CALL -680059(PC)
+  read_perf_review_probe_test.go:129	0x100314e94		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314e98		910023f5		ADD $8, RSP, R21
+  read_perf_review_probe_test.go:129	0x100314e9c		9105e3f4		ADD $376, RSP, R20
+  read_perf_review_probe_test.go:129	0x100314ea0		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:129	0x100314ea4		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:129	0x100314ea8		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314eac		97f59ff7		CALL -679945(PC)
+  read_perf_review_probe_test.go:129	0x100314eb0		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314eb4		94000027		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.reviewReadOpenedValue(SB)
+  read_perf_review_probe_test.go:129	0x100314eb8		9108a3f5		ADD $552, RSP, R21
+  read_perf_review_probe_test.go:129	0x100314ebc		9102e3f4		ADD $184, RSP, R20
+  read_perf_review_probe_test.go:129	0x100314ec0		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:129	0x100314ec4		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:129	0x100314ec8		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314ecc		97f59fef		CALL -679953(PC)
+  read_perf_review_probe_test.go:129	0x100314ed0		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314ed4		910ba3f5		ADD $744, RSP, R21
+  read_perf_review_probe_test.go:129	0x100314ed8		9108a3f4		ADD $552, RSP, R20
+  read_perf_review_probe_test.go:129	0x100314edc		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:129	0x100314ee0		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:129	0x100314ee4		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314ee8		97f59fe8		CALL -679960(PC)
+  read_perf_review_probe_test.go:129	0x100314eec		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314ef0		910ba3f5		ADD $744, RSP, R21
+  read_perf_review_probe_test.go:129	0x100314ef4		9108a3f4		ADD $552, RSP, R20
+  read_perf_review_probe_test.go:129	0x100314ef8		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:129	0x100314efc		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:129	0x100314f00		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314f04		97f59fe1		CALL -679967(PC)
+  read_perf_review_probe_test.go:129	0x100314f08		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:129	0x100314f0c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:129	0x100314f10		910b83ff		ADD $736, RSP, RSP
+  read_perf_review_probe_test.go:129	0x100314f14		d65f03c0		RET
+  read_perf_review_probe_test.go:124	0x100314f18		a90b87e0		STP (R0, R1), 184(RSP)
+  read_perf_review_probe_test.go:124	0x100314f1c		a90c8fe2		STP (R2, R3), 200(RSP)
+  read_perf_review_probe_test.go:124	0x100314f20		a90d97e4		STP (R4, R5), 216(RSP)
+  read_perf_review_probe_test.go:124	0x100314f24		f90077e6		MOVD R6, 232(RSP)
+  read_perf_review_probe_test.go:124	0x100314f28		aa1e03e3		MOVD R30, R3
+  read_perf_review_probe_test.go:124	0x100314f2c		97f59599		CALL runtime.morestack_noctxt.abi0(SB)
+  read_perf_review_probe_test.go:124	0x100314f30		a94b87e0		LDP 184(RSP), (R0, R1)
+  read_perf_review_probe_test.go:124	0x100314f34		a94c8fe2		LDP 200(RSP), (R2, R3)
+  read_perf_review_probe_test.go:124	0x100314f38		a94d97e4		LDP 216(RSP), (R4, R5)
+  read_perf_review_probe_test.go:124	0x100314f3c		f94077e6		MOVD 232(RSP), R6
+  read_perf_review_probe_test.go:124	0x100314f40		17ffff9c		JMP github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).reviewValueGetObject(SB)
+  read_perf_review_probe_test.go:124	0x100314f44		00000000		?
+  read_perf_review_probe_test.go:124	0x100314f48		00000000		?
+  read_perf_review_probe_test.go:124	0x100314f4c		00000000		?
+
+TEXT github.com/chester-hill-solutions/stow-s3/internal/runtime.reviewReadOpenedValue(SB) /Users/ladmin/.codex/worktrees/core-copy-quality/stow/internal/runtime/read_perf_review_probe_test.go
+  read_perf_review_probe_test.go:132	0x100314f50		f9400b90		MOVD 16(R28), R16
+  read_perf_review_probe_test.go:132	0x100314f54		d10083f1		SUB $32, RSP, R17
+  read_perf_review_probe_test.go:132	0x100314f58		eb10023f		CMP R16, R17
+  read_perf_review_probe_test.go:132	0x100314f5c		54001149		BLS 138(PC)
+  read_perf_review_probe_test.go:132	0x100314f60		f8160ffe		MOVD.W R30, -160(RSP)
+  read_perf_review_probe_test.go:132	0x100314f64		f81f83fd		MOVD R29, -8(RSP)
+  read_perf_review_probe_test.go:132	0x100314f68		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:132	0x100314f6c		f9004bff		MOVD ZR, 144(RSP)
+  read_perf_review_probe_test.go:135	0x100314f70		f9010be1		MOVD R1, 528(RSP)
+  read_perf_review_probe_test.go:135	0x100314f74		f90107e0		MOVD R0, 520(RSP)
+  read_perf_review_probe_test.go:132	0x100314f78		39013fff		MOVB ZR, 79(RSP)
+  read_perf_review_probe_test.go:132	0x100314f7c		910563f4		ADD $344, RSP, R20
+  read_perf_review_probe_test.go:132	0x100314f80		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:132	0x100314f84		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:132	0x100314f88		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:132	0x100314f8c		97f59f46		CALL -680122(PC)
+  read_perf_review_probe_test.go:132	0x100314f90		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:132	0x100314f94		a905ffff		STP (ZR, ZR), 88(RSP)
+  read_perf_review_probe_test.go:133	0x100314f98		3980001b		MOVB (R0), R27
+  read_perf_review_probe_test.go:133	0x100314f9c		b0000003		ADRP 4096(PC), R3
+  read_perf_review_probe_test.go:133	0x100314fa0		91068063		ADD $416, R3, R3
+  read_perf_review_probe_test.go:133	0x100314fa4		f9003fe3		MOVD R3, 120(RSP)
+  read_perf_review_probe_test.go:133	0x100314fa8		a90807e0		STP (R0, R1), 128(RSP)
+  read_perf_review_probe_test.go:133	0x100314fac		9101e3e3		ADD $120, RSP, R3
+  read_perf_review_probe_test.go:133	0x100314fb0		f9004be3		MOVD R3, 144(RSP)
+  read_perf_review_probe_test.go:133	0x100314fb4		b24003e3		ORR $1, ZR, R3
+  read_perf_review_probe_test.go:133	0x100314fb8		39013fe3		MOVB R3, 79(RSP)
+  read_perf_review_probe_test.go:134	0x100314fbc		f94073e3		MOVD 224(RSP), R3
+  read_perf_review_probe_test.go:135	0x100314fc0		f100007f		CMP $0, R3
+  read_perf_review_probe_test.go:138	0x100314fc4		9a9fa063		CSEL GE, R3, ZR, R3
+  read_perf_review_probe_test.go:138	0x100314fc8		d2a04004		MOVD $33554432, R4
+  read_perf_review_probe_test.go:138	0x100314fcc		eb04007f		CMP R4, R3
+  read_perf_review_probe_test.go:141	0x100314fd0		d2a04004		MOVD $33554432, R4
+  read_perf_review_probe_test.go:141	0x100314fd4		9a83c082		CSEL GT, R4, R3, R2
+  read_perf_review_probe_test.go:141	0x100314fd8		f9002be2		MOVD R2, 80(RSP)
+  read_perf_review_probe_test.go:141	0x100314fdc		90000cc0		ADRP 1671168(PC), R0
+  read_perf_review_probe_test.go:141	0x100314fe0		91060000		ADD $384, R0, R0
+  read_perf_review_probe_test.go:141	0x100314fe4		aa1f03e1		MOVD ZR, R1
+  read_perf_review_probe_test.go:141	0x100314fe8		97f58666		CALL runtime.makeslice(SB)
+  read_perf_review_probe_test.go:141	0x100314fec		f9003be0		MOVD R0, 112(RSP)
+  buffer.go:478				0x100314ff0		f0000f60		ADRP 2027520(PC), R0
+  buffer.go:478				0x100314ff4		91160000		ADD $1408, R0, R0
+  buffer.go:478				0x100314ff8		97f3fc9a		CALL runtime.newobject(SB)
+  buffer.go:478				0x100314ffc		f9402be3		MOVD 80(RSP), R3
+  buffer.go:478				0x100315000		f9000803		MOVD R3, 16(R0)
+  buffer.go:478				0x100315004		b0002d3b		ADRP 5918720(PC), R27
+  buffer.go:478				0x100315008		b94a5363		MOVWU 2640(R27), R3
+  buffer.go:478				0x10031500c		35000063		CBNZW R3, 3(PC)
+  buffer.go:478				0x100315010		f9403be7		MOVD 112(RSP), R7
+  buffer.go:478				0x100315014		14000004		JMP 4(PC)
+  buffer.go:478				0x100315018		97f59dfa		CALL runtime.gcWriteBarrier1(SB)
+  buffer.go:478				0x10031501c		f9403be7		MOVD 112(RSP), R7
+  buffer.go:478				0x100315020		f9000327		MOVD R7, (R25)
+  buffer.go:478				0x100315024		f90037e0		MOVD R0, 104(RSP)
+  buffer.go:478				0x100315028		f9000007		MOVD R7, (R0)
+  read_perf_review_probe_test.go:135	0x10031502c		f94107e1		MOVD 520(RSP), R1
+  read_perf_review_probe_test.go:135	0x100315030		b4000101		CBZ R1, 8(PC)
+  read_perf_review_probe_test.go:142	0x100315034		f9400427		MOVD 8(R1), R7
+  read_perf_review_probe_test.go:142	0x100315038		d0002b28		ADRP 5660672(PC), R8
+  read_perf_review_probe_test.go:142	0x10031503c		9133c108		ADD $3312, R8, R8
+  read_perf_review_probe_test.go:142	0x100315040		c8dffd09		LDAR (R8), R9
+  read_perf_review_probe_test.go:142	0x100315044		b940102a		MOVWU 16(R1), R10
+  read_perf_review_probe_test.go:142	0x100315048		f940012b		MOVD (R9), R11
+  read_perf_review_probe_test.go:142	0x10031504c		14000037		JMP 55(PC)
+  io.go:388				0x100315050		aa0103e2		MOVD R1, R2
+  io.go:388				0x100315054		f9410be3		MOVD 528(RSP), R3
+  io.go:388				0x100315058		aa1f03e4		MOVD ZR, R4
+  io.go:388				0x10031505c		aa1f03e5		MOVD ZR, R5
+  io.go:388				0x100315060		aa0503e6		MOVD R5, R6
+  io.go:388				0x100315064		aa0003e1		MOVD R0, R1
+  io.go:388				0x100315068		f0001220		ADRP 2387968(PC), R0
+  io.go:388				0x10031506c		91058000		ADD $352, R0, R0
+  io.go:388				0x100315070		97f63efc		CALL io.copyBuffer(SB)
+  read_perf_review_probe_test.go:143	0x100315074		b50003a1		CBNZ R1, 29(PC)
+  buffer.go:60				0x100315078		f94037e2		MOVD 104(RSP), R2
+  buffer.go:60				0x10031507c		a9400443		LDP (R2), (R3, R1)
+  buffer.go:60				0x100315080		a9410042		LDP 16(R2), (R2, R0)
+  buffer.go:60				0x100315084		eb00003f		CMP R0, R1
+  buffer.go:60				0x100315088		540004e3		BCC 39(PC)
+  buffer.go:60				0x10031508c		cb020004		SUB R2, R0, R4
+  buffer.go:60				0x100315090		cb000021		SUB R0, R1, R1
+  buffer.go:60				0x100315094		cb000042		SUB R0, R2, R2
+  buffer.go:60				0x100315098		8a84fc00		AND R4->63, R0, R0
+  buffer.go:60				0x10031509c		8b000060		ADD R0, R3, R0
+  read_perf_review_probe_test.go:146	0x1003150a0		f90067e0		MOVD R0, 200(RSP)
+  read_perf_review_probe_test.go:146	0x1003150a4		a90d0be1		STP (R1, R2), 208(RSP)
+  read_perf_review_probe_test.go:147	0x1003150a8		910563f5		ADD $344, RSP, R21
+  read_perf_review_probe_test.go:147	0x1003150ac		9102a3f4		ADD $168, RSP, R20
+  read_perf_review_probe_test.go:147	0x1003150b0		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:147	0x1003150b4		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:147	0x1003150b8		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:147	0x1003150bc		97f59f73		CALL -680077(PC)
+  read_perf_review_probe_test.go:147	0x1003150c0		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:147	0x1003150c4		a905ffff		STP (ZR, ZR), 88(RSP)
+  read_perf_review_probe_test.go:147	0x1003150c8		39013fff		MOVB ZR, 79(RSP)
+  read_perf_review_probe_test.go:147	0x1003150cc		f9404bfa		MOVD 144(RSP), R26
+  read_perf_review_probe_test.go:147	0x1003150d0		f9400340		MOVD (R26), R0
+  read_perf_review_probe_test.go:147	0x1003150d4		d63f0000		CALL (R0)
+  read_perf_review_probe_test.go:147	0x1003150d8		a94587e0		LDP 88(RSP), (R0, R1)
+  read_perf_review_probe_test.go:147	0x1003150dc		f85f83fd		MOVD -8(RSP), R29
+  read_perf_review_probe_test.go:147	0x1003150e0		f84a07fe		MOVD.P 160(RSP), R30
+  read_perf_review_probe_test.go:147	0x1003150e4		d65f03c0		RET
+  read_perf_review_probe_test.go:144	0x1003150e8		910563f4		ADD $344, RSP, R20
+  read_perf_review_probe_test.go:144	0x1003150ec		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:144	0x1003150f0		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:144	0x1003150f4		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:144	0x1003150f8		97f59eeb		CALL -680213(PC)
+  read_perf_review_probe_test.go:144	0x1003150fc		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:144	0x100315100		a9058be1		STP (R1, R2), 88(RSP)
+  read_perf_review_probe_test.go:144	0x100315104		39013fff		MOVB ZR, 79(RSP)
+  read_perf_review_probe_test.go:144	0x100315108		f9404bfa		MOVD 144(RSP), R26
+  read_perf_review_probe_test.go:144	0x10031510c		f9400340		MOVD (R26), R0
+  read_perf_review_probe_test.go:144	0x100315110		d63f0000		CALL (R0)
+  read_perf_review_probe_test.go:144	0x100315114		a94587e0		LDP 88(RSP), (R0, R1)
+  read_perf_review_probe_test.go:144	0x100315118		f85f83fd		MOVD -8(RSP), R29
+  read_perf_review_probe_test.go:144	0x10031511c		f84a07fe		MOVD.P 160(RSP), R30
+  read_perf_review_probe_test.go:144	0x100315120		d65f03c0		RET
+  buffer.go:60				0x100315124		97f59e87		CALL runtime.panicSliceB(SB)
+  read_perf_review_probe_test.go:142	0x100315128		8a0b014c		AND R11, R10, R12
+  read_perf_review_probe_test.go:142	0x10031512c		d37ced8c		LSL $4, R12, R12
+  read_perf_review_probe_test.go:142	0x100315130		9100218c		ADD $8, R12, R12
+  read_perf_review_probe_test.go:142	0x100315134		f86c692d		MOVD (R9)(R12), R13
+  read_perf_review_probe_test.go:142	0x100315138		8b0c012c		ADD R12, R9, R12
+  read_perf_review_probe_test.go:142	0x10031513c		eb0701bf		CMP R7, R13
+  read_perf_review_probe_test.go:142	0x100315140		54000120		BEQ 9(PC)
+  read_perf_review_probe_test.go:142	0x100315144		9100054a		ADD $1, R10, R10
+  read_perf_review_probe_test.go:142	0x100315148		b5ffff0d		CBNZ R13, -8(PC)
+  read_perf_review_probe_test.go:142	0x10031514c		aa0803e0		MOVD R8, R0
+  read_perf_review_probe_test.go:142	0x100315150		aa0703e1		MOVD R7, R1
+  read_perf_review_probe_test.go:142	0x100315154		97f3edbb		CALL runtime.typeAssert(SB)
+  read_perf_review_probe_test.go:142	0x100315158		aa0003e1		MOVD R0, R1
+  io.go:388				0x10031515c		f94037e0		MOVD 104(RSP), R0
+  read_perf_review_probe_test.go:142	0x100315160		17ffffbc		JMP -68(PC)
+  read_perf_review_probe_test.go:142	0x100315164		f9400581		MOVD 8(R12), R1
+  read_perf_review_probe_test.go:142	0x100315168		17ffffba		JMP -70(PC)
+  read_perf_review_probe_test.go:142	0x10031516c		97f49c69		CALL runtime.deferreturn(SB)
+  read_perf_review_probe_test.go:142	0x100315170		f9402fe0		MOVD 88(RSP), R0
+  read_perf_review_probe_test.go:142	0x100315174		f94033e1		MOVD 96(RSP), R1
+  read_perf_review_probe_test.go:142	0x100315178		f85f83fd		MOVD -8(RSP), R29
+  read_perf_review_probe_test.go:142	0x10031517c		f84a07fe		MOVD.P 160(RSP), R30
+  read_perf_review_probe_test.go:142	0x100315180		d65f03c0		RET
+  read_perf_review_probe_test.go:132	0x100315184		a91687e0		STP (R0, R1), 360(RSP)
+  read_perf_review_probe_test.go:132	0x100315188		aa1e03e3		MOVD R30, R3
+  read_perf_review_probe_test.go:132	0x10031518c		97f59501		CALL runtime.morestack_noctxt.abi0(SB)
+  read_perf_review_probe_test.go:132	0x100315190		a95687e0		LDP 360(RSP), (R0, R1)
+  read_perf_review_probe_test.go:132	0x100315194		17ffff6f		JMP github.com/chester-hill-solutions/stow-s3/internal/runtime.reviewReadOpenedValue(SB)
+  read_perf_review_probe_test.go:132	0x100315198		00000000		?
+  read_perf_review_probe_test.go:132	0x10031519c		00000000		?
+
+TEXT github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).reviewValueReadForSave(SB) /Users/ladmin/.codex/worktrees/core-copy-quality/stow/internal/runtime/read_perf_review_probe_test.go
+  read_perf_review_probe_test.go:150	0x100315200		f9400b90		MOVD 16(R28), R16
+  read_perf_review_probe_test.go:150	0x100315204		d10b43f1		SUB $720, RSP, R17
+  read_perf_review_probe_test.go:150	0x100315208		eb10023f		CMP R16, R17
+  read_perf_review_probe_test.go:150	0x10031520c		54002e09		BLS 368(PC)
+  read_perf_review_probe_test.go:150	0x100315210		d10d43f4		SUB $848, RSP, R20
+  read_perf_review_probe_test.go:150	0x100315214		a93ffa9d		STP (R29, R30), -8(R20)
+  read_perf_review_probe_test.go:150	0x100315218		9100029f		MOVD R20, RSP
+  read_perf_review_probe_test.go:150	0x10031521c		d10023fd		SUB $8, RSP, R29
+  instance.go:178			0x100315220		f9022fe0		MOVD R0, 1112(RSP)
+  instance.go:178			0x100315224		f90247e6		MOVD R6, 1160(RSP)
+  instance.go:178			0x100315228		f90243e5		MOVD R5, 1152(RSP)
+  instance.go:178			0x10031522c		f9023fe4		MOVD R4, 1144(RSP)
+  instance.go:178			0x100315230		f9023be3		MOVD R3, 1136(RSP)
+  instance.go:178			0x100315234		f90237e2		MOVD R2, 1128(RSP)
+  instance.go:178			0x100315238		f90233e1		MOVD R1, 1120(RSP)
+  read_perf_review_probe_test.go:150	0x10031523c		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:150	0x100315240		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:150	0x100315244		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:150	0x100315248		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:150	0x10031524c		97f59e96		CALL -680298(PC)
+  read_perf_review_probe_test.go:150	0x100315250		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:150	0x100315254		911023f4		ADD $1032, RSP, R20
+  read_perf_review_probe_test.go:150	0x100315258		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:150	0x10031525c		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:150	0x100315260		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:150	0x100315264		97f59e96		CALL -680298(PC)
+  read_perf_review_probe_test.go:150	0x100315268		d10023fd		SUB $8, RSP, R29
+  instance.go:178			0x10031526c		b5000081		CBNZ R1, 4(PC)
+  read_perf_review_probe_test.go:151	0x100315270		aa1f03e7		MOVD ZR, R7
+  read_perf_review_probe_test.go:151	0x100315274		aa1f03e8		MOVD ZR, R8
+  read_perf_review_probe_test.go:151	0x100315278		1400000d		JMP 13(PC)
+  instance.go:181			0x10031527c		f9401421		MOVD 40(R1), R1
+  instance.go:181			0x100315280		aa0203e0		MOVD R2, R0
+  instance.go:181			0x100315284		d63f0020		CALL (R1)
+  streams.go:15				0x100315288		f94237e2		MOVD 1128(RSP), R2
+  policy.go:36				0x10031528c		f9423be3		MOVD 1136(RSP), R3
+  policy.go:36				0x100315290		f9423fe4		MOVD 1144(RSP), R4
+  policy.go:36				0x100315294		f94243e5		MOVD 1152(RSP), R5
+  policy.go:36				0x100315298		f94247e6		MOVD 1160(RSP), R6
+  read_perf_review_probe_test.go:151	0x10031529c		aa0003e7		MOVD R0, R7
+  read_perf_review_probe_test.go:151	0x1003152a0		aa0103e8		MOVD R1, R8
+  read_perf_review_probe_test.go:154	0x1003152a4		f9422fe0		MOVD 1112(RSP), R0
+  streams.go:15				0x1003152a8		f94233e1		MOVD 1120(RSP), R1
+  read_perf_review_probe_test.go:151	0x1003152ac		b50026e7		CBNZ R7, 311(PC)
+  read_perf_review_probe_test.go:154	0x1003152b0		910a63f4		ADD $664, RSP, R20
+  read_perf_review_probe_test.go:154	0x1003152b4		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:154	0x1003152b8		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:154	0x1003152bc		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:154	0x1003152c0		97f59e7f		CALL -680321(PC)
+  read_perf_review_probe_test.go:154	0x1003152c4		d10023fd		SUB $8, RSP, R29
+  policy.go:36				0x1003152c8		9000056d		ADRP 704512(PC), R13
+  policy.go:36				0x1003152cc		911f41ad		ADD $2000, R13, R13
+  policy.go:36				0x1003152d0		b2400bee		ORR $7, ZR, R14
+  policy.go:36				0x1003152d4		910a63fb		ADD $664, RSP, R27
+  policy.go:36				0x1003152d8		a9003b6d		STP (R13, R14), (R27)
+  policy.go:36				0x1003152dc		910aa3fb		ADD $680, RSP, R27
+  policy.go:36				0x1003152e0		a9001363		STP (R3, R4), (R27)
+  policy.go:36				0x1003152e4		90000567		ADRP 704512(PC), R7
+  policy.go:36				0x1003152e8		9105c0e7		ADD $368, R7, R7
+  policy.go:36				0x1003152ec		b27f07e8		ORR $6, ZR, R8
+  policy.go:36				0x1003152f0		910ae3fb		ADD $696, RSP, R27
+  policy.go:36				0x1003152f4		a9002367		STP (R7, R8), (R27)
+  policy.go:36				0x1003152f8		910b23fb		ADD $712, RSP, R27
+  policy.go:36				0x1003152fc		a9001b65		STP (R5, R6), (R27)
+  read_perf_review_probe_test.go:154	0x100315300		910a63fb		ADD $664, RSP, R27
+  read_perf_review_probe_test.go:154	0x100315304		a9401363		LDP (R27), (R3, R4)
+  read_perf_review_probe_test.go:154	0x100315308		910aa3fb		ADD $680, RSP, R27
+  read_perf_review_probe_test.go:154	0x10031530c		a9403b6d		LDP (R27), (R13, R14)
+  read_perf_review_probe_test.go:154	0x100315310		910b63fb		ADD $728, RSP, R27
+  read_perf_review_probe_test.go:154	0x100315314		a940336b		LDP (R27), (R11, R12)
+  read_perf_review_probe_test.go:154	0x100315318		d0000561		ADRP 712704(PC), R1
+  read_perf_review_probe_test.go:154	0x10031531c		911dd421		ADD $1909, R1, R1
+  read_perf_review_probe_test.go:154	0x100315320		d2800162		MOVD $11, R2
+  read_perf_review_probe_test.go:154	0x100315324		aa0503e9		MOVD R5, R9
+  read_perf_review_probe_test.go:154	0x100315328		aa0603ea		MOVD R6, R10
+  read_perf_review_probe_test.go:154	0x10031532c		aa0d03e5		MOVD R13, R5
+  read_perf_review_probe_test.go:154	0x100315330		aa0e03e6		MOVD R14, R6
+  read_perf_review_probe_test.go:154	0x100315334		97ff193f		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).checkResource(SB)
+  read_perf_review_probe_test.go:154	0x100315338		b50020a0		CBNZ R0, 261(PC)
+  read_perf_review_probe_test.go:157	0x10031533c		f9422fe0		MOVD 1112(RSP), R0
+  read_perf_review_probe_test.go:157	0x100315340		97ff1120		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).SupportsGuardedSaves(SB)
+  read_perf_review_probe_test.go:157	0x100315344		36001e00		TBZ $0, R0, 240(PC)
+  streams.go:15				0x100315348		910a63f4		ADD $664, RSP, R20
+  streams.go:15				0x10031534c		1000009b		ADR 16(PC), R27
+  streams.go:15				0x100315350		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15				0x100315354		d10063fd		SUB $24, RSP, R29
+  streams.go:15				0x100315358		97f59e53		CALL -680365(PC)
+  streams.go:15				0x10031535c		d10023fd		SUB $8, RSP, R29
+  streams.go:15				0x100315360		f9422fe0		MOVD 1112(RSP), R0
+  streams.go:15				0x100315364		f94233e1		MOVD 1120(RSP), R1
+  streams.go:15				0x100315368		f94237e2		MOVD 1128(RSP), R2
+  streams.go:15				0x10031536c		f9423be3		MOVD 1136(RSP), R3
+  streams.go:15				0x100315370		f9423fe4		MOVD 1144(RSP), R4
+  streams.go:15				0x100315374		f94243e5		MOVD 1152(RSP), R5
+  streams.go:15				0x100315378		f94247e6		MOVD 1160(RSP), R6
+  streams.go:15				0x10031537c		aa1f03e7		MOVD ZR, R7
+  streams.go:15				0x100315380		97ff45cc		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).openObject(SB)
+  streams.go:15				0x100315384		f900bfe2		MOVD R2, 376(RSP)
+  streams.go:15				0x100315388		f900c7e3		MOVD R3, 392(RSP)
+  streams.go:15				0x10031538c		f900c3e0		MOVD R0, 384(RSP)
+  streams.go:15				0x100315390		f900cbe1		MOVD R1, 400(RSP)
+  streams.go:15				0x100315394		910a63f5		ADD $664, RSP, R21
+  streams.go:15				0x100315398		910023f4		ADD $8, RSP, R20
+  streams.go:15				0x10031539c		1000009b		ADR 16(PC), R27
+  streams.go:15				0x1003153a0		a93eeffd		STP (R29, R27), -24(RSP)
+  streams.go:15				0x1003153a4		d10063fd		SUB $24, RSP, R29
+  streams.go:15				0x1003153a8		97f59eb8		CALL -680264(PC)
+  streams.go:15				0x1003153ac		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:160	0x1003153b0		910663f5		ADD $408, RSP, R21
+  read_perf_review_probe_test.go:160	0x1003153b4		910a63f4		ADD $664, RSP, R20
+  read_perf_review_probe_test.go:160	0x1003153b8		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:160	0x1003153bc		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:160	0x1003153c0		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:160	0x1003153c4		97f59eb1		CALL -680271(PC)
+  read_perf_review_probe_test.go:160	0x1003153c8		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:161	0x1003153cc		910923f4		ADD $584, RSP, R20
+  read_perf_review_probe_test.go:161	0x1003153d0		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:161	0x1003153d4		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:161	0x1003153d8		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:161	0x1003153dc		97f59e38		CALL -680392(PC)
+  read_perf_review_probe_test.go:161	0x1003153e0		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:161	0x1003153e4		f9422fe8		MOVD 1112(RSP), R8
+  read_perf_review_probe_test.go:161	0x1003153e8		f90127e8		MOVD R8, 584(RSP)
+  read_perf_review_probe_test.go:161	0x1003153ec		f9423be8		MOVD 1136(RSP), R8
+  read_perf_review_probe_test.go:161	0x1003153f0		f9423fe9		MOVD 1144(RSP), R9
+  read_perf_review_probe_test.go:161	0x1003153f4		910943fb		ADD $592, RSP, R27
+  read_perf_review_probe_test.go:161	0x1003153f8		a9002768		STP (R8, R9), (R27)
+  read_perf_review_probe_test.go:161	0x1003153fc		f94243e8		MOVD 1152(RSP), R8
+  read_perf_review_probe_test.go:161	0x100315400		f94247e9		MOVD 1160(RSP), R9
+  read_perf_review_probe_test.go:161	0x100315404		910983fb		ADD $608, RSP, R27
+  read_perf_review_probe_test.go:161	0x100315408		a9002768		STP (R8, R9), (R27)
+  read_perf_review_probe_test.go:162	0x10031540c		b0002b3b		ADRP 5656576(PC), R27
+  read_perf_review_probe_test.go:162	0x100315410		9123437b		ADD $2256, R27, R27
+  read_perf_review_probe_test.go:162	0x100315414		a9402768		LDP (R27), (R8, R9)
+  read_perf_review_probe_test.go:162	0x100315418		aa0203e0		MOVD R2, R0
+  read_perf_review_probe_test.go:162	0x10031541c		aa0303e1		MOVD R3, R1
+  read_perf_review_probe_test.go:162	0x100315420		aa0803e2		MOVD R8, R2
+  read_perf_review_probe_test.go:162	0x100315424		aa0903e3		MOVD R9, R3
+  read_perf_review_probe_test.go:162	0x100315428		97f5b6f2		CALL errors.Is(SB)
+  read_perf_review_probe_test.go:162	0x10031542c		36000100		TBZ $0, R0, 8(PC)
+  read_perf_review_probe_test.go:162	0x100315430		b0002b3b		ADRP 5656576(PC), R27
+  read_perf_review_probe_test.go:162	0x100315434		9122437b		ADD $2192, R27, R27
+  read_perf_review_probe_test.go:162	0x100315438		a9400f62		LDP (R27), (R2, R3)
+  read_perf_review_probe_test.go:162	0x10031543c		f940bfe0		MOVD 376(RSP), R0
+  read_perf_review_probe_test.go:162	0x100315440		f940c7e1		MOVD 392(RSP), R1
+  read_perf_review_probe_test.go:162	0x100315444		97f5b6eb		CALL errors.Is(SB)
+  read_perf_review_probe_test.go:162	0x100315448		36001180		TBZ $0, R0, 140(PC)
+  read_perf_review_probe_test.go:166	0x10031544c		f940bfe0		MOVD 376(RSP), R0
+  read_perf_review_probe_test.go:166	0x100315450		b5000f40		CBNZ R0, 122(PC)
+  read_perf_review_probe_test.go:169	0x100315454		910a63f4		ADD $664, RSP, R20
+  read_perf_review_probe_test.go:169	0x100315458		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:169	0x10031545c		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:169	0x100315460		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:169	0x100315464		97f59e10		CALL -680432(PC)
+  read_perf_review_probe_test.go:169	0x100315468		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:169	0x10031546c		910023f5		ADD $8, RSP, R21
+  read_perf_review_probe_test.go:169	0x100315470		910663f4		ADD $408, RSP, R20
+  read_perf_review_probe_test.go:169	0x100315474		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:169	0x100315478		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:169	0x10031547c		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:169	0x100315480		97f59e82		CALL -680318(PC)
+  read_perf_review_probe_test.go:169	0x100315484		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:169	0x100315488		f940c3e0		MOVD 384(RSP), R0
+  read_perf_review_probe_test.go:169	0x10031548c		f940cbe1		MOVD 400(RSP), R1
+  read_perf_review_probe_test.go:169	0x100315490		97fffeb0		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.reviewReadOpenedValue(SB)
+  read_perf_review_probe_test.go:169	0x100315494		910a63f5		ADD $664, RSP, R21
+  read_perf_review_probe_test.go:169	0x100315498		9102e3f4		ADD $184, RSP, R20
+  read_perf_review_probe_test.go:169	0x10031549c		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:169	0x1003154a0		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:169	0x1003154a4		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:169	0x1003154a8		97f59e78		CALL -680328(PC)
+  read_perf_review_probe_test.go:169	0x1003154ac		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:169	0x1003154b0		910663f5		ADD $408, RSP, R21
+  read_perf_review_probe_test.go:169	0x1003154b4		910a63f4		ADD $664, RSP, R20
+  read_perf_review_probe_test.go:169	0x1003154b8		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:169	0x1003154bc		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:169	0x1003154c0		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:169	0x1003154c4		97f59e71		CALL -680335(PC)
+  read_perf_review_probe_test.go:169	0x1003154c8		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:170	0x1003154cc		b4000200		CBZ R0, 16(PC)
+  read_perf_review_probe_test.go:171	0x1003154d0		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:171	0x1003154d4		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:171	0x1003154d8		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:171	0x1003154dc		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:171	0x1003154e0		97f59df1		CALL -680463(PC)
+  read_perf_review_probe_test.go:171	0x1003154e4		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:171	0x1003154e8		911023f4		ADD $1032, RSP, R20
+  read_perf_review_probe_test.go:171	0x1003154ec		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:171	0x1003154f0		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:171	0x1003154f4		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:171	0x1003154f8		97f59df1		CALL -680463(PC)
+  read_perf_review_probe_test.go:171	0x1003154fc		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:171	0x100315500		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:171	0x100315504		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:171	0x100315508		d65f03c0		RET
+  read_perf_review_probe_test.go:175	0x10031550c		910a63f4		ADD $664, RSP, R20
+  read_perf_review_probe_test.go:175	0x100315510		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:175	0x100315514		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:175	0x100315518		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:175	0x10031551c		97f59de4		CALL -680476(PC)
+  read_perf_review_probe_test.go:175	0x100315520		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:175	0x100315524		f90197ff		MOVD ZR, 808(RSP)
+  read_perf_review_probe_test.go:174	0x100315528		a95e93e3		LDP 488(RSP), (R3, R4)
+  read_perf_review_probe_test.go:174	0x10031552c		910ae3fb		ADD $696, RSP, R27
+  read_perf_review_probe_test.go:174	0x100315530		a9001363		STP (R3, R4), (R27)
+  read_perf_review_probe_test.go:174	0x100315534		a95f93e3		LDP 504(RSP), (R3, R4)
+  read_perf_review_probe_test.go:174	0x100315538		910b83fb		ADD $736, RSP, R27
+  read_perf_review_probe_test.go:174	0x10031553c		a9001363		STP (R3, R4), (R27)
+  read_perf_review_probe_test.go:175	0x100315540		f94107e3		MOVD 520(RSP), R3
+  read_perf_review_probe_test.go:175	0x100315544		f90187e3		MOVD R3, 776(RSP)
+  read_perf_review_probe_test.go:175	0x100315548		9108a3fb		ADD $552, RSP, R27
+  read_perf_review_probe_test.go:175	0x10031554c		a9401363		LDP (R27), (R3, R4)
+  read_perf_review_probe_test.go:175	0x100315550		910c43fb		ADD $784, RSP, R27
+  read_perf_review_probe_test.go:175	0x100315554		a9001363		STP (R3, R4), (R27)
+  read_perf_review_probe_test.go:175	0x100315558		9108e3fb		ADD $568, RSP, R27
+  read_perf_review_probe_test.go:175	0x10031555c		a9401363		LDP (R27), (R3, R4)
+  read_perf_review_probe_test.go:175	0x100315560		910c83fb		ADD $800, RSP, R27
+  read_perf_review_probe_test.go:175	0x100315564		a9001363		STP (R3, R4), (R27)
+  read_perf_review_probe_test.go:176	0x100315568		a95b87e0		LDP 440(RSP), (R0, R1)
+  read_perf_review_probe_test.go:176	0x10031556c		f940e7e2		MOVD 456(RSP), R2
+  read_perf_review_probe_test.go:173	0x100315570		910023f5		ADD $8, RSP, R21
+  read_perf_review_probe_test.go:173	0x100315574		910a63f4		ADD $664, RSP, R20
+  read_perf_review_probe_test.go:173	0x100315578		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:173	0x10031557c		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:173	0x100315580		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:173	0x100315584		97f59e45		CALL -680379(PC)
+  read_perf_review_probe_test.go:173	0x100315588		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:173	0x10031558c		f94197e3		MOVD 808(RSP), R3
+  read_perf_review_probe_test.go:173	0x100315590		f9004fe3		MOVD R3, 152(RSP)
+  read_perf_review_probe_test.go:173	0x100315594		97fa65df		CALL github.com/chester-hill-solutions/stow-s3/internal/storage.ObjectFingerprint(SB)
+  read_perf_review_probe_test.go:173	0x100315598		a94a13e3		LDP 160(RSP), (R3, R4)
+  read_perf_review_probe_test.go:173	0x10031559c		a94b1be5		LDP 176(RSP), (R5, R6)
+  read_perf_review_probe_test.go:173	0x1003155a0		910a63fb		ADD $664, RSP, R27
+  read_perf_review_probe_test.go:173	0x1003155a4		a9001363		STP (R3, R4), (R27)
+  read_perf_review_probe_test.go:173	0x1003155a8		910aa3fb		ADD $680, RSP, R27
+  read_perf_review_probe_test.go:173	0x1003155ac		a9001b65		STP (R5, R6), (R27)
+  read_perf_review_probe_test.go:173	0x1003155b0		910a63fb		ADD $664, RSP, R27
+  read_perf_review_probe_test.go:173	0x1003155b4		a9401363		LDP (R27), (R3, R4)
+  read_perf_review_probe_test.go:173	0x1003155b8		910aa3fb		ADD $680, RSP, R27
+  read_perf_review_probe_test.go:173	0x1003155bc		a9401b65		LDP (R27), (R5, R6)
+  read_perf_review_probe_test.go:173	0x1003155c0		9109c7fb		ADD $625, RSP, R27
+  read_perf_review_probe_test.go:173	0x1003155c4		a9001363		STP (R3, R4), (R27)
+  read_perf_review_probe_test.go:173	0x1003155c8		910a07fb		ADD $641, RSP, R27
+  read_perf_review_probe_test.go:173	0x1003155cc		a9001b65		STP (R5, R6), (R27)
+  read_perf_review_probe_test.go:177	0x1003155d0		910d63f5		ADD $856, RSP, R21
+  read_perf_review_probe_test.go:177	0x1003155d4		910663f4		ADD $408, RSP, R20
+  read_perf_review_probe_test.go:177	0x1003155d8		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:177	0x1003155dc		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:177	0x1003155e0		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:177	0x1003155e4		97f59e29		CALL -680407(PC)
+  read_perf_review_probe_test.go:177	0x1003155e8		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:177	0x1003155ec		911023f5		ADD $1032, RSP, R21
+  read_perf_review_probe_test.go:177	0x1003155f0		910923f4		ADD $584, RSP, R20
+  read_perf_review_probe_test.go:177	0x1003155f4		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:177	0x1003155f8		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:177	0x1003155fc		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:177	0x100315600		97f59e2e		CALL -680402(PC)
+  read_perf_review_probe_test.go:177	0x100315604		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:177	0x100315608		911023f5		ADD $1032, RSP, R21
+  read_perf_review_probe_test.go:177	0x10031560c		910923f4		ADD $584, RSP, R20
+  read_perf_review_probe_test.go:177	0x100315610		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:177	0x100315614		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:177	0x100315618		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:177	0x10031561c		97f59e27		CALL -680409(PC)
+  read_perf_review_probe_test.go:177	0x100315620		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:177	0x100315624		aa1f03e0		MOVD ZR, R0
+  read_perf_review_probe_test.go:177	0x100315628		aa1f03e1		MOVD ZR, R1
+  read_perf_review_probe_test.go:177	0x10031562c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:177	0x100315630		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:177	0x100315634		d65f03c0		RET
+  read_perf_review_probe_test.go:167	0x100315638		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:167	0x10031563c		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:167	0x100315640		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:167	0x100315644		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:167	0x100315648		97f59d97		CALL -680553(PC)
+  read_perf_review_probe_test.go:167	0x10031564c		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:167	0x100315650		911023f4		ADD $1032, RSP, R20
+  read_perf_review_probe_test.go:167	0x100315654		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:167	0x100315658		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:167	0x10031565c		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:167	0x100315660		97f59d97		CALL -680553(PC)
+  read_perf_review_probe_test.go:167	0x100315664		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:167	0x100315668		f940c7e1		MOVD 392(RSP), R1
+  read_perf_review_probe_test.go:167	0x10031566c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:167	0x100315670		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:167	0x100315674		d65f03c0		RET
+  read_perf_review_probe_test.go:163	0x100315678		b24003e2		ORR $1, ZR, R2
+  read_perf_review_probe_test.go:163	0x10031567c		3909c3e2		MOVB R2, 624(RSP)
+  read_perf_review_probe_test.go:164	0x100315680		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:164	0x100315684		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:164	0x100315688		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:164	0x10031568c		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:164	0x100315690		97f59d85		CALL -680571(PC)
+  read_perf_review_probe_test.go:164	0x100315694		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:164	0x100315698		f9423be2		MOVD 1136(RSP), R2
+  read_perf_review_probe_test.go:164	0x10031569c		f9423fe3		MOVD 1144(RSP), R3
+  read_perf_review_probe_test.go:164	0x1003156a0		910d63fb		ADD $856, RSP, R27
+  read_perf_review_probe_test.go:164	0x1003156a4		a9000f62		STP (R2, R3), (R27)
+  read_perf_review_probe_test.go:164	0x1003156a8		f94243e2		MOVD 1152(RSP), R2
+  read_perf_review_probe_test.go:164	0x1003156ac		f94247e3		MOVD 1160(RSP), R3
+  read_perf_review_probe_test.go:164	0x1003156b0		910da3fb		ADD $872, RSP, R27
+  read_perf_review_probe_test.go:164	0x1003156b4		a9000f62		STP (R2, R3), (R27)
+  read_perf_review_probe_test.go:164	0x1003156b8		911023f5		ADD $1032, RSP, R21
+  read_perf_review_probe_test.go:164	0x1003156bc		910923f4		ADD $584, RSP, R20
+  read_perf_review_probe_test.go:164	0x1003156c0		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:164	0x1003156c4		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:164	0x1003156c8		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:164	0x1003156cc		97f59dfb		CALL -680453(PC)
+  read_perf_review_probe_test.go:164	0x1003156d0		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:164	0x1003156d4		911023f5		ADD $1032, RSP, R21
+  read_perf_review_probe_test.go:164	0x1003156d8		910923f4		ADD $584, RSP, R20
+  read_perf_review_probe_test.go:164	0x1003156dc		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:164	0x1003156e0		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:164	0x1003156e4		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:164	0x1003156e8		97f59df4		CALL -680460(PC)
+  read_perf_review_probe_test.go:164	0x1003156ec		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:164	0x1003156f0		aa1f03e0		MOVD ZR, R0
+  read_perf_review_probe_test.go:164	0x1003156f4		aa1f03e1		MOVD ZR, R1
+  read_perf_review_probe_test.go:164	0x1003156f8		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:164	0x1003156fc		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:164	0x100315700		d65f03c0		RET
+  read_perf_review_probe_test.go:158	0x100315704		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:158	0x100315708		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:158	0x10031570c		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:158	0x100315710		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:158	0x100315714		97f59d64		CALL -680604(PC)
+  read_perf_review_probe_test.go:158	0x100315718		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:158	0x10031571c		911023f4		ADD $1032, RSP, R20
+  read_perf_review_probe_test.go:158	0x100315720		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:158	0x100315724		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:158	0x100315728		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:158	0x10031572c		97f59d64		CALL -680604(PC)
+  read_perf_review_probe_test.go:158	0x100315730		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:158	0x100315734		b0002b3b		ADRP 5656576(PC), R27
+  read_perf_review_probe_test.go:158	0x100315738		9100037b		ADD $0, R27, R27
+  read_perf_review_probe_test.go:158	0x10031573c		a9400760		LDP (R27), (R0, R1)
+  read_perf_review_probe_test.go:158	0x100315740		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:158	0x100315744		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:158	0x100315748		d65f03c0		RET
+  read_perf_review_probe_test.go:155	0x10031574c		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:155	0x100315750		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:155	0x100315754		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:155	0x100315758		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:155	0x10031575c		97f59d52		CALL -680622(PC)
+  read_perf_review_probe_test.go:155	0x100315760		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:155	0x100315764		911023f4		ADD $1032, RSP, R20
+  read_perf_review_probe_test.go:155	0x100315768		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:155	0x10031576c		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:155	0x100315770		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:155	0x100315774		97f59d52		CALL -680622(PC)
+  read_perf_review_probe_test.go:155	0x100315778		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:155	0x10031577c		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:155	0x100315780		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:155	0x100315784		d65f03c0		RET
+  read_perf_review_probe_test.go:152	0x100315788		910d63f4		ADD $856, RSP, R20
+  read_perf_review_probe_test.go:152	0x10031578c		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:152	0x100315790		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:152	0x100315794		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:152	0x100315798		97f59d43		CALL -680637(PC)
+  read_perf_review_probe_test.go:152	0x10031579c		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:152	0x1003157a0		911023f4		ADD $1032, RSP, R20
+  read_perf_review_probe_test.go:152	0x1003157a4		1000009b		ADR 16(PC), R27
+  read_perf_review_probe_test.go:152	0x1003157a8		a93eeffd		STP (R29, R27), -24(RSP)
+  read_perf_review_probe_test.go:152	0x1003157ac		d10063fd		SUB $24, RSP, R29
+  read_perf_review_probe_test.go:152	0x1003157b0		97f59d43		CALL -680637(PC)
+  read_perf_review_probe_test.go:152	0x1003157b4		d10023fd		SUB $8, RSP, R29
+  read_perf_review_probe_test.go:152	0x1003157b8		aa0703e0		MOVD R7, R0
+  read_perf_review_probe_test.go:152	0x1003157bc		aa0803e1		MOVD R8, R1
+  read_perf_review_probe_test.go:152	0x1003157c0		a97ffbfd		LDP -8(RSP), (R29, R30)
+  read_perf_review_probe_test.go:152	0x1003157c4		910d43ff		ADD $848, RSP, RSP
+  read_perf_review_probe_test.go:152	0x1003157c8		d65f03c0		RET
+  read_perf_review_probe_test.go:150	0x1003157cc		a91087e0		STP (R0, R1), 264(RSP)
+  read_perf_review_probe_test.go:150	0x1003157d0		a9118fe2		STP (R2, R3), 280(RSP)
+  read_perf_review_probe_test.go:150	0x1003157d4		a91297e4		STP (R4, R5), 296(RSP)
+  read_perf_review_probe_test.go:150	0x1003157d8		f9009fe6		MOVD R6, 312(RSP)
+  read_perf_review_probe_test.go:150	0x1003157dc		aa1e03e3		MOVD R30, R3
+  read_perf_review_probe_test.go:150	0x1003157e0		97f5936c		CALL runtime.morestack_noctxt.abi0(SB)
+  read_perf_review_probe_test.go:150	0x1003157e4		a95087e0		LDP 264(RSP), (R0, R1)
+  read_perf_review_probe_test.go:150	0x1003157e8		a9518fe2		LDP 280(RSP), (R2, R3)
+  read_perf_review_probe_test.go:150	0x1003157ec		a95297e4		LDP 296(RSP), (R4, R5)
+  read_perf_review_probe_test.go:150	0x1003157f0		f9409fe6		MOVD 312(RSP), R6
+  read_perf_review_probe_test.go:150	0x1003157f4		17fffe83		JMP github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).reviewValueReadForSave(SB)
+  read_perf_review_probe_test.go:150	0x1003157f8		00000000		?
+  read_perf_review_probe_test.go:150	0x1003157fc		00000000		?

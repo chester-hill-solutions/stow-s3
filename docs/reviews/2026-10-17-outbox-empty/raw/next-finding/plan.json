@@ -1,0 +1,47 @@
+{
+  "phase": "next-finding-live-journal-loss",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_recovery_test.go",
+    "benchmark/_missing-repro/live_journal_missing_repro_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-reproduction",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/_missing-repro/live_journal_missing_repro_test.go"
+      ]
+    },
+    {
+      "name": "missing-journal-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=/app/benchmark/_missing-repro/overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxRefusesMissingLiveJournal$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "missing-journal-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=/app/benchmark/_missing-repro/overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxRefusesMissingLiveJournal$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

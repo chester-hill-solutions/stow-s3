@@ -1,0 +1,83 @@
+package runthrough_test
+
+import (
+	"context"
+	"errors"
+	"io"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type preflightReviewStore struct {
+	*storage.MemoryStore
+	heads, puts     int
+	headErr, putErr error
+}
+
+func (s *preflightReviewStore) HeadObject(ctx context.Context, bucket, key string) (*storage.ObjectMeta, error) {
+	s.heads++
+	if s.heads == 1 {
+		return nil, s.headErr
+	}
+	return s.MemoryStore.HeadObject(ctx, bucket, key)
+}
+func (s *preflightReviewStore) PutObject(context.Context, string, string, io.Reader, storage.PutOptions) (*storage.ObjectMeta, error) {
+	s.puts++
+	return nil, s.putErr
+}
+func TestReviewPreflightUncertainty(t *testing.T) {
+	for _, mode := range []string{"unknown", "marked-missing"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx := context.Background()
+			local := &preflightReviewStore{MemoryStore: storage.NewMemoryStore(), headErr: errors.New("HEAD uncertain"), putErr: errors.New("PUT refused without committing")}
+			if mode == "marked-missing" {
+				local.headErr = errors.Join(storage.ErrMutationCommitted, storage.ErrObjectNotFound)
+			}
+			if err := local.CreateBucket(ctx, "probe"); err != nil {
+				t.Fatal(err)
+			}
+			original, err := local.MemoryStore.PutObject(ctx, "probe", "target", strings.NewReader("old"), storage.PutOptions{ContentType: "text/plain"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			upstream := newMockUpstream()
+			etag, err := upstream.PutObject(ctx, "probe", "target", strings.NewReader("remote-base"), storage.PutOptions{ContentType: "text/plain"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			upstream.putCalls = 0
+			outbox := fileVersionOutbox(t)
+			if err := outbox.SaveUpstreamState("probe", "target", runthrough.UpstreamState{ETag: etag}); err != nil {
+				t.Fatal(err)
+			}
+			adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, local, local, upstream, outbox)
+			t.Cleanup(func() { _ = adapter.Close() })
+			meta, err := adapter.PutObject(ctx, "probe", "target", strings.NewReader("new"), storage.PutOptions{})
+			if !errors.Is(err, local.headErr) || meta != nil {
+				t.Errorf("uncertain preflight admitted refused mutation: meta=%+v error=%v", meta, err)
+			}
+			if errors.Is(err, local.putErr) && errors.Is(err, storage.ErrMutationCommitted) {
+				t.Errorf("refused local mutation was reported committed: %v", err)
+			}
+			if local.puts != 0 {
+				t.Errorf("uncertain preflight reached local PUT: calls=%d", local.puts)
+			}
+			if len(outbox.Pending()) != 0 || len(outbox.Prepared()) != 0 {
+				t.Errorf("refused mutation invented an intent: pending=%+v prepared=%+v", outbox.Pending(), outbox.Prepared())
+			}
+			after, headErr := local.MemoryStore.HeadObject(ctx, "probe", "target")
+			if headErr != nil || after.VersionID != original.VersionID {
+				t.Fatalf("fixture local object changed: %v", headErr)
+			}
+			if err := adapter.RetryPending(ctx); err != nil {
+				t.Fatal(err)
+			}
+			if upstream.putCalls != 0 || string(upstream.bodies[objectKey("probe", "target")]) != "remote-base" {
+				t.Errorf("refused local mutation overwrote upstream: puts=%d body=%q", upstream.putCalls, upstream.bodies[objectKey("probe", "target")])
+			}
+		})
+	}
+}

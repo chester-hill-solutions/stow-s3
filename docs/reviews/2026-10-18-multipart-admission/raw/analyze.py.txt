@@ -1,0 +1,36 @@
+from pathlib import Path
+import json,statistics,re,hashlib
+p=Path('/private/tmp/stow-multipart-admission-2026-10-18');phase='final';j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert v['complete'] and not v['success'] and [x['name']for x in checks if not x['passed']]==['measure'] and len(checks)==22
+for n in ['verified-red-normal','verified-red-race']:
+ t=(e/(n+'.log')).read_text();assert 'build failed'not in t and 'DATA RACE'not in t
+ for message in ['oversized multipart part error = <nil>','multipart resources were not charged','completion payload charge','over-budget manifest accepted','over-budget replacement accepted','manifest charge was stale','accepted=2 refused=0','shared host budget ignored']:
+  assert message in t,(n,message)
+ assert '--- PASS: TestMultipartCompletionAdmissionRefusalRetainsUpload' in t
+for n in ['focused-normal','focused-race']:
+ t=(e/(n+'.log')).read_text();assert '--- FAIL:'not in t and 'DATA RACE'not in t
+ for name in ['TestMultipartPartsRespectNamespaceBudget','TestMultipartAbortReleasesNamespaceCapacity','TestMultipartCompletionReleasesPartCapacity','TestMultipartManifestRecoveryBudget','TestMultipartRejectedReplacementPreservesPart','TestMultipartManifestChargeMatchesScan','TestMultipartReplacementChargesOnePart','TestMultipartConcurrentNamespaceAdmission','TestMultipartSharedHostAdmission','TestMultipartCompletionAdmissionRefusalRetainsUpload','TestMultipartBoundCompletionCleanupPreservesCommittedOutcome','TestMultipartCapacityHoldProtectsPart']:
+  assert len(re.findall(r'^--- PASS: '+name+r' \(',t,re.M))==2,(n,name)
+contract=e
+mjob=json.loads((p/'measure-start.json').read_text());e=p/('export-'+mjob['id']);mrun=json.loads((e/'run.json').read_text());assert mrun['complete']and mrun['success']and mrun['checks']==1
+for name,h in json.loads((contract/'environment.json').read_text())['sourceSHA256'].items():
+ if name.endswith('.go'):assert json.loads((e/'environment.json').read_text())['sourceSHA256'][name]==h
+rows=json.loads((e/'measurements.json').read_text());assert len(rows['observations'])==128 and all(r['iterations']==10 for r in rows['observations'])
+analysis=[]
+for name in sorted({r['name']for r in rows['observations']}):
+ cell={'name':name,'labels':{}}
+ for label in ['A','B','C','D']:
+  values=[r for r in rows['observations']if r['name']==name and r['label']==label];assert len(values)==4
+  cell['labels'][label]={k:{'median':statistics.median(r[k]for r in values),'min':min(r[k]for r in values),'max':max(r[k]for r in values)}for k in ['ns','bytes','allocs']}
+ cell['changePercent']={k:100*(cell['labels']['B'][k]['median']/cell['labels']['A'][k]['median']-1)for k in ['ns','bytes','allocs']}
+ cell['sameBinaryControlTimePercent']=100*(cell['labels']['D']['ns']['median']/cell['labels']['C']['ns']['median']-1)
+ analysis.append(cell)
+pilot=[]
+for line in (contract/'sample-0-A.log').read_text().splitlines():
+ m=re.match(r'^(BenchmarkMultipartAdmission/\S+)\s+(\d+)\s+([\d.]+) ns/op\s+([\d.]+) B/op\s+([\d.]+) allocs/op$',line)
+ if m:pilot.append({'name':m[1],'iterations':int(m[2]),'ns':float(m[3]),'bytes':float(m[4]),'allocs':float(m[5])})
+assert len(pilot)==3
+(contract/'pilot-observations.json').write_text(json.dumps({'method':'200ms calibration, timed out during abort','observations':pilot},indent=2)+'\n')
+(e/'comparison-analysis.json').write_text(json.dumps(analysis,indent=2)+'\n')
+(e/'validation-receipt.json').write_text(json.dumps({'contractChecks':len(checks),'expectedPilotFailure':'measure','fixedIterationCheckPassed':True,'correctnessGatesPassed':14,'measurements':128,'regressionTopLevelTests':12,'normalRepeats':2,'raceRepeats':2,'sources':json.loads((e/'environment.json').read_text())['sourceSHA256']},indent=2)+'\n')
+for c in analysis:
+ a,b=c['labels']['A'],c['labels']['B'];print(c['name'],f"time {a['ns']['median']/1e6:.3f}->{b['ns']['median']/1e6:.3f} ms ({c['changePercent']['ns']:+.2f}%)",f"bytes {a['bytes']['median']}->{b['bytes']['median']}",f"allocs {a['allocs']['median']}->{b['allocs']['median']}",f"AA {c['sameBinaryControlTimePercent']:+.2f}%")

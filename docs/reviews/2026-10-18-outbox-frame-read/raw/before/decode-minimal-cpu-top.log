@@ -1,0 +1,49 @@
+File: post-profile.test
+Build ID: d891571500456aead629a84f12762f47e25c566a
+Type: cpu
+Time: 2026-10-18 13:11:06 UTC
+Duration: 4.31s, Total samples = 4.16s (96.58%)
+Showing nodes accounting for 2.96s, 71.15% of 4.16s total
+Dropped 101 nodes (cum <= 0.02s)
+Showing top 40 nodes out of 123
+      flat  flat%   sum%        cum   cum%
+     0.30s  7.21%  7.21%      0.30s  7.21%  runtime.duffcopy
+     0.26s  6.25% 13.46%      0.59s 14.18%  runtime.scanobject
+     0.17s  4.09% 17.55%      1.14s 27.40%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+     0.12s  2.88% 20.43%      0.22s  5.29%  runtime.findObject
+     0.11s  2.64% 23.08%      0.11s  2.64%  aeshashbody
+     0.11s  2.64% 25.72%      0.23s  5.53%  runtime.mallocgcTiny
+     0.10s  2.40% 28.12%      0.10s  2.40%  memeqbody
+     0.10s  2.40% 30.53%      0.10s  2.40%  runtime.(*mspan).base (inline)
+     0.09s  2.16% 32.69%      0.09s  2.16%  runtime.typePointers.nextFast (inline)
+     0.08s  1.92% 34.62%      0.96s 23.08%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+     0.08s  1.92% 36.54%      1.49s 35.82%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+     0.08s  1.92% 38.46%      0.23s  5.53%  runtime.wbBufFlush1
+     0.07s  1.68% 40.14%      0.34s  8.17%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoEntry
+     0.07s  1.68% 41.83%      0.09s  2.16%  google.golang.org/protobuf/encoding/protowire.ConsumeBytes
+     0.07s  1.68% 43.51%      0.07s  1.68%  runtime.memclrNoHeapPointers
+     0.07s  1.68% 45.19%      0.72s 17.31%  runtime.slicebytetostring
+     0.07s  1.68% 46.88%      0.08s  1.92%  runtime.spanOf (inline)
+     0.07s  1.68% 48.56%      0.07s  1.68%  unicode/utf8.Valid
+     0.06s  1.44% 50.00%      0.20s  4.81%  runtime.bulkBarrierPreWrite
+     0.06s  1.44% 51.44%      1.42s 34.13%  runtime.mallocgc
+     0.06s  1.44% 52.88%      0.06s  1.44%  time.parseRFC3339[go.shape.string].func1 (inline)
+     0.05s  1.20% 54.09%      3.45s 82.93%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).record
+     0.05s  1.20% 55.29%      0.05s  1.20%  internal/runtime/maps.ctrlGroup.matchH2 (inline)
+     0.05s  1.20% 56.49%      0.05s  1.20%  runtime.(*sweepLocker).tryAcquire
+     0.05s  1.20% 57.69%      0.05s  1.20%  runtime.duffzero
+     0.05s  1.20% 58.89%      0.05s  1.20%  runtime.memmove
+     0.05s  1.20% 60.10%      0.05s  1.20%  time.leadingInt[go.shape.string] (inline)
+     0.04s  0.96% 61.06%      0.13s  3.12%  gcWriteBarrier
+     0.04s  0.96% 62.02%      0.29s  6.97%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.normalizeOutboxEntries
+     0.04s  0.96% 62.98%      1.55s 37.26%  google.golang.org/protobuf/proto.UnmarshalOptions.Unmarshal
+     0.04s  0.96% 63.94%      0.04s  0.96%  runtime.(*mspan).heapBitsSmallForAddr
+     0.04s  0.96% 64.90%      0.04s  0.96%  runtime.(*mspan).writeHeapBitsSmall
+     0.04s  0.96% 65.87%      0.04s  0.96%  runtime.nextFreeFast (inline)
+     0.04s  0.96% 66.83%      0.04s  0.96%  runtime.releasem (inline)
+     0.03s  0.72% 67.55%      3.52s 84.62%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).consume
+     0.03s  0.72% 68.27%      0.03s  0.72%  github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb.(*Entry).ProtoReflect
+     0.03s  0.72% 68.99%      0.03s  0.72%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeUnknownFieldsFunc.func1
+     0.03s  0.72% 69.71%      0.43s 10.34%  internal/runtime/maps.(*table).split
+     0.03s  0.72% 70.43%      0.18s  4.33%  internal/runtime/maps.(*table).uncheckedPutSlot
+     0.03s  0.72% 71.15%      0.03s  0.72%  runtime.(*fixalloc).alloc

@@ -1,0 +1,46 @@
+syntax = "proto3";
+package stow.runthrough;
+option go_package = "github.com/chester-hill-solutions/stow-s3/internal/runthrough/outboxpb";
+
+message Outbox {
+  uint32 version = 1;
+  repeated Provenance provenance = 2;
+  repeated Entry entries = 3;
+  repeated Entry prepared = 4;
+  uint64 seq = 5;
+  uint64 next_token = 6;
+}
+
+message Provenance {
+  string identity = 1;
+  string etag = 2;
+  bool absent = 3;
+  bool unknown = 4;
+}
+
+message Entry {
+  string identity = 1;
+  string id = 2;
+  string operation = 3;
+  string bucket = 4;
+  string key = 5;
+  string source_bucket = 6;
+  string source_key = 7;
+  string version = 8;
+  string previous_version = 9;
+  string upstream_version = 10;
+  bool upstream_absent = 11;
+  bool prepared = 12;
+  string created_at = 13;
+  sint64 attempts = 14;
+  string next_attempt = 15;
+  string last_error = 16;
+  bool terminal = 17;
+  string claim_owner = 18;
+  string claim_until = 19;
+  uint64 claim_token = 20;
+  bool attempted = 21;
+  string prepared_owner = 22;
+  string prepared_until = 23;
+  uint64 prepared_token = 24;
+}

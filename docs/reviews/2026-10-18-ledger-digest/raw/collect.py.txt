@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,hashlib,shutil
+p=Path('/private/tmp/stow-ledger-cost-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-ledger-digest/raw';raw.mkdir(parents=True,exist_ok=True)
+phases={'probe':(7,[]),'inline':(11,['prototype-race']),'command-failure':(11,['red-normal','build-before']),'prototype':(12,[]),'final':(22,[])}
+for phase,(count,failed) in phases.items():
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and len(checks)==count and [x['name']for x in checks if not x['passed']]==failed;assert run['success']==(not failed);assert job['deploymentId']==run['railwayDeploymentId']=='75f56fbc-c6d7-41ee-b316-8a7f2faf163c'
+ dest=raw/phase;dest.mkdir(parents=True,exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ for suffix,name in [('start.json','start.json'),('deployments.json','deployments.json'),('upload.log','upload.log')]:shutil.copy2(p/(phase+'-'+suffix),dest/name)
+ if phase=='final':
+  env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+  for n,h in env['sourceSHA256'].items():
+   if n.endswith('.go'):
+    data=(src/('source-'+Path(n).name+'.txt')).read_bytes();assert hashlib.sha256(data).hexdigest()==h;assert (r/n).read_bytes()==data,n
+names=['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','baseline-state.go.txt','legacy-reader-state.go.txt','isolate-bench.go.txt','isolate-measure.mjs','isolate-profile.mjs','digest-measure.mjs','final-digest-measure.mjs','digest-baseline-state.go.txt','digest-stream-state.go.txt','failed-attempt-build.log','failed-attempt-deployments.json','failed-attempt-upload.log','failed-second-build.log','failed-second-deployments.json','failed-second-upload.log','transport-Dockerfile.txt','transport-receipt.json','inspect-pool.js','inspect-pool.log']
+for n in names:shutil.copy2(p/n,raw/n)
+for n in ['setup.py','control.py','remote.py','export.py','watch.py','analyze-probe.py','analyze-prototype.py','analyze-final.py','collect.py','report.py']:shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-ledger-digest.md');print('Collected all five jobs, including adverse/invalid results, and verified exact tested Go files')

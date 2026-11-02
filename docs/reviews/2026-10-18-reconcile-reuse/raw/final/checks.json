@@ -1,0 +1,384 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/state.go",
+      "internal/capacity/admission.go",
+      "internal/capacity/reconcile_unchanged_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 457,
+    "passed": true
+  },
+  {
+    "name": "verified-red-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestReconcileUnchanged",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 306,
+    "passed": true
+  },
+  {
+    "name": "verified-red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/capacity",
+      "-run",
+      "^TestReconcileUnchanged",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 412,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22188,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 56428,
+    "passed": true
+  },
+  {
+    "name": "full-go",
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 69834,
+    "passed": true
+  },
+  {
+    "name": "broad-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/capacity",
+      "./internal/storage/...",
+      "./internal/runtime",
+      "./internal/embedded",
+      "./internal/runthrough",
+      "./internal/s3api",
+      "./pkg/stow",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 103681,
+    "passed": true
+  },
+  {
+    "name": "conformance-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4918,
+    "passed": true
+  },
+  {
+    "name": "conformance-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7179,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 5505,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4714,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7820,
+    "passed": true
+  },
+  {
+    "name": "site-build",
+    "args": [
+      "npm",
+      "run",
+      "build",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 502,
+    "passed": true
+  },
+  {
+    "name": "site-tests",
+    "args": [
+      "npm",
+      "test",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 613,
+    "passed": true
+  },
+  {
+    "name": "doc-links",
+    "args": [
+      "node",
+      "scripts/check-doc-links.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 98,
+    "passed": true
+  },
+  {
+    "name": "install-capacity-benchmark",
+    "args": [
+      "cp",
+      "benchmark/ledger-reuse-bench.go.txt",
+      "internal/capacity/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13,
+    "passed": true
+  },
+  {
+    "name": "install-mutation-benchmark",
+    "args": [
+      "cp",
+      "benchmark/mutation-reuse-bench.go.txt",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 11,
+    "passed": true
+  },
+  {
+    "name": "format-benchmarks",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/ledger_reuse_bench_test.go",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13,
+    "passed": true
+  },
+  {
+    "name": "snapshot-benchmarks",
+    "args": [
+      "node",
+      "-e",
+      "const fs=require('node:fs');for(const[p,n]of [['capacity','internal/capacity/ledger_reuse_bench_test.go'],['fs','internal/storage/fs/ledger_reuse_bench_test.go']])fs.copyFileSync(n,process.env.STOW_RESULT_ROOT+'/compiled-'+p+'-bench.go.txt')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 34,
+    "passed": true
+  },
+  {
+    "name": "build-capacity-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/capacity-before.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 330,
+    "passed": true
+  },
+  {
+    "name": "build-capacity-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/capacity-after.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 331,
+    "passed": true
+  },
+  {
+    "name": "build-fs-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/fs-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 459,
+    "passed": true
+  },
+  {
+    "name": "build-fs-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/fs-after.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 451,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/reuse-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 131443,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmarks",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_reuse_bench_test.go",
+      "internal/storage/fs/ledger_reuse_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  }
+]

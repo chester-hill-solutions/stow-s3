@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib
+p=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');b=p/'context/benchmark'
+files=['benchmark/phase-probe/trace-file_outbox.go.txt','benchmark/phase-probe/trace-atomicfile.go.txt','benchmark/phase-probe/phase_probe_test.go.txt']
+sources=['internal/runthrough/outbox.go','internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go','internal/atomicfile/atomicfile.go','internal/runthrough/outbox_admission_bench_test.go',*files,'benchmark/write-comparison.mjs','benchmark/phase-baseline-overlay.json','benchmark/phase-trace-overlay.json','benchmark/phase-probe/before-outbox.go.txt','benchmark/phase-probe/before-file_outbox.go.txt']
+plan={'phase':'outbox-write-phases','sources':sources,'steps':[
+ {'name':'format-probe','args':['gofmt','-w',*files]},
+ {'name':'current-contracts','args':['go','test','./internal/runthrough','./internal/atomicfile','-count=1']},
+ {'name':'current-race','args':['go','test','-race','./internal/runthrough','./internal/atomicfile','-count=1']},
+ {'name':'build-before','args':['go','test','-overlay=benchmark/phase-baseline-overlay.json','-c','./internal/runthrough','-o','benchmark/write-before.test']},
+ {'name':'build-current','args':['go','test','-c','./internal/runthrough','-o','benchmark/write-after.test']},
+ {'name':'build-probe','args':['go','test','-overlay=benchmark/phase-trace-overlay.json','-c','./internal/runthrough','-o','benchmark/write-trace.test']},
+ {'name':'comparison','args':['node','benchmark/write-comparison.mjs']}
+]}
+(p/'main-plan.json').write_text(json.dumps(plan,indent=2)+'\n');(b/'active-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+(p/'diagnostic-inputs.json').write_text(json.dumps({n:hashlib.sha256((p/'context'/n).read_bytes()).hexdigest()for n in sources},indent=2)+'\n')

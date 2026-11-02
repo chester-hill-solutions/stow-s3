@@ -354,7 +354,12 @@ func (a *Adapter) PutObject(ctx context.Context, bucket, key string, body io.Rea
 }
 
 func (a *Adapter) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
-	return a.resolveObject(ctx, bucket, key, true)
+	reader, meta, err := a.resolveObject(ctx, bucket, key, true)
+	if err != nil && reader != nil {
+		_ = reader.Close()
+		reader = nil
+	}
+	return reader, meta, err
 }
 
 func (a *Adapter) HeadObject(ctx context.Context, bucket, key string) (*storage.ObjectMeta, error) {
@@ -390,10 +395,14 @@ func (a *Adapter) resolveObject(ctx context.Context, bucket, key string, needBod
 func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, needBody bool) (io.ReadCloser, *storage.ObjectMeta, error) {
 	a.cacheMisses.Add(1)
 	rc, meta, err := a.upstream.GetObject(ctx, bucket, key)
+	defer func() {
+		if rc != nil {
+			_ = rc.Close()
+		}
+	}()
 	if err != nil {
 		return nil, nil, err
 	}
-	defer rc.Close()
 	cacheStore := a.local
 	if a.separateCache {
 		cacheStore = a.cache
@@ -407,6 +416,18 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err := a.saveUpstreamState(bucket, key, UpstreamState{ETag: meta.ETag}); err != nil {
 		return nil, nil, err
 	}
+	// Stream an object that cannot fit instead of caching, evicting and refetching it.
+	if a.cacheObjectCannotFit(meta.Size) {
+		if err := a.discardCacheObject(ctx, bucket, key); err != nil {
+			return nil, nil, err
+		}
+		if !needBody {
+			return nil, meta, nil
+		}
+		reader := rc
+		rc = nil
+		return reader, meta, nil
+	}
 	cached, err := cacheStore.PutObject(ctx, bucket, key, rc, storage.PutOptions{
 		ContentType:       meta.ContentType,
 		Metadata:          meta.Metadata,
@@ -416,27 +437,14 @@ func (a *Adapter) refreshFromUpstream(ctx context.Context, bucket, key string, n
 	if err != nil {
 		return nil, nil, err
 	}
-	// cached.Size is the stored length, which is what the cache byte limit is
-	// measured against. Passing it in avoids a store round trip to re-read what
-	// PutObject just returned.
+	// Use the stored length when applying the cache budget.
 	if err := a.trackCacheObject(ctx, bucket, key, cached.Size); err != nil {
 		return nil, nil, err
 	}
 	if !needBody {
 		return nil, cached, nil
 	}
-	reader, _, err := cacheStore.GetObject(ctx, bucket, key)
-	if err == nil {
-		return reader, cached, nil
-	}
-	if !errors.Is(err, storage.ErrObjectNotFound) {
-		return nil, nil, err
-	}
-	fresh, _, freshErr := a.upstream.GetObject(ctx, bucket, key)
-	if freshErr != nil {
-		return nil, nil, freshErr
-	}
-	return fresh, cached, nil
+	return a.openRefreshedObject(ctx, cacheStore, bucket, key, meta.ETag)
 }
 
 func (a *Adapter) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {

@@ -1,0 +1,103 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-outbox-clone-2026-10-18');p.mkdir(exist_ok=True)
+tests='''package runthrough
+
+import (
+    "fmt"
+    "reflect"
+    "testing"
+)
+
+func cloneContractFixture(mask int) outboxState {
+    s := outboxState{seq: 41, nextToken: 42}
+    if mask & 1 != 0 { s.entries = map[string]OutboxEntry{"active": {ID: "active", Operation: OutboxPut, Bucket: "bucket", Key: "active", Version: "v"}} }
+    if mask & 2 != 0 { s.prepared = map[string]OutboxEntry{"prepared": {ID: "prepared", Prepared: true, PreparedOwner: "worker", PreparedToken: 42}} }
+    if mask & 4 != 0 { s.provenance = map[string]UpstreamState{"upstream": {ETag: "etag"}} }
+    return s
+}
+
+func TestOutboxStateCloneIndependence(t *testing.T) {
+    for mask := 0; mask < 8; mask++ {
+        t.Run(fmt.Sprintf("maps-%d", mask), func(t *testing.T) {
+            s, original := cloneContractFixture(mask), cloneContractFixture(mask)
+            clone := s.clone()
+            if clone.entries == nil || clone.prepared == nil || clone.provenance == nil { t.Fatal("clone must have mutable maps even for nil input") }
+            if clone.seq != s.seq || clone.nextToken != s.nextToken { t.Fatal("clone changed counters") }
+            for id, value := range s.entries { if clone.entries[id] != value { t.Fatal("active entry changed") } }
+            for id, value := range s.prepared { if clone.prepared[id] != value { t.Fatal("prepared entry changed") } }
+            for id, value := range s.provenance { if clone.provenance[id] != value { t.Fatal("provenance changed") } }
+            clone.entries["active"] = OutboxEntry{ID: "active", Version: "changed"}
+            clone.prepared["prepared"] = OutboxEntry{ID: "prepared", PreparedToken: 99}
+            clone.provenance["upstream"] = UpstreamState{Absent: true}
+            clone.seq, clone.nextToken = 99, 100
+            if !reflect.DeepEqual(s, original) { t.Fatal("clone mutation changed original state") }
+            delete(clone.entries, "active"); delete(clone.prepared, "prepared"); delete(clone.provenance, "upstream")
+            if !reflect.DeepEqual(s, original) { t.Fatal("clone deletion changed original state") }
+        })
+    }
+    t.Run("empty-nonnil", func(t *testing.T) {
+        s := newOutboxState(); clone := s.clone()
+        if !reflect.DeepEqual(s, clone) { t.Fatal("empty clone changed map state") }
+        clone.entries["new"] = OutboxEntry{ID: "new"}
+        if len(s.entries) != 0 { t.Fatal("empty maps alias") }
+    })
+}
+'''
+(r/'internal/runthrough/outbox_clone_test.go').write_text(tests)
+bench='''package runthrough
+
+import (
+    "fmt"
+    "reflect"
+    "testing"
+)
+
+var outboxCloneSink outboxState
+
+func cloneBenchFixture(depth int, churned bool) outboxState {
+    s := newOutboxState(); s.seq, s.nextToken = 41, 42
+    inserted := depth
+    if churned && depth > 0 { inserted = 32768 }
+    for n := 0; n < inserted; n++ {
+        id := fmt.Sprintf("entry-%08d", n)
+        s.entries[id] = OutboxEntry{ID: id, Operation: OutboxPut, Bucket: "bucket", Key: id, Version: "version"}
+        s.prepared[id] = OutboxEntry{ID: id, Prepared: true, PreparedOwner: "worker", PreparedToken: 42}
+        s.provenance[id] = UpstreamState{ETag: "etag"}
+    }
+    for n := depth; n < inserted; n++ {
+        id := fmt.Sprintf("entry-%08d", n)
+        delete(s.entries, id); delete(s.prepared, id); delete(s.provenance, id)
+    }
+    return s
+}
+
+func BenchmarkOutboxStateClone(b *testing.B) {
+    for _, depth := range []int{0,128,4096} {
+        for _, churned := range []bool{false,true} {
+            b.Run(fmt.Sprintf("depth=%d/churned=%t", depth, churned),func(b *testing.B) {
+                s := cloneBenchFixture(depth, churned)
+                b.ReportAllocs(); b.ResetTimer()
+                for n := 0; n < b.N; n++ { outboxCloneSink = s.clone() }
+                b.StopTimer()
+                if !reflect.DeepEqual(s, outboxCloneSink) { b.Fatal("clone changed state") }
+                outboxCloneSink = outboxState{}
+            })
+        }
+    }
+}
+'''
+(r/'internal/runthrough/outbox_clone_bench_test.go').write_text(bench)
+source=(r/'internal/runthrough/outbox.go').read_text();candidate=source.replace('"fmt"','"fmt"\n "maps"');start=candidate.index('func (s outboxState) clone() outboxState {');end=candidate.index('\nfunc (s *outboxState) assignID(',start)
+candidate=candidate[:start]+'''func (s outboxState) clone() outboxState {
+    entries := maps.Clone(s.entries)
+    if entries == nil { entries = make(map[string]OutboxEntry) }
+    prepared := maps.Clone(s.prepared)
+    if prepared == nil { prepared = make(map[string]OutboxEntry) }
+    provenance := maps.Clone(s.provenance)
+    if provenance == nil { provenance = make(map[string]UpstreamState) }
+    return outboxState{provenance: provenance, entries: entries, prepared: prepared, seq: s.seq, nextToken: s.nextToken}
+}
+''' +candidate[end:]
+(p/'candidate-outbox.go.txt').write_text(candidate)
+print('Created clone contracts, dense/churn benchmarks and a temporary one-function candidate; production unchanged')

@@ -1,0 +1,33 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxWriteCache/depth=0/enqueue           	      64	   6275635 ns/op	        14.00 cached-B	        14.00 journal-B	  14737408 process-HWM-B	    397720 process-live-heap-B	    8087 B/op	      67 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/enqueue-4         	      79	   7188789 ns/op	        14.00 cached-B	        14.00 journal-B	  16932864 process-HWM-B	    400504 process-live-heap-B	    8086 B/op	      67 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/prepare           	      67	   7141474 ns/op	        14.00 cached-B	        14.00 journal-B	  16424960 process-HWM-B	    397688 process-live-heap-B	    8087 B/op	      67 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/prepare-4         	      91	   7057289 ns/op	        14.00 cached-B	        14.00 journal-B	  16531456 process-HWM-B	    405976 process-live-heap-B	    8087 B/op	      67 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/provenance        	     146	   4550940 ns/op	        34.00 cached-B	        34.00 journal-B	  16224256 process-HWM-B	    407880 process-live-heap-B	    3728 B/op	      34 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/provenance-4      	     151	   3724682 ns/op	        34.00 cached-B	        34.00 journal-B	  16367616 process-HWM-B	    411288 process-live-heap-B	    3734 B/op	      34 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/renew             	     141	   3280937 ns/op	       151.0 cached-B	       151.0 journal-B	  16343040 process-HWM-B	    408192 process-live-heap-B	    4370 B/op	      36 allocs/op
+BenchmarkFileOutboxWriteCache/depth=0/renew-4           	     165	   3526984 ns/op	       151.0 cached-B	       151.0 journal-B	  16613376 process-HWM-B	    411168 process-live-heap-B	    4371 B/op	      36 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/enqueue         	      66	   9884017 ns/op	     25486 cached-B	     25486 journal-B	  19042304 process-HWM-B	    641312 process-live-heap-B	  544807 B/op	    1620 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/enqueue-4       	      76	   8120832 ns/op	     25486 cached-B	     25486 journal-B	  19001344 process-HWM-B	    644416 process-live-heap-B	  544810 B/op	    1620 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/prepare         	      72	   7263183 ns/op	     25486 cached-B	     25486 journal-B	  18927616 process-HWM-B	    641584 process-live-heap-B	  544808 B/op	    1620 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/prepare-4       	      58	  10987196 ns/op	     25486 cached-B	     25486 journal-B	  21499904 process-HWM-B	    644576 process-live-heap-B	  544809 B/op	    1620 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/provenance      	     134	   3526510 ns/op	     25506 cached-B	     25506 journal-B	  21319680 process-HWM-B	    642112 process-live-heap-B	  272317 B/op	     812 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/provenance-4    	     136	   3892731 ns/op	     25506 cached-B	     25506 journal-B	  21139456 process-HWM-B	    646040 process-live-heap-B	  272372 B/op	     812 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/renew           	     138	   3928825 ns/op	     25623 cached-B	     25623 journal-B	  21028864 process-HWM-B	    642016 process-live-heap-B	  272623 B/op	     812 allocs/op
+BenchmarkFileOutboxWriteCache/depth=128/renew-4         	     123	   3868356 ns/op	     25623 cached-B	     25623 journal-B	  21147648 process-HWM-B	    645360 process-live-heap-B	  272625 B/op	     812 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/enqueue        	      15	  34828922 ns/op	    815118 cached-B	    815118 journal-B	  49008640 process-HWM-B	   7464136 process-live-heap-B	17018504 B/op	   49292 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/enqueue-4      	      13	  32966821 ns/op	    815118 cached-B	    815118 journal-B	  48365568 process-HWM-B	   7467240 process-live-heap-B	17018518 B/op	   49292 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/prepare        	      13	  44928063 ns/op	    815118 cached-B	    815118 journal-B	  50180096 process-HWM-B	   7464008 process-live-heap-B	17018504 B/op	   49292 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/prepare-4      	      14	  32064960 ns/op	    815118 cached-B	    815118 journal-B	  48365568 process-HWM-B	   7467096 process-live-heap-B	17018524 B/op	   49292 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/provenance     	      26	  18146362 ns/op	    815138 cached-B	    815138 journal-B	  48365568 process-HWM-B	   7464592 process-live-heap-B	 8501116 B/op	   24649 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/provenance-4   	      26	  16564342 ns/op	    815138 cached-B	    815138 journal-B	  48365568 process-HWM-B	   7468176 process-live-heap-B	 8501576 B/op	   24650 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/renew          	      27	  18637012 ns/op	    815255 cached-B	    815255 journal-B	  48365568 process-HWM-B	   7472440 process-live-heap-B	 8517664 B/op	   24648 allocs/op
+BenchmarkFileOutboxWriteCache/depth=4096/renew-4        	      26	  17632421 ns/op	    815255 cached-B	    815255 journal-B	  48365568 process-HWM-B	   7476552 process-live-heap-B	 8517720 B/op	   24648 allocs/op
+BenchmarkFileOutboxWriteCacheFallback/depth=128         	      61	   8821695 ns/op	         0 cached-B	     25491 journal-B	  48365568 process-HWM-B	    645768 process-live-heap-B	 1006720 B/op	    6008 allocs/op
+BenchmarkFileOutboxWriteCacheFallback/depth=128-4       	      64	   7578578 ns/op	         0 cached-B	     25491 journal-B	  48365568 process-HWM-B	    648952 process-live-heap-B	 1006905 B/op	    6010 allocs/op
+BenchmarkFileOutboxWriteCacheFallback/depth=4096        	       9	  54904965 ns/op	         0 cached-B	    815123 journal-B	  55271424 process-HWM-B	   7586152 process-live-heap-B	31387023 B/op	  180972 allocs/op
+BenchmarkFileOutboxWriteCacheFallback/depth=4096-4      	       9	  45186298 ns/op	         0 cached-B	    815123 journal-B	  51240960 process-HWM-B	   7589336 process-live-heap-B	31387037 B/op	  180972 allocs/op
+PASS

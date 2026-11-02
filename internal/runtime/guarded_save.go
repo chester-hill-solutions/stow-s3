@@ -68,12 +68,16 @@ func (i *Instance) ReadForSave(ctx context.Context, bucket, key string) (Object,
 	if !i.SupportsGuardedSaves() {
 		return Object{}, SaveCondition{}, ErrGuardedSavesUnsupported
 	}
-	object, err := i.GetObject(ctx, bucket, key)
+	reader, object, err := i.OpenObject(ctx, bucket, key)
 	condition := SaveCondition{owner: i, bucket: bucket, key: key}
-	if errors.Is(err, storage.ErrObjectNotFound) {
+	if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
 		condition.guard.Absent = true
 		return Object{Bucket: bucket, Key: key}, condition, nil
 	}
+	if err != nil {
+		return Object{}, SaveCondition{}, err
+	}
+	err = readOpenedObject(reader, &object)
 	if err != nil {
 		return Object{}, SaveCondition{}, err
 	}

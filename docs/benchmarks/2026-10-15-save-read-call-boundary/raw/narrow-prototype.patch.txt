@@ -1,0 +1,30 @@
+--- a/internal/runtime/objects.go
++++ b/internal/runtime/objects.go
+@@ -32,4 +32,8 @@
+-	return readOpenedObject(reader, object)
+-}
+-
+-func readOpenedObject(reader io.ReadCloser, object Object) (Object, error) {
++	object.Data, err = readOpenedData(reader, object.Size)
++	if err != nil {
++		return Object{}, err
++	}
++	return object, nil
++}
++
++func readOpenedData(reader io.ReadCloser, size int64) ([]byte, error) {
+@@ -37 +40,0 @@
+-	size := object.Size
+@@ -47,4 +50,3 @@
+-		return Object{}, err
+-	}
+-	object.Data = buffer.Bytes()
+-	return object, nil
++		return nil, err
++	}
++	return buffer.Bytes(), nil
+--- a/internal/runtime/guarded_save.go
++++ b/internal/runtime/guarded_save.go
+@@ -80 +80 @@
+-	object, err = readOpenedObject(reader, object)
++	object.Data, err = readOpenedData(reader, object.Size)

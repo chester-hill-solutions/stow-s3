@@ -1,0 +1,22 @@
+{
+  "baseline": "2c100c3",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "branch": "codex/core-copy-quality",
+  "commands": {
+    "full_go": "GOTOOLCHAIN=go1.25.6 go test ./...",
+    "race": "GOTOOLCHAIN=go1.25.6 go test -race ./internal/runtime ./internal/storage/... ./internal/s3api ./internal/runthrough ./internal/embedded ./pkg/stow",
+    "conformance": "make test-conformance",
+    "focused": "go test ./internal/runtime ./internal/s3api -run Test(WorkspaceCompletionPublicationFailureRetainsAccounting|WorkspaceCommittedCompletionCanAbortAfterRepair|CommittedCompletion|MultipartIndexFailureReturnsS3ErrorAfterPublication) -count=2",
+    "focused_race": "same focused selection with -race -count=5",
+    "benchmark": "standalone binaries: -test.run=^$ -test.bench=^BenchmarkWorkspaceMultipartCompletion$ -test.benchtime=5x -test.count=3 -test.benchmem",
+    "vet": "GOTOOLCHAIN=go1.25.6 go vet ./internal/runtime ./internal/storage/workspace ./internal/s3api",
+    "generated": "node scripts/check-generated.mjs",
+    "wasm": "node --test wasm/runtime.test.mjs",
+    "package": "node --import tsx --test test/embedded.test.ts test/node-wasm-host.test.ts test/wasm-assets.test.ts test/host-backed-streams.test.ts"
+  },
+  "notes": [
+    "Baseline failures ran before implementation; new regression helpers were subsequently extended.",
+    "Conformance verbose output summarized by backend invocation and final result.",
+    "Log trailing whitespace normalized for repository checks."
+  ]
+}

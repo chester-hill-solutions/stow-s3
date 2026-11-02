@@ -1,0 +1,40 @@
+--- a/internal/runtime/objects.go
++++ b/internal/runtime/objects.go
+@@ -27,0 +28,5 @@
++	object, _, err := i.getObject(ctx, bucket, key)
++	return object, err
++}
++
++func (i *Instance) getObject(ctx context.Context, bucket, key string) (Object, bool, error) {
+@@ -30,6 +35,2 @@
+-		return Object{}, err
+-	}
+-	return readOpenedObject(reader, object)
+-}
+-
+-func readOpenedObject(reader io.ReadCloser, object Object) (Object, error) {
++		return Object{}, false, err
++	}
+@@ -45,3 +46,3 @@
+-	_, err := io.Copy(buffer, reader)
+-	if err != nil {
+-		return Object{}, err
++	_, err = io.Copy(buffer, reader)
++	if err != nil {
++		return Object{}, true, err
+@@ -50 +51 @@
+-	return object, nil
++	return object, true, nil
+--- a/internal/runtime/guarded_save.go
++++ b/internal/runtime/guarded_save.go
+@@ -71 +71 @@
+-	reader, object, err := i.OpenObject(ctx, bucket, key)
++	object, opened, err := i.getObject(ctx, bucket, key)
+@@ -73 +73 @@
+-	if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
++	if !opened && errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
+@@ -77,4 +76,0 @@
+-	if err != nil {
+-		return Object{}, SaveCondition{}, err
+-	}
+-	object, err = readOpenedObject(reader, object)

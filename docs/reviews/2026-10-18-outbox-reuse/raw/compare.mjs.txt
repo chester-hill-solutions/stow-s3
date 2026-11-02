@@ -1,0 +1,51 @@
+import{readFile,writeFile,copyFile,rm,mkdir}from'node:fs/promises';
+import{spawn}from'node:child_process';
+import{createHash}from'node:crypto';
+import{join}from'node:path';
+import{systemMetadata,cgroupResources}from'./resources.mjs';
+const root=process.env.STOW_RESULT_ROOT,plan=JSON.parse(await readFile('benchmark/active-plan.json'));
+if(!root?.startsWith('/results/')||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4')throw Error('Railway scratch results required');
+const fixtures=join(root,'fixtures'),samples=[],commands=[],binaries={},sources={};
+const save=(n,v)=>writeFile(join(root,n),typeof v==='string'?v:JSON.stringify(v,null,2)+'\n');
+const hash=data=>createHash('sha256').update(data).digest('hex');
+async function run(name,args,env={}){
+ const startedAt=new Date().toISOString(),start=Date.now();let output='';
+ const child=spawn(args[0],args.slice(1),{env:{...process.env,...env},stdio:['ignore','pipe','pipe']});child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);
+ const result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(exitCode,signal)=>resolve({exitCode,signal}))});await save(name+'.log',output);
+ commands.push({name,args,env,startedAt,elapsedMs:Date.now()-start,...result});await save('comparison-commands.json',commands);
+ if(result.exitCode!==0)throw Error(name+' failed: '+output.slice(-3000));return output;
+}
+try{
+ const before=await systemMetadata();if(before.cgroup.cpuMax!=='400000 100000'||before.cgroup.memoryMax!=='4294967296'||!before.mountInfo.split('\n').some(line=>line.includes(' /results ')&&line.includes(' - ext4 ')))throw Error('Unexpected resources');
+ const variants=JSON.parse(await readFile('benchmark/variants.json'));
+ for(const[variant,cfg]of Object.entries(variants)){
+  const args=['go','test','-c','-buildvcs=false','-o',join(root,variant+'.test')],replace={};
+  for(const[target,input]of Object.entries(cfg)){replace['/app/'+target]='/app/'+input;const data=await readFile(input);sources[input]=hash(data);await copyFile(input,join(root,'source-'+variant+'-'+target.split('/').at(-1)+'.txt'))}
+  if(Object.keys(replace).length){const overlay=join(root,variant+'-overlay.json');await save(variant+'-overlay.json',{Replace:replace});args.push('-overlay='+overlay)}
+  args.push('./internal/runthrough');await run('build-'+variant,args);const data=await readFile(join(root,variant+'.test'));binaries[variant]={bytes:data.length,sha256:hash(data)};
+  if(plan.compare.contracts){
+   const overlayArgs=Object.keys(replace).length?['-overlay='+join(root,variant+'-overlay.json')]:[];
+   for(const race of [false,true])await run('contracts-'+variant+(race?'-race':''),['go','test',...overlayArgs,...(race?['-race']:[]),'./internal/runthrough','-run','^TestFileOutbox','-count=2','-v']);
+  }
+ }
+ for(const n of plan.sources)sources[n]=hash(await readFile(n));
+ await save('comparison-build.json',{variants,binaries,sources});
+ await save('runtime-settings.json',{goVersion:await run('go-version',['go','version']),environment:Object.fromEntries(['GOGC','GOMEMLIMIT','GODEBUG','GOEXPERIMENT','GOTOOLCHAIN','GOFLAGS','GOMAXPROCS'].map(k=>[k,process.env[k]??null]))});
+ await run('seed',[join(root,'before.test'),'-test.run=^TestOutboxReadCostSeed$','-test.count=1','-test.v'],{STOW_OUTBOX_READ_COST_SEED:fixtures});
+ const manifest=JSON.parse(await readFile(join(fixtures,'manifest.json')));for(const[n,row]of Object.entries(manifest))row.initialSHA256=hash(await readFile(join(fixtures,n)));await save('fixtures.json',manifest);
+ const cells=[];for(const cpu of plan.compare.cpu)for(const fixture of cpu===1?plan.compare.fixtures:[...plan.compare.fixtures].reverse())for(const stage of cpu===1?plan.compare.stages:[...plan.compare.stages].reverse()){
+  for(let cycle=0;cycle<plan.compare.cycles;cycle++)for(const variant of cycle%2===0?['before','after','after','before']:['after','before','before','after'])cells.push({cpu,fixture,stage,cycle,variant,kind:'timed',benchtime:plan.compare.benchtime})
+ }
+ if(plan.compare.fixed)for(const cpu of [1,4])for(const fixture of ['provenance=16384','provenance=262144','mixed=16384'])for(const variant of ['before','after','after','before'])cells.push({cpu,fixture,stage:'lookup',variant,kind:'fixed',benchtime:'32x'});
+ await save('cells.json',cells);
+ for(const[index,cell]of cells.entries()){
+  const name='cell-'+String(index).padStart(3,'0')+'-'+cell.kind+'-'+cell.variant+'-cpu'+cell.cpu+'-'+cell.fixture+'-'+cell.stage;console.log('Starting '+name);
+  const resourcesBefore=await cgroupResources();const output=await run(name,[join(root,cell.variant+'.test'),'-test.run=^$','-test.bench=^BenchmarkFileOutboxReadCost$/^'+cell.fixture+'$/^'+cell.stage+'$','-test.benchtime='+cell.benchtime,'-test.count=1','-test.cpu='+cell.cpu,'-test.benchmem','-test.timeout=120s'],{STOW_OUTBOX_READ_COST_FIXTURES:fixtures});
+  const lines=output.split('\n').filter(line=>line.startsWith('BenchmarkFileOutboxReadCost/'));if(lines.length!==1)throw Error('Expected one measurement');const fields=lines[0].trim().split(/\s+/),metrics={};for(let i=2;i+1<fields.length;i+=2)metrics[fields[i+1]]=Number(fields[i]);
+  if(!Number.isFinite(metrics['ns/op'])||!Number.isFinite(metrics['process-live-heap-B'])||metrics['journal-B']!==manifest[cell.fixture].bytes)throw Error('Invalid measurement '+name);
+  samples.push({...cell,index,benchmark:fields[0],iterations:Number(fields[1]),metrics,resourcesBefore,resourcesAfter:await cgroupResources(),log:name+'.log'});await save('samples.json',samples);await save('measurement-progress.json',{completed:index+1,total:cells.length,last:name,observations:samples.length});
+ }
+ for(const[variant,row]of Object.entries(binaries)){if(hash(await readFile(join(root,variant+'.test')))!==row.sha256)throw Error('Binary changed');await rm(join(root,variant+'.test'))}
+ await rm(fixtures,{recursive:true});await save('binary-cleanup.json',{verifiedBinaries:binaries,removed:true,fixturesRemoved:true});
+ await save('comparison-environment.json',{start:before,end:await systemMetadata(),observations:samples.length,complete:true});
+}catch(error){await save('comparison-error.json',{error:error.stack});throw error}

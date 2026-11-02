@@ -1,0 +1,94 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type reviewPartialSaveStore struct {
+	*storage.MemoryStore
+	fail          bool
+	readErr       error
+	bytes, closes int
+}
+
+func (s *reviewPartialSaveStore) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := s.MemoryStore.GetObject(ctx, bucket, key)
+	if err != nil || !s.fail {
+		return reader, meta, err
+	}
+	return &reviewPartialSaveBody{ReadCloser: reader, store: s}, meta, nil
+}
+
+type reviewPartialSaveBody struct {
+	io.ReadCloser
+	store *reviewPartialSaveStore
+}
+
+func (r *reviewPartialSaveBody) Read(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+	if r.store.bytes > 0 {
+		return 0, r.store.readErr
+	}
+	n, err := r.ReadCloser.Read(p[:1])
+	r.store.bytes += n
+	return n, err
+}
+func (r *reviewPartialSaveBody) Close() error { r.store.closes++; return r.ReadCloser.Close() }
+
+func TestReviewReadForSavePartialBodyMissing(t *testing.T) {
+	for _, wrapped := range []bool{false, true} {
+		t.Run(fmt.Sprint(wrapped), func(t *testing.T) {
+			ctx := context.Background()
+			store := &reviewPartialSaveStore{MemoryStore: storage.NewMemoryStore(), readErr: storage.ErrObjectNotFound}
+			if wrapped {
+				store.readErr = fmt.Errorf("body: %w", store.readErr)
+			}
+			instance, err := OpenWithStore(Options{Backend: BackendMemory, MaxBytes: 8, MaxObjects: 1}, store, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { _ = instance.Close() })
+			if err := instance.CreateBucket(ctx, "probe"); err != nil {
+				t.Fatal(err)
+			}
+			before, err := instance.PutObject(ctx, "probe", "target", []byte("old"), PutOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			store.fail = true
+			_, condition, err := instance.ReadForSave(ctx, "probe", "target")
+			if err != store.readErr {
+				t.Errorf("partial body failure lost: %v want %v", err, store.readErr)
+			}
+			if condition.ObservedAbsence() {
+				t.Errorf("one-byte partial read became authoritative absence for existing three-byte object")
+			}
+			if store.bytes != 1 || store.closes != 1 {
+				t.Fatalf("partial reader bytes=%d closes=%d", store.bytes, store.closes)
+			}
+			store.fail = false
+			if condition.ObservedAbsence() {
+				result, err := instance.SaveObject(ctx, "probe", "target", []byte("bad"), SaveOptions{Condition: condition})
+				if !errors.Is(err, storage.ErrSaveConflict) || result.Outcome != SaveNotCommitted {
+					t.Fatalf("backend guard failed: result=%+v error=%v", result, err)
+				}
+			}
+			object, healthy, err := instance.ReadForSave(ctx, "probe", "target")
+			if err != nil || healthy.ObservedAbsence() || string(object.Data) != "old" || object.VersionID != before.VersionID {
+				t.Fatalf("healthy read changed: object=%+v absent=%t error=%v", object, healthy.ObservedAbsence(), err)
+			}
+			result, err := instance.SaveObject(ctx, "probe", "target", []byte("new"), SaveOptions{Condition: healthy})
+			if err != nil || result.Outcome != SaveCommitted {
+				t.Fatalf("healthy save: result=%+v error=%v", result, err)
+			}
+		})
+	}
+}

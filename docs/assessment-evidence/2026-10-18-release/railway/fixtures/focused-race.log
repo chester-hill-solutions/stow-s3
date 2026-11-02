@@ -1,0 +1,178 @@
+=== RUN   TestCapacityPayloadAllocationBound
+=== RUN   TestCapacityPayloadAllocationBound/object/8388608
+    capacity_payload_read_test.go:139: kind=object payload=8388608 binding allocated=189824 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/object/67108864
+    capacity_payload_read_test.go:139: kind=object payload=67108864 binding allocated=248776 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/8388608
+    capacity_payload_read_test.go:139: kind=part payload=8388608 binding allocated=233032 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/67108864
+    capacity_payload_read_test.go:139: kind=part payload=67108864 binding allocated=275760 budget=4194304
+--- PASS: TestCapacityPayloadAllocationBound (1.55s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/8388608 (0.11s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/67108864 (0.74s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/8388608 (0.09s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/67108864 (0.61s)
+=== RUN   TestCapacityPayloadIdentities
+=== RUN   TestCapacityPayloadIdentities/object/0
+=== RUN   TestCapacityPayloadIdentities/object/257
+=== RUN   TestCapacityPayloadIdentities/part/0
+=== RUN   TestCapacityPayloadIdentities/part/257
+=== RUN   TestCapacityPayloadIdentities/legacy
+--- PASS: TestCapacityPayloadIdentities (0.03s)
+    --- PASS: TestCapacityPayloadIdentities/object/0 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/object/257 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/part/0 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/part/257 (0.00s)
+    --- PASS: TestCapacityPayloadIdentities/legacy (0.01s)
+=== RUN   TestCapacityPayloadInvalidRecords
+=== RUN   TestCapacityPayloadInvalidRecords/prefix
+=== RUN   TestCapacityPayloadInvalidRecords/header
+=== RUN   TestCapacityPayloadInvalidRecords/short
+=== RUN   TestCapacityPayloadInvalidRecords/long
+--- PASS: TestCapacityPayloadInvalidRecords (0.01s)
+    --- PASS: TestCapacityPayloadInvalidRecords/prefix (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/header (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/short (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/long (0.00s)
+=== RUN   TestCapacityPayloadNativeRefusals
+=== RUN   TestCapacityPayloadNativeRefusals/permission
+=== RUN   TestCapacityPayloadNativeRefusals/symlink
+--- PASS: TestCapacityPayloadNativeRefusals (0.01s)
+    --- PASS: TestCapacityPayloadNativeRefusals/permission (0.01s)
+    --- PASS: TestCapacityPayloadNativeRefusals/symlink (0.01s)
+=== RUN   TestCapacityPayloadUnknownAllocation
+    capacity_payload_read_test.go:260: unknown bytes=67108864 allocated=19800
+--- PASS: TestCapacityPayloadUnknownAllocation (0.01s)
+=== RUN   TestCompletionBufferAllocation
+=== RUN   TestCompletionBufferAllocation/bound=false/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8418832 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=false/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8428584 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8756272 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8750904 budget=10485760
+--- PASS: TestCompletionBufferAllocation (1.15s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=false (0.25s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=true (0.27s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=false (0.30s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=true (0.32s)
+=== RUN   TestCompletionBufferChecksums
+=== RUN   TestCompletionBufferChecksums/CRC32
+=== RUN   TestCompletionBufferChecksums/CRC32C
+=== RUN   TestCompletionBufferChecksums/CRC64NVME
+=== RUN   TestCompletionBufferChecksums/SHA1
+=== RUN   TestCompletionBufferChecksums/SHA256
+--- PASS: TestCompletionBufferChecksums (0.40s)
+    --- PASS: TestCompletionBufferChecksums/CRC32 (0.07s)
+    --- PASS: TestCompletionBufferChecksums/CRC32C (0.07s)
+    --- PASS: TestCompletionBufferChecksums/CRC64NVME (0.12s)
+    --- PASS: TestCompletionBufferChecksums/SHA1 (0.07s)
+    --- PASS: TestCompletionBufferChecksums/SHA256 (0.07s)
+=== RUN   TestMultipartOwnedHTTPTransfer
+2026/10/19 00:55:32 PUT /s3 400 266.937µs
+2026/10/19 00:55:32 PUT /s3 400 113.338µs
+2026/10/19 00:55:32 PUT /s3 200 990.299µs
+--- PASS: TestMultipartOwnedHTTPTransfer (0.01s)
+=== RUN   TestMultipartOwnedHTTPAllocation
+=== RUN   TestMultipartOwnedHTTPAllocation/bound=false
+2026/10/19 00:55:33 PUT /s3 200 115.702458ms
+    part_http_owned_test.go:184: 8 MiB S3 UploadPart allocated 34527424 bytes
+=== RUN   TestMultipartOwnedHTTPAllocation/bound=true
+2026/10/19 00:55:33 PUT /s3 200 116.718818ms
+    part_http_owned_test.go:184: 8 MiB S3 UploadPart allocated 34635416 bytes
+--- PASS: TestMultipartOwnedHTTPAllocation (0.47s)
+    --- PASS: TestMultipartOwnedHTTPAllocation/bound=false (0.17s)
+    --- PASS: TestMultipartOwnedHTTPAllocation/bound=true (0.24s)
+=== RUN   TestMultipartOwnedRefusalsPreservePart
+--- PASS: TestMultipartOwnedRefusalsPreservePart (0.04s)
+=== RUN   TestCapacityPayloadAllocationBound
+=== RUN   TestCapacityPayloadAllocationBound/object/8388608
+    capacity_payload_read_test.go:139: kind=object payload=8388608 binding allocated=201784 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/object/67108864
+    capacity_payload_read_test.go:139: kind=object payload=67108864 binding allocated=208304 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/8388608
+    capacity_payload_read_test.go:139: kind=part payload=8388608 binding allocated=257872 budget=4194304
+=== RUN   TestCapacityPayloadAllocationBound/part/67108864
+    capacity_payload_read_test.go:139: kind=part payload=67108864 binding allocated=289256 budget=4194304
+--- PASS: TestCapacityPayloadAllocationBound (1.59s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/8388608 (0.12s)
+    --- PASS: TestCapacityPayloadAllocationBound/object/67108864 (0.75s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/8388608 (0.11s)
+    --- PASS: TestCapacityPayloadAllocationBound/part/67108864 (0.61s)
+=== RUN   TestCapacityPayloadIdentities
+=== RUN   TestCapacityPayloadIdentities/object/0
+=== RUN   TestCapacityPayloadIdentities/object/257
+=== RUN   TestCapacityPayloadIdentities/part/0
+=== RUN   TestCapacityPayloadIdentities/part/257
+=== RUN   TestCapacityPayloadIdentities/legacy
+--- PASS: TestCapacityPayloadIdentities (0.04s)
+    --- PASS: TestCapacityPayloadIdentities/object/0 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/object/257 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/part/0 (0.01s)
+    --- PASS: TestCapacityPayloadIdentities/part/257 (0.02s)
+    --- PASS: TestCapacityPayloadIdentities/legacy (0.01s)
+=== RUN   TestCapacityPayloadInvalidRecords
+=== RUN   TestCapacityPayloadInvalidRecords/prefix
+=== RUN   TestCapacityPayloadInvalidRecords/header
+=== RUN   TestCapacityPayloadInvalidRecords/short
+=== RUN   TestCapacityPayloadInvalidRecords/long
+--- PASS: TestCapacityPayloadInvalidRecords (0.01s)
+    --- PASS: TestCapacityPayloadInvalidRecords/prefix (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/header (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/short (0.00s)
+    --- PASS: TestCapacityPayloadInvalidRecords/long (0.00s)
+=== RUN   TestCapacityPayloadNativeRefusals
+=== RUN   TestCapacityPayloadNativeRefusals/permission
+=== RUN   TestCapacityPayloadNativeRefusals/symlink
+--- PASS: TestCapacityPayloadNativeRefusals (0.02s)
+    --- PASS: TestCapacityPayloadNativeRefusals/permission (0.01s)
+    --- PASS: TestCapacityPayloadNativeRefusals/symlink (0.01s)
+=== RUN   TestCapacityPayloadUnknownAllocation
+    capacity_payload_read_test.go:260: unknown bytes=67108864 allocated=36200
+--- PASS: TestCapacityPayloadUnknownAllocation (0.02s)
+=== RUN   TestCompletionBufferAllocation
+=== RUN   TestCompletionBufferAllocation/bound=false/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8419072 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=false/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8427992 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8698064 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8760392 budget=10485760
+--- PASS: TestCompletionBufferAllocation (1.11s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=false (0.26s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=true (0.24s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=false (0.31s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=true (0.30s)
+=== RUN   TestCompletionBufferChecksums
+=== RUN   TestCompletionBufferChecksums/CRC32
+=== RUN   TestCompletionBufferChecksums/CRC32C
+=== RUN   TestCompletionBufferChecksums/CRC64NVME
+=== RUN   TestCompletionBufferChecksums/SHA1
+=== RUN   TestCompletionBufferChecksums/SHA256
+--- PASS: TestCompletionBufferChecksums (0.35s)
+    --- PASS: TestCompletionBufferChecksums/CRC32 (0.05s)
+    --- PASS: TestCompletionBufferChecksums/CRC32C (0.05s)
+    --- PASS: TestCompletionBufferChecksums/CRC64NVME (0.12s)
+    --- PASS: TestCompletionBufferChecksums/SHA1 (0.06s)
+    --- PASS: TestCompletionBufferChecksums/SHA256 (0.06s)
+=== RUN   TestMultipartOwnedHTTPTransfer
+2026/10/19 00:55:36 PUT /s3 400 175.837µs
+2026/10/19 00:55:36 PUT /s3 400 76.909µs
+2026/10/19 00:55:36 PUT /s3 200 723.742µs
+--- PASS: TestMultipartOwnedHTTPTransfer (0.01s)
+=== RUN   TestMultipartOwnedHTTPAllocation
+=== RUN   TestMultipartOwnedHTTPAllocation/bound=false
+2026/10/19 00:55:36 PUT /s3 200 112.509053ms
+    part_http_owned_test.go:184: 8 MiB S3 UploadPart allocated 34527728 bytes
+=== RUN   TestMultipartOwnedHTTPAllocation/bound=true
+2026/10/19 00:55:36 PUT /s3 200 113.979418ms
+    part_http_owned_test.go:184: 8 MiB S3 UploadPart allocated 34660776 bytes
+--- PASS: TestMultipartOwnedHTTPAllocation (0.49s)
+    --- PASS: TestMultipartOwnedHTTPAllocation/bound=false (0.18s)
+    --- PASS: TestMultipartOwnedHTTPAllocation/bound=true (0.24s)
+=== RUN   TestMultipartOwnedRefusalsPreservePart
+--- PASS: TestMultipartOwnedRefusalsPreservePart (0.04s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	8.363s

@@ -1,0 +1,40 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,re
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-prepared-uncertainty-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+environment=json.loads((p/'environment.json').read_text())
+assert environment['provider']=='Railway'
+assert environment['start']['deployment']['RAILWAY_DEPLOYMENT_ID']=='ddeed917-0e0e-4e22-b463-fd0a3e61b6ef'
+assert environment['start']['deployment']['RAILWAY_SERVICE_ID']=='83497842-c51d-420e-8ba1-181589730ad4'
+assert environment['input_manifest_sha256']==hashlib.sha256((p/'railway-context-manifest.json').read_bytes()).hexdigest()
+assert environment['baseline_source_sha256']==hashlib.sha256((p/'outbox_adapter.go.before.txt').read_bytes()).hexdigest()
+assert json.loads((p/'run.json').read_text())['complete']
+identities=json.loads((p/'environment.json').read_text())['sources']
+assert identities==json.loads((p/'source-freeze.json').read_text())
+for name,value in identities.items():
+ f=r/name
+ assert value==dict(bytes=f.stat().st_size,sha256=hashlib.sha256(f.read_bytes()).hexdigest()),name
+assert not subprocess.check_output(['gofmt','-l',*identities],cwd=r,env=env).strip()
+assert subprocess.check_output(['git','show','HEAD:internal/runthrough/outbox_adapter.go'],cwd=r)==(p/'outbox_adapter.go.before.txt').read_bytes()
+assert not (r/'internal/runthrough/preflight_review_probe_test.go').exists()
+assert not (r/'internal/runthrough/prepared_review_probe_test.go').exists()
+assert not (r/'packages/stow-s3/node_modules').is_symlink()
+for name,want in [('before-tests.log',(64,64)),('before-race.log',(64,64)),('after-tests.log',(128,0)),('focused-race.log',(1780,0)),('original-before.log',(2,2)),('original-before-race.log',(2,2)),('original-after.log',(4,0)),('original-after-race.log',(4,0)),('next-before.log',(2,2)),('next-before-race.log',(2,2)),('next-after.log',(2,2)),('next-after-race.log',(2,2))]:
+ text=(p/name).read_text();outcomes=re.findall(r'^\s*--- (PASS|FAIL): (\S+)',text,re.M)
+ leaves=[(state,n) for state,n in outcomes if not any(m.startswith(n+'/') for _,m in outcomes)]
+ counts=(sum(state=='PASS' for state,_ in leaves),sum(state=='FAIL' for state,_ in leaves))
+ assert counts==want,(name,counts,want)
+rows=json.loads((p/'samples.json').read_text())
+for row in rows:
+ m=row['metrics'];assert m['heads/op']==1,row
+ if row['name'].endswith('/marked'):
+  if row['version']=='after': assert m['commits/op']==0 and m['discards/op']==0 and m['errors/op']==1,row
+  elif '/put/' in row['name']: assert m['discards/op']==1 and m['errors/op']==0,row
+  else: assert m['commits/op']==1 and m['errors/op']==0,row
+print('Source identities, formatting, temporary fixture removal, leaf counts and benchmark action counts verified',flush=True)
+q=subprocess.run(['git','fetch','origin','main'],cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=45)
+(p/'fetch-final.log').write_text(q.stdout.rstrip()+'\n');assert q.returncode==0,q.stdout
+origin=subprocess.check_output(['git','rev-parse','origin/main'],cwd=r,text=True).strip()
+assert origin==json.loads((p/'environment-base.json').read_text())['origin_main'],origin
+subprocess.run(['git','merge-base','--is-ancestor','origin/main','HEAD'],cwd=r,check=True)
+(p/'final-provenance.json').write_text(json.dumps(dict(sources_match_freeze_and_measurements=True,sources=identities,baseline_matches_head=True,origin_main=origin,regression_leaf_counts_verified=True,benchmark_head_and_journal_action_counts_verified=True),indent=2)+'\n')
+print('Latest origin/main remains baseline ancestor',flush=True)

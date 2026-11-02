@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,statistics as st
+p=Path('/private/tmp/stow-workspace-parts-2026-10-16')
+cohorts=[('overlay','f3258e07-986e-4026-8861-63c2089b6b56',['baseline','scan','record']),('volume-first','15faaa38-2176-4a9d-ae75-6ec943ffcf04',['baseline','scan','record']),('volume-fixed','2806c27c-3315-4f0d-84ee-deb0c2a7142a',['baseline','record','fixed'])]
+allrows=[];md=['# Railway multipart comparison','', 'Every cell is median ms/op [min–max], median B/op, median allocations/op. Four samples per cell; CPU is Go GOMAXPROCS, not independent concurrent requests. `record` is the rejected JSON header; `fixed` is retained.','']
+for label,job,variants in cohorts:
+ rows=json.loads((p/('export-'+job)/'samples.json').read_text())
+ md += ['## '+label,'', 'Job `'+job+'`.','', '| CPU | Workload | '+' | '.join(variants)+' |','|---|---|'+'---|'*len(variants)]
+ for cpu in [1,4]:
+  for name in dict.fromkeys(x['name']for x in rows):
+   row={'cohort':label,'job':job,'cpu':cpu,'workload':name.split('Comparison/')[1],'variants':{}};cells=[]
+   for v in variants:
+    data=[x for x in rows if x['cpu']==cpu and x['name']==name and x['variant']==v]
+    d={k:{'median':st.median(x['metrics'][k]for x in data),'min':min(x['metrics'][k]for x in data),'max':max(x['metrics'][k]for x in data)}for k in ['ns/op','B/op','allocs/op']};row['variants'][v]=d
+    n=d['ns/op'];cells.append(f"{n['median']/1e6:.4f} [{n['min']/1e6:.4f}–{n['max']/1e6:.4f}], {d['B/op']['median']:g}, {d['allocs/op']['median']:g}")
+   md.append('| '+str(cpu)+' | '+row['workload']+' | '+' | '.join(cells)+' |');allrows.append(row)
+ md.append('')
+(p/'comparison.md').write_text('\n'.join(md)+'\n');(p/'comparison.json').write_text(json.dumps(allrows,indent=2)+'\n')
+print('\n'.join(md[-15:]))

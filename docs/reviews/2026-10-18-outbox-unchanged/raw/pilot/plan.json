@@ -1,0 +1,30 @@
+{
+  "kind": "measure",
+  "cohort": "outbox-noop-pilot",
+  "families": [
+    "native"
+  ],
+  "variants": {
+    "native": [
+      "before",
+      "prototype"
+    ]
+  },
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/provenance.go",
+    "internal/atomicfile/atomicfile.go",
+    "internal/atomicfile/syncdir.go",
+    "internal/atomicfile/syncdir_windows.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go"
+  ],
+  "cpu": [
+    1
+  ],
+  "benchtime": "100ms",
+  "count": 1,
+  "caseCount": 10,
+  "pattern": "^BenchmarkFileOutboxProvenance$",
+  "stepwise": true,
+  "profile": false
+}

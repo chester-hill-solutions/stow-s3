@@ -1,0 +1,13 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/storage/workspace
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/list         	   14953	     18043 ns/op	    3752 B/op	      43 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/list         	   13734	     16979 ns/op	    3752 B/op	      43 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/runtime-replace         	      67	   3656678 ns/op	   22417 B/op	     205 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/runtime-replace         	      81	   4156729 ns/op	   22416 B/op	     205 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/list                	    2312	     92284 ns/op	   19268 B/op	     203 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/list                	    2763	     83661 ns/op	   19123 B/op	     203 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/runtime-replace     	      13	  16252657 ns/op	 6340872 B/op	     400 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/runtime-replace     	      22	  16272986 ns/op	 6341029 B/op	     400 allocs/op
+PASS

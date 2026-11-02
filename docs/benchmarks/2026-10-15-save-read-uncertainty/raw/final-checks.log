@@ -1,0 +1,9 @@
+COMMAND ['gofmt', '-l', 'internal/runtime/guarded_save.go', 'internal/runtime/save_read_access_test.go', 'internal/runtime/save_read_bench_test.go', 'internal/runtime/save_read_observation_test.go', 'internal/embedded/save_read_observation_test.go']
+COMMAND ['make', 'check-go-quality', 'check-file-size']
+node scripts/check-go-quality.mjs
+Go quality ratchet OK (15 baseline entries)
+node scripts/check-file-size.mjs
+File-size ratchet OK (0 baseline entries; maximum 500 lines)
+COMMAND ['node', 'scripts/check-doc-links.mjs']
+Local documentation links OK (214 Markdown files)
+COMMAND ['git', 'diff', '--check']

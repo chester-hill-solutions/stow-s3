@@ -1,0 +1,33 @@
+COMMAND ["/private/tmp/stow-completion-lookup/before.test", "-test.run=^$", "-test.bench=^BenchmarkCompletionLookupAccounting$", "-test.benchmem", "-test.benchtime=250000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkCompletionLookupAccounting/confirmed-missing-8         	  250000	       792.3 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/confirmed-missing-8         	  250000	       761.2 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/confirmed-missing-8         	  250000	       927.3 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/wrapped-missing-8           	  250000	       787.7 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/wrapped-missing-8           	  250000	       793.7 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/wrapped-missing-8           	  250000	       727.0 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/unknown-8                   	  250000	       722.6 ns/op	    1192 B/op	      13 allocs/op
+BenchmarkCompletionLookupAccounting/unknown-8                   	  250000	       703.7 ns/op	    1192 B/op	      13 allocs/op
+BenchmarkCompletionLookupAccounting/unknown-8                   	  250000	       721.6 ns/op	    1192 B/op	      13 allocs/op
+BenchmarkCompletionLookupAccounting/marker-first-8              	  250000	       761.9 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/marker-first-8              	  250000	       729.8 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/marker-first-8              	  250000	       994.2 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/missing-first-8             	  250000	       880.5 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/missing-first-8             	  250000	       838.2 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/missing-first-8             	  250000	       798.3 ns/op	    1152 B/op	      12 allocs/op
+BenchmarkCompletionLookupAccounting/retained-8                  	  250000	       683.3 ns/op	    1176 B/op	      13 allocs/op
+BenchmarkCompletionLookupAccounting/retained-8                  	  250000	       747.8 ns/op	    1176 B/op	      13 allocs/op
+BenchmarkCompletionLookupAccounting/retained-8                  	  250000	       838.1 ns/op	    1176 B/op	      13 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-completion-lookup/before.test", "-test.run=^$", "-test.bench=^BenchmarkMemoryCompletionSuccessLifecycle$", "-test.benchmem", "-test.benchtime=50000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkMemoryCompletionSuccessLifecycle-8   	   50000	      3662 ns/op	    3626 B/op	      34 allocs/op
+BenchmarkMemoryCompletionSuccessLifecycle-8   	   50000	      3698 ns/op	    3625 B/op	      34 allocs/op
+BenchmarkMemoryCompletionSuccessLifecycle-8   	   50000	      3692 ns/op	    3625 B/op	      34 allocs/op
+PASS

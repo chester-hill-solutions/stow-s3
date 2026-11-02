@@ -1,0 +1,92 @@
+{
+  "baseline_commit": "26262a5",
+  "origin_main": "219d1dcfff9807b04660a40313b32127e5be2933",
+  "go": "go version go1.25.6 darwin/arm64",
+  "platform": "macOS-14.5-arm64-arm-64bit",
+  "blocks": [
+    {
+      "block": 1,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-custom-multipart-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomMultipartCompletionLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3"
+      ],
+      "exit": 0
+    },
+    {
+      "block": 2,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-custom-multipart-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomMultipartCompletionLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3"
+      ],
+      "exit": 0
+    },
+    {
+      "block": 3,
+      "version": "candidate",
+      "command": [
+        "/private/tmp/stow-custom-multipart-publication/candidate.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomMultipartCompletionLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3"
+      ],
+      "exit": 0
+    },
+    {
+      "block": 4,
+      "version": "baseline",
+      "command": [
+        "/private/tmp/stow-custom-multipart-publication/baseline.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkCustomMultipartCompletionLifecycle$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3"
+      ],
+      "exit": 0
+    }
+  ],
+  "binary_sha256": {
+    "baseline": "4390daffae1d52e36cf742023b84bc52028a1cd886ff052581f661ba01945f3f",
+    "candidate": "b44010359d2ad368cae38be3c46841cc7e4796aa14348e090b08c00aaee49fbc"
+  },
+  "fixed_workload": {
+    "iterations_per_sample": 50000,
+    "samples_per_block": 3,
+    "block_order": [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ],
+    "one_processor": {
+      "flags": [
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=1"
+      ],
+      "GOMAXPROCS": "1"
+    },
+    "eight_processors": {
+      "flags": [
+        "-test.benchtime=50000x",
+        "-test.count=3",
+        "-test.cpu=8"
+      ],
+      "GOMAXPROCS": "8"
+    },
+    "concurrent_agent_tests_or_builds": false
+  },
+  "pilot_exclusion": "The pilot-* run overlapped test compilation; all samples are preserved separately and excluded from the clean comparisons."
+}

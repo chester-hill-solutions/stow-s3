@@ -1,0 +1,46 @@
+--- before-complete.asm
++++ after-complete.asm
+@@ -64,14 +64,14 @@
+   multipart.go:142	0x1002dcef8		b5001aa5		CBNZ R5, 213(PC)
+   multipart.go:145	0x1002dcefc		a95f13e3		LDP 496(RSP), (R3, R4)
+   multipart.go:145	0x1002dcf00		b0000661		ADRP 839680(PC), R1
+-  multipart.go:145	0x1002dcf04		91387421		ADD $3613, R1, R1
++  multipart.go:145	0x1002dcf04		9138f421		ADD $3645, R1, R1
+   multipart.go:145	0x1002dcf08		b27e07e2		ORR $12, ZR, R2
+   multipart.go:145	0x1002dcf0c		97fff40d		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).checkUpload(SB)
+   multipart.go:145	0x1002dcf10		b5001880		CBNZ R0, 196(PC)
+   workspace_usage.go:49	0x1002dcf14		f940efe0		MOVD 472(RSP), R0
+   workspace_usage.go:49	0x1002dcf18		f940f3e1		MOVD 480(RSP), R1
+   workspace_usage.go:49	0x1002dcf1c		f940f7e2		MOVD 488(RSP), R2
+-  workspace_usage.go:49	0x1002dcf20		94002f78		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).refreshUsageObservationLocked(SB)
++  workspace_usage.go:49	0x1002dcf20		94002f80		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).refreshUsageObservationLocked(SB)
+   workspace_usage.go:49	0x1002dcf24		b4000060		CBZ R0, 3(PC)
+   multipart.go:151	0x1002dcf28		f940efe3		MOVD 472(RSP), R3
+   multipart.go:148	0x1002dcf2c		14000003		JMP 3(PC)
+@@ -114,7 +114,7 @@
+   multipart.go:155	0x1002dcfc0		f940efe0		MOVD 472(RSP), R0
+   multipart.go:155	0x1002dcfc4		f940f3e1		MOVD 480(RSP), R1
+   multipart.go:155	0x1002dcfc8		f940f7e2		MOVD 488(RSP), R2
+-  multipart.go:155	0x1002dcfcc		940011bd		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).objectSize(SB)
++  multipart.go:155	0x1002dcfcc		940011c5		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*Instance).objectSize(SB)
+   multipart.go:156	0x1002dcfd0		b5000e02		CBNZ R2, 112(PC)
+   multipart.go:155	0x1002dcfd4		f9002fe0		MOVD R0, 88(RSP)
+   multipart.go:155	0x1002dcfd8		39015be1		MOVB R1, 86(RSP)
+@@ -126,7 +126,7 @@
+   multipart.go:159	0x1002dcff0		aa0103e7		MOVD R1, R7
+   multipart.go:159	0x1002dcff4		f940efe0		MOVD 472(RSP), R0
+   multipart.go:159	0x1002dcff8		aa0803e1		MOVD R8, R1
+-  multipart.go:159	0x1002dcffc		94002945		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*usageState).admitCompletion(SB)
++  multipart.go:159	0x1002dcffc		9400294d		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*usageState).admitCompletion(SB)
+   multipart.go:159	0x1002dd000		b5000b20		CBNZ R0, 89(PC)
+   multipart.go:162	0x1002dd004		f940efe8		MOVD 472(RSP), R8
+   multipart.go:162	0x1002dd008		a94d0108		LDP 208(R8), (R8, R0)
+@@ -150,7 +150,7 @@
+   multipart.go:163	0x1002dd050		f940efe0		MOVD 472(RSP), R0
+   multipart.go:163	0x1002dd054		aa0803e1		MOVD R8, R1
+   multipart.go:163	0x1002dd058		aa0903e2		MOVD R9, R2
+-  multipart.go:163	0x1002dd05c		94002bc5		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*usageState).finishCompletion(SB)
++  multipart.go:163	0x1002dd05c		94002bcd		CALL github.com/chester-hill-solutions/stow-s3/internal/runtime.(*usageState).finishCompletion(SB)
+   multipart.go:163	0x1002dd060		36000680		TBZ $0, R0, 52(PC)
+   multipart.go:166	0x1002dd064		f94033e0		MOVD 96(RSP), R0
+   multipart.go:166	0x1002dd068		b5000060		CBNZ R0, 3(PC)

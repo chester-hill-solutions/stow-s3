@@ -1,0 +1,145 @@
+{
+  "phase": "outbox-read-cost-final",
+  "sources": [
+    "internal/runthrough/file_outbox_read_cost_bench_test.go",
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/provenance.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_read_cost_bench_test.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "go",
+        "test",
+        "./..."
+      ]
+    },
+    {
+      "name": "broad-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/...",
+        "./internal/runtime",
+        "./internal/embedded",
+        "./internal/runthrough",
+        "./internal/s3api",
+        "./pkg/stow"
+      ]
+    },
+    {
+      "name": "conformance-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "conformance-runtime-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-runtime-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "doc-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ]
+    },
+    {
+      "name": "read-cost-measurement",
+      "args": [
+        "node",
+        "benchmark/readcost.mjs"
+      ]
+    }
+  ]
+}

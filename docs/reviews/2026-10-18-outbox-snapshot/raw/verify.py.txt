@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,hashlib,subprocess,collections
+p=Path('/private/tmp/stow-outbox-snapshot-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');expected={'pilot':32,'main':320,'follow':64,'tail':8};total=0;environments={};builds={}
+for phase in ['pilot','main','follow','tail','trace']:
+ j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());assert run['complete']and run['success'];assert all(x['passed']for x in json.loads((e/'checks.json').read_text()));env=json.loads((e/'environment.json').read_text());environments[phase]=env
+ assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+ if phase!='trace':
+  rows=json.loads((e/'samples.json').read_text());assert len(rows)==expected[phase]and len({x['index']for x in rows})==len(rows);total+=len(rows);builds[phase]=json.loads((e/'comparison-build.json').read_text());clean=json.loads((e/'binary-cleanup.json').read_text());assert clean['removed']and clean['fixturesRemoved']
+  if phase=='main':assert collections.Counter(x['kind']for x in rows)=={'timed':256,'fixed':48,'writer':16}
+  if phase=='follow':assert all(x['metrics']['snapshot-count']==x['iterations']for x in rows if x['kind']=='writer-matched')
+ else:
+  rows=json.loads((e/'write-phases.json').read_text());assert len(rows)==512 and collections.Counter(x['variant']for x in rows)=={'before':256,'after':256};assert all(all(k in x['phases']for k in ['wait','reload','operation','encode','atomic-write'])for x in rows);clean=json.loads((e/'trace-environment.json').read_text());assert clean['binariesRemoved']and clean['fixturesRemoved']
+  receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0 and receipt['sourceSHA256']==env['sourceSHA256']
+  for name,digest in receipt['documentSHA256'].items():assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+ for row in json.loads((e/'export-receipt.json').read_text())['files']:
+  data=(e/row['name']).read_bytes();assert len(data)==row['bytes']and hashlib.sha256(data).hexdigest()==row['sha256'],row['name']
+assert total==424
+for variant in ['before','after']:assert builds['follow']['binaries'][variant]['sha256']==builds['tail']['binaries'][variant]['sha256']
+for phase,env in environments.items():
+ for name,digest in env['sourceSHA256'].items():
+  if phase=='pilot'and name in ['internal/runthrough/file_outbox.go','internal/runthrough/outbox.go']:continue
+  assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,(phase,name)
+base=json.loads((p/'baseline.json').read_text())['base']
+for name in ['internal/runthrough/file_outbox.go','internal/runthrough/outbox.go']:
+ original=subprocess.check_output(['git','show',base+':'+name],cwd=r);assert hashlib.sha256(original).hexdigest()==builds['main']['sources']['benchmark/_before/'+name]
+ assert hashlib.sha256((r/name).read_bytes()).hexdigest()==builds['pilot']['sources']['benchmark/_prototype/'+name]
+assert 'outboxPhaseHook'not in(r/'internal/runthrough/file_outbox.go').read_text()
+print('Verified 424 benchmark observations, 512 phase records, all checks, exact baseline/prototype/current sources, identical tail binaries and final document receipts')

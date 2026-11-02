@@ -1,0 +1,1 @@
+const fs=require('node:fs');const root="/results/f5322e35-36ca-443e-835f-d43e2b6b59d1";for(const n of ['quality.log','full-go.log','broad-race.log']){try{console.log(n+':'+fs.readFileSync(root+'/'+n,'utf8').slice(-2000))}catch(e){if(e.code!=='ENOENT')throw e}}

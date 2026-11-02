@@ -1,0 +1,56 @@
+{
+  "phase": "paired-outbox-write-phases",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/file_outbox.go",
+    "internal/atomicfile/atomicfile.go",
+    "benchmark/phase-probe/trace-before-file_outbox.go.txt",
+    "benchmark/phase-trace-before-overlay.json",
+    "benchmark/phase-probe/trace-file_outbox.go.txt",
+    "benchmark/phase-probe/trace-atomicfile.go.txt",
+    "benchmark/phase-probe/phase_probe_test.go.txt",
+    "benchmark/paired-phase.mjs",
+    "benchmark/phase-probe/before-outbox.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "format-probe",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/phase-probe/trace-before-file_outbox.go.txt"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/phase-trace-before-overlay.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/paired-before.test"
+      ]
+    },
+    {
+      "name": "build-current",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/phase-trace-overlay.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/paired-after.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/paired-phase.mjs"
+      ]
+    }
+  ]
+}

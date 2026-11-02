@@ -1,0 +1,29 @@
+{
+  "kind": "measure",
+  "cohort": "outbox-unchanged-save-final",
+  "families": [
+    "native"
+  ],
+  "variants": {
+    "native": [
+      "before",
+      "after"
+    ]
+  },
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/provenance.go",
+    "internal/atomicfile/atomicfile.go",
+    "internal/runthrough/file_outbox_unchanged_test.go"
+  ],
+  "cpu": [
+    1,
+    4
+  ],
+  "benchtime": "1s",
+  "count": 2,
+  "caseCount": 10,
+  "pattern": "^BenchmarkFileOutboxProvenance$",
+  "stepwise": false,
+  "profile": false
+}

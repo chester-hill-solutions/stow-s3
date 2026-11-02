@@ -1,0 +1,24 @@
+COMMAND ['go', 'test', '-race', './internal/runtime', '-run', '^TestReviewReadForSavePartialBodyMissing$', '-count=2', '-v']
+=== RUN   TestReviewReadForSavePartialBodyMissing
+=== RUN   TestReviewReadForSavePartialBodyMissing/false
+    partial_save_read_review_probe_test.go:69: partial body failure lost: <nil> want object not found
+    partial_save_read_review_probe_test.go:72: one-byte partial read became authoritative absence for existing three-byte object
+=== RUN   TestReviewReadForSavePartialBodyMissing/true
+    partial_save_read_review_probe_test.go:69: partial body failure lost: <nil> want body: object not found
+    partial_save_read_review_probe_test.go:72: one-byte partial read became authoritative absence for existing three-byte object
+--- FAIL: TestReviewReadForSavePartialBodyMissing (0.00s)
+    --- FAIL: TestReviewReadForSavePartialBodyMissing/false (0.00s)
+    --- FAIL: TestReviewReadForSavePartialBodyMissing/true (0.00s)
+=== RUN   TestReviewReadForSavePartialBodyMissing
+=== RUN   TestReviewReadForSavePartialBodyMissing/false
+    partial_save_read_review_probe_test.go:69: partial body failure lost: <nil> want object not found
+    partial_save_read_review_probe_test.go:72: one-byte partial read became authoritative absence for existing three-byte object
+=== RUN   TestReviewReadForSavePartialBodyMissing/true
+    partial_save_read_review_probe_test.go:69: partial body failure lost: <nil> want body: object not found
+    partial_save_read_review_probe_test.go:72: one-byte partial read became authoritative absence for existing three-byte object
+--- FAIL: TestReviewReadForSavePartialBodyMissing (0.00s)
+    --- FAIL: TestReviewReadForSavePartialBodyMissing/false (0.00s)
+    --- FAIL: TestReviewReadForSavePartialBodyMissing/true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.279s
+FAIL

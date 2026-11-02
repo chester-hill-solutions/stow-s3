@@ -1,0 +1,1 @@
+const fs=require('node:fs');const root='/go/pkg/mod/google.golang.org/protobuf@v1.36.12/proto';for(const name of fs.readdirSync(root)){if(!name.endsWith('.go')||name.endsWith('_test.go'))continue;const t=fs.readFileSync(root+'/'+name,'utf8');for(const l of t.split('\n'))if(l.includes('Error =')||l.includes('var Error'))console.log(name,l)}

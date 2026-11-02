@@ -126,10 +126,11 @@ export { SURFACE, DOCS };
 // that decides whether the gate passes should not only be reachable by running the
 // gate against the network.
 export function reachabilityProblems(check, reachable, detail) {
-  if (reachable === check.published) return [];
+  const unknownNpm = check.ecosystem === "npm" && !reachable && detail !== "HTTP 404";
+  if (!unknownNpm && reachable === check.published) return [];
   const problems = [
-    `${check.ecosystem} ${check.name} is ${reachable ? "reachable" : "not reachable"} (${detail}) ` +
-      `but is declared published=${check.published}`,
+    unknownNpm ? `${check.name}: npm availability is unverified (${detail}); this is not evidence of absence` :
+      `${check.ecosystem} ${check.name} is ${reachable ? "reachable" : "not reachable"} (${detail}) but is declared published=${check.published}`,
   ];
   if (check.ecosystem === "npm" && detail === "HTTP 401") {
     problems.push(`  ${check.name}: anonymous registry access returned 401; verify the public npmjs destination and access configuration before claiming availability.`);
@@ -165,11 +166,7 @@ export function publishRegistry(repoRoot = resolve(import.meta.dirname, "..")) {
 }
 
 if (process.argv.includes("--online")) {
-  // The registry comes from the manifest's own publishConfig rather than being written
-  // here. Hardcoding npmjs meant that after the release moved to GitHub Packages this
-  // check asked npmjs about packages that are not there, so it would report the whole
-  // npm surface as unreachable - a false failure caused by the gate looking in the wrong
-  // place, which is the failure this repository has now paid for three times.
+  // Keep availability probes on the same registry as the reviewed manifests.
   const npmRegistry = publishRegistry();
   const checks = [
     ...SURFACE.filter((e) => e.ecosystem === "npm").map((e) => ({
@@ -195,8 +192,9 @@ if (process.argv.includes("--online")) {
     } catch (error) {
       detail = error.message;
     }
-    if (reachable !== check.published) {
-      problems.push(...reachabilityProblems(check, reachable, detail));
+    const observedProblems = reachabilityProblems(check, reachable, detail);
+    if (observedProblems.length) {
+      problems.push(...observedProblems);
     } else {
       console.log(
         `  ${reachable ? "ok" : "unpublished"}  ${check.ecosystem} ${check.name} (${detail})`,

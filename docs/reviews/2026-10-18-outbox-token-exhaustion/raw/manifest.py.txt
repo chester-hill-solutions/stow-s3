@@ -1,0 +1,5 @@
+from pathlib import Path
+import json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow/docs/reviews/2026-10-18-outbox-token-exhaustion/raw')
+rows={str(f.relative_to(r)):{'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()}for f in sorted(r.rglob('*'))if f.is_file()and f.name!='artifact-manifest.json'}
+(r/'artifact-manifest.json').write_text(json.dumps(rows,indent=2)+'\n');print('Hashed',len(rows),'evidence artifacts')

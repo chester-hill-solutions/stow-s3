@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil,gzip
+p=Path('/private/tmp/stow-multipart-admission-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-multipart-admission/raw';raw.mkdir(parents=True,exist_ok=True)
+for phase,count in [('red',3),('final',22),('measure',1)]:
+ j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert v['complete']and v['success']==(phase!='final')and len(checks)==count and [c['name']for c in checks if not c['passed']]==(['measure']if phase=='final'else[]);assert j['deploymentId']==v['railwayDeploymentId']=='cd966cae-b626-4589-882d-7005a75b47d4'
+ dest=raw/phase;dest.mkdir(exist_ok=True)
+ for f in e.iterdir():
+  if not f.is_file():continue
+  if phase=='red'and f.suffix=='.log'and f.stat().st_size>200000:(dest/(f.name+'.gz')).write_bytes(gzip.compress(f.read_bytes(),mtime=0))
+  else:shutil.copy2(f,dest/f.name)
+ shutil.copy2(p/(phase+'-start.json'),dest/'start.json')
+ if phase=='final':
+  env=json.loads((e/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+  for n,h in env['sourceSHA256'].items():
+   if not n.endswith('.go'):continue
+   data=(e/('source-'+Path(n).name+'.txt')).read_bytes();assert hashlib.sha256(data).hexdigest()==h;(r/n).write_bytes(data)
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','multipart-bench.go.txt','multipart-measure.mjs','baseline-fs_multipart.go.txt','sibling-original.patch.txt','pilot-multipart-measure.mjs']:shutil.copy2(p/n,raw/n)
+for n in ['setup.py','control.py','remote.py','export.py','watch.py','analyze.py','collect.py','report.py']:shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-multipart-admission.md');print('Collected all source, proofs, 128 observations and losslessly compressed large initial logs')

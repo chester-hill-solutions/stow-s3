@@ -134,6 +134,9 @@ func (a *Adapter) propagateEntry(ctx context.Context, entry OutboxEntry, reconci
 func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconcile bool) error {
 	rc, meta, err := a.local.GetObject(ctx, entry.Bucket, entry.Key)
 	if err != nil {
+		if rc != nil {
+			_ = rc.Close()
+		}
 		return err
 	}
 	if entry.Version != "" && entry.Version != objectVersion(meta) {
@@ -422,7 +425,7 @@ func (a *Adapter) reconcilePreparedEntryLocked(ctx context.Context, entry Outbox
 	case OutboxPut, OutboxCopy, OutboxMultipart:
 		meta, err := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
 		if err != nil {
-			if errors.Is(err, storage.ErrObjectNotFound) {
+			if errors.Is(err, storage.ErrObjectNotFound) && !errors.Is(err, storage.ErrMutationCommitted) {
 				return false, a.discardPreparedIntent(entry)
 			}
 			return false, err
@@ -445,7 +448,7 @@ func (a *Adapter) reconcilePreparedEntryLocked(ctx context.Context, entry Outbox
 			}
 			return false, ErrOutboxPreparedUnresolved
 		}
-		if !errors.Is(err, storage.ErrObjectNotFound) {
+		if !errors.Is(err, storage.ErrObjectNotFound) || errors.Is(err, storage.ErrMutationCommitted) {
 			return false, err
 		}
 		_, err = a.commitPreparedIntent(entry, previousVersion)

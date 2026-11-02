@@ -1,0 +1,65 @@
+{
+  "phase": "filesystem-completion-final-test-quality",
+  "sources": [
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/fs_test.go",
+    "internal/runtime/completion_cleanup_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/fs_multipart.go",
+        "internal/storage/fs/fs_test.go",
+        "internal/runtime/completion_cleanup_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "./internal/runtime",
+        "-run",
+        "^TestFilesystem(StoreMultipartCompletionReportsCleanupFailureAndCanRecover|CompletionCleanupOutcome)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "./internal/runtime",
+        "-run",
+        "^TestFilesystem(StoreMultipartCompletionReportsCleanupFailureAndCanRecover|CompletionCleanupOutcome)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./internal/storage/fs",
+        "./internal/runtime"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+[
+  {
+    "id": "e1b0cfb3-2bb6-4cfc-84ae-2f301eb43362",
+    "status": "SUCCESS",
+    "createdAt": "2026-10-18T17:43:57.670Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-bucket-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Reproduce native bucket namespace admission gaps",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:e40ae774471bfafbd9a19b01758d87494eb07f9f1e89b4d19016b5a1b317e0c8",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  },
+  {
+    "id": "3ae259eb-72c0-43d9-9b8f-304f544305c1",
+    "status": "REMOVED",
+    "createdAt": "2026-10-18T17:16:20.724Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-fence-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Retry native capacity fence reproduction after failed source upload",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:e387d5ab3e0baca87a3b227f42541c18d6940f3947d7904186d362ff0e7861b0",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  }
+]

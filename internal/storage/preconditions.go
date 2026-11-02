@@ -10,11 +10,11 @@ const httpTimeFormat = "Mon, 02 Jan 2006 15:04:05 GMT"
 // CheckWritePreconditions applies the shared object-write preconditions.
 func CheckWritePreconditions(opts PutOptions, existing *ObjectMeta) error {
 	if opts.IfMatch != "" {
-		if existing == nil || !matchesETagHeader(opts.IfMatch, existing.ETag, false) {
+		if existing == nil || !ETagHeaderMatches(opts.IfMatch, existing.ETag, false) {
 			return ErrPreconditionFailed
 		}
 	}
-	if opts.IfNoneMatch != "" && existing != nil && matchesETagHeader(opts.IfNoneMatch, existing.ETag, true) {
+	if opts.IfNoneMatch != "" && existing != nil && ETagHeaderMatches(opts.IfNoneMatch, existing.ETag, true) {
 		return ErrPreconditionFailed
 	}
 	return nil
@@ -23,10 +23,9 @@ func CheckWritePreconditions(opts PutOptions, existing *ObjectMeta) error {
 // ValidateCopyRequest applies the name validation every copy needs, whichever
 // end of it a backend checks first.
 //
-// It is shared because the four names are four names: a copy with an invalid
-// source key and a valid destination is the same request whichever order a store
-// looked at them in, and an order that reported a different error for the same
-// request would make the store's choice visible to a client.
+// The four names are four names: a copy with an invalid source key and a valid
+// destination is the same request whichever order a store looked at them in, so
+// the order must not change the answer.
 func ValidateCopyRequest(req CopyRequest) error {
 	if err := ValidateBucketName(req.SourceBucket); err != nil {
 		return err
@@ -46,14 +45,14 @@ func ValidateCopyRequest(req CopyRequest) error {
 // destination occupies, because it is the same question: does the version about
 func CheckCopySourceConditions(opts CopyOptions, source *ObjectMeta) error {
 	if opts.SourceIfMatch != "" {
-		if source == nil || !matchesETagHeader(opts.SourceIfMatch, source.ETag, false) {
+		if source == nil || !ETagHeaderMatches(opts.SourceIfMatch, source.ETag, false) {
 			return ErrPreconditionFailed
 		}
 	} else if err := checkCopyDate(opts.SourceIfUnmodifiedSince, source, false); err != nil {
 		return err
 	}
 	if opts.SourceIfNoneMatch != "" {
-		if source != nil && matchesETagHeader(opts.SourceIfNoneMatch, source.ETag, true) {
+		if source != nil && ETagHeaderMatches(opts.SourceIfNoneMatch, source.ETag, true) {
 			return ErrPreconditionFailed
 		}
 		return nil
@@ -75,7 +74,10 @@ func checkCopyDate(raw string, source *ObjectMeta, modified bool) error {
 	return nil
 }
 
-func matchesETagHeader(header, actual string, weak bool) bool {
+// ETagHeaderMatches reports whether an If-Match or If-None-Match header
+// carries the given entity tag. A weak comparison accepts a weak validator
+// where a strong one does not; the tag is opaque and compares exactly.
+func ETagHeaderMatches(header, actual string, weak bool) bool {
 	for _, candidate := range strings.Split(header, ",") {
 		candidate = strings.TrimSpace(candidate)
 		if candidate == "*" {
@@ -88,7 +90,7 @@ func matchesETagHeader(header, actual string, weak bool) bool {
 			}
 			candidateValue = candidateValue[2:]
 		}
-		if strings.EqualFold(strings.Trim(candidateValue, "\""), strings.Trim(actual, "\"")) {
+		if strings.Trim(candidateValue, "\"") == strings.Trim(actual, "\"") {
 			return true
 		}
 	}

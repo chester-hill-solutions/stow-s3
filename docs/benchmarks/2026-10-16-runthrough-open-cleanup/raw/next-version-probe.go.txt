@@ -1,0 +1,40 @@
+package runthrough_test
+
+import (
+ "context"
+ "errors"
+ "io"
+ "strings"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+ "github.com/chester-hill-solutions/stow-s3/internal/runtime"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type reviewChangingReadClient struct{*mockUpstream;gets int}
+func(c *reviewChangingReadClient)GetObject(ctx context.Context,bucket,key string)(io.ReadCloser,*storage.ObjectMeta,error){
+ c.gets++
+ if c.gets==2{
+  if _,err:=c.PutObject(ctx,bucket,key,strings.NewReader("new"),storage.PutOptions{ContentType:"application/new",Metadata:map[string]string{"state":"new"}});err!=nil{return nil,nil,err}
+ }
+ return c.mockUpstream.GetObject(ctx,bucket,key)
+}
+func TestReviewEvictedRefreshReturnsMatchingVersion(t *testing.T){
+ ctx:=context.Background()
+ local,cache:=storage.NewMemoryStore(),storage.NewMemoryStore()
+ if err:=local.CreateBucket(ctx,"probe");err!=nil{t.Fatal(err)}
+ client:=&reviewChangingReadClient{mockUpstream:newMockUpstream()}
+ if _,err:=client.PutObject(ctx,"probe","target",strings.NewReader("old"),storage.PutOptions{ContentType:"text/plain",Metadata:map[string]string{"state":"old"}});err!=nil{t.Fatal(err)}
+ old,err:=client.HeadObject(ctx,"probe","target");if err!=nil{t.Fatal(err)}
+ adapter:=runthrough.NewWithCache(runthrough.Config{Policy:runthrough.PolicyReadThroughCache,Cache:runthrough.CachePolicy{MaxBytes:1}},local,cache,client)
+ instance,err:=runtime.OpenWithStore(runtime.Options{Backend:runtime.BackendMemory},adapter,nil);if err!=nil{t.Fatal(err)}
+ defer instance.Close()
+ object,err:=instance.GetObject(ctx,"probe","target");if err!=nil{t.Fatal(err)}
+ current,err:=client.HeadObject(ctx,"probe","target");if err!=nil{t.Fatal(err)}
+ if client.gets!=2 || string(object.Data)!="new" || old.ETag==current.ETag{t.Fatalf("probe did not change version between fetches: gets=%d body=%q",client.gets,object.Data)}
+ if _,err:=cache.HeadObject(ctx,"probe","target");!errors.Is(err,storage.ErrObjectNotFound){t.Fatalf("one-byte cache did not evict the three-byte object: %v",err)}
+ if object.ETag!=current.ETag || object.ContentType!=current.ContentType || object.Metadata["state"]!="new"{
+  t.Errorf("mixed source versions: body=%q ETag=%q (old=%q new=%q) type=%q state=%q",object.Data,object.ETag,old.ETag,current.ETag,object.ContentType,object.Metadata["state"])
+ }
+}

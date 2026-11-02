@@ -1,0 +1,53 @@
+{
+  "phase": "prepared-migration-collision-before",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_migration_collision_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_migration_collision_test.go"
+      ]
+    },
+    {
+      "name": "regression-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxMigrationRejectsOverlappingPreparedIDs|TestFileOutboxRefusesCollidingPreparedMigrationOnOpen|TestFileOutboxRefusesCollidingPreparedMigrationOnReload|TestOutboxMigrationPreservesNonOverlappingRecords)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "regression-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxMigrationRejectsOverlappingPreparedIDs|TestFileOutboxRefusesCollidingPreparedMigrationOnOpen|TestFileOutboxRefusesCollidingPreparedMigrationOnReload|TestOutboxMigrationPreservesNonOverlappingRecords)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

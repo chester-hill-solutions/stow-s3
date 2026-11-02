@@ -1,0 +1,17 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkRefreshVersionFallback/memory/stable-4         	 1874911	       563.8 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	     457 B/op	       9 allocs/op
+BenchmarkRefreshVersionFallback/memory/stable-4         	 2194608	       546.7 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	     457 B/op	       9 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-4        	  746278	      1484 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    1547 B/op	      19 allocs/op
+BenchmarkRefreshVersionFallback/memory/changed-4        	  850516	      1593 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    1547 B/op	      19 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-4           	     438	   3241793 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    5204 B/op	      63 allocs/op
+BenchmarkRefreshVersionFallback/file/stable-4           	     422	   2853738 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    5206 B/op	      63 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-4          	     453	   3413177 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    6243 B/op	      73 allocs/op
+BenchmarkRefreshVersionFallback/file/changed-4          	     404	   3065803 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    6276 B/op	      73 allocs/op
+BenchmarkRefreshVersionControl/cache-hit-4              	 1580298	       878.6 ns/op	         0 state-writes/op	         0 upstream-gets/op	    1208 B/op	      12 allocs/op
+BenchmarkRefreshVersionControl/cache-hit-4              	 1527249	       740.4 ns/op	         0 state-writes/op	         0 upstream-gets/op	    1208 B/op	      12 allocs/op
+BenchmarkRefreshVersionControl/head-evicted-4           	     439	   2767751 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    5144 B/op	      63 allocs/op
+BenchmarkRefreshVersionControl/head-evicted-4           	     391	   3291699 ns/op	         1.000 state-writes/op	         1.000 upstream-gets/op	    5147 B/op	      63 allocs/op
+PASS

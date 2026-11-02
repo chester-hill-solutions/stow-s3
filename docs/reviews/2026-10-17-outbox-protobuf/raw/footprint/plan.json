@@ -1,0 +1,44 @@
+{
+  "phase": "outbox-protobuf-cli-footprint",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/outbox.go"
+  ],
+  "steps": [
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "build",
+        "-buildvcs=false",
+        "-trimpath",
+        "-ldflags=-s -w",
+        "-overlay=benchmark/_outbox-variants/footprint-overlay.json",
+        "-o",
+        "benchmark/_outbox-variants/footprint-before/stow-before",
+        "./cmd/stow-s3"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "build",
+        "-buildvcs=false",
+        "-trimpath",
+        "-ldflags=-s -w",
+        "-o",
+        "benchmark/_outbox-variants/footprint-before/stow-after",
+        "./cmd/stow-s3"
+      ]
+    },
+    {
+      "name": "footprint",
+      "args": [
+        "node",
+        "benchmark/_outbox-variants/footprint-record.mjs"
+      ]
+    }
+  ]
+}

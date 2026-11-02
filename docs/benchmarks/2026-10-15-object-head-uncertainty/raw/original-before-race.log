@@ -1,0 +1,32 @@
+COMMAND ['go', 'test', '-race', './internal/runtime', '-run', '^TestReviewDeleteAmbiguousObjectHead$', '-count=2', '-v']
+=== RUN   TestReviewDeleteAmbiguousObjectHead
+=== RUN   TestReviewDeleteAmbiguousObjectHead/marker-first
+    head_ambiguity_review_probe_test.go:36: ambiguous HEAD did not stop deletion: <nil>
+    head_ambiguity_review_probe_test.go:40: object removed despite unknown HEAD: object not found; runtime usage={Bytes:3 Objects:1}
+    head_ambiguity_review_probe_test.go:50: healthy deletion retry: object not found
+    head_ambiguity_review_probe_test.go:53: confirmed removal stranded quota: runtime quota exceeded; usage={Bytes:3 Objects:1}
+=== RUN   TestReviewDeleteAmbiguousObjectHead/missing-first
+    head_ambiguity_review_probe_test.go:36: ambiguous HEAD did not stop deletion: <nil>
+    head_ambiguity_review_probe_test.go:40: object removed despite unknown HEAD: object not found; runtime usage={Bytes:3 Objects:1}
+    head_ambiguity_review_probe_test.go:50: healthy deletion retry: object not found
+    head_ambiguity_review_probe_test.go:53: confirmed removal stranded quota: runtime quota exceeded; usage={Bytes:3 Objects:1}
+--- FAIL: TestReviewDeleteAmbiguousObjectHead (0.00s)
+    --- FAIL: TestReviewDeleteAmbiguousObjectHead/marker-first (0.00s)
+    --- FAIL: TestReviewDeleteAmbiguousObjectHead/missing-first (0.00s)
+=== RUN   TestReviewDeleteAmbiguousObjectHead
+=== RUN   TestReviewDeleteAmbiguousObjectHead/marker-first
+    head_ambiguity_review_probe_test.go:36: ambiguous HEAD did not stop deletion: <nil>
+    head_ambiguity_review_probe_test.go:40: object removed despite unknown HEAD: object not found; runtime usage={Bytes:3 Objects:1}
+    head_ambiguity_review_probe_test.go:50: healthy deletion retry: object not found
+    head_ambiguity_review_probe_test.go:53: confirmed removal stranded quota: runtime quota exceeded; usage={Bytes:3 Objects:1}
+=== RUN   TestReviewDeleteAmbiguousObjectHead/missing-first
+    head_ambiguity_review_probe_test.go:36: ambiguous HEAD did not stop deletion: <nil>
+    head_ambiguity_review_probe_test.go:40: object removed despite unknown HEAD: object not found; runtime usage={Bytes:3 Objects:1}
+    head_ambiguity_review_probe_test.go:50: healthy deletion retry: object not found
+    head_ambiguity_review_probe_test.go:53: confirmed removal stranded quota: runtime quota exceeded; usage={Bytes:3 Objects:1}
+--- FAIL: TestReviewDeleteAmbiguousObjectHead (0.00s)
+    --- FAIL: TestReviewDeleteAmbiguousObjectHead/marker-first (0.00s)
+    --- FAIL: TestReviewDeleteAmbiguousObjectHead/missing-first (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.274s
+FAIL

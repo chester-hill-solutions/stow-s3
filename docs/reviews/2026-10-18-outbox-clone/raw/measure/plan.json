@@ -1,0 +1,111 @@
+{
+  "phase": "outbox-clone-measure",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/outbox_clone_test.go",
+    "internal/runthrough/outbox_clone_bench_test.go",
+    "benchmark/candidate-outbox.go.txt",
+    "benchmark/clone-file-bench.go.txt",
+    "benchmark/clone-before.json",
+    "benchmark/clone-candidate.json",
+    "benchmark/clone-comparison.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_clone_test.go",
+        "internal/runthrough/outbox_clone_bench_test.go",
+        "benchmark/candidate-outbox.go.txt",
+        "benchmark/clone-file-bench.go.txt"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/clone-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxStateClone|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/clone-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxStateClone|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/clone-before.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/clone-before.test"
+      ]
+    },
+    {
+      "name": "candidate-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/clone-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxStateClone|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/clone-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxStateClone|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/clone-candidate.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/clone-candidate.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/clone-comparison.mjs"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+package runthrough
+
+// The comparative Railway binary overlays only this selector.
+// 0 = indented JSON; 1 = compact JSON; 2 = protobuf.
+const benchmarkOutboxEncodingKind = 0

@@ -1,0 +1,41 @@
+{
+  "order": [
+    "before",
+    "after",
+    "after",
+    "before"
+  ],
+  "groups": [
+    [
+      "^BenchmarkReadForSaveObservation$/^present$",
+      250000
+    ],
+    [
+      "^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$",
+      1000000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^get-tiny$",
+      250000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$",
+      50000
+    ],
+    [
+      "^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$",
+      100000
+    ],
+    [
+      "^BenchmarkBufferedEOFRead$",
+      100000
+    ]
+  ],
+  "cpus": [
+    1,
+    8
+  ],
+  "samples_per_case_version_cpu": 6,
+  "flags": "ordinary go test -c",
+  "all_samples_retained": true
+}

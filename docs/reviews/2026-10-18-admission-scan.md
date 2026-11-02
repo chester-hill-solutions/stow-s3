@@ -1,0 +1,55 @@
+# Reuse verified capacity usage within one mutation
+
+**Bound filesystem mutations read and hash the existing store twice before admission.** Return the usage already verified and durably reconciled by the first scan, then reuse it to project the same mutation. This small change removes a redundant full read; it retains the existing reconciliation, admission ledger writes, quota and hold checks, uncertain-outcome handling and filesystem fences. No cache, index, checkpointing, dependency, format, public API or storage abstraction is added.
+
+## Baseline and proof before implementation
+
+The checkout starts clean at `1e8d5435c6b1e1324614cb15b776525cb258ad8d`; fetching main returns unchanged `219d1dcfff9807b04660a40313b32127e5be2933`. The prior bucket, multipart, guarded-save and uncertain-publication repairs remain in place. Their costs are the baseline, rather than the older unsafe bypasses. Source inspection shows the sequence `scan → Reconcile → scan → project → WithAdmission` for ordinary file writes, deletion and durable saves.
+
+Three ranked hypotheses guided the probes: duplicate scans should dominate allocations over existing payload; durable ledger/fence operations should retain most empty-store latency; unbound operations should not benefit from an admission-only change. Production implementation files remained unchanged while the new native regression test and a temporary two-file Go overlay prototype ran on Railway.
+
+The native test creates eight 1 MiB objects through the real unbound store, binds its namespace, then measures one actual 64 KiB PUT, request-keyed save, or empty-bucket deletion. A pre-operation GC and `runtime.ReadMemStats.TotalAlloc` measure allocated Go bytes for exactly one mutation, excluding fixture construction and later accounting verification. This is a fixture-specific 12 MiB allocation regression budget, not a new public resource guarantee or peak-RSS measurement. The 4 MiB margin above one payload pass permits ordinary metadata/runtime overhead. Fixed operation counts avoid calibration-dependent receipt growth. The test also verifies exact namespace accounting through a later native reconciliation.
+
+The parent allocates **17,257,440 bytes for PUT, 17,406,568 for save, and 17,121,192 for deletion** in the initial normal proof. The prototype allocates **8,758,176, 8,901,976 and 8,619,648 bytes**, respectively. All three exceed the budget on the parent and pass with the prototype, both normally and under race detection. [Parent normal proof](2026-10-18-admission-scan/raw/proof/red-normal.log), [parent race proof](2026-10-18-admission-scan/raw/proof/red-race.log), [prototype normal](2026-10-18-admission-scan/raw/proof/prototype-normal.log), [prototype race](2026-10-18-admission-scan/raw/proof/prototype-race.log). Exit 1 is expected only for the parent; actual native budget failures and absence of compilation/race errors are independently checked.
+
+Comparative measurement preceded the production edit. Over the 8 MiB fixture, the prototype reduces allocated bytes from roughly **17–18 MB to 8.6–9.0 MB**. Deletion measures **31.532 → 22.856 ms (-27.51%)**, PUT **30.472 → 27.954 ms (-8.26%)**, and save **51.588 → 45.977 ms (-10.88%)**. Empty-store results are adverse for deletion **14.262 → 16.541 ms (+15.98%)** and save **36.091 → 38.919 ms (+7.83%)**; all remain retained. A standalone 8 MiB scan is about **5.68 ms/8.49 MB**, while reconciliation, which adds real ledger persistence, is about **11.42 ms/8.53 MB**. This supports removing the duplicate pass while preserving the durable work. [All 144 prototype observations](2026-10-18-admission-scan/raw/proof/measurements.json), [analysis and ranges](2026-10-18-admission-scan/raw/proof/comparison-analysis.json). Only after those results was the exact measured implementation selected.
+
+## Change and preserved contracts
+
+`reconciledCapacityUsageLocked` contains the existing pending-save refusal, full validated scan and `Namespace.Reconcile`, and returns that usage. The existing `reconcileCapacityLocked` wrapper retains its unbound/active guards and error-only interface. `capacityFileAdmission`, `removeCapacityPath` and `saveAdmissionLocked` reuse the returned resource slice instead of scanning again.
+
+The caller's store mutex keeps managed owned files stable for the whole operation. `Namespace.Reconcile` persists namespace state without modifying those owned files. The host retains no in-memory ledger cache: each access reads its durable state, so later mutation of the local projected slice cannot mutate a cached settled ledger. Admission still reacquires the host gate, reloads current shared namespace usage and checks holds and aggregate budgets. Resource IDs, full content versions, byte charges and staging/recovery reservations are unchanged. Both namespace write-ahead/final ledger writes and the pre-admission reconciliation write remain. The uncertain-publication reservations, ancestor fences, receipt semantics and failure/reopen behavior remain covered by their existing native tests.
+
+This relies on the existing owned-store coordination qualification in [ADR 0020](../adr/0020-binary-object-records.md). Arbitrary external edits or overlapping independent ownership were not made safe by the former second scan and receive no new guarantee here. No usage is retained across operations. Scanning malformed/unknown files and unresolved save evidence still refuses before effects. No S3 behavior or error mapping is changed.
+
+The regression test adds three 8 MiB fixtures and explicit GC calls to test execution; production does not add a GC policy. Production still performs one full verified read and remains linear in owned data. The change therefore reduces allocation pressure without claiming bounded scratch independent of store size.
+
+## Final Railway comparison
+
+All formatting, builds, tests, race/conformance, vet, quality/site/documentation checks and benchmarks run exclusively on the authorized scratch runner, deployment `e6b7f577-fa49-4f5d-b81c-645f1084d84d`. Go 1.25.6, Linux amd64, UID 10001, GOMAXPROCS 4, 4 CPU/4 GiB. Timed filesystem fixtures use mounted ext4 `/results` (statfs 61267). The target service remains unchanged.
+
+Nine cells cover PUT/save/deletion over zero or eight existing 1 MiB objects, separate scan/reconciliation stages, and an unbound creation control. The written body is 64 KiB. Setup, namespace binding, empty-bucket preparation, charge verification and cleanup are excluded from timed allocation accounting. The save cell uses fresh bounded request keys over ten operations. The unbound control reuses an opened store; it does not duplicate the earlier fresh-store fixture and cannot resolve its unexplained +16% timing difference.
+
+Each observation has ten timed operations. Four original/fixed observations per cell use ABBA/BAAB ordering, plus four observations per label for identical-original-binary C/D controls: **144 final observations, 288 including the prototype comparison**. All commands, binary identities, observations and ranges are retained. These are synthetic operation measurements and Go allocated bytes/objects; they are not peak RSS, physical I/O throughput or statistical-significance claims. Positive percentages mean more/slower.
+
+| Operation | Median time, original → fixed | Time change | Bytes/op, original → fixed | Objects/op, original → fixed | Same-binary control time change |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| objects=0/op=delete | 13.785 → 14.028 ms | +1.77% | 79,457.0 → 68,205.0 | 671.0 → 528.5 | -3.61% |
+| objects=0/op=put | 14.582 → 14.135 ms | -3.07% | 370,111.0 → 290,809.5 | 729.0 → 594.5 | +24.35% |
+| objects=0/op=save | 35.103 → 32.902 ms | -6.27% | 572,787.5 → 463,084.5 | 1,600.0 → 1,230.0 | -14.96% |
+| objects=8/op=delete | 31.720 → 21.871 ms | -31.05% | 17,124,843.5 → 8,622,351.5 | 1,172.0 → 818.0 | -5.29% |
+| objects=8/op=put | 30.703 → 24.434 ms | -20.42% | 17,406,731.0 → 8,836,790.5 | 1,221.5 → 876.5 | -2.66% |
+| objects=8/op=save | 51.310 → 43.514 ms | -15.19% | 17,619,173.5 → 9,018,164.5 | 2,089.5 → 1,506.5 | +3.38% |
+| stage=reconcile | 10.660 → 10.612 ms | -0.44% | 8,533,961.0 → 8,533,971.0 | 477.0 → 477.0 | +8.02% |
+| stage=scan | 5.646 → 5.465 ms | -3.21% | 8,491,063.0 → 8,491,082.0 | 309.0 → 309.0 | -10.96% |
+| unbound-create | 3.709 → 3.471 ms | -6.43% | 4,132.0 → 4,132.0 | 40.0 → 40.0 | +27.87% |
+
+[Final measurements and binary hashes](2026-10-18-admission-scan/raw/final/measurements.json), [analysis and ranges](2026-10-18-admission-scan/raw/final/comparison-analysis.json), [benchmark fixture](2026-10-18-admission-scan/raw/scan-bench.go.txt). Both comparisons are retained, including adverse outcomes. Small-store timing differences are not dismissed as noise or attributed to scan reduction without evidence. Standalone stage measurements are controls, not optimized entry points. The large and previously measured empty-store admission costs remain material; this change does not claim to erase the roughly 161× bucket-deletion or 185× multipart-abort gap against their unsafe historical bypasses.
+
+## Validation and next work
+
+All 22 final steps pass: formatting; quality/file-size/format ratchets; exact-parent normal/race red proofs twice; filesystem/capacity normal/race suites twice; full Go tests; broad capacity/storage/runtime/embedded/runthrough/S3/public-package race tests; four conformance profiles; vet; site build/tests; documentation links; benchmark installation/formatting, before/after builds, measurement and cleanup. The prototype's eleven expected-outcome steps also pass. Existing quota/concurrent admission, recovery hold, replacement refusal, multipart cleanup, publication/fence failure and reopen tests pass; native permission cases execute as the unprivileged runner. [Checks](2026-10-18-admission-scan/raw/final/checks.json), [validation receipt](2026-10-18-admission-scan/raw/final/validation-receipt.json), [fixed normal](2026-10-18-admission-scan/raw/final/focused-normal.log), [fixed race](2026-10-18-admission-scan/raw/final/focused-race.log). The temporary benchmark Go file is removed; committed source is verified against Railway's exact formatted/tested bytes. Report/evidence receive additional Railway documentation and hash checks before teardown.
+
+The next performance question is the cost of repeated unchanged ledger persistence and ancestor fences, which remains after removing one read. Any proposed reduction needs its own comparative measurements and crash/failure proof; none is implemented here. The earlier fresh-store unbound timing difference remains unresolved. The namespace-wide pending resource-count boundary remains a separate correctness lead requiring deterministic native reproduction. No next finding is implemented automatically in this change.
+
+The [artifact manifest](2026-10-18-admission-scan/raw/artifact-manifest.json) records parent sources, both comparisons, validation and scratch-runner teardown evidence.

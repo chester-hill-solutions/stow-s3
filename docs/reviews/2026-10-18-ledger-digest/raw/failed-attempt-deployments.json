@@ -1,0 +1,129 @@
+[
+  {
+    "id": "6b2ba466-21bf-44fb-b8a2-eb65f24ea15a",
+    "status": "FAILED",
+    "createdAt": "2026-10-18T19:32:24.158Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-ledger-cost-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Isolate accepted ledger read costs and allocation sources before optimization",
+      "configErrors": [
+        "Failed to create code snapshot. Please review your last commit, or try again.",
+        "If this error persists, please reach out to the Railway team."
+      ],
+      "logsV2": true,
+      "reason": "deploy",
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  },
+  {
+    "id": "9ab6875d-76da-40be-ae20-d7c14e5887a0",
+    "status": "REMOVED",
+    "createdAt": "2026-10-18T19:02:56.952Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-ledger-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Retry unchanged capacity ledger read proof after terminal upload failure",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:210afa5751319bc9b7b3824806be93b1ec3288c5d075ebc4f0219505696c53ea",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  }
+]

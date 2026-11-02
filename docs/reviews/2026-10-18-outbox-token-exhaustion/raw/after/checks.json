@@ -1,0 +1,242 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox.go",
+      "internal/runthrough/outbox_claims.go",
+      "internal/runthrough/outbox_token_exhaustion_test.go",
+      "internal/runthrough/outbox_token_exhaustion_controls_test.go",
+      "internal/runthrough/outbox_token_exhaustion_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutbox|TestOutbox)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3324,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutbox|TestOutbox)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8802,
+    "passed": true
+  },
+  {
+    "name": "full-go",
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 55403,
+    "passed": true
+  },
+  {
+    "name": "broad-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/...",
+      "./internal/runtime",
+      "./internal/embedded",
+      "./internal/runthrough",
+      "./internal/s3api",
+      "./pkg/stow",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 63615,
+    "passed": true
+  },
+  {
+    "name": "conformance-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7356,
+    "passed": true
+  },
+  {
+    "name": "conformance-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7725,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4955,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 6700,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8286,
+    "passed": true
+  },
+  {
+    "name": "site-build",
+    "args": [
+      "npm",
+      "run",
+      "build",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 577,
+    "passed": true
+  },
+  {
+    "name": "site-tests",
+    "args": [
+      "npm",
+      "test",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 680,
+    "passed": true
+  },
+  {
+    "name": "doc-links",
+    "args": [
+      "node",
+      "scripts/check-doc-links.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 100,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 505,
+    "passed": true
+  },
+  {
+    "name": "benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/token-after.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 814,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/token-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 84021,
+    "passed": true
+  }
+]

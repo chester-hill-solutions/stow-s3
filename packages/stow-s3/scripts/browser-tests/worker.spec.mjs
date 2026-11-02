@@ -84,6 +84,35 @@ test("persistent worker streams above transport limits, pins reads, and reopens 
   expect(result).toEqual({ backend: "host", persistent: true, savedSize: 5_242_880, pinnedSize: 5_242_880, readBytes: 5_242_880, first: 7, latest: [9], cancelled: true, absent: true });
 });
 
+test("persistent worker releases concurrently closed readers and their content pins", async ({ page }) => {
+  await page.goto("/");
+  const protections = await page.evaluate(async () => {
+    const { loadBrowserPersistentWasmHost } = await import("/runtime/browser-wasm-host.js");
+    const { AsyncEmbeddedStow } = await import("/runtime/async-embedded.js");
+    const host = loadBrowserPersistentWasmHost();
+    const runtime = await AsyncEmbeddedStow.openPersistent(host, {
+      namespace: crypto.randomUUID(), databaseName: "stow-worker-close-tests", maxBytes: 1_000_000,
+    });
+    try {
+      await runtime.createBucket("assets");
+      await runtime.putObject("assets", "file", new Uint8Array([1, 2, 3]));
+      const counts = [];
+      for (let round = 0; round < 2; round++) {
+        const readers = [];
+        for (let index = 0; index < 16; index++) readers.push(await runtime.getObjectStream("assets", "file"));
+        counts.push((await runtime.inspectRecovery()).protections.length);
+        await Promise.all(readers.flatMap((reader) => [reader.close(), reader.close()]));
+        counts.push((await runtime.inspectRecovery()).protections.length);
+      }
+      return counts;
+    } finally {
+      await runtime.close();
+      host.close();
+    }
+  });
+  expect(protections).toEqual([16, 0, 16, 0]);
+});
+
 test("persistent worker inspects crashed stages, refuses live discard, and reclaims abandoned bytes", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {

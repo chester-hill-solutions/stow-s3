@@ -1,0 +1,342 @@
+package runthrough_test
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	fsstore "github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+)
+
+func TestRefreshOversizedStreamsObservedVersion(t *testing.T) {
+	for _, kind := range []string{"memory", "filesystem"} {
+		for _, mode := range []string{"adapter", "runtime"} {
+			for _, durable := range []bool{false, true} {
+				t.Run(fmt.Sprintf("%s/%s/durable=%t", kind, mode, durable), func(t *testing.T) { checkEvictionVersion(t, kind, mode, durable) })
+			}
+		}
+	}
+}
+
+func checkEvictionVersion(t *testing.T, kind, mode string, durable bool) {
+	t.Helper()
+	var cache storage.Store = storage.NewMemoryStore()
+	if kind == "filesystem" {
+		var err error
+		cache, err = fsstore.NewFilesystemStore(t.TempDir())
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	path := filepath.Join(t.TempDir(), "outbox.json")
+	var delegate runthrough.Outbox = runthrough.NewMemoryOutbox()
+	if durable {
+		var err error
+		delegate, err = runthrough.NewFileOutbox(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	outbox := &versionCostOutbox{Outbox: delegate}
+	f := newVersionFixtureWithCache(t, "old", outbox, cache)
+	f.client.change = nil
+	if err := versionPut(context.Background(), f.client.mockUpstream, "old"); err != nil {
+		t.Fatal(err)
+	}
+	usage := f.instance.Usage()
+	data, meta, err := observeVersion(f, mode)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertVersionResult(t, f, data, meta)
+	if f.client.gets != 1 || f.client.closes != 1 || outbox.saves != 1 {
+		t.Errorf("eviction refetched the same object: gets=%d closes=%d saves=%d want=1/1/1", f.client.gets, f.client.closes, outbox.saves)
+	}
+	if _, err := cache.HeadObject(context.Background(), "probe", "target"); !errors.Is(err, storage.ErrObjectNotFound) {
+		t.Fatalf("cache retained oversized object: %v", err)
+	}
+	if f.adapter.CacheEvictions() != 0 || f.instance.Usage() != usage {
+		t.Fatal("eviction or authoritative accounting changed")
+	}
+	if durable {
+		assertEvictionProvenance(t, f, path, meta.ETag)
+	}
+}
+
+func assertEvictionProvenance(t *testing.T, f *versionFixture, path, etag string) {
+	t.Helper()
+	if err := f.instance.Close(); err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := runthrough.NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.Close()
+	state, known, err := reopened.UpstreamState("probe", "target")
+	if err != nil || !known || state.ETag != etag {
+		t.Fatalf("reopened provenance=%+v known=%t error=%v", state, known, err)
+	}
+}
+
+type evictionFailureCache struct {
+	storage.Store
+	failure        error
+	opened, closed int
+}
+
+func (s *evictionFailureCache) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := s.Store.GetObject(ctx, bucket, key)
+	if reader != nil {
+		s.opened++
+		reader = &evictionReader{ReadCloser: reader, cache: s}
+	}
+	return reader, meta, err
+}
+func (s *evictionFailureCache) DeleteObject(ctx context.Context, bucket, key string) error {
+	if s.failure != nil {
+		return s.failure
+	}
+	return s.Store.DeleteObject(ctx, bucket, key)
+}
+
+type evictionReader struct {
+	io.ReadCloser
+	cache *evictionFailureCache
+}
+
+func (r *evictionReader) Close() error { r.cache.closed++; return r.ReadCloser.Close() }
+
+func TestRefreshOversizedEvictionFailureClosesUpstreamReader(t *testing.T) {
+	for _, mode := range []string{"adapter", "runtime"} {
+		t.Run(mode, func(t *testing.T) {
+			failure := errors.New("cannot evict cache entry")
+			cache := &evictionFailureCache{Store: storage.NewMemoryStore(), failure: failure}
+			f := newVersionFixtureWithCache(t, "old", nil, cache)
+			f.client.change = nil
+			_, _, err := observeVersion(f, mode)
+			if err != failure {
+				t.Fatalf("error=%v want=%v", err, failure)
+			}
+			if cache.opened != 0 || cache.closed != cache.opened || f.client.closes != 1 {
+				t.Fatalf("reader leak: opened=%d closed=%d upstream closed=%d", cache.opened, cache.closed, f.client.closes)
+			}
+			cache.failure = nil
+			if _, _, err := observeVersion(f, mode); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestRefreshOversizedReaderSurvivesCacheReplacement(t *testing.T) {
+	cache, err := fsstore.NewFilesystemStore(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := newVersionFixtureWithCache(t, "old", nil, cache)
+	f.client.change = nil
+	reader, meta, err := f.adapter.GetObject(context.Background(), "probe", "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reader.Close()
+	if _, err := cache.PutObject(context.Background(), "probe", "target", strings.NewReader("replacement"), storage.PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	data, err := io.ReadAll(reader)
+	if err != nil || string(data) != "old" || meta.Size != 3 {
+		t.Fatalf("captured version changed: body=%q meta=%+v error=%v", data, meta, err)
+	}
+}
+
+func TestRefreshOversizedPreservesObservedWriteCondition(t *testing.T) {
+	ctx := context.Background()
+	cache := &versionCostCache{MemoryStore: storage.NewMemoryStore()}
+	f := newVersionFixtureWithCache(t, "old", fileVersionOutbox(t), cache)
+	f.client.change = nil
+	cache.change = func() error { return versionPut(ctx, f.client.mockUpstream, "new") }
+	data, meta, err := observeVersion(f, "adapter")
+	if err != nil || string(data) != "old" || meta.ETag != f.original.ETag {
+		t.Fatalf("observed version=%q meta=%+v error=%v", data, meta, err)
+	}
+	state, known, err := f.outbox.(interface {
+		UpstreamState(string, string) (runthrough.UpstreamState, bool, error)
+	}).UpstreamState("probe", "target")
+	if err != nil || !known || state.ETag != meta.ETag {
+		t.Fatalf("provenance=%+v known=%t error=%v", state, known, err)
+	}
+	mirror := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, f.local, f.cache, f.client, f.outbox)
+	if _, err := mirror.PutObject(ctx, "probe", "target", strings.NewReader("edit"), storage.PutOptions{}); !errors.Is(err, runthrough.ErrUpstreamConflict) {
+		t.Fatalf("concurrent upstream change was not protected: %v", err)
+	}
+	reader, _, err := f.client.mockUpstream.GetObject(ctx, "probe", "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reader.Close()
+	written, err := io.ReadAll(reader)
+	if err != nil || string(written) != "new" {
+		t.Fatalf("conflicting write replaced upstream: %q error=%v", written, err)
+	}
+}
+
+func TestRefreshOversizedRevalidationDropsStaleCache(t *testing.T) {
+	ctx := context.Background()
+	f := newVersionFixtureWithCache(t, "old", fileVersionOutbox(t), nil)
+	f.client.change = nil
+	if err := versionPut(ctx, f.client.mockUpstream, "o"); err != nil {
+		t.Fatal(err)
+	}
+	f.adapter = runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyReadThroughCache, Revalidate: true, Cache: runthrough.CachePolicy{MaxBytes: 3}}, f.local, f.cache, f.client, f.outbox)
+	reader, _, err := f.adapter.GetObject(ctx, "probe", "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = reader.Close()
+	if _, err := f.client.PutObject(ctx, "probe", "retained", strings.NewReader("ok"), storage.PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	retainedReader, _, err := f.adapter.GetObject(ctx, "probe", "retained")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = retainedReader.Close()
+	if err := versionPut(ctx, f.client.mockUpstream, "too large"); err != nil {
+		t.Fatal(err)
+	}
+	f.body = "too large"
+	data, meta, err := observeVersion(f, "adapter")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertVersionResult(t, f, data, meta)
+	if _, err := f.cache.HeadObject(ctx, "probe", "target"); !errors.Is(err, storage.ErrObjectNotFound) {
+		t.Fatalf("old cached version retained: %v", err)
+	}
+	if _, err := f.cache.HeadObject(ctx, "probe", "retained"); err != nil {
+		t.Fatalf("unrelated cached key evicted: %v", err)
+	}
+	if f.client.gets != 3 || f.adapter.CacheEvictions() != 1 {
+		t.Fatalf("gets=%d evictions=%d", f.client.gets, f.adapter.CacheEvictions())
+	}
+}
+
+func TestRefreshOversizedProvenanceFailureClosesStream(t *testing.T) {
+	failure := errors.New("cannot save initial observation")
+	outbox := &versionOutbox{MemoryOutbox: runthrough.NewMemoryOutbox(), saves: 1, failure: failure}
+	f := newVersionFixtureWithCache(t, "old", outbox, nil)
+	f.client.change = nil
+	reader, meta, err := f.adapter.GetObject(context.Background(), "probe", "target")
+	if err != failure || reader != nil || meta != nil || f.client.closes != 1 {
+		t.Fatalf("reader=%v meta=%+v error=%v closed=%d", reader, meta, err, f.client.closes)
+	}
+	if _, err := f.cache.HeadObject(context.Background(), "probe", "target"); !errors.Is(err, storage.ErrObjectNotFound) {
+		t.Fatalf("failed observation cached: %v", err)
+	}
+}
+
+func TestRefreshOversizedReaderOwnership(t *testing.T) {
+	f := newVersionFixtureWithCache(t, "old", nil, nil)
+	f.client.change = nil
+	reader, _, err := f.adapter.GetObject(context.Background(), "probe", "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reader.Close()
+	if f.client.gets != 1 || f.client.closes != 0 {
+		t.Fatalf("upstream stream was refetched or closed before return: gets=%d closes=%d", f.client.gets, f.client.closes)
+	}
+}
+
+type oversizedFailureClient struct {
+	*versionClient
+	failure error
+}
+
+func (c *oversizedFailureClient) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := c.versionClient.GetObject(ctx, bucket, key)
+	if err == nil {
+		reader = &oversizedFailureReader{ReadCloser: reader, failure: c.failure}
+	}
+	return reader, meta, err
+}
+
+type oversizedFailureReader struct {
+	io.ReadCloser
+	failure error
+}
+
+func (r *oversizedFailureReader) Read([]byte) (int, error) { return 0, r.failure }
+
+func TestRefreshOversizedStreamErrorsReachCaller(t *testing.T) {
+	ctx := context.Background()
+	f := newVersionFixtureWithCache(t, "old", nil, nil)
+	f.client.change = nil
+	failure := errors.New("upstream body interrupted")
+	client := &oversizedFailureClient{versionClient: f.client, failure: failure}
+	adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyReadThroughCache, Cache: runthrough.CachePolicy{MaxBytes: 1}}, f.local, f.cache, client, f.outbox)
+	reader, meta, err := adapter.GetObject(ctx, "probe", "target")
+	if err != nil || reader == nil || meta == nil {
+		t.Fatalf("stream opening failed: reader=%v meta=%+v error=%v", reader, meta, err)
+	}
+	_, err = io.ReadAll(reader)
+	_ = reader.Close()
+	if err != failure || f.client.closes != 1 {
+		t.Fatalf("stream error=%v closes=%d", err, f.client.closes)
+	}
+	if _, err = f.cache.HeadObject(ctx, "probe", "target"); !errors.Is(err, storage.ErrObjectNotFound) {
+		t.Fatalf("failed stream cached: %v", err)
+	}
+}
+
+func TestRefreshOversizedHeadDoesNotReadUncacheableBody(t *testing.T) {
+	ctx := context.Background()
+	f := newVersionFixtureWithCache(t, "old", nil, nil)
+	f.client.change = nil
+	client := &oversizedFailureClient{versionClient: f.client, failure: errors.New("HEAD must not consume an uncacheable body")}
+	adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyReadThroughCache, Cache: runthrough.CachePolicy{MaxBytes: 1}}, f.local, f.cache, client, f.outbox)
+	meta, err := adapter.HeadObject(ctx, "probe", "target")
+	if err != nil || meta == nil || meta.ETag != f.original.ETag || f.client.gets != 1 || f.client.closes != 1 {
+		t.Fatalf("HEAD meta=%+v error=%v gets=%d closes=%d", meta, err, f.client.gets, f.client.closes)
+	}
+}
+
+func TestRefreshCacheAdmissionBoundary(t *testing.T) {
+	for _, size := range []int{0, 1, 2} {
+		t.Run(fmt.Sprint(size), func(t *testing.T) {
+			ctx := context.Background()
+			f := newVersionFixtureWithCache(t, strings.Repeat("x", size), nil, nil)
+			f.client.change = nil
+			if err := versionPut(ctx, f.client.mockUpstream, f.body); err != nil {
+				t.Fatal(err)
+			}
+			for i := 0; i < 2; i++ {
+				data, meta, err := observeVersion(f, "adapter")
+				if err != nil {
+					t.Fatal(err)
+				}
+				assertVersionResult(t, f, data, meta)
+			}
+			_, err := f.cache.HeadObject(ctx, "probe", "target")
+			wantGets := 1
+			if size > 1 {
+				wantGets = 2
+				if !errors.Is(err, storage.ErrObjectNotFound) {
+					t.Fatalf("oversized object cached: %v", err)
+				}
+			} else if err != nil {
+				t.Fatalf("fitting object not cached: %v", err)
+			}
+			if f.client.gets != wantGets || f.adapter.CacheEvictions() != 0 {
+				t.Fatalf("gets=%d want=%d evictions=%d", f.client.gets, wantGets, f.adapter.CacheEvictions())
+			}
+		})
+	}
+}

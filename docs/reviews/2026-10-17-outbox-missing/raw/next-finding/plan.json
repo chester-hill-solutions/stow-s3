@@ -1,0 +1,47 @@
+{
+  "phase": "next-finding-null-journal-root",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_recovery_test.go",
+    "benchmark/_null-repro/null_journal_repro_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-reproduction",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/_null-repro/null_journal_repro_test.go"
+      ]
+    },
+    {
+      "name": "null-journal-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=/app/benchmark/_null-repro/overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxRefuses(NullJournal|OtherScalarJournalRoots)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "null-journal-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=/app/benchmark/_null-repro/overlay.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestFileOutboxRefuses(NullJournal|OtherScalarJournalRoots)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

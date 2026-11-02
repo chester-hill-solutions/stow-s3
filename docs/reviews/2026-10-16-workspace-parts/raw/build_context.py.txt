@@ -1,0 +1,60 @@
+from pathlib import Path
+import shutil,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-workspace-parts-2026-10-16');c=p/'railway-context'
+assert not c.exists();c.mkdir()
+for name in ['go.mod','go.sum','internal','pkg']:
+ src=r/name;dst=c/name
+ if src.is_dir():shutil.copytree(src,dst)
+ else:shutil.copyfile(src,dst)
+b=c/'benchmark';b.mkdir()
+for name in ['runner.mjs','http.mjs','resources.mjs']:shutil.copyfile(r/'benchmark'/name,b/name)
+for variant in ['scan','record']:
+ d=b/variant;d.mkdir()
+ for name in ['multipart.go','part_record.go']:shutil.copyfile(p/variant/name,d/name)
+shutil.copyfile(p/'baseline.json',b/'baseline.json')
+(b/'build.mjs').write_text('''import {readFile,writeFile,mkdir}from'node:fs/promises';
+import{execFileSync}from'node:child_process';import{createHash}from'node:crypto';
+const hash=x=>createHash('sha256').update(x).digest('hex');
+await mkdir('/out',{recursive:true});const binaries={},sources={};
+for(const variant of ['baseline','scan','record']){
+ const files=variant==='baseline'?['internal/storage/workspace/multipart.go']:['benchmark/'+variant+'/multipart.go','benchmark/'+variant+'/part_record.go'];
+ for(const name of files){const bytes=await readFile(name);sources[name]={bytes:bytes.length,sha256:hash(bytes)}}
+ const args=['test','-c','-buildvcs=false','-o','/out/'+variant+'.test'];
+ if(variant!=='baseline'){
+  const overlay={Replace:{'/src/internal/storage/workspace/multipart.go':'/src/benchmark/'+variant+'/multipart.go','/src/internal/storage/workspace/part_record.go':'/src/benchmark/'+variant+'/part_record.go'}};
+  await writeFile('benchmark/'+variant+'-overlay.json',JSON.stringify(overlay));args.push('-overlay=benchmark/'+variant+'-overlay.json');
+ }
+ args.push('./internal/storage/workspace');execFileSync('go',args,{stdio:'inherit'});
+ const bytes=await readFile('/out/'+variant+'.test');binaries[variant]={bytes:bytes.length,sha256:hash(bytes)};
+}
+for(const name of ['internal/storage/workspace/part_comparison_bench_test.go','internal/storage/workspace/part_publication_test.go']){const bytes=await readFile(name);sources[name]={bytes:bytes.length,sha256:hash(bytes)}}
+await writeFile('/out/build-identity.json',JSON.stringify({baseline:JSON.parse(await readFile('benchmark/baseline.json')),sources,binaries,go:execFileSync('go',['version'],{encoding:'utf8'}).trim(),compiler:JSON.parse(execFileSync('go',['env','-json','GOOS','GOARCH','GOTOOLCHAIN','GOAMD64','CGO_ENABLED','GOFLAGS','GOEXPERIMENT'],{encoding:'utf8'}))},null,2)+'\\n');
+''')
+(b/'diagnosis.mjs').write_text('''import{readFile,writeFile,mkdir}from'node:fs/promises';import{spawnSync}from'node:child_process';import{createHash}from'node:crypto';import{join}from'node:path';import{loadavg}from'node:os';import{systemMetadata,cgroupResources}from'./resources.mjs';
+if(process.platform!=='linux'||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4'||process.env.RAILWAY_ENVIRONMENT_ID!=='3cd200cb-c94f-4e4d-9335-0f6c1b7e9411'||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway runner only');
+const root=process.argv[2];if(!root?.startsWith('/results/'))throw Error('Results volume required');await mkdir(root,{recursive:false});
+const save=(name,value)=>writeFile(join(root,name),typeof value==='string'?value:JSON.stringify(value,null,2)+'\\n');
+try{
+ const start=await systemMetadata(),build=JSON.parse(await readFile('benchmark/build-identity.json'));
+ if(start.cgroup.cpuMax!=='400000 100000'||start.cgroup.memoryMax!=='4294967296')throw Error('Unexpected resource limits');
+ for(const [name,value]of Object.entries(build.binaries))if(createHash('sha256').update(await readFile('benchmark/'+name+'.test')).digest('hex')!==value.sha256)throw Error('Binary mismatch');
+ const plan=[];for(const cpu of [1,4])for(let cycle=0;cycle<2;cycle++)for(const variant of cycle===0?['baseline','scan','record']:['record','scan','baseline'])plan.push({cpu,cycle,variant});
+ await save('plan.json',{blocks:plan,benchtime:'200ms',count:2});const rows=[],resources=[];
+ for(const[index,block]of plan.entries()){
+  const before=await cgroupResources(),loadBefore=loadavg();
+  const command=['benchmark/'+block.variant+'.test','-test.run=^$','-test.bench=^BenchmarkWorkspaceMultipartComparison$','-test.benchmem','-test.benchtime=200ms','-test.count=2','-test.cpu='+block.cpu];
+  const q=spawnSync(command[0],command.slice(1),{encoding:'utf8',timeout:240000,maxBuffer:4194304});
+  await save('block-'+index+'.log','COMMAND '+JSON.stringify(command)+'\\n'+q.stdout+q.stderr);
+  resources.push({block:index,before,after:await cgroupResources(),loadBefore,loadAfter:loadavg()});
+  if(q.status!==0)throw Error('Block '+index+' failed: '+q.status+' '+q.error);
+  for(const line of q.stdout.split('\\n'))if(line.startsWith('Benchmark')){const tokens=line.trim().split(/\\s+/),metrics={};for(let i=2;i<tokens.length-1;i+=2)metrics[tokens[i+1]]=Number(tokens[i]);rows.push({...block,block:index,name:tokens[0].replace(/-\\d+$/,''),iterations:Number(tokens[1]),metrics})}
+  await save('progress.json',{blocks:index+1,total:plan.length});console.log(JSON.stringify({block:index,...block,complete:true}));
+ }
+ if(rows.length!==144)throw Error('Expected 144 samples, got '+rows.length);
+ await save('samples.json',rows);await save('block-resources.json',resources);await save('environment.json',{provider:'Railway',...build,start,end:await systemMetadata()});await save('run.json',{complete:true,samples:rows.length,railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID});
+}catch(error){await save('run.json',{complete:false,error:error.stack});throw error}
+''')
+(b/'Dockerfile').write_bytes((r/'docs/benchmarks/2026-10-16-prepared-recovery/raw/Dockerfile.txt').read_bytes())
+manifest={str(f.relative_to(c)):hashlib.sha256(f.read_bytes()).hexdigest()for f in sorted(c.rglob('*'))if f.is_file()}
+(p/'railway-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print('Sanitized context files',len(manifest),'bytes',sum(f.stat().st_size for f in c.rglob('*')if f.is_file()))

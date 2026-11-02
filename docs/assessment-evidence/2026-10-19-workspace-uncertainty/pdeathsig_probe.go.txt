@@ -1,0 +1,63 @@
+// A minimal probe for the parent-death signal the parentwatch package relies
+// on.
+//
+// An intermediate shell becomes the parent of a child that traps the
+// parent-death signal. The intermediate is SIGKILLed and the child is watched.
+// A host that delivers the signal ends with a dead child; a host that does not
+// leaves it running.
+//
+// The program uses only the standard library, so it measures the host rather
+// than any part of the product.
+package main
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"syscall"
+	"time"
+)
+
+const childPidFile = "/tmp/pdeathsig.pid"
+
+func main() {
+	_ = os.Remove(childPidFile)
+	script := "sh -c 'trap \"exit 42\" TERM; echo $$ > " + childPidFile + "; sleep 30' & wait"
+	intermediate := exec.Command("/bin/sh", "-c", script)
+	if err := intermediate.Start(); err != nil {
+		fmt.Println("STOWPDEATHSIG: could not start the intermediate parent:", err)
+		os.Exit(2)
+	}
+
+	pid := waitForPid(childPidFile)
+	fmt.Println("STOWPDEATHSIG: watched child pid", pid)
+	if err := intermediate.Process.Signal(syscall.SIGKILL); err != nil {
+		fmt.Println("STOWPDEATHSIG: could not kill the parent:", err)
+		os.Exit(2)
+	}
+	_ = intermediate.Wait()
+	time.Sleep(2 * time.Second)
+
+	if err := syscall.Kill(pid, 0); err == nil {
+		fmt.Println("STOWPDEATHSIG: the child survived its parent's death, so this host does not deliver the parent-death signal")
+		os.Exit(1)
+	}
+	fmt.Println("STOWPDEATHSIG: the child died with its parent, so this host delivers the parent-death signal")
+}
+
+func waitForPid(path string) int {
+	deadline := time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		data, err := os.ReadFile(path)
+		if err == nil {
+			pid := 0
+			if _, err := fmt.Sscanf(string(data), "%d", &pid); err == nil && pid > 0 {
+				return pid
+			}
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	fmt.Println("STOWPDEATHSIG: the child never published its pid")
+	os.Exit(2)
+	return 0
+}

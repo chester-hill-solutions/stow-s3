@@ -75,7 +75,7 @@ Report simulated scanner and real scanner tests separately.
 
 The first batch measures bounded PUT, GET and simulated quarantine workflows.
 Flagged-file promotion, a real scanner and read-through cache comparisons remain separate work.
-The local workflow harness remains available for desktop measurements.
+Run the workflow harness on Railway; performance benchmarks run only there.
 The expanded October 13 batch runs all testing and analysis on Railway and
 produces a private website preview before any publication. Go heap allocation
 counters exclude SQLite's C allocations; they are separate from process RSS.

@@ -1,0 +1,56 @@
+package runtime
+import("context";"encoding/json";"errors";"io";"reflect"; goruntime "runtime";"syscall";"testing";"time";"github.com/chester-hill-solutions/stow-s3/internal/authority";"github.com/chester-hill-solutions/stow-s3/internal/policy";"github.com/chester-hill-solutions/stow-s3/internal/storage")
+func (i *Instance) reviewBeforeOpen(ctx context.Context, bucket, key string, span *storage.ObjectRange) (io.ReadCloser, Object, error) {
+	if err := i.checkContext(ctx); err != nil {
+		return nil, Object{}, err
+	}
+	if err := i.checkResource(authority.ObjectRead, policy.Object(bucket, key)); err != nil {
+		return nil, Object{}, err
+	}
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+	if err := i.checkOpen(); err != nil {
+		return nil, Object{}, err
+	}
+	reader, meta, err := i.openStoreRange(ctx, bucket, key, span)
+	if err != nil {
+		return nil, Object{}, err
+	}
+	size := meta.Size
+	if span != nil {
+		size = span.Length
+	}
+	stream := &objectStream{instance: i, context: ctx, bucket: bucket, key: key, reader: reader, size: size}
+	if seeker, ok := reader.(io.Seeker); ok {
+		return &seekableObjectStream{objectStream: stream, seeker: seeker}, objectFromMeta(meta, nil), nil
+	}
+	return stream, objectFromMeta(meta, nil), nil
+}
+
+func reviewCPU(r syscall.Rusage)int64{return r.Utime.Sec*1000000+int64(r.Utime.Usec)+r.Stime.Sec*1000000+int64(r.Stime.Usec)}
+func TestReviewPairedOpeningCosts(t *testing.T){
+ ctx:=context.Background()
+ for _,mode:=range []string{"nil-error","reader-error","healthy-open"}{
+  base:=storage.NewMemoryStore();var store storage.Store=base
+  failure:=errors.New("opening refused")
+  if mode!="healthy-open"{fault:=&openingBenchmarkStore{MemoryStore:base,failure:failure};if mode=="reader-error"{fault.reader=&openingBenchmarkReader{}};store=fault}
+  instance,err:=OpenWithStore(Options{Backend:BackendMemory},store,nil);if err!=nil{t.Fatal(err)}
+  if mode=="healthy-open"{if err:=instance.CreateBucket(ctx,"probe");err!=nil{t.Fatal(err)};if _,err:=instance.PutObject(ctx,"probe","target",[]byte("old"),PutOptions{});err!=nil{t.Fatal(err)}}
+  openers:=map[string]func(context.Context,string,string,*storage.ObjectRange)(io.ReadCloser,Object,error){"before":instance.reviewBeforeOpen,"after":instance.openObject}
+  if mode=="healthy-open"{old,_,_:=instance.reviewBeforeOpen(ctx,"probe","target",nil);now,_,_:=instance.openObject(ctx,"probe","target",nil);if reflect.TypeOf(old)!=reflect.TypeOf(now){t.Fatal("reader types differ")};if _,ok:=old.(io.WriterTo);!ok{t.Fatal("WriterTo missing")};_ = old.Close();_ = now.Close()}
+  n:=200000;if mode=="healthy-open"{n=20000}
+  for cycle:=0;cycle<10;cycle++{
+   labels:=[]string{"before-a","after-a","after-b","before-b"};if cycle%2==1{labels=[]string{"after-a","before-a","before-b","after-b"}}
+   for position,label:=range labels{
+    key:=label[:len(label)-2];open:=openers[key]
+    var m0,m1 goruntime.MemStats;var c0,c1 syscall.Rusage
+    goruntime.ReadMemStats(&m0);_ = syscall.Getrusage(syscall.RUSAGE_SELF,&c0);start:=time.Now()
+    for k:=0;k<n;k++{reader,_,err:=open(ctx,"probe","target",nil);if mode=="healthy-open"{if err!=nil{t.Fatal(err)};_ = reader.Close()}else if err!=failure || reader!=nil{t.Fatal("opening error changed")}}
+    wall:=time.Since(start).Nanoseconds();_ = syscall.Getrusage(syscall.RUSAGE_SELF,&c1);goruntime.ReadMemStats(&m1)
+    row:=map[string]interface{}{"case":mode,"cpu":goruntime.GOMAXPROCS(0),"cycle":cycle,"position":position,"label":label,"n":n,"wall_ns":wall,"cpu_us":reviewCPU(c1)-reviewCPU(c0),"bytes":m1.TotalAlloc-m0.TotalAlloc,"allocs":m1.Mallocs-m0.Mallocs}
+    encoded,_:=json.Marshal(row);t.Logf("PAIRED %s",encoded)
+   }
+  }
+  _ = instance.Close()
+ }
+}

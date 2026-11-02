@@ -1,0 +1,169 @@
+{
+  "binarySHA256": "67e724835130db6e106a8a200d705901013108d915117541dacea985ad62f40e",
+  "runs": [
+    {
+      "name": "uninstrumented",
+      "args": [
+        "/app/benchmark/decode-before.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$",
+        "-test.benchmem",
+        "-test.benchtime=1s",
+        "-test.count=3",
+        "-test.cpu=1,4"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-false-cpu",
+      "args": [
+        "/app/benchmark/decode-before.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=false$",
+        "-test.benchtime=3s",
+        "-test.cpu=1",
+        "-test.cpuprofile=/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-false-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-false-memory",
+      "args": [
+        "/app/benchmark/decode-before.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=false$",
+        "-test.benchtime=10x",
+        "-test.cpu=1",
+        "-test.memprofilerate=1",
+        "-test.memprofile=/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-false-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-false-cpu-top",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=35",
+        "/app/benchmark/decode-before.test",
+        "/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-false-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-false-alloc_objects",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_objects",
+        "-top",
+        "-cum",
+        "-nodecount=30",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/decode-before.test",
+        "/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-false-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-false-alloc_space",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_space",
+        "-top",
+        "-cum",
+        "-nodecount=30",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/decode-before.test",
+        "/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-false-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-true-cpu",
+      "args": [
+        "/app/benchmark/decode-before.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=true$",
+        "-test.benchtime=3s",
+        "-test.cpu=1",
+        "-test.cpuprofile=/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-true-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-true-memory",
+      "args": [
+        "/app/benchmark/decode-before.test",
+        "-test.run=^$",
+        "-test.bench=^BenchmarkOutboxDecodeProfile$/rich=true$",
+        "-test.benchtime=10x",
+        "-test.cpu=1",
+        "-test.memprofilerate=1",
+        "-test.memprofile=/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-true-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-true-cpu-top",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=35",
+        "/app/benchmark/decode-before.test",
+        "/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-true-cpu.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-true-alloc_objects",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_objects",
+        "-top",
+        "-cum",
+        "-nodecount=30",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/decode-before.test",
+        "/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-true-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "rich-true-alloc_space",
+      "args": [
+        "go",
+        "tool",
+        "pprof",
+        "-alloc_space",
+        "-top",
+        "-cum",
+        "-nodecount=30",
+        "-focus=decodeOutboxProto",
+        "/app/benchmark/decode-before.test",
+        "/results/97184e16-1c30-4a7f-98ec-843b3c9e607f/rich-true-memory.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

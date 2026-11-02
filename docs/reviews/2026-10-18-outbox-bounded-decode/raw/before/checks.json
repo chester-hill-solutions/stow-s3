@@ -1,0 +1,77 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_decode_resource_test.go",
+      "benchmark/decode-profile-bench.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 25,
+    "passed": true
+  },
+  {
+    "name": "resource-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDecodeRejectsDuplicateFloodWithinBudget$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 23101,
+    "passed": true
+  },
+  {
+    "name": "resource-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDecodeRejectsDuplicateFloodWithinBudget$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 39141,
+    "passed": true
+  },
+  {
+    "name": "build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/decode-profile.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/decode-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1995,
+    "passed": true
+  },
+  {
+    "name": "profiles",
+    "args": [
+      "node",
+      "benchmark/decode-profiles.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 39822,
+    "passed": true
+  }
+]

@@ -55,9 +55,10 @@ func namespaceCharge(ns *namespaceState) (Snapshot, error) {
 	return out, nil
 }
 
-// storeCharge folds one store into the namespace totals. A pending admission is
-// a maximum, not an addition: the store already accounts for those bytes.
+// storeCharge folds one store into the namespace totals. A pending admission
+// charges the larger settled or projected usage, for both bytes and slots.
 func storeCharge(store *storeState, out *Snapshot) (int, error) {
+	count := len(store.Resources)
 	payload, recovery, err := resourcesCharge(store.Resources)
 	if err != nil {
 		return 0, err
@@ -68,6 +69,7 @@ func storeCharge(store *storeState, out *Snapshot) (int, error) {
 			return 0, err
 		}
 		payload, recovery = max(payload, stagedPayload), max(recovery, stagedRecovery)
+		count = max(count, len(store.Pending.Resources))
 		if err := add(&out.PendingBytes, store.Pending.StagingBytes); err != nil {
 			return 0, err
 		}
@@ -78,7 +80,7 @@ func storeCharge(store *storeState, out *Snapshot) (int, error) {
 	if err := add(&out.PayloadBytes, payload); err != nil {
 		return 0, err
 	}
-	return len(store.Resources), add(&out.RecoveryBytes, recovery)
+	return count, add(&out.RecoveryBytes, recovery)
 }
 
 // the payload budget cannot leave no room to record its own release.

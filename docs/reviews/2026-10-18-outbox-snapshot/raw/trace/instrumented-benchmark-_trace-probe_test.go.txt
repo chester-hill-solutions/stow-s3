@@ -1,0 +1,78 @@
+package runthrough
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"testing"
+	"time"
+)
+
+type snapshotPhaseWrite struct {
+	Index      int              `json:"index"`
+	TotalNanos int64            `json:"totalNanos"`
+	Phases     map[string]int64 `json:"phases"`
+}
+
+func TestOutboxSnapshotWriterPhases(t *testing.T) {
+	root := os.Getenv("STOW_OUTBOX_SNAPSHOT_FIXTURES")
+	output := os.Getenv("STOW_SNAPSHOT_TRACE_OUTPUT")
+	if root == "" || output == "" {
+		t.Skip("diagnostic overlay only")
+	}
+	path := filepath.Join(root, "active=16384")
+	writer, err := NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := writer.SaveUpstreamState("bucket", "target", UpstreamState{ETag: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}); err != nil {
+		t.Fatal(err)
+	}
+	observer, err := NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := observer.PendingSnapshot(); err != nil {
+		t.Fatal(err)
+	}
+	var current *snapshotPhaseWrite
+	outboxPhaseHook = func(o *FileOutbox, phase string, elapsed time.Duration) {
+		if o == writer && current != nil {
+			current.Phases[phase] = elapsed.Nanoseconds()
+		}
+	}
+	requests := make(chan struct{})
+	responses := make(chan snapshotWriterResult)
+	go runMatchedSnapshotObserver(observer, false, requests, responses)
+	rows := make([]snapshotPhaseWrite, 128)
+	runtime.GC()
+	for n := range rows {
+		rows[n] = snapshotPhaseWrite{Index: n, Phases: make(map[string]int64, 8)}
+		current = &rows[n]
+		requests <- struct{}{}
+		value := UpstreamState{ETag: fmt.Sprintf("%032x", n+1)}
+		began := time.Now()
+		err := writer.SaveUpstreamState("bucket", "target", value)
+		current.TotalNanos = time.Since(began).Nanoseconds()
+		result := <-responses
+		if err != nil || result.err != nil {
+			close(requests)
+			for range responses {
+			}
+			t.Fatalf("writer=%v snapshot=%v", err, result.err)
+		}
+	}
+	close(requests)
+	for range responses {
+	}
+	outboxPhaseHook = nil
+	data, err := json.MarshalIndent(rows, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(output, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+}

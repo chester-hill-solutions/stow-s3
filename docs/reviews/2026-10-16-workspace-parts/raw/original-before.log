@@ -1,0 +1,27 @@
+=== RUN   TestContractAuditPartDescriptor
+=== RUN   TestContractAuditPartDescriptor/healthy
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:49:11.567165 +0000 UTC} result=&{PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:49:11.607812 +0000 UTC} write error=<nil> listed={PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:49:11.607812 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:146: completion from ListParts: meta=&{Bucket:workspace Key:target VersionID:89536088f3b0df1c45dea86fc904bc9e Size:11 ETag:"f5300127f646a4550bc4a04fbe393e79" ContentType:text/plain; charset=utf-8 LastModified:2026-10-16 19:49:11 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=<nil>
+=== RUN   TestContractAuditPartDescriptor/descriptor-failure
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:49:11.774782 +0000 UTC} result=<nil> write error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure1399423321/001/.stow/multipart/d556d59e8bb3fb1d98ee7f6acf53cb4a/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure1399423321/001/.stow/multipart/d556d59e8bb3fb1d98ee7f6acf53cb4a/.tmp-3333254955 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure1399423321/001/.stow/multipart/d556d59e8bb3fb1d98ee7f6acf53cb4a/upload.json: file exists listed={PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:49:11.774782 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:143: ListParts descriptor disagrees with actual stored bytes
+    contract_audit_probe_test.go:146: completion from ListParts: meta=<nil> error=invalid multipart part
+    contract_audit_probe_test.go:148: completion from the returned list failed: invalid multipart part
+--- FAIL: TestContractAuditPartDescriptor (0.45s)
+    --- PASS: TestContractAuditPartDescriptor/healthy (0.30s)
+    --- FAIL: TestContractAuditPartDescriptor/descriptor-failure (0.14s)
+=== RUN   TestContractAuditPartDescriptor
+=== RUN   TestContractAuditPartDescriptor/healthy
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:49:11.919739 +0000 UTC} result=&{PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:49:11.98242 +0000 UTC} write error=<nil> listed={PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:49:11.98242 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:146: completion from ListParts: meta=&{Bucket:workspace Key:target VersionID:99be75ee03534bdfbf8c1592d862d9fc Size:11 ETag:"f5300127f646a4550bc4a04fbe393e79" ContentType:text/plain; charset=utf-8 LastModified:2026-10-16 19:49:11 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=<nil>
+=== RUN   TestContractAuditPartDescriptor/descriptor-failure
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:49:12.171166 +0000 UTC} result=<nil> write error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure3544544129/001/.stow/multipart/0436a2cd54fc5fc80a3d84bd88180215/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure3544544129/001/.stow/multipart/0436a2cd54fc5fc80a3d84bd88180215/.tmp-695525569 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure3544544129/001/.stow/multipart/0436a2cd54fc5fc80a3d84bd88180215/upload.json: file exists listed={PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:49:12.171166 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:143: ListParts descriptor disagrees with actual stored bytes
+    contract_audit_probe_test.go:146: completion from ListParts: meta=<nil> error=invalid multipart part
+    contract_audit_probe_test.go:148: completion from the returned list failed: invalid multipart part
+--- FAIL: TestContractAuditPartDescriptor (0.38s)
+    --- PASS: TestContractAuditPartDescriptor/healthy (0.27s)
+    --- FAIL: TestContractAuditPartDescriptor/descriptor-failure (0.11s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	1.130s
+FAIL

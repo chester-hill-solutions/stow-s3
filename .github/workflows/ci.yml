@@ -33,6 +33,21 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      # The benchmark module replaces the main module with a local path, so it
+      # resolves the main module's requirements while pinning its own. A bump
+      # in the main module therefore breaks its checksum file, and the harness
+      # image fails at go mod download with nothing else pointing at it.
+      #
+      # The test compile is the part that finds it. The benchmark's own packages
+      # do not import the SDK, so go build alone passes; the tests do, through
+      # the main module, and they are what go.sum has to cover.
+      - name: Build the benchmark module
+        working-directory: benchmark/go
+        run: |
+          go mod download
+          go build ./...
+          go test -run '^$' ./...
+
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -151,7 +166,7 @@ jobs:
           go-version-file: .go-version
           cache: true
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           # The floor pyproject declares, not the newest available. The declared
           # floor is the version whose syntax the package has to keep parsing, so

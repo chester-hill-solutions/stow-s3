@@ -1,0 +1,23 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkOutboxInsertDecode/field=provenance/key=16         	     550	    889503 ns/op	    155662 frame-B	  945544 B/op	    8244 allocs/op
+BenchmarkOutboxInsertDecode/field=provenance/key=1024       	     220	   2140755 ns/op	   4292622 frame-B	 5565832 B/op	    8244 allocs/op
+BenchmarkOutboxInsertDecode/field=entries/key=16            	     206	   2457223 ns/op	    319502 frame-B	 2141323 B/op	   28724 allocs/op
+BenchmarkOutboxInsertDecode/field=entries/key=1024          	      63	   6953280 ns/op	  12722190 frame-B	14527627 B/op	   28724 allocs/op
+BenchmarkOutboxInsertDecode/field=prepared/key=16           	     181	   2285064 ns/op	    327694 frame-B	 2141324 B/op	   28724 allocs/op
+BenchmarkOutboxInsertDecode/field=prepared/key=1024         	      62	   7288344 ns/op	  12730382 frame-B	14527626 B/op	   28724 allocs/op
+BenchmarkOutboxInsertReject/field=provenance/key=16/prefix=1         	  484134	       861.6 ns/op	        92.00 frame-B	    1008 B/op	      13 allocs/op
+BenchmarkOutboxInsertReject/field=provenance/key=16/prefix=129       	   18913	     24186 ns/op	      4956 frame-B	   27353 B/op	     280 allocs/op
+BenchmarkOutboxInsertReject/field=provenance/key=1024/prefix=1       	   89068	      5323 ns/op	      2112 frame-B	    7024 B/op	      15 allocs/op
+BenchmarkOutboxInsertReject/field=provenance/key=1024/prefix=129     	    7885	     57437 ns/op	    136256 frame-B	  177761 B/op	     282 allocs/op
+BenchmarkOutboxInsertReject/field=entries/key=16/prefix=1            	  363165	      1194 ns/op	       174.0 frame-B	    1560 B/op	      22 allocs/op
+BenchmarkOutboxInsertReject/field=entries/key=16/prefix=129          	    9146	     55177 ns/op	     10158 frame-B	   68067 B/op	     929 allocs/op
+BenchmarkOutboxInsertReject/field=entries/key=1024/prefix=1          	   80479	      6374 ns/op	      6230 frame-B	    9848 B/op	      23 allocs/op
+BenchmarkOutboxInsertReject/field=entries/key=1024/prefix=129        	    3547	    141194 ns/op	    403798 frame-B	  463452 B/op	     930 allocs/op
+BenchmarkOutboxInsertReject/field=prepared/key=16/prefix=1           	  355879	      1239 ns/op	       178.0 frame-B	    1560 B/op	      22 allocs/op
+BenchmarkOutboxInsertReject/field=prepared/key=16/prefix=129         	    9279	     66865 ns/op	     10418 frame-B	   68067 B/op	     929 allocs/op
+BenchmarkOutboxInsertReject/field=prepared/key=1024/prefix=1         	   69253	      7399 ns/op	      6234 frame-B	    9848 B/op	      23 allocs/op
+BenchmarkOutboxInsertReject/field=prepared/key=1024/prefix=129       	    3448	    146378 ns/op	    404058 frame-B	  463452 B/op	     930 allocs/op
+PASS

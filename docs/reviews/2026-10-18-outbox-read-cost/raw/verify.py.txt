@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,hashlib
+p=Path('/private/tmp/stow-outbox-readcost-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');job=json.loads((p/'final-start.json').read_text());e=p/('export-'+job['id']);receipt=json.loads((e/'report-receipt.json').read_text());assert receipt['exitCode']==0 and receipt['railwayDeploymentId']==job['deploymentId']
+for name,digest in dict(receipt['sourceSHA256'],**receipt['documentSHA256']).items():assert hashlib.sha256((r/name).read_bytes()).hexdigest()==digest,name
+for phase,expected_success in [('measure',False),('final',True)]:
+ j=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+j['id']);run=json.loads((src/'run.json').read_text());assert run['complete']and run['success']==expected_success;checks=json.loads((src/'checks.json').read_text());failed=[x['name']for x in checks if not x['passed']];assert failed==(['quality']if phase=='measure'else[])
+ samples=json.loads((src/'samples.json').read_text());assert len(samples)==168
+ assert len({(s['fixture'],s['stage'],s['cpu'],s['repetition'])for s in samples})==168
+ smoke=(src/'diagnostic-race-smoke.log').read_text();assert sum(line.startswith('BenchmarkFileOutboxReadCost/')for line in smoke.splitlines())==42
+ for entry in json.loads((src/'export-receipt.json').read_text())['files']:
+  data=(src/entry['name']).read_bytes();assert len(data)==entry['bytes']and hashlib.sha256(data).hexdigest()==entry['sha256'],entry['name']
+print('Verified 336 distinct observations, both 42-case race smokes, all final checks, complete exports and exact local document/source hashes')

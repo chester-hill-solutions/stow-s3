@@ -6,8 +6,7 @@ package auth
 // Separate from the header-auth parsing because the failure it prevents is
 // different in kind. A malformed Authorization header is the client saying
 // something stow cannot read; an ambiguous presigned query is two readings of one
-// string disagreeing, and the values stow consumes come from the same string the
-// signature was computed over.
+// string disagreeing, and the values stow consumes come from the signed string.
 
 import (
 	"net/url"
@@ -97,9 +96,8 @@ func presignedCredentialScope(query url.Values) (credentialScope, error) {
 // non-integer, zero or negative, and anything past the seven-day ceiling.
 //
 // The ceiling is the only thing standing between a presigned URL and a permanent
-// one, so an unusable value is refused rather than clamped or defaulted: a
-// clamped 604801 would silently become a seven-day URL, and a defaulted one
-// would silently become whatever the default is.
+// one, so an unusable value is refused rather than clamped: a clamped 604801
+// would silently become a seven-day URL.
 func presignedExpiry(query url.Values) (int, error) {
 	raw, err := authQueryValue(query, "X-Amz-Expires")
 	if err != nil {
@@ -128,12 +126,10 @@ func presignedSignedHeaders(query url.Values) ([]string, error) {
 //
 // Exact match, because the signed query and the values read here are two readings
 // of the same string: an interpretation that treats X-Amz-Date and x-amz-date as
-// one parameter can be handed a query where the two spellings disagree and answer
-// with a different value than the one that was signed.
+// one parameter can be handed a query where the two spellings disagree.
 //
 // Refused rather than resolved when it appears more than once, or under another
-// spelling, because there is no correct choice to make. Picking one would make
-// what stow authenticates depend on iteration order.
+// spelling, because there is no correct choice to make.
 func authQueryValue(query url.Values, key string) (string, error) {
 	values, exact := query[key]
 	if !exact {

@@ -1,6 +1,7 @@
 package runthrough
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -9,13 +10,18 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
 )
 
 type FileOutbox struct {
-	path     string
-	lockPath string
-	mu       sync.Mutex
-	state    outboxState
+	path          string
+	lockPath      string
+	mu            sync.Mutex
+	state         outboxState
+	journalSeen   bool
+	nativeJournal bool
+	validatedData []byte
 }
 
 type persistedOutbox struct {
@@ -47,70 +53,60 @@ func NewFileOutbox(path string) (*FileOutbox, error) {
 }
 
 func decodeOutboxState(data []byte) (outboxState, error) {
+	if len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic {
+		return decodeOutboxProto(data)
+	}
+	return decodeLegacyOutboxState(data)
+}
+
+func decodeLegacyOutboxState(data []byte) (outboxState, error) {
 	var persisted persistedOutbox
 	if err := json.Unmarshal(data, &persisted); err != nil {
 		return outboxState{}, fmt.Errorf("decode outbox: %w", err)
 	}
-	if persisted.Version < 0 || persisted.Version > outboxFormatVersion {
+	if persisted.Version < 0 || persisted.Version > outboxLegacyJSONVersion {
 		return outboxState{}, fmt.Errorf("%w: file declares version %d, this writer supports 0-%d",
-			ErrOutboxFormatVersion, persisted.Version, outboxFormatVersion)
+			ErrOutboxFormatVersion, persisted.Version, outboxLegacyJSONVersion)
 	}
 	if persisted.Entries == nil && persisted.Prepared == nil {
 		var legacy map[string]OutboxEntry
 		if err := json.Unmarshal(data, &legacy); err != nil {
 			return outboxState{}, fmt.Errorf("decode legacy outbox: %w", err)
 		}
+		if legacy == nil {
+			return outboxState{}, fmt.Errorf("decode legacy outbox: expected object snapshot")
+		}
 		persisted.Entries = legacy
 	}
-	if persisted.Entries == nil {
-		persisted.Entries = make(map[string]OutboxEntry)
-	}
-	if persisted.Prepared == nil {
-		persisted.Prepared = make(map[string]OutboxEntry)
-	}
-	for id, entry := range persisted.Entries {
-		if !entry.Prepared {
-			continue
-		}
-		delete(persisted.Entries, id)
-		persisted.Prepared[id] = entry
-	}
-	for id := range persisted.Prepared {
-		if _, exists := persisted.Entries[id]; exists {
-			return outboxState{}, fmt.Errorf("outbox entry %q is both prepared and active", id)
-		}
-	}
-	if persisted.Provenance == nil {
-		persisted.Provenance = make(map[string]UpstreamState)
-	}
-	migrateOutboxAttempts(persisted.Entries)
-	migrateOutboxAttempts(persisted.Prepared)
-	return outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken}, nil
+	return normalizeDecodedOutboxState(outboxState{provenance: persisted.Provenance, entries: persisted.Entries, prepared: persisted.Prepared, seq: persisted.Seq, nextToken: persisted.NextToken})
 }
 
-// migrateOutboxAttempts marks entries written by a format that kept an attempt count
-// but no marker of whether the attempt reached upstream, so the next claim reconciles
-// them against upstream before propagating again.
-func migrateOutboxAttempts(entries map[string]OutboxEntry) {
+// normalizeOutboxEntries validates entry IDs and marks historical attempts for
+// upstream reconciliation. Older formats recorded an attempt count without
+// recording whether that attempt reached upstream.
+func normalizeOutboxEntries(entries map[string]OutboxEntry) error {
 	for id, entry := range entries {
+		if entry.ID != id {
+			return fmt.Errorf("outbox entry identity %q does not match ID %q", id, entry.ID)
+		}
 		if !entry.Attempted && entry.Attempts > 0 {
 			entry.Attempted = true
 			entries[id] = entry
 		}
 	}
+	return nil
 }
 
 func (o *FileOutbox) reloadLocked() error {
-	data, err := os.ReadFile(o.path)
-	if os.IsNotExist(err) {
+	data, err := readOutboxFile(o.path)
+	if os.IsNotExist(err) && !o.journalSeen {
 		o.state = newOutboxState()
 		return nil
 	}
 	if err != nil {
 		return err
 	}
-	if len(data) == 0 {
-		o.state = newOutboxState()
+	if o.validatedData != nil && bytes.Equal(data, o.validatedData) {
 		return nil
 	}
 	state, err := decodeOutboxState(data)
@@ -118,8 +114,11 @@ func (o *FileOutbox) reloadLocked() error {
 		return err
 	}
 	o.state = state
+	o.journalSeen = true
+	o.nativeJournal = len(data) >= len(outboxProtoMagic) && string(data[:len(outboxProtoMagic)]) == outboxProtoMagic
 	o.updateSequences()
 	o.updateTokens()
+	o.validatedData = data
 	return nil
 }
 
@@ -158,47 +157,47 @@ func (o *FileOutbox) updateSequence(id string) {
 	}
 }
 
-func (o *FileOutbox) withState(update func(*outboxState) error) (err error) {
-	o.mu.Lock()
-	defer o.mu.Unlock()
-	lock, err := acquireOutboxFileLock(o.lockPath)
-	if err != nil {
+func (o *FileOutbox) withState(update func(*outboxState) error) error {
+	return o.withLockedState(func(state outboxState) error {
+		next := state.clone()
+		if err := update(&next); err != nil {
+			return err
+		}
+		return o.commitState(next)
+	})
+}
+
+func (o *FileOutbox) commitState(state outboxState) error {
+	o.validatedData = nil
+	if err := o.persistState(state); err != nil {
 		return err
 	}
-	defer func() { _ = lock.release() }()
-	if err := o.reloadLocked(); err != nil {
-		return err
-	}
-	next := o.state.clone()
-	if err := update(&next); err != nil {
-		return err
-	}
-	if err := o.persistState(next); err != nil {
-		return err
-	}
-	o.state = next
+	o.state = state
+	o.journalSeen = true
+	o.nativeJournal = true
 	return nil
 }
 
-func (o *FileOutbox) readState() (state outboxState, err error) {
+func (o *FileOutbox) withLockedState(operation func(outboxState) error) error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	lock, err := acquireOutboxFileLock(o.lockPath)
 	if err != nil {
-		return outboxState{}, err
+		return err
 	}
 	defer func() { _ = lock.release() }()
 	if err := o.reloadLocked(); err != nil {
-		return outboxState{}, err
+		return err
 	}
-	return o.state.clone(), nil
+	return operation(o.state)
 }
 
 func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
 	var enqueued OutboxEntry
 	err := o.withState(func(state *outboxState) error {
-		enqueued = state.enqueue(entry)
-		return nil
+		var err error
+		enqueued, err = state.enqueue(entry)
+		return err
 	})
 	if err != nil {
 		return OutboxEntry{}, err
@@ -209,8 +208,9 @@ func (o *FileOutbox) Enqueue(entry OutboxEntry) (OutboxEntry, error) {
 func (o *FileOutbox) Prepare(entry OutboxEntry) (OutboxEntry, error) {
 	var prepared OutboxEntry
 	err := o.withState(func(state *outboxState) error {
-		prepared = state.prepare(entry)
-		return nil
+		var err error
+		prepared, err = state.prepare(entry)
+		return err
 	})
 	if err != nil {
 		return OutboxEntry{}, err
@@ -229,11 +229,12 @@ func (o *FileOutbox) Prepared() []OutboxEntry {
 }
 
 func (o *FileOutbox) PreparedSnapshot() ([]OutboxEntry, error) {
-	state, err := o.readState()
+	var entries []OutboxEntry
+	err := o.withLockedState(func(state outboxState) error { entries = copyOutboxEntries(state.prepared); return nil })
 	if err != nil {
 		return nil, err
 	}
-	return state.preparedEntries(), nil
+	return sortOutboxEntries(entries), nil
 }
 
 func (o *FileOutbox) Pending() []OutboxEntry {
@@ -247,11 +248,12 @@ func (o *FileOutbox) Pending() []OutboxEntry {
 }
 
 func (o *FileOutbox) PendingSnapshot() ([]OutboxEntry, error) {
-	state, err := o.readState()
+	var entries []OutboxEntry
+	err := o.withLockedState(func(state outboxState) error { entries = copyOutboxEntries(state.entries); return nil })
 	if err != nil {
 		return nil, err
 	}
-	return state.pending(), nil
+	return sortOutboxEntries(entries), nil
 }
 
 func (o *FileOutbox) MarkSuccess(id string) error {
@@ -298,33 +300,9 @@ func (o *FileOutbox) Close() error {
 }
 
 func (o *FileOutbox) persistState(state outboxState) error {
-	data, err := json.MarshalIndent(persistedOutbox{Provenance: state.provenance, Version: outboxFormatVersion, Entries: state.entries, Prepared: state.prepared, Seq: state.seq, NextToken: state.nextToken}, "", "  ")
+	data, err := encodeOutboxProto(state)
 	if err != nil {
 		return err
 	}
-	tmp, err := os.CreateTemp(filepath.Dir(o.path), ".outbox-*")
-	if err != nil {
-		return err
-	}
-	tmpName := tmp.Name()
-	defer os.Remove(tmpName)
-	if _, err := tmp.Write(data); err != nil {
-		_ = tmp.Close()
-		return err
-	}
-	if err := tmp.Sync(); err != nil {
-		_ = tmp.Close()
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		return err
-	}
-	if err := os.Rename(tmpName, o.path); err != nil {
-		return err
-	}
-	if dirFile, err := os.Open(filepath.Dir(o.path)); err == nil {
-		_ = dirFile.Sync()
-		_ = dirFile.Close()
-	}
-	return nil
+	return atomicfile.Write(o.path, data, 0o600)
 }

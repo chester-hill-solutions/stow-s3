@@ -1,0 +1,17 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkOutboxIdentityValidation/depth=0/encode           	 3334486	       185.2 ns/op	  75.58 MB/s	     184 B/op	       3 allocs/op
+BenchmarkOutboxIdentityValidation/depth=0/encode-4         	 3193384	       182.6 ns/op	  76.65 MB/s	     184 B/op	       3 allocs/op
+BenchmarkOutboxIdentityValidation/depth=0/decode           	 2541110	       209.7 ns/op	  66.75 MB/s	     288 B/op	       4 allocs/op
+BenchmarkOutboxIdentityValidation/depth=0/decode-4         	 2623069	       243.5 ns/op	  57.50 MB/s	     288 B/op	       4 allocs/op
+BenchmarkOutboxIdentityValidation/depth=128/encode         	    4420	    141958 ns/op	 191.25 MB/s	  146336 B/op	     393 allocs/op
+BenchmarkOutboxIdentityValidation/depth=128/encode-4       	    3745	    147898 ns/op	 183.57 MB/s	  146336 B/op	     393 allocs/op
+BenchmarkOutboxIdentityValidation/depth=128/decode         	    4088	    162905 ns/op	 166.66 MB/s	  253398 B/op	    2341 allocs/op
+BenchmarkOutboxIdentityValidation/depth=128/decode-4       	    2994	    201504 ns/op	 134.74 MB/s	  253399 B/op	    2341 allocs/op
+BenchmarkOutboxIdentityValidation/depth=16384/encode       	      18	  30044155 ns/op	 115.61 MB/s	18555040 B/op	   49161 allocs/op
+BenchmarkOutboxIdentityValidation/depth=16384/encode-4     	      27	  27023814 ns/op	 128.53 MB/s	18555054 B/op	   49161 allocs/op
+BenchmarkOutboxIdentityValidation/depth=16384/decode       	      22	  31796971 ns/op	 109.24 MB/s	33525816 B/op	  295171 allocs/op
+BenchmarkOutboxIdentityValidation/depth=16384/decode-4     	      20	  26069288 ns/op	 133.24 MB/s	33525839 B/op	  295171 allocs/op
+PASS

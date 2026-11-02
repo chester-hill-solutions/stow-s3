@@ -1,0 +1,32 @@
+FROM node:25.9.0-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370 AS node
+FROM golang:1.25.6-bookworm@sha256:f4490d7b261d73af4543c46ac6597d7d101b6e1755bcdd8c5159fda7046b6b3e
+COPY --from=node /usr/local /usr/local
+ENV GOTOOLCHAIN=local GOFLAGS=-p=1 GOMAXPROCS=4 STOW_BASELINE_REF=HEAD STOW_TEST_UID=10001
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY site/package.json site/package-lock.json ./site/
+RUN npm ci --ignore-scripts --prefix site
+COPY validation-source.tar.gz /tmp/validation-source.tar.gz
+RUN mv /app/site/node_modules /tmp/node_modules \
+ && rm -rf /app && mkdir -p /app \
+ && tar -xzf /tmp/validation-source.tar.gz -C /app \
+ && rm /tmp/validation-source.tar.gz \
+ && mv /tmp/node_modules /app/site/node_modules
+RUN useradd --uid 10001 --create-home --shell /bin/sh stow-validation \
+ && chown -R stow-validation:stow-validation /app /go/pkg/mod
+# The quality and documentation gates read a Git baseline. The repository holds
+# the parent's baseline, so the gate compares the current tree against the
+# revision it replaces, exactly as it does in a checkout.
+RUN cp -r /app/scripts/baselines /tmp/current-baselines \
+ && cp /app/benchmark/validation-previous-baselines/* /app/scripts/baselines/ \
+ && git config --global --add safe.directory '*' \
+ && git init -q /app \
+ && git -C /app config user.email validation@localhost \
+ && git -C /app config user.name RailwayValidation \
+ && git -C /app add -A \
+ && git -C /app commit -q -m 'Validation fixture: parent quality baselines' \
+ && cp /tmp/current-baselines/* /app/scripts/baselines/ \
+ && rm -rf /tmp/current-baselines \
+ && chown -R stow-validation:stow-validation /app
+CMD ["node","benchmark/runner.mjs"]

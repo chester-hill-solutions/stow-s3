@@ -3,6 +3,9 @@ package storage
 import "io"
 
 func readOwnedBytes(reader io.Reader) ([]byte, error) {
+	if owned, ok := reader.(*OwnedBody); ok {
+		return owned.take()
+	}
 	var hint int64 = 512
 	if sized, ok := reader.(interface{ ReadSize() int64 }); ok {
 		hint = sized.ReadSize()

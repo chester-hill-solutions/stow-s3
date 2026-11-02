@@ -1,0 +1,49 @@
+package capacity
+
+import (
+ "bytes"
+ "context"
+ "encoding/json"
+ "fmt"
+ "os"
+ "runtime"
+ "strings"
+ "syscall"
+ "testing"
+)
+
+func BenchmarkLedgerIsolation(b *testing.B) {
+ root:=os.Getenv("STOW_BENCH_ROOT")
+ if !strings.HasPrefix(root,"/results/") { b.Fatal("Railway volume required") }
+ b.Setenv("TMPDIR",root)
+ for _,count:=range []int{16,maxResources} {
+  for _,stage:=range []string{"legacy-read","bounded-read","snapshot","snapshot-gc","encode"} {
+   b.Run(fmt.Sprintf("resources=%d/stage=%s",count,stage),func(b *testing.B){
+    ns,_:=resourceCountNamespace(b,[2]int{count/2,count-count/2})
+    path:=ns.host.dir+"/capacity.json"
+    var disk syscall.Statfs_t
+    if err:=syscall.Statfs(path,&disk);err!=nil||disk.Type!=61267 { b.Fatalf("ext4 required: %v type=%d",err,disk.Type) }
+    expected,err:=os.ReadFile(path);if err!=nil { b.Fatal(err) }
+    var state hostState
+    if err:=json.Unmarshal(expected,&state);err!=nil { b.Fatal(err) }
+    var data []byte
+    b.ReportAllocs();b.ResetTimer()
+    for i:=0;i<b.N;i++ {
+     if stage=="snapshot-gc" { b.StopTimer();runtime.GC();runtime.GC();b.StartTimer() }
+     switch stage {
+     case "legacy-read":data,err=os.ReadFile(path)
+     case "bounded-read":data,err=readBoundedStateFile(path)
+     case "encode":data,err=encodeState(&state)
+     default:
+      var snapshot Snapshot
+      snapshot,err=ns.Snapshot(context.Background())
+      if err==nil&&snapshot.PayloadBytes!=int64(count) { b.Fatal("wrong snapshot") }
+     }
+     if err!=nil { b.Fatal(err) }
+    }
+    b.StopTimer()
+    if data!=nil&&!bytes.Equal(data,expected) { b.Fatal("ledger bytes changed") }
+   })
+  }
+ }
+}

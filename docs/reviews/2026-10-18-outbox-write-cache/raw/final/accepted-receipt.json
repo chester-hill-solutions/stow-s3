@@ -1,0 +1,65 @@
+{
+  "productionSourceUnchanged": true,
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox.go": "c352b972a3e3ae94a0bbc134a5b51a839a4256677cc7f7f9687ff705278121fd",
+    "internal/runthrough/file_outbox_proto.go": "c999a4f02f6ad9506b6ec09596b1faee1dd9b64da1999c36da600384f5adef19",
+    "internal/runthrough/write_cache_contract_test.go": "4b6f95cb60cf2ce81ae05faac1415bcbaf0796faff4b18f26b9365e909489e10",
+    "internal/runthrough/write_cache_retention_test.go": "7dcea327b1c7f168a90013ce879b27537fb2c59954276ab278e0874c81be7077"
+  },
+  "regressions": {
+    "focused-normal": {
+      "distinctCases": 18,
+      "passes": 36,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "TestFileOutboxOwnWriteCanonicalizesProvenance",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+        "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+        "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+        "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+        "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+        "TestFileOutboxReleasesCallerStringBuffers"
+      ]
+    },
+    "focused-race": {
+      "distinctCases": 18,
+      "passes": 36,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "TestFileOutboxOwnWriteCanonicalizesProvenance",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/enqueue/text",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/counter-fields",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/historical-attempt",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/monotonic-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/offset-time",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/ordinary",
+        "TestFileOutboxOwnWriteMatchesReopenedState/prepare/text",
+        "TestFileOutboxOwnWritePreservesCounterFences/enqueue",
+        "TestFileOutboxOwnWritePreservesCounterFences/prepare",
+        "TestFileOutboxOwnWriteRejectsChangedPeerBytes",
+        "TestFileOutboxOwnWriteReloadsAfterUncertainFence",
+        "TestFileOutboxReleasesCallerStringBuffers"
+      ]
+    }
+  },
+  "allChecksPassed": true,
+  "checks": 15
+}

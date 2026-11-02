@@ -1,0 +1,48 @@
+{
+  "phase": "filesystem-completion-before",
+  "sources": [
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/fs_test.go",
+    "internal/runtime/completion_cleanup_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/fs_test.go",
+        "internal/runtime/completion_cleanup_test.go"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "./internal/runtime",
+        "-run",
+        "^TestFilesystem(StoreMultipartCompletionReportsCleanupFailureAndCanRecover|CompletionCleanupOutcome)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "./internal/runtime",
+        "-run",
+        "^TestFilesystem(StoreMultipartCompletionReportsCleanupFailureAndCanRecover|CompletionCleanupOutcome)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

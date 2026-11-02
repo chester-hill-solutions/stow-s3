@@ -1,0 +1,43 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-insert.md": "102f8290628a490fa1e3b0e78fdba1cb4ef3e303f9dd4c7952c3ffc751f6399f"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox_proto_decode.go": "530d7adcf647401e051dc56894a267f1e6419900f769549e6892ba0610af9b04",
+    "internal/runthrough/outbox_interleaved_identity_test.go": "5e4e7539ee0cba067ce7dcd5336cd4be2f18ecc348f8613bef2fc6ed9b27fa13",
+    "internal/runthrough/outbox_duplicate_boundary_test.go": "cd06cce60295f5224e319393b674f2aa4506e8e292bc310e4c7654352ddd2992"
+  },
+  "railwayDeploymentId": "c47e63ce-668d-4c8b-ba95-3505188ff7f3"
+}

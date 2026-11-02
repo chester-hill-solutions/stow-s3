@@ -1,0 +1,214 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/file_outbox_proto_decode.go",
+      "internal/runthrough/outbox_interleaved_identity_test.go",
+      "internal/runthrough/outbox_duplicate_boundary_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 460,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutbox|TestOutbox)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3056,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutbox|TestOutbox)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 9857,
+    "passed": true
+  },
+  {
+    "name": "full-go",
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 58367,
+    "passed": true
+  },
+  {
+    "name": "broad-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/...",
+      "./internal/runtime",
+      "./internal/embedded",
+      "./internal/runthrough",
+      "./internal/s3api",
+      "./pkg/stow",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 64157,
+    "passed": true
+  },
+  {
+    "name": "conformance-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7406,
+    "passed": true
+  },
+  {
+    "name": "conformance-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3682,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 3813,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8422,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8268,
+    "passed": true
+  },
+  {
+    "name": "site-build",
+    "args": [
+      "npm",
+      "run",
+      "build",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 507,
+    "passed": true
+  },
+  {
+    "name": "site-tests",
+    "args": [
+      "npm",
+      "test",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 621,
+    "passed": true
+  },
+  {
+    "name": "doc-links",
+    "args": [
+      "node",
+      "scripts/check-doc-links.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 94,
+    "passed": true
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-17-outbox-durability.md": "df68acd65adb16091f824a9ccb35b7e915cf668497b6b94a268c466c617fb0f9",
+    "docs/outbox.md": "fd6a574d6401b4bf6a06582c9b758e37b19039cb89a98b5a02105d5aa4c63e14",
+    "docs/reviews/2026-10-17-refresh-eviction-performance.md": "49f8a99548f3e150d3a8f0b0c327d488b71b24806386e9e9bf9722948fd03642"
+  },
+  "reportSHA256": "df68acd65adb16091f824a9ccb35b7e915cf668497b6b94a268c466c617fb0f9",
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox.go": "26e168cc363219b5211195820868ea472dc71146dc2c470d5ab869efdd5bb95a",
+    "internal/runthrough/file_outbox_provenance_test.go": "9566db9edb2e37df7a0807c5a5fe7a0a29bc663ac205b31996f9342cb1a5486b",
+    "internal/runthrough/file_outbox_fence_api_test.go": "9c6d833d7e270e6f026707912ed7b41b5211fa6cec21c090502b6b086203a1f2",
+    "internal/runthrough/file_outbox_provenance_bench_test.go": "f30cef4c164112869e4b8bcfbd1926fde74cca951a30bb028b1188908804e18a"
+  },
+  "railwayDeploymentId": "dd03f42a-20b3-49c4-8a8e-4ca846213227"
+}

@@ -1,0 +1,18 @@
+COMMAND ['/private/tmp/stow-abort-retry/runtime-before.test', '-test.run=^$', '-test.bench=^BenchmarkAbort(Accounting|RetryAccounting)Lifecycle$', '-test.benchmem', '-test.benchtime=500000x', '-test.count=3', '-test.cpu=1']
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkAbortAccountingLifecycle/success         	  500000	       487.1 ns/op	     368 B/op	       5 allocs/op
+BenchmarkAbortAccountingLifecycle/success         	  500000	       488.1 ns/op	     368 B/op	       5 allocs/op
+BenchmarkAbortAccountingLifecycle/success         	  500000	       526.0 ns/op	     368 B/op	       5 allocs/op
+BenchmarkAbortAccountingLifecycle/committed       	  500000	       497.7 ns/op	     368 B/op	       5 allocs/op
+BenchmarkAbortAccountingLifecycle/committed       	  500000	       508.3 ns/op	     368 B/op	       5 allocs/op
+BenchmarkAbortAccountingLifecycle/committed       	  500000	       520.0 ns/op	     368 B/op	       5 allocs/op
+BenchmarkAbortRetryAccountingLifecycle/missing    	  500000	       363.7 ns/op	     352 B/op	       4 allocs/op
+BenchmarkAbortRetryAccountingLifecycle/missing    	  500000	       355.7 ns/op	     352 B/op	       4 allocs/op
+BenchmarkAbortRetryAccountingLifecycle/missing    	  500000	       331.8 ns/op	     352 B/op	       4 allocs/op
+BenchmarkAbortRetryAccountingLifecycle/unknown    	  500000	       315.6 ns/op	     352 B/op	       4 allocs/op
+BenchmarkAbortRetryAccountingLifecycle/unknown    	  500000	       313.9 ns/op	     352 B/op	       4 allocs/op
+BenchmarkAbortRetryAccountingLifecycle/unknown    	  500000	       313.5 ns/op	     352 B/op	       4 allocs/op
+PASS

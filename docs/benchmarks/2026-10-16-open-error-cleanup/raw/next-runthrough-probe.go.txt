@@ -1,0 +1,58 @@
+package runthrough_test
+
+import (
+ "context"
+ "errors"
+ "io"
+ "os"
+ "path/filepath"
+ "strings"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+ "github.com/chester-hill-solutions/stow-s3/internal/runtime"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type reviewRunthroughOpeningStore struct {
+ *storage.MemoryStore
+ path string
+ failure error
+ file *os.File
+ closes int
+}
+func(s *reviewRunthroughOpeningStore)GetObject(ctx context.Context,bucket,key string)(io.ReadCloser,*storage.ObjectMeta,error){
+ meta,err:=s.MemoryStore.HeadObject(ctx,bucket,key);if err!=nil{return nil,nil,err}
+ file,err:=os.Open(s.path);if err!=nil{return nil,nil,err};s.file=file
+ return &reviewRunthroughOpeningReader{File:file,store:s},meta,s.failure
+}
+type reviewRunthroughOpeningReader struct{*os.File;store *reviewRunthroughOpeningStore}
+func(r *reviewRunthroughOpeningReader)Close()error{r.store.closes++;return r.File.Close()}
+type reviewRunthroughOpeningClient struct{*mockUpstream;store *reviewRunthroughOpeningStore}
+func(c *reviewRunthroughOpeningClient)GetObject(ctx context.Context,bucket,key string)(io.ReadCloser,*storage.ObjectMeta,error){return c.store.GetObject(ctx,bucket,key)}
+
+func TestReviewRunthroughDropsOpeningReader(t *testing.T){
+ for _,source:=range []string{"local","upstream"}{
+  t.Run(source,func(t *testing.T){
+   ctx:=context.Background();base:=storage.NewMemoryStore()
+   if err:=base.CreateBucket(ctx,"probe");err!=nil{t.Fatal(err)}
+   if _,err:=base.PutObject(ctx,"probe","target",strings.NewReader("old"),storage.PutOptions{});err!=nil{t.Fatal(err)}
+   path:=filepath.Join(t.TempDir(),"body");if err:=os.WriteFile(path,[]byte("old"),0600);err!=nil{t.Fatal(err)}
+   failure:=errors.New("provider opening failed")
+   store:=&reviewRunthroughOpeningStore{MemoryStore:base,path:path,failure:failure}
+   var local storage.Store=store
+   if source=="upstream"{local=storage.NewMemoryStore();if err:=local.CreateBucket(ctx,"probe");err!=nil{t.Fatal(err)}}
+   adapter:=runthrough.NewWithCache(runthrough.Config{Policy:runthrough.PolicyReadThroughCache},local,storage.NewMemoryStore(),&reviewRunthroughOpeningClient{newMockUpstream(),store})
+   instance,err:=runtime.OpenWithStore(runtime.Options{Backend:runtime.BackendMemory},adapter,nil);if err!=nil{t.Fatal(err)}
+   defer instance.Close()
+   defer func(){if store.file!=nil{_ = store.file.Close()}}()
+   before:=instance.Usage()
+   reader,_,err:=instance.OpenObject(ctx,"probe","target")
+   if reader!=nil || err!=failure{t.Fatalf("opening contract: reader=%v error=%v",reader,err)}
+   if store.closes!=1{_,statErr:=store.file.Stat();t.Errorf("run-through discarded opening reader: closes=%d file_still_open=%t",store.closes,statErr==nil)}
+   if instance.Usage()!=before{t.Error("opening error changed usage")}
+   _ = store.file.Close();store.file=nil;store.failure=nil
+   healthy,err:=instance.GetObject(ctx,"probe","target");if err!=nil || string(healthy.Data)!="old"{t.Fatalf("retry=%q error=%v",healthy.Data,err)}
+  })
+ }
+}

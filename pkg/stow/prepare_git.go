@@ -9,58 +9,58 @@ import (
 	"strings"
 )
 
-// cloneGitRepositories fetches one explicit commit into a fresh shallow
-// repository. Its history is independent and its lifetime matches the owned
-// workspace; the source repository gets no worktree registration.
-func cloneGitRepositories(root string, inputs []GitRepositoryInput, includeSensitive bool) (int64, int64, []PreparedRepository, error) {
+// cloneGitRepositories shallow-clones explicit commits into owned task repositories.
+// The source gains no worktree registrations and retains its independent lifetime.
+func cloneGitRepositories(root string, inputs []GitRepositoryInput, totals *seedContext) ([]PreparedRepository, error) {
 	if len(inputs) == 0 {
-		return 0, 0, nil, nil
+		return nil, nil
 	}
 	hooksDirectory := filepath.Join(root, ".stow", "disabled-hooks")
 	if err := os.MkdirAll(hooksDirectory, 0o700); err != nil {
-		return 0, 0, nil, fmt.Errorf("stow: prepare an empty Git hooks directory: %w", err)
+		return nil, fmt.Errorf("stow: prepare an empty Git hooks directory: %w", err)
 	}
-	return prepareGitInputs(root, hooksDirectory, inputs, includeSensitive)
+	return prepareGitInputs(root, hooksDirectory, inputs, totals)
 }
 
-func prepareGitInputs(root, hooksDirectory string, inputs []GitRepositoryInput, includeSensitive bool) (int64, int64, []PreparedRepository, error) {
-	var totalBytes, totalObjects int64
+func prepareGitInputs(root, hooksDirectory string, inputs []GitRepositoryInput, totals *seedContext) ([]PreparedRepository, error) {
 	prepared := make([]PreparedRepository, 0, len(inputs))
 	for _, input := range inputs {
-		repository, bytes, objects, err := prepareGitInput(root, hooksDirectory, input, includeSensitive)
+		repository, err := prepareGitInput(root, hooksDirectory, input, totals)
 		if err != nil {
-			return 0, 0, nil, err
+			return nil, err
 		}
-		if bytes > int64(^uint64(0)>>1)-totalBytes || objects > int64(^uint64(0)>>1)-totalObjects {
-			return 0, 0, nil, fmt.Errorf("stow: Git seed totals exceed supported limits")
-		}
-		totalBytes += bytes
-		totalObjects += objects
 		prepared = append(prepared, repository)
 	}
-	return totalBytes, totalObjects, prepared, nil
+	return prepared, nil
 }
 
-func prepareGitInput(root, hooksDirectory string, input GitRepositoryInput, includeSensitive bool) (PreparedRepository, int64, int64, error) {
+func prepareGitInput(root, hooksDirectory string, input GitRepositoryInput, totals *seedContext) (PreparedRepository, error) {
 	source, commit, err := resolveGitInput(input)
 	if err != nil {
-		return PreparedRepository{}, 0, 0, err
+		return PreparedRepository{}, err
+	}
+	checkoutBudget := *totals
+	if err := admitGitTree(source, commit, &checkoutBudget); err != nil {
+		return PreparedRepository{}, err
 	}
 	destination, err := safeDestination(root, input.Destination)
 	if err != nil {
-		return PreparedRepository{}, 0, 0, fmt.Errorf("stow: invalid Git destination %q: %w", input.Destination, err)
+		return PreparedRepository{}, fmt.Errorf("stow: invalid Git destination %q: %w", input.Destination, err)
 	}
 	if err := initializeTaskRepository(destination); err != nil {
-		return PreparedRepository{}, 0, 0, err
+		return PreparedRepository{}, err
 	}
-	if err := fetchAndCheckout(destination, hooksDirectory, source, commit, input); err != nil {
-		return PreparedRepository{}, 0, 0, err
+	if err := fetchAndCheckout(destination, hooksDirectory, source, commit, &checkoutBudget); err != nil {
+		return PreparedRepository{}, err
 	}
-	bytes, objects, err := measureGitSeed(destination, includeSensitive)
+	bytes, objects, err := measureGitSeed(destination, totals.includeSensitive)
 	if err != nil {
-		return PreparedRepository{}, 0, 0, err
+		return PreparedRepository{}, err
 	}
-	return PreparedRepository{Source: source, Destination: filepath.ToSlash(input.Destination), Ref: input.Ref, Commit: commit}, bytes, objects, nil
+	if err := totals.add(bytes, objects); err != nil {
+		return PreparedRepository{}, err
+	}
+	return PreparedRepository{Source: source, Destination: filepath.ToSlash(input.Destination), Ref: input.Ref, Commit: commit}, nil
 }
 
 func resolveGitInput(input GitRepositoryInput) (string, string, error) {
@@ -92,15 +92,22 @@ func initializeTaskRepository(destination string) error {
 	return nil
 }
 
-func fetchAndCheckout(destination, hooksDirectory, source, commit string, input GitRepositoryInput) error {
+func fetchAndCheckout(destination, hooksDirectory, source, commit string, budget *seedContext) error {
 	if _, err := gitCommand(destination, "-c", "protocol.file.allow=always", "fetch", "--no-tags", "--depth=1", "--no-recurse-submodules", "--", source, commit); err != nil {
-		return fmt.Errorf("stow: fetch Git ref %q from %q: %w", input.Ref, input.Source, err)
-	}
-	if _, err := gitCommand(destination, "-c", "core.hooksPath="+hooksDirectory, "checkout", "--detach", "--no-recurse-submodules", "FETCH_HEAD"); err != nil {
-		return fmt.Errorf("stow: check out Git ref %q: %w", input.Ref, err)
+		return fmt.Errorf("stow: fetch Git commit %q from %q: %w", commit, source, err)
 	}
 	if err := os.Remove(filepath.Join(destination, ".git", "FETCH_HEAD")); err != nil {
 		return fmt.Errorf("stow: remove temporary Git fetch metadata: %w", err)
+	}
+	bytes, objects, err := measureGitSeed(destination, budget.includeSensitive)
+	if err != nil {
+		return err
+	}
+	if err := budget.add(bytes, objects); err != nil {
+		return err
+	}
+	if _, err := gitCommand(destination, "-c", "core.hooksPath="+hooksDirectory, "checkout", "--detach", "--no-recurse-submodules", commit); err != nil {
+		return fmt.Errorf("stow: check out Git commit %q: %w", commit, err)
 	}
 	actual, err := gitOutput(destination, "rev-parse", "HEAD")
 	if err != nil || strings.TrimSpace(actual) != commit {
@@ -157,6 +164,15 @@ func gitOutput(directory string, args ...string) (string, error) {
 }
 
 func gitCommand(directory string, args ...string) ([]byte, error) {
+	command := seedGitCommand(directory, args...)
+	output, err := command.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", err, strings.TrimSpace(string(output)))
+	}
+	return output, nil
+}
+
+func seedGitCommand(directory string, args ...string) *exec.Cmd {
 	commandArgs := append([]string{"-C", directory}, args...)
 	command := exec.CommandContext(context.Background(), "git", commandArgs...)
 	command.Env = append(os.Environ(),
@@ -165,9 +181,5 @@ func gitCommand(directory string, args ...string) ([]byte, error) {
 		"GIT_TERMINAL_PROMPT=0",
 		"GIT_LFS_SKIP_SMUDGE=1",
 	)
-	output, err := command.CombinedOutput()
-	if err != nil {
-		return nil, fmt.Errorf("%w: %s", err, strings.TrimSpace(string(output)))
-	}
-	return output, nil
+	return command
 }

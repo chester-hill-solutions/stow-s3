@@ -1,0 +1,74 @@
+{
+  "phase": "outbox-provenance-ownership",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/outbox_proto_blocks_test.go",
+    "internal/runthrough/outbox_proto_blocks_resource_test.go",
+    "internal/runthrough/outbox_proto_blocks_bench_test.go",
+    "benchmark/provenance-file_outbox_proto.go.txt",
+    "benchmark/proto-block-provenance.json",
+    "benchmark/provenance-comparison.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_proto_blocks_resource_test.go"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxProtoBlock",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxProtoBlock",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "provenance-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/proto-block-provenance.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxProtoBlock",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "provenance-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/proto-block-provenance.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxProtoBlock",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

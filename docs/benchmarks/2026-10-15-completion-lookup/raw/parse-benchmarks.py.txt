@@ -1,0 +1,25 @@
+from pathlib import Path
+import re, json, statistics
+p=Path('/private/tmp/stow-completion-lookup')
+for prefix in ['', 'long-']:
+ data={}
+ for f in sorted(p.glob(prefix+'bench-cpu*-*.log')):
+  cpu,block,version=re.match(prefix+r'bench-cpu(\d+)-(\d+)-(before|after)',f.name).groups()
+  for line in f.read_text().splitlines():
+   m=re.match(r'(Benchmark\S+)\s+(\d+)\s+([\d.]+) ns/op\s+(\d+) B/op\s+(\d+) allocs/op',line)
+   if not m: continue
+   name,n,ns,mem,alloc=m.groups(); name=re.sub(r'-\d+$','',name)
+   row=data.setdefault((cpu,name),{'cpu':int(cpu),'case':name,'before':[],'after':[]})
+   row[version].append({'ns_per_op':float(ns),'bytes_per_op':int(mem),'allocs_per_op':int(alloc),'iterations':int(n),'source':f.name,'block':int(block)})
+ rows=[]
+ for key,row in sorted(data.items()):
+  for v in ['before','after']:
+   samples=row[v]; vals=[s['ns_per_op'] for s in samples]
+   row[v+'_summary']={'median_ns':statistics.median(vals),'min_ns':min(vals),'max_ns':max(vals),'bytes':sorted(set(s['bytes_per_op'] for s in samples)),'allocs':sorted(set(s['allocs_per_op'] for s in samples)),'samples':len(vals)}
+  row['median_delta_ns']=row['after_summary']['median_ns']-row['before_summary']['median_ns']
+  row['median_change_percent']=100*row['median_delta_ns']/row['before_summary']['median_ns']
+  rows.append(row)
+ assert len(rows)==14 and all(len(r[v])==6 for r in rows for v in ['before','after'])
+ (p/(prefix+'measurements.json')).write_text(json.dumps(rows,indent=2)+'\n')
+ for row in rows:
+  print(prefix or 'initial',row['cpu'],row['case'],row['before_summary']['median_ns'],row['after_summary']['median_ns'],round(row['median_change_percent'],1))

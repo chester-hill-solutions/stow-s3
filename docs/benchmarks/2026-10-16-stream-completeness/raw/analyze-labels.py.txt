@@ -1,0 +1,14 @@
+from pathlib import Path
+import re,json,statistics
+p=Path('/private/tmp/stow-stream-completeness-2026-10-16');rows={}
+for m in re.finditer(r'(BenchmarkStreamMatched/\S+)\s+(\d+)\s+([\d.]+) ns/op\s+(\d+) B/op\s+(\d+) allocs/op',(p/'matched.log').read_text()):
+ name,n,ns,b,a=m.groups();cpu=8 if name.endswith('-8') else 1;name=re.sub(r'-\d+$','',name);case,label=name.removeprefix('BenchmarkStreamMatched/').rsplit('/',1)
+ rows.setdefault((cpu,case),{}).setdefault(label,[]).append({'n':int(n),'ns':float(ns),'bytes':int(b),'allocs':int(a)})
+result=[]
+for (cpu,case),labels in sorted(rows.items()):
+ assert len(labels)==4 and all(len(v)==6 for v in labels.values())
+ ver={v:[s for label,ss in labels.items() if label.startswith(v) for s in ss] for v in ['before','after']};med={v:statistics.median(s['ns'] for s in ss) for v,ss in ver.items()}
+ controls={v:100*(statistics.median(s['ns'] for s in labels[v+'-b'])/statistics.median(s['ns'] for s in labels[v+'-a'])-1) for v in ver}
+ result.append({'cpu':cpu,'case':case,'labels':labels,'median_ns':med,'median_change_pct':100*(med['after']/med['before']-1),'same_code_label_median_change_pct':controls})
+assert len(result)==10
+(p/'matched-measurements.json').write_text(json.dumps(result,indent=2)+'\n')

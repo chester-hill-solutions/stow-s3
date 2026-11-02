@@ -1,0 +1,16 @@
+from pathlib import Path
+from collections import Counter
+import re,json,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-clone-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');d=p/('export-'+json.loads((p/'final-start.json').read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==4 and all(x['passed']for x in checks)
+rx=re.compile(r'^--- (PASS|FAIL|SKIP): ((?:TestOutboxStateClone|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers)\S*)');out={}
+for name in ['focused-normal','focused-race']:
+ counts=Counter();t=(d/(name+'.log')).read_text()
+ for line in t.splitlines():
+  m=rx.match(line.strip())
+  if m:counts[(m[1],m[2])]+=1
+ leaves={n for s,n in counts if not any(other.startswith(n+'/')for _,other in counts)};assert len(leaves)==28 and all(counts.get(('PASS',n))==2 for n in leaves);assert not any(s in ['FAIL','SKIP']for s,n in counts)
+ capacities=[json.loads(line.removeprefix('STOWCLONECAPACITY: '))for line in t.splitlines()if line.startswith('STOWCLONECAPACITY: ')];assert len(capacities)==2 and all(x['growth']<2<<20 for x in capacities)
+ out[name]={'distinctCases':28,'passes':56,'failed':0,'skipped':0,'cases':sorted(leaves),'capacity':capacities}
+env=json.loads((d/'environment.json').read_text());base=json.loads((p/'baseline.json').read_text())['base'];assert hashlib.sha256(subprocess.check_output(['git','show',base+':internal/runthrough/outbox.go'],cwd=r)).hexdigest()==env['sourceSHA256']['internal/runthrough/outbox.go']
+for n,h in env['sourceSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+(d/'green-receipt.json').write_text(json.dumps({'regressions':out,'sourceSHA256':env['sourceSHA256']},indent=2)+'\n');print('Final source equals baseline; 28 cases twice per focused mode, no skips, all final repair gates pass')

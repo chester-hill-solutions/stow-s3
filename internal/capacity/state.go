@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -128,9 +129,34 @@ func (h *Host) access(ctx context.Context, visit func(*hostState) error) error {
 	return visit(state)
 }
 
+func readBoundedStateFile(path string) ([]byte, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	size := info.Size()
+	if size < 0 || size > maxStateBytes {
+		return nil, ErrUnknown
+	}
+	data := make([]byte, int(size)+1)
+	n, err := io.ReadFull(file, data)
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+		return nil, err
+	}
+	if int64(n) != size {
+		return nil, ErrUnknown
+	}
+	return data[:n], nil
+}
+
 func (h *Host) read() (*hostState, error) {
 	path := filepath.Join(h.dir, "capacity.json")
-	data, err := os.ReadFile(path)
+	data, err := readBoundedStateFile(path)
 	if os.IsNotExist(err) {
 		return &hostState{Version: 1, MaxBytes: h.options.MaxBytes, MaxNamespaces: h.options.MaxNamespaces, Namespaces: map[string]*namespaceState{}}, nil
 	}
@@ -158,18 +184,29 @@ func (h *Host) read() (*hostState, error) {
 	return &state, nil
 }
 
+func stateIntegrity(data []byte) string {
+	digest := sha256.New()
+	_, _ = digest.Write([]byte("stow-capacity-v1\x00"))
+	_, _ = digest.Write(data)
+	var checksum [sha256.Size]byte
+	return hex.EncodeToString(digest.Sum(checksum[:0]))
+}
+
 func encodeState(state *hostState) ([]byte, error) {
 	state.Integrity = ""
 	data, err := json.Marshal(state)
 	if err != nil {
 		return nil, err
 	}
-	digest := sha256.Sum256(append([]byte("stow-capacity-v1\x00"), data...))
-	state.Integrity = hex.EncodeToString(digest[:])
+	state.Integrity = stateIntegrity(data)
 	return json.Marshal(state)
 }
 
 func (h *Host) write(state *hostState) error {
+	return h.persist(state, false)
+}
+
+func (h *Host) persist(state *hostState, unchanged bool) error {
 	data, err := encodeState(state)
 	if err != nil {
 		return err
@@ -180,8 +217,11 @@ func (h *Host) write(state *hostState) error {
 	if err := checkCapacity(state, int64(len(data))*2); err != nil {
 		return err
 	}
-	if err := atomicfile.Write(filepath.Join(h.dir, "capacity.json"), data, 0o600); err != nil {
-		return errors.Join(ErrUnknown, err)
+	path := filepath.Join(h.dir, "capacity.json")
+	if !unchanged || atomicfile.SyncExisting(path, 0o600) != nil {
+		if err := atomicfile.Write(path, data, 0o600); err != nil {
+			return errors.Join(ErrUnknown, err)
+		}
 	}
 	return syncAncestors(h.dir)
 }

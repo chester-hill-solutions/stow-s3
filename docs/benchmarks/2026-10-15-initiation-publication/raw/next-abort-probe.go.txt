@@ -1,0 +1,58 @@
+package stow_test
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
+)
+
+type reviewCommittedAbortStore struct{ *initiationPublicationStore }
+
+func (s *reviewCommittedAbortStore) AbortMultipartUpload(ctx context.Context, id string) error {
+	if err := s.initiationPublicationStore.AbortMultipartUpload(ctx, id); err != nil {
+		return err
+	}
+	return errors.Join(stow.ErrMutationCommitted, errors.New("after upload abort"))
+}
+
+func TestReviewCommittedAbortReleasesQuota(t *testing.T) {
+	ctx := context.Background()
+	store := &reviewCommittedAbortStore{&initiationPublicationStore{partPublicationStore: &partPublicationStore{singlePartPublicationStore: newSinglePartPublicationStore()}}}
+	outer, err := stow.Open(stow.Options{Store: store, MaxBytes: 4, MaxObjects: 1, MaxMultipartUploads: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outer.Close()
+	if err := outer.CreateBucket(ctx, "probe"); err != nil {
+		t.Fatal(err)
+	}
+	inner := embedded.UnwrapInstance(outer)
+	upload, err := inner.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := inner.UploadPart(ctx, upload.UploadID, 1, storage.NewOwnedBody([]byte("part"))); err != nil {
+		t.Fatal(err)
+	}
+	abortErr := inner.AbortMultipartUpload(ctx, upload.UploadID)
+	if !errors.Is(abortErr, stow.ErrMutationCommitted) {
+		t.Fatal(abortErr)
+	}
+	actual, listErr := store.ListMultipartUploads(ctx, "probe")
+	if listErr != nil || len(actual) != 0 || len(store.body) != 0 {
+		t.Fatalf("invalid probe: uploads=%+v body=%q error=%v", actual, store.body, listErr)
+	}
+	_, putErr := outer.PutObject(ctx, "probe", "other", []byte("body"), stow.PutOptions{})
+	_, createErr := inner.CreateMultipartUpload(ctx, "probe", "other", storage.MultipartOptions{})
+	t.Logf("actual uploads after abort=0 actual part bytes=0 abort-error=%v put-error=%v initiation-error=%v usage=%+v", abortErr, putErr, createErr, outer.Usage())
+	if putErr != nil {
+		t.Errorf("committed abort left object/byte reservations: %v", putErr)
+	}
+	if createErr != nil {
+		t.Errorf("committed abort left session quota: %v", createErr)
+	}
+}

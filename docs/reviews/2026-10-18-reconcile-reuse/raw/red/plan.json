@@ -1,0 +1,45 @@
+{
+  "phase": "reconcile-reuse-original-proof",
+  "sources": [
+    "internal/capacity/state.go",
+    "internal/capacity/admission.go",
+    "internal/capacity/reconcile_unchanged_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/reconcile_unchanged_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/capacity",
+        "-run",
+        "^TestReconcileUnchanged",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/capacity",
+        "-run",
+        "^TestReconcileUnchanged",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

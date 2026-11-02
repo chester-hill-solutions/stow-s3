@@ -149,6 +149,8 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 	committed := false
 	defer func() { resultErr = discardOnFailure(resultErr, ws, &committed) }()
 
+	limits := ws.Capabilities()
+	options.MaxBytes, options.MaxObjects = limits.MaxBytes, limits.MaxObjects
 	bytes, objects, repositories, err := seedPreparedWorkspace(root, options)
 	if err != nil {
 		return nil, err
@@ -184,19 +186,15 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 }
 
 func seedPreparedWorkspace(root string, options PrepareOptions) (int64, int64, []PreparedRepository, error) {
-	bytes, objects, repositories, err := cloneGitRepositories(root, options.Repositories, options.IncludeSensitiveInputs)
+	totals := &seedContext{includeSensitive: options.IncludeSensitiveInputs, maxBytes: options.MaxBytes, maxObjects: options.MaxObjects}
+	repositories, err := cloneGitRepositories(root, options.Repositories, totals)
 	if err != nil {
 		return 0, 0, nil, err
 	}
-	inputBytes, inputObjects, err := seedWorkspaceInputs(root, options.Inputs, options.IncludeSensitiveInputs)
-	if err != nil {
+	if err := seedWorkspaceInputs(root, options.Inputs, totals); err != nil {
 		return 0, 0, nil, err
 	}
-	maxInt64 := int64(^uint64(0) >> 1)
-	if inputBytes > maxInt64-bytes || inputObjects > maxInt64-objects {
-		return 0, 0, nil, fmt.Errorf("stow: seeded totals exceed supported limits")
-	}
-	return bytes + inputBytes, objects + inputObjects, repositories, nil
+	return totals.bytes, totals.objects, repositories, nil
 }
 
 func openPreparedWorkspace(options WorkspaceOptions, root string) (*Workspace, error) {
@@ -232,21 +230,20 @@ func validatePrepareRoot(dir string) (string, error) {
 	return root, nil
 }
 
-func seedWorkspaceInputs(root string, inputs []WorkspaceInput, includeSensitive bool) (int64, int64, error) {
-	totals := &seedContext{includeSensitive: includeSensitive}
+func seedWorkspaceInputs(root string, inputs []WorkspaceInput, totals *seedContext) error {
 	for _, input := range inputs {
 		if strings.TrimSpace(input.Source) == "" {
-			return 0, 0, fmt.Errorf("stow: input source is required")
+			return fmt.Errorf("stow: input source is required")
 		}
 		destination, err := safeDestination(root, input.Destination)
 		if err != nil {
-			return 0, 0, fmt.Errorf("stow: invalid input destination %q: %w", input.Destination, err)
+			return fmt.Errorf("stow: invalid input destination %q: %w", input.Destination, err)
 		}
 		if err := copySeed(input.Source, destination, totals); err != nil {
-			return 0, 0, fmt.Errorf("stow: seed %q: %w", input.Source, err)
+			return fmt.Errorf("stow: seed %q: %w", input.Source, err)
 		}
 	}
-	return totals.bytes, totals.objects, nil
+	return nil
 }
 
 func prepareWorkingDirectory(root, relative string) (string, error) {

@@ -1,0 +1,821 @@
+﻿2026-10-19T00:47:04.6332350Z Current runner version: '2.337.0'
+2026-10-19T00:47:04.6348435Z ##[group]Runner Image Provisioner
+2026-10-19T00:47:04.6349057Z Hosted Compute Agent
+2026-10-19T00:47:04.6349368Z Version: 20261002.596
+2026-10-19T00:47:04.6349687Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-19T00:47:04.6350117Z Build Date: 2026-10-02T22:28:27Z
+2026-10-19T00:47:04.6350476Z Worker ID: {449c62d1-0495-4ce9-bea9-009eb1c36659}
+2026-10-19T00:47:04.6350864Z Region: westus2
+2026-10-19T00:47:04.6351173Z Cloud: Azure
+2026-10-19T00:47:04.6351477Z ##[endgroup]
+2026-10-19T00:47:04.6352232Z ##[group]Operating System
+2026-10-19T00:47:04.6352633Z Microsoft Windows Server 2025
+2026-10-19T00:47:04.6352962Z 10.0.26100
+2026-10-19T00:47:04.6353275Z Datacenter
+2026-10-19T00:47:04.6353590Z ##[endgroup]
+2026-10-19T00:47:04.6353871Z ##[group]Runner Image
+2026-10-19T00:47:04.6354208Z Image: windows-2025-vs2026
+2026-10-19T00:47:04.6354556Z Version: 20261007.264.1
+2026-10-19T00:47:04.6355324Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261007.264/images/windows/Windows2025-VS2026-Readme.md
+2026-10-19T00:47:04.6356510Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261007.264
+2026-10-19T00:47:04.6357018Z ##[endgroup]
+2026-10-19T00:47:04.6357648Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T00:47:04.6358899Z Contents: read
+2026-10-19T00:47:04.6359185Z Metadata: read
+2026-10-19T00:47:04.6359506Z ##[endgroup]
+2026-10-19T00:47:04.6360763Z Secret source: Actions
+2026-10-19T00:47:04.6361208Z Cache mode: write
+2026-10-19T00:47:04.6361550Z Prepare workflow directory
+2026-10-19T00:47:04.6564422Z Prepare all required actions
+2026-10-19T00:47:04.6596777Z Getting action download info
+2026-10-19T00:47:04.9545181Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-10-19T00:47:05.0275309Z Download action repository 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+2026-10-19T00:47:05.3412465Z Complete job name: Filesystem tests (windows-latest)
+2026-10-19T00:47:05.4236929Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-10-19T00:47:05.4237704Z with:
+2026-10-19T00:47:05.4237944Z   repository: chester-hill-solutions/stow-s3
+2026-10-19T00:47:05.4239909Z   token: ***
+2026-10-19T00:47:05.4240120Z   ssh-strict: true
+2026-10-19T00:47:05.4240339Z   ssh-user: git
+2026-10-19T00:47:05.4240560Z   persist-credentials: true
+2026-10-19T00:47:05.4240806Z   clean: true
+2026-10-19T00:47:05.4241037Z   sparse-checkout-cone-mode: true
+2026-10-19T00:47:05.4241295Z   fetch-depth: 1
+2026-10-19T00:47:05.4241513Z   fetch-tags: false
+2026-10-19T00:47:05.4241732Z   show-progress: true
+2026-10-19T00:47:05.4241953Z   lfs: false
+2026-10-19T00:47:05.4242160Z   submodules: false
+2026-10-19T00:47:05.4242385Z   set-safe-directory: true
+2026-10-19T00:47:05.4242640Z   allow-unsafe-pr-checkout: false
+2026-10-19T00:47:05.4243018Z ##[endgroup]
+2026-10-19T00:47:05.5203140Z Syncing repository: chester-hill-solutions/stow-s3
+2026-10-19T00:47:05.5204501Z ##[group]Getting Git version info
+2026-10-19T00:47:05.5204921Z Working directory is 'D:\a\stow-s3\stow-s3'
+2026-10-19T00:47:05.5615162Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-10-19T00:47:05.8343820Z git version 2.56.0.windows.2
+2026-10-19T00:47:05.8384541Z ##[endgroup]
+2026-10-19T00:47:05.8395776Z Temporarily overriding HOME='D:\a\_temp\a18ee1c8-75ae-4e8a-a612-b741188dd719' before making global git config changes
+2026-10-19T00:47:05.8397542Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T00:47:05.8403180Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\stow-s3\stow-s3
+2026-10-19T00:47:05.8909255Z Deleting the contents of 'D:\a\stow-s3\stow-s3'
+2026-10-19T00:47:05.8912719Z ##[group]Determining repository object format
+2026-10-19T00:47:05.8914293Z ##[endgroup]
+2026-10-19T00:47:05.8916228Z ##[group]Initializing the repository
+2026-10-19T00:47:05.8920278Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\stow-s3\stow-s3
+2026-10-19T00:47:05.9548874Z Initialized empty Git repository in D:/a/stow-s3/stow-s3/.git/
+2026-10-19T00:47:05.9580261Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/chester-hill-solutions/stow-s3
+2026-10-19T00:47:06.0056047Z ##[endgroup]
+2026-10-19T00:47:06.0056439Z ##[group]Disabling automatic garbage collection
+2026-10-19T00:47:06.0062230Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-10-19T00:47:06.0293984Z ##[endgroup]
+2026-10-19T00:47:06.0294570Z ##[group]Setting up auth
+2026-10-19T00:47:06.0294957Z Removing SSH command configuration
+2026-10-19T00:47:06.0302063Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T00:47:06.0541504Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-10-19T00:47:07.0895770Z Removing HTTP extra header
+2026-10-19T00:47:07.0901893Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T00:47:07.1149103Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-10-19T00:47:07.5016306Z Removing includeIf entries pointing to credentials config files
+2026-10-19T00:47:07.5023586Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T00:47:07.5283696Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-10-19T00:47:07.9112529Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-10-19T00:47:07.9364220Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/stow-s3/stow-s3/.git.path D:\a\_temp\git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:07.9603217Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/stow-s3/stow-s3/.git/worktrees/*.path D:\a\_temp\git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:08.0035571Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:08.0296383Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:08.0540769Z ##[endgroup]
+2026-10-19T00:47:08.0541242Z ##[group]Fetching the repository
+2026-10-19T00:47:08.0548745Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +45e9782e6e0836f5350ce55204bdfe711c0d2e0a:refs/remotes/pull/78/merge
+2026-10-19T00:47:11.5925262Z From https://github.com/chester-hill-solutions/stow-s3
+2026-10-19T00:47:11.5925933Z  * [new ref]         45e9782e6e0836f5350ce55204bdfe711c0d2e0a -> pull/78/merge
+2026-10-19T00:47:11.5955901Z ##[endgroup]
+2026-10-19T00:47:11.5956455Z ##[group]Determining the checkout info
+2026-10-19T00:47:11.5956884Z ##[endgroup]
+2026-10-19T00:47:11.5963061Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-10-19T00:47:11.6307749Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-10-19T00:47:11.6552475Z ##[group]Checking out the ref
+2026-10-19T00:47:11.6555988Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force refs/remotes/pull/78/merge
+2026-10-19T00:47:12.7339548Z Updating files:  44% (6385/14421)
+2026-10-19T00:47:12.7465846Z Updating files:  45% (6490/14421)
+2026-10-19T00:47:12.7586928Z Updating files:  46% (6634/14421)
+2026-10-19T00:47:12.7747401Z Updating files:  47% (6778/14421)
+2026-10-19T00:47:12.7881762Z Updating files:  48% (6923/14421)
+2026-10-19T00:47:12.8010965Z Updating files:  49% (7067/14421)
+2026-10-19T00:47:12.8698386Z Updating files:  50% (7211/14421)
+2026-10-19T00:47:12.8838074Z Updating files:  51% (7355/14421)
+2026-10-19T00:47:12.8996391Z Updating files:  52% (7499/14421)
+2026-10-19T00:47:12.9174917Z Updating files:  53% (7644/14421)
+2026-10-19T00:47:12.9344157Z Updating files:  54% (7788/14421)
+2026-10-19T00:47:12.9531587Z Updating files:  55% (7932/14421)
+2026-10-19T00:47:12.9681331Z Updating files:  56% (8076/14421)
+2026-10-19T00:47:12.9874509Z Updating files:  57% (8220/14421)
+2026-10-19T00:47:13.0053170Z Updating files:  58% (8365/14421)
+2026-10-19T00:47:13.0231692Z Updating files:  59% (8509/14421)
+2026-10-19T00:47:13.0415725Z Updating files:  60% (8653/14421)
+2026-10-19T00:47:13.0576301Z Updating files:  61% (8797/14421)
+2026-10-19T00:47:13.0755076Z Updating files:  62% (8942/14421)
+2026-10-19T00:47:13.0928300Z Updating files:  63% (9086/14421)
+2026-10-19T00:47:13.1107373Z Updating files:  64% (9230/14421)
+2026-10-19T00:47:13.1259906Z Updating files:  65% (9374/14421)
+2026-10-19T00:47:13.1385343Z Updating files:  66% (9518/14421)
+2026-10-19T00:47:13.1539911Z Updating files:  67% (9663/14421)
+2026-10-19T00:47:13.1642117Z Updating files:  68% (9807/14421)
+2026-10-19T00:47:13.1744643Z Updating files:  69% (9951/14421)
+2026-10-19T00:47:13.1890141Z Updating files:  70% (10095/14421)
+2026-10-19T00:47:13.2034237Z Updating files:  71% (10239/14421)
+2026-10-19T00:47:13.2141142Z Updating files:  72% (10384/14421)
+2026-10-19T00:47:13.2239976Z Updating files:  73% (10528/14421)
+2026-10-19T00:47:13.2400339Z Updating files:  74% (10672/14421)
+2026-10-19T00:47:13.2550434Z Updating files:  75% (10816/14421)
+2026-10-19T00:47:13.2721974Z Updating files:  76% (10960/14421)
+2026-10-19T00:47:13.2878643Z Updating files:  77% (11105/14421)
+2026-10-19T00:47:13.3026326Z Updating files:  78% (11249/14421)
+2026-10-19T00:47:13.3216483Z Updating files:  79% (11393/14421)
+2026-10-19T00:47:13.3378174Z Updating files:  80% (11537/14421)
+2026-10-19T00:47:13.3524555Z Updating files:  81% (11682/14421)
+2026-10-19T00:47:13.3670739Z Updating files:  82% (11826/14421)
+2026-10-19T00:47:13.3839948Z Updating files:  83% (11970/14421)
+2026-10-19T00:47:13.3978642Z Updating files:  84% (12114/14421)
+2026-10-19T00:47:13.4102129Z Updating files:  85% (12258/14421)
+2026-10-19T00:47:13.4229108Z Updating files:  86% (12403/14421)
+2026-10-19T00:47:13.4353257Z Updating files:  87% (12547/14421)
+2026-10-19T00:47:13.4476588Z Updating files:  88% (12691/14421)
+2026-10-19T00:47:13.4662648Z Updating files:  89% (12835/14421)
+2026-10-19T00:47:13.4831395Z Updating files:  90% (12979/14421)
+2026-10-19T00:47:13.5013349Z Updating files:  91% (13124/14421)
+2026-10-19T00:47:13.5175513Z Updating files:  92% (13268/14421)
+2026-10-19T00:47:13.5340456Z Updating files:  93% (13412/14421)
+2026-10-19T00:47:13.5503681Z Updating files:  94% (13556/14421)
+2026-10-19T00:47:13.5663723Z Updating files:  95% (13700/14421)
+2026-10-19T00:47:13.5805551Z Updating files:  96% (13845/14421)
+2026-10-19T00:47:13.6143699Z Updating files:  97% (13989/14421)
+2026-10-19T00:47:13.6300042Z Updating files:  98% (14133/14421)
+2026-10-19T00:47:13.6678230Z Updating files:  99% (14277/14421)
+2026-10-19T00:47:13.6678796Z Updating files: 100% (14421/14421)
+2026-10-19T00:47:13.6679034Z Updating files: 100% (14421/14421), done.
+2026-10-19T00:47:13.6836893Z Note: switching to 'refs/remotes/pull/78/merge'.
+2026-10-19T00:47:13.6837136Z 
+2026-10-19T00:47:13.6837429Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-19T00:47:13.6838241Z changes and commit them, and you can discard any commits you make in this
+2026-10-19T00:47:13.6838669Z state without impacting any branches by switching back to a branch.
+2026-10-19T00:47:13.6839364Z 
+2026-10-19T00:47:13.6839742Z If you want to create a new branch to retain commits you create, you may
+2026-10-19T00:47:13.6840215Z do so (now or later) by using -c with the switch command. Example:
+2026-10-19T00:47:13.6840905Z 
+2026-10-19T00:47:13.6841239Z   git switch -c <new-branch-name>
+2026-10-19T00:47:13.6841414Z 
+2026-10-19T00:47:13.6841486Z Or undo this operation with:
+2026-10-19T00:47:13.6841610Z 
+2026-10-19T00:47:13.6841693Z   git switch -
+2026-10-19T00:47:13.6841777Z 
+2026-10-19T00:47:13.6841919Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-19T00:47:13.6842095Z 
+2026-10-19T00:47:13.6842305Z HEAD is now at 45e9782 Merge bc71a7bbeb697c631885542ce155f338dc5e46af into 219d1dcfff9807b04660a40313b32127e5be2933
+2026-10-19T00:47:13.7013351Z ##[endgroup]
+2026-10-19T00:47:13.7364731Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-10-19T00:47:13.7585238Z 45e9782e6e0836f5350ce55204bdfe711c0d2e0a
+2026-10-19T00:47:13.7934960Z ##[group]Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+2026-10-19T00:47:13.7935222Z with:
+2026-10-19T00:47:13.7935335Z   go-version-file: .go-version
+2026-10-19T00:47:13.7935462Z   cache: true
+2026-10-19T00:47:13.7935559Z   check-latest: false
+2026-10-19T00:47:13.7936780Z   token: ***
+2026-10-19T00:47:13.7936881Z ##[endgroup]
+2026-10-19T00:47:13.8896258Z Setup go version spec 1.25.6
+2026-10-19T00:47:13.8902354Z Attempting to download 1.25.6...
+2026-10-19T00:47:14.3552922Z matching 1.25.6...
+2026-10-19T00:47:14.3556999Z Acquiring 1.25.6 from https://github.com/actions/go-versions/releases/download/1.25.6-21053840953/go-1.25.6-win32-x64.zip
+2026-10-19T00:47:15.6240012Z Extracting Go...
+2026-10-19T00:47:15.6686882Z [command]"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "$ErrorActionPreference = 'Stop' ; try { Add-Type -AssemblyName System.IO.Compression.ZipFile } catch { } ; try { [System.IO.Compression.ZipFile]::ExtractToDirectory('D:\a\_temp\go-1.25.6-win32-x64.zip', 'D:\a\_temp\cf44e676-1f4a-4d96-b841-7df93543e5fc', $true) } catch { if (($_.Exception.GetType().FullName -eq 'System.Management.Automation.MethodException') -or ($_.Exception.GetType().FullName -eq 'System.Management.Automation.RuntimeException') ){ Expand-Archive -LiteralPath 'D:\a\_temp\go-1.25.6-win32-x64.zip' -DestinationPath 'D:\a\_temp\cf44e676-1f4a-4d96-b841-7df93543e5fc' -Force } else { throw $_ } } ;"
+2026-10-19T00:47:18.1731570Z Successfully extracted go to D:\a\_temp\cf44e676-1f4a-4d96-b841-7df93543e5fc
+2026-10-19T00:47:18.1731841Z Adding to the cache ...
+2026-10-19T00:47:23.9296810Z Created link C:\hostedtoolcache\windows\go\1.25.6\x64 => D:\hostedtoolcache\windows\go\1.25.6\x64
+2026-10-19T00:47:23.9298705Z Created link C:\hostedtoolcache\windows\go\1.25.6\x64.complete => D:\hostedtoolcache\windows\go\1.25.6\x64.complete
+2026-10-19T00:47:23.9299099Z Successfully cached go to C:\hostedtoolcache\windows\go\1.25.6\x64
+2026-10-19T00:47:23.9303550Z Added go to the path
+2026-10-19T00:47:23.9304872Z Successfully set up Go version 1.25.6
+2026-10-19T00:47:24.3560799Z [command]C:\hostedtoolcache\windows\go\1.25.6\x64\bin\go.exe env GOMODCACHE
+2026-10-19T00:47:24.3592496Z [command]C:\hostedtoolcache\windows\go\1.25.6\x64\bin\go.exe env GOCACHE
+2026-10-19T00:47:24.3724865Z C:\Users\runneradmin\go\pkg\mod
+2026-10-19T00:47:24.3753607Z C:\Users\runneradmin\AppData\Local\go-build
+2026-10-19T00:47:24.6650394Z Cache hit for: setup-go-Windows-x64-go-1.25.6-62687a7f2431c8d909879bb0b8335e3e01e4222667bcf43292dd9107cabdfa25
+2026-10-19T00:47:25.9720223Z Received 8388608 of 32958054 (25.5%), 8.0 MBs/sec
+2026-10-19T00:47:26.1311695Z Received 32958054 of 32958054 (100.0%), 27.1 MBs/sec
+2026-10-19T00:47:26.1313187Z Cache Size: ~31 MB (32958054 B)
+2026-10-19T00:47:26.1366615Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/dca01ec5-a9b0-4443-8211-11155db9f615/cache.tzst -P -C D:/a/stow-s3/stow-s3 --force-local --use-compress-program "zstd -d"
+2026-10-19T00:47:31.5530741Z Cache restored successfully
+2026-10-19T00:47:31.5561264Z Cache restored from key: setup-go-Windows-x64-go-1.25.6-62687a7f2431c8d909879bb0b8335e3e01e4222667bcf43292dd9107cabdfa25
+2026-10-19T00:47:31.5579985Z go version go1.25.6 windows/amd64
+2026-10-19T00:47:31.5580121Z 
+2026-10-19T00:47:31.5580308Z ##[group]go env
+2026-10-19T00:47:31.7715259Z set AR=ar
+2026-10-19T00:47:31.7715489Z set CC=gcc
+2026-10-19T00:47:31.7715679Z set CGO_CFLAGS=-O2 -g
+2026-10-19T00:47:31.7715892Z set CGO_CPPFLAGS=
+2026-10-19T00:47:31.7716073Z set CGO_CXXFLAGS=-O2 -g
+2026-10-19T00:47:31.7716261Z set CGO_ENABLED=1
+2026-10-19T00:47:31.7716429Z set CGO_FFLAGS=-O2 -g
+2026-10-19T00:47:31.7716604Z set CGO_LDFLAGS=-O2 -g
+2026-10-19T00:47:31.7716785Z set CXX=g++
+2026-10-19T00:47:31.7716968Z set GCCGO=gccgo
+2026-10-19T00:47:31.7717134Z set GO111MODULE=
+2026-10-19T00:47:31.7717293Z set GOAMD64=v1
+2026-10-19T00:47:31.7717462Z set GOARCH=amd64
+2026-10-19T00:47:31.7719394Z set GOAUTH=netrc
+2026-10-19T00:47:31.7719808Z set GOBIN=
+2026-10-19T00:47:31.7720035Z set GOCACHE=C:\Users\runneradmin\AppData\Local\go-build
+2026-10-19T00:47:31.7720306Z set GOCACHEPROG=
+2026-10-19T00:47:31.7720478Z set GODEBUG=
+2026-10-19T00:47:31.7720688Z set GOENV=C:\Users\runneradmin\AppData\Roaming\go\env
+2026-10-19T00:47:31.7720941Z set GOEXE=.exe
+2026-10-19T00:47:31.7721103Z set GOEXPERIMENT=
+2026-10-19T00:47:31.7721277Z set GOFIPS140=off
+2026-10-19T00:47:31.7721435Z set GOFLAGS=
+2026-10-19T00:47:31.7722078Z set GOGCCFLAGS=-m64 -mthreads -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\RUNNER~1\AppData\Local\Temp\go-build3203057081=/tmp/go-build -gno-record-gcc-switches
+2026-10-19T00:47:31.7722733Z set GOHOSTARCH=amd64
+2026-10-19T00:47:31.7722919Z set GOHOSTOS=windows
+2026-10-19T00:47:31.7723095Z set GOINSECURE=
+2026-10-19T00:47:31.7723282Z set GOMOD=D:\a\stow-s3\stow-s3\go.mod
+2026-10-19T00:47:31.7723541Z set GOMODCACHE=C:\Users\runneradmin\go\pkg\mod
+2026-10-19T00:47:31.7723794Z set GONOPROXY=
+2026-10-19T00:47:31.7723950Z set GONOSUMDB=
+2026-10-19T00:47:31.7724100Z set GOOS=windows
+2026-10-19T00:47:31.7724273Z set GOPATH=C:\Users\runneradmin\go
+2026-10-19T00:47:31.7724507Z set GOPRIVATE=
+2026-10-19T00:47:31.7724718Z set GOPROXY=https://proxy.golang.org,direct
+2026-10-19T00:47:31.7724912Z set GOROOT=C:\hostedtoolcache\windows\go\1.25.6\x64
+2026-10-19T00:47:31.7725080Z set GOSUMDB=sum.golang.org
+2026-10-19T00:47:31.7725210Z set GOTELEMETRY=local
+2026-10-19T00:47:31.7725385Z set GOTELEMETRYDIR=C:\Users\runneradmin\AppData\Roaming\go\telemetry
+2026-10-19T00:47:31.7725575Z set GOTMPDIR=
+2026-10-19T00:47:31.7725677Z set GOTOOLCHAIN=local
+2026-10-19T00:47:31.7725865Z set GOTOOLDIR=C:\hostedtoolcache\windows\go\1.25.6\x64\pkg\tool\windows_amd64
+2026-10-19T00:47:31.7726070Z set GOVCS=
+2026-10-19T00:47:31.7726174Z set GOVERSION=go1.25.6
+2026-10-19T00:47:31.7726282Z set GOWORK=
+2026-10-19T00:47:31.7726405Z set PKG_CONFIG=pkg-config
+2026-10-19T00:47:31.7726487Z 
+2026-10-19T00:47:31.7726750Z ##[endgroup]
+2026-10-19T00:47:31.8001888Z ##[group]Run go test -v ./internal/storage/fs ./internal/storage/workspace
+2026-10-19T00:47:31.8002250Z [36;1mgo test -v ./internal/storage/fs ./internal/storage/workspace[0m
+2026-10-19T00:47:31.8526338Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-10-19T00:47:31.8526544Z env:
+2026-10-19T00:47:31.8526652Z   GOTOOLCHAIN: local
+2026-10-19T00:47:31.8526772Z ##[endgroup]
+2026-10-19T00:47:32.6082601Z go: downloading github.com/aws/aws-sdk-go-v2 v1.47.2
+2026-10-19T00:47:32.6083023Z go: downloading github.com/aws/aws-sdk-go-v2/credentials v1.20.8
+2026-10-19T00:47:32.6083396Z go: downloading github.com/aws/aws-sdk-go-v2/service/s3 v1.114.2
+2026-10-19T00:47:33.1188694Z go: downloading github.com/aws/smithy-go v1.28.4
+2026-10-19T00:47:34.2390152Z go: downloading github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.21
+2026-10-19T00:47:34.2390731Z go: downloading github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.5
+2026-10-19T00:47:34.2391168Z go: downloading github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.5
+2026-10-19T00:47:34.2732435Z go: downloading github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.20
+2026-10-19T00:47:34.2926044Z go: downloading github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.6
+2026-10-19T00:47:34.3005777Z go: downloading github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.5
+2026-10-19T00:47:34.3006311Z go: downloading github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.5
+2026-10-19T00:47:34.3345782Z go: downloading github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.5
+2026-10-19T00:47:53.4577697Z === RUN   TestBucketCapacityConcurrentCreationRespectsReserve
+2026-10-19T00:47:53.4578862Z     capacity_bucket_concurrent_test.go:15: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4579374Z --- SKIP: TestBucketCapacityConcurrentCreationRespectsReserve (0.00s)
+2026-10-19T00:47:53.4579837Z === RUN   TestBucketCapacityFenceFailureRetainsMetadata
+2026-10-19T00:47:53.4580320Z     capacity_bucket_fence_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4580761Z --- SKIP: TestBucketCapacityFenceFailureRetainsMetadata (0.00s)
+2026-10-19T00:47:53.4581075Z === RUN   TestBucketCapacityCreationChargesMetadata
+2026-10-19T00:47:53.4581544Z     capacity_bucket_test.go:52: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4581939Z --- SKIP: TestBucketCapacityCreationChargesMetadata (0.00s)
+2026-10-19T00:47:53.4582266Z === RUN   TestBucketCapacityDeletionReleasesAfterReopen
+2026-10-19T00:47:53.4582700Z     capacity_bucket_test.go:70: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4583102Z --- SKIP: TestBucketCapacityDeletionReleasesAfterReopen (0.00s)
+2026-10-19T00:47:53.4583435Z === RUN   TestBucketCapacityRefusalLeavesNoBucket
+2026-10-19T00:47:53.4583851Z     capacity_bucket_test.go:107: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4584249Z --- SKIP: TestBucketCapacityRefusalLeavesNoBucket (0.00s)
+2026-10-19T00:47:53.4584549Z === RUN   TestBucketCapacityHoldPreventsDeletion
+2026-10-19T00:47:53.4584976Z     capacity_bucket_test.go:150: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4585358Z --- SKIP: TestBucketCapacityHoldPreventsDeletion (0.00s)
+2026-10-19T00:47:53.4585693Z === RUN   TestCapacityFenceFailureRetainsReservation
+2026-10-19T00:47:53.4586030Z === RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+2026-10-19T00:47:53.4586995Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4587474Z === RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+2026-10-19T00:47:53.4587998Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4588459Z === RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+2026-10-19T00:47:53.4590773Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4591113Z === RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+2026-10-19T00:47:53.4591438Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4591704Z === RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+2026-10-19T00:47:53.4592121Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4592481Z === RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+2026-10-19T00:47:53.4592776Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4593049Z === RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+2026-10-19T00:47:53.4593604Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4593884Z === RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+2026-10-19T00:47:53.4594192Z     capacity_fence_test.go:81: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4594458Z --- PASS: TestCapacityFenceFailureRetainsReservation (0.00s)
+2026-10-19T00:47:53.4594765Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.00s)
+2026-10-19T00:47:53.4595095Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.00s)
+2026-10-19T00:47:53.4595434Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.00s)
+2026-10-19T00:47:53.4595786Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.00s)
+2026-10-19T00:47:53.4596126Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.00s)
+2026-10-19T00:47:53.4596448Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.00s)
+2026-10-19T00:47:53.4596774Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.00s)
+2026-10-19T00:47:53.4597119Z     --- SKIP: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.00s)
+2026-10-19T00:47:53.4597470Z === RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+2026-10-19T00:47:53.4597869Z === RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+2026-10-19T00:47:53.4598185Z     capacity_fence_test.go:211: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4598470Z === RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+2026-10-19T00:47:53.4598773Z     capacity_fence_test.go:211: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4599041Z --- PASS: TestCapacityWriteFailureBeforeRenameCanReconcile (0.00s)
+2026-10-19T00:47:53.4599362Z     --- SKIP: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.00s)
+2026-10-19T00:47:53.4599706Z     --- SKIP: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.00s)
+2026-10-19T00:47:53.4599983Z === RUN   TestMultipartCompletionAdmissionRefusalRetainsUpload
+2026-10-19T00:47:53.4600303Z     capacity_multipart_recovery_test.go:17: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4600609Z --- SKIP: TestMultipartCompletionAdmissionRefusalRetainsUpload (0.00s)
+2026-10-19T00:47:53.4600882Z === RUN   TestMultipartBoundCompletionCleanupPreservesCommittedOutcome
+2026-10-19T00:47:53.4601209Z     capacity_multipart_recovery_test.go:41: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4601522Z --- SKIP: TestMultipartBoundCompletionCleanupPreservesCommittedOutcome (0.00s)
+2026-10-19T00:47:53.4601782Z === RUN   TestMultipartCapacityHoldProtectsPart
+2026-10-19T00:47:53.4602070Z     capacity_multipart_recovery_test.go:78: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4602332Z --- SKIP: TestMultipartCapacityHoldProtectsPart (0.00s)
+2026-10-19T00:47:53.4602532Z === RUN   TestMultipartConcurrentNamespaceAdmission
+2026-10-19T00:47:53.4603342Z     capacity_multipart_shared_test.go:24: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4603624Z --- SKIP: TestMultipartConcurrentNamespaceAdmission (0.00s)
+2026-10-19T00:47:53.4603825Z === RUN   TestMultipartSharedHostAdmission
+2026-10-19T00:47:53.4604127Z     capacity_multipart_shared_test.go:57: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4604384Z --- SKIP: TestMultipartSharedHostAdmission (0.00s)
+2026-10-19T00:47:53.4604579Z === RUN   TestMultipartPartsRespectNamespaceBudget
+2026-10-19T00:47:53.4604856Z     capacity_multipart_test.go:17: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4605126Z --- SKIP: TestMultipartPartsRespectNamespaceBudget (0.00s)
+2026-10-19T00:47:53.4605340Z === RUN   TestMultipartAbortReleasesNamespaceCapacity
+2026-10-19T00:47:53.4605699Z     capacity_multipart_test.go:35: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4605973Z --- SKIP: TestMultipartAbortReleasesNamespaceCapacity (0.00s)
+2026-10-19T00:47:53.4606195Z === RUN   TestMultipartCompletionReleasesPartCapacity
+2026-10-19T00:47:53.4606585Z     capacity_multipart_test.go:65: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4606848Z --- SKIP: TestMultipartCompletionReleasesPartCapacity (0.00s)
+2026-10-19T00:47:53.4607069Z === RUN   TestMultipartManifestRecoveryBudget
+2026-10-19T00:47:53.4607339Z     capacity_multipart_test.go:93: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4607582Z --- SKIP: TestMultipartManifestRecoveryBudget (0.00s)
+2026-10-19T00:47:53.4607791Z === RUN   TestMultipartRejectedReplacementPreservesPart
+2026-10-19T00:47:53.4608155Z     capacity_multipart_test.go:111: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4608564Z --- SKIP: TestMultipartRejectedReplacementPreservesPart (0.00s)
+2026-10-19T00:47:53.4608782Z === RUN   TestMultipartManifestChargeMatchesScan
+2026-10-19T00:47:53.4609071Z     capacity_multipart_test.go:137: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4609330Z --- SKIP: TestMultipartManifestChargeMatchesScan (0.00s)
+2026-10-19T00:47:53.4609530Z === RUN   TestMultipartReplacementChargesOnePart
+2026-10-19T00:47:53.4609803Z     capacity_multipart_test.go:157: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4610068Z --- SKIP: TestMultipartReplacementChargesOnePart (0.00s)
+2026-10-19T00:47:53.4610266Z === RUN   TestCapacityPayloadAllocationBound
+2026-10-19T00:47:53.4610462Z === RUN   TestCapacityPayloadAllocationBound/object/8388608
+2026-10-19T00:47:53.4610728Z     capacity_payload_read_test.go:121: invalid namespace capacity request
+2026-10-19T00:47:53.4610974Z === RUN   TestCapacityPayloadAllocationBound/object/67108864
+2026-10-19T00:47:53.4611235Z     capacity_payload_read_test.go:121: invalid namespace capacity request
+2026-10-19T00:47:53.4611464Z === RUN   TestCapacityPayloadAllocationBound/part/8388608
+2026-10-19T00:47:53.4611722Z     capacity_payload_read_test.go:121: invalid namespace capacity request
+2026-10-19T00:47:53.4611964Z === RUN   TestCapacityPayloadAllocationBound/part/67108864
+2026-10-19T00:47:53.4612220Z     capacity_payload_read_test.go:121: invalid namespace capacity request
+2026-10-19T00:47:53.4612445Z --- FAIL: TestCapacityPayloadAllocationBound (2.26s)
+2026-10-19T00:47:53.4612703Z     --- FAIL: TestCapacityPayloadAllocationBound/object/8388608 (0.12s)
+2026-10-19T00:47:53.4612978Z     --- FAIL: TestCapacityPayloadAllocationBound/object/67108864 (1.37s)
+2026-10-19T00:47:53.4613243Z     --- FAIL: TestCapacityPayloadAllocationBound/part/8388608 (0.12s)
+2026-10-19T00:47:53.4613608Z     --- FAIL: TestCapacityPayloadAllocationBound/part/67108864 (0.65s)
+2026-10-19T00:47:53.4613907Z === RUN   TestCapacityPayloadIdentities
+2026-10-19T00:47:53.4614074Z === RUN   TestCapacityPayloadIdentities/object/0
+2026-10-19T00:47:53.4614314Z     capacity_payload_read_test.go:158: invalid namespace capacity request
+2026-10-19T00:47:53.4614592Z === RUN   TestCapacityPayloadIdentities/object/257
+2026-10-19T00:47:53.4614838Z     capacity_payload_read_test.go:158: invalid namespace capacity request
+2026-10-19T00:47:53.4615044Z === RUN   TestCapacityPayloadIdentities/part/0
+2026-10-19T00:47:53.4615281Z     capacity_payload_read_test.go:158: invalid namespace capacity request
+2026-10-19T00:47:53.4615487Z === RUN   TestCapacityPayloadIdentities/part/257
+2026-10-19T00:47:53.4615728Z     capacity_payload_read_test.go:158: invalid namespace capacity request
+2026-10-19T00:47:53.4615930Z === RUN   TestCapacityPayloadIdentities/legacy
+2026-10-19T00:47:53.4616160Z     capacity_payload_read_test.go:171: invalid namespace capacity request
+2026-10-19T00:47:53.4616370Z --- FAIL: TestCapacityPayloadIdentities (0.07s)
+2026-10-19T00:47:53.4616648Z     --- FAIL: TestCapacityPayloadIdentities/object/0 (0.01s)
+2026-10-19T00:47:53.4616883Z     --- FAIL: TestCapacityPayloadIdentities/object/257 (0.01s)
+2026-10-19T00:47:53.4617111Z     --- FAIL: TestCapacityPayloadIdentities/part/0 (0.01s)
+2026-10-19T00:47:53.4617331Z     --- FAIL: TestCapacityPayloadIdentities/part/257 (0.02s)
+2026-10-19T00:47:53.4617554Z     --- FAIL: TestCapacityPayloadIdentities/legacy (0.01s)
+2026-10-19T00:47:53.4617742Z === RUN   TestCapacityPayloadInvalidRecords
+2026-10-19T00:47:53.4617977Z     capacity_payload_read_test.go:186: invalid namespace capacity request
+2026-10-19T00:47:53.4618197Z --- FAIL: TestCapacityPayloadInvalidRecords (0.01s)
+2026-10-19T00:47:53.4618387Z === RUN   TestCapacityPayloadNativeRefusals
+2026-10-19T00:47:53.4618574Z === RUN   TestCapacityPayloadNativeRefusals/permission
+2026-10-19T00:47:53.4618918Z     capacity_payload_read_test.go:210: invalid namespace capacity request
+2026-10-19T00:47:53.4619277Z === RUN   TestCapacityPayloadNativeRefusals/symlink
+2026-10-19T00:47:53.4619536Z     capacity_payload_read_test.go:222: invalid namespace capacity request
+2026-10-19T00:47:53.4619757Z --- FAIL: TestCapacityPayloadNativeRefusals (0.03s)
+2026-10-19T00:47:53.4619999Z     --- FAIL: TestCapacityPayloadNativeRefusals/permission (0.01s)
+2026-10-19T00:47:53.4620255Z     --- FAIL: TestCapacityPayloadNativeRefusals/symlink (0.01s)
+2026-10-19T00:47:53.4620466Z === RUN   TestCapacityPayloadUnknownAllocation
+2026-10-19T00:47:53.4620706Z     capacity_payload_read_test.go:236: invalid namespace capacity request
+2026-10-19T00:47:53.4620933Z --- FAIL: TestCapacityPayloadUnknownAllocation (0.01s)
+2026-10-19T00:47:53.4621141Z === RUN   TestOrdinaryWritesShareNamespaceAdmission
+2026-10-19T00:47:53.4621426Z     capacity_publication_test.go:52: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4621692Z --- SKIP: TestOrdinaryWritesShareNamespaceAdmission (0.00s)
+2026-10-19T00:47:53.4621911Z === RUN   TestOrdinaryOverwriteAndReopenChargeOneRecord
+2026-10-19T00:47:53.4622205Z     capacity_publication_test.go:86: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4622478Z --- SKIP: TestOrdinaryOverwriteAndReopenChargeOneRecord (0.00s)
+2026-10-19T00:47:53.4622698Z === RUN   TestOrdinaryWritesRespectSharedHostBudget
+2026-10-19T00:47:53.4622981Z     capacity_publication_test.go:127: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4623250Z --- SKIP: TestOrdinaryWritesRespectSharedHostBudget (0.00s)
+2026-10-19T00:47:53.4623470Z === RUN   TestResourceCountFilesystemRefusalLeavesNoBucket
+2026-10-19T00:47:53.4623737Z     capacity_resource_count_test.go:101: requires native namespace admission
+2026-10-19T00:47:53.4623997Z --- SKIP: TestResourceCountFilesystemRefusalLeavesNoBucket (0.00s)
+2026-10-19T00:47:53.4624307Z === RUN   TestSaveCapacityConcurrentAdmission
+2026-10-19T00:47:53.4624732Z     capacity_save_publication_test.go:17: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4624991Z --- SKIP: TestSaveCapacityConcurrentAdmission (0.00s)
+2026-10-19T00:47:53.4625174Z === RUN   TestSaveCapacitySharesHostBudget
+2026-10-19T00:47:53.4625512Z     capacity_save_publication_test.go:49: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4625765Z --- SKIP: TestSaveCapacitySharesHostBudget (0.00s)
+2026-10-19T00:47:53.4625963Z === RUN   TestSaveCapacityProjectsExactRecordAndReceipt
+2026-10-19T00:47:53.4626174Z === RUN   TestSaveCapacityProjectsExactRecordAndReceipt/key
+2026-10-19T00:47:53.4626580Z     capacity_save_publication_test.go:73: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4626846Z === RUN   TestSaveCapacityProjectsExactRecordAndReceipt/lon
+2026-10-19T00:47:53.4627148Z     capacity_save_publication_test.go:73: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4627433Z --- PASS: TestSaveCapacityProjectsExactRecordAndReceipt (0.00s)
+2026-10-19T00:47:53.4628099Z     --- SKIP: TestSaveCapacityProjectsExactRecordAndReceipt/key (0.00s)
+2026-10-19T00:47:53.4628385Z     --- SKIP: TestSaveCapacityProjectsExactRecordAndReceipt/lon (0.00s)
+2026-10-19T00:47:53.4628610Z === RUN   TestSaveCapacityRefusesBeforeIntent
+2026-10-19T00:47:53.4628836Z === RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000
+2026-10-19T00:47:53.4629124Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4629380Z === RUN   TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304
+2026-10-19T00:47:53.4629796Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4630142Z === RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000
+2026-10-19T00:47:53.4630425Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4630675Z === RUN   TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304
+2026-10-19T00:47:53.4630959Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4631220Z === RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000
+2026-10-19T00:47:53.4631507Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4631760Z === RUN   TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304
+2026-10-19T00:47:53.4632055Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4632321Z === RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000
+2026-10-19T00:47:53.4632620Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4632883Z === RUN   TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304
+2026-10-19T00:47:53.4633181Z     capacity_save_test.go:19: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4633416Z --- PASS: TestSaveCapacityRefusesBeforeIntent (0.00s)
+2026-10-19T00:47:53.4633686Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=1600000 (0.00s)
+2026-10-19T00:47:53.4633990Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/ordinary/bytes=4194304 (0.00s)
+2026-10-19T00:47:53.4634292Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/guard/bytes=1600000 (0.00s)
+2026-10-19T00:47:53.4634589Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/guard/bytes=4194304 (0.00s)
+2026-10-19T00:47:53.4634910Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/request/bytes=1600000 (0.00s)
+2026-10-19T00:47:53.4635384Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/request/bytes=4194304 (0.00s)
+2026-10-19T00:47:53.4635693Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=1600000 (0.00s)
+2026-10-19T00:47:53.4636015Z     --- SKIP: TestSaveCapacityRefusesBeforeIntent/request-guard/bytes=4194304 (0.00s)
+2026-10-19T00:47:53.4636259Z === RUN   TestSaveCapacityChargesSuccessAndReplay
+2026-10-19T00:47:53.4636529Z     capacity_save_test.go:63: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4636777Z --- SKIP: TestSaveCapacityChargesSuccessAndReplay (0.00s)
+2026-10-19T00:47:53.4636971Z === RUN   TestSaveCapacitySharesNamespace
+2026-10-19T00:47:53.4637473Z     capacity_save_test.go:94: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4637721Z --- SKIP: TestSaveCapacitySharesNamespace (0.00s)
+2026-10-19T00:47:53.4637923Z === RUN   TestSaveCapacityRetainsInterruptedReservation
+2026-10-19T00:47:53.4638147Z === RUN   TestSaveCapacityRetainsInterruptedReservation/prepared
+2026-10-19T00:47:53.4638450Z     capacity_save_test.go:112: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4638713Z === RUN   TestSaveCapacityRetainsInterruptedReservation/publishing
+2026-10-19T00:47:53.4639002Z     capacity_save_test.go:112: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4639266Z === RUN   TestSaveCapacityRetainsInterruptedReservation/published
+2026-10-19T00:47:53.4639605Z     capacity_save_test.go:112: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4639855Z === RUN   TestSaveCapacityRetainsInterruptedReservation/sync
+2026-10-19T00:47:53.4640148Z     capacity_save_test.go:112: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4640540Z === RUN   TestSaveCapacityRetainsInterruptedReservation/terminal
+2026-10-19T00:47:53.4640927Z     capacity_save_test.go:112: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4641192Z --- PASS: TestSaveCapacityRetainsInterruptedReservation (0.00s)
+2026-10-19T00:47:53.4641636Z     --- SKIP: TestSaveCapacityRetainsInterruptedReservation/prepared (0.00s)
+2026-10-19T00:47:53.4641959Z     --- SKIP: TestSaveCapacityRetainsInterruptedReservation/publishing (0.00s)
+2026-10-19T00:47:53.4642275Z     --- SKIP: TestSaveCapacityRetainsInterruptedReservation/published (0.00s)
+2026-10-19T00:47:53.4642574Z     --- SKIP: TestSaveCapacityRetainsInterruptedReservation/sync (0.00s)
+2026-10-19T00:47:53.4642882Z     --- SKIP: TestSaveCapacityRetainsInterruptedReservation/terminal (0.00s)
+2026-10-19T00:47:53.4643114Z === RUN   TestSaveCapacityReservesReceiptSpace
+2026-10-19T00:47:53.4643376Z     capacity_save_test.go:190: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4643621Z --- SKIP: TestSaveCapacityReservesReceiptSpace (0.00s)
+2026-10-19T00:47:53.4643835Z === RUN   TestSaveCapacityReopenSettlesReservation
+2026-10-19T00:47:53.4644069Z === RUN   TestSaveCapacityReopenSettlesReservation/prepared
+2026-10-19T00:47:53.4644351Z     capacity_save_test.go:222: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4644609Z === RUN   TestSaveCapacityReopenSettlesReservation/published
+2026-10-19T00:47:53.4644888Z     capacity_save_test.go:222: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4645135Z --- PASS: TestSaveCapacityReopenSettlesReservation (0.00s)
+2026-10-19T00:47:53.4645402Z     --- SKIP: TestSaveCapacityReopenSettlesReservation/prepared (0.00s)
+2026-10-19T00:47:53.4645772Z     --- SKIP: TestSaveCapacityReopenSettlesReservation/published (0.00s)
+2026-10-19T00:47:53.4646117Z === RUN   TestCapacityMutationAllocation
+2026-10-19T00:47:53.4646301Z === RUN   TestCapacityMutationAllocation/put
+2026-10-19T00:47:53.4646630Z     capacity_scan_test.go:66: requires native namespace admission
+2026-10-19T00:47:53.4646837Z === RUN   TestCapacityMutationAllocation/save
+2026-10-19T00:47:53.4647061Z     capacity_scan_test.go:66: requires native namespace admission
+2026-10-19T00:47:53.4647259Z === RUN   TestCapacityMutationAllocation/delete
+2026-10-19T00:47:53.4647479Z     capacity_scan_test.go:66: requires native namespace admission
+2026-10-19T00:47:53.4647684Z --- PASS: TestCapacityMutationAllocation (0.00s)
+2026-10-19T00:47:53.4647897Z     --- SKIP: TestCapacityMutationAllocation/put (0.00s)
+2026-10-19T00:47:53.4648119Z     --- SKIP: TestCapacityMutationAllocation/save (0.00s)
+2026-10-19T00:47:53.4648343Z     --- SKIP: TestCapacityMutationAllocation/delete (0.00s)
+2026-10-19T00:47:53.4648548Z === RUN   TestMultipartCompletionCapacityVersion
+2026-10-19T00:47:53.4648738Z === RUN   TestMultipartCompletionCapacityVersion/#00
+2026-10-19T00:47:53.4649095Z     completion_capacity_version_test.go:17: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4649379Z === RUN   TestMultipartCompletionCapacityVersion/verified_payload
+2026-10-19T00:47:53.4649697Z     completion_capacity_version_test.go:17: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4649966Z --- PASS: TestMultipartCompletionCapacityVersion (0.00s)
+2026-10-19T00:47:53.4650208Z     --- SKIP: TestMultipartCompletionCapacityVersion/#00 (0.00s)
+2026-10-19T00:47:53.4671182Z     --- SKIP: TestMultipartCompletionCapacityVersion/verified_payload (0.00s)
+2026-10-19T00:47:53.4671560Z === RUN   TestDiskPutAndCopyAllocationBounded
+2026-10-19T00:47:53.4671817Z === RUN   TestDiskPutAndCopyAllocationBounded/put
+2026-10-19T00:47:53.4672110Z === RUN   TestDiskPutAndCopyAllocationBounded/copy
+2026-10-19T00:47:53.4672415Z     disk_performance_test.go:84: Windows materializes captured payloads before replacement
+2026-10-19T00:47:53.4672855Z --- PASS: TestDiskPutAndCopyAllocationBounded (3.48s)
+2026-10-19T00:47:53.4673210Z     --- PASS: TestDiskPutAndCopyAllocationBounded/put (3.08s)
+2026-10-19T00:47:53.4673581Z     --- SKIP: TestDiskPutAndCopyAllocationBounded/copy (0.00s)
+2026-10-19T00:47:53.4673908Z === RUN   TestMultipartManifestFailuresPreserveUpload
+2026-10-19T00:47:53.4674141Z === RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+2026-10-19T00:47:53.4674374Z === RUN   TestMultipartManifestFailuresPreserveUpload/null
+2026-10-19T00:47:53.4674595Z === RUN   TestMultipartManifestFailuresPreserveUpload/empty
+2026-10-19T00:47:53.4674833Z === RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+2026-10-19T00:47:53.4675087Z === RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+2026-10-19T00:47:53.4675323Z === RUN   TestMultipartManifestFailuresPreserveUpload/missing
+2026-10-19T00:47:53.4675555Z === RUN   TestMultipartManifestFailuresPreserveUpload/directory
+2026-10-19T00:47:53.4675789Z --- PASS: TestMultipartManifestFailuresPreserveUpload (0.20s)
+2026-10-19T00:47:53.4676074Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.02s)
+2026-10-19T00:47:53.4676363Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.02s)
+2026-10-19T00:47:53.4676754Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.02s)
+2026-10-19T00:47:53.4677054Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.02s)
+2026-10-19T00:47:53.4677379Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.02s)
+2026-10-19T00:47:53.4677681Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.06s)
+2026-10-19T00:47:53.4677977Z     --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.02s)
+2026-10-19T00:47:53.4678220Z === RUN   TestMultipartAbsentUploadKeepsNotFound
+2026-10-19T00:47:53.4678424Z --- PASS: TestMultipartAbsentUploadKeepsNotFound (0.01s)
+2026-10-19T00:47:53.4678615Z === RUN   TestBinaryRecordRoundTrip
+2026-10-19T00:47:53.4678848Z --- PASS: TestBinaryRecordRoundTrip (0.01s)
+2026-10-19T00:47:53.4679113Z === RUN   TestOpenRecordSurvivesOverwriteAndDelete
+2026-10-19T00:47:53.4679364Z --- PASS: TestOpenRecordSurvivesOverwriteAndDelete (0.02s)
+2026-10-19T00:47:53.4679557Z === RUN   TestBinaryRecordSurvivesReopen
+2026-10-19T00:47:53.4679730Z --- PASS: TestBinaryRecordSurvivesReopen (0.01s)
+2026-10-19T00:47:53.4679919Z === RUN   TestLegacyJSONRecordReadableAndRewritten
+2026-10-19T00:47:53.4680123Z --- PASS: TestLegacyJSONRecordReadableAndRewritten (0.02s)
+2026-10-19T00:47:53.4680312Z === RUN   TestMalformedBinaryRecordRefused
+2026-10-19T00:47:53.4680486Z === RUN   TestMalformedBinaryRecordRefused/version
+2026-10-19T00:47:53.4680677Z === RUN   TestMalformedBinaryRecordRefused/prefix
+2026-10-19T00:47:53.4680875Z === RUN   TestMalformedBinaryRecordRefused/header-size
+2026-10-19T00:47:53.4681086Z === RUN   TestMalformedBinaryRecordRefused/truncated-payload
+2026-10-19T00:47:53.4681368Z === RUN   TestMalformedBinaryRecordRefused/extra-payload
+2026-10-19T00:47:53.4681571Z --- PASS: TestMalformedBinaryRecordRefused (0.00s)
+2026-10-19T00:47:53.4681792Z     --- PASS: TestMalformedBinaryRecordRefused/version (0.00s)
+2026-10-19T00:47:53.4682025Z     --- PASS: TestMalformedBinaryRecordRefused/prefix (0.00s)
+2026-10-19T00:47:53.4682273Z     --- PASS: TestMalformedBinaryRecordRefused/header-size (0.00s)
+2026-10-19T00:47:53.4682541Z     --- PASS: TestMalformedBinaryRecordRefused/truncated-payload (0.00s)
+2026-10-19T00:47:53.4682814Z     --- PASS: TestMalformedBinaryRecordRefused/extra-payload (0.00s)
+2026-10-19T00:47:53.4683013Z === RUN   TestHeadAllocationBounded
+2026-10-19T00:47:53.4683170Z --- PASS: TestHeadAllocationBounded (1.71s)
+2026-10-19T00:47:53.4683362Z === RUN   TestRecordWriteToCopiesOnlyRemainingPayload
+2026-10-19T00:47:53.4683639Z --- PASS: TestRecordWriteToCopiesOnlyRemainingPayload (0.01s)
+2026-10-19T00:47:53.4683858Z === RUN   TestRecoveryHoldBlocksMutationUntilRelease
+2026-10-19T00:47:53.4684157Z     recovery_holds_test.go:62: durable recovery holds require Darwin or Linux
+2026-10-19T00:47:53.4684574Z --- SKIP: TestRecoveryHoldBlocksMutationUntilRelease (0.00s)
+2026-10-19T00:47:53.4684777Z === RUN   TestRecoveryHoldOutlivesTheStore
+2026-10-19T00:47:53.4685025Z     recovery_holds_test.go:119: durable recovery holds require Darwin or Linux
+2026-10-19T00:47:53.4685261Z --- SKIP: TestRecoveryHoldOutlivesTheStore (0.00s)
+2026-10-19T00:47:53.4685454Z === RUN   TestRecoveryHoldIdentityIsEnforced
+2026-10-19T00:47:53.4685707Z     recovery_holds_test.go:145: durable recovery holds require Darwin or Linux
+2026-10-19T00:47:53.4685942Z --- SKIP: TestRecoveryHoldIdentityIsEnforced (0.00s)
+2026-10-19T00:47:53.4686136Z === RUN   TestRecoveryHoldRefusesAStaleObservation
+2026-10-19T00:47:53.4686401Z     recovery_holds_test.go:175: durable recovery holds require Darwin or Linux
+2026-10-19T00:47:53.4686644Z --- SKIP: TestRecoveryHoldRefusesAStaleObservation (0.53s)
+2026-10-19T00:47:53.4686852Z === RUN   TestRecoveryHoldRefusesAMalformedRequest
+2026-10-19T00:47:53.4687105Z     recovery_holds_test.go:190: durable recovery holds require Darwin or Linux
+2026-10-19T00:47:53.4687349Z --- SKIP: TestRecoveryHoldRefusesAMalformedRequest (0.00s)
+2026-10-19T00:47:53.4687554Z === RUN   TestRecoveryHoldRefusesUnreadableState
+2026-10-19T00:47:53.4687804Z     recovery_holds_test.go:228: durable recovery holds require Darwin or Linux
+2026-10-19T00:47:53.4688052Z --- SKIP: TestRecoveryHoldRefusesUnreadableState (0.00s)
+2026-10-19T00:47:53.4688265Z === RUN   TestRuntimeReopensAfterInterruptedPublishing
+2026-10-19T00:47:53.4688524Z     runtime_recovery_test.go:38: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4688766Z --- SKIP: TestRuntimeReopensAfterInterruptedPublishing (0.00s)
+2026-10-19T00:47:53.4688983Z === RUN   TestComputedChecksumSaveReplay
+2026-10-19T00:47:53.4689157Z === RUN   TestComputedChecksumSaveReplay/put
+2026-10-19T00:47:53.4689385Z     save_checksum_test.go:22: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4689693Z === RUN   TestComputedChecksumSaveReplay/receipt
+2026-10-19T00:47:53.4690022Z     save_checksum_test.go:22: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4690228Z --- PASS: TestComputedChecksumSaveReplay (0.00s)
+2026-10-19T00:47:53.4690443Z     --- SKIP: TestComputedChecksumSaveReplay/put (0.00s)
+2026-10-19T00:47:53.4690670Z     --- SKIP: TestComputedChecksumSaveReplay/receipt (0.00s)
+2026-10-19T00:47:53.4690877Z === RUN   TestSaveRecoveryAtPublicationBoundaries
+2026-10-19T00:47:53.4691078Z === RUN   TestSaveRecoveryAtPublicationBoundaries/prepared
+2026-10-19T00:47:53.4691325Z     save_requests_test.go:40: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4691546Z === RUN   TestSaveRecoveryAtPublicationBoundaries/publishing
+2026-10-19T00:47:53.4691801Z     save_requests_test.go:40: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4692018Z === RUN   TestSaveRecoveryAtPublicationBoundaries/published
+2026-10-19T00:47:53.4692329Z     save_requests_test.go:40: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4692540Z === RUN   TestSaveRecoveryAtPublicationBoundaries/sync
+2026-10-19T00:47:53.4692781Z     save_requests_test.go:40: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4692996Z === RUN   TestSaveRecoveryAtPublicationBoundaries/terminal
+2026-10-19T00:47:53.4693235Z     save_requests_test.go:40: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4693454Z --- PASS: TestSaveRecoveryAtPublicationBoundaries (0.00s)
+2026-10-19T00:47:53.4693717Z     --- SKIP: TestSaveRecoveryAtPublicationBoundaries/prepared (0.00s)
+2026-10-19T00:47:53.4693998Z     --- SKIP: TestSaveRecoveryAtPublicationBoundaries/publishing (0.00s)
+2026-10-19T00:47:53.4694281Z     --- SKIP: TestSaveRecoveryAtPublicationBoundaries/published (0.00s)
+2026-10-19T00:47:53.4694617Z     --- SKIP: TestSaveRecoveryAtPublicationBoundaries/sync (0.00s)
+2026-10-19T00:47:53.4694961Z     --- SKIP: TestSaveRecoveryAtPublicationBoundaries/terminal (0.00s)
+2026-10-19T00:47:53.4695359Z === RUN   TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete
+2026-10-19T00:47:53.4695639Z     save_requests_test.go:123: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4695914Z --- SKIP: TestSaveReplayRetainsOriginalMetadataAfterOverwriteAndDelete (0.00s)
+2026-10-19T00:47:53.4696161Z === RUN   TestSaveJournalBoundedAdmission
+2026-10-19T00:47:53.4696340Z === RUN   TestSaveJournalBoundedAdmission/count
+2026-10-19T00:47:53.4696574Z     save_requests_test.go:170: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4696997Z === RUN   TestSaveJournalBoundedAdmission/bytes
+2026-10-19T00:47:53.4697341Z     save_requests_test.go:170: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4697654Z === RUN   TestSaveJournalBoundedAdmission/entry
+2026-10-19T00:47:53.4697982Z     save_requests_test.go:170: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4698277Z --- PASS: TestSaveJournalBoundedAdmission (0.00s)
+2026-10-19T00:47:53.4698625Z     --- SKIP: TestSaveJournalBoundedAdmission/count (0.00s)
+2026-10-19T00:47:53.4698958Z     --- SKIP: TestSaveJournalBoundedAdmission/bytes (0.00s)
+2026-10-19T00:47:53.4699288Z     --- SKIP: TestSaveJournalBoundedAdmission/entry (0.00s)
+2026-10-19T00:47:53.4699624Z === RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence
+2026-10-19T00:47:53.4700018Z === RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed
+2026-10-19T00:47:53.4700472Z     save_requests_test.go:201: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4700865Z === RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity
+2026-10-19T00:47:53.4701152Z     save_requests_test.go:201: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4701535Z === RUN   TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal
+2026-10-19T00:47:53.4701974Z     save_requests_test.go:201: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4702240Z --- PASS: TestSavePendingCorruptionAndIdentityLossPreserveEvidence (0.00s)
+2026-10-19T00:47:53.4702632Z     --- SKIP: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/malformed (0.00s)
+2026-10-19T00:47:53.4703143Z     --- SKIP: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/identity (0.00s)
+2026-10-19T00:47:53.4703626Z     --- SKIP: TestSavePendingCorruptionAndIdentityLossPreserveEvidence/conflicting-terminal (0.00s)
+2026-10-19T00:47:53.4704068Z === RUN   TestSaveEvidenceMetadataCorruptionRefuses
+2026-10-19T00:47:53.4704413Z === RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-raw
+2026-10-19T00:47:53.4704683Z     save_requests_test.go:260: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4705009Z === RUN   TestSaveEvidenceMetadataCorruptionRefuses/pending-valid
+2026-10-19T00:47:53.4705271Z     save_requests_test.go:260: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4705499Z === RUN   TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw
+2026-10-19T00:47:53.4706336Z     save_requests_test.go:260: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4706578Z --- PASS: TestSaveEvidenceMetadataCorruptionRefuses (0.00s)
+2026-10-19T00:47:53.4706850Z     --- SKIP: TestSaveEvidenceMetadataCorruptionRefuses/pending-raw (0.00s)
+2026-10-19T00:47:53.4707159Z     --- SKIP: TestSaveEvidenceMetadataCorruptionRefuses/pending-valid (0.00s)
+2026-10-19T00:47:53.4707471Z     --- SKIP: TestSaveEvidenceMetadataCorruptionRefuses/terminal-raw (0.00s)
+2026-10-19T00:47:53.4707710Z === RUN   TestSaveLegacyRecordAndUnkeyedPublication
+2026-10-19T00:47:53.4707950Z     save_requests_test.go:325: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4708172Z --- SKIP: TestSaveLegacyRecordAndUnkeyedPublication (0.00s)
+2026-10-19T00:47:53.4708391Z === RUN   TestSaveInvalidRequestKeyRefusesAndReopens
+2026-10-19T00:47:53.4708691Z     save_requests_test.go:360: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4708917Z --- SKIP: TestSaveInvalidRequestKeyRefusesAndReopens (0.00s)
+2026-10-19T00:47:53.4709154Z === RUN   TestSaveMalformedLogicalOptionsRefuseBeforeEvidence
+2026-10-19T00:47:53.4709418Z     save_requests_test.go:395: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4709671Z --- SKIP: TestSaveMalformedLogicalOptionsRefuseBeforeEvidence (0.00s)
+2026-10-19T00:47:53.4709906Z === RUN   TestSaveMalformedLookupResourceRefuses
+2026-10-19T00:47:53.4710140Z     save_requests_test.go:413: durable saves require Darwin or Linux
+2026-10-19T00:47:53.4710371Z --- SKIP: TestSaveMalformedLookupResourceRefuses (0.00s)
+2026-10-19T00:47:53.4710581Z === RUN   TestPrefixFullReadRetainsUnderlyingFailure
+2026-10-19T00:47:53.4710795Z --- PASS: TestPrefixFullReadRetainsUnderlyingFailure (0.01s)
+2026-10-19T00:47:53.4711003Z === RUN   TestDiskStageOwnsBytesAndChecksums
+2026-10-19T00:47:53.4711268Z --- PASS: TestDiskStageOwnsBytesAndChecksums (0.02s)
+2026-10-19T00:47:53.4711598Z === RUN   TestDiskStageRechecksConditionsAndCleansAbort
+2026-10-19T00:47:53.4711838Z --- PASS: TestDiskStageRechecksConditionsAndCleansAbort (0.01s)
+2026-10-19T00:47:53.4712067Z === RUN   TestDiskStageFailurePreservesPublishedObject
+2026-10-19T00:47:53.4712305Z --- PASS: TestDiskStageFailurePreservesPublishedObject (0.01s)
+2026-10-19T00:47:53.4712514Z === RUN   TestDiskStaleStageRemovedOnReopen
+2026-10-19T00:47:53.4712704Z --- PASS: TestDiskStaleStageRemovedOnReopen (0.01s)
+2026-10-19T00:47:53.4712925Z === RUN   TestDiskStagePreventsCapacityRebindingUntilFinished
+2026-10-19T00:47:53.4713222Z     staged_put_test.go:183: namespace capacity admission requires Darwin or Linux
+2026-10-19T00:47:53.4713495Z --- SKIP: TestDiskStagePreventsCapacityRebindingUntilFinished (0.01s)
+2026-10-19T00:47:53.4713731Z === RUN   TestDiskStageVerifiesLargeStreamChecksums
+2026-10-19T00:47:53.4713931Z === RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32
+2026-10-19T00:47:53.4714153Z === RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC32C
+2026-10-19T00:47:53.4714371Z === RUN   TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME
+2026-10-19T00:47:53.4714591Z === RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA1
+2026-10-19T00:47:53.4714801Z === RUN   TestDiskStageVerifiesLargeStreamChecksums/SHA256
+2026-10-19T00:47:53.4715025Z --- PASS: TestDiskStageVerifiesLargeStreamChecksums (0.06s)
+2026-10-19T00:47:53.4715286Z     --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32 (0.01s)
+2026-10-19T00:47:53.4715563Z     --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC32C (0.01s)
+2026-10-19T00:47:53.4715852Z     --- PASS: TestDiskStageVerifiesLargeStreamChecksums/CRC64NVME (0.01s)
+2026-10-19T00:47:53.4716131Z     --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA1 (0.01s)
+2026-10-19T00:47:53.4716400Z     --- PASS: TestDiskStageVerifiesLargeStreamChecksums/SHA256 (0.01s)
+2026-10-19T00:47:53.4716854Z === RUN   TestCompletionBufferAllocation
+2026-10-19T00:47:53.4717102Z === RUN   TestCompletionBufferAllocation/bound=false/split=false
+2026-10-19T00:47:53.4717468Z     completion_buffer_test.go:17: completion bytes=8388608 allocated=8482080 budget=10485760
+2026-10-19T00:47:53.4717740Z === RUN   TestCompletionBufferAllocation/bound=false/split=true
+2026-10-19T00:47:53.4718038Z     completion_buffer_test.go:17: completion bytes=8388608 allocated=8492832 budget=10485760
+2026-10-19T00:47:53.4718310Z === RUN   TestCompletionBufferAllocation/bound=true/split=false
+2026-10-19T00:47:53.4718567Z     completion_buffer_test.go:17: invalid namespace capacity request
+2026-10-19T00:47:53.4718790Z === RUN   TestCompletionBufferAllocation/bound=true/split=true
+2026-10-19T00:47:53.4719044Z     completion_buffer_test.go:17: invalid namespace capacity request
+2026-10-19T00:47:53.4719258Z --- FAIL: TestCompletionBufferAllocation (0.49s)
+2026-10-19T00:47:53.4719519Z     --- PASS: TestCompletionBufferAllocation/bound=false/split=false (0.25s)
+2026-10-19T00:47:53.4719885Z     --- PASS: TestCompletionBufferAllocation/bound=false/split=true (0.21s)
+2026-10-19T00:47:53.4720178Z     --- FAIL: TestCompletionBufferAllocation/bound=true/split=false (0.02s)
+2026-10-19T00:47:53.4720468Z     --- FAIL: TestCompletionBufferAllocation/bound=true/split=true (0.02s)
+2026-10-19T00:47:53.4720690Z === RUN   TestCompletionBufferChecksums
+2026-10-19T00:47:53.4720859Z === RUN   TestCompletionBufferChecksums/CRC32
+2026-10-19T00:47:53.4721032Z === RUN   TestCompletionBufferChecksums/CRC32C
+2026-10-19T00:47:53.4721212Z === RUN   TestCompletionBufferChecksums/CRC64NVME
+2026-10-19T00:47:53.4721393Z === RUN   TestCompletionBufferChecksums/SHA1
+2026-10-19T00:47:53.4721566Z === RUN   TestCompletionBufferChecksums/SHA256
+2026-10-19T00:47:53.4721742Z --- PASS: TestCompletionBufferChecksums (0.67s)
+2026-10-19T00:47:53.4722039Z     --- PASS: TestCompletionBufferChecksums/CRC32 (0.13s)
+2026-10-19T00:47:53.4722382Z     --- PASS: TestCompletionBufferChecksums/CRC32C (0.14s)
+2026-10-19T00:47:53.4722616Z     --- PASS: TestCompletionBufferChecksums/CRC64NVME (0.13s)
+2026-10-19T00:47:53.4722840Z     --- PASS: TestCompletionBufferChecksums/SHA1 (0.13s)
+2026-10-19T00:47:53.4723059Z     --- PASS: TestCompletionBufferChecksums/SHA256 (0.13s)
+2026-10-19T00:47:53.4723254Z === RUN   TestFilesystemStoreBucketContract
+2026-10-19T00:47:53.4723437Z --- PASS: TestFilesystemStoreBucketContract (0.01s)
+2026-10-19T00:47:53.4723618Z === RUN   TestFilesystemStoreObjectContract
+2026-10-19T00:47:53.4723798Z --- PASS: TestFilesystemStoreObjectContract (0.03s)
+2026-10-19T00:47:53.4723989Z === RUN   TestFilesystemStoreMultipartContract
+2026-10-19T00:47:53.4724183Z --- PASS: TestFilesystemStoreMultipartContract (0.02s)
+2026-10-19T00:47:53.4724379Z === RUN   TestFilesystemStoreListHonorsCancellation
+2026-10-19T00:47:53.4724584Z --- PASS: TestFilesystemStoreListHonorsCancellation (0.01s)
+2026-10-19T00:47:53.4724795Z === RUN   TestStoreLockAdmitsOneOwnerAtATime
+2026-10-19T00:47:53.4724986Z --- PASS: TestStoreLockAdmitsOneOwnerAtATime (0.00s)
+2026-10-19T00:47:53.4725170Z === RUN   TestStoreLockExcludesAnotherProcess
+2026-10-19T00:47:53.4725354Z --- PASS: TestStoreLockExcludesAnotherProcess (0.01s)
+2026-10-19T00:47:53.4725555Z === RUN   TestFilesystemStoreSingleOwnerLock
+2026-10-19T00:47:53.4725740Z --- PASS: TestFilesystemStoreSingleOwnerLock (0.00s)
+2026-10-19T00:47:53.4725928Z === RUN   TestFilesystemStoreObjectLifecycle
+2026-10-19T00:47:53.4726108Z --- PASS: TestFilesystemStoreObjectLifecycle (0.01s)
+2026-10-19T00:47:53.4726326Z === RUN   TestFilesystemStoreRemovesStaleAtomicTempsOnOpen
+2026-10-19T00:47:53.4726578Z --- PASS: TestFilesystemStoreRemovesStaleAtomicTempsOnOpen (0.00s)
+2026-10-19T00:47:53.4726837Z === RUN   TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock
+2026-10-19T00:47:53.4727101Z --- PASS: TestFilesystemStoreDoesNotCleanTempsBeforeOwningLock (0.00s)
+2026-10-19T00:47:53.4727468Z === RUN   TestFilesystemStoreRecoversStaleLockBeforeCleanup
+2026-10-19T00:47:53.4727845Z --- PASS: TestFilesystemStoreRecoversStaleLockBeforeCleanup (0.00s)
+2026-10-19T00:47:53.4728154Z === RUN   TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover
+2026-10-19T00:47:53.4728747Z     fs_test.go:217: cannot make a directory unwritable with POSIX mode bits on windows; the completion-then-clean-staging path is covered unconditionally below
+2026-10-19T00:47:53.4729219Z --- SKIP: TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover (0.02s)
+2026-10-19T00:47:53.4729512Z === RUN   TestFilesystemStoreUsesSingleObjectRecord
+2026-10-19T00:47:53.4729726Z --- PASS: TestFilesystemStoreUsesSingleObjectRecord (0.01s)
+2026-10-19T00:47:53.4729930Z === RUN   TestFilesystemStoreOpaqueKeys
+2026-10-19T00:47:53.4730111Z --- PASS: TestFilesystemStoreOpaqueKeys (0.03s)
+2026-10-19T00:47:53.4730284Z === RUN   TestFilesystemStoreMultipart
+2026-10-19T00:47:53.4730456Z --- PASS: TestFilesystemStoreMultipart (0.13s)
+2026-10-19T00:47:53.4730638Z === RUN   TestFilesystemStoreDeleteBucketNotEmpty
+2026-10-19T00:47:53.4730903Z --- PASS: TestFilesystemStoreDeleteBucketNotEmpty (0.01s)
+2026-10-19T00:47:53.4731100Z === RUN   TestFilesystemStoreDeletePrunesShards
+2026-10-19T00:47:53.4731297Z --- PASS: TestFilesystemStoreDeletePrunesShards (0.02s)
+2026-10-19T00:47:53.4731519Z === RUN   TestFilesystemStoreDeleteBucketRefusesLongKeyObjects
+2026-10-19T00:47:53.4731776Z --- PASS: TestFilesystemStoreDeleteBucketRefusesLongKeyObjects (0.02s)
+2026-10-19T00:47:53.4731996Z === RUN   TestFilesystemStoreCopyLongKey
+2026-10-19T00:47:53.4732174Z --- PASS: TestFilesystemStoreCopyLongKey (0.02s)
+2026-10-19T00:47:53.4732367Z === RUN   TestFilesystemStoreDeleteObjectsWithLongKeys
+2026-10-19T00:47:53.4732593Z --- PASS: TestFilesystemStoreDeleteObjectsWithLongKeys (0.02s)
+2026-10-19T00:47:53.4732992Z === RUN   TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide
+2026-10-19T00:47:53.4733296Z --- PASS: TestFilesystemStoreLongKeysSharingAPrefixDoNotCollide (0.09s)
+2026-10-19T00:47:53.4733544Z === RUN   TestFilesystemStoreReadsLegacyLongKeyShards
+2026-10-19T00:47:53.4733759Z --- PASS: TestFilesystemStoreReadsLegacyLongKeyShards (0.02s)
+2026-10-19T00:47:53.4733966Z === RUN   TestFilesystemStoreLongKeysRoundTrip
+2026-10-19T00:47:53.4734158Z --- PASS: TestFilesystemStoreLongKeysRoundTrip (0.04s)
+2026-10-19T00:47:53.4734356Z === RUN   TestFilesystemStoreShortKeysStayFlat
+2026-10-19T00:47:53.4734543Z --- PASS: TestFilesystemStoreShortKeysStayFlat (0.01s)
+2026-10-19T00:47:53.4734750Z === RUN   TestFilesystemStoreLongestKeysUseBoundedPaths
+2026-10-19T00:47:53.4734977Z --- PASS: TestFilesystemStoreLongestKeysUseBoundedPaths (0.01s)
+2026-10-19T00:47:53.4735232Z === RUN   TestFilesystemStoreBoundedPathsWithLongRootAndReopen
+2026-10-19T00:47:53.4735495Z --- PASS: TestFilesystemStoreBoundedPathsWithLongRootAndReopen (0.03s)
+2026-10-19T00:47:53.4735770Z === RUN   TestFilesystemStoreCompletesMultipartUploadToBoundedPath
+2026-10-19T00:47:53.4736049Z --- PASS: TestFilesystemStoreCompletesMultipartUploadToBoundedPath (0.02s)
+2026-10-19T00:47:53.4736303Z === RUN   TestFilesystemStoreListsMixedKeyLengths
+2026-10-19T00:47:53.4736509Z --- PASS: TestFilesystemStoreListsMixedKeyLengths (0.03s)
+2026-10-19T00:47:53.4736705Z === RUN   TestMultipartOwnedHTTPTransfer
+2026-10-19T00:47:53.4737004Z 2026/10/19 00:47:53 PUT /s3 400 0s
+2026-10-19T00:47:53.4737152Z 2026/10/19 00:47:53 PUT /s3 400 0s
+2026-10-19T00:47:53.4737294Z 2026/10/19 00:47:53 PUT /s3 200 4.6566ms
+2026-10-19T00:47:53.4737462Z --- PASS: TestMultipartOwnedHTTPTransfer (0.04s)
+2026-10-19T00:47:53.4737641Z === RUN   TestMultipartOwnedHTTPAllocation
+2026-10-19T00:47:53.4737835Z === RUN   TestMultipartOwnedHTTPAllocation/bound=false
+2026-10-19T00:47:53.4738046Z 2026/10/19 00:47:53 PUT /s3 200 93.1997ms
+2026-10-19T00:47:53.4738435Z     part_http_owned_test.go:181: 8 MiB S3 UploadPart allocated 34529704 bytes
+2026-10-19T00:47:53.4738668Z === RUN   TestMultipartOwnedHTTPAllocation/bound=true
+2026-10-19T00:47:53.4738915Z     part_http_owned_test.go:164: invalid namespace capacity request
+2026-10-19T00:47:53.4739128Z --- FAIL: TestMultipartOwnedHTTPAllocation (0.23s)
+2026-10-19T00:47:53.4739368Z     --- PASS: TestMultipartOwnedHTTPAllocation/bound=false (0.21s)
+2026-10-19T00:47:53.4739688Z     --- FAIL: TestMultipartOwnedHTTPAllocation/bound=true (0.00s)
+2026-10-19T00:47:53.4739905Z === RUN   TestMultipartOwnedRefusalsPreservePart
+2026-10-19T00:47:53.4740137Z     part_http_owned_test.go:211: invalid namespace capacity request
+2026-10-19T00:47:53.4740359Z --- FAIL: TestMultipartOwnedRefusalsPreservePart (0.00s)
+2026-10-19T00:47:53.4740528Z FAIL
+2026-10-19T00:47:53.4740729Z FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	10.666s
+2026-10-19T00:47:53.4741145Z SKIP internal/storage/workspace: no atomic regular-file open, so every rooted read fails closed; no advisory file lock, so a capture lock cannot be held
+2026-10-19T00:47:53.4741549Z ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	0.017s
+2026-10-19T00:47:53.4742109Z FAIL
+2026-10-19T00:47:53.6399381Z ##[error]Process completed with exit code 1.
+2026-10-19T00:47:53.6582119Z Post job cleanup.
+2026-10-19T00:47:53.7642820Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-10-19T00:47:53.7886581Z git version 2.56.0.windows.2
+2026-10-19T00:47:53.7932115Z Temporarily overriding HOME='D:\a\_temp\db5461e9-86b1-418c-a6a7-481cfbee90b6' before making global git config changes
+2026-10-19T00:47:53.7932711Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T00:47:53.7938419Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\stow-s3\stow-s3
+2026-10-19T00:47:53.8191906Z Removing SSH command configuration
+2026-10-19T00:47:53.8198060Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T00:47:53.8493562Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-10-19T00:47:54.2684562Z Removing HTTP extra header
+2026-10-19T00:47:54.2692156Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T00:47:54.2976359Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-10-19T00:47:54.7379641Z Removing includeIf entries pointing to credentials config files
+2026-10-19T00:47:54.7393270Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-19T00:47:54.7631941Z includeif.gitdir:D:/a/stow-s3/stow-s3/.git.path
+2026-10-19T00:47:54.7632204Z includeif.gitdir:D:/a/stow-s3/stow-s3/.git/worktrees/*.path
+2026-10-19T00:47:54.7632478Z includeif.gitdir:/github/workspace/.git.path
+2026-10-19T00:47:54.7632800Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-19T00:47:54.7662504Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/stow-s3/stow-s3/.git.path
+2026-10-19T00:47:54.7890107Z D:\a\_temp\git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:54.7921364Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/stow-s3/stow-s3/.git.path D\:\\a\\_temp\\git\-credentials\-25804f65\-107d\-4c2e\-a141\-346bf44da7fd\.config
+2026-10-19T00:47:54.8220252Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/stow-s3/stow-s3/.git/worktrees/*.path
+2026-10-19T00:47:54.8451223Z D:\a\_temp\git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:54.8481597Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/stow-s3/stow-s3/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-25804f65\-107d\-4c2e\-a141\-346bf44da7fd\.config
+2026-10-19T00:47:54.8741045Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-19T00:47:54.8990907Z /github/runner_temp/git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:54.9018765Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-25804f65\-107d\-4c2e\-a141\-346bf44da7fd\.config
+2026-10-19T00:47:54.9296306Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-19T00:47:54.9525059Z /github/runner_temp/git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config
+2026-10-19T00:47:54.9561905Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-25804f65\-107d\-4c2e\-a141\-346bf44da7fd\.config
+2026-10-19T00:47:54.9816962Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-10-19T00:47:55.3742661Z Removing credentials config 'D:\a\_temp\git-credentials-25804f65-107d-4c2e-a141-346bf44da7fd.config'
+2026-10-19T00:47:55.3897621Z Cleaning up orphan processes

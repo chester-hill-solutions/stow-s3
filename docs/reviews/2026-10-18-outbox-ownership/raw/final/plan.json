@@ -1,0 +1,59 @@
+{
+  "phase": "outbox-ownership-final",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/outbox_claims.go",
+    "internal/runthrough/outbox_ownership_test.go",
+    "internal/runthrough/outbox_ownership_controls_test.go",
+    "internal/runthrough/outbox_token_exhaustion_bench_test.go",
+    "benchmark/ownership-comparison.mjs",
+    "docs/outbox.md"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox.go",
+        "internal/runthrough/outbox_claims.go",
+        "internal/runthrough/outbox_ownership_test.go",
+        "internal/runthrough/outbox_ownership_controls_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestOutbox)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutbox|TestOutbox)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

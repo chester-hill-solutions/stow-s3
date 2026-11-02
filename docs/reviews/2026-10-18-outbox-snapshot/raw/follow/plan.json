@@ -1,0 +1,76 @@
+{
+  "phase": "outbox-snapshot-writer-followup",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/file_outbox_proto_native_test.go",
+    "internal/runthrough/file_outbox_snapshot_test.go",
+    "internal/runthrough/file_outbox_snapshot_bench_test.go",
+    "internal/runthrough/file_outbox_snapshot_writer_bench_test.go",
+    "internal/runthrough/file_outbox_snapshot_matched_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_snapshot_matched_bench_test.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "follow-go",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "follow-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./internal/runthrough"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/compare.mjs"
+      ]
+    }
+  ],
+  "compare": {
+    "fixtures": [],
+    "stages": [],
+    "cpu": [],
+    "cycles": 0,
+    "benchtime": "32x",
+    "contracts": false,
+    "fixed": false,
+    "writers": false,
+    "follow": true
+  }
+}

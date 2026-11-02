@@ -1,0 +1,25 @@
+File: post-profile.test
+Build ID: d891571500456aead629a84f12762f47e25c566a
+Type: alloc_space
+Time: 2026-10-18 13:11:23 UTC
+Active filters:
+   focus=decodeOutboxProto
+Showing nodes accounting for 76443.93kB, 67.22% of 113725.01kB total
+Dropped 3 nodes (cum <= 568.62kB)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0% 76445.73kB 67.22%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkOutboxDecodeProfile.func1
+         0     0%     0% 76445.73kB 67.22%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+    2.58kB 0.0023% 0.0023% 76445.73kB 67.22%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoRecords
+         0     0% 0.0023% 76445.73kB 67.22%  testing.(*B).runN
+         0     0% 0.0023% 76441.60kB 67.22%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).consume
+    4.98kB 0.0044% 0.0066% 76441.60kB 67.22%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).record
+         0     0% 0.0066% 69495.89kB 61.11%  testing.(*B).launch
+40356.42kB 35.49% 35.49% 40356.42kB 35.49%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).addEntry
+         0     0% 35.49% 27687.97kB 24.35%  google.golang.org/protobuf/proto.UnmarshalOptions.Unmarshal
+         0     0% 35.49% 27687.97kB 24.35%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 35.49% 27687.72kB 24.35%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 35.49% 27687.72kB 24.35%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 35.49% 27687.72kB 24.35%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+27687.72kB 24.35% 59.84% 27687.72kB 24.35%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+ 8392.23kB  7.38% 67.22%  8392.23kB  7.38%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).addProvenance
+         0     0% 67.22%  6949.84kB  6.11%  testing.(*B).run1.func1

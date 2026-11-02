@@ -149,24 +149,27 @@ func handleReadObjectChunk(_ context.Context, _ *stow.Runtime, req request) (jso
 	}{err == io.EOF})
 }
 
-func closeReadSession(token string, handle int) {
+func closeReadSession(token string, handle int) error {
 	runtimeStreams.Lock()
 	session := runtimeStreams.reads[token]
-	if session != nil && session.handle == handle {
-		delete(runtimeStreams.reads, token)
-	} else {
-		session = nil
-	}
 	runtimeStreams.Unlock()
-	if session != nil {
-		session.cancel()
-		_ = session.reader.Close()
+	if session == nil || session.handle != handle {
+		return nil
 	}
+	session.cancel()
+	session.mu.Lock()
+	defer session.mu.Unlock()
+	if err := session.reader.Close(); err != nil {
+		return err
+	}
+	runtimeStreams.Lock()
+	delete(runtimeStreams.reads, token)
+	runtimeStreams.Unlock()
+	return nil
 }
 
 func handleCloseObjectRead(_ context.Context, _ *stow.Runtime, req request) (json.RawMessage, error) {
-	closeReadSession(req.Token, req.Handle)
-	return nil, nil
+	return nil, closeReadSession(req.Token, req.Handle)
 }
 
 func handleOpenObjectWrite(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {

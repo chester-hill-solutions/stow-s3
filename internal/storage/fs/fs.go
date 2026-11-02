@@ -225,11 +225,7 @@ func (s *FilesystemStore) CreateBucket(_ context.Context, name string) error {
 	if _, err := os.Stat(dir); err == nil {
 		return storage.ErrBucketExists
 	}
-	if err := os.MkdirAll(s.objectsDir(name), 0o755); err != nil {
-		return err
-	}
-	created := time.Now().UTC()
-	return writeJSONAtomic(filepath.Join(dir, "bucket.json"), map[string]time.Time{"created_at": created})
+	return s.createBucketLocked(dir)
 }
 
 func (s *FilesystemStore) DeleteBucket(_ context.Context, name string) error {
@@ -258,7 +254,7 @@ func (s *FilesystemStore) DeleteBucket(_ context.Context, name string) error {
 		return storage.ErrBucketNotEmpty
 	}
 	s.forgetFencedDirectories(dir)
-	return os.RemoveAll(dir)
+	return s.removeCapacityPath(dir)
 }
 
 func (s *FilesystemStore) HeadBucket(_ context.Context, name string) (*storage.BucketInfo, error) {

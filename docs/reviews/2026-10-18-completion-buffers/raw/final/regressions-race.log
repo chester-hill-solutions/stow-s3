@@ -1,0 +1,66 @@
+=== RUN   TestMultipartCompletionCapacityVersion
+=== RUN   TestMultipartCompletionCapacityVersion/#00
+=== RUN   TestMultipartCompletionCapacityVersion/verified_payload
+--- PASS: TestMultipartCompletionCapacityVersion (0.06s)
+    --- PASS: TestMultipartCompletionCapacityVersion/#00 (0.03s)
+    --- PASS: TestMultipartCompletionCapacityVersion/verified_payload (0.03s)
+=== RUN   TestCompletionBufferAllocation
+=== RUN   TestCompletionBufferAllocation/bound=false/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8418560 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=false/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8427832 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8781080 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8784344 budget=10485760
+--- PASS: TestCompletionBufferAllocation (1.04s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=false (0.23s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=true (0.22s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=false (0.29s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=true (0.29s)
+=== RUN   TestCompletionBufferChecksums
+=== RUN   TestCompletionBufferChecksums/CRC32
+=== RUN   TestCompletionBufferChecksums/CRC32C
+=== RUN   TestCompletionBufferChecksums/CRC64NVME
+=== RUN   TestCompletionBufferChecksums/SHA1
+=== RUN   TestCompletionBufferChecksums/SHA256
+--- PASS: TestCompletionBufferChecksums (0.29s)
+    --- PASS: TestCompletionBufferChecksums/CRC32 (0.05s)
+    --- PASS: TestCompletionBufferChecksums/CRC32C (0.05s)
+    --- PASS: TestCompletionBufferChecksums/CRC64NVME (0.10s)
+    --- PASS: TestCompletionBufferChecksums/SHA1 (0.05s)
+    --- PASS: TestCompletionBufferChecksums/SHA256 (0.05s)
+=== RUN   TestMultipartCompletionCapacityVersion
+=== RUN   TestMultipartCompletionCapacityVersion/#00
+=== RUN   TestMultipartCompletionCapacityVersion/verified_payload
+--- PASS: TestMultipartCompletionCapacityVersion (0.05s)
+    --- PASS: TestMultipartCompletionCapacityVersion/#00 (0.03s)
+    --- PASS: TestMultipartCompletionCapacityVersion/verified_payload (0.03s)
+=== RUN   TestCompletionBufferAllocation
+=== RUN   TestCompletionBufferAllocation/bound=false/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8419072 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=false/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8428936 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=false
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8739832 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=true
+    completion_buffer_test.go:17: completion bytes=8388608 allocated=8742912 budget=10485760
+--- PASS: TestCompletionBufferAllocation (1.03s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=false (0.20s)
+    --- PASS: TestCompletionBufferAllocation/bound=false/split=true (0.23s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=false (0.29s)
+    --- PASS: TestCompletionBufferAllocation/bound=true/split=true (0.31s)
+=== RUN   TestCompletionBufferChecksums
+=== RUN   TestCompletionBufferChecksums/CRC32
+=== RUN   TestCompletionBufferChecksums/CRC32C
+=== RUN   TestCompletionBufferChecksums/CRC64NVME
+=== RUN   TestCompletionBufferChecksums/SHA1
+=== RUN   TestCompletionBufferChecksums/SHA256
+--- PASS: TestCompletionBufferChecksums (0.33s)
+    --- PASS: TestCompletionBufferChecksums/CRC32 (0.06s)
+    --- PASS: TestCompletionBufferChecksums/CRC32C (0.05s)
+    --- PASS: TestCompletionBufferChecksums/CRC64NVME (0.11s)
+    --- PASS: TestCompletionBufferChecksums/SHA1 (0.05s)
+    --- PASS: TestCompletionBufferChecksums/SHA256 (0.05s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	3.819s

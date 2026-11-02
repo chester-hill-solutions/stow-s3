@@ -68,11 +68,13 @@ type Index struct {
 // ManifestEntry records what stow knows about one object. A missing entry is
 // legal and is the normal case for a file the host wrote.
 type ManifestEntry struct {
-	Form              Form              `json:"form"`
-	Digest            string            `json:"digest,omitempty"`
-	Size              int64             `json:"size"`
-	ETag              string            `json:"etag,omitempty"`
-	Multipart         bool              `json:"multipart,omitempty"`
+	Form      Form   `json:"form"`
+	Digest    string `json:"digest,omitempty"`
+	Size      int64  `json:"size"`
+	ETag      string `json:"etag,omitempty"`
+	Multipart bool   `json:"multipart,omitempty"`
+	// ContentETag identifies multipart bytes independently of the public composite ETag.
+	ContentETag       string            `json:"content_etag,omitempty"`
 	VersionID         string            `json:"version_id,omitempty"`
 	ContentType       string            `json:"content_type,omitempty"`
 	Metadata          map[string]string `json:"metadata,omitempty"`
@@ -177,8 +179,8 @@ func (m *Manifest) saveIdentity() error {
 
 // writeFileAtomic delegates to internal/atomicfile.
 //
-// All five callers in this package go through here, so the guarantee is now
-// shared rather than per-file.
+// Byte-slice writes here and compound part records use the same atomicfile
+// publication guarantee.
 func writeFileAtomic(path string, data []byte) error {
 	return atomicfile.Write(path, data, 0o644)
 }
@@ -216,8 +218,7 @@ func (i *Index) removeEntry(bucket, key string) {
 // stale reports whether a recorded entry no longer describes the file on disk,
 // which is what an agent overwriting a file behind stow's back looks like.
 //
-// Size and modification time are compared rather than the ETag because checking
-// the ETag would mean reading every file on every head.
+// Byte identity is checked separately by reconcileEntry.
 func (e ManifestEntry) stale(size int64, modified time.Time) bool {
 	if e.Size != size {
 		return true

@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,statistics,sys
+p=Path('/private/tmp/stow-outbox-reuse-2026-10-18');phase=sys.argv[1];job=json.loads((p/(phase+'-start.json')).read_text())['id'];e=p/('export-'+job);samples=json.loads((e/'samples.json').read_text());groups={}
+for row in samples:groups.setdefault((row['kind'],row['cpu'],row['fixture'],row['stage']),{}).setdefault(row['variant'],[]).append(row)
+summary=[]
+for (kind,cpu,fixture,stage),variants in sorted(groups.items()):
+ row=dict(kind=kind,cpu=cpu,fixture=fixture,stage=stage)
+ for v,observations in variants.items():row[v]={'observations':len(observations),'metrics':{k:{'median':statistics.median([o['metrics'][k]for o in observations]),'min':min(o['metrics'][k]for o in observations),'max':max(o['metrics'][k]for o in observations)}for k in observations[0]['metrics']}}
+ a,b=row['before']['metrics'],row['after']['metrics'];row['latencyChangePercent']=(b['ns/op']['median']/a['ns/op']['median']-1)*100;row['liveHeapDeltaBytes']=b['process-live-heap-B']['median']-a['process-live-heap-B']['median'];summary.append(row)
+(e/'analysis.json').write_text(json.dumps(summary,indent=2)+'\n')
+for r in summary:
+ if r['cpu']!=1:continue
+ a,b=r['before']['metrics'],r['after']['metrics'];print(r['kind'],r['fixture'],r['stage'],f"ms {a['ns/op']['median']/1e6:.4f} -> {b['ns/op']['median']/1e6:.4f} ({r['latencyChangePercent']:+.2f}%)",f"B/op {a['B/op']['median']:,.0f} -> {b['B/op']['median']:,.0f}",f"live heap delta {r['liveHeapDeltaBytes']:,.0f} B")
+print('Observations',len(samples),'adverse timed latencies',[(r['cpu'],r['fixture'],r['stage'],round(r['latencyChangePercent'],2))for r in summary if r['kind']=='timed'and r['latencyChangePercent']>0])

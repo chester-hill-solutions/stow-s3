@@ -1,0 +1,29 @@
+package runtime
+
+import (
+ "context"
+ "errors"
+ "testing"
+
+)
+
+func TestReviewExcessReadRechecked(t *testing.T){
+ for _,mode:=range []string{"stream","get","guarded"}{
+  t.Run(mode,func(t *testing.T){
+   f,store:=saveBodyFixture(t)
+   f.instance.store=&completionSeekStore{saveBodyStore:store,body:"old!"}
+   usage:=f.instance.Usage()
+   object,condition,err:=observeExcessRead(f.instance,mode)
+   if err==nil{t.Error("excess body accepted")}
+   checkExcessResult(t,mode,object,condition,"old")
+   assertSaveBodyCounts(t,store,4,1)
+   if f.instance.Usage()!=usage{t.Fatal("read changed accounting")}
+   f.instance.store=store
+   if mode=="guarded"{
+    result,err:=f.instance.SaveObject(context.Background(),"probe","target",[]byte("bad"),SaveOptions{Condition:condition})
+    if !errors.Is(err,ErrInvalidSaveCondition) || result.Outcome!=SaveNotCommitted{t.Fatalf("malformed read issued usable condition: result=%+v error=%v",result,err)}
+   }
+   verifySaveReadRecovery(t,f)
+  })
+ }
+}
