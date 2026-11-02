@@ -55,9 +55,8 @@ func bearerToken(header string) string {
 	return strings.TrimSpace(header[len(prefix):])
 }
 
-// mcpHTTPHandler wraps the transport handler with the token check. An empty token
-// means the caller accepted a loopback-only address, where the process boundary is
-// the protection and the S3 listener next to it needs no token either.
+// mcpHTTPHandler checks a configured caller credential before the SDK transport.
+// An empty token is allowed only after loopback exposure validation.
 func mcpHTTPHandler(server *mcp.Server, token string) http.Handler {
 	handler := mcp.NewStreamableHTTPHandler(
 		func(*http.Request) *mcp.Server { return server },
