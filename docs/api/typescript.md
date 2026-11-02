@@ -421,7 +421,7 @@ interface EmbeddedSaveOptions {
 
 ## EmbeddedSaveResult
 
-The outcome of a save or of resolving one.
+Only `committed` proves the write; a thrown error does not prove non-commit.
 
 ```ts
 interface EmbeddedSaveResult {
@@ -433,7 +433,7 @@ interface EmbeddedSaveResult {
 
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `object` | `EmbeddedObject` | No |  |
+| `object` | `EmbeddedObject` | No | Commit metadata; payload bytes may be absent, as in the native save result. |
 | `outcome` | `"committed" \| "not_committed" \| "unknown"` | No |  |
 | `replayed` | `boolean` | No | True when a retained request answered instead of the write being attempted. |
 

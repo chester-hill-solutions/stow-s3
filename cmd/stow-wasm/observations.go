@@ -78,7 +78,7 @@ func (t *observationTable) get(token string) (stow.SaveCondition, error) {
 	if !ok {
 		return stow.SaveCondition{}, errUnknownObservation
 	}
-	if t.now().After(entry.expires) {
+	if !t.now().Before(entry.expires) {
 		delete(t.entries, token)
 		return stow.SaveCondition{}, errObservationExpired
 	}
@@ -106,7 +106,7 @@ func (t *observationTable) evictExpiredLocked() {
 		if !ok {
 			continue
 		}
-		if now.After(entry.expires) {
+		if !now.Before(entry.expires) {
 			delete(t.entries, token)
 			continue
 		}

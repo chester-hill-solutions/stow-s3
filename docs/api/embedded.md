@@ -76,7 +76,7 @@ interface BridgeObject  extends Omit<EmbeddedObject, "data"> {
 
 
 ```ts
-decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array<ArrayBufferLike> | undefined): T
+decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array<ArrayBufferLike> | undefined, operation?: unknown): T
 ```
 
 | Parameter | Type | Required | Default | Meaning |
@@ -84,6 +84,7 @@ decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array
 | `parsed` | `unknown` | Yes | — |  |
 | `version` | `number` | Yes | — |  |
 | `payload` | `Uint8Array<ArrayBufferLike> \| undefined` | No | — |  |
+| `operation` | `unknown` | No | — |  |
 
 Returns: `T`.
 

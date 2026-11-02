@@ -255,8 +255,8 @@ export class EmbeddedStow {
   /**
    * Publish a save that compares at publication, or replaces deliberately.
    *
-   * A replacement is still a save with a request key: consent to replace is not
-   * consent to write twice.
+   * A replacement publishes without comparison and still enforces authority and
+   * quotas. Durable replay additionally requires retained request receipts.
    */
   saveObject(
     bucket: string,
@@ -387,13 +387,14 @@ function invoke<T>(host: EmbeddedHost, request: Record<string, unknown>, data?: 
     const message = error instanceof Error ? error.message : String(error);
     throw new EmbeddedStowError("host_error", `embedded host call failed: ${message}`);
   }
-  return decodeEmbeddedResponse<T>(parsed, version, payload);
+  return decodeEmbeddedResponse<T>(parsed, version, payload, request.op);
 }
 
 export function decodeEmbeddedResponse<T>(
   parsed: unknown,
   version: number,
   payload?: Uint8Array,
+  operation?: unknown,
 ): T {
   if (!isRecord(parsed) || typeof parsed.version !== "number" || typeof parsed.ok !== "boolean") {
     throw new EmbeddedStowError("protocol", "embedded host returned an invalid response");
@@ -418,10 +419,16 @@ export function decodeEmbeddedResponse<T>(
     if (!(payload instanceof Uint8Array) || !isRecord(parsed.result)) {
       throw new EmbeddedStowError("protocol", "embedded host returned an invalid binary payload");
     }
-    parsed.result.data = payload;
+    binaryResultObject(parsed.result, operation).data = payload;
   }
   return parsed.result as T;
 
+}
+
+function binaryResultObject(result: Record<string, unknown>, operation: unknown): Record<string, unknown> {
+  if (operation !== "readForSave" && operation !== "saveObject" && operation !== "resolveSave") return result;
+  if (!isRecord(result.object)) throw new EmbeddedStowError("protocol", "embedded host returned an invalid managed object");
+  return result.object;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -13,8 +13,9 @@ export interface EmbeddedSaveObservation {
     absent: boolean;
     observationToken: string;
 }
-/** The outcome of a save or of resolving one. Only `committed` proves the write. */
+/** Only `committed` proves the write; a thrown error does not prove non-commit. */
 export interface EmbeddedSaveResult {
+    /** Commit metadata; payload bytes may be absent, as in the native save result. */
     object: EmbeddedObject;
     outcome: "committed" | "not_committed" | "unknown";
     /** True when a retained request answered instead of the write being attempted. */
@@ -27,7 +28,7 @@ export interface EmbeddedSaveOptions {
     replace?: boolean;
     contentType?: string;
     metadata?: Record<string, string>;
-    /** Reuse on every retry, so a lost reply can be resolved instead of repeated. */
+    /** Requires durableSaveRequests; reuse to resolve lost replies through retained receipts. */
     requestKey?: string;
 }
 export interface BridgeObject extends Omit<EmbeddedObject, "data"> {

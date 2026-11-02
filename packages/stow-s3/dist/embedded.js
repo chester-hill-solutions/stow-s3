@@ -106,8 +106,8 @@ export class EmbeddedStow {
     /**
      * Publish a save that compares at publication, or replaces deliberately.
      *
-     * A replacement is still a save with a request key: consent to replace is not
-     * consent to write twice.
+     * A replacement publishes without comparison and still enforces authority and
+     * quotas. Durable replay additionally requires retained request receipts.
      */
     saveObject(bucket, key, data, options = {}) {
         this.requireGuardedSaves();
@@ -207,9 +207,9 @@ function invoke(host, request, data) {
         const message = error instanceof Error ? error.message : String(error);
         throw new EmbeddedStowError("host_error", `embedded host call failed: ${message}`);
     }
-    return decodeEmbeddedResponse(parsed, version, payload);
+    return decodeEmbeddedResponse(parsed, version, payload, request.op);
 }
-export function decodeEmbeddedResponse(parsed, version, payload) {
+export function decodeEmbeddedResponse(parsed, version, payload, operation) {
     if (!isRecord(parsed) || typeof parsed.version !== "number" || typeof parsed.ok !== "boolean") {
         throw new EmbeddedStowError("protocol", "embedded host returned an invalid response");
     }
@@ -228,9 +228,16 @@ export function decodeEmbeddedResponse(parsed, version, payload) {
         if (!(payload instanceof Uint8Array) || !isRecord(parsed.result)) {
             throw new EmbeddedStowError("protocol", "embedded host returned an invalid binary payload");
         }
-        parsed.result.data = payload;
+        binaryResultObject(parsed.result, operation).data = payload;
     }
     return parsed.result;
+}
+function binaryResultObject(result, operation) {
+    if (operation !== "readForSave" && operation !== "saveObject" && operation !== "resolveSave")
+        return result;
+    if (!isRecord(result.object))
+        throw new EmbeddedStowError("protocol", "embedded host returned an invalid managed object");
+    return result.object;
 }
 function isRecord(value) {
     return typeof value === "object" && value !== null;

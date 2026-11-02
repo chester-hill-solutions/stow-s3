@@ -208,5 +208,5 @@ async function invoke<T>(host: AsyncEmbeddedHost, request: Record<string, unknow
   } catch {
     throw new EmbeddedStowError("protocol", "embedded host returned invalid JSON metadata");
   }
-  return decodeEmbeddedResponse<T>(parsed, EMBEDDED_BINARY_PROTOCOL_VERSION, response.data);
+  return decodeEmbeddedResponse<T>(parsed, EMBEDDED_BINARY_PROTOCOL_VERSION, response.data, request.op);
 }

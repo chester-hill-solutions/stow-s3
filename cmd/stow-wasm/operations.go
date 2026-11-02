@@ -143,7 +143,11 @@ func handleReadForSave(ctx context.Context, instance *stow.Runtime, req request)
 	if err != nil {
 		return nil, err
 	}
-	token, err := observationsFor(req.Handle).add(condition)
+	table := observationsFor(req.Handle)
+	if table == nil {
+		return nil, fmt.Errorf("runtime handle %d is not open", req.Handle)
+	}
+	token, err := table.add(condition)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +164,14 @@ func handleReadForSave(ctx context.Context, instance *stow.Runtime, req request)
 func handleSaveObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
 	condition := stow.ReplacementCondition()
 	if !req.Replace {
-		retained, err := observationsFor(req.Handle).get(req.ObservationToken)
+		if req.ObservationToken == "" {
+			return nil, stow.ErrInvalidSaveCondition
+		}
+		table := observationsFor(req.Handle)
+		if table == nil {
+			return nil, errUnknownObservation
+		}
+		retained, err := table.get(req.ObservationToken)
 		if err != nil {
 			return nil, err
 		}
@@ -196,7 +207,9 @@ func handleResolveSave(ctx context.Context, instance *stow.Runtime, req request)
 }
 
 func handleReleaseObservation(_ context.Context, _ *stow.Runtime, req request) (json.RawMessage, error) {
-	observationsFor(req.Handle).release(req.ObservationToken)
+	if table := observationsFor(req.Handle); table != nil {
+		table.release(req.ObservationToken)
+	}
 	return nil, nil
 }
 

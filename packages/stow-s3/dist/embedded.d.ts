@@ -124,8 +124,8 @@ export declare class EmbeddedStow {
     /**
      * Publish a save that compares at publication, or replaces deliberately.
      *
-     * A replacement is still a save with a request key: consent to replace is not
-     * consent to write twice.
+     * A replacement publishes without comparison and still enforces authority and
+     * quotas. Durable replay additionally requires retained request receipts.
      */
     saveObject(bucket: string, key: string, data: Uint8Array, options?: EmbeddedSaveOptions): EmbeddedSaveResult;
     /** Ask what a request key did, instead of writing again. */
@@ -139,6 +139,6 @@ export declare class EmbeddedStow {
     private invoke;
     private ensureOpen;
 }
-export declare function decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array): T;
+export declare function decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array, operation?: unknown): T;
 export declare function fromBridgeObject(object: BridgeObject): EmbeddedObject;
 //# sourceMappingURL=embedded.d.ts.map

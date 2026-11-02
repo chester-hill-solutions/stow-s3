@@ -146,6 +146,6 @@ async function invoke(host, request, data, options) {
     catch {
         throw new EmbeddedStowError("protocol", "embedded host returned invalid JSON metadata");
     }
-    return decodeEmbeddedResponse(parsed, EMBEDDED_BINARY_PROTOCOL_VERSION, response.data);
+    return decodeEmbeddedResponse(parsed, EMBEDDED_BINARY_PROTOCOL_VERSION, response.data, request.op);
 }
 //# sourceMappingURL=async-embedded.js.map

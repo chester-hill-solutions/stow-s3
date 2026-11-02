@@ -132,6 +132,9 @@ var state = struct {
 func observationsFor(handle int) *observationTable {
 	state.Lock()
 	defer state.Unlock()
+	if _, open := state.instances[handle]; !open {
+		return nil
+	}
 	table, ok := state.observations[handle]
 	if !ok {
 		table = newObservationTable()
