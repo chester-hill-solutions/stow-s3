@@ -76,7 +76,7 @@ func parseServeFlags(args []string) serveFlags {
 	// string flag, and that is a trap: `--offline` as a string consumed the next
 	// argument, so `--offline --ready-fd 3` failed with "invalid --offline
 	offline := registerOfflineFlag(flags)
-	allowInsecureRemote := flags.Bool("allow-insecure-remote", false, "Permit a listen host beyond loopback; requires TLS in front of this process and provisioned credentials")
+	allowInsecureRemote := flags.Bool("allow-insecure-remote", false, "Permit a listen host beyond loopback; accept cleartext exposure or terminate TLS externally; requires provisioned credentials")
 	showVersion := versionFlag(flags)
 	maxBytes := flags.Int64("max-bytes", 0, "Maximum stored object bytes enforced on every native S3 request (0 disables the limit)")
 	maxObjects := flags.Int64("max-objects", 0, "Maximum stored object count enforced on every native S3 request (0 disables the limit)")

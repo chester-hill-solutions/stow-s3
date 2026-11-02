@@ -304,6 +304,9 @@ Removal coordinates with active storage operations.
 ## Install
 
 Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
+
+The [npmjs/OIDC preparation guide](docs/npm-publishing.md) describes the future
+public package path. npm publication and trust configuration remain disabled.
 Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
 against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
 Run `stow-s3 --version` to check the installed version. Use WSL on Windows.

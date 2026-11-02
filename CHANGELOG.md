@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.4 — release candidate
+
 Close the three correctness findings the bounded closure review left open after
 v0.3.3. A signed HTTP header now covers every value it carries, so a request
 that changes one after signing is refused
@@ -13,8 +15,11 @@ query is ordered by the encoded parameter names, as the signing rules require,
 so a query signed by the pinned Node signer with an encoded name authenticates
 ([query order fix](docs/reviews/2026-10-19-sigv4-query-order.md)).
 
-These are corrections on `main` after the `v0.3.3` tag. The published v0.3.3
-archives carry the three issues their
+Also correct MCP plugin template copying on newer Node versions, strengthen
+the conditional-write examples, and update the AWS SDKs and development tools.
+Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
+[candidate release notes](docs/releases/v0.3.4.md) for scope and compatibility.
+The published v0.3.3 archives still carry the three issues their
 [release notes](docs/releases/v0.3.3.md) list.
 
 ## 0.3.3 — 2026-10-18

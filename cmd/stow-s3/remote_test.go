@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestListenHostIsLoopback(t *testing.T) {
@@ -18,7 +20,7 @@ func TestListenHostIsLoopback(t *testing.T) {
 		{"localhost", true},
 		{"LOCALHOST", true},
 		{"127.0.0.5", true},
-		{"", false},
+		{"", true},
 		{"0.0.0.0", false},
 		{"::", false},
 		{"[::]", false},
@@ -68,6 +70,15 @@ func TestValidateRemoteExposure(t *testing.T) {
 		{
 			name:        "consent without an admin token is refused",
 			options:     serveFlags{host: "0.0.0.0", allowInsecureRemote: true, accessKey: "key", secretKey: "secret"},
+			wantMessage: "--admin-token",
+		},
+		{
+			name:    "an empty host uses the server loopback default",
+			options: serveFlags{},
+		},
+		{
+			name:        "whitespace is not an admin token",
+			options:     serveFlags{host: "0.0.0.0", allowInsecureRemote: true, accessKey: "key", secretKey: "secret", adminToken: "   "},
 			wantMessage: "--admin-token",
 		},
 		{
@@ -121,32 +132,47 @@ func envWithout(keys ...string) []string {
 // the socket it is refusing to serve on. This runs the real binary, because the
 // claim is about a process's exit and its message.
 func TestServeRefusesAWildcardBindWithoutConsent(t *testing.T) {
-	binary := launcherBinary(t)
-	cmd := exec.Command(binary, "serve", "--host", "0.0.0.0", "--port", "0", "--data-dir", t.TempDir())
-	cmd.Env = envWithout("STOW_LOCAL_ACCESS_KEY_ID", "STOW_LOCAL_SECRET_ACCESS_KEY", "STOW_ADMIN_TOKEN")
-	output, err := cmd.CombinedOutput()
-	if err == nil {
-		t.Fatalf("serve started on a wildcard address with no consent: %s", output)
-	}
-	if !strings.Contains(string(output), "--allow-insecure-remote") {
-		t.Errorf("the refusal does not name the flag that resolves it: %s", output)
-	}
-	if strings.Contains(string(output), "STOW_READY") {
-		t.Errorf("the server announced readiness after refusing: %s", output)
+	expectRemoteRefusal(t, []string{"--host", "0.0.0.0"}, nil, "--allow-insecure-remote")
+}
+
+func TestServeRefusesARemoteBindWithoutProvisionedCredentials(t *testing.T) {
+	expectRemoteRefusal(t, []string{"--host", "192.0.2.1", "--allow-insecure-remote"}, nil, "--access-key and --secret-key")
+}
+
+func TestServeRefusesBlankAdminTokensFromFlagsAndEnvironment(t *testing.T) {
+	for _, source := range []string{"flag", "environment"} {
+		t.Run(source, func(t *testing.T) {
+			args := []string{"--host", "192.0.2.1", "--allow-insecure-remote", "--access-key", "fixture-key", "--secret-key", "fixture-secret"}
+			var env []string
+			if source == "flag" {
+				args = append(args, "--admin-token", "   ")
+			} else {
+				env = []string{"STOW_ADMIN_TOKEN=   "}
+			}
+			expectRemoteRefusal(t, args, env, "--admin-token")
+		})
 	}
 }
 
-// A remote bind with consent still refuses when the credentials are missing,
-// because a generated pair is reported only to this process's stdout.
-func TestServeRefusesARemoteBindWithoutProvisionedCredentials(t *testing.T) {
+func expectRemoteRefusal(t *testing.T, args, env []string, message string) {
+	t.Helper()
 	binary := launcherBinary(t)
-	cmd := exec.Command(binary, "serve", "--host", "192.0.2.1", "--port", "0", "--allow-insecure-remote", "--data-dir", t.TempDir())
-	cmd.Env = envWithout("STOW_LOCAL_ACCESS_KEY_ID", "STOW_LOCAL_SECRET_ACCESS_KEY", "STOW_ADMIN_TOKEN")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	command := append([]string{"serve", "--port", "0", "--data-dir", t.TempDir()}, args...)
+	cmd := exec.CommandContext(ctx, binary, command...)
+	cmd.Env = append(envWithout("STOW_LOCAL_ACCESS_KEY_ID", "STOW_LOCAL_SECRET_ACCESS_KEY", "STOW_ADMIN_TOKEN"), env...)
 	output, err := cmd.CombinedOutput()
-	if err == nil {
-		t.Fatalf("serve started without credentials: %s", output)
+	if ctx.Err() != nil {
+		t.Fatal("serve did not refuse before the deadline; the owned process was stopped")
 	}
-	if !strings.Contains(string(output), "--access-key and --secret-key") {
-		t.Errorf("the refusal does not name the credentials: %s", output)
+	if err == nil {
+		t.Fatalf("serve started despite missing consent/provisioning: %s", output)
+	}
+	if !strings.Contains(string(output), message) {
+		t.Errorf("refusal does not name %s: %s", message, output)
+	}
+	if strings.Contains(string(output), "STOW_READY") {
+		t.Errorf("server announced readiness after refusing: %s", output)
 	}
 }
