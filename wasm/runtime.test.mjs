@@ -29,12 +29,9 @@ test("EmbeddedStow drives the real memory runtime", async () => {
     embedded = EmbeddedStow.open(host, { maxBytes: 10, maxObjects: 2 });
     const capabilities = embedded.capabilities();
     assert.equal(capabilities.conditionalWrites, true);
-    // The save-semantics flags are reported rather than omitted. A caller cannot
-    // ask for a guarantee it has no way to see, and a missing field is
-    // indistinguishable from false in a language where undefined is falsy.
-    for (const name of ["guardedSaves", "durableSaveRequests", "recoveryHolds"]) {
-      assert.equal(typeof capabilities[name], "boolean", `${name} must be reported`);
-    }
+    assert.equal(capabilities.guardedSaves, true);
+    assert.equal(capabilities.durableSaveRequests, false);
+    assert.equal(capabilities.recoveryHolds, false);
     embedded.createBucket("assets");
     const put = embedded.putObject(
       "assets",
