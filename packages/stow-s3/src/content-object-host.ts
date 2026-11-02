@@ -105,14 +105,18 @@ export class ContentObjectHost implements HostObjectStoreBridge {
       }
       rows.set(object.key, object);
     }
-    const ordered = [...rows.entries()].filter(([value]) => value > after).sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0));
+    const encoder = new TextEncoder();
+    const cursorBytes = encoder.encode(after);
+    const ordered = [...rows.entries()].map(([value, object]) => ({ value, object, bytes: encoder.encode(value) }))
+      .filter((row) => compareKeyBytes(row.bytes, cursorBytes) > 0)
+      .sort((left, right) => compareKeyBytes(left.bytes, right.bytes));
     const page = ordered.slice(0, limit);
     const truncated = ordered.length > limit;
     return {
-      objects: page.flatMap(([, object]) => (object === null ? [] : [object])),
-      commonPrefixes: page.flatMap(([value, object]) => (object === null ? [value] : [])),
+      objects: page.flatMap(({ object }) => (object === null ? [] : [object])),
+      commonPrefixes: page.flatMap(({ value, object }) => (object === null ? [value] : [])),
       truncated,
-      nextCursor: truncated ? page[page.length - 1]?.[0] : undefined,
+      nextCursor: truncated ? page[page.length - 1]?.value : undefined,
     };
   }
   private startPut(request: Record<string, unknown>): { token: string } {
@@ -191,4 +195,13 @@ function numberField(request: Record<string, unknown>, key: string): number {
 }
 function replaceEntry(catalog: ObjectCatalog, entry: { id: string; object: EmbeddedObject }) {
   return [...catalog.objects.filter((item) => item.object.bucket !== entry.object.bucket || item.object.key !== entry.object.key), entry];
+}
+
+// Match the shared Go paginator: S3 key and cursor order is UTF-8 byte order.
+function compareKeyBytes(left: Uint8Array, right: Uint8Array): number {
+  for (let index = 0; index < Math.min(left.length, right.length); index += 1) {
+    const difference = (left[index] ?? 0) - (right[index] ?? 0);
+    if (difference !== 0) return difference;
+  }
+  return left.length - right.length;
 }

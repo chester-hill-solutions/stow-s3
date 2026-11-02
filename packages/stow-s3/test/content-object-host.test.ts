@@ -113,3 +113,18 @@ test("a delimiter groups keys into directory rows the host can page over", async
   assert.deepEqual(thirdPage.objects.map((object) => object.key), ["root.txt"]);
   assert.equal(thirdPage.truncated, false);
 });
+
+test("delimiter cursors follow UTF-8 order across BMP and astral groups", async () => {
+  const { host } = await fixture();
+  assert.ok((await call(host, { op: "createBucket", bucket: "objects" })).ok);
+  for (const key of ["\u{10000}/a", "\uE000/a", "\uE000/b"]) assert.ok((await put(host, key, "x")).ok);
+  const first = await call(host, { op: "listObjects", bucket: "objects", list: { delimiter: "/", limit: 1 } });
+  const page = first.result as { commonPrefixes: string[]; nextCursor: string; truncated: boolean };
+  assert.deepEqual(page.commonPrefixes, ["\uE000/"]);
+  assert.equal(page.nextCursor, "\uE000/");
+  assert.equal(page.truncated, true);
+  const second = await call(host, { op: "listObjects", bucket: "objects", list: { delimiter: "/", limit: 1, cursor: page.nextCursor } });
+  const last = second.result as { commonPrefixes: string[]; truncated: boolean };
+  assert.deepEqual(last.commonPrefixes, ["\u{10000}/"]);
+  assert.equal(last.truncated, false);
+});
