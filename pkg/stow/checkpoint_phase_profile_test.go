@@ -53,12 +53,14 @@ func profileCheckpointRun(t *testing.T, caseName string, fileCount, fileSize, ch
 	inputBytes := int64(fileCount * fileSize)
 	verificationTime := profileVerifyCapture(t, w.Dir(), manifest)
 	recoveryTime := profileRestoreCheckpoint(t, registry, manifest, inputBytes)
-	copyBytes := profileCopyBytes(manifest.Files, parent)
-	t.Logf("workload=%s files=%d input_bytes=%d payload_bytes_read_estimate=%d payload_bytes_copied=%d added_persistent_logical_bytes=%d added_persistent_allocated_path_bytes=%d added_unique_allocated_bytes=%d verification=%s restore=%s",
+	copyBytes := profileCopyEligibilityBytes(manifest.Files, parent)
+	t.Logf("workload=%s files=%d input_bytes=%d payload_bytes_read_no_fallback_estimate=%d payload_bytes_copy_eligibility_estimate=%d added_persistent_logical_bytes=%d added_persistent_allocated_path_bytes=%d added_unique_allocated_bytes=%d verification=%s restore=%s",
 		caseName, fileCount, inputBytes, inputBytes*3, copyBytes, afterLogical-beforeLogical, afterAllocated-beforeAllocated, afterUnique-beforeUnique, verificationTime, recoveryTime)
 }
 
-func profileCopyBytes(files []CheckpointFile, parent *CheckpointManifest) int64 {
+// profileCopyEligibilityBytes estimates copying when every verified eligible link succeeds.
+// A rejected parent or failed link adds parent reads and a fallback source copy.
+func profileCopyEligibilityBytes(files []CheckpointFile, parent *CheckpointManifest) int64 {
 	var copied int64
 	parentFiles := make(map[string]CheckpointFile)
 	if parent != nil {

@@ -9,8 +9,7 @@ only 32 MiB still copied and stored all 256 MiB.
 
 ## Root cause
 
-Capture compared the current workspace to its parent only after making a full
-copy. Each checkpoint had its own complete set of payload paths, even when the
+Capture validated parent lineage but always copied the current workspace payload. Each checkpoint had its own complete set of payload paths, even when the
 parent already held identical bytes.
 
 ## Change
@@ -33,14 +32,18 @@ parent directory does not break restore.
 The before measurements are from the checkpoint characterization on the same
 Apple M1 Pro; the after measurements use the same four fixture shapes and the
 existing opt-in phase diagnostic. Measurements are one or two runs per case,
-not a stable benchmark. `payload read estimate` counts logical bytes: inventory
+not a stable benchmark. Copy volume is a manifest-eligibility estimate assuming
+all eligible links succeed, not an instrumented count of copied bytes.
+`payload read estimate` assumes no fallback and counts logical bytes: inventory
 and final source verification read the workspace, and a reused file is read
 once to verify its parent payload. The host reported zero block input
 operations, so physical read bytes are unavailable. Process CPU and peak RSS
 include fixture creation, any baseline checkpoint, measured capture,
-verification, and restore.
+verification, and restore. A rejected parent or failed link can add a parent
+verification read followed by a full source copy; these estimates exclude that
+fallback cost. Unique allocated storage is measured independently.
 
-| Workload | Capture before → after | Payload copied before → after | Added unique allocated payload storage before → after | Verify before → after | Restore before → after | CPU before → after (user + system) | Peak RSS before → after |
+| Workload | Capture before → after | Copy-eligibility estimate before → after | Added unique allocated payload storage before → after | Verify before → after | Restore before → after | CPU before → after (user + system) | Peak RSS before → after |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Small, many files (4,096 × 16 KiB) | 1.00–1.55 s → 1.07 s | 64 → 64 MiB | 67,796,992 → 67,796,992 B | 153–161 → 160 ms | 1.70–1.73 → 1.82 s | 6.43–7.93 → 6.48 s | 239.7–245.7 → 236.6 MB |
 | Large, unchanged (16 × 16 MiB) | 0.65–2.28 s → 0.38 s | 256 → 0 MiB | 268,439,552 → 4,096 B | 137–140 → 147 ms | 1.44–4.51 → 1.16 s | 4.13–5.92 → 3.68 s | 245.5–248.2 → 249.0 MB |
@@ -49,7 +52,7 @@ verification, and restore.
 
 After capture and restore latency should be treated as inconclusive: each is a
 single run, while before ranges vary substantially, especially on the 256 MiB
-restore cases. The stable result is storage and copy volume. An unchanged
+restore cases. The stable measured result is allocated storage; copy volume is an estimate. An unchanged
 256 MiB child adds only 4 KiB of unique allocated files, and changing 32 MiB
 adds about 32 MiB plus manifest and filesystem metadata. The diagnostic also
 reports per-path allocated bytes; those still appear as a full payload because
