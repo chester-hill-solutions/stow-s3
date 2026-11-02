@@ -188,6 +188,9 @@ func profileCheckpointPhases(t *testing.T, target captureTarget, options Checkpo
 	files, excluded, _, err := checkpointInputs(ctx, source, options)
 	phase("file inventory/hash", err)
 	portable, err := preparePortableCapture(ctx, target, options, files)
+	if err != nil {
+		t.Fatal(err)
+	}
 	root, stage, err := stageCheckpointDirectory(target.registryDir)
 	if err != nil {
 		t.Fatal(err)
