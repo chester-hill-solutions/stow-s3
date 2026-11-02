@@ -18,9 +18,6 @@ export declare class WorkerEmbeddedHost implements AsyncEmbeddedHost {
     private readonly endpoint;
     private readonly pending;
     private nextId;
-    private pendingBytes;
-    private controls;
-    private controlBytes;
     private closed;
     private readonly maxInFlight;
     private readonly maxInFlightBytes;
@@ -30,5 +27,6 @@ export declare class WorkerEmbeddedHost implements AsyncEmbeddedHost {
     close(): void;
     private readonly receive;
     private release;
+    private dispatchControl;
 }
 //# sourceMappingURL=worker-host.d.ts.map

@@ -1,0 +1,30 @@
+COMMAND ["go", "test", "-race", "./internal/runthrough", "-run", "^TestReviewPreflightUncertainty$", "-count=2", "-v"]
+=== RUN   TestReviewPreflightUncertainty
+=== RUN   TestReviewPreflightUncertainty/unknown
+=== RUN   TestReviewPreflightUncertainty/marked-missing
+    preflight_review_probe_test.go:60: uncertain preflight admitted refused mutation: meta=&{Bucket:probe Key:target VersionID:eb4b2475b330036f5454cdb2eebe86d8 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 18:46:01.514237 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=local mutation committed
+        PUT refused without committing
+    preflight_review_probe_test.go:63: refused local mutation was reported committed: local mutation committed
+        PUT refused without committing
+    preflight_review_probe_test.go:66: uncertain preflight reached local PUT: calls=1
+    preflight_review_probe_test.go:69: refused mutation invented an intent: pending=[{ID:outbox-1 Operation:put Bucket:probe Key:target SourceBucket: SourceKey: Version:eb4b2475b330036f5454cdb2eebe86d8 PreviousVersion: UpstreamVersion:"d21be73796c78c6ee1b36425fb2f71e7" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:46:01.526405 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}] prepared=[]
+    preflight_review_probe_test.go:79: refused local mutation overwrote upstream: puts=1 body="old"
+--- FAIL: TestReviewPreflightUncertainty (0.11s)
+    --- PASS: TestReviewPreflightUncertainty/unknown (0.03s)
+    --- FAIL: TestReviewPreflightUncertainty/marked-missing (0.08s)
+=== RUN   TestReviewPreflightUncertainty
+=== RUN   TestReviewPreflightUncertainty/unknown
+=== RUN   TestReviewPreflightUncertainty/marked-missing
+    preflight_review_probe_test.go:60: uncertain preflight admitted refused mutation: meta=&{Bucket:probe Key:target VersionID:3331ce94452692d4448cf0f423115dd4 Size:3 ETag:"149603e6c03516362a8da23f624db945" ContentType:text/plain LastModified:2026-10-16 18:46:01.624087 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=local mutation committed
+        PUT refused without committing
+    preflight_review_probe_test.go:63: refused local mutation was reported committed: local mutation committed
+        PUT refused without committing
+    preflight_review_probe_test.go:66: uncertain preflight reached local PUT: calls=1
+    preflight_review_probe_test.go:69: refused mutation invented an intent: pending=[{ID:outbox-1 Operation:put Bucket:probe Key:target SourceBucket: SourceKey: Version:3331ce94452692d4448cf0f423115dd4 PreviousVersion: UpstreamVersion:"d21be73796c78c6ee1b36425fb2f71e7" UpstreamAbsent:false Prepared:false CreatedAt:2026-10-16 18:46:01.637875 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}] prepared=[]
+    preflight_review_probe_test.go:79: refused local mutation overwrote upstream: puts=1 body="old"
+--- FAIL: TestReviewPreflightUncertainty (0.11s)
+    --- PASS: TestReviewPreflightUncertainty/unknown (0.03s)
+    --- FAIL: TestReviewPreflightUncertainty/marked-missing (0.08s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.518s
+FAIL

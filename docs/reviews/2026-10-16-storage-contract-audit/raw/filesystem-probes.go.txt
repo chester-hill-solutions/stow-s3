@@ -1,0 +1,157 @@
+package runtime
+
+import (
+	"context"
+	"errors"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	disk "github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+)
+
+func auditDisk(t *testing.T, root string) *disk.FilesystemStore {
+	t.Helper()
+	s, err := disk.NewFilesystemStore(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+	return s
+}
+
+func TestContractAuditDiskCompletion(t *testing.T) {
+	for _, fault := range []bool{false, true} {
+		name := "healthy"
+		if fault {
+			name = "cleanup-failure"
+		}
+		t.Run(name, func(t *testing.T) {
+			if fault && os.Geteuid() == 0 {
+				t.Skip("requires enforced POSIX permissions")
+			}
+			root := t.TempDir()
+			s := auditDisk(t, root)
+			ctx := context.Background()
+			instance, err := OpenWithStore(Options{Backend: BackendFilesystem, MaxBytes: 8, MaxObjects: 1}, s, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer instance.Close()
+			if err := instance.CreateBucket(ctx, "probe"); err != nil {
+				t.Fatal(err)
+			}
+			upload, err := instance.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			part, err := instance.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("body"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			dir := filepath.Join(root, ".multipart", upload.UploadID)
+			if fault {
+				if err := os.Chmod(dir, 0555); err != nil {
+					t.Fatal(err)
+				}
+				defer os.Chmod(dir, 0755)
+			}
+			meta, completeErr := instance.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part})
+			if fault && completeErr == nil {
+				t.Fatal("filesystem permission fault did not fire")
+			}
+			if !fault && completeErr != nil {
+				t.Fatal(completeErr)
+			}
+			actual, headErr := s.HeadObject(ctx, "probe", "target")
+			if headErr != nil {
+				t.Fatal(headErr)
+			}
+			t.Logf("returned meta=%+v error=%v committed=%v; actual=%+v usage=%+v reserved=%d", meta, completeErr, errors.Is(completeErr, storage.ErrMutationCommitted), actual, instance.Usage(), instance.reservedBytes)
+			if meta == nil || (fault && !errors.Is(completeErr, storage.ErrMutationCommitted)) {
+				t.Error("published completion lost committed identity/outcome")
+			}
+			if instance.Usage() != (Usage{Bytes: 4, Objects: 1}) {
+				t.Errorf("published object missing from immediate usage: %+v", instance.Usage())
+			}
+			if fault {
+				if err := os.Chmod(dir, 0755); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := instance.RefreshUsage(ctx); err != nil {
+				t.Fatal(err)
+			}
+			t.Logf("after repair+refresh: usage=%+v reserved=%d", instance.Usage(), instance.reservedBytes)
+			if instance.Usage() != (Usage{Bytes: 4, Objects: 1}) {
+				t.Error("usage did not recover")
+			}
+		})
+	}
+}
+
+func TestContractAuditDiskCorruptUpload(t *testing.T) {
+	for _, fault := range []bool{false, true} {
+		name := "healthy"
+		if fault {
+			name = "corrupt-manifest"
+		}
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			root := t.TempDir()
+			s := auditDisk(t, root)
+			if err := s.CreateBucket(ctx, "probe"); err != nil {
+				t.Fatal(err)
+			}
+			upload, err := s.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := s.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("old")); err != nil {
+				t.Fatal(err)
+			}
+			if err := s.Close(); err != nil {
+				t.Fatal(err)
+			}
+			dir := filepath.Join(root, ".multipart", upload.UploadID)
+			if fault {
+				if err := os.WriteFile(filepath.Join(dir, "manifest.json"), []byte("{"), 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			reopened := auditDisk(t, root)
+			_, lookupErr := reopened.GetMultipartUpload(ctx, upload.UploadID)
+			listed, listErr := reopened.ListMultipartUploads(ctx, "probe", storage.MultipartListOptions{})
+			t.Logf("lookup=%v list=%+v list error=%v", lookupErr, listed, listErr)
+			if fault && errors.Is(lookupErr, storage.ErrUploadNotFound) {
+				t.Error("corrupt existing upload misreported as absent")
+			}
+			if fault && listErr == nil {
+				t.Error("listing silently omitted corrupt existing upload")
+			}
+			instance, openErr := OpenWithStore(Options{Backend: BackendFilesystem, MaxBytes: 4, MaxObjects: 1}, reopened, nil)
+			t.Logf("runtime reopen error=%v", openErr)
+			if openErr != nil {
+				if !fault {
+					t.Fatal(openErr)
+				}
+				return
+			}
+			defer instance.Close()
+			if fault {
+				t.Error("runtime admitted unreadable upload state instead of refusing reconciliation")
+			}
+			_, putErr := instance.PutObject(ctx, "probe", "target", []byte("full"), PutOptions{})
+			data, err := os.ReadFile(filepath.Join(dir, "part-00001"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Logf("new 4-byte write error=%v; retained part bytes=%d object usage=%+v reserved=%d cap=4", putErr, len(data), instance.Usage(), instance.reservedBytes)
+			if !errors.Is(putErr, ErrQuotaExceeded) {
+				t.Errorf("retained 3-byte part escaped 4-byte quota: write error=%v", putErr)
+			}
+		})
+	}
+}

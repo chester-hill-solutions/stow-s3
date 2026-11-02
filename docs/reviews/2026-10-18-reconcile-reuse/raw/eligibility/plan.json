@@ -1,0 +1,45 @@
+{
+  "phase": "reconcile-repeated-eligibility",
+  "sources": [
+    "internal/capacity/state.go",
+    "internal/capacity/admission.go",
+    "benchmark/diagnostic-admission.go.txt",
+    "benchmark/diagnostic-overlay.json",
+    "benchmark/repeated-trace.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/reuse_trace_test.go",
+        "benchmark/repeated-trace.go.txt"
+      ]
+    },
+    {
+      "name": "trace",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/diagnostic-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestReconcileEligibilityTrace$",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_REUSE_DIAGNOSTIC": "on",
+        "STOW_REUSE_TRACE": "1"
+      }
+    },
+    {
+      "name": "cleanup",
+      "args": [
+        "rm",
+        "internal/storage/fs/reuse_trace_test.go"
+      ]
+    }
+  ]
+}

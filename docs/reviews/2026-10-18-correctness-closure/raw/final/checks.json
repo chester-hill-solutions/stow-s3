@@ -1,0 +1,97 @@
+[
+  {
+    "name": "install-probe",
+    "args": [
+      "cp",
+      "benchmark/etag_probe.go.txt",
+      "internal/s3api/closure_etag_probe_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "format-probe",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/s3api/closure_etag_probe_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 24,
+    "passed": true
+  },
+  {
+    "name": "capture-probe",
+    "args": [
+      "node",
+      "-e",
+      "require('node:fs').copyFileSync('internal/s3api/closure_etag_probe_test.go',process.env.STOW_RESULT_ROOT+'/etag_probe.formatted.go.txt')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 37,
+    "passed": true
+  },
+  {
+    "name": "s3api-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/s3api",
+      "-run",
+      "^TestClosureETagCase$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 899,
+    "passed": true
+  },
+  {
+    "name": "s3api-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/s3api",
+      "-run",
+      "^TestClosureETagCase$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1211,
+    "passed": true
+  },
+  {
+    "name": "cleanup-probe",
+    "args": [
+      "rm",
+      "internal/s3api/closure_etag_probe_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 392,
+    "passed": true
+  }
+]

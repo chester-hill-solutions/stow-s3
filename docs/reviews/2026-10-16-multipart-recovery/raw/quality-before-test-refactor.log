@@ -1,0 +1,13 @@
+node scripts/check-go-quality.mjs
+Go quality ratchet violation
+  new debt: comment-lines: 4083 > 4082
+  new debt: complexity: 9 > 2
+  new: internal/runtime/filesystem_multipart_recovery_test.go:TestFilesystemMultipartRecoveryRefusesDamagedManifest#1
+  new: internal/runtime/filesystem_multipart_recovery_test.go:TestFilesystemMultipartRecoveryRefusesDamagedManifest/func-literal-1#1
+  new: internal/runtime/filesystem_multipart_recovery_test.go:TestFilesystemMultipartValidationPreservesUnknownReservation#1
+  new: internal/s3api/multipart_manifest_test.go:TestFilesystemMultipartManifestWireErrors#1
+  new: internal/s3api/multipart_manifest_test.go:TestFilesystemMultipartManifestWireErrors/func-literal-1#1
+  new: internal/storage/fs/multipart_manifest_test.go:TestMultipartManifestFailuresPreserveUpload#1
+  new: internal/storage/fs/multipart_manifest_test.go:TestMultipartManifestFailuresPreserveUpload/func-literal-1#1
+Fix the violation; do not raise the baseline to pass.
+make: *** [check-go-quality] Error 1

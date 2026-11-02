@@ -1,0 +1,35 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from statistics import median,mean
+import json
+p=Path('/private/tmp/stow-outbox-write-phases-2026-10-18');job=json.loads((p/'paired-start.json').read_text());d=p/('export-'+job['id'])
+status=json.loads((d/'run.json').read_text());assert status['complete']and status['success'];assert len(json.loads((d/'checks.json').read_text()))==4
+commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==8
+expected={'atomic.mkdir','atomic.create','atomic.write','atomic.chmod','atomic.file_sync','atomic.close','atomic.rename','atomic.dir_sync','outbox.read','outbox.decode','outbox.clone','outbox.update','outbox.mutex_wait','outbox.file_lock','outbox.unlock','outbox.reload','outbox.encode','outbox.atomic'}
+runs=[]
+for command in commands['runs']:
+ assert command['exitCode']==0 and command['signal']is None
+ rows=[]
+ for line in(d/command['log']).read_text().splitlines():
+  if line.startswith('STOWPHASE:'):rows.append(json.loads(line.removeprefix('STOWPHASE:')))
+ assert len(rows)==120
+ for depth in [0,128]:
+  samples=[r for r in rows if r['depth']==depth];assert len(samples)==60 and {x['cycle']for x in samples}==set(range(60))
+  parts=defaultdict(list)
+  for sample in samples:
+   counts=Counter(x['name']for x in sample['phases']);assert set(counts)==expected and set(counts.values())=={2}
+   sums=defaultdict(int)
+   for event in sample['phases']:sums[event['name']]+=event['ns']
+   for name,value in sums.items():parts[name].append(value)
+  total=sum(x['ns']for x in samples)
+  runs.append({'index':command['index'],'variant':command['variant'],'depth':depth,'cycles':60,'nsMedian':median(x['ns']for x in samples),'nsMean':total/60,'nsMin':min(x['ns']for x in samples),'nsMax':max(x['ns']for x in samples),'phases':{name:{'nsMedian':median(values),'nsMean':mean(values),'aggregateSharePercent':sum(values)/total*100}for name,values in sorted(parts.items())}})
+summary=[]
+for depth in [0,128]:
+ result={'depth':depth}
+ for variant in ['before','after']:
+  samples=[x for x in runs if x['depth']==depth and x['variant']==variant];assert len(samples)==4
+  result[variant]={'processes':4,'cycles':240,'medianProcessP50NS':median(x['nsMedian']for x in samples),'medianProcessMeanNS':median(x['nsMean']for x in samples),'phaseMedianProcessMeans':{name:median(x['phases'][name]['nsMean']for x in samples)for name in sorted(expected)},'processP50NS':[x['nsMedian']for x in samples]}
+ result['medianProcessP50DeltaPercent']=(result['after']['medianProcessP50NS']/result['before']['medianProcessP50NS']-1)*100
+ summary.append(result)
+out={'railwayDeploymentId':job['deploymentId'],'binarySHA256':commands['binarySHA256'],'cycles':960,'processes':8,'summary':summary,'runs':runs}
+(d/'paired-analysis.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(summary,indent=2))

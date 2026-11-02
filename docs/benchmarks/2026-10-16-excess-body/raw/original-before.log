@@ -1,0 +1,26 @@
+COMMAND ["go", "test", "./internal/runtime", "-run", "^TestReviewExcessObjectBody$", "-count=2", "-v"]
+=== RUN   TestReviewExcessObjectBody
+=== RUN   TestReviewExcessObjectBody/stream
+    excess_body_review_probe_test.go:33: excess body accepted: mode=stream bytes=4 advertised=3 guard=false
+=== RUN   TestReviewExcessObjectBody/get
+    excess_body_review_probe_test.go:33: excess body accepted: mode=get bytes=4 advertised=3 guard=false
+=== RUN   TestReviewExcessObjectBody/guarded
+    excess_body_review_probe_test.go:33: excess body accepted: mode=guarded bytes=4 advertised=3 guard=true
+--- FAIL: TestReviewExcessObjectBody (0.00s)
+    --- FAIL: TestReviewExcessObjectBody/stream (0.00s)
+    --- FAIL: TestReviewExcessObjectBody/get (0.00s)
+    --- FAIL: TestReviewExcessObjectBody/guarded (0.00s)
+=== RUN   TestReviewExcessObjectBody
+=== RUN   TestReviewExcessObjectBody/stream
+    excess_body_review_probe_test.go:33: excess body accepted: mode=stream bytes=4 advertised=3 guard=false
+=== RUN   TestReviewExcessObjectBody/get
+    excess_body_review_probe_test.go:33: excess body accepted: mode=get bytes=4 advertised=3 guard=false
+=== RUN   TestReviewExcessObjectBody/guarded
+    excess_body_review_probe_test.go:33: excess body accepted: mode=guarded bytes=4 advertised=3 guard=true
+--- FAIL: TestReviewExcessObjectBody (0.00s)
+    --- FAIL: TestReviewExcessObjectBody/stream (0.00s)
+    --- FAIL: TestReviewExcessObjectBody/get (0.00s)
+    --- FAIL: TestReviewExcessObjectBody/guarded (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.236s
+FAIL

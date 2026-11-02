@@ -1,0 +1,469 @@
+package runthrough
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func (a *Adapter) localVersion(ctx context.Context, bucket, key string) string {
+	version, _ := a.localVersionStrict(ctx, bucket, key)
+	return version
+}
+
+func (a *Adapter) localVersionStrict(ctx context.Context, bucket, key string) (string, error) {
+	meta, err := a.local.HeadObject(ctx, bucket, key)
+	if errors.Is(err, storage.ErrObjectNotFound) {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return objectVersion(meta), nil
+}
+
+func objectVersion(meta *storage.ObjectMeta) string {
+	if meta == nil {
+		return ""
+	}
+	if meta.VersionID != "" {
+		return meta.VersionID
+	}
+	return meta.ETag
+}
+
+func (a *Adapter) enqueueIntent(ctx context.Context, operation OutboxOperation, bucket, key string, versions ...string) (OutboxEntry, error) {
+	unlock := a.outboxLocks.lock(outboxIdentity(bucket, key))
+	defer unlock()
+	return a.enqueueIntentLocked(ctx, operation, bucket, key, versions...)
+}
+
+func (a *Adapter) enqueueIntentLocked(ctx context.Context, operation OutboxOperation, bucket, key string, versions ...string) (OutboxEntry, error) {
+	version := ""
+	if len(versions) > 0 {
+		version = versions[0]
+	}
+	if operation == OutboxPut && version == "" {
+		meta, err := a.local.HeadObject(ctx, bucket, key)
+		if err != nil {
+			return OutboxEntry{}, err
+		}
+		version = objectVersion(meta)
+	}
+	entry := OutboxEntry{Operation: operation, Bucket: bucket, Key: key, Version: version, CreatedAt: time.Now().UTC()}
+	if err := a.recordUpstreamState(ctx, &entry); err != nil {
+		return OutboxEntry{}, err
+	}
+	return a.outbox.Enqueue(entry)
+}
+
+func (a *Adapter) prepareIntent(operation OutboxOperation, bucket, key, previousVersion string, source ...string) (OutboxEntry, error) {
+	if a.coordinatedOutbox == nil {
+		return OutboxEntry{}, ErrDurableOutboxRequired
+	}
+	entry := OutboxEntry{
+		Operation:       operation,
+		Bucket:          bucket,
+		Key:             key,
+		PreviousVersion: previousVersion,
+		Prepared:        true,
+		CreatedAt:       time.Now().UTC(),
+	}
+	if err := a.recordUpstreamState(context.Background(), &entry); err != nil {
+		return OutboxEntry{}, err
+	}
+	if len(source) > 0 {
+		entry.SourceBucket = source[0]
+	}
+	if len(source) > 1 {
+		entry.SourceKey = source[1]
+	}
+	if owned, ok := a.coordinatedOutbox.(OwnedPreparedOutbox); ok {
+		return owned.PrepareOwned(entry, a.claimOwner, defaultOutboxClaimLease)
+	}
+	return a.coordinatedOutbox.Prepare(entry)
+}
+
+func (a *Adapter) commitPreparedIntent(entry OutboxEntry, version string) (OutboxEntry, error) {
+	if a.coordinatedOutbox == nil {
+		return OutboxEntry{}, ErrDurableOutboxRequired
+	}
+	if owned, ok := a.coordinatedOutbox.(OwnedPreparedOutbox); ok && entry.PreparedOwner != "" {
+		owner := entry.PreparedOwner
+		return owned.CommitPrepared(entry.ID, owner, entry.PreparedToken, version)
+	}
+	return a.coordinatedOutbox.Commit(entry.ID, version)
+}
+
+func (a *Adapter) discardPreparedIntent(entry OutboxEntry) error {
+	if a.coordinatedOutbox == nil {
+		return ErrDurableOutboxRequired
+	}
+	if owned, ok := a.coordinatedOutbox.(OwnedPreparedOutbox); ok && entry.PreparedOwner != "" {
+		return owned.DiscardPreparedOwned(entry.ID, entry.PreparedOwner, entry.PreparedToken)
+	}
+	return a.coordinatedOutbox.DiscardPrepared(entry.ID)
+}
+
+func (a *Adapter) enqueuePreparedIntentLocked(operation OutboxOperation, bucket, key, previousVersion string, source ...string) (OutboxEntry, error) {
+	return a.prepareIntent(operation, bucket, key, previousVersion, source...)
+}
+
+// propagateEntry sends one entry upstream. When reconcile is set, the entry was
+// attempted before and an earlier call may have committed without being
+// acknowledged, so each effect checks upstream against the immutable local
+// version before repeating the mutation.
+func (a *Adapter) propagateEntry(ctx context.Context, entry OutboxEntry, reconcile bool) error {
+	if entry.UpstreamVersion == "" && !entry.UpstreamAbsent {
+		return NewDeterministicUpstreamError(ErrUpstreamStateUnknown)
+	}
+	switch entry.Operation {
+	case OutboxPut, OutboxCopy, OutboxMultipart:
+		return a.propagateWrite(ctx, entry, reconcile)
+	case OutboxDelete:
+		return a.propagateDelete(ctx, entry, reconcile)
+	default:
+		return NewDeterministicUpstreamError(fmt.Errorf("unsupported outbox operation %q", entry.Operation))
+	}
+}
+
+func (a *Adapter) propagateWrite(ctx context.Context, entry OutboxEntry, reconcile bool) error {
+	rc, meta, err := a.local.GetObject(ctx, entry.Bucket, entry.Key)
+	if err != nil {
+		return err
+	}
+	if entry.Version != "" && entry.Version != objectVersion(meta) {
+		_ = rc.Close()
+		return ErrOutboxVersionConflict
+	}
+	defer rc.Close()
+	if reconcile {
+		remote, err := a.upstream.HeadObject(ctx, entry.Bucket, entry.Key)
+		if err == nil {
+			if remote == nil {
+				return errors.New("upstream head returned no object metadata")
+			}
+			if samePropagatedObject(remote, meta) {
+				return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{ETag: remote.ETag})
+			}
+		} else if !errors.Is(err, storage.ErrObjectNotFound) {
+			return err
+		}
+	}
+	etag, err := a.upstream.PutObject(ctx, entry.Bucket, entry.Key, rc, storage.PutOptions{
+		ContentType:       meta.ContentType,
+		Metadata:          meta.Metadata,
+		ChecksumAlgorithm: meta.ChecksumAlgorithm,
+		ChecksumValue:     meta.ChecksumValue,
+		// The precondition recorded at enqueue. Absent upstream is asserted with
+		// If-None-Match "*" rather than left unguarded, because a key created
+		// between enqueue and propagation has no ETag for If-Match to compare.
+		IfMatch:     entry.UpstreamVersion,
+		IfNoneMatch: upstreamAbsentCondition(entry.UpstreamAbsent),
+	})
+	if err != nil {
+		// A refused precondition is a conflict, not a failure to try again. It
+		// classifies as deterministic, so the entry goes terminal and somebody
+		// decides which object should win.
+		if errors.Is(err, storage.ErrPreconditionFailed) {
+			return ErrUpstreamConflict
+		}
+		return err
+	}
+	return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{ETag: etag})
+}
+
+func upstreamAbsentCondition(absent bool) string {
+	if absent {
+		return "*"
+	}
+	return ""
+}
+
+func (a *Adapter) propagateDelete(ctx context.Context, entry OutboxEntry, reconcile bool) error {
+	if entry.Version != "" {
+		current, err := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
+		if err == nil && objectVersion(current) != entry.Version {
+			return ErrOutboxVersionConflict
+		}
+		if err != nil && !errors.Is(err, storage.ErrObjectNotFound) {
+			return err
+		}
+	}
+	if reconcile {
+		_, err := a.upstream.HeadObject(ctx, entry.Bucket, entry.Key)
+		if errors.Is(err, storage.ErrObjectNotFound) {
+			return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{Absent: true})
+		}
+		if err != nil {
+			return err
+		}
+	}
+	if entry.UpstreamAbsent {
+		return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{Absent: true})
+	}
+	if err := a.upstream.DeleteObject(ctx, entry.Bucket, entry.Key, entry.UpstreamVersion); err != nil {
+		if errors.Is(err, storage.ErrPreconditionFailed) {
+			return ErrUpstreamConflict
+		}
+		return err
+	}
+	return a.saveUpstreamState(entry.Bucket, entry.Key, UpstreamState{Absent: true})
+}
+
+func (a *Adapter) completeIntent(ctx context.Context, entry OutboxEntry) error {
+	unlock := a.outboxLocks.lock(outboxIdentity(entry.Bucket, entry.Key))
+	defer unlock()
+	return a.completeIntentWithScheduleLocked(ctx, entry, true)
+}
+
+func (a *Adapter) completeIntentLocked(ctx context.Context, entry OutboxEntry) error {
+	return a.completeIntentWithScheduleLocked(ctx, entry, false)
+}
+
+func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry OutboxEntry, respectSchedule bool) error {
+	pending := a.orderingEntries()
+	current, ok := findPendingEntry(a.outbox.Pending(), entry.ID)
+	if !ok || !dueForPropagation(current, pending, respectSchedule) {
+		return nil
+	}
+	// Gate immediate propagation and both retry paths on current reachability and
+	// authority. A withheld grant or offline host leaves the intent pending.
+	if !a.upstreamReachable(current.Bucket) || !a.authority.Allows(authority.UpstreamWrite) {
+		return nil
+	}
+	// The policy is asked here, on the entry, and not only on the path that enqueued
+	// it: a write admitted under a grant that has since been withdrawn is provenance,
+	// not authorization.
+	if err := a.allows(authority.UpstreamWrite, current.Bucket, current.Key); err != nil {
+		return nil
+	}
+	claim, err := a.claimPropagation(current)
+	if err != nil {
+		return err
+	}
+	if !claim.acquired {
+		return nil
+	}
+	if err := claim.propagate(ctx, a); err != nil {
+		retryAt := time.Time{}
+		if IsTransientRetry(err) {
+			retryAt = time.Now().Add(outboxRetryDelay(current.Attempts))
+		} else {
+			a.refreshUpstreamState(ctx, current.Bucket, current.Key)
+		}
+		markErr := claim.failure(err, retryAt)
+		if claim.provider == nil {
+			markErr = a.outbox.MarkFailure(current.ID, err, retryAt)
+		}
+		if markErr != nil {
+			return errors.Join(err, markErr)
+		}
+		return err
+	}
+	if claim.provider == nil {
+		return a.outbox.MarkSuccess(current.ID)
+	}
+	return claim.success()
+}
+
+func outboxRetryDelay(attempts int) time.Duration {
+	if attempts < 1 {
+		attempts = 1
+	}
+	if attempts > 6 {
+		attempts = 6
+	}
+	return time.Duration(1<<uint(attempts-1)) * time.Second
+}
+
+// RetryPending retries due outbox entries. It is safe to call from a worker or
+// at startup; entries that are not due remain queued.
+func (a *Adapter) RetryPending(ctx context.Context) error {
+	recoveryErr := a.RecoverPrepared(ctx)
+	now := time.Now()
+	blocked := make(map[string]bool)
+	for _, entry := range a.preparedEntries() {
+		blocked[outboxIdentity(entry.Bucket, entry.Key)] = true
+	}
+	var firstErr error
+	if recoveryErr != nil {
+		firstErr = recoveryErr
+	}
+	for _, entry := range a.outbox.Pending() {
+		key := outboxIdentity(entry.Bucket, entry.Key)
+		if blocked[key] {
+			continue
+		}
+		block, err := a.retryEntry(ctx, entry, now)
+		if block {
+			blocked[key] = true
+		}
+		if err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
+}
+
+func (a *Adapter) RecoverPrepared(ctx context.Context) error {
+	if a.coordinatedOutbox == nil {
+		return nil
+	}
+	entries, err := a.preparedEntriesWithError()
+	if err != nil {
+		return err
+	}
+	var firstErr error
+	for _, entry := range entries {
+		if entry.PreparedOwner != "" && (entry.PreparedUntil.After(time.Now().UTC()) || outboxOwnerAlive(entry.PreparedOwner)) {
+			continue
+		}
+		unlock := a.outboxLocks.lock(outboxIdentity(entry.Bucket, entry.Key))
+		_, err := a.reconcilePreparedEntryLocked(ctx, entry)
+		unlock()
+		if err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
+}
+
+// dueForPropagation is the scheduling half of the funnel: pending, due, and first
+// for its key. Kept apart from the permission half because they answer different
+// questions.
+func dueForPropagation(current OutboxEntry, pending []OutboxEntry, respectSchedule bool) bool {
+	if current.Terminal {
+		return false
+	}
+	if respectSchedule && !current.NextAttempt.IsZero() && current.NextAttempt.After(time.Now()) {
+		return false
+	}
+	return isFirstPendingForKey(pending, current)
+}
+
+func (a *Adapter) rejectPreparedKey(bucket, key string) error {
+	entries, err := a.preparedEntriesWithError()
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if entry.Bucket == bucket && entry.Key == key {
+			return ErrOutboxPreparedUnresolved
+		}
+	}
+	return nil
+}
+
+func (a *Adapter) preparedEntries() []OutboxEntry {
+	entries, _ := a.preparedEntriesWithError()
+	return entries
+}
+
+func (a *Adapter) preparedEntriesWithError() ([]OutboxEntry, error) {
+	if a.coordinatedOutbox == nil {
+		return nil, nil
+	}
+	if snapshot, ok := a.outbox.(SnapshotOutbox); ok {
+		return snapshot.PreparedSnapshot()
+	}
+	return a.coordinatedOutbox.Prepared(), nil
+}
+
+func (a *Adapter) orderingEntries() []OutboxEntry {
+	entries := append([]OutboxEntry(nil), a.outbox.Pending()...)
+	return append(entries, a.preparedEntries()...)
+}
+
+func (a *Adapter) retryEntry(ctx context.Context, entry OutboxEntry, now time.Time) (bool, error) {
+	if entry.Terminal {
+		return false, nil
+	}
+	if !outboxEntryDue(entry, now) {
+		return true, nil
+	}
+	key := outboxIdentity(entry.Bucket, entry.Key)
+	unlock := a.outboxLocks.lock(key)
+	defer unlock()
+
+	pending := a.orderingEntries()
+	current, ok := findPendingEntry(a.outbox.Pending(), entry.ID)
+	if !ok {
+		return false, nil
+	}
+	if !a.upstreamReachable(current.Bucket) || current.Terminal || !outboxEntryDue(current, now) || !isFirstPendingForKey(pending, current) {
+		return true, nil
+	}
+	if err := a.completeIntentLocked(ctx, current); err != nil {
+		return true, err
+	}
+	remainingState := a.orderingEntries()
+	remaining, stillPending := findPendingEntry(a.outbox.Pending(), current.ID)
+	return stillPending && (!outboxEntryDue(remaining, time.Now()) || !isFirstPendingForKey(remainingState, remaining)), nil
+}
+
+func (a *Adapter) reconcilePreparedWrite(ctx context.Context, entry OutboxEntry, cause error) (*storage.ObjectMeta, error) {
+	committed, recoveryErr := a.reconcilePreparedEntryLocked(ctx, entry)
+	err := errors.Join(cause, recoveryErr)
+	if !committed {
+		return nil, err
+	}
+	a.invalidateCache(ctx, entry.Bucket, entry.Key)
+	meta, headErr := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
+	return meta, storage.CommittedError(errors.Join(err, headErr))
+}
+
+func (a *Adapter) reconcilePreparedEntryLocked(ctx context.Context, entry OutboxEntry) (bool, error) {
+	switch entry.Operation {
+	case OutboxPut, OutboxCopy, OutboxMultipart:
+		meta, err := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
+		if err != nil {
+			if errors.Is(err, storage.ErrObjectNotFound) {
+				return false, a.discardPreparedIntent(entry)
+			}
+			return false, err
+		}
+		currentVersion := objectVersion(meta)
+		if entry.PreviousVersion != "" && currentVersion == entry.PreviousVersion {
+			return false, a.discardPreparedIntent(entry)
+		}
+		_, err = a.commitPreparedIntent(entry, currentVersion)
+		return true, err
+	case OutboxDelete:
+		previousVersion := entry.PreviousVersion
+		if previousVersion == "" {
+			previousVersion = entry.Version
+		}
+		meta, err := a.local.HeadObject(ctx, entry.Bucket, entry.Key)
+		if err == nil {
+			if previousVersion != "" && objectVersion(meta) == previousVersion {
+				return false, a.discardPreparedIntent(entry)
+			}
+			return false, ErrOutboxPreparedUnresolved
+		}
+		if !errors.Is(err, storage.ErrObjectNotFound) {
+			return false, err
+		}
+		_, err = a.commitPreparedIntent(entry, previousVersion)
+		return true, err
+	default:
+		return false, ErrOutboxPreparedUnresolved
+	}
+}
+
+func outboxEntryDue(entry OutboxEntry, now time.Time) bool {
+	return entry.NextAttempt.IsZero() || !entry.NextAttempt.After(now)
+}
+
+func findPendingEntry(entries []OutboxEntry, id string) (OutboxEntry, bool) {
+	for _, entry := range entries {
+		if entry.ID == id {
+			return entry, true
+		}
+	}
+	return OutboxEntry{}, false
+}

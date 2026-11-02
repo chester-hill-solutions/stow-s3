@@ -1,0 +1,24 @@
+File: post-profile.test
+Build ID: d891571500456aead629a84f12762f47e25c566a
+Type: alloc_space
+Time: 2026-10-18 13:11:12 UTC
+Active filters:
+   focus=decodeOutboxProto
+Showing nodes accounting for 50101.69kB, 63.92% of 78375.89kB total
+Dropped 3 nodes (cum <= 391.88kB)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0% 50103.33kB 63.93%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.BenchmarkOutboxDecodeProfile.func1
+         0     0%     0% 50103.33kB 63.93%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProto
+    2.58kB 0.0033% 0.0033% 50103.33kB 63.93%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.decodeOutboxProtoRecords
+         0     0% 0.0033% 50103.33kB 63.93%  testing.(*B).runN
+         0     0% 0.0033% 50099.20kB 63.92%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).consume
+    4.12kB 0.0053% 0.0086% 50099.20kB 63.92%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).record
+         0     0% 0.0086% 45548.39kB 58.12%  testing.(*B).launch
+40356.42kB 51.49% 51.50% 40356.42kB 51.49%  github.com/chester-hill-solutions/stow-s3/internal/runthrough.(*outboxProtoRecordDecoder).addEntry
+         0     0% 51.50%  9738.66kB 12.43%  google.golang.org/protobuf/proto.UnmarshalOptions.Unmarshal
+         0     0% 51.50%  9738.66kB 12.43%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 51.50%  9738.56kB 12.43%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 51.50%  9738.56kB 12.43%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 51.50%  9738.56kB 12.43%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointerEager
+ 9738.56kB 12.43% 63.92%  9738.56kB 12.43%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+         0     0% 63.92%  4554.94kB  5.81%  testing.(*B).run1.func1

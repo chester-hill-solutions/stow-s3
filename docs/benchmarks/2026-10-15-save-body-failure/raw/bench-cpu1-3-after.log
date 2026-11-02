@@ -1,0 +1,63 @@
+COMMAND ["/private/tmp/stow-save-body-failure/after.test", "-test.run=^$", "-test.bench=^BenchmarkReadForSaveObservation$/^present$", "-test.benchmem", "-test.benchtime=250000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkReadForSaveObservation/present         	  250000	      2200 ns/op	    1619 B/op	      19 allocs/op
+BenchmarkReadForSaveObservation/present         	  250000	      2155 ns/op	    1619 B/op	      19 allocs/op
+BenchmarkReadForSaveObservation/present         	  250000	      2181 ns/op	    1619 B/op	      19 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-save-body-failure/after.test", "-test.run=^$", "-test.bench=^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$", "-test.benchmem", "-test.benchtime=1000000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkReadForSaveObservation/missing         	 1000000	       197.4 ns/op	      48 B/op	       1 allocs/op
+BenchmarkReadForSaveObservation/missing         	 1000000	       200.7 ns/op	      48 B/op	       1 allocs/op
+BenchmarkReadForSaveObservation/missing         	 1000000	       201.5 ns/op	      48 B/op	       1 allocs/op
+BenchmarkReadForSaveObservation/wrapped-missing 	 1000000	       136.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/wrapped-missing 	 1000000	       137.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/wrapped-missing 	 1000000	       136.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/unknown         	 1000000	       124.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/unknown         	 1000000	       123.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/unknown         	 1000000	       124.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/marker-first    	 1000000	       135.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/marker-first    	 1000000	       134.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/marker-first    	 1000000	       136.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/missing-first   	 1000000	       139.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/missing-first   	 1000000	       138.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkReadForSaveObservation/missing-first   	 1000000	       138.1 ns/op	       0 B/op	       0 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-save-body-failure/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$/^get-tiny$", "-test.benchmem", "-test.benchtime=250000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-tiny         	  250000	       921.4 ns/op	    1139 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	  250000	       868.7 ns/op	    1139 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny         	  250000	       918.2 ns/op	    1139 B/op	      14 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-save-body-failure/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=10000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-64KiB         	   10000	      8400 ns/op	   66675 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB         	   10000	      8501 ns/op	   66675 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB         	   10000	      8336 ns/op	   66675 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB        	   10000	     40969 ns/op	   67158 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB        	   10000	     40297 ns/op	   67159 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB        	   10000	     40707 ns/op	   67159 B/op	      19 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-save-body-failure/after.test", "-test.run=^$", "-test.bench=^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$", "-test.benchmem", "-test.benchtime=100000x", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpenedObjectRead/get-body-missing         	  100000	       874.0 ns/op	    1147 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing         	  100000	       858.8 ns/op	    1147 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-body-missing         	  100000	       861.6 ns/op	    1147 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing        	  100000	       933.4 ns/op	    1147 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing        	  100000	       984.8 ns/op	    1147 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-body-missing        	  100000	       946.5 ns/op	    1147 B/op	      14 allocs/op
+PASS

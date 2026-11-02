@@ -10,6 +10,10 @@ var (
 	ErrInvalidKey        = errors.New("invalid object key")
 	ErrInvalidUpload     = errors.New("invalid multipart upload")
 	ErrInvalidPart       = errors.New("invalid multipart part")
+	// ErrObjectUncertain means the store could not determine whether the object
+	// is there. Reporting absence instead loses data: a create-only write over an
+	// unreadable object replaces bytes that are still there.
+	ErrObjectUncertain = errors.New("object state is uncertain")
 	// ErrEntityTooSmall is a non-final part below MinPartSize. It has a name of
 	// its own rather than reusing ErrInvalidPart because S3 reports the two
 	// differently: one part cannot be found, the other is not allowed to be

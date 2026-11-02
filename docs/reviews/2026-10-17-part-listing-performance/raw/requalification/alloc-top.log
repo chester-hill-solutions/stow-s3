@@ -1,0 +1,62 @@
+File: parts-current.test
+Build ID: 58f79db2f6fcf05807dbd24bdddcd988af7aa7fb
+Type: alloc_objects
+Time: 2026-10-17 21:01:41 UTC
+Showing nodes accounting for 217246, 98.12% of 221407 total
+Dropped 322 nodes (cum <= 1107)
+      flat  flat%   sum%        cum   cum%
+     36310 16.40% 16.40%      36310 16.40%  os.newFile
+     35200 15.90% 32.30%      35200 15.90%  strings.(*Builder).grow
+     32032 14.47% 46.77%      48048 21.70%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.readPartHeader
+     19460  8.79% 55.55%      19460  8.79%  syscall.ByteSliceFromString
+     18098  8.17% 63.73%      36196 16.35%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.InternalPath (inline)
+     17049  7.70% 71.43%      17049  7.70%  os.(*File).Stat
+     17021  7.69% 79.12%      17021  7.69%  os.newUnixDirent
+     16090  7.27% 86.38%      33139 14.97%  os.(*File).readdir
+      8015  3.62% 90.00%      56159 25.36%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).partPath
+      6006  2.71% 92.72%     198222 89.53%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).listPartFiles
+      3099  1.40% 94.12%       5166  2.33%  encoding/json.(*decodeState).object
+      2066  0.93% 95.05%       2067  0.93%  encoding/json.(*decodeState).literalStore
+      2002   0.9% 95.95%       2002   0.9%  internal/reflectlite.Swapper
+      1565  0.71% 96.66%       1565  0.71%  encoding/json.(*scanner).pushParseState
+      1125  0.51% 97.17%       2216  1.00%  os.lstatNolog
+      1033  0.47% 97.64%       7761  3.51%  encoding/json.Unmarshal
+      1033  0.47% 98.10%       8794  3.97%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.decodeUploadState
+        32 0.014% 98.12%       1428  0.64%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).UploadPart
+         4 0.0018% 98.12%      51368 23.20%  os.openFileNolog
+         2 0.0009% 98.12%       2213     1%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace_test.multipartBenchmarkStore
+         2 0.0009% 98.12%       3025  1.37%  os.openDirNolog
+         2 0.0009% 98.12%     221024 99.83%  testing.(*B).runN
+         0     0% 98.12%       5166  2.33%  encoding/json.(*decodeState).unmarshal
+         0     0% 98.12%       5166  2.33%  encoding/json.(*decodeState).value
+         0     0% 98.12%       1562  0.71%  encoding/json.checkValid
+         0     0% 98.12%       1565  0.71%  encoding/json.stateBeginValue
+         0     0% 98.12%     217743 98.35%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).ListParts
+         0     0% 98.12%       2070  0.93%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).checkOpen (inline)
+         0     0% 98.12%       2074  0.94%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).checkRootIdentity
+         0     0% 98.12%      18091  8.17%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).loadUpload
+         0     0% 98.12%      36172 16.34%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.(*Store).uploadDir (inline)
+         0     0% 98.12%      96096 43.40%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace.openPartRecord
+         0     0% 98.12%     219960 99.35%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace_test.BenchmarkWorkspaceMultipartComparison.func1
+         0     0% 98.12%     219960 99.35%  github.com/chester-hill-solutions/stow-s3/internal/storage/workspace_test.benchmarkMultipartOperation
+         0     0% 98.12%      33077 14.94%  os.(*File).ReadDir
+         0     0% 98.12%       2216  1.00%  os.Lstat
+         0     0% 98.12%      51257 23.15%  os.Open (inline)
+         0     0% 98.12%      51368 23.20%  os.OpenFile
+         0     0% 98.12%      36102 16.31%  os.ReadDir
+         0     0% 98.12%       5173  2.34%  os.ReadFile
+         0     0% 98.12%      19439  8.78%  os.ignoringEINTR (inline)
+         0     0% 98.12%      18141  8.19%  os.open
+         0     0% 98.12%       3025  1.37%  os.openDir
+         0     0% 98.12%      17124  7.73%  os.openFileNolog.func1 (inline)
+         0     0% 98.12%      35206 15.90%  path/filepath.Join (inline)
+         0     0% 98.12%      35206 15.90%  path/filepath.join
+         0     0% 98.12%       2002   0.9%  sort.Slice
+         0     0% 98.12%      35200 15.90%  strings.(*Builder).Grow
+         0     0% 98.12%      35198 15.90%  strings.Join
+         0     0% 98.12%      19460  8.79%  syscall.BytePtrFromString (inline)
+         0     0% 98.12%      18141  8.19%  syscall.Open (inline)
+         0     0% 98.12%       1142  0.52%  syscall.fstatat
+         0     0% 98.12%      18141  8.19%  syscall.openat
+         0     0% 98.12%     218640 98.75%  testing.(*B).launch
+         0     0% 98.12%       2368  1.07%  testing.(*B).run1.func1

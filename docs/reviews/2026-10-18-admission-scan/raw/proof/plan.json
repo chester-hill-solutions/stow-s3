@@ -1,0 +1,132 @@
+{
+  "phase": "admission-scan-prototype",
+  "sources": [
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/capacity_save.go",
+    "internal/storage/fs/capacity_scan_test.go",
+    "benchmark/scan-capacity.go.txt",
+    "benchmark/scan-capacity_save.go.txt",
+    "benchmark/scan-bench.go.txt",
+    "benchmark/scan-measure.mjs",
+    "benchmark/scan-overlay.json"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_scan_test.go",
+        "benchmark/scan-capacity.go.txt",
+        "benchmark/scan-capacity_save.go.txt"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityMutationAllocation$",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityMutationAllocation$",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "prototype-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/scan-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityMutationAllocation$",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "prototype-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/scan-overlay.json",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacityMutationAllocation$",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "install-benchmark",
+      "args": [
+        "cp",
+        "benchmark/scan-bench.go.txt",
+        "internal/storage/fs/admission_scan_bench_test.go"
+      ]
+    },
+    {
+      "name": "format-benchmark",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/admission_scan_bench_test.go"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/scan-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/scan-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/scan-after.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/scan-measure.mjs"
+      ]
+    },
+    {
+      "name": "remove-benchmark",
+      "args": [
+        "rm",
+        "internal/storage/fs/admission_scan_bench_test.go"
+      ]
+    }
+  ]
+}

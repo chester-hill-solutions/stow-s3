@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-provenance-messages/raw';receipt=json.loads((raw/'final/report-receipt.json').read_text());stop=json.loads((p/'runner-stop-status.json').read_text());base=json.loads((p/'baseline.json').read_text())['base'];assert receipt['exitCode']==0 and stop['stopVerified']and all(x['exitCode']==0 for x in receipt['checks'])
+for n,h in {**receipt['documentSHA256'],**receipt['sourceSHA256']}.items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+confirmed=json.loads((raw/'confirmation/environment.json').read_text())['sourceSHA256'];assert confirmed['benchmark/provenance-file_outbox_proto.go.txt']==receipt['sourceSHA256']['internal/runthrough/file_outbox_proto.go']
+original=subprocess.check_output(['git','show',base+':internal/runthrough/file_outbox_proto.go'],cwd=r);current=(r/'internal/runthrough/file_outbox_proto.go').read_bytes();assert original[original.index(b'\nfunc outboxProtoText'):]==current[current.index(b'\nfunc outboxProtoText'):]
+assert subprocess.check_output(['git','diff','--name-only',base,'--','*.go','go.mod','go.sum'],cwd=r).decode().splitlines()==['internal/runthrough/file_outbox_proto.go']
+observations=sum(json.loads((raw/phase/name).read_text())['observations']for phase,name in [('measure','comparison-analysis.json'),('provenance','comparison-analysis.json'),('confirmation','confirmation-analysis.json')]);assert observations==864
+assert json.loads((raw/'final/green-receipt.json').read_text())['regressions']['focused-race']['passes']==100
+for phase,count in [('measure',10),('provenance',6),('ownership',5),('confirmation',6),('final',14)]:
+ checks=json.loads((raw/phase/'checks.json').read_text());run=json.loads((raw/phase/'run.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks)
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip()==base
+shutil.copy2(p/'runner-stop-status.json',raw/'runner-stop-status.json');shutil.copy2(p/'verify-final.py',raw/'verify-final.py.txt')
+result={'verified':True,'base':json.loads((p/'baseline.json').read_text()),'sourceSHA256':receipt['sourceSHA256'],'documentSHA256':receipt['documentSHA256'],'productionMatchesConfirmedCandidate':True,'entryDecoderUnchanged':True,'observations':864,'focusedCases':50,'passesPerMode':100,'teardown':stop};(raw/'review-verification.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified exact final source/docs, preserved entry/decoder code, all cohorts/gates and isolated teardown')

@@ -1,0 +1,33 @@
+COMMAND ["/private/tmp/stow-object-head-uncertainty/before.test", "-test.run=^$", "-test.bench=^BenchmarkStoredObjectHeadClassification$", "-test.benchmem", "-test.benchtime=5000000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkStoredObjectHeadClassification/present-8         	 5000000	         2.942 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/present-8         	 5000000	         2.944 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/present-8         	 5000000	         2.946 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/missing-8         	 5000000	         7.303 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/missing-8         	 5000000	         7.340 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/missing-8         	 5000000	         7.256 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/wrapped-missing-8 	 5000000	        10.59 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/wrapped-missing-8 	 5000000	        10.61 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/wrapped-missing-8 	 5000000	        10.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/unknown-8         	 5000000	        13.07 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/unknown-8         	 5000000	        13.15 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/unknown-8         	 5000000	        13.09 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/marker-first-8    	 5000000	        23.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/marker-first-8    	 5000000	        23.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/marker-first-8    	 5000000	        23.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/missing-first-8   	 5000000	        12.59 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/missing-first-8   	 5000000	        12.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStoredObjectHeadClassification/missing-first-8   	 5000000	        12.44 ns/op	       0 B/op	       0 allocs/op
+PASS
+COMMAND ["/private/tmp/stow-object-head-uncertainty/before.test", "-test.run=^$", "-test.bench=^BenchmarkMemoryDeleteHeadLifecycle$", "-test.benchmem", "-test.benchtime=250000x", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkMemoryDeleteHeadLifecycle-8   	  250000	      1811 ns/op	    1200 B/op	      20 allocs/op
+BenchmarkMemoryDeleteHeadLifecycle-8   	  250000	      1828 ns/op	    1200 B/op	      20 allocs/op
+BenchmarkMemoryDeleteHeadLifecycle-8   	  250000	      1793 ns/op	    1200 B/op	      20 allocs/op
+PASS

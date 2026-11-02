@@ -1,0 +1,46 @@
+from pathlib import Path
+import json,base64,shutil
+p=Path('/private/tmp/stow-outbox-postprofile-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');updates={}
+for n in ['file_outbox.go','file_outbox_read.go']:updates['benchmark/candidate-'+n+'.txt']=(p/('candidate-'+n+'.txt')).read_bytes()
+for n in ['outbox_frame_read_resource_test.go','outbox_frame_read_test.go']:updates['internal/runthrough/'+n]=(r/'internal/runthrough'/n).read_bytes()
+updates['benchmark/empty-frame-test.go.txt']=b'package runthrough\n'
+core={'/app/internal/runthrough/file_outbox.go':'/app/benchmark/candidate-file_outbox.go.txt','/app/internal/runthrough/file_outbox_read.go':'/app/benchmark/candidate-file_outbox_read.go.txt'}
+updates['benchmark/frame-candidate.json']=(json.dumps({'Replace':core},indent=2)+'\n').encode()
+updates['benchmark/frame-read-bench.go.txt']=b'''package runthrough
+import("bytes";"encoding/json";"fmt";"os";"path/filepath";"reflect";"runtime";"testing")
+func BenchmarkOutboxFrameReload(b *testing.B){
+ for _,format:=range []string{"native","legacy"}{for _,depth:=range []int{0,128,4096}{b.Run(fmt.Sprintf("format=%s/depth=%d",format,depth),func(b *testing.B){
+  state:=decodeProfileFixture(depth,false);data,err:=encodeOutboxProto(state)
+  if format=="legacy"{data,err=json.Marshal(persistedOutbox{Version:outboxLegacyJSONVersion,Entries:state.entries,Prepared:state.prepared,Provenance:state.provenance,Seq:state.seq,NextToken:state.nextToken})};if err!=nil{b.Fatal(err)}
+  path:=filepath.Join(b.TempDir(),"outbox");if err:=os.WriteFile(path,data,0600);err!=nil{b.Fatal(err)}
+  outbox,err:=NewFileOutbox(path);if err!=nil{b.Fatal(err)};want:=outbox.state.clone()
+  b.ReportAllocs();b.SetBytes(int64(len(data)));b.ResetTimer();for n:=0;n<b.N;n++{if err:=outbox.reloadLocked();err!=nil{b.Fatal(err)}};b.StopTimer()
+  b.ReportMetric(float64(len(data)),"journal-B");if !reflect.DeepEqual(want,outbox.state)||!bytes.Equal(data,outbox.validatedData){b.Fatal("cached reload changed state or bytes")};runtime.KeepAlive(outbox)
+ })}}
+}
+'''
+common={'/app/internal/runthrough/diagnostic_decode_profile_bench_test.go':'/app/benchmark/decode-profile-bench.go.txt','/app/internal/runthrough/diagnostic_decode_cycle_bench_test.go':'/app/benchmark/decode-file-bench.go.txt','/app/internal/runthrough/diagnostic_frame_read_bench_test.go':'/app/benchmark/frame-read-bench.go.txt'}
+for variant in ['before','candidate']:
+ replace=dict(common)
+ if variant=='candidate':replace.update(core)
+ else:replace['/app/internal/runthrough/outbox_frame_read_test.go']='/app/benchmark/empty-frame-test.go.txt'
+ updates['benchmark/frame-'+variant+'-measure.json']=(json.dumps({'Replace':replace},indent=2)+'\n').encode()
+probe=(Path('/private/tmp/stow-outbox-decode-2026-10-18/export-defdc078-aaac-4e15-b72a-8c273a70aba3/source-decode-comparison.mjs.txt')).read_text()
+start=probe[:probe.index('const files=')]
+probe=start+'''const files={before:'/app/benchmark/frame-before.test',candidate:'/app/benchmark/frame-candidate.test'},binarySHA256={};for(const[name,file]of Object.entries(files))binarySHA256[name]=createHash('sha256').update(await readFile(file)).digest('hex');const runs=[];
+for(const cohort of ['paired','aa'])for(const[index,variant]of ['before','candidate','candidate','before','candidate','before','before','candidate'].entries())for(const section of ['read','file']){
+ const binary=files[cohort==='aa'?'candidate':variant];const args=[binary,'-test.run=^$','-test.bench='+(section==='read'?'^BenchmarkOutboxFrameReload$':'^BenchmarkFileOutboxDecodeCycle$/depth=(0|128|4096)/^enqueue$'),'-test.benchmem','-test.benchtime=1s','-test.count=1','-test.cpu='+(section==='read'?'4':'1,4')];const logName=cohort+'-'+index+'-'+variant+'-'+section+'.log';const log=await open(root+'/'+logName,'w');let result;try{const child=spawn('python3',['benchmark/reap_validation.py',...args],{env:{...process.env,TMPDIR:temporaryDirectory},stdio:['ignore',log.fd,log.fd]});result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(exitCode,signal)=>resolve({exitCode,signal}))})}finally{await log.close()}
+ runs.push({cohort,index,variant,section,binary,sha256:binarySHA256[cohort==='aa'?'candidate':variant],args,log:logName,...result});await writeFile(root+'/comparison-runs.json',JSON.stringify({binarySHA256,runs},null,2)+'\\n');if(result.exitCode!==0)throw Error(logName+' failed');console.log(logName+' passed');
+}
+'''
+updates['benchmark/frame-comparison.mjs']=probe.encode()
+sources=['internal/runthrough/file_outbox.go',*['internal/runthrough/'+n for n in ['outbox_frame_read_resource_test.go','outbox_frame_read_test.go']],*updates]
+sources=list(dict.fromkeys(sources+['internal/runthrough/file_outbox_proto.go','internal/runthrough/file_outbox_proto_decode.go','benchmark/decode-profile-bench.go.txt','benchmark/decode-file-bench.go.txt']));steps=[{'name':'format','args':['gofmt','-w',*[n for n in updates if n.endswith('.go.txt')or n.endswith('.go')]]}]
+for mode in ['normal','race']:steps.append({'name':'candidate-'+mode,'args':['go','test',*(['-race']if mode=='race'else[]),'-overlay=benchmark/frame-candidate.json','./internal/runthrough','-run','^(TestFileOutboxFrameRead|TestOutboxFrameReader|TestFileOutboxDuplicateFlood|TestOutboxDecode)','-count=2','-v']})
+for variant in ['before','candidate']:steps.append({'name':variant+'-build','args':['go','test','-overlay=benchmark/frame-'+variant+'-measure.json','-c','./internal/runthrough','-o','benchmark/frame-'+variant+'.test']})
+steps.append({'name':'comparison','args':['node','benchmark/frame-comparison.mjs']})
+plan={'phase':'outbox-frame-candidate','sources':sources,'steps':steps};(p/'candidate-plan.json').write_text(json.dumps(plan,indent=2)+'\n');updates['benchmark/active-plan.json']=(p/'candidate-plan.json').read_bytes()
+js="const fs=require('node:fs');const run=JSON.parse(fs.readFileSync('/results/baeb8620-a7c9-42c2-926f-fc8910cbd910/run.json'));if(!run.complete||!run.success)throw Error('Baseline active');for(const[n,b]of Object.entries("+json.dumps({n:base64.b64encode(b).decode()for n,b in updates.items()})+")){fs.writeFileSync(n,Buffer.from(b,'base64'));fs.chownSync(n,10001,10001)}const plan=JSON.parse(fs.readFileSync('benchmark/active-plan.json'));if(plan.phase!=='outbox-frame-candidate'||plan.steps.length!==6)throw Error('Wrong plan');console.log('Installed bounded frame candidate, guards and 192-observation comparison');"
+(p/'install-candidate.js').write_text(js)
+for n in ['upload.log','deployments.json']:(p/('candidate-'+n)).write_bytes((p/('before-'+n)).read_bytes())
+print('Prepared candidate proof and comparative measurements')

@@ -1,0 +1,91 @@
+[
+  {
+    "name": "install-benchmark",
+    "args": [
+      "cp",
+      "benchmark/isolate-bench.go.txt",
+      "internal/capacity/ledger_isolate_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22,
+    "passed": true
+  },
+  {
+    "name": "format-benchmark",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/capacity/ledger_isolate_bench_test.go",
+      "benchmark/legacy-reader-state.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/legacy-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/legacy-reader.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 14656,
+    "passed": true
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/bounded-reader.test",
+      "./internal/capacity"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 456,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/isolate-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18246,
+    "passed": true
+  },
+  {
+    "name": "profile",
+    "args": [
+      "node",
+      "benchmark/isolate-profile.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4207,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmark",
+    "args": [
+      "rm",
+      "internal/capacity/ledger_isolate_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  }
+]

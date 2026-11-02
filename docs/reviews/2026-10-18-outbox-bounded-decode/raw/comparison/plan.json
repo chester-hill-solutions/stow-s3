@@ -1,0 +1,57 @@
+{
+  "phase": "outbox-decode-comparison",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/outbox_decode_resource_test.go",
+    "internal/runthrough/outbox_decode_reference_test.go",
+    "internal/runthrough/outbox_decode_equivalence_test.go",
+    "benchmark/candidate-file_outbox_proto.go.txt",
+    "benchmark/candidate-file_outbox_proto_decode.go.txt",
+    "benchmark/decode-candidate.json",
+    "benchmark/decode-file-bench.go.txt",
+    "benchmark/decode-before-measure.json",
+    "benchmark/decode-candidate-measure.json",
+    "benchmark/decode-comparison.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/decode-file-bench.go.txt"
+      ]
+    },
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/decode-before-measure.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/decode-before.test"
+      ]
+    },
+    {
+      "name": "candidate-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/decode-candidate-measure.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/decode-candidate.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/decode-comparison.mjs"
+      ]
+    }
+  ]
+}

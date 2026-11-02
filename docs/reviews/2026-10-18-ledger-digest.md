@@ -1,0 +1,69 @@
+# Remove the capacity ledger checksum's full-input copy
+
+**Hashing the version-one prefix and encoded ledger separately removes a full encoded-state copy.** The deterministic 4,096-resource checksum proof allocates 311,424 bytes before and 128 bytes after. Stored bytes remain identical. This is a measured allocation improvement, not a newly demonstrated corruption defect or a promise of general S3 throughput improvement.
+
+## Baseline and isolation
+
+Work begins at `3cd5412435848abab29b07dd9e177b31785e21d1`, with a clean checkout. Fetching `origin/main` returns unchanged `219d1dcfff9807b04660a40313b32127e5be2933`. The bounded ledger reader, pending-slot limits, uncertain-publication reservations and filesystem scan reuse are already complete. This change does not repeat or weaken them. The previous bounded-reader report retains an unresolved +5.65% valid 4,096-resource allocation sample and adverse small-snapshot timing; those results motivate diagnosis rather than being discarded.
+
+Three hypotheses guide the probe: the bounded reader adds material accepted-path cost; GC/JSON buffer reuse changes the aggregate allocation sample; or canonical encoding/integrity work dominates. The [probe plan](2026-10-18-ledger-digest/raw/probe/plan.json) runs both real readers, native snapshots, snapshots with GC between operations, and encoding, at 16 and 4,096 resources. Each case creates equivalent native fixtures; different cases do not claim byte-identical fixture paths. A legacy overlay changes only the `Host.read` call to `os.ReadFile`, retaining other source and checks. The unsafe legacy reader is used only for accepted-input diagnosis.
+
+The direct 4,096-resource readers both allocate about 311,768 bytes and five objects. Identical-binary snapshot observations vary with downstream allocation. The GC-controlled snapshots allocate roughly 4.86 → 4.96 MB/op, while ordinary snapshot medians in that probe are 3.55 → 3.91 MB/op. These observations do not establish the exact cause of the previous +5.65% sample. The full [160 observations](2026-10-18-ledger-digest/raw/probe/measurements.json), [ranges](2026-10-18-ledger-digest/raw/probe/comparison-analysis.json), [allocation profiles](2026-10-18-ledger-digest/raw/probe/profile-receipt.json), and both raw pprof files remain available.
+
+The allocation profile includes fixture/setup allocations as well as timed calls, so it is not a per-operation accounting table. In the bounded profile, JSON marshal, reflect slice growth and byte-buffer growth dominate; validation also allocates. The old `encodeState` checksum line accounts for about 8.41 MB of the profile's 103.68 MB total. That line uses `sha256.Sum256(append(prefix, data...))`: prepending the 17-byte domain prefix materializes a second full encoded payload. [Profile by source line](2026-10-18-ledger-digest/raw/probe/bounded-alloc-lines.log), [profile by function](2026-10-18-ledger-digest/raw/probe/bounded-alloc-top.log).
+
+## Reproduction and smallest change
+
+Before changing production, an inline streaming prototype demonstrates an allocation reduction and identical version-one encoding. Its initial whole-encoder allocation ceiling passes normally but fails under race instrumentation. The pinned Go runtime's `sync.Pool.Put` deliberately discards some entries under race; including pooled JSON buffers makes that ceiling unsuitable for isolating the checksum. There is no reported data race or wire mismatch. The [failed run](2026-10-18-ledger-digest/raw/inline/checks.json), [race log](2026-10-18-ledger-digest/raw/inline/prototype-race.log), and [pinned runtime source inspection](2026-10-18-ledger-digest/raw/inspect-pool.log) remain preserved.
+
+A private `stateIntegrity` function isolates hashing from JSON allocation. The baseline bridge extracts the existing two-line algorithm unchanged; restoring the extraction reconstructs the exact original `state.go` bytes. The bridge exists only in validation overlays so the same direct regression test links to both algorithms. It is not a second production implementation. The corrected prototype proves the old implementation fails the 64 KiB digest-allocation ceiling in both normal and race builds: **309,728 input bytes, 311,424 allocated bytes**. The replacement passes with **128 allocated bytes** in each build. This internal regression ceiling is not a new public process-memory guarantee. [Baseline normal](2026-10-18-ledger-digest/raw/prototype/red-normal.log), [baseline race](2026-10-18-ledger-digest/raw/prototype/red-race.log), [fixed normal](2026-10-18-ledger-digest/raw/prototype/prototype-normal.log), [fixed race](2026-10-18-ledger-digest/raw/prototype/prototype-race.log).
+
+The production change initializes SHA-256, writes the existing prefix, writes the existing encoded data, and encodes the same 32-byte digest. A fixed 32-byte result buffer avoids allocating another digest buffer. `encodeState` calls this private helper. There is no dependency, public API, format, migration, cache, index, checkpoint or storage abstraction. Both canonical marshals, the integrity comparison, size limits, structural validation, capacity admission, host locking, atomic replacement and ancestor durability fences remain unchanged.
+
+The wire regression compares complete encoded bytes against the former algorithm at 0, 16 and 4,096 resources, including Unicode and HTML-escaped root text. It checks the existing domain prefix and checksum, not just successful reopening. The digest allocation regression constructs the native ledger before measuring hashing directly. Existing tamper/reopen, exact-limit, native-error, reservation, recovery and filesystem tests remain part of validation.
+
+## Railway comparisons
+
+All Go formatting, builds, tests, race/conformance, quality, vet, site/docs checks and benchmarks run only on the authorized Railway scratch runner, deployment `75f56fbc-c6d7-41ee-b316-8a7f2faf163c`. Go 1.25.6, Linux amd64, UID 10001, GOMAXPROCS 4, 4 CPU/4 GiB; benchmark fixtures use verified ext4 `/results` (statfs 61267). The target service is not started or changed.
+
+Each cell runs in a separate child process. Fixture creation and binding are excluded from Go's timed/allocation counters. ABBA/BAAB order yields four original/fixed observations per cell; C/D labels run the identical original binary as a control. Linux child maximum RSS includes startup, calibration and fixtures, so it is neither per-operation RSS nor a cgroup/page-cache measurement. Positive timing percentages mean slower. Raw samples, binary hashes, commands, iteration counts and min/max ranges are retained.
+
+The isolated prototype uses ten timed operations per process:
+
+| Resources / stage | Time, before → after | Time change | Bytes/op, before → after | Objects/op, before → after | Child peak RSS, before → after | Same-binary time change |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 16 / encode | 0.0101 → 0.0089 ms | -12.59% | 6,112.0 → 4,320.0 | 15.0 → 14.0 | 10.10 → 10.09 MiB | -4.69% |
+| 16 / snapshot | 0.0390 → 0.0385 ms | -1.23% | 15,888.0 → 14,088.0 | 136.0 → 135.0 | 10.13 → 10.09 MiB | +0.12% |
+| 4096 / encode | 1.1958 → 1.1597 ms | -3.02% | 987,046.5 → 728,137.5 | 17.0 → 17.0 | 14.20 → 14.71 MiB | -15.95% |
+| 4096 / snapshot | 5.0742 → 5.4648 ms | +7.70% | 3,704,921.5 → 3,393,184.0 | 16,549.5 → 16,548.5 | 15.04 → 14.70 MiB | -0.27% |
+
+The large native snapshot's **+7.70%** timing result is adverse, despite lower allocation. Its same-binary control changes only -0.27%; the sample is not dismissed as noise. The final run increases each process to **100 timed operations** and repeats the full comparison after all final gates:
+
+| Resources / stage | Time, before → after | Time change | Bytes/op, before → after | Objects/op, before → after | Child peak RSS, before → after | Same-binary time change |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 16 / encode | 0.0073 → 0.0073 ms | -0.39% | 6,112.0 → 4,320.0 | 15.0 → 14.0 | 10.16 → 10.09 MiB | +1.18% |
+| 16 / snapshot | 0.0365 → 0.0356 ms | -2.44% | 15,888.0 → 14,096.0 | 136.0 → 135.0 | 10.26 → 10.32 MiB | +7.30% |
+| 4096 / encode | 1.1643 → 1.1393 ms | -2.15% | 955,557.5 → 717,658.0 | 16.0 → 16.5 | 13.26 → 14.25 MiB | -0.60% |
+| 4096 / snapshot | 5.7845 → 5.5865 ms | -3.42% | 3,762,333.5 → 3,351,306.0 | 16,550.0 → 16,547.0 | 14.86 → 14.89 MiB | +8.26% |
+
+[Final measurements](2026-10-18-ledger-digest/raw/final/measurements.json), [final ranges](2026-10-18-ledger-digest/raw/final/comparison-analysis.json), [prototype measurements](2026-10-18-ledger-digest/raw/prototype/measurements.json), [initial inline measurements](2026-10-18-ledger-digest/raw/inline/measurements.json), [fixture](2026-10-18-ledger-digest/raw/isolate-bench.go.txt), [final sampler](2026-10-18-ledger-digest/raw/final-digest-measure.mjs). There are 352 valid isolated observations across the 160-cell reader probe and three 64-observation checksum comparisons. The earlier inline comparison uses an unmodified original encoder; the deterministic prototype and final comparison use the identical-algorithm extraction bridge. The final source comparison is checked against exact captured bytes.
+
+The final large encoder child peak RSS increases **7.44%**, and its median object count increases **16.0 → 16.5**, despite fewer allocated bytes. This is an allocation reduction, not a demonstrated process peak-RSS improvement. The final large snapshot is **3.42% faster**, against an **8.26%** same-binary control change; latency improvement is not established.
+
+Allocation savings are established directly by the checksum regression. Native snapshot and encoder samples include JSON allocation and GC behavior; their exact byte savings, timings and process RSS need not equal the isolated checksum delta. Timing evidence is workload- and runner-specific; no statistical-significance or general object-throughput claim is made. Two incremental hash writes replace the combined one-shot input, adding a small fixed call cost while removing the linear temporary copy. All adverse observations remain visible.
+
+## Validation provenance and costs
+
+Two source uploads terminate before an associated build: `6b2ba466-21bf-44fb-b8a2-eb65f24ea15a` and `2253b6aa-d666-4313-81ec-74cce83c0f21`. Their terminal deployment lists, upload errors and no-build logs are retained. A compressed transport then uploads the same source/evidence package: 10,644 files in a 63,109,355-byte archive. The [transport receipt](2026-10-18-ledger-digest/raw/transport-receipt.json) records its SHA-256; the [actual transport Dockerfile](2026-10-18-ledger-digest/raw/transport-Dockerfile.txt) and original [validation Dockerfile](2026-10-18-ledger-digest/raw/Dockerfile.txt) are both preserved. Compression changes transport only. No local project execution substitutes for Railway validation.
+
+An intermediate validation plan incorrectly placed `-overlay` before `go test`, causing `red-normal` and `build-before` command failures. Its sampler used a stale earlier before-binary. All 64 observations are retained under [command-failure](2026-10-18-ledger-digest/raw/command-failure/validation-receipt.json) but excluded from the valid-comparison total and performance conclusions. The corrected prototype deletes binaries before rebuilding, places overlays after `go test`, and passes all 12 steps. The final source is installed only after that measured proof. The earlier failed race allocation ceiling remains recorded separately.
+
+All 22 final steps pass: formatting; quality/file-size/format checks; baseline-bridge normal/race expected-failure proofs; filesystem/capacity normal and race suites twice; full Go tests; broad capacity/storage/runtime/embedded/runthrough/S3/public-package race tests; all four conformance profiles; vet; site build/tests; documentation links; benchmark installation/formatting; both binary builds; final measurement; cleanup. [Final checks](2026-10-18-ledger-digest/raw/final/checks.json), [receipt](2026-10-18-ledger-digest/raw/final/validation-receipt.json), [normal tests](2026-10-18-ledger-digest/raw/final/focused-normal.log), [race tests](2026-10-18-ledger-digest/raw/final/focused-race.log). No quality baseline is raised. The temporary Go benchmark is removed. Report/evidence receive additional Railway site/docs and exact-source checks before runner teardown.
+
+The only intended compatibility effect is reduced temporary allocation; version-one encoded bytes are identical in the tested cases and the hash input is mathematically identical for arbitrary bytes. Total ledger decoding/encoding and validation still allocate with ledger size. This change does not establish a new whole-operation memory bound or remove persistence costs.
+
+## Next finding
+
+The larger unresolved performance issue is capacity admission's repeated ledger persistence and ancestor-fence work, together with the previously recorded bound-mutation and fresh-store timing costs. Measure those costs against the uncertain-publication and recovery contracts before changing them. No persistence/fence optimization or further production change is implemented here.
+
+The [artifact manifest](2026-10-18-ledger-digest/raw/artifact-manifest.json) records all source snapshots, profiles, comparisons, failed attempts, validation and runner teardown evidence. The active product-quality goal remains open.

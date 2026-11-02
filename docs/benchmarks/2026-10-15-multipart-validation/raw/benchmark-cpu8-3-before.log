@@ -1,0 +1,18 @@
+COMMAND ['/private/tmp/stow-multipart-validation/before.test', '-test.run=^$', '-test.bench=^BenchmarkMultipartValidation$', '-test.benchmem', '-test.benchtime=10000000x', '-test.count=3', '-test.cpu=8']
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/embedded
+cpu: Apple M1 Pro
+BenchmarkMultipartValidation/success/metadata=0-8         	10000000	        11.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=0-8         	10000000	        11.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=0-8         	10000000	        11.90 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=1-8         	10000000	        11.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=1-8         	10000000	        11.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=1-8         	10000000	        12.01 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=512-8       	10000000	        12.01 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=512-8       	10000000	        11.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/success/metadata=512-8       	10000000	        11.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/wrapped-missing-8            	10000000	        11.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/wrapped-missing-8            	10000000	        12.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMultipartValidation/wrapped-missing-8            	10000000	        12.13 ns/op	       0 B/op	       0 allocs/op
+PASS

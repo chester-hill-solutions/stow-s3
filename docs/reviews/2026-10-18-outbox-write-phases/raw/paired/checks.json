@@ -1,0 +1,57 @@
+[
+  {
+    "name": "format-probe",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/phase-probe/trace-before-file_outbox.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/phase-trace-before-overlay.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/paired-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1919,
+    "passed": true
+  },
+  {
+    "name": "build-current",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/phase-trace-overlay.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/paired-after.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 826,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/paired-phase.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8465,
+    "passed": true
+  }
+]

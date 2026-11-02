@@ -1,0 +1,60 @@
+{
+  "phase": "outbox-token-exhaustion-before",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/outbox_claims.go",
+    "internal/runthrough/outbox_token_exhaustion_test.go",
+    "internal/runthrough/outbox_token_exhaustion_controls_test.go",
+    "internal/runthrough/outbox_token_exhaustion_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-tests",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_token_exhaustion_test.go",
+        "internal/runthrough/outbox_token_exhaustion_controls_test.go",
+        "internal/runthrough/outbox_token_exhaustion_bench_test.go"
+      ]
+    },
+    {
+      "name": "regression-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxTokenExhaustion",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "regression-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxTokenExhaustion",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "benchmark-build",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/token-before.test"
+      ]
+    }
+  ]
+}

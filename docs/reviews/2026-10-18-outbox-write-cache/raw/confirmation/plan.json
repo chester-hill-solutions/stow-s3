@@ -1,0 +1,50 @@
+{
+  "phase": "outbox-write-cache-confirmation",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_proto.go",
+    "benchmark/write-cache/contract_test.go.txt",
+    "benchmark/write-cache/bench_test.go.txt",
+    "benchmark/write-cache/naive-file_outbox.go.txt",
+    "benchmark/write-cache/safe-file_outbox.go.txt",
+    "benchmark/write-cache/safe-file_outbox_proto.go.txt",
+    "benchmark/write-cache-before.json",
+    "benchmark/write-cache-naive.json",
+    "benchmark/write-cache-safe.json",
+    "benchmark/cache-comparison.mjs",
+    "benchmark/cache-confirmation.mjs"
+  ],
+  "steps": [
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/write-cache-before.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/write-cache-before.test"
+      ]
+    },
+    {
+      "name": "safe-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/write-cache-safe.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/write-cache-safe.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/cache-confirmation.mjs"
+      ]
+    }
+  ]
+}

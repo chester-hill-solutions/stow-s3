@@ -76,7 +76,7 @@ func (a *Adapter) openLocal(ctx context.Context, bucket, key string, meta *stora
 	}
 	rc, bodyMeta, err := a.local.GetObject(ctx, bucket, key)
 	if err != nil {
-		return nil, nil, err
+		return rc, nil, err
 	}
 	return rc, bodyMeta, nil
 }
@@ -92,4 +92,48 @@ func (a *Adapter) openCached(ctx context.Context, bucket, key string, meta *stor
 		store = a.cache
 	}
 	return store.GetObject(ctx, bucket, key)
+}
+
+func (a *Adapter) refetchUncachedObject(ctx context.Context, bucket, key, previousETag string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := a.upstream.GetObject(ctx, bucket, key)
+	if err != nil {
+		return reader, nil, err
+	}
+	if meta.ETag == previousETag {
+		return reader, meta, nil
+	}
+	if err := a.saveUpstreamState(bucket, key, UpstreamState{ETag: meta.ETag}); err != nil {
+		return reader, nil, err
+	}
+	return reader, meta, nil
+}
+
+func (a *Adapter) cacheObjectCannotFit(size int64) bool {
+	return a.separateCache && a.cfg.Cache.MaxBytes > 0 && size > a.cfg.Cache.MaxBytes
+}
+
+func (a *Adapter) discardCacheObject(ctx context.Context, bucket, key string) error {
+	err := a.cache.DeleteObject(ctx, bucket, key)
+	if err != nil && !storageErrIsMissingObject(err) && !storageErrIsMissingBucket(err) {
+		return err
+	}
+	a.forgetCacheObject(bucket, key)
+	if err == nil {
+		a.cacheEvictions.Add(1)
+	}
+	return nil
+}
+
+func (a *Adapter) openRefreshedObject(ctx context.Context, store storage.Store, bucket, key, upstreamETag string) (io.ReadCloser, *storage.ObjectMeta, error) {
+	reader, meta, err := store.GetObject(ctx, bucket, key)
+	if err == nil {
+		return reader, meta, nil
+	}
+	if reader != nil {
+		_ = reader.Close()
+	}
+	if !errors.Is(err, storage.ErrObjectNotFound) {
+		return nil, nil, err
+	}
+	return a.refetchUncachedObject(ctx, bucket, key, upstreamETag)
 }

@@ -1,0 +1,562 @@
+{
+  "summary": [
+    {
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "baseline": {
+        "samples": 6,
+        "median_ns": 7368.0,
+        "min_ns": 6973.0,
+        "max_ns": 8601.0,
+        "B/op": [
+          8409,
+          8410
+        ],
+        "allocs/op": [
+          61,
+          61
+        ]
+      },
+      "candidate": {
+        "samples": 6,
+        "median_ns": 7489.5,
+        "min_ns": 6616.0,
+        "max_ns": 11417.0,
+        "B/op": [
+          8409,
+          8410
+        ],
+        "allocs/op": [
+          61,
+          61
+        ]
+      }
+    },
+    {
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "baseline": {
+        "samples": 6,
+        "median_ns": 205330069.5,
+        "min_ns": 157907875.0,
+        "max_ns": 302178333.0,
+        "B/op": [
+          61800,
+          64669
+        ],
+        "allocs/op": [
+          226,
+          229
+        ]
+      },
+      "candidate": {
+        "samples": 6,
+        "median_ns": 213060041.5,
+        "min_ns": 189343680.0,
+        "max_ns": 255934069.0,
+        "B/op": [
+          61858,
+          67362
+        ],
+        "allocs/op": [
+          227,
+          228
+        ]
+      }
+    },
+    {
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "baseline": {
+        "samples": 6,
+        "median_ns": 7317.5,
+        "min_ns": 6587.0,
+        "max_ns": 9872.0,
+        "B/op": [
+          8409,
+          8410
+        ],
+        "allocs/op": [
+          61,
+          61
+        ]
+      },
+      "candidate": {
+        "samples": 6,
+        "median_ns": 7528.5,
+        "min_ns": 6787.0,
+        "max_ns": 25353.0,
+        "B/op": [
+          8409,
+          8411
+        ],
+        "allocs/op": [
+          61,
+          61
+        ]
+      }
+    },
+    {
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "baseline": {
+        "samples": 6,
+        "median_ns": 1363.0,
+        "min_ns": 1297.0,
+        "max_ns": 1399.0,
+        "B/op": [
+          2336,
+          2336
+        ],
+        "allocs/op": [
+          25,
+          25
+        ]
+      },
+      "candidate": {
+        "samples": 6,
+        "median_ns": 1336.5,
+        "min_ns": 1298.0,
+        "max_ns": 1551.0,
+        "B/op": [
+          2336,
+          2336
+        ],
+        "allocs/op": [
+          25,
+          25
+        ]
+      }
+    }
+  ],
+  "samples": [
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 248565111.0,
+      "B/op": 64669,
+      "allocs/op": 229
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 185344597.0,
+      "B/op": 64624,
+      "allocs/op": 227
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 158360514.0,
+      "B/op": 64442,
+      "allocs/op": 227
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 32996,
+      "ns/op": 7311.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 31668,
+      "ns/op": 6972.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 32996,
+      "ns/op": 6587.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 35187,
+      "ns/op": 6973.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 33696,
+      "ns/op": 7284.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 30963,
+      "ns/op": 7452.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 270283,
+      "ns/op": 1297.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 274918,
+      "ns/op": 1399.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "block": 1,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 284232,
+      "ns/op": 1389.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 207358014.0,
+      "B/op": 67362,
+      "allocs/op": 228
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 255934069.0,
+      "B/op": 67362,
+      "allocs/op": 228
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 202714153.0,
+      "B/op": 64442,
+      "allocs/op": 227
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 30658,
+      "ns/op": 7310.0,
+      "B/op": 8411,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 33370,
+      "ns/op": 6810.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 10000,
+      "ns/op": 23917.0,
+      "B/op": 8411,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 32414,
+      "ns/op": 7427.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 30814,
+      "ns/op": 7552.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 28615,
+      "ns/op": 7998.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 299583,
+      "ns/op": 1326.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 285706,
+      "ns/op": 1326.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "block": 2,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 274380,
+      "ns/op": 1347.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 255574556.0,
+      "B/op": 67362,
+      "allocs/op": 228
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 218762069.0,
+      "B/op": 61858,
+      "allocs/op": 227
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 189343680.0,
+      "B/op": 64624,
+      "allocs/op": 227
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 24961,
+      "ns/op": 25353.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 33276,
+      "ns/op": 7747.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 30279,
+      "ns/op": 6787.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 33834,
+      "ns/op": 6789.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 32640,
+      "ns/op": 6616.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 31860,
+      "ns/op": 11417.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 235874,
+      "ns/op": 1426.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 288410,
+      "ns/op": 1551.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "candidate",
+      "block": 3,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 271740,
+      "ns/op": 1298.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 302178333.0,
+      "B/op": 64512,
+      "allocs/op": 227
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 157907875.0,
+      "B/op": 64624,
+      "allocs/op": 227
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/native/filesystem/64MiB-8",
+      "iterations": 3,
+      "ns/op": 225315542.0,
+      "B/op": 61800,
+      "allocs/op": 226
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 29775,
+      "ns/op": 9872.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 27680,
+      "ns/op": 7423.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/native/memory/64MiB-8",
+      "iterations": 29320,
+      "ns/op": 7324.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 29462,
+      "ns/op": 7178.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 33103,
+      "ns/op": 8601.0,
+      "B/op": 8410,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkConditionalCopy/fallback/memory/64MiB-8",
+      "iterations": 33986,
+      "ns/op": 7720.0,
+      "B/op": 8409,
+      "allocs/op": 61
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 262908,
+      "ns/op": 1375.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 261082,
+      "ns/op": 1321.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    },
+    {
+      "version": "baseline",
+      "block": 4,
+      "benchmark": "BenchmarkQuotaReconciliation-8",
+      "iterations": 255864,
+      "ns/op": 1351.0,
+      "B/op": 2336,
+      "allocs/op": 25
+    }
+  ]
+}

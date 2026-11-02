@@ -1,0 +1,273 @@
+{
+  "phase": "multipart-ownership-final",
+  "sources": [
+    "internal/storage/owned_reader.go",
+    "internal/s3api/handlers_multipart.go",
+    "internal/storage/part_owned_test.go",
+    "internal/storage/fs/part_http_owned_test.go",
+    "benchmark/baseline-owned_reader.go.txt",
+    "benchmark/baseline-handlers_multipart.go.txt",
+    "benchmark/before-overlay.json",
+    "benchmark/part-probe.go.txt",
+    "benchmark/measure.mjs",
+    "benchmark/measure-child.py",
+    "benchmark/doc-links-capture.mjs"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/owned_reader.go",
+        "internal/s3api/handlers_multipart.go",
+        "internal/storage/part_owned_test.go",
+        "internal/storage/fs/part_http_owned_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage",
+        "./internal/storage/fs",
+        "-run",
+        "^Test(PartReader|PartBytesOf|MultipartOwned)",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage",
+        "./internal/storage/fs",
+        "-run",
+        "^Test(PartReader|PartBytesOf|MultipartOwned)",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage",
+        "./internal/storage/fs",
+        "./internal/storage/workspace",
+        "./internal/capacity",
+        "./internal/s3api",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage",
+        "./internal/storage/fs",
+        "./internal/storage/workspace",
+        "./internal/capacity",
+        "./internal/s3api",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "go",
+        "test",
+        "./...",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "broad-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/...",
+        "./internal/capacity",
+        "./internal/runtime",
+        "./internal/embedded",
+        "./internal/runthrough",
+        "./pkg/stow",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "conformance-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "conformance-runtime-memory",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+      }
+    },
+    {
+      "name": "conformance-runtime-filesystem",
+      "args": [
+        "go",
+        "test",
+        "./conformance/...",
+        "-count=1",
+        "-v"
+      ],
+      "env": {
+        "STOW_CONFORMANCE_BACKEND": "runtime",
+        "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+      }
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "install-probe",
+      "args": [
+        "cp",
+        "benchmark/part-probe.go.txt",
+        "internal/storage/fs/part_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "format-probe",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/part_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "snapshot-probe",
+      "args": [
+        "node",
+        "-e",
+        "require('node:fs').copyFileSync('internal/storage/fs/part_memory_probe_test.go',process.env.STOW_RESULT_ROOT+'/compiled-probe.go.txt')"
+      ]
+    },
+    {
+      "name": "build-before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/part-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "build-after",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/part-after.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/measure.mjs"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "args": [
+        "rm",
+        "internal/storage/fs/part_memory_probe_test.go"
+      ]
+    },
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "doc-links",
+      "args": [
+        "node",
+        "--import",
+        "./benchmark/doc-links-capture.mjs",
+        "scripts/check-doc-links.mjs"
+      ]
+    }
+  ]
+}

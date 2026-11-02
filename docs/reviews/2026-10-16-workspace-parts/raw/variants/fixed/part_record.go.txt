@@ -1,0 +1,122 @@
+package workspace
+
+import (
+	"encoding/binary"
+	"encoding/hex"
+	"errors"
+	"io"
+	"os"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+var errPartRecord = errors.New("workspace store: invalid multipart part record")
+
+// Part descriptors and payloads share one atomic replacement.
+const partRecordMagic = "STOWPART1"
+const (
+	partNumberOffset = len(partRecordMagic)
+	partSizeOffset   = partNumberOffset + 2
+	partTimeOffset   = partSizeOffset + 8
+	partNsecOffset   = partTimeOffset + 8
+	partDigestOffset = partNsecOffset + 4
+	partRecordPrefix = partDigestOffset + 16
+)
+
+func writePartRecord(path string, part storage.PartInfo, data []byte) error {
+	if part.PartNumber < 1 || part.PartNumber > 10000 || len(part.ETag) != 34 || part.ETag[0] != '"' || part.ETag[33] != '"' || part.LastModified.Year() < 0 || part.LastModified.Year() > 9999 {
+		return errPartRecord
+	}
+	var prefix [partRecordPrefix]byte
+	copy(prefix[:], partRecordMagic)
+	binary.LittleEndian.PutUint16(prefix[partNumberOffset:], uint16(part.PartNumber))
+	binary.LittleEndian.PutUint64(prefix[partSizeOffset:], uint64(len(data)))
+	binary.LittleEndian.PutUint64(prefix[partTimeOffset:], uint64(part.LastModified.Unix()))
+	binary.LittleEndian.PutUint32(prefix[partNsecOffset:], uint32(part.LastModified.Nanosecond()))
+	if _, err := hex.Decode(prefix[partDigestOffset:], []byte(part.ETag[1:33])); err != nil {
+		return err
+	}
+	return atomicfile.WriteParts(path, 0644, prefix[:], data)
+}
+func openPartRecord(path string, number int) (*os.File, storage.PartInfo, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, storage.PartInfo{}, err
+	}
+	part, err := readPartHeader(file, number)
+	if err != nil {
+		file.Close()
+		return nil, part, err
+	}
+	return file, part, nil
+}
+func readPartHeader(file *os.File, number int) (storage.PartInfo, error) {
+	var part storage.PartInfo
+	var prefix [partRecordPrefix]byte
+	if _, err := io.ReadFull(file, prefix[:]); err != nil {
+		return part, err
+	}
+	if string(prefix[:len(partRecordMagic)]) != partRecordMagic {
+		return part, errPartRecord
+	}
+	part.PartNumber = int(binary.LittleEndian.Uint16(prefix[partNumberOffset:]))
+	part.Size = int64(binary.LittleEndian.Uint64(prefix[partSizeOffset:]))
+	nanos := binary.LittleEndian.Uint32(prefix[partNsecOffset:])
+	part.LastModified = time.Unix(int64(binary.LittleEndian.Uint64(prefix[partTimeOffset:])), int64(nanos)).UTC()
+	info, err := file.Stat()
+	if err != nil {
+		return part, err
+	}
+	if part.PartNumber != number || part.Size < 0 || part.Size != info.Size()-int64(partRecordPrefix) || nanos >= 1e9 || part.LastModified.Year() < 0 || part.LastModified.Year() > 9999 {
+		return part, errPartRecord
+	}
+	var tag [34]byte
+	tag[0], tag[33] = '"', '"'
+	hex.Encode(tag[1:33], prefix[partDigestOffset:])
+	part.ETag = string(tag[:])
+	return part, nil
+}
+func readPartRecord(path string, number int) ([]byte, error) {
+	file, part, err := openPartRecord(path, number)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	if part.Size > int64(int(^uint(0)>>1)) {
+		return nil, errPartRecord
+	}
+	data := make([]byte, int(part.Size))
+	_, err = io.ReadFull(file, data)
+	return data, err
+}
+func (s *Store) listPartFiles(id string) ([]storage.PartInfo, error) {
+	entries, err := os.ReadDir(s.uploadDir(id))
+	if err != nil {
+		return nil, err
+	}
+	var parts []storage.PartInfo
+	for _, entry := range entries {
+		if !strings.HasPrefix(entry.Name(), "part-") {
+			continue
+		}
+		number, err := strconv.Atoi(strings.TrimPrefix(entry.Name(), "part-"))
+		if err != nil || number < 1 || number > 10000 {
+			return nil, errPartRecord
+		}
+		file, part, err := openPartRecord(s.partPath(id, number), number)
+		if err != nil {
+			return nil, err
+		}
+		if err := file.Close(); err != nil {
+			return nil, err
+		}
+		parts = append(parts, part)
+	}
+	sort.Slice(parts, func(i, j int) bool { return parts[i].PartNumber < parts[j].PartNumber })
+	return parts, nil
+}

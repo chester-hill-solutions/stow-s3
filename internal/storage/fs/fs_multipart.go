@@ -2,7 +2,9 @@ package fs
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -83,8 +85,13 @@ func (s *FilesystemStore) CreateMultipartUpload(_ context.Context, bucket, key s
 		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
 		ChecksumValue:     opts.ChecksumValue,
 	}
-	if err := writeJSONAtomic(filepath.Join(dir, "manifest.json"), manifest); err != nil {
+	manifestData, err := json.Marshal(manifest)
+	if err != nil {
 		_ = os.RemoveAll(dir)
+		return nil, err
+	}
+	if err := s.writeCapacityFile(filepath.Join(dir, "manifest.json"), manifestData); err != nil {
+		_ = s.removeCapacityPath(dir)
 		return nil, err
 	}
 	upload := manifest.upload(uploadID)
@@ -96,7 +103,7 @@ func (s *FilesystemStore) GetMultipartUpload(_ context.Context, uploadID string)
 	defer s.mu.RUnlock()
 	manifest, err := readMultipartManifest(s.multipartDir(uploadID))
 	if err != nil {
-		return nil, storage.ErrUploadNotFound
+		return nil, err
 	}
 	upload := manifest.upload(uploadID)
 	return &upload, nil
@@ -122,7 +129,7 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
 		return nil, err
 	}
 	partPath := filepath.Join(dir, fmt.Sprintf("part-%05d", partNumber))
-	if err := writeBytesAtomic(partPath, data); err != nil {
+	if err := s.writeCapacityFile(partPath, data); err != nil {
 		return nil, err
 	}
 	now := time.Now().UTC()
@@ -148,7 +155,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	dir := s.multipartDir(uploadID)
 	manifest, err := readMultipartManifest(dir)
 	if err != nil {
-		return nil, storage.ErrUploadNotFound
+		return nil, err
 	}
 
 	// Resolve and check every part before assembling any of it, so a completion
@@ -176,15 +183,8 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		return nil, err
 	}
 
-	// Allocated once at the exact total: the parts are already on disk and
-	// already the right size, so growing the destination by appending discovers
-	// nothing and reallocates on the way.
-	combined := make([]byte, 0, total)
-	for _, chunk := range chunks {
-		combined = append(combined, chunk...)
-	}
 	upload := manifest.upload(uploadID)
-	if err := storage.VerifyChecksum(storage.MultipartPutOptions(upload.Options), combined); err != nil {
+	if err := verifyMultipartChecksum(upload.Options, chunks); err != nil {
 		return nil, err
 	}
 
@@ -196,14 +196,14 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	completion := storage.Completion{
 		Upload:      upload,
 		ETag:        etag,
-		Size:        int64(len(combined)),
+		Size:        total,
 		VersionID:   recordVersion,
 		CompletedAt: time.Now().UTC(),
 	}
 	meta := completion.ObjectMeta()
 	record := objectRecord{
 		RecordVersion:     recordVersion,
-		Data:              combined,
+		payloadSize:       total,
 		ETag:              etag,
 		ContentType:       meta.ContentType,
 		Metadata:          meta.Metadata,
@@ -212,23 +212,31 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		LastModified:      meta.LastModified,
 	}
 	// A completion publishes the object like any other write, so a held object
-	// refuses it before assembly rather than after.
+	// refuses it before publication.
 	if err := s.checkRecoveryHoldsLocked(manifest.Bucket, manifest.Key); err != nil {
 		return nil, err
 	}
-	if err := s.writeObject(manifest.Bucket, manifest.Key, record); err != nil {
+	if err := s.writeObject(manifest.Bucket, manifest.Key, record, chunks...); err != nil {
 		return nil, err
 	}
-	if err := os.RemoveAll(dir); err != nil {
+	if err := s.removeCapacityPath(dir); err != nil {
 		// The object is already committed; retain the upload so callers can retry cleanup.
-		return nil, fmt.Errorf("cleanup multipart upload: %w", err)
+		return &meta, storage.CommittedError(fmt.Errorf("cleanup multipart upload: %w", err))
 	}
 	return &meta, nil
 }
 
 func (s *FilesystemStore) ValidateMultipartUpload(_ context.Context, uploadID, bucket, key string) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	manifest, err := readMultipartManifest(s.multipartDir(uploadID))
-	if err != nil || manifest.Bucket != bucket || manifest.Key != key {
+	if errors.Is(err, storage.ErrUploadNotFound) {
+		return storage.ErrNoSuchUpload
+	}
+	if err != nil {
+		return err
+	}
+	if manifest.Bucket != bucket || manifest.Key != key {
 		return storage.ErrNoSuchUpload
 	}
 	return nil
@@ -257,7 +265,10 @@ func (s *FilesystemStore) ListMultipartUploads(_ context.Context, bucket string,
 			continue
 		}
 		manifest, err := readMultipartManifest(filepath.Join(s.dataDir, ".multipart", entry.Name()))
-		if err != nil || manifest.Bucket != bucket {
+		if err != nil {
+			return nil, err
+		}
+		if manifest.Bucket != bucket {
 			continue
 		}
 		uploads = append(uploads, manifest.upload(entry.Name()))
@@ -277,7 +288,7 @@ func (s *FilesystemStore) AbortMultipartUpload(_ context.Context, uploadID strin
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return storage.ErrUploadNotFound
 	}
-	return os.RemoveAll(dir)
+	return s.removeCapacityPath(dir)
 }
 
 func (s *FilesystemStore) listParts(_ context.Context, uploadID string) ([]storage.PartInfo, error) {
@@ -337,8 +348,42 @@ func readMultipartManifest(dir string) (multipartManifest, error) {
 	var m multipartManifest
 	data, err := os.ReadFile(filepath.Join(dir, "manifest.json"))
 	if err != nil {
+		if os.IsNotExist(err) {
+			if _, dirErr := os.Stat(dir); os.IsNotExist(dirErr) {
+				return m, storage.ErrUploadNotFound
+			} else if dirErr != nil {
+				return m, dirErr
+			}
+		}
 		return m, err
 	}
-	err = json.Unmarshal(data, &m)
-	return m, err
+	if err := json.Unmarshal(data, &m); err != nil {
+		return m, err
+	}
+	if storage.ValidateBucketName(m.Bucket) != nil || storage.ValidateKey(m.Key) != nil {
+		return m, fmt.Errorf("invalid multipart manifest bucket or key")
+	}
+	return m, nil
+}
+
+// The validated part buffers are the publication source; checksum them without
+// allocating a second concatenated payload.
+func verifyMultipartChecksum(opts storage.MultipartOptions, parts [][]byte) error {
+	if opts.ChecksumValue == "" {
+		return nil
+	}
+	if storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm) == "" {
+		return storage.VerifyChecksum(storage.MultipartPutOptions(opts), nil)
+	}
+	digest, err := storage.NewChecksumDigest(opts.ChecksumAlgorithm)
+	if err != nil {
+		return err
+	}
+	for _, part := range parts {
+		_, _ = digest.Write(part)
+	}
+	if base64.StdEncoding.EncodeToString(digest.Sum(nil)) != opts.ChecksumValue {
+		return storage.ErrChecksumMismatch
+	}
+	return nil
 }

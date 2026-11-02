@@ -1,0 +1,327 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity.go",
+      "internal/storage/fs/capacity_save.go",
+      "internal/storage/fs/capacity_scan_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 451,
+    "passed": true
+  },
+  {
+    "name": "verified-red-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityMutationAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 872,
+    "passed": true
+  },
+  {
+    "name": "verified-red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/before-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityMutationAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1471,
+    "passed": true
+  },
+  {
+    "name": "focused-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 14268,
+    "passed": true
+  },
+  {
+    "name": "focused-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 24045,
+    "passed": true
+  },
+  {
+    "name": "full-go",
+    "args": [
+      "go",
+      "test",
+      "./...",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 62685,
+    "passed": true
+  },
+  {
+    "name": "broad-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/capacity",
+      "./internal/storage/...",
+      "./internal/runtime",
+      "./internal/embedded",
+      "./internal/runthrough",
+      "./internal/s3api",
+      "./pkg/stow",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 87480,
+    "passed": true
+  },
+  {
+    "name": "conformance-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 5728,
+    "passed": true
+  },
+  {
+    "name": "conformance-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7099,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-memory",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "memory"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 6234,
+    "passed": true
+  },
+  {
+    "name": "conformance-runtime-filesystem",
+    "args": [
+      "go",
+      "test",
+      "./conformance/...",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_CONFORMANCE_BACKEND": "runtime",
+      "STOW_CONFORMANCE_RUNTIME_BACKEND": "filesystem"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 7788,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 8693,
+    "passed": true
+  },
+  {
+    "name": "site-build",
+    "args": [
+      "npm",
+      "run",
+      "build",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 490,
+    "passed": true
+  },
+  {
+    "name": "site-tests",
+    "args": [
+      "npm",
+      "test",
+      "--prefix",
+      "site"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 588,
+    "passed": true
+  },
+  {
+    "name": "doc-links",
+    "args": [
+      "node",
+      "scripts/check-doc-links.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 93,
+    "passed": true
+  },
+  {
+    "name": "install-benchmark",
+    "args": [
+      "cp",
+      "benchmark/scan-bench.go.txt",
+      "internal/storage/fs/admission_scan_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "format-benchmark",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/admission_scan_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 14,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/before-overlay.json",
+      "-c",
+      "-o",
+      "benchmark/scan-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 207,
+    "passed": true
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/scan-after.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 178,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/scan-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 71693,
+    "passed": true
+  },
+  {
+    "name": "remove-benchmark",
+    "args": [
+      "rm",
+      "internal/storage/fs/admission_scan_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  }
+]

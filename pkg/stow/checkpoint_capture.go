@@ -30,7 +30,11 @@ func scanCheckpointFilesContext(ctx context.Context, root string, includeSensiti
 }
 
 func scanCheckpointRoot(ctx context.Context, source *rooted.Root, includeSensitive bool) ([]CheckpointFile, []string, int64, error) {
-	scan := checkpointScan{ctx: ctx, root: ".", source: source, includeSensitive: includeSensitive}
+	return scanCheckpointRootWithOptions(ctx, source, CheckpointOptions{IncludeSensitiveFiles: includeSensitive})
+}
+
+func scanCheckpointRootWithOptions(ctx context.Context, source *rooted.Root, options CheckpointOptions) ([]CheckpointFile, []string, int64, error) {
+	scan := checkpointScan{ctx: ctx, root: ".", source: source, includeSensitive: options.IncludeSensitiveFiles, maxBytes: options.MaxBytes, maxFiles: options.MaxFiles}
 	err := fs.WalkDir(source.FS(), ".", scan.visit)
 	if err != nil {
 		return nil, nil, 0, fmt.Errorf("stow: scan checkpoint inputs: %w", err)
@@ -50,6 +54,8 @@ type checkpointScan struct {
 	files            []CheckpointFile
 	excluded         []string
 	total            int64
+	maxBytes         int64
+	maxFiles         int64
 }
 
 func (s *checkpointScan) visit(path string, entry os.DirEntry, walkErr error) error {
@@ -102,11 +108,21 @@ func (s *checkpointScan) addRegularFile(path, rel string, entry os.DirEntry) err
 	if !info.Mode().IsRegular() {
 		return fmt.Errorf("stow: checkpoint supports regular files only: %q", rel)
 	}
+	if s.maxFiles > 0 && int64(len(s.files)) >= s.maxFiles {
+		return checkpointFailure("capacity_exceeded", "scan", "not_committed", fmt.Errorf("checkpoint files exceed limit %d", s.maxFiles))
+	}
+	remaining := int64(-1)
+	if s.maxBytes > 0 {
+		remaining = s.maxBytes - s.total
+	}
+	if remaining >= 0 && info.Size() > remaining {
+		return checkpointFailure("capacity_exceeded", "scan", "not_committed", fmt.Errorf("checkpoint bytes exceed limit %d", s.maxBytes))
+	}
 	input, err := s.source.OpenRegularFile(filepath.FromSlash(rel))
 	if err != nil {
 		return err
 	}
-	digest, size, err := digestCheckpointInput(s.ctx, input)
+	digest, size, err := digestCheckpointInputWithin(s.ctx, input, remaining)
 	if err != nil {
 		return err
 	}
@@ -188,6 +204,10 @@ func digestFileContext(ctx context.Context, path string) (string, int64, error) 
 }
 
 func digestCheckpointInput(ctx context.Context, file *os.File) (string, int64, error) {
+	return digestCheckpointInputWithin(ctx, file, -1)
+}
+
+func digestCheckpointInputWithin(ctx context.Context, file *os.File, maxBytes int64) (string, int64, error) {
 	info, err := file.Stat()
 	if err != nil {
 		file.Close()
@@ -196,6 +216,10 @@ func digestCheckpointInput(ctx context.Context, file *os.File) (string, int64, e
 	if !info.Mode().IsRegular() {
 		file.Close()
 		return "", 0, fmt.Errorf("stow: checkpoint input is not regular")
+	}
+	if maxBytes >= 0 && info.Size() > maxBytes {
+		file.Close()
+		return "", 0, checkpointFailure("capacity_exceeded", "scan", "not_committed", fmt.Errorf("checkpoint input exceeds remaining byte budget"))
 	}
 	hash := sha256.New()
 	size, copyErr := io.Copy(hash, io.LimitReader(checkpointReader{ctx: ctx, reader: file}, info.Size()+1))

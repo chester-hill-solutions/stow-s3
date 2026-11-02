@@ -1,0 +1,92 @@
+package runthrough_test
+
+import (
+	"context"
+	"errors"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+type preparedReviewStore struct {
+	*storage.MemoryStore
+	failure error
+}
+
+func (s *preparedReviewStore) HeadObject(ctx context.Context, bucket, key string) (*storage.ObjectMeta, error) {
+	if s.failure != nil {
+		return nil, s.failure
+	}
+	return s.MemoryStore.HeadObject(ctx, bucket, key)
+}
+func TestReviewPreparedAmbiguousMissing(t *testing.T) {
+	for _, mode := range []string{"uncertain", "marked-missing"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx := context.Background()
+			local := &preparedReviewStore{MemoryStore: storage.NewMemoryStore()}
+			if err := local.CreateBucket(ctx, "probe"); err != nil {
+				t.Fatal(err)
+			}
+			old, err := local.PutObject(ctx, "probe", "target", strings.NewReader("old"), storage.PutOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			path := filepath.Join(t.TempDir(), "outbox.json")
+			outbox, err := runthrough.NewFileOutbox(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			entry, err := outbox.Prepare(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "probe", Key: "target", PreviousVersion: old.VersionID, UpstreamAbsent: true})
+			if err != nil {
+				t.Fatal(err)
+			}
+			committed, err := local.PutObject(ctx, "probe", "target", strings.NewReader("new"), storage.PutOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			local.failure = errors.New("HEAD uncertain")
+			if mode == "marked-missing" {
+				local.failure = errors.Join(storage.ErrMutationCommitted, storage.ErrObjectNotFound)
+			}
+			upstream := newMockUpstream()
+			adapter := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, local, storage.NewMemoryStore(), upstream, outbox)
+			t.Cleanup(func() { _ = adapter.Close() })
+			err = adapter.RecoverPrepared(ctx)
+			if !errors.Is(err, local.failure) {
+				t.Errorf("uncertainty lost: got=%v want=%v", err, local.failure)
+			}
+			if len(outbox.Prepared()) != 1 || len(outbox.Pending()) != 0 {
+				t.Errorf("uncertain recovery lost prepared intent %s: prepared=%d pending=%d", entry.ID, len(outbox.Prepared()), len(outbox.Pending()))
+			}
+			if upstream.putCalls != 0 {
+				t.Error("uncertain source propagated")
+			}
+			if err := outbox.Close(); err != nil {
+				t.Fatal(err)
+			}
+			reopened, err := runthrough.NewFileOutbox(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(reopened.Prepared()) != 1 {
+				t.Errorf("intent loss persisted across reopen: prepared=%d", len(reopened.Prepared()))
+			}
+			local.failure = nil
+			current, err := local.HeadObject(ctx, "probe", "target")
+			if err != nil || current.VersionID != committed.VersionID {
+				t.Fatalf("local commit changed: meta=%+v error=%v", current, err)
+			}
+			recovered := runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true}, local, storage.NewMemoryStore(), upstream, reopened)
+			t.Cleanup(func() { _ = recovered.Close() })
+			if err := recovered.RetryPending(ctx); err != nil {
+				t.Fatalf("healthy recovery failed: %v", err)
+			}
+			if upstream.putCalls != 1 {
+				t.Errorf("committed local write was never propagated after repair: puts=%d", upstream.putCalls)
+			}
+		})
+	}
+}

@@ -1,0 +1,21 @@
+COMMAND ["make", "test-conformance"] cwd=/Users/ladmin/.codex/worktrees/core-copy-quality/stow
+STOW_CONFORMANCE_BACKEND=memory GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	19.516s
+STOW_CONFORMANCE_BACKEND=filesystem GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	17.835s
+STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=memory GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	13.470s
+STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=filesystem GOTOOLCHAIN=go1.25.6 go test ./conformance/... -count=1 -v
+--- SKIP: TestMirrorWritesCreatesTheBucketUpstream (0.00s)
+--- SKIP: TestUpstreamRunThrough (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	25.012s

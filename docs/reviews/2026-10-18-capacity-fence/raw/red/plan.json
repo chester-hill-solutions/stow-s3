@@ -1,0 +1,44 @@
+{
+  "phase": "capacity-fence-red",
+  "sources": [
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/capacity_fence_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/capacity_fence_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacity(Fence|WriteFailure)",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^TestCapacity(Fence|WriteFailure)",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

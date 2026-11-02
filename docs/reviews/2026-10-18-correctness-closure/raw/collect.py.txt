@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,shutil,hashlib
+p=Path('/private/tmp/stow-correctness-closure-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');out=r/'docs/reviews/2026-10-18-correctness-closure';raw=out/'raw';raw.mkdir(parents=True,exist_ok=True)
+for phase,dest,count in [('red','initial',22),('final','final',7)]:
+ j=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+j['id']);v=json.loads((e/'run.json').read_text());assert v['complete']and v['success']and v['checks']==count and v['railwayDeploymentId']==j['deploymentId']=='bb794cd2-6e96-4014-94bc-97bea9526b4a';d=raw/dest;d.mkdir(exist_ok=True)
+ for f in e.iterdir():
+  if f.is_file():shutil.copy2(f,d/f.name)
+ for suffix in ['start.json','deployments.json','upload.log']:shutil.copy2(p/(phase+'-'+suffix),d/suffix)
+for n in ['baseline.json','source-manifest.json','lead-register-input.json','reference-notes.json','validation-receipt.json','preflight-runner.json','preflight-target.json','transport-receipt.json','transport-Dockerfile.txt','red-plan.json','audit-plan.json','final-plan.json','workspace_probe.go.txt','auth_sdk_probe.go.txt','auth_query_probe.go.txt','etag_probe_initial.go.txt','etag_probe.go.txt','node-sdk-sign.mjs','install-node-sdk.js','install-final.js','doc-links-capture.mjs']:shutil.copy2(p/n,raw/n)
+for n in ['preflight.py','package.py','deploy.py','control.py','watch.py','remote.py','export.py','analyze.py','collect.py','report.py','publish.py','manifest.py','stop.py','verify.py']:
+ if(p/n).exists():shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['runner.mjs','http.mjs','resources.mjs','diagnosis.mjs','diagnosis-validation.mjs','reap_validation.py']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-correctness-closure.md');shutil.copy2(p/'register.json',out/'register.json')
+for path,link in [('docs/remediation-plan-2026-10-14.md','reviews/2026-10-18-correctness-closure.md'),('docs/reviews/2026-10-16-storage-contract-audit.md','2026-10-18-correctness-closure.md'),('docs/reviews/2026-10-15-codebase-map.md','2026-10-18-correctness-closure.md')]:
+ f=r/path;s=f.read_text();head,body=s.split('\n',1);pointer='\nCurrent core correctness status: the [bounded closure register]('+link+')\nevaluates nine historical leads: four reproduced fixes remain, four leads are\nclosed, and one is optional strictness. Older follow-ups below are historical;\nthey do not imply the current queue is empty.\n';assert 'Current core correctness status:'not in s;f.write_text(head+'\n'+pointer+body)
+print('Saved finite closure register, report, evidence and historical status pointers')

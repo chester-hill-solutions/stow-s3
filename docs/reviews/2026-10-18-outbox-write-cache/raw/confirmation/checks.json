@@ -1,0 +1,45 @@
+[
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-before.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-cache-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 737,
+    "passed": true
+  },
+  {
+    "name": "safe-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-safe.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-cache-safe.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 768,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/cache-confirmation.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 277804,
+    "passed": true
+  }
+]

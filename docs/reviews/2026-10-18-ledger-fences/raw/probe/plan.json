@@ -1,0 +1,102 @@
+{
+  "phase": "ledger-fence-isolation",
+  "sources": [
+    "internal/capacity/state.go",
+    "internal/capacity/admission.go",
+    "benchmark/diagnostic-state.go.txt",
+    "benchmark/diagnostic-overlay.json",
+    "benchmark/ledger-fence-bench.go.txt",
+    "benchmark/mutation-fence-bench.go.txt",
+    "benchmark/fence-measure.mjs",
+    "benchmark/measure-child.py"
+  ],
+  "steps": [
+    {
+      "name": "install-capacity-benchmark",
+      "args": [
+        "cp",
+        "benchmark/ledger-fence-bench.go.txt",
+        "internal/capacity/ledger_fence_bench_test.go"
+      ]
+    },
+    {
+      "name": "install-mutation-benchmark",
+      "args": [
+        "cp",
+        "benchmark/mutation-fence-bench.go.txt",
+        "internal/storage/fs/ledger_fence_bench_test.go"
+      ]
+    },
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/capacity/ledger_fence_bench_test.go",
+        "internal/storage/fs/ledger_fence_bench_test.go",
+        "benchmark/diagnostic-state.go.txt"
+      ]
+    },
+    {
+      "name": "build-capacity-before",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/capacity-before.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "build-capacity-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/diagnostic-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/capacity-after.test",
+        "./internal/capacity"
+      ]
+    },
+    {
+      "name": "build-fs-before",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "-o",
+        "benchmark/fs-before.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "build-fs-after",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/diagnostic-overlay.json",
+        "-c",
+        "-o",
+        "benchmark/fs-after.test",
+        "./internal/storage/fs"
+      ]
+    },
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/fence-measure.mjs"
+      ]
+    },
+    {
+      "name": "remove-benchmarks",
+      "args": [
+        "rm",
+        "internal/capacity/ledger_fence_bench_test.go",
+        "internal/storage/fs/ledger_fence_bench_test.go"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+from pathlib import Path
+import json,hashlib,shutil
+p=Path('/private/tmp/stow-scan-memory-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-capacity-scan-stream/raw';raw.mkdir(parents=True,exist_ok=True)
+for phase,count in [('red',9),('prototype',12),('final',23)]:
+ job=json.loads((p/(phase+'-start.json')).read_text());src=p/('export-'+job['id']);run=json.loads((src/'run.json').read_text());checks=json.loads((src/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==count and all(x['passed']for x in checks);assert run['railwayDeploymentId']==job['deploymentId']=='3a2c61df-2837-418b-bae3-4bff53fc6359'
+ dest=raw/phase;dest.mkdir(exist_ok=True)
+ for f in src.iterdir():
+  if f.is_file():shutil.copy2(f,dest/f.name)
+ for suffix in ['start.json','deployments.json','upload.log']:shutil.copy2(p/(phase+'-'+suffix),dest/suffix)
+ if phase=='final':
+  env=json.loads((src/'environment.json').read_text());assert env['sourceManifestSHA256']==hashlib.sha256((p/'source-manifest.json').read_bytes()).hexdigest()
+  for n,h in env['sourceSHA256'].items():
+   if n.endswith('.go'):assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n in ['baseline.json','source-manifest.json','preflight-runner.json','preflight-target.json','baseline-capacity.go.txt','empty-read.go.txt','before-overlay.json','candidate-capacity.go.txt','candidate-read.go.txt','candidate-overlay.json','scan-bench.go.txt','baseline-measure.mjs','scan-measure.mjs','final-scan-measure.mjs','transport-Dockerfile.txt','transport-receipt.json','failed-transport-receipt.json','failed-attempt-upload.log','failed-attempt-deployments.json','failed-attempt-build.log']:shutil.copy2(p/n,raw/n)
+for n in ['package.py','control.py','remote.py','export.py','watch.py','analyze-red.py','analyze-prototype.py','analyze-final.py','collect.py','report.py','install-prototype.js','install-final.js']:shutil.copy2(p/n,raw/(n+'.txt'))
+for n in ['Dockerfile','runner.mjs','http.mjs','resources.mjs','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs','measure-child.py']:shutil.copy2(p/'context/benchmark'/n,raw/(n+'.txt'))
+shutil.copy2(p/'report.md',r/'docs/reviews/2026-10-18-capacity-scan-stream.md');print('Collected original proof, all measurements, validation and exact tested source hashes')

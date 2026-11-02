@@ -126,10 +126,10 @@ func (r *Runtime) DeleteObject(ctx context.Context, bucket, key string) error {
 
 func (r *Runtime) CopyObject(ctx context.Context, sourceBucket, sourceKey, destinationBucket, destinationKey string) (Object, error) {
 	object, err := r.inner.CopyObject(ctx, sourceBucket, sourceKey, destinationBucket, destinationKey)
-	if err != nil {
+	if err != nil && !errors.Is(err, storage.ErrMutationCommitted) {
 		return Object{}, mapError(err)
 	}
-	return objectOf(object), nil
+	return objectOf(object), mapError(err)
 }
 
 // Authorize is the decision for one operation on one resource this Runtime's verbs

@@ -1,0 +1,25 @@
+COMMAND ['go', 'test', '-race', './internal/runtime', '-run', '^TestContractAuditDiskCorruptUpload$', '-count=2', '-v']
+=== RUN   TestContractAuditDiskCorruptUpload
+=== RUN   TestContractAuditDiskCorruptUpload/healthy
+    contract_audit_probe_test.go:127: lookup=<nil> list=&{Uploads:[{UploadID:9f2e2934f7b93090c7c875397ea64d39 Bucket:probe Key:target Initiated:2026-10-16 19:40:18.970046 +0000 UTC Options:{ContentType: Metadata:map[] ChecksumAlgorithm: ChecksumValue:}}] Prefix: Delimiter: KeyMarker: UploadIDMarker: NextKeyMarker: NextUploadIDMarker: MaxUploads:1000 IsTruncated:false} list error=<nil>
+    contract_audit_probe_test.go:135: runtime reopen error=<nil>
+    contract_audit_probe_test.go:151: new 4-byte write error=runtime quota exceeded; retained part bytes=3 object usage={Bytes:0 Objects:0} reserved=3 cap=4
+=== RUN   TestContractAuditDiskCorruptUpload/corrupt-manifest
+    contract_audit_probe_test.go:127: lookup=unexpected end of JSON input list=<nil> list error=unexpected end of JSON input
+    contract_audit_probe_test.go:135: runtime reopen error=unexpected end of JSON input
+--- PASS: TestContractAuditDiskCorruptUpload (0.12s)
+    --- PASS: TestContractAuditDiskCorruptUpload/healthy (0.07s)
+    --- PASS: TestContractAuditDiskCorruptUpload/corrupt-manifest (0.05s)
+=== RUN   TestContractAuditDiskCorruptUpload
+=== RUN   TestContractAuditDiskCorruptUpload/healthy
+    contract_audit_probe_test.go:127: lookup=<nil> list=&{Uploads:[{UploadID:1474469427190c17b2c2f2d387d40288 Bucket:probe Key:target Initiated:2026-10-16 19:40:19.060045 +0000 UTC Options:{ContentType: Metadata:map[] ChecksumAlgorithm: ChecksumValue:}}] Prefix: Delimiter: KeyMarker: UploadIDMarker: NextKeyMarker: NextUploadIDMarker: MaxUploads:1000 IsTruncated:false} list error=<nil>
+    contract_audit_probe_test.go:135: runtime reopen error=<nil>
+    contract_audit_probe_test.go:151: new 4-byte write error=runtime quota exceeded; retained part bytes=3 object usage={Bytes:0 Objects:0} reserved=3 cap=4
+=== RUN   TestContractAuditDiskCorruptUpload/corrupt-manifest
+    contract_audit_probe_test.go:127: lookup=unexpected end of JSON input list=<nil> list error=unexpected end of JSON input
+    contract_audit_probe_test.go:135: runtime reopen error=unexpected end of JSON input
+--- PASS: TestContractAuditDiskCorruptUpload (0.10s)
+    --- PASS: TestContractAuditDiskCorruptUpload/healthy (0.05s)
+    --- PASS: TestContractAuditDiskCorruptUpload/corrupt-manifest (0.05s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	1.489s

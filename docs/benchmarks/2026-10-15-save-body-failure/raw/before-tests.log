@@ -1,0 +1,170 @@
+COMMAND ['go', 'test', './internal/runtime', './internal/embedded', '-run', '^TestReadForSaveBody|^TestEmbeddedReadForSaveBodyMissing$', '-count=2', '-v']
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a2c0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a420 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a580 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a6e0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a840 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a9a0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ab00 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ac60 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018adc0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018af20 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b080 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b1e0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+--- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a2c0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a420 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a580 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a6e0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a840 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018a9a0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ab00 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018ac60 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018adc0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018af20 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b080 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+    save_body_failure_test.go:76: body error became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} condition={owner:0x1400018b1e0 bucket:probe key:target guard:{Absent:true Fingerprint:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]} replace:false} error=<nil> want=body: object not found
+    save_body_failure_test.go:76: failed body issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: VersionID: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC ChecksumAlgorithm: ChecksumValue:} Outcome:not_committed Replayed:false} error=guarded save conflicts with current object
+--- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- FAIL: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.234s
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+--- FAIL: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+    save_body_failure_test.go:53: public body failure became observation: object={Bucket:probe Key:target Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} absent=true error=<nil>
+    save_body_failure_test.go:53: public failure issued usable condition: result={Object:{Bucket: Key: Data:[] Size:0 ETag: ContentType: Metadata:map[] LastModified:0001-01-01 00:00:00 +0000 UTC} Outcome:not_committed Replayed:false} error=stow: guarded save conflicts with current object
+--- FAIL: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- FAIL: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.403s
+FAIL

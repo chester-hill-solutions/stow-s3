@@ -1,0 +1,18 @@
+COMMAND ["benchmark/baseline.test","-test.run=^$","-test.bench=^BenchmarkWorkspaceMultipartComparison$","-test.benchmem","-test.benchtime=200ms","-test.count=2","-test.cpu=1"]
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/storage/workspace
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/list         	   12819	     17816 ns/op	    4352 B/op	      47 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/list         	   13617	     18723 ns/op	    4352 B/op	      47 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/replace      	     217	   1192123 ns/op	    9032 B/op	      70 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/replace      	     223	   1074440 ns/op	    9132 B/op	      70 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/runtime-replace         	     213	   1158406 ns/op	   25987 B/op	     237 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=1/bytes=1024/runtime-replace         	     224	   1036506 ns/op	   25988 B/op	     237 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/list                	    3612	     55406 ns/op	   16016 B/op	     115 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/list                	    3841	     62026 ns/op	   16016 B/op	     115 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/replace             	      80	   3096108 ns/op	 1077609 B/op	     122 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/replace             	      80	   3259506 ns/op	 1077611 B/op	     122 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/runtime-replace     	      52	   5076630 ns/op	 6368051 B/op	     444 allocs/op
+BenchmarkWorkspaceMultipartComparison/parts=16/bytes=1048576/runtime-replace     	      46	   5464359 ns/op	 6368051 B/op	     444 allocs/op
+PASS

@@ -1,0 +1,28 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,re
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-propagation-open-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+def run(cmd,name):
+ q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==0,(name,q.stdout[-4000:]);print(name,'PASS',flush=True)
+run(['go','test','./internal/runthrough','-run','^TestPropagation(OpeningFailure|VersionConflictCloses)','-count=2','-v'],'after-tests.log')
+run(['make','check-go-quality','check-file-size'],'quality.log')
+sources=json.loads((p/'environment.json').read_text())['sources']
+for name,identity in sources.items():
+ source=r/name
+ assert identity==dict(bytes=source.stat().st_size,sha256=hashlib.sha256(source.read_bytes()).hexdigest()),name
+assert subprocess.check_output(['git','show','HEAD:internal/runthrough/outbox_adapter.go'],cwd=r)==(p/'outbox_adapter.go.before.txt').read_bytes()
+assert not subprocess.check_output(['gofmt','-l',*sources],cwd=r,env=env).strip()
+assert not (r/'internal/runthrough/prepared_review_probe_test.go').exists()
+assert not (r/'packages/stow-s3/node_modules').is_symlink()
+for name,want in [('before-tests.log',(18,48)),('before-race.log',(18,48)),('final-before.log',(18,48)),('final-before-race.log',(18,48)),('after-tests.log',(66,0)),('focused-race.log',(1460,0)),('next-before.log',(2,2)),('next-before-race.log',(2,2)),('next-after.log',(2,2)),('next-after-race.log',(2,2))]:
+ text=(p/name).read_text();outcomes=re.findall(r'^\s*--- (PASS|FAIL): (\S+)',text,re.M)
+ leaves=[(state,n) for state,n in outcomes if not any(m.startswith(n+'/') for _,m in outcomes)]
+ counts=(sum(state=='PASS' for state,_ in leaves),sum(state=='FAIL' for state,_ in leaves))
+ assert counts==want,(name,counts,want)
+print('Final source identities, formatting, fixture removal and leaf counts verified',flush=True)
+run(['git','fetch','origin','main'],'fetch-final.log')
+origin=subprocess.check_output(['git','rev-parse','origin/main'],cwd=r,text=True).strip()
+assert origin==json.loads((p/'environment-base.json').read_text())['origin_main'],origin
+subprocess.run(['git','merge-base','--is-ancestor','origin/main','HEAD'],cwd=r,check=True)
+print('Latest origin/main remains baseline ancestor',flush=True)

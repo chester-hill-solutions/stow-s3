@@ -1,0 +1,10 @@
+COMMAND ["go", "test", "-overlay=/private/tmp/stow-runthrough-version-2026-10-16/next-after-overlay.json", "-race", "./internal/runthrough", "-run", "^TestReviewPropagationClosesRefusedSource$", "-count=2", "-v"]
+=== RUN   TestReviewPropagationClosesRefusedSource
+    propagation_review_probe_test.go:28: propagation discarded reader: closes=0 file_still_open=true
+--- FAIL: TestReviewPropagationClosesRefusedSource (0.15s)
+=== RUN   TestReviewPropagationClosesRefusedSource
+    propagation_review_probe_test.go:28: propagation discarded reader: closes=0 file_still_open=true
+--- FAIL: TestReviewPropagationClosesRefusedSource (0.08s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.556s
+FAIL

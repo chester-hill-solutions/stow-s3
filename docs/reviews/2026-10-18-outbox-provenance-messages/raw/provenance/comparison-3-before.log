@@ -1,0 +1,49 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxProvenance/provenance=0/unchanged           	   10000	    328158 ns/op	        65.00 journal-B	         0 written-B/op	    2280 B/op	      19 allocs/op
+BenchmarkFileOutboxProvenance/provenance=0/unchanged-4         	    1533	    319106 ns/op	        65.00 journal-B	         0 written-B/op	    2280 B/op	      19 allocs/op
+BenchmarkFileOutboxProvenance/provenance=0/changed             	     127	   4162150 ns/op	        65.00 journal-B	        65.00 written-B/op	    4584 B/op	      43 allocs/op
+BenchmarkFileOutboxProvenance/provenance=0/changed-4           	     117	   3736586 ns/op	        65.00 journal-B	        65.00 written-B/op	    4584 B/op	      43 allocs/op
+BenchmarkFileOutboxProvenance/provenance=128/unchanged         	    8895	    318056 ns/op	      7233 journal-B	         0 written-B/op	    9963 B/op	      19 allocs/op
+BenchmarkFileOutboxProvenance/provenance=128/unchanged-4       	    9267	    331897 ns/op	      7233 journal-B	         0.0008633 written-B/op	    9964 B/op	      19 allocs/op
+BenchmarkFileOutboxProvenance/provenance=128/changed           	     135	   3819163 ns/op	      7233 journal-B	      7233 written-B/op	   74767 B/op	     567 allocs/op
+BenchmarkFileOutboxProvenance/provenance=128/changed-4         	     132	   4172897 ns/op	      7233 journal-B	      7233 written-B/op	   74769 B/op	     567 allocs/op
+BenchmarkFileOutboxProvenance/provenance=2048/unchanged        	    5511	    301354 ns/op	    114753 journal-B	         0 written-B/op	  124743 B/op	      20 allocs/op
+BenchmarkFileOutboxProvenance/provenance=2048/unchanged-4      	    1476	    272083 ns/op	    114753 journal-B	         0 written-B/op	  125003 B/op	      23 allocs/op
+BenchmarkFileOutboxProvenance/provenance=2048/changed          	      85	   5141648 ns/op	    114753 journal-B	    114753 written-B/op	 1192592 B/op	    8264 allocs/op
+BenchmarkFileOutboxProvenance/provenance=2048/changed-4        	     100	   5222852 ns/op	    114753 journal-B	    114753 written-B/op	 1192597 B/op	    8264 allocs/op
+BenchmarkFileOutboxProvenance/provenance=16384/unchanged       	    1971	    335063 ns/op	    917569 journal-B	         0 written-B/op	  929683 B/op	      43 allocs/op
+BenchmarkFileOutboxProvenance/provenance=16384/unchanged-4     	    1480	    326281 ns/op	    917569 journal-B	         0 written-B/op	  930420 B/op	      52 allocs/op
+BenchmarkFileOutboxProvenance/provenance=16384/changed         	      30	  20241208 ns/op	    917569 journal-B	    917569 written-B/op	 9524048 B/op	   65727 allocs/op
+BenchmarkFileOutboxProvenance/provenance=16384/changed-4       	      26	  20053893 ns/op	    917569 journal-B	    917569 written-B/op	 9524055 B/op	   65727 allocs/op
+BenchmarkFileOutboxProvenance/mixed=1024/unchanged             	    4676	    297159 ns/op	    157598 journal-B	         0 written-B/op	  165865 B/op	      21 allocs/op
+BenchmarkFileOutboxProvenance/mixed=1024/unchanged-4           	    1575	    311152 ns/op	    157598 journal-B	         0 written-B/op	  166372 B/op	      26 allocs/op
+BenchmarkFileOutboxProvenance/mixed=1024/changed               	      62	   9987237 ns/op	    157598 journal-B	    157598 written-B/op	 2603991 B/op	   16471 allocs/op
+BenchmarkFileOutboxProvenance/mixed=1024/changed-4             	      58	  10288369 ns/op	    157598 journal-B	    157598 written-B/op	 2604006 B/op	   16471 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=0/encode          	 2929484	       162.0 ns/op	        19.00 frame-B	     184 B/op	       3 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=0/encode-4        	 2395323	       214.4 ns/op	        19.00 frame-B	     184 B/op	       3 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=0/decode          	 2020248	       225.1 ns/op	        19.00 frame-B	     288 B/op	       4 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=0/decode-4        	 1735092	       317.9 ns/op	        19.00 frame-B	     288 B/op	       4 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=128/encode        	   19012	     24661 ns/op	      4348 frame-B	   18720 B/op	     133 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=128/encode-4      	   16202	     26003 ns/op	      4348 frame-B	   18720 B/op	     133 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=128/decode        	   19002	     21927 ns/op	      4348 frame-B	   27712 B/op	     399 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=128/decode-4      	   20506	     22544 ns/op	      4348 frame-B	   27712 B/op	     399 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=4096/encode       	     481	    972951 ns/op	    145002 frame-B	  573600 B/op	    4101 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=4096/encode-4     	     417	   1029786 ns/op	    145002 frame-B	  573600 B/op	    4101 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=4096/decode       	     600	    697755 ns/op	    145002 frame-B	 1032088 B/op	   12325 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=false/depth=4096/decode-4     	     496	   1066281 ns/op	    145002 frame-B	 1032090 B/op	   12325 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=0/encode           	 2708601	       196.9 ns/op	        19.00 frame-B	     184 B/op	       3 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=0/encode-4         	 1993437	       226.5 ns/op	        19.00 frame-B	     184 B/op	       3 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=0/decode           	 1817708	       224.4 ns/op	        19.00 frame-B	     288 B/op	       4 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=0/decode-4         	 1750956	       243.8 ns/op	        19.00 frame-B	     288 B/op	       4 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=128/encode         	    1851	    227551 ns/op	     82022 frame-B	  241952 B/op	    1417 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=128/encode-4       	    1682	    254138 ns/op	     82022 frame-B	  241953 B/op	    1417 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=128/decode         	    1884	    242002 ns/op	     82022 frame-B	  306177 B/op	    5285 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=128/decode-4       	    1756	    336512 ns/op	     82022 frame-B	  306178 B/op	    5285 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=4096/encode        	      46	  10122326 ns/op	   2698344 frame-B	 7520416 B/op	   45065 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=4096/encode-4      	      37	  11644853 ns/op	   2698344 frame-B	 7520416 B/op	   45065 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=4096/decode        	      45	  13065311 ns/op	   2698344 frame-B	10229384 B/op	  168039 allocs/op
+BenchmarkOutboxProtoBlocks/mixed=true/depth=4096/decode-4      	      44	  12233810 ns/op	   2698344 frame-B	10229390 B/op	  168039 allocs/op
+PASS

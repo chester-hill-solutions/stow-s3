@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,subprocess,shutil,hashlib,tarfile
+p=Path('/private/tmp/stow-completion-buffer-2026-10-18');old=Path('/private/tmp/stow-part-ownership-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True);manifest={}
+for n in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0'):
+ if not n:continue
+ f=r/n
+ if not f.is_file():continue
+ dst=c/n;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dst);manifest[n]=hashlib.sha256(f.read_bytes()).hexdigest()
+for n in ['internal/storage/fs/completion_buffer_test.go','internal/storage/fs/completion_buffer_verify_test.go']:shutil.copy2(r/n,c/n)
+(p/'source-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');shutil.copy2(p/'source-manifest.json',c/'benchmark/validation-input-manifest.json')
+for n in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs','measure-child.py']:shutil.copy2(old/'context/benchmark'/n,c/'benchmark'/n)
+for n in ['doc-links-capture.mjs']:shutil.copy2(p/n,c/'benchmark'/n)
+for n in ['completion-probe.go.txt','baseline-fs_multipart.go.txt','measure.mjs']:shutil.copy2(p/n,c/'benchmark'/n)
+steps=[{'name':'format-tests','args':['gofmt','-w','internal/storage/fs/completion_buffer_test.go','internal/storage/fs/completion_buffer_verify_test.go']},{'name':'red-normal','args':['go','test','./internal/storage/fs','-run','^TestCompletionBufferAllocation$','-count=2','-v'],'expected':1},{'name':'red-race','args':['go','test','-race','./internal/storage/fs','-run','^TestCompletionBufferAllocation$','-count=1','-v'],'expected':1},{'name':'install-probe','args':['cp','benchmark/completion-probe.go.txt','internal/storage/fs/completion_memory_probe_test.go']},{'name':'format-probe','args':['gofmt','-w','internal/storage/fs/completion_memory_probe_test.go']},{'name':'snapshot-probe','args':['node','-e',"require('node:fs').copyFileSync('internal/storage/fs/completion_memory_probe_test.go',process.env.STOW_RESULT_ROOT+'/compiled-probe.go.txt')"]},{'name':'build-before','args':['go','test','-c','-o','benchmark/completion-before.test','./internal/storage/fs']},{'name':'measure-baseline','args':['node','benchmark/measure.mjs'],'env':{'STOW_BASELINE_ONLY':'1'}},{'name':'cleanup-probe','args':['rm','internal/storage/fs/completion_memory_probe_test.go']}]
+plan={'phase':'completion-buffer-original','sources':['internal/storage/fs/fs_multipart.go','internal/storage/fs/completion_buffer_test.go','internal/storage/fs/completion_buffer_verify_test.go','benchmark/completion-probe.go.txt','benchmark/measure.mjs'],'steps':steps};(p/'red-plan.json').write_text(json.dumps(plan,indent=2)+'\n');shutil.copy2(p/'red-plan.json',c/'benchmark/active-plan.json')
+base=c/'benchmark/validation-previous-baselines';base.mkdir(exist_ok=True)
+for f in (r/'scripts/baselines').iterdir():
+ if f.is_file():shutil.copy2(f,base/f.name)
+u=p/'upload';(u/'benchmark').mkdir(parents=True,exist_ok=True);(u/'site').mkdir(exist_ok=True)
+for n in ['go.mod','go.sum','site/package.json','site/package-lock.json']:shutil.copy2(c/n,u/n)
+shutil.copy2(p/'transport-Dockerfile.txt',u/'benchmark/Dockerfile');archive=u/'validation-source.tar.gz';files=[f for f in sorted(c.rglob('*'))if f.is_file()]
+with tarfile.open(archive,'w:gz',compresslevel=9)as t:
+ for f in files:t.add(f,arcname=str(f.relative_to(c)),recursive=False)
+(p/'transport-receipt.json').write_text(json.dumps({'archiveBytes':archive.stat().st_size,'archiveSHA256':hashlib.sha256(archive.read_bytes()).hexdigest(),'contentsFiles':len(files)},indent=2)+'\n');print('Packaged',len(manifest),'tracked files;',len(files),'files;',archive.stat().st_size,'bytes')

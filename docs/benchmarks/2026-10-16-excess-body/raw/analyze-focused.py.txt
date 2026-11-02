@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,math,statistics,collections
+p=Path('/private/tmp/stow-excess-body-2026-10-16');data=json.loads((p/'focused-samples.json').read_text());assert len(data)==240
+rows=[]
+for cpu in [1,8]:
+ for case in ['get-tiny','get-64KiB','stream-64KiB-1KiB']:
+  ss=[s for s in data if s['cpu']==cpu and s['case']==case];cycles=collections.defaultdict(dict)
+  for s in ss:cycles[s['cycle']][s['label']]=s
+  def val(s,metric):return s['ns'] if metric=='benchmark_ns' else (s['process_user_cpu_ns']+s['process_system_cpu_ns'])/s['n']
+  metrics={}
+  for metric in ['benchmark_ns','process_cpu_ns_per_op']:
+   ratios=[];controls=[]
+   for c in cycles.values():
+    v={k:val(s,metric) for k,s in c.items()};ratios.append(100*(math.sqrt(v['after-a']*v['after-b']/(v['before-a']*v['before-b']))-1));controls.extend([100*(v['before-b']/v['before-a']-1),100*(v['after-b']/v['after-a']-1)])
+   versions={v:[s for s in ss if s['label'].startswith(v)] for v in ['before','after']}
+   metrics[metric]={'median_paired_cycle_change_pct':statistics.median(ratios),'same_code_abs_median_pct':statistics.median(abs(x) for x in controls),'versions':{v:{'median':statistics.median(val(s,metric) for s in vs),'min':min(val(s,metric) for s in vs),'max':max(val(s,metric) for s in vs)} for v,vs in versions.items()}}
+  row={'cpu':cpu,'case':case,'samples':len(ss),'metrics':metrics};rows.append(row);print(cpu,case,metrics)
+(p/'focused-summary.json').write_text(json.dumps(rows,indent=2)+'\n')

@@ -1,0 +1,49 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/workspace/delete_outcome_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/workspace",
+      "-run",
+      "^TestWorkspaceDelete",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 612,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/workspace",
+      "-run",
+      "^TestWorkspaceDelete",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 860,
+    "passed": true
+  }
+]

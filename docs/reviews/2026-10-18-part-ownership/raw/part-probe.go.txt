@@ -1,0 +1,42 @@
+package fs_test
+
+import (
+ "bytes"
+ "context"
+ "crypto/sha256"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "io"
+ "net/http"
+ "net/http/httptest"
+ "os"
+ "path/filepath"
+ "runtime"
+ "strconv"
+ "strings"
+ "syscall"
+ "testing"
+ "time"
+
+ rt "github.com/chester-hill-solutions/stow-s3/internal/runtime"
+ "github.com/chester-hill-solutions/stow-s3/internal/s3api"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+ ws "github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
+)
+
+func TestPartMemoryComparison(t *testing.T){
+ root:=os.Getenv("STOW_BENCH_ROOT");if root==""{t.Skip("Railway comparison only")};if os.Getuid()!=10001||os.Getenv("RAILWAY_SERVICE_ID")!="83497842-c51d-420e-8ba1-181589730ad4"||!strings.HasPrefix(root,"/results/"){t.Fatal("Railway scratch required")};var disk syscall.Statfs_t;if err:=syscall.Statfs(root,&disk);err!=nil||disk.Type!=61267{t.Fatal("ext4 required",err)}
+ size,err:=strconv.ParseInt(os.Getenv("STOW_PROBE_SIZE"),10,64);if err!=nil||size<1||size>64<<20{t.Fatal("invalid probe size")};profile:=os.Getenv("STOW_PROBE_PROFILE");ctx:=context.Background();md5value,digest:=partHashes(size)
+ var backend storage.Store;var rawPath string
+ if profile=="memory"{backend=storage.NewMemoryStore()}else if profile=="workspace"{store,e:=ws.New(ws.Options{Root:t.TempDir(),Bucket:"bucket"});if e!=nil{t.Fatal(e)};defer store.Close();backend=store}else{store,_,path:=partStore(t,strings.Contains(profile,"bound")&&!strings.Contains(profile,"unbound"),1<<30);backend=store;rawPath=path}
+ if profile=="runtime-fs"{instance,e:=rt.OpenWithStore(rt.Options{Backend:rt.BackendFilesystem,MaxBytes:256<<20,MaxObjects:16},backend,nil);if e!=nil{t.Fatal(e)};defer instance.Close();backend,e=rt.NewStoreAdapter(instance);if e!=nil{t.Fatal(e)}}
+ if _,err:=backend.HeadBucket(ctx,"bucket");errors.Is(err,storage.ErrBucketNotFound){if err:=backend.CreateBucket(ctx,"bucket");err!=nil{t.Fatal(err)}}else if err!=nil{t.Fatal(err)};multipart,ok:=backend.(storage.MultipartStore);if !ok{t.Fatal("multipart unavailable")};upload,err:=multipart.CreateMultipartUpload(ctx,"bucket","payload",storage.MultipartOptions{ContentType:"application/octet-stream",Metadata:map[string]string{"label":"part"}});if err!=nil{t.Fatal(err)}
+ var run func()error;var result *storage.PartInfo
+ if strings.HasPrefix(profile,"owned-")||strings.HasPrefix(profile,"borrowed-"){
+  data:=make([]byte,int(size));for i:=range data{data[i]='q'};var body io.Reader;if strings.HasPrefix(profile,"owned-"){body=storage.NewOwnedBody(data)}else{body=bytes.NewReader(data)};run=func()error{var e error;result,e=multipart.UploadPart(ctx,upload.UploadID,1,body);return e}
+ }else{limit:=int64(0);if size>8<<20{limit=size};server,e:=s3api.New(s3api.Config{Store:backend,Auth:s3api.DevBypass,MaxRequestBytes:limit});if e!=nil{t.Fatal(e)};req:=partRequest(upload.UploadID,size,md5value);out:=httptest.NewRecorder();run=func()error{server.Handler().ServeHTTP(out,req);if out.Code!=http.StatusOK{return fmt.Errorf("upload HTTP %d: %s",out.Code,out.Body.String())};result=&storage.PartInfo{PartNumber:1,ETag:out.Header().Get("ETag"),Size:size};return nil}}
+ runtime.GC();var a,b,c runtime.MemStats;runtime.ReadMemStats(&a);start:=time.Now();err=run();elapsed:=time.Since(start).Nanoseconds();runtime.ReadMemStats(&b);runtime.GC();runtime.ReadMemStats(&c);row:=map[string]any{"profile":profile,"size":size,"allocatedBytes":b.TotalAlloc-a.TotalAlloc,"allocations":b.Mallocs-a.Mallocs,"ns":elapsed,"retainedHeapDelta":int64(c.HeapAlloc)-int64(a.HeapAlloc)};encoded,_:=json.Marshal(row);fmt.Println("STOW_PART:"+string(encoded));if err!=nil{t.Fatal(err)};if result.Size!=size||result.ETag==""{t.Fatalf("part metadata %+v",result)}
+ if rawPath!=""{file,e:=os.Open(filepath.Join(rawPath,".multipart",upload.UploadID,"part-00001"));if e!=nil{t.Fatal(e)};h:=sha256.New();n,e:=io.Copy(h,file);closeErr:=file.Close();if e!=nil||closeErr!=nil||n!=size||hex.EncodeToString(h.Sum(nil))!=digest{t.Fatal("raw persisted part mismatch",n,e,closeErr)}}else{meta,e:=multipart.CompleteMultipartUpload(ctx,upload.UploadID,[]storage.PartInfo{*result});if e!=nil||meta.Size!=size{t.Fatal("completion mismatch",e)};reader,_,e:=backend.GetObject(ctx,"bucket","payload");if e!=nil{t.Fatal(e)};h:=sha256.New();n,e:=io.Copy(h,reader);_ = reader.Close();if e!=nil||n!=size||hex.EncodeToString(h.Sum(nil))!=digest{t.Fatal("stored part mismatch",e)}}
+}

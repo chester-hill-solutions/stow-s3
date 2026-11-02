@@ -1,0 +1,105 @@
+{
+  "commands": [
+    {
+      "variant": "legacy",
+      "stage": "profile",
+      "cmd": "benchmark/legacy-reader.test",
+      "args": [
+        "-test.run=^$",
+        "-test.bench=^BenchmarkLedgerIsolation$/^resources=4096$/^stage=snapshot$",
+        "-test.benchtime=20x",
+        "-test.memprofile=/results/354fe2ee-afaa-4d57-a482-5057df4c34bf/legacy.pprof",
+        "-test.memprofilerate=1"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 670
+    },
+    {
+      "variant": "legacy",
+      "stage": "alloc-top",
+      "cmd": "go",
+      "args": [
+        "tool",
+        "pprof",
+        "-top",
+        "-sample_index=alloc_space",
+        "-unit=bytes",
+        "benchmark/legacy-reader.test",
+        "/results/354fe2ee-afaa-4d57-a482-5057df4c34bf/legacy.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 2505
+    },
+    {
+      "variant": "legacy",
+      "stage": "alloc-lines",
+      "cmd": "go",
+      "args": [
+        "tool",
+        "pprof",
+        "-top",
+        "-lines",
+        "-sample_index=alloc_space",
+        "-unit=bytes",
+        "benchmark/legacy-reader.test",
+        "/results/354fe2ee-afaa-4d57-a482-5057df4c34bf/legacy.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 97
+    },
+    {
+      "variant": "bounded",
+      "stage": "profile",
+      "cmd": "benchmark/bounded-reader.test",
+      "args": [
+        "-test.run=^$",
+        "-test.bench=^BenchmarkLedgerIsolation$/^resources=4096$/^stage=snapshot$",
+        "-test.benchtime=20x",
+        "-test.memprofile=/results/354fe2ee-afaa-4d57-a482-5057df4c34bf/bounded.pprof",
+        "-test.memprofilerate=1"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 697
+    },
+    {
+      "variant": "bounded",
+      "stage": "alloc-top",
+      "cmd": "go",
+      "args": [
+        "tool",
+        "pprof",
+        "-top",
+        "-sample_index=alloc_space",
+        "-unit=bytes",
+        "benchmark/bounded-reader.test",
+        "/results/354fe2ee-afaa-4d57-a482-5057df4c34bf/bounded.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 95
+    },
+    {
+      "variant": "bounded",
+      "stage": "alloc-lines",
+      "cmd": "go",
+      "args": [
+        "tool",
+        "pprof",
+        "-top",
+        "-lines",
+        "-sample_index=alloc_space",
+        "-unit=bytes",
+        "benchmark/bounded-reader.test",
+        "/results/354fe2ee-afaa-4d57-a482-5057df4c34bf/bounded.pprof"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 98
+    }
+  ],
+  "allPassed": true
+}

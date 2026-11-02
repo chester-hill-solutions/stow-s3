@@ -1,0 +1,52 @@
+[
+  {
+    "name": "format-tests",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/part_owned_test.go",
+      "internal/storage/fs/part_http_owned_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 28,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage",
+      "./internal/storage/fs",
+      "-run",
+      "^Test(PartReader|PartBytesOf|MultipartOwned)",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 26128,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage",
+      "./internal/storage/fs",
+      "-run",
+      "^Test(PartReader|PartBytesOf|MultipartOwned)",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 41615,
+    "passed": true
+  }
+]

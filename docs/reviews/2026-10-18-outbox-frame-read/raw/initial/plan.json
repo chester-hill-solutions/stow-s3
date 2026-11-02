@@ -1,0 +1,93 @@
+{
+  "phase": "outbox-frame-candidate",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/outbox_frame_read_resource_test.go",
+    "internal/runthrough/outbox_frame_read_test.go",
+    "benchmark/candidate-file_outbox.go.txt",
+    "benchmark/candidate-file_outbox_read.go.txt",
+    "benchmark/empty-frame-test.go.txt",
+    "benchmark/frame-candidate.json",
+    "benchmark/frame-read-bench.go.txt",
+    "benchmark/frame-before-measure.json",
+    "benchmark/frame-candidate-measure.json",
+    "benchmark/frame-comparison.mjs",
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_decode.go",
+    "benchmark/decode-profile-bench.go.txt",
+    "benchmark/decode-file-bench.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/candidate-file_outbox.go.txt",
+        "benchmark/candidate-file_outbox_read.go.txt",
+        "internal/runthrough/outbox_frame_read_resource_test.go",
+        "internal/runthrough/outbox_frame_read_test.go",
+        "benchmark/empty-frame-test.go.txt",
+        "benchmark/frame-read-bench.go.txt"
+      ]
+    },
+    {
+      "name": "candidate-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/frame-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxFrameRead|TestOutboxFrameReader|TestFileOutboxDuplicateFlood|TestOutboxDecode)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/frame-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxFrameRead|TestOutboxFrameReader|TestFileOutboxDuplicateFlood|TestOutboxDecode)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/frame-before-measure.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/frame-before.test"
+      ]
+    },
+    {
+      "name": "candidate-build",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/frame-candidate-measure.json",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/frame-candidate.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/frame-comparison.mjs"
+      ]
+    }
+  ]
+}

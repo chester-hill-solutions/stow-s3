@@ -1,0 +1,50 @@
+from pathlib import Path
+from collections import defaultdict,Counter
+from statistics import median
+import json,re,hashlib
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');job=json.loads((p/'proof-start.json').read_text());d=p/('export-'+job['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==9 and all(x['passed']for x in checks)
+rx=re.compile(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$');commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==8
+cells=defaultdict(lambda:defaultdict(list));samples=[]
+for command in commands['runs']:
+ assert command['exitCode']==0 and command['signal']is None
+ rows=[]
+ for line in(d/command['log']).read_text().splitlines():
+  m=rx.match(line)
+  if not m:continue
+  values=m[3].split();assert len(values)%2==0
+  row={'name':m[1],'iterations':int(m[2]),'index':command['index'],'variant':command['variant'],'log':command['log']}
+  for k in range(0,len(values),2):row[values[k+1]]=float(values[k])
+  rows.append(row);samples.append(row);cells[row['name']][row['variant']].append(row)
+ assert len(rows)==28,(command,len(rows))
+assert len(samples)==224 and len(cells)==28
+results=[]
+for name,variants in sorted(cells.items()):
+ assert set(variants)=={'before','safe'}and all(len(rows)==4 for rows in variants.values())
+ stats={}
+ for variant,rows in variants.items():
+  stats[variant]={key:median(x[key]for x in rows)for key in ['ns/op','B/op','allocs/op','cached-B','journal-B','process-live-heap-B','process-HWM-B']}
+  stats[variant]['nsMin']=min(x['ns/op']for x in rows);stats[variant]['nsMax']=max(x['ns/op']for x in rows)
+  if variant=='before':assert all(x['cached-B']==0 for x in rows)
+  elif 'Fallback'not in name:assert all(x['cached-B']>0 for x in rows)
+  else:assert all(x['cached-B']==0 for x in rows)
+ results.append({'name':name,**stats,'nsDeltaPercent':(stats['safe']['ns/op']/stats['before']['ns/op']-1)*100,'allocDeltaPercent':(stats['safe']['allocs/op']/stats['before']['allocs/op']-1)*100,'bytesDeltaPercent':(stats['safe']['B/op']/stats['before']['B/op']-1)*100})
+# Prove the new contracts pass original code and expose naive reuse.
+contract_rx=re.compile(r'^--- (PASS|FAIL|SKIP): (TestFileOutboxOwnWrite\S+)')
+receipts={}
+for log in ['before-contracts','before-race','naive-counterexamples']:
+ counts=Counter()
+ for line in(d/(log+'.log')).read_text(errors='replace').splitlines():
+  m=contract_rx.match(line.strip())
+  if m:counts[(m[1],m[2])]+=1
+ leaves={name for status,name in counts if not any(other.startswith(name+'/')for _,other in counts)}
+ leaf_counts={status:sum(count for (s,name),count in counts.items()if s==status and name in leaves)for status in ['PASS','FAIL','SKIP']}
+ assert not leaf_counts['SKIP']
+ if log.startswith('before'):assert leaf_counts=={'PASS':34,'FAIL':0,'SKIP':0},leaf_counts
+ else:assert leaf_counts=={'PASS':8,'FAIL':26,'SKIP':0},leaf_counts
+ receipts[log]={'counts':leaf_counts,'cases':{name:{status:counts.get((status,name),0)for status in ['PASS','FAIL','SKIP']}for name in sorted(leaves)}}
+assert json.loads((d/'fixture-filesystem.json').read_text())['statfsType']==61267
+out={'baseline':json.loads((p/'baseline.json').read_text()),'railwayDeploymentId':job['deploymentId'],'observations':224,'comparisons':results,'samples':samples,'contracts':receipts}
+(d/'comparison-analysis.json').write_text(json.dumps(out,indent=2)+'\n');(d/'contract-receipt.json').write_text(json.dumps(receipts,indent=2)+'\n')
+print('Verified 224 samples and 17 baseline contracts; naive reuse has 13 distinct counterexamples')
+for row in results:
+ print(row['name'],'ns%='+str(round(row['nsDeltaPercent'],2)),'alloc%='+str(round(row['allocDeltaPercent'],2)),'bytes%='+str(round(row['bytesDeltaPercent'],2)),'cache='+str(row['safe']['cached-B']))

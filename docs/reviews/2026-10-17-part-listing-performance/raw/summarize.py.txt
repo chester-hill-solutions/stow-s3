@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,statistics,sys
+p=Path('/private/tmp/stow-performance-2026-10-17');job=sys.argv[1];root=p/('export-'+job);rows=json.loads((root/'samples.json').read_text());groups={}
+for row in rows:groups.setdefault((row['family'],row['cpu'],row['name'],row['variant']),[]).append(row)
+summary=[]
+for key,samples in groups.items():
+ metrics={}
+ for unit in samples[0]['metrics']:
+  values=[x['metrics'][unit]for x in samples];metrics[unit]={'median':statistics.median(values),'min':min(values),'max':max(values)}
+ summary.append(dict(zip(['family','cpu','name','variant'],key),samples=len(samples),metrics=metrics))
+(root/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+for row in summary:print(row['cpu'],row['variant'],row['name'],json.dumps({k:v['median']for k,v in row['metrics'].items()}))

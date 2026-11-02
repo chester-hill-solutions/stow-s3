@@ -1,0 +1,52 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_save_test.go",
+      "internal/capacity/admission_unknown_test.go"
+    ],
+    "exitCode": 2,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": false
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-run",
+      "^(TestSaveCapacity|TestAdmissionRetainsUnknown)",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1776,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "./internal/capacity",
+      "-run",
+      "^(TestSaveCapacity|TestAdmissionRetainsUnknown)",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 3040,
+    "passed": true
+  }
+]

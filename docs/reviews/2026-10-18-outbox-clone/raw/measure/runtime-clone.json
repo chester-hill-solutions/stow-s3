@@ -1,0 +1,6 @@
+{
+  "path": "/usr/local/go/src/internal/runtime/maps/map.go",
+  "sha256": "806adc0145833e8a13f592734b3de97c1fa0ccb2e2585b16d44f3e2a1df66f9b",
+  "cloneSource": "func (m *Map) Clone(typ *abi.SwissMapType) *Map {\n\t// Note: this should never be called with a nil map.\n\tif m.writing != 0 {\n\t\tfatal(\"concurrent map clone and map write\")\n\t}\n\n\t// Shallow copy the Map structure.\n\tm2 := new(Map)\n\t*m2 = *m\n\tm = m2\n\n\t// We need to just deep copy the dirPtr field.\n\tif m.dirPtr == nil {\n\t\t// delayed group allocation, nothing to do.\n\t} else if m.dirLen == 0 {\n\t\t// Clone one group.\n\t\toldGroup := groupReference{data: m.dirPtr}\n\t\tnewGroup := groupReference{data: newGroups(typ, 1).data}\n\t\tcloneGroup(typ, newGroup, oldGroup)\n\t\tm.dirPtr = newGroup.data\n\t} else {\n\t\t// Clone each (different) table.\n\t\toldDir := unsafe.Slice((**table)(m.dirPtr), m.dirLen)\n\t\tnewDir := make([]*table, m.dirLen)\n\t\tfor i, t := range oldDir {\n\t\t\tif i > 0 && t == oldDir[i-1] {\n\t\t\t\tnewDir[i] = newDir[i-1]\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tnewDir[i] = t.clone(typ)\n\t\t}\n\t\tm.dirPtr = unsafe.Pointer(&newDir[0])\n\t}\n\n\treturn m\n}\n",
+  "railwayDeploymentId": "c5345be1-81b4-4599-a791-c1e459b26173"
+}

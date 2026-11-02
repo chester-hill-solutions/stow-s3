@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -220,9 +221,11 @@ func TestFilesystemStoreMultipartCompletionReportsCleanupFailureAndCanRecover(t 
 		t.Fatalf("protect upload directory: %v", err)
 	}
 	defer func() { _ = os.Chmod(uploadDir, 0o755) }()
-	if _, err := store.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part}); err == nil {
+	meta, err := store.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part})
+	if err == nil {
 		t.Fatal("completion ignored staging cleanup failure")
 	}
+	assertFilesystemCompletionCommitted(t, meta, err)
 	if _, err := os.Stat(uploadDir); err != nil {
 		t.Fatalf("upload staging was not retained for recovery: %v", err)
 	}
@@ -386,5 +389,12 @@ func TestFilesystemStoreDeleteBucketNotEmpty(t *testing.T) {
 
 	if err := store.DeleteBucket(ctx, "bucket"); err != storage.ErrBucketNotEmpty {
 		t.Fatalf("delete bucket = %v, want ErrBucketNotEmpty", err)
+	}
+}
+
+func assertFilesystemCompletionCommitted(t *testing.T, meta *storage.ObjectMeta, err error) {
+	t.Helper()
+	if !errors.Is(err, storage.ErrMutationCommitted) || meta == nil {
+		t.Errorf("published completion lost outcome: meta=%+v error=%v", meta, err)
 	}
 }

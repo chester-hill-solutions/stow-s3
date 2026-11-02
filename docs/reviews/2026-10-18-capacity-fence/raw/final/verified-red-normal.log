@@ -1,0 +1,155 @@
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-newretry3899707431/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:3895 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500360 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-newreopen346608909/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:3895 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500360 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-overwriteretr897461515/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=126 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:126 RecoveryBytes:4279 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500360 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-overwritereop860745653/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=125 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:125 RecoveryBytes:4281 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500360 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-newretry137573172/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:4315 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-newreopen6702530/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:4309 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-overwriteretry4193632901/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=8 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:8 RecoveryBytes:4715 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-overwritereopen1469677188/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=8 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:8 RecoveryBytes:4721 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+--- FAIL: TestCapacityFenceFailureRetainsReservation (0.56s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.08s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.07s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.08s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.08s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.07s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.06s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.06s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.06s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+    capacity_fence_test.go:211: uncertain writer error=atomicfile: write /tmp/TestCapacityWriteFailureBeforeRenameCanReconcileobject-overwrit2441565921/002/corridor/store/buckets/bucket/objects/6b6579: open /tmp/TestCapacityWriteFailureBeforeRenameCanReconcileobject-overwrit2441565921/002/corridor/store/buckets/bucket/objects/.tmp-974654630: permission denied
+    capacity_fence_test.go:211: failed writer reservation={PayloadBytes:126 RecoveryBytes:4293 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}, <nil>
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+    capacity_fence_test.go:211: uncertain writer error=atomicfile: write /tmp/TestCapacityWriteFailureBeforeRenameCanReconcilepart-overwrite3002108091/002/corridor/store/.multipart/4653cbbb547dc72abce08c409384a429/part-00001: open /tmp/TestCapacityWriteFailureBeforeRenameCanReconcilepart-overwrite3002108091/002/corridor/store/.multipart/4653cbbb547dc72abce08c409384a429/.tmp-413053154: permission denied
+    capacity_fence_test.go:211: failed writer reservation={PayloadBytes:8 RecoveryBytes:4721 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}, <nil>
+--- FAIL: TestCapacityWriteFailureBeforeRenameCanReconcile (0.05s)
+    --- FAIL: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.02s)
+    --- FAIL: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.02s)
+=== RUN   TestCapacityFenceFailureRetainsReservation
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-newretry1677611587/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:3895 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500359 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-new/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-newreopen263685275/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500119 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:3895 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500119
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500359 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-overwriteretr1312893480/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=126 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:126 RecoveryBytes:4287 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500359 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationobject-overwritereop1885902568/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500120 charged=125 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:125 RecoveryBytes:4285 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500120
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500360 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-newretry2718066408/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:4321 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-new/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-newreopen2157435399/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=0 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:0 RecoveryBytes:4327 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/retry
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-overwriteretry3072769973/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=8 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:8 RecoveryBytes:4714 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500240 allowance=3145728
+=== RUN   TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen
+    capacity_fence_test.go:81: visible failed write did not require reconciliation: open /tmp/TestCapacityFenceFailureRetainsReservationpart-overwritereopen2439259647/002/corridor: permission denied
+    capacity_fence_test.go:81: visible=1500000 charged=8 pending=0
+    capacity_fence_test.go:81: visible failed write lost durable reservation: {PayloadBytes:8 RecoveryBytes:4720 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} file=1500000
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-first
+    capacity_fence_test.go:81: unreconciled write allowed competitor competing-second
+    capacity_fence_test.go:81: visible payload exceeded namespace allowance: bytes=3500239 allowance=3145728
+--- FAIL: TestCapacityFenceFailureRetainsReservation (0.53s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-new/retry (0.06s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-new/reopen (0.06s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-overwrite/retry (0.06s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/object-overwrite/reopen (0.07s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-new/retry (0.06s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-new/reopen (0.07s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-overwrite/retry (0.07s)
+    --- FAIL: TestCapacityFenceFailureRetainsReservation/part-overwrite/reopen (0.07s)
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite
+    capacity_fence_test.go:211: uncertain writer error=atomicfile: write /tmp/TestCapacityWriteFailureBeforeRenameCanReconcileobject-overwrit2761891716/002/corridor/store/buckets/bucket/objects/6b6579: open /tmp/TestCapacityWriteFailureBeforeRenameCanReconcileobject-overwrit2761891716/002/corridor/store/buckets/bucket/objects/.tmp-3371038637: permission denied
+    capacity_fence_test.go:211: failed writer reservation={PayloadBytes:126 RecoveryBytes:4293 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}, <nil>
+=== RUN   TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite
+    capacity_fence_test.go:211: uncertain writer error=atomicfile: write /tmp/TestCapacityWriteFailureBeforeRenameCanReconcilepart-overwrite4207804786/002/corridor/store/.multipart/c0f3ccfb2dba55ca842bf44d000542ac/part-00001: open /tmp/TestCapacityWriteFailureBeforeRenameCanReconcilepart-overwrite4207804786/002/corridor/store/.multipart/c0f3ccfb2dba55ca842bf44d000542ac/.tmp-749909537: permission denied
+    capacity_fence_test.go:211: failed writer reservation={PayloadBytes:8 RecoveryBytes:4720 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}, <nil>
+--- FAIL: TestCapacityWriteFailureBeforeRenameCanReconcile (0.05s)
+    --- FAIL: TestCapacityWriteFailureBeforeRenameCanReconcile/object-overwrite (0.02s)
+    --- FAIL: TestCapacityWriteFailureBeforeRenameCanReconcile/part-overwrite (0.02s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	1.189s
+FAIL

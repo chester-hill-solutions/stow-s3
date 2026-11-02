@@ -1,0 +1,17 @@
+from pathlib import Path
+import json,re,hashlib,statistics
+p=Path('/private/tmp/stow-scan-memory-2026-10-18');j=json.loads((p/'red-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==9 and all(x['passed']for x in checks)
+for n in ['red-normal','red-race']:
+ t=(e/(n+'.log')).read_text();assert 'build failed'not in t and 'DATA RACE'not in t and '--- SKIP:'not in t
+ assert set(re.findall(r'^--- FAIL: (\S+) \(',t,re.M))=={'TestCapacityPayloadAllocationBound','TestCapacityPayloadUnknownAllocation'}
+ assert t.count('capacity binding materializes payload:')==4 and 'unknown scan file was materialized:'in t
+ for name in ['Identities','InvalidRecords','NativeRefusals']:assert '--- PASS: TestCapacityPayload'+name+' 'in t
+ assert len(re.findall(r'kind=(object|part) payload=(8388608|67108864) binding allocated=(\d+)',t))==4
+ assert 'unknown bytes=67108864 allocated='in t
+assert json.loads((e/'environment.json').read_text())['sourceSHA256']['internal/storage/fs/capacity.go']==hashlib.sha256((p/'baseline-capacity.go.txt').read_bytes()).hexdigest()
+r=json.loads((e/'measurements.json').read_text());assert len(r['observations'])==30 and len(r['commands'])==30 and all(x['iterations']==3 for x in r['observations'])and all(x['exitCode']==0 for x in r['commands'])
+a=[]
+for name in sorted({x['name']for x in r['observations']}):
+ v=[x for x in r['observations']if x['name']==name];assert len(v)==2
+ out={'name':name,'metrics':{k:{'median':statistics.median(x[k]for x in v),'min':min(x[k]for x in v),'max':max(x[k]for x in v)}for k in ['ns','bytes','allocs','maxRSSBytes']}};a.append(out);print(name,'ms',round(out['metrics']['ns']['median']/1e6,3),'bytes',out['metrics']['bytes']['median'],'RSS',round(out['metrics']['maxRSSBytes']['median']/1048576,2),'MiB')
+(e/'baseline-analysis.json').write_text(json.dumps(a,indent=2)+'\n');(e/'validation-receipt.json').write_text(json.dumps({'checks':9,'allPassed':True,'expectedOriginalRootFailures':2,'expectedOriginalAllocationFailures':5,'observations':30,'productionUnchanged':True},indent=2)+'\n')

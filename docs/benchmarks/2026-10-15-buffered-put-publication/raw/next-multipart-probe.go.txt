@@ -1,0 +1,71 @@
+package stow_test
+
+import (
+	"context"
+	"errors"
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
+	"strings"
+	"testing"
+)
+
+type reviewPublishingMultipartStore struct {
+	*multipartStore
+	body []byte
+}
+
+func (s *reviewPublishingMultipartStore) UploadPart(ctx context.Context, upload string, number int, data []byte) (stow.Part, error) {
+	part, err := s.multipartStore.UploadPart(ctx, upload, number, data)
+	s.multipartStore.mu.Lock()
+	s.body = append([]byte(nil), data...)
+	s.multipartStore.mu.Unlock()
+	return part, err
+}
+
+func (s *reviewPublishingMultipartStore) CompleteMultipartUpload(ctx context.Context, upload string, parts []stow.Part) (stow.Object, error) {
+	state, err := s.GetMultipartUpload(ctx, upload)
+	if err != nil {
+		return stow.Object{}, err
+	}
+	s.multipartStore.mu.Lock()
+	data := append([]byte(nil), s.body...)
+	s.multipartStore.mu.Unlock()
+	object, err := s.memoryStore.PutObject(ctx, state.Bucket, state.Key, data, stow.PutOptions{ContentType: state.ContentType, Metadata: state.Metadata})
+	if err != nil {
+		return object, err
+	}
+	return object, errors.Join(stow.ErrMutationCommitted, errors.New("after multipart publication"))
+}
+
+func TestReviewCustomMultipartCompletionPreservesCommittedResult(t *testing.T) {
+	ctx := context.Background()
+	store := &reviewPublishingMultipartStore{multipartStore: newMultipartStore()}
+	outer, err := stow.Open(stow.Options{Store: store, MaxBytes: 8, MaxObjects: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer outer.Close()
+	if err := outer.CreateBucket(ctx, "probe"); err != nil {
+		t.Fatal(err)
+	}
+	inner := embedded.UnwrapInstance(outer)
+	upload, err := inner.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	part, err := inner.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("body"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if value := recover(); value != nil {
+			actual, readErr := store.GetObject(ctx, "probe", "target")
+			t.Errorf("completion panicked: %v; actual=%q read-error=%v usage=%+v", value, actual.Data, readErr, outer.Usage())
+		}
+	}()
+	meta, err := inner.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part})
+	if !errors.Is(err, stow.ErrMutationCommitted) || meta == nil || meta.Key != "target" {
+		t.Fatalf("committed completion lost result: meta=%+v error=%v usage=%+v", meta, err, outer.Usage())
+	}
+}

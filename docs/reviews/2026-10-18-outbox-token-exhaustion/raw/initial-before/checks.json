@@ -1,0 +1,66 @@
+[
+  {
+    "name": "format-tests",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_token_exhaustion_test.go",
+      "internal/runthrough/outbox_token_exhaustion_controls_test.go",
+      "internal/runthrough/outbox_token_exhaustion_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 23,
+    "passed": true
+  },
+  {
+    "name": "regression-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxTokenExhaustion",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 23970,
+    "passed": true
+  },
+  {
+    "name": "regression-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxTokenExhaustion",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 39152,
+    "passed": true
+  },
+  {
+    "name": "benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/token-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 787,
+    "passed": true
+  }
+]

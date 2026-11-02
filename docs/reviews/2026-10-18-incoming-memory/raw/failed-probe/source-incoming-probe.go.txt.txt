@@ -1,0 +1,84 @@
+package fs_test
+
+import (
+ "context"
+ "crypto/md5"
+ "crypto/sha256"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "io"
+ "net/http"
+ "net/http/httptest"
+ "os"
+ "path/filepath"
+ "runtime"
+ "strconv"
+ "strings"
+ "sync"
+ "syscall"
+ "testing"
+ "time"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/capacity"
+ "github.com/chester-hill-solutions/stow-s3/internal/s3api"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+ fsstore "github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+)
+
+type incomingHint struct{ *incomingReader }
+func(r incomingHint)ReadSize()int64{return r.remaining}
+
+type incomingReader struct{ remaining, read int64 }
+func (r *incomingReader) Read(p []byte)(int,error){if r.remaining==0{return 0,io.EOF};n:=min(int64(len(p)),r.remaining);for i:=range p[:n]{p[i]='q'};r.remaining-=n;r.read+=n;return int(n),nil}
+func incomingHashes(size int64)(string,string){m,s:=md5.New(),sha256.New();_,_=io.Copy(io.MultiWriter(m,s),&incomingReader{remaining:size});return hex.EncodeToString(m.Sum(nil)),hex.EncodeToString(s.Sum(nil))}
+func incomingMeasure(t *testing.T, name string, f func()error){t.Helper();runtime.GC();var a,b,c runtime.MemStats;runtime.ReadMemStats(&a);start:=time.Now();err:=f();ns:=time.Since(start).Nanoseconds();runtime.ReadMemStats(&b);runtime.GC();runtime.ReadMemStats(&c);out:=map[string]any{"phase":name,"ns":ns,"allocatedBytes":b.TotalAlloc-a.TotalAlloc,"allocations":b.Mallocs-a.Mallocs,"heapBefore":a.HeapAlloc,"heapAfter":b.HeapAlloc,"retainedHeapDelta":int64(c.HeapAlloc)-int64(a.HeapAlloc)};if err!=nil{out["error"]=err.Error()};data,_:=json.Marshal(out);fmt.Println("STOW_MEMORY:"+string(data));if err!=nil{t.Fatal(err)}}
+func incomingStore(t *testing.T,root string,bound bool,limit int64)(*fsstore.FilesystemStore,*capacity.Namespace,string){t.Helper();dir,err:=os.MkdirTemp(root,"incoming-");if err!=nil{t.Fatal(err)};t.Cleanup(func(){_ = os.RemoveAll(dir)});var ns *capacity.Namespace;if bound{host,err:=capacity.Open(capacity.HostOptions{Dir:filepath.Join(dir,"host"),MaxBytes:2<<30});if err!=nil{t.Fatal(err)};ns,err=host.Bind(capacity.NamespaceOptions{ID:"incoming",MaxBytes:limit,RecoveryReserveBytes:limit/8});if err!=nil{t.Fatal(err)}};path:=filepath.Join(dir,"store");var store *fsstore.FilesystemStore;if bound{store,err=fsstore.NewFilesystemStoreWithNamespace(path,ns)}else{store,err=fsstore.NewFilesystemStore(path)};if err!=nil{t.Fatal(err)};t.Cleanup(func(){_ = store.Close()});if err=store.CreateBucket(context.Background(),"bucket");err!=nil{t.Fatal(err)};return store,ns,path}
+func incomingVerify(t *testing.T,store *fsstore.FilesystemStore,key string,size int64,etag,digest string){t.Helper();reader,meta,err:=store.GetObject(context.Background(),"bucket",key);if err!=nil{t.Fatal(err)};h:=sha256.New();n,err:=io.Copy(h,reader);closeErr:=reader.Close();if err!=nil||closeErr!=nil||n!=size||meta.Size!=size||!storage.ETagEqual(meta.ETag,etag)||hex.EncodeToString(h.Sum(nil))!=digest||meta.Metadata["source"]!="probe"{t.Fatalf("content contract n=%d meta=%+v err=%v close=%v",n,meta,err,closeErr)}}
+func incomingSnapshot(t *testing.T,ns *capacity.Namespace,size int64){t.Helper();if ns==nil{return};v,err:=ns.Snapshot(context.Background());if err!=nil||v.PendingBytes!=0||v.PayloadBytes<size{t.Fatalf("charge=%+v err=%v",v,err)}}
+
+func TestIncomingMemoryProbe(t *testing.T){
+ root:=os.Getenv("STOW_BENCH_ROOT");if root==""{t.Skip("Railway measurement only")};if os.Getenv("RAILWAY_SERVICE_ID")!="83497842-c51d-420e-8ba1-181589730ad4"||os.Getuid()!=10001||!strings.HasPrefix(root,"/results/"){t.Fatal("authorized Railway runner required")};var disk syscall.Statfs_t;if err:=syscall.Statfs(root,&disk);err!=nil||disk.Type!=61267{t.Fatal("ext4 required",err)}
+ size,err:=strconv.ParseInt(os.Getenv("STOW_PROBE_SIZE"),10,64);if err!=nil||size<=0||size>64<<20{t.Fatal("invalid size")};kind:=os.Getenv("STOW_PROBE_KIND");etag,digest:=incomingHashes(size);ctx:=context.Background();bound:=strings.Contains(kind,"bound")&&!strings.Contains(kind,"unbound");limit:=int64(1<<30);if kind=="refuse-bound"{limit=4<<20};store,ns,path:=incomingStore(t,root,bound,limit);opts:=storage.PutOptions{ContentType:"application/octet-stream",Metadata:map[string]string{"source":"probe"}}
+ if strings.HasPrefix(kind,"http-part-"){incomingHTTPPart(t,store,ns,size,etag,digest);return}
+ if strings.HasPrefix(kind,"http-"){incomingHTTP(t,store,ns,kind,size,etag,digest);return}
+ if strings.HasPrefix(kind,"stages-"){incomingStages(t,store,kind,size,opts);return}
+ if strings.HasPrefix(kind,"part-"){
+  upload,err:=store.CreateMultipartUpload(ctx,"bucket","payload",storage.MultipartOptions{ContentType:opts.ContentType,Metadata:opts.Metadata});if err!=nil{t.Fatal(err)};reader:=&incomingReader{remaining:size};var part *storage.PartInfo
+  incomingMeasure(t,"upload-part",func()error{var e error;part,e=store.UploadPart(ctx,upload.UploadID,1,reader);return e});if part.Size!=size||!storage.ETagEqual(part.ETag,etag)||reader.read!=size{t.Fatal("part contract",part,reader.read)};incomingSnapshot(t,ns,size)
+  incomingMeasure(t,"complete-part",func()error{_,e:=store.CompleteMultipartUpload(ctx,upload.UploadID,[]storage.PartInfo{*part});return e});etag=storage.CompletionETag([]string{part.ETag});incomingVerify(t,store,"payload",size,etag,digest);if _,e:=store.GetMultipartUpload(ctx,upload.UploadID);!errors.Is(e,storage.ErrUploadNotFound){t.Fatal("upload not removed",e)};incomingSnapshot(t,ns,size)
+ }else{
+  if strings.HasPrefix(kind,"guard")||kind=="save"{opts.Guard=&storage.WriteGuard{Absent:true}};if kind=="save"{opts.RequestKey="incoming-save"};reader:=&incomingReader{remaining:size};var stage storage.StagedObject
+  incomingMeasure(t,"stage",func()error{var e error;var body io.Reader=reader;if strings.HasSuffix(kind,"hinted"){body=incomingHint{reader}};stage,e=store.StageObject(ctx,"bucket","payload",body,opts);return e});if reader.read!=size{t.Fatal("short body",reader.read)};defer stage.Abort(ctx)
+  if _,e:=store.HeadObject(ctx,"bucket","payload");!errors.Is(e,storage.ErrObjectNotFound){t.Fatal("stage visible",e)}
+  if kind=="refuse-bound"{before,e:=ns.Snapshot(ctx);if e!=nil{t.Fatal(e)};incomingMeasure(t,"refused-commit",func()error{_,e:=stage.Commit(ctx);if !errors.Is(e,capacity.ErrFull){return fmt.Errorf("expected quota refusal: %v",e)};return nil});after,e:=ns.Snapshot(ctx);if e!=nil||after.PayloadBytes!=before.PayloadBytes||after.PendingBytes!=0{t.Fatalf("refusal charge before=%+v after=%+v %v",before,after,e)};if _,e=store.HeadObject(ctx,"bucket","payload");!errors.Is(e,storage.ErrObjectNotFound){t.Fatal("refused object published",e)};fmt.Printf("STOW_CONTROL:refused body read=%d namespace limit=%d\n",reader.read,limit);return}
+  incomingMeasure(t,"commit",func()error{_,e:=stage.Commit(ctx);return e});incomingVerify(t,store,"payload",size,etag,digest);incomingSnapshot(t,ns,size)
+  if kind=="save"{receipt,e:=store.ResolveSaveRequest(ctx,"bucket","payload",opts.RequestKey);if e!=nil||receipt.Meta==nil||receipt.Meta.Size!=size{t.Fatalf("save receipt %+v %v",receipt,e)}}
+ }
+ if err:=store.Close();err!=nil{t.Fatal(err)};var reopened *fsstore.FilesystemStore;if ns==nil{reopened,err=fsstore.NewFilesystemStore(path)}else{reopened,err=fsstore.NewFilesystemStoreWithNamespace(path,ns)};if err!=nil{t.Fatal(err)};defer reopened.Close();incomingVerify(t,reopened,"payload",size,etag,digest);incomingSnapshot(t,ns,size)
+}
+
+func incomingStages(t *testing.T,store *fsstore.FilesystemStore,kind string,size int64,opts storage.PutOptions){
+ const workers=16;stages:=make([]storage.StagedObject,workers);errs:=make([]error,workers);ctx:=context.Background();incomingMeasure(t,"stage-sixteen",func()error{var wg sync.WaitGroup;start:=make(chan struct{});for i:=range stages{wg.Add(1);go func(i int){defer wg.Done();<-start;stages[i],errs[i]=store.StageObject(ctx,"bucket",fmt.Sprintf("pending-%d",i),&incomingReader{remaining:size},opts)}(i)};close(start);wg.Wait();return errors.Join(errs...)});runtime.KeepAlive(stages)
+ incomingMeasure(t,"abort-sixteen",func()error{for i,p:=range stages{errs[i]=p.Abort(ctx)};return errors.Join(errs...)});for i:=range stages{if _,err:=store.HeadObject(ctx,"bucket",fmt.Sprintf("pending-%d",i));!errors.Is(err,storage.ErrObjectNotFound){t.Fatal("aborted stage published",err)}}
+ fmt.Printf("STOW_CONTROL:staged workers=%d bytes=%d profile=%s\n",workers,size,kind)
+}
+
+type incomingGate struct{storage.Store;arrived chan struct{};release chan struct{}}
+func(g *incomingGate)PutObject(ctx context.Context,bucket,key string,body io.Reader,opts storage.PutOptions)(*storage.ObjectMeta,error){g.arrived<-struct{}{};<-g.release;return g.Store.PutObject(ctx,bucket,key,body,opts)}
+func incomingHTTP(t *testing.T,store *fsstore.FilesystemStore,ns *capacity.Namespace,kind string,size int64,etag,digest string){
+ workers:=1;if strings.Contains(kind,"sixteen"){workers=16};gate:=&incomingGate{Store:store,arrived:make(chan struct{},workers),release:make(chan struct{})};var backend storage.Store=store;if workers>1{backend=gate};maxRequest:=int64(0);if size>8<<20&&!strings.Contains(kind,"refuse"){maxRequest=size};server,err:=s3api.New(s3api.Config{Store:backend,Auth:s3api.DevBypass,MaxRequestBytes:maxRequest});if err!=nil{t.Fatal(err)};handler:=server.Handler();statuses:=make([]int,workers);bodies:=make([]string,workers);readers:=make([]*incomingReader,workers)
+ run:=func(i int){reader:=&incomingReader{remaining:size};readers[i]=reader;request:=httptest.NewRequest(http.MethodPut,"http://localhost/bucket/http-"+strconv.Itoa(i),reader);request.ContentLength=size;request.Header.Set("Content-Length",strconv.FormatInt(size,10));request.Header.Set("Content-Length",strconv.FormatInt(size,10));request.Header.Set("X-Amz-Content-Sha256",digest);request.Header.Set("X-Amz-Meta-Source","probe");recorder:=httptest.NewRecorder();handler.ServeHTTP(recorder,request);statuses[i]=recorder.Code;bodies[i]=recorder.Body.String()}
+ if workers==1{incomingMeasure(t,"http-put",func()error{run(0);return nil})}else{
+  runtime.GC();var a,b runtime.MemStats;runtime.ReadMemStats(&a);start:=time.Now();var wg sync.WaitGroup;for i:=range statuses{wg.Add(1);go func(i int){defer wg.Done();run(i)}(i)};for range workers{select{case <-gate.arrived:case <-time.After(30*time.Second):close(gate.release);wg.Wait();t.Fatal("HTTP body barrier timeout")}};runtime.GC();runtime.ReadMemStats(&b);data,_:=json.Marshal(map[string]any{"phase":"http-sixteen-at-store","ns":time.Since(start).Nanoseconds(),"allocatedBytes":b.TotalAlloc-a.TotalAlloc,"allocations":b.Mallocs-a.Mallocs,"heapBefore":a.HeapAlloc,"heapAfter":b.HeapAlloc,"retainedHeapDelta":int64(b.HeapAlloc)-int64(a.HeapAlloc)});fmt.Println("STOW_MEMORY:"+string(data))
+  rejected:=&incomingReader{remaining:size};req:=httptest.NewRequest(http.MethodPut,"http://localhost/bucket/overflow",rejected);rec:=httptest.NewRecorder();handler.ServeHTTP(rec,req);if rec.Code!=503||rejected.read!=0{close(gate.release);wg.Wait();t.Fatalf("admission status=%d read=%d",rec.Code,rejected.read)};close(gate.release);wg.Wait();fmt.Println("STOW_CONTROL:seventeenth handler refused before body read")
+ }
+ for i,status:=range statuses{if strings.Contains(kind,"refuse"){if status!=400||!strings.Contains(bodies[i],"EntityTooLarge")||readers[i].read>8<<20+1{t.Fatalf("HTTP refusal status=%d read=%d body=%s",status,readers[i].read,bodies[i])};if _,e:=store.HeadObject(context.Background(),"bucket","http-0");!errors.Is(e,storage.ErrObjectNotFound){t.Fatal("oversize published",e)}}else{if status!=200{t.Fatalf("HTTP status=%d body=%s",status,bodies[i])};incomingVerify(t,store,"http-"+strconv.Itoa(i),size,etag,digest)}};incomingSnapshot(t,ns,0)
+}
+
+func incomingHTTPPart(t *testing.T,store *fsstore.FilesystemStore,ns *capacity.Namespace,size int64,etag,digest string){
+ ctx:=context.Background();upload,err:=store.CreateMultipartUpload(ctx,"bucket","payload",storage.MultipartOptions{Metadata:map[string]string{"source":"probe"}});if err!=nil{t.Fatal(err)};limit:=int64(0);if size>8<<20{limit=size};server,err:=s3api.New(s3api.Config{Store:store,Auth:s3api.DevBypass,MaxRequestBytes:limit});if err!=nil{t.Fatal(err)};var response *httptest.ResponseRecorder
+ incomingMeasure(t,"http-upload-part",func()error{reader:=&incomingReader{remaining:size};req:=httptest.NewRequest(http.MethodPut,"http://localhost/bucket/payload?uploadId="+upload.UploadID+"&partNumber=1",reader);req.ContentLength=size;req.Header.Set("Content-Length",strconv.FormatInt(size,10));req.Header.Set("X-Amz-Content-Sha256",digest);response=httptest.NewRecorder();server.Handler().ServeHTTP(response,req);if response.Code!=200{return fmt.Errorf("upload HTTP %d: %s",response.Code,response.Body.String())};return nil});if !storage.ETagEqual(response.Header().Get("ETag"),etag){t.Fatal("HTTP part ETag")}
+ incomingSnapshot(t,ns,size);incomingMeasure(t,"complete-part",func()error{_,e:=store.CompleteMultipartUpload(ctx,upload.UploadID,[]storage.PartInfo{{PartNumber:1,ETag:etag}});return e});incomingVerify(t,store,"payload",size,storage.CompletionETag([]string{etag}),digest);incomingSnapshot(t,ns,size)
+}

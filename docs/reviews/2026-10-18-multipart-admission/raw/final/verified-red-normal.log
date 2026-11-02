@@ -1,0 +1,113 @@
+=== RUN   TestMultipartCompletionAdmissionRefusalRetainsUpload
+--- PASS: TestMultipartCompletionAdmissionRefusalRetainsUpload (0.02s)
+=== RUN   TestMultipartBoundCompletionCleanupPreservesCommittedOutcome
+    capacity_multipart_recovery_test.go:72: cleanup recovery charge={PayloadBytes:132 RecoveryBytes:3447 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} object=125 err=<nil>
+--- FAIL: TestMultipartBoundCompletionCleanupPreservesCommittedOutcome (0.02s)
+=== RUN   TestMultipartCapacityHoldProtectsPart
+    capacity_multipart_recovery_test.go:88: namespace binding or operation conflict
+--- FAIL: TestMultipartCapacityHoldProtectsPart (0.01s)
+=== RUN   TestMultipartConcurrentNamespaceAdmission
+    capacity_multipart_shared_test.go:52: accepted=2 refused=0
+--- FAIL: TestMultipartConcurrentNamespaceAdmission (0.02s)
+=== RUN   TestMultipartSharedHostAdmission
+    capacity_multipart_shared_test.go:73: shared host budget ignored: <nil>
+--- FAIL: TestMultipartSharedHostAdmission (0.02s)
+=== RUN   TestMultipartPartsRespectNamespaceBudget
+    capacity_multipart_test.go:26: oversized multipart part error = <nil>, want capacity.ErrFull
+--- FAIL: TestMultipartPartsRespectNamespaceBudget (0.02s)
+=== RUN   TestMultipartAbortReleasesNamespaceCapacity
+    capacity_multipart_test.go:49: multipart resources were not charged: {PayloadBytes:0 RecoveryBytes:1832 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+--- FAIL: TestMultipartAbortReleasesNamespaceCapacity (0.01s)
+=== RUN   TestMultipartCompletionReleasesPartCapacity
+    capacity_multipart_test.go:87: completion payload charge = 126, want only the committed object size 122
+--- FAIL: TestMultipartCompletionReleasesPartCapacity (0.01s)
+=== RUN   TestMultipartManifestRecoveryBudget
+    capacity_multipart_test.go:97: over-budget manifest accepted: <nil>
+    capacity_multipart_test.go:101: refused manifest remained visible: err=<nil>
+--- FAIL: TestMultipartManifestRecoveryBudget (0.01s)
+=== RUN   TestMultipartRejectedReplacementPreservesPart
+    capacity_multipart_test.go:123: over-budget replacement accepted: <nil>
+    capacity_multipart_test.go:127: refused replacement changed part: [{PartNumber:1 ETag:"4f08eef4096726bff1125e1b1b734644" Size:5242880 LastModified:2026-10-18 16:22:45.658484777 +0000 UTC}], <nil>
+--- FAIL: TestMultipartRejectedReplacementPreservesPart (0.02s)
+=== RUN   TestMultipartManifestChargeMatchesScan
+    capacity_multipart_test.go:151: manifest charge was stale: before={PayloadBytes:0 RecoveryBytes:1817 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2722 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+--- FAIL: TestMultipartManifestChargeMatchesScan (0.01s)
+=== RUN   TestMultipartReplacementChargesOnePart
+    capacity_multipart_test.go:170: replacement charge={PayloadBytes:0 RecoveryBytes:1817 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} size=1000000 err=<nil>
+--- FAIL: TestMultipartReplacementChargesOnePart (0.01s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (0.02s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.00s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.00s)
+=== RUN   TestMultipartCompletionAdmissionRefusalRetainsUpload
+--- PASS: TestMultipartCompletionAdmissionRefusalRetainsUpload (0.02s)
+=== RUN   TestMultipartBoundCompletionCleanupPreservesCommittedOutcome
+    capacity_multipart_recovery_test.go:72: cleanup recovery charge={PayloadBytes:132 RecoveryBytes:3450 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} object=125 err=<nil>
+--- FAIL: TestMultipartBoundCompletionCleanupPreservesCommittedOutcome (0.01s)
+=== RUN   TestMultipartCapacityHoldProtectsPart
+    capacity_multipart_recovery_test.go:88: namespace binding or operation conflict
+--- FAIL: TestMultipartCapacityHoldProtectsPart (0.01s)
+=== RUN   TestMultipartConcurrentNamespaceAdmission
+    capacity_multipart_shared_test.go:52: accepted=2 refused=0
+--- FAIL: TestMultipartConcurrentNamespaceAdmission (0.02s)
+=== RUN   TestMultipartSharedHostAdmission
+    capacity_multipart_shared_test.go:73: shared host budget ignored: <nil>
+--- FAIL: TestMultipartSharedHostAdmission (0.02s)
+=== RUN   TestMultipartPartsRespectNamespaceBudget
+    capacity_multipart_test.go:26: oversized multipart part error = <nil>, want capacity.ErrFull
+--- FAIL: TestMultipartPartsRespectNamespaceBudget (0.02s)
+=== RUN   TestMultipartAbortReleasesNamespaceCapacity
+    capacity_multipart_test.go:49: multipart resources were not charged: {PayloadBytes:0 RecoveryBytes:1832 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0}
+--- FAIL: TestMultipartAbortReleasesNamespaceCapacity (0.01s)
+=== RUN   TestMultipartCompletionReleasesPartCapacity
+    capacity_multipart_test.go:87: completion payload charge = 126, want only the committed object size 122
+--- FAIL: TestMultipartCompletionReleasesPartCapacity (0.01s)
+=== RUN   TestMultipartManifestRecoveryBudget
+    capacity_multipart_test.go:97: over-budget manifest accepted: <nil>
+    capacity_multipart_test.go:101: refused manifest remained visible: err=<nil>
+--- FAIL: TestMultipartManifestRecoveryBudget (0.01s)
+=== RUN   TestMultipartRejectedReplacementPreservesPart
+    capacity_multipart_test.go:123: over-budget replacement accepted: <nil>
+    capacity_multipart_test.go:127: refused replacement changed part: [{PartNumber:1 ETag:"4f08eef4096726bff1125e1b1b734644" Size:5242880 LastModified:2026-10-18 16:22:45.842482738 +0000 UTC}], <nil>
+--- FAIL: TestMultipartRejectedReplacementPreservesPart (0.02s)
+=== RUN   TestMultipartManifestChargeMatchesScan
+    capacity_multipart_test.go:151: manifest charge was stale: before={PayloadBytes:0 RecoveryBytes:1814 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} after={PayloadBytes:0 RecoveryBytes:2719 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} err=<nil>
+--- FAIL: TestMultipartManifestChargeMatchesScan (0.01s)
+=== RUN   TestMultipartReplacementChargesOnePart
+    capacity_multipart_test.go:170: replacement charge={PayloadBytes:0 RecoveryBytes:1817 ReservedRecoveryBytes:1048576 PendingBytes:0 Operations:0} size=1000000 err=<nil>
+--- FAIL: TestMultipartReplacementChargesOnePart (0.01s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+--- PASS: TestMultipartManifestFailuresPreserveUpload (0.02s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/truncated (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/null (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/empty (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/missing (0.00s)
+    --- PASS: TestMultipartManifestFailuresPreserveUpload/directory (0.00s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	0.385s
+FAIL

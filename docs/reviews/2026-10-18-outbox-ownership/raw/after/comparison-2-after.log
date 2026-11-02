@@ -1,0 +1,21 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkOutboxFencingToken/state/depth=0/claim           	 1867101	       248.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOutboxFencingToken/state/depth=0/claim-4         	 1922049	       249.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOutboxFencingToken/state/depth=0/prepare         	 2133162	       224.2 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxFencingToken/state/depth=0/prepare-4       	 2106379	       235.2 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxFencingToken/state/depth=128/claim         	  131948	      3446 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOutboxFencingToken/state/depth=128/claim-4       	  132391	      3497 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOutboxFencingToken/state/depth=128/prepare       	  222981	      2374 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxFencingToken/state/depth=128/prepare-4     	  245634	      2187 ns/op	     352 B/op	       1 allocs/op
+BenchmarkOutboxFencingToken/file/depth=0/claim            	      60	   6734924 ns/op	   11392 B/op	     103 allocs/op
+BenchmarkOutboxFencingToken/file/depth=0/claim-4          	      81	   6212240 ns/op	   11392 B/op	     103 allocs/op
+BenchmarkOutboxFencingToken/file/depth=0/prepare          	      73	   6619401 ns/op	    9880 B/op	      89 allocs/op
+BenchmarkOutboxFencingToken/file/depth=0/prepare-4        	      75	   5501021 ns/op	    9879 B/op	      89 allocs/op
+BenchmarkOutboxFencingToken/file/depth=128/claim          	      75	   6004087 ns/op	 1011168 B/op	    6047 allocs/op
+BenchmarkOutboxFencingToken/file/depth=128/claim-4        	      79	   6519464 ns/op	 1011176 B/op	    6047 allocs/op
+BenchmarkOutboxFencingToken/file/depth=128/prepare        	      74	   6375936 ns/op	 1009936 B/op	    6036 allocs/op
+BenchmarkOutboxFencingToken/file/depth=128/prepare-4      	      72	   6700040 ns/op	 1009941 B/op	    6036 allocs/op
+PASS

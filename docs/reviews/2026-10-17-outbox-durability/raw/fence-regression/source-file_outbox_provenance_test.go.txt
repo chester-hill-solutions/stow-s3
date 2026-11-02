@@ -1,0 +1,128 @@
+package runthrough
+
+import (
+	"errors"
+	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
+	"testing"
+)
+
+func TestFileOutboxReportsDirectoryFenceFailure(t *testing.T) {
+	if runtime.GOOS == "windows" || os.Geteuid() == 0 {
+		t.Skip("requires Unix directory permissions as an unprivileged user")
+	}
+	for _, operation := range []string{"provenance", "enqueue", "prepare", "commit", "acknowledge", "close"} {
+		t.Run(operation, func(t *testing.T) { checkOutboxDirectoryFence(t, operation) })
+	}
+}
+
+func checkOutboxDirectoryFence(t *testing.T, operation string) {
+	t.Helper()
+	dir := t.TempDir()
+	path := filepath.Join(dir, "outbox.json")
+	outbox, err := NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	active, err := outbox.Enqueue(OutboxEntry{Operation: OutboxPut, Bucket: "bucket", Key: "active", UpstreamAbsent: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	prepared, err := outbox.Prepare(OutboxEntry{Operation: OutboxPut, Bucket: "bucket", Key: "prepared", UpstreamAbsent: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := outbox.SaveUpstreamState("bucket", "key", UpstreamState{ETag: "old"}); err != nil {
+		t.Fatal(err)
+	}
+	before, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	memory := outbox.state.clone()
+	if err := os.Chmod(dir, 0333); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(dir, 0700) })
+	probe, err := os.Open(dir)
+	if err == nil {
+		_ = probe.Close()
+		t.Fatal("directory-read fault not installed")
+	}
+	err = outboxFenceOperation(outbox, operation, active.ID, prepared.ID)
+	if !errors.Is(err, os.ErrPermission) {
+		t.Errorf("journal replacement acknowledged without a directory fence: %v", err)
+	}
+	after, statErr := os.Stat(path)
+	if statErr != nil {
+		t.Fatal(statErr)
+	}
+	if os.SameFile(before, after) {
+		t.Fatal("fault occurred before replacement instead of during directory fencing")
+	}
+	if !reflect.DeepEqual(memory, outbox.state) {
+		t.Error("failed persistence updated the acknowledged in-memory snapshot")
+	}
+	if err := os.Chmod(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	checkOutboxFenceRecovery(t, path)
+}
+
+func outboxFenceOperation(outbox *FileOutbox, operation, activeID, preparedID string) error {
+	entry := OutboxEntry{Operation: OutboxPut, Bucket: "bucket", Key: "new", UpstreamAbsent: true}
+	switch operation {
+	case "provenance":
+		return outbox.SaveUpstreamState("bucket", "key", UpstreamState{ETag: "new"})
+	case "enqueue":
+		_, err := outbox.Enqueue(entry)
+		return err
+	case "prepare":
+		_, err := outbox.Prepare(entry)
+		return err
+	case "commit":
+		_, err := outbox.Commit(preparedID, "local-version")
+		return err
+	case "acknowledge":
+		return outbox.MarkSuccess(activeID)
+	default:
+		return outbox.Close()
+	}
+}
+
+func checkOutboxFenceRecovery(t *testing.T, path string) {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	visible, err := decodeOutboxState(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := NewFileOutbox(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(visible, reopened.state) {
+		t.Fatal("reopen lost the replacement visible after uncertain persistence")
+	}
+	entry, err := reopened.Enqueue(OutboxEntry{Operation: OutboxPut, Bucket: "bucket", Key: "recovery", UpstreamAbsent: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reopened.state.seq <= visible.seq || entry.ID == "" {
+		t.Fatal("recovery reused an existing outbox sequence")
+	}
+	entries, err := os.ReadDir(filepath.Dir(path))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range entries {
+		if entry.Name() != "outbox.json" && entry.Name() != "outbox.json.lock" {
+			t.Errorf("temporary file left behind: %s", entry.Name())
+		}
+	}
+}

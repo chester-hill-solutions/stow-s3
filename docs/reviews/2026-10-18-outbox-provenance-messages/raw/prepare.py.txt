@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,subprocess,hashlib,shutil
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');old=Path('/private/tmp/stow-outbox-clone-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True)
+added=['internal/runthrough/outbox_proto_blocks_test.go','internal/runthrough/outbox_proto_blocks_resource_test.go','internal/runthrough/outbox_proto_blocks_bench_test.go'];files=[n for n in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if n]+added
+for name in files:
+ f=r/name
+ if f.is_file():dest=c/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dest)
+b=c/'benchmark';b.mkdir(exist_ok=True)
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/name,b/name)
+z=b/'validation-previous-baselines';z.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:shutil.copy2(r/'scripts/baselines'/name,z/name)
+for name in ['control.py','export.py','remote.py','watch.py']:(p/name).write_text((old/name).read_text().replace(str(old),str(p)).replace('stow-outbox-clone-20261018','stow-outbox-proto-blocks-20261018'))
+for variant in ['bulk','bounded']:
+ s=(p/(variant+'-file_outbox_proto.go.txt')).read_text()
+ if variant=='bounded':s=s.replace('const outboxProtoVersion = 4','const outboxProtoVersion = 4\nconst outboxProtoMessageBlockSize = 128').replace('% 128','% outboxProtoMessageBlockSize').replace('min(128,','min(outboxProtoMessageBlockSize,')
+ (b/(variant+'-file_outbox_proto.go.txt')).write_text(s)
+filebench=(old/'context/benchmark/clone-file-bench.go.txt').read_text().replace('BenchmarkFileOutboxCloneCycle','BenchmarkFileOutboxProtoBlocksCycle').replace('benchmarkCloneCycle','benchmarkProtoBlocksCycle');(b/'proto-block-file-bench.go.txt').write_text(filebench)
+common={'/app/internal/runthrough/diagnostic_proto_blocks_cycle_bench_test.go':'/app/benchmark/proto-block-file-bench.go.txt'}
+for variant in ['before','bulk','bounded']:
+ overlay=dict(common)
+ if variant!='before':overlay['/app/internal/runthrough/file_outbox_proto.go']='/app/benchmark/'+variant+'-file_outbox_proto.go.txt'
+ (b/('proto-block-'+variant+'.json')).write_text(json.dumps({'Replace':overlay},indent=2)+'\n')
+# All listed sources were copied above; retain their exact upload bytes.
+manifest={n:hashlib.sha256((c/n).read_bytes()).hexdigest()for n in files if(c/n).is_file()}
+for f in [p/'source-manifest.json',b/'validation-input-manifest.json']:f.write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({k:subprocess.check_output(['git','rev-parse',v],cwd=r).decode().strip()for k,v in [('base','HEAD'),('origin_main','origin/main')]},indent=2)+'\n')
+sources=['internal/runthrough/file_outbox_proto.go',*added,'benchmark/bulk-file_outbox_proto.go.txt','benchmark/bounded-file_outbox_proto.go.txt','benchmark/proto-block-file-bench.go.txt','benchmark/proto-block-before.json','benchmark/proto-block-bulk.json','benchmark/proto-block-bounded.json','benchmark/proto-block-comparison.mjs']
+steps=[{'name':'format','args':['gofmt','-w',*sources[1:7]]}]
+focus='^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)'
+for variant in ['before','bulk','bounded']:
+ for race in [False,True]:steps.append({'name':variant+('-race'if race else'-normal'),'args':['go','test',*(['-race']if race else[]),'-overlay=benchmark/proto-block-'+variant+'.json','./internal/runthrough','-run',focus,'-count=2','-v'],**({'expected':1}if variant=='bulk'else{})})
+ if variant!='bulk':steps.append({'name':variant+'-build','args':['go','test','-overlay=benchmark/proto-block-'+variant+'.json','-c','./internal/runthrough','-o','benchmark/proto-block-'+variant+'.test']})
+steps.append({'name':'comparison','args':['node','benchmark/proto-block-comparison.mjs']});plan={'phase':'outbox-proto-block-measure','sources':sources,'steps':steps};(p/'measure-plan.json').write_text(json.dumps(plan,indent=2)+'\n');(b/'active-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+s=(old/'context/benchmark/clone-comparison.mjs').read_text().replace('clone-before.test','proto-block-before.test').replace("candidate:'/app/benchmark/clone-candidate.test'","bounded:'/app/benchmark/proto-block-bounded.test'").replace("'candidate'","'bounded'").replace('^(BenchmarkOutboxStateClone|BenchmarkFileOutboxCloneCycle)$','^(BenchmarkOutboxProtoBlocks|BenchmarkFileOutboxProtoBlocksCycle)$');(b/'proto-block-comparison.mjs').write_text(s)
+print('Prepared original/full-slice/bounded-block contract and allocation experiment, production unchanged')

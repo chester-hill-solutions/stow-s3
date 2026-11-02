@@ -1,0 +1,48 @@
+[
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "build",
+      "-buildvcs=false",
+      "-trimpath",
+      "-ldflags=-s -w",
+      "-overlay=benchmark/_outbox-variants/footprint-overlay.json",
+      "-o",
+      "benchmark/_outbox-variants/footprint-before/stow-before",
+      "./cmd/stow-s3"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19836,
+    "passed": true
+  },
+  {
+    "name": "build-after",
+    "args": [
+      "go",
+      "build",
+      "-buildvcs=false",
+      "-trimpath",
+      "-ldflags=-s -w",
+      "-o",
+      "benchmark/_outbox-variants/footprint-before/stow-after",
+      "./cmd/stow-s3"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1411,
+    "passed": true
+  },
+  {
+    "name": "footprint",
+    "args": [
+      "node",
+      "benchmark/_outbox-variants/footprint-record.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 64,
+    "passed": true
+  }
+]

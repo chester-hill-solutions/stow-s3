@@ -1,0 +1,122 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_payload_read_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 26,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityPayload",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 18594,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCapacityPayload",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 29053,
+    "passed": true
+  },
+  {
+    "name": "install-benchmark",
+    "args": [
+      "cp",
+      "benchmark/scan-bench.go.txt",
+      "internal/storage/fs/capacity_payload_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 14,
+    "passed": true
+  },
+  {
+    "name": "format-benchmark",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_payload_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "snapshot-benchmark",
+    "args": [
+      "node",
+      "-e",
+      "require('node:fs').copyFileSync('internal/storage/fs/capacity_payload_bench_test.go',process.env.STOW_RESULT_ROOT+'/compiled-benchmark.go.txt')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 35,
+    "passed": true
+  },
+  {
+    "name": "build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/scan-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 880,
+    "passed": true
+  },
+  {
+    "name": "measure",
+    "args": [
+      "node",
+      "benchmark/baseline-measure.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 41131,
+    "passed": true
+  },
+  {
+    "name": "cleanup",
+    "args": [
+      "rm",
+      "internal/storage/fs/capacity_payload_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 15,
+    "passed": true
+  }
+]

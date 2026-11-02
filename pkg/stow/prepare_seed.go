@@ -60,6 +60,24 @@ type seedContext struct {
 	includeSensitive bool
 	bytes            int64
 	objects          int64
+	maxBytes         int64
+	maxObjects       int64
+}
+
+func (s *seedContext) add(bytes, objects int64) error {
+	maximum := int64(^uint64(0) >> 1)
+	if bytes < 0 || objects < 0 || bytes > maximum-s.bytes || objects > maximum-s.objects {
+		return fmt.Errorf("stow: seeded totals exceed supported limits")
+	}
+	if s.maxBytes > 0 && bytes > s.maxBytes-s.bytes {
+		return fmt.Errorf("stow: seeded bytes exceed workspace limit %d", s.maxBytes)
+	}
+	if s.maxObjects > 0 && objects > s.maxObjects-s.objects {
+		return fmt.Errorf("stow: seeded objects exceed workspace limit %d", s.maxObjects)
+	}
+	s.bytes += bytes
+	s.objects += objects
+	return nil
 }
 
 func copySeed(source, destination string, totals *seedContext) error {
@@ -157,7 +175,8 @@ func copySeedFile(source, destination string, info os.FileInfo, totals *seedCont
 	if !info.Mode().IsRegular() {
 		return fmt.Errorf("only regular files and directories are supported: %s", source)
 	}
-	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
+	projected := *totals
+	if err := projected.add(info.Size(), 1); err != nil {
 		return err
 	}
 	in, err := os.Open(source)
@@ -165,11 +184,31 @@ func copySeedFile(source, destination string, info os.FileInfo, totals *seedCont
 		return err
 	}
 	defer in.Close()
+	current, err := in.Stat()
+	if err != nil {
+		return err
+	}
+	if !current.Mode().IsRegular() {
+		return fmt.Errorf("seed input is no longer a regular file")
+	}
+	projected = *totals
+	if err := projected.add(current.Size(), 1); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
+		return err
+	}
 	out, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, info.Mode().Perm()&0o755)
 	if err != nil {
 		return err
 	}
-	n, copyErr := io.Copy(out, in)
+	_, copyErr := io.CopyN(out, in, current.Size())
+	if copyErr == nil {
+		var extra [1]byte
+		if n, err := in.Read(extra[:]); n != 0 || err != io.EOF {
+			copyErr = fmt.Errorf("seed input changed size while copying")
+		}
+	}
 	closeErr := out.Close()
 	if copyErr != nil {
 		return copyErr
@@ -177,11 +216,6 @@ func copySeedFile(source, destination string, info os.FileInfo, totals *seedCont
 	if closeErr != nil {
 		return closeErr
 	}
-	maxInt64 := int64(^uint64(0) >> 1)
-	if n > maxInt64-totals.bytes || totals.objects == maxInt64 {
-		return fmt.Errorf("seeded totals exceed supported limits")
-	}
-	totals.bytes += n
-	totals.objects++
+	*totals = projected
 	return nil
 }

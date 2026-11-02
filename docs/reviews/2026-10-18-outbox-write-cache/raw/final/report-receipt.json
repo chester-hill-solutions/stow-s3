@@ -1,0 +1,44 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-write-cache.md": "e4782fcceceb2ace5825dc0a0f71cf00d30d890af64a6d02d0c75e59985cd363"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/file_outbox.go": "c352b972a3e3ae94a0bbc134a5b51a839a4256677cc7f7f9687ff705278121fd",
+    "internal/runthrough/file_outbox_proto.go": "c999a4f02f6ad9506b6ec09596b1faee1dd9b64da1999c36da600384f5adef19",
+    "internal/runthrough/write_cache_contract_test.go": "4b6f95cb60cf2ce81ae05faac1415bcbaf0796faff4b18f26b9365e909489e10",
+    "internal/runthrough/write_cache_retention_test.go": "7dcea327b1c7f168a90013ce879b27537fb2c59954276ab278e0874c81be7077"
+  },
+  "railwayDeploymentId": "8fb6e6de-de0b-4adf-9041-d29c24308347"
+}

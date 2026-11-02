@@ -1,0 +1,54 @@
+{
+  "phase": "null-journal-regressions-before",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_null_test.go",
+    "internal/runthrough/file_outbox_lookup_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_null_test.go"
+      ]
+    },
+    {
+      "name": "regression-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxRefuses(NullJournal|NonObjectJournalRoots)|TestRetryPendingRefusesNullJournal|TestFileOutboxAcceptsValidEmptyJournal|TestFileOutboxMigratesJSONToProtobuf)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "regression-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestFileOutboxRefuses(NullJournal|NonObjectJournalRoots)|TestRetryPendingRefusesNullJournal|TestFileOutboxAcceptsValidEmptyJournal|TestFileOutboxMigratesJSONToProtobuf)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

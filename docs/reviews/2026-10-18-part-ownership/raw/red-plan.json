@@ -1,0 +1,49 @@
+{
+  "phase": "multipart-ownership-original",
+  "sources": [
+    "internal/storage/owned_reader.go",
+    "internal/s3api/handlers_multipart.go",
+    "internal/storage/part_owned_test.go",
+    "internal/storage/fs/part_http_owned_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-tests",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/part_owned_test.go",
+        "internal/storage/fs/part_http_owned_test.go"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage",
+        "./internal/storage/fs",
+        "-run",
+        "^Test(PartReader|PartBytesOf|MultipartOwned)",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage",
+        "./internal/storage/fs",
+        "-run",
+        "^Test(PartReader|PartBytesOf|MultipartOwned)",
+        "-count=1",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

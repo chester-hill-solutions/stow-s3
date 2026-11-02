@@ -1,0 +1,17 @@
+from pathlib import Path
+import json
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');b=p/'context/benchmark'
+files=['benchmark/write-cache/'+x for x in ['contract_test.go.txt','bench_test.go.txt','naive-file_outbox.go.txt','safe-file_outbox.go.txt','safe-file_outbox_proto.go.txt']]
+pattern='^TestFileOutboxOwnWrite'
+plan={'phase':'outbox-write-cache-proof','sources':['internal/runthrough/file_outbox.go','internal/runthrough/file_outbox_proto.go',*files,'benchmark/write-cache-before.json','benchmark/write-cache-naive.json','benchmark/write-cache-safe.json'],'steps':[
+ {'name':'format-probes','args':['gofmt','-w',*files]},
+ {'name':'before-contracts','args':['go','test','-overlay=benchmark/write-cache-before.json','./internal/runthrough','-run',pattern,'-count=2','-v']},
+ {'name':'before-race','args':['go','test','-race','-overlay=benchmark/write-cache-before.json','./internal/runthrough','-run',pattern,'-count=2','-v']},
+ {'name':'naive-counterexamples','args':['go','test','-overlay=benchmark/write-cache-naive.json','./internal/runthrough','-run',pattern,'-count=2','-v'],'expected':1},
+ {'name':'safe-contracts','args':['go','test','-overlay=benchmark/write-cache-safe.json','./internal/runthrough','-count=1']},
+ {'name':'safe-race','args':['go','test','-race','-overlay=benchmark/write-cache-safe.json','./internal/runthrough','-count=1']},
+ {'name':'before-build','args':['go','test','-overlay=benchmark/write-cache-before.json','-c','./internal/runthrough','-o','benchmark/write-cache-before.test']},
+ {'name':'safe-build','args':['go','test','-overlay=benchmark/write-cache-safe.json','-c','./internal/runthrough','-o','benchmark/write-cache-safe.test']},
+ {'name':'comparison','args':['node','benchmark/cache-comparison.mjs']}
+]}
+(p/'proof-plan.json').write_text(json.dumps(plan,indent=2)+'\n');(b/'active-plan.json').write_text(json.dumps(plan,indent=2)+'\n')

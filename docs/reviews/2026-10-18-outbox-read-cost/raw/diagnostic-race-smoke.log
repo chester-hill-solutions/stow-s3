@@ -1,0 +1,48 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkFileOutboxReadCost/provenance=0/read-4    	       1	     69429 ns/op	        65.00 journal-B	  39866368 process-HWM-B	     920 B/op	       6 allocs/op
+BenchmarkFileOutboxReadCost/provenance=0/unmarshal-4         	       1	     18860 ns/op	        65.00 journal-B	  40976384 process-HWM-B	     280 B/op	       5 allocs/op
+BenchmarkFileOutboxReadCost/provenance=0/decode-4            	       1	     14330 ns/op	        65.00 journal-B	  40947712 process-HWM-B	     776 B/op	       9 allocs/op
+BenchmarkFileOutboxReadCost/provenance=0/lookup-4            	       1	    107599 ns/op	        65.00 journal-B	  41181184 process-HWM-B	    1872 B/op	      18 allocs/op
+BenchmarkFileOutboxReadCost/provenance=0/unchanged-4         	       1	    214028 ns/op	        65.00 journal-B	  41259008 process-HWM-B	    2736 B/op	      28 allocs/op
+BenchmarkFileOutboxReadCost/provenance=0/changed-4           	       1	   6428293 ns/op	        65.00 journal-B	  41472000 process-HWM-B	    3944 B/op	      43 allocs/op
+BenchmarkFileOutboxReadCost/provenance=2048/read-4           	       1	    220757 ns/op	    114753 journal-B	  41811968 process-HWM-B	  123272 B/op	       5 allocs/op
+BenchmarkFileOutboxReadCost/provenance=2048/unmarshal-4      	       1	   2137588 ns/op	    114753 journal-B	  46538752 process-HWM-B	  327048 B/op	    6161 allocs/op
+BenchmarkFileOutboxReadCost/provenance=2048/decode-4         	       1	   3054958 ns/op	    114753 journal-B	  46768128 process-HWM-B	  523960 B/op	    6173 allocs/op
+BenchmarkFileOutboxReadCost/provenance=2048/lookup-4         	       1	   3271727 ns/op	    114753 journal-B	  49287168 process-HWM-B	  647424 B/op	    6182 allocs/op
+BenchmarkFileOutboxReadCost/provenance=2048/unchanged-4      	       1	   3608183 ns/op	    114753 journal-B	  49790976 process-HWM-B	  648288 B/op	    6192 allocs/op
+BenchmarkFileOutboxReadCost/provenance=2048/changed-4        	       1	  16951974 ns/op	    114753 journal-B	  50442240 process-HWM-B	 1191936 B/op	    8264 allocs/op
+BenchmarkFileOutboxReadCost/provenance=16384/read-4          	       1	   1321777 ns/op	    917569 journal-B	  51658752 process-HWM-B	  926088 B/op	       5 allocs/op
+BenchmarkFileOutboxReadCost/provenance=16384/unmarshal-4     	       1	  18766486 ns/op	    917569 journal-B	  68997120 process-HWM-B	 2801128 B/op	   49177 allocs/op
+BenchmarkFileOutboxReadCost/provenance=16384/decode-4        	       1	  32746630 ns/op	    917569 journal-B	  70582272 process-HWM-B	 4380824 B/op	   49250 allocs/op
+BenchmarkFileOutboxReadCost/provenance=16384/lookup-4        	       1	  33234065 ns/op	    917569 journal-B	  80658432 process-HWM-B	 5301600 B/op	   49253 allocs/op
+BenchmarkFileOutboxReadCost/provenance=16384/unchanged-4     	       1	  33845519 ns/op	    917569 journal-B	  82976768 process-HWM-B	 5302464 B/op	   49263 allocs/op
+BenchmarkFileOutboxReadCost/provenance=16384/changed-4       	       1	  78320177 ns/op	    917569 journal-B	  89989120 process-HWM-B	 9523392 B/op	   65727 allocs/op
+BenchmarkFileOutboxReadCost/provenance=65536/read-4          	       1	   4846200 ns/op	   3670081 journal-B	  89829376 process-HWM-B	 3678616 B/op	       6 allocs/op
+BenchmarkFileOutboxReadCost/provenance=65536/unmarshal-4     	       1	  67948965 ns/op	   3670081 journal-B	 144515072 process-HWM-B	11689352 B/op	  196638 allocs/op
+BenchmarkFileOutboxReadCost/provenance=65536/decode-4        	       1	 126322438 ns/op	   3670081 journal-B	 148946944 process-HWM-B	17986200 B/op	  196898 allocs/op
+BenchmarkFileOutboxReadCost/provenance=65536/lookup-4        	       1	 133372295 ns/op	   3670081 journal-B	 195375104 process-HWM-B	21664992 B/op	  196907 allocs/op
+BenchmarkFileOutboxReadCost/provenance=65536/unchanged-4     	       1	 132898991 ns/op	   3670081 journal-B	 195411968 process-HWM-B	21665856 B/op	  196917 allocs/op
+BenchmarkFileOutboxReadCost/provenance=65536/changed-4       	       1	 315422045 ns/op	   3670081 journal-B	 252747776 process-HWM-B	38473664 B/op	  262725 allocs/op
+BenchmarkFileOutboxReadCost/provenance=262144/read-4         	       1	  17725966 ns/op	  14680129 journal-B	 252747776 process-HWM-B	14688648 B/op	       5 allocs/op
+BenchmarkFileOutboxReadCost/provenance=262144/unmarshal-4    	       1	 271190674 ns/op	  14680129 journal-B	 458285056 process-HWM-B	47119848 B/op	  786469 allocs/op
+BenchmarkFileOutboxReadCost/provenance=262144/decode-4       	       1	 494791193 ns/op	  14680129 journal-B	 470065152 process-HWM-B	72306968 B/op	  787496 allocs/op
+BenchmarkFileOutboxReadCost/provenance=262144/lookup-4       	       1	 539393670 ns/op	  14680129 journal-B	 603467776 process-HWM-B	86995808 B/op	  787505 allocs/op
+BenchmarkFileOutboxReadCost/provenance=262144/unchanged-4    	       1	 506053437 ns/op	  14680129 journal-B	 676741120 process-HWM-B	86996672 B/op	  787515 allocs/op
+BenchmarkFileOutboxReadCost/provenance=262144/changed-4      	       1	1550303175 ns/op	  14680129 journal-B	1009381376 process-HWM-B	154152128 B/op	 1050699 allocs/op
+BenchmarkFileOutboxReadCost/mixed=1024/read-4                	       1	    462446 ns/op	    157598 journal-B	1009381376 process-HWM-B	  164232 B/op	       5 allocs/op
+BenchmarkFileOutboxReadCost/mixed=1024/unmarshal-4           	       1	   4169256 ns/op	    157598 journal-B	1009381376 process-HWM-B	  723456 B/op	   11292 allocs/op
+BenchmarkFileOutboxReadCost/mixed=1024/decode-4              	       1	   4909410 ns/op	    157598 journal-B	1009381376 process-HWM-B	 1237040 B/op	   12329 allocs/op
+BenchmarkFileOutboxReadCost/mixed=1024/lookup-4              	       1	   7777400 ns/op	    157598 journal-B	1009381376 process-HWM-B	 1401464 B/op	   12338 allocs/op
+BenchmarkFileOutboxReadCost/mixed=1024/unchanged-4           	       1	   5574972 ns/op	    157598 journal-B	1009381376 process-HWM-B	 1402328 B/op	   12348 allocs/op
+BenchmarkFileOutboxReadCost/mixed=1024/changed-4             	       1	  22014891 ns/op	    157598 journal-B	1009381376 process-HWM-B	 2635896 B/op	   16471 allocs/op
+BenchmarkFileOutboxReadCost/mixed=16384/read-4               	       1	   2847690 ns/op	   2566529 journal-B	1009381376 process-HWM-B	 2572680 B/op	       5 allocs/op
+BenchmarkFileOutboxReadCost/mixed=16384/unmarshal-4          	       1	  71618766 ns/op	   2566529 journal-B	1009381376 process-HWM-B	11762176 B/op	  180268 allocs/op
+BenchmarkFileOutboxReadCost/mixed=16384/decode-4             	       1	  97712086 ns/op	   2566529 journal-B	1009381376 process-HWM-B	19977360 B/op	  196785 allocs/op
+BenchmarkFileOutboxReadCost/mixed=16384/lookup-4             	       1	 119092093 ns/op	   2566529 journal-B	1009381376 process-HWM-B	22550232 B/op	  196794 allocs/op
+BenchmarkFileOutboxReadCost/mixed=16384/unchanged-4          	       1	 150650926 ns/op	   2566529 journal-B	1009381376 process-HWM-B	22551096 B/op	  196804 allocs/op
+BenchmarkFileOutboxReadCost/mixed=16384/changed-4            	       1	 333629917 ns/op	   2566529 journal-B	1009381376 process-HWM-B	42137496 B/op	  262488 allocs/op
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runthrough	15.120s

@@ -1,0 +1,35 @@
+=== RUN   TestFileOutboxFrameReadResourceBudget
+=== RUN   TestFileOutboxFrameReadResourceBudget/short-declaration
+STOWFRAMEREAD: {"name":"short-declaration","fileBytes":8388608,"declaredBytes":2,"allocatedBytes":8403712}
+    outbox_frame_read_resource_test.go:53: rejected frame materialized the oversized file before checking length
+=== RUN   TestFileOutboxFrameReadResourceBudget/long-declaration
+STOWFRAMEREAD: {"name":"long-declaration","fileBytes":8388608,"declaredBytes":4294967295,"allocatedBytes":8398336}
+    outbox_frame_read_resource_test.go:53: rejected frame materialized the oversized file before checking length
+=== RUN   TestFileOutboxFrameReadResourceBudget/truncated-header
+STOWFRAMEREAD: {"name":"truncated-header","fileBytes":10,"declaredBytes":2,"allocatedBytes":1920}
+=== RUN   TestFileOutboxFrameReadResourceBudget/invalid-wire
+STOWFRAMEREAD: {"name":"invalid-wire","fileBytes":14,"declaredBytes":2,"allocatedBytes":2504}
+--- FAIL: TestFileOutboxFrameReadResourceBudget (0.01s)
+    --- FAIL: TestFileOutboxFrameReadResourceBudget/short-declaration (0.01s)
+    --- FAIL: TestFileOutboxFrameReadResourceBudget/long-declaration (0.00s)
+    --- PASS: TestFileOutboxFrameReadResourceBudget/truncated-header (0.00s)
+    --- PASS: TestFileOutboxFrameReadResourceBudget/invalid-wire (0.00s)
+=== RUN   TestFileOutboxFrameReadResourceBudget
+=== RUN   TestFileOutboxFrameReadResourceBudget/short-declaration
+STOWFRAMEREAD: {"name":"short-declaration","fileBytes":8388608,"declaredBytes":2,"allocatedBytes":8398320}
+    outbox_frame_read_resource_test.go:53: rejected frame materialized the oversized file before checking length
+=== RUN   TestFileOutboxFrameReadResourceBudget/long-declaration
+STOWFRAMEREAD: {"name":"long-declaration","fileBytes":8388608,"declaredBytes":4294967295,"allocatedBytes":8398224}
+    outbox_frame_read_resource_test.go:53: rejected frame materialized the oversized file before checking length
+=== RUN   TestFileOutboxFrameReadResourceBudget/truncated-header
+STOWFRAMEREAD: {"name":"truncated-header","fileBytes":10,"declaredBytes":2,"allocatedBytes":1920}
+=== RUN   TestFileOutboxFrameReadResourceBudget/invalid-wire
+STOWFRAMEREAD: {"name":"invalid-wire","fileBytes":14,"declaredBytes":2,"allocatedBytes":2488}
+--- FAIL: TestFileOutboxFrameReadResourceBudget (0.01s)
+    --- FAIL: TestFileOutboxFrameReadResourceBudget/short-declaration (0.01s)
+    --- FAIL: TestFileOutboxFrameReadResourceBudget/long-declaration (0.00s)
+    --- PASS: TestFileOutboxFrameReadResourceBudget/truncated-header (0.00s)
+    --- PASS: TestFileOutboxFrameReadResourceBudget/invalid-wire (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.031s
+FAIL

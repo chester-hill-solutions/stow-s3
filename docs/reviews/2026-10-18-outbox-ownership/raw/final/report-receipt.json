@@ -1,0 +1,48 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-ownership.md": "f90bceaa98a9a487280e11f661b8101df88b929db9fba35987ef403f5c312fd1",
+    "docs/outbox.md": "40f238ba0e09c5e459662fb7d7b926e6e49482fe7f7575c5944e5cf54ed3ffe3"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/outbox.go": "627fd1c86758d3ade6c0182e8eea142d623845677136af26c4119c6dfffb9f19",
+    "internal/runthrough/outbox_claims.go": "0d370d729fff6f8aef0968e051a81ee9777269b7d7b828fa8213ce8158f59443",
+    "internal/runthrough/outbox_ownership_test.go": "3a7649d0b06ba332ca2872ec53ca6b87b1f9b170298ddcf38cca21bfbf1dd634",
+    "internal/runthrough/outbox_ownership_controls_test.go": "23e8d44c2a5bee0c411b04944aafdd3f5af3b393e7bbc9b9977dddc2bbb0126f",
+    "internal/runthrough/outbox_token_exhaustion_bench_test.go": "64f82c2a241fa136094a0df9b2395f5d25f4241187cd0cb83617b5a4e35c4449",
+    "benchmark/ownership-comparison.mjs": "7d020a09f9a01e13d4c96c0f01872fe24232eb45a1a8baf32f0c4905abd2c4a7",
+    "docs/outbox.md": "40f238ba0e09c5e459662fb7d7b926e6e49482fe7f7575c5944e5cf54ed3ffe3"
+  },
+  "railwayDeploymentId": "e2b29c54-e723-4ff3-ad23-854dad88390a"
+}

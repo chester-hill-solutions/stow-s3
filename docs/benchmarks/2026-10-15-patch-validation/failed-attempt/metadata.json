@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "startedAt": "2026-10-15T16:11:54.749Z",
+  "complete": false,
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "23.5.0",
+    "cpu": "Apple M1 Pro",
+    "logicalCpus": 8,
+    "memoryBytes": 17179869184,
+    "node": "v25.9.0"
+  },
+  "compiler": "go version go1.25.6 darwin/arm64",
+  "buildArgs": [
+    "-buildvcs=false",
+    "-trimpath",
+    "-ldflags",
+    "-s -w"
+  ],
+  "baselineRevision": "29897c891d39766d856fd3ff9b0e4e80036eb8e3",
+  "candidateRevision": "8e8df36117d9de11f6f82d8b5d6e1d2aa067569a",
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline"
+  ],
+  "artifacts": {
+    "baseline": {
+      "binary": {
+        "bytes": 14248402,
+        "sha256": "0bcbd998a7863fbedb54d57a0fba8f14519b7ce21e9fc7f67e197bf2d41cbfc1"
+      },
+      "wasm": {
+        "bytes": 4615854,
+        "sha256": "0926e52ac5859884a311322968d9f112bf31927d491cb16a77cf4207160dbc93"
+      },
+      "worker": {
+        "bytes": 5010,
+        "sha256": "e2324b1a1e10dd2900b6aa7589d7b8b50558e54502be30d9325babd4ae31774b"
+      },
+      "streams": {
+        "bytes": 4027,
+        "sha256": "ba48ebdac4309ed5288243a8e5e5e9147c151145df7597682f5b12b6d8119c81"
+      }
+    },
+    "candidate": {
+      "binary": {
+        "bytes": 14248434,
+        "sha256": "34df48dc00f2c76f883d50cc63a63c3d58704c327a58c0b2a08747123f69821f"
+      },
+      "wasm": {
+        "bytes": 4615854,
+        "sha256": "0926e52ac5859884a311322968d9f112bf31927d491cb16a77cf4207160dbc93"
+      },
+      "worker": {
+        "bytes": 6097,
+        "sha256": "7a99ce8eb20713472aebe38a16504ccd707fadea3b514b29d00d8579282f1aa8"
+      },
+      "streams": {
+        "bytes": 4603,
+        "sha256": "0b9b6d341e0ea38dc31d514d8ece902a381f58c50a8ebb02e7164fdeb8776ee7"
+      }
+    }
+  },
+  "harnesses": {
+    "packages/stow-s3/scripts/benchmark-session.mjs": {
+      "bytes": 12075,
+      "sha256": "076412dedf333fee61a4d574968c70a0ef2b7139ff386e7e9a1776e9cbcdd2b8"
+    },
+    "packages/stow-s3/scripts/benchmark-concurrency.mjs": {
+      "bytes": 11197,
+      "sha256": "35a85f86bff8b659ae5fe610d42b4c1f3b8c87f6e4d6969bbc025c037e77de06"
+    },
+    "packages/stow-s3/scripts/benchmark-workspace.mjs": {
+      "bytes": 17448,
+      "sha256": "a45180738466dc13402ee060abcd0fbed0f1ef7b9366a64d45588f762afa0496"
+    },
+    "scripts/benchmark-portable.mjs": {
+      "bytes": 4163,
+      "sha256": "1f76b35da84e3b7f1864d3a4aaba93dea7757d34d06a5e2a528f960d92119e2e"
+    }
+  },
+  "notes": [
+    "Runs execute serially on one host. No test/build jobs run beside the measurements.",
+    "Native startup creates fresh processes with warm OS caches; it is not a cold-disk measurement.",
+    "Browser trials create fresh contexts and persistent workers in a warmed Chromium process; warm-up trials are excluded.",
+    "Raw per-block summaries are preserved. Do not infer a combined percentile from block percentiles.",
+    "RSS is sampled by the existing native harnesses; browser heap and production capacity are not measured."
+  ]
+}

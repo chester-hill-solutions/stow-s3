@@ -1,0 +1,25 @@
+from pathlib import Path
+import json,re,collections,hashlib,sys
+p=Path('/private/tmp/stow-outbox-binding-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');phase=sys.argv[1];e=p/('export-'+json.loads((p/(phase+'-start.json')).read_text())['id']);formats=['json-0','json-1','json-2','json-3','protobuf','flat'];expected=set();controls=set()
+for f in formats:
+ for c in ['entries','prepared']:
+  for k in ['missing','dangling','aliased']:expected.add('TestFileOutboxRejectsMismatchedEntryIDsOnOpen/'+f+'/'+c+'/'+k)
+  for op in ['snapshot','finish','close']:expected.add('TestFileOutboxRejectsMismatchedEntryIDsOnReload/'+f+'/'+c+'/'+op)
+  controls.add('TestFileOutboxPreservesMatchingCustomEntryIDs/'+f+'/'+c)
+receipt={}
+for mode in ['normal','race']:
+ text=(e/(('regression-'if phase=='before'else'focused-')+mode+'.log')).read_text();label='FAIL'if phase=='before'else'PASS';counts=collections.Counter(n for n in re.findall(r'^\s*--- '+label+r': (\S+) \(',text,re.M)if n in expected);assert set(counts)==expected,(mode,expected-set(counts));assert all(n==2 for n in counts.values()),counts
+ fails=[n for n in re.findall(r'^\s*--- FAIL: (\S+) \(',text,re.M)if'/'in n];assert (set(fails)==expected if phase=='before'else not fails),fails
+ passes=collections.Counter(re.findall(r'^\s*--- PASS: (\S+) \(',text,re.M));assert all(passes[c]==2 for c in controls),[(c,passes[c])for c in controls]
+ if phase=='before':
+  wrong=[line for line in text.splitlines()if'wrong-record=true'in line];assert len(wrong)==24 and all('rewritten=true read=<nil>'in line for line in wrong)
+ receipt[mode]={'uniqueRegressions':len(expected),'casesWithCount2':sum(counts.values()),'uniqueValidControls':len(controls),'passedControlsWithCount2':sum(passes[c]for c in controls)}
+run=json.loads((e/'run.json').read_text());assert run['complete']and run['success'];checks=json.loads((e/'checks.json').read_text());assert len(checks)==(5 if phase=='before'else 16)and all(c['passed']for c in checks);env=json.loads((e/'environment.json').read_text());receipt.update(checksPassed=len(checks),sourceSHA256=env['sourceSHA256'],railwayDeploymentId=run['railwayDeploymentId'])
+for n,h in env['sourceSHA256'].items():
+ assert hashlib.sha256((e/('source-'+Path(n).name+'.txt')).read_bytes()).hexdigest()==h,n
+ if phase=='after':assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+if phase=='after':
+ before=json.loads((p/('export-'+json.loads((p/'before-start.json').read_text())['id'])/'environment.json').read_text())
+ for n,h in env['sourceSHA256'].items():
+  if n.endswith('_test.go'):assert before['sourceSHA256'][n]==h,n
+(e/('red-receipt.json'if phase=='before'else'green-receipt.json')).write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

@@ -32,22 +32,22 @@ type objectRecord struct {
 	payloadSize       int64
 }
 
-func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord) error {
+func (s *FilesystemStore) writeObject(bucket, key string, record objectRecord, parts ...[]byte) error {
 	if err := s.settleSaveLocked(); err != nil {
 		return err
 	}
-	return s.writeObjectRaw(bucket, key, record)
+	return s.writeObjectRaw(bucket, key, record, parts...)
 }
 
-func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord) error {
-	return s.writeObjectBody(bucket, key, record, nil)
+func (s *FilesystemStore) writeObjectRaw(bucket, key string, record objectRecord, parts ...[]byte) error {
+	return s.writeObjectBody(bucket, key, record, nil, parts...)
 }
 
 func (s *FilesystemStore) writeObjectStream(bucket, key string, record objectRecord, body io.Reader) error {
 	return s.writeObjectBody(bucket, key, record, body)
 }
 
-func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecord, body io.Reader) error {
+func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecord, body io.Reader, parts ...[]byte) error {
 	path := s.objectPath(bucket, key)
 	if s.isBoundedObjectPath(bucket, path) {
 		if existing, err := readObjectHeader(path); err == nil && existing.Key != key {
@@ -59,7 +59,7 @@ func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecor
 	} else {
 		record.Key = ""
 	}
-	if err := s.writeRecordBody(path, record, body); err != nil {
+	if err := s.writeRecordBody(path, record, body, parts...); err != nil {
 		return err
 	}
 	if s.SupportsGuardedWrites() {
@@ -68,7 +68,14 @@ func (s *FilesystemStore) writeObjectBody(bucket, key string, record objectRecor
 	return nil
 }
 
-func (s *FilesystemStore) writeRecordBody(path string, record objectRecord, body io.Reader) error {
+func (s *FilesystemStore) writeRecordBody(path string, record objectRecord, body io.Reader, parts ...[]byte) error {
+	if len(parts) > 0 {
+		header, err := encodeRecordPrefix(record)
+		if err != nil {
+			return err
+		}
+		return s.writeCapacityFile(path, append([][]byte{header}, parts...)...)
+	}
 	if body == nil {
 		return s.writeRecord(path, record)
 	}

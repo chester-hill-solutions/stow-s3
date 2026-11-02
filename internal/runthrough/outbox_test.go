@@ -3,7 +3,6 @@ package runthrough_test
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -95,15 +94,10 @@ func TestFileOutboxUpgradesLegacyAttemptedEntries(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read outbox: %v", err)
 	}
-	var written struct {
-		Version int `json:"version"`
+	if !bytes.HasPrefix(data, []byte("STOWOUT4")) {
+		t.Fatal("rewritten outbox is not the versioned protobuf format")
 	}
-	if err := json.Unmarshal(data, &written); err != nil {
-		t.Fatalf("decode rewritten outbox: %v", err)
-	}
-	if written.Version == 0 {
-		t.Fatalf("rewritten outbox is still unversioned: %s", data)
-	}
+
 }
 
 func writeOutboxFile(t *testing.T, path, contents string) {

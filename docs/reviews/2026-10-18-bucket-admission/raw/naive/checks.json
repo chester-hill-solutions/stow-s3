@@ -1,0 +1,51 @@
+[
+  {
+    "name": "format-overlay",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/naive-fs.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "naive-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/naive-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestBucketCapacityRefusalLeavesNoBucket$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 824,
+    "passed": true
+  },
+  {
+    "name": "naive-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/naive-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestBucketCapacityRefusalLeavesNoBucket$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1383,
+    "passed": true
+  }
+]

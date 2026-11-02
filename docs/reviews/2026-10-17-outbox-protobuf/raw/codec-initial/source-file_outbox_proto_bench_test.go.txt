@@ -1,0 +1,148 @@
+package runthrough
+
+import (
+	"encoding/json"
+	"os"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
+)
+
+func benchmarkEncodeOutboxJSON(state outboxState) ([]byte, error) {
+	return json.MarshalIndent(persistedOutbox{Provenance: state.provenance, Version: outboxFormatVersion, Entries: state.entries, Prepared: state.prepared, Seq: state.seq, NextToken: state.nextToken}, "", "  ")
+}
+
+func benchmarkEncodeOutboxCompactJSON(state outboxState) ([]byte, error) {
+	return json.Marshal(persistedOutbox{Provenance: state.provenance, Version: outboxFormatVersion, Entries: state.entries, Prepared: state.prepared, Seq: state.seq, NextToken: state.nextToken})
+}
+
+func benchmarkOutboxEncoding() (func(outboxState) ([]byte, error), func([]byte) (outboxState, error)) {
+	if benchmarkOutboxEncodingKind == 2 {
+		return encodeOutboxProto, decodeOutboxProto
+	}
+	if benchmarkOutboxEncodingKind == 1 {
+		return benchmarkEncodeOutboxCompactJSON, decodeOutboxState
+	}
+	return benchmarkEncodeOutboxJSON, decodeOutboxState
+}
+
+func BenchmarkOutboxEncoding(b *testing.B) {
+	for _, fixture := range []struct {
+		name   string
+		depth  int
+		queued bool
+	}{
+		{"provenance=0", 0, false}, {"provenance=128", 128, false}, {"provenance=2048", 2048, false}, {"provenance=16384", 16384, false}, {"mixed=1024", 1024, true},
+	} {
+		for _, operation := range []string{"encode", "decode", "unchanged", "changed"} {
+			b.Run(fixture.name+"/"+operation, func(b *testing.B) { benchmarkOutboxEncodingOperation(b, fixture.depth, fixture.queued, operation) })
+		}
+	}
+}
+
+func benchmarkOutboxEncodingOperation(b *testing.B, depth int, queued bool, operation string) {
+	outbox, path := seedProvenanceBenchmark(b, depth, queued)
+	encode, decode := benchmarkOutboxEncoding()
+	data, err := encode(outbox.state)
+	if err != nil {
+		b.Fatal(err)
+	}
+	if err := atomicfile.Write(path, data, 0600); err != nil {
+		b.Fatal(err)
+	}
+	if operation == "unchanged" || operation == "changed" {
+		benchmarkOutboxEncodingSave(b, outbox, path, len(data), operation == "changed")
+		return
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		if operation == "encode" {
+			data, err = encode(outbox.state)
+		} else {
+			outbox.state, err = decode(data)
+		}
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+	b.StopTimer()
+	b.ReportMetric(float64(len(data)), "journal-B")
+	state, err := decode(data)
+	if err != nil || len(state.provenance) != depth+1 {
+		b.Fatalf("decode check: provenance=%d error=%v", len(state.provenance), err)
+	}
+}
+
+func benchmarkOutboxEncodingSave(b *testing.B, outbox *FileOutbox, path string, size int, changed bool) {
+	value := UpstreamState{ETag: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+	expectedEntries := len(outbox.state.entries)
+	before := benchmarkProcessWrites(b)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		if changed {
+			if n%2 == 0 {
+				value.ETag = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+			} else {
+				value.ETag = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			}
+		}
+		var err error
+		if benchmarkOutboxEncodingKind != 0 {
+			err = benchmarkSaveEncodedOutbox(outbox, "bucket", "target", value)
+		} else {
+			err = outbox.SaveUpstreamState("bucket", "target", value)
+		}
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+	b.StopTimer()
+	after := benchmarkProcessWrites(b)
+	b.ReportMetric(float64(after-before)/float64(b.N), "written-B/op")
+	b.ReportMetric(float64(size), "journal-B")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		b.Fatal(err)
+	}
+	_, decode := benchmarkOutboxEncoding()
+	state, err := decode(data)
+	if err != nil || len(state.entries) != expectedEntries || state.provenance[outboxIdentity("bucket", "target")] != value {
+		b.Fatalf("saved value check: %+v %v", state.provenance[outboxIdentity("bucket", "target")], err)
+	}
+}
+
+// Copy the existing FileOutbox transaction for the measured prototype. Only the
+// decoder and encoder differ; native locking, reload, clone and fsync remain.
+func benchmarkSaveEncodedOutbox(o *FileOutbox, bucket, key string, value UpstreamState) error {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	lock, err := acquireOutboxFileLock(o.lockPath)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = lock.release() }()
+	data, err := os.ReadFile(o.path)
+	if err != nil {
+		return err
+	}
+	encode, decode := benchmarkOutboxEncoding()
+	o.state, err = decode(data)
+	if err != nil {
+		return err
+	}
+	o.updateSequences()
+	o.updateTokens()
+	next := o.state.clone()
+	next.provenance[outboxIdentity(bucket, key)] = value
+	data, err = encode(next)
+	if err != nil {
+		return err
+	}
+	if err := atomicfile.Write(o.path, data, 0600); err != nil {
+		return err
+	}
+	o.state = next
+	return nil
+}

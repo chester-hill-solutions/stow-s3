@@ -73,7 +73,7 @@ func (a *storeAdapter) OpenObjectRange(ctx context.Context, bucket, key string, 
 	}
 	reader, meta, err := a.GetObject(ctx, bucket, key)
 	if err != nil {
-		return nil, nil, err
+		return reader, meta, err
 	}
 	if span.Offset < 0 || span.Length < 0 || span.Offset > meta.Size || span.Length > meta.Size-span.Offset {
 		_ = reader.Close()

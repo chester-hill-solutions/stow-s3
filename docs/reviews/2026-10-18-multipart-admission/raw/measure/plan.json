@@ -1,0 +1,23 @@
+{
+  "phase": "multipart-admission-fixed-iterations",
+  "sources": [
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/capacity_multipart_test.go",
+    "internal/storage/fs/capacity_multipart_shared_test.go",
+    "internal/storage/fs/capacity_multipart_recovery_test.go",
+    "internal/storage/fs/capacity.go",
+    "benchmark/multipart-bench.go.txt",
+    "benchmark/multipart-measure.mjs",
+    "benchmark/before-overlay.json",
+    "benchmark/baseline-fs_multipart.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "measure",
+      "args": [
+        "node",
+        "benchmark/multipart-measure.mjs"
+      ]
+    }
+  ]
+}
