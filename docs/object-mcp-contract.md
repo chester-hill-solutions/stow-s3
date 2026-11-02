@@ -30,8 +30,9 @@ The token is separate from the admin token because it is a caller credential, no
 an operations one.
 A refused address is refused before the listener opens.
 
-The surface holds one workspace or one bucket for the life of the process, so the
-caller identity and the resource scope are fixed at startup.
+The surface uses one shared caller identity. Object mode fixes one bucket at
+startup. Workspace mode includes its configured workspace and workspaces
+explicitly added through the enabled handoff-adoption tool.
 Per-caller scoped access is not implemented.
 <!-- repo-only:start -->
 Per-caller scoped access is [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).

@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"context"
+	"errors"
 	"io"
+	"net"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -109,7 +111,7 @@ func TestMCPHTTPServesTheToolsOverStreamableHTTP(t *testing.T) {
 // A token makes the transport a credentialed surface, and the refusal has to be a
 // refusal rather than a silently empty session.
 func TestMCPHTTPRequiresTheTokenWhenOneIsSet(t *testing.T) {
-	endpoint := mcpHTTPTestServer(t, "--mcp-token", "s3cret")
+	endpoint := mcpHTTPTestServer(t, "--mcp-token", " s3cret ")
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
@@ -162,6 +164,11 @@ func TestMCPHTTPRefusesAnAddressBeyondLoopback(t *testing.T) {
 			wantMessage: "--mcp-token",
 		},
 		{
+			name:        "a blank explicit token is refused",
+			args:        []string{"--http-addr", "127.0.0.1:0", "--mcp-token", "   "},
+			wantMessage: "--mcp-token",
+		},
+		{
 			name:        "a malformed address is refused",
 			args:        []string{"--http-addr", "not-an-address"},
 			wantMessage: "invalid --http-addr",
@@ -170,9 +177,14 @@ func TestMCPHTTPRefusesAnAddressBeyondLoopback(t *testing.T) {
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
 			args := append([]string{"mcp", "--object-dir", t.TempDir(), "--bucket", "probe", "--create-bucket"}, testCase.args...)
-			cmd := exec.Command(binary, args...)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			cmd := exec.CommandContext(ctx, binary, args...)
 			cmd.Env = envWithout("STOW_MCP_TOKEN")
 			output, err := cmd.CombinedOutput()
+			if ctx.Err() != nil {
+				t.Fatalf("refused server did not exit: %v", ctx.Err())
+			}
 			if err == nil {
 				t.Fatalf("the server started on the refused address: %s", output)
 			}
@@ -183,5 +195,67 @@ func TestMCPHTTPRefusesAnAddressBeyondLoopback(t *testing.T) {
 				t.Errorf("the server reported a listener after refusing: %s", output)
 			}
 		})
+	}
+}
+
+func TestMCPHTTPEmptyHostIsAWildcard(t *testing.T) {
+	for _, token := range []string{"", "caller-token"} {
+		if err := validateMCPExposure(":0", token, false); err == nil {
+			t.Fatalf("wildcard host accepted without remote consent (token set: %v)", token != "")
+		}
+	}
+	if err := validateMCPExposure(":0", "", true); err == nil {
+		t.Fatal("wildcard host accepted without a token")
+	}
+	if err := validateMCPExposure(":0", "caller-token", true); err != nil {
+		t.Fatalf("explicitly consented credentialed wildcard refused: %v", err)
+	}
+}
+
+func TestMCPHTTPShutdownClosesActiveRequestsAtDeadline(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	entered := make(chan struct{})
+	stopped := make(chan struct{})
+	server := &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(entered)
+		<-r.Context().Done()
+		close(stopped)
+	})}
+	t.Cleanup(func() { _ = server.Close() })
+	go func() { _ = server.Serve(listener) }()
+	clientDone := make(chan error, 1)
+	go func() {
+		client := &http.Client{Timeout: 3 * time.Second}
+		response, err := client.Get("http://" + listener.Addr().String())
+		if response != nil {
+			_ = response.Body.Close()
+		}
+		clientDone <- err
+	}()
+	select {
+	case <-entered:
+	case <-time.After(3 * time.Second):
+		t.Fatal("request did not start")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	if err := shutdownMCPHTTP(ctx, server); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("shutdown error = %v, want deadline", err)
+	}
+	select {
+	case <-stopped:
+	case <-time.After(time.Second):
+		t.Fatal("active handler survived shutdown")
+	}
+	select {
+	case err := <-clientDone:
+		if err == nil {
+			t.Fatal("unfinished request reported success")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("client connection survived shutdown")
 	}
 }

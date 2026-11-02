@@ -24,7 +24,7 @@ type mcpCommandOptions struct {
 	allowInsecureRemote bool
 }
 
-func mcpCommand(args []string) error {
+func mcpCommand(args []string) (err error) {
 	if versionRequested(args) {
 		printVersion(os.Stdout, true)
 		return nil
@@ -44,6 +44,10 @@ func mcpCommand(args []string) error {
 	if err != nil {
 		return err
 	}
+	if options.token != "" && strings.TrimSpace(options.token) == "" {
+		return fmt.Errorf("--mcp-token must not contain only whitespace")
+	}
+	options.token = strings.TrimSpace(options.token)
 	if options.token == "" {
 		options.token = strings.TrimSpace(os.Getenv("STOW_MCP_TOKEN"))
 	}
@@ -53,7 +57,7 @@ func mcpCommand(args []string) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = closer() }()
+	defer func() { err = errors.Join(err, closer()) }()
 	if options.httpAddr != "" {
 		if err := validateMCPExposure(options.httpAddr, options.token, options.allowInsecureRemote); err != nil {
 			return err

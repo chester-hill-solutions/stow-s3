@@ -32,7 +32,8 @@ func validateMCPExposure(addr, token string, allowInsecureRemote bool) error {
 	if err != nil {
 		return fmt.Errorf("invalid --http-addr %q: want host:port", addr)
 	}
-	if listenHostIsLoopback(host) {
+	// Unlike the S3 Host default, an empty net.Listen host binds all interfaces.
+	if host != "" && listenHostIsLoopback(host) {
 		return nil
 	}
 	if !allowInsecureRemote {
@@ -103,7 +104,13 @@ func runMCPHTTP(ctx context.Context, server *mcp.Server, addr, token string) err
 	case <-ctx.Done():
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), mcpHTTPShutdownTimeout)
 		defer cancel()
-		_ = httpServer.Shutdown(shutdownCtx)
-		return nil
+		return shutdownMCPHTTP(shutdownCtx, httpServer)
 	}
+}
+
+func shutdownMCPHTTP(ctx context.Context, server *http.Server) error {
+	if err := server.Shutdown(ctx); err != nil {
+		return errors.Join(err, server.Close())
+	}
+	return nil
 }
