@@ -82,6 +82,8 @@ test("Cloudflare deploy config retains the site Worker contract and build output
   assert.match(cloudflareConfig, /compatibilityDate: "2026-10-12"/);
   assert.match(cloudflareConfig, /"stow\.chesterhillsolutions\.ca"/);
   assert.match(cloudflareConfig, /notFoundHandling: "none"/);
-  assert.match(wranglerConfig, /command: "npm run build"/);
+  const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+  assert.equal(manifest.scripts["build:cloudflare"], "npm run build && cf build");
+  assert.doesNotMatch(wranglerConfig, /cwd: "site"/);
   assert.match(wranglerConfig, /assetsDirectory: "\.build"/);
 });

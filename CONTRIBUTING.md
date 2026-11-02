@@ -8,7 +8,8 @@ and discuss substantial behavior changes before implementation. Read the
 ## Build and test
 
 Go is pinned in `.go-version`; `make` selects that toolchain. Use Node 20 or newer
-for the client and site, and Python 3.10 or newer for the Python client.
+for the client, Node 22.18 or newer for the Cloudflare site tooling, and
+Python 3.10 or newer for the Python client.
 
 ```sh
 make build build-wasm
