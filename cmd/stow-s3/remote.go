@@ -11,9 +11,12 @@ import (
 // TLS termination belongs to the host adapter, not this process (ADR 0016).
 
 // listenHostIsLoopback reports whether a listen host reaches nothing but this
-// machine. Empty and wildcard hosts select every interface, and a name that is
-// not "localhost" cannot be proven loopback from here.
+// machine. An empty host uses the server loopback default; wildcard hosts and
+// names other than "localhost" are not proven loopback here.
 func listenHostIsLoopback(host string) bool {
+	if host == "" {
+		return true
+	}
 	trimmed := strings.TrimSpace(host)
 	if trimmed == "" {
 		return false
@@ -38,7 +41,7 @@ func validateRemoteExposure(options serveFlags) error {
 	if options.accessKey == "" || options.secretKey == "" {
 		return fmt.Errorf("serving on %q requires --access-key and --secret-key (or STOW_LOCAL_ACCESS_KEY_ID and STOW_LOCAL_SECRET_ACCESS_KEY): without them this process generates a pair and reports it only to its own stdout, which no remote client can read", options.host)
 	}
-	if options.adminToken == "" {
+	if strings.TrimSpace(options.adminToken) == "" {
 		return fmt.Errorf("serving on %q requires --admin-token (or STOW_ADMIN_TOKEN): without one the diagnostic and metrics routes answer 404 to every caller that is not loopback, so health, status and inspection are unavailable to the deployment", options.host)
 	}
 	return nil

@@ -95,7 +95,7 @@ stow mode: local
 
 In local mode, the banner says `upstream: not in use`.
 Run-through mode reports an `override:` note.
-A `mirrorWrites` policy without live-write consent keeps writes local and reports this in the banner.
+A `mirrorWrites` policy without live-write consent refuses mutations when upstream use is enabled; it stays local when upstream use is unavailable or unauthorized.
 Set `--mode local` explicitly in launchers that require local-only storage.
 
 ## Serving beyond loopback
@@ -113,8 +113,12 @@ A remote bind requires those three values, from flags or from
 Without credentials the process generates a pair and reports it only to its own stdout, which no remote client can read.
 Without an admin token the diagnostic routes answer `404` to every caller that is not loopback.
 
-Prefer keeping the process on loopback and terminating TLS in a proxy on the same host: that shape needs no consent flag and exposes no other interface.
+Prefer keeping the process on loopback and terminating TLS in a proxy on the same host: that shape needs no consent flag and exposes no other interface. The proxy must set forwarding headers (for example `X-Forwarded-For`) or restrict `/_stow/*`; otherwise proxy-originated requests can qualify for token-free loopback diagnostics.
 [Run-through mode](run-through.md#serving-a-shared-cache-node) describes that deployment as a shared cache node.
+
+TypeScript callers that deliberately bind remotely use `allowInsecureRemote: true`
+and provision `accessKey`, `secretKey` and `adminToken`. The token is passed in
+the child environment, never the process arguments. Loopback callers need no opt-in.
 
 One server serves one credential pair and one environment authority: every client shares them.
 Scoped per-caller principals are not implemented yet.

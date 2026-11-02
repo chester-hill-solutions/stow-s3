@@ -250,7 +250,7 @@ interface EmbeddedCapabilities {
 | `multipart` | `boolean` | No | Whether this handle supports multipart operations. |
 | `upstream` | `boolean` | No | Whether this handle can use an upstream provider. |
 | `conditionalWrites` | `boolean \| undefined` | Yes | Whether atomic ETag write conditions are supported. |
-| `guardedSaves` | `boolean \| undefined` | Yes | Whether this runtime can observe an object and publish against that observation, so a save can be retried without writing twice. |
+| `guardedSaves` | `boolean \| undefined` | Yes | Whether the underlying runtime can compare an observation atomically at publication. |
 | `durableSaveRequests` | `boolean \| undefined` | Yes | Whether a save request key is retained, so a lost reply can be resolved. |
 | `recoveryHolds` | `boolean \| undefined` | Yes | Whether an observed object's bytes can be protected from mutation until release. |
 | `hostMaintenance` | `boolean \| undefined` | Yes | Whether namespace recovery inspection and garbage collection are supported. |
@@ -1206,6 +1206,8 @@ interface StartOptions {
   buckets?: string[] | undefined;
   port?: number | undefined;
   host?: string | undefined;
+  allowInsecureRemote?: boolean | undefined;
+  adminToken?: string | undefined;
   timeoutMs?: number | undefined;
   signal?: AbortSignal | undefined;
   region?: string | undefined;
@@ -1238,6 +1240,8 @@ interface StartOptions {
 | `buckets` | `string[] \| undefined` | Yes | Buckets to create before startup resolves, or buckets returned by inspection. |
 | `port` | `number \| undefined` | Yes | Requested native TCP port; zero selects an ephemeral port. |
 | `host` | `string \| undefined` | Yes | Bind address; native default is 127.0.0.1. |
+| `allowInsecureRemote` | `boolean \| undefined` | Yes | Explicit consent to bind beyond loopback; requires provisioned credentials and adminToken. |
+| `adminToken` | `string \| undefined` | Yes | Credential for admin routes, passed only to the child environment. |
 | `timeoutMs` | `number \| undefined` | Yes | Startup deadline in milliseconds; see the defaults table for this interface. |
 | `signal` | `AbortSignal \| undefined` | Yes | AbortSignal for cancellation. A started write can still commit. |
 | `region` | `string \| undefined` | Yes | Region used for S3 signing; native default is us-east-1. |

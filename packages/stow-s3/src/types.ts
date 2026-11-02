@@ -18,6 +18,10 @@ export interface StartOptions {
   buckets?: string[];
   port?: number;
   host?: string;
+  /** Explicit consent to bind beyond loopback; requires provisioned credentials and adminToken. */
+  allowInsecureRemote?: boolean;
+  /** Credential for admin routes, passed only to the child environment. */
+  adminToken?: string;
   /**
    * Milliseconds allowed for the whole startup: becoming ready and creating the
    * requested buckets. Defaults to 10 seconds.

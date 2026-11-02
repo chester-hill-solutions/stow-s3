@@ -128,6 +128,9 @@ stow-s3 serve --mode run-through \
   --access-key "$ACCESS_KEY" --secret-key "$SECRET_KEY"
 ```
 
+Configure that proxy to send forwarding headers (such as `X-Forwarded-For`) or
+restrict `/_stow/*`, so proxied clients cannot inherit token-free loopback diagnostics.
+
 A process that must listen on another interface needs the consent flag and provisioned credentials that [the server guide](running-and-probing.md#serving-beyond-loopback) describes.
 That shape is for a network you control, and the proxy shape above is still the one to prefer.
 
