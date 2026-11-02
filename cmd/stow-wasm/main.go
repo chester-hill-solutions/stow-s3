@@ -87,9 +87,10 @@ type objectResult struct {
 }
 
 type listResult struct {
-	Objects    []objectResult `json:"objects"`
-	Truncated  bool           `json:"truncated"`
-	NextCursor string         `json:"nextCursor,omitempty"`
+	Objects        []objectResult `json:"objects"`
+	Truncated      bool           `json:"truncated"`
+	NextCursor     string         `json:"nextCursor,omitempty"`
+	CommonPrefixes []string       `json:"commonPrefixes,omitempty"`
 }
 
 type bucketResult struct {

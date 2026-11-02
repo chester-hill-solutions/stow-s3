@@ -302,6 +302,7 @@ Returns: `EmbeddedBinaryResponse`.
 ```ts
 interface EmbeddedListOptions {
   prefix?: string | undefined;
+  delimiter?: string | undefined;
   cursor?: string | undefined;
   limit?: number | undefined;
 }
@@ -310,6 +311,7 @@ interface EmbeddedListOptions {
 | Field | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `prefix` | `string \| undefined` | Yes | Only list keys beginning with this prefix. |
+| `delimiter` | `string \| undefined` | Yes | Groups keys that share it into `commonPrefixes`; empty lists every key. |
 | `cursor` | `string \| undefined` | Yes | Opaque continuation value returned by the previous page. |
 | `limit` | `number \| undefined` | Yes | Maximum results per page; limits and defaults depend on the listing API. |
 
@@ -350,6 +352,7 @@ interface EmbeddedObjectPage {
   objects: EmbeddedObject[];
   truncated: boolean;
   nextCursor?: string | undefined;
+  commonPrefixes?: string[] | undefined;
 }
 ```
 
@@ -358,6 +361,7 @@ interface EmbeddedObjectPage {
 | `objects` | `EmbeddedObject[]` | No | Objects returned by the listing or persistence snapshot. |
 | `truncated` | `boolean` | No | Whether additional matching objects remain. |
 | `nextCursor` | `string \| undefined` | Yes | Continuation value for the next page when truncated is true. |
+| `commonPrefixes` | `string[] \| undefined` | Yes | The delimiter groups this page collapsed, in row order. |
 
 ## EmbeddedPutOptions
 

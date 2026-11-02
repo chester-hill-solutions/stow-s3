@@ -171,7 +171,6 @@ func (UpstreamConfig) FromEnv() (UpstreamConfig, bool) {
 	}, true
 }
 
-// ConfigFromEnv builds a Config from environment variables.
 func ConfigFromEnv() Config {
 	upstream, hasUpstream := (UpstreamConfig{}).FromEnv()
 

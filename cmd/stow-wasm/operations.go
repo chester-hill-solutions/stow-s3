@@ -105,9 +105,10 @@ func handleListObjects(ctx context.Context, instance *stow.Runtime, req request)
 		return nil, err
 	}
 	result := listResult{
-		Objects:    make([]objectResult, 0, len(page.Objects)),
-		Truncated:  page.Truncated,
-		NextCursor: page.NextCursor,
+		Objects:        make([]objectResult, 0, len(page.Objects)),
+		Truncated:      page.Truncated,
+		NextCursor:     page.NextCursor,
+		CommonPrefixes: append([]string(nil), page.CommonPrefixes...),
 	}
 	for _, object := range page.Objects {
 		result.Objects = append(result.Objects, objectResultOf(object))
