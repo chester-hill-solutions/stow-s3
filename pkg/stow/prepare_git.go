@@ -93,7 +93,7 @@ func initializeTaskRepository(destination string) error {
 }
 
 func fetchAndCheckout(destination, hooksDirectory, source, commit string, budget *seedContext) error {
-	if _, err := gitCommand(destination, "-c", "protocol.file.allow=always", "fetch", "--no-tags", "--depth=1", "--no-recurse-submodules", "--", source, commit); err != nil {
+	if _, err := gitCommand(destination, "-c", "protocol.file.allow=always", "fetch", "--no-auto-maintenance", "--no-tags", "--depth=1", "--no-recurse-submodules", "--", source, commit); err != nil {
 		return fmt.Errorf("stow: fetch Git commit %q from %q: %w", commit, source, err)
 	}
 	if err := os.Remove(filepath.Join(destination, ".git", "FETCH_HEAD")); err != nil {
