@@ -1,0 +1,52 @@
+package workspace
+
+import (
+	"crypto/md5"
+	"fmt"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"io"
+	"os"
+	"sort"
+	"strconv"
+	"strings"
+)
+
+func (s *Store) listPartFiles(id string) ([]storage.PartInfo, error) {
+	entries, err := os.ReadDir(s.uploadDir(id))
+	if err != nil {
+		return nil, err
+	}
+	var parts []storage.PartInfo
+	buffer := make([]byte, 32<<10)
+	hash := md5.New()
+	for _, entry := range entries {
+		if !strings.HasPrefix(entry.Name(), "part-") {
+			continue
+		}
+		number, err := strconv.Atoi(strings.TrimPrefix(entry.Name(), "part-"))
+		if err != nil || number < 1 || number > 10000 {
+			return nil, storage.ErrInvalidPart
+		}
+		file, err := os.Open(s.partPath(id, number))
+		if err != nil {
+			return nil, err
+		}
+		info, err := file.Stat()
+		if err != nil {
+			file.Close()
+			return nil, err
+		}
+		hash.Reset()
+		_, err = io.CopyBuffer(hash, file, buffer)
+		closeErr := file.Close()
+		if err != nil {
+			return nil, err
+		}
+		if closeErr != nil {
+			return nil, closeErr
+		}
+		parts = append(parts, storage.PartInfo{PartNumber: number, ETag: fmt.Sprintf("\"%x\"", hash.Sum(nil)), Size: info.Size(), LastModified: info.ModTime().UTC()})
+	}
+	sort.Slice(parts, func(i, j int) bool { return parts[i].PartNumber < parts[j].PartNumber })
+	return parts, nil
+}

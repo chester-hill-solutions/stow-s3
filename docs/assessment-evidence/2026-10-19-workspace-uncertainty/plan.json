@@ -1,0 +1,193 @@
+{
+  "phase": "c04-workspace-uncertainty",
+  "sources": [
+    "internal/rooted/root.go",
+    "internal/rooted/regular_unix.go",
+    "internal/storage/errors.go",
+    "internal/storage/workspace/buckets.go",
+    "internal/storage/workspace/list_rooted.go",
+    "internal/storage/workspace/objects.go",
+    "internal/storage/workspace/resolve.go",
+    "internal/storage/workspace/rooted_reads.go",
+    "internal/storage/workspace/absence.go",
+    "internal/storage/workspace/uncertain_absence_test.go",
+    "internal/s3api/uncertain_absence_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-l",
+        "internal/rooted",
+        "internal/storage",
+        "internal/s3api"
+      ]
+    },
+    {
+      "name": "red-normal",
+      "expected": 1,
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage/workspace",
+        "-run",
+        "^TestClosureWorkspaceUnreadable$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "red-race",
+      "expected": 1,
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/before-overlay.json",
+        "./internal/storage/workspace",
+        "-run",
+        "^TestClosureWorkspaceUnreadable$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "uncertain-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/workspace",
+        "./internal/s3api",
+        "-run",
+        "^(TestACreateOnlyWriteDoesNotReplaceAnObjectItCannotRead|TestAListingDoesNotReportAnObjectItCannotReadAsAbsent|TestACreateOnlyWriteUnderAnUnreadableDirectoryIsRefused|TestAReadableObjectStillRefusesACreateOnlyWriteAndAnAbsentKeyIsAbsent|TestAnUnreadableObjectIsNotReportedAsMissing)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "uncertain-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/workspace",
+        "./internal/s3api",
+        "-run",
+        "^(TestACreateOnlyWriteDoesNotReplaceAnObjectItCannotRead|TestAListingDoesNotReportAnObjectItCannotReadAsAbsent|TestACreateOnlyWriteUnderAnUnreadableDirectoryIsRefused|TestAReadableObjectStillRefusesACreateOnlyWriteAndAnAbsentKeyIsAbsent|TestAnUnreadableObjectIsNotReportedAsMissing)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "workspace-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/workspace",
+        "./internal/rooted",
+        "./internal/s3api",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "workspace-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/workspace",
+        "./internal/rooted",
+        "./internal/s3api",
+        "-count=1"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "/bin/sh",
+        "-c",
+        "go list ./... | grep -v 'internal/parentwatch$' | xargs go test"
+      ]
+    },
+    {
+      "name": "full-race",
+      "args": [
+        "/bin/sh",
+        "-c",
+        "go list ./... | grep -v 'internal/parentwatch$' | xargs go test -race"
+      ]
+    },
+    {
+      "name": "parentwatch",
+      "expected": 1,
+      "args": [
+        "go",
+        "test",
+        "./internal/parentwatch/",
+        "-count=1",
+        "-v"
+      ]
+    },
+    {
+      "name": "pdeathsig",
+      "expected": 1,
+      "args": [
+        "/bin/sh",
+        "-c",
+        "cd benchmark/pdeathsig && go run ."
+      ]
+    },
+    {
+      "name": "conformance",
+      "args": [
+        "make",
+        "test-conformance"
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ]
+    },
+    {
+      "name": "doc-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ]
+    }
+  ]
+}

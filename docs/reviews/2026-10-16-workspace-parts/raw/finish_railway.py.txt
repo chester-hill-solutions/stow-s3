@@ -1,0 +1,16 @@
+from pathlib import Path
+import subprocess,os,json
+p=Path('/private/tmp/stow-workspace-parts-2026-10-16');cli='/Users/ladmin/.npm/_npx/840d6e3429277c8b/node_modules/@railway/cli/bin/railway'
+env=dict(os.environ,RAILWAY_CALLER='skill:use-railway@1.6.1',RAILWAY_AGENT_SESSION='stow-workspace-parts-20261016')
+base=[cli];scope=['--project','8d90188e-0f1e-4c47-9379-9399ae06e6fa','--environment','3cd200cb-c94f-4e4d-9335-0f6c1b7e9411','--service','83497842-c51d-420e-8ba1-181589730ad4']
+def run(args):
+ q=subprocess.run(base+args,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=55)
+ assert q.returncode==0,q.stdout
+ return q.stdout
+before=json.loads(run(['deployment','list',*scope,'--limit','2','--json']));(p/'railway-fixed-deployments.json').write_text(json.dumps(before,indent=2)+'\n')
+assert before[0]['id']=='0c2379a7-b8d3-4714-8f7c-14ebc5889082' and before[0]['status']=='SUCCESS'
+jobs=[json.loads((p/name).read_text()) for name in ['railway-volume-start.json','railway-fixed-volume-start.json']]
+js="const fs=require('node:fs');const jobs="+json.dumps(jobs)+";for(const job of jobs){const run=JSON.parse(fs.readFileSync(job.root+'/run.json'));if(!run.complete)throw Error('Incomplete job');if(!job.tmp.startsWith('/results/stow-parts-tmp-'))throw Error('Unknown tmp path');fs.rmdirSync(job.tmp);console.log(JSON.stringify({removedEmptyDirectory:job.tmp,runComplete:run.complete}))}"
+cleanup=run(['ssh',*scope,'--','node','-e',js]);(p/'railway-temp-cleanup.log').write_text(cleanup)
+print(cleanup)
+out=run(['down',*scope,'--yes']);(p/'railway-down.log').write_text(out);print(out)

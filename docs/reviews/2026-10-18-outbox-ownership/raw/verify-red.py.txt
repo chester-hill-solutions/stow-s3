@@ -1,0 +1,16 @@
+from pathlib import Path
+from collections import Counter
+import re,json,sys
+p=Path('/private/tmp/stow-outbox-ownership-2026-10-18');job=json.loads((p/((sys.argv[1]if len(sys.argv)>1 else'before')+'-start.json')).read_text());d=p/('export-'+job['id']);run=json.loads((d/'run.json').read_text());assert run['complete']and run['success'];out={}
+for log in ['regression-normal','regression-race']:
+ counts=Counter()
+ for line in(d/(log+'.log')).read_text().splitlines():
+  m=re.match(r'^--- (PASS|FAIL|SKIP): (TestOutboxOwnership\S+)',line.strip())
+  if m:counts[(m[1],m[2])]+=1
+ leaves={n for _,n in counts if not any(other.startswith(n+'/')for _,other in counts)}
+ summary={s:sum(v for(status,n),v in counts.items()if status==s and n in leaves)for s in ['PASS','FAIL','SKIP']}
+ assert len(leaves)==114 and summary=={'PASS':144,'FAIL':84,'SKIP':0},(len(leaves),summary)
+ assert all(counts.get(('FAIL',n),0)==(2 if n.startswith('TestOutboxOwnershipRequiresIssuedCredentials/')else 0)for n in leaves)
+ assert all(sum(counts.get((s,n),0)for s in ['PASS','FAIL','SKIP'])==2 for n in leaves)
+ out[log]={'distinctCases':114,'counts':summary,'cases':{n:{s:counts.get((s,n),0)for s in ['PASS','FAIL','SKIP']}for n in sorted(leaves)}}
+(d/'red-receipt.json').write_text(json.dumps(out,indent=2)+'\n');print('Verified 42 distinct original failures and 72 passing controls, each twice normal/race')

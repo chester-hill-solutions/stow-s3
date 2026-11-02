@@ -1,0 +1,108 @@
+package workspace
+
+import (
+	"encoding/binary"
+	"encoding/json"
+	"errors"
+	"github.com/chester-hill-solutions/stow-s3/internal/atomicfile"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"io"
+	"os"
+	"sort"
+	"strconv"
+	"strings"
+)
+
+var errPartRecord = errors.New("workspace store: invalid multipart part record")
+
+const partRecordMagic = "STOWPART1"
+const partRecordPrefix = len(partRecordMagic) + 4
+
+func writePartRecord(path string, part storage.PartInfo, data []byte) error {
+	raw, err := json.Marshal(part)
+	if err != nil {
+		return err
+	}
+	prefix := make([]byte, partRecordPrefix+len(raw))
+	copy(prefix, partRecordMagic)
+	binary.LittleEndian.PutUint32(prefix[len(partRecordMagic):], uint32(len(raw)))
+	copy(prefix[partRecordPrefix:], raw)
+	return atomicfile.WriteParts(path, 0644, prefix, data)
+}
+func openPartRecord(path string, number int) (*os.File, storage.PartInfo, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, storage.PartInfo{}, err
+	}
+	part, err := readPartHeader(file, number)
+	if err != nil {
+		file.Close()
+		return nil, part, err
+	}
+	return file, part, nil
+}
+func readPartHeader(file *os.File, number int) (storage.PartInfo, error) {
+	var part storage.PartInfo
+	var prefix [partRecordPrefix]byte
+	if _, err := io.ReadFull(file, prefix[:]); err != nil {
+		return part, err
+	}
+	size := binary.LittleEndian.Uint32(prefix[len(partRecordMagic):])
+	if string(prefix[:len(partRecordMagic)]) != partRecordMagic || size == 0 || size > 1024 {
+		return part, errPartRecord
+	}
+	raw := make([]byte, int(size))
+	if _, err := io.ReadFull(file, raw); err != nil {
+		return part, err
+	}
+	if err := json.Unmarshal(raw, &part); err != nil {
+		return part, err
+	}
+	info, err := file.Stat()
+	if err != nil {
+		return part, err
+	}
+	if part.PartNumber != number || part.Size < 0 || part.Size != info.Size()-int64(partRecordPrefix)-int64(size) || len(part.ETag) != 34 {
+		return part, errPartRecord
+	}
+	return part, nil
+}
+func readPartRecord(path string, number int) ([]byte, error) {
+	file, part, err := openPartRecord(path, number)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	if part.Size > int64(int(^uint(0)>>1)) {
+		return nil, errPartRecord
+	}
+	data := make([]byte, int(part.Size))
+	_, err = io.ReadFull(file, data)
+	return data, err
+}
+func (s *Store) listPartFiles(id string) ([]storage.PartInfo, error) {
+	entries, err := os.ReadDir(s.uploadDir(id))
+	if err != nil {
+		return nil, err
+	}
+	var parts []storage.PartInfo
+	for _, entry := range entries {
+		if !strings.HasPrefix(entry.Name(), "part-") {
+			continue
+		}
+		number, err := strconv.Atoi(strings.TrimPrefix(entry.Name(), "part-"))
+		if err != nil || number < 1 || number > 10000 {
+			return nil, errPartRecord
+		}
+		file, part, err := openPartRecord(s.partPath(id, number), number)
+		if err != nil {
+			return nil, err
+		}
+		if err := file.Close(); err != nil {
+			return nil, err
+		}
+		parts = append(parts, part)
+	}
+	sort.Slice(parts, func(i, j int) bool { return parts[i].PartNumber < parts[j].PartNumber })
+	return parts, nil
+}

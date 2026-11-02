@@ -1,0 +1,63 @@
+{
+  "phase": "outbox-protobuf-codec-final-verification",
+  "sources": [
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_selector_test.go",
+    "internal/runthrough/file_outbox_proto_bench_test.go",
+    "internal/runthrough/file_outbox_proto_test.go",
+    "internal/runthrough/outboxpb/outbox.proto",
+    "internal/runthrough/outboxpb/outbox.pb.go",
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/file_outbox_proto.go",
+        "internal/runthrough/file_outbox_proto_selector_test.go",
+        "internal/runthrough/file_outbox_proto_bench_test.go",
+        "internal/runthrough/file_outbox_proto_test.go",
+        "internal/runthrough/outboxpb/outbox.pb.go",
+        "internal/runthrough/file_outbox.go",
+        "internal/runthrough/file_outbox_provenance_bench_test.go"
+      ]
+    },
+    {
+      "name": "codec-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProto|TestFileOutboxReports|TestOutboxFence)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "codec-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestOutboxProto|TestFileOutboxReports|TestOutboxFence)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

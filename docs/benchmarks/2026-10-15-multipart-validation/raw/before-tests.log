@@ -1,0 +1,125 @@
+=== RUN   TestMultipartValidationErrors
+=== RUN   TestMultipartValidationErrors/success
+=== RUN   TestMultipartValidationErrors/wrong-bucket
+=== RUN   TestMultipartValidationErrors/wrong-key
+=== RUN   TestMultipartValidationErrors/missing
+    multipart_validation_test.go:52: error=stow: object not found want identical multipart upload not found
+=== RUN   TestMultipartValidationErrors/wrapped-missing
+    multipart_validation_test.go:52: error=lookup: stow: object not found want identical multipart upload not found
+=== RUN   TestMultipartValidationErrors/internal-missing
+=== RUN   TestMultipartValidationErrors/unknown
+=== RUN   TestMultipartValidationErrors/committed-missing
+=== RUN   TestMultipartValidationErrors/missing-committed
+--- FAIL: TestMultipartValidationErrors (0.00s)
+    --- PASS: TestMultipartValidationErrors/success (0.00s)
+    --- PASS: TestMultipartValidationErrors/wrong-bucket (0.00s)
+    --- PASS: TestMultipartValidationErrors/wrong-key (0.00s)
+    --- FAIL: TestMultipartValidationErrors/missing (0.00s)
+    --- FAIL: TestMultipartValidationErrors/wrapped-missing (0.00s)
+    --- PASS: TestMultipartValidationErrors/internal-missing (0.00s)
+    --- PASS: TestMultipartValidationErrors/unknown (0.00s)
+    --- PASS: TestMultipartValidationErrors/committed-missing (0.00s)
+    --- PASS: TestMultipartValidationErrors/missing-committed (0.00s)
+=== RUN   TestMultipartValidationErrors
+=== RUN   TestMultipartValidationErrors/success
+=== RUN   TestMultipartValidationErrors/wrong-bucket
+=== RUN   TestMultipartValidationErrors/wrong-key
+=== RUN   TestMultipartValidationErrors/missing
+    multipart_validation_test.go:52: error=stow: object not found want identical multipart upload not found
+=== RUN   TestMultipartValidationErrors/wrapped-missing
+    multipart_validation_test.go:52: error=lookup: stow: object not found want identical multipart upload not found
+=== RUN   TestMultipartValidationErrors/internal-missing
+=== RUN   TestMultipartValidationErrors/unknown
+=== RUN   TestMultipartValidationErrors/committed-missing
+=== RUN   TestMultipartValidationErrors/missing-committed
+--- FAIL: TestMultipartValidationErrors (0.00s)
+    --- PASS: TestMultipartValidationErrors/success (0.00s)
+    --- PASS: TestMultipartValidationErrors/wrong-bucket (0.00s)
+    --- PASS: TestMultipartValidationErrors/wrong-key (0.00s)
+    --- FAIL: TestMultipartValidationErrors/missing (0.00s)
+    --- FAIL: TestMultipartValidationErrors/wrapped-missing (0.00s)
+    --- PASS: TestMultipartValidationErrors/internal-missing (0.00s)
+    --- PASS: TestMultipartValidationErrors/unknown (0.00s)
+    --- PASS: TestMultipartValidationErrors/committed-missing (0.00s)
+    --- PASS: TestMultipartValidationErrors/missing-committed (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/embedded	0.601s
+=== RUN   TestCustomMissingUploadS3Status
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/upload-part
+2026/10/15 18:30:39 PUT /s3 500 219.542µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>f830eea59dd6e5f57cda55d74f1715c3</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/complete
+2026/10/15 18:30:39 POST /s3 500 37.875µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>ba250b0f6c0cebe4fc6c11428e88703a</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/abort
+2026/10/15 18:30:39 DELETE /s3 500 15.375µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>4a448a4bf1388b9a5106df8607cc7427</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/list-parts
+2026/10/15 18:30:39 GET /s3 500 12.792µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>921d88bce996aa4eabbde0d4c26a6ca2</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/upload-part
+2026/10/15 18:30:39 PUT /s3 500 16.833µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>e818221d16da4ca5677fc8e846187756</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/complete
+2026/10/15 18:30:39 POST /s3 500 10.5µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>813899ddbc302ecd8d029d7cd41652e9</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/abort
+2026/10/15 18:30:39 DELETE /s3 500 12.583µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>8214c758bc0386fc8368d80e83cffbc6</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/list-parts
+2026/10/15 18:30:39 GET /s3 500 24.292µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>4448144d24624d1b93f313fad9987a3a</RequestId></Error>
+--- FAIL: TestCustomMissingUploadS3Status (0.00s)
+    --- FAIL: TestCustomMissingUploadS3Status/wrapped=false (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/upload-part (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/complete (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/abort (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/list-parts (0.00s)
+    --- FAIL: TestCustomMissingUploadS3Status/wrapped=true (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/upload-part (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/complete (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/abort (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/list-parts (0.00s)
+=== RUN   TestCustomMissingUploadS3Status
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/upload-part
+2026/10/15 18:30:39 PUT /s3 500 531.583µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>b1e5d36bda951c21d558f7000c3bc2ed</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/complete
+2026/10/15 18:30:39 POST /s3 500 22.625µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>0b2558669399e0f4f2e0639e35bbf6f7</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/abort
+2026/10/15 18:30:39 DELETE /s3 500 15.417µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>5f5c3f9dd25269fd5ff792da0d1c306b</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=false/list-parts
+2026/10/15 18:30:39 GET /s3 500 15.375µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>469d41b4edc5850a143ef0ba0145006d</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/upload-part
+2026/10/15 18:30:39 PUT /s3 500 33.375µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>7fefd683a0bf38ada0d73f1cc466b6a1</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/complete
+2026/10/15 18:30:39 POST /s3 500 85.958µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>a01e1da09290f5f5b4fd9ae83655ae00</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/abort
+2026/10/15 18:30:39 DELETE /s3 500 14.75µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>7d91ec2fd02f946941c42c4ed4c0d3cc</RequestId></Error>
+=== RUN   TestCustomMissingUploadS3Status/wrapped=true/list-parts
+2026/10/15 18:30:39 GET /s3 500 11.417µs
+    multipart_validation_test.go:50: missing upload status=500 body=<Error><Code>InternalError</Code><Message>internal storage error</Message><Resource>/probe/target</Resource><RequestId>7eac12c26ba3fbdc1e732b146c8ca48e</RequestId></Error>
+--- FAIL: TestCustomMissingUploadS3Status (0.00s)
+    --- FAIL: TestCustomMissingUploadS3Status/wrapped=false (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/upload-part (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/complete (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/abort (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=false/list-parts (0.00s)
+    --- FAIL: TestCustomMissingUploadS3Status/wrapped=true (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/upload-part (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/complete (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/abort (0.00s)
+        --- FAIL: TestCustomMissingUploadS3Status/wrapped=true/list-parts (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.592s
+FAIL

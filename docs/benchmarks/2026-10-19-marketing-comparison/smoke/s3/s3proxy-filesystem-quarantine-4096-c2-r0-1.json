@@ -1,0 +1,272 @@
+{
+  "scenario": {
+    "backend": "filesystem",
+    "workload": "quarantine",
+    "bytes": 4096,
+    "concurrency": 2,
+    "rate": 0,
+    "soak": false,
+    "implementation": "s3proxy-filesystem"
+  },
+  "startupMs": 1009.0329259999999,
+  "firstWriteMs": 1079.4770280000084,
+  "firstWriteBytes": 4096,
+  "firstWriteVerified": true,
+  "warmup": null,
+  "load": {
+    "mode": "closed-loop capacity",
+    "offered": 47,
+    "dropped": 0,
+    "failed": 0,
+    "successful": 47,
+    "windowSuccessful": 45,
+    "peakQueue": 0,
+    "expiredBeforeStart": 0,
+    "errors": {},
+    "measuredSeconds": 0.5,
+    "drainMs": 35.634,
+    "filesPerSecond": 90,
+    "responseLatencyMs": {
+      "samples": 47,
+      "mean": 22.774,
+      "p50": 15.705,
+      "p95": 51.32,
+      "p99": 52.688,
+      "max": 52.688
+    },
+    "serviceLatencyMs": {
+      "samples": 47,
+      "mean": 22.773,
+      "p50": 15.705,
+      "p95": 51.32,
+      "p99": 52.687,
+      "max": 52.687
+    },
+    "queueWaitMs": {
+      "samples": 47,
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.002,
+      "p99": 0.005,
+      "max": 0.005
+    },
+    "schedulerLagMs": {
+      "samples": 0,
+      "mean": null,
+      "p50": null,
+      "p95": null,
+      "p99": null,
+      "max": null
+    },
+    "perSecond": [
+      {
+        "second": 0,
+        "offered": 47,
+        "dropped": 0,
+        "successful": 45,
+        "failed": 0,
+        "peakQueue": 0
+      }
+    ]
+  },
+  "resources": {
+    "intervalSeconds": 0.541267356999997,
+    "sampleIntervalMs": 250,
+    "samples": [
+      {
+        "elapsedSeconds": 0.0032947649999987335,
+        "process": {
+          "rssBytes": 176504832,
+          "highWaterRssBytes": 178765824,
+          "cpuSeconds": 2.36,
+          "readBytes": 0,
+          "writtenBytes": 53248
+        },
+        "diskAvailableBytes": 4935630848,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 25369359\nuser_usec 22291004\nsystem_usec 3078354\nnice_usec 0\nnr_periods 190\nnr_throttled 95\nthrottled_usec 9190135\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 201445376,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 48588676\nuser_usec 40046323\nsystem_usec 8542352\nnice_usec 0\nnr_periods 534\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.25692197499999747,
+        "process": {
+          "rssBytes": 179601408,
+          "highWaterRssBytes": 179601408,
+          "cpuSeconds": 2.86,
+          "readBytes": 0,
+          "writtenBytes": 229376
+        },
+        "diskAvailableBytes": 4935622656,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 25875551\nuser_usec 22738439\nsystem_usec 3137112\nnice_usec 0\nnr_periods 192\nnr_throttled 97\nthrottled_usec 9291917\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 208523264,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 48660938\nuser_usec 40104908\nsystem_usec 8556030\nnice_usec 0\nnr_periods 537\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.512688012999999,
+        "process": {
+          "rssBytes": 191320064,
+          "highWaterRssBytes": 191320064,
+          "cpuSeconds": 3.37,
+          "readBytes": 0,
+          "writtenBytes": 438272
+        },
+        "diskAvailableBytes": 4935606272,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 26393711\nuser_usec 23205334\nsystem_usec 3188376\nnice_usec 0\nnr_periods 195\nnr_throttled 100\nthrottled_usec 9512315\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 231723008,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 48737147\nuser_usec 40163873\nsystem_usec 8573274\nnice_usec 0\nnr_periods 539\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      {
+        "elapsedSeconds": 0.5408656219999975,
+        "process": {
+          "rssBytes": 191381504,
+          "highWaterRssBytes": 191381504,
+          "cpuSeconds": 3.38,
+          "readBytes": 0,
+          "writtenBytes": 438272
+        },
+        "diskAvailableBytes": 4935630848,
+        "cgroup": {
+          "cpuMax": "200000 100000",
+          "memoryMax": "2147483648",
+          "cpuStat": "usage_usec 26404444\nuser_usec 23216067\nsystem_usec 3188376\nnice_usec 0\nnr_periods 195\nnr_throttled 100\nthrottled_usec 9512315\nnr_bursts 0\nburst_usec 0"
+        },
+        "generatorRssBytes": 232116224,
+        "generatorCgroup": {
+          "cpuMax": "400000 100000",
+          "memoryMax": "4294967296",
+          "cpuStat": "usage_usec 48738935\nuser_usec 40165346\nsystem_usec 8573588\nnice_usec 0\nnr_periods 540\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    ],
+    "serverPeakSampledRssBytes": 191381504,
+    "serverHighWaterRssBytes": 191381504,
+    "serverAverageCpuPercent": 188.446612715277,
+    "generatorPeakSampledRssBytes": 232116224,
+    "generatorCpuSeconds": 0.153002,
+    "generatorEventLoopDelayMs": {
+      "mean": 20.10873856,
+      "max": 21.200895
+    },
+    "diskReadBytes": 0,
+    "diskWrittenBytes": 385024,
+    "minimumSampledDiskAvailableBytes": 4935606272,
+    "diskHeadroomMaintained": true
+  },
+  "measurements": {
+    "operations": {
+      "put": {
+        "latencyMs": {
+          "samples": 47,
+          "mean": 4.327,
+          "p50": 2.301,
+          "p95": 16.671,
+          "p99": 39.151,
+          "max": 39.151
+        },
+        "successful": 47,
+        "failed": 0,
+        "windowSuccessful": 47,
+        "windowFailed": 0,
+        "windowBytes": 192512,
+        "successfulBytes": 192512,
+        "requestsPerSecond": 94,
+        "payloadMiBPerSecond": 0.367,
+        "completedAttemptsPerSecond": 94
+      },
+      "get": {
+        "latencyMs": {
+          "samples": 47,
+          "mean": 3.322,
+          "p50": 2.146,
+          "p95": 14.076,
+          "p99": 28.745,
+          "max": 28.745
+        },
+        "successful": 47,
+        "failed": 0,
+        "windowSuccessful": 45,
+        "windowFailed": 0,
+        "windowBytes": 184320,
+        "successfulBytes": 192512,
+        "requestsPerSecond": 90,
+        "payloadMiBPerSecond": 0.352,
+        "completedAttemptsPerSecond": 90
+      },
+      "verdict": {
+        "latencyMs": {
+          "samples": 47,
+          "mean": 6.926,
+          "p50": 2.442,
+          "p95": 40.418,
+          "p99": 43.066,
+          "max": 43.066
+        },
+        "successful": 47,
+        "failed": 0,
+        "windowSuccessful": 45,
+        "windowFailed": 0,
+        "windowBytes": 4725,
+        "successfulBytes": 4935,
+        "requestsPerSecond": 90,
+        "payloadMiBPerSecond": 0.009,
+        "completedAttemptsPerSecond": 90
+      },
+      "delete": {
+        "latencyMs": {
+          "samples": 94,
+          "mean": 3.011,
+          "p50": 1.47,
+          "p95": 18.233,
+          "p99": 34.144,
+          "max": 34.144
+        },
+        "successful": 94,
+        "failed": 0,
+        "windowSuccessful": 90,
+        "windowFailed": 0,
+        "windowBytes": 0,
+        "successfulBytes": 0,
+        "requestsPerSecond": 180,
+        "payloadMiBPerSecond": 0,
+        "completedAttemptsPerSecond": 180
+      }
+    },
+    "errors": {}
+  },
+  "verification": {
+    "verifiedObjects": 4,
+    "algorithm": "SHA-256",
+    "complete": true,
+    "unknownOutcomeKeys": []
+  },
+  "leftovers": {
+    "count": 0,
+    "truncated": false
+  },
+  "repetition": 1,
+  "orderWithinRepetition": 3
+}

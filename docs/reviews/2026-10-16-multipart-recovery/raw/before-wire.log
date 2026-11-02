@@ -1,0 +1,188 @@
+COMMAND ['go', 'test', './internal/storage/fs', './internal/runtime', './internal/s3api', '-run', 'TestMultipartManifestFailuresPreserveUpload|TestMultipartAbsentUploadKeepsNotFound|TestFilesystemMultipart(RecoveryRefusesDamagedManifest|ValidationPreservesUnknownReservation|ManifestWireErrors)', '-count=2', '-v']
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: multipart upload not found
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: multipart upload not found
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: failed operations changed retained part: "" open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartManifestFailuresPreserveUploadnull1886281656/001/.multipart/adde42e7553a72f04645f2f2d787bb84/part-00001: no such file or directory
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: failed operations changed retained part: "" open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartManifestFailuresPreserveUploadempty4186924945/001/.multipart/bfbee5bd3e9c1c5a121b79f61d8916a0/part-00001: no such file or directory
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: failed operations changed retained part: "" open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartManifestFailuresPreserveUploadinvalid-bucket2499106774/001/.multipart/cb19128c3b3365aa05e4c4c0f607be8d/part-00001: no such file or directory
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: multipart upload not found
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: multipart upload not found
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: multipart upload not found
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: multipart upload not found
+--- FAIL: TestMultipartManifestFailuresPreserveUpload (1.43s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/truncated (0.18s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/null (0.24s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/empty (0.15s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.11s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.21s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/missing (0.32s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/directory (0.22s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.22s)
+=== RUN   TestMultipartManifestFailuresPreserveUpload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/truncated
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: multipart upload not found
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: multipart upload not found
+=== RUN   TestMultipartManifestFailuresPreserveUpload/null
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: failed operations changed retained part: "" open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartManifestFailuresPreserveUploadnull3065896722/001/.multipart/a1afd9c139d90e7a478a4f988234e95b/part-00001: no such file or directory
+=== RUN   TestMultipartManifestFailuresPreserveUpload/empty
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: failed operations changed retained part: "" open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartManifestFailuresPreserveUploadempty3551618235/001/.multipart/588744c454525f789b7236e3f9188ad3/part-00001: no such file or directory
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-bucket
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: failed operations changed retained part: "" open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartManifestFailuresPreserveUploadinvalid-bucket3654793601/001/.multipart/0eba4498a37ed4acde3bfead956f39b3/part-00001: no such file or directory
+=== RUN   TestMultipartManifestFailuresPreserveUpload/invalid-key
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+=== RUN   TestMultipartManifestFailuresPreserveUpload/missing
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: multipart upload not found
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: multipart upload not found
+=== RUN   TestMultipartManifestFailuresPreserveUpload/directory
+    multipart_manifest_test.go:17: lookup hid damaged upload as success/absence: multipart upload not found
+    multipart_manifest_test.go:17: list hid damaged upload as success/absence: <nil>
+    multipart_manifest_test.go:17: validate hid damaged upload as success/absence: no such upload
+    multipart_manifest_test.go:17: complete hid damaged upload as success/absence: multipart upload not found
+--- FAIL: TestMultipartManifestFailuresPreserveUpload (2.12s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/truncated (0.24s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/null (0.26s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/empty (0.24s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/invalid-bucket (0.26s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/invalid-key (0.30s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/missing (0.50s)
+    --- FAIL: TestMultipartManifestFailuresPreserveUpload/directory (0.31s)
+=== RUN   TestMultipartAbsentUploadKeepsNotFound
+--- PASS: TestMultipartAbsentUploadKeepsNotFound (0.14s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	4.209s
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated
+    filesystem_multipart_recovery_test.go:91: opened with damaged upload; new 4-byte write error=<nil> while 3-byte part remains
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing
+    filesystem_multipart_recovery_test.go:91: opened with damaged upload; new 4-byte write error=<nil> while 3-byte part remains
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory
+    filesystem_multipart_recovery_test.go:91: opened with damaged upload; new 4-byte write error=<nil> while 3-byte part remains
+--- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest (1.11s)
+    --- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated (0.32s)
+    --- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing (0.36s)
+    --- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory (0.43s)
+=== RUN   TestFilesystemMultipartValidationPreservesUnknownReservation
+    filesystem_multipart_recovery_test.go:159: validation misclassified uncertainty: no such upload
+    filesystem_multipart_recovery_test.go:161: retained reservation: bytes=0 uploads=0
+    filesystem_multipart_recovery_test.go:163: refresh accepted unreadable multipart state
+    filesystem_multipart_recovery_test.go:165: retained reservation: bytes=0 uploads=0
+    filesystem_multipart_recovery_test.go:167: mutation admitted after failed reconciliation
+--- FAIL: TestFilesystemMultipartValidationPreservesUnknownReservation (0.28s)
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated
+    filesystem_multipart_recovery_test.go:91: opened with damaged upload; new 4-byte write error=<nil> while 3-byte part remains
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing
+    filesystem_multipart_recovery_test.go:91: opened with damaged upload; new 4-byte write error=<nil> while 3-byte part remains
+=== RUN   TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory
+    filesystem_multipart_recovery_test.go:91: opened with damaged upload; new 4-byte write error=<nil> while 3-byte part remains
+--- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest (1.29s)
+    --- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest/truncated (0.34s)
+    --- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest/missing (0.35s)
+    --- FAIL: TestFilesystemMultipartRecoveryRefusesDamagedManifest/directory (0.60s)
+=== RUN   TestFilesystemMultipartValidationPreservesUnknownReservation
+    filesystem_multipart_recovery_test.go:159: validation misclassified uncertainty: no such upload
+    filesystem_multipart_recovery_test.go:161: retained reservation: bytes=0 uploads=0
+    filesystem_multipart_recovery_test.go:163: refresh accepted unreadable multipart state
+    filesystem_multipart_recovery_test.go:165: retained reservation: bytes=0 uploads=0
+    filesystem_multipart_recovery_test.go:167: mutation admitted after failed reconciliation
+--- FAIL: TestFilesystemMultipartValidationPreservesUnknownReservation (0.47s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	3.445s
+=== RUN   TestFilesystemMultipartManifestWireErrors
+=== RUN   TestFilesystemMultipartManifestWireErrors/healthy
+2026/10/16 15:39:39 GET /s3 200 362µs
+2026/10/16 15:39:39 POST /s3 200 97.212584ms
+=== RUN   TestFilesystemMultipartManifestWireErrors/absent
+2026/10/16 15:39:39 GET /s3 200 204.666µs
+2026/10/16 15:39:39 POST /s3 404 47.209µs
+=== RUN   TestFilesystemMultipartManifestWireErrors/truncated
+2026/10/16 15:39:39 GET /s3 200 269.292µs
+    multipart_manifest_test.go:52: listing status=200 want=500 body=<?xml version="1.0" encoding="UTF-8"?>
+        <ListMultipartUploadsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Bucket>bucket</Bucket><Prefix></Prefix><MaxUploads>1000</MaxUploads><IsTruncated>false</IsTruncated></ListMultipartUploadsResult>
+2026/10/16 15:39:39 POST /s3 404 47.625µs
+    multipart_manifest_test.go:52: completion status=404 want=500 body=<Error><Code>NoSuchUpload</Code><Message>The specified multipart upload does not exist</Message><Resource>/bucket/target</Resource><RequestId>d959a4d2582e2f960bdc000ee6f932c4</RequestId></Error>
+=== RUN   TestFilesystemMultipartManifestWireErrors/missing-manifest
+2026/10/16 15:39:39 GET /s3 200 110µs
+    multipart_manifest_test.go:52: listing status=200 want=500 body=<?xml version="1.0" encoding="UTF-8"?>
+        <ListMultipartUploadsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Bucket>bucket</Bucket><Prefix></Prefix><MaxUploads>1000</MaxUploads><IsTruncated>false</IsTruncated></ListMultipartUploadsResult>
+2026/10/16 15:39:39 POST /s3 404 27.791µs
+    multipart_manifest_test.go:52: completion status=404 want=500 body=<Error><Code>NoSuchUpload</Code><Message>The specified multipart upload does not exist</Message><Resource>/bucket/target</Resource><RequestId>4139d7eebabdddedf7f2a32601eb65e9</RequestId></Error>
+--- FAIL: TestFilesystemMultipartManifestWireErrors (0.94s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/healthy (0.34s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/absent (0.18s)
+    --- FAIL: TestFilesystemMultipartManifestWireErrors/truncated (0.27s)
+    --- FAIL: TestFilesystemMultipartManifestWireErrors/missing-manifest (0.16s)
+=== RUN   TestFilesystemMultipartManifestWireErrors
+=== RUN   TestFilesystemMultipartManifestWireErrors/healthy
+2026/10/16 15:39:40 GET /s3 200 452.417µs
+2026/10/16 15:39:40 POST /s3 200 101.775959ms
+=== RUN   TestFilesystemMultipartManifestWireErrors/absent
+2026/10/16 15:39:40 GET /s3 200 94.334µs
+2026/10/16 15:39:40 POST /s3 404 30µs
+=== RUN   TestFilesystemMultipartManifestWireErrors/truncated
+2026/10/16 15:39:40 GET /s3 200 129.625µs
+    multipart_manifest_test.go:52: listing status=200 want=500 body=<?xml version="1.0" encoding="UTF-8"?>
+        <ListMultipartUploadsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Bucket>bucket</Bucket><Prefix></Prefix><MaxUploads>1000</MaxUploads><IsTruncated>false</IsTruncated></ListMultipartUploadsResult>
+2026/10/16 15:39:40 POST /s3 404 55.834µs
+    multipart_manifest_test.go:52: completion status=404 want=500 body=<Error><Code>NoSuchUpload</Code><Message>The specified multipart upload does not exist</Message><Resource>/bucket/target</Resource><RequestId>a0c8c6176bab96eec5245fd57cb676ac</RequestId></Error>
+=== RUN   TestFilesystemMultipartManifestWireErrors/missing-manifest
+2026/10/16 15:39:40 GET /s3 200 103.708µs
+    multipart_manifest_test.go:52: listing status=200 want=500 body=<?xml version="1.0" encoding="UTF-8"?>
+        <ListMultipartUploadsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Bucket>bucket</Bucket><Prefix></Prefix><MaxUploads>1000</MaxUploads><IsTruncated>false</IsTruncated></ListMultipartUploadsResult>
+2026/10/16 15:39:40 POST /s3 404 21.417µs
+    multipart_manifest_test.go:52: completion status=404 want=500 body=<Error><Code>NoSuchUpload</Code><Message>The specified multipart upload does not exist</Message><Resource>/bucket/target</Resource><RequestId>70400131b3af6d20c1809f9b08f61c87</RequestId></Error>
+--- FAIL: TestFilesystemMultipartManifestWireErrors (0.86s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/healthy (0.30s)
+    --- PASS: TestFilesystemMultipartManifestWireErrors/absent (0.20s)
+    --- FAIL: TestFilesystemMultipartManifestWireErrors/truncated (0.18s)
+    --- FAIL: TestFilesystemMultipartManifestWireErrors/missing-manifest (0.19s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/s3api	2.345s
+FAIL

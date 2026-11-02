@@ -1,0 +1,72 @@
+package s3api_test
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/s3api"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func TestClosureETagCase(t *testing.T) {
+	cases := []struct {
+		name, header                 string
+		copy                         bool
+		equalStatus, differentStatus int
+	}{
+		{"put-match", "If-Match", false, 200, 412},
+		{"put-none", "If-None-Match", false, 412, 200},
+		{"copy-match", "X-Amz-Copy-Source-If-Match", true, 200, 412},
+		{"copy-none", "X-Amz-Copy-Source-If-None-Match", true, 412, 200},
+	}
+	for _, tc := range cases {
+		for _, changeCase := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/caseChanged=%t", tc.name, changeCase), func(t *testing.T) {
+				store := storage.NewMemoryStore()
+				ctx := context.Background()
+				if err := store.CreateBucket(ctx, "bucket"); err != nil {
+					t.Fatal(err)
+				}
+				meta, err := store.PutObject(ctx, "bucket", "source", strings.NewReader("old"), storage.PutOptions{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				tag := meta.ETag
+				want := tc.equalStatus
+				if changeCase {
+					tag = strings.ToUpper(tag)
+					want = tc.differentStatus
+					if tag == meta.ETag {
+						t.Fatal("fixture has no ETag letters")
+					}
+				}
+				server, err := s3api.New(s3api.Config{Store: store, Auth: s3api.DevBypass})
+				if err != nil {
+					t.Fatal(err)
+				}
+				path := "http://localhost/bucket/source"
+				body := "replacement"
+				if tc.copy {
+					path = "http://localhost/bucket/destination"
+					body = ""
+				}
+				req := httptest.NewRequest(http.MethodPut, path, strings.NewReader(body))
+				req.Header.Set("Content-Length", fmt.Sprint(len(body)))
+				req.Header.Set(tc.header, tag)
+				if tc.copy {
+					req.Header.Set("X-Amz-Copy-Source", "/bucket/source")
+				}
+				out := httptest.NewRecorder()
+				server.Handler().ServeHTTP(out, req)
+				t.Logf("actual ETag=%s supplied=%s status=%d expected=%d body=%s", meta.ETag, tag, out.Code, want, out.Body.String())
+				if out.Code != want {
+					t.Errorf("opaque ETag comparison folded case: got=%d want=%d", out.Code, want)
+				}
+			})
+		}
+	}
+}

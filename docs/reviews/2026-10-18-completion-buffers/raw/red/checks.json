@@ -1,0 +1,126 @@
+[
+  {
+    "name": "format-tests",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/completion_buffer_test.go",
+      "internal/storage/fs/completion_buffer_verify_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCompletionBufferAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 23256,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "-run",
+      "^TestCompletionBufferAllocation$",
+      "-count=1",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 37319,
+    "passed": true
+  },
+  {
+    "name": "install-probe",
+    "args": [
+      "cp",
+      "benchmark/completion-probe.go.txt",
+      "internal/storage/fs/completion_memory_probe_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  },
+  {
+    "name": "format-probe",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/completion_memory_probe_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13,
+    "passed": true
+  },
+  {
+    "name": "snapshot-probe",
+    "args": [
+      "node",
+      "-e",
+      "require('node:fs').copyFileSync('internal/storage/fs/completion_memory_probe_test.go',process.env.STOW_RESULT_ROOT+'/compiled-probe.go.txt')"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 30,
+    "passed": true
+  },
+  {
+    "name": "build-before",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "-o",
+      "benchmark/completion-before.test",
+      "./internal/storage/fs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 661,
+    "passed": true
+  },
+  {
+    "name": "measure-baseline",
+    "args": [
+      "node",
+      "benchmark/measure.mjs"
+    ],
+    "env": {
+      "STOW_BASELINE_ONLY": "1"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 14194,
+    "passed": true
+  },
+  {
+    "name": "cleanup-probe",
+    "args": [
+      "rm",
+      "internal/storage/fs/completion_memory_probe_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19,
+    "passed": true
+  }
+]

@@ -1,0 +1,169 @@
+from pathlib import Path
+import json,hashlib,subprocess
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');candidate=p/'export-87fa5834-7457-46c3-965f-27f5ae181091';memory=json.loads((candidate/'retention-receipt.json').read_text());regression=json.loads((candidate/'retention-regression-receipt.json').read_text());assert all(x['passed']for x in regression['checks'])
+j=json.loads((p/'final-start.json').read_text());accepted=p/('export-'+j['id']);receipt=json.loads((accepted/'accepted-receipt.json').read_text());assert receipt['productionSourceUnchanged']and receipt['allChecksPassed']
+raw='2026-10-18-outbox-write-cache/raw/'
+before=memory['samples']['before'];after=memory['samples']['candidate'];old=(p/'candidate-report.md.txt').read_text();timings=old[old.index('## Measurement method'):old.index('## Memory and compatibility costs')]
+timings=timings.replace('RAW',raw).replace('raw/final/','raw/candidate-final/').replace('## Final-source confirmation','## Rejected candidate source confirmation').replace('qualifies the exact final Go bytes','qualifies the exact rejected-candidate Go bytes')
+s=f'''# Reject native outbox state reuse after writes — 2026-10-18
+
+## Decision
+
+**Reject the write-cache optimization. Production source is restored byte-for-byte
+to baseline `feb0f27`. No runtime speedup, new cache or format/API change ships.**
+The accepted change adds 17 canonicalization/fencing contracts and one resource
+regression, plus the complete experimental evidence.
+
+The candidate reduced normal backlog allocations by about 73% and allocated bytes
+by about 46%. Its largest fixture improved 12–26% in the first timing cohort and
+about 19% in final-source checks. Those gains are real measurements of a rejected
+candidate. A final ownership probe found a much larger cost: 64 small entries kept
+**{after['heapGrowth']/1e6:.1f} MB** of additional live heap versus **{before['heapGrowth']/1e3:.1f} KB** in
+the baseline, even though both native journal frames were **{before['cachedLength']:,} bytes**.
+Value equivalence after protobuf serialization did not imply bounded ownership.
+
+`origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
+[Exact refs](RAWbaseline.json) and the
+[preceding phase investigation](2026-10-18-outbox-write-phases.md) record the baseline.
+Existing storage, S3, durability, migration, ownership and error contracts remain
+unchanged. The active quality objective remains open.
+
+## What failed
+
+The existing native reload creates state from the stored bytes. Besides validation
+and canonicalization, this releases references to caller string backing buffers.
+A logical key can be a short view into a much larger string. Retaining the original
+in-memory state after writing preserves that larger allocation indefinitely even
+when every key, timestamp, token and other value matches a fresh decode.
+
+The attempted optimization reused the already-produced native journal buffer and
+checked serialized entries with the existing decoder/full value comparison. It
+retained fresh full-file reads, byte comparisons, file/directory syncs and error
+rollback. It passed canonicalization contracts, full normal/race tests and all four
+conformance profiles. None of those value checks established string ownership.
+The production implementation was not committed or deployed to the target service.
+
+## Resource reproduction and regression
+
+On the same Railway ext4 runner, admit 64 ordinary entries. Each 12-byte key is a
+view into a distinct 1 MiB string created in a helper, which returns after Enqueue.
+Other fields use normal UTC timestamps and small valid values. Read provenance to
+exercise a post-write reload, run GC and keep the outbox alive while collecting
+`runtime.MemStats`. No caller retains the large source strings. No upstream writes
+occur; these are temporary journals.
+
+| Implementation | Entries | Source bytes per entry | Journal frame B | Live heap growth B |
+| --- | ---: | ---: | ---: | ---: |
+| Baseline | 64 | {before['sourceBytesPerEntry']:,} | {before['cachedLength']:,} | {before['heapGrowth']:,} |
+| Rejected candidate | 64 | {after['sourceBytesPerEntry']:,} | {after['cachedLength']:,} | {after['heapGrowth']:,} |
+
+[Commands, exact samples and exits](RAWcandidate-final/retention-receipt.json),
+[baseline output](RAWcandidate-final/retention-before.log),
+[candidate output](RAWcandidate-final/retention-candidate.log) and
+[executed source](RAWcandidate-final/source-retention_probe_test.go.txt) are retained.
+These are live Go heap differences for this fixture, not RSS bounds or a service SLA.
+
+The regression adds a generous 16 MiB live-growth ceiling for these 64 small
+persisted entries after the read/GC boundary. It fails twice against the candidate
+and passes twice against the baseline before restoration. The large separation
+makes the failure deterministic in these recorded runs. The final normal/race
+suites repeat it on the exact accepted source.
+[Red/green commands and expected exits](RAWcandidate-final/retention-regression-receipt.json)
+and [candidate failures](RAWcandidate-final/retention-regression-candidate-red.log)
+remain separate from the 400 timing observations.
+
+The guard is a test fixture, not a new general memory limit. It generates 64 MiB of
+source backing strings, with additional transient concatenation allocations, and
+performs explicit GC. That adds test CPU/IO and temporary allocations; it adds no
+production allocation or public API.
+
+## Other correctness contracts
+
+Before experimenting, 17 cases pass the original implementation twice normally
+and twice under race detection. Blindly retaining written bytes breaks 13 cases
+twice: text/time canonicalization, historical-attempt reconciliation, token-counter
+clamping and provenance normalization. Four controls continue to pass. Expected
+exit 1 in that probe means successful reproduction, not a passing regression suite.
+[Exact cases/counts](RAWproof/contract-receipt.json) and
+[proof steps](RAWproof/checks.json) retain the rejected blind prototype.
+
+The guarded candidate passes those 17 contracts, including same-handle recovery
+after a real directory-sync permission fault, changed/missing peer bytes and
+comparison with a fresh handle. All tests run as UID 10001, and the fault case is
+not skipped. The accepted final source adds the separate resource guard: **18
+cases, each twice normally and twice under race, 36 passes per focused mode**.
+The original baseline had no demonstrated correctness defect in these contracts;
+the tests prevent attempted optimizations from violating existing behavior.
+
+## Candidate timings: retained, not shipped
+
+Every table below concerns the rejected candidate. Both favorable and adverse
+results remain. They do not describe a committed runtime improvement. Retained
+frame length/live-heap observations from ordinary small-string fixtures did not
+cover the caller-buffer ownership case above.
+
+'''.replace('RAW',raw)
+s+=timings
+s+='''
+## Candidate buffer cost and qualification limits
+
+The candidate retained one native frame in the existing byte cache after a
+successful reusable write. An untimed Railway probe measured length/capacity:
+14/24 bytes when empty, 25,486/25,486 at depth 128 per queue, and
+815,118/815,118 at depth 4,096 per queue.
+[Exact capacity results](RAWcandidate-final/capacity-receipt.json) are retained.
+The ordinary large enqueue benchmark's process live heap was about 7.59 → 7.47 MB,
+and allocated bytes were 31.62 → 17.02 MB per two-call cycle. These process values
+include fixtures and preceding subcases; they are not isolated per-handle peaks.
+The retention probe demonstrates why those ordinary-input metrics were insufficient.
+
+Fallback writes also showed a repeated roughly 11% slowdown for a large journal
+with an unusual timestamp. Small/mid timings varied, including initial +22.18% and
++17.73% cells. A/A variation did not prove zero implementation effect. Those costs
+are preserved in the tables, but neither that code nor its performance tradeoffs
+ship. No workload threshold, new copy machinery, weaker fence or storage abstraction
+is introduced to rescue the rejected design.
+
+The candidate's first final validation passed all functional/conformance stages but
+failed the comment-line ratchet (4080 > 4077). Removing only the three new explanatory
+comment lines restored that gate; all 18 subsequent candidate checks passed before
+the resource failure was found. [The quality failure](RAWinitial-final/quality.log),
+[comment-only change](RAWcomment-only-repair.json) and
+[candidate qualification](RAWcandidate-final/checks.json) are retained. No baseline
+was raised. Green functional gates were evidence, not proof of every resource property.
+
+## Accepted result and validation
+
+The two production files are restored to their recorded baseline hashes. The
+existing read cache, authoritative reads, native/legacy decoders, full-state writes
+and durability fences remain unchanged. Only regression tests and evidence are
+committed. [Accepted source verification](RAWfinal/accepted-source-verification.json)
+and [regression receipt](RAWfinal/accepted-receipt.json) check exact bytes and cases.
+
+All 15 accepted Railway stages pass: formatting and source verification; focused
+normal/race tests twice; full Go suite; broad storage/runtime/embedded/run-through/
+S3/public-package race tests; four conformance profiles (memory, filesystem,
+runtime-memory, runtime-filesystem); vet; site build/tests; documentation links; and
+quality/file-size/format gates. [Accepted commands/results](RAWfinal/checks.json)
+are separate from the rejected candidate's checks.
+
+The final report is checked on the same Railway source. Every timing observation,
+failed prototype, resource sample, executed overlay, source/transfer hash and teardown
+receipt is retained. Benchmark binaries are removed after hashes are recorded. The
+scratch runner is stopped after verified exports; the separate target service
+remains removed and unchanged. All Go, formatting, code checks, tests, race,
+conformance, documentation checks and measurements run on Railway. Local work is
+reads, edits, packaging, Git, hashing and exported-data analysis.
+
+Next correctness investigation: reproduce fencing-token exhaustion. The existing
+allocator still increments uint64 without the ID allocator's exhaustion guard;
+the serializer permits the maximum value. This is a code finding awaiting an
+operational reproduction, not a claim of tested corruption. No next fix is included.
+
+The write-performance problem remains open. Any future reuse candidate must bound
+ownership of keys, entry text, IDs and provenance, pass the new retention guard,
+and demonstrate net value after copying costs. Existing full-journal clone/encode
+and durable sync costs remain. No indexing, incremental checkpoint, new storage
+abstraction, dependency, format or public API is added.
+'''.replace('RAW',raw)
+(p/'report.md').write_text(s);(r/'docs/reviews/2026-10-18-outbox-write-cache.md').write_text(s);print('Wrote rejection report: runtime unchanged; full measurements retained; 18 regression cases')

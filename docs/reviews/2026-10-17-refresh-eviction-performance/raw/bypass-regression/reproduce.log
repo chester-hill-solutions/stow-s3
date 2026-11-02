@@ -1,0 +1,95 @@
+=== RUN   TestRefreshOversizedStreamsObservedVersion
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+--- FAIL: TestRefreshOversizedStreamsObservedVersion (0.02s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true (0.00s)
+=== RUN   TestRefreshOversizedRevalidationDropsStaleCache
+    refresh_eviction_test.go:222: gets=3 evictions=1
+--- FAIL: TestRefreshOversizedRevalidationDropsStaleCache (0.00s)
+=== RUN   TestRefreshOversizedReaderOwnership
+    refresh_eviction_test.go:249: upstream stream was refetched or closed before return: gets=2 closes=1
+--- FAIL: TestRefreshOversizedReaderOwnership (0.00s)
+=== RUN   TestRefreshOversizedStreamErrorsReachCaller
+    refresh_eviction_test.go:282: stream opening failed: reader=<nil> meta=<nil> error=upstream body interrupted
+--- FAIL: TestRefreshOversizedStreamErrorsReachCaller (0.00s)
+=== RUN   TestRefreshOversizedHeadDoesNotReadUncacheableBody
+    refresh_eviction_test.go:302: HEAD meta=<nil> error=HEAD must not consume an uncacheable body gets=1 closes=1
+--- FAIL: TestRefreshOversizedHeadDoesNotReadUncacheableBody (0.00s)
+=== RUN   TestRefreshOversizedStreamsObservedVersion
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+=== RUN   TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true
+    refresh_eviction_test.go:21: eviction refetched the same object: gets=2 closes=2 saves=1 want=1/1/1
+    refresh_eviction_test.go:21: eviction or authoritative accounting changed
+--- FAIL: TestRefreshOversizedStreamsObservedVersion (0.02s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/memory/runtime/durable=true (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/adapter/durable=true (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=false (0.00s)
+    --- FAIL: TestRefreshOversizedStreamsObservedVersion/filesystem/runtime/durable=true (0.00s)
+=== RUN   TestRefreshOversizedRevalidationDropsStaleCache
+    refresh_eviction_test.go:222: gets=3 evictions=1
+--- FAIL: TestRefreshOversizedRevalidationDropsStaleCache (0.00s)
+=== RUN   TestRefreshOversizedReaderOwnership
+    refresh_eviction_test.go:249: upstream stream was refetched or closed before return: gets=2 closes=1
+--- FAIL: TestRefreshOversizedReaderOwnership (0.00s)
+=== RUN   TestRefreshOversizedStreamErrorsReachCaller
+    refresh_eviction_test.go:282: stream opening failed: reader=<nil> meta=<nil> error=upstream body interrupted
+--- FAIL: TestRefreshOversizedStreamErrorsReachCaller (0.00s)
+=== RUN   TestRefreshOversizedHeadDoesNotReadUncacheableBody
+    refresh_eviction_test.go:302: HEAD meta=<nil> error=HEAD must not consume an uncacheable body gets=1 closes=1
+--- FAIL: TestRefreshOversizedHeadDoesNotReadUncacheableBody (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.044s
+FAIL

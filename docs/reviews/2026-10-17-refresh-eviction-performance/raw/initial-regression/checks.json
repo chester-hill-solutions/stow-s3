@@ -1,0 +1,50 @@
+[
+  {
+    "name": "format-tests",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/refresh_version_fixture_test.go",
+      "internal/runthrough/refresh_version_bench_test.go",
+      "internal/runthrough/refresh_eviction_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 29,
+    "passed": true
+  },
+  {
+    "name": "reproduce",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestRefreshEviction(RetainsOpenedVersion|FailureClosesOpenedReader)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 23468,
+    "passed": true
+  },
+  {
+    "name": "fallback-controls",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestRefreshFallback|TestRefreshHead|TestRefreshConcurrent|TestRunthroughOpening|TestRunthroughMissing)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 39293,
+    "passed": true
+  }
+]

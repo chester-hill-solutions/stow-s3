@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,subprocess,shutil,hashlib
+p=Path('/private/tmp/stow-outbox-token-exhaustion-2026-10-18');old=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');c=p/'context';c.mkdir(exist_ok=True)
+added=['internal/runthrough/outbox_token_exhaustion_test.go','internal/runthrough/outbox_token_exhaustion_controls_test.go','internal/runthrough/outbox_token_exhaustion_bench_test.go'];files=[x for x in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0')if x]+added
+for name in files:
+ f=r/name
+ if f.is_file():dest=c/name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,dest)
+b=c/'benchmark';b.mkdir(exist_ok=True)
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copy2(old/'context/benchmark'/name,b/name)
+z=b/'validation-previous-baselines';z.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:shutil.copy2(r/'scripts/baselines'/name,z/name)
+for name in ['control.py','export.py','remote.py','watch.py']:(p/name).write_text((old/name).read_text().replace(str(old),str(p)).replace('stow-outbox-write-cache-20261018','stow-outbox-token-exhaustion-20261018'))
+manifest={name:hashlib.sha256((c/name).read_bytes()).hexdigest()for name in files if(c/name).is_file()}
+for file in [b/'validation-input-manifest.json',p/'source-manifest.json']:file.write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({k:subprocess.check_output(['git','rev-parse',v],cwd=r).decode().strip()for k,v in [('base','HEAD'),('origin_main','origin/main')]},indent=2)+'\n')
+sources=['internal/runthrough/outbox.go','internal/runthrough/outbox_claims.go',*added]
+plan={'phase':'outbox-token-exhaustion-before','sources':sources,'steps':[{'name':'format-tests','args':['gofmt','-w',*added]},{'name':'regression-normal','args':['go','test','./internal/runthrough','-run','^TestOutboxTokenExhaustion','-count=2','-v'],'expected':1},{'name':'regression-race','args':['go','test','-race','./internal/runthrough','-run','^TestOutboxTokenExhaustion','-count=2','-v'],'expected':1},{'name':'benchmark-build','args':['go','test','-c','./internal/runthrough','-o','benchmark/token-before.test']}]}
+(p/'before-plan.json').write_text(json.dumps(plan,indent=2)+'\n');(b/'active-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+print('Prepared latest source and regression-first plan; production unchanged')

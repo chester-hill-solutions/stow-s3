@@ -1,0 +1,17 @@
+import pathlib,subprocess,json,itertools,time,hashlib
+p=pathlib.Path('/private/tmp/stow-save-body-perf-repeat');out=p/'final-comparison';out.mkdir(exist_ok=True)
+bins={'original':'/private/tmp/stow-save-body-failure/before.test','committed':'/private/tmp/stow-save-body-failure/after.test','phase':str(p/'final.test')}
+orders=list(itertools.permutations(bins))
+groups=[('^BenchmarkReadForSaveObservation$/^present$',250000),('^BenchmarkReadForSaveObservation$/^(missing|wrapped-missing|unknown|marker-first|missing-first)$',1000000),('^BenchmarkOpenedObjectRead$/^get-tiny$',250000),('^BenchmarkOpenedObjectRead$/^(get-64KiB|save-64KiB)$',50000),('^BenchmarkOpenedObjectRead$/^(get-body-missing|save-body-missing)$',100000)]
+(out/'plan.json').write_text(json.dumps({'orders':orders,'groups':groups,'cpus':[1,8],'binaries':{v:{'path':b,'sha256':hashlib.sha256(pathlib.Path(b).read_bytes()).hexdigest()} for v,b in bins.items()},'samples_per_case_version_cpu':6,'excluded_samples':0},indent=2)+'\n')
+for cpu in [1,8]:
+ for cycle,order in enumerate(orders,1):
+  for position,version in enumerate(order,1):
+   contents=[];start=time.time()
+   for pattern,n in groups:
+    cmd=[bins[version],'-test.run=^$',f'-test.bench={pattern}','-test.benchmem',f'-test.benchtime={n}x','-test.count=1',f'-test.cpu={cpu}']
+    r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    contents.extend(['COMMAND '+json.dumps(cmd),r.stdout]);assert r.returncode==0,r.stdout
+   (out/f'cpu{cpu}-cycle{cycle}-position{position}-{version}.log').write_text('\n'.join(contents))
+   print(cpu,cycle,position,version,round(time.time()-start,2),flush=True)
+print('COMPLETE',flush=True)

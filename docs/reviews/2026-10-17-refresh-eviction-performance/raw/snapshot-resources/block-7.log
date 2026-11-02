@@ -1,0 +1,17 @@
+goos: linux
+goarch: amd64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runthrough
+cpu: AMD EPYC 9655P 96-Core Processor               
+BenchmarkRefreshHeldReaderResource/memory/bytes=1048576         	       1	   2524594 ns/op	   1116104 held-heap-B	   4161536 held-rss-B	         0 held-unlinked-B	   5254432 open-alloc-B	      9896 released-heap-B	 5276696 B/op	     164 allocs/op
+BenchmarkRefreshHeldReaderResource/memory/bytes=1048576         	       1	   3255427 ns/op	   1116056 held-heap-B	   3547136 held-rss-B	         0 held-unlinked-B	   5254432 open-alloc-B	      9848 released-heap-B	 5276040 B/op	     161 allocs/op
+BenchmarkRefreshHeldReaderResource/memory/bytes=1048576         	       1	   2990760 ns/op	   1116056 held-heap-B	   3547136 held-rss-B	         0 held-unlinked-B	   5254432 open-alloc-B	      9848 released-heap-B	 5276040 B/op	     161 allocs/op
+BenchmarkRefreshHeldReaderResource/memory/bytes=16777216        	       1	  28032715 ns/op	  20653976 held-heap-B	  45240320 held-rss-B	         0 held-unlinked-B	 102649120 open-alloc-B	      9848 released-heap-B	102670728 B/op	     174 allocs/op
+BenchmarkRefreshHeldReaderResource/memory/bytes=16777216        	       1	  27758708 ns/op	  20653912 held-heap-B	  44220416 held-rss-B	         0 held-unlinked-B	 102649120 open-alloc-B	      9784 released-heap-B	102670728 B/op	     174 allocs/op
+BenchmarkRefreshHeldReaderResource/memory/bytes=16777216        	       1	  27175634 ns/op	  20653976 held-heap-B	  44179456 held-rss-B	         0 held-unlinked-B	 102649120 open-alloc-B	      9848 released-heap-B	102670728 B/op	     174 allocs/op
+BenchmarkRefreshHeldReaderResource/filesystem/bytes=1048576     	       1	  23998536 ns/op	     13064 held-heap-B	    540672 held-rss-B	   1048722 held-unlinked-B	    272368 open-alloc-B	     28776 released-heap-B	  328600 B/op	     819 allocs/op
+BenchmarkRefreshHeldReaderResource/filesystem/bytes=1048576     	       1	  21717738 ns/op	     -6832 held-heap-B	    139264 held-rss-B	   1048722 held-unlinked-B	    241848 open-alloc-B	      9048 released-heap-B	  287640 B/op	     547 allocs/op
+BenchmarkRefreshHeldReaderResource/filesystem/bytes=1048576     	       1	  17680970 ns/op	     -6768 held-heap-B	    266240 held-rss-B	   1048722 held-unlinked-B	    241848 open-alloc-B	      9112 released-heap-B	  287640 B/op	     547 allocs/op
+BenchmarkRefreshHeldReaderResource/filesystem/bytes=16777216    	       1	  93176683 ns/op	     -6768 held-heap-B	    200704 held-rss-B	  16777363 held-unlinked-B	    241896 open-alloc-B	      9112 released-heap-B	  287768 B/op	     547 allocs/op
+BenchmarkRefreshHeldReaderResource/filesystem/bytes=16777216    	       1	 286676836 ns/op	     -6832 held-heap-B	    131072 held-rss-B	  16777363 held-unlinked-B	    241848 open-alloc-B	      9048 released-heap-B	  287640 B/op	     547 allocs/op
+BenchmarkRefreshHeldReaderResource/filesystem/bytes=16777216    	       1	 231983752 ns/op	     -6768 held-heap-B	    335872 held-rss-B	  16777363 held-unlinked-B	    241896 open-alloc-B	      9112 released-heap-B	  287768 B/op	     547 allocs/op
+PASS

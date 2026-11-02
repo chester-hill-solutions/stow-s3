@@ -1,0 +1,29 @@
+[
+  {
+    "name": "trace-contracts",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/phase-trace-overlay.json",
+      "./internal/runthrough",
+      "./internal/atomicfile",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null
+  },
+  {
+    "name": "trace-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/phase-trace-overlay.json",
+      "./internal/runthrough",
+      "./internal/atomicfile",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null
+  }
+]

@@ -1,0 +1,78 @@
+{
+  "phase": "outbox-insert-proof",
+  "sources": [
+    "internal/runthrough/file_outbox_proto_decode.go",
+    "internal/runthrough/outbox_interleaved_identity_test.go",
+    "internal/runthrough/outbox_duplicate_boundary_test.go",
+    "benchmark/insert-bench.go.txt",
+    "benchmark/boundary-comparison.mjs",
+    "benchmark/candidate-file_outbox_proto_decode.go.txt",
+    "benchmark/insert-before.json",
+    "benchmark/insert-candidate.json",
+    "benchmark/insert-candidate-test.json"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_duplicate_boundary_test.go"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxDuplicateBoundaryAllocation$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxDuplicateBoundaryAllocation$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/insert-candidate-test.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxDuplicateBoundaryAllocation$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "candidate-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/insert-candidate-test.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxDuplicateBoundaryAllocation$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

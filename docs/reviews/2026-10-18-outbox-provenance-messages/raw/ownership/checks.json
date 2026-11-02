@@ -1,0 +1,82 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/outbox_proto_blocks_resource_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 21,
+    "passed": true
+  },
+  {
+    "name": "before-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxProtoBlock",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1845,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxProtoBlock",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4630,
+    "passed": true
+  },
+  {
+    "name": "provenance-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-provenance.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxProtoBlock",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1775,
+    "passed": true
+  },
+  {
+    "name": "provenance-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/proto-block-provenance.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxProtoBlock",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 4548,
+    "passed": true
+  }
+]

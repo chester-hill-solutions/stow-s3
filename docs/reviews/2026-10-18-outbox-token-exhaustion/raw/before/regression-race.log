@@ -1,0 +1,501 @@
+=== RUN   TestOutboxTokenExhaustionStateAtomicity
+=== RUN   TestOutboxTokenExhaustionStateAtomicity/claim
+    outbox_token_exhaustion_controls_test.go:27: exhausted state granted ownership
+    outbox_token_exhaustion_controls_test.go:33: exhausted state admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:v PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:0001-01-01 00:00:00 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:owner ClaimUntil:2026-10-18 11:26:50.509111486 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:36: exhausted allocation consumed an ID/token or changed fields
+=== RUN   TestOutboxTokenExhaustionStateAtomicity/prepare
+    outbox_token_exhaustion_controls_test.go:33: exhausted state admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.509348033 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:owner PreparedUntil:2026-10-18 11:26:50.509348363 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:36: exhausted allocation consumed an ID/token or changed fields
+--- FAIL: TestOutboxTokenExhaustionStateAtomicity (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateAtomicity/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateAtomicity/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionExistingOwners
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/renew
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/release
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/acknowledge
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/renew-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/commit-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/discard-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/renew
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/release
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/acknowledge
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/renew-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/commit-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/discard-prepared
+--- PASS: TestOutboxTokenExhaustionExistingOwners (0.02s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/renew (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/release (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/acknowledge (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/renew-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/commit-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/discard-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/renew (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/release (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/acknowledge (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/renew-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/commit-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/discard-prepared (0.00s)
+=== RUN   TestOutboxTokenExhaustionPreconditions
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/missing
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/held
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/terminal
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/bad-claim-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/bad-prepared-owner
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/bad-prepared-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/prepared-key
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/duplicate-id
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/missing
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/held
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/terminal
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/bad-claim-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/bad-prepared-owner
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/bad-prepared-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/prepared-key
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/duplicate-id
+--- PASS: TestOutboxTokenExhaustionPreconditions (0.02s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/missing (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/held (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/terminal (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/bad-claim-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/bad-prepared-owner (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/bad-prepared-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/prepared-key (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/duplicate-id (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/missing (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/held (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/terminal (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/bad-claim-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/bad-prepared-owner (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/bad-prepared-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/prepared-key (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/duplicate-id (0.00s)
+=== RUN   TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken
+=== RUN   TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/duplicate
+=== RUN   TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/id-limit
+--- PASS: TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken (0.00s)
+    --- PASS: TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/duplicate (0.00s)
+    --- PASS: TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/id-limit (0.00s)
+=== RUN   TestOutboxTokenExhaustionStateLastToken
+=== RUN   TestOutboxTokenExhaustionStateLastToken/claim
+    outbox_token_exhaustion_controls_test.go:248: state reused exhausted token: {ID:outbox-42 Operation:put Bucket:bucket Key:another SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.549618335 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:owner PreparedUntil:2026-10-18 11:26:50.549618675 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:251: refusal after last token changed state
+=== RUN   TestOutboxTokenExhaustionStateLastToken/prepare
+    outbox_token_exhaustion_controls_test.go:248: state reused exhausted token: {ID:outbox-43 Operation:put Bucket:bucket Key:another SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.549787833 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:owner PreparedUntil:2026-10-18 11:26:50.549788013 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:251: refusal after last token changed state
+--- FAIL: TestOutboxTokenExhaustionStateLastToken (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateLastToken/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateLastToken/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/counter/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.550314477 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/counter/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.551968091 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.551968561 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.553427347 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.554736173 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.554736583 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.55605156 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.557732522 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.557732942 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.559376026 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.56089224 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.56089266 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/counter/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.562649433 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/counter/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.564270686 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.564271266 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.56585978 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.567584183 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.567584593 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.569103668 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.570518623 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.570519003 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.572083997 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.573827809 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.573828319 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+--- FAIL: TestOutboxTokenExhaustionRefusesAllocation (0.03s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/counter/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/counter/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/prepared/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/counter/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/counter/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/prepared/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionStaleAcknowledgement
+=== RUN   TestOutboxTokenExhaustionStaleAcknowledgement/native
+    outbox_token_exhaustion_test.go:147: exhausted counter issued token 0
+    outbox_token_exhaustion_test.go:161: stale acknowledgement accepted after token reuse: old=0 current=0 error=<nil>
+    outbox_token_exhaustion_test.go:174: stale acknowledgement removed the current propagation intent
+=== RUN   TestOutboxTokenExhaustionStaleAcknowledgement/json
+    outbox_token_exhaustion_test.go:147: exhausted counter issued token 0
+    outbox_token_exhaustion_test.go:161: stale acknowledgement accepted after token reuse: old=0 current=0 error=<nil>
+    outbox_token_exhaustion_test.go:174: stale acknowledgement removed the current propagation intent
+--- FAIL: TestOutboxTokenExhaustionStaleAcknowledgement (0.01s)
+    --- FAIL: TestOutboxTokenExhaustionStaleAcknowledgement/native (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStaleAcknowledgement/json (0.00s)
+=== RUN   TestOutboxTokenExhaustionLastToken
+=== RUN   TestOutboxTokenExhaustionLastToken/native/claim
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.584022716 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionLastToken/native/prepare
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:outbox-43 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.586824297 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.586824927 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionLastToken/json/claim
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.589969776 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionLastToken/json/prepare
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:outbox-43 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.594062364 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.594063034 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+--- FAIL: TestOutboxTokenExhaustionLastToken (0.01s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/native/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/native/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/json/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/json/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/native/claim-claim
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.596365231 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/native/claim-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-42 Operation:put Bucket:bucket Key:prepared-other SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.598838666 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.598839266 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/native/prepare-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-43 Operation:put Bucket:bucket Key:prepared-target SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.600977794 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.600978364 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/json/claim-claim
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:other Operation:put Bucket:bucket Key:other SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.603282981 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/json/claim-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-42 Operation:put Bucket:bucket Key:prepared-other SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.605557908 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.605558438 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/json/prepare-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-43 Operation:put Bucket:bucket Key:prepared-target SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.608206031 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.608206411 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+--- FAIL: TestOutboxTokenExhaustionConcurrentLastToken (0.01s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/native/claim-claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/native/claim-prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/native/prepare-prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/json/claim-claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/json/claim-prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/json/prepare-prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionStateAtomicity
+=== RUN   TestOutboxTokenExhaustionStateAtomicity/claim
+    outbox_token_exhaustion_controls_test.go:27: exhausted state granted ownership
+    outbox_token_exhaustion_controls_test.go:33: exhausted state admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:v PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:0001-01-01 00:00:00 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:owner ClaimUntil:2026-10-18 11:26:50.609926573 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:36: exhausted allocation consumed an ID/token or changed fields
+=== RUN   TestOutboxTokenExhaustionStateAtomicity/prepare
+    outbox_token_exhaustion_controls_test.go:33: exhausted state admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.610143981 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:owner PreparedUntil:2026-10-18 11:26:50.610144361 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:36: exhausted allocation consumed an ID/token or changed fields
+--- FAIL: TestOutboxTokenExhaustionStateAtomicity (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateAtomicity/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateAtomicity/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionExistingOwners
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/renew
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/release
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/acknowledge
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/renew-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/commit-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/native/discard-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/renew
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/release
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/acknowledge
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/renew-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/commit-prepared
+=== RUN   TestOutboxTokenExhaustionExistingOwners/json/discard-prepared
+--- PASS: TestOutboxTokenExhaustionExistingOwners (0.06s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/renew (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/release (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/acknowledge (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/renew-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/commit-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/native/discard-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/renew (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/release (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/acknowledge (0.01s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/renew-prepared (0.02s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/commit-prepared (0.00s)
+    --- PASS: TestOutboxTokenExhaustionExistingOwners/json/discard-prepared (0.00s)
+=== RUN   TestOutboxTokenExhaustionPreconditions
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/missing
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/held
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/terminal
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/bad-claim-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/bad-prepared-owner
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/bad-prepared-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/prepared-key
+=== RUN   TestOutboxTokenExhaustionPreconditions/native/duplicate-id
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/missing
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/held
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/terminal
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/bad-claim-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/bad-prepared-owner
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/bad-prepared-lease
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/prepared-key
+=== RUN   TestOutboxTokenExhaustionPreconditions/json/duplicate-id
+--- PASS: TestOutboxTokenExhaustionPreconditions (0.02s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/missing (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/held (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/terminal (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/bad-claim-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/bad-prepared-owner (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/bad-prepared-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/prepared-key (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/native/duplicate-id (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/missing (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/held (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/terminal (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/bad-claim-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/bad-prepared-owner (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/bad-prepared-lease (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/prepared-key (0.00s)
+    --- PASS: TestOutboxTokenExhaustionPreconditions/json/duplicate-id (0.00s)
+=== RUN   TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken
+=== RUN   TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/duplicate
+=== RUN   TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/id-limit
+--- PASS: TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken (0.00s)
+    --- PASS: TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/duplicate (0.00s)
+    --- PASS: TestOutboxTokenExhaustionIDFailureDoesNotConsumeToken/id-limit (0.00s)
+=== RUN   TestOutboxTokenExhaustionStateLastToken
+=== RUN   TestOutboxTokenExhaustionStateLastToken/claim
+    outbox_token_exhaustion_controls_test.go:248: state reused exhausted token: {ID:outbox-42 Operation:put Bucket:bucket Key:another SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.686860283 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:owner PreparedUntil:2026-10-18 11:26:50.686860733 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:251: refusal after last token changed state
+=== RUN   TestOutboxTokenExhaustionStateLastToken/prepare
+    outbox_token_exhaustion_controls_test.go:248: state reused exhausted token: {ID:outbox-43 Operation:put Bucket:bucket Key:another SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.687014091 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:owner PreparedUntil:2026-10-18 11:26:50.687014351 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_controls_test.go:251: refusal after last token changed state
+--- FAIL: TestOutboxTokenExhaustionStateLastToken (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateLastToken/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStateLastToken/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/counter/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.687413068 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/counter/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.689260629 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.689261039 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.690482006 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.691636635 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.691637215 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.693035371 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.694266838 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.694267248 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.695544555 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/native/prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.696717103 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.696717663 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/counter/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.697904611 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/counter/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.699273347 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.699273727 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.700719653 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.702250687 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.702251207 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.703550444 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.70490132 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.7049017 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/prepared/claim
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.706863551 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionRefusesAllocation/json/prepared/prepare
+    outbox_token_exhaustion_test.go:123: exhausted token allocator admitted entry: {ID:outbox-42 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.708165028 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.708165388 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:125: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:125: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:125: refused allocation changed reopened state
+--- FAIL: TestOutboxTokenExhaustionRefusesAllocation (0.02s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/counter/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/counter/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-claim/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/active-prepared/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/native/prepared/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/counter/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/counter/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-claim/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/active-prepared/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/prepared/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionRefusesAllocation/json/prepared/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionStaleAcknowledgement
+=== RUN   TestOutboxTokenExhaustionStaleAcknowledgement/native
+    outbox_token_exhaustion_test.go:147: exhausted counter issued token 0
+    outbox_token_exhaustion_test.go:161: stale acknowledgement accepted after token reuse: old=0 current=0 error=<nil>
+    outbox_token_exhaustion_test.go:174: stale acknowledgement removed the current propagation intent
+=== RUN   TestOutboxTokenExhaustionStaleAcknowledgement/json
+    outbox_token_exhaustion_test.go:147: exhausted counter issued token 0
+    outbox_token_exhaustion_test.go:161: stale acknowledgement accepted after token reuse: old=0 current=0 error=<nil>
+    outbox_token_exhaustion_test.go:174: stale acknowledgement removed the current propagation intent
+--- FAIL: TestOutboxTokenExhaustionStaleAcknowledgement (0.01s)
+    --- FAIL: TestOutboxTokenExhaustionStaleAcknowledgement/native (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionStaleAcknowledgement/json (0.00s)
+=== RUN   TestOutboxTokenExhaustionLastToken
+=== RUN   TestOutboxTokenExhaustionLastToken/native/claim
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.717139327 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionLastToken/native/prepare
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:outbox-43 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.720045367 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.720045887 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionLastToken/json/claim
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.722809809 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+=== RUN   TestOutboxTokenExhaustionLastToken/json/prepare
+    outbox_token_exhaustion_test.go:208: last token followed by wrap: {ID:outbox-43 Operation:put Bucket:bucket Key:new-key SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.725481772 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.725482212 +0000 UTC PreparedToken:0} <nil>
+    outbox_token_exhaustion_test.go:210: refused allocation changed journal bytes
+    outbox_token_exhaustion_test.go:210: refused allocation changed in-memory fields/counters
+    outbox_token_exhaustion_test.go:210: refused allocation changed reopened state
+--- FAIL: TestOutboxTokenExhaustionLastToken (0.01s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/native/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/native/prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/json/claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionLastToken/json/prepare (0.00s)
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/native/claim-claim
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.72763567 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/native/claim-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-42 Operation:put Bucket:bucket Key:prepared-other SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.730285923 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.730286343 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/native/prepare-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-43 Operation:put Bucket:bucket Key:prepared-target SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.732241483 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.732241863 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/json/claim-claim
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:other Operation:put Bucket:bucket Key:other SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.735018255 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/json/claim-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:target Operation:put Bucket:bucket Key:target SourceBucket: SourceKey: Version:version PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:false CreatedAt:1970-01-01 00:01:40 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner:same-worker ClaimUntil:2026-10-18 11:26:50.737590918 +0000 UTC ClaimToken:0 Attempted:true PreparedOwner: PreparedUntil:0001-01-01 00:00:00 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+=== RUN   TestOutboxTokenExhaustionConcurrentLastToken/json/prepare-prepare
+    outbox_token_exhaustion_test.go:219: concurrent allocator issued wrapped token: {ID:outbox-43 Operation:put Bucket:bucket Key:prepared-target SourceBucket: SourceKey: Version: PreviousVersion: UpstreamVersion: UpstreamAbsent:false Prepared:true CreatedAt:2026-10-18 10:26:50.741856296 +0000 UTC Attempts:0 NextAttempt:0001-01-01 00:00:00 +0000 UTC LastError: Terminal:false ClaimOwner: ClaimUntil:0001-01-01 00:00:00 +0000 UTC ClaimToken:0 Attempted:false PreparedOwner:same-worker PreparedUntil:2026-10-18 11:26:50.741856716 +0000 UTC PreparedToken:0}
+    outbox_token_exhaustion_test.go:219: expected one final-token owner; got 2
+--- FAIL: TestOutboxTokenExhaustionConcurrentLastToken (0.02s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/native/claim-claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/native/claim-prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/native/prepare-prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/json/claim-claim (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/json/claim-prepare (0.00s)
+    --- FAIL: TestOutboxTokenExhaustionConcurrentLastToken/json/prepare-prepare (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.244s
+FAIL

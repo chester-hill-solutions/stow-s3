@@ -1,6 +1,10 @@
 package runtime
 
-import "github.com/chester-hill-solutions/stow-s3/internal/storage"
+import (
+	"errors"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
 
 func (s *usageState) admitCompletion(uploadID string, parts []storage.PartInfo, oldSize int64, exists bool) error {
 	upload := s.multipart[uploadID]
@@ -19,8 +23,7 @@ func (s *usageState) admitCompletion(uploadID string, parts []storage.PartInfo, 
 }
 
 func (s *usageState) finishUpload(upload *storage.MultipartUpload, exists bool, err error) bool {
-	s.recordMutation(err)
-	if err != nil {
+	if !s.recordMutation(err) {
 		return false
 	}
 	clone := storage.CloneMultipartUpload(*upload)
@@ -34,8 +37,7 @@ func (s *usageState) finishUpload(upload *storage.MultipartUpload, exists bool, 
 }
 
 func (s *usageState) finishPart(uploadID string, part *storage.PartInfo, err error) bool {
-	s.recordMutation(err)
-	if err != nil {
+	if !s.recordMutation(err) {
 		return false
 	}
 	upload := s.multipart[uploadID]
@@ -60,13 +62,14 @@ func (s *usageState) finishCompletion(uploadID string, oldSize int64, meta *stor
 	if !s.finishStoredPut(objectTarget(upload.upload.Bucket, upload.upload.Key), oldSize, meta, exists, err) {
 		return false
 	}
-	s.removeUpload(uploadID, true)
+	if err == nil {
+		s.removeUpload(uploadID, true)
+	}
 	return true
 }
 
 func (s *usageState) finishAbort(uploadID string, exists bool, err error) bool {
-	s.recordMutation(err)
-	if err != nil {
+	if !s.recordMutation(err) && !errors.Is(err, storage.ErrUploadNotFound) {
 		return false
 	}
 	s.removeUpload(uploadID, exists)

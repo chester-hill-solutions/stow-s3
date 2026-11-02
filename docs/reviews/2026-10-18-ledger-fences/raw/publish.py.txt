@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,base64,hashlib,subprocess
+p=Path('/private/tmp/stow-ledger-fences-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');report='docs/reviews/2026-10-18-ledger-fences.md';raw=str(Path(report).with_suffix(''))+'/raw';j=json.loads((p/'probe-start.json').read_text());root='/results/'+j['id']
+def remote(text,name):
+ f=p/name;f.write_text(text);q=subprocess.run(['python3',str(p/'remote.py'),str(f)],capture_output=True,text=True,timeout=60);print(q.stdout);assert q.returncode==0,q.stdout+q.stderr
+jobs={phase:'/results/'+json.loads((p/(phase+'-start.json')).read_text())['id']for phase in ['probe']}
+remote("const fs=require('node:fs');for(const[phase,src]of Object.entries("+json.dumps(jobs)+")){const run=JSON.parse(fs.readFileSync(src+'/run.json'));if(!run.complete)throw Error('Active job');const dst='/app/"+raw+"/'+phase;fs.mkdirSync(dst,{recursive:true});for(const ent of fs.readdirSync(src,{withFileTypes:true}))if(ent.isFile())fs.copyFileSync(src+'/'+ent.name,dst+'/'+ent.name)}console.log('Copied all terminal job artifacts');",'publish-copy.js')
+remote("const fs=require('node:fs');fs.copyFileSync('/app/benchmark/validation-input-manifest.json','/app/"+raw+"/source-manifest.json');console.log('Copied source upload manifest');",'publish-source-manifest.js')
+names=[report]+[str(f.relative_to(r))for f in (r/raw).iterdir()if f.is_file()and f.name!='source-manifest.json']+[raw+'/'+phase+'/'+f.name for phase in jobs for f in (r/raw/phase).iterdir()if f.is_file()and f.name in ['comparison-analysis.json','validation-receipt.json','export-receipt.json','start.json','deployments.json','upload.log','red-normal.log.gz','red-race.log.gz','pilot-observations.json']]
+batch={};size=0;i=0
+def flush():
+ global batch,size,i
+ if not batch:return
+ remote("const fs=require('node:fs'),path=require('node:path');for(const[n,b]of Object.entries("+json.dumps(batch)+")){fs.mkdirSync(path.dirname('/app/'+n),{recursive:true});fs.writeFileSync('/app/'+n,Buffer.from(b,'base64'))}console.log('Published artifact batch');",'publish-batch-'+str(i)+'.js');i+=1;batch={};size=0
+for name in names:
+ data=base64.b64encode((r/name).read_bytes()).decode()
+ if len(data)>80000:
+  flush()
+  for offset in range(0,len(data),60000):remote("const fs=require('node:fs'),path=require('node:path');const f='/app/'+"+json.dumps(name)+";fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,Buffer.from("+json.dumps(data[offset:offset+60000])+",'base64'),{flag:"+json.dumps('w'if offset==0 else'a')+"});console.log('Published large artifact chunk');",'publish-chunk-'+str(i)+'-'+str(offset)+'.js')
+  i+=1;continue
+ if size+len(data)>80000:flush()
+ batch[name]=data;size+=len(data)
+flush()
+script="""const fs=require('node:fs'),cp=require('node:child_process'),crypto=require('node:crypto');const root=ROOT,expected=JSON.parse(fs.readFileSync(root+'/environment.json')).sourceSHA256;
+for(const[n,h]of Object.entries(expected))if(crypto.createHash('sha256').update(fs.readFileSync('/app/'+n)).digest('hex')!==h)throw Error('Source changed '+n);
+const artifactRoot='/app/'+RAW;for(const[n,v]of Object.entries(JSON.parse(fs.readFileSync(artifactRoot+'/artifact-manifest.json')))){const b=fs.readFileSync(artifactRoot+'/'+n);if(b.length!==v.bytes||crypto.createHash('sha256').update(b).digest('hex')!==v.sha256)throw Error('Artifact mismatch '+n)}
+const checks=[];for(const[name,args]of [['site-build',['npm','run','build','--prefix','site']],['site-tests',['npm','test','--prefix','site']],['report-links',['node','scripts/check-doc-links.mjs']]]){const q=cp.spawnSync('python3',['benchmark/reap_validation.py','runuser','-u','stow-validation','--',...args],{cwd:'/app',encoding:'utf8',timeout:45000,maxBuffer:4000000});fs.writeFileSync(root+'/report-'+name+'.log',q.stdout+q.stderr);checks.push({name,args,exitCode:q.status});console.log(name+': '+q.status);if(q.status!==0){console.log(q.stdout+q.stderr);process.exit(1)}}
+const documents={};documents[REPORT]=crypto.createHash('sha256').update(fs.readFileSync('/app/'+REPORT)).digest('hex');const result={exitCode:0,checks,documentSHA256:documents,sourceSHA256:expected,railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID};fs.writeFileSync(root+'/report-receipt.json',JSON.stringify(result,null,2));console.log('Verified report, evidence and final source hashes');
+""".replace('ROOT',json.dumps(root)).replace('RAW',json.dumps(raw)).replace('REPORT',json.dumps(report));remote(script,'publish-check.js')

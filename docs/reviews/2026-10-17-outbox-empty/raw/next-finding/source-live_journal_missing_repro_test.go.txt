@@ -1,0 +1,20 @@
+package runthrough_test
+
+import (
+	"os"
+	"testing"
+)
+
+func TestFileOutboxRefusesMissingLiveJournal(t *testing.T) {
+	for _, operation := range []string{"lookup", "pending", "enqueue", "prepare", "close"} {
+		t.Run(operation, func(t *testing.T) {
+			f := newJournalRecoveryFixture(t)
+			if err := os.Remove(f.path); err != nil {
+				t.Fatal(err)
+			}
+			if err := f.operation(t, operation); err == nil {
+				t.Fatalf("%s accepted a missing journal previously loaded with active %q and prepared %q", operation, f.active.ID, f.prepared.ID)
+			}
+		})
+	}
+}

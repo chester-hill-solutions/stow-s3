@@ -1,0 +1,91 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/provenance-file_outbox_proto.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 18,
+    "passed": true
+  },
+  {
+    "name": "provenance-normal",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-provenance.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 2052,
+    "passed": true
+  },
+  {
+    "name": "provenance-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/proto-block-provenance.json",
+      "./internal/runthrough",
+      "-run",
+      "^(TestOutboxProtoBlock|TestOutboxProtoMatchesJSONState|TestOutboxProtoPreservesTimestampErrors|TestFileOutboxOwnWrite|TestFileOutboxReleasesCallerStringBuffers|TestOutboxStateClone)",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 5526,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/provenance-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 747,
+    "passed": true
+  },
+  {
+    "name": "provenance-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/proto-block-provenance.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/provenance-after.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 747,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/confirmation.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 250768,
+    "passed": true
+  }
+]

@@ -1,0 +1,54 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {loadavg} from 'node:os';
+import {join} from 'node:path';
+import {systemMetadata,cgroupResources} from './resources.mjs';
+if(process.platform!=='linux'||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4'||process.env.RAILWAY_ENVIRONMENT_ID!=='3cd200cb-c94f-4e4d-9335-0f6c1b7e9411'||!process.env.RAILWAY_DEPLOYMENT_ID)throw Error('Railway benchmark runner only');
+const out=process.argv[2];if(!out?.startsWith('/results/'))throw Error('Dedicated results volume required');
+await mkdir(out,{recursive:false});
+const save=async(name,value)=>writeFile(join(out,name),typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');
+const median=values=>{const s=[...values].sort((a,b)=>a-b),m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const mean=values=>values.reduce((a,b)=>a+b,0)/values.length;
+const describe=values=>({median:median(values),min:Math.min(...values),max:Math.max(...values)});
+try{
+ const start=await systemMetadata(),build=JSON.parse(await readFile('benchmark/build-identity.json','utf8'));
+ if(start.cgroup.cpuMax!=='400000 100000'||start.cgroup.memoryMax!=='4294967296')throw Error('Unexpected resource ceilings: '+JSON.stringify(start.cgroup));
+ for(const version of ['before','after']){const bytes=await readFile('benchmark/'+version+'.test');if(createHash('sha256').update(bytes).digest('hex')!==build.binaries[version].sha256)throw Error('Binary mismatch')}
+ const plan=[];
+ for(const cpu of [1,4])for(let cycle=0;cycle<2;cycle++)for(const [position,version]of (cycle===0?['before','after','after','before']:['after','before','before','after']).entries())plan.push({cpu,cycle,position,version});
+ await save('plan.json',{blocks:plan,benchtime:'200ms',count:2});
+ const rows=[],resources=[],outputs=[];
+ for(const [index,block]of plan.entries()){
+  const before=await cgroupResources(),loadBefore=loadavg();
+  const args=['-test.run=^$','-test.bench=^BenchmarkPreparedRecoveryClassification$','-test.benchmem','-test.benchtime=200ms','-test.count=2','-test.cpu='+block.cpu];
+  const binary='benchmark/'+block.version+'.test',q=spawnSync(binary,args,{encoding:'utf8',timeout:180000,maxBuffer:4194304});
+  const text='COMMAND '+JSON.stringify([binary,...args])+'\n'+(q.stdout??'')+(q.stderr??'');
+  await save('block-'+index+'.log',text);outputs.push(text);
+  resources.push({block:index,before,after:await cgroupResources(),loadBefore,loadAfter:loadavg()});
+  if(q.status!==0)throw Error('Benchmark block failed: '+index+' '+q.status+' '+q.error);
+  for(const line of q.stdout.split('\n'))if(line.startsWith('Benchmark')){
+   const tokens=line.trim().split(/\s+/),metrics={};
+   for(let n=2;n<tokens.length-1;n+=2)metrics[tokens[n+1]]=Number(tokens[n]);
+   rows.push({...block,block:index,name:tokens[0].replace(/-\d+$/,''),iterations:Number(tokens[1]),metrics});
+  }
+  console.log(JSON.stringify({block:index,...block,complete:true}));
+ }
+ if(rows.length!==256)throw Error('Unexpected sample count '+rows.length);
+ const summary=[];
+ for(const cpu of [1,4])for(const name of [...new Set(rows.map(row=>row.name))].sort()){
+  const row={cpu,name};
+  for(const version of ['before','after']){const values=rows.filter(x=>x.cpu===cpu&&x.name===name&&x.version===version).map(x=>x.metrics);row[version]=Object.fromEntries(Object.keys(values[0]).map(key=>[key,describe(values.map(x=>x[key]))]))}
+  row.ns_change_percent=(row.after['ns/op'].median/row.before['ns/op'].median-1)*100;
+  row.paired_cycle_changes_percent=[];row.same_code_absolute_changes_percent=[];
+  for(let cycle=0;cycle<2;cycle++){
+   const blocks={};
+   for(const version of ['before','after']){const subset=rows.filter(x=>x.cpu===cpu&&x.name===name&&x.cycle===cycle&&x.version===version),ids=[...new Set(subset.map(x=>x.block))].sort((a,b)=>a-b);blocks[version]=ids.map(id=>median(subset.filter(x=>x.block===id).map(x=>x.metrics['ns/op'])));row.same_code_absolute_changes_percent.push(Math.abs((blocks[version][1]/blocks[version][0]-1)*100))}
+   row.paired_cycle_changes_percent.push((mean(blocks.after)/mean(blocks.before)-1)*100);
+  }
+  summary.push(row);
+ }
+ await save('measurements.log',outputs.join('\n'));await save('samples.json',rows);await save('summary.json',summary);await save('block-resources.json',resources);
+ await save('environment.json',{...build,provider:'Railway',measurementPhase:'deployed runner; binaries compiled during image build',start,end:await systemMetadata(),runtimeSettings:{GOGC:process.env.GOGC??null,GOMEMLIMIT:process.env.GOMEMLIMIT??null}});
+ await save('run.json',{complete:true,samples:rows.length,startedAt:start.recordedAt,finishedAt:new Date().toISOString(),source:build.sources,railwayDeploymentId:process.env.RAILWAY_DEPLOYMENT_ID});
+}catch(error){await save('run.json',{complete:false,error:error.stack,finishedAt:new Date().toISOString()});throw error}

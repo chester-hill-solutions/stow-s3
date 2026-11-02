@@ -1,0 +1,77 @@
+{
+  "phase": "bounded-closure-corrected-s3-fixture",
+  "sources": [
+    "internal/storage/preconditions.go",
+    "internal/s3api/validators.go",
+    "benchmark/etag_probe.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "install-probe",
+      "args": [
+        "cp",
+        "benchmark/etag_probe.go.txt",
+        "internal/s3api/closure_etag_probe_test.go"
+      ]
+    },
+    {
+      "name": "format-probe",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/s3api/closure_etag_probe_test.go"
+      ]
+    },
+    {
+      "name": "capture-probe",
+      "args": [
+        "node",
+        "-e",
+        "require('node:fs').copyFileSync('internal/s3api/closure_etag_probe_test.go',process.env.STOW_RESULT_ROOT+'/etag_probe.formatted.go.txt')"
+      ]
+    },
+    {
+      "name": "s3api-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/s3api",
+        "-run",
+        "^TestClosureETagCase$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "s3api-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/s3api",
+        "-run",
+        "^TestClosureETagCase$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "cleanup-probe",
+      "args": [
+        "rm",
+        "internal/s3api/closure_etag_probe_test.go"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

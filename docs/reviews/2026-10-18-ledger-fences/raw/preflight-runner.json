@@ -1,0 +1,66 @@
+[
+  {
+    "id": "75f56fbc-c6d7-41ee-b316-8a7f2faf163c",
+    "status": "REMOVED",
+    "createdAt": "2026-10-18T19:35:35.189Z",
+    "meta": {
+      "buildOnly": false,
+      "cliAgentSessionId": "stow-ledger-cost-20261018",
+      "cliCaller": "skill:use-railway@1.6.1",
+      "cliMessage": "Transport identical ledger diagnostics as compressed source after terminal upload failures",
+      "fileServiceManifest": {},
+      "imageDigest": "sha256:a7f774d1409b391d9a1a781889b766343338f424b233d6c9d393d9bc8144fe4e",
+      "logsV2": true,
+      "nixpacksProviders": [],
+      "propertyFileMapping": {},
+      "reason": "deploy",
+      "rootDirectory": null,
+      "runtime": "V2",
+      "serviceManifest": {
+        "build": {
+          "buildCommand": null,
+          "buildEnvironment": "V3",
+          "builder": "DOCKERFILE",
+          "dockerfilePath": "benchmark/Dockerfile",
+          "nixpacksConfigPath": null,
+          "nixpacksPlan": null,
+          "watchPatterns": []
+        },
+        "deploy": {
+          "cronSchedule": null,
+          "drainingSeconds": null,
+          "healthcheckPath": "/health",
+          "healthcheckTimeout": null,
+          "ipv6EgressEnabled": false,
+          "limitOverride": {
+            "containers": {
+              "cpu": 4,
+              "memoryBytes": 4294967296
+            }
+          },
+          "multiRegionConfig": {
+            "us-east4-eqdc4a": {
+              "numReplicas": 1
+            }
+          },
+          "numReplicas": 1,
+          "overlapSeconds": null,
+          "preDeployCommand": null,
+          "preDeployTimeoutSeconds": null,
+          "region": null,
+          "registryCredentials": null,
+          "requiredMountPath": null,
+          "restartPolicyMaxRetries": null,
+          "restartPolicyType": "NEVER",
+          "runtime": "V2",
+          "sleepApplication": false,
+          "startCommand": "node benchmark/runner.mjs",
+          "useLegacyStacker": false
+        }
+      },
+      "volumeMounts": [
+        "/results"
+      ]
+    }
+  }
+]

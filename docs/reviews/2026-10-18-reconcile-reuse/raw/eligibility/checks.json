@@ -1,0 +1,47 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/reuse_trace_test.go",
+      "benchmark/repeated-trace.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 17,
+    "passed": true
+  },
+  {
+    "name": "trace",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/diagnostic-overlay.json",
+      "./internal/storage/fs",
+      "-run",
+      "^TestReconcileEligibilityTrace$",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "STOW_REUSE_DIAGNOSTIC": "on",
+      "STOW_REUSE_TRACE": "1"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 1886,
+    "passed": true
+  },
+  {
+    "name": "cleanup",
+    "args": [
+      "rm",
+      "internal/storage/fs/reuse_trace_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16,
+    "passed": true
+  }
+]

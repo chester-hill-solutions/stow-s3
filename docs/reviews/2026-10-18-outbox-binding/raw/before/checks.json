@@ -1,0 +1,77 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/file_outbox_binding_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "regression-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxRejectsMismatchedEntryIDsOnOpen|TestFileOutboxRejectsMismatchedEntryIDsOnReload|TestFileOutboxPreservesMatchingCustomEntryIDs)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 24508,
+    "passed": true
+  },
+  {
+    "name": "regression-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-run",
+      "^(TestFileOutboxRejectsMismatchedEntryIDsOnOpen|TestFileOutboxRejectsMismatchedEntryIDsOnReload|TestFileOutboxPreservesMatchingCustomEntryIDs)$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 39515,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 478,
+    "passed": true
+  },
+  {
+    "name": "benchmark-build",
+    "args": [
+      "go",
+      "test",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/outbox-binding-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 791,
+    "passed": true
+  }
+]

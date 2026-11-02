@@ -1,0 +1,20 @@
+from pathlib import Path
+import subprocess,os,json,base64,hashlib,sys
+p=Path('/private/tmp/stow-outbox-readcost-2026-10-18');cli='/Users/ladmin/.npm/_npx/840d6e3429277c8b/node_modules/@railway/cli/bin/railway'
+env=dict(os.environ,RAILWAY_CALLER='skill:use-railway@1.6.1',RAILWAY_AGENT_SESSION='stow-outbox-readcost-20261018')
+job=sys.argv[1];assert len(job)==36 and all(c in '0123456789abcdef-'for c in job)
+root='/results/'+job
+js="const fs=require('node:fs'),crypto=require('node:crypto');const root="+json.dumps(root)+";const run=JSON.parse(fs.readFileSync(root+'/run.json','utf8'));if(!run.complete&&!run.error)throw Error(JSON.stringify(run));for(const entry of fs.readdirSync(root,{withFileTypes:true})){if(!entry.isFile())continue;const data=fs.readFileSync(root+'/'+entry.name);console.log('STOWEXPORT:'+JSON.stringify({name:entry.name,bytes:data.length,sha256:crypto.createHash('sha256').update(data).digest('hex'),data:data.toString('base64')}))}"
+cmd=[cli,'ssh','--project','8d90188e-0f1e-4c47-9379-9399ae06e6fa','--environment','3cd200cb-c94f-4e4d-9335-0f6c1b7e9411','--service','83497842-c51d-420e-8ba1-181589730ad4','--','node','-e',js]
+q=subprocess.run(cmd,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=55)
+if q.returncode:print(q.stdout[:2500]);raise SystemExit(q.returncode)
+assert len(q.stdout)<8<<20
+out=p/('export-'+job);out.mkdir(exist_ok=True);receipt=[]
+for line in q.stdout.splitlines():
+ if not line.startswith('STOWEXPORT:'):continue
+ row=json.loads(line.removeprefix('STOWEXPORT:'));name=row.pop('name');data=base64.b64decode(row.pop('data'));assert Path(name).name==name
+ assert len(data)==row['bytes'] and hashlib.sha256(data).hexdigest()==row['sha256']
+ (out/name).write_bytes(data);receipt.append(dict(name=name,**row))
+assert any(x['name']=='run.json'for x in receipt)
+(out/'export-receipt.json').write_text(json.dumps(dict(root=root,files=receipt),indent=2)+'\n')
+print('Verified export',root,'files',len(receipt))

@@ -1,0 +1,17 @@
+import {readFile,writeFile,mkdir}from'node:fs/promises';
+import{execFileSync}from'node:child_process';import{createHash}from'node:crypto';
+const hash=x=>createHash('sha256').update(x).digest('hex');
+await mkdir('/out',{recursive:true});const binaries={},sources={};
+for(const variant of ['baseline','record','fixed']){
+ const files=variant==='baseline'?['internal/storage/workspace/multipart.go']:['benchmark/'+variant+'/multipart.go','benchmark/'+variant+'/part_record.go'];
+ for(const name of files){const bytes=await readFile(name);sources[name]={bytes:bytes.length,sha256:hash(bytes)}}
+ const args=['test','-c','-buildvcs=false','-o','/out/'+variant+'.test'];
+ if(variant!=='baseline'){
+  const overlay={Replace:{'/src/internal/storage/workspace/multipart.go':'/src/benchmark/'+variant+'/multipart.go','/src/internal/storage/workspace/part_record.go':'/src/benchmark/'+variant+'/part_record.go'}};
+  await writeFile('benchmark/'+variant+'-overlay.json',JSON.stringify(overlay));args.push('-overlay=benchmark/'+variant+'-overlay.json');
+ }
+ args.push('./internal/storage/workspace');execFileSync('go',args,{stdio:'inherit'});
+ const bytes=await readFile('/out/'+variant+'.test');binaries[variant]={bytes:bytes.length,sha256:hash(bytes)};
+}
+for(const name of ['internal/storage/workspace/part_comparison_bench_test.go','internal/storage/workspace/part_publication_test.go']){const bytes=await readFile(name);sources[name]={bytes:bytes.length,sha256:hash(bytes)}}
+await writeFile('/out/build-identity.json',JSON.stringify({baseline:JSON.parse(await readFile('benchmark/baseline.json')),sources,binaries,go:execFileSync('go',['version'],{encoding:'utf8'}).trim(),compiler:JSON.parse(execFileSync('go',['env','-json','GOOS','GOARCH','GOTOOLCHAIN','GOAMD64','CGO_ENABLED','GOFLAGS','GOEXPERIMENT'],{encoding:'utf8'}))},null,2)+'\n');

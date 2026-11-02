@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,re,math,statistics,collections
+p=Path('/private/tmp/stow-read-matched-2026-10-16');data=[];run=-1
+for line in (p/'matched.log').read_text().splitlines():
+ if 'MATCHED {' not in line:continue
+ s=json.loads(line.split('MATCHED ',1)[1]);
+ if s['case']=='get-3' and s['cycle']==0 and s['position']==0:run+=1
+ s['run']=run;data.append(s)
+assert len(data)==1280
+rows=[]
+def quantile(v,q):return sorted(v)[round((len(v)-1)*q)]
+def corr(a,b):
+ ma=statistics.mean(a);mb=statistics.mean(b);num=sum((x-ma)*(y-mb) for x,y in zip(a,b));den=math.sqrt(sum((x-ma)**2 for x in a)*sum((y-mb)**2 for y in b));return num/den if den else 0
+for cpu in [1,8]:
+ for case in ['get-3','get-64KiB','save-3','save-64KiB']:
+  samples=[s for s in data if s['cpu']==cpu and s['case']==case];versions={v:[s for s in samples if s['label'].startswith(v)] for v in ['original','current']};cycles=collections.defaultdict(dict)
+  for s in samples:cycles[s['run'],s['cycle']][s['label']]=s
+  ratios=[];controls=[]
+  for group in cycles.values():
+   vals={k:s['ns']/s['n'] for k,s in group.items()};ratios.append(math.sqrt(vals['current-a']*vals['current-b']/(vals['original-a']*vals['original-b']))-1)
+   controls.extend([vals['original-b']/vals['original-a']-1,vals['current-b']/vals['current-a']-1])
+  row={'cpu':cpu,'case':case,'samples':len(samples),'median_ns':{v:statistics.median(s['ns']/s['n'] for s in ss) for v,ss in versions.items()},'paired_cycle_ratio_median_pct':100*statistics.median(ratios),'paired_cycle_ratio_p10_p90_pct':[100*quantile(ratios,q) for q in [.1,.9]],'same_code_control_abs_median_pct':100*statistics.median(abs(x) for x in controls),'same_code_control_abs_p90_pct':100*quantile([abs(x) for x in controls],.9),'gc_cpu_vs_elapsed_correlation':corr([s['gc_cpu_seconds']/s['n'] for s in samples],[s['ns']/s['n'] for s in samples]),'versions':{v:{'median_bytes_per_op':statistics.median(s['allocated_bytes']/s['n'] for s in ss),'median_allocs_per_op':statistics.median(s['allocs']/s['n'] for s in ss),'median_gc_cpu_ns_per_op':statistics.median(s['gc_cpu_seconds']*1e9/s['n'] for s in ss),'median_gc_cycles_per_1000_ops':statistics.median(s['gc_cycles']*1000/s['n'] for s in ss)} for v,ss in versions.items()}}
+  rows.append(row);print(json.dumps(row))
+(p/'samples.json').write_text(json.dumps(data,indent=2)+'\n');(p/'summary.json').write_text(json.dumps(rows,indent=2)+'\n')

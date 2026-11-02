@@ -1,0 +1,91 @@
+{
+  "phase": "multipart-completion-buffers-final-format",
+  "sources": [
+    "internal/storage/fs/fs_multipart.go",
+    "internal/storage/fs/fs_records.go",
+    "internal/storage/fs/fs_atomic.go",
+    "internal/storage/fs/capacity.go",
+    "internal/storage/fs/completion_buffer_test.go",
+    "internal/storage/fs/completion_buffer_verify_test.go",
+    "internal/storage/fs/completion_capacity_version_test.go",
+    "benchmark/baseline-fs_multipart.go.txt",
+    "benchmark/baseline-fs_records.go.txt",
+    "benchmark/baseline-fs_atomic.go.txt",
+    "benchmark/baseline-capacity.go.txt",
+    "benchmark/before-overlay.json",
+    "benchmark/completion-probe.go.txt",
+    "benchmark/measure.mjs",
+    "benchmark/measure-child.py",
+    "benchmark/doc-links-capture.mjs",
+    "scripts/baselines/go-quality.json",
+    "internal/storage/fs/completion_checksum_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/fs/fs_multipart.go",
+        "internal/storage/fs/fs_records.go",
+        "internal/storage/fs/fs_atomic.go",
+        "internal/storage/fs/capacity.go",
+        "internal/storage/fs/completion_buffer_test.go",
+        "internal/storage/fs/completion_buffer_verify_test.go",
+        "internal/storage/fs/completion_capacity_version_test.go",
+        "internal/storage/fs/completion_checksum_test.go"
+      ]
+    },
+    {
+      "name": "regressions-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/fs",
+        "-run",
+        "^Test(CompletionBuffer(Allocation|Checksums)|MultipartCompletionCapacityVersion)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "regressions-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/fs",
+        "-run",
+        "^Test(CompletionBuffer(Allocation|Checksums)|MultipartCompletionCapacityVersion)$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "ratchet-baseline",
+      "args": [
+        "node",
+        "scripts/check-go-quality.mjs",
+        "--write-baseline"
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./internal/storage/fs",
+        "./internal/capacity"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+from pathlib import Path
+import subprocess,os,json,hashlib,shutil
+root=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');os.chdir(root)
+p=Path('/private/tmp/stow-runthrough-version-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+def run(cmd,name,cwd=root):
+ r=subprocess.run(cmd,cwd=cwd,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (p/name).write_text('COMMAND '+json.dumps(cmd)+' cwd='+str(cwd)+'\n'+r.stdout)
+ assert r.returncode==0,(name,r.stdout[-4000:]);print(name,'PASS',flush=True)
+run(['go','test','-race','./internal/runthrough','-count=5','-v'],'focused-race.log')
+run(['go','test','./...'],'full-go.log')
+run(['go','test','-race','./internal/runtime','./internal/storage/...','./internal/s3api','./internal/runthrough','./internal/embedded','./pkg/stow'],'broad-race.log')
+run(['make','test-conformance'],'conformance-full.log')
+text=(p/'conformance-full.log').read_text();(p/'conformance-summary.log').write_text('\n'.join(l for l in text.splitlines() if l.startswith(('COMMAND ','STOW_','--- SKIP:','PASS','ok  ')))+'\n')
+run(['go','vet','./internal/runtime','./internal/embedded','./internal/storage/...','./internal/s3api','./internal/runthrough','./pkg/stow'],'vet.log')
+wasm=root/'packages/stow-s3/dist/stow-runtime.wasm'
+def identity(file):
+ data=file.read_bytes();return {'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+wasmBefore=identity(wasm)
+run(['make','build-wasm'],'build-wasm.log')
+link=root/'packages/stow-s3/node_modules';assert not link.exists() and not link.is_symlink()
+link.symlink_to('/Users/ladmin/WebProjects/stow/packages/stow-s3/node_modules',target_is_directory=True)
+try:
+ run(['npm','run','build'],'package-build.log',root/'packages/stow-s3')
+ run(['node','scripts/check-generated.mjs'],'generated.log')
+ run(['node','--test','wasm/runtime.test.mjs'],'wasm-smoke.log')
+ run(['node','--import','tsx','--test','test/embedded.test.ts','test/node-wasm-host.test.ts','test/wasm-assets.test.ts','test/host-backed-streams.test.ts'],'package-tests.log',root/'packages/stow-s3')
+finally:link.unlink()
+(p/'wasm.json').write_text(json.dumps({'before':wasmBefore,'after':identity(wasm)},indent=2)+'\n')
+print('VALIDATION COMPLETE',flush=True)

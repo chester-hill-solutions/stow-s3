@@ -1,0 +1,23 @@
+{
+  "completed": 5,
+  "total": 5,
+  "last": {
+    "name": "candidate-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/insert-candidate-test.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestOutboxDuplicateBoundaryAllocation$",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 3604,
+    "passed": true
+  }
+}

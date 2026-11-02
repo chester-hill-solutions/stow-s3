@@ -1,0 +1,31 @@
+{
+  "phase": "outbox-native-protobuf-final-quality",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/file_outbox_proto.go",
+    "internal/runthrough/file_outbox_proto_selector_test.go",
+    "internal/runthrough/file_outbox_proto_bench_test.go",
+    "internal/runthrough/file_outbox_proto_test.go",
+    "internal/runthrough/file_outbox_proto_native_test.go",
+    "internal/runthrough/outbox_test.go",
+    "internal/runthrough/outbox_claim_test.go",
+    "internal/runthrough/outboxpb/entry.proto",
+    "internal/runthrough/outboxpb/entry.pb.go",
+    "internal/runthrough/outboxpb/outbox.proto",
+    "internal/runthrough/outboxpb/outbox.pb.go",
+    "internal/runthrough/file_outbox_provenance_bench_test.go",
+    "scripts/baselines/go-quality.json"
+  ],
+  "steps": [
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

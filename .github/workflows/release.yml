@@ -129,7 +129,7 @@ jobs:
       # that platform rather than left as py3-none-any, because a pure-python tag
       # would let pip install a Linux binary on macOS and fail at run time.
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
 
@@ -240,10 +240,11 @@ jobs:
         run: |
           node scripts/pack-platform-package.mjs "dist/native/stow-${{ matrix.target }}.tar.gz" dist/platform
           mkdir -p "$RUNNER_TEMP/npm-consumer"
-          cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/npm-consumer/"
+          cp scripts/smoke-npm-consumer.mjs scripts/assert-consumer-binary.mjs "$RUNNER_TEMP/npm-consumer/"
           cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
           cd "$RUNNER_TEMP/npm-consumer"
-          npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com ./*.tgz
+          touch "$RUNNER_TEMP/packed-user-npmrc" "$RUNNER_TEMP/packed-global-npmrc"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/packed-user-npmrc" --globalconfig="$RUNNER_TEMP/packed-global-npmrc" ./*.tgz
           env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${RELEASE_VERSION#v}"
 
   live_gate:
@@ -290,39 +291,13 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-          registry-url: https://npm.pkg.github.com
-      # npm is required to publish; PyPI is not. The step further down named
-      # "Record PyPI publishing status" is written for PyPI being off — it records
-      # the skip and prints a warning in the release notes — so requiring it here
-      # made that step unreachable and turned an optional target into a release
-      # blocker. docs/foss-readiness-plan.md A3 tracks configuring the trusted
-      # publisher, and until that is done this gate must not be what stops a
-      # release.
-      #
-      # A rehearsal reports an unready account and carries on, because the point
-      # of a rehearsal is to validate everything after this step, and stopping
-      # here would leave the tail unexercised for a reason that is a settings
-      # change rather than a defect. A tagged release still refuses to publish.
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      # This is a reviewed local assertion, not proof from account ownership or 2FA.
       - name: Require release account setup
         if: needs.plan.outputs.publish_packages == 'true'
-        id: account
-        env:
-          NPM_READY: ${{ vars.STOW_NPM_PUBLISH_READY }}
-          REHEARSING: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          set -euo pipefail
-          if [[ "$NPM_READY" == "true" ]]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "ready=false" >> "$GITHUB_OUTPUT"
-          message='Configure npmjs scope ownership and OIDC/token publishing, then set STOW_NPM_PUBLISH_READY=true'
-          if [[ "$REHEARSING" == "true" ]]; then
-            echo "::warning title=Release account not ready::$message A rehearsal reports this and continues; a tagged release stops here."
-          else
-            echo "$message" >&2
-            exit 1
-          fi
+        run: node scripts/check-npm-publish-readiness.mjs
+
       - name: Verify npm package artifact
         shell: bash
         run: |
@@ -381,6 +356,20 @@ jobs:
             grep -Fxq package/bin/stow-s3 "$RUNNER_TEMP/platform-tarball-files.txt"
           done
           ls -l dist/npm-platform
+
+      - name: Prepare first npm 0.3.5 bootstrap artifacts (publishes nothing)
+        if: github.event_name == 'workflow_dispatch' && inputs.version == '0.3.5'
+        run: |
+          mkdir -p dist/npm-first
+          cp dist/npm-platform/*.tgz dist/npm/*.tgz dist/npm-first/
+          node scripts/npm-first-release.mjs dist/npm-first/receipt.json dist/npm-first/*.tgz
+      - name: Upload first npm 0.3.5 bootstrap artifacts
+        if: github.event_name == 'workflow_dispatch' && inputs.version == '0.3.5'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm-first-0.3.5
+          path: dist/npm-first/*
+          if-no-files-found: error
 
       - name: Preflight exact npm artifacts
         if: needs.plan.outputs.publish_packages == 'true'
@@ -446,13 +435,9 @@ jobs:
       # Everything from here to the end of the job publishes. Each step says so.
       - name: Publish platform packages
         if: startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node scripts/publish-if-absent.mjs ./dist/npm-platform/*.tgz
       - name: Publish npm package
         if: startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node scripts/publish-if-absent.mjs ./dist/npm/*.tgz
 
       # PyPI is off until a trusted publisher is configured for this project on
@@ -477,7 +462,7 @@ jobs:
 
       - name: Publish to PyPI
         if: startsWith(github.ref, 'refs/tags/v') && needs.plan.outputs.publish_packages == 'true' && steps.pypi.outputs.status == 'enabled'
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: dist/wheel
           # attestations prove the wheel came from this workflow rather than
@@ -491,10 +476,10 @@ jobs:
         run: |
           version="${RELEASE_VERSION#v}"
           mkdir -p "$RUNNER_TEMP/anonymous-npm-consumer"
-          cp scripts/smoke-npm-consumer.mjs "$RUNNER_TEMP/anonymous-npm-consumer/"
+          cp scripts/smoke-npm-consumer.mjs scripts/assert-consumer-binary.mjs "$RUNNER_TEMP/anonymous-npm-consumer/"
           cd "$RUNNER_TEMP/anonymous-npm-consumer"
-          touch "$RUNNER_TEMP/empty-npmrc"
-          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --@chester-hill-solutions:registry=https://npm.pkg.github.com --userconfig="$RUNNER_TEMP/empty-npmrc" "@chester-hill-solutions/stow-s3@$version"
+          touch "$RUNNER_TEMP/empty-npmrc" "$RUNNER_TEMP/empty-global-npmrc"
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG -u STOW_BIN npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/empty-npmrc" --globalconfig="$RUNNER_TEMP/empty-global-npmrc" --cache="$RUNNER_TEMP/anonymous-npm-cache" "@chester-hill-solutions/stow-s3@$version"
           env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u STOW_BIN node smoke-npm-consumer.mjs "$version"
 
       - name: Verify exact published PyPI version as anonymous consumer

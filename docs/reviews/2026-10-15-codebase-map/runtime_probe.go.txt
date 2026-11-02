@@ -1,0 +1,122 @@
+package runtime_test
+
+import (
+	"context"
+	"errors"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
+	stowruntime "github.com/chester-hill-solutions/stow-s3/internal/runtime"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
+)
+
+func mapReviewWorkspace(t *testing.T) (*stowruntime.Instance, string) {
+	t.Helper()
+	root := t.TempDir()
+	store, err := workspace.New(workspace.Options{Root: root, Bucket: "probe"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	instance, err := stowruntime.OpenWithStore(stowruntime.Options{Backend: stowruntime.BackendWorkspace, MaxBytes: 128, MaxObjects: 4}, store, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := instance.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	return instance, root
+}
+
+func mapReviewBlockIndex(t *testing.T, root string) {
+	t.Helper()
+	path := filepath.Join(root, ".stow", "index.json")
+	if err := os.Rename(path, path+".saved"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(path, 0700); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.Remove(path); err != nil {
+			t.Error(err)
+		}
+		if err := os.Rename(path+".saved", path); err != nil {
+			t.Error(err)
+		}
+	})
+}
+
+func TestMapWorkspaceMultipartPublicationDoesNotPanic(t *testing.T) {
+	ctx := context.Background()
+	instance, root := mapReviewWorkspace(t)
+	upload, err := instance.CreateMultipartUpload(ctx, "probe", "target", storage.MultipartOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	part, err := instance.UploadPart(ctx, upload.UploadID, 1, storage.NewOwnedBody([]byte("body")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	mapReviewBlockIndex(t, root)
+	defer func() {
+		if value := recover(); value != nil {
+			body, _ := os.ReadFile(filepath.Join(root, "target"))
+			t.Errorf("completion panicked: %v; published=%q usage=%+v", value, body, instance.Usage())
+		}
+	}()
+	meta, err := instance.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part})
+	if !errors.Is(err, storage.ErrMutationCommitted) || meta == nil {
+		t.Fatalf("committed completion lost result: meta=%+v error=%v", meta, err)
+	}
+}
+
+func TestMapCopyPreservesCommittedIdentity(t *testing.T) {
+	for _, mode := range []string{"adapter", "conditional-adapter", "public"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx := context.Background()
+			instance, root := mapReviewWorkspace(t)
+			source, err := instance.PutObject(ctx, "probe", "source", []byte("body"), stowruntime.PutOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			mapReviewBlockIndex(t, root)
+			var resultKey, resultETag string
+			if mode == "public" {
+				object, err := embedded.WrapInstance(instance).CopyObject(ctx, "probe", "source", "probe", "target")
+				if !errors.Is(err, storage.ErrMutationCommitted) {
+					t.Fatalf("wrong copy error: %v", err)
+				}
+				resultKey, resultETag = object.Key, object.ETag
+			} else {
+				adapter, err := stowruntime.NewStoreAdapter(instance)
+				if err != nil {
+					t.Fatal(err)
+				}
+				var meta *storage.ObjectMeta
+				if mode == "adapter" {
+					meta, err = adapter.CopyObject(ctx, "probe", "source", "probe", "target")
+				} else {
+					meta, err = adapter.CopyObjectCond(ctx, storage.CopyRequest{SourceBucket: "probe", SourceKey: "source", DestBucket: "probe", DestKey: "target", Options: storage.CopyOptions{SourceIfMatch: source.ETag}})
+				}
+				if !errors.Is(err, storage.ErrMutationCommitted) {
+					t.Fatalf("wrong copy error: %v", err)
+				}
+				if meta != nil {
+					resultKey, resultETag = meta.Key, meta.ETag
+				}
+			}
+			body, err := os.ReadFile(filepath.Join(root, "target"))
+			if err != nil || string(body) != "body" {
+				t.Fatalf("copy not committed: %q %v", body, err)
+			}
+			if resultKey != "target" || resultETag == "" {
+				t.Fatalf("committed copy identity missing: key=%q etag=%q usage=%+v", resultKey, resultETag, instance.Usage())
+			}
+		})
+	}
+}

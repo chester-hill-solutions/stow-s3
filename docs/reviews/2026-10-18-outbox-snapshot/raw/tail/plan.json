@@ -1,0 +1,37 @@
+{
+  "phase": "outbox-snapshot-tail-investigation",
+  "sources": [
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/file_outbox_proto_native_test.go",
+    "internal/runthrough/file_outbox_snapshot_test.go",
+    "internal/runthrough/file_outbox_snapshot_bench_test.go",
+    "internal/runthrough/file_outbox_snapshot_writer_bench_test.go",
+    "internal/runthrough/file_outbox_snapshot_matched_bench_test.go"
+  ],
+  "steps": [
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/compare.mjs"
+      ]
+    }
+  ],
+  "compare": {
+    "fixtures": [],
+    "stages": [],
+    "cpu": [],
+    "cycles": 0,
+    "benchtime": "64x",
+    "contracts": false,
+    "fixed": false,
+    "writers": false,
+    "follow": false,
+    "tail": true,
+    "expectedBinaries": {
+      "before": "c0c8b488dbadf1690e7526f27c708767dad424cae0cbff97ff428bd0ab5f158b",
+      "after": "bf59d24d7312006e134c253c595fde3ff2f2c6aa8b7eff824f2a85e49d0904a6"
+    }
+  }
+}

@@ -1,0 +1,509 @@
+ok  	github.com/chester-hill-solutions/stow-s3/cmd/stow-s3	99.040s
+ok  	github.com/chester-hill-solutions/stow-s3/conformance	72.959s
+ok  	github.com/chester-hill-solutions/stow-s3/examples/resumable-transfer	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/examples/storage-dogfood	[no test files]
+?   	github.com/chester-hill-solutions/stow-s3/examples/stow-recipes/go/start-small	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/atomicfile	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/auth	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/authority	2.125s
+--- FAIL: TestReleasedOperationsFreeTheirSlotAndReserve (177.45s)
+    capacity_test.go:203: begin op-305: namespace admission requires verified reconciliation
+        atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReleasedOperationsFreeTheirSlotAndReserve617333047/001/host/capacity.json: open /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReleasedOperationsFreeTheirSlotAndReserve617333047/001/host/.tmp-471920644: no space left on device
+--- FAIL: TestHostStateSurvivesReopenAndRefusesTampering (0.23s)
+    capacity_test.go:219: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestHostStateSurvivesReopenAndRefusesTampering1628957388: no space left on device
+--- FAIL: TestBindRefusesAnUnequalRebindAndHonoursItsBound (0.27s)
+    capacity_test.go:270: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestBindRefusesAnUnequalRebindAndHonoursItsBound560717495: no space left on device
+FAIL
+testing: can't write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b385/testlog.txt: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b385/testlog.txt: no space left on device
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/capacity	191.976s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/embedded	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/mcpstorage	57.511s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/parentwatch	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policy	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/policystore	(cached)
+ok  	github.com/chester-hill-solutions/stow-s3/internal/ready	(cached)
+?   	github.com/chester-hill-solutions/stow-s3/internal/recoveryerrors	[no test files]
+ok  	github.com/chester-hill-solutions/stow-s3/internal/rooted	(cached)
+2026/10/16 16:19:41 GET /s3 200 86.791µs
+2026/10/16 16:21:19 stow: write ownership marker /tmp/TestPreparedRecoveryUncertaintyfilesystemdeleteretrywrapped-3480921932/001/.stow-owner: open /tmp/TestPreparedRecoveryUncertaintyfilesystemdeleteretrywrapped-3480921932/001/.stow-owner: no space left on device (this data directory will not be resettable)
+--- FAIL: TestPreparedRecoveryUncertainty (74.89s)
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/retry/wrapped-marked (0.80s)
+        prepared_uncertainty_test.go:21: mkdir /tmp/TestPreparedRecoveryUncertaintyfilesystemdeleteretrywrapped-3480921932/001/buckets/probe: no space left on device
+    --- FAIL: TestPreparedRecoveryUncertainty/filesystem/delete/retry/unknown (0.11s)
+        prepared_uncertainty_test.go:21: TempDir: mkdir /tmp/TestPreparedRecoveryUncertaintyfilesystemdeleteretryunknown3616783558: no space left on device
+--- FAIL: TestPreparedRecoveryConfirmedMissing (1.93s)
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=false (0.15s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemoryputwrapped=false1908511815: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/put/wrapped=true (0.27s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemoryputwrapped=true2622444883: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=false (0.13s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemorycopywrapped=false3444252205: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/copy/wrapped=true (0.03s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemorycopywrapped=true1699704872: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=false (0.31s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemorymultipartwrapped=fa3175226718: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/multipart/wrapped=true (0.04s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemorymultipartwrapped=tr3841496748: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=false (0.08s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemorydeletewrapped=false896557526: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/memory/delete/wrapped=true (0.02s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingmemorydeletewrapped=true2444044938: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=false (0.02s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemputwrapped=fals3565768184: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/put/wrapped=true (0.02s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemputwrapped=true3511761406: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=false (0.11s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemcopywrapped=fal1916985566: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/copy/wrapped=true (0.10s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemcopywrapped=tru4108251596: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=false (0.30s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemmultipartwrappe1013854450/001: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/multipart/wrapped=true (0.12s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemmultipartwrappe3438258998: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=false (0.13s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemdeletewrapped=f4150290982/001: no space left on device
+    --- FAIL: TestPreparedRecoveryConfirmedMissing/filesystem/delete/wrapped=true (0.10s)
+        prepared_uncertainty_test.go:99: TempDir: mkdir /tmp/TestPreparedRecoveryConfirmedMissingfilesystemdeletewrapped=t2421699633: no space left on device
+--- FAIL: TestPropagationOpeningFailureClosesSource (2.38s)
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=false (0.09s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putreadermarked3495690302: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/reader/marked=true (0.08s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putreadermarked1402713654: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=false (0.02s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putnilmarked=fa2058000896: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/nil/marked=true (0.10s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putnilmarked=tr4000012063: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=false (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putclose-errorm2609540196: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/close-error/marked=true (0.19s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putclose-errorm2913994986: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=false (0.01s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putno-metamarke1574298935: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/live-put/no-meta/marked=true (0.02s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcelive-putno-metamarke1675328495: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=false (0.09s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putreadermark1139940968: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/reader/marked=true (0.10s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putreadermark3428277615: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=false (0.11s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putnilmarked=3606619369: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/nil/marked=true (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putnilmarked=3439540167: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=false (0.09s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putclose-error217383670: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/close-error/marked=true (0.05s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putclose-error199104137: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=false (0.05s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putno-metamar4262724548: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-put/no-meta/marked=true (0.06s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-putno-metamar219457297: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=false (0.08s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copyreadermar2702789490: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/reader/marked=true (0.06s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copyreadermar803305263: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=false (0.07s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copynilmarked3188779371: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/nil/marked=true (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copynilmarked1440715817: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=false (0.12s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copyclose-erro609912835: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/close-error/marked=true (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copyclose-erro3759012615: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=false (0.05s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copyno-metama1538155775: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-copy/no-meta/marked=true (0.10s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-copyno-metama2463416833: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=false (0.14s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartreade1127210262: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/reader/marked=true (0.11s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartreade2077354693/001: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=false (0.12s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartnilm2361206239: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/nil/marked=true (0.02s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartnilm2030674145: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=false (0.17s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartclose786433512/001: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/close-error/marked=true (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartclose924890205: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=false (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartno-me525259824: no space left on device
+    --- FAIL: TestPropagationOpeningFailureClosesSource/queued-multipart/no-meta/marked=true (0.04s)
+        propagation_open_test.go:84: TempDir: mkdir /tmp/TestPropagationOpeningFailureClosesSourcequeued-multipartno-me3048706808: no space left on device
+--- FAIL: TestPropagationVersionConflictClosesSourceOnce (0.03s)
+    propagation_open_test.go:125: TempDir: mkdir /tmp/TestPropagationVersionConflictClosesSourceOnce1005558549: no space left on device
+--- FAIL: TestProvenanceSurvivesRestartAndEviction (0.05s)
+    --- FAIL: TestProvenanceSurvivesRestartAndEviction/read (0.04s)
+        provenance_integrity_test.go:23: TempDir: mkdir /tmp/TestProvenanceSurvivesRestartAndEvictionread3195454384: no space left on device
+    --- FAIL: TestProvenanceSurvivesRestartAndEviction/write (0.01s)
+        provenance_integrity_test.go:23: TempDir: mkdir /tmp/TestProvenanceSurvivesRestartAndEvictionwrite1475396708: no space left on device
+--- FAIL: TestEveryMutationPreservesConcurrentUpstreamChanges (0.09s)
+    --- FAIL: TestEveryMutationPreservesConcurrentUpstreamChanges/put (0.01s)
+        provenance_integrity_test.go:61: TempDir: mkdir /tmp/TestEveryMutationPreservesConcurrentUpstreamChangesput1435121560: no space left on device
+    --- FAIL: TestEveryMutationPreservesConcurrentUpstreamChanges/copy (0.03s)
+        provenance_integrity_test.go:61: TempDir: mkdir /tmp/TestEveryMutationPreservesConcurrentUpstreamChangescopy3345345219: no space left on device
+    --- FAIL: TestEveryMutationPreservesConcurrentUpstreamChanges/multipart (0.01s)
+        provenance_integrity_test.go:61: TempDir: mkdir /tmp/TestEveryMutationPreservesConcurrentUpstreamChangesmultipart3528954245: no space left on device
+    --- FAIL: TestEveryMutationPreservesConcurrentUpstreamChanges/delete (0.02s)
+        provenance_integrity_test.go:61: TempDir: mkdir /tmp/TestEveryMutationPreservesConcurrentUpstreamChangesdelete2811747746: no space left on device
+    --- FAIL: TestEveryMutationPreservesConcurrentUpstreamChanges/batch-delete (0.02s)
+        provenance_integrity_test.go:61: TempDir: mkdir /tmp/TestEveryMutationPreservesConcurrentUpstreamChangesbatch-delete199094224: no space left on device
+--- FAIL: TestLegacyIntentWithoutProvenanceIsRefused (0.05s)
+    provenance_integrity_test.go:117: TempDir: mkdir /tmp/TestLegacyIntentWithoutProvenanceIsRefused762136249: no space left on device
+--- FAIL: TestRefreshFallbackCapturesVersion (0.45s)
+    --- FAIL: TestRefreshFallbackCapturesVersion/adapter/body="new"/durable=true (0.05s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionadapterbody=newdurable=tr2390417846: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/adapter/body="longer_new_body"/durable=true (0.09s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionadapterbody=longer_new_body3832557751: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/adapter/body=""/durable=true (0.01s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionadapterbody=durable=true1401016577: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/adapter/body="old"/durable=true (0.15s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionadapterbody=olddurable=tr1061176282/001: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/runtime/body="new"/durable=true (0.03s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionruntimebody=newdurable=tr657761285: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/runtime/body="longer_new_body"/durable=true (0.04s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionruntimebody=longer_new_body816360673: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/runtime/body=""/durable=true (0.05s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionruntimebody=durable=true983993745: no space left on device
+    --- FAIL: TestRefreshFallbackCapturesVersion/runtime/body="old"/durable=true (0.04s)
+        refresh_version_test.go:23: TempDir: mkdir /tmp/TestRefreshFallbackCapturesVersionruntimebody=olddurable=tr978274341: no space left on device
+--- FAIL: TestRefreshFallbackDurableProvenanceSurvivesReopen (0.03s)
+    refresh_version_test.go:113: TempDir: mkdir /tmp/TestRefreshFallbackDurableProvenanceSurvivesReopen3627733950: no space left on device
+--- FAIL: TestRefreshFallbackObservationAuthorizesCurrentWrite (0.03s)
+    refresh_version_test.go:138: TempDir: mkdir /tmp/TestRefreshFallbackObservationAuthorizesCurrentWrite2097953940: no space left on device
+--- FAIL: TestRetryDoesNotRetireUnappliedSameBodyMetadata (2.06s)
+    --- FAIL: TestRetryDoesNotRetireUnappliedSameBodyMetadata/content-type (0.01s)
+        retry_semantics_test.go:19: TempDir: mkdir /tmp/TestRetryDoesNotRetireUnappliedSameBodyMetadatacontent-type1525302605: no space left on device
+    --- FAIL: TestRetryDoesNotRetireUnappliedSameBodyMetadata/metadata (0.26s)
+        retry_semantics_test.go:19: TempDir: mkdir /tmp/TestRetryDoesNotRetireUnappliedSameBodyMetadatametadata2057158520: no space left on device
+FAIL
+testing: can't write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b412/testlog.txt: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b412/testlog.txt: no space left on device
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	131.318s
+--- FAIL: TestReopenSharesObjectQuotaWithMultipartTargets (49.49s)
+    --- FAIL: TestReopenSharesObjectQuotaWithMultipartTargets/workspace/uploadsFirst=true/cap=4 (4.24s)
+        quota_reopen_objects_test.go:17: atomicfile: write .stow/index.json: openat .stow/.tmp-5747eb3906ec60de74509476b8029c95: no space left on device
+--- FAIL: TestReopenSharesByteQuotaWithMultipartParts (2.62s)
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=8 (0.47s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsmemorycap=82169095063: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=11 (0.28s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsmemorycap=111953734874: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=12 (0.11s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsmemorycap=12350628577: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/memory/cap=13 (0.07s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsmemorycap=13530026595: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=8 (0.20s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsfilesystemcap=81305412983: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=11 (0.29s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsfilesystemcap=113983821387: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=12 (0.13s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsfilesystemcap=121828978897: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/filesystem/cap=13 (0.20s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsfilesystemcap=133939414134/001: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=8 (0.14s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsworkspacecap=81125480237: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=11 (0.37s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsworkspacecap=111321194428/001: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=12 (0.16s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsworkspacecap=121187070198: no space left on device
+    --- FAIL: TestReopenSharesByteQuotaWithMultipartParts/workspace/cap=13 (0.20s)
+        quota_reopen_test.go:19: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReopenSharesByteQuotaWithMultipartPartsworkspacecap=13470442619: no space left on device
+--- FAIL: TestDurableSaveResolutionKeepsCurrentObjectsAndMultipartReservations (0.21s)
+    save_requests_test.go:102: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestDurableSaveResolutionKeepsCurrentObjectsAndMultipartReservat1608734833: no space left on device
+2026/10/16 16:21:26 POST /s3 500 251.54025ms
+2026/10/16 16:21:26 DELETE /s3 204 57.861708ms
+2026/10/16 16:21:27 POST /s3 500 164.151375ms
+2026/10/16 16:21:27 DELETE /s3 204 9.690375ms
+2026/10/16 16:21:30 DELETE /s3 500 29.416µs
+2026/10/16 16:21:30 DELETE /s3 204 3.208µs
+2026/10/16 16:21:30 DELETE /s3 500 20.667µs
+2026/10/16 16:21:30 DELETE /s3 204 2.542µs
+2026/10/16 16:21:30 POST /s3 500 587.458µs
+2026/10/16 16:21:30 POST /s3 200 47.375µs
+2026/10/16 16:21:30 POST /s3 500 17.042µs
+2026/10/16 16:21:30 POST /s3 200 18.375µs
+FAIL
+testing: can't write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b417/testlog.txt: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b417/testlog.txt: no space left on device
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	96.633s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/s3api	28.700s
+--- FAIL: TestMultipartInitiationPropertiesSurviveIntoTheCompletedObject (5.90s)
+    --- FAIL: TestMultipartInitiationPropertiesSurviveIntoTheCompletedObject/workspace (0.13s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartInitiationPropertiesSurviveIntoTheCompletedObjectw1538315595: no space left on device
+--- FAIL: TestMultipartCompletionRejectsAChecksumTheAssembledObjectContradicts (0.26s)
+    --- FAIL: TestMultipartCompletionRejectsAChecksumTheAssembledObjectContradicts/filesystem (0.10s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartCompletionRejectsAChecksumTheAssembledObjectContrad3137982014: no space left on device
+    --- FAIL: TestMultipartCompletionRejectsAChecksumTheAssembledObjectContradicts/workspace (0.15s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartCompletionRejectsAChecksumTheAssembledObjectContrad1601267625: no space left on device
+--- FAIL: TestMultipartUploadMetadataDoesNotAliasStoredState (0.35s)
+    --- FAIL: TestMultipartUploadMetadataDoesNotAliasStoredState/filesystem (0.15s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartUploadMetadataDoesNotAliasStoredStatefilesystem3816173786: no space left on device
+    --- FAIL: TestMultipartUploadMetadataDoesNotAliasStoredState/workspace (0.19s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestMultipartUploadMetadataDoesNotAliasStoredStateworkspace1033822012: no space left on device
+--- FAIL: TestAFailedCompletionLeavesThePreviousObjectIntact (0.36s)
+    --- FAIL: TestAFailedCompletionLeavesThePreviousObjectIntact/filesystem (0.17s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestAFailedCompletionLeavesThePreviousObjectIntactfilesystem1144635260: no space left on device
+    --- FAIL: TestAFailedCompletionLeavesThePreviousObjectIntact/workspace (0.19s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestAFailedCompletionLeavesThePreviousObjectIntactworkspace547362733: no space left on device
+--- FAIL: TestCompletionAfterAbortAndRepeatedCompletionFail (0.52s)
+    --- FAIL: TestCompletionAfterAbortAndRepeatedCompletionFail/filesystem (0.20s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionAfterAbortAndRepeatedCompletionFailfilesystem1512411408: no space left on device
+    --- FAIL: TestCompletionAfterAbortAndRepeatedCompletionFail/workspace (0.32s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCompletionAfterAbortAndRepeatedCompletionFailworkspace231491904: no space left on device
+--- FAIL: TestReplacingAPartInvalidatesItsPreviousETag (0.34s)
+    --- FAIL: TestReplacingAPartInvalidatesItsPreviousETag/filesystem (0.10s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReplacingAPartInvalidatesItsPreviousETagfilesystem4191789991: no space left on device
+    --- FAIL: TestReplacingAPartInvalidatesItsPreviousETag/workspace (0.15s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestReplacingAPartInvalidatesItsPreviousETagworkspace3839366678: no space left on device
+--- FAIL: TestConcurrentCompletionAndAbortHaveOneOutcome (0.54s)
+    --- FAIL: TestConcurrentCompletionAndAbortHaveOneOutcome/filesystem (0.06s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentCompletionAndAbortHaveOneOutcomefilesystem312838928: no space left on device
+    --- FAIL: TestConcurrentCompletionAndAbortHaveOneOutcome/workspace (0.14s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentCompletionAndAbortHaveOneOutcomeworkspace3191977093: no space left on device
+--- FAIL: TestStoreEnforcesTheMinimumPartSize (0.34s)
+    --- FAIL: TestStoreEnforcesTheMinimumPartSize/filesystem (0.16s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStoreEnforcesTheMinimumPartSizefilesystem2613958500: no space left on device
+    --- FAIL: TestStoreEnforcesTheMinimumPartSize/workspace (0.17s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStoreEnforcesTheMinimumPartSizeworkspace3625694881: no space left on device
+--- FAIL: TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithm (0.31s)
+    --- FAIL: TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithm/filesystem (0.19s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithmfilesys2998128848: no space left on device
+    --- FAIL: TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithm/workspace (0.13s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStoreCompletesAnUploadThatDeclaredAChecksumAlgorithmworkspa624523064: no space left on device
+--- FAIL: TestStoreVerifiesASuppliedWholeObjectChecksumAtCompletion (0.27s)
+    --- FAIL: TestStoreVerifiesASuppliedWholeObjectChecksumAtCompletion/filesystem (0.12s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStoreVerifiesASuppliedWholeObjectChecksumAtCompletionfilesy3689925765: no space left on device
+    --- FAIL: TestStoreVerifiesASuppliedWholeObjectChecksumAtCompletion/workspace (0.14s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStoreVerifiesASuppliedWholeObjectChecksumAtCompletionworksp949150877: no space left on device
+--- FAIL: TestStorePreparesEmptyBody (1.95s)
+    --- FAIL: TestStorePreparesEmptyBody/filesystem (0.37s)
+        backend_contract_test.go:68: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestStorePreparesEmptyBodyfilesystem3942509332: no space left on device
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage	97.614s
+ok  	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	190.385s
+?   	github.com/chester-hill-solutions/stow-s3/internal/storage/fs/recordpb	[no test files]
+--- FAIL: TestConcurrentReadsAndWritesAreSafe (106.95s)
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: openat .tmp-91f109e9e8943a73f086c2a127a12e16: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: openat .tmp-c6a5aaeaec57cdb21ca865579cf7dcca: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-ba0ee3e52b89fa4c7796af188ea1b8c4: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: openat .tmp-b01f538b99be6be46a2b74cb73f22927: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-03bd2104f990a5c25890e62f822ab907: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: openat .tmp-ed16b8913d2d864358c4ee6d02bf21b7: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-94dc22dbab00e5f205e105cfb5743ff5: no space left on device
+    concurrency_test.go:43: put: workspace store: write k003: atomicfile: write k003: openat .tmp-62656088efafca318adb8c99911b6223: no space left on device
+    concurrency_test.go:43: put: workspace store: write k004: atomicfile: write k004: openat .tmp-8df254ea5af307bda6735bcbabca32b9: no space left on device
+    concurrency_test.go:43: put: workspace store: write k005: atomicfile: write k005: openat .tmp-7fdf9ec99733bea5aacc49ba3ea46f11: no space left on device
+    concurrency_test.go:43: put: workspace store: write k006: atomicfile: write k006: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-4d17e060197ccbf488e8be24642d9cd8: no space left on device
+    concurrency_test.go:43: put: workspace store: write k007: atomicfile: write k007: openat .tmp-cfadd442ed55024cc367aa789e77b071: no space left on device
+    concurrency_test.go:43: put: workspace store: write k008: atomicfile: write k008: openat .tmp-fe14aa7767801301f4d10134cea15125: no space left on device
+    concurrency_test.go:43: put: workspace store: write k009: atomicfile: write k009: openat .tmp-964e0036d7857fbdfa247371b5ed494d: no space left on device
+    concurrency_test.go:43: put: workspace store: write k010: atomicfile: write k010: openat .tmp-3015057d22d26d6d1f4e4ad0680fc80a: no space left on device
+    concurrency_test.go:43: put: workspace store: write k011: atomicfile: write k011: openat .tmp-34bb51853513bd1f01d8af07bb83139a: no space left on device
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: openat .tmp-ab6723a2e06c1dc4bfdd76a5ae3d63f3: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: openat .tmp-3b9a163b530f28f89013bfb688ce6ea7: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-595aedb52b92df6f2111e79d7209e8fc: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: openat .tmp-74edbb37c06a296fd9e6162b65b16f66: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-761d9b9b472b523d8e7368ad42328f62: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-651b0f4a1e34da0ba42255fcb9347e9c: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-b54eb23eb6d54f6a5641c22b0067a97b: no space left on device
+    concurrency_test.go:43: put: workspace store: write k003: atomicfile: write k003: openat .tmp-afeffa1cbb1e637c64deb6f40ac58147: no space left on device
+    concurrency_test.go:43: put: workspace store: write k004: atomicfile: write k004: openat .tmp-5749956bd0a43fd1b9479b630cc6e747: no space left on device
+    concurrency_test.go:43: put: workspace store: write k005: atomicfile: write k005: openat .tmp-0e1c7ade331140caf70b0eebd53195da: no space left on device
+    concurrency_test.go:43: put: workspace store: write k006: atomicfile: write k006: openat .tmp-38e475c549c4bb30bcbfbaddc70d9b49: no space left on device
+    concurrency_test.go:43: put: workspace store: write k007: atomicfile: write k007: openat .tmp-b44b793a5e5b6b861f771f818af386f5: no space left on device
+    concurrency_test.go:43: put: workspace store: write k008: atomicfile: write k008: openat .tmp-e1287ef9814c175c44846bdb72dcbafc: no space left on device
+    concurrency_test.go:43: put: workspace store: write k009: atomicfile: write k009: openat .tmp-57fa03130c836f23348160828c772d0a: no space left on device
+    concurrency_test.go:43: put: workspace store: write k010: atomicfile: write k010: openat .tmp-a2a0786f27273389bd132d9d325a4023: no space left on device
+    concurrency_test.go:43: put: workspace store: write k011: atomicfile: write k011: openat .tmp-f9dcf1aea74d6334547461a639a2de6f: no space left on device
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: openat .tmp-db6332823cd49d2b5c51e98644930c1c: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: openat .tmp-16ef31e3a09abe82573403dee54b62e8: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-453e33d9efc87e5155fcc5781e0362b5: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-6c963ad2858d3f1eb5d4da4bc935af65: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-ddf32f9ad4b347579641a37202bee1a7: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: openat .tmp-2a38267d5cd9412f46df9493d316029a: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-3777375eee009891369b4d6958cfc584: no space left on device
+    concurrency_test.go:43: put: workspace store: write k003: atomicfile: write k003: openat .tmp-84592f8021edc0989b84e5f35445d232: no space left on device
+    concurrency_test.go:43: put: workspace store: write k004: atomicfile: write k004: openat .tmp-a4c0c080a77faf89410e023af6ff7714: no space left on device
+    concurrency_test.go:43: put: workspace store: write k005: atomicfile: write k005: openat .tmp-03970553665f6406c3d09c37c43a420a: no space left on device
+    concurrency_test.go:43: put: workspace store: write k006: atomicfile: write k006: openat .tmp-a5cc990eb9437920eac5e55b9a7bfebb: no space left on device
+    concurrency_test.go:43: put: workspace store: write k007: atomicfile: write k007: openat .tmp-4aca660c0a505424b7173ca9a59c8216: no space left on device
+    concurrency_test.go:43: put: workspace store: write k008: atomicfile: write k008: openat .tmp-3664246cd2a2917ecb74b68092f54981: no space left on device
+    concurrency_test.go:43: put: workspace store: write k009: atomicfile: write k009: openat .tmp-3a408490c7a5a08694d4bf7f7be10e33: no space left on device
+    concurrency_test.go:43: put: workspace store: write k010: atomicfile: write k010: openat .tmp-4af8c34d343e13eb03582fa245f8cf64: no space left on device
+    concurrency_test.go:43: put: workspace store: write k011: atomicfile: write k011: openat .tmp-91c981dd335937d37b06bd5ad83cef21: no space left on device
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: openat .tmp-eb9c81ae74a7cc3169cdc49df5e02a1f: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-5579053bb51458285f3a95018a7f65e6: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-30c86e53b0c23df7b6a057a5c96508a7: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: openat .tmp-eb1a4944aa3b3a16b8ab60135ba703a5: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-38c73bc5bc1894175aa8eef45a6d3f18: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: openat .tmp-c1875b163cf66f323ee3ef24322d3e2d: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-8f4be26c9375450d30c73dc6db634de6: no space left on device
+    concurrency_test.go:43: put: workspace store: write k003: atomicfile: write k003: openat .tmp-4654b47529fe77207a529195bb0895bb: no space left on device
+    concurrency_test.go:43: put: workspace store: write k004: atomicfile: write k004: openat .tmp-81212556dbd635c3983422ac5399745f: no space left on device
+    concurrency_test.go:43: put: workspace store: write k005: atomicfile: write k005: openat .tmp-5288dbc9549d6ac20b7010895e436009: no space left on device
+    concurrency_test.go:43: put: workspace store: write k006: atomicfile: write k006: openat .tmp-f4d15ad77803327c972b4f4018e962bb: no space left on device
+    concurrency_test.go:43: put: workspace store: write k007: atomicfile: write k007: openat .tmp-49644ceaea7044d9c719f465aed90924: no space left on device
+    concurrency_test.go:43: put: workspace store: write k008: atomicfile: write k008: openat .tmp-7f4d75f1e24b9bba0e362496d41cd365: no space left on device
+    concurrency_test.go:43: put: workspace store: write k009: atomicfile: write k009: openat .tmp-cff4d722e4937edc173448a805c3f1d0: no space left on device
+    concurrency_test.go:43: put: workspace store: write k010: atomicfile: write k010: openat .tmp-3e88a4e7061e764b784aa5ec6398c91f: no space left on device
+    concurrency_test.go:43: put: workspace store: write k011: atomicfile: write k011: openat .tmp-e4ecfd6c78f529e493c46e261d6080ee: no space left on device
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-9a80d87a0156b4f1042ac4dc9055a865: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: openat .tmp-6aa812512b6576b1cccd485872a3d1a8: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-92d562d490d5274c9d931b039febc620: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: openat .tmp-bd38f85773fa038bc17e0f38d657f9a2: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-ffaca2192380e29f0001e143cb62f8e2: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: openat .tmp-12b63b0acc1728b2551ae712fa9db1dd: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-cf30e7f3bf1c3d7eab5812a0488be4f3: no space left on device
+    concurrency_test.go:43: put: workspace store: write k003: atomicfile: write k003: openat .tmp-a6a58141bf6431271b52d8f857885baf: no space left on device
+    concurrency_test.go:43: put: workspace store: write k004: atomicfile: write k004: openat .tmp-81534abd5abe8d29cb0519fae788fa89: no space left on device
+    concurrency_test.go:43: put: workspace store: write k005: atomicfile: write k005: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-7f2822cd8c747045404375774cdb9614: no space left on device
+    concurrency_test.go:43: put: workspace store: write k006: atomicfile: write k006: openat .tmp-231341ed5f629a05c5a8314a601f01bd: no space left on device
+    concurrency_test.go:43: put: workspace store: write k007: atomicfile: write k007: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-c8cf1fbc75d31c6039dd44c2c3563602: no space left on device
+    concurrency_test.go:43: put: workspace store: write k008: atomicfile: write k008: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-8bb1858e3b5363aecc37580fbd9ba059: no space left on device
+    concurrency_test.go:43: put: workspace store: write k009: atomicfile: write k009: openat .tmp-fc2ab667d3dc9356169e492cb56ee562: no space left on device
+    concurrency_test.go:43: put: workspace store: write k010: atomicfile: write k010: openat .tmp-bd642de89a811b50f83a9d7822999047: no space left on device
+    concurrency_test.go:43: put: workspace store: write k011: atomicfile: write k011: openat .tmp-73f8ce3b50fddeb6fb4ee1acc85ca673: no space left on device
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: openat .tmp-ceecd0917ee1674d6b226616979bc8b6: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: openat .tmp-041833cdaadc1b8d9dd737296f68bc92: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-94b362f3034e9aaef28a1551853500a1: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: openat .tmp-4cb93d475dec631abf603a5196ea1a2d: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-9a06c989ff7c6bbd8b3c9e7331009f81: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: openat .tmp-d7d486b003e9449d43068bf23f62d7b5: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-cca39f0ec2d4e0384457b85aaf295960: no space left on device
+    concurrency_test.go:43: put: workspace store: write k003: atomicfile: write k003: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentReadsAndWritesAreSafe3462855741/001/.tmp-1b7d980fab68f4bcc1626d49bb18e894: no space left on device
+    concurrency_test.go:43: put: workspace store: write k004: atomicfile: write k004: openat .tmp-d0107d73bbe6c99de909d77f016df1ab: no space left on device
+    concurrency_test.go:43: put: workspace store: write k005: atomicfile: write k005: openat .tmp-9f95fc6da0d1f77100948daa2ffd3d59: no space left on device
+    concurrency_test.go:43: put: workspace store: write k006: atomicfile: write k006: openat .tmp-d8c481ca9365f97bbbe60f299bc0dfb8: no space left on device
+    concurrency_test.go:43: put: workspace store: write k007: atomicfile: write k007: openat .tmp-d5904ea3454b4b40edee6b74806ba91c: no space left on device
+    concurrency_test.go:43: put: workspace store: write k008: atomicfile: write k008: openat .tmp-15283b8f4aef5931b90b4e2671ae088d: no space left on device
+    concurrency_test.go:43: put: workspace store: write k009: atomicfile: write k009: openat .tmp-9f974eb915fe59e550e4ce0e6ee61f65: no space left on device
+    concurrency_test.go:43: put: workspace store: write k010: atomicfile: write k010: openat .tmp-6c3795236e93b1e69600d16e96388498: no space left on device
+    concurrency_test.go:43: put: workspace store: write k011: atomicfile: write k011: openat .tmp-06aaed688c904c991a4fcff54205038b: no space left on device
+    concurrency_test.go:43: put: workspace store: write k012: atomicfile: write k012: openat .tmp-ac1420d21fd5058fd631ff42ab581d78: no space left on device
+    concurrency_test.go:43: put: workspace store: write k013: atomicfile: write k013: openat .tmp-f5a94fe3fc95882f6bd02a3d4e1f03a5: no space left on device
+    concurrency_test.go:43: put: workspace store: write k014: atomicfile: write k014: openat .tmp-6fdf6583c48d4a70671648c11777a506: no space left on device
+    concurrency_test.go:43: put: workspace store: write k015: atomicfile: write k015: openat .tmp-85b9baa5a91b31aa227733a8adb0e685: no space left on device
+    concurrency_test.go:43: put: workspace store: write k000: atomicfile: write k000: openat .tmp-0b5d253941255ffc4886ef9e9e67bfd9: no space left on device
+    concurrency_test.go:43: put: workspace store: write k001: atomicfile: write k001: openat .tmp-9223a5f6597c9131e8ae43a1354578b9: no space left on device
+    concurrency_test.go:43: put: workspace store: write k002: atomicfile: write k002: openat .tmp-d1f592d093437c5700f8927d84109001: no space left on device
+FAIL
+testing: can't write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b438/testlog.txt: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b438/testlog.txt: no space left on device
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	153.031s
+?   	github.com/chester-hill-solutions/stow-s3/internal/version	[no test files]
+--- FAIL: TestPortableCheckpointRoundTripObjectsAndEmptyBuckets (3.07s)
+    checkpoint_portable_test.go:42: local mutation committed
+        atomicfile: write .stow/index.json: openat .stow/.tmp-170e12a5380cb581679c39d76d1f179d: no space left on device
+--- FAIL: TestPortableMetadataDiffAndDeltaRefusal (0.29s)
+    checkpoint_portable_test.go:122: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestPortableMetadataDiffAndDeltaRefusal2613763371: no space left on device
+--- FAIL: TestPortableReplayVerifiesDedicatedPayload (0.12s)
+    checkpoint_portable_test.go:151: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestPortableReplayVerifiesDedicatedPayload1768007667: no space left on device
+--- FAIL: TestPortableHostEditDropsStaleChecksumAndKeepsDeclaredMetadata (0.19s)
+    checkpoint_portable_validation_test.go:16: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestPortableHostEditDropsStaleChecksumAndKeepsDeclaredMetadata989687494/001: no space left on device
+--- FAIL: TestPortableSensitiveObjectsRequireSenderAndReceiverConsent (0.18s)
+    checkpoint_portable_validation_test.go:54: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestPortableSensitiveObjectsRequireSenderAndReceiverConsent2801821980: no space left on device
+--- FAIL: TestPortableManifestRefusesInvalidInventory (0.19s)
+    checkpoint_portable_validation_test.go:84: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestPortableManifestRefusesInvalidInventory3458528867: no space left on device
+--- FAIL: TestPortableRestoreRefusesInvalidChecksumBeforeCreatingDestination (0.28s)
+    checkpoint_portable_validation_test.go:127: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestPortableRestoreRefusesInvalidChecksumBeforeCreatingDestinati2302514624/001: no space left on device
+--- FAIL: TestCheckpointPublicationCancellationBeforeRename (0.16s)
+    checkpoint_publish_test.go:12: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointPublicationCancellationBeforeRename1821982761: no space left on device
+--- FAIL: TestCheckpointPublicationSyncFailureAfterRenameIsUnknown (0.10s)
+    checkpoint_publish_test.go:35: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointPublicationSyncFailureAfterRenameIsUnknown3664712857: no space left on device
+--- FAIL: TestCheckpointScansAndReadsObserveCancellation (0.11s)
+    checkpoint_publish_test.go:58: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointScansAndReadsObserveCancellation2618083863: no space left on device
+--- FAIL: TestCheckpointSyncFilesBoundedBeforeDirectories (0.13s)
+    checkpoint_sync_test.go:15: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointSyncFilesBoundedBeforeDirectories3284616891: no space left on device
+--- FAIL: TestCheckpointSyncFailurePreventsPublication (0.19s)
+    checkpoint_sync_test.go:56: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointSyncFailurePreventsPublication3935964153: no space left on device
+--- FAIL: TestHandoffParentSyncFailureRetainsPublishedBundle (0.19s)
+    handoff_publish_test.go:11: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestHandoffParentSyncFailureRetainsPublishedBundle390900497: no space left on device
+2026/10/16 16:21:22 DELETE /s3 500 13.8635ms
+--- FAIL: TestACheckpointOfALiveWorkspaceDoesNotNeedTheSession (0.26s)
+    checkpoint_external_test.go:21: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestACheckpointOfALiveWorkspaceDoesNotNeedTheSession1763920137: no space left on device
+--- FAIL: TestAnExternalCheckpointAgreesWithTheHandleOnWhatIsCaptured (0.11s)
+    checkpoint_external_test.go:53: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestAnExternalCheckpointAgreesWithTheHandleOnWhatIsCaptured3210850810: no space left on device
+--- FAIL: TestConcurrentCapturesOfOneWorkspaceRespectTheRetentionCap (0.25s)
+    checkpoint_external_test.go:111: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestConcurrentCapturesOfOneWorkspaceRespectTheRetentionCap1174006685: no space left on device
+--- FAIL: TestTheCaptureLockIsPerWorkspaceAndNotGlobal (0.15s)
+    checkpoint_external_test.go:178: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestTheCaptureLockIsPerWorkspaceAndNotGlobal2336638457: no space left on device
+--- FAIL: TestTheCaptureLockDoesNotDisturbTheSessionLock (0.06s)
+    checkpoint_external_test.go:208: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestTheCaptureLockDoesNotDisturbTheSessionLock2457107355: no space left on device
+--- FAIL: TestCheckpointGitReconstructionPreservesDeletion (0.08s)
+    checkpoint_git_test.go:15: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointGitReconstructionPreservesDeletion1768836769: no space left on device
+--- FAIL: TestAPolicyCanDenyCapturingAWorkspace (0.10s)
+    checkpoint_policy_test.go:62: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestAPolicyCanDenyCapturingAWorkspace3057247621: no space left on device
+--- FAIL: TestTheSamePolicyWithAllowLeavesCaptureWorking (0.11s)
+    checkpoint_policy_test.go:80: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestTheSamePolicyWithAllowLeavesCaptureWorking125615438/001: no space left on device
+--- FAIL: TestCaptureStillNeedsTheEnvironmentGrant (0.18s)
+    checkpoint_policy_test.go:92: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCaptureStillNeedsTheEnvironmentGrant1121232571: no space left on device
+--- FAIL: TestACaptureDenialLeavesNoCheckpointBehind (0.07s)
+    checkpoint_policy_test.go:130: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestACaptureDenialLeavesNoCheckpointBehind2959366082: no space left on device
+--- FAIL: TestAnExternalCaptureIsRefusedByAPolicy (0.13s)
+    checkpoint_policy_test.go:168: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestAnExternalCaptureIsRefusedByAPolicy4278945011/001: no space left on device
+--- FAIL: TestTheSameExternalPolicyWithAllowCaptures (0.19s)
+    checkpoint_policy_test.go:184: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestTheSameExternalPolicyWithAllowCaptures1528484708: no space left on device
+--- FAIL: TestAnExternalCaptureStillNeedsTheEnvironmentGrant (0.13s)
+    checkpoint_policy_test.go:196: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestAnExternalCaptureStillNeedsTheEnvironmentGrant224634154: no space left on device
+--- FAIL: TestALegacyExternalCaptureIsUnboundAndSaysSo (0.26s)
+    checkpoint_policy_test.go:216: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestALegacyExternalCaptureIsUnboundAndSaysSo2601365022: no space left on device
+--- FAIL: TestASourceThatCannotSayIsNotARefusal (0.06s)
+    checkpoint_policy_test.go:228: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestASourceThatCannotSayIsNotARefusal1696211598: no space left on device
+--- FAIL: TestCheckpointRequestReplaySurvivesReopenAndCapacity (0.14s)
+    checkpoint_request_test.go:30: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointRequestReplaySurvivesReopenAndCapacity1147293656: no space left on device
+--- FAIL: TestCheckpointRequestConflictMissingAndCorruption (0.15s)
+    checkpoint_request_test.go:63: TempDir: mkdir /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestCheckpointRequestConflictMissingAndCorruption1613224800: no space left on device
+2026/10/16 16:21:50 POST /s3 500 67.25µs
+2026/10/16 16:22:04 POST /s3 500 182.667µs
+2026/10/16 16:22:04 PUT /s3 404 29.125µs
+2026/10/16 16:22:04 POST /s3 404 13.042µs
+2026/10/16 16:22:04 DELETE /s3 404 12.583µs
+2026/10/16 16:22:04 GET /s3 404 7.5µs
+2026/10/16 16:22:04 PUT /s3 404 8µs
+2026/10/16 16:22:04 POST /s3 404 7.666µs
+2026/10/16 16:22:04 DELETE /s3 404 9.042µs
+2026/10/16 16:22:04 GET /s3 404 9.375µs
+2026/10/16 16:22:10 PUT /s3 500 3.051667ms
+2026/10/16 16:22:30 DELETE /s3 500 27.167µs
+2026/10/16 16:22:30 DELETE /s3 404 8.083µs
+2026/10/16 16:22:30 DELETE /s3 500 30.125µs
+2026/10/16 16:22:30 PUT /s3 404 22.416µs
+2026/10/16 16:22:30 DELETE /s3 500 8.042µs
+2026/10/16 16:22:30 POST /s3 404 13.083µs
+2026/10/16 16:22:30 DELETE /s3 500 9.292µs
+2026/10/16 16:22:30 GET /s3 404 5.834µs
+2026/10/16 16:22:30 DELETE /s3 500 5.083µs
+2026/10/16 16:22:30 DELETE /s3 404 7.041µs
+2026/10/16 16:22:30 DELETE /s3 500 5.375µs
+2026/10/16 16:22:30 PUT /s3 404 6.458µs
+2026/10/16 16:22:30 DELETE /s3 500 5.833µs
+2026/10/16 16:22:30 POST /s3 404 6.084µs
+2026/10/16 16:22:30 DELETE /s3 500 4.666µs
+2026/10/16 16:22:30 GET /s3 404 4.917µs
+2026/10/16 16:22:30 DELETE /s3 500 5.25µs
+2026/10/16 16:22:30 DELETE /s3 404 5.125µs
+2026/10/16 16:22:30 DELETE /s3 500 5µs
+2026/10/16 16:22:30 PUT /s3 404 5.708µs
+2026/10/16 16:22:30 DELETE /s3 500 5.209µs
+2026/10/16 16:22:30 POST /s3 404 5.958µs
+2026/10/16 16:22:30 DELETE /s3 500 4.916µs
+2026/10/16 16:22:30 GET /s3 404 4.958µs
+2026/10/16 16:22:30 DELETE /s3 500 5.208µs
+2026/10/16 16:22:30 DELETE /s3 404 5.5µs
+2026/10/16 16:22:30 DELETE /s3 500 4.917µs
+2026/10/16 16:22:30 PUT /s3 404 5.541µs
+2026/10/16 16:22:30 DELETE /s3 500 4.458µs
+2026/10/16 16:22:30 POST /s3 404 6.583µs
+2026/10/16 16:22:30 DELETE /s3 500 4.833µs
+2026/10/16 16:22:30 GET /s3 404 8.041µs
+2026/10/16 16:22:48 PUT /s3 200 40.756375ms
+2026/10/16 16:22:49 PUT /s3 200 30.24575ms
+2026/10/16 16:22:49 PUT /s3 507 621.041µs
+2026/10/16 16:22:49 PUT /s3 200 43.510125ms
+2026/10/16 16:22:49 GET /s3 403 27.542µs
+2026/10/16 16:22:53 GET /s3 200 28.214166ms
+2026/10/16 16:22:53 PUT /s3 403 94.083µs
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	128.172s
+?   	github.com/chester-hill-solutions/stow-s3/tools/api-reference	[no test files]
+?   	github.com/chester-hill-solutions/stow-s3/tools/mcp-browser-pack	[no test files]
+PASS
+testing: can't write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b454/testlog.txt: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/go-build1608001579/b454/testlog.txt: no space left on device
+FAIL	github.com/chester-hill-solutions/stow-s3/tools/quality	7.718s
+FAIL

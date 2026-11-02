@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "benchmark/write-cache/retention_probe_test.go.txt"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "before",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/retention-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxCallerStringRetentionProbe$",
+        "-count=1",
+        "-v"
+      ],
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "candidate",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/retention-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxCallerStringRetentionProbe$",
+        "-count=1",
+        "-v"
+      ],
+      "exitCode": 0,
+      "signal": null
+    }
+  ],
+  "samples": {
+    "before": {
+      "cachedLength": 5246,
+      "entries": 64,
+      "heapAfter": 437184,
+      "heapBefore": 354536,
+      "heapGrowth": 82648,
+      "sourceBytesPerEntry": 1048576
+    },
+    "candidate": {
+      "cachedLength": 5246,
+      "entries": 64,
+      "heapAfter": 68061440,
+      "heapBefore": 354536,
+      "heapGrowth": 67706904,
+      "sourceBytesPerEntry": 1048576
+    }
+  }
+}

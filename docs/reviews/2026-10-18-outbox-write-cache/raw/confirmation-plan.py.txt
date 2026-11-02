@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,base64
+p=Path('/private/tmp/stow-outbox-write-cache-2026-10-18');proof=json.loads((p/'proof-plan.json').read_text());plan={'phase':'outbox-write-cache-confirmation','sources':proof['sources']+['benchmark/cache-confirmation.mjs'],'steps':[x for x in proof['steps']if x['name']in ['before-build','safe-build']]+[{'name':'comparison','args':['node','benchmark/cache-confirmation.mjs']}]};(p/'confirmation-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+data={'benchmark/active-plan.json':base64.b64encode((p/'confirmation-plan.json').read_bytes()).decode(),'benchmark/cache-confirmation.mjs':base64.b64encode((p/'context/benchmark/cache-confirmation.mjs').read_bytes()).decode()}
+js="const fs=require('node:fs');const prior=JSON.parse(fs.readFileSync('/results/f7288dff-81a1-41c3-a2ea-f3bc714592fe/run.json'));if(!prior.complete||!prior.success)throw Error('Successful terminal proof required');for(const[name,encoded]of Object.entries("+json.dumps(data)+"))fs.writeFileSync(name,Buffer.from(encoded,'base64'));console.log('Installed bounded confirmation after terminal proof');"
+(p/'install-confirmation.js').write_text(js)
+for suffix in ['upload.log','deployments.json']:(p/('confirmation-'+suffix)).write_bytes((p/('proof-'+suffix)).read_bytes())

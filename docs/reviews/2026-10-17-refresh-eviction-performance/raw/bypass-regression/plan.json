@@ -1,0 +1,52 @@
+{
+  "phase": "oversize-cache-bypass-before",
+  "sources": [
+    "internal/runthrough/refresh_eviction_test.go",
+    "internal/runthrough/refresh_version_fixture_test.go",
+    "internal/runthrough/refresh_version_test.go",
+    "internal/runthrough/refresh_version_bench_test.go",
+    "internal/runthrough/cache_policy_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-tests",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/refresh_eviction_test.go",
+        "internal/runthrough/refresh_version_fixture_test.go",
+        "internal/runthrough/refresh_version_test.go",
+        "internal/runthrough/refresh_version_bench_test.go",
+        "internal/runthrough/cache_policy_test.go"
+      ]
+    },
+    {
+      "name": "reproduce",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-overlay=/app/benchmark/bypass-before-overlay.json",
+        "-run",
+        "^TestRefreshOversized(StreamsObservedVersion|RevalidationDropsStaleCache|ReaderOwnership|StreamErrorsReachCaller|HeadDoesNotReadUncacheableBody)$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "fallback-controls",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-overlay=/app/benchmark/bypass-before-overlay.json",
+        "-run",
+        "^(TestRefreshFallback|TestRefreshHead|TestRefreshConcurrent|TestRunthroughOpening|TestRunthroughMissing)",
+        "-count=2",
+        "-v"
+      ]
+    }
+  ]
+}

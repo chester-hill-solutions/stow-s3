@@ -1,0 +1,21 @@
+=== RUN   TestCompletionBufferAllocation
+=== RUN   TestCompletionBufferAllocation/bound=false/split=false
+    completion_buffer_test.go:47: completion bytes=8388608 allocated=16838320 budget=10485760
+    completion_buffer_test.go:49: completion retained a duplicate payload: allocated=16838320 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=false/split=true
+    completion_buffer_test.go:47: completion bytes=8388608 allocated=16817728 budget=10485760
+    completion_buffer_test.go:49: completion retained a duplicate payload: allocated=16817728 budget=10485760
+=== RUN   TestCompletionBufferAllocation/bound=true/split=false
+    completion_buffer_test.go:47: completion bytes=8388608 allocated=25525192 budget=18874368
+    completion_buffer_test.go:49: completion retained a duplicate payload: allocated=25525192 budget=18874368
+=== RUN   TestCompletionBufferAllocation/bound=true/split=true
+    completion_buffer_test.go:47: completion bytes=8388608 allocated=25512448 budget=18874368
+    completion_buffer_test.go:49: completion retained a duplicate payload: allocated=25512448 budget=18874368
+--- FAIL: TestCompletionBufferAllocation (0.86s)
+    --- FAIL: TestCompletionBufferAllocation/bound=false/split=false (0.18s)
+    --- FAIL: TestCompletionBufferAllocation/bound=false/split=true (0.16s)
+    --- FAIL: TestCompletionBufferAllocation/bound=true/split=false (0.24s)
+    --- FAIL: TestCompletionBufferAllocation/bound=true/split=true (0.23s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/fs	0.877s
+FAIL

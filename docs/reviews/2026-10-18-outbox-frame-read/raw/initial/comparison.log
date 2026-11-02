@@ -1,0 +1,15 @@
+node:internal/fs/promises:1281
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open '/app/benchmark/frame-candidate.test'
+    at async open (node:internal/fs/promises:1281:25)
+    at async readFile (node:internal/fs/promises:1929:14)
+    at async file:///app/benchmark/frame-comparison.mjs:3:213 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/app/benchmark/frame-candidate.test'
+}
+
+Node.js v25.9.0

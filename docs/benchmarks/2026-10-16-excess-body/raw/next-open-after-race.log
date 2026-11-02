@@ -1,0 +1,44 @@
+COMMAND ["go", "test", "-race", "./internal/runtime", "-run", "^TestReviewOpeningErrorDropsReader$", "-count=2", "-v"]
+=== RUN   TestReviewOpeningErrorDropsReader
+=== RUN   TestReviewOpeningErrorDropsReader/stream
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/get
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/guarded
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/adapter
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/fallback-range
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/native-range
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+--- FAIL: TestReviewOpeningErrorDropsReader (0.02s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/stream (0.01s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/get (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/guarded (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/adapter (0.01s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/fallback-range (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/native-range (0.00s)
+=== RUN   TestReviewOpeningErrorDropsReader
+=== RUN   TestReviewOpeningErrorDropsReader/stream
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/get
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/guarded
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/adapter
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/fallback-range
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+=== RUN   TestReviewOpeningErrorDropsReader/native-range
+    opening_error_review_probe_test.go:54: opening error discarded reader: closes=0 file_still_open=true
+--- FAIL: TestReviewOpeningErrorDropsReader (0.02s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/stream (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/get (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/guarded (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/adapter (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/fallback-range (0.00s)
+    --- FAIL: TestReviewOpeningErrorDropsReader/native-range (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runtime	0.463s
+FAIL

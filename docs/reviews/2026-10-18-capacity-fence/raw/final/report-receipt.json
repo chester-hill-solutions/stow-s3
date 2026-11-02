@@ -1,0 +1,46 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-capacity-fence.md": "39bcb079d4f1677b09cb4d269ff0b512179dd98a6048a51554d22c621f1d1b4f"
+  },
+  "sourceSHA256": {
+    "internal/storage/fs/capacity.go": "55d3e924fe59ea72757e1cb185c4788615cf1e7c0054b632ad59316064859a93",
+    "internal/storage/fs/capacity_fence_test.go": "93a89ee0506cddb8378b65442848ca3660f3b7ad45172e241759940d52d6ba54",
+    "benchmark/fence-bench.go.txt": "1561c6417e87e3aa384f59f9d0ddceb11ded05c3d8df18f974331c1ae3fb63b2",
+    "benchmark/fence-measure.mjs": "45460e7c4399ae1cf088e948292b88f866e0ef354795065a254fe62d2877238b",
+    "benchmark/before-overlay.json": "35513f96597bc87dcabfaed77de972db7f0236aa3da090e199cad0e95bf9fad5",
+    "benchmark/baseline-capacity.go.txt": "09b21a902b2fe733ab3c7599c1c4e4608c09abf2dad8d3f3c0172af5554a6169"
+  },
+  "railwayDeploymentId": "3ae259eb-72c0-43d9-9b8f-304f544305c1"
+}

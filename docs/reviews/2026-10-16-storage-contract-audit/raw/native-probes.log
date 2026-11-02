@@ -1,0 +1,61 @@
+=== RUN   TestContractAuditDeleteOutcome
+=== RUN   TestContractAuditDeleteOutcome/single/healthy
+    contract_audit_probe_test.go:75: object absent; error=<nil>; committed=false; confirmed=[]
+=== RUN   TestContractAuditDeleteOutcome/single/index-failure
+    contract_audit_probe_test.go:75: object absent; error=atomicfile: write .stow/index.json: renameat .stow/.tmp-1a47205e328be127d1faee5bea2267a9 .stow/index.json: is a directory; committed=false; confirmed=[]
+    contract_audit_probe_test.go:77: native deletion completed but error does not identify committed outcome
+=== RUN   TestContractAuditDeleteOutcome/batch/healthy
+    contract_audit_probe_test.go:75: object absent; error=<nil>; committed=false; confirmed=[victim]
+=== RUN   TestContractAuditDeleteOutcome/batch/index-failure
+    contract_audit_probe_test.go:75: object absent; error=atomicfile: write .stow/index.json: renameat .stow/.tmp-a96efbde1bd9380a4d169fe804e2b23d .stow/index.json: is a directory; committed=false; confirmed=[]
+    contract_audit_probe_test.go:77: native deletion completed but error does not identify committed outcome
+    contract_audit_probe_test.go:80: confirmed deleted=[], want [victim]
+--- FAIL: TestContractAuditDeleteOutcome (0.33s)
+    --- PASS: TestContractAuditDeleteOutcome/single/healthy (0.13s)
+    --- FAIL: TestContractAuditDeleteOutcome/single/index-failure (0.06s)
+    --- PASS: TestContractAuditDeleteOutcome/batch/healthy (0.07s)
+    --- FAIL: TestContractAuditDeleteOutcome/batch/index-failure (0.08s)
+=== RUN   TestContractAuditPartDescriptor
+=== RUN   TestContractAuditPartDescriptor/healthy
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:10:17.751534 +0000 UTC} result=&{PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:10:17.77147 +0000 UTC} write error=<nil> listed={PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:10:17.77147 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:146: completion from ListParts: meta=&{Bucket:workspace Key:target VersionID:e3c840e15662e9ae1145d395b32deaec Size:11 ETag:"f5300127f646a4550bc4a04fbe393e79" ContentType:text/plain; charset=utf-8 LastModified:2026-10-16 19:10:17 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=<nil>
+=== RUN   TestContractAuditPartDescriptor/descriptor-failure
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:10:17.875537 +0000 UTC} result=<nil> write error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure3621901537/001/.stow/multipart/77f8ca0df93a2d4e563bf526beb4be34/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure3621901537/001/.stow/multipart/77f8ca0df93a2d4e563bf526beb4be34/.tmp-2504741424 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure3621901537/001/.stow/multipart/77f8ca0df93a2d4e563bf526beb4be34/upload.json: file exists listed={PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:10:17.875537 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:143: ListParts descriptor disagrees with actual stored bytes
+    contract_audit_probe_test.go:146: completion from ListParts: meta=<nil> error=invalid multipart part
+    contract_audit_probe_test.go:148: completion from the returned list failed: invalid multipart part
+--- FAIL: TestContractAuditPartDescriptor (0.24s)
+    --- PASS: TestContractAuditPartDescriptor/healthy (0.12s)
+    --- FAIL: TestContractAuditPartDescriptor/descriptor-failure (0.12s)
+=== RUN   TestContractAuditDeleteOutcome
+=== RUN   TestContractAuditDeleteOutcome/single/healthy
+    contract_audit_probe_test.go:75: object absent; error=<nil>; committed=false; confirmed=[]
+=== RUN   TestContractAuditDeleteOutcome/single/index-failure
+    contract_audit_probe_test.go:75: object absent; error=atomicfile: write .stow/index.json: renameat .stow/.tmp-271e81294e73890774670afc035fe4c1 .stow/index.json: is a directory; committed=false; confirmed=[]
+    contract_audit_probe_test.go:77: native deletion completed but error does not identify committed outcome
+=== RUN   TestContractAuditDeleteOutcome/batch/healthy
+    contract_audit_probe_test.go:75: object absent; error=<nil>; committed=false; confirmed=[victim]
+=== RUN   TestContractAuditDeleteOutcome/batch/index-failure
+    contract_audit_probe_test.go:75: object absent; error=atomicfile: write .stow/index.json: renameat .stow/.tmp-54b8edb1cc6bc4de262bf3c7444b0f61 .stow/index.json: is a directory; committed=false; confirmed=[]
+    contract_audit_probe_test.go:77: native deletion completed but error does not identify committed outcome
+    contract_audit_probe_test.go:80: confirmed deleted=[], want [victim]
+--- FAIL: TestContractAuditDeleteOutcome (0.28s)
+    --- PASS: TestContractAuditDeleteOutcome/single/healthy (0.07s)
+    --- FAIL: TestContractAuditDeleteOutcome/single/index-failure (0.06s)
+    --- PASS: TestContractAuditDeleteOutcome/batch/healthy (0.07s)
+    --- FAIL: TestContractAuditDeleteOutcome/batch/index-failure (0.07s)
+=== RUN   TestContractAuditPartDescriptor
+=== RUN   TestContractAuditPartDescriptor/healthy
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:10:18.271578 +0000 UTC} result=&{PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:10:18.293217 +0000 UTC} write error=<nil> listed={PartNumber:1 ETag:"f5300127f646a4550bc4a04fbe393e79" Size:11 LastModified:2026-10-16 19:10:18.293217 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:146: completion from ListParts: meta=&{Bucket:workspace Key:target VersionID:eb009d5e2591e4a715d676818bf3670d Size:11 ETag:"f5300127f646a4550bc4a04fbe393e79" ContentType:text/plain; charset=utf-8 LastModified:2026-10-16 19:10:18 +0000 UTC Metadata:map[] ChecksumAlgorithm: ChecksumValue:} error=<nil>
+=== RUN   TestContractAuditPartDescriptor/descriptor-failure
+    contract_audit_probe_test.go:141: old=&{PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:10:18.392467 +0000 UTC} result=<nil> write error=workspace store: save upload: atomicfile: write /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure696546535/001/.stow/multipart/57fa950ed561b72adbfddd9791d4112a/upload.json: rename /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure696546535/001/.stow/multipart/57fa950ed561b72adbfddd9791d4112a/.tmp-3632292610 /var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/TestContractAuditPartDescriptordescriptor-failure696546535/001/.stow/multipart/57fa950ed561b72adbfddd9791d4112a/upload.json: file exists listed={PartNumber:1 ETag:"149603e6c03516362a8da23f624db945" Size:3 LastModified:2026-10-16 19:10:18.392467 +0000 UTC} actual="replacement"
+    contract_audit_probe_test.go:143: ListParts descriptor disagrees with actual stored bytes
+    contract_audit_probe_test.go:146: completion from ListParts: meta=<nil> error=invalid multipart part
+    contract_audit_probe_test.go:148: completion from the returned list failed: invalid multipart part
+--- FAIL: TestContractAuditPartDescriptor (0.21s)
+    --- PASS: TestContractAuditPartDescriptor/healthy (0.12s)
+    --- FAIL: TestContractAuditPartDescriptor/descriptor-failure (0.09s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/storage/workspace	1.359s
+FAIL

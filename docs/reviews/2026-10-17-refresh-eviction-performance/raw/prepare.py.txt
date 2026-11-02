@@ -1,0 +1,21 @@
+from pathlib import Path
+import subprocess,shutil,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-fallback-2026-10-17');c=p/'context';c.mkdir(exist_ok=True)
+files=[x for x in subprocess.check_output(['git','ls-files','-z'],cwd=r).decode().split('\0') if x]+['internal/runthrough/refresh_eviction_test.go']
+for name in files:
+ src=r/name;dst=c/name
+ if not src.is_file():continue
+ dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dst);shutil.copymode(src,dst)
+b=c/'benchmark';old=Path('/private/tmp/stow-performance-2026-10-17/context/benchmark')
+for name in ['runner.mjs','http.mjs','resources.mjs','Dockerfile','reap_validation.py','diagnosis.mjs','diagnosis-validation.mjs']:shutil.copyfile(old/name,b/name)
+d=b/'validation-previous-baselines';d.mkdir(exist_ok=True)
+for name in ['go-quality.json','file-size.json']:(d/name).write_bytes(subprocess.check_output(['git','show','HEAD:scripts/baselines/'+name],cwd=r))
+plan={'phase':'eviction-order-test-before','sources':['internal/runthrough/adapter.go','internal/runthrough/refresh_version_fixture_test.go','internal/runthrough/refresh_version_bench_test.go','internal/runthrough/refresh_eviction_test.go'],'steps':[
+{'name':'format-tests','args':['gofmt','-w','internal/runthrough/refresh_version_fixture_test.go','internal/runthrough/refresh_version_bench_test.go','internal/runthrough/refresh_eviction_test.go']},
+{'name':'reproduce','args':['go','test','./internal/runthrough','-run','^TestRefreshEviction(RetainsOpenedVersion|FailureClosesOpenedReader)$','-count=2','-v'],'expected':1},
+{'name':'fallback-controls','args':['go','test','-race','./internal/runthrough','-run','^(TestRefreshFallback|TestRefreshHead|TestRefreshConcurrent|TestRunthroughOpening|TestRunthroughMissing)','-count=2','-v']} ]}
+(b/'active-plan.json').write_text(json.dumps(plan,indent=2)+'\n');(p/'before-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+manifest={name:hashlib.sha256((c/name).read_bytes()).hexdigest()for name in files if(c/name).is_file()}
+(b/'validation-input-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');(p/'source-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');(p/'remote-state.json').write_text(json.dumps(manifest,indent=2)+'\n')
+(p/'baseline.json').write_text(json.dumps({'base':subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip(),'origin_main':subprocess.check_output(['git','rev-parse','origin/main'],cwd=r).decode().strip()},indent=2)+'\n')
+print('Prepared',len(files),'tracked/test files,',sum(f.stat().st_size for f in c.rglob('*')if f.is_file()),'bytes')

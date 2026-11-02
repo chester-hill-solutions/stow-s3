@@ -26,10 +26,11 @@ func TestProvenanceSurvivesRestartAndEviction(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				return runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true, Cache: runthrough.CachePolicy{MaxBytes: 1}}, local, storage.NewMemoryStore(), up, outbox)
+				return runthrough.NewWithOutbox(runthrough.Config{Policy: runthrough.PolicyMirrorWrites, AllowLiveWrites: true, Cache: runthrough.CachePolicy{MaxObjects: 1}}, local, storage.NewMemoryStore(), up, outbox)
 			}
 			a := open()
 			readThrough(t, a, ctx)
+			evictProvenanceCache(t, a, up)
 			if a.CacheEvictions() == 0 {
 				t.Fatal("expected cache eviction")
 			}
@@ -129,4 +130,17 @@ func TestLegacyIntentWithoutProvenanceIsRefused(t *testing.T) {
 	if string(up.bodies[objectKey("bucket", "key")]) != "other writer" {
 		t.Fatal("legacy intent overwrote upstream")
 	}
+}
+
+func evictProvenanceCache(t *testing.T, adapter *runthrough.Adapter, up *mockUpstream) {
+	t.Helper()
+	ctx := context.Background()
+	if _, err := up.PutObject(ctx, "bucket", "other", bytes.NewBufferString("evict target"), storage.PutOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	reader, _, err := adapter.GetObject(ctx, "bucket", "other")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = reader.Close()
 }

@@ -1,0 +1,31 @@
+from pathlib import Path
+from collections import defaultdict,Counter
+from statistics import median
+import json,re
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');d=p/('export-'+json.loads((p/'confirmation-start.json').read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==6 and all(x['passed']for x in checks)
+commands=json.loads((d/'confirmation-runs.json').read_text());assert len(commands['runs'])==24;assert json.loads((d/'fixture-filesystem.json').read_text())['statfsType']==61267
+samples=[];cells=defaultdict(lambda:defaultdict(list))
+for c in commands['runs']:
+ assert c['exitCode']==0 and c['signal']is None
+ assert c['sha256']==commands['binarySHA256']['provenance'if c['cohort']=='aa'else c['variant']]
+ rows=[]
+ for line in(d/c['log']).read_text().splitlines():
+  m=re.match(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$',line)
+  if not m:continue
+  row={'name':m[1],'iterations':int(m[2]),'index':c['index'],'variant':c['variant'],'cohort':c['cohort'],'section':c['section'],'log':c['log']};parts=m[3].split();assert len(parts)%2==0
+  for n in range(0,len(parts),2):row[parts[n+1]]=float(parts[n])
+  rows.append(row);samples.append(row);cells[(row['cohort'],row['name'])][row['variant']].append(row)
+ assert len(rows)==(4 if c['section']=='component'else 6),(c,len(rows))
+assert len(samples)==128 and len(cells)==16
+summary=[]
+for (cohort,name),v in sorted(cells.items()):
+ assert set(v)=={'before','provenance'}and all(len(rows)==4 for rows in v.values());stats={}
+ for label,rows in v.items():
+  keys=[k for k in rows[0]if k not in ['name','iterations','index','variant','cohort','section','log']];stats[label]={k:median(x[k]for x in rows)for k in keys};stats[label]['nsMin']=min(x['ns/op']for x in rows);stats[label]['nsMax']=max(x['ns/op']for x in rows)
+ summary.append({'cohort':cohort,'name':name,**stats,'timeDeltaPercent':(stats['provenance']['ns/op']/stats['before']['ns/op']-1)*100,'allocDeltaPercent':(stats['provenance']['allocs/op']/stats['before']['allocs/op']-1)*100,'byteDeltaPercent':(stats['provenance']['B/op']/stats['before']['B/op']-1)*100})
+initial=p/('export-'+json.loads((p/'measure-start.json').read_text())['id']);ref=json.loads((initial/'contract-receipt.json').read_text())['before-normal']['frames']
+for name in ['provenance-normal','provenance-race']:
+ text=(d/(name+'.log')).read_text();frames=[json.loads(line.removeprefix('STOWPROTOFRAME: '))for line in text.splitlines()if line.startswith('STOWPROTOFRAME: ')];assert len(frames)==28 and {f['name']:f for f in frames}==ref
+ assert text.count('--- PASS: TestOutboxProtoBlockEarlyErrorAllocation')==2 and '--- FAIL:'not in text and '--- SKIP:'not in text
+(d/'confirmation-analysis.json').write_text(json.dumps({'observations':128,'pairedObservations':80,'sameBinaryObservations':48,'comparisons':summary,'samples':samples},indent=2)+'\n');print('Verified 80 paired and 48 same-binary observations with exact final candidate and unchanged frames')
+for x in summary:print(x['cohort'],x['name'],'time%=',round(x['timeDeltaPercent'],2),'alloc%=',round(x['allocDeltaPercent'],2),'B%=',round(x['byteDeltaPercent'],2))

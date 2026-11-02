@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+p=Path('/private/tmp/stow-outbox-ownership-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');raw=r/'docs/reviews/2026-10-18-outbox-ownership/raw';final=raw/'final';receipt=json.loads((final/'report-receipt.json').read_text());stop=json.loads((p/'runner-stop-status.json').read_text());assert receipt['exitCode']==0 and all(c['exitCode']==0 for c in receipt['checks'])and stop['stopVerified']
+for n,h in receipt['documentSHA256'].items():assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n,h in receipt['sourceSHA256'].items():
+ if n.startswith('internal/'):assert hashlib.sha256((r/n).read_bytes()).hexdigest()==h,n
+for n in ['internal/runthrough/outbox.go','internal/runthrough/outbox_claims.go','internal/runthrough/outbox_token_exhaustion_bench_test.go']:
+ assert receipt['sourceSHA256'][n]==json.loads((raw/'after/environment.json').read_text())['sourceSHA256'][n]
+for n in ['internal/runthrough/outbox_ownership_test.go','internal/runthrough/outbox_ownership_controls_test.go']:
+ assert receipt['sourceSHA256'][n]==json.loads((raw/'before-final/environment.json').read_text())['sourceSHA256'][n]
+assert json.loads((raw/'after/comparison-analysis.json').read_text())['observations']==128
+assert all(x['allocDelta']==0 for x in json.loads((raw/'after/comparison-analysis.json').read_text())['comparisons'])
+assert json.loads((final/'green-receipt.json').read_text())['regressions']['focused-race']['passes']==228
+assert not [x for x in json.loads((final/'checks.json').read_text())if not x['passed']]
+assert [x['name']for x in json.loads((raw/'after/checks.json').read_text())if not x['passed']]==['quality']
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip()==json.loads((p/'baseline.json').read_text())['base']
+shutil.copy2(p/'runner-stop-status.json',raw/'runner-stop-status.json');shutil.copy2(p/'verify-final.py',raw/'verify-final.py.txt')
+result={'verified':True,'base':json.loads((p/'baseline.json').read_text()),'sourceSHA256':{n:h for n,h in receipt['sourceSHA256'].items()if n.startswith('internal/')},'documentSHA256':receipt['documentSHA256'],'finalRegressionCases':114,'passesPerMode':228,'comparisonObservations':128,'allocationsUnchanged':True,'railwayDeploymentId':receipt['railwayDeploymentId'],'teardown':stop}
+(raw/'review-verification.json').write_text(json.dumps(result,indent=2)+'\n');print('Verified exact final source/docs, final red/green identity, all comparison cells and isolated teardown')

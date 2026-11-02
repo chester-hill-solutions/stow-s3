@@ -1,0 +1,585 @@
+COMMAND ["go", "test", "-race", "./internal/runtime", "./internal/embedded", "-run", "^TestReadForSaveBody|^TestEmbeddedReadForSaveBodyMissing$|^TestReadForSaveMarkedMissingObservation$|^TestReadForSaveObservationControls$|^TestReadForSaveRefusalDoesNotRead$|^TestEmbeddedReadForSavePreservesMarkedMissing$", "-count=5", "-v"]
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.01s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.01s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.01s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.01s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.01s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.01s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.05s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false
+=== RUN   TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true
+--- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=false/after=3/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=0/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=1/together=true (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=false (0.00s)
+    --- PASS: TestReadForSaveBodyMissingDoesNotEstablishAbsence/wrapped=true/after=3/together=true (0.00s)
+=== RUN   TestReadForSaveBodyFailureControls
+=== RUN   TestReadForSaveBodyFailureControls/unexpected-eof
+=== RUN   TestReadForSaveBodyFailureControls/unknown
+=== RUN   TestReadForSaveBodyFailureControls/bucket-missing
+=== RUN   TestReadForSaveBodyFailureControls/marked-missing
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=false
+=== RUN   TestReadForSaveBodyFailureControls/complete/empty=true
+--- PASS: TestReadForSaveBodyFailureControls (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unexpected-eof (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/unknown (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/bucket-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/marked-missing (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=false (0.00s)
+    --- PASS: TestReadForSaveBodyFailureControls/complete/empty=true (0.00s)
+=== RUN   TestReadForSaveRefusalDoesNotRead
+=== RUN   TestReadForSaveRefusalDoesNotRead/cancelled
+=== RUN   TestReadForSaveRefusalDoesNotRead/authority
+=== RUN   TestReadForSaveRefusalDoesNotRead/policy
+=== RUN   TestReadForSaveRefusalDoesNotRead/closed
+=== RUN   TestReadForSaveRefusalDoesNotRead/unsupported
+--- PASS: TestReadForSaveRefusalDoesNotRead (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/cancelled (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/authority (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/policy (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/closed (0.00s)
+    --- PASS: TestReadForSaveRefusalDoesNotRead/unsupported (0.00s)
+=== RUN   TestReadForSaveMarkedMissingObservation
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/missing-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent
+=== RUN   TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present
+--- PASS: TestReadForSaveMarkedMissingObservation (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/missing-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-marker-first/body-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-present (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/open-absent (0.00s)
+    --- PASS: TestReadForSaveMarkedMissingObservation/wrapped-missing-first/body-present (0.00s)
+=== RUN   TestReadForSaveObservationControls
+=== RUN   TestReadForSaveObservationControls/unknown-open
+=== RUN   TestReadForSaveObservationControls/unknown-body
+=== RUN   TestReadForSaveObservationControls/marker-only-open
+=== RUN   TestReadForSaveObservationControls/marker-only-body
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=false
+=== RUN   TestReadForSaveObservationControls/missing/wrapped=true
+=== RUN   TestReadForSaveObservationControls/healthy-missing
+=== RUN   TestReadForSaveObservationControls/healthy-probe
+--- PASS: TestReadForSaveObservationControls (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/unknown-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-open (0.00s)
+    --- PASS: TestReadForSaveObservationControls/marker-only-body (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=false (0.00s)
+    --- PASS: TestReadForSaveObservationControls/missing/wrapped=true (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-missing (0.00s)
+    --- PASS: TestReadForSaveObservationControls/healthy-probe (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/runtime	2.037s
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+=== RUN   TestEmbeddedReadForSaveBodyMissing
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false
+=== RUN   TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true
+--- PASS: TestEmbeddedReadForSaveBodyMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=false/together=true (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=false (0.00s)
+    --- PASS: TestEmbeddedReadForSaveBodyMissing/wrapped=true/together=true (0.00s)
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false
+=== RUN   TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true
+--- PASS: TestEmbeddedReadForSavePreservesMarkedMissing (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=false/wrapped=true (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=false (0.00s)
+    --- PASS: TestEmbeddedReadForSavePreservesMarkedMissing/missingFirst=true/wrapped=true (0.00s)
+PASS
+ok  	github.com/chester-hill-solutions/stow-s3/internal/embedded	1.783s

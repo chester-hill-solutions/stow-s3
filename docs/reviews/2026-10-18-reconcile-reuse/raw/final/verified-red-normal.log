@@ -1,0 +1,38 @@
+=== RUN   TestReconcileUnchangedKeepsLedger
+    reconcile_unchanged_test.go:53: unchanged reconciliation replaced the ledger
+--- FAIL: TestReconcileUnchangedKeepsLedger (0.00s)
+=== RUN   TestReconcileUnchangedChangesReplaceLedger
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/version
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/bytes
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/id
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/class
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/store-field
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/order
+=== RUN   TestReconcileUnchangedChangesReplaceLedger/nil-to-empty
+--- PASS: TestReconcileUnchangedChangesReplaceLedger (0.02s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/version (0.00s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/bytes (0.00s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/id (0.00s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/class (0.00s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/store-field (0.00s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/order (0.00s)
+    --- PASS: TestReconcileUnchangedChangesReplaceLedger/nil-to-empty (0.00s)
+=== RUN   TestReconcileUnchangedReadOnlyDirectory
+    reconcile_unchanged_test.go:124: unchanged reconciliation required replacement: namespace admission requires verified reconciliation
+        atomicfile: write /tmp/TestReconcileUnchangedReadOnlyDirectory3107599088/001/host/capacity.json: open /tmp/TestReconcileUnchangedReadOnlyDirectory3107599088/001/host/.tmp-995165308: permission denied
+--- FAIL: TestReconcileUnchangedReadOnlyDirectory (0.00s)
+=== RUN   TestReconcileUnchangedFallback
+=== RUN   TestReconcileUnchangedFallback/repair
+=== RUN   TestReconcileUnchangedFallback/refuse
+--- PASS: TestReconcileUnchangedFallback (0.01s)
+    --- PASS: TestReconcileUnchangedFallback/repair (0.00s)
+    --- PASS: TestReconcileUnchangedFallback/refuse (0.00s)
+=== RUN   TestReconcileUnchangedPendingStillWrites
+--- PASS: TestReconcileUnchangedPendingStillWrites (0.00s)
+=== RUN   TestReconcileUnchangedAncestorError
+--- PASS: TestReconcileUnchangedAncestorError (0.00s)
+=== RUN   TestReconcileUnchangedChecksQuota
+--- PASS: TestReconcileUnchangedChecksQuota (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/capacity	0.046s
+FAIL

@@ -1,0 +1,48 @@
+package runthrough_test
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
+)
+
+func TestFileOutboxRejectsTruncatedJournal(t *testing.T) {
+	for _, operation := range []string{"open", "lookup", "pending", "enqueue"} {
+		t.Run(operation, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "outbox")
+			outbox, err := runthrough.NewFileOutbox(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			first, err := outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "first", Version: "local-version"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := outbox.SaveUpstreamState("bucket", "first", runthrough.UpstreamState{ETag: "upstream-version"}); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Truncate(path, 0); err != nil {
+				t.Fatal(err)
+			}
+			switch operation {
+			case "open":
+				_, err = runthrough.NewFileOutbox(path)
+			case "lookup":
+				_, _, err = outbox.UpstreamState("bucket", "first")
+			case "pending":
+				_, err = outbox.PendingSnapshot()
+			case "enqueue":
+				var next runthrough.OutboxEntry
+				next, err = outbox.Enqueue(runthrough.OutboxEntry{Operation: runthrough.OutboxPut, Bucket: "bucket", Key: "second", Version: "other-version"})
+				if err == nil && next.ID == first.ID {
+					t.Logf("reused durably assigned intent ID %q after truncation", first.ID)
+				}
+			}
+			if err == nil {
+				t.Fatalf("%s accepted a journal truncated after durable enqueue %q", operation, first.ID)
+			}
+		})
+	}
+}

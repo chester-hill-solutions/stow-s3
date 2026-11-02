@@ -1,0 +1,20 @@
+from pathlib import Path
+import subprocess,os,json,hashlib
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-open-error-2026-10-16');env=dict(os.environ,GOTOOLCHAIN='go1.25.6')
+def run(cmd,name):
+ q=subprocess.run(cmd,cwd=r,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (p/name).write_text('COMMAND '+json.dumps(cmd)+'\n'+q.stdout)
+ assert q.returncode==0,(name,q.stdout[-4000:]);print(name,'PASS',flush=True)
+run(['go','test','./internal/runtime','./pkg/stow','-run','^Test(OpeningError|PublicOpening)','-count=2','-v'],'after-tests.log')
+run(['go','test','-race','./internal/runtime','./internal/embedded','./pkg/stow','-run','^Test(OpeningError|PublicOpening|Excess|EmbeddedExcess|Stream(EOF|CopyEOF|Seek|Range|Partial|Rechecks|WriteTo)|AdapterReturnsStream|AdapterSeek|IndependentStreams|BufferedRead|ReadForSave|EmbeddedReadForSave|EmbeddedBufferedRead|EmbeddedStreamRejects)','-count=5','-v'],'focused-race.log')
+run(['go','test','./...'],'full-go.log')
+run(['go','test','-race','./internal/runtime','./internal/storage/...','./internal/s3api','./internal/runthrough','./internal/embedded','./pkg/stow'],'broad-race.log')
+run(['make','check-go-quality','check-file-size'],'quality.log')
+run(['go','vet','./internal/runtime','./internal/embedded','./pkg/stow'],'vet.log')
+run(['git','diff','--check'],'diff-check.log')
+files=['internal/runtime/open_error_test.go','internal/runtime/open_error_bench_test.go','pkg/stow/open_error_test.go','internal/runtime/streams.go','internal/embedded/streams.go']
+q=subprocess.check_output(['gofmt','-l',*files],cwd=r,text=True);assert not q,q
+identity=json.loads((p/'environment.json').read_text())
+for file in files:assert identity['sources'][file]['sha256']==hashlib.sha256((r/file).read_bytes()).hexdigest(),file
+assert not (r/'packages/stow-s3/node_modules').is_symlink()
+(p/'final-source-check.log').write_text('gofmt clean; measured source hashes unchanged; temporary package symlink removed.\n')

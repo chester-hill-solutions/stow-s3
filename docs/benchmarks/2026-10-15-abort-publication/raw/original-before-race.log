@@ -1,0 +1,15 @@
+=== RUN   TestReviewCommittedAbortReleasesQuota
+    abort_review_probe_test.go:51: actual uploads after abort=0 actual part bytes=0 abort-error=local mutation committed
+        after upload abort put-error=stow: runtime quota exceeded initiation-error=runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data usage={Bytes:0 Objects:0}
+    abort_review_probe_test.go:53: committed abort left object/byte reservations: stow: runtime quota exceeded
+    abort_review_probe_test.go:56: committed abort left session quota: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+--- FAIL: TestReviewCommittedAbortReleasesQuota (0.00s)
+=== RUN   TestReviewCommittedAbortReleasesQuota
+    abort_review_probe_test.go:51: actual uploads after abort=0 actual part bytes=0 abort-error=local mutation committed
+        after upload abort put-error=stow: runtime quota exceeded initiation-error=runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data usage={Bytes:0 Objects:0}
+    abort_review_probe_test.go:53: committed abort left object/byte reservations: stow: runtime quota exceeded
+    abort_review_probe_test.go:56: committed abort left session quota: runtime quota exceeded: maximum outstanding multipart uploads (1) reached; abort uploads or raise Go MaxMultipartUploads to reopen existing data
+--- FAIL: TestReviewCommittedAbortReleasesQuota (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/pkg/stow	0.308s
+FAIL

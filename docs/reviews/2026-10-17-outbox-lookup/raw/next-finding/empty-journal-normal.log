@@ -1,0 +1,33 @@
+=== RUN   TestFileOutboxRejectsTruncatedJournal
+=== RUN   TestFileOutboxRejectsTruncatedJournal/open
+    empty_journal_repro_test.go:44: open accepted a journal truncated after durable enqueue "outbox-1"
+=== RUN   TestFileOutboxRejectsTruncatedJournal/lookup
+    empty_journal_repro_test.go:44: lookup accepted a journal truncated after durable enqueue "outbox-1"
+=== RUN   TestFileOutboxRejectsTruncatedJournal/pending
+    empty_journal_repro_test.go:44: pending accepted a journal truncated after durable enqueue "outbox-1"
+=== RUN   TestFileOutboxRejectsTruncatedJournal/enqueue
+    empty_journal_repro_test.go:40: reused durably assigned intent ID "outbox-1" after truncation
+    empty_journal_repro_test.go:44: enqueue accepted a journal truncated after durable enqueue "outbox-1"
+--- FAIL: TestFileOutboxRejectsTruncatedJournal (0.01s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/open (0.00s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/lookup (0.00s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/pending (0.00s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/enqueue (0.00s)
+=== RUN   TestFileOutboxRejectsTruncatedJournal
+=== RUN   TestFileOutboxRejectsTruncatedJournal/open
+    empty_journal_repro_test.go:44: open accepted a journal truncated after durable enqueue "outbox-1"
+=== RUN   TestFileOutboxRejectsTruncatedJournal/lookup
+    empty_journal_repro_test.go:44: lookup accepted a journal truncated after durable enqueue "outbox-1"
+=== RUN   TestFileOutboxRejectsTruncatedJournal/pending
+    empty_journal_repro_test.go:44: pending accepted a journal truncated after durable enqueue "outbox-1"
+=== RUN   TestFileOutboxRejectsTruncatedJournal/enqueue
+    empty_journal_repro_test.go:40: reused durably assigned intent ID "outbox-1" after truncation
+    empty_journal_repro_test.go:44: enqueue accepted a journal truncated after durable enqueue "outbox-1"
+--- FAIL: TestFileOutboxRejectsTruncatedJournal (0.01s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/open (0.00s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/lookup (0.00s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/pending (0.00s)
+    --- FAIL: TestFileOutboxRejectsTruncatedJournal/enqueue (0.00s)
+FAIL
+FAIL	github.com/chester-hill-solutions/stow-s3/internal/runthrough	0.023s
+FAIL

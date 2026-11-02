@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,statistics
+p=Path('/private/tmp/stow-scan-memory-2026-10-18');j=json.loads((p/'prototype-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==12 and all(x['passed']for x in checks)
+rows=json.loads((e/'measurements.json').read_text());assert len(rows['observations'])==240 and len(rows['commands'])==240 and all(x['iterations']==3 for x in rows['observations'])
+import re
+expected={'TestCapacityPayloadAllocationBound','TestCapacityPayloadUnknownAllocation'}
+for n in ['red-normal','red-race']:
+ t=(e/(n+'.log')).read_text();assert set(re.findall(r'^--- FAIL: (\S+) \(',t,re.M))==expected
+ assert 'DATA RACE'not in t and 'build failed'not in t and '--- SKIP:'not in t
+for n in ['prototype-normal','prototype-race']:
+ t=(e/(n+'.log')).read_text();assert '--- FAIL:'not in t and 'DATA RACE'not in t and '--- SKIP:'not in t
+ assert len(re.findall(r'^--- PASS: TestCapacityPayload\S+ \(',t,re.M))==5
+analysis=[]
+for name in sorted({x['name']for x in rows['observations']}):
+ labels={}
+ for label in ['A','B','C','D']:
+  subset=[x for x in rows['observations']if x['name']==name and x['label']==label];assert len(subset)==4
+  labels[label]={k:{'median':statistics.median(x[k]for x in subset),'min':min(x[k]for x in subset),'max':max(x[k]for x in subset)}for k in ['ns','bytes','allocs','maxRSSBytes']}
+ c={'name':name,'labels':labels};c['changePercent']={k:100*(labels['B'][k]['median']/labels['A'][k]['median']-1)for k in ['ns','bytes','allocs','maxRSSBytes']};c['sameBinaryControlTimePercent']=100*(labels['D']['ns']['median']/labels['C']['ns']['median']-1);analysis.append(c)
+ print(name,{'ns':(labels['A']['ns']['median'],labels['B']['ns']['median']),'bytes':(labels['A']['bytes']['median'],labels['B']['bytes']['median']),'allocs':(labels['A']['allocs']['median'],labels['B']['allocs']['median'])})
+(e/'comparison-analysis.json').write_text(json.dumps(analysis,indent=2)+'\n');(e/'validation-receipt.json').write_text(json.dumps({'checks':12,'allPassed':True,'observations':240,'originalNormalRepeats':1,'originalRaceRepeats':1,'prototypeNormalRepeats':1,'prototypeRaceRepeats':1},indent=2)+'\n')
+
+import hashlib
+for n in ['red-normal','red-race']:
+ t=(e/(n+'.log')).read_text();assert t.count('capacity binding materializes payload:')==4 and 'unknown scan file was materialized:'in t
+for n in ['prototype-normal','prototype-race']:
+ t=(e/(n+'.log')).read_text();v=[int(x)for x in re.findall(r'binding allocated=(\d+)',t)];assert len(v)==4 and all(x<4194304 for x in v)
+ print(n,'binding allocated',v)
+ print([x for x in t.splitlines()if 'unknown bytes='in x])
+assert json.loads((e/'environment.json').read_text())['sourceSHA256']['benchmark/baseline-capacity.go.txt']==hashlib.sha256((p/'baseline-capacity.go.txt').read_bytes()).hexdigest()

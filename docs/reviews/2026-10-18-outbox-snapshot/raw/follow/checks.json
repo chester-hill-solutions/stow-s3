@@ -1,0 +1,77 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/runthrough/file_outbox_snapshot_matched_bench_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 20,
+    "passed": true
+  },
+  {
+    "name": "quality",
+    "args": [
+      "make",
+      "check-go-quality",
+      "check-file-size",
+      "format-check"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 365,
+    "passed": true
+  },
+  {
+    "name": "follow-go",
+    "args": [
+      "go",
+      "test",
+      "./internal/runthrough",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 13067,
+    "passed": true
+  },
+  {
+    "name": "follow-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/runthrough",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 16904,
+    "passed": true
+  },
+  {
+    "name": "vet",
+    "args": [
+      "go",
+      "vet",
+      "./internal/runthrough"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 331,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/compare.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 175863,
+    "passed": true
+  }
+]

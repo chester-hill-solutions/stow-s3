@@ -1,0 +1,247 @@
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil   	 2303942	        53.14 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 2284726	        48.05 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 2503670	        58.05 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 2567326	        52.99 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 1732617	        63.28 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 2395898	        50.19 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	  137551	       981.3 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	  116192	      2647 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	   91878	      1646 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    4513	     24290 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    8713	     28566 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    5659	     36298 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2167	    124294 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    1634	    117588 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    1928	     57089 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny     	  138226	      1042 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	   89142	      1402 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  107805	      2371 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range    	   28800	      3995 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   47929	      2178 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   55798	      2085 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter  	  120810	      1208 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	  117102	      1032 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	  123399	      1033 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil   	 2612282	        51.91 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 1000000	       121.7 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	  475024	       219.2 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 1000000	       219.9 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 1000000	       150.1 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 2424214	        63.36 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	   66614	      3659 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	  101815	      1071 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	  137875	       943.3 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	   11480	     21776 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    9501	     13331 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    9958	     15117 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2005	     53566 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2738	     48779 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2547	     61203 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny     	  147555	      1068 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  135432	       884.1 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  140436	       872.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range    	   46078	      2298 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   52922	      2293 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   52380	      2373 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter  	  112279	      1317 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	   65362	      1653 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	   74373	      1960 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil   	 1000000	       104.0 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 1990525	        72.24 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 2024502	       112.3 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 1000000	       201.0 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 1404032	        94.96 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 1808487	        57.09 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	   79484	      1459 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	   65899	      3263 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	   10000	     26248 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	   10000	     22225 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	   10000	     11222 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	   10000	     11290 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2708	     46978 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    3111	     45672 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2736	     45135 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny     	  139749	       825.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  129549	       955.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  124980	       843.5 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range    	   51190	      2004 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   50022	      2161 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   54310	      2224 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter  	  104342	      1045 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	  118612	       988.4 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	  102433	      1179 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=1"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil   	 2198944	        46.28 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 2645630	        46.59 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil   	 2533279	        46.46 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 2600714	        47.70 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 2482170	        47.65 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader         	 2421553	        52.68 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	  113440	      1602 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	  106753	      1719 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny   	   87308	      2251 ns/op	    1155 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	   10000	     25102 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    9176	     16207 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB  	    8952	     21788 ns/op	   66691 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2353	     45165 ns/op	   67174 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2932	     51296 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB 	    2006	     52646 ns/op	   67175 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny     	  151092	       878.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  132987	       828.9 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny     	  139036	       930.4 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range    	   51451	      2323 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   54726	      2383 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range    	   57692	      2586 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter  	   72822	      1563 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	  110216	      1198 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter  	   83592	      1345 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil-8     	 2556235	        51.80 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2546394	        48.82 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2603822	        53.08 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2120583	        64.25 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2547126	        59.27 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2310595	        54.37 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   58099	      2085 ns/op	    1182 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   83658	      1546 ns/op	    1194 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	  130870	      3296 ns/op	    1195 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    2143	     49748 ns/op	   67996 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    5194	     42038 ns/op	   67896 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    2944	     51706 ns/op	   67905 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2226	     64133 ns/op	   69251 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    1298	    183077 ns/op	   68858 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    1896	     87889 ns/op	   69889 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  114896	      1097 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  128257	      1291 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	   68060	      2408 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8          	   43308	      4167 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   10000	     16640 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	    9795	     12823 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	   45566	      2608 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	   63913	      2500 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	   60580	      1718 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil-8     	 2243593	        49.62 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2191387	        52.83 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2156268	        46.42 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2623351	        49.51 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2030666	        54.56 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2356980	        50.37 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	  117356	      1466 ns/op	    1198 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	  102232	      1083 ns/op	    1207 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   98968	      1426 ns/op	    1202 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    5185	     21585 ns/op	   68436 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   10000	     21568 ns/op	   68734 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	   10000	     28768 ns/op	   68338 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	     200	   1162712 ns/op	   68560 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    1573	     83463 ns/op	   70180 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    1447	    114902 ns/op	   68967 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	   27224	      5590 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  150622	       685.4 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  166524	       831.8 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8          	   55153	      2011 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   59028	      2411 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   58195	      2378 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	  123915	       906.0 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	   80547	      1303 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	  111999	      1001 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/after.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil-8     	 2302089	        56.75 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2413528	        47.97 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2561534	        50.48 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2249479	        52.87 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2520868	        48.07 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2347822	        85.56 ns/op	         1.000 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   67057	      1711 ns/op	    1196 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	  133834	      2324 ns/op	    1195 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   87156	      1793 ns/op	    1214 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    8308	     21605 ns/op	   68815 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    8079	     19216 ns/op	   68453 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    6920	     21102 ns/op	   68685 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2748	     72151 ns/op	   69935 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2518	     63654 ns/op	   70229 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2368	    224400 ns/op	   69751 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  104529	      1198 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  121173	       862.9 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  152197	      1158 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8          	   48105	      2177 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   56413	      2672 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   56378	      2638 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	  110113	      1163 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	  113715	      1174 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	   74594	      1728 ns/op	    1568 B/op	      13 allocs/op
+PASS
+
+COMMAND ["/private/tmp/stow-open-error-2026-10-16/before.test", "-test.run=^$", "-test.bench=^Benchmark(OpeningError|StreamCompleteness|OpenedObjectRead)$/^(nil|reader|tiny|range|adapter|get-tiny|get-64KiB|save-64KiB)$", "-test.benchmem", "-test.benchtime=100ms", "-test.count=3", "-test.cpu=8"]
+goos: darwin
+goarch: arm64
+pkg: github.com/chester-hill-solutions/stow-s3/internal/runtime
+cpu: Apple M1 Pro
+BenchmarkOpeningError/nil-8     	 2451728	        50.81 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2388877	        55.52 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/nil-8     	 2033344	        81.34 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2202782	        54.92 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2221140	        93.41 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpeningError/reader-8  	 2324576	        64.02 ns/op	         0 close/op	       0 B/op	       0 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   70000	      2804 ns/op	    1189 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	   66105	      1806 ns/op	    1191 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-tiny-8         	  103911	      2450 ns/op	    1201 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    3368	     93792 ns/op	   68816 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    5820	     28023 ns/op	   68356 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/get-64KiB-8        	    8162	     29245 ns/op	   68530 B/op	      14 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2139	     78873 ns/op	   69147 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2233	     87419 ns/op	   69902 B/op	      19 allocs/op
+BenchmarkOpenedObjectRead/save-64KiB-8       	    2564	     62712 ns/op	   69917 B/op	      19 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	   92996	      2505 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  163178	       898.9 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/tiny-8           	  166467	       828.3 ns/op	    1072 B/op	      10 allocs/op
+BenchmarkStreamCompleteness/range-8          	   47640	      3228 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   59514	      3374 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/range-8          	   52676	      2316 ns/op	    1104 B/op	      11 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	   97454	      1389 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	  102420	      1687 ns/op	    1568 B/op	      13 allocs/op
+BenchmarkStreamCompleteness/adapter-8        	  109924	      1985 ns/op	    1568 B/op	      13 allocs/op
+PASS

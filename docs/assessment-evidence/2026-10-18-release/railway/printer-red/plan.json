@@ -1,0 +1,44 @@
+{
+  "phase": "release-api-printer-reproduction",
+  "sources": [
+    "tools/api-reference/main.go",
+    "tools/api-reference/main_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format-regression",
+      "args": [
+        "gofmt",
+        "-w",
+        "tools/api-reference/main_test.go"
+      ]
+    },
+    {
+      "name": "printer-red-normal",
+      "args": [
+        "go",
+        "test",
+        "./tools/api-reference",
+        "-run",
+        "^TestSignatureIgnoresUnrelatedFilePositions$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "printer-red-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./tools/api-reference",
+        "-run",
+        "^TestSignatureIgnoresUnrelatedFilePositions$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

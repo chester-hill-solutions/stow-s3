@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,json,shutil,hashlib
+p=Path('/private/tmp/stow-incoming-memory-2026-10-18'); old=Path('/private/tmp/stow-scan-memory-2026-10-18'); r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow')
+for n in ['control.py','watch.py','remote.py','export.py']:
+ s=(old/n).read_text().replace(str(old),str(p)).replace('stow-scan-memory-20261018','stow-incoming-memory-20261018');(p/n).write_text(s)
+base=subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip();main=subprocess.check_output(['git','rev-parse','origin/main'],cwd=r).decode().strip();assert not subprocess.check_output(['git','status','--porcelain'],cwd=r)
+(p/'baseline.json').write_text(json.dumps({'base':base,'originMain':main,'branch':'codex/core-copy-quality','purpose':'Measurement only; no production changes'},indent=2)+'\n')
+shutil.copy2(old/'transport-Dockerfile.txt',p/'transport-Dockerfile.txt')

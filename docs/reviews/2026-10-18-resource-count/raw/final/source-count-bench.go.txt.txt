@@ -1,0 +1,48 @@
+package capacity
+
+import (
+ "context"
+ "fmt"
+ "os"
+ "strings"
+ "syscall"
+ "testing"
+)
+
+func BenchmarkResourceCountAdmission(b *testing.B) {
+ root:=os.Getenv("STOW_BENCH_ROOT")
+ if !strings.HasPrefix(root,"/results/") { b.Fatal("Railway ext4 root required") }
+ b.Setenv("TMPDIR",root)
+ for _,count:=range []int{16,maxResources} {
+  b.Run(fmt.Sprintf("resources=%d",count),func(b *testing.B){
+   ns,usages:=resourceCountNamespace(b,[2]int{count/2,count-count/2})
+   var disk syscall.Statfs_t
+   if err:=syscall.Statfs(ns.host.dir,&disk);err!=nil||disk.Type!=61267 { b.Fatalf("ext4 ledger required: %v type=%d",err,disk.Type) }
+   next:=usages[0];next.Resources=append([]Resource(nil),next.Resources...);next.Resources[0].Version="v2"
+   called:=0
+   effect:=func() error { called++;return nil }
+   b.ReportAllocs();b.ResetTimer()
+   for i:=0;i<b.N;i++ { if err:=ns.WithAdmission(context.Background(),Admission{Usage:next},effect);err!=nil { b.Fatal(err) } }
+   b.StopTimer()
+   if called!=b.N { b.Fatalf("effects=%d iterations=%d",called,b.N) }
+  })
+ }
+}
+
+func BenchmarkResourceCountCharge(b *testing.B) {
+ for _,count:=range []int{0,16,maxResources/2} {
+  b.Run(fmt.Sprintf("settled=%d",count),func(b *testing.B){
+   resources:=make([]Resource,count+1)
+   for i:=range resources { resources[i]=Resource{ID:fmt.Sprint(i),Version:"v1",Bytes:1,Class:Payload} }
+   store:=storeState{Resources:resources[:count],Pending:&AdmissionState{Resources:resources}}
+   want:=count
+   if os.Getenv("STOW_BENCH_EXPECT_COUNT")=="1" { want=count+1 }
+   b.ReportAllocs();b.ResetTimer()
+   for i:=0;i<b.N;i++ {
+    var out Snapshot
+    got,err:=storeCharge(&store,&out)
+    if err!=nil||got!=want||out.PayloadBytes!=int64(count+1) { b.Fatalf("count=%d want=%d payload=%d err=%v",got,want,out.PayloadBytes,err) }
+   }
+  })
+ }
+}

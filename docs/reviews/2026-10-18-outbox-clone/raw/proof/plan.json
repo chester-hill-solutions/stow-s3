@@ -1,0 +1,76 @@
+{
+  "phase": "outbox-clone-capacity-proof",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/outbox_clone_test.go",
+    "internal/runthrough/outbox_clone_bench_test.go",
+    "internal/runthrough/outbox_clone_capacity_test.go",
+    "benchmark/candidate-outbox.go.txt"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/outbox_clone_capacity_test.go"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/clone-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxStateCloneDoesNotDuplicateDeletedCapacity$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/clone-before.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxStateCloneDoesNotDuplicateDeletedCapacity$",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "candidate-normal",
+      "args": [
+        "go",
+        "test",
+        "-overlay=benchmark/clone-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxStateCloneDoesNotDuplicateDeletedCapacity$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "candidate-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "-overlay=benchmark/clone-candidate.json",
+        "./internal/runthrough",
+        "-run",
+        "^TestOutboxStateCloneDoesNotDuplicateDeletedCapacity$",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

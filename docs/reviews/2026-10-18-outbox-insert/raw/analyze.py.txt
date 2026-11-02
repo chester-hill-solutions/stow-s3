@@ -1,0 +1,32 @@
+from pathlib import Path
+from collections import defaultdict,Counter
+from statistics import median
+import json,re
+p=Path('/private/tmp/stow-outbox-insert-2026-10-18');d=p/('export-'+json.loads((p/'pilot-start.json').read_text())['id']);run=json.loads((d/'run.json').read_text());checks=json.loads((d/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==8 and all(x['passed']for x in checks)
+proof={}
+for variant in ['before','candidate']:
+ for mode in ['normal','race']:
+  name=variant+'-'+mode;text=(d/(name+'.log')).read_text();counts=Counter()
+  for line in text.splitlines():
+   m=re.match(r'\s*--- (PASS|FAIL|SKIP): (TestFileOutboxInterleavedDuplicateRecovery\S*)',line)
+   if m:counts[(m[1],m[2])]+=1
+  leaves={n for _,n in counts if not any(other.startswith(n+'/')for _,other in counts)};assert len(leaves)==6 and all(counts.get(('PASS',n))==2 for n in leaves)and not any(s!='PASS'for s,n in counts)
+  assert text.count('STOWMUTATION: cases=6000 seed=81173')==2 and text.count('STOWFIELDORDER: cases=2000 seed=81174')==2
+  proof[name]={'newDistinctCases':6,'passed':12,'failed':0,'skipped':0,'cases':sorted(leaves),'mutationsPerRun':6000,'fieldOrdersPerRun':2000,'repeats':2}
+(d/'contract-receipt.json').write_text(json.dumps(proof,indent=2)+'\n');commands=json.loads((d/'comparison-runs.json').read_text());assert len(commands['runs'])==16 and json.loads((d/'fixture-filesystem.json').read_text())['statfsType']==61267
+samples=[];cells=defaultdict(lambda:defaultdict(list))
+for c in commands['runs']:
+ assert c['exitCode']==0 and c['signal']is None and c['sha256']==commands['binarySHA256'][c['variant']];rows=[]
+ for line in(d/c['log']).read_text().splitlines():
+  m=re.match(r'^(Benchmark\S+)\s+(\d+)\s+(.+)$',line)
+  if m:
+   parts=m[3].split();row={'name':m[1],'iterations':int(m[2]),'index':c['index'],'variant':c['variant'],'log':c['log'],**{parts[i+1]:float(parts[i])for i in range(0,len(parts),2)}};rows.append(row);samples.append(row);cells[m[1]][c['variant']].append(row)
+ assert len(rows)==(18 if c['section']=='component'else 3),(c['log'],len(rows))
+assert len(samples)==168 and len(cells)==21;summary=[]
+for name,v in sorted(cells.items()):
+ assert set(v)=={'before','candidate'}and all(len(z)==4 for z in v.values());stats={}
+ for label,rows in v.items():
+  stats[label]={m:median(x[m]for x in rows)for m in ['ns/op','B/op','allocs/op']};stats[label].update(nsMin=min(x['ns/op']for x in rows),nsMax=max(x['ns/op']for x in rows))
+ summary.append({'name':name,**stats,'timeDeltaPercent':(stats['candidate']['ns/op']/stats['before']['ns/op']-1)*100,'byteDeltaPercent':(stats['candidate']['B/op']/stats['before']['B/op']-1)*100,'allocDeltaPercent':(stats['candidate']['allocs/op']/stats['before']['allocs/op']-1)*100})
+(d/'comparison-analysis.json').write_text(json.dumps({'observations':168,'comparisons':summary,'samples':samples},indent=2)+'\n');print('Verified all 168 observations and the contract/race runs')
+for x in summary:print(x['name'],'time%=',round(x['timeDeltaPercent'],2),'bytes%=',round(x['byteDeltaPercent'],2),'objects%=',round(x['allocDeltaPercent'],2))

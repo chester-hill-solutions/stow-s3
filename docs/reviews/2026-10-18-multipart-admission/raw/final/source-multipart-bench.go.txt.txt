@@ -1,0 +1,63 @@
+package fs
+
+import (
+ "context"
+ "fmt"
+ "os"
+ "path/filepath"
+ "strings"
+ "syscall"
+ "testing"
+
+ "github.com/chester-hill-solutions/stow-s3/internal/capacity"
+ "github.com/chester-hill-solutions/stow-s3/internal/storage"
+)
+
+func BenchmarkMultipartAdmission(b *testing.B) {
+ root:=os.Getenv("STOW_BENCH_ROOT")
+ if !strings.HasPrefix(root,"/results/") { b.Fatal("Railway volume required") }
+ var disk syscall.Statfs_t
+ if err:=syscall.Statfs(root,&disk);err!=nil||disk.Type!=61267 { b.Fatalf("ext4 volume required: %v type=%d",err,disk.Type) }
+ cases:=[]struct{bound bool;op string;size int}{{true,"create",0},{true,"part",65536},{true,"part",1048576},{true,"abort",65536},{true,"complete",65536},{true,"complete",1048576},{false,"part",65536},{false,"complete",65536}}
+ for _,c:=range cases {
+  b.Run(fmt.Sprintf("bound=%t/op=%s/bytes=%d",c.bound,c.op,c.size),func(b *testing.B){
+   body:=strings.Repeat("x",c.size)
+   b.ReportAllocs();b.ResetTimer()
+   for i:=0;i<b.N;i++ {
+    b.StopTimer()
+    dir,err:=os.MkdirTemp(root,"multipart-");if err!=nil { b.Fatal(err) }
+    store:=multipartBenchStore(b,dir,c.bound)
+    var id string;var part *storage.PartInfo
+    if c.op!="create" {
+     upload,err:=store.CreateMultipartUpload(context.Background(),"bucket","key",storage.MultipartOptions{});if err!=nil { b.Fatal(err) };id=upload.UploadID
+    }
+    if c.op=="abort"||c.op=="complete" { part,err=store.UploadPart(context.Background(),id,1,strings.NewReader(body));if err!=nil { b.Fatal(err) } }
+    b.StartTimer()
+    switch c.op {
+    case "create":_,err=store.CreateMultipartUpload(context.Background(),"bucket","key",storage.MultipartOptions{})
+    case "part":_,err=store.UploadPart(context.Background(),id,1,strings.NewReader(body))
+    case "abort":err=store.AbortMultipartUpload(context.Background(),id)
+    case "complete":_,err=store.CompleteMultipartUpload(context.Background(),id,[]storage.PartInfo{*part})
+    }
+    b.StopTimer()
+    if err!=nil { b.Fatal(err) }
+    if err:=store.Close();err!=nil { b.Fatal(err) }
+    if err:=os.RemoveAll(dir);err!=nil { b.Fatal(err) }
+    b.StartTimer()
+   }
+  })
+ }
+}
+
+func multipartBenchStore(b *testing.B,dir string,bound bool) *FilesystemStore {
+ b.Helper()
+ var store *FilesystemStore;var err error
+ if bound {
+  host,e:=capacity.Open(capacity.HostOptions{Dir:filepath.Join(dir,"host"),MaxBytes:64<<20});if e!=nil { b.Fatal(e) }
+  ns,e:=host.Bind(capacity.NamespaceOptions{ID:"benchmark",MaxBytes:32<<20,RecoveryReserveBytes:4<<20});if e!=nil { b.Fatal(e) }
+  store,err=NewFilesystemStoreWithNamespace(filepath.Join(dir,"store"),ns)
+ } else { store,err=NewFilesystemStore(filepath.Join(dir,"store")) }
+ if err!=nil { b.Fatal(err) }
+ if err:=store.CreateBucket(context.Background(),"bucket");err!=nil { b.Fatal(err) }
+ return store
+}

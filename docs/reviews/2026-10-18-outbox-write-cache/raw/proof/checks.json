@@ -1,0 +1,143 @@
+[
+  {
+    "name": "format-probes",
+    "args": [
+      "gofmt",
+      "-w",
+      "benchmark/write-cache/contract_test.go.txt",
+      "benchmark/write-cache/bench_test.go.txt",
+      "benchmark/write-cache/naive-file_outbox.go.txt",
+      "benchmark/write-cache/safe-file_outbox.go.txt",
+      "benchmark/write-cache/safe-file_outbox_proto.go.txt"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 21,
+    "passed": true
+  },
+  {
+    "name": "before-contracts",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-before.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutboxOwnWrite",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 23538,
+    "passed": true
+  },
+  {
+    "name": "before-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/write-cache-before.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutboxOwnWrite",
+      "-count=2",
+      "-v"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 39766,
+    "passed": true
+  },
+  {
+    "name": "naive-counterexamples",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-naive.json",
+      "./internal/runthrough",
+      "-run",
+      "^TestFileOutboxOwnWrite",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 1925,
+    "passed": true
+  },
+  {
+    "name": "safe-contracts",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-safe.json",
+      "./internal/runthrough",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 11279,
+    "passed": true
+  },
+  {
+    "name": "safe-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "-overlay=benchmark/write-cache-safe.json",
+      "./internal/runthrough",
+      "-count=1"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 19009,
+    "passed": true
+  },
+  {
+    "name": "before-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-before.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-cache-before.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 759,
+    "passed": true
+  },
+  {
+    "name": "safe-build",
+    "args": [
+      "go",
+      "test",
+      "-overlay=benchmark/write-cache-safe.json",
+      "-c",
+      "./internal/runthrough",
+      "-o",
+      "benchmark/write-cache-safe.test"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 816,
+    "passed": true
+  },
+  {
+    "name": "comparison",
+    "args": [
+      "node",
+      "benchmark/cache-comparison.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 156996,
+    "passed": true
+  }
+]

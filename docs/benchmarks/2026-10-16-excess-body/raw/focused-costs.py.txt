@@ -1,0 +1,26 @@
+from pathlib import Path
+import subprocess,json,resource,time,re
+p=Path('/private/tmp/stow-excess-body-2026-10-16')
+cases=[('get-tiny','^BenchmarkOpenedObjectRead$/^get-tiny$',100000),('get-64KiB','^BenchmarkOpenedObjectRead$/^get-64KiB$',10000),('stream-64KiB-1KiB','^BenchmarkStreamCompleteness$/^64KiB-1KiB$',50000)]
+plan={'cpus':[1,8],'cycles':10,'order':'alternating ABBA/BAAB','cases':cases,'code':'same original before.test and after.test binaries; duplicate labels execute identical binaries','cpu_time':'RUSAGE_CHILDREN delta, includes process startup and fixture setup outside benchmark time','all_samples_retained':True,'no_concurrent_agent_builds_or_tests':True}
+(p/'focused-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+rows=[];lines=[]
+for cpu in [1,8]:
+ for case,pattern,n in cases:
+  for cycle in range(10):
+   labels=['before-a','after-a','after-b','before-b'] if cycle%2==0 else ['after-a','before-a','before-b','after-b']
+   for pos,label in enumerate(labels):
+    binary=label.split('-')[0]+'.test'
+    cmd=[str(p/binary),'-test.run=^$','-test.bench='+pattern,'-test.benchmem',f'-test.benchtime={n}x','-test.count=1',f'-test.cpu={cpu}']
+    r0=resource.getrusage(resource.RUSAGE_CHILDREN);start=time.perf_counter_ns()
+    result=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    wall=time.perf_counter_ns()-start;r1=resource.getrusage(resource.RUSAGE_CHILDREN)
+    lines.extend(['COMMAND '+json.dumps(cmd),result.stdout.rstrip()])
+    assert result.returncode==0,result.stdout
+    matches=re.findall(r'(Benchmark\S+)\s+(\d+)\s+([\d.]+) ns/op\s+(\d+) B/op\s+(\d+) allocs/op',result.stdout);assert len(matches)==1,matches
+    name,ops,ns,b,a=matches[0];assert int(ops)==n
+    rows.append({'cpu':cpu,'case':case,'cycle':cycle,'position':pos,'label':label,'n':n,'ns':float(ns),'bytes':int(b),'allocs':int(a),'process_wall_ns':wall,'process_user_cpu_ns':(r1.ru_utime-r0.ru_utime)*1e9,'process_system_cpu_ns':(r1.ru_stime-r0.ru_stime)*1e9})
+  print(cpu,case,'40 balanced process samples complete',flush=True)
+assert len(rows)==240
+(p/'focused-costs.log').write_text('\n'.join(lines)+'\n');(p/'focused-samples.json').write_text(json.dumps(rows,indent=2)+'\n')
+print('FOCUSED MEASUREMENT COMPLETE',flush=True)

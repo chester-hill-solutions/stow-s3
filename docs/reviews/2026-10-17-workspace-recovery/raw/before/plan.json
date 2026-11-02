@@ -1,0 +1,48 @@
+{
+  "phase": "workspace-owner-before",
+  "sources": [
+    "internal/storage/workspace/multipart.go",
+    "internal/storage/workspace/owner_recovery_test.go",
+    "internal/s3api/workspace_owner_test.go"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/storage/workspace/owner_recovery_test.go",
+        "internal/s3api/workspace_owner_test.go"
+      ]
+    },
+    {
+      "name": "before-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/storage/workspace",
+        "./internal/s3api",
+        "-run",
+        "^TestWorkspaceMultipartOwner",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    },
+    {
+      "name": "before-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/storage/workspace",
+        "./internal/s3api",
+        "-run",
+        "^TestWorkspaceMultipartOwner",
+        "-count=2",
+        "-v"
+      ],
+      "expected": 1
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+commit 29897c891d39766d856fd3ff9b0e4e80036eb8e3
+Author: Nathaniel Arfin <info@nathanielarfin.com>
+Date:   Thu Oct 15 09:26:57 2026 -0400
+
+    fix: account multipart data against namespace capacity
+
+diff --git a/internal/storage/fs/capacity_publication_test.go b/internal/storage/fs/capacity_publication_test.go
+index a30bc7f..55abefd 100644
+--- a/internal/storage/fs/capacity_publication_test.go
++++ b/internal/storage/fs/capacity_publication_test.go
+@@ -145,6 +145,82 @@ func TestOrdinaryWritesRespectSharedHostBudget(t *testing.T) {
+ 	}
+ }
+ 
++func TestMultipartPartsRespectNamespaceBudget(t *testing.T) {
++	ctx := context.Background()
++	namespace := publicationNamespace(t)
++	store := publicationStore(t, namespace, t.TempDir())
++	upload, err := store.CreateMultipartUpload(ctx, "bucket", "large", storage.MultipartOptions{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	partPath := filepath.Join(store.multipartDir(upload.UploadID), "part-00001")
++	_, err = store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader(strings.Repeat("x", 5<<20)))
++	if !errors.Is(err, capacity.ErrFull) {
++		t.Fatalf("oversized multipart part error = %v, want capacity.ErrFull", err)
++	}
++	if _, err := os.Stat(partPath); !os.IsNotExist(err) {
++		t.Fatalf("over-budget multipart part was published: %v", err)
++	}
++}
++
++func TestMultipartAbortReleasesNamespaceCapacity(t *testing.T) {
++	ctx := context.Background()
++	namespace := publicationNamespace(t)
++	store := publicationStore(t, namespace, t.TempDir())
++	upload, err := store.CreateMultipartUpload(ctx, "bucket", "small", storage.MultipartOptions{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("part")); err != nil {
++		t.Fatal(err)
++	}
++	before, err := namespace.Snapshot(ctx)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if before.PayloadBytes == 0 || before.RecoveryBytes == 0 {
++		t.Fatalf("multipart resources were not charged: %+v", before)
++	}
++	if err := store.AbortMultipartUpload(ctx, upload.UploadID); err != nil {
++		t.Fatal(err)
++	}
++	after, err := namespace.Snapshot(ctx)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if after.PayloadBytes != 0 || after.RecoveryBytes >= before.RecoveryBytes {
++		t.Fatalf("abort did not release multipart capacity: before=%+v after=%+v", before, after)
++	}
++}
++
++func TestMultipartCompletionReleasesPartCapacity(t *testing.T) {
++	ctx := context.Background()
++	namespace := publicationNamespace(t)
++	store := publicationStore(t, namespace, t.TempDir())
++	upload, err := store.CreateMultipartUpload(ctx, "bucket", "complete", storage.MultipartOptions{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	part, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader("part"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err := store.CompleteMultipartUpload(ctx, upload.UploadID, []storage.PartInfo{*part}); err != nil {
++		t.Fatal(err)
++	}
++	objectInfo, err := os.Stat(store.objectPath("bucket", "complete"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	snapshot, err := namespace.Snapshot(ctx)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if snapshot.PayloadBytes != objectInfo.Size() {
++		t.Fatalf("completion payload charge = %d, want only the committed object size %d", snapshot.PayloadBytes, objectInfo.Size())
++	}
++}
++
+ func assertPublicationCharge(t *testing.T, store *FilesystemStore, namespace *capacity.Namespace) {
+ 	t.Helper()
+ 	ctx := context.Background()
+diff --git a/internal/storage/fs/fs_multipart.go b/internal/storage/fs/fs_multipart.go
+index 8aac9ef..d278cf8 100644
+--- a/internal/storage/fs/fs_multipart.go
++++ b/internal/storage/fs/fs_multipart.go
+@@ -83,10 +83,15 @@ func (s *FilesystemStore) CreateMultipartUpload(_ context.Context, bucket, key s
+ 		ChecksumAlgorithm: storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm),
+ 		ChecksumValue:     opts.ChecksumValue,
+ 	}
+-	if err := writeJSONAtomic(filepath.Join(dir, "manifest.json"), manifest); err != nil {
++	manifestData, err := json.Marshal(manifest)
++	if err != nil {
+ 		_ = os.RemoveAll(dir)
+ 		return nil, err
+ 	}
++	if err := s.writeCapacityFile(filepath.Join(dir, "manifest.json"), manifestData); err != nil {
++		_ = s.removeCapacityPath(dir)
++		return nil, err
++	}
+ 	upload := manifest.upload(uploadID)
+ 	return &upload, nil
+ }
+@@ -122,7 +127,7 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
+ 		return nil, err
+ 	}
+ 	partPath := filepath.Join(dir, fmt.Sprintf("part-%05d", partNumber))
+-	if err := writeBytesAtomic(partPath, data); err != nil {
++	if err := s.writeCapacityFile(partPath, data); err != nil {
+ 		return nil, err
+ 	}
+ 	now := time.Now().UTC()
+@@ -219,7 +224,7 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
+ 	if err := s.writeObject(manifest.Bucket, manifest.Key, record); err != nil {
+ 		return nil, err
+ 	}
+-	if err := os.RemoveAll(dir); err != nil {
++	if err := s.removeCapacityPath(dir); err != nil {
+ 		// The object is already committed; retain the upload so callers can retry cleanup.
+ 		return nil, fmt.Errorf("cleanup multipart upload: %w", err)
+ 	}
+@@ -277,7 +282,7 @@ func (s *FilesystemStore) AbortMultipartUpload(_ context.Context, uploadID strin
+ 	if _, err := os.Stat(dir); os.IsNotExist(err) {
+ 		return storage.ErrUploadNotFound
+ 	}
+-	return os.RemoveAll(dir)
++	return s.removeCapacityPath(dir)
+ }
+ 
+ func (s *FilesystemStore) listParts(_ context.Context, uploadID string) ([]storage.PartInfo, error) {

@@ -1,0 +1,8 @@
+node scripts/check-go-quality.mjs
+Go quality ratchet violation
+  new debt: complexity: 4 > 2
+  stale baseline: comment-lines: 4074 < 4077; lower the baseline
+  new: internal/storage/fs/capacity_save_test.go:TestSaveCapacityRetainsInterruptedReservation#1
+  new: internal/storage/fs/capacity_save_test.go:TestSaveCapacityRetainsInterruptedReservation/func-literal-1#1
+Fix the violation; do not raise the baseline to pass.
+make: *** [Makefile:113: check-go-quality] Error 1

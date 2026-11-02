@@ -362,6 +362,13 @@ func (s *MemoryStore) UploadPart(_ context.Context, uploadID string, partNumber 
 	if partNumber < 1 || partNumber > 10000 {
 		return nil, ErrInvalidPart
 	}
+	if owned, ok := body.(*OwnedBody); ok {
+		data, err := owned.take()
+		if err != nil {
+			return nil, err
+		}
+		body = bytes.NewReader(data)
+	}
 	etag, data, err := ETagForReader(body)
 	if err != nil {
 		return nil, err

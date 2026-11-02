@@ -1,0 +1,48 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-ledger-digest.md": "90e98631c784457b4bf1cc5d03c738b3887ff4e5dbabfa3ccfbea69d1799480a"
+  },
+  "sourceSHA256": {
+    "internal/capacity/state.go": "23eb98540568097e0ee6b0894b1d41e9d85418785fe009a8b0fb50ea0ae485c1",
+    "internal/capacity/state_digest_test.go": "db3964dd84d7442afc67ea70c807d40b15ac93febb9c95bb3ee8be83ff777963",
+    "benchmark/digest-baseline-state.go.txt": "e34b0ea692e7fdfd66df9f4f29cdcc1f609550e7ffd6ae30a555ef100d780eb3",
+    "benchmark/digest-baseline-overlay.json": "f9aae986cd85c401d9ae02d08a684ab3f754d247fdb817485fe85cdc4b9bbf2e",
+    "benchmark/baseline-state.go.txt": "eabc64fb5fb0e1e79cc4c2154f2e0b3acc657f4745b8c23e387a3a62a4949dc2",
+    "benchmark/isolate-bench.go.txt": "65b7ef3943db0e78f2401692f9fbcb5c2092b44ddf167fab602eadeac03d375f",
+    "benchmark/digest-measure.mjs": "c5e0f8856cfde1356249318b5be7f81384bad607f0897812c4452f15c79f4f18",
+    "benchmark/measure-child.py": "506589c7416291fa1ef36dc4c182b10ae84267b45a74bf9297e54ce8fcf77986"
+  },
+  "railwayDeploymentId": "75f56fbc-c6d7-41ee-b316-8a7f2faf163c"
+}

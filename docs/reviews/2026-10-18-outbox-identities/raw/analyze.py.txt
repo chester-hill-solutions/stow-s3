@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,re,statistics,hashlib,sys
+p=Path('/private/tmp/stow-outbox-identities-2026-10-18');phase=sys.argv[1];job=json.loads((p/(phase+'-start.json')).read_text());e=p/('export-'+job['id']);runs=json.loads((e/'comparison-runs.json').read_text());rows=[]
+assert [x['variant']for x in runs['runs']]==['before','after','after','before','after','before','before','after']
+for run in runs['runs']:
+ assert run['exitCode']==0;count=0
+ for line in (e/run['log']).read_text().splitlines():
+  m=re.match(r'^BenchmarkOutboxIdentityValidation/depth=(\d+)/(encode|decode)(?:-(\d+))?\s+(\d+)\s+([\d.]+) ns/op\s+[\d.]+ MB/s\s+(\d+) B/op\s+(\d+) allocs/op$',line)
+  if not m:continue
+  depth,op,cpu,n,ns,b,a=m.groups();rows.append({'variant':run['variant'],'run':run['index'],'depth':int(depth),'operation':op,'cpu':int(cpu or 1),'iterations':int(n),'nsPerOp':float(ns),'bytesPerOp':int(b),'allocsPerOp':int(a)});count+=1
+ assert count==12,(run,count)
+assert len(rows)==96
+summary=[]
+for depth in [0,128,16384]:
+ for op in ['encode','decode']:
+  for cpu in [1,4]:
+   cell={'depth':depth,'operation':op,'cpu':cpu}
+   for variant in ['before','after']:
+    items=[x for x in rows if all(x[k]==cell[k]for k in ['depth','operation','cpu'])and x['variant']==variant];assert len(items)==4
+    cell[variant]={k:{'median':statistics.median(x[k]for x in items),'min':min(x[k]for x in items),'max':max(x[k]for x in items)}for k in ['nsPerOp','bytesPerOp','allocsPerOp']}
+   cell['timeChangePercent']=(cell['after']['nsPerOp']['median']/cell['before']['nsPerOp']['median']-1)*100;summary.append(cell)
+(e/'comparison-analysis.json').write_text(json.dumps({'observations':len(rows),'order':runs['order'],'binarySHA256':runs['binarySHA256'],'summary':summary,'samples':rows},indent=2)+'\n')
+for x in summary:print(x['depth'],x['operation'],x['cpu'],'ns/op',x['before']['nsPerOp']['median'],'->',x['after']['nsPerOp']['median'],'delta%',round(x['timeChangePercent'],2),'B/op',x['before']['bytesPerOp']['median'],'->',x['after']['bytesPerOp']['median'],'allocs',x['before']['allocsPerOp']['median'],'->',x['after']['allocsPerOp']['median'])

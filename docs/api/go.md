@@ -351,7 +351,6 @@ type Capabilities struct {
 	MaxMultipartUploads	int64
 	Persistent		bool
 	Multipart		bool
-
 	Upstream		bool
 	ConditionalWrites	bool
 	GuardedSaves		bool
@@ -366,8 +365,8 @@ CapacityHost configures trusted namespace budgets; it does not authenticate call
 
 ```go
 type CapacityHost struct {
-	// contains filtered or unexported fields
-}
+
+}// contains filtered or unexported fields
 ```
 
 ### CapacityHost.BindNamespace
@@ -402,8 +401,8 @@ type CapacityHostOptions struct {
 
 ```go
 type CapacityNamespace struct {
-	// contains filtered or unexported fields
-}
+
+}// contains filtered or unexported fields
 ```
 
 ### CapacityNamespace.Snapshot
@@ -426,10 +425,8 @@ Returns: `CapacitySnapshot, error`.
 
 ```go
 type CapacityNamespaceOptions struct {
-	ID	string
-	MaxBytes,
-	RecoveryReserveBytes	int64
-
+	ID				string
+	MaxBytes, RecoveryReserveBytes	int64
 	MaxOperations, MaxDependencies	int
 }
 ```
@@ -440,9 +437,8 @@ type CapacityNamespaceOptions struct {
 
 ```go
 type CapacitySnapshot struct {
-	PayloadBytes,
-	RecoveryBytes, ReservedRecoveryBytes, PendingBytes	int64
-	Operations	int
+	PayloadBytes, RecoveryBytes, ReservedRecoveryBytes, PendingBytes	int64
+	Operations								int
 }
 ```
 
@@ -781,10 +777,8 @@ CollectOptions configures a sweep.
 ```go
 type CollectOptions struct {
 	RegistryDir	string
-
-	Team	string
-
-	Now	func() time.Time
+	Team		string
+	Now		func() time.Time
 }
 ```
 
@@ -795,11 +789,8 @@ CollectResult is one workspace a sweep considered, and what it did about it.
 ```go
 type CollectResult struct {
 	ID	string	`json:"id"`
-
 	Dir	string	`json:"dir"`
-
 	Removed	bool	`json:"removed"`
-
 	Reason	string	`json:"reason"`
 }
 ```
@@ -850,9 +841,7 @@ type ConditionalWriteStore interface{ SupportsConditionalWrites() bool }
 
 ```go
 type CopyStore interface {
-	CopyObject(context.Context, string, string,
-
-		string, string) (Object, error)
+	CopyObject(context.Context, string, string, string, string) (Object, error)
 }
 ```
 
@@ -1001,13 +990,11 @@ DeltaOptions bounds the work a delta may describe.
 
 ```go
 type DeltaOptions struct {
-	MaxBytes	int64
-	MaxFiles	int64
-
+	MaxBytes		int64
+	MaxFiles		int64
 	IncludeSensitive	bool
-
-	Encoded		[]byte
-	ExpectSHA256	string
+	Encoded			[]byte
+	ExpectSHA256		string
 }
 ```
 
@@ -1624,7 +1611,6 @@ Returns: `WorkspaceListing, error`.
 ```go
 type ListOptions struct {
 	Prefix	string
-
 	Cursor	string
 	Limit	int
 }
@@ -1654,8 +1640,7 @@ ListWorkspacesOptions bounds a workspace listing.
 type ListWorkspacesOptions struct {
 	RegistryDir	string
 	Team		string
-
-	Now	time.Time
+	Now		time.Time
 }
 ```
 
@@ -1750,9 +1735,7 @@ type MultipartStore interface {
 	UploadPart(ctx context.Context, uploadID string, partNumber int, data []byte) (Part, error)
 	CompleteMultipartUpload(ctx context.Context, uploadID string, parts []Part) (Object, error)
 	AbortMultipartUpload(ctx context.Context, uploadID string) error
-
-	GetMultipartUpload(ctx context.
-		Context, uploadID string) (MultipartUpload, error)
+	GetMultipartUpload(ctx context.Context, uploadID string) (MultipartUpload, error)
 	ListParts(ctx context.Context, uploadID string) ([]Part, error)
 	ListMultipartUploads(ctx context.Context, bucket string) ([]MultipartUpload, error)
 }
@@ -1843,9 +1826,8 @@ const ObjectRead Operation = "object.read"
 
 ```go
 type ObjectRecoveryHoldOptions struct {
-	ID,
-	Owner	string
-	Objects	[]ObjectRecoveryReference
+	ID, Owner	string
+	Objects		[]ObjectRecoveryReference
 }
 ```
 
@@ -1855,8 +1837,7 @@ type ObjectRecoveryHoldOptions struct {
 
 ```go
 type ObjectRecoveryReference struct {
-	Bucket,
-	Key	string
+	Bucket, Key	string
 	Condition	SaveCondition
 }
 ```
@@ -1943,10 +1924,8 @@ type Options struct {
 	MaxBytes		int64
 	MaxObjects		int64
 	MaxMultipartUploads	int64
-
-	Store	Store
-
-	Authority	*Authority
+	Store			Store
+	Authority		*Authority
 }
 ```
 
@@ -2000,10 +1979,8 @@ type PreparedWorkspace struct {
 	SeededObjects		int64
 	BaseIdentity		string
 	Repositories		[]PreparedRepository
-
-	RegistryEntries	int64
-
-	MaxWorkspaces	int64
+	RegistryEntries		int64
+	MaxWorkspaces		int64
 }
 ```
 
@@ -2018,8 +1995,7 @@ type PrepareOptions struct {
 	Inputs			[]WorkspaceInput	`json:"inputs,omitempty"`
 	Repositories		[]GitRepositoryInput	`json:"repositories,omitempty"`
 	IncludeSensitiveInputs	bool			`json:"include_sensitive_inputs,omitempty"`
-
-	MaxWorkspaces	int64	`json:"max_workspaces,omitempty"`
+	MaxWorkspaces		int64			`json:"max_workspaces,omitempty"`
 }
 ```
 
@@ -2075,7 +2051,6 @@ PruneOptions bounds a prune.
 type PruneOptions struct {
 	RegistryDir	string
 	Team		string
-
 	IncludeAdopted	bool
 }
 ```
@@ -2088,9 +2063,7 @@ PruneResult is one registry entry prune considered, and what it did about it.
 type PruneResult struct {
 	ID	string	`json:"id"`
 	Dir	string	`json:"dir"`
-
 	Removed	bool	`json:"removed"`
-
 	Reason	string	`json:"reason"`
 }
 ```
@@ -2114,8 +2087,7 @@ type PutOptions struct {
 
 ```go
 type RangeStore interface {
-	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser,
-		Object, error)
+	OpenObjectRange(context.Context, string, string, ObjectRange) (io.ReadCloser, Object, error)
 }
 ```
 
@@ -2239,7 +2211,6 @@ type RecoveryHoldRequest struct {
 ```go
 type RecoveryReference struct {
 	WorkspaceID	string	`json:"workspace_id"`
-
 	CheckpointID	string	`json:"checkpoint_id,omitempty"`
 }
 ```
@@ -2407,8 +2378,8 @@ Returns: `*Workspace, error`.
 
 ```go
 type Runtime struct {
-	// contains filtered or unexported fields
-}
+
+}// contains filtered or unexported fields
 ```
 
 ### Runtime.Authority
@@ -2811,8 +2782,8 @@ SaveCondition is opaque and valid only for its issuing runtime and resource.
 
 ```go
 type SaveCondition struct {
-	// contains filtered or unexported fields
-}
+
+}// contains filtered or unexported fields
 ```
 
 ### SaveCondition.ObservedAbsence
@@ -2895,8 +2866,7 @@ Returns: `error`.
 ```go
 type StagedObject interface {
 	Commit(context.Context) (Object, error)
-	Abort(context.
-		Context) error
+	Abort(context.Context) error
 }
 ```
 
@@ -2906,8 +2876,7 @@ type StagedObject interface {
 
 ```go
 type StagedWriteStore interface {
-	StageObject(context.Context, string,
-		string, io.Reader, PutOptions) (StagedObject, error)
+	StageObject(context.Context, string, string, io.Reader, PutOptions) (StagedObject, error)
 }
 ```
 
@@ -2920,22 +2889,11 @@ type Store interface {
 	CreateBucket(ctx context.Context, name string) error
 	DeleteBucket(ctx context.Context, name string) error
 	ListBuckets(ctx context.Context) ([]Bucket, error)
-	PutObject(
-		ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
-	GetObject(ctx context.Context,
-		bucket,
-
-		key string) (Object, error)
-
-	HeadObject(ctx context.
-		Context,
-		bucket, key string) (Object,
-		error)
-	DeleteObject(ctx context.
-		Context, bucket,
-		key string) error
+	PutObject(ctx context.Context, bucket, key string, data []byte, options PutOptions) (Object, error)
+	GetObject(ctx context.Context, bucket, key string) (Object, error)
+	HeadObject(ctx context.Context, bucket, key string) (Object, error)
+	DeleteObject(ctx context.Context, bucket, key string) error
 	ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error)
-
 	Close() error
 }
 ```
@@ -2946,8 +2904,7 @@ type Store interface {
 
 ```go
 type StreamingStore interface {
-	OpenObject(
-		context.Context, string, string) (io.ReadCloser, Object, error)
+	OpenObject(context.Context, string, string) (io.ReadCloser, Object, error)
 }
 ```
 
@@ -3035,8 +2992,8 @@ Workspace is a bounded artifact workspace: a real directory a caller works in, a
 ```go
 type Workspace struct {
 	*Runtime
-	// contains filtered or unexported fields
-}
+
+}// contains filtered or unexported fields
 ```
 
 ### Workspace.Bucket
@@ -3245,9 +3202,7 @@ WorkspaceListing is what a listing resolved to: the registry it actually read, a
 ```go
 type WorkspaceListing struct {
 	Registry	string
-
-	Team	string
-
+	Team		string
 	Workspaces	[]WorkspaceSummary
 }
 ```
@@ -3258,32 +3213,22 @@ WorkspaceOptions configures a workspace.
 
 ```go
 type WorkspaceOptions struct {
-	Dir	string
-
-	Bucket	string
-
+	Dir			string
+	Bucket			string
 	MaxBytes		int64
 	MaxObjects		int64
 	MaxMultipartUploads	int64
-
 	MaxCheckpointBytes	int64
 	MaxCheckpoints		int64
+	Authority		*Authority
+	Policy			policy.Source
+	TTL			time.Duration
+	RegistryDir		string
+	Team			string
+	Adopted			bool
+	Now			func() time.Time
 
-	Authority	*Authority
-
-	Policy	policy.Source
-
-	TTL	time.Duration
-
-	RegistryDir	string
-
-	Team	string
-
-	Adopted	bool
-
-	Now	func() time.Time
-	// contains filtered or unexported fields
-}
+}// contains filtered or unexported fields
 ```
 
 ## WorkspaceReference
@@ -3296,7 +3241,6 @@ type WorkspaceReference struct {
 	ID			string
 	Dir			string
 	Bucket			string
-
 	MaxCheckpointBytes	int64
 	MaxCheckpoints		int64
 }
@@ -3308,22 +3252,18 @@ WorkspaceSummary is one workspace as a caller can see it without resuming it.
 
 ```go
 type WorkspaceSummary struct {
-	ID	string	`json:"id"`
-	Dir	string	`json:"dir"`
-	Bucket	string	`json:"bucket"`
-	Created	string	`json:"created"`
-
-	LastUsed	string	`json:"last_used"`
-
-	AgeSeconds	int64	`json:"age_seconds"`
-	IdleSeconds	int64	`json:"idle_seconds"`
-	TTLSeconds	int64	`json:"ttl_seconds"`
-
+	ID			string	`json:"id"`
+	Dir			string	`json:"dir"`
+	Bucket			string	`json:"bucket"`
+	Created			string	`json:"created"`
+	LastUsed		string	`json:"last_used"`
+	AgeSeconds		int64	`json:"age_seconds"`
+	IdleSeconds		int64	`json:"idle_seconds"`
+	TTLSeconds		int64	`json:"ttl_seconds"`
 	ExpiresInSeconds	int64	`json:"expires_in_seconds"`
 	HasTTL			bool	`json:"has_ttl"`
 	Owned			bool	`json:"owned"`
-
-	Readable	bool	`json:"readable"`
+	Readable		bool	`json:"readable"`
 }
 ```
 
@@ -3342,13 +3282,11 @@ type WorkspaceTaskManifest struct {
 	MaxObjects		int64			`json:"max_objects,omitempty"`
 	MaxCheckpointBytes	int64			`json:"max_checkpoint_bytes,omitempty"`
 	MaxCheckpoints		int64			`json:"max_checkpoints,omitempty"`
-
-	MaxWorkspaces	int64	`json:"max_workspaces,omitempty"`
-	TTLSeconds	int64	`json:"ttl_seconds,omitempty"`
-
-	Team			string	`json:"team,omitempty"`
-	RegistryDir		string	`json:"registry_dir,omitempty"`
-	Bucket			string	`json:"bucket,omitempty"`
-	IncludeSensitiveInputs	bool	`json:"include_sensitive_inputs,omitempty"`
+	MaxWorkspaces		int64			`json:"max_workspaces,omitempty"`
+	TTLSeconds		int64			`json:"ttl_seconds,omitempty"`
+	Team			string			`json:"team,omitempty"`
+	RegistryDir		string			`json:"registry_dir,omitempty"`
+	Bucket			string			`json:"bucket,omitempty"`
+	IncludeSensitiveInputs	bool			`json:"include_sensitive_inputs,omitempty"`
 }
 ```

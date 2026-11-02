@@ -1,0 +1,51 @@
+[
+  {
+    "name": "format",
+    "args": [
+      "gofmt",
+      "-w",
+      "internal/storage/fs/capacity_multipart_test.go",
+      "internal/storage/fs/capacity_multipart_shared_test.go",
+      "internal/storage/fs/capacity_multipart_recovery_test.go"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedMs": 22,
+    "passed": true
+  },
+  {
+    "name": "red-normal",
+    "args": [
+      "go",
+      "test",
+      "./internal/storage/fs",
+      "-run",
+      "^TestMultipart",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 16836,
+    "passed": true
+  },
+  {
+    "name": "red-race",
+    "args": [
+      "go",
+      "test",
+      "-race",
+      "./internal/storage/fs",
+      "-run",
+      "^TestMultipart",
+      "-count=2",
+      "-v"
+    ],
+    "expected": 1,
+    "exitCode": 1,
+    "signal": null,
+    "elapsedMs": 26494,
+    "passed": true
+  }
+]

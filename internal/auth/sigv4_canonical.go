@@ -40,6 +40,11 @@ func uriEncode(value string, encodeSlash bool) string {
 	return b.String()
 }
 
+// canonicalQueryString builds the canonical query string of a request.
+//
+// The names and values are encoded first and sorted after, because that is the
+// order the signing rules use. Sorting the decoded names can put a name ahead
+// of another one that the encoded order reverses.
 func canonicalQueryString(rawQuery string) string {
 	if rawQuery == "" {
 		return ""
@@ -50,20 +55,23 @@ func canonicalQueryString(rawQuery string) string {
 	}
 	deleteCaseInsensitive(values, "X-Amz-Signature")
 
-	keys := make([]string, 0, len(values))
-	for key := range values {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-
-	var parts []string
-	for _, key := range keys {
-		vals := values[key]
-		sort.Strings(vals)
+	type parameter struct{ key, value string }
+	parameters := make([]parameter, 0, len(values))
+	for key, vals := range values {
 		encodedKey := uriEncode(key, true)
 		for _, val := range vals {
-			parts = append(parts, encodedKey+"="+uriEncode(val, true))
+			parameters = append(parameters, parameter{encodedKey, uriEncode(val, true)})
 		}
+	}
+	sort.Slice(parameters, func(i, j int) bool {
+		if parameters[i].key != parameters[j].key {
+			return parameters[i].key < parameters[j].key
+		}
+		return parameters[i].value < parameters[j].value
+	})
+	parts := make([]string, 0, len(parameters))
+	for _, p := range parameters {
+		parts = append(parts, p.key+"="+p.value)
 	}
 	return strings.Join(parts, "&")
 }
@@ -83,7 +91,7 @@ func canonicalHeaders(r *http.Request, signed []string) (string, string, error) 
 		if err != nil {
 			return "", "", err
 		}
-		headerMap[name] = normalizeHeaderValue(value)
+		headerMap[name] = value
 	}
 
 	ordered := make([]string, len(signed))
@@ -100,6 +108,10 @@ func canonicalHeaders(r *http.Request, signed []string) (string, string, error) 
 	return b.String(), strings.Join(ordered, ";"), nil
 }
 
+// signedHeaderValue returns the value a signed header contributes to the
+// canonical request: every value the request carries, each trimmed with its
+// inner whitespace collapsed, joined with a comma. The AWS SDK signs the whole
+// set, so a request carrying a value the signature did not cover must not verify.
 func signedHeaderValue(r *http.Request, name string) (string, error) {
 	switch name {
 	case "host":
@@ -110,13 +122,17 @@ func signedHeaderValue(r *http.Request, name string) (string, error) {
 		if host == "" {
 			return "", authError("AccessDenied", "missing host header")
 		}
-		return host, nil
+		return normalizeHeaderValue(host), nil
 	default:
-		value := headerValue(r.Header, name)
-		if value == "" {
+		values := headerValues(r.Header, name)
+		if len(values) == 0 {
 			return "", authError("AccessDenied", "missing signed header %q", name)
 		}
-		return value, nil
+		cleaned := make([]string, 0, len(values))
+		for _, value := range values {
+			cleaned = append(cleaned, normalizeHeaderValue(value))
+		}
+		return strings.Join(cleaned, ","), nil
 	}
 }
 

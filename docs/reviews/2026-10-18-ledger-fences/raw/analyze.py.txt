@@ -1,0 +1,15 @@
+from pathlib import Path
+import json,statistics,hashlib
+p=Path('/private/tmp/stow-ledger-fences-2026-10-18');j=json.loads((p/'probe-start.json').read_text());e=p/('export-'+j['id']);run=json.loads((e/'run.json').read_text());checks=json.loads((e/'checks.json').read_text());assert run['complete']and run['success']and len(checks)==9 and all(x['passed']for x in checks)
+rows=json.loads((e/'measurements.json').read_text());assert len(rows['observations'])==368 and len(rows['commands'])==368 and all(x['iterations']==10 and x['maxRSSBytes']>0 for x in rows['observations'])and all(x['exitCode']==0 for x in rows['commands'])
+env=json.loads((e/'environment.json').read_text());original=(p/'baseline-state.go.txt').read_bytes();assert env['sourceSHA256']['internal/capacity/state.go']==hashlib.sha256(original).hexdigest()
+diagnostic=(e/'source-diagnostic-state.go.txt.txt').read_text();restored=diagnostic.replace('return nil\n}\n\nfunc syncAncestors','return syncAncestors(h.dir)\n}\n\nfunc syncAncestors');assert restored.encode()==original,'Diagnostic changes more than ledger ancestor sync call'
+analysis=[]
+for name in sorted({x['name']for x in rows['observations']}):
+ labels={}
+ for label in ['A','B','C','D']:
+  subset=[x for x in rows['observations']if x['name']==name and x['label']==label];assert len(subset)==4
+  labels[label]={k:{'median':statistics.median(x[k]for x in subset),'min':min(x[k]for x in subset),'max':max(x[k]for x in subset)}for k in ['ns','bytes','allocs','maxRSSBytes']}
+ c={'name':name,'labels':labels};c['changePercent']={k:100*(labels['B'][k]['median']/labels['A'][k]['median']-1)for k in ['ns','bytes','allocs','maxRSSBytes']};c['sameBinaryControlTimePercent']=100*(labels['D']['ns']['median']/labels['C']['ns']['median']-1);analysis.append(c)
+ print(name,f"ms {labels['A']['ns']['median']/1e6:.4f}->{labels['B']['ns']['median']/1e6:.4f} ({c['changePercent']['ns']:+.2f}%)",f"B {labels['A']['bytes']['median']}->{labels['B']['bytes']['median']}",f"AA {c['sameBinaryControlTimePercent']:+.2f}%")
+(e/'comparison-analysis.json').write_text(json.dumps(analysis,indent=2)+'\n');(e/'validation-receipt.json').write_text(json.dumps({'checks':9,'allPassed':True,'observations':368,'cells':23,'iterationsPerObservation':10,'diagnosticOnly':True,'productionUnchanged':True,'sourceSHA256':env['sourceSHA256']},indent=2)+'\n')

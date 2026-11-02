@@ -1,0 +1,17 @@
+from pathlib import Path
+import subprocess,os,json,base64,hashlib,sys
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-performance-2026-10-17');cli='/Users/ladmin/.npm/_npx/840d6e3429277c8b/node_modules/@railway/cli/bin/railway'
+env=dict(os.environ,RAILWAY_CALLER='skill:use-railway@1.6.1',RAILWAY_AGENT_SESSION='stow-performance-20261017')
+previous,phase=sys.argv[1:3];job=json.loads((p/(previous+'-start.json')).read_text());prior=p/('export-'+job['id']);info=json.loads((prior/'environment.json').read_text());files=json.loads((p/(phase+'-sync-files.json')).read_text())
+state=json.loads((p/'remote-state.json').read_text());receipts=[]
+for name in files:
+ data=(r/name).read_bytes();expected=state.get(name);new=hashlib.sha256(data).hexdigest()
+ js="const fs=require('node:fs'),crypto=require('node:crypto');const root='/results/"+job['id']+"';if(!JSON.parse(fs.readFileSync(root+'/run.json')).complete)throw Error('Previous checks still running');const name="+json.dumps(name)+",expected="+json.dumps(expected)+",file='/app/'+name;const before=fs.existsSync(file)?crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'):null;if(before!==expected)throw Error('Unexpected source: '+name);fs.writeFileSync(file,Buffer.from("+json.dumps(base64.b64encode(data).decode())+",'base64'));fs.chownSync(file,10001,10001);const after=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');console.log('STOWSYNC:'+JSON.stringify({name,before,after,deploymentId:process.env.RAILWAY_DEPLOYMENT_ID}));"
+ assert len(js.encode())<120000
+ q=subprocess.run([cli,'ssh','--project','8d90188e-0f1e-4c47-9379-9399ae06e6fa','--environment','3cd200cb-c94f-4e4d-9335-0f6c1b7e9411','--service','83497842-c51d-420e-8ba1-181589730ad4','--','node','-e',js],env=env,text=True,capture_output=True,timeout=55)
+ assert q.returncode==0,q.stderr+q.stdout
+ row=json.loads(next(x.removeprefix('STOWSYNC:')for x in q.stdout.splitlines()if x.startswith('STOWSYNC:')));assert row['after']==new;receipts.append(row);state[name]=new;(p/'remote-state.json').write_text(json.dumps(state,indent=2)+'\n')
+(p/(phase+'-sync-receipt.json')).write_text(json.dumps(receipts,indent=2)+'\n')
+(p/(phase+'-upload.log')).write_text(json.dumps({'deploymentId':job['deploymentId'],'sourceUpdate':True,'previousJob':job['id']})+'\n')
+(p/(phase+'-deployments.json')).write_bytes((p/(previous+'-deployments.json')).read_bytes())
+print('Updated',len(receipts),'files on the existing Railway runner')

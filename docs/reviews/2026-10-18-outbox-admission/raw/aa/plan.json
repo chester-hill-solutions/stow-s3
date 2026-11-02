@@ -1,0 +1,31 @@
+{
+  "phase": "outbox-admission-identical-binary-control",
+  "sources": [
+    "internal/runthrough/outbox.go",
+    "internal/runthrough/file_outbox.go",
+    "internal/runthrough/outbox_admission_test.go",
+    "internal/runthrough/outbox_admission_bench_test.go",
+    "internal/runthrough/file_outbox_snapshot_test.go",
+    "internal/runthrough/outbox_admission_sequence_test.go"
+  ],
+  "steps": [
+    {
+      "name": "benchmark-build",
+      "args": [
+        "go",
+        "test",
+        "-c",
+        "./internal/runthrough",
+        "-o",
+        "benchmark/outbox-admission-after.test"
+      ]
+    },
+    {
+      "name": "comparison",
+      "args": [
+        "node",
+        "benchmark/admission-aa-comparison.mjs"
+      ]
+    }
+  ]
+}

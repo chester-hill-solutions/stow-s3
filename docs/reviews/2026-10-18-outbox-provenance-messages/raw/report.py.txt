@@ -1,0 +1,205 @@
+from pathlib import Path
+import json,re
+p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow')
+def phase(name):return p/('export-'+json.loads((p/(name+'-start.json')).read_text())['id'])
+first=json.loads((phase('measure')/'comparison-analysis.json').read_text());second=json.loads((phase('provenance')/'comparison-analysis.json').read_text());confirmation=json.loads((phase('confirmation')/'confirmation-analysis.json').read_text());assert first['observations']==384 and second['observations']==352 and confirmation['observations']==128
+raw='2026-10-18-outbox-provenance-messages/raw/'
+s='''# Allocate temporary protobuf provenance messages together — 2026-10-18
+
+## Result and scope
+
+The encoder now allocates one fresh slice of provenance message values and points
+its existing repeated-message list at those values. It previously allocated each
+provenance message separately. Empty collections skip the new slice. The values
+remain local to encoding; no pool, cache, persisted representation, dependency or
+public API is added. Entry construction and the decoder are byte-identical to the
+baseline. Sorting, canonicalization, validation, framing, locks and durability stay
+on their existing paths.
+
+At 4,096 provenance records, encoding drops from **4,101 allocations to 6** with
+unchanged allocated bytes in this fixture. In longer confirmation, encode medians
+improve **4.73% at one CPU and 15.14% at four CPUs**. A changed durable provenance
+save with 16,384 retained records plus its target drops from **65,727 allocations
+to 49,343** (24.93%). This is an allocation-count improvement; it is not a claim
+that every request gets faster or allocates fewer bytes.
+
+Baseline is `5d28d18`. `origin/main` was fetched and remains
+`219d1dcfff9807b04660a40313b32127e5be2933`.
+[Exact refs](RAWbaseline.json) and the earlier
+[phase profile](2026-10-18-outbox-write-phases.md),
+[rejected write cache](2026-10-18-outbox-write-cache.md) and
+[rejected map clone](2026-10-18-outbox-clone.md) establish completed work.
+This change does not repeat those rejected implementations.
+
+## Why only provenance
+
+The first experiment grouped both entry and provenance messages. A full-slice entry
+candidate reserves message storage before validating the first timestamp: the
+4,096-entry early-error fixture allocates about **1.57 MB instead of 98.5 KB**.
+It fails the new 512 KiB fixture budget twice normally and twice with race
+detection. An entry-block candidate limits that case to about 147.7 KB, but its
+large enqueue medians are 9.31–12.17% slower despite about 9% fewer whole-cycle
+allocations. Neither entry implementation is adopted.
+
+Provenance has a different error boundary: the existing encoder builds its entire
+provenance list before entering timestamp-bearing records or calling Marshal.
+Its loop has no error return. Grouping those already-required values avoids
+per-record heap objects without introducing entry reservation on early timestamp
+failure. The final early-error allocation remains about **98.5 KB**, matching the
+baseline. All framing and error returns use the same implementation.
+
+The initial encoder round-trip/error/resource cases pass the original code before
+experimentation. Only the deliberately rejected full-entry slice fails the early
+error budget; this is not evidence of a pre-existing production correctness bug.
+[Exact case counts, original frame hashes and error allocations](RAWmeasure/contract-receipt.json)
+retain the original, full-slice and bounded-entry results. Expected test exit 1
+means a reproduced candidate regression, not a passing suite.
+
+## Method and ownership guarantees
+
+All formatting, builds, tests and measurements run on the existing authorized
+Railway scratch runner, Go 1.25.6 / protobuf v1.36.12 / Node 25.9.0, 4 CPU / 4 GiB,
+as UID 10001. Benchmark fixtures use TMPDIR on the results volume, verified ext4
+(type 61267). Local work is editing, Git, packaging, hashing and exported-data
+analysis. No local Go tool, test, benchmark or commit hook runs.
+
+The matrices use separate original/candidate binaries from identical fixtures and
+Go overlays. ABBA BAAB ordering gives four observations per variant/cell with
+GOMAXPROCS 1 and 4 and a 400-ms minimum. The first cohort has **384 observations**;
+the provenance-only cohort has **352**. Longer final-source confirmation adds
+**80 paired and 48 identical-binary control observations**, at one-second minima.
+All **864 observations** are retained separately; discarded candidates are not
+pooled into accepted-source results. Medians/ranges do not establish statistical
+significance or a service latency SLA.
+
+Component fixtures contain either N provenance records or N records in each of
+provenance, active and prepared collections. Mixed entries exercise all serialized
+fields and four timestamp strings. Encode and unchanged-decode controls are
+measured separately. Frame length, counts and decoding are checked outside timing.
+Initial durable cycles retain N intents per active/prepared queue; enqueue and
+prepare include admission plus completion/discard, two calls/replacements per
+cycle. Provenance and renewal each make one call/replacement.
+
+The provenance-only durable cohort uses the existing native benchmark. Its
+`provenance=N` fixture has N retained provenance records plus a target;
+`mixed=1024` has 1,024 active intents and 1,024 provenance records plus its target.
+Changed saves alternate target ETags and replace the journal. Unchanged saves use
+the existing validated-byte read and durability-fence path. Written-byte counters,
+frame lengths and final target values are checked outside timing. These synthetic
+backlogs exercise supported paths; they are not an asserted traffic distribution.
+
+Fourteen deterministic frame vectors cover empty, singleton, multiple-record and
+127/128/129/257-record fixtures with all fields. Their full framed SHA-256 values
+match the original across every candidate and final tests. They also verify
+round-trip values, nonmutation of source state and deterministic ordering. Eight
+concurrent encodes of a shared read-only state must produce independent output
+buffers; race detection repeats the case.
+
+The input-retention test keeps only encoded bytes after a helper constructs 64
+small entry keys and provenance ETags as views into distinct 1 MiB strings.
+GC/live-heap sampling must stay below a generous 16 MiB positive-growth ceiling,
+and the frame must decode to all 64 entries and provenance records. The stronger
+provenance-field version is run against both the original and final candidate
+before adoption. It passes normally and with race detection. The guard excludes
+the observed 64 MiB caller-buffer retention pattern; it is not an RSS bound or a
+new global quota. Setup and forced GC add bounded test CPU/memory work, not runtime
+storage allocations. [Ownership proof](RAWownership/plan.json) and
+[final normal/race results](RAWfinal/green-receipt.json) retain the exact sources
+and observations.
+
+## Initial entry/provenance grouping: not shipped
+
+This table includes unchanged decoder controls and every durable-cycle cell.
+Depth in the durable cycle is per intent queue, so 4,096 means 8,192 retained
+intents. The candidate is the rejected bounded-entry version, not final production.
+
+| Benchmark | Before → candidate ms | Time delta | Allocation-count delta | Allocated-byte delta |
+| --- | ---: | ---: | ---: | ---: |
+'''
+for x in first['comparisons']:
+ b,z=x['before'],x['bounded'];s+=f"| {x['name']} | {b['ns/op']/1e6:.6f} → {z['ns/op']/1e6:.6f} | {x['timeDeltaPercent']:+.2f}% | {x['allocDeltaPercent']:+.2f}% | {x['byteDeltaPercent']:+.2f}% |\n"
+s+='''
+[All initial samples, ranges, bytes/counts, process heap/HWM and frame metrics](RAWmeasure/comparison-analysis.json)
+and [commands/order/binary hashes](RAWmeasure/comparison-runs.json) are retained.
+The allocation reduction does not erase the adverse latency cells. This candidate
+is not used in the product.
+
+## Provenance-only comparison before the empty-input guard
+
+The entry path is restored to the original implementation. This cohort measures
+one temporary provenance-value slice. The final empty-input guard is added only
+after these observations; its exact-source confirmation follows below.
+
+| Benchmark | Before → candidate ms | Time delta | Allocations before → candidate | Allocated-byte delta |
+| --- | ---: | ---: | ---: | ---: |
+'''
+for x in second['comparisons']:
+ b,z=x['before'],x['provenance'];s+=f"| {x['name']} | {b['ns/op']/1e6:.6f} → {z['ns/op']/1e6:.6f} | {x['timeDeltaPercent']:+.2f}% | {b['allocs/op']:,.1f} → {z['allocs/op']:,.1f} | {x['byteDeltaPercent']:+.2f}% |\n"
+s+='''
+The initial empty changed-save cell at four CPUs is +14.44%, medium changed save
+is +8.99%, and the 2,048-record one-CPU changed save is +7.23%. These adverse cells
+remain visible. Some unmodified decode/unchanged controls also move in time.
+No universal latency benefit is inferred. [Every provenance-only observation](RAWprovenance/comparison-analysis.json)
+and [commands/source hashes](RAWprovenance/comparison-runs.json) are retained.
+
+## Exact final-source confirmation and same-binary controls
+
+The final source skips the new allocation when there are no provenance records.
+The selected file regexp `changed$` also matches `unchanged`; every actual control
+row is included. Paired rows compare original/final binaries. A/A rows execute the
+identical final binary under both labels, verified by binary SHA-256. CPU is four
+for file cases; component names retain their Go CPU suffix (no suffix means one).
+
+| Cohort | Benchmark | Before/A → final/B ms | Time delta | Allocation-count delta |
+| --- | --- | ---: | ---: | ---: |
+'''
+for x in confirmation['comparisons']:
+ b,z=x['before'],x['provenance'];s+=f"| {x['cohort']} | {x['name']} | {b['ns/op']/1e6:.6f} → {z['ns/op']/1e6:.6f} | {x['timeDeltaPercent']:+.2f}% | {x['allocDeltaPercent']:+.2f}% |\n"
+s+='''
+In longer paired confirmation, the initially adverse empty/medium four-CPU changed
+cells instead improve 13.99%/13.21%; the large changed save improves 2.76%. The
+same-binary file medians range from -9.75% to +9.20%. These observations demonstrate
+variability; they do not prove zero implementation effect or turn all first-cohort
+regressions into noise. The one-CPU 2,048-record +7.23% is not remeasured here.
+The final-source encode allocation benefit repeats exactly, and the truly empty
+codec is -1.76%/+3.04% at one/four CPUs. No fixed request-latency gain is claimed.
+[All final paired/A/A samples and ranges](RAWconfirmation/confirmation-analysis.json)
+and [exact commands, order and binary identities](RAWconfirmation/confirmation-runs.json)
+are retained separately from earlier cohorts.
+
+## Costs, contracts and remaining work
+
+Successful encoding still retains all provenance messages until Marshal returns;
+they now occupy one contiguous temporary allocation. Storage remains proportional
+to the live collection size, and whole-journal read/encode memory remains O(N).
+No stronger total-memory limit is introduced. Runtime allocation classes can add
+padding: isolated 128-record provenance encoding allocates 3.42% more bytes;
+sampled changed file saves add up to 0.75%. At the 4,096-record component, total
+allocated bytes are unchanged. This is fewer heap objects, not a general reduction
+in allocated-byte volume. No provenance message pointers escape the encoder.
+
+The output remains framed protobuf schema 4, with identical field values and
+ordering in the vectors. The generated schema, native/legacy readers, timestamp
+conversion, ID/token fences, malformed-identity checks, locks, state rollback,
+file/directory syncs and S3 behavior are unchanged. No dependency, public API,
+format, migration, indexing or incremental-checkpointing change is needed.
+
+All 14 final Railway stages pass: formatting; unchanged quality/file-size/format
+gates; focused normal/race; full Go; broad race across storage/runtime/embedded/
+run-through/S3/public packages; all four conformance profiles; vet; site build/tests;
+and documentation links. The focused subset has **50 cases passing twice per mode:
+100 normal and 100 race passes, with no failures or skips**. The tested production
+hash is identical to the confirmed candidate. [Final checks](RAWfinal/checks.json),
+[source/hash proof](RAWfinal/green-receipt.json) and [environment](RAWfinal/environment.json)
+retain the evidence. All final Go bytes come from Railway formatting. Report/site/
+link checks run again after this document and evidence are saved. The scratch
+runner is then stopped; the separate target remains removed and unchanged.
+The [artifact manifest](RAWartifact-manifest.json) includes final validation and
+teardown receipts.
+
+The next priority remains decode/entry-path CPU and allocation cost, which has the
+larger measured share at backlog. Entry grouping stays rejected until a candidate
+improves its measured tradeoff. No next optimization is automatically implemented
+in this change.
+'''
+s=s.replace('RAW',raw);(p/'report.md').write_text(s);(r/'docs/reviews/2026-10-18-outbox-provenance-messages.md').write_text(s);print('Wrote final-scope report with all 864 observations, rejected candidates and explicit costs/limits')

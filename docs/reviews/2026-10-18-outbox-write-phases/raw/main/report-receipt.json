@@ -1,0 +1,53 @@
+{
+  "exitCode": 0,
+  "checks": [
+    {
+      "name": "site-build",
+      "args": [
+        "npm",
+        "run",
+        "build",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "site-tests",
+      "args": [
+        "npm",
+        "test",
+        "--prefix",
+        "site"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "report-links",
+      "args": [
+        "node",
+        "scripts/check-doc-links.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "documentSHA256": {
+    "docs/reviews/2026-10-18-outbox-write-phases.md": "a8034c2e107013845f8790825bf56d30f6d0a8962948cbc10720800bdc837cab"
+  },
+  "sourceSHA256": {
+    "internal/runthrough/outbox.go": "cd2ef3214c4fae218ada19053150fe8eb89f2fa79f857c3bb87a56322d6f3af5",
+    "internal/runthrough/file_outbox.go": "c352b972a3e3ae94a0bbc134a5b51a839a4256677cc7f7f9687ff705278121fd",
+    "internal/runthrough/file_outbox_proto.go": "c999a4f02f6ad9506b6ec09596b1faee1dd9b64da1999c36da600384f5adef19",
+    "internal/atomicfile/atomicfile.go": "5bac2f15e09036c2ae9ae9d3cd8582f8ea4c7d2194dc53c2286e31b0940fbea1",
+    "internal/runthrough/outbox_admission_bench_test.go": "492fb3f33edcbf4a9e0ec8b506faa28e49041dd4e15bbdba50e6990436373c64",
+    "benchmark/phase-probe/trace-file_outbox.go.txt": "6eb27d81caae4362b93002101f65dc0225fcc46fe46d1078c12defbfe067d59b",
+    "benchmark/phase-probe/trace-atomicfile.go.txt": "7ea88ce2b37fb03d561209def8c7c5628b5b700656d55e4013a08fcb62f7a9a5",
+    "benchmark/phase-probe/phase_probe_test.go.txt": "81d7b12896011aaea47b5bec565c43a0eef8165c0e5b1695b68f9aca06469975",
+    "benchmark/write-comparison.mjs": "fba80088dc78a64bd7d1b9605914c54df3f37083a67ad70f8a5f21e7619e3299",
+    "benchmark/phase-baseline-overlay.json": "a04cc5320f24bd8949e2452a9128e8c471df820a25cce41a0c1e1fcc8a8265f0",
+    "benchmark/phase-trace-overlay.json": "916ffedf57f8b779a47d9054e6422ea5fa8f85bbfe069b38f180e883dbf5d624",
+    "benchmark/phase-probe/before-outbox.go.txt": "9991aa79b04e8654f7a988166f0715ff62d91459bd7db30c085fd980381f5526",
+    "benchmark/phase-probe/before-file_outbox.go.txt": "b19cc7f7f6680d4dbeb99de8db3038f4e5799c3045e6c669a67e60e094bdf662"
+  },
+  "railwayDeploymentId": "e2aa1875-8a12-48ab-a612-c69b1f1c4e50"
+}

@@ -1,0 +1,58 @@
+import{readFile,writeFile,copyFile,stat,rm}from'node:fs/promises';
+import{spawn}from'node:child_process';
+import{createHash}from'node:crypto';
+import{join}from'node:path';
+import{systemMetadata,cgroupResources}from'./resources.mjs';
+const root=process.env.STOW_RESULT_ROOT;
+if(!root?.startsWith('/results/')||process.env.RAILWAY_SERVICE_ID!=='83497842-c51d-420e-8ba1-181589730ad4')throw Error('Railway scratch results required');
+const fixtures=join(root,'fixtures'),binary=join(root,'readcost.test'),samples=[],commands=[];
+const save=(n,v)=>writeFile(join(root,n),typeof v==='string'?v:JSON.stringify(v,null,2)+'\n');
+async function run(name,args,env={}){
+ const startedAt=new Date().toISOString(),start=Date.now();let output='';
+ const child=spawn(args[0],args.slice(1),{env:{...process.env,...env},stdio:['ignore','pipe','pipe']});
+ child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);
+ const result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(exitCode,signal)=>resolve({exitCode,signal}))});
+ await save(name+'.log',output);const row={name,args,env,startedAt,elapsedMs:Date.now()-start,...result};commands.push(row);await save('diagnostic-commands.json',commands);
+ if(result.exitCode!==0)throw Error(name+' failed: '+output.slice(-3000));return output;
+}
+try{
+ const before=await systemMetadata();
+ if(before.cgroup.cpuMax!=='400000 100000'||before.cgroup.memoryMax!=='4294967296')throw Error('Unexpected resource limits');
+ const mounts=before.mountInfo.split('\n');if(!mounts.some(line=>line.includes(' /results ')&&line.includes(' - ext4 ')))throw Error('Expected ext4 results volume');
+ await run('diagnostic-build',['go','test','-c','-buildvcs=false','-o',binary,'./internal/runthrough']);
+ await run('diagnostic-seed',[binary,'-test.run=^TestOutboxReadCostSeed$','-test.v','-test.count=1'],{STOW_OUTBOX_READ_COST_SEED:fixtures});
+ const fixtureInfo=JSON.parse(await readFile(join(fixtures,'manifest.json')));
+ for(const[name,info]of Object.entries(fixtureInfo)){info.sha256=createHash('sha256').update(await readFile(join(fixtures,name))).digest('hex')}
+ await save('fixtures.json',fixtureInfo);
+ const fixtureEnv={STOW_OUTBOX_READ_COST_FIXTURES:fixtures};
+ await run('diagnostic-race-smoke',['go','test','-race','./internal/runthrough','-run','^$','-bench','^BenchmarkFileOutboxReadCost$','-benchtime=1x','-count=1','-cpu=4','-timeout=180s'],fixtureEnv);
+ const names=Object.keys(fixtureInfo);const stages=['read','unmarshal','decode','lookup','unchanged','changed'];let cells=0;
+ for(const cpu of [1,4]){
+  const order=cpu===1?names:[...names].reverse();
+  for(const fixture of order){
+   const stageOrder=cpu===1?stages:[...stages].reverse();
+   for(const stage of stageOrder){
+    const name='cell-cpu'+cpu+'-'+fixture+'-'+stage;
+    console.log('Starting '+name);
+    const resourcesBefore=await cgroupResources();
+    const output=await run(name,[binary,'-test.run=^$','-test.bench=^BenchmarkFileOutboxReadCost$/^'+fixture+'$/^'+stage+'$','-test.benchtime=1s','-test.count=2','-test.cpu='+cpu,'-test.benchmem','-test.timeout=90s'],fixtureEnv);
+    const rows=output.split('\n').filter(line=>line.startsWith('BenchmarkFileOutboxReadCost/')).map(line=>{
+     const fields=line.trim().split(/\s+/);const row={fixture,stage,cpu,benchmark:fields[0],iterations:Number(fields[1]),metrics:{},log:name+'.log'};
+     for(let i=2;i+1<fields.length;i+=2)row.metrics[fields[i+1]]=Number(fields[i]);return row;
+    });
+    if(rows.length!==2||rows.some(row=>!Number.isFinite(row.metrics['ns/op'])||row.metrics['journal-B']!==fixtureInfo[fixture].bytes))throw Error('Invalid measurement '+name);
+    rows.forEach((row,i)=>samples.push({...row,repetition:i+1,resourcesBefore}));await save('samples.json',samples);
+    cells++;await save('measurement-progress.json',{completed:cells,total:names.length*stages.length*2,last:name,observations:samples.length});
+   }
+  }
+ }
+ const pattern='^BenchmarkFileOutboxReadCost$/^provenance=65536$/^lookup$';
+ await run('lookup-cpu-profile',[binary,'-test.run=^$','-test.bench='+pattern,'-test.benchtime=5s','-test.cpu=1','-test.cpuprofile='+join(root,'lookup-cpu.pprof')],fixtureEnv);
+ await run('lookup-cpu-top',['go','tool','pprof','-top','-nodecount=35',binary,join(root,'lookup-cpu.pprof')]);
+ await run('lookup-alloc-profile',[binary,'-test.run=^$','-test.bench=^BenchmarkFileOutboxReadCost$/^provenance=16384$/^lookup$','-test.benchtime=20x','-test.cpu=1','-test.memprofilerate=1','-test.memprofile='+join(root,'lookup-alloc.pprof')],fixtureEnv);
+ await run('lookup-alloc-space',['go','tool','pprof','-top','-alloc_space','-nodecount=30',binary,join(root,'lookup-alloc.pprof')]);
+ await run('lookup-alloc-objects',['go','tool','pprof','-top','-alloc_objects','-nodecount=30',binary,join(root,'lookup-alloc.pprof')]);
+ const data=await readFile(binary);await save('binary.json',{sha256:createHash('sha256').update(data).digest('hex'),bytes:data.length,removedAfterMeasurement:true});
+ await rm(binary);await rm(fixtures,{recursive:true});
+ await save('diagnostic-environment.json',{start:before,end:await systemMetadata(),observations:samples.length,complete:true});
+}catch(error){await save('diagnostic-error.json',{error:error.stack});throw error}

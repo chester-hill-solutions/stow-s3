@@ -1,0 +1,73 @@
+{
+  "phase": "refresh-reader-before-eviction-final-check",
+  "sources": [
+    "internal/runthrough/adapter.go",
+    "internal/runthrough/refresh_eviction_test.go",
+    "internal/runthrough/refresh_version_fixture_test.go",
+    "internal/runthrough/refresh_version_bench_test.go",
+    "scripts/baselines/go-quality.json"
+  ],
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "gofmt",
+        "-w",
+        "internal/runthrough/adapter.go",
+        "internal/runthrough/refresh_eviction_test.go",
+        "internal/runthrough/refresh_version_fixture_test.go",
+        "internal/runthrough/refresh_version_bench_test.go"
+      ]
+    },
+    {
+      "name": "focused-normal",
+      "args": [
+        "go",
+        "test",
+        "./internal/runthrough",
+        "-run",
+        "^(TestRefresh|TestRunthrough|TestAdapter|TestCache|TestLimitedCache)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "focused-race",
+      "args": [
+        "go",
+        "test",
+        "-race",
+        "./internal/runthrough",
+        "-run",
+        "^(TestRefresh|TestRunthrough|TestAdapter|TestCache|TestLimitedCache)",
+        "-count=2",
+        "-v"
+      ]
+    },
+    {
+      "name": "full-go",
+      "args": [
+        "go",
+        "test",
+        "./..."
+      ]
+    },
+    {
+      "name": "vet",
+      "args": [
+        "go",
+        "vet",
+        "./..."
+      ]
+    },
+    {
+      "name": "quality",
+      "args": [
+        "make",
+        "check-go-quality",
+        "check-file-size",
+        "format-check"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+from pathlib import Path
+import json
+r=Path('/Users/ladmin/.codex/worktrees/core-copy-quality/stow');p=Path('/private/tmp/stow-outbox-proto-blocks-2026-10-18');p.mkdir(exist_ok=True)
+source=(r/'internal/runthrough/file_outbox_proto.go').read_text()
+for variant in ['bulk','bounded']:
+ s=source
+ s=s.replace('for _, key := range keys {\n\t\tvalue := state.provenance[key]\n\t\tmessage.Provenance = append(message.Provenance, &outboxpb.Provenance{Identity: key, Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown})\n\t}', '''var values []outboxpb.Provenance
+    for index, key := range keys {
+        if index % 128 == 0 { values = make([]outboxpb.Provenance, min(128, len(keys)-index)) }
+        value := state.provenance[key]
+        target := &values[index % 128]
+        *target = outboxpb.Provenance{Identity: key, Etag: outboxProtoText(value.ETag), Absent: value.Absent, Unknown: value.Unknown}
+        message.Provenance = append(message.Provenance, target)
+    }''')
+ old='''for _, key := range keys {
+		entry, err := outboxProtoEntry(key, entries[key])
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, entry)
+	}'''
+ assert old in s
+ s=s.replace(old,'''var values []outboxpb.Entry
+    for index, key := range keys {
+        if index % 128 == 0 { values = make([]outboxpb.Entry, min(128, len(keys)-index)) }
+        target := &values[index % 128]
+        if err := outboxProtoEntry(key, entries[key], target); err != nil { return nil, err }
+        result = append(result, target)
+    }''')
+ s=s.replace('func outboxProtoEntry(key string, e OutboxEntry) (*outboxpb.Entry, error) {','func outboxProtoEntry(key string, e OutboxEntry, target *outboxpb.Entry) error {')
+ a=s.index('func outboxProtoEntry(');b=s.index('\nfunc decodeOutboxProto(',a);section=s[a:b].replace('return nil, err','return err').replace('return &outboxpb.Entry{','*target = outboxpb.Entry{').replace('\n\t}, nil\n}', '\n\t}\n    return nil\n}')
+ s=s[:a]+section+s[b:]
+ if variant=='bulk':
+  s=s.replace('var values []outboxpb.Provenance','values := make([]outboxpb.Provenance, len(keys))').replace('var values []outboxpb.Entry','values := make([]outboxpb.Entry, len(keys))')
+  s=s.replace('        if index % 128 == 0 { values = make([]outboxpb.Provenance, min(128, len(keys)-index)) }\n','').replace('        if index % 128 == 0 { values = make([]outboxpb.Entry, min(128, len(keys)-index)) }\n','').replace('values[index % 128]','values[index]')
+ (p/(variant+'-file_outbox_proto.go.txt')).write_text(s)
+print('Prepared transient bulk/bounded encoders; no production file edited')
