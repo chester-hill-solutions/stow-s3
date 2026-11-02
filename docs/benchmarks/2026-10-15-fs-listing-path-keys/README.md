@@ -4,7 +4,7 @@
 
 At 10,000 objects, the filesystem list path spent about 204–206 ms on any
 single page and about 2.11 s on complete enumeration in the baseline run. A
-page allocated about 21.2 MiB. First and middle pages had the same cost, which
+page allocated about 20.24 MiB. First and middle pages had the same cost, which
 showed that listing read record headers across the whole bucket before
 pagination. Prefix filtering also happened after those reads.
 
@@ -91,5 +91,6 @@ Flat, sharded, and bounded digest-addressed records remain supported.
 Buckets dominated by bounded digest-addressed paths still read each candidate
 header because the key cannot be recovered from the digest. All layouts still
 require a complete directory walk per request. Raw edits to object record
-directories are outside the managed profile; a path/header identity mismatch
-is reported when that object is selected for a page.
+directories are outside the managed profile; a reversible path/header identity mismatch
+is reported when that object is selected for a page. Bounded candidates with
+mismatched identity remain omitted during discovery, preserving the prior behavior.
