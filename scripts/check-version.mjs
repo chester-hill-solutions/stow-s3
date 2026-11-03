@@ -2,6 +2,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { manifestProblems } from "./npm-publication.mjs";
 
 // versionProblems compares the versions this repository declares in four places
 // and reports every disagreement.
@@ -45,11 +46,23 @@ export function versionProblems({ goVersion, packageVersion, pythonProjectVersio
 }
 
 export function registryProblems(manifest) {
- // The registry is the check; access is not. GitHub Packages reads visibility from a
-  // package setting rather than from the manifest, so asserting access: public here
-  // refused every manifest that was actually correct for this registry.
-  return manifest.publishConfig?.registry === "https://npm.pkg.github.com"
-   ? [] : [`${manifest.name} must declare the public npmjs publish destination`];
+  return manifestProblems(manifest);
+}
+
+export function optionalLockProblems(optional, lock) {
+  const problems = [];
+  for (const [name, version] of Object.entries(optional)) {
+    const record = lock?.packages?.[`node_modules/${name}`];
+    if (!record || record.optional !== true) {
+      problems.push(`package-lock.json omits the optional package record for ${name}`);
+    } else if (record.version !== undefined && record.version !== version) {
+      problems.push(`package-lock.json ${name} version is ${record.version}, want ${version}`);
+    }
+    if (lock?.packages?.[""]?.optionalDependencies?.[name] !== version) {
+      problems.push(`package-lock.json optionalDependencies.${name} does not match ${version}`);
+    }
+  }
+  return problems;
 }
 
 const root = resolve(import.meta.dirname, "..");
@@ -69,6 +82,8 @@ const PLATFORM_PACKAGES = [
 ];
 
 const optional = packageJson.optionalDependencies ?? {};
+const packageLock = JSON.parse(readFileSync(resolve(root, "packages/stow-s3/package-lock.json"), "utf8"));
+problems.push(...optionalLockProblems(optional, packageLock));
 
 // The PyPI distribution ships the same binary, so it must be in step too. A skew
 // here would publish a wheel whose binary is from a different release than the
