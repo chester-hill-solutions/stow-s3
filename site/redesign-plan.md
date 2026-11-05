@@ -14,6 +14,14 @@ Updated for the November 5, 2026 release: public npm installation is the TypeScr
 The homepage, guides, agent indexes and ecosystem graphic now describe v0.3.5.
 Python remains source-only; future automated registry publication remains disabled.
 
+Updated on November 5, 2026 for use-case clarity: the homepage now introduces four
+storage problems before the implementation examples: shared test data, disposable
+agent files, browser edits during a lost connection, and upstream-dependent reads.
+The overview links to matching walkthroughs in the same order. Each walkthrough
+states the problem and Stow's response before setup. Saved-file handoff, explicit
+browser sync and cache retention limits remain visible. The existing brand,
+public documentation routes and section anchors are retained.
+
 ## Design direction
 
 Replace the current dark, terminal-led presentation with warm ivory, large black headings, forest green actions, thin dividers and generous spacing. Keep monospace for commands and small technical labels. Use the concept's modular containers and documents to make objects, files and checkpoints tangible.
