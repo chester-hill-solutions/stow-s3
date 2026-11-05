@@ -159,7 +159,7 @@ func handleReadForSave(ctx context.Context, instance *stow.Runtime, req request)
 	return marshalReadForSave(object, result, req)
 }
 
-// handleSaveObject saves against an observation or explicit replacement, retaining its request key.
+// handleSaveObject saves against an observation or explicit replacement, forwarding its request key.
 func handleSaveObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
 	condition := stow.ReplacementCondition()
 	if !req.Replace {
