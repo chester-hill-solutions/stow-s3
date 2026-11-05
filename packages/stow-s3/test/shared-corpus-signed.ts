@@ -10,7 +10,7 @@ function bytes(input: SourceData): string | Buffer {
   if (typeof input === "string") return input;
   return ArrayBuffer.isView(input) ? Buffer.from(input.buffer, input.byteOffset, input.byteLength) : Buffer.from(input);
 }
-class SHA256 {
+export class SHA256 {
   private readonly hash: Hash | Hmac;
   constructor(secret?: SourceData) { this.hash = secret === undefined ? createHash("sha256") : createHmac("sha256", bytes(secret)); }
   update(input: SourceData): void { this.hash.update(bytes(input)); }
