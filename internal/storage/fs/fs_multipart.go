@@ -99,6 +99,9 @@ func (s *FilesystemStore) CreateMultipartUpload(_ context.Context, bucket, key s
 }
 
 func (s *FilesystemStore) GetMultipartUpload(_ context.Context, uploadID string) (*storage.MultipartUpload, error) {
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	manifest, err := readMultipartManifest(s.multipartDir(uploadID))
@@ -120,6 +123,9 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
 		return nil, err
 	}
 
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	dir := s.multipartDir(uploadID)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return nil, storage.ErrUploadNotFound
@@ -152,6 +158,9 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		return nil, err
 	}
 
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	dir := s.multipartDir(uploadID)
 	manifest, err := readMultipartManifest(dir)
 	if err != nil {
@@ -227,6 +236,9 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 }
 
 func (s *FilesystemStore) ValidateMultipartUpload(_ context.Context, uploadID, bucket, key string) error {
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return storage.ErrNoSuchUpload
+	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	manifest, err := readMultipartManifest(s.multipartDir(uploadID))
@@ -284,6 +296,9 @@ func (s *FilesystemStore) AbortMultipartUpload(_ context.Context, uploadID strin
 		return err
 	}
 
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return storage.ErrUploadNotFound
+	}
 	dir := s.multipartDir(uploadID)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return storage.ErrUploadNotFound
@@ -333,6 +348,9 @@ func (s *FilesystemStore) listParts(_ context.Context, uploadID string) ([]stora
 
 // ListPartsPage returns a marker-paginated page of uploaded parts.
 func (s *FilesystemStore) ListPartsPage(ctx context.Context, uploadID string, opts storage.ListPartsOptions) (*storage.ListPartsResult, error) {
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	parts, err := s.listParts(ctx, uploadID)
 	if err != nil {
 		return nil, err
@@ -341,6 +359,9 @@ func (s *FilesystemStore) ListPartsPage(ctx context.Context, uploadID string, op
 }
 
 func (s *FilesystemStore) ListParts(ctx context.Context, uploadID string) ([]storage.PartInfo, error) {
+	if err := storage.ValidateUploadID(uploadID); err != nil {
+		return nil, storage.ErrUploadNotFound
+	}
 	return s.listParts(ctx, uploadID)
 }
 
