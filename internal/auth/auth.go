@@ -14,7 +14,6 @@ const (
 	DefaultMaxSkew = 15 * time.Minute
 )
 
-// Verifier validates SigV4 header auth and presigned query-string auth.
 type Verifier struct {
 	Region  string
 	MaxSkew time.Duration

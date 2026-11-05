@@ -176,7 +176,6 @@ func summarizePrewarm(bucket string, entries []runthrough.PrewarmResult) prewarm
 	return out
 }
 
-// reportPrewarm prints the result and decides the exit status.
 func reportPrewarm(bucket string, keys []string, entries []runthrough.PrewarmResult) error {
 	out := summarizePrewarm(bucket, entries)
 	encoded, err := json.MarshalIndent(out, "", "  ")

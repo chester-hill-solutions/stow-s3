@@ -64,7 +64,6 @@ const (
 	doctorExitCouldNotRun = 2
 )
 
-// doctor runs the diagnostic and exits with a status describing the result.
 func doctor(args []string) {
 	flags := flag.NewFlagSet("doctor", flag.ExitOnError)
 	asJSON := flags.Bool("json", false, "Emit one machine-readable JSON object instead of the human-readable report")
