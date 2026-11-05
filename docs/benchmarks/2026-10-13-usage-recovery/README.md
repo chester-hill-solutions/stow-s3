@@ -1,5 +1,8 @@
 # Usage and Recovery State consolidation — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The Embedded Runtime now owns one private accounting module for committed usage,
 multipart reservations, staged reservations, revision tracking and recovery readiness.
 Reconciliation builds an accounting snapshot instead of constructing another runtime.
@@ -32,7 +35,7 @@ treat recovery uncertainty differently. Public mutation refusal exposes
 ## Validation
 
 All builds and tests ran on Railway. No throughput benchmark ran in this pass.
-The [two recovery regressions](red-regressions.json) failed against the previous
+The [two recovery regressions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/red-regressions.json) failed against the previous
 implementation, then passed in the final race-tested suite.
 
 | Test | Observable behavior |
@@ -57,8 +60,8 @@ copied back after hash verification.
 
 ## Evidence and scope
 
-- [Final verification receipt](verification/receipt.json) and [complete log](verification/standards.log).
-- [Generated SDK hashes](verification/generated-change.json) and [quality measurement](verification/go-quality-report.json).
+- [Final verification receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/receipt.json) and [complete log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/standards.log).
+- [Generated SDK hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/generated-change.json) and [quality measurement](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/go-quality-report.json).
 - [Accounting implementation](../../../internal/runtime/usage_state.go), [multipart transitions](../../../internal/runtime/usage_multipart.go) and [recovery observations](../../../internal/runtime/usage_recovery.go).
 - [Caller guidance](../../portable-workspace-usage.md) and [ADR 0020](../../adr/0020-binary-object-records.md).
 

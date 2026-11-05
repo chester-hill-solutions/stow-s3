@@ -1,5 +1,8 @@
 # Reject invalid outbox ownership credentials — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Defect and consequence
 
 Baseline `2a5941a` checks completion credentials only for equality with the stored
@@ -18,7 +21,7 @@ external authentication bypass or a deployed data-loss incident. No upstream
 requests are sent by the focused reproduction.
 
 `origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
-[Baseline refs](2026-10-18-outbox-ownership/raw/baseline.json) and the previous
+[Baseline refs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/baseline.json) and the previous
 [token-exhaustion review](2026-10-18-outbox-token-exhaustion.md) establish completed
 work. This change adds no format, dependency or exported API.
 
@@ -27,9 +30,9 @@ work. This change adds no format, dependency or exported API.
 The final matrix has **42 distinct failing cases and 72 passing controls**, each
 run twice normally and twice under race detection against unchanged production.
 Each mode therefore records 84 expected failures and 144 passing controls.
-[Red receipt](2026-10-18-outbox-ownership/raw/before-final/red-receipt.json),
-[normal output](2026-10-18-outbox-ownership/raw/before-final/regression-normal.log) and
-[race output](2026-10-18-outbox-ownership/raw/before-final/regression-race.log) retain case-level results.
+[Red receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/before-final/red-receipt.json),
+[normal output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/before-final/regression-normal.log) and
+[race output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/before-final/regression-race.log) retain case-level results.
 Harness success at this stage means the expected test exit 1 was observed.
 
 The failures cover seven ownership-checked methods, two input formats and three
@@ -47,7 +50,7 @@ stale-token and caller-buffer retention tests remain in the full suite.
 
 An earlier original-code run contains the same 42 failures and 64 passing controls
 before eight generic-API controls were added. Its
-[output](2026-10-18-outbox-ownership/raw/initial-before/regression-normal.log) and tested sources are retained.
+[output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/initial-before/regression-normal.log) and tested sources are retained.
 A bounded SSH transfer refused an oversized local command before sending it; the
 initial job consequently ran the previously uploaded controls. After that job was
 confirmed terminal, a smaller test-only update installed the final controls and
@@ -84,7 +87,7 @@ benchmarks ran on the existing Railway scratch runner, as UID 10001. Exact
 Railway-formatted Go files were copied back and hash checked. No local Go tools or
 commit hooks ran. The final focused matrix records **114 cases passing twice in
 each mode: 228 passes normally and 228 with race detection**, with no skipped or
-failing cases. [Green receipt](2026-10-18-outbox-ownership/raw/final/green-receipt.json) verifies exact test names
+failing cases. [Green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/final/green-receipt.json) verifies exact test names
 and unchanged regression source bytes across final red and green runs.
 
 The first 16-stage implementation run passes focused normal/race, the full Go
@@ -93,15 +96,15 @@ package), all four conformance profiles, vet, site build/tests, documentation li
 benchmark build and the paired comparison. Its quality gate correctly rejects a
 panic in the new test dispatcher's unknown-action default. That default now returns
 an error; no test assertion or production behavior is changed to satisfy the gate.
-[The initial checks](2026-10-18-outbox-ownership/raw/after/checks.json) and
-[quality output](2026-10-18-outbox-ownership/raw/after/quality.log) retain the failure.
+[The initial checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/after/checks.json) and
+[quality output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/after/quality.log) retain the failure.
 
 After that job finished, the corrected final regression bytes were run against the
 original production again, reproducing the same 42 failures twice in both modes.
 The final source then passes formatting, focused normal/race and all unchanged
-quality/file-size/format gates. [Final checks](2026-10-18-outbox-ownership/raw/final/checks.json),
-[commands](2026-10-18-outbox-ownership/raw/final/plan.json), [environment/source hashes](2026-10-18-outbox-ownership/raw/final/environment.json)
-and [export receipts](2026-10-18-outbox-ownership/raw/final/export-receipt.json) are retained. The production
+quality/file-size/format gates. [Final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/final/checks.json),
+[commands](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/final/plan.json), [environment/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/final/environment.json)
+and [export receipts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/final/export-receipt.json) are retained. The production
 and benchmark sources are byte-identical to the earlier full-suite, conformance
 and measurement run. Only the unreachable test dispatcher default changed; those
 unrelated passing checks and measurements were not repeated. Documentation is
@@ -135,9 +138,9 @@ results volume, verified ext4 (type 61267), rather than container overlay storag
 | state | 128 | prepare | 1 | 2.439 → 2.374 | -2.66% | 1.0 → 1.0 |
 | state | 128 | prepare | 4 | 2.216 → 2.012 | -9.23% | 1.0 → 1.0 |
 
-[All observations, ranges, iterations and allocated bytes](2026-10-18-outbox-ownership/raw/after/comparison-analysis.json),
-[commands, order and binary hashes](2026-10-18-outbox-ownership/raw/after/comparison-runs.json), and the
-[pinned baseline binary](2026-10-18-outbox-ownership/raw/before/benchmark-binary.json) are retained. The new
+[All observations, ranges, iterations and allocated bytes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/after/comparison-analysis.json),
+[commands, order and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/after/comparison-runs.json), and the
+[pinned baseline binary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-ownership/raw/before/benchmark-binary.json) are retained. The new
 success-path work is two validity comparisons; the helper creates no error,
 allocation, retained cache or buffer. Allocations per cycle are unchanged in all
 cells. File IO variability and Go map iteration affect wall time; all adverse

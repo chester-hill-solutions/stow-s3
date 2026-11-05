@@ -1,5 +1,8 @@
 # Assessment evidence — 2026-09-29
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Tested source revision: `5485a3640dbeeb368324d7e2a223bc17d7d23fc5`.
 Read the adjacent product assessment for conclusions and limitations.
 

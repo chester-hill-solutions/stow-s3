@@ -1,5 +1,8 @@
 # Remove copies of the buffered read result
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline source is `11f3c9a` (production is unchanged from `c614a2b`); freshly
 fetched origin/main remains `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
 The [earlier unresolved timing investigation](../2026-10-15-save-read-call-boundary/README.md)
@@ -44,8 +47,8 @@ The initial comparison uses 10,000 operations/block for three-byte reads and
 1,000 for 64 KiB. Identical-code absolute control medians range about 1.6–6.3%,
 while original-vs-current guarded 64 KiB paired changes are −0.61%/+0.25%.
 GET of three bytes shows +1.85%/+4.93% paired current cost. Its controls also vary,
-so this alone is not a precise copy-cost estimate. [Initial results](raw/matched.log),
-[summary](raw/initial-summary.json), [source](raw/probe.go.txt), [plan](raw/plan.json).
+so this alone is not a precise copy-cost estimate. [Initial results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/matched.log),
+[summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/initial-summary.json), [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/probe.go.txt), [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/plan.json).
 
 Runtime allocation, GC-cycle, pause and GC-CPU counters are read outside each
 timed batch. These process-wide counters include runtime/background work and
@@ -62,15 +65,15 @@ the already-opened Object and returns only error. Tiny-read blocks grow to 50,00
 operations; 64 KiB remains 1,000. Tiny GET paired medians improve 2.1–2.6% in all
 four per-run/CPU comparisons; every run favors the prototype. The combined paired
 changes are −2.42%/−2.18%. Other cases include adverse values; none is removed.
-[Prototype measurements](raw/pointer-matched.log), [summary](raw/prototype-summary.json),
-[per-run results](raw/pointer-repeat-summary.json), [source](raw/pointer-probe.go.txt),
-[plan](raw/pointer-plan.json).
+[Prototype measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/pointer-matched.log), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/prototype-summary.json),
+[per-run results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/pointer-repeat-summary.json), [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/pointer-probe.go.txt),
+[plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/pointer-plan.json).
 
 The prototype also checks 24 combinations of raw/wrapped missing, unexpected EOF
 and committed body errors, after zero/one/all bytes, together with bytes or on the
 next read. Each combination is run twice. Exact errors, no returned partial object
 or condition, one close per opening and healthy recovery pass:
-[contract probe](raw/pointer-contract.log). This is a performance refinement of the
+[contract probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/pointer-contract.log). This is a performance refinement of the
 already-demonstrated body-error fix, not a newly alleged correctness defect.
 
 The production change updates the existing readOpenedObject signature from
@@ -90,19 +93,19 @@ Compiler escape analysis confirms the Object pointer does not escape. The same
 binary's static ARM64 instruction counts shrink: GetObject 104 → 96, helper
 148 → 140, ReadForSave 384 → 352. These static counts support removal of record
 movement, not an executed-instruction or cycle guarantee.
-[Compiler excerpt](raw/production-compiler-excerpt.log),
-[assembly](raw/production-assembly.log), [counts](raw/production-assembly-summary.json).
+[Compiler excerpt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-compiler-excerpt.log),
+[assembly](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-assembly.log), [counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-assembly-summary.json).
 Diagnostic compiler binaries are never used for timing.
 
 ## Actual production comparison with same-code controls
 
 The final matched binary compares the real new production methods with an exact
 frozen copy of the previous methods; only private names differ in the reference.
-[Reference verification](raw/reference-verification.json) and
-[source/binary identities](raw/production-source.json) are retained. New production
+[Reference verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/reference-verification.json) and
+[source/binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-source.json) are retained. New production
 code is not replaced by an independently optimized synthetic loop.
-[Raw results](raw/production-matched.log), [summaries](raw/production-summary.json),
-[source](raw/production-matched-probe.go.txt), [plan](raw/production-matched-plan.json).
+[Raw results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-matched.log), [summaries](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-summary.json),
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-matched-probe.go.txt), [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/production-matched-plan.json).
 
 | Case | CPUs | Value median ns/op | Pointer median ns/op | Paired-cycle change | Same-code absolute control median |
 |---|---:|---:|---:|---:|---:|
@@ -134,8 +137,8 @@ host activity is uncontrolled. Go 1.25.6, Apple M1 Pro, macOS 14.5 ARM64.
 These are native memory workloads, not end-to-end HTTP or disk results and not
 concurrent-throughput tests. The three matched phases contain 1,280 blocks each;
 direct benchmarks add 264 samples: **4,104 measured observations, all retained**.
-[Direct raw log](raw/direct.log), [all values/ranges](raw/direct-measurements.json),
-[plan](raw/direct-plan.json), [harness](raw/measure-production.py.txt).
+[Direct raw log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/direct.log), [all values/ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/direct-measurements.json),
+[plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/direct-plan.json), [harness](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/measure-production.py.txt).
 SOURCE headings identify the individual direct-log files used by the summaries.
 
 | Case | CPUs | Before ns/op | After ns/op | Median change |
@@ -190,7 +193,7 @@ into a claim of strict byte equality. These are cumulative allocations, not peak
 heap/RSS or a new memory guarantee.
 
 The rebuilt packaged WASM grows **4,617,893 → 4,618,016 bytes (+123)**.
-[Artifact hashes](raw/wasm.json) retain this compatibility/distribution cost.
+[Artifact hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/wasm.json) retain this compatibility/distribution cost.
 No WASM speedup is inferred from native measurements.
 
 ## Contracts, validation and next finding
@@ -198,26 +201,26 @@ No WASM speedup is inferred from native measurements.
 Four new ownership cases exercise both GET/guarded-read pairings: mutating the
 first returned bytes/metadata cannot change a second result or storage, and the
 original guard remains valid with full byte capacity. They pass twice before
-production edits and twice afterward: [before](raw/before-ownership.log),
-[after with prior regressions](raw/after-contracts.log). They pin preserved behavior;
+production edits and twice afterward: [before](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/before-ownership.log),
+[after with prior regressions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/after-contracts.log). They pin preserved behavior;
 they are not falsely presented as failing pre-existing correctness tests.
 
 All 56 focused leaf cases (four new and 52 existing) pass five race repetitions,
-**280 passes, no skips**: [focused race](raw/focused-race.log). Full Go tests,
+**280 passes, no skips**: [focused race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/focused-race.log). Full Go tests,
 affected runtime/storage/S3/run-through/embedded/public race suites, all four
 conformance profiles, relevant vet, unchanged quality/file-size ratchets,
 generated output, WASM smoke and seven package tests pass.
-[Full Go](raw/full-go.log), [broad race](raw/broad-race.log),
-[conformance](raw/conformance-summary.log), [vet](raw/vet.log),
-[quality](raw/quality.log), [generated](raw/generated.log),
-[WASM smoke](raw/wasm-smoke.log), [package tests](raw/package-tests.log).
+[Full Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/full-go.log), [broad race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/broad-race.log),
+[conformance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/conformance-summary.log), [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/vet.log),
+[quality](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/quality.log), [generated](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/generated.log),
+[WASM smoke](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/wasm-smoke.log), [package tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/package-tests.log).
 Conformance retains two existing skips/profile: opt-in live upstream coverage and
 mirrored bucket creation awaiting an authority decision. No baseline is raised.
 
 All temporary measurement probes and dependency links are removed before broad
 validation. Exact production hashes are checked against measured sources, along
 with formatting, documentation links and staged whitespace checks:
-[final checks](raw/final-checks.log). Retained probe files are diagnostic text,
+[final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-result-pointer/raw/final-checks.log). Retained probe files are diagnostic text,
 not permanent tests; reproduce one at a time using the recorded commands and
 remove it afterward. Source frozen references are internal to those probes.
 

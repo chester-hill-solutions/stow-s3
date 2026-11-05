@@ -1,5 +1,8 @@
 # Keep lookup-before-insert duplicate checks
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 **Reject the single-lookup decoder candidate. Production remains byte-identical to baseline `46eb7f9`.** The retained change adds nine regression cases: six interleaved duplicate/recovery cases and three allocation guards. No dependency, public API, format, retained cache or storage abstraction changes.
 
 The candidate saves a map lookup on valid records, but writing before detecting a duplicate can grow a full eight-entry map. In the focused short-provenance benchmark, rejection allocated **1,288 → 2,032 bytes (+57.76%)**, **27 → 30 objects**, and the median time was **21.66% slower**. Both entry collections also allocated three additional objects. This outweighs the pilot's faster decode observations under the product's correctness/resource-first objective.
@@ -16,7 +19,7 @@ Three predictions were tested: saving a lookup might reduce valid-decode CPU, es
 
 ## Pinned runtime and allocation reproduction
 
-The actual Go 1.25.6 map implementation grows a full small map before finding whether the assigned key already exists. Its `PutSlot` source explicitly marks the unnecessary-growth-on-update case. The string fast path and generic implementation are retained with full-file hashes and Go version in the [runtime evidence](2026-10-18-outbox-insert/raw/pilot/runtime-map.json). This is evidence for the pinned runtime, not a claim about every future Go release or all map updates.
+The actual Go 1.25.6 map implementation grows a full small map before finding whether the assigned key already exists. Its `PutSlot` source explicitly marks the unnecessary-growth-on-update case. The string fast path and generic implementation are retained with full-file hashes and Go version in the [runtime evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/pilot/runtime-map.json). This is evidence for the pinned runtime, not a claim about every future Go release or all map updates.
 
 The new serialized-frame guard interleaves eight provenance, eight active and eight prepared records. It compares allocations for that valid prefix with a frame containing a conflicting duplicate and a later distinct record. The later record must still receive wire validation, and the duplicate must still return no partial state. Allocation difference includes legitimate extra string decoding/error formatting; it should not rebuild the prefix merely to reject it.
 
@@ -28,7 +31,7 @@ The first proof averaged 64 decodes and used a 512-byte incremental allowance. P
 | 3 | 291–415 | 747–879 |
 | 4 | 290–411 | 747–878 |
 
-[Initial boundary proof](2026-10-18-outbox-insert/raw/boundary/boundary-receipt.json), [final higher-sample proof](2026-10-18-outbox-insert/raw/proof/boundary-receipt.json) and the exact source snapshots retain both methods. Candidate test exit 1 is expected and verified to come only from this allocation guard; a green harness step does not mean the candidate test passed.
+[Initial boundary proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/boundary/boundary-receipt.json), [final higher-sample proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/proof/boundary-receipt.json) and the exact source snapshots retain both methods. Candidate test exit 1 is expected and verified to come only from this allocation guard; a green harness step does not mean the candidate test passed.
 
 The other six new cases interleave all three record collections at depths 129 and 1,025 per collection, insert a nonadjacent conflicting duplicate followed by a distinct record, compare decoding with the original batch-decoder oracle, and exercise real `FileOutbox` reload. Failed loads must preserve known state and corrupt bytes; restoring valid bytes must recover the active/prepared queues and provenance. Both implementations pass these functional contracts. The experiment exposes a resource regression, not an existing production data-loss defect.
 
@@ -68,7 +71,7 @@ Positive deltas below mean more/slower. All adverse cells are retained, includin
 | reject field=provenance/key=16/prefix=1 | -4.32% | +0.00% | +0.00% |
 | reject field=provenance/key=16/prefix=129 | -14.37% | +0.00% | +0.00% |
 
-[All pilot samples, medians and ranges](2026-10-18-outbox-insert/raw/pilot/comparison-analysis.json), [commands/binary identities](2026-10-18-outbox-insert/raw/pilot/comparison-runs.json), [functional/race receipt](2026-10-18-outbox-insert/raw/pilot/contract-receipt.json).
+[All pilot samples, medians and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/pilot/comparison-analysis.json), [commands/binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/pilot/comparison-runs.json), [functional/race receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/pilot/contract-receipt.json).
 
 The focused follow-up adds **48 observations across six cells**, using eight valid records followed by a duplicate. It exercises the boundary omitted by the one/129-record pilot. No earlier observation is discarded or replaced.
 
@@ -81,14 +84,14 @@ The focused follow-up adds **48 observations across six cells**, using eight val
 | field=provenance/key=1024/prefix=8 | 15,200 → 15,944 | 29 → 32 | +7.20% |
 | field=provenance/key=16/prefix=8 | 1,288 → 2,032 | 27 → 30 | +21.66% |
 
-Every boundary cell allocates three more objects. Short provenance rejection allocates 57.76% more bytes; short active/prepared rejection allocates 10.20% more. The source and repeated measured byte/object changes support the growth attribution. Timing remains a measured observation with the limitations above. [All focused samples and ranges](2026-10-18-outbox-insert/raw/boundary/comparison-analysis.json), [commands/binary identities](2026-10-18-outbox-insert/raw/boundary/comparison-runs.json).
+Every boundary cell allocates three more objects. Short provenance rejection allocates 57.76% more bytes; short active/prepared rejection allocates 10.20% more. The source and repeated measured byte/object changes support the growth attribution. Timing remains a measured observation with the limitations above. [All focused samples and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/boundary/comparison-analysis.json), [commands/binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/boundary/comparison-runs.json).
 
 ## Retained change, validation and next work
 
 The two new test files preserve interleaved duplicate recovery and guard prefix allocation at the full-small-map boundary. The allocation test samples more calls to reduce measurement noise; it adds GC/allocation work to the test suite. Runtime/formatting changes may require remeasurement of its allowance. Existing mutation, field-order, recursion, malformed-input, ownership, identity and recovery tests remain in force.
 
-Final validation checks the unchanged production decoder and exact formatted tests: focused tests twice normally/race, full Go suite, broader storage/runtime/embedded/runthrough/S3/public-package race tests, four conformance configurations, vet, quality/size/format gates, site build/tests and doc links. The report and evidence undergo another Railway documentation check after publication. [Final checks](2026-10-18-outbox-insert/raw/final/checks.json), [nine-case regression proof](2026-10-18-outbox-insert/raw/final/green-receipt.json).
+Final validation checks the unchanged production decoder and exact formatted tests: focused tests twice normally/race, full Go suite, broader storage/runtime/embedded/runthrough/S3/public-package race tests, four conformance configurations, vet, quality/size/format gates, site build/tests and doc links. The report and evidence undergo another Railway documentation check after publication. [Final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/final/checks.json), [nine-case regression proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/final/green-receipt.json).
 
 The remaining measured decode-byte cost is stored map values, rather than duplicate-check allocations. This experiment gives no basis to introduce a new state representation, index or checkpointing scheme. The next correctness review should return to resource admission and recovery across the storage paths, before proposing broader allocation machinery. No next production change is implemented here.
 
-The [evidence manifest](2026-10-18-outbox-insert/raw/artifact-manifest.json) covers all 216 timing observations, rejected source/overlays, runtime evidence, normal/race proofs, final checks, source verification and isolated runner teardown.
+The [evidence manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-insert/raw/artifact-manifest.json) covers all 216 timing observations, rejected source/overlays, runtime evidence, normal/race proofs, final checks, source verification and isolated runner teardown.

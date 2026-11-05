@@ -1,5 +1,8 @@
 # Owned HTTP body handoff — Railway evidence
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Completed 2026-10-14. All builds, tests, benchmarks, and numerical analysis ran on Railway. Website charts remain unpublished. Both benchmark deployments were subsequently confirmed `REMOVED`.
 
 HTTP PUT now transfers its privately materialized request buffer into write preparation through a once-only internal ownership contract. Request cache and replay references are cleared at transfer. Caller-owned buffers and ordinary readers retain defensive copies. Authentication, checksum validation before publication, actual-content ETags, metadata ownership, quota enforcement, and lifecycle checks remain enforced. Stream writes reject a declared size that differs from the transferred body size.
@@ -43,10 +46,10 @@ Two superseded attempts failed evidence packaging: copied documentation containe
 
 ## Evidence and identities
 
-- [Raw run receipt](comparison/run.json), [checked analysis and paired intervals](comparison/analysis.json), [generated tables](comparison/report.md), and [exact analysis source](comparison/analyze-owned.mjs).
-- [Final validation receipt](verification/receipt.json), [validation export checksum](validation-export.json), and [comparison export checksum](comparison-export.json).
-- [Allocation regression log](red.log), [compiled variant identities](comparison/variants.json), and [retention receipt](comparison/retention.json).
-- [Baseline source archives](comparison/baseline-source-archives.tar.gz), [exact after native source](comparison/after-native-source.tar.gz), and [archived generated documentation](verification/rendered-documentation.tar.gz).
+- [Raw run receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/run.json), [checked analysis and paired intervals](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/analysis.json), [generated tables](comparison/report.md), and [exact analysis source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/analyze-owned.mjs).
+- [Final validation receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/verification/receipt.json), [validation export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/validation-export.json), and [comparison export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison-export.json).
+- [Allocation regression log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/red.log), [compiled variant identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/variants.json), and [retention receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/retention.json).
+- [Baseline source archives](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/baseline-source-archives.tar.gz), [exact after native source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/comparison/after-native-source.tar.gz), and [archived generated documentation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-owned-http-body/verification/rendered-documentation.tar.gz).
 
 Run ID: `c80e35c3-f6e3-4020-91af-ae8ad6c8e95b`; UTC 13:18:06–13:36:34 on 2026-10-14. Comparison source payload SHA-256: `178ca240d23a9f260a1bafc5404521d0e1efd1ee0bc96d0d19d5d6e03fc38f55`. Exact after production source projection: `ed958b131d418fcc55930686752127519be43a7192e603126daaf85ff5cb4b04`. The after source archive was unpacked and verified against the compiled source on Railway. Local exports were checksum verified; native binaries remain on the Railway results volume, with paths and digests in the retention receipt.
 

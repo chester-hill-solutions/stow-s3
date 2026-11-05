@@ -1,5 +1,8 @@
 # Core COPY correctness review — October 15, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The [source-snapshot attempt](../2026-10-15-copy-source-snapshot/README.md) was
 withdrawn for performance regression. The
 [restoration](../2026-10-15-copy-cost-restoration/README.md) returns to this report's
@@ -60,8 +63,8 @@ Before: eight cases fail in each of two runs. Failing conditions return 200,
 create absent destinations and overwrite existing destination bytes.
 After: all cases pass in both runs; the same requests return 412 and preserve
 existing destinations or leave absent destinations absent. See
-[baseline reproduction](raw/defect-before.txt) and
-[candidate result](raw/defect-after.txt).
+[baseline reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/defect-before.txt) and
+[candidate result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/defect-after.txt).
 
 The adapter now obtains source metadata and calls the existing
 `storage.CheckCopySourceConditions` before the fallback copy. It forwards metadata
@@ -89,8 +92,8 @@ Host: Apple M1 Pro, 16 GiB RAM, macOS 14.5 ARM64, Go 1.25.6.
 Serial baseline/candidate/candidate/baseline blocks; no concurrent build or test
 jobs. Identical benchmark source was compiled against both versions. The candidate
 contains only the implementation above, regression tests and measurement code.
-Binary identities and method are in [metadata](raw/metadata.json), with parsed
-samples in [summary](raw/summary.json) and complete per-process logs in `raw/`.
+Binary identities and method are in [metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/metadata.json), with parsed
+samples in [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/summary.json) and complete per-process logs in `raw/`.
 
 Adapter microbenchmarks use a 4 KiB source and repeatedly overwrite one target.
 Each block has three 300 ms samples per case. Values below are pooled medians of
@@ -160,7 +163,7 @@ go test ./internal/s3api -run '^$' -bench '^BenchmarkCopyReplace$' -benchtime=3x
 
 For RSS, compile `go test -c` and run that standalone binary under
 `/usr/bin/time -l`, selecting one backend/size per process. The retained
-[measurement runner](raw/measure.py) records the four-block order and exact flags;
+[measurement runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/measure.py) records the four-block order and exact flags;
 place baseline/candidate S3 and run-through test binaries alongside it with the
 names shown in `metadata.json`. Test binaries are not committed.
 
@@ -169,12 +172,12 @@ names shown in `metadata.json`. Test binaries are not committed.
 Passed:
 
 - Baseline: `go test ./internal/s3api ./internal/storage/... ./internal/runtime ./internal/runthrough`.
-- Candidate: `go test ./...`; [full output](raw/go-tests.txt).
+- Candidate: `go test ./...`; [full output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/go-tests.txt).
 - `make test-conformance`: memory, filesystem, runtime/memory and runtime/filesystem;
-  [full output](raw/conformance.txt).
+  [full output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/conformance.txt).
 - `go test -race ./internal/s3api ./internal/storage/... ./internal/runtime ./internal/runthrough`.
 - Final regression and existing date/REPLACE tests under the race detector;
-  [output](raw/final-copy-race.txt).
+  [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-core-copy-quality/raw/final-copy-race.txt).
 - `go vet ./internal/runthrough ./internal/s3api`, formatting/diff checks,
   Go-quality and file-size ratchets without baseline changes.
 

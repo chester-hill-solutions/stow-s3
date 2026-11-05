@@ -1,5 +1,8 @@
 # Missing custom-store uploads retain the S3 error contract
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `8f35607` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This follows the separate
 [committed-abort correction](../2026-10-15-abort-publication/README.md), preserving
@@ -18,8 +21,8 @@ Before production modification, permanent regressions reproduce this across
 UploadPart, CompleteMultipartUpload, AbortMultipartUpload and ListParts, with both
 raw and wrapped missing errors: eight HTTP combinations. Two direct adapter cases
 also fail, while the other seven direct cases pass. Each runs twice normally and
-twice under the race detector: [normal](raw/before-tests.log),
-[race](raw/before-race.log). These are the same HTTP scenarios retained as a probe
+twice under the race detector: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/before-tests.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/before-race.log). These are the same HTTP scenarios retained as a probe
 in the preceding report, now permanent regression tests.
 
 The production change adds three lines to ValidateMultipartUpload's error branch,
@@ -48,10 +51,10 @@ one provider lookup and unchanged metadata. HTTP tests use real initiation, part
 upload and successful abort through the existing public custom-store fixture,
 then submit each of the four missing-upload requests.
 
-[Passing regressions](raw/after-tests.log), [focused races](raw/focused-race.log),
-[full Go tests](raw/full-go.log), [relevant race suites](raw/broad-race.log), all
+[Passing regressions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/after-tests.log), [focused races](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/focused-race.log),
+[full Go tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/full-go.log), [relevant race suites](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/broad-race.log), all
 four memory/filesystem/runtime conformance profiles
-([summary](raw/conformance-summary.log)), relevant vet, quality/file-size ratchets,
+([summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/conformance-summary.log)), relevant vet, quality/file-size ratchets,
 formatting and diff checks, generated-output verification, WASM smoke and seven
 package integration tests pass. The intentionally failing next-finding probe is
 removed before broad validation. Detailed logs are retained in `raw`.
@@ -71,8 +74,8 @@ baseline blocks, each with three samples at 10,000,000 fixed iterations, give si
 samples per version/case/processor count. No agent builds or tests run concurrently
 with measurements; other host activity is uncontrolled. All samples and commands,
 including outliers, are retained in raw benchmark logs and
-[measurements](raw/measurements.json); binary digests and host/toolchain metadata
-are in [environment](raw/benchmark-environment.json).
+[measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/measurements.json); binary digests and host/toolchain metadata
+are in [environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/benchmark-environment.json).
 
 | Case | Processors | Median ns/op before → after | Change | Before range | After range |
 |---|---:|---:|---:|---:|---:|
@@ -95,7 +98,7 @@ cost more. No payload-sized work is added. Earlier reviews' separate performance
 concerns are not considered resolved by this adapter comparison.
 
 The packaged WASM is rebuilt and verified: it remains **4,617,032 bytes**, with
-an updated digest ([comparison](raw/wasm.json)). No optimization is proposed.
+an updated digest ([comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/wasm.json)). No optimization is proposed.
 
 ## Next recovery finding — confirmed absence does not release an uncertain abort
 
@@ -109,8 +112,8 @@ upload session and, for a missing target, object slot. Further full-capacity PUT
 and initiation are refused at the configured limits.
 
 Both missing and existing targets reproduce twice normally and twice under the
-race detector, without reported data races: [probe source](raw/next-abort-retry-probe.go.txt),
-[normal](raw/next-abort-retry-probe.log), [race](raw/next-abort-retry-probe-race.log).
+race detector, without reported data races: [probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/next-abort-retry-probe.go.txt),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/next-abort-retry-probe.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-validation/raw/next-abort-retry-probe-race.log).
 The probe reuses the native abort fault fixture, deliberately supplies an unmarked
 unknown-outcome error first, and verifies backend absence before retrying. This
 is a fault-injected recovery scenario, not evidence that a built-in memory abort

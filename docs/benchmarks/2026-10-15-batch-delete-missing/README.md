@@ -1,5 +1,8 @@
 # Custom-store batch deletion confirms missing keys
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `524ca63` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This corrects **F4** from the
 [codebase review](../../reviews/2026-10-15-codebase-map.md). F1/F2 corrections are
@@ -16,7 +19,7 @@ confirming that key and proceeding. This violates the existing internal Store
 contract and documented idempotent S3 deletion.
 
 The new regression reproduced the failure twice before production changes:
-[original failures](raw/before-tests.log). Nine of eleven cases failed per run;
+[original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-batch-delete-missing/raw/before-tests.log). Nine of eleven cases failed per run;
 raw/wrapped internal-sentinel compatibility cases passed. The original review
 had separately reproduced this twice normally and twice under the race detector;
 its [probe source](../../reviews/2026-10-15-codebase-map/embedded_probe.go.txt) and
@@ -56,7 +59,7 @@ of 1,000 fixed-result deletes, median adapter overhead rose from 11.415 µs to
 65.968 µs (**5.8×**) when the store returned the internal missing-key sentinel.
 Confirmed-success overhead rose from 5.288 µs to 7.097 µs. Allocations stayed at
 one 16 KiB result slice. That implementation was replaced with the narrow public
-sentinel check. [Intermediate measurements](raw/normalized-measurements.json)
+sentinel check. [Intermediate measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-batch-delete-missing/raw/normalized-measurements.json)
 and its four raw benchmark blocks are retained; those results describe an
 implementation that is not shipped.
 
@@ -87,8 +90,8 @@ have no comparable successful baseline because the original adapter stops at the
 first missing key. Completing all requested deletes necessarily does more work
 than that defective early return.
 
-[All final samples and binary hashes](raw/measurements.json), raw benchmark logs
-and [WASM hashes](raw/wasm.json) are retained. The final correction adds error-chain
+[All final samples and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-batch-delete-missing/raw/measurements.json), raw benchmark logs
+and [WASM hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-batch-delete-missing/raw/wasm.json) are retained. The final correction adds error-chain
 checks only after the existing nil/internal-missing fast paths. Those additional
 checks affect public missing-key and genuine-error results. No new success-path
 storage operation or allocation is introduced.

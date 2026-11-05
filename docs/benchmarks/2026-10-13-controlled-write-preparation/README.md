@@ -1,5 +1,8 @@
 # Paired write-preparation comparison — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Managed filesystem saves improved in this Railway comparison.
 Median throughput increased from 98.290 to 114.884 MiB/s.
 Median allocated bytes decreased from 7,417,247.5 to 2,166,604.5 per acknowledged 1 MiB save, about 71% less.
@@ -90,10 +93,10 @@ Runner deployment: `c544a874-4682-4e38-93ca-b27117c8af7e`.
 Target deployment: `68cce335-7eb7-4811-b3f2-a6fd122d3b71`.
 Both were observed `SUCCESS`, then `REMOVED` after verified export.
 
-- [Completed run receipt](comparison/run.json), [paired analysis](comparison/analysis.json) and [paired report](comparison/paired-report.md).
-- [Effective profile](comparison/profile.json), [S3 raw index](comparison/s3/suite.json) and [smoke receipt](smoke/receipt.json).
-- [Binary and source identities](comparison/build-variants.json), [retention receipt](comparison/binary-retention.json) and [export verification](export.json).
-- [Executed analyzer](comparison/analyze-controlled.mjs), [native source archive](comparison/native-source.tar.gz) and [baseline regression log](comparison/baseline-regression.txt).
+- [Completed run receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/run.json), [paired analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/analysis.json) and [paired report](comparison/paired-report.md).
+- [Effective profile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/profile.json), [S3 raw index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/s3/suite.json) and [smoke receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/smoke/receipt.json).
+- [Binary and source identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/build-variants.json), [retention receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/binary-retention.json) and [export verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/export.json).
+- [Executed analyzer](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/analyze-controlled.mjs), [native source archive](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/native-source.tar.gz) and [baseline regression log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-controlled-write-preparation/comparison/baseline-regression.txt).
 - [Baseline reconstruction patch](../../../benchmark/variants/before-write-preparation.patch) and [patch specification](../../../benchmark/variants/write-preparation.json).
 
 Both server and native benchmark binaries remain on the Railway results volume under the retained build path in the receipt.

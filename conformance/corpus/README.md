@@ -44,4 +44,4 @@ per-case buckets so the filesystem and memory matrices remain isolated; the
 Node runner creates the same logical set in a fresh temporary data directory.
 
 The current 51-case acceptance and focused wire-test mapping is recorded in
-[compatibility coverage](../../docs/compatibility-coverage-2026-09-29.md).
+[compatibility coverage](../../docs/history/assessments/compatibility-coverage-2026-09-29.md).

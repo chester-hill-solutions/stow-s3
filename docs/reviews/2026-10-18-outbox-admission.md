@@ -1,9 +1,12 @@
 # Refuse occupied outbox IDs at admission — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Baseline and consequences
 
 Baseline `49eaa80` already rejects inconsistent journal identities. `origin/main`
-was refreshed before this investigation; [baseline.json](2026-10-18-outbox-admission/raw/baseline.json)
+was refreshed before this investigation; [baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/baseline.json)
 records exact refs. This change addresses an existing API creating lost intents
 or a journal that those recovery checks then refuse.
 
@@ -38,14 +41,14 @@ All **52 distinct regressions failed twice in each mode**, 104 failures per
 normal/race run. Seven controls passed twice per mode: the five available-ID
 controls plus two owned-prepare same-key exclusions that already rejected.
 Each mode reported **24 journals that could not reopen after an accepted
-collision**. The [red receipt](2026-10-18-outbox-admission/raw/before/red-receipt.json)
+collision**. The [red receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/before/red-receipt.json)
 verifies the exact failing cases, repetitions and passing controls. The harness
 expects regression exit code 1; successful harness status records that expected
 failure, not a passing regression suite.
 
 The first full validation found four existing snapshot subtests relying on
 same-ID overwrite to alter a fixture. Their failed normal/race/full-suite stages
-are retained in [the first attempt](2026-10-18-outbox-admission/raw/after/checks.json).
+are retained in [the first attempt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/after/checks.json).
 Revised fixtures use fresh intents for peer writes, check monotonic bounded counts
 and every new record's paired fields, and retain held-slice/caller-mutation checks.
 Additional coverage mutates existing records through MarkFailure or owned lease
@@ -56,12 +59,12 @@ make admission refusal pass.
 
 A measured first allocator used two lookups for every ID and returned a large
 entry plus error. Its memory-cycle medians increased up to 34.2%. Those 256
-[initial observations](2026-10-18-outbox-admission/raw/after/comparison-analysis.json) remain retained. Before removing redundant automatic-ID lookups,
+[initial observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/after/comparison-analysis.json) remain retained. Before removing redundant automatic-ID lookups,
 two additional original-source counter tests demonstrated maximum-sequence wrap
 replacing an existing `outbox-0`, twice normally and twice under race detection.
 The first guarded candidate already refused that collision. The final allocator
 preserves refusal through explicit exhaustion handling. The
-[preflight receipt](2026-10-18-outbox-admission/raw/preflight/preflight-receipt.json)
+[preflight receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/preflight/preflight-receipt.json)
 records exact baseline failures, candidate passes and original snapshot passes.
 
 ## Contract and focused change
@@ -103,15 +106,15 @@ twice under race detection**, 122 passing cases per mode in the new matrix, usin
 byte-identical original admission regression/benchmark source from the first red run;
 the separate exhaustion tests were reproduced against original code before the
 allocator refinement. The
-[green receipt](2026-10-18-outbox-admission/raw/final/green-receipt.json) verifies exact cases and source hashes.
+[green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/final/green-receipt.json) verifies exact cases and source hashes.
 
 All **17 final Railway stages pass**: formatting; focused outbox tests twice normally
 and twice with race detection; full Go suite; broad storage/runtime/embedded/
 run-through/S3/public-package race tests; four conformance profiles (memory,
 filesystem, runtime-memory, runtime-filesystem); vet; site build/tests;
 documentation links; quality/file-size/format gates; original/final benchmark builds; and
-interleaved comparison. [Final commands/results](2026-10-18-outbox-admission/raw/final/checks.json)
-and [baseline commands/results](2026-10-18-outbox-admission/raw/before/checks.json)
+interleaved comparison. [Final commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/final/checks.json)
+and [baseline commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/before/checks.json)
 retain every stage. No baseline or tolerance was raised.
 
 All formatting, compilation, code checks, tests and measurements run on the same
@@ -156,15 +159,15 @@ A third, file-only cohort places TMPDIR under its UID-10001-owned ext4 result
 folder and verifies the filesystem type before timing. It uses the same ABBA/BAAB
 order, CPU settings and 300-ms minimum: **128 additional observations**, bringing
 the retained total to **640 observations** across the three distinct cohorts.
-The [ext4 fixture receipt](2026-10-18-outbox-admission/raw/volume/fixture-filesystem.json)
-records the actual path; [volume observations and ranges](2026-10-18-outbox-admission/raw/volume/comparison-analysis.json)
+The [ext4 fixture receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/volume/fixture-filesystem.json)
+records the actual path; [volume observations and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/volume/comparison-analysis.json)
 remain separate from overlay data. Rebuilt original/refined binary hashes must
 match the final overlay cohort before the report is finalized. No production
 source or benchmark Go source changes between those two cohorts.
 
 A targeted identical-binary control adds 16 ext4 observations for the two CPU-4
 explicit-prepare cells. Both labels execute the same refined binary; hashes are
-checked against the final comparison. Its [raw samples](2026-10-18-outbox-admission/raw/aa/comparison-analysis.json)
+checked against the final comparison. Its [raw samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/aa/comparison-analysis.json)
 remain separate. **656 observations total** are retained: 640 before/after and
 16 control observations. The control does not cancel the adverse ext4 results.
 
@@ -249,9 +252,9 @@ This demonstrates variability in the control; it does not rule out an implementa
 The largest absolute difference between median allocated bytes is 50.5 B/cycle.
 Exact bytes, iteration counts and ranges for each cell remain in the analysis.
 
-[All samples and ranges](2026-10-18-outbox-admission/raw/final/comparison-analysis.json),
-[commands/order and binary hashes](2026-10-18-outbox-admission/raw/final/comparison-runs.json)
-and the [harness hash](2026-10-18-outbox-admission/raw/comparison-harness-receipt.json)
+[All samples and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/final/comparison-analysis.json),
+[commands/order and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/final/comparison-runs.json)
+and the [harness hash](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-admission/raw/comparison-harness-receipt.json)
 are retained. Adverse samples and cells are not discarded. Small sample counts do
 not establish statistical significance. Benchmark binaries are removed after hashes
 are recorded; the scratch runner is stopped after verified exports and documentation checks.

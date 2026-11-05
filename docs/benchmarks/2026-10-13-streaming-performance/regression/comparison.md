@@ -1,5 +1,8 @@
 # Streaming and quarantine performance regression
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 All workloads and analysis ran on Railway. Same S3 configuration and CPU limits as the earlier comparison. Competitors were not remeasured.
 
 | Backend / workflow | Before rate | After rate | Ratio | p99 ms before → after | Sampled RSS MiB before → after |

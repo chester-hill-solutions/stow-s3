@@ -1,5 +1,8 @@
 # Paired write-preparation throughput comparison
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Six paired rounds on one target worker. Student-t interval for mean log throughput ratio, conditional on these rounds; shared-host noise and client limits remain. No sustained-capacity qualification.
 
 Reconstructed immediately preceding write-preparation implementation; keeps usage/recovery consolidation and all earlier changes. Not the historical pre-streaming build.

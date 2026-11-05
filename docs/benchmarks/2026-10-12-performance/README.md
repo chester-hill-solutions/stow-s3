@@ -1,5 +1,8 @@
 # Local storage performance evidence
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Measured on **2026-10-12, Toronto time**, using an Apple M1 Pro with 16 GiB RAM.
 These are exploratory measurements from a shared desktop.
 They do not establish sustained DPI throughput or a latency guarantee.
@@ -42,12 +45,12 @@ The earlier interrupted experiment is excluded from this evidence.
 
 ## Evidence files
 
-- [Generated report](report.md) and [throughput versus latency chart](throughput-latency.svg).
-- [Effective configuration](config.json), [run summaries](summary.json) and [raw run index](suite.json).
+- [Generated report](report.md) and [throughput versus latency chart](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/throughput-latency.svg).
+- [Effective configuration](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/config.json), [run summaries](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/summary.json) and [raw run index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/suite.json).
 - Scenario JSON files named in the raw run index contain queue, resource and per-second observations.
-- [Embedded raw output](embedded.txt) and [embedded metadata](embedded-metadata.json).
-- [Embedded benchmark source snapshot](embedded-benchmark-source.txt).
-- [Validation record](validation.json) confirms the standards gate, measurement tests and completed runs.
+- [Embedded raw output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/embedded.txt) and [embedded metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/embedded-metadata.json).
+- [Embedded benchmark source snapshot](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/embedded-benchmark-source.txt).
+- [Validation record](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-12-performance/validation.json) confirms the standards gate, measurement tests and completed runs.
 - The `harness/` directory preserves the S3 measurement sources whose hash appears in `suite.json`.
 
 Embedded measurements use three repetitions and 300 ms target windows.

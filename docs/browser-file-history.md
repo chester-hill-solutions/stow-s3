@@ -168,5 +168,5 @@ environment, using encrypted `STOW_LIVE_ENDPOINT`, `STOW_LIVE_ACCESS_KEY_ID` and
 `STOW_LIVE_REGION` variables. The environment is configured with encrypted
 Railway testing-bucket credentials and permits deployments only from `main`.
 The manual workflow is available from `main`.
-See the [recorded Railway run](assessment-evidence/2026-10-12/railway-browser.json) for local test results.
+See the [recorded Railway run](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-10-12/railway-browser.json) for local test results.
 <!-- repo-only:end -->

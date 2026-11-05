@@ -1,5 +1,8 @@
 # Object-write preparation — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The buffered object-write module now owns body materialization, MD5 ETags,
 checksum resolution and retained metadata ownership.
 Memory, managed filesystem and buffered workspace writes use the same implementation.
@@ -45,9 +48,9 @@ their fields and public interfaces did not change.
 
 ## Evidence
 
-- [Final verification receipt](verification/receipt.json) and [complete log](verification/standards.log).
-- [Generated SDK hashes](verification/generated-change.json), [artifact export](verification/artifact-export.json) and [quality measurement](verification/go-quality-report.json).
-- [Retry regression reproduction](red-regressions.json) and [supplemental validation history](supplemental-validation.json).
+- [Final verification receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/verification/receipt.json) and [complete log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/verification/standards.log).
+- [Generated SDK hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/verification/generated-change.json), [artifact export](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/verification/artifact-export.json) and [quality measurement](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/verification/go-quality-report.json).
+- [Retry regression reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/red-regressions.json) and [supplemental validation history](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-write-preparation/supplemental-validation.json).
 - [Preparation module](../../../internal/storage/put_body.go) and [store-interface tests](../../../internal/storage/put_body_contract_test.go).
 - [Railway environment readback](../railway-environment.json).
 

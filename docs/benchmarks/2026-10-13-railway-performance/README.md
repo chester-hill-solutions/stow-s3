@@ -1,5 +1,8 @@
 # Railway storage comparison — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The cloud batch completed successfully: **378 native samples and 45 S3 runs**, plus a separate 15-case smoke suite. Every measured/final read passed SHA-256 and length verification. There were zero failed workflows or dropped arrivals, including during warm-up. Quarantine teardown left no worker objects.
 
 Stow memory provides a small server footprint and competitive verified-read throughput in this configuration. Filesystem writes and quarantine are substantially slower than the S3 baselines and are the clearest performance work to pursue. These are exploratory comparisons; sustained capacity qualification is incomplete.
@@ -26,7 +29,7 @@ Stow memory’s verified GET median was 466.95 MiB/s versus 398.65 for S3Proxy m
 
 Stow filesystem measured 7.05 MiB/s PUT, 119.40 MiB/s GET and 2.00 quarantine files/s. MinIO measured 65.55, 502.80 and 65.40 respectively. The filesystem baselines have different storage formats, accounting and acknowledgement guarantees; this is an application-level comparison of these deployments. It does not isolate the cost of any one feature.
 
-For full latency, RPS, per-workload RSS and repetition ranges, see the [S3 report](comparison/s3/report.md) and [summary](comparison/s3/summary.json). Quarantine throughput counts incoming payload once per completed file workflow; it does not sum upload and download wire bytes. RPS counts individual successful requests and therefore differs from files/s.
+For full latency, RPS, per-workload RSS and repetition ranges, see the [S3 report](comparison/s3/report.md) and [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/comparison/s3/summary.json). Quarantine throughput counts incoming payload once per completed file workflow; it does not sum upload and download wire bytes. RPS counts individual successful requests and therefore differs from files/s.
 
 ## Embedded results
 
@@ -46,7 +49,7 @@ The owned-buffer baseline clones each PUT and preserves previously opened bytes.
 
 Stow memory PUT allocates approximately 5.04 MiB per 1 MiB operation, versus roughly 1.00 MiB for the owned-buffer baseline. Stow filesystem PUT allocates about 23.58 MiB/op. Allocation is cumulative Go heap activity per operation, not retained memory or RSS. Native GET includes hashing, so its rate is partly an integrity-check benchmark. Native quarantine has no scan delay.
 
-See [all embedded cases and allocations](comparison/embedded-report.md), [original Go output](comparison/embedded.txt) and [analysis](comparison/analysis.json).
+See [all embedded cases and allocations](comparison/embedded-report.md), [original Go output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/comparison/embedded.txt) and [analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/comparison/analysis.json).
 
 ## Resource checks and limits
 
@@ -85,9 +88,9 @@ Then qualify the actual inspection-and-retention use case: memory inspection, pr
 ## Reproduction and evidence
 
 - [Benchmark runner and commands](../../../benchmark/README.md), [Railway IaC](../../../benchmark/.railway/railway.ts) and [environment receipt](../railway-environment.json).
-- [Comparison configuration](comparison/profile.json), [completion receipt](comparison/run.json) and [S3 raw file index](comparison/s3/suite.json).
-- [Smoke completion receipt](smoke/run.json); smoke timings are correctness checks and are excluded from the comparison tables.
-- [Validation and evidence hashes](validation.json).
+- [Comparison configuration](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/comparison/profile.json), [completion receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/comparison/run.json) and [S3 raw file index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/comparison/s3/suite.json).
+- [Smoke completion receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/smoke/run.json); smoke timings are correctness checks and are excluded from the comparison tables.
+- [Validation and evidence hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-railway-performance/validation.json).
 
 An earlier comparison ended after eight S3 cases because MinIO accepted HTTP before storage initialization. It is excluded. The final harness requires a successful authenticated list-buckets request before preparation. The corrected smoke passed before restarting the entire comparison.
 

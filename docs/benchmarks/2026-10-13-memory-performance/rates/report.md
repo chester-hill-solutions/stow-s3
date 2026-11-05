@@ -1,10 +1,13 @@
 # Stow performance measurements
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Profile: **Memory quarantine offered-rate sweep; loopback HTTP**. Recorded 2026-10-13T12:33:40.422Z.
 
 Measurement windows: 20 s; warm-up: 5 s; repetitions: 3; soak: 0 s per backend.
 Scanner delay: 2 ms; retained fixtures: 16; queue capacity: 8; file deadline: 10000 ms.
-Suite complete: **true**. See [effective configuration](config.json) and [raw run index](suite.json).
+Suite complete: **true**. See [effective configuration](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/rates/config.json) and [raw run index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/rates/suite.json).
 
 **Exploratory measurements. The public capacity protocol has not been completed.**
 
@@ -18,7 +21,7 @@ Machine: Apple M1 Pro; 16 GiB RAM; darwin arm64; 23.5.0.
 | memory / quarantine | 1048576 | 4 | 150 | 3 | 149.85 | 149.85 (149.3–149.85) | 749.5 | 30.287 | 57.281 | 0 / 12 |
 | memory / quarantine | 1048576 | 4 | 200 | 3 | 199.9 | 199.9 (191.45–199.9) | 999.6 | 48.346 | 61.531 | 0 / 168 |
 
-![Throughput and latency](throughput-latency.svg)
+![Throughput and latency](https://raw.githubusercontent.com/chester-hill-solutions/stow-s3/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/rates/throughput-latency.svg)
 
 ## Measurement scope
 

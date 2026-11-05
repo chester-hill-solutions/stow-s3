@@ -25,7 +25,7 @@
 | [Planning index and disposition](../planning-index.md) | Complete document inventory, old-item migration map and deferred decisions |
 | Older DX, remediation, FOSS, workspace, portability and architecture plans | Superseded historical records; their remaining work is carried into the IDs below |
 | [Work-session proposal](plans/work-session-plan.md), [isolate exploration](plans/agent-isolate-exploration.md) | Retired proposals; execution designs require a new scope decision |
-| [Assessment](../product-assessment-2026-09-29.md), [continuity pilot](../agent-continuity-pilot-2026-09-29.md) | Revision-specific observations, including failures and limitations |
+| [Assessment](assessments/product-assessment-2026-09-29.md), [continuity pilot](experiments/agent-continuity-pilot-2026-09-29.md) | Revision-specific observations, including failures and limitations |
 | [Realtime multiplayer experiment](collaboration/realtime-multiplayer-plan.md) | Transferred historical RT handover; standalone collaboration repository owns current scope/status |
 | [Prior plan](plan-through-2026-09-28.md) | Historical implementation record; superseded ordering |
 
@@ -181,7 +181,7 @@ before testing a useful native slice. Existing release and real-consumer gates r
 **Development candidate: 0.3.0, implemented locally on 2026-09-29.** The baseline
 assessment and pre-code discovery below are historical inputs. Current commands
 and contracts are in [portable workspace usage](../portable-workspace-usage.md);
-[implementation evidence](../implementation-2026-09-29.md) records validation and
+[implementation evidence](implementation/implementation-2026-09-29.md) records validation and
 remaining gates. This candidate has not been published.
 
 | Area | Implemented in this tree | Remaining acceptance |
@@ -198,7 +198,7 @@ The caller now uses readiness `working_directory`, records task-file changes and
 blocks successful no-ops for review, forwards the named Zen credential, and has an
 opt-in real-model acceptance test. The authorized follow-up passed with
 `opencode/space-bunny-free`: verified task output, changed notes and restored
-checkpoint artifacts after sender data was removed. [The remediation record](../opencode-receiver-remediation-2026-09-29.md)
+checkpoint artifacts after sender data was removed. [The remediation record](implementation/opencode-receiver-remediation-2026-09-29.md)
 separates that local model pass from the still-required second-host/Linux and
 real interruption gates.
 
@@ -215,7 +215,7 @@ by the first demo. Collaboration remains above Stow's storage interface under AD
 Final local validation: **`make test-all` and `make standards` passed**, including
 race tests, all four local conformance profiles, language/WASM/caller tests and
 reproducible generated artifacts. Live-provider credentials were not supplied.
-No packages were published. See [the implementation record](../implementation-2026-09-29.md).
+No packages were published. See [the implementation record](implementation/implementation-2026-09-29.md).
 
 ### What is next
 

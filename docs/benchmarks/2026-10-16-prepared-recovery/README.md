@@ -1,5 +1,8 @@
 # Preserve prepared intents until local absence is reliable
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Corrected on 2026-10-16 from `8e537ac0c0d0e92dd4bd435c0b376e94075ca7bf`, on
 `codex/core-copy-quality`. Freshly fetched `origin/main` remains
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of this branch.
@@ -10,7 +13,7 @@ This change preserves that contract, without adding a storage feature or optimiz
 
 ## Demonstrated defect
 
-The [saved probe](../2026-10-16-propagation-open/raw/next-prepared-probe.go.txt)
+The [saved probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/next-prepared-probe.go.txt)
 prepares a PUT in a real FileOutbox, commits a new local record, then injects a
 HEAD error joining ErrObjectNotFound with ErrMutationCommitted. Prepared recovery
 mistakes that marked error for reliable absence, silently discards the intent,
@@ -19,9 +22,9 @@ replacement still exists, but a healthy retry cannot propagate it: the only
 recovery intent is gone.
 
 Before changing production code, the saved probe fails twice
-[normally](raw/original-before.log) and twice [under race](raw/original-before-race.log).
+[normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/original-before.log) and twice [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/original-before-race.log).
 An ordinary uncertain HEAD error is a passing control. The original probe passes
-twice [normally](raw/original-after.log) and twice [under race](raw/original-after-race.log)
+twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/original-after.log) and twice [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/original-after-race.log)
 after the correction.
 
 The permanent matrix also demonstrates the DELETE consequence. An uncommitted
@@ -81,9 +84,9 @@ which is what prepared recovery observes. They do not exercise separate source
 copying or multipart initiation/completion in these tests.
 
 On the unchanged production implementation, **32 defect cases fail and 32
-controls pass per repetition**, twice [normally](raw/before-tests.log) and twice
-[under race](raw/before-race.log). No build failure is counted as evidence. After the correction, all 64 pass twice:
-[128 normal passing leaf executions](raw/after-tests.log).
+controls pass per repetition**, twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/before-tests.log) and twice
+[under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/before-race.log). No build failure is counted as evidence. After the correction, all 64 pass twice:
+[128 normal passing leaf executions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/after-tests.log).
 
 Each uncertain call returns the exact HEAD error, performs one HEAD, retains
 its ID, previous local version and upstream condition, and makes no upstream
@@ -98,15 +101,15 @@ establish the interleaving or recovery result.
 
 The final Go implementation and regression sources pass:
 
-- [All Go tests](raw/full-go.log), [broad storage/runtime/S3/run-through race checks](raw/broad-race.log) and [vet](raw/vet.log).
-- [Five repetitions of the entire run-through race suite](raw/focused-race.log): **1,780 passing leaf executions**.
-- [Four conformance profiles](raw/conformance-summary.log): memory, filesystem, runtime-memory and runtime-filesystem; [full output](raw/conformance-full.log). The pre-existing mirror-bucket authority decision and opt-in live upstream tests remain skipped in each profile. No live AWS qualification is claimed.
-- [Go/file-size gates](raw/quality.log), [WASM build](raw/build-wasm.log), [package build](raw/package-build.log), [generated-artifact checks](raw/generated.log), [real WASM smoke test](raw/wasm-smoke.log) and [seven package integration tests](raw/package-tests.log).
+- [All Go tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/full-go.log), [broad storage/runtime/S3/run-through race checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/broad-race.log) and [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/vet.log).
+- [Five repetitions of the entire run-through race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/focused-race.log): **1,780 passing leaf executions**.
+- [Four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/conformance-summary.log): memory, filesystem, runtime-memory and runtime-filesystem; [full output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/conformance-full.log). The pre-existing mirror-bucket authority decision and opt-in live upstream tests remain skipped in each profile. No live AWS qualification is claimed.
+- [Go/file-size gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/quality.log), [WASM build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/build-wasm.log), [package build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/package-build.log), [generated-artifact checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/generated.log), [real WASM smoke test](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/wasm-smoke.log) and [seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/package-tests.log).
 
 These correctness checks ran locally with Go 1.25.6. Performance benchmarks ran
-only on Railway. The [verification runner](raw/validate.py.txt) and
-[final provenance audit](raw/final-provenance.json) distinguish the two.
-The [rebuilt WASM](raw/wasm.json) remains byte-for-byte identical:
+only on Railway. The [verification runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/validate.py.txt) and
+[final provenance audit](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/final-provenance.json) distinguish the two.
+The [rebuilt WASM](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/wasm.json) remains byte-for-byte identical:
 **4,619,197 bytes**, SHA-256
 `a828baf915d451665700e039bf7a1895bdfcd2306c2298cca9ea9482668f1193`.
 Native prepared recovery is outside that artifact.
@@ -123,12 +126,12 @@ outbox_adapter.go is replaced by its exact baseline source in the reference bina
 The complete uploaded native source payload is hash-checked during the build;
 the four changed Go files match the local correctness-tested source freeze.
 
-[Successful deployment](raw/railway-deployment.json), [job receipt](raw/run.json),
-[export hashes](raw/railway-export-receipt.json), [input payload manifest](raw/railway-context-manifest.json),
-[compiler/binary/source/runtime identities](raw/environment.json),
-[source freeze](raw/source-freeze.json), [final provenance](raw/final-provenance.json).
-The [Dockerfile](raw/Dockerfile.txt), [build script](raw/build.mjs.txt) and
-[Railway-only runner script](raw/diagnosis.mjs.txt) retain the execution method.
+[Successful deployment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/railway-deployment.json), [job receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/run.json),
+[export hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/railway-export-receipt.json), [input payload manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/railway-context-manifest.json),
+[compiler/binary/source/runtime identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/environment.json),
+[source freeze](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/source-freeze.json), [final provenance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/final-provenance.json).
+The [Dockerfile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/Dockerfile.txt), [build script](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/build.mjs.txt) and
+[Railway-only runner script](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/diagnosis.mjs.txt) retain the execution method.
 The existing benchmark controller and authenticated controls are reused.
 The remote script refuses to execute outside this Railway environment/service.
 
@@ -140,11 +143,11 @@ The remote script refuses to execute outside this Railway environment/service.
 - GOMAXPROCS settings **1 and 4**, with serial benchmark workers.
 - Two ABBA/BAAB cycles, two repetitions per block and 200 ms per observation: **256 retained samples**, eight per case/version/CPU.
 
-[Plan](raw/plan.json), [raw output](raw/measurements.log), [all samples](raw/samples.json),
-[summary with ranges and both cycle comparisons](raw/summary.json),
-[per-block cgroup/load observations](raw/block-resources.json).
+[Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/plan.json), [raw output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/measurements.log), [all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/samples.json),
+[summary with ranges and both cycle comparisons](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/summary.json),
+[per-block cgroup/load observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/block-resources.json).
 The readable log trims trailing padding on CPU header lines only;
-[normalization hashes](raw/log-normalization.json) distinguish it from the exact
+[normalization hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/log-normalization.json) distinguish it from the exact
 export receipt. All timing, allocation, iteration and action lines are unchanged.
 The measurement span records **781 cgroup periods, zero throttled periods and
 zero throttled microseconds**. This does not establish physical-host isolation,
@@ -215,8 +218,8 @@ by this isolated Railway classifier comparison.
 
 Railway's SFTP download timed out. The same completed result directory was
 exported through working SSH, with every file length and SHA-256 checked before
-cleanup. The retained results volume is untouched. [Export receipt](raw/railway-export-receipt.json),
-[runner cleanup](raw/railway-runner-after.json), [target still stopped](raw/railway-target-after.json).
+cleanup. The retained results volume is untouched. [Export receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/railway-export-receipt.json),
+[runner cleanup](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/railway-runner-after.json), [target still stopped](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/railway-target-after.json).
 
 ## Next confirmed finding — left unchanged
 
@@ -230,7 +233,7 @@ Mutation preflight's localVersionStrict still classifies a marked-missing HEAD
 as ordinary absence and returns an empty previous version. This occurs before
 prepared recovery and is a separate entry point from the corrected reconciliation.
 
-The [separate deterministic probe](raw/next-preflight-probe.go.txt) keeps a real
+The [separate deterministic probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/next-preflight-probe.go.txt) keeps a real
 native MemoryStore object and a real FileOutbox. Its first HEAD returns a missing
 error joined with ErrMutationCommitted; later HEAD calls are healthy. The local
 PUT is explicitly refused without committing. Preflight nevertheless admits it,
@@ -240,13 +243,13 @@ false committed mutation result. A healthy retry sends the old local bytes upstr
 replacing `remote-base`, although the requested local write never committed.
 
 The marked-missing case fails twice and the ordinary uncertain HEAD control
-passes twice in each [baseline normal](raw/next-before.log),
-[baseline race](raw/next-before-race.log), [candidate normal](raw/next-after.log)
-and [candidate race](raw/next-after-race.log). [Probe runner](raw/next-probe.py.txt).
+passes twice in each [baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/next-before.log),
+[baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/next-before-race.log), [candidate normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/next-after.log)
+and [candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/next-after-race.log). [Probe runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/next-probe.py.txt).
 This is provider fault injection, not a claim that native filesystem HEAD
 spontaneously produces that error. The probe checks local version preservation,
 false committed status, an invented pending intent and the actual upstream body
 change. No preflight implementation or permanent test is added in this prepared
 recovery correction.
 
-[Documentation/site checks](raw/docs.log) accompany this report.
+[Documentation/site checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/docs.log) accompany this report.

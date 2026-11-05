@@ -1,5 +1,8 @@
 # Bounded correctness closure register — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 **No required fix remains.** Of nine named historical leads, eight are closed by
 existing implementations and fresh regressions; one is optional input
 strictness with no demonstrated security consequence.
@@ -25,8 +28,8 @@ is now finite rather than another sequence of speculative “next bugs.”
 
 Baseline is clean `b6d37430d731e03da3209f38b9737a99053765fe`. Fetching `origin/main`
 again returns `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Baseline](2026-10-18-correctness-closure/raw/baseline.json),
-[frozen lead list](2026-10-18-correctness-closure/raw/lead-register-input.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/baseline.json),
+[frozen lead list](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/lead-register-input.json).
 No implementation, dependency, public API, storage format or quality baseline
 changes. Only this report/register, historical-document pointers and evidence
 are committed. Temporary red probes are retained as text and removed from the Go
@@ -67,9 +70,9 @@ UID 10001, with enforced Linux permissions. It uses no custom store, mocked
 absence error, callback or production hook. Two normal and two race executions
 of the adverse leaf reproduce the overwrite; all four healthy controls pass.
 It is a deterministic injected-permission failure, not a claimed production incident.
-[Normal](2026-10-18-correctness-closure/raw/initial/workspace-normal.log),
-[race](2026-10-18-correctness-closure/raw/initial/workspace-race.log),
-[probe](2026-10-18-correctness-closure/raw/initial/workspace_probe.formatted.go.txt).
+[Normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/workspace-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/workspace-race.log),
+[probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/workspace_probe.formatted.go.txt).
 
 The trace is existing error-to-absence conversion in
 [workspace rooted reads](../../internal/storage/workspace/rooted_reads.go#L40),
@@ -107,10 +110,10 @@ fail their required-contract assertions twice normally and twice under race.
 This establishes a signature-binding and interoperability defect. It does not
 establish that an appended metadata value changes a stored object or grants an
 attacker additional authority through the built-in consumer.
-[Normal](2026-10-18-correctness-closure/raw/initial/auth-normal.log),
-[race](2026-10-18-correctness-closure/raw/initial/auth-race.log),
-[SDK probe](2026-10-18-correctness-closure/raw/initial/auth_sdk_probe.formatted.go.txt),
-[actual Go signer source](2026-10-18-correctness-closure/raw/initial/sdk-v4.go.txt).
+[Normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/auth-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/auth-race.log),
+[SDK probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/auth_sdk_probe.formatted.go.txt),
+[actual Go signer source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/sdk-v4.go.txt).
 
 ### 3. C09 — Case-changed opaque ETags produce incorrect conditional outcomes
 
@@ -140,9 +143,9 @@ character, even when its current implementation resembles a hexadecimal digest.
 
 The corrected matrix has eight adverse leaf executions and eight healthy
 controls in each mode (four routes, two repetitions), normally and under race.
-[Normal](2026-10-18-correctness-closure/raw/final/s3api-normal.log),
-[race](2026-10-18-correctness-closure/raw/final/s3api-race.log),
-[corrected probe](2026-10-18-correctness-closure/raw/final/etag_probe.formatted.go.txt).
+[Normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/final/s3api-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/final/s3api-race.log),
+[corrected probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/final/etag_probe.formatted.go.txt).
 Existing exact, wildcard and weak-validator behavior needs regression coverage
 when the comparison is corrected. No ETag-generation or format change is needed.
 
@@ -167,9 +170,9 @@ it is not evidence of an ordinary ASCII S3 SDK request failing or an authenticat
 bypass. Each independent-reference and Node-signed case runs twice normally and
 twice under race. The actual installed signer version, source and generated
 requests are preserved; no dependency is added or upgraded.
-[Reference probe](2026-10-18-correctness-closure/raw/initial/auth_query_probe.formatted.go.txt),
-[pinned signer receipt](2026-10-18-correctness-closure/raw/initial/node-sdk-receipt.json),
-[generated signatures](2026-10-18-correctness-closure/raw/initial/node-sdk-signatures.json).
+[Reference probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/auth_query_probe.formatted.go.txt),
+[pinned signer receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/node-sdk-receipt.json),
+[generated signatures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/node-sdk-signatures.json).
 
 ## Closed and nonblocking leads
 
@@ -180,8 +183,8 @@ existing grant/banner tests. C05 is closed within the managed namespace writer:
 the native ancestor-fence permission fault retains `ErrUnknown` reservations;
 the before-rename failure reconciles safely. These regressions run twice normally
 and twice under race with no skips or failures.
-[Closed-lead normal](2026-10-18-correctness-closure/raw/initial/closed-normal.log),
-[race](2026-10-18-correctness-closure/raw/initial/closed-race.log).
+[Closed-lead normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/closed-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/closed-race.log).
 
 C08's strict-spelling assertion deliberately records that a request using
 `unsigned-payload` can authenticate **with a valid HMAC**. A credential holder
@@ -199,8 +202,8 @@ All execution is on scratch deployment `bb794cd2-6e96-4014-94bc-97bea9526b4a`:
 Go 1.25.6, Node 25.9.0, Linux amd64, GOMAXPROCS 4, cgroup 4 CPU/4 GiB, test
 processes UID 10001. The workspace permission probe explicitly uses `/results`
 ext4. The task has no benchmarks and no local Go/Node project execution.
-[Environment](2026-10-18-correctness-closure/raw/initial/environment.json),
-[commands](2026-10-18-correctness-closure/raw/audit-plan.json).
+[Environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/environment.json),
+[commands](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/audit-plan.json).
 
 The 22-step initial job and seven-step corrected-S3 job match their expected
 exits, including the intentionally failing defect probes. This is **not** a claim
@@ -209,9 +212,9 @@ Content-Length header made the PUT portion of the first S3 fixture unqualified;
 that output is preserved and excluded from proof counts. The repaired fixture
 sets the header, all healthy controls pass, and only the case-changed predicates
 fail. No production edit or fault expectation is changed to obtain the result.
-[Initial checks](2026-10-18-correctness-closure/raw/initial/checks.json),
-[corrected checks](2026-10-18-correctness-closure/raw/final/checks.json),
-[independent verification](2026-10-18-correctness-closure/raw/validation-receipt.json).
+[Initial checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/initial/checks.json),
+[corrected checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/final/checks.json),
+[independent verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-correctness-closure/raw/validation-receipt.json).
 
 Qualified defect matrices contain **20 required-contract failing leaf executions
 and 20 healthy passing leaf executions per mode**, plus two optional strictness

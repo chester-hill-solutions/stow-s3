@@ -6,7 +6,7 @@
 caller-controlled OpenCode example are implemented; successful real-model and
 cross-host acceptance remain open. [Usage](../../portable-workspace-usage.md),
 [caller instructions](../../../examples/opencode/README.md) and
-[implementation evidence](../../implementation-2026-09-29.md) describe the concrete API.
+[implementation evidence](../implementation/implementation-2026-09-29.md) describe the concrete API.
 The design below preserves discovery rationale; proposed names are illustrative
 where they differ from the implementation. The [canonical plan](../../plan.md) owns
 acceptance status and ordering. [ADR 0014](../../adr/0014-storage-product-caller-owned-execution.md)
@@ -55,7 +55,7 @@ Decisions agreed on 2026-09-29:
 
 Installed binary: **2.0.16**. Inspected tag source:
 `3a103fe0aff726a4edc7492f03f7b88195d9e4c9`. This is a discovery pin, not a tested
-compatibility certification. [Source manifest](../../assessment-evidence/2026-09-29/pre-code-source-manifest.json)
+compatibility certification. [Source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-09-29/pre-code-source-manifest.json)
 records exact files and hashes.
 
 The public [SDK guide](https://opencode.ai/docs/sdk/) describes the older

@@ -1,5 +1,8 @@
 # Streaming and quarantine optimization — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The code changes improve disk reads and quarantine, reduce disk write allocations,
 and lower sampled server memory. They do not establish an across-the-board speedup:
 memory HTTP PUT and quarantine measured lower in this batch. All builds, tests,
@@ -77,11 +80,11 @@ No new startup or first-write timing was measured by this regression profile.
 
 ## Evidence
 
-- [Cloud comparison and ranges](regression/comparison.json), [latency and RSS table](regression/comparison.md).
-- [Raw S3 index](regression/s3/suite.json), [S3 report](regression/s3/report.md), [resource analysis](regression/analysis.json).
-- [Native throughput and allocations](regression/embedded-report.md), [completion receipt](regression/run.json).
-- [Cloud comparison source](regression/compare-regression.mjs).
-- [Full validation receipt](verification/receipt.json), [validation log](verification/standards.log), [generated artifact hashes](verification/generated-change.json).
+- [Cloud comparison and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/regression/comparison.json), [latency and RSS table](regression/comparison.md).
+- [Raw S3 index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/regression/s3/suite.json), [S3 report](regression/s3/report.md), [resource analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/regression/analysis.json).
+- [Native throughput and allocations](regression/embedded-report.md), [completion receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/regression/run.json).
+- [Cloud comparison source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/regression/compare-regression.mjs).
+- [Full validation receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/verification/receipt.json), [validation log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/verification/standards.log), [generated artifact hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-streaming-performance/verification/generated-change.json).
 
 Validation deployment `aa2bded5-b990-45c3-a193-be4995b3eacb` reached `SUCCESS`:
 `make standards`, all conformance lanes, Node/WASM tests, 33 browser tests

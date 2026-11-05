@@ -1,8 +1,11 @@
 # Preserve committed workspace DELETE outcomes
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `7eeced4` contains workspace multipart owner recovery. Fresh `origin/main`
 is still `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Baseline](2026-10-17-workspace-delete/raw/baseline.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/baseline.json).
 This corrects the workspace DELETE site of A3 from the
 [bounded audit](2026-10-16-storage-contract-audit.md).
 
@@ -11,9 +14,9 @@ This corrects the workspace DELETE site of A3 from the
 All execution ran on the existing Railway scratch runner as UID 10001. No local
 validation or benchmark ran. Permanent regressions ran twice normally and under
 race before implementation: **eight adverse leaf failures and ten passing controls
-in each run**, without skips. [Normal](2026-10-17-workspace-delete/raw/before/before-normal.log),
-[race](2026-10-17-workspace-delete/raw/before/before-race.log),
-[counts](2026-10-17-workspace-delete/raw/counts.json).
+in each run**, without skips. [Normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/before/before-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/before/before-race.log),
+[counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/counts.json).
 The final before run uses the native rename error type, `os.LinkError`; an initial
 test draft incorrectly expected `os.PathError`, which was corrected before this run.
 
@@ -36,21 +39,21 @@ behavior is unchanged. Existing runtime accounting consumes this outcome without
 new logic. The storage and workspace contracts were clarified before implementation.
 
 All **18 focused leaf executions pass normally and under race**, repeated twice
-with no skips: [normal](2026-10-17-workspace-delete/raw/after/focused-normal.log),
-[race](2026-10-17-workspace-delete/raw/after/focused-race.log).
+with no skips: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/after/focused-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/after/focused-race.log).
 Immediate usage now reports three bytes/one object on the failure, and healthy
 batch usage is zero. Canceled deletion still leaves the victim unchanged and
 has no committed marker.
 
-All [14 Railway checks](2026-10-17-workspace-delete/raw/after/checks.json) pass:
+All [14 Railway checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/after/checks.json) pass:
 focused normal/race, full Go, broad storage/runtime/embedded/run-through/S3/public
 API race, four conformance profiles, vet, quality/file-size/format, site build,
 site tests and documentation links. The two existing mirror/live-upstream
-conformance skips remain. [Result](2026-10-17-workspace-delete/raw/after/run.json).
+conformance skips remain. [Result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/after/run.json).
 Deployment `7de49edd-449b-44f1-a030-3d78a45cef2c` is the same qualified isolated
 runner as the owner change; source updates occur only after previous runs finish.
-[Update receipt](2026-10-17-workspace-delete/raw/delete-after-sync-receipt.json)
-and [tested hashes](2026-10-17-workspace-delete/raw/after/environment.json)
+[Update receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/delete-after-sync-receipt.json)
+and [tested hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-delete/raw/after/environment.json)
 identify the actual formatted sources. The new report gets an additional Railway
 document-link check, recorded in the after evidence, before its commit.
 

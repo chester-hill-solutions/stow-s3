@@ -1,5 +1,8 @@
 # Memory HTTP PUT generator diagnosis
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The original single-process Node generator limited the measured memory HTTP PUT rate.
 Splitting the same four clients across four generator processes raised median throughput
 from **173.200 to 516.225 MiB/s**, using the **identical server binary**.
@@ -54,10 +57,10 @@ Runner deployment: `27c7ece6-0ac7-4e53-8111-fa3ad872a514`.
 Target deployment: `ff0f0be6-287e-4809-aa5a-de667d008fac`.
 Both were observed `SUCCESS`, then `REMOVED` after verified export.
 
-- [Run receipt and raw measurements](run/run.json), [checked analysis](run/analysis.json), and [paired report](run/report.md).
-- [Single-process client profile](run/client-1-0.cpuprofile), [server CPU](run/server-4-profile-top.txt), [server mutex](run/server-4-mutex-top.txt), and [allocation profile](run/server-4-heap-top.txt).
-- [Executed harness and identity](run/executed-source), [executed analyzer](run/analyze-diagnosis.mjs), [analyzer test result](run/analysis-tests.txt), and [export verification](export.json).
-- [Retained binaries](run/retention.json) remain on the Railway results volume. The exact production source archive is retained from the preceding controlled comparison.
+- [Run receipt and raw measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/run.json), [checked analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/analysis.json), and [paired report](run/report.md).
+- [Single-process client profile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/client-1-0.cpuprofile), [server CPU](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/server-4-profile-top.txt), [server mutex](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/server-4-mutex-top.txt), and [allocation profile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/server-4-heap-top.txt).
+- [Executed harness and identity](https://github.com/chester-hill-solutions/stow-s3/tree/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/executed-source), [executed analyzer](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/analyze-diagnosis.mjs), [analyzer test result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/analysis-tests.txt), and [export verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/export.json).
+- [Retained binaries](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-put-diagnosis/run/retention.json) remain on the Railway results volume. The exact production source archive is retained from the preceding controlled comparison.
 
 Historical one-process competitor results remain useful as measurements of that setup,
 but do not establish each server's maximum capacity. Repeat MinIO, S3Proxy, RustFS,

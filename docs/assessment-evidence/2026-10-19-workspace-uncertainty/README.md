@@ -1,5 +1,8 @@
 # Workspace uncertainty qualification evidence — 2026-10-19
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 This directory holds the receipts for the
 [workspace uncertainty correction](../../reviews/2026-10-19-workspace-uncertainty.md),
 which closes C04 from the

@@ -1,10 +1,13 @@
 # Refreshed marketing comparisons — October 14, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The optimized Stow code was rebuilt and compared against pinned MinIO, S3Proxy
 and RustFS versions on Railway. All builds, tests, workloads, analysis and chart
 verification ran on Railway. The local website dataset now contains these results;
 the website has not been published. The private preview is in
-[preview/preview.html](preview/preview.html).
+[preview/preview.html](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/preview/preview.html).
 
 Startup and sampled server memory remain the clearest comparative strengths.
 Filesystem download rates were roughly level with MinIO in this resource-limited
@@ -87,16 +90,16 @@ previews with no browser errors. Compute was stopped after checksum-verified exp
 
 ## Evidence
 
-- [Marketing dataset](agent-storage.json), [previous dataset](previous-agent-storage.json)
-  and [separate-batch observations](previous-comparison.json). The latter are not
+- [Marketing dataset](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/agent-storage.json), [previous dataset](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/previous-agent-storage.json)
+  and [separate-batch observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/previous-comparison.json). The latter are not
   paired causal estimates; competitor rates also changed between batches.
-- [Complete run](comparison/run.json), [analysis](comparison/analysis.json),
-  [S3 suite](comparison/s3/suite.json), [S3 report](comparison/s3/report.md)
+- [Complete run](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/comparison/run.json), [analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/comparison/analysis.json),
+  [S3 suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/comparison/s3/suite.json), [S3 report](comparison/s3/report.md)
   and individual raw cases in `comparison/s3/`.
-- [Source manifest](source.json), [build identity](build-identity.json),
-  [chart source checksum](chart-source.json) and [export checksum](export.json).
-- [Cloud refresh controller](refresh.mjs), [controller status](status.json),
-  [site/build/browser log](refresh.log) and [chart verification](preview/receipt.json).
+- [Source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/source.json), [build identity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/build-identity.json),
+  [chart source checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/chart-source.json) and [export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/export.json).
+- [Cloud refresh controller](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/refresh.mjs), [controller status](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/status.json),
+  [site/build/browser log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/refresh.log) and [chart verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-marketing-comparison/preview/receipt.json).
 
 Source payload SHA-256:
 `bb32c46b5247d6f72192d2d381f70495a9de5a4d80eefbc3ebb3bbbffb398228`.

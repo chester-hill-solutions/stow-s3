@@ -1,5 +1,8 @@
 # Retain multipart accounting after ambiguous completion lookup
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `b070dea` on `codex/core-copy-quality`; a fresh fetch of `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This addresses the separate
 [completion lookup finding](../2026-10-15-s3-abort-recovery/README.md#next-confirmed-finding--ambiguous-completion-lookup-discards-retained-state).
@@ -32,14 +35,14 @@ lookup error. Successful completion does not enter this method. Ordinary confirm
 absence still frees capacity. No new read, lock, interface, dependency, public API
 or format is introduced; there is no new recovery mechanism.
 
-The exact earlier probe is retained [unchanged](raw/retained-probe.go.txt).
-Its replay [source](raw/original-probe.go.txt) makes RefreshUsage and the second
+The exact earlier probe is retained [unchanged](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/retained-probe.go.txt).
+Its replay [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/original-probe.go.txt) makes RefreshUsage and the second
 abort conditional on failure of the first abort; otherwise correcting recovery
 would make that unconditional second abort correctly report missing. The replay
 fails twice normally and twice under -race before production edits:
-[normal](raw/original-before.log), [race](raw/original-before-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/original-before.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/original-before-race.log).
 It passes twice in both modes afterward:
-[normal](raw/original-after.log), [race](raw/original-after-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/original-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/original-after-race.log).
 The permission fault was enforced on this host; these cases did not skip.
 
 ## Regression and validation evidence
@@ -55,18 +58,18 @@ faulted lookup, so a later confirmed-missing abort must also release that
 conservative reservation.
 
 The regressions fail twice against the original production code:
-[before](raw/before-tests.log). They pass twice after the one-condition fix,
-alongside relevant existing publication tests: [after](raw/after-tests.log).
+[before](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/before-tests.log). They pass twice after the one-condition fix,
+alongside relevant existing publication tests: [after](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/after-tests.log).
 Five focused race repetitions cover **100 new cases**:
-[race](raw/focused-race.log).
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/focused-race.log).
 
 Full Go tests, relevant runtime/storage/S3/run-through/embedded/public race suites,
-all four conformance profiles ([summary](raw/conformance-summary.log)), relevant
+all four conformance profiles ([summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/conformance-summary.log)), relevant
 vet, unchanged quality/file-size ratchets, source formatting, documentation links,
 generated-output verification, WASM smoke and seven package integration tests pass.
-[Full Go](raw/full-go.log), [broad race](raw/broad-race.log),
-[quality](raw/quality.log), [format/docs](raw/format-docs.log) and
-[package](raw/package-tests.log) outputs are retained. No ratchet baseline is raised.
+[Full Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/full-go.log), [broad race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/broad-race.log),
+[quality](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/quality.log), [format/docs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/format-docs.log) and
+[package](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/package-tests.log) outputs are retained. No ratchet baseline is raised.
 The temporary next-finding probe and dependency symlink are removed.
 Each conformance profile retains two existing skips: opt-in live upstream coverage
 and mirrored bucket creation awaiting an authority decision. None of the new
@@ -96,8 +99,8 @@ processor, then eight: six samples per version/case/configuration. These loops
 are serial even with GOMAXPROCS=8. No agent builds/tests run concurrently with
 measurements; other host activity is uncontrolled. Both passes, every sample and
 outlier, exact commands, binary digests and environment are retained:
-[environment](raw/benchmark-environment.json), [first pass](raw/measurements.json),
-[longer pass](raw/long-measurements.json).
+[environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/benchmark-environment.json), [first pass](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/measurements.json),
+[longer pass](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/long-measurements.json).
 
 The first pass uses 250,000 accounting iterations and 50,000 successful lifecycle
 iterations. The longer pass uses 1,000,000 and 500,000 respectively. The repeat
@@ -155,7 +158,7 @@ the timing uncertainty remains a qualification limit for this change.
 The compiled CompleteMultipartUpload instruction sequence has the same control
 flow/call targets and stack frame; its differences are address relocations,
 including a shifted string address. The added classification occurs only in the
-error reconciler. [Disassembly comparison](raw/completion-codegen-diff.log) supports
+error reconciler. [Disassembly comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/completion-codegen-diff.log) supports
 that successful completion adds no executed guard; it does not explain away the
 observed whole-lifecycle timing difference or establish performance parity.
 Other unchanged-behavior cases also show large median changes (including +47.6%
@@ -179,7 +182,7 @@ results gain an additional error-chain check, with no extra provider call. The
 runtime lock and context propagation remain unchanged.
 
 The refreshed packaged WASM remains **4,617,093 bytes (zero size change)**, with a
-new digest. [Artifact metadata](raw/wasm.json) records both digests; generated-output
+new digest. [Artifact metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/wasm.json) records both digests; generated-output
 verification, WASM smoke and package tests check the refreshed artifact.
 
 ## Next confirmed finding — ambiguous object HEAD strands quota
@@ -193,8 +196,8 @@ object. A healthy delete retry returns missing and cannot free the phantom quota
 a one-byte PUT to another key fails the object cap.
 
 Both orders reproduce twice normally and twice under -race, without a reported
-data race: [source](raw/next-head-ambiguity-probe.go.txt),
-[normal](raw/next-head-ambiguity.log), [race](raw/next-head-ambiguity-race.log).
+data race: [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/next-head-ambiguity-probe.go.txt),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/next-head-ambiguity.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-completion-lookup/raw/next-head-ambiguity-race.log).
 This is a deliberately injected ambiguous read result, not a claim that the
 built-in memory HEAD naturally emits committed mutation errors. The demonstrated
 failure is incorrect accounting and failed capacity reuse after actual deletion.

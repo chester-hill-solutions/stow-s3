@@ -1,10 +1,13 @@
 # Outbox full-journal read and decode cost — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Scope and product relevance
 
 This is a measurement-only change on top of `dfe17b0`. Production code, journal
 format and public APIs are unchanged. `origin/main` was refreshed before starting;
-the recorded baseline is in [baseline.json](2026-10-18-outbox-read-cost/raw/baseline.json).
+the recorded baseline is in [baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/baseline.json).
 
 Every file-backed provenance lookup/save reloads the journal under the existing
 process and filesystem locks. The decoder first constructs generated protobuf
@@ -24,7 +27,7 @@ All compilation, formatting, validation, profiling and benchmarking ran on the
 existing Railway scratch runner. Local work was source editing, Git, packaging
 and analysis of exported results. The runner used pinned Go 1.25.6 and Node
 25.9.0, a 4-CPU/4-GiB cgroup and its ext4 `/results` volume. The deployment,
-cgroup and host details are in [environment.json](2026-10-18-outbox-read-cost/raw/diagnostic-environment.json).
+cgroup and host details are in [environment.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/diagnostic-environment.json).
 CPU 1 and 4 are `GOMAXPROCS` settings; operations are serial, with no competing
 client processes. These are warm-file measurements, not cold-start, throughput,
 concurrency, end-to-end S3 latency or supported-capacity guarantees.
@@ -35,7 +38,7 @@ Each also contains one target provenance row. Keys, ETags and timestamps have
 fixed shapes matching the earlier provenance benchmarks. Larger journals are
 stress cases, not claims about typical deployments. Fixture creation happens in
 a separate process, keeping encoder construction out of benchmark RSS. Fixture
-sizes, row counts and initial hashes are retained in [fixtures.json](2026-10-18-outbox-read-cost/raw/fixtures.json).
+sizes, row counts and initial hashes are retained in [fixtures.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/fixtures.json).
 
 Six stages run in a separate process per fixture/stage/CPU combination, with two
 repetitions, a one-second Go benchmark minimum and allocation reporting. CPU-4
@@ -63,7 +66,7 @@ not an isolated per-operation memory increment. Each cell has its own process;
 the seed process is excluded. Read-only cells retain the previous read buffer
 through the next read; decode probes similarly retain the previous decoded result
 through the next decode. Measurements use normal runtime GC defaults; the selected
-[Go runtime settings](2026-10-18-outbox-read-cost/raw/runtime-settings.json) were recorded without credentials.
+[Go runtime settings](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/runtime-settings.json) were recorded without credentials.
 High-water values can vary substantially with calibration and GC history and
 need not grow monotonically across fixtures. They are observations, not a memory
 requirement or a bound for a real deployment.
@@ -101,8 +104,8 @@ Actual lookup medians; RSS is the maximum observed whole-process high water thro
 | 4 | mixed=1024 | 1.326 | 1,368,925 | 12,338 | 21.7 |
 | 4 | mixed=16384 | 17.501 | 22,149,053 | 196,794 | 87.7 |
 
-[Every observation](2026-10-18-outbox-read-cost/raw/samples.json), [medians and full ranges](2026-10-18-outbox-read-cost/raw/analysis.json)
-and [exact commands](2026-10-18-outbox-read-cost/raw/diagnostic-commands.json) include all stages and both CPU
+[Every observation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/samples.json), [medians and full ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/analysis.json)
+and [exact commands](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/diagnostic-commands.json) include all stages and both CPU
 settings. Two repetitions per cell are a diagnostic sample, not a statistical
 significance study. Results can change with storage, GC, contention, key/value
 sizes, pending-entry composition and deployment resources.
@@ -112,8 +115,8 @@ its quality gate because the benchmark helper exceeded the complexity ceiling.
 The helper was split into setup, measurement and verification functions, and the
 entire validation/matrix was repeated. No baseline was raised. The two cohorts
 have different benchmark instrumentation and are not pooled. Both remain evidence:
-[initial checks](2026-10-18-outbox-read-cost/raw/initial/checks.json), [initial observations](2026-10-18-outbox-read-cost/raw/initial/samples.json)
-and [initial ranges](2026-10-18-outbox-read-cost/raw/initial/analysis.json). There are **336 retained timing
+[initial checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/initial/checks.json), [initial observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/initial/samples.json)
+and [initial ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/initial/analysis.json). There are **336 retained timing
 observations** across both cohorts. Tables above use the final source only.
 
 ## Profiles and decision
@@ -122,9 +125,9 @@ CPU profiling uses an actual lookup at 65,536 extra provenance rows, CPU 1, with
 five-second minimum. Allocation profiling uses the 16,384-row actual lookup,
 20 timed iterations and `memprofilerate=1`, separately from timing observations.
 Allocation profiles include process setup/calibration and are not direct per-op
-estimates. [CPU profile top](2026-10-18-outbox-read-cost/raw/lookup-cpu-top.log),
-[allocated bytes](2026-10-18-outbox-read-cost/raw/lookup-alloc-space.log),
-[allocated objects](2026-10-18-outbox-read-cost/raw/lookup-alloc-objects.log) and the [CPU](2026-10-18-outbox-read-cost/raw/lookup-cpu.pprof) / [allocation](2026-10-18-outbox-read-cost/raw/lookup-alloc.pprof) profiles are
+estimates. [CPU profile top](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/lookup-cpu-top.log),
+[allocated bytes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/lookup-alloc-space.log),
+[allocated objects](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/lookup-alloc-objects.log) and the [CPU](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/lookup-cpu.pprof) / [allocation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/lookup-alloc.pprof) profiles are
 retained.
 
 Full decoding is the dominant remaining cost for large-journal lookups and
@@ -163,7 +166,7 @@ All 13 Railway stages passed: formatting, the full Go suite, broad storage/runti
 embedded/run-through/S3/public-package race tests, four conformance profiles, vet,
 quality/file-size/format gates, site build/tests, documentation links, and the
 measurement step. The measurement step also passed its 42-case race smoke.
-[Checks](2026-10-18-outbox-read-cost/raw/checks.json) record commands and results; [source hashes](2026-10-18-outbox-read-cost/raw/environment.json)
+[Checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/checks.json) record commands and results; [source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/environment.json)
 bind them to the exact benchmark and production source. The source manifest records
 the uploaded tree before Railway formatting; the final source hashes record the
 formatted benchmark returned to the local worktree.
@@ -176,4 +179,4 @@ Benchmark binaries and fixtures were deleted after their metadata/profiles were
 saved. All raw observations and the harness are retained. The report is checked
 on Railway against the already validated source hashes before the runner stops.
 
-[Artifact manifest](2026-10-18-outbox-read-cost/raw/artifact-manifest.json) records the retained files and hashes.
+[Artifact manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-read-cost/raw/artifact-manifest.json) records the retained files and hashes.

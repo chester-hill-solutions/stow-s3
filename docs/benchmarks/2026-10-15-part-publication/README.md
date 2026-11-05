@@ -1,5 +1,8 @@
 # Committed part uploads retain their identity and byte reservation
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `b7eff79` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. Earlier completed corrections
 are retained. This addresses the committed-part finding in the
@@ -18,12 +21,12 @@ A subsequent four-byte PUT to the same target succeeded with `MaxBytes: 4`:
 **eight actual bytes remained stored under a four-byte cap**. Object usage reports
 four bytes / one object; part bytes belong in the separate reservation accounting.
 The original probe fails twice normally and twice under the race detector before
-production changes: [normal](raw/original-before.log),
-[race](raw/original-before-race.log). It now passes twice in each mode:
-[normal](raw/original-after.log), [race](raw/original-after-race.log).
+production changes: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/original-before.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/original-before-race.log). It now passes twice in each mode:
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/original-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/original-after-race.log).
 
 The finalized regression harness also ran twice before changing production:
-[original failures](raw/before-tests.log). Six native and six custom committed
+[original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/before-tests.log). Six native and six custom committed
 cases plus the HTTP quota check fail per repetition; success and ordinary-refusal
 cases pass. Native tests independently expose lost identity, stale reservations
 of zero/two/six bytes after publishing a four-byte replacement, incorrect admission
@@ -71,7 +74,7 @@ All twenty-five cases pass twice normally and five times under the race detector
 embedded/public-API race suites, and all four conformance profiles pass. Relevant
 vet, existing quality/file-size ratchets, formatting/diff checks, generated-output
 verification, WASM smoke and seven package integration tests pass. Actual logs are
-retained in `raw`; the [conformance summary](raw/conformance-summary.log) records
+retained in `raw`; the [conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/conformance-summary.log) records
 each backend profile. Intentionally failing probes were removed before the broad
 suites.
 
@@ -92,8 +95,8 @@ candidate/baseline blocks each contain three fixed 50,000-operation samples, fir
 with one Go processor and then eight: six samples per version/case/processor count.
 No agent tests or builds ran concurrently. Other host activity is uncontrolled.
 All samples, binary hashes and commands are retained in
-[measurements](raw/measurements.json) and
-[environment metadata](raw/benchmark-environment.json).
+[measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/measurements.json) and
+[environment metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/benchmark-environment.json).
 
 | Case | Median before → after | Timing change | Allocations before → after |
 |---|---:|---:|---:|
@@ -128,7 +131,7 @@ primitives, with no identified new storage operation. Disassembly confirms
 stack frame and the same map-operation call targets. No cause for the success
 latency difference was established. The correction is not presented as latency
 neutral; no speculative optimization is introduced to explain away the data.
-[Diagnostic metadata](raw/performance-diagnostics.json), raw benchmark/profile-top
+[Diagnostic metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/performance-diagnostics.json), raw benchmark/profile-top
 logs and both `finishPart` disassemblies are retained. Profile timing differs from
 the earlier runs, so the diagnostic pair does not supersede the adverse medians.
 
@@ -149,7 +152,7 @@ part buffering and limits remain unchanged. No optimization, filesystem indexing
 checkpointing or new storage abstraction is proposed.
 
 The rebuilt packaged WASM remains **4,617,032 bytes**, with a changed digest:
-[artifact comparison](raw/wasm.json).
+[artifact comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/wasm.json).
 
 ## Next confirmed finding — committed initiation bypasses the session cap
 
@@ -162,8 +165,8 @@ then contains **two real uploads at a one-upload cap**, with two provider calls.
 No external writer, concurrency or payload failure is needed.
 
 It reproduces twice normally and twice under `-race`, without a reported data
-race: [source](raw/next-initiation-probe.go.txt),
-[normal](raw/next-initiation-probe.log), [race](raw/next-initiation-probe-race.log).
+race: [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/next-initiation-probe.go.txt),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/next-initiation-probe.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-part-publication/raw/next-initiation-probe-race.log).
 Copy the text temporarily to `pkg/stow/initiation_review_probe_test.go` and run
 only `TestReviewCommittedInitiationQuota` with `-count=2`, optionally `-race`, then
 remove it. It reuses this change's public fixture, replacing the old fixture's

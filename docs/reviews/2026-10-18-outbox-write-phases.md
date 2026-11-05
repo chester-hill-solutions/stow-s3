@@ -1,5 +1,8 @@
 # Outbox write phases on the Railway persistent volume — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Outcome
 
 Keep the occupied-ID correctness guard. Its explicit-ID memory cost is measurable:
@@ -22,7 +25,7 @@ format or public product API is added.
 The working baseline is `c32db46da7365256463c052cd57f95373679777b`.
 `origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
 The pre-admission source is `49eaa807bb8a4e97979d83568ba5f6937ddc1000`.
-Exact refs are in [baseline.json](2026-10-18-outbox-write-phases/raw/baseline.json).
+Exact refs are in [baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/baseline.json).
 The previous goal turn committed the correctness change and its verified evidence;
 this turn supplies measurements needed before choosing the next optimization.
 
@@ -41,7 +44,7 @@ All execution occurs on the already-authorized Railway scratch service
 `3cd200cb-c94f-4e4d-9335-0f6c1b7e9411`, deployment
 `e2aa1875-8a12-48ab-a612-c69b1f1c4e50`. Go 1.25.6, Node 25.9.0, GOMAXPROCS 4,
 4 CPU/4 GiB cgroup, UID 10001. TMPDIR is explicitly under the ext4 `/results`
-volume; [filesystem metadata](2026-10-18-outbox-write-phases/raw/main/fixture-filesystem.json) records the actual
+volume; [filesystem metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/main/fixture-filesystem.json) records the actual
 path and statfs type. No benchmark runs on the local computer. Local actions are
 reads, edits, packaging, Git, hashing and exported-data analysis.
 
@@ -87,8 +90,8 @@ Pooled medians need not equal block medians. Do not infer significance, eliminat
 adverse samples or declare a zero implementation effect from this small set of
 processes. The larger earlier slowdown is not reproduced at the same magnitude;
 positive medians still remain and require caution.
-[All raw observations, ranges, allocations and block calculations](2026-10-18-outbox-write-phases/raw/main/analysis.json)
-and [commands, order and binary hashes](2026-10-18-outbox-write-phases/raw/main/comparison-runs.json) are retained.
+[All raw observations, ranges, allocations and block calculations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/main/analysis.json)
+and [commands, order and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/main/comparison-runs.json) are retained.
 
 ## Phase measurements
 
@@ -132,8 +135,8 @@ The observations localize dominant variation to filesystem publication, but do n
 prove the implementation has no effect on filesystem scheduling or establish
 steady-state provider latency. The nanosecond-scale memory admission cost is real.
 The original adverse result remains visible rather than being classified away as
-noise. [Paired summaries and per-process statistics](2026-10-18-outbox-write-phases/raw/paired/paired-analysis.json)
-and [paired commands and hashes](2026-10-18-outbox-write-phases/raw/paired/comparison-runs.json) are separate.
+noise. [Paired summaries and per-process statistics](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/paired/paired-analysis.json)
+and [paired commands and hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/paired/comparison-runs.json) are separate.
 
 ## Component allocations
 
@@ -165,9 +168,9 @@ but its isolated cost is not comparative proof for a particular optimization.
 Both Railway jobs completed successfully: seven main stages and four paired
 stages. Current run-through/atomic-file suites pass normally and under race.
 The instrumented current suites also pass normally and under race, including
-retained-state reopen assertions. [Main checks](2026-10-18-outbox-write-phases/raw/main/checks.json),
-[overlay checks](2026-10-18-outbox-write-phases/raw/main/post-checks.json) and [paired checks](2026-10-18-outbox-write-phases/raw/paired/checks.json)
-retain exact commands. [Source verification](2026-10-18-outbox-write-phases/raw/main/product-source-verification.json)
+retained-state reopen assertions. [Main checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/main/checks.json),
+[overlay checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/main/post-checks.json) and [paired checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/paired/checks.json)
+retain exact commands. [Source verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-phases/raw/main/product-source-verification.json)
 checks all 695 Go/module files against the deployed input manifest; collection
 also checks these hashes against the current worktree. The product Go files remain
 byte-identical to the already conformance-qualified correctness commit; no product

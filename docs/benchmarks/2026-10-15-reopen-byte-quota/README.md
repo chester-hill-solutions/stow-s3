@@ -1,5 +1,8 @@
 # Reopen enforces the combined byte quota
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Follow-up: the object-count finding at the end of this report is corrected in
 [the next independent change](../2026-10-15-reopen-object-quota/README.md).
 
@@ -31,8 +34,8 @@ Before the correction, seven cases failed per run, reproduced twice. Afterward,
 all cases pass. Refusal preserves the object and upload. Reopening the same store
 at an adequate cap retains both the object bytes and part identity, still charges
 parts against new writes, and can complete the original multipart payload after
-freeing the old object's space. See [before failures](raw/before-tests.log) and
-[repeated race results](raw/after-tests.log).
+freeing the old object's space. See [before failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/before-tests.log) and
+[repeated race results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/after-tests.log).
 
 ## Comparative measurements
 
@@ -40,8 +43,8 @@ Apple M1 Pro, macOS 14.5 ARM64, Go 1.25.6. Standalone baseline/candidate test
 binaries use the same benchmark code. Runs were serial, ordered baseline,
 candidate, candidate, baseline, with three samples per benchmark per block
 (**six samples per version**). No build or validation suite ran concurrently.
-Binary hashes and host details are in [metadata](raw/metadata.json); all numerical
-samples, ranges and medians are in [measurements](raw/measurements.json).
+Binary hashes and host details are in [metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/metadata.json); all numerical
+samples, ranges and medians are in [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/measurements.json).
 
 | Benchmark | Before median | After median | Allocations before → after |
 |---|---:|---:|---|
@@ -64,7 +67,7 @@ payload-sized allocation was introduced.
 
 The only additional runtime work is one subtraction per reconciliation. The
 packaged WASM was rebuilt and grows from 4,615,854 to 4,615,863 bytes (**+9**);
-[hashes](raw/wasm.json) identify both artifacts. The compatibility change is
+[hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/wasm.json) identify both artifacts. The compatibility change is
 intentional: a reopen whose combined data exceeds the requested cap now returns
 `ErrQuotaExceeded`. Reopen with sufficient capacity to recover or remove data;
 the refused open does not prune objects or uploads.
@@ -80,8 +83,8 @@ the refused open does not prune objects or uploads.
 - Rebuilt WASM smoke test, seven packaged runtime tests, and generated artifact
   verification.
 
-The [raw evidence](raw/full-go.log), [race output](raw/race.log),
-[conformance summary](raw/conformance-summary.log) and packaged-runtime logs in
+The [raw evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/full-go.log), [race output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/race.log),
+[conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/conformance-summary.log) and packaged-runtime logs in
 `raw` record these checks. The existing full doc-link check still reports six
 missing built website targets in unchanged `site/agent.md`; new report links pass.
 
@@ -95,9 +98,9 @@ final check compares the two subtotals separately. The current byte correction
 does not affect this object-count check.
 
 This was reproduced twice with the corrected `state.go` in the temporary checkout.
-The [probe source](raw/next-object-quota-probe.go.txt),
-[failure output](raw/next-object-quota-probe.log), and
-[source hashes](raw/next-probe-source.json) are retained. It is an admission-contract
+The [probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/next-object-quota-probe.go.txt),
+[failure output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/next-object-quota-probe.log), and
+[source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-byte-quota/raw/next-probe-source.json) are retained. It is an admission-contract
 violation; no data loss was demonstrated. No object-count fix is included here.
 The next change should enforce the combined object-slot budget, test both bucket
 orders and repeated targets, and preserve uploads when an open is refused.

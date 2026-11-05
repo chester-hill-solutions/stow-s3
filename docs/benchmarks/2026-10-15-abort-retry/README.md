@@ -1,5 +1,8 @@
 # Direct abort retry reconciles confirmed upload absence
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `18aab69` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. Previous corrections are
 retained. This implements the direct-runtime finding from the
@@ -19,10 +22,10 @@ The first conservative response is correct; ignoring the later confirmation is n
 This fault model does not claim that built-in memory aborts ordinarily lose replies.
 
 The exact retained probe fails twice normally and twice under the race detector
-before production edits: [normal](raw/original-before.log),
-[race](raw/original-before-race.log), [source](raw/original-probe.go.txt).
+before production edits: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/original-before.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/original-before-race.log), [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/original-probe.go.txt).
 It passes twice in each mode after correction:
-[normal](raw/original-after.log), [race](raw/original-after-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/original-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/original-after-race.log).
 
 There are two small production changes:
 
@@ -64,7 +67,7 @@ same target and releases the final reservation after remaining aborts.
 The concurrent regression starts two direct retries together after one uncertain
 abort. Both return missing; exactly one reaches the provider, cleanup happens once,
 all counters reach zero, and full capacity is reusable. It also fails twice against
-the baseline accounting implementation ([original failure](raw/concurrent-before.log)).
+the baseline accounting implementation ([original failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/concurrent-before.log)).
 
 Eight adapter cases cover success, raw/wrapped public missing, internal missing,
 unknown failure, refusal and both committed/missing join orders. Four public
@@ -74,7 +77,7 @@ not an added production read. Tests assert conservative first-response admission
 absence/error mapping, exact chain preservation, unchanged object bytes/Usage,
 no provider work on further repeats, and reusable full byte/object/session capacity.
 
-The finalized pre-implementation matrix's [failure log](raw/before-tests.log)
+The finalized pre-implementation matrix's [failure log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/before-tests.log)
 shows native missing retries, shared-target recovery, public missing translation
 and public capacity reuse failing. Refusal/unknown controls pass. The concurrent
 red check separately restores only baseline accounting for that native test and
@@ -82,9 +85,9 @@ restores the candidate in a finally block before other validation.
 
 All **22 new cases** and **18 previous abort-publication cases** pass twice
 normally and five times under -race: **200 focused race cases**
-([normal](raw/after-tests.log), [race](raw/focused-race.log)). Full Go tests,
+([normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/after-tests.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/focused-race.log)). Full Go tests,
 relevant runtime/storage/S3/run-through/embedded/public race suites, all four
-conformance profiles ([summary](raw/conformance-summary.log)), relevant vet,
+conformance profiles ([summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/conformance-summary.log)), relevant vet,
 existing quality and file-size ratchets, formatting/diff checks, documentation
 links, generated-output verification, WASM smoke and seven package integration
 tests pass. Intentionally failing next-finding probes are removed before broad
@@ -119,7 +122,7 @@ six samples per version/case/processor count. Native samples use 500,000 fixed
 iterations, public samples 50,000. No agent builds/tests run concurrently with the
 measurements; other host activity is uncontrolled. These benchmarks are serial
 even with GOMAXPROCS=8. Commands, all samples and outliers are retained in raw logs,
-[measurements](raw/measurements.json) and [binary/host metadata](raw/benchmark-environment.json).
+[measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/measurements.json) and [binary/host metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/benchmark-environment.json).
 
 | Benchmark | Processors | Median ns/op before → after | Change | Before range | After range |
 |---|---:|---:|---:|---:|---:|
@@ -157,7 +160,7 @@ per block and 50,000 iterations. One-processor medians are **3,581.5 → 3,907 n
 (+9.1%)**, with ranges 3,450–6,129 before and 3,435–6,017 after. Eight-processor
 medians are **3,489 → 3,042 ns (−12.8%)**, with ranges 2,917–4,998 before and
 2,967–3,269 after. All repeat samples are retained in raw logs and
-[repeat measurements](raw/repeat-measurements.json). Allocations stay 32/3,752 B
+[repeat measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/repeat-measurements.json). Allocations stay 32/3,752 B
 at one processor and 33/3,753 B before versus 33/3,753–3,754 B after at eight.
 
 The one-processor median is higher in both runs (+4.2%, +9.1%); the eight-processor
@@ -169,7 +172,7 @@ performance concerns are not considered resolved. No buffering/indexing/checkpoi
 optimization is proposed.
 
 The rebuilt packaged WASM remains **4,617,032 bytes**, with a changed digest:
-[artifact comparison](raw/wasm.json).
+[artifact comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/wasm.json).
 
 ## Next confirmed finding — S3 validation bypasses this recovery path
 
@@ -184,8 +187,8 @@ entry, verifies actual upload/part data is gone, and demonstrates that full-capa
 PUT and new initiation remain refused.
 
 This reproduces twice normally and twice under -race, without reported data races:
-[source](raw/next-s3-abort-retry-probe.go.txt),
-[normal](raw/next-s3-abort-retry-probe.log), [race](raw/next-s3-abort-retry-probe-race.log).
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/next-s3-abort-retry-probe.go.txt),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/next-s3-abort-retry-probe.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-abort-retry/raw/next-s3-abort-retry-probe-race.log).
 The current correction is deliberately limited to direct abort results and their
 public adapter; it does not claim HTTP retry reconciliation is solved.
 

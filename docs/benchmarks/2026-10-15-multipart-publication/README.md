@@ -1,5 +1,8 @@
 # Multipart completion preserves a committed publication
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `2c100c3` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This corrects **F1** from the
 [codebase review](../../reviews/2026-10-15-codebase-map.md). F2–F4 remain open.
@@ -15,7 +18,7 @@ The [original review probe](../../reviews/2026-10-15-codebase-map/runtime_probe.
 reproduced this twice normally and twice under the race detector before this fix.
 
 The new regression also reproduced the panic twice before implementation:
-[baseline failures](raw/before-tests.log). A second fixture makes the upload
+[baseline failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-publication/raw/before-tests.log). A second fixture makes the upload
 directory non-writable, forcing cleanup failure after successful publication;
 completion previously returned nil metadata and an ordinary error for that
 committed object. This permission fixture ran on this host; it skips for root or
@@ -24,7 +27,7 @@ hosts that do not enforce directory permissions.
 Preserving metadata alone was insufficient: an intermediate implementation
 prevented the panic but released all part reservations while upload files remained
 on disk. Both failure fixtures demonstrated that under-accounting:
-[backend-only failures](raw/backend-only-tests.log).
+[backend-only failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-publication/raw/backend-only-tests.log).
 
 ## Small correction
 
@@ -71,7 +74,7 @@ this small sample does not establish latency parity or a statistically reliable
 slowdown. It is no speedup claim. Allocation ranges overlap. Production adds
 branches on success and one upload lookup plus error handling only on committed
 failure. There is no new payload buffering. All samples and binary hashes are in
-[measurements](raw/measurements.json); [WASM hashes](raw/wasm.json) record the
+[measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-publication/raw/measurements.json); [WASM hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-multipart-publication/raw/wasm.json) record the
 45-byte artifact increase.
 
 Post-publication cleanup errors now report `ErrMutationCommitted` and known

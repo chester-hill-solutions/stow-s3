@@ -792,7 +792,20 @@ See the [step vocabulary](docs/workspace-contract-steps.md) for case fields.
 `make check-generated` compares tracked WASM and TypeScript output with a fresh build.
 To update the toolchain, change both version files, rebuild, and commit the output.
 
-The repository contains the Go server, storage backends, runtime packages, WebAssembly bridge, TypeScript package, Python package, and shared conformance tests.
+### Repository map
+
+| Folder | Contents |
+| --- | --- |
+| [cmd/](cmd) | Native server and WebAssembly entry points |
+| [pkg/stow/](pkg/stow) | Public Go API |
+| [internal/](internal) | Storage backends, protocol handling and runtime internals |
+| [packages/](packages) | TypeScript, Python and native platform packages |
+| [conformance/](conformance) | Shared compatibility and workspace cases |
+| [examples/](examples) and [extensions/](extensions) | Runnable integrations and the optional MCP browser |
+| [docs/](docs/README.md) | Guides, contracts, API reference and release notes |
+| [docs/history/](docs/history/README.md) | Dated release checks, assessments and retired plans |
+| [site/](site/README.md) | Marketing website and documentation renderer |
+| [benchmark/](benchmark/README.md) and [scripts/](scripts) | Measurement harnesses and project checks |
 
 Measure session startup, first upload, request latency, memory scaling, parallel
 connections and sessions, and the workspace handoff/checkpoint lifecycle with:
@@ -806,9 +819,9 @@ This is measurement rather than a gate, so it is deliberately not part of
 loopback binding; workspace measurements run through the TypeScript wrapper and
 native CLI. To capture the workspace CLI's high-water RSS separately, run
 `node packages/stow-s3/scripts/benchmark-workspace.mjs --memory-only`. The
-recorded machine-specific baseline and raw JSON are in
-`docs/benchmarks/2026-09-27/`; the older session memory experiments remain in
-`docs/benchmarks/session-baseline.md`.
+recorded machine-specific reports are in the [benchmark index](docs/benchmarks/README.md).
+Historical raw output is recoverable from the [evidence archive](docs/evidence-archive.md).
+The session memory baseline remains in [session-baseline.md](docs/benchmarks/session-baseline.md).
 <!-- repo-only:end -->
 ## License
 

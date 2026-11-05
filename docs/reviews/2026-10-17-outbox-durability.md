@@ -1,5 +1,8 @@
 # Return outbox durability failures and measure journal save cost
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Follow-up: [protobuf outbox measurements and implementation](2026-10-17-outbox-protobuf.md).
 
 Outbox persistence reported success after replacing its journal even when opening
@@ -12,7 +15,7 @@ full-rewrite cost; no unchanged-save optimization is included.
 The starting revision is `e95d66c` (the completed cache-admission optimization).
 A fresh fetch reports `origin/main` at
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Exact baseline](2026-10-17-outbox-durability/raw/baseline.json).
+[Exact baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/baseline.json).
 Prior COPY, recovery, listing and cache work is retained. This is one correctness
 change, discovered while measuring the next performance finding.
 
@@ -30,7 +33,7 @@ On the original implementation, provenance save, enqueue, prepare, commit,
 acknowledge and close all return success. Adapter, runtime and HEAD reads also
 return success without a completed provenance fence. The assertions fail twice
 normally and twice under race before production changes:
-[original normal failure](2026-10-17-outbox-durability/raw/fence-regression/reproduce-fence.log), [original race failure](2026-10-17-outbox-durability/raw/fence-regression/reproduce-fence-race.log).
+[original normal failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/fence-regression/reproduce-fence.log), [original race failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/fence-regression/reproduce-fence-race.log).
 
 The final regression additionally requires the acknowledged in-memory snapshot to
 remain unchanged after the error. Once permissions recover, reopening must read
@@ -45,7 +48,7 @@ normally and twice under race without skips on Railway.
 The initial investigation also retained a failing diagnostic that an unchanged
 provenance save replaces the journal inode. That is a measured performance property,
 not an existing no-rewrite contract. The diagnostic is absent from the final tests:
-[initial rewrite diagnostic](2026-10-17-outbox-durability/raw/rewrite-diagnostic/reproduce.log). Existing outbox race controls passed on that baseline.
+[initial rewrite diagnostic](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/rewrite-diagnostic/reproduce.log). Existing outbox race controls passed on that baseline.
 
 ## Small implementation change and contracts
 
@@ -92,7 +95,7 @@ CPU labels mean GOMAXPROCS, not affinity or concurrent clients.
 
 ### Original cost and identical-binary control
 
-[Plan](2026-10-17-outbox-durability/raw/baseline-identical/plan.json), [identical binary hashes](2026-10-17-outbox-durability/raw/baseline-identical/build.json), [samples](2026-10-17-outbox-durability/raw/baseline-identical/samples.json), [all ranges](2026-10-17-outbox-durability/raw/baseline-identical/summary.json).
+[Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/baseline-identical/plan.json), [identical binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/baseline-identical/build.json), [samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/baseline-identical/samples.json), [all ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/baseline-identical/summary.json).
 The 80 observations use a 100-ms minimum and forward/reverse ordering. Both labels
 copy exactly the same binary (identical SHA-256); each row below pools the four
 observations. Shared-storage latency varies substantially: the largest CPU-4 case
@@ -122,7 +125,7 @@ individual CPU shares or measure lock contention. Those hypotheses remain open.
 
 ### Correctness fix: before/after costs
 
-[Plan](2026-10-17-outbox-durability/raw/final-timings/plan.json), [source/binary hashes](2026-10-17-outbox-durability/raw/final-timings/build.json), [all samples](2026-10-17-outbox-durability/raw/final-timings/samples.json), [all ranges](2026-10-17-outbox-durability/raw/final-timings/summary.json), [resources/load](2026-10-17-outbox-durability/raw/final-timings/block-resources.json).
+[Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-timings/plan.json), [source/binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-timings/build.json), [all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-timings/samples.json), [all ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-timings/summary.json), [resources/load](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-timings/block-resources.json).
 There are 320 final observations: ABBA and BAAB cycles, two repetitions per block,
 200-ms minimum, eight observations per workload/version/CPU. Both binaries use
 identical final tests; the baseline overlays only `file_outbox.go` from the starting
@@ -174,7 +177,7 @@ The initial comparison's six slower medians warranted a longer run. This separat
 cohort uses identical source and ABBA/BAAB ordering, a one-second minimum and
 two repetitions per block, retaining 160 additional observations. It covers all
 five unchanged-save workloads at both CPU settings and is not pooled with the
-shorter cohort: [Plan](2026-10-17-outbox-durability/raw/long-unchanged/plan.json), [source/binary hashes](2026-10-17-outbox-durability/raw/long-unchanged/build.json), [all samples](2026-10-17-outbox-durability/raw/long-unchanged/samples.json), [all ranges and allocations](2026-10-17-outbox-durability/raw/long-unchanged/summary.json), [resources/load](2026-10-17-outbox-durability/raw/long-unchanged/block-resources.json).
+shorter cohort: [Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/long-unchanged/plan.json), [source/binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/long-unchanged/build.json), [all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/long-unchanged/samples.json), [all ranges and allocations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/long-unchanged/summary.json), [resources/load](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/long-unchanged/block-resources.json).
 
 | CPU | Unchanged save | Median ms before → after | Change | Before range ms | After range ms |
 |---|---|---:|---:|---:|---:|
@@ -202,7 +205,7 @@ update from storage variation remains unmeasured. The complete 560 observations
 ## Validation and evidence
 
 The complete final validation matrix passed on Railway:
-[Commands/results](2026-10-17-outbox-durability/raw/final-checks/checks.json), [exact source hashes](2026-10-17-outbox-durability/raw/final-checks/environment.json), [export receipt](2026-10-17-outbox-durability/raw/final-checks/export-receipt.json).
+[Commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-checks/checks.json), [exact source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-checks/environment.json), [export receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-checks/export-receipt.json).
 
 | Check | Exit | Seconds |
 |---|---:|---:|
@@ -226,7 +229,7 @@ race pass covers storage, runtime, embedded, run-through, S3 and the public pack
 Conformance runs memory, filesystem, runtime-memory and runtime-filesystem profiles.
 The full Go suite includes the existing shared atomic-writer tests. Quality and
 file-size baselines are unchanged. Final report/document checks also run on Railway:
-[report receipt](2026-10-17-outbox-durability/raw/final-checks/report-receipt.json).
+[report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/final-checks/report-receipt.json).
 
 Raw logs, plans, formatted source snapshots, build/source/binary hashes, resource
 snapshots and length/SHA-256-verified export receipts are retained. Test binaries
@@ -234,7 +237,7 @@ are not committed. The initial tracked-source manifest records the upload before
 the staged source edits; each later job records its own final changed-source hashes.
 The evidence includes expected failed regression commands, not suppressed failures.
 The runner is stopped after export; the benchmark target remains untouched:
-[verified service status](2026-10-17-outbox-durability/raw/runner-stop-status.json).
+[verified service status](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-durability/raw/runner-stop-status.json).
 
 ## Next finding, not implemented
 

@@ -1,5 +1,8 @@
 # Single-key outbox lookup allocation review
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Date: 2026-10-17 (Toronto; Railway receipts use UTC).
 Baseline: `a56510419d06adc3f561a6e8c354aae22153d193` on `codex/core-copy-quality`; freshly fetched
 `origin/main` is `219d1dcfff9807b04660a40313b32127e5be2933`. The worktree started clean.
@@ -18,7 +21,7 @@ The profile includes fixture setup and benchmark calibration. It samples every
 allocation and imposes substantial timing overhead; its latency is excluded from
 the comparison below. Most allocated objects came from protobuf decoding, so
 removing the clone should save bytes while leaving most allocation counts intact.
-See the [original profile](2026-10-17-outbox-lookup/raw/baseline-profile/lookup-profile.log).
+See the [original profile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/baseline-profile/lookup-profile.log).
 
 ## Change and preserved contracts
 
@@ -45,7 +48,7 @@ The actual `BenchmarkFileOutboxLookup` operation is unchanged. Original binaries
 overlay only `file_outbox.go` and `provenance.go` from the baseline commit; candidate
 binaries use the final implementation. Both use identical final test/benchmark
 fixtures and build flags. Source and binary hashes are retained in
-[build metadata](2026-10-17-outbox-lookup/raw/lookup-comparison/build.json).
+[build metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/lookup-comparison/build.json).
 
 There are **160 observations**: five shapes × two variants × two CPU settings ×
 eight observations per cell. For each CPU setting, ABBA and BAAB blocks each run
@@ -79,10 +82,10 @@ these medians do not establish statistical significance or cold-cache performanc
 
 Adverse latency medians: none in this cohort.
 
-[All observations](2026-10-17-outbox-lookup/raw/lookup-comparison/samples.json),
-[medians and ranges](2026-10-17-outbox-lookup/raw/lookup-comparison/analysis.json),
-[per-block resources](2026-10-17-outbox-lookup/raw/lookup-comparison/block-resources.json),
-and [final allocation profile](2026-10-17-outbox-lookup/raw/final-profile/lookup-profile.log).
+[All observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/lookup-comparison/samples.json),
+[medians and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/lookup-comparison/analysis.json),
+[per-block resources](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/lookup-comparison/block-resources.json),
+and [final allocation profile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/final-profile/lookup-profile.log).
 The final profile attributes only 288 bytes to cloning during fixture setup;
 lookup calls no longer clone the maps.
 
@@ -93,7 +96,7 @@ and twice under race detection; the complete Go suite; broad storage/runtime/
 embedded/run-through/S3/public-package race tests; all four conformance profiles
 (memory, filesystem, runtime-memory and runtime-filesystem); vet; quality,
 file-size and formatting gates; site build, site tests and documentation links.
-See [final checks](2026-10-17-outbox-lookup/raw/source-checks/checks.json).
+See [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/source-checks/checks.json).
 
 The initial quality check rejected complex new test functions. Test setup and
 repeated read/write loops were simplified; production source did not change, and
@@ -110,7 +113,7 @@ compilation, formatting, tests and measurements ran on Railway.
 
 The final report and retained evidence are also checked on Railway against exact
 source and document hashes; see the
-[report receipt](2026-10-17-outbox-lookup/raw/source-checks/report-receipt.json).
+[report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/source-checks/report-receipt.json).
 The scratch runner is stopped after evidence export.
 
 ## Next highest-priority finding
@@ -123,8 +126,8 @@ recovery state and resets intent identity.
 
 An isolated test overlay reproduced all four cases twice normally and twice under
 race detection on Railway. Failures are assertion failures, with no compile failure
-or race report. See the [normal reproduction](2026-10-17-outbox-lookup/raw/next-finding/empty-journal-normal.log)
-and [race reproduction](2026-10-17-outbox-lookup/raw/next-finding/empty-journal-race.log).
+or race report. See the [normal reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/next-finding/empty-journal-normal.log)
+and [race reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-lookup/raw/next-finding/empty-journal-race.log).
 The reproduction source is retained as evidence; it is not added as a failing test
 to the passing suite. This finding is **not fixed by the lookup change** and takes
 priority over avoiding unchanged-save rewrites. Missing-path initialization must

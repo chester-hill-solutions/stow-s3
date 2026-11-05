@@ -1,5 +1,8 @@
 # Custom multipart completion preserves committed results and cleanup accounting
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `26262a5` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. Earlier completed corrections
 are retained. This addresses the custom multipart completion finding from the
@@ -17,7 +20,7 @@ zero objects, or three bytes / one object when overwriting `old`.
 The deterministic regression ran twice before changing production. Eight
 committed-outcome cases per run panic after publication; the HTTP case also
 panics. The baseline also exposes a distinct missing-upload sentinel mismatch:
-[original output](raw/before-tests.log). The final regression adds a conservative
+[original output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/before-tests.log). The final regression adds a conservative
 lookup-error case beyond that initial matrix.
 
 Preserving the completion result alone stops the panic but exposes the cleanup
@@ -25,10 +28,10 @@ accounting issue. When the custom store has removed the upload, its public
 `ErrObjectNotFound` is not the internal `ErrUploadNotFound` expected by runtime
 reconciliation. Removed parts remain charged and an eight-byte overwrite is
 incorrectly refused at an eight-byte cap:
-[isolated output with the finalized harness](raw/metadata-only-final-harness.log).
+[isolated output with the finalized harness](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/metadata-only-final-harness.log).
 That isolation temporarily withholds only the missing-error mapping. Restoring
 the exact implementation makes the same cases pass:
-[final focused output](raw/final-focused.log). Earlier intermediate development
+[final focused output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/final-focused.log). Earlier intermediate development
 output is also retained in `raw`.
 
 The production diff is five added lines and two removed lines in the existing
@@ -72,7 +75,7 @@ The full Go suite, relevant runtime/storage/S3/run-through/embedded/public-API r
 suites, and all four conformance profiles pass. Relevant vet, Go quality and
 file-size ratchets, formatting/diff checks, generated-output verification, WASM
 smoke and seven package integration tests pass. Logs are retained in `raw`;
-[conformance summary](raw/conformance-summary.log) records all four profiles.
+[conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/conformance-summary.log) records all four profiles.
 
 ## Comparative cost evidence
 
@@ -116,8 +119,8 @@ Successful allocation counts remain 59 in every clean sample. At one processor,
 both versions allocate exactly 51,882 B/op; at eight processors, the initial
 ranges are 51,904–51,908 before and 51,903–51,908 after. These are cumulative
 allocation totals, not peak heap or RSS. All samples, commands, environment and
-binary hashes are retained in [measurements](raw/measurements.json) and
-[environment metadata](raw/benchmark-environment.json), alongside raw logs.
+binary hashes are retained in [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/measurements.json) and
+[environment metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/benchmark-environment.json), alongside raw logs.
 
 The newly working committed-error path converts and clones the known metadata
 and reaches the runtime's existing reconciliation lookup. Those operations were
@@ -128,7 +131,7 @@ lookup or payload buffer. No resource-limit relaxation, optimization, indexing,
 checkpointing, dependency, storage format, abstraction or public API is added.
 
 The rebuilt packaged WASM remains **4,617,032 bytes**, with a changed digest:
-[before/after artifact hashes](raw/wasm.json).
+[before/after artifact hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/wasm.json).
 
 ## Next confirmed finding — committed parts escape byte quota
 
@@ -141,8 +144,8 @@ four object bytes plus four retained part bytes: **eight actual bytes under a
 four-byte cap**, with reported object usage four bytes / one object.
 
 It reproduces twice normally and twice under `-race`, without a reported data
-race: [probe](raw/next-part-probe.go.txt), [normal](raw/next-part-probe.log),
-[race](raw/next-part-probe-race.log). Copy the text temporarily to
+race: [probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/next-part-probe.go.txt), [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/next-part-probe.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-multipart-publication/raw/next-part-probe-race.log). Copy the text temporarily to
 `pkg/stow/part_review_probe_test.go` and run only
 `TestReviewCustomCommittedPartQuota` with `-count=2` (optionally `-race`), then
 remove it. It reuses this change's single-part fixture, enters through the public

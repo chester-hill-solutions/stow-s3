@@ -1,5 +1,8 @@
 # v0.3.2 patch qualification
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The measured patch preserves the small-runtime characteristics tested here and
 fixes concurrent reader cleanup. This is a local comparison on one Apple M1 Pro,
 not a production capacity result. Small latency differences and noisy filesystem
@@ -14,7 +17,7 @@ measurements do not establish either a speedup or a general performance guarante
   and measured artifact hashes are unchanged.
 - Native builds: Go 1.25.6, `-buildvcs=false -trimpath -ldflags '-s -w'` for both.
 - Host: macOS Darwin 23.5.0, ARM64, Apple M1 Pro, 8 logical CPUs, 16 GiB memory;
-  Node 25.9.0. See [complete metadata](results/metadata.json) for artifact hashes,
+  Node 25.9.0. See [complete metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-patch-validation/results/metadata.json) for artifact hashes,
   Chromium version, timestamps and harness identities.
 - Native comparisons ran serially in baseline/candidate/candidate/baseline order.
   Each block contains 20 fresh native sessions and three samples per concurrency
@@ -69,8 +72,8 @@ checkpoint speedup.
 
 The first attempt at the general workspace lifecycle benchmark failed in the
 unchanged baseline's parallel-prepare cleanup with `ENOTEMPTY`. Its partial
-results and error are retained in [failed-attempt](failed-attempt/metadata.json)
-and [the runner log](failed-attempt/runner.log), with `complete: false`. They are
+results and error are retained in [failed-attempt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-patch-validation/failed-attempt/metadata.json)
+and [the runner log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-patch-validation/failed-attempt/runner.log), with `complete: false`. They are
 excluded from the comparison above. The successful comparison uses serial
 portable captures and the workspace memory-only harness, which has no parallel
 prepare stage. Parallel workspace lifecycle qualification remains incomplete.
@@ -93,8 +96,8 @@ node docs/benchmarks/2026-10-15-patch-validation/qualify.mjs \
   /absolute/baseline /absolute/candidate /absolute/new-results-directory
 ```
 
-The [qualification harness](qualify.mjs) records identities before running.
-The [raw browser trials](results/browser.json) preserve all measured samples.
+The [qualification harness](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-patch-validation/qualify.mjs) records identities before running.
+The [raw browser trials](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-patch-validation/results/browser.json) preserve all measured samples.
 Native evidence is grouped under `results/1-baseline-*`, `2-candidate-*`,
 `3-candidate-*`, and `4-baseline-*`, with JSON summaries and corresponding logs.
 The successful run has `complete: true` in its metadata. Keep failed runs and

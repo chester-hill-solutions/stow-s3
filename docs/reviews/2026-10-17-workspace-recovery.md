@@ -1,9 +1,12 @@
 # Preserve unknown workspace multipart owners during recovery
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `13bc1534759fa7346ecdd71c14a9354493e801ce` contains the atomic part
 publication fix. Fresh `origin/main` remains
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of this branch.
-[Baseline](2026-10-17-workspace-recovery/raw/baseline.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/baseline.json).
 This corrects the workspace occurrence of A1 from the
 [bounded audit](2026-10-16-storage-contract-audit.md), independently of A3.
 
@@ -15,9 +18,9 @@ benchmarks or quality gates ran. No benchmark ran anywhere in this change.
 
 Permanent regressions ran twice normally and twice under race before production
 changes: **38 adverse leaf failures and eight passing controls in each run**.
-[Normal](2026-10-17-workspace-recovery/raw/before/before-normal.log),
-[race](2026-10-17-workspace-recovery/raw/before/before-race.log),
-[counts](2026-10-17-workspace-recovery/raw/counts.json).
+[Normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/before/before-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/before/before-race.log),
+[counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/counts.json).
 These are native filesystem faults, not synthetic provider errors.
 
 Truncated/null/empty JSON, invalid bucket/key, mismatched upload ID, missing
@@ -54,23 +57,23 @@ storage format, index, cache or migration is added.
 ## Results and costs
 
 All **46 focused leaf executions pass normally and under race**, with each case
-repeated twice and no skips: [normal](2026-10-17-workspace-recovery/raw/after/focused-normal.log),
-[race](2026-10-17-workspace-recovery/raw/after/focused-race.log).
+repeated twice and no skips: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/after/focused-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/after/focused-race.log).
 Lookup, validation, enumeration, parts and completion preserve damaged state.
 Repair permits completion with initiation metadata, restores the 11-byte quota
 reservation, refuses a 2-byte PUT under cap 12 and permits a 12-byte PUT after
 abort releases staging. Healthy/absent S3 outcomes stay 200/404; damaged listing
 and completion return 500. Failed initiation no longer leaves unknown staging.
 
-All [14 Railway checks](2026-10-17-workspace-recovery/raw/after/checks.json) pass:
+All [14 Railway checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/after/checks.json) pass:
 focused normal/race; full Go; broad storage/runtime/embedded/run-through/S3/public
 API race; four conformance profiles; vet; quality/file-size/format; site build,
 site tests and documentation links. The two existing mirror-bucket/live-upstream
-conformance skips remain. [Result](2026-10-17-workspace-recovery/raw/after/run.json).
+conformance skips remain. [Result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/after/run.json).
 Deployment `7de49edd-449b-44f1-a030-3d78a45cef2c` reached SUCCESS. The code was
 updated in the same isolated container after the before run completed, preserving
-warm tool caches; [source update receipts](2026-10-17-workspace-recovery/raw/owner-after-sync-receipt.json)
-and [actual tested source hashes](2026-10-17-workspace-recovery/raw/after/environment.json)
+warm tool caches; [source update receipts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/owner-after-sync-receipt.json)
+and [actual tested source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-workspace-recovery/raw/after/environment.json)
 identify the change. The Git fixture contains the exact original parent quality
 baselines, not the repository history. Source/test formatting was done on Railway.
 The runner remains available for the next explicitly authorized correctness slice.

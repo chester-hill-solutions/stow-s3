@@ -49,16 +49,24 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 - [Storage admission design](storage-admission-contract.md) describes the shared
   foundation contract; consult usage guides for implemented API names.
 - [Contributing](../CONTRIBUTING.md) and [code standards](CODE_STANDARDS.md).
-- [Release verification](release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
+- [Release verification](history/releases/release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
   not evidence that a later candidate was published.
 - [npm publication record](npm-publishing.md) records the verified 0.3.5 release and remaining automated-publishing requirements.
 
 ## Evidence and history
 
-[History](history/README.md) contains retired plans and experiments.
-For dated test results, see the [assessment records](assessment-evidence/2026-09-29/README.md),
-[Railway browser tests](assessment-evidence/2026-10-12/railway-browser.json)
-and [benchmarks](benchmarks/session-baseline.md).
+[History](history/README.md) contains dated records and retired plans.
+
+| Browse | Contents |
+| --- | --- |
+| [Release checks](history/releases/README.md) | Dated readiness and download verification |
+| [Implementation records](history/implementation/README.md) | Completed slices and receiver experiments |
+| [Assessments](history/assessments/README.md) | Product evaluation and compatibility coverage |
+| [Code reviews](reviews/README.md) | Findings, fixes and the bounded correctness register |
+| [Benchmarks](benchmarks/README.md) | Current baselines, published comparisons and investigations |
+| [Assessment evidence](assessment-evidence/README.md) | Probe methods and test receipts |
+| [Evidence archive](evidence-archive.md) | Original logs, profiles and source snapshots in Git history |
+
 Use the [performance testing guide](performance-testing.md) to reproduce throughput,
 latency, resource and quarantine workflow measurements.
 The [October 13 memory results](benchmarks/2026-10-13-memory-performance/README.md)

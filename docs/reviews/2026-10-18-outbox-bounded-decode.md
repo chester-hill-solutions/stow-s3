@@ -1,5 +1,8 @@
 # Bounded protobuf outbox decoding
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The outbox decoder rejected duplicate identities only after constructing the entire generated protobuf graph and maps sized from repeated-message counts. A 65,550-byte snapshot containing 32,768 empty repeated records allocated 7–15.7 MB before returning an error. The new decoder reuses one generated message per record type and grows domain maps only as valid records are accepted.
 
 This is one recovery/resource correctness change. It does not change the v4 format, encoder, dependencies, exported interfaces, storage operations, S3 behavior, or journal durability protocol. No deployed incident is inferred from the synthetic corrupt input.
@@ -18,7 +21,7 @@ The regression builds a length-correct `STOWOUT4` frame with version 4 and 32,76
 | entries | 15,633,472–15,638,976 | 1,912–2,216 |
 | prepared | 15,633,520–15,633,616 | 1,912–2,216 |
 
-The original implementation failed all four resource/recovery cases twice normally and twice under race detection. Thirty equivalence controls passed in each run. The corrected implementation passed all 34 cases twice per mode. The [red/green receipt](2026-10-18-outbox-bounded-decode/raw/proof/proof-receipt.json) records exact cases and allocations; the [final-candidate logs](2026-10-18-outbox-bounded-decode/raw/confirmation/candidate-normal.log) retain the refined measurements.
+The original implementation failed all four resource/recovery cases twice normally and twice under race detection. Thirty equivalence controls passed in each run. The corrected implementation passed all 34 cases twice per mode. The [red/green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/proof/proof-receipt.json) records exact cases and allocations; the [final-candidate logs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/confirmation/candidate-normal.log) retain the refined measurements.
 
 ## Implementation and preserved contracts
 
@@ -34,9 +37,9 @@ This bounds the temporary repeated-message graph and avoids map preallocation fr
 
 All formatting, Go builds/tests, race/conformance checks, quality/documentation checks and benchmarks ran on the existing Railway scratch runner. Local work was limited to source editing, Git, packaging, hashing and result analysis. Runner deployment: `0c2710b0-fe71-4fa7-b98d-bdb44ed287de`; Linux amd64, Go 1.25.6, 4-CPU/4-GiB cgroup, UID 10001. Durable benchmark fixtures used the mounted ext4 `/results` volume (statfs 61267). Source hashes, commands, environment and binary hashes are retained in each job directory.
 
-Before changing the implementation, 12 uninstrumented observations established the decode baseline. Separate 3-second CPU profiles and allocation profiles at rate 1/10 iterations identified generated string copies and temporary message allocations. In the minimal allocation-object profile, string decoding contributed 60.44% of total profile objects and reflected message construction 11.70%; the focused decoder accounted for 83.94% of the full profile. Instrumented timings are excluded from latency comparisons. [Profiles and commands](2026-10-18-outbox-bounded-decode/raw/before/profile-runs.json).
+Before changing the implementation, 12 uninstrumented observations established the decode baseline. Separate 3-second CPU profiles and allocation profiles at rate 1/10 iterations identified generated string copies and temporary message allocations. In the minimal allocation-object profile, string decoding contributed 60.44% of total profile objects and reflected message construction 11.70%; the focused decoder accounted for 83.94% of the full profile. Instrumented timings are excluded from latency comparisons. [Profiles and commands](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/before/profile-runs.json).
 
-The initial embedded-scratch prototype produced 224 valid-workload observations: 28 cells, four samples per variant, ABBA/BAAB ordering, 400 ms minimum. It reduced allocations but retained adverse timings: rich decode on one CPU was 17.66% slower; populated enqueue/prepare cells were up to 8.10% slower. Empty file operations used 3–10.54% more bytes. These results remain in the [initial analysis](2026-10-18-outbox-bounded-decode/raw/comparison/comparison-analysis.json).
+The initial embedded-scratch prototype produced 224 valid-workload observations: 28 cells, four samples per variant, ABBA/BAAB ordering, 400 ms minimum. It reduced allocations but retained adverse timings: rich decode on one CPU was 17.66% slower; populated enqueue/prepare cells were up to 8.10% slower. Empty file operations used 3–10.54% more bytes. These results remain in the [initial analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/comparison/comparison-analysis.json).
 
 The adopted variant allocates scratch messages lazily. A longer confirmation used 1-second minimum runs, the same alternating order, four observations per variant per cell, followed by a separate identical-candidate-binary control with both labels: 56 paired observations and 56 same-binary observations. No earlier adverse observation was discarded. The following are median deltas for the final candidate; positive latency means slower.
 
@@ -64,11 +67,11 @@ The final populated enqueue cycles allocated 17.51–18.59% fewer bytes, with me
 | decode rich=true | +3.01% |
 | decode rich=true-4 | -6.38% |
 
-[All final samples and summaries](2026-10-18-outbox-bounded-decode/raw/confirmation/confirmation-analysis.json); [exact commands and binary identities](2026-10-18-outbox-bounded-decode/raw/confirmation/confirmation-runs.json).
+[All final samples and summaries](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/confirmation/confirmation-analysis.json); [exact commands and binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/confirmation/confirmation-runs.json).
 
 ## Validation and limits
 
-The final adopted production source hashes match the measured lazy-scratch candidate. Required checks: focused outbox tests twice normally and under race detection; full `go test ./...`; broader storage/runtime/embedded/runthrough/S3/public-package race tests; memory, filesystem, runtime-memory and runtime-filesystem conformance; `go vet ./...`; quality, size and formatting gates; site build/tests and documentation links. [Final checks](2026-10-18-outbox-bounded-decode/raw/final/checks.json), [regression receipt](2026-10-18-outbox-bounded-decode/raw/final/green-receipt.json).
+The final adopted production source hashes match the measured lazy-scratch candidate. Required checks: focused outbox tests twice normally and under race detection; full `go test ./...`; broader storage/runtime/embedded/runthrough/S3/public-package race tests; memory, filesystem, runtime-memory and runtime-filesystem conformance; `go vet ./...`; quality, size and formatting gates; site build/tests and documentation links. [Final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/final/checks.json), [regression receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/final/green-receipt.json).
 
 A harness mistake initially launched the previous six-stage confirmation plan after source adoption. That extra run is retained under `raw/extra` and excluded from the baseline/paired/control measurements and final validation claims. The active plan was corrected; final validation requires the separate 14-stage job and its plan/receipt. The report and evidence also undergo Railway documentation checks after publication.
 
@@ -76,4 +79,4 @@ New costs: a small root-field scanner, per-record generated unmarshal calls, ret
 
 The next performance investigation is generated string-copy and domain-map allocation cost, which remains visible in the profiles. Establish a new post-change profile and a separately reviewable Railway comparison before any further optimization. No indexing, incremental checkpointing, format migration or broader storage machinery is part of this change.
 
-[Evidence manifest](2026-10-18-outbox-bounded-decode/raw/artifact-manifest.json) covers the retained raw jobs, profiles, source snapshots, analysis scripts, validation receipts and isolated runner teardown.
+[Evidence manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-bounded-decode/raw/artifact-manifest.json) covers the retained raw jobs, profiles, source snapshots, analysis scripts, validation receipts and isolated runner teardown.

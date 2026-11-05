@@ -1,5 +1,8 @@
 # Keep compacting outbox state copies — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Decision
 
 **Reject replacing the three state-copy loops with maps.Clone. Production source
@@ -14,7 +17,7 @@ outweighs the mixed durable-write timings. The prior faster write-cache candidat
 also remains rejected for its separate caller-string retention problem.
 
 `origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
-[Baseline refs](2026-10-18-outbox-clone/raw/baseline.json), [prior phase measurements](2026-10-18-outbox-write-phases.md)
+[Baseline refs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/baseline.json), [prior phase measurements](2026-10-18-outbox-write-phases.md)
 and [write-cache rejection](2026-10-18-outbox-write-cache.md) establish completed
 work. No new format, dependency, public API, cache or storage abstraction ships.
 
@@ -31,7 +34,7 @@ explicit nil handling should preserve independence/rollback contracts; and
 copying map tables could preserve deleted capacity and increase allocation cost.
 The first two hold; the third makes a general replacement unacceptable here.
 The pinned Go runtime copies the source map directory and tables. Its
-[exact Clone source and full-file hash](2026-10-18-outbox-clone/raw/measure/runtime-clone.json) are retained.
+[exact Clone source and full-file hash](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/measure/runtime-clone.json) are retained.
 This is evidence for Go 1.25.6, not a claim about every future runtime.
 
 ## Method and scope
@@ -123,8 +126,8 @@ those adverse timings or establish a stable request-latency improvement. Full
 cycle allocation counts/bytes move by less than 1%; the isolated dense clone
 allocations are identical. No allocation benefit is claimed. Further timing
 confirmation is not pursued because the resource regression already rejects the
-candidate. [All observations, ranges, iterations, process heap/HWM and frame sizes](2026-10-18-outbox-clone/raw/measure/comparison-analysis.json)
-and [order/commands/binary hashes](2026-10-18-outbox-clone/raw/measure/comparison-runs.json) remain available.
+candidate. [All observations, ranges, iterations, process heap/HWM and frame sizes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/measure/comparison-analysis.json)
+and [order/commands/binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/measure/comparison-runs.json) remain available.
 Heap/HWM metrics are process observations, not a per-operation memory SLA.
 
 ## Deterministic resource regression
@@ -138,9 +141,9 @@ capacity rather than only transient cumulative allocation.
 The original implementation passes twice normally and twice with race detection,
 adding **112,912–113,568 B**. The candidate fails twice per mode, adding
 **6,732,072–6,732,952 B**. Expected candidate exit 1 means a reproduced regression,
-not a passing test suite. [Sample/count receipt](2026-10-18-outbox-clone/raw/proof/capacity-receipt.json),
-[normal candidate failure](2026-10-18-outbox-clone/raw/proof/candidate-normal.log) and
-[race candidate failure](2026-10-18-outbox-clone/raw/proof/candidate-race.log) are retained.
+not a passing test suite. [Sample/count receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/proof/capacity-receipt.json),
+[normal candidate failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/proof/candidate-normal.log) and
+[race candidate failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/proof/candidate-race.log) are retained.
 
 The guard is a test budget for this fixture, not a new general quota. Source setup
 creates tens of MiB of temporary objects and forces GC; that adds bounded test
@@ -166,10 +169,10 @@ normal/race and unchanged quality/file-size/format gates pass on the corrected
 source. The final focused contract/resource subset has **28 cases passing twice
 per mode: 56 normal passes and 56 race passes, with no failures or skips**.
 
-[Initial verification checks](2026-10-18-outbox-clone/raw/initial-final/checks.json),
-[quality failure](2026-10-18-outbox-clone/raw/initial-final/quality.log),
-[final checks](2026-10-18-outbox-clone/raw/final/checks.json), [green receipt](2026-10-18-outbox-clone/raw/final/green-receipt.json)
-and [exact final source hashes](2026-10-18-outbox-clone/raw/final/environment.json) record the scope.
+[Initial verification checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/initial-final/checks.json),
+[quality failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/initial-final/quality.log),
+[final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/final/checks.json), [green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/final/green-receipt.json)
+and [exact final source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/final/environment.json) record the scope.
 Only the test layout changes after full verification; production, benchmark and
 capacity-regression sources remain byte-identical to their tested versions.
 All modified Go bytes come from Railway formatting, with hashes checked locally.
@@ -177,8 +180,8 @@ The report/site/link checks run again after this report and evidence are saved.
 
 Production source is verified against `1e650fc` before commit. The scratch runner
 is stopped after verified exports; the separate target remains removed and
-unchanged. [Baseline refs](2026-10-18-outbox-clone/raw/baseline.json) and the
-[artifact manifest](2026-10-18-outbox-clone/raw/artifact-manifest.json), including the final teardown receipt,
+unchanged. [Baseline refs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/baseline.json) and the
+[artifact manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-clone/raw/artifact-manifest.json), including the final teardown receipt,
 retain the audit trail. No discarded overlay enters
 the product build.
 

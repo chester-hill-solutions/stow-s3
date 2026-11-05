@@ -1,28 +1,31 @@
 # Close failed run-through reads without losing the opening error
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Corrected on 2026-10-16 from `fe6238d571ab59c5358bc6ee887753b51e713cb4`,
 on `codex/core-copy-quality`. Freshly fetched `origin/main` is
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of this branch.
 The [previous runtime cleanup](../2026-10-16-open-error-cleanup/README.md) remains
 intact. That change could only close readers it received; run-through discarded
 some readers before reaching it. This change addresses that separate boundary.
-[Source, toolchain and binary identities](raw/environment.json) pin the comparison.
+[Source, toolchain and binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/environment.json) pin the comparison.
 
 ## Before: opened files survive refused reads
 
 The retained two-path probe was replayed before production edits:
-[normal](raw/original-before.log), [race](raw/original-before-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/original-before.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/original-before-race.log).
 Both local reads and upstream refreshes return the original error while leaving a
 real file open. Each case fails twice in each log: **four expected failures per log**.
-The original [probe source](../2026-10-16-open-error-cleanup/raw/next-runthrough-probe.go.txt)
+The original [probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-open-error-cleanup/raw/next-runthrough-probe.go.txt)
 uses the real adapter-to-runtime composition and verifies accounting and repaired retries.
 
 A new **40-case** matrix ran twice before production edits:
-[normal](raw/before-tests.log), [race](raw/before-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/before-tests.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/before-race.log).
 Per repetition, **25 defect cases fail and 15 existing-behavior controls pass**.
 The final test sources were also replayed twice against the exact baseline
 production files, with the same results:
-[normal overlay](raw/final-before.log), [race overlay](raw/final-before-race.log).
+[normal overlay](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/final-before.log), [race overlay](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/final-before-race.log).
 No build failure is counted as a reproduced defect.
 
 The matrix covers direct adapter and runtime reads of authoritative local data,
@@ -81,26 +84,26 @@ costs cannot be ruled out by these measurements.
 
 ## Validation
 
-- [Final new regressions](raw/after-tests.log): **40 leaves twice = 80 passes**.
-- The original two-path probe passes twice [normally](raw/original-after.log) and
-  [under race](raw/original-after-race.log).
-- [Entire run-through race suite](raw/focused-race.log): **230 leaves five times =
+- [Final new regressions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/after-tests.log): **40 leaves twice = 80 passes**.
+- The original two-path probe passes twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/original-after.log) and
+  [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/original-after-race.log).
+- [Entire run-through race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/focused-race.log): **230 leaves five times =
   1,150 passes**, including policy, offline, cache eviction/TTL, restart,
   concurrent outbox and runtime-composition coverage. No skips or races.
-- [Full Go suite](raw/full-go.log), [broad runtime/storage/S3/run-through/public
-  race suite](raw/broad-race.log) and [vet](raw/vet.log) pass.
-- [Four conformance profiles](raw/conformance-summary.log) pass: memory,
+- [Full Go suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/full-go.log), [broad runtime/storage/S3/run-through/public
+  race suite](raw/broad-race.log) and [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/vet.log) pass.
+- [Four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/conformance-summary.log) pass: memory,
   filesystem, runtime-memory and runtime-filesystem. Each retains the two existing
   live-upstream/mirror-bucket skips.
-- [Quality and file-size gates](raw/quality.log), [generated comparison](raw/generated.log),
-  [WASM smoke](raw/wasm-smoke.log), [seven package integration tests](raw/package-tests.log),
-  [final source/cleanup checks](raw/final-source-check.log) and
-  [documentation checks](raw/docs.log) pass.
-- [Validation runner](raw/validate.py.txt) and [final checks](raw/final-checks.py.txt)
+- [Quality and file-size gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/quality.log), [generated comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/generated.log),
+  [WASM smoke](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/wasm-smoke.log), [seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/package-tests.log),
+  [final source/cleanup checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/final-source-check.log) and
+  [documentation checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/docs.log) pass.
+- [Validation runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/validate.py.txt) and [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/final-checks.py.txt)
   retain the exact commands.
 
 The rebuilt WASM is **byte-for-byte unchanged at 4,619,197 bytes**:
-[hashes](raw/wasm.json), [build](raw/build-wasm.log), [package build](raw/package-build.log).
+[hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/wasm.json), [build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/build-wasm.log), [package build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/package-build.log).
 Run-through is outside that memory-only WASM path. No generated asset needs updating.
 Reader ownership tests at the existing adapter boundary would have prevented this
 leak; no architecture expansion is needed.
@@ -122,9 +125,9 @@ allocation or eviction cost. Healthy reads copy to io.Discard; this is not an HT
 disk, network, payload-throughput, RSS or peak-heap measurement.
 
 Two alternating ABBA/BAAB cycles at CPU 1 and 8, with two repetitions per block,
-produce **288 retained samples**, eight per case/version/CPU. See [plan](raw/plan.json),
-[runner/parser](raw/measure.py.txt), [raw](raw/measurements.log),
-[all samples](raw/samples.json) and [summary with ranges, allocations and both cycle
+produce **288 retained samples**, eight per case/version/CPU. See [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/plan.json),
+[runner/parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/measure.py.txt), [raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/measurements.log),
+[all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/samples.json) and [summary with ranges, allocations and both cycle
 comparisons](raw/summary.json). Nothing is filtered out.
 
 | CPU | Case | Median ns/op before → after | Change | Same-code absolute change, median |
@@ -187,9 +190,9 @@ fault. The runtime returns body `new` with the old ETag, content type and metada
 
 The ordinary MemoryStore cache and real adapter/runtime path reproduce the defect
 without reader+error injection or timing assumptions:
-[source](raw/next-version-probe.go.txt), [baseline](raw/next-before.log),
-[baseline race](raw/next-before-race.log), [candidate](raw/next-after.log),
-[candidate race](raw/next-after-race.log). It fails twice in each log; the native
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/next-version-probe.go.txt), [baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/next-before.log),
+[baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/next-before-race.log), [candidate](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/next-after.log),
+[candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-open-cleanup/raw/next-after-race.log). It fails twice in each log; the native
 cache is verified empty and exactly two upstream GETs occur. This can mislabel
 S3 responses and break validator/version consistency. The missing-cache retry
 currently discards the fresh GET's metadata and returns the previous cached

@@ -692,7 +692,7 @@ are lexical key markers, not authenticated query-bound provider tokens. Clients
 should replay returned tokens.
 
 <!-- repo-only:start -->
-The [acceptance coverage map](compatibility-coverage-2026-09-29.md) records SDK and raw protocol tests.
+The [acceptance coverage map](history/assessments/compatibility-coverage-2026-09-29.md) records SDK and raw protocol tests.
 <!-- repo-only:end -->
 
 Resource-policy listings paginate permitted objects and prefixes before choosing

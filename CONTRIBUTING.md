@@ -78,6 +78,18 @@ retired plans. Move historical designs under `docs/history/` and repair their
 incoming and outgoing links. Only remove an ADR after its replacement is in force;
 record its number and original Git source in `docs/adr/retired.json`.
 
+Keep current guides and contracts in `docs/`, API references in `docs/api/`,
+and published release notes in `docs/releases/`. File dated release checks,
+assessments and implementation receipts under the matching `docs/history/`
+folder. Add an entry to its index and repair links when moving a document.
+
+Commit concise review and benchmark reports with the datasets required by checks
+or published results. Keep disposable logs, profiles, copied source trees and
+build archives in ignored `output/` while working. Attach evidence needed for
+long-term review to the relevant GitHub release or linked artifact storage.
+Record its source revision, checksum, method and limitations in the report.
+See the [evidence archive](docs/evidence-archive.md) to recover older artifacts.
+
 ## Documentation style
 
 Use the clear-writing principles of [Simplified Technical English](https://en.wikipedia.org/wiki/Simplified_Technical_English).

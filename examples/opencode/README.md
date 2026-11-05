@@ -235,7 +235,7 @@ successful no-op. After this fix, the local real-model gate passed with
 checkpoint artifacts after removing sender data. Continuation on a second physical
 host, Linux runtime and real interruption/cleanup still require a pilot. The
 example remains experimental until those pass. See the
-[remediation record](../../docs/opencode-receiver-remediation-2026-09-29.md).
+[remediation record](../../docs/history/implementation/opencode-receiver-remediation-2026-09-29.md).
 
 ## Coordinating agent instructions
 

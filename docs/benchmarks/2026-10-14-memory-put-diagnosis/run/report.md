@@ -1,5 +1,8 @@
 # Memory HTTP PUT generator diagnosis
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 All workloads executed on Railway. Original server binary SHA matches the retained controlled comparison.
 
 | Generator processes | Total clients | Median MiB/s | Client CPU % | Server CPU % |

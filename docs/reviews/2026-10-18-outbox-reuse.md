@@ -1,12 +1,15 @@
 # Reuse byte-identical validated outbox state — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Evidence and change
 
 The [preceding Railway investigation](2026-10-18-outbox-read-cost.md) showed a
 16,385-row provenance lookup allocating 5.30 MB and spending most of its CPU in
 full decoding. Disk reads were a small fraction of its latency. This change is
 based on `f2a65d9`; `origin/main` was refreshed before work and is recorded in
-[baseline.json](2026-10-18-outbox-reuse/raw/baseline.json).
+[baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/baseline.json).
 
 Seven production lines add one private byte slice, compare a fresh file read
 with its contents, remember successfully validated bytes, and clear them before
@@ -33,12 +36,12 @@ must recover retained entries. A historical snapshot restored immediately after
 a successful write must be read faithfully, preserving sequence allocation.
 
 The baseline and isolated prototype each passed the complete file-outbox suite
-twice normally and twice under race detection in the [pilot](2026-10-18-outbox-reuse/raw/pilot/comparison-commands.json).
+twice normally and twice under race detection in the [pilot](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/pilot/comparison-commands.json).
 A deliberately broken overlay omitting write invalidation fails the historical
 restore test twice normally and twice under race detection. The corrected code
-passes it. See [control results](2026-10-18-outbox-reuse/raw/repair/negative-control.json),
-[normal failures](2026-10-18-outbox-reuse/raw/repair/negative-control-normal.log) and
-[race failures](2026-10-18-outbox-reuse/raw/repair/negative-control-race.log). This is a sensitivity check
+passes it. See [control results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/repair/negative-control.json),
+[normal failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/repair/negative-control-normal.log) and
+[race failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/repair/negative-control-race.log). This is a sensitivity check
 for the new optimization, not a claim that the baseline had this correctness bug.
 The original defect being addressed is repeated unnecessary full decoding.
 
@@ -122,8 +125,8 @@ CPU 4:
 | mixed=1024 | 1.446 → 0.048 | 1.419 → 0.319 | 8.605 → 8.937 | 1,368,924 → 164,424 | 165.6 |
 | mixed=16384 | 17.820 → 0.694 | 19.292 → 0.733 | 56.984 → 58.355 | 22,149,058 → 2,572,872 | 2,512.2 |
 
-[Main observations](2026-10-18-outbox-reuse/raw/main/samples.json), [all medians/ranges](2026-10-18-outbox-reuse/raw/main/analysis.json),
-[pilot observations](2026-10-18-outbox-reuse/raw/pilot/samples.json) and [pilot ranges](2026-10-18-outbox-reuse/raw/pilot/analysis.json)
+[Main observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/samples.json), [all medians/ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/analysis.json),
+[pilot observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/pilot/samples.json) and [pilot ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/pilot/analysis.json)
 retain favorable and adverse results. These small balanced samples are diagnostic,
 not statistical-significance claims. Timing, memory and relative results can
 change with CPU scheduling, storage, contention, key lengths and workload mix.
@@ -155,9 +158,9 @@ reads still allocate/read the whole encoded file and compare all bytes; the
 optimization removes repeat decoding, not linear I/O, storage or memory scaling.
 Cache byte/object limits still govern cached objects, not journal history.
 
-[Fixture sizes](2026-10-18-outbox-reuse/raw/main/fixtures.json), [runtime settings](2026-10-18-outbox-reuse/raw/main/runtime-settings.json),
-[build/source hashes](2026-10-18-outbox-reuse/raw/main/comparison-build.json), [commands](2026-10-18-outbox-reuse/raw/main/comparison-commands.json)
-and [fixed-count observations](2026-10-18-outbox-reuse/raw/main/cells.json) make those costs reviewable.
+[Fixture sizes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/fixtures.json), [runtime settings](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/runtime-settings.json),
+[build/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/comparison-build.json), [commands](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/comparison-commands.json)
+and [fixed-count observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/cells.json) make those costs reviewable.
 
 ## Validation and evidence handling
 
@@ -165,15 +168,15 @@ The changed production source passed focused file-outbox tests twice normally
 and twice under race detection, the full Go suite, broad storage/runtime/embedded/
 run-through/S3/public-package race tests, four conformance profiles, vet, quality,
 file-size/format gates, site build/tests and documentation links on Railway.
-The [main checks](2026-10-18-outbox-reuse/raw/main/checks.json) include one control-harness failure: its
+The [main checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/main/checks.json) include one control-harness failure: its
 unprivileged process attempted to overwrite the root-owned outer log with the
-same name. The corrected log name was verified in a separate [repair job](2026-10-18-outbox-reuse/raw/repair/checks.json)
+same name. The corrected log name was verified in a separate [repair job](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/repair/checks.json)
 after all timing measurements, with byte-identical Go sources. Only that affected
 control was repeated; all main performance evidence is retained.
 
 An initial deployment failed before compilation because the upload used the
 packaging directory instead of its source root. The corrected deployment ran all
-validation and benchmarks. The [failed build log](2026-10-18-outbox-reuse/raw/pilot-build-failure.log)
+validation and benchmarks. The [failed build log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-reuse/raw/pilot-build-failure.log)
 is retained. Neither harness correction changes production behavior or supplies
 missing performance observations by substitution.
 

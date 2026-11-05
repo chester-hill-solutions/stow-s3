@@ -1,5 +1,8 @@
 # Memory write preparation outside the runtime lock
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Ordinary memory writes now prepare their owned payload and integrity properties
 outside the runtime write lock. Publication still holds the runtime lock and
 the memory store lock. This reduces the scope of serialization identified in
@@ -26,7 +29,7 @@ Two regressions were reproduced before the fix on Railway:
 - Slow memory-stream preparation blocked unrelated metadata reads.
 - Ordinary buffered writes bypassed staging and its reset fence.
 
-[Expected failures](red.log) and [the tested source identity](red-source.json)
+[Expected failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/red.log) and [the tested source identity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/red-source.json)
 were retained. Green coverage also exercises cancellation, close, reset,
 policy revocation, competing replacements, deleted buckets, quota release,
 payload/metadata ownership, computed checksums, abort, and single-use commit.
@@ -57,13 +60,13 @@ Validation completed at 2026-10-14 12:04:32.504 UTC.
 The deployment was observed `SUCCESS`, then `REMOVED` after verified export.
 Both benchmark services are stopped; volumes and retained evidence remain.
 
-- [Final receipt](verification/receipt.json), [standards log](verification/standards.log), and [export verification](export.json).
-- [Generated artifact identities](verification/generated-change.json), [quality report](verification/go-quality-report.json), and [browser report](verification/sdk-browser-report.json).
+- [Final receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/verification/receipt.json), [standards log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/verification/standards.log), and [export verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/export.json).
+- [Generated artifact identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/verification/generated-change.json), [quality report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/verification/go-quality-report.json), and [browser report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/verification/sdk-browser-report.json).
 - Exact verification output, including WASM, remains on the Railway results volume
   at `/results/memory-write-staging-244bd6e0-d02c-4f2e-b0d9-422cfe89a0cd/verification`.
 
 Initial validation found an abort-test cleanup error, recorded in
-[the initial log](initial-validation.log). The test was corrected to avoid deleting
+[the initial log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-memory-write-staging/initial-validation.log). The test was corrected to avoid deleting
 an object never published. Two superseded builds were cancelled while test-helper
 updates were completed. Final validation above is the completed result.
 

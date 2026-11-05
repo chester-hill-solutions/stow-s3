@@ -1,12 +1,15 @@
 # Copy only the requested outbox snapshot — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Baseline, evidence and change
 
 After `8278d32` removed repeat decoding of byte-identical journals, pending and
 prepared snapshots still called `readState`, cloning provenance and both queues
 before returning just one queue. Propagation ordering/retries, prepared recovery
 and inspection use those existing paths. `origin/main` was refreshed before this
-work; exact baseline commits are in [baseline.json](2026-10-18-outbox-snapshot/raw/baseline.json).
+work; exact baseline commits are in [baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/baseline.json).
 
 The Railway pilot demonstrated this remaining cost before production adoption.
 For 16,384 provenance rows plus one target and one entry in each queue, a CPU-1
@@ -48,8 +51,8 @@ quality/file-size/format gates; site build/tests; documentation links; compariso
 The added matched-load diagnostic subsequently passed formatting, quality, the
 complete run-through suite normally and under race detection, and vet. Its Go
 production sources match the main verification exactly. Tail and phase studies
-also completed successfully. [Main checks](2026-10-18-outbox-snapshot/raw/main/checks.json),
-[follow-up checks](2026-10-18-outbox-snapshot/raw/follow/checks.json) and their environments record exact
+also completed successfully. [Main checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/main/checks.json),
+[follow-up checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/follow/checks.json) and their environments record exact
 commands/source hashes. No baseline was raised.
 
 ## Method and limits
@@ -131,9 +134,9 @@ CPU 4:
 | mixed=2048 | 4.179 → 1.630 | 4.054 → 1.475 | 5,217,990 → 1,983,474 | 5,217,989 → 1,983,474 |
 
 No pure-snapshot pilot/main median regressed. All ranges and individual samples,
-including contention regressions, remain in [main observations](2026-10-18-outbox-snapshot/raw/main/samples.json),
-[main analysis](2026-10-18-outbox-snapshot/raw/main/analysis.json), [pilot observations](2026-10-18-outbox-snapshot/raw/pilot/samples.json)
-and [pilot analysis](2026-10-18-outbox-snapshot/raw/pilot/analysis.json). Small diagnostic sample counts do
+including contention regressions, remain in [main observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/main/samples.json),
+[main analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/main/analysis.json), [pilot observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/pilot/samples.json)
+and [pilot analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/pilot/analysis.json). Small diagnostic sample counts do
 not establish statistical significance or universal latency improvements.
 
 ## Contended writes, adverse results and follow-up
@@ -174,9 +177,9 @@ That includes another after outlier; neither tail nor the original +20.40%
 median is replaced by a favorable later measurement. Timing ranges overlap;
 no storage/scheduling-versus-code statistical attribution is claimed.
 
-[Writer follow-up](2026-10-18-outbox-snapshot/raw/follow/samples.json), [follow-up ranges](2026-10-18-outbox-snapshot/raw/follow/analysis.json),
-[targeted observations](2026-10-18-outbox-snapshot/raw/tail/samples.json), [targeted ranges](2026-10-18-outbox-snapshot/raw/tail/analysis.json)
-and [binary hashes](2026-10-18-outbox-snapshot/raw/tail/comparison-build.json) retain the complete evidence.
+[Writer follow-up](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/follow/samples.json), [follow-up ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/follow/analysis.json),
+[targeted observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/tail/samples.json), [targeted ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/tail/analysis.json)
+and [binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/tail/comparison-build.json) retain the complete evidence.
 
 ## Phase attribution diagnostic
 
@@ -198,9 +201,9 @@ and 0.047 ms waiting for the locks. It was not a long snapshot-lock wait. That
 phase includes file operations/fences and any runtime/scheduling delays within
 it; no syscall-level attribution separates them. This does not establish a
 filesystem-only cause or a universal absence of writer-tail costs. Durability
-fences are preserved. [Every phase record](2026-10-18-outbox-snapshot/raw/trace/write-phases.json),
-[phase analysis](2026-10-18-outbox-snapshot/raw/trace/phase-analysis.json), [commands](2026-10-18-outbox-snapshot/raw/trace/trace-commands.json)
-and [overlay/binary hashes](2026-10-18-outbox-snapshot/raw/trace/trace-build.json) are retained. No debug hook
+fences are preserved. [Every phase record](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/trace/write-phases.json),
+[phase analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/trace/phase-analysis.json), [commands](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/trace/trace-commands.json)
+and [overlay/binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/trace/trace-build.json) are retained. No debug hook
 is included in the production implementation.
 
 ## Memory, cost and compatibility
@@ -234,7 +237,7 @@ No public fields/order/error/empty-result/storage-format changes are intended.
 Native versus memory profiles retain the same value-copy/sort logic. Snapshot
 ordering/copying still scales with requested queue size; journal reads still
 scale with all retained state. Cache object/byte limits do not bound journal
-history. [Fixture sizes](2026-10-18-outbox-snapshot/raw/main/fixtures.json), [runtime settings](2026-10-18-outbox-snapshot/raw/main/runtime-settings.json)
+history. [Fixture sizes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/main/fixtures.json), [runtime settings](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-snapshot/raw/main/runtime-settings.json)
 and per-cohort source/binary hashes record the measurement context and limits.
 All raw observations, harnesses and overlays are retained. Binaries and fixture
 directories are removed after hashes are saved, and the scratch runner is stopped

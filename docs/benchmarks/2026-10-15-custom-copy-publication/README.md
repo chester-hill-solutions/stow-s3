@@ -1,5 +1,8 @@
 # Custom-store COPY preserves a committed result
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `f8c8951` on `codex/core-copy-quality`, with freshly fetched `origin/main`
 `219d1dcfff9807b04660a40313b32127e5be2933`. This corrects **F2** from the
 [codebase review](../../reviews/2026-10-15-codebase-map.md), including the public
@@ -17,7 +20,7 @@ but usage remains four bytes/one object instead of eight bytes/two objects.
 An overwrite similarly leaves seven bytes charged instead of eight.
 
 The 16-case regression ran twice before production changes; eight cases failed
-per run. See [original failures](raw/before-tests.log). It also demonstrated two
+per run. See [original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-copy-publication/raw/before-tests.log). It also demonstrated two
 necessary result/error boundaries:
 
 - The public COPY wrapper discarded the known object even when the underlying
@@ -79,7 +82,7 @@ other host activity was not controlled.
 First, baseline/candidate/candidate/baseline blocks each collected three 300 ms
 samples. Candidate medians were **2.5% higher at 4 KiB and 10.2% higher at 1 MiB**;
 one candidate 1 MiB sample reached 6.83 ms. These noisy results prompted longer
-samples, retained rather than discarded in [short measurements](raw/measurements.json).
+samples, retained rather than discarded in [short measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-copy-publication/raw/measurements.json).
 
 The same binaries then ran candidate/baseline/baseline/candidate blocks, three
 one-second samples per block: six samples per version and payload.
@@ -95,7 +98,7 @@ one-second samples per block: six samples per version and payload.
 | Packaged WASM | 4,615,917 bytes | 4,616,726 bytes (+809) |
 
 Timing and allocation ranges overlap. This is no speedup or exact-parity claim.
-[Longer samples](raw/long-measurements.json), raw benchmark logs and baseline/
+[Longer samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-copy-publication/raw/long-measurements.json), raw benchmark logs and baseline/
 candidate binary hashes are retained. The measured success path adds no allocation
 count or storage operation. Committed failure now converts and clones known
 metadata instead of discarding it; those error-path allocations are necessary to
@@ -121,7 +124,7 @@ WASM smoke and seven package integration tests pass. Logs are retained in `raw`.
 
 Next priority: **F4**, a custom store's public missing-key sentinel stops batch
 deletion before later keys. The original probe still fails twice on this corrected
-branch: [confirmation](raw/next-batch-delete-probe.log). This common idempotent-delete
+branch: [confirmation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-custom-copy-publication/raw/next-batch-delete-probe.log). This common idempotent-delete
 failure remains a separate change; it is not implemented here. The remaining F3
 adapter identity loss and neighboring buffered PUT/multipart result adapters also
 remain outside this correction.

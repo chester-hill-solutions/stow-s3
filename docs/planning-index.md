@@ -12,8 +12,8 @@ orders now live under [history](history/README.md).
    and limits for the published 0.3.5 release.
 3. [ADR index](adr/README.md): decisions in force; the custom-store conflict in
    ADR 0010 is explicitly tracked by W01.
-4. [Baseline implementation evidence](implementation-2026-09-29.md),
-   [later receiver/model evidence](opencode-receiver-remediation-2026-09-29.md) and
+4. [Baseline implementation evidence](history/implementation/implementation-2026-09-29.md),
+   [later receiver/model evidence](history/implementation/opencode-receiver-remediation-2026-09-29.md) and
    [conditional slice evidence](guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite):
    dated records with distinct scope. None certifies publication or Linux runtime.
 5. [Current release](releases/v0.3.5.md) and [npm publication record](npm-publishing.md#published-035):
@@ -33,9 +33,9 @@ and deferred boundary together. Existing contracts and ADRs remain normative.
 | [gangcode-stow-boundary.md](gangcode-stow-boundary.md) | **Ownership/integration reference.** Storage facts and durable delivery belong to Stow; agent meaning, context and coordination belong to GangCode. No independent queue. |
 | [plan.md](plan.md) | **Routing page.** Preserves old entry point/anchors; no separate queue. |
 | [portable-workspace-usage.md](portable-workspace-usage.md) | **Current usage.** Concrete supported development APIs, commands and limits. |
-| [implementation-2026-09-29.md](implementation-2026-09-29.md) | **Dated baseline evidence.** Earlier aggregate validation and costs; later evidence is separately linked. |
-| [opencode-receiver-remediation-2026-09-29.md](opencode-receiver-remediation-2026-09-29.md) | **Dated later evidence.** Local meaningful model continuation complete; interruption/second-host/Linux remain W19. |
-| [compatibility-coverage-2026-09-29.md](compatibility-coverage-2026-09-29.md) | **Evidence/coverage map.** Existing SDK/protocol coverage; uncovered work belongs to W06/W16/W20. |
+| [implementation-2026-09-29.md](history/implementation/implementation-2026-09-29.md) | **Dated baseline evidence.** Earlier aggregate validation and costs; later evidence is separately linked. |
+| [opencode-receiver-remediation-2026-09-29.md](history/implementation/opencode-receiver-remediation-2026-09-29.md) | **Dated later evidence.** Local meaningful model continuation complete; interruption/second-host/Linux remain W19. |
+| [compatibility-coverage-2026-09-29.md](history/assessments/compatibility-coverage-2026-09-29.md) | **Evidence/coverage map.** Existing SDK/protocol coverage; uncovered work belongs to W06/W16/W20. |
 | [portable-agent-workspace-goal.md](history/plans/portable-agent-workspace-goal.md) | **Superseded milestone ordering; retained rationale.** Product/workflow/adoption acceptance absorbed into the new plan and W19/W21/W22. |
 | [mcp-storage-integration-plan.md](history/plans/mcp-storage-integration-plan.md) | **Superseded detail work order; retained design history.** Actual adapter/caller already implemented; remaining acceptance W19, usage/source govern concrete names. |
 | [resumable-transfer-plan.md](resumable-transfer-plan.md) | **Retained transfer design reference.** Same-store SDK continuation W06; consumer recipe W21. No independent checklist. |
@@ -58,7 +58,7 @@ and deferred boundary together. Existing contracts and ADRs remain normative.
 | [previous September 29 queue](history/plan-before-foundation-consolidation-2026-09-29.md), [previous disposition register](history/planning-index-before-foundation-consolidation-2026-09-29.md) | **Frozen before this consolidation.** Preserve earlier assertions and mappings; new plan owns present status. |
 | [handoff-2026-09-27.md](history/experiments/handoff-2026-09-27.md) | **Obsolete handoff.** Do not use it as resume instructions. |
 | [distribution-spike.md](history/experiments/distribution-spike.md), [assessment-2026-09-27.md](history/experiments/assessment-2026-09-27.md), [agent-workspace-pilot.md](history/experiments/agent-workspace-pilot.md) | **Dated experiments.** No independent work queue or current release claim. |
-| [product assessment](product-assessment-2026-09-29.md), [continuity pilot](agent-continuity-pilot-2026-09-29.md), [assessment receipts](assessment-evidence/2026-09-29/README.md) | **Dated evidence.** Preserve failures/workarounds as history and link subsequent fixes; do not mark repaired defects open. |
+| [product assessment](history/assessments/product-assessment-2026-09-29.md), [continuity pilot](history/experiments/agent-continuity-pilot-2026-09-29.md), [assessment receipts](assessment-evidence/2026-09-29/README.md) | **Dated evidence.** Preserve failures/workarounds as history and link subsequent fixes; do not mark repaired defects open. |
 | [competitive-landscape.md](competitive-landscape.md), [session baseline](benchmarks/session-baseline.md), [tool baseline](benchmarks/2026-09-27/tool-performance-baseline.md) | **Dated research/measurements.** Refresh relevant claims when executing W16/W22; not product or performance promises. |
 
 ## Reconciliation outcomes recorded on 2026-09-29

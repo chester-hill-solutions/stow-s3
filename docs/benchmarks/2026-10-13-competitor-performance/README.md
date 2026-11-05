@@ -1,5 +1,8 @@
 # Competitor performance — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Stow has a credible compact-server and fast native-startup story. It does not
 lead filesystem download throughput or disk quarantine throughput. Product
 comparisons cover S3-shaped stores: Stow, MinIO, S3Proxy and RustFS. SQLite,
@@ -148,7 +151,7 @@ See the [completion receipt](comparison/run.json), [analysis](comparison/analysi
 [full native table](comparison/embedded-report.md),
 [Go startup samples](comparison/agent.txt), [Node samples](comparison/node-agent.json),
 [historical combined diagnostic dataset](comparison/website.json), and
-[smoke analysis](smoke/analysis.json). The [runner methods](../../../benchmark/README.md)
+[smoke analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-competitor-performance/smoke/analysis.json). The [runner methods](../../../benchmark/README.md)
 describe measurement boundaries and reproduction.
 
 ## Original combined preview validation
@@ -156,13 +159,13 @@ describe measurement boundaries and reproduction.
 This receipt describes the earlier combined preview. The S3-only product
 preview is verified separately; the original evidence remains intact.
 
-The [Railway validation receipt](verification/receipt.json) records repository
+The [Railway validation receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-competitor-performance/verification/receipt.json) records repository
 standards, all conformance lanes, Node/WASM tests, SDK browser tests and protobuf
 generation checks. SDK browser tests passed 33 cases; the optional 1 GiB workload
 and direct-provider live qualification were skipped. The
-[chart preview receipt](verification/preview-receipt.json) records 39 chart
+[chart preview receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-competitor-performance/verification/preview-receipt.json) records 39 chart
 combinations, eight desktop/mobile screenshots and no browser errors. The
-[generated-output manifest](verification/generated-change.json) confirms no SDK
+[generated-output manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-competitor-performance/verification/generated-change.json) confirms no SDK
 output changed and the measured WASM hash still matches.
 
 Verification deployment `fce13738-fcb4-44e8-b115-c1ffbe53cfa5` reached `SUCCESS`.
@@ -181,8 +184,8 @@ The Go/Node/SQLite/buffer results remain internal diagnostics in this report.
 
 The [S3-only chart dataset](comparison/agent-storage.json) was derived on Railway
 from the existing completed batch. No workloads were rerun. The
-[product-preview receipt](verification-product/receipt.json) and
-[Chromium receipt](verification-product/preview-receipt.json) record the site
+[product-preview receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-competitor-performance/verification-product/receipt.json) and
+[Chromium receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-competitor-performance/verification-product/preview-receipt.json) record the site
 build, three passing site tests, documentation links, 13 chart checks, six
 screenshots and zero browser errors. Deployment
 `b37d3d8d-2ae7-4a8f-839d-529330a1e38a` reached `SUCCESS`; both services were read
