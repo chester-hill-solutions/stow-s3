@@ -1,6 +1,7 @@
 ---
 status: accepted
-decision_digest: 1a7736e67ab94072
+amended: 2026-11-01
+decision_digest: 1de94cda35e64901
 supersedes: 0002 (section 5, only as to what constitutes live-write consent)
 ---
 
@@ -71,9 +72,14 @@ variables, so the unsafe path had no coverage by construction.
 **A policy is a routing choice. The live-write flag is the consent. Neither
 implies the other.**
 
-- `STOW_POLICY=mirrorWrites` alone never enables propagation. Writes stay local.
-- `STOW_ALLOW_LIVE_WRITES=true`, or `--allow-live-writes`, is required and is
-  sufficient on its own, under either policy.
+- `STOW_POLICY=mirrorWrites` alone never enables propagation. A mutation for which
+  upstream use is enabled is refused with `ErrLiveWritesDisabled`, because a
+  mirror-writes policy is not satisfied by a local write. If upstream use is
+  unavailable or unauthorized (no client, offline mode, or denied upstream-read
+  grant/policy), it stays local. Under `readThroughCache` a local write is the
+  policy working rather than a failure.
+- `STOW_ALLOW_LIVE_WRITES=true`, or `--allow-live-writes`, is required under
+  either policy, in addition to the applicable authority and durable-outbox gates.
 - An explicit `STOW_ALLOW_LIVE_WRITES=false` is a refusal, not an omission, and
   is never overridden by the policy.
 
@@ -81,7 +87,8 @@ The three independent derivations of the effective write policy are replaced by
 one exported function, `runthrough.EffectiveWritePolicy`, which is what the
 banner, the status payload, and startup validation all read. The reported policy
 distinguishes `mirrorWrites-disabled` from `mirrorWrites` so that a configured
-but inert policy is visible rather than silently described as active.
+policy whose consent is absent is visible rather than silently described as
+active.
 
 `validateLiveWriteBackend` now keys on consent rather than on policy, so a
 run-through server on the memory backend with `mirrorWrites` configured and no
@@ -120,7 +127,10 @@ unnoticed, which is the bug this ADR exists to close.
 - `STOW_POLICY=mirrorWrites` without `STOW_ALLOW_LIVE_WRITES=true` no longer
   propagates. This is a behavior change for anyone relying on the old implicit
   grant, and it is a narrowing of capability rather than a break: their reads
-  still go through run-through, and their writes still succeed locally.
+  still go through run-through, while a write for which upstream use is enabled is
+  refused with `ErrLiveWritesDisabled` so the caller learns it did not propagate
+  instead of having it silently retained. Under `readThroughCache` the write
+  succeeds locally, because that policy is satisfied without propagation.
 - Anyone who genuinely wants propagation sets the flag, which they must now do
   deliberately. The banner says so on every run-through start, and the hint
   names the exact variable.
@@ -148,4 +158,14 @@ unnoticed, which is the bug this ADR exists to close.
 
 ## Amendments
 
-None. Recorded at acceptance and not amended since.
+- 2026-11-01: Clarified that upstream availability includes offline, read-authority
+  and per-object policy gates. Consent does not replace authority or a durable
+  outbox. This records the existing adapter behavior without changing consent.
+
+- 2026-10-22: The decision and consequences said a `mirrorWrites` policy without
+  consent leaves writes local. The adapter has refused such a mutation since
+  `547b3a51` (2026-09-26), before this record was published, because a
+  mirror-writes policy is not satisfied by a local write. Both statements now
+  describe the refusal, and the `readThroughCache` case that does stay local is
+  stated separately. The decision itself is unchanged: consent is what
+  authorizes propagation.

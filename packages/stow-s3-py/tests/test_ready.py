@@ -11,7 +11,7 @@ import json
 
 import pytest
 
-from stow_s3 import READY_PROTOCOL_VERSION, StowProtocolError, parse_ready_message
+from stow_s3 import READY_PROTOCOL_VERSION, StowCapabilities, StowProtocolError, parse_ready_message
 
 
 def ready_payload(**overrides: object) -> str:
@@ -31,6 +31,7 @@ def ready_payload(**overrides: object) -> str:
             "conditionalWrites": True,
             "presignedUrls": True,
             "maxBytes": 16 * 1024 * 1024,
+            "maxMultipartUploads": 1024,
             "maxObjects": 1000,
             "maxRequestBytes": 8 * 1024 * 1024,
         },
@@ -44,6 +45,7 @@ def test_parses_a_complete_message() -> None:
     assert ready.endpoint == "http://127.0.0.1:9000"
     assert ready.backend == "filesystem"
     assert ready.capabilities.max_bytes == 16 * 1024 * 1024
+    assert ready.capabilities.max_multipart_uploads == 1024
     assert ready.capabilities.max_objects == 1000
     assert ready.capabilities.upstream is False
 
@@ -123,3 +125,9 @@ def test_zero_limits_are_carried_through_unchanged() -> None:
     ready = parse_ready_message(json.dumps(message))
     assert ready.capabilities.max_bytes == 0
     assert ready.capabilities.max_objects == 0
+
+
+def test_capabilities_preserve_existing_positional_concurrency_argument() -> None:
+    capabilities = StowCapabilities(True, True, False, True, True, 10, 20, 30, 4)
+    assert capabilities.max_concurrent_requests == 4
+    assert capabilities.max_multipart_uploads == 0

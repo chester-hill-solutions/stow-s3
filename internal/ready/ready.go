@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"os"
 )
 
 // ProtocolVersion is the version of this message shape. Clients reject an
@@ -92,12 +91,10 @@ func New(input Input) Message {
 	}
 }
 
-// WriteToFd writes exactly one JSON object to an inherited file descriptor.
+// WriteToFd writes one JSON object to a caller-owned descriptor.
+// Unix descriptors and Windows handles are supported; other platforms refuse.
 //
-// os.NewFile is used rather than a /dev/fd path so this works on macOS as well
-// as Linux. The descriptor is not closed: the client owns the pipe and may read
-// more than the first line. Arbitrary descriptor inheritance is a Unix
-// facility, which matches the supported platforms for this release.
+// Only a temporary duplicate is owned and closed, including after write failure.
 func WriteToFd(fd int, message Message) error {
 	if fd < 0 {
 		return fmt.Errorf("ready: file descriptor must not be negative")
@@ -106,10 +103,11 @@ func WriteToFd(fd int, message Message) error {
 	if err != nil {
 		return fmt.Errorf("ready: encode: %w", err)
 	}
-	file := os.NewFile(uintptr(fd), "stow-ready")
-	if file == nil {
-		return fmt.Errorf("ready: file descriptor %d is not open", fd)
+	file, err := duplicateReadyFile(fd)
+	if err != nil {
+		return fmt.Errorf("ready: duplicate fd %d: %w", fd, err)
 	}
+	defer file.Close()
 	if _, err := file.Write(append(encoded, '\n')); err != nil {
 		return fmt.Errorf("ready: write to fd %d: %w", fd, err)
 	}

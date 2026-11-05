@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { optionalLockProblems, versionProblems } from "./check-version.mjs";
+import {
+  capabilityFieldNames,
+  capabilityProblems,
+  readinessProtocolProblems,
+  readinessCapabilitySets,
+  optionalLockProblems,
+  versionProblems,
+} from "./check-version.mjs";
 
 // The version gate exists because a skew publishes a tarball or a wheel whose
 // binary is from a different release than the code that resolves it. Every version
@@ -78,6 +85,151 @@ test("nothing found anywhere is still a failure", () => {
   });
   assert.ok(problems.length >= 2);
   assert.ok(problems.every((p) => !/mismatch.*undefined.*undefined/.test(p)));
+});
+
+// The readiness version is a second, independent version. The build number and the
+// wire protocol move for different reasons, so a build bump must not read as a
+// protocol bump. Both rules below are pure for the same reason as versionProblems:
+// the failure worth testing is a discovery pattern that stops matching.
+
+const agreeing = { goProtocol: "1", typescriptProtocol: "1", pythonProtocol: "1" };
+
+test("three agreeing readiness protocol versions pass", () => {
+  assert.deepEqual(readinessProtocolProblems(agreeing), []);
+});
+
+test("an unreadable readiness version is a failure, not agreement", () => {
+  const problems = readinessProtocolProblems({ ...agreeing, goProtocol: undefined });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /ready\.go no longer declares ProtocolVersion/);
+});
+
+test("an unreadable client readiness version is a failure", () => {
+  assert.match(
+    readinessProtocolProblems({ ...agreeing, typescriptProtocol: undefined })[0],
+    /ready\.ts no longer declares READY_PROTOCOL_VERSION/,
+  );
+  assert.match(
+    readinessProtocolProblems({ ...agreeing, pythonProtocol: undefined })[0],
+    /ready\.py no longer declares READY_PROTOCOL_VERSION/,
+  );
+});
+
+test("a readiness version skew names all three", () => {
+  const problems = readinessProtocolProblems({ ...agreeing, typescriptProtocol: "2" });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /Go 1, TypeScript 2, Python 1/);
+});
+
+test("capabilityFieldNames reads a declaration block", () => {
+  const names = capabilityFieldNames({
+    text: 'type Capabilities struct {\n\tA bool `json:"a"`\n\tB int64 `json:"b"`\n}\n',
+    marker: "type Capabilities struct {",
+    terminators: ["\n}"],
+    pattern: /json:"([A-Za-z0-9_]+)"/g,
+  });
+  assert.deepEqual(names, ["a", "b"]);
+});
+
+// The block reader is where the pattern risk lives, so the block boundary has to
+// stop at the closing brace rather than running on into the next declaration.
+test("capabilityFieldNames stops at the end of the block", () => {
+  const names = capabilityFieldNames({
+    text: 'type Capabilities struct {\n\tA bool `json:"a"`\n}\ntype Other struct {\n\tC bool `json:"c"`\n}\n',
+    marker: "type Capabilities struct {",
+    terminators: ["\n}"],
+    pattern: /json:"([A-Za-z0-9_]+)"/g,
+  });
+  assert.deepEqual(names, ["a"]);
+});
+
+// A marker that stops matching must return null, not an empty list that the
+// comparison below would then read as a set with nothing missing.
+test("capabilityFieldNames returns null when the declaration is gone", () => {
+  assert.equal(
+    capabilityFieldNames({
+      text: "nothing here",
+      marker: "type Capabilities struct {",
+      terminators: ["\n}"],
+      pattern: /json:"([A-Za-z0-9_]+)"/g,
+    }),
+    null,
+  );
+});
+
+// The convention difference the normalisation exists for: the wire and TypeScript
+// are camelCase, the Python dataclass is snake_case, and that is not a disagreement.
+test("capability sets agree across naming conventions", () => {
+  assert.deepEqual(
+    capabilityProblems({
+      sets: [
+        { language: "Go", names: ["maxBytes", "maxMultipartUploads"] },
+        { language: "TypeScript", names: ["maxBytes", "maxMultipartUploads"] },
+        { language: "Python", names: ["max_bytes", "max_multipart_uploads"] },
+      ],
+    }),
+    [],
+  );
+});
+
+// The failure that motivated the gate: a field the writer publishes and a reader
+// never declares is a capability no client can report.
+test("a capability missing from a reader is reported with both sides named", () => {
+  const problems = capabilityProblems({
+    sets: [
+      { language: "Go", names: ["maxBytes", "maxMultipartUploads"] },
+      { language: "TypeScript", names: ["maxBytes"] },
+      { language: "Python", names: ["max_bytes", "max_multipart_uploads"] },
+    ],
+  });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /declared in Go, Python but not in TypeScript/);
+});
+
+// The same failure in the other direction: a field a reader declares and the
+// writer never sends is one the reader cannot rely on.
+test("a capability the writer does not publish is reported", () => {
+  const problems = capabilityProblems({
+    sets: [
+      { language: "Go", names: ["maxBytes"] },
+      { language: "TypeScript", names: ["maxBytes", "imaginary"] },
+      { language: "Python", names: ["max_bytes"] },
+    ],
+  });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /imaginary is declared in TypeScript but not in Go, Python/);
+});
+
+// A declaration that could not be found must fail loudly. Reporting a field per
+// field against an empty set would bury the cause in noise.
+test("an undiscovered capability set fails rather than comparing as empty", () => {
+  const problems = capabilityProblems({
+    sets: [
+      { language: "Go", names: null },
+      { language: "TypeScript", names: ["maxBytes"] },
+      { language: "Python", names: ["max_bytes"] },
+    ],
+  });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /no longer declared in Go/);
+});
+
+
+test("capability extraction rejects unterminated and empty declarations", () => {
+  for (const text of ['type Capabilities struct {\n A bool `json:"a"`', 'type Capabilities struct {\n}']) {
+    assert.equal(capabilityFieldNames({ text, marker: "type Capabilities struct {", terminators: ["\n}"], pattern: /json:"([A-Za-z0-9_]+)"/g }), null);
+  }
+  assert.equal(capabilityProblems({ sets: [{ language: "Go", names: [] }] }).length, 1);
+});
+
+test("the real readiness extractor includes Go fields with JSON tag options", () => {
+  const sets = readinessCapabilitySets({
+    goReady: 'type Capabilities struct {\n A bool `json:"a,omitempty"`\n}\n',
+    tsReady: 'export interface StowReadyCapabilities {\n  a: boolean;\n}\n',
+    pyReady: 'class StowCapabilities:\n    a: bool\n\n@dataclass\nclass Other:\n',
+  });
+  assert.deepEqual(sets[0].names, ["a"]);
+  assert.deepEqual(capabilityProblems({ sets }), []);
 });
 
 const nativeOptional = {
