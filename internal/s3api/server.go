@@ -109,7 +109,6 @@ func New(cfg Config) (*Server, error) {
 	}, nil
 }
 
-// ListenAndServe binds and serves HTTP. Blocks until the server stops.
 func (s *Server) ListenAndServe() error {
 	s.mu.Lock()
 	if s.closed {
@@ -160,7 +159,6 @@ func (s *Server) ListenAndServe() error {
 	return httpServer.Serve(ln)
 }
 
-// Ready closes after the listener has bound or startup has failed.
 func (s *Server) Ready() <-chan struct{} { return s.ready }
 
 func (s *Server) Addr() string {
