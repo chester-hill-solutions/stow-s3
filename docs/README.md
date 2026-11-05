@@ -21,6 +21,8 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 <!-- repo-only:start -->
 - [Workspace contract](workspace-contract.md) and [shared conformance vocabulary](workspace-contract-steps.md).
 <!-- repo-only:end -->
+- [Filesystem store](filesystem-store.md): the data-directory layout, the object-record framing, and
+  the ownership and lock rules.
 - [Run-through cache](run-through.md) and [durable outbox](outbox.md): offline
   reads, conditional propagation, retry and recovery.
 - [S3 compatibility contract](compat-contract.md): supported behavior and refusals.

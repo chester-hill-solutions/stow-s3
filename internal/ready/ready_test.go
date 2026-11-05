@@ -109,6 +109,9 @@ func TestWriteToFdEmitsOneJSONLine(t *testing.T) {
 }
 
 func TestWriteToFdRejectsInvalidDescriptor(t *testing.T) {
+	if err := ready.WriteToFd(int(^uint(0)>>1), sampleMessage()); err == nil {
+		t.Fatal("expected an invalid positive descriptor to be rejected")
+	}
 	if err := ready.WriteToFd(-1, sampleMessage()); err == nil {
 		t.Fatal("expected a negative descriptor to be rejected")
 	}

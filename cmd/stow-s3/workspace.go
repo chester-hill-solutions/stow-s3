@@ -109,7 +109,7 @@ type checkpointResult struct {
 
 // workspaceVerbs maps each subcommand to its implementation.
 //
-// It is a table rather than a switch because the verb list is now fifteen long
+// It is a table rather than a switch because the verb list is now seventeen long
 // and every one of them is a straight call: a switch grew the function's
 // complexity by one per verb until it crossed the quality ratchet's ceiling of
 // 15, and the ratchet was right to object, because a verb added for a new

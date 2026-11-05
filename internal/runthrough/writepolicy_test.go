@@ -54,6 +54,13 @@ func TestEffectiveWritePolicyHonoursAWithheldGrant(t *testing.T) {
 	if runthrough.PropagatesUpstream(cfg) {
 		t.Fatal("PropagatesUpstream = true for a grant that withholds upstream.write")
 	}
+	banner := runthrough.StartupBanner(cfg, runthrough.ModeRunThrough)
+	if strings.Contains(banner, "without live-write consent") {
+		t.Fatalf("banner attributes an authority refusal to missing consent:\n%s", banner)
+	}
+	if !strings.Contains(banner, "upstream writes are not authorized") {
+		t.Fatalf("banner omits the effective authorization refusal:\n%s", banner)
+	}
 }
 
 // The regression this policy exists for: STOW_POLICY=mirrorWrites arriving from

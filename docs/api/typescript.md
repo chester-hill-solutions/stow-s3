@@ -1650,6 +1650,7 @@ interface StowReadyCapabilities {
   conditionalWrites: boolean;
   presignedUrls: boolean;
   maxBytes: number;
+  maxMultipartUploads?: number | undefined;
   maxObjects: number;
   maxRequestBytes: number;
   maxConcurrentRequests?: number | undefined;
@@ -1664,6 +1665,7 @@ interface StowReadyCapabilities {
 | `conditionalWrites` | `boolean` | No | Whether atomic ETag write conditions are supported. |
 | `presignedUrls` | `boolean` | No |  |
 | `maxBytes` | `number` | No | Maximum managed object bytes; zero means unlimited. |
+| `maxMultipartUploads` | `number \| undefined` | Yes |  |
 | `maxObjects` | `number` | No | Maximum object count; zero means unlimited. |
 | `maxRequestBytes` | `number` | No | Positive HTTP request-body byte limit; native default is 8 MiB. |
 | `maxConcurrentRequests` | `number \| undefined` | Yes | Positive active HTTP handler limit; native default is 16. |
