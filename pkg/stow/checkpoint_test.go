@@ -126,7 +126,11 @@ func TestCheckpointRefusesCorruptFilesAndEnforcesLimits(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CreateCheckpoint: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(registry, "checkpoints", checkpoint.ID, "files", "large.txt"), []byte("corrupt"), 0o600); err != nil {
+	payload := filepath.Join(registry, "checkpoints", checkpoint.ID, "files", "large.txt")
+	if err := os.Chmod(payload, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(payload, []byte("corrupt"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	_, err = stow.RestoreCheckpoint(registry, checkpoint.ID, stow.WorkspaceOptions{

@@ -12,11 +12,9 @@ import (
 	stow "github.com/chester-hill-solutions/stow-s3/internal/embedded"
 )
 
-// Observation tokens carry a save condition across the bridge, which the runtime
-// refuses to serialize: an etag alone would lose the case where a key is written,
-// changed and changed back, which is what a guarded save exists to catch. Bounded
-// and expiring like the object MCP tools' tokens, so a long-lived runtime cannot
-// grow the table without limit.
+// Observation tokens retain runtime save conditions that cannot be serialized.
+// An ETag alone misses a key changed and restored between observation and save.
+// Expiry and eviction bound each runtime's retained state.
 const (
 	maxObservations = 256
 	observationTTL  = 15 * time.Minute
