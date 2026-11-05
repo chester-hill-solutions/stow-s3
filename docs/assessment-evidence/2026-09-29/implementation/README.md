@@ -1,8 +1,11 @@
 # Implementation receipts — 2026-09-29
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 These files describe local, unpublished 0.3.0 development measurements on macOS
 arm64. The source tree changed between experiments; they are not measurements of
-one released artifact. See [the implementation report](../../../implementation-2026-09-29.md)
+one released artifact. See [the implementation report](../../../history/implementation/implementation-2026-09-29.md)
 for the validation ledger and limits.
 
 - `stow-portable-cost-20260929.json`: original small fixture.

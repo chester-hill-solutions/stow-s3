@@ -1,5 +1,8 @@
 # Preserve marked read uncertainty in ReadForSave
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `720a9ea` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This addresses the separate
 [guarded-read finding](../2026-10-15-object-head-uncertainty/README.md#next-confirmed-finding--readforsave-fabricates-absence-on-ambiguous-get).
@@ -15,10 +18,10 @@ absence condition. Both joined orders and their wrapped forms reproduce. The
 backend still refuses replacing that existing object under an absence guard;
 this is a false observation/condition, not a demonstrated guard bypass or data loss.
 
-The [original probe](raw/original-probe.go.txt) fails twice normally and twice
-under -race before production changes: [normal](raw/original-before.log),
-[race](raw/original-before-race.log). It now passes twice in both modes:
-[normal](raw/original-after.log), [race](raw/original-after-race.log).
+The [original probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/original-probe.go.txt) fails twice normally and twice
+under -race before production changes: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/original-before.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/original-before-race.log). It now passes twice in both modes:
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/original-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/original-after-race.log).
 The native wrapper deliberately injects the read uncertainty over real memory
 storage; built-in memory GET does not naturally emit this marked error.
 
@@ -59,20 +62,20 @@ The final matrix contains **29 cases**:
   does not enable guarded saves for custom public stores, which remain unsupported.
 
 All final sources were run twice against unchanged production code before the
-one-condition edit: [baseline](raw/before-tests.log). Sixteen defect cases fail
+one-condition edit: [baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/before-tests.log). Sixteen defect cases fail
 in each repetition; the controls already pass. All 29 pass twice afterward:
-[after](raw/after-tests.log). The direct and public seams exercise actual reads,
+[after](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/after-tests.log). The direct and public seams exercise actual reads,
 condition validation, guarded publication and quota enforcement; no new test-only
 production hook is introduced.
 
 Five focused race repetitions pass **145 cases**, without skips:
-[focused race](raw/focused-race.log). Full Go tests, relevant runtime/storage/S3/
+[focused race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/focused-race.log). Full Go tests, relevant runtime/storage/S3/
 run-through/embedded/public race suites, all four conformance profiles, relevant
 vet, unchanged quality/file-size ratchets, formatting, documentation links,
 generated-output verification, WASM smoke and seven package integration tests pass.
-[Full Go](raw/full-go.log), [broad race](raw/broad-race.log),
-[conformance summary](raw/conformance-summary.log), [quality](raw/quality.log) and
-[package tests](raw/package-tests.log) retain the results. Each conformance profile
+[Full Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/full-go.log), [broad race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/broad-race.log),
+[conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/conformance-summary.log), [quality](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/quality.log) and
+[package tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/package-tests.log) retain the results. Each conformance profile
 keeps two existing skips: opt-in live upstream coverage and mirrored bucket
 creation awaiting an authority decision. No ratchet baseline is raised.
 
@@ -95,8 +98,8 @@ version/case/configuration. Present-object samples have 250,000 iterations; othe
 samples 2,000,000. Loops are serial even with GOMAXPROCS=8. No agent builds/tests
 run concurrently with measurements; other host activity is uncontrolled.
 Every command, sample/outlier, binary digest and allocation value is retained in
-[measurements](raw/measurements.json), the raw benchmark logs and
-[environment](raw/benchmark-environment.json).
+[measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/measurements.json), the raw benchmark logs and
+[environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/benchmark-environment.json).
 
 | Case | Processors | Median ns/op before → after | Change | Before range | After range |
 |---|---:|---:|---:|---:|---:|
@@ -145,7 +148,7 @@ error chain remains visible, and normal absent-object creation is unchanged.
 No extra provider request, fingerprint or payload-sized buffer is introduced.
 
 The rebuilt packaged WASM remains **4,617,224 bytes (zero size change)**,
-with a new digest. [Artifact metadata](raw/wasm.json) records both digests;
+with a new digest. [Artifact metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/wasm.json) records both digests;
 generated-output verification, WASM smoke and package tests validate the refreshed
 artifact. No managed-save API is added to WASM or S3.
 
@@ -157,8 +160,8 @@ reader without a committed marker. ReadForSave still converts that body failure
 into success with an absence condition, losing the read error. The stream closes
 once, but there was no complete read and the actual object remains present.
 Both forms reproduce twice normally and twice under -race:
-[source](raw/next-partial-read-probe.go.txt), [normal](raw/next-partial-read.log),
-[race](raw/next-partial-read-race.log). No data race is reported.
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/next-partial-read-probe.go.txt), [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/next-partial-read.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-uncertainty/raw/next-partial-read-race.log). No data race is reported.
 
 The backend's absence guard rejects the subsequent save, preserving the real
 bytes/version; a healthy observation and guarded save then succeed. This is a

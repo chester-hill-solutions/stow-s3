@@ -1,11 +1,14 @@
 # Reject premature EOF in runtime streams
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Corrected on 2026-10-16 on `codex/core-copy-quality`, based on `336ea8d`.
 Freshly fetched `origin/main` remains `219d1dcfff9807b04660a40313b32127e5be2933`,
 an ancestor of this review branch. The preceding
 [buffered-read correction](../2026-10-16-read-completeness/README.md) is retained.
-[Measured source/executable identities](raw/environment.json) and
-[final source hashes](raw/final-source-hashes.json) pin this change.
+[Measured source/executable identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/environment.json) and
+[final source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/final-source-hashes.json) pin this change.
 
 ## Evidence before changing production
 
@@ -13,17 +16,17 @@ The retained six-case repro opens a real native memory object whose metadata say
 three bytes, then injects a reader ending at zero, one or two. Both `OpenObject`
 and `StoreAdapter.GetObject` return that incomplete body with nil `io.ReadAll`
 error. This is provider-reader fault injection, not spontaneous MemoryStore damage.
-The original [normal](raw/original-before.log) and [race](raw/original-before-race.log)
+The original [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/original-before.log) and [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/original-before-race.log)
 runs each contain twelve semantic failures (six cases, twice); no data race occurs.
 The source is retained in the preceding
-[report](../2026-10-16-read-completeness/raw/next-stream-probe.go.txt).
+[report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-probe.go.txt).
 
 The initial 57 permanent cases were run before production edits:
-[44 failing leaves](raw/before-tests.log) are 22 distinct defect cases repeated
+[44 failing leaves](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/before-tests.log) are 22 distinct defect cases repeated
 twice; all 35 controls pass. These include direct/adapter streams, the public
 wrapper, seekable truncated bodies and both native/fallback range paths.
 The later explicit `io.Copy` coverage adds twelve cases: eight defects and four
-controls. A [baseline source-overlay replay](raw/copy-before-tests.log) reproduces
+controls. A [baseline source-overlay replay](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/copy-before-tests.log) reproduces
 all eight twice, leaving production files untouched. Overall: **69 new cases,
 30 defect cases and 39 controls**. No guard bypass or persisted overwrite was
 observed; failure/retry checks preserve the original object and quota accounting.
@@ -57,29 +60,29 @@ Close-error handling and range-opening errors remain as before.
 
 ## Verification
 
-- [Initial new cases and prior buffered/guarded regressions](raw/after-tests.log):
+- [Initial new cases and prior buffered/guarded regressions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/after-tests.log):
   140 leaves repeated twice, all pass.
-- [Explicit WriterTo cases](raw/copy-after-tests.log): twelve leaves twice, all pass.
-- [Focused race matrix](raw/focused-race.log): 145 leaves repeated five times,
-  **725 passes**. [WriterTo race cases](raw/copy-after-race.log): another **60 passes**.
+- [Explicit WriterTo cases](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/copy-after-tests.log): twelve leaves twice, all pass.
+- [Focused race matrix](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/focused-race.log): 145 leaves repeated five times,
+  **725 passes**. [WriterTo race cases](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/copy-after-race.log): another **60 passes**.
   Combined **785 focused race case runs**, no skips or races.
-- Original repro passes twice [normally](raw/original-after.log) and
-  [under race](raw/original-after-race.log).
-- [Full Go suite](raw/full-go.log), [broad runtime/storage/S3 race suite](raw/broad-race.log)
-  and [vet](raw/vet.log) pass. These ran before the final test-only WriterTo
+- Original repro passes twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/original-after.log) and
+  [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/original-after-race.log).
+- [Full Go suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/full-go.log), [broad runtime/storage/S3 race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/broad-race.log)
+  and [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/vet.log) pass. These ran before the final test-only WriterTo
   addition, which was separately checked normally and under race. Production
   source did not change afterward.
-- [Four conformance profiles](raw/conformance-summary.log) pass: memory,
+- [Four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/conformance-summary.log) pass: memory,
   filesystem, runtime-memory and runtime-filesystem. Each retains the two existing
   skips for opt-in live upstream and mirror bucket creation awaiting an authority decision.
-- [Quality and file-size gates](raw/quality.log), [generated comparison](raw/generated.log),
-  [WASM smoke](raw/wasm-smoke.log), [seven package integration tests](raw/package-tests.log)
-  and [final checks](raw/final-checks.log) pass.
+- [Quality and file-size gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/quality.log), [generated comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/generated.log),
+  [WASM smoke](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/wasm-smoke.log), [seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/package-tests.log)
+  and [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/final-checks.log) pass.
 
 WASM was rebuilt with pinned Go 1.25.6 and reproducible flags:
 4,618,255 → 4,618,495 bytes, **+240 bytes**.
-[Build](raw/build-wasm.log), [package build](raw/package-build.log) and
-[artifact hashes](raw/wasm.json) are retained. The added regression coverage belongs
+[Build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/build-wasm.log), [package build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/package-build.log) and
+[artifact hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/wasm.json) are retained. The added regression coverage belongs
 at this existing stream seam; no new storage abstraction is required.
 
 ## Comparative costs
@@ -97,10 +100,10 @@ Allocation measurements are cumulative bytes per operation, not RSS or peak heap
 The primary probe includes exact frozen baseline stream methods **and its existing
 WriterTo method**, plus unchanged GET/ReadForSave methods with private renaming.
 It uses the original shared copy-buffer pool and checks reader method names/count
-and WriterTo support before timing. See [source](raw/paired-probe.go.txt),
-[reference verification](raw/paired-reference-verification.json), [plan](raw/paired-plan.json),
-[all blocks](raw/paired.log), [summary](raw/paired-summary.json) and
-[parser](raw/analyze-paired.py.txt). Ten alternating ABBA/BAAB cycles per case run
+and WriterTo support before timing. See [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-probe.go.txt),
+[reference verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-reference-verification.json), [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-plan.json),
+[all blocks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired.log), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-summary.json) and
+[parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/analyze-paired.py.txt). Ten alternating ABBA/BAAB cycles per case run
 twice at CPU 1 and 8; duplicate labels execute identical code as A/A controls.
 Streaming large blocks use 10,000 operations, tiny blocks 50,000, buffered 64 KiB
 GET 5,000 and guarded 64 KiB reads 1,000. Allocation and process-wide GC CPU,
@@ -136,9 +139,9 @@ clear every direct adverse reading. No general speedup or parity is claimed.
 Both ordinary binaries contain identical tests and final benchmark sources at
 measurement time. The final WriterTo regression file was added later; measured
 and final hashes are retained separately. ABBA blocks contain three samples each,
-six samples per case/CPU/version: [plan](raw/plan.json), [raw](raw/direct.log),
-[parsed samples/ranges/allocations](raw/direct-measurements.json),
-[runner](raw/measure.py.txt) and [parser](raw/analyze-direct.py.txt).
+six samples per case/CPU/version: [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/plan.json), [raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/direct.log),
+[parsed samples/ranges/allocations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/direct-measurements.json),
+[runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/measure.py.txt) and [parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/analyze-direct.py.txt).
 `short` changes from EOF accepted as success to `io.ErrUnexpectedEOF`; its timing
 compares different results and is not a like-for-like successful-read cost.
 
@@ -194,8 +197,8 @@ allocation counts. This correction adds a small fixed allocation cost; it is not
 a buffering optimization or a claim of zero overhead.
 
 The initial same-binary label experiment used manual Read loops (no WriterTo
-invocation): [source](raw/matched-probe.go.txt), [raw](raw/matched.log),
-[summary](raw/matched-measurements.json), [parser](raw/analyze-labels.py.txt).
+invocation): [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/matched-probe.go.txt), [raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/matched.log),
+[summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/matched-measurements.json), [parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/analyze-labels.py.txt).
 Its frozen reader omitted WriterTo, so this cohort applies only to those explicit
 Read loops. CPU 8 seek is +2.89%; all other case medians decrease, with large
 same-code label variation (up to −16.67%). The balanced complete-method-set run
@@ -205,10 +208,10 @@ A subsequent probe incorrectly reused that incomplete frozen type for buffered
 GET/ReadForSave. io.Copy therefore took a different path: e.g. baseline 64 KiB
 GET allocated about 197,712 B/op versus the actual baseline's about 66,675.
 Its apparent large improvements are invalid. That **entire 1,280-block run** is
-excluded from conclusions and retained as [raw](raw/paired-incomplete-reference.log),
-[source](raw/paired-incomplete-reference-probe.go.txt),
-[plan](raw/paired-incomplete-reference-plan.json) and
-[summary](raw/paired-incomplete-reference-summary.json). The corrected run restores
+excluded from conclusions and retained as [raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-incomplete-reference.log),
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-incomplete-reference-probe.go.txt),
+[plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-incomplete-reference-plan.json) and
+[summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/paired-incomplete-reference-summary.json). The corrected run restores
 WriterTo, uses the original pool and checks method sets. No production change
 was made in response to the invalid timing result.
 
@@ -222,10 +225,10 @@ under race on both baseline and candidate. Each log contains six semantic failur
 no data race, persisted overwrite or accounting mutation is demonstrated.
 Healthy retry and full-capacity save still succeed.
 
-[Probe source](raw/next-excess-probe.go.txt), [runner](raw/next-probe.py.txt),
-[baseline normal](raw/next-excess-before.log), [baseline race](raw/next-excess-before-race.log),
-[candidate normal](raw/next-excess-after.log), [candidate race](raw/next-excess-after-race.log)
-and [frozen baseline source](raw/baseline-streams.go.txt) are retained. The baseline
+[Probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-excess-probe.go.txt), [runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-probe.py.txt),
+[baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-excess-before.log), [baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-excess-before-race.log),
+[candidate normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-excess-after.log), [candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-excess-after-race.log)
+and [frozen baseline source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/baseline-streams.go.txt) are retained. The baseline
 uses a Go source overlay; production files were never replaced. To reproduce,
 copy the probe into `internal/runtime/excess_body_review_probe_test.go`, run
 `go test ./internal/runtime -run '^TestReviewExcessObjectBody$' -count=2 -v`

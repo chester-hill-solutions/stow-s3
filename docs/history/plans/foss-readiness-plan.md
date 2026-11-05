@@ -13,7 +13,7 @@ not current instructions. Accepted ADRs and implemented contracts remain in forc
 
 ## Historical document (frozen)
 
-> **Scope and evidence update, 2026-09-29:** [The canonical storage plan](../../plan.md) schedules this work under ADR 0014. This document supplies distribution/contribution details, not an execution-product backlog. The latest [assessment](../../product-assessment-2026-09-29.md) records successful local wheel/tarball installs but incomplete public delivery; its newer observations take precedence over the dated status table below.
+> **Scope and evidence update, 2026-09-29:** [The canonical storage plan](../../plan.md) schedules this work under ADR 0014. This document supplies distribution/contribution details, not an execution-product backlog. The latest [assessment](../assessments/product-assessment-2026-09-29.md) records successful local wheel/tarball installs but incomplete public delivery; its newer observations take precedence over the dated status table below.
 
 **Status:** proposed, not agreed
 **Date:** 2026-09-28

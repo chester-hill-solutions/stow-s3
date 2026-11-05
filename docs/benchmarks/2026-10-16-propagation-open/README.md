@@ -1,5 +1,8 @@
 # Close refused propagation source readers
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Corrected on 2026-10-16 from `877526a59da521239ab2fe688091e42a5fe4af52`, on
 `codex/core-copy-quality`. Freshly fetched `origin/main` is
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of this branch.
@@ -18,9 +21,9 @@ This is a provider fault injection over native MemoryStore descriptors and real
 file readers, not evidence that native filesystem GET naturally returns a
 reader together with an opening error.
 
-Before implementation, the [original probe](../2026-10-16-runthrough-version/raw/next-propagation-probe.go.txt)
-fails twice [normally](raw/original-before.log) and twice [under race](raw/original-before-race.log).
-It passes twice [normally](raw/original-after.log) and twice [under race](raw/original-after-race.log)
+Before implementation, the [original probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-runthrough-version/raw/next-propagation-probe.go.txt)
+fails twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/original-before.log) and twice [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/original-before-race.log).
+It passes twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/original-after.log) and twice [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/original-after-race.log)
 after the correction.
 
 The production diff adds **three lines** to propagateWrite's existing opening-error
@@ -58,31 +61,31 @@ the fault and making the existing entry due through the existing scheduling API,
 one retry delivers it exactly once and clears the queue. Version conflicts still
 close once and remain terminal. No sleeps establish these outcomes.
 
-Evidence: [pre-edit normal](raw/before-tests.log), [pre-edit race](raw/before-race.log),
-[final-source baseline normal](raw/final-before.log), [final-source baseline race](raw/final-before-race.log),
-and [corrected normal, 66 passing executions](raw/after-tests.log).
-[Final source provenance](raw/final-provenance.json),
-[focused/provenance runner](raw/final-checks.py.txt), and [final origin refresh](raw/fetch-final.log).
+Evidence: [pre-edit normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/before-tests.log), [pre-edit race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/before-race.log),
+[final-source baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/final-before.log), [final-source baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/final-before-race.log),
+and [corrected normal, 66 passing executions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/after-tests.log).
+[Final source provenance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/final-provenance.json),
+[focused/provenance runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/final-checks.py.txt), and [final origin refresh](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/fetch-final.log).
 
 ## Verification
 
 The final implementation passes:
 
-- [All Go tests](raw/full-go.log), [broad storage/runtime/S3/run-through race checks](raw/broad-race.log), and [vet](raw/vet.log).
-- [Entire run-through race suite, five repetitions](raw/focused-race.log): **1,460 passing leaf executions**.
-- [Conformance](raw/conformance-summary.log) on memory, filesystem, runtime-memory and runtime-filesystem; [full output](raw/conformance-full.log). The pre-existing mirror-bucket authority decision and opt-in live upstream tests remain skipped in each profile. No live AWS qualification is claimed.
-- [Go/file-size gates](raw/quality.log), [WASM build](raw/build-wasm.log), [package build](raw/package-build.log), [generated-artifact check](raw/generated.log), [real WASM smoke test](raw/wasm-smoke.log), and [seven package integration tests](raw/package-tests.log).
+- [All Go tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/full-go.log), [broad storage/runtime/S3/run-through race checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/broad-race.log), and [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/vet.log).
+- [Entire run-through race suite, five repetitions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/focused-race.log): **1,460 passing leaf executions**.
+- [Conformance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/conformance-summary.log) on memory, filesystem, runtime-memory and runtime-filesystem; [full output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/conformance-full.log). The pre-existing mirror-bucket authority decision and opt-in live upstream tests remain skipped in each profile. No live AWS qualification is claimed.
+- [Go/file-size gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/quality.log), [WASM build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/build-wasm.log), [package build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/package-build.log), [generated-artifact check](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/generated.log), [real WASM smoke test](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/wasm-smoke.log), and [seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/package-tests.log).
 
-The [rebuilt WASM identity](raw/wasm.json) is unchanged: **4,619,197 bytes**,
+The [rebuilt WASM identity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/wasm.json) is unchanged: **4,619,197 bytes**,
 SHA-256 `a828baf915d451665700e039bf7a1895bdfcd2306c2298cca9ea9482668f1193`.
-Native propagation is outside that artifact. [Verification runner](raw/validate.py.txt).
+Native propagation is outside that artifact. [Verification runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/validate.py.txt).
 
 ## Before/after measurements
 
 Two optimized ordinary test binaries contain identical final tests and benchmarks.
 Only outbox_adapter.go is replaced by its exact baseline in the reference binary.
-The [runner](raw/measure.py.txt) records source/compiler/binary identities in
-[environment.json](raw/environment.json) and [compiler-environment.json](raw/compiler-environment.json).
+The [runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/measure.py.txt) records source/compiler/binary identities in
+[environment.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/environment.json) and [compiler-environment.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/compiler-environment.json).
 Apple M1 Pro, Darwin arm64, Go 1.25.6. CPU settings select GOMAXPROCS, not parallel
 benchmark workers.
 
@@ -97,8 +100,8 @@ Its Close increments a counter; it does not model real provider cleanup latency.
 
 Two alternating ABBA/BAAB cycles at CPU 1 and 8, two repetitions per block and
 100 ms per measurement produce **256 retained observations**, eight per case,
-version and CPU: [plan](raw/plan.json), [raw](raw/measurements.log),
-[samples](raw/samples.json), [summary with ranges](raw/summary.json).
+version and CPU: [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/plan.json), [raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/measurements.log),
+[samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/samples.json), [summary with ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/summary.json).
 All samples, adverse medians and both cycle comparisons are retained.
 
 | CPU | Case | Median ns/op before → after | Change | Both cycle changes | Same-code absolute change, median |
@@ -161,9 +164,9 @@ frequency or scheduling effects. These are serial runs at GOMAXPROCS 1 and 8.
 No other validation/build is run concurrently by this review.
 
 Each case uses a full ABBA then BAAB sequence: **128 retained process samples**,
-four per version/case/CPU. [Runner](raw/cpu-measure.py.txt),
-[raw](raw/cpu-measurements.log), [all observations](raw/cpu-samples.json),
-[summary/ranges/cycle comparisons](raw/cpu-summary.json).
+four per version/case/CPU. [Runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/cpu-measure.py.txt),
+[raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/cpu-measurements.log), [all observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/cpu-samples.json),
+[summary/ranges/cycle comparisons](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/cpu-summary.json).
 
 | CPU | Case | Median process CPU ns/op before → after | Change | Same-code absolute change, median |
 | --- | --- | ---: | ---: | ---: |
@@ -204,7 +207,7 @@ joined with ErrMutationCommitted, recovery silently discards the prepared intent
 rather than preserving uncertainty. This is the same existing marked-error
 convention that earlier runtime fixes retain; it is not reliable absence.
 
-The [separate deterministic probe](raw/next-prepared-probe.go.txt) prepares an
+The [separate deterministic probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/next-prepared-probe.go.txt) prepares an
 unowned PUT intent in a real FileOutbox, commits a replacement in native
 MemoryStore, then injects that ambiguous HEAD result. RecoverPrepared returns
 nil and removes the intent. The removal survives closing and reopening the
@@ -214,13 +217,13 @@ HEAD error is a passing control: it preserves the intent and later propagates
 exactly once.
 
 The marked-missing case fails twice and the ordinary uncertainty control passes
-twice in each of [baseline normal](raw/next-before.log),
-[baseline race](raw/next-before-race.log), [candidate normal](raw/next-after.log)
-and [candidate race](raw/next-after-race.log). [Probe runner](raw/prepared-probe.py.txt).
+twice in each of [baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/next-before.log),
+[baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/next-before-race.log), [candidate normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/next-after.log)
+and [candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/next-after-race.log). [Probe runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/prepared-probe.py.txt).
 This models an existing recovery state and provider error result; it does not
 claim a physical process crash or a naturally occurring native filesystem HEAD
 failure. The journal is reopened, while the native memory object remains in the
 same process. No prepared-recovery implementation or permanent test is added in
 this reader-ownership correction.
 
-[Documentation/site gate output](raw/docs.log) accompanies this report.
+[Documentation/site gate output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-propagation-open/raw/docs.log) accompanies this report.

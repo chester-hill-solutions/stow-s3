@@ -1,10 +1,13 @@
 # Preserve protobuf outbox identities — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Baseline and demonstrated failures
 
 Baseline `bfe5b90` already rejects IDs shared between active and prepared maps.
 `origin/main` was refreshed before this work; exact refs are in
-[baseline.json](2026-10-18-outbox-identities/raw/baseline.json).
+[baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/baseline.json).
 This change addresses loss before those maps reach the shared normalizer.
 
 The protobuf decoder accepted repeated records with the same identity within
@@ -28,12 +31,12 @@ failed-write case. Both differing/identical duplicates and both record orders
 are exercised. Each mode recorded 24 accepted-and-rewritten opens. A control
 preserving distinct empty, ASCII, NUL, Unicode and replacement-character
 identities passed twice in each mode.
-[Red receipt](2026-10-18-outbox-identities/raw/before/red-receipt.json) verifies the exact case set.
+[Red receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/before/red-receipt.json) verifies the exact case set.
 
 The baseline job's final benchmark build failed because its output path was in
 the root-owned `/results` directory. The original failure and log are retained.
 Only that build was repeated with output in writable `/app/benchmark`; the
-[repair job](2026-10-18-outbox-identities/raw/baseline-build/checks.json) passed with source hashes
+[repair job](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/baseline-build/checks.json) passed with source hashes
 identical to the red run. No production edit preceded the repaired baseline build.
 This infrastructure failure is not counted as an integrity regression.
 
@@ -66,7 +69,7 @@ claim fencing and conformance tests remain in the full verification.
 All 52 originally failing cases now pass twice normally and twice under race
 detection, plus the distinct-identity control twice in each mode: **106 passing
 cases per mode** using byte-identical regression/benchmark source from the red
-run. The [final green receipt](2026-10-18-outbox-identities/raw/final/green-receipt.json)
+run. The [final green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/final/green-receipt.json)
 verifies exact cases and source hashes.
 
 All **17 final Railway stages** pass: formatting; focused outbox tests twice
@@ -75,8 +78,8 @@ embedded/run-through/S3/public-package race tests; four conformance profiles
 (memory, filesystem, runtime-memory, runtime-filesystem); vet; site build/tests;
 documentation links; quality/file-size/format gates; two benchmark builds; and
 interleaved comparison. The initial lookup implementation also passed all 16 of
-its stages. [Final commands/results](2026-10-18-outbox-identities/raw/final/checks.json)
-and [initial commands/results](2026-10-18-outbox-identities/raw/after/checks.json)
+its stages. [Final commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/final/checks.json)
+and [initial commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/after/checks.json)
 are retained alongside the original red job and its separate build repair.
 
 All formatting, compilation, code checks, tests and measurements ran on the same
@@ -95,7 +98,7 @@ implementation added membership lookups against the destination maps instead.
 Its separate 96-observation cohort measured a 16.8% CPU-1 decode increase at depth
 128 and an 8.0% CPU-4 increase at depth 16,384. Allocation counts were unchanged.
 Those adverse results prompted the simpler growth check and remain retained in
-[initial comparison](2026-10-18-outbox-identities/raw/after/comparison-analysis.json).
+[initial comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/after/comparison-analysis.json).
 The final cohort is reported separately; its measurements do not replace the
 initial results or pool different implementations. There is no new
 retained cache, map, allocation site on valid input, storage format or abstraction.
@@ -139,8 +142,8 @@ difference between median allocated bytes is 2.5 B/op; exact values
 and ranges for every cell remain in the analysis.
 
 All individual samples, timing/allocation ranges and binary hashes are retained
-in [comparison analysis](2026-10-18-outbox-identities/raw/final/comparison-analysis.json) and
-[commands/order](2026-10-18-outbox-identities/raw/final/comparison-runs.json).
+in [comparison analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/final/comparison-analysis.json) and
+[commands/order](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-identities/raw/final/comparison-runs.json).
 Small sample counts do not establish statistical significance. Benchmark binaries
 are removed after measurements and hashes are saved; the runner is stopped only
 after verified exports and final documentation checks.

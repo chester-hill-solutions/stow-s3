@@ -1,5 +1,8 @@
 # Memory performance rerun — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Measured on an Apple M1 Pro, eight logical CPUs, 16 GiB RAM, macOS 14.5, Node v25.9.0. These are exploratory measurements on a shared desktop.
 The capacity rerun is faster than the earlier baseline. The five-minute quarantine run has lower latency and fewer dropped arrivals, but still records a brief loss event.
 
@@ -72,10 +75,10 @@ The desktop was quieter by the user’s observation, but background processes re
 
 ## Evidence and reproduction
 
-- [Capacity report](capacity/report.md), [effective config](capacity/config.json), [summary](capacity/summary.json) and [raw index](capacity/suite.json).
-- [Arrival-rate report](rates/report.md), [effective config](rates/config.json), [summary](rates/summary.json) and [raw index](rates/suite.json).
-- [Five-minute report](steady/report.md), [effective config](steady/config.json), [summary](steady/summary.json) and [raw index](steady/suite.json).
-- [Validation record](validation.json): all 22 runs completed, zero operation failures, verified data, no quarantine leftovers, disk reserve maintained, and 12 measurement tests passed after the load runs. All three benchmark commands exited zero; dropped arrivals are reported separately from operation failures.
+- [Capacity report](capacity/report.md), [effective config](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/capacity/config.json), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/capacity/summary.json) and [raw index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/capacity/suite.json).
+- [Arrival-rate report](rates/report.md), [effective config](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/rates/config.json), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/rates/summary.json) and [raw index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/rates/suite.json).
+- [Five-minute report](steady/report.md), [effective config](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/steady/config.json), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/steady/summary.json) and [raw index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/steady/suite.json).
+- [Validation record](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/validation.json): all 22 runs completed, zero operation failures, verified data, no quarantine leftovers, disk reserve maintained, and 12 measurement tests passed after the load runs. All three benchmark commands exited zero; dropped arrivals are reported separately from operation failures.
 - Each suite preserves its harness source snapshot, binary SHA-256, build metadata, SDK lockfile hash and dirty-checkout identity. Scenario JSON files contain per-second arrivals and sampled resources.
 - [Earlier evidence](../2026-10-12-performance/README.md) and [testing guide](../../performance-testing.md).
 

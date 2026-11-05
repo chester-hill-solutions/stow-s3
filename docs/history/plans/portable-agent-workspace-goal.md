@@ -8,7 +8,7 @@ This document defines success for S0–S4; it is not an independent backlog. The
 [planning index](../../planning-index.md) records which old plans were retired and where
 their remaining work was carried forward.
 
-The [local 0.3.0 implementation](../../implementation-2026-09-29.md) now includes portable
+The [local 0.3.0 implementation](../implementation/implementation-2026-09-29.md) now includes portable
 object payloads and metadata, shared capture/publication guarantees, local MCP and
 an experimental OpenCode caller. Public release, successful real-model cross-host
 continuation and independent adoption remain open. The goal below defines acceptance
@@ -107,4 +107,4 @@ A future paid offer needs evidence of recurring team needs such as shared retent
 
 ## Starting evidence
 
-The [assessment](../../product-assessment-2026-09-29.md) records passing storage checks and current defects. The [continuity pilot](../../agent-continuity-pilot-2026-09-29.md) demonstrates two deterministic worker processes using offline inputs and transferred files on one host, with an archive-reference workaround. It did not demonstrate fresh-agent or cross-host continuation. Those are validation tasks, not existing product claims.
+The [assessment](../assessments/product-assessment-2026-09-29.md) records passing storage checks and current defects. The [continuity pilot](../experiments/agent-continuity-pilot-2026-09-29.md) demonstrates two deterministic worker processes using offline inputs and transferred files on one host, with an archive-reference workaround. It did not demonstrate fresh-agent or cross-host continuation. Those are validation tasks, not existing product claims.

@@ -1,5 +1,8 @@
 # Refuse loss of an observed outbox journal
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Date: 2026-10-17 (Toronto; receipts use UTC).
 Baseline: `7720c749ddc9120c7a381d7f7f93ebc771af72e5` on `codex/core-copy-quality`.
 Freshly fetched `origin/main`: `219d1dcfff9807b04660a40313b32127e5be2933`. Worktree initially clean.
@@ -22,9 +25,9 @@ write, an empty snapshot and the recovery caller. Failures show nil where
 failure or race report. The unpublished-first-write retry control passed twice
 in both modes, and the quality/file-size/format gates passed before the fix.
 
-[Normal failures](2026-10-17-outbox-missing/raw/before/regression-normal.log),
-[race failures](2026-10-17-outbox-missing/raw/before/regression-race.log),
-[original checks](2026-10-17-outbox-missing/raw/before/checks.json).
+[Normal failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/before/regression-normal.log),
+[race failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/before/regression-race.log),
+[original checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/before/checks.json).
 
 ## Change and protected contracts
 
@@ -56,9 +59,9 @@ and twice under race detection; the complete Go suite; broad storage/runtime/
 embedded/run-through/S3/public-package race tests; all four conformance profiles
 (memory, filesystem, runtime-memory and runtime-filesystem); vet; quality,
 file-size and formatting gates; site build, site tests and documentation links.
-See [final checks](2026-10-17-outbox-missing/raw/source-checks/checks.json).
+See [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/source-checks/checks.json).
 The finished report and source bytes are verified in the
-[report receipt](2026-10-17-outbox-missing/raw/source-checks/report-receipt.json).
+[report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/source-checks/report-receipt.json).
 All compilation, formatting and verification ran on the existing Railway scratch
 runner using the pinned Go 1.25.6/Node 25.9.0 toolchain. No baseline was raised.
 
@@ -89,8 +92,8 @@ Other tested non-object roots (boolean, number, string and array) are rejected.
 
 The isolated overlay reproduced all eight `null` cases twice normally and twice
 under race detection after the live-file-loss correction; the other-root controls
-passed. See the [normal reproduction](2026-10-17-outbox-missing/raw/next-finding/null-journal-normal.log)
-and [race reproduction](2026-10-17-outbox-missing/raw/next-finding/null-journal-race.log).
+passed. See the [normal reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/next-finding/null-journal-normal.log)
+and [race reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-missing/raw/next-finding/null-journal-race.log).
 This finding is not fixed here. The next correction should reject a null root
 while preserving valid legacy object snapshots and the protobuf format.
 

@@ -1,5 +1,8 @@
 # Refuse ambiguous object HEAD before mutation
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `058255d` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This addresses the separate
 [object HEAD finding](../2026-10-15-completion-lookup/README.md#next-confirmed-finding--ambiguous-object-head-strands-quota).
@@ -16,10 +19,10 @@ removes the actual object and returns success, but Usage remains three bytes/one
 object. A healthy delete retry returns missing and a one-byte PUT elsewhere is
 blocked by the phantom object count.
 
-The [original probe](raw/original-probe.go.txt) fails twice normally and twice
-under -race before production edits: [normal](raw/original-before.log),
-[race](raw/original-before-race.log). After the correction it passes twice in
-both modes: [normal](raw/original-after.log), [race](raw/original-after-race.log).
+The [original probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/original-probe.go.txt) fails twice normally and twice
+under -race before production edits: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/original-before.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/original-before-race.log). After the correction it passes twice in
+both modes: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/original-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/original-after-race.log).
 The error is deliberately injected at the native store seam over real memory
 storage; this does not claim built-in memory HEAD naturally emits committed
 mutation errors. The demonstrated defect is actual deletion with incorrect quota.
@@ -61,19 +64,19 @@ The final suite has **59 cases**:
 The native defect was reproduced before the guards were added. After correcting
 the HTTP fixture's required Content-Length header, the final matrix was also run
 twice against original objects.go, restored in a finally block:
-[baseline failures](raw/before-tests.log). The final tests pass twice with the two
-guards: [after](raw/after-tests.log). The
-[old fixture's 400 response](raw/http-fixture-before-length-fix.log) is not treated
+[baseline failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/before-tests.log). The final tests pass twice with the two
+guards: [after](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/after-tests.log). The
+[old fixture's 400 response](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/http-fixture-before-length-fix.log) is not treated
 as evidence of the storage defect.
 
 Five focused race repetitions pass **295 cases** without skips:
-[focused race](raw/focused-race.log). Full Go tests, relevant runtime/storage/S3/
+[focused race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/focused-race.log). Full Go tests, relevant runtime/storage/S3/
 run-through/embedded/public race suites, all four conformance profiles, relevant
 vet, unchanged quality/file-size ratchets, source formatting, generated-output
 verification, WASM smoke and seven package integration tests pass.
-[Full Go](raw/full-go.log), [broad race](raw/broad-race.log),
-[conformance summary](raw/conformance-summary.log), [quality](raw/quality.log) and
-[package tests](raw/package-tests.log) retain the results. Each conformance profile
+[Full Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/full-go.log), [broad race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/broad-race.log),
+[conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/conformance-summary.log), [quality](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/quality.log) and
+[package tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/package-tests.log) retain the results. Each conformance profile
 keeps two existing skips: opt-in live upstream coverage and mirrored bucket
 creation awaiting an authority decision. No new regression skipped and no ratchet
 baseline is raised.
@@ -82,7 +85,7 @@ One post-fix replay attempt failed during Go setup because unicode/utf8 was
 reported missing from the pinned standard library. The directory was present on
 immediate inspection, go list succeeded and the replay then passed normally and
 under -race without a toolchain/source change. The failed attempt is retained:
-[setup failure](raw/original-after-toolchain-failure.log).
+[setup failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/original-after-toolchain-failure.log).
 
 ## Comparative measurements and costs
 
@@ -108,16 +111,16 @@ processor, then eight: six samples per version/case/configuration. Classifier
 samples have 5,000,000 iterations; real lifecycles 250,000. Loops remain serial at
 GOMAXPROCS=8. No agent builds/tests run concurrently with measurements; other host
 activity is uncontrolled. Every sample/outlier, exact command, binary digest and
-allocation count is retained in [measurements](raw/measurements.json) and
-[environment](raw/benchmark-environment.json).
+allocation count is retained in [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/measurements.json) and
+[environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/benchmark-environment.json).
 
 The batch benchmark was added afterward to measure the second corrected site
 explicitly. It uses the same two-guard implementation pair and matched final
 benchmark sources within that comparison. Original classifier/single-loop
 binaries and results were retained rather than relabeled or overwritten. Their
-[original source](raw/classification-and-single-bench.go.txt) and the separate
-[batch measurements](raw/batch-measurements.json) and
-[batch environment](raw/batch-benchmark-environment.json) record the distinction.
+[original source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/classification-and-single-bench.go.txt) and the separate
+[batch measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/batch-measurements.json) and
+[batch environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/batch-benchmark-environment.json) record the distinction.
 
 | Case | Processors | Median ns/op before → after | Change | Before range | After range |
 |---|---:|---:|---:|---:|---:|
@@ -170,7 +173,7 @@ exact latency parity or resolution of earlier reports' performance concerns is
 claimed, and no substantial optimization is proposed.
 
 The refreshed packaged WASM grows **4,617,093 → 4,617,224
-bytes (+131 bytes)**. [Artifact metadata](raw/wasm.json) records both digests.
+bytes (+131 bytes)**. [Artifact metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/wasm.json) records both digests.
 Generated-output verification, WASM smoke and package integration tests validate
 the refreshed artifact.
 
@@ -180,8 +183,8 @@ A separate native probe injects the same ambiguous missing/committed chain durin
 GET over a real memory store holding an existing object. ReadForSave converts it
 into success with ObservedAbsence=true, dropping the uncertainty. Both joined
 orders and both wrapped variants reproduce twice normally and twice under -race:
-[source](raw/next-save-read-probe.go.txt), [normal](raw/next-save-read.log),
-[race](raw/next-save-read-race.log). There is no reported data race.
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/next-save-read-probe.go.txt), [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/next-save-read.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-object-head-uncertainty/raw/next-save-read-race.log). There is no reported data race.
 
 The probe also verifies the boundary: a subsequent SaveObject with the fabricated
 absence condition is refused by the backend's guard, leaving the original bytes

@@ -313,7 +313,7 @@ run.
 
 ## Related contracts
 
-- [Agent continuity pilot, 2026-09-29](../../agent-continuity-pilot-2026-09-29.md) — measured offline input capture and two-process continuation, including the archive-path workaround; fresh-model and cross-host continuation remain untested.
+- [Agent continuity pilot, 2026-09-29](../experiments/agent-continuity-pilot-2026-09-29.md) — measured offline input capture and two-process continuation, including the archive-path workaround; fresh-model and cross-host continuation remain untested.
 - [Agent task manifest](../../task-manifest.md) — current workspace preparation,
   lifecycle, and explicit non-sandbox limitation.
 - [Workspace contract](../../workspace-contract.md) — object/file mapping and

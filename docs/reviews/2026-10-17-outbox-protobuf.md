@@ -1,5 +1,8 @@
 # Store outbox snapshots as protobuf
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The filesystem outbox now writes a framed protobuf snapshot, using the protobuf
 dependency already present for filesystem object records. It preserves the same
 locks, fresh reload, state cloning, file/directory durability fence and acknowledgement
@@ -9,7 +12,7 @@ successful write. The journal path, Go interfaces and S3 behavior remain unchang
 Base `39f61ba9bfdb2be9bd7ddb469b5b1579f51f3509` includes the directory-fence fix.
 A fresh fetch reports `origin/main` at
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Baseline](2026-10-17-outbox-protobuf/raw/baseline.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/baseline.json).
 This is one measured encoding change; no indexing, checkpointing, new storage
 abstraction or unchanged-save shortcut is implemented.
 
@@ -33,7 +36,7 @@ codecs. Indented JSON and compact JSON use schema 3. The prototype protobuf uses
 schema 4. Each comparison uses forward/reverse order and a 100-ms minimum at
 GOMAXPROCS 1. The two JSON-baseline labels are byte-identical copies of one test
 binary; their separately timed samples are retained without pooling them into one
-baseline. [Plan](2026-10-17-outbox-protobuf/raw/pilot/plan.json), [binary/source hashes](2026-10-17-outbox-protobuf/raw/pilot/build.json), [all pilot samples](2026-10-17-outbox-protobuf/raw/pilot/samples.json), [ranges](2026-10-17-outbox-protobuf/raw/pilot/summary.json).
+baseline. [Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/pilot/plan.json), [binary/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/pilot/build.json), [all pilot samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/pilot/samples.json), [ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/pilot/summary.json).
 
 The pilot shows a material whole-save benefit beyond compact JSON at large depth.
 It also reveals a real adverse result: isolated mixed-state protobuf decoding
@@ -45,7 +48,7 @@ race: the existing writer still emits JSON, JSON migration does not produce prot
 and native opening of a future protobuf file does not expose the format-version
 error. These are test-first checks for the requested representation; the baseline
 durability contract was already corrected in the previous change.
-[Original native failures](2026-10-17-outbox-protobuf/raw/native-regression/reproduce-normal.log), [original race failures](2026-10-17-outbox-protobuf/raw/native-regression/reproduce-race.log).
+[Original native failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-regression/reproduce-normal.log), [original race failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-regression/reproduce-race.log).
 
 ## Implementation and storage contracts
 
@@ -119,7 +122,7 @@ The final codec cohort retains 640 observations: two comparison families, ABBA a
 BAAB order, two repetitions per block, a 200-ms minimum and CPU 1/4. Each row has
 eight observations per version. The compact-JSON and protobuf families each retain
 their own JSON baseline observations. The same final source and fixtures are used
-by every binary; selector overlays choose only the codec. [Plan](2026-10-17-outbox-protobuf/raw/codec-final/plan.json), [binary/source hashes](2026-10-17-outbox-protobuf/raw/codec-final/build.json), [all samples](2026-10-17-outbox-protobuf/raw/codec-final/samples.json), [ranges](2026-10-17-outbox-protobuf/raw/codec-final/summary.json), [resources/load](2026-10-17-outbox-protobuf/raw/codec-final/block-resources.json).
+by every binary; selector overlays choose only the codec. [Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/codec-final/plan.json), [binary/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/codec-final/build.json), [all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/codec-final/samples.json), [ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/codec-final/summary.json), [resources/load](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/codec-final/block-resources.json).
 
 | CPU | Comparison | Operation | Median μs before → after | Median B/op before → after | Allocations/op before → after |
 |---|---|---|---:|---:|---:|
@@ -172,7 +175,7 @@ baseline overlays only `file_outbox.go` and `outbox.go` from the starting revisi
 the candidate uses the exact validated production path. Both versions call
 `FileOutbox.SaveUpstreamState`, including native locks, reload, clone, update,
 encoding and file/parent fsync. Both still replace the full journal on unchanged
-values. [Plan](2026-10-17-outbox-protobuf/raw/native-final/plan.json), [binary/source hashes](2026-10-17-outbox-protobuf/raw/native-final/build.json), [all samples](2026-10-17-outbox-protobuf/raw/native-final/samples.json), [ranges](2026-10-17-outbox-protobuf/raw/native-final/summary.json), [resources/load](2026-10-17-outbox-protobuf/raw/native-final/block-resources.json).
+values. [Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-final/plan.json), [binary/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-final/build.json), [all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-final/samples.json), [ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-final/summary.json), [resources/load](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/native-final/block-resources.json).
 
 | CPU | Save | Median ms before → after | Change | Median B/op before → after | Allocations/op before → after |
 |---|---|---:|---:|---:|---:|
@@ -214,7 +217,7 @@ repetitions, a 200-ms minimum and CPU 1/4. It calls `FileOutbox.UpstreamState`,
 including file reading, decoding, sequence/token updates, whole-state cloning and
 the single-key lookup. It checks the returned value and reports process writes.
 This captures the full read cost rather than interpreting isolated decoder
-allocation as the whole operation's allocation. [Plan](2026-10-17-outbox-protobuf/raw/lookup-final/plan.json), [binary/source hashes](2026-10-17-outbox-protobuf/raw/lookup-final/build.json), [all samples](2026-10-17-outbox-protobuf/raw/lookup-final/samples.json), [ranges](2026-10-17-outbox-protobuf/raw/lookup-final/summary.json).
+allocation as the whole operation's allocation. [Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/lookup-final/plan.json), [binary/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/lookup-final/build.json), [all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/lookup-final/samples.json), [ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/lookup-final/summary.json).
 
 | CPU | Lookup | Median μs before → after | Change | Median B/op before → after | Allocations/op before → after |
 |---|---|---:|---:|---:|---:|
@@ -241,7 +244,7 @@ The stripped CLI built with the repository's release flags grows from **15,048,9
 the new codec file so an unused import does not initialize the outbox descriptor;
 test binaries include both codecs and cannot establish this production footprint.
 Both CLI builds use `-trimpath`, `-ldflags=-s -w` and `-buildvcs=false`. Temporary
-CLI binaries are removed after hashes/sizes are recorded. [CLI footprint and hashes](2026-10-17-outbox-protobuf/raw/footprint/footprint.log).
+CLI binaries are removed after hashes/sizes are recorded. [CLI footprint and hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/footprint/footprint.log).
 
 All adverse timings and allocation rows remain in the samples and range summaries.
 Generated messages add intermediate allocations; mixed-state decoding can allocate
@@ -268,7 +271,7 @@ tests, all four conformance profiles, vet, site build/tests and document checks.
 The first full matrix's only failing step is the required stale-comment baseline
 reduction; no production source changes between that pass and the successful
 quality-only recheck. Source hashes make that boundary reviewable:
-[Full commands/results](2026-10-17-outbox-protobuf/raw/source-checks/checks.json), [source hashes](2026-10-17-outbox-protobuf/raw/source-checks/environment.json), [final quality check](2026-10-17-outbox-protobuf/raw/quality-checks/checks.json), [final source/quality hashes](2026-10-17-outbox-protobuf/raw/quality-checks/environment.json).
+[Full commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/source-checks/checks.json), [source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/source-checks/environment.json), [final quality check](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/quality-checks/checks.json), [final source/quality hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/quality-checks/environment.json).
 
 | Full matrix check | Exit | Seconds |
 |---|---:|---:|
@@ -289,14 +292,14 @@ quality-only recheck. Source hashes make that boundary reviewable:
 
 The successful quality recheck tightens the count and runs quality/file-size/format
 together. Final report/site/document checks run on Railway against the exact source:
-[final report receipt](2026-10-17-outbox-protobuf/raw/quality-checks/report-receipt.json). The retained total is 1,280 observations: 160 pilot, 640 final codec,
+[final report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/quality-checks/report-receipt.json). The retained total is 1,280 observations: 160 pilot, 640 final codec,
 320 actual native saves and 160 actual lookups. Plans, logs, source snapshots,
 binary/source hashes, cgroup/filesystem/load metadata, cleanup records and verified
 export receipts are saved. Expected red tests and failed setup gates are retained.
 No test or CLI binaries are committed. The initial upload manifest predates the
 staged edits; later jobs record their final source hashes. The scratch runner is
 stopped after export and the separate benchmark target remains untouched:
-[verified service status](2026-10-17-outbox-protobuf/raw/runner-stop-status.json).
+[verified service status](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-protobuf/raw/runner-stop-status.json).
 
 ## Next finding, not implemented
 

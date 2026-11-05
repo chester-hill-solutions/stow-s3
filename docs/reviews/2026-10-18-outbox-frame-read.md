@@ -1,5 +1,8 @@
 # Validate outbox framing before whole-file allocation
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `7a248a0d425defb9f679f968f3cf8c04018090c7` already bounds the temporary protobuf record graph during duplicate rejection. Its file loader still called `os.ReadFile` before validating the native frame length. An invalid 8 MiB snapshot allocated about 8.4 MB before returning the expected length error, even when the header declared just two payload bytes.
 
 This change checks the fixed header and size of the same opened file before allocating its contents. The v4 encoding, decoder, normalization, state/cache ownership, locks and durability protocol stay unchanged. No dependencies, formats or exported APIs are added.
@@ -15,7 +18,7 @@ Each large-file case failed the 1 MiB allocation budget twice normally and twice
 | short-declaration | 8,398,224–8,403,712 | 1,184–1,440 |
 | long-declaration | 8,398,208–8,398,336 | 1,184–1,424 |
 
-[Original reproduction](2026-10-18-outbox-frame-read/raw/before/red-receipt.json) and [candidate proof](2026-10-18-outbox-frame-read/raw/candidate/candidate-receipt.json) retain all samples. This is a corrupt-journal resource defect, without a claim of a deployed incident or remote exploit.
+[Original reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/before/red-receipt.json) and [candidate proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/candidate/candidate-receipt.json) retain all samples. This is a corrupt-journal resource defect, without a claim of a deployed incident or remote exploit.
 
 ## Reader and contracts
 
@@ -33,7 +36,7 @@ The baseline was refreshed from current source before this change. Latest fetche
 
 All Go formatting, builds, tests, profiles, benchmarks, quality gates, conformance and documentation checks ran on the existing Railway scratch runner. Local operations were source editing, Git, packaging, hashing and evidence analysis. Deployment `b394995c-6112-4041-a3f8-d2d47444aec4`; Linux amd64, Go 1.25.6, UID 10001, 4-CPU/4-GiB cgroup. Performance fixtures use the mounted ext4 `/results` volume, verified by statfs 61267.
 
-The fresh baseline has 42 uninstrumented observations: full decode, isolated domain conversion, and durable enqueue/remove cycles at CPU 1/4. Decode fixtures contain 4,096 active and 4,096 prepared entries, minimal or all-fields/provenance shapes. Separately, four CPU/allocation profile groups cover minimal decode, rich decode, rich domain conversion and populated durable enqueue. Instrumented timings are excluded from latency comparisons. [Profile summary](2026-10-18-outbox-frame-read/raw/before/profile-analysis.json), [commands/binary identity](2026-10-18-outbox-frame-read/raw/before/profile-runs.json).
+The fresh baseline has 42 uninstrumented observations: full decode, isolated domain conversion, and durable enqueue/remove cycles at CPU 1/4. Decode fixtures contain 4,096 active and 4,096 prepared entries, minimal or all-fields/provenance shapes. Separately, four CPU/allocation profile groups cover minimal decode, rich decode, rich domain conversion and populated durable enqueue. Instrumented timings are excluded from latency comparisons. [Profile summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/before/profile-analysis.json), [commands/binary identity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/before/profile-runs.json).
 
 Minimal decoding allocates 4,664,150 bytes/op and 61,539 objects; isolated domain conversion with already-owned protobuf strings allocates 3,757,200 bytes/op and 8,290 objects. Rich decoding allocates 7,116,376 bytes/op versus 4,538,440 for isolated domain conversion. The isolated component is diagnostic: its setup/string ownership differs, so its timings cannot simply be subtracted from full decoding.
 
@@ -41,7 +44,7 @@ In the minimal allocation-object profile, string decoding is 68.41% of the whole
 
 ## Comparative measurements and costs
 
-The first valid reader used a consumed prefix followed by `io.ReadFull`. It fixed the corrupt-frame allocation but added one allocation per valid read, with cached native reload medians +8.02–9.70%. Its empty CPU-4 enqueue cycle was +7.10%; other write deltas ranged −15.87% to +4.01%. All 192 paired/control observations are retained under [partial reader analysis](2026-10-18-outbox-frame-read/raw/partial/comparison-analysis.json).
+The first valid reader used a consumed prefix followed by `io.ReadFull`. It fixed the corrupt-frame allocation but added one allocation per valid read, with cached native reload medians +8.02–9.70%. Its empty CPU-4 enqueue cycle was +7.10%; other write deltas ranged −15.87% to +4.01%. All 192 paired/control observations are retained under [partial reader analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/partial/comparison-analysis.json).
 
 The adopted comparison uses `File.ReadAt`, matching the existing object-record I/O style, and reads the captured file without assembling a consumed prefix. It keeps the same framing/recovery guards. An earlier prototype build lacked an explicit integer conversion; that failed job is retained under `raw/initial` and excluded from timing claims. Its incomplete comparison is not treated as a successful measurement.
 
@@ -81,14 +84,14 @@ The adopted reader retains five allocations per cached reload. Empty native relo
 | cached reload format=native/depth=128-4 | +3.24% |
 | cached reload format=native/depth=4096-4 | -7.00% |
 
-These control deltas describe observed variation, not confidence intervals and not proof that a particular slowdown has no code contribution. The extra header probe has a real I/O cost; absolute times and adverse cells remain visible. This is a resource-correctness change with measured costs, without a general speedup claim. [All final observations](2026-10-18-outbox-frame-read/raw/candidate/comparison-analysis.json), [commands and hashes](2026-10-18-outbox-frame-read/raw/candidate/comparison-runs.json).
+These control deltas describe observed variation, not confidence intervals and not proof that a particular slowdown has no code contribution. The extra header probe has a real I/O cost; absolute times and adverse cells remain visible. This is a resource-correctness change with measured costs, without a general speedup claim. [All final observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/candidate/comparison-analysis.json), [commands and hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/candidate/comparison-runs.json).
 
 ## Final verification and remaining work
 
-Adopted production bytes match the measured candidate. The rest of `file_outbox.go` is byte-identical apart from the single read call. The protobuf encoder/decoder are unchanged. Final validation includes focused tests twice normally/race, full Go tests, broader storage/runtime/embedded/runthrough/S3/public-package race coverage, all four conformance configurations, vet, quality/size/format gates, site build/tests and documentation links. Report/evidence documentation checks run again on Railway after publication. [Final checks](2026-10-18-outbox-frame-read/raw/final/checks.json), [final regression proof](2026-10-18-outbox-frame-read/raw/final/green-receipt.json).
+Adopted production bytes match the measured candidate. The rest of `file_outbox.go` is byte-identical apart from the single read call. The protobuf encoder/decoder are unchanged. Final validation includes focused tests twice normally/race, full Go tests, broader storage/runtime/embedded/runthrough/S3/public-package race coverage, all four conformance configurations, vet, quality/size/format gates, site build/tests and documentation links. Report/evidence documentation checks run again on Railway after publication. [Final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/final/checks.json), [final regression proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/final/green-receipt.json).
 
 New costs and limits: a small private file reader, a fixed header probe per reload, and the valid-workload timing/allocation changes above. Seekable regular journals are the qualified profile. This does not replace full-file validation with metadata-only cache acceptance, change durability fences, add retained buffers, or impose a new payload quota.
 
 The next measured performance target is domain-map and stored-entry allocation, which retains most minimal decode bytes even with already-owned strings. Any representation or checkpointing change needs its own comparative measurements and recovery evidence. No such change is included here.
 
-The [evidence manifest](2026-10-18-outbox-frame-read/raw/artifact-manifest.json) covers profiles, all comparisons including the unused reader, source snapshots, regression/validation receipts and isolated Railway runner teardown.
+The [evidence manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-frame-read/raw/artifact-manifest.json) covers profiles, all comparisons including the unused reader, source snapshots, regression/validation receipts and isolated Railway runner teardown.

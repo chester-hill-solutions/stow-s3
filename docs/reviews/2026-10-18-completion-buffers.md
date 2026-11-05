@@ -1,9 +1,12 @@
 # Remove duplicate payload copies from filesystem multipart completion
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `271b89f` includes the completed UploadPart ownership fix. Fresh
 `origin/main` remains `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
 The existing COPY, recovery, capacity and ownership remediations are retained.
-[Baseline](2026-10-18-completion-buffers/raw/baseline.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/baseline.json).
 
 ## Demonstrated problem
 
@@ -19,12 +22,12 @@ four cells: one/two parts, unbound/namespace-bound. An 8 MiB completion allocate
 about 16.8 MB unbound and 25.4 MB bound. Eight normal leaf executions and four race
 leaf executions fail only their allocation assertions; content, reopened metadata
 and capacity checks continue. There are no skips or compilation failures.
-[Normal](2026-10-18-completion-buffers/raw/red/red-normal.log),
-[race](2026-10-18-completion-buffers/raw/red/red-race.log),
-[verified proof](2026-10-18-completion-buffers/raw/red/validation-receipt.json).
+[Normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/red/red-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/red/red-race.log),
+[verified proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/red/validation-receipt.json).
 A separate pre-change run measures 16 fresh children, confirming approximately
 134.3 MB unbound and 201.6 MB bound for 64 MiB completion.
-[Original measurements](2026-10-18-completion-buffers/raw/red/measurements.json).
+[Original measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/red/measurements.json).
 
 ## Change and preserved contracts
 
@@ -62,9 +65,9 @@ and measurements run only on the existing Railway scratch runner. Go 1.25.6,
 Node 25.9.0, Linux amd64, UID 10001, GOMAXPROCS=4, GOFLAGS=-p=1, cgroup 4 CPU/4 GiB;
 fixtures are on `/results` ext4 (statfs 61267). The pinned transport recipe,
 source inventory, actual source and executable hashes are preserved.
-[Environment](2026-10-18-completion-buffers/raw/full/environment.json),
-[recipe](2026-10-18-completion-buffers/raw/transport-Dockerfile.txt),
-[compiled probe](2026-10-18-completion-buffers/raw/full/compiled-probe.go.txt).
+[Environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/full/environment.json),
+[recipe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/transport-Dockerfile.txt),
+[compiled probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/full/compiled-probe.go.txt).
 
 The comparison uses exact original-production overlays and the same probe/test
 fixtures. Twelve cells execute in 96 fresh Go children, four samples per variant
@@ -105,8 +108,8 @@ controls are noisy, including -49.97% in one original 8 MiB split cell, so the
 one-part medians improve 2.17%; this remains a four-sample measurement, not a
 universal latency guarantee. All ranges, allocation counts, raw samples and A/C,
 B/D control differences remain available.
-[Raw comparison](2026-10-18-completion-buffers/raw/full/measurements.json),
-[analysis](2026-10-18-completion-buffers/raw/full/comparison-analysis.json).
+[Raw comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/full/measurements.json),
+[analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/full/comparison-analysis.json).
 
 ## Validation and evidence
 
@@ -117,7 +120,7 @@ site tests and documentation links. Its two failed checks are preserved: formatt
 could not rewrite a newly root-owned scratch test, and quality required lowering
 the stale production-comment baseline from 4077 to 4076. No test failure is hidden
 behind the runner's process exit status.
-[Full checks](2026-10-18-completion-buffers/raw/full/checks.json).
+[Full checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/full/checks.json).
 
 After that job finishes, the test file is made writable by UID 10001 and its
 capacity-dependency comment is clarified; ordered checksum controls are added.
@@ -125,8 +128,8 @@ The final six checks pass format, focused regressions twice normally and under
 race, the generated baseline reduction, quality/file-size/format, and relevant
 vet. No complexity, parameter-count or type allowance is raised. The recorded
 comment density updates with the reduced code/comment counts.
-[Final checks](2026-10-18-completion-buffers/raw/final/checks.json),
-[final source hashes](2026-10-18-completion-buffers/raw/final/environment.json).
+[Final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/final/checks.json),
+[final source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/final/environment.json).
 Existing live-upstream/mirror conformance skips remain; the new regressions do not
 skip. Production hashes are identical between full qualification and final checks;
 Railway-formatted/tested bytes are copied back and verified before committing.
@@ -136,8 +139,8 @@ limit. The validation preload raises only that inventory capture to 16 MiB; the
 checker source is unchanged. This is a documented capture workaround, not a claim
 that the stock invocation passes. The final report/evidence receive separate site
 build/tests and link checks on Railway before teardown.
-[Preload](2026-10-18-completion-buffers/raw/doc-links-capture.mjs),
-[report evidence](2026-10-18-completion-buffers/raw/final/).
+[Preload](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/doc-links-capture.mjs),
+[report evidence](https://github.com/chester-hill-solutions/stow-s3/tree/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-completion-buffers/raw/final).
 Only scratch deployment `392a795b-7d2c-4afa-869a-2f5323c0c185` is used. Its removal
 and unchanged removed target are verified after evidence export.
 The stop receipt is saved as `raw/runner-stop-status.json`.

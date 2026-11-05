@@ -1,5 +1,8 @@
 # Conditional COPY source capture — October 15, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 **Withdrawn for performance regression.** The `959f3b5` implementation described
 below is historical evidence, not the current implementation. The
 [restoration](../2026-10-15-copy-cost-restoration/README.md) returns to the earlier
@@ -42,8 +45,8 @@ captured four-byte version or refuse a captured oversized version. It cannot
 admit one size and publish the other. Unmanaged external changes themselves are
 outside the runtime's quota ownership; the test checks COPY's own admission.
 
-See [failing baseline](raw/defect-before.txt) and
-[passing candidate](raw/defect-after.txt). The 24 race cases and one quota case
+See [failing baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/defect-before.txt) and
+[passing candidate](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/defect-after.txt). The 24 race cases and one quota case
 each run twice in these logs.
 
 ## Implementation and preserved contracts
@@ -157,26 +160,26 @@ go test ./internal/s3api -run '^$' -bench '^BenchmarkConditionalCopy$' -benchtim
 
 For process memory, compile standalone test binaries for each source version and
 run one profile/backend/size per process under `/usr/bin/time -l`.
-[The measurement runner](raw/measure.py) retains exact flags and ordering; its
-four binary names and hashes are in [metadata](raw/metadata.json). The
-[summary](raw/summary.json) contains 48 adapter samples and 48 large-object samples.
+[The measurement runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/measure.py) retains exact flags and ordering; its
+four binary names and hashes are in [metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/metadata.json). The
+[summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/summary.json) contains 48 adapter samples and 48 large-object samples.
 Binaries are not committed.
 
 ## Validation and next correctness investigation
 
 Passed:
 
-- Final `go test ./...`: [output](raw/go-tests.txt).
-- `make test-conformance`, all four profiles: [output](raw/conformance.txt).
+- Final `go test ./...`: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/go-tests.txt).
+- `make test-conformance`, all four profiles: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/conformance.txt).
 - `go test -race ./internal/s3api ./internal/storage/... ./internal/runtime ./internal/runthrough`:
-  [output](raw/race.txt).
+  [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/race.txt).
 - Final captured-copy backend and HTTP regressions under race detection:
-  [backend output](raw/final-contract.txt), [HTTP output](raw/final-wire.txt).
+  [backend output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/final-contract.txt), [HTTP output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/final-wire.txt).
 - Vet for changed packages; formatting and whitespace checks; Go-quality and
   file-size ratchets without baseline changes.
-- Rebuilt real WASM runtime test: [output](raw/wasm.txt).
-- Seven embedded, WASM-host, stream and asset tests: [output](raw/node.txt).
-- Reproducible generated package output: [output](raw/generated.txt). Existing
+- Rebuilt real WASM runtime test: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/wasm.txt).
+- Seven embedded, WASM-host, stream and asset tests: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/node.txt).
+- Reproducible generated package output: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-source-snapshot/raw/generated.txt). Existing
   matching TypeScript/tsx dependencies were reused; none were added.
 
 Next correctness investigation: quota admission when a native conditional backend

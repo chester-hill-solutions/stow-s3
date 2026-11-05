@@ -1,5 +1,8 @@
 # Read timing investigation — no optimization retained
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The body-error correction in `c614a2b` reported adverse 64 KiB guarded-read medians
 of +2.1–2.3% and a 93,447 ns candidate outlier. Calling it finished without first
 establishing repeatability was premature. The [original evidence](../2026-10-15-save-body-failure/README.md)
@@ -19,8 +22,8 @@ The exact original/committed binaries are checked against their retained SHA256
 identities. Sixteen serial blocks per CPU use ABBA order repeated four times,
 eight samples/version/case at CPUs one and eight. Both 64 KiB GET and guarded
 reads use 50,000 iterations/sample, five times the earlier 10,000.
-[Plan](raw/repeat-plan.json), [all results](raw/repeat.log),
-[summary](raw/repeat-summary.json).
+[Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/repeat-plan.json), [all results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/repeat.log),
+[summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/repeat-summary.json).
 
 Committed vs original medians are +3.93%/+0.84% for guarded reads and
 −4.04%/+13.11% for ordinary GET at one/eight CPUs. Individual adjacent-pair ratios
@@ -43,22 +46,22 @@ The first prototype passes only reader + size into the body helper and returns
 bytes + error, keeping all read semantics unchanged. Its 64 KiB GET medians are
 +0.87%/+4.62% vs original and −0.40%/+0.66% vs committed at one/eight CPUs. Guarded
 64 KiB medians are −0.48%/−2.21% vs original. It does not demonstrate a dependable
-improvement. [Patch](raw/narrow-prototype.patch.txt), [all results](raw/narrow-comparison.log),
-[measurements/ranges](raw/narrow-measurements.json), [plan](raw/narrow-plan.json).
+improvement. [Patch](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/narrow-prototype.patch.txt), [all results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/narrow-comparison.log),
+[measurements/ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/narrow-measurements.json), [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/narrow-plan.json).
 
 The second prototype retains the original combined open/read routine in a private
 method returning an additional opening-success flag. ReadForSave distinguishes
 lookup absence from body failure through that flag; the public GET wrapper inlines.
 This avoids passing the Object through a second body helper and preserves the
-corrected body-error semantics. [Patch](raw/phase-prototype.patch.txt),
-[compiler evidence](raw/phase-compiler-excerpt.log), [source identity](raw/phase-source.json).
+corrected body-error semantics. [Patch](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-prototype.patch.txt),
+[compiler evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-compiler-excerpt.log), [source identity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-source.json).
 
 An intermediate compiler-check build used diagnostic -m=2 flags and an additional
 explanatory comment. Its diagnostic flags do not change optimization settings,
 but its generated data addresses differ. It is not substituted for an identical-
-flags comparison: [all intermediate results](raw/diagnostic-comparison.log),
-[measurements](raw/diagnostic-measurements.json), [plan](raw/diagnostic-plan.json),
-[source identity](raw/diagnostic-source.json). That intermediate run placed success
+flags comparison: [all intermediate results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/diagnostic-comparison.log),
+[measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/diagnostic-measurements.json), [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/diagnostic-plan.json),
+[source identity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/diagnostic-source.json). That intermediate run placed success
 medians within 1% of original; **the later identical-flags run does not**. The
 added comment also hit the existing comment-line ratchet and was removed without
 raising any baseline before the final prototype build.
@@ -80,9 +83,9 @@ No agent tests/builds run during timed comparisons; other host activity is
 uncontrolled. All four rounds total 1,252 individual case measurements; none is
 excluded. SOURCE headers in combined logs preserve filenames referenced by JSON.
 
-[All final results](raw/phase-comparison.log), [all samples/ranges](raw/phase-measurements.json),
-[plan and binary identities](raw/phase-plan.json), [harness](raw/compare.py.txt),
-[summary parser](raw/summarize.py.txt). The scripts use temporary binary paths;
+[All final results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-comparison.log), [all samples/ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-measurements.json),
+[plan and binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/phase-plan.json), [harness](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/compare.py.txt),
+[summary parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/summarize.py.txt). The scripts use temporary binary paths;
 rebuild identical benchmark sources against the recorded versions to repeat elsewhere.
 Original body-failing guarded reads incorrectly succeed; those timings describe
 the buggy path rather than an equivalent error result. Corrected versions return
@@ -134,7 +137,7 @@ counts vary; every individual value is retained. These are cumulative allocation
 not peak heap/RSS or proof of per-run byte equality. No resource guarantee changes.
 
 The rejected phase prototype's WASM is 4,617,455 bytes, 438 bytes smaller than
-committed, but still 231 bytes larger than original. [Prototype artifact metadata](raw/wasm.json)
+committed, but still 231 bytes larger than original. [Prototype artifact metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/wasm.json)
 is retained. The shipped artifact is restored to committed's **4,617,893 bytes**.
 A smaller prototype artifact does not justify its unproven/adverse runtime costs.
 
@@ -149,21 +152,21 @@ selecting an optimization. Further speculative tuning is stopped.
 Both prototypes preserve the correction's existing regressions. The opening-phase
 prototype passes the 22 body-failure cases plus prior controls; the broader focus
 includes read authority, giving 52 leaf cases repeated five times under -race
-(**260 passes**, no skips): [focused race](raw/focused-race.log). Candidate
-[full Go](raw/full-go.log), [broader race](raw/broad-race.log),
-[four conformance profiles](raw/conformance-summary.log), [vet](raw/vet.log),
-[generated output](raw/generated.log), [WASM smoke](raw/wasm-smoke.log) and
-[seven package integration tests](raw/package-tests.log) pass. These are prototype
+(**260 passes**, no skips): [focused race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/focused-race.log). Candidate
+[full Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/full-go.log), [broader race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/broad-race.log),
+[four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/conformance-summary.log), [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/vet.log),
+[generated output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/generated.log), [WASM smoke](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/wasm-smoke.log) and
+[seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/package-tests.log) pass. These are prototype
 validation evidence, not a reason to retain the prototype. Conformance keeps two
 existing skips/profile: opt-in live upstream coverage and mirrored bucket creation
 awaiting an authority decision. No ratchet baseline is increased.
 
 After all experiments, source/artifact digests prove exact restoration to c614a2b:
-[restoration](raw/restoration.json). The original correction's broader validation
+[restoration](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/restoration.json). The original correction's broader validation
 remains linked in its evidence report; focused tests are also rerun on the restored
-source: [restored tests](raw/restored-tests.log). Final formatting, unchanged
+source: [restored tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/restored-tests.log). Final formatting, unchanged
 quality/file-size ratchets, documentation links and diff checks pass:
-[final checks](raw/final-checks.log). Temporary links and probes are absent.
+[final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-read-call-boundary/raw/final-checks.log). Temporary links and probes are absent.
 
 The next confirmed correctness finding is still premature EOF returning truncated
 data as success. Its deterministic baseline/candidate reproduction remains in the

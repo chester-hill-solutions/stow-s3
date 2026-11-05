@@ -1,5 +1,8 @@
 # Reject null legacy journal roots
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Date: 2026-10-18 (Toronto; receipts use UTC).
 Baseline: `2839fb83b778c41117bf61d2af1a9beb98e32711` on `codex/core-copy-quality`.
 Freshly fetched `origin/main`: `219d1dcfff9807b04660a40313b32127e5be2933`. Worktree initially clean.
@@ -22,9 +25,9 @@ not compile failures or race reports. All other-root, valid empty snapshot and
 JSON-to-protobuf migration controls passed twice in both modes. The new tests
 also passed quality, file-size and formatting gates before the fix.
 
-[Normal failures and controls](2026-10-18-outbox-null/raw/before/regression-normal.log),
-[race failures and controls](2026-10-18-outbox-null/raw/before/regression-race.log),
-[before checks](2026-10-18-outbox-null/raw/before/checks.json).
+[Normal failures and controls](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-null/raw/before/regression-normal.log),
+[race failures and controls](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-null/raw/before/regression-race.log),
+[before checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-null/raw/before/checks.json).
 
 ## Small correction and protected behavior
 
@@ -53,9 +56,9 @@ and twice under race detection; the complete Go suite; broad storage/runtime/
 embedded/run-through/S3/public-package race tests; all four conformance profiles
 (memory, filesystem, runtime-memory and runtime-filesystem); vet; quality,
 file-size and formatting gates; site build, site tests and documentation links.
-See [final checks](2026-10-18-outbox-null/raw/source-checks/checks.json).
+See [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-null/raw/source-checks/checks.json).
 The completed report is verified against exact source and document hashes in the
-[report receipt](2026-10-18-outbox-null/raw/source-checks/report-receipt.json).
+[report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-null/raw/source-checks/report-receipt.json).
 All code compilation, formatting, tests and quality checks ran on Railway using
 the existing scratch service and pinned Go 1.25.6/Node 25.9.0 toolchain. No quality
 baseline was raised. The runner is stopped after verified evidence export.

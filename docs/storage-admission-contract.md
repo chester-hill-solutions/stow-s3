@@ -67,7 +67,7 @@ Filesystem admission refreshes full authoritative accounting; no constant-time o
 physical disk-reserve promise follows. Newly assigned generations detect managed
 changes after enrollment, not all earlier ABA history or arbitrary host writes.
 See [usage and fixed retention limits](portable-workspace-usage.md#filesystem-save-receipts-and-recovery)
-and [dated local evidence](implementation-2026-09-30.md). The
+and [dated local evidence](history/implementation/implementation-2026-09-30.md). The
 [native object MCP profile](object-mcp-contract.md) exposes these filesystem
 operations through a thin adapter. WASM/in-process TypeScript exposes the memory-backed
 managed-save profile through bounded observation tokens; request keys and durable

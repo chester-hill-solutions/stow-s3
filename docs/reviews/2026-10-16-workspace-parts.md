@@ -1,5 +1,8 @@
 # Atomic workspace multipart part publication
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Follow-up: [Railway performance requalification and directory-path reuse](2026-10-17-part-listing-performance.md)
 records all new measurements, including adverse timings. Changed-version durable
 fallback is now measured on Railway and remains the next separate change.
@@ -8,7 +11,7 @@ This corrects **A2 only** from the [bounded storage audit](2026-10-16-storage-co
 Baseline is `91e8ba0501aaab5c3d221f6dde9f3bf52786425d` on
 `codex/core-copy-quality`. Freshly fetched `origin/main` is
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of that baseline.
-[Baseline](2026-10-16-workspace-parts/raw/baseline.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/baseline.json).
 The user explicitly removed backward compatibility as a requirement.
 
 ## Original defect, reproduced before implementation
@@ -18,10 +21,10 @@ in `upload.json`. A failure in the second publication left retained bytes and
 persisted size/ETag describing different versions. A committed-error marker alone
 could not repair that persistent disagreement.
 
-The exact [saved native audit probe](2026-10-16-storage-contract-audit/raw/workspace-probes.go.txt)
+The exact [saved native audit probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/workspace-probes.go.txt)
 was run twice normally and twice under race before implementation:
-[normal](2026-10-16-workspace-parts/raw/original-before.log),
-[race](2026-10-16-workspace-parts/raw/original-before-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/original-before.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/original-before-race.log).
 A reader callback obstructs the owner document after UploadPart has read it;
 part publication succeeds and descriptor publication fails. Restoring the owner
 document isolates the split without inventing a custom provider return value.
@@ -36,8 +39,8 @@ under a 12-byte cap. Abort must still release the actual retained reservation.
 
 Before implementation, each twice-repeated run has **8 failing adverse leaves
 and 6 passing healthy controls**, normally and under race:
-[normal](2026-10-16-workspace-parts/raw/before-tests.log),
-[race](2026-10-16-workspace-parts/raw/before-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/before-tests.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/before-race.log).
 
 ## Smallest selected correction
 
@@ -62,8 +65,8 @@ and completion without migration; runtime reopen that encounters them fails.
 Abort remains available. Finish or abort old uploads before changing builds.
 
 The retained production functions are byte-identical to the measured fixed
-prototype. [Source freeze](2026-10-16-workspace-parts/raw/source-freeze.json)
-and [Railway build identities](2026-10-16-workspace-parts/raw/railway-2806c27c-3315-4f0d-84ee-deb0c2a7142a/environment.json).
+prototype. [Source freeze](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/source-freeze.json)
+and [Railway build identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-2806c27c-3315-4f0d-84ee-deb0c2a7142a/environment.json).
 The only other production edit corrects an outdated atomic-writer comment.
 
 ## Comparative measurements — Railway only
@@ -79,11 +82,11 @@ measurement, not a throughput, peak-memory or durability qualification.
 Three complete cohorts each retain 144 samples, raw block logs, source/binary
 hashes, compiler settings, mount information and resource snapshots:
 
-- [Initial overlay-filesystem run](2026-10-16-workspace-parts/raw/railway-f3258e07-986e-4026-8861-63c2089b6b56/run.json): baseline, streaming scan/hash, JSON part record.
-- [Persistent ext4 run](2026-10-16-workspace-parts/raw/railway-15faaa38-2176-4a9d-ae75-6ec943ffcf04/run.json): the same binaries on the volume.
-- [Final persistent ext4 comparison](2026-10-16-workspace-parts/raw/railway-2806c27c-3315-4f0d-84ee-deb0c2a7142a/run.json): baseline, JSON record, fixed header.
+- [Initial overlay-filesystem run](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-f3258e07-986e-4026-8861-63c2089b6b56/run.json): baseline, streaming scan/hash, JSON part record.
+- [Persistent ext4 run](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-15faaa38-2176-4a9d-ae75-6ec943ffcf04/run.json): the same binaries on the volume.
+- [Final persistent ext4 comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-2806c27c-3315-4f0d-84ee-deb0c2a7142a/run.json): baseline, JSON record, fixed header.
 
-[Every median, minimum, maximum, B/op and allocations/op](2026-10-16-workspace-parts/raw/comparison.md)
+[Every median, minimum, maximum, B/op and allocations/op](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/comparison.md)
 is retained, including adverse rows. The workloads are one 1-KiB staged part and
 sixteen 1-MiB staged parts, measuring native listing/replacement and runtime
 replacement. The latter is valid acknowledged staging, not a completable set of
@@ -135,10 +138,10 @@ also reached SUCCESS. Export receipts verify each result file's
 length and SHA-256. The scratch runner was stopped after export verification;
 the target remained stopped and untouched. Only the two empty task-owned volume
 temporary directories were removed; result directories remain preserved.
-[Deployment evidence](2026-10-16-workspace-parts/raw/railway-fixed-deployments.json),
-[cleanup](2026-10-16-workspace-parts/raw/railway-temp-cleanup.log),
-[runner stopped](2026-10-16-workspace-parts/raw/railway-runner-after.json),
-[target unchanged](2026-10-16-workspace-parts/raw/railway-target-after.json).
+[Deployment evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-fixed-deployments.json),
+[cleanup](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-temp-cleanup.log),
+[runner stopped](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-runner-after.json),
+[target unchanged](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-target-after.json).
 
 ## Regression and contract validation
 
@@ -156,58 +159,58 @@ payload bytes and preserves the upload without publishing a corrupt object.
 All **38 focused regression leaf executions pass normally and under race**
 (two repetitions in each mode), with
 no skips or race reports:
-[normal](2026-10-16-workspace-parts/raw/after-tests.log),
-[race](2026-10-16-workspace-parts/raw/after-race.log),
-[counts](2026-10-16-workspace-parts/raw/regression-counts.json).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/after-tests.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/after-race.log),
+[counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/regression-counts.json).
 The old audit probe's raw-file-layout/error assertions are not reused against the
 new private encoding; permanent API/reopen/quota regressions replace them.
 
 Broad local Go/race/conformance runs exhausted available disk space and failed;
 they are **not passing validation**. A sequential retry was stopped when the user
 clarified that all execution belongs on Railway. Failed/interrupted evidence is
-retained: [Go](2026-10-16-workspace-parts/raw/local-full-go.disk-full.log),
-[race](2026-10-16-workspace-parts/raw/local-broad-race.disk-full.log),
-[conformance](2026-10-16-workspace-parts/raw/local-conformance.disk-full.log),
-[stopped retry](2026-10-16-workspace-parts/raw/local-validation-stopped.json).
+retained: [Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/local-full-go.disk-full.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/local-broad-race.disk-full.log),
+[conformance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/local-conformance.disk-full.log),
+[stopped retry](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/local-validation-stopped.json).
 All further tests, race/conformance checks and benchmarks must run on Railway.
 After explicit upload approval, final validation ran on Railway deployment
 `1c7b7aba-7fdb-4b89-ac5b-a53a96d68c2f`, job
 `0caf6ebb-cf77-4236-9f3d-914b614a8869`. **All 13 checks pass:**
-[check commands and exit codes](2026-10-16-workspace-parts/raw/railway-validation-final/checks.json),
-[completed result](2026-10-16-workspace-parts/raw/railway-validation-final/run.json).
+[check commands and exit codes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/checks.json),
+[completed result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/run.json).
 
-- [Full Go suite](2026-10-16-workspace-parts/raw/railway-validation-final/full-go.log).
-- [Broad storage/runtime/embedded/run-through/S3/public API race suite](2026-10-16-workspace-parts/raw/railway-validation-final/broad-race.log).
-- [Focused normal](2026-10-16-workspace-parts/raw/railway-validation-final/focused-normal.log) and
-  [focused race](2026-10-16-workspace-parts/raw/railway-validation-final/focused-race.log):
+- [Full Go suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/full-go.log).
+- [Broad storage/runtime/embedded/run-through/S3/public API race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/broad-race.log).
+- [Focused normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/focused-normal.log) and
+  [focused race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/focused-race.log):
   38 passing leaf executions in each, with no skips or failures.
-  [Counts](2026-10-16-workspace-parts/raw/railway-regression-counts.json).
-- Conformance: [memory](2026-10-16-workspace-parts/raw/railway-validation-final/conformance-memory.log),
-  [filesystem](2026-10-16-workspace-parts/raw/railway-validation-final/conformance-filesystem.log),
-  [runtime-memory](2026-10-16-workspace-parts/raw/railway-validation-final/conformance-runtime-memory.log),
-  [runtime-filesystem](2026-10-16-workspace-parts/raw/railway-validation-final/conformance-runtime-filesystem.log).
+  [Counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-regression-counts.json).
+- Conformance: [memory](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/conformance-memory.log),
+  [filesystem](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/conformance-filesystem.log),
+  [runtime-memory](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/conformance-runtime-memory.log),
+  [runtime-filesystem](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/conformance-runtime-filesystem.log).
   Each retains the two existing mirror-bucket decision and live-upstream skips.
-- [Go vet](2026-10-16-workspace-parts/raw/railway-validation-final/vet.log),
-  [quality/file-size/format gates](2026-10-16-workspace-parts/raw/railway-validation-final/quality.log),
-  [site build](2026-10-16-workspace-parts/raw/railway-validation-final/site-build.log),
-  [site tests](2026-10-16-workspace-parts/raw/railway-validation-final/site-tests.log),
-  [documentation links](2026-10-16-workspace-parts/raw/railway-validation-final/doc-links.log).
+- [Go vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/vet.log),
+  [quality/file-size/format gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/quality.log),
+  [site build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/site-build.log),
+  [site tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/site-tests.log),
+  [documentation links](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/doc-links.log).
 
 The first Railway run passed the new regressions and conformance but failed
 broader tests because the container ran as root, did not resolve the test's named
 loopback hosts, and left the parentwatch child as a zombie under PID 1. Those
-[failed results](2026-10-16-workspace-parts/raw/railway-validation-initial/checks.json)
-and [environment evidence](2026-10-16-workspace-parts/raw/railway-validation-environment-inspection.log)
+[failed results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-initial/checks.json)
+and [environment evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-environment-inspection.log)
 remain retained. The corrected run uses UID 10001, two explicit loopback host
 entries, and an existing-Python supervisor that reaps orphaned children without
 terminating them. No tests or production sources were changed to obtain a pass.
-[Runner configuration](2026-10-16-workspace-parts/raw/railway-validation-configured.log).
+[Runner configuration](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-configured.log).
 The supervisor is validation tooling only; it adds no product dependency.
 
 The archive excludes local credentials, `.git` and ignored working files. The
 quality gates receive the exact original parent baseline JSON files in a small
 Git fixture, with `STOW_BASELINE_REF=HEAD`; this is not the product's Git history.
-The [validation environment and source manifest](2026-10-16-workspace-parts/raw/railway-validation-final/environment.json)
+The [validation environment and source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/railway-validation-final/environment.json)
 identify the actual source snapshot. Final documentation links and production/test
 source identities were checked again on Railway after updating this report.
 
@@ -230,9 +233,9 @@ reveals the retained part again. The healthy control refuses that write. The
 probe fails twice normally and twice under race. This does not claim Stow's
 atomic writer normally corrupts JSON, and this change does not repair it.
 
-[Reproduction source](2026-10-16-workspace-parts/raw/next_recovery_probe.go.txt),
-[normal evidence](2026-10-16-workspace-parts/raw/next-recovery.log),
-[race evidence](2026-10-16-workspace-parts/raw/next-recovery-race.log).
+[Reproduction source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/next_recovery_probe.go.txt),
+[normal evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/next-recovery.log),
+[race evidence](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-workspace-parts/raw/next-recovery-race.log).
 It needs the same fail-closed treatment already applied to filesystem owners;
 no new format or performance project is indicated. A3's native committed-outcome
 sites remain queued. No next finding is implemented in this change.

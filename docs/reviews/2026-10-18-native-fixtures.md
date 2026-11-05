@@ -1,10 +1,13 @@
 # Native capacity fixture qualification — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The release Windows job fails in new payload-scan and multipart tests before
 reaching their assertions: both shared helpers unconditionally open namespace
 capacity, while `capacity.Open` explicitly supports Darwin and Linux only.
 The existing capacity fixtures already check `SupportsGuardedWrites` first.
-[Original Windows failure](../assessment-evidence/2026-10-18-release/windows-original.log).
+[Original Windows failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-10-18-release/windows-original.log).
 
 Use that existing capability predicate in the payload fixture and only the bound
 branch of the shared multipart fixture. Unbound multipart and completion tests
@@ -16,9 +19,9 @@ Railway deployment `122c1ab0-acf4-4185-96e0-a2070983ec0e` formats both files and
 passes the selected payload, completion and multipart tests twice normally and
 twice under race. No selected Linux test skips. Existing allocation bounds and
 content/quota/reopen assertions stay intact. Quality, file-size and formatting
-checks pass. [Checks](../assessment-evidence/2026-10-18-release/railway/fixtures/checks.json),
-[normal](../assessment-evidence/2026-10-18-release/railway/fixtures/focused-normal.log),
-[race](../assessment-evidence/2026-10-18-release/railway/fixtures/focused-race.log).
+checks pass. [Checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-10-18-release/railway/fixtures/checks.json),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-10-18-release/railway/fixtures/focused-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-10-18-release/railway/fixtures/focused-race.log).
 The actual Windows rerun remains a required release-PR check.
 
 The cost is explicit skips for namespace-bound tests on unsupported systems,

@@ -131,7 +131,7 @@ profile adds bounded request receipts and reopen resolution. These operations ar
 available directly through the public Go package
 `github.com/chester-hill-solutions/stow-s3/pkg/stow`; GangCode does not need the
 native object MCP wrapper to use them. See the
-[dated implementation evidence](implementation-2026-09-30.md).
+[dated implementation evidence](history/implementation/implementation-2026-09-30.md).
 
 That object directory uses object records. It is **not** the ordinary editable
 workspace directory used by GangCode's native file tools. Workspace/custom-store,

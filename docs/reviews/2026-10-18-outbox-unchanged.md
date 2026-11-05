@@ -1,5 +1,8 @@
 # Fence unchanged provenance without replacing the journal
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Date: 2026-10-18 (Toronto; receipts use UTC).
 Baseline: `a4eba1f4785323ece11ad50954c577fc31b8df83` on `codex/core-copy-quality`.
 Freshly fetched `origin/main`: `219d1dcfff9807b04660a40313b32127e5be2933`. Worktree initially clean.
@@ -17,7 +20,7 @@ unchanged saves measured 19.213 → 3.355 ms and written payload bytes fell to z
 The smallest fixture measured 4.322 → 0.172 ms. Changed results were mixed,
 including +3.08% latency for the largest provenance fixture. The pilot established
 material value, with a longer paired comparison reserved for the final source.
-See [pilot observations](2026-10-18-outbox-unchanged/raw/pilot/samples.json).
+See [pilot observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/pilot/samples.json).
 
 Before wiring the implementation, the final observable regression failed for six
 unchanged values twice normally and twice under race detection: every save
@@ -25,8 +28,8 @@ replaced the journal inode. Known-empty creation, complete flag comparison, peer
 freshness, equal-value JSON migration, permission repair and symlink replacement
 controls all passed. No compile failure or race report is used as evidence.
 The test/quality gates passed against this original production implementation.
-See [normal contracts](2026-10-18-outbox-unchanged/raw/contracts-before/contracts-normal.log)
-and [race contracts](2026-10-18-outbox-unchanged/raw/contracts-before/contracts-race.log).
+See [normal contracts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/contracts-before/contracts-normal.log)
+and [race contracts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/contracts-before/contracts-race.log).
 
 ## Implementation and durability
 
@@ -65,7 +68,7 @@ with two repetitions and a one-second minimum per observation. The actual public
 `SaveUpstreamState` benchmark is unchanged. Both variants include identical final
 regression/benchmark fixtures. Original binaries overlay exactly the three
 production files from the baseline; final binaries use the validated source.
-Hashes are in [build metadata](2026-10-18-outbox-unchanged/raw/comparison/build.json).
+Hashes are in [build metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/comparison/build.json).
 
 The pinned Go 1.25.6 runner has four CPUs and 4 GiB memory. CPU labels are
 `GOMAXPROCS`, not client concurrency or affinity. Temporary journals use the ext4
@@ -78,7 +81,7 @@ or retained heap. Written-B/op is Linux process `wchar`, not physical disk traff
 fsync can write kernel-managed data without appearing in this metric. Nine unchanged observations contain 8 or 16 process-level bytes in total, all
 below one complete journal payload; their medians are zero. The pinned Go runtime
 has 8-byte poller wakeup writes, but no descriptor-level attribution was performed.
-These counter observations are retained in [counter notes](2026-10-18-outbox-unchanged/raw/comparison/counter-notes.json).
+These counter observations are retained in [counter notes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/comparison/counter-notes.json).
 The healthy unchanged-save branch issues no payload write calls. Journal sizes and final
 row values are verified. Raw observations and ranges are retained; medians are
 not statistical-significance or cold-cache claims.
@@ -108,11 +111,11 @@ not statistical-significance or cold-cache claims.
 
 Adverse latency medians: CPU 1 mixed=1024/changed: +1.61%; CPU 1 provenance=128/changed: +12.78%; CPU 1 provenance=2048/changed: +0.81%; CPU 4 provenance=2048/changed: +4.13%.
 
-The adverse CPU-1 provenance=128 changed-save case was investigated with a longer, separate paired cohort: 32 observations, two-second minimums, four repetitions per block, ABBA/BAAB order, and byte-identical binaries. Its median was 3.579 → 3.774 ms (+5.43%). Both the original adverse result and this follow-up remain evidence; no sample is replaced or discarded. Timing ranges overlap and no statistical attribution to code versus filesystem variation is claimed. Across pilot, main and follow-up cohorts, **392 observations** are retained. See [follow-up observations](2026-10-18-outbox-unchanged/raw/changed-followup/samples.json) and [follow-up ranges](2026-10-18-outbox-unchanged/raw/changed-followup/analysis.json).
+The adverse CPU-1 provenance=128 changed-save case was investigated with a longer, separate paired cohort: 32 observations, two-second minimums, four repetitions per block, ABBA/BAAB order, and byte-identical binaries. Its median was 3.579 → 3.774 ms (+5.43%). Both the original adverse result and this follow-up remain evidence; no sample is replaced or discarded. Timing ranges overlap and no statistical attribution to code versus filesystem variation is claimed. Across pilot, main and follow-up cohorts, **392 observations** are retained. See [follow-up observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/changed-followup/samples.json) and [follow-up ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/changed-followup/analysis.json).
 
-[All observations](2026-10-18-outbox-unchanged/raw/comparison/samples.json),
-[medians and ranges](2026-10-18-outbox-unchanged/raw/comparison/analysis.json),
-[resource counters](2026-10-18-outbox-unchanged/raw/comparison/block-resources.json).
+[All observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/comparison/samples.json),
+[medians and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/comparison/analysis.json),
+[resource counters](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/comparison/block-resources.json).
 
 ## Validation, costs and compatibility
 
@@ -120,10 +123,10 @@ All 15 final stages passed on Railway: formatting; downward-only quality-baselin
 maintenance; focused tests twice normally and twice under race detection; the full
 Go suite; broad storage/runtime/embedded/run-through/S3/public-package race tests;
 four conformance profiles; vet; quality/file-size/format gates; site build, site
-tests and documentation links. See [final checks](2026-10-18-outbox-unchanged/raw/source-checks/checks.json).
+tests and documentation links. See [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/source-checks/checks.json).
 The baseline change records reduced production comment volume; no floor is raised.
 The final report is verified against exact source and document hashes in the
-[report receipt](2026-10-18-outbox-unchanged/raw/source-checks/report-receipt.json).
+[report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-unchanged/raw/source-checks/report-receipt.json).
 All compilation, formatting, tests and benchmarks ran on Railway. Local operations
 were source edits, Git, packaging and analysis of exported data.
 

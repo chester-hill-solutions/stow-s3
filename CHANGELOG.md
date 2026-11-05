@@ -75,7 +75,7 @@ See the [release notes](docs/releases/v0.3.1.md) and [performance testing guide]
 Native downloads for Linux and macOS on x86_64 and ARM64 are distributed through
 GitHub Releases. npm and PyPI publication remain deferred; use source checkouts
 for those clients. See the [release notes](docs/releases/v0.3.0.md) and
-[verification checkpoint](docs/release-verification-2026-10-14.md).
+[verification checkpoint](docs/history/releases/release-verification-2026-10-14.md).
 
 ### Storage performance and compatibility
 

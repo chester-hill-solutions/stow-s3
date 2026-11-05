@@ -1,5 +1,8 @@
 # Reject zero-byte outbox journals
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Date: 2026-10-17 (Toronto; receipts use UTC).
 Baseline: `f23f56ea40932085af582577583bf08624f23f2c` on `codex/core-copy-quality`.
 Freshly fetched `origin/main`: `219d1dcfff9807b04660a40313b32127e5be2933`. Worktree initially clean.
@@ -24,10 +27,10 @@ file-size and formatting checks.
 
 The positive controls passed before the fix: missing-path initialization, a valid
 empty protobuf snapshot and a valid empty legacy JSON object all remain supported.
-See [loader failures](2026-10-17-outbox-empty/raw/loader-before/regression-normal.log),
-[loader race failures](2026-10-17-outbox-empty/raw/loader-before/regression-race.log),
-[caller failure](2026-10-17-outbox-empty/raw/caller-before/caller-normal.log) and
-[caller race failure](2026-10-17-outbox-empty/raw/caller-before/caller-race.log).
+See [loader failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/loader-before/regression-normal.log),
+[loader race failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/loader-before/regression-race.log),
+[caller failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/caller-before/caller-normal.log) and
+[caller race failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/caller-before/caller-race.log).
 
 ## Change and preserved contracts
 
@@ -58,9 +61,9 @@ matrix covers focused tests twice normally and twice under race detection, the
 full Go suite, broad storage/runtime/embedded/run-through/S3/public-package race
 tests, all four conformance profiles (memory, filesystem, runtime-memory and
 runtime-filesystem), vet, quality/file-size/format gates, site build, site tests
-and documentation links. See [final checks](2026-10-17-outbox-empty/raw/source-checks/checks.json).
+and documentation links. See [final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/source-checks/checks.json).
 The source and document hashes are verified again for the finished report in the
-[report receipt](2026-10-17-outbox-empty/raw/source-checks/report-receipt.json).
+[report receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/source-checks/report-receipt.json).
 
 Compatibility change: an existing zero-byte file now causes an error instead of
 being accepted as empty. A deliberately precreated empty file is also rejected;
@@ -92,8 +95,8 @@ mutations may create a new journal from that empty state.
 
 An isolated overlay reproduced all five cases twice normally and twice under
 race detection after the zero-byte correction. See the
-[normal reproduction](2026-10-17-outbox-empty/raw/next-finding/missing-journal-normal.log)
-and [race reproduction](2026-10-17-outbox-empty/raw/next-finding/missing-journal-race.log).
+[normal reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/next-finding/missing-journal-normal.log)
+and [race reproduction](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-outbox-empty/raw/next-finding/missing-journal-race.log).
 This finding is not fixed here. The next correction must distinguish missing-path
 initialization from losing a journal already observed by the same live handle,
 while preserving fresh reads and cross-process locking. These tests do not claim

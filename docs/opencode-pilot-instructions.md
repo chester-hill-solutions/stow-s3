@@ -7,7 +7,7 @@ pushed Stow commit alongside the prompt so both hosts use the same revision.
 Validate Stow's implemented portable-workspace workflow with a real agent.
 
 Read docs/plan.md, docs/portable-workspace-usage.md,
-docs/implementation-2026-09-29.md, and examples/opencode/README.md.
+docs/history/implementation/implementation-2026-09-29.md, and examples/opencode/README.md.
 Follow the README's installation section before running the pilot.
 
 INSTALL

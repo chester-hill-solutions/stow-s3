@@ -1,9 +1,12 @@
 # Preserve published filesystem completion outcomes after cleanup failure
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `83c1ebe` includes the independent workspace DELETE correction and owner
 recovery. Fresh `origin/main` remains
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Baseline](2026-10-17-filesystem-completion/raw/baseline.json).
+[Baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/baseline.json).
 This corrects the final confirmed A3 site from the
 [bounded audit](2026-10-16-storage-contract-audit.md).
 
@@ -20,9 +23,9 @@ but completion returns nil metadata, lacks `ErrMutationCommitted`, and immediate
 runtime usage is zero bytes/zero objects instead of four bytes/one object. Four
 adverse leaf executions fail and two healthy controls pass in each before run,
 repeated twice normally and under race, with no skips:
-[normal](2026-10-17-filesystem-completion/raw/before/before-normal.log),
-[race](2026-10-17-filesystem-completion/raw/before/before-race.log),
-[counts](2026-10-17-filesystem-completion/raw/counts.json).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/before/before-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/before/before-race.log),
+[counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/counts.json).
 
 ## Change and results
 
@@ -35,8 +38,8 @@ existing result/accounting and cleanup-reconciliation paths consume this outcome
 no runtime production code changes. The storage contract was clarified first.
 
 All **six focused leaf executions pass normally and under race**, repeated twice
-without skips: [normal](2026-10-17-filesystem-completion/raw/after/focused-normal.log),
-[race](2026-10-17-filesystem-completion/raw/after/focused-race.log).
+without skips: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/after/focused-normal.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/after/focused-race.log).
 Returned size, multipart ETag, version, content type, metadata and modification
 time match the published record. `errors.Is`/`errors.As` preserve the permission
 cause. Immediate usage includes the four-byte object; retained staging still
@@ -44,20 +47,20 @@ reserves four bytes and its upload-session slot. Repair and abort release stagin
 without deleting the object. The native test also verifies retry completion removes
 staging after repair. Healthy completion removes staging immediately.
 
-The [initial complete Railway suite](2026-10-17-filesystem-completion/raw/initial-after/checks.json)
+The [initial complete Railway suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/initial-after/checks.json)
 passes focused normal/race, full Go, broad storage/runtime/embedded/run-through/S3/public
 API race, all four conformance profiles, vet, site build, site tests and documentation
 links. Its quality gate finds that adding the native test assertion exceeded the
 existing complexity limit. The assertion moves unchanged into a small helper;
-no production code or quality baseline changes. The final [five Railway checks](2026-10-17-filesystem-completion/raw/after/checks.json)
+no production code or quality baseline changes. The final [five Railway checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/after/checks.json)
 pass format, focused normal/race, affected-package vet and quality/file-size/format.
 The two existing mirror/live-upstream skips remain in each conformance profile;
-focused regressions have no skips. [Final result](2026-10-17-filesystem-completion/raw/after/run.json).
+focused regressions have no skips. [Final result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/after/run.json).
 Deployment `7de49edd-449b-44f1-a030-3d78a45cef2c` is the same isolated qualified
 runner as the preceding two corrections. Source updates follow completed before
-runs, preserving warm tool caches. [Update receipt](2026-10-17-filesystem-completion/raw/completion-after-sync-receipt.json)
-[final test-only update](2026-10-17-filesystem-completion/raw/completion-final-sync-receipt.json)
-and [actual tested hashes](2026-10-17-filesystem-completion/raw/after/environment.json)
+runs, preserving warm tool caches. [Update receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/completion-after-sync-receipt.json)
+[final test-only update](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/completion-final-sync-receipt.json)
+and [actual tested hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-filesystem-completion/raw/after/environment.json)
 identify formatted source. Production hashes are identical between the full-suite
 and final test-helper runs. An additional Railway link check covers this report
 and the consolidated review status, with its receipt in the after evidence.

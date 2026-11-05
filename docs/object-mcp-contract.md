@@ -3,7 +3,7 @@
 The native object MCP tools wrap [guarded filesystem saves](portable-workspace-usage.md#filesystem-save-receipts-and-recovery).
 They support read-for-save, keyed save, resolution, observation release and capability inspection.
 <!-- repo-only:start -->
-The [dated test record](implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
+The [dated test record](history/implementation/implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
 <!-- repo-only:end -->
 
 ## Serving the surface over HTTP

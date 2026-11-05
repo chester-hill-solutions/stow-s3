@@ -1,5 +1,8 @@
 # Avoid cache work for objects that cannot fit
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Follow-up: [outbox durability and journal-depth measurements](2026-10-17-outbox-durability.md).
 
 This change streams an oversized upstream GET after recording its provenance,
@@ -11,12 +14,12 @@ disappearance fallback retain their existing behavior.
 Base `488378bb29dff15865cba4bddbad3238e9f3bbb3` includes the previous correctness
 and listing work. A fresh fetch reports `origin/main`
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Exact baseline](2026-10-17-refresh-eviction-performance/raw/baseline.json). No completed correctness work is repeated.
+[Exact baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/baseline.json). No completed correctness work is repeated.
 One independently reviewable change is implemented; the next finding is left alone.
 
 ## Reproduction and rejected candidate
 
-The [original regression](2026-10-17-refresh-eviction-performance/raw/bypass-regression/reproduce.log) fails twice
+The [original regression](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/bypass-regression/reproduce.log) fails twice
 against the original adapter source: all eight native memory/filesystem cache,
 adapter/runtime and memory/file-outbox combinations issue two upstream GETs.
 The first stream is consumed and closed before the caller receives a second one.
@@ -25,8 +28,8 @@ GETs require the existing second durable provenance save. Existing fallback and
 concurrent-observation race controls pass on the original source.
 
 The first candidate opened the cached snapshot before eviction. Its
-[192 timing observations](2026-10-17-refresh-eviction-performance/raw/snapshot-timings/summary.json) reduce the extra
-GET and changed-version save, but its [96 resource observations](2026-10-17-refresh-eviction-performance/raw/snapshot-resources/summary.json)
+[192 timing observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/snapshot-timings/summary.json) reduce the extra
+GET and changed-version save, but its [96 resource observations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/snapshot-resources/summary.json)
 show a real new cost: a 16-MiB object retains **20,653,976 heap bytes** while the
 reader is held, compared with 1,928 bytes on the baseline. A filesystem reader
 holds 16,777,363 unlinked file bytes. That candidate is rejected and is absent from
@@ -86,10 +89,10 @@ The changed-source fixture mutates upstream once per cache-deletion attempt in
 both versions, including an absent oversized entry, so fewer GETs do not also
 remove fixture mutations. This differs from the earlier per-GET mutation fixture;
 older report timings are retained as history and are not directly pooled here.
-[Plans, sources and binary hashes](2026-10-17-refresh-eviction-performance/raw/final-timings/build.json),
-[all samples](2026-10-17-refresh-eviction-performance/raw/final-timings/samples.json),
-[all ranges](2026-10-17-refresh-eviction-performance/raw/final-timings/summary.json),
-[block resource/load snapshots](2026-10-17-refresh-eviction-performance/raw/final-timings/block-resources.json).
+[Plans, sources and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-timings/build.json),
+[all samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-timings/samples.json),
+[all ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-timings/summary.json),
+[block resource/load snapshots](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-timings/block-resources.json).
 
 | CPU | Workload | Median before → after | Change | B/op before → after | Allocations before → after | Saves/op | GETs/op |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -130,8 +133,8 @@ deltas reflect GC/scavenging and measurement noise.
 | filesystem/bytes=1048576 | 241,072 → 19,400 | -7,040 → -8,288 | 0 → 0 |
 | filesystem/bytes=16777216 | 241,120 → 19,432 | -7,040 → -8,288 | 0 → 0 |
 
-[Resource samples and RSS ranges](2026-10-17-refresh-eviction-performance/raw/final-resources/summary.json),
-[diagnostic source](2026-10-17-refresh-eviction-performance/raw/refresh_resource_probe_test.go.txt).
+[Resource samples and RSS ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-resources/summary.json),
+[diagnostic source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/refresh_resource_probe_test.go.txt).
 The probe's forced-GC timings are not used as throughput evidence. Total retained
 observations across rejected and selected candidates are **576**. The selected
 path avoids full-payload cache allocations and leaves no unlinked cached payload.
@@ -140,26 +143,26 @@ process-memory isolation or a new limit on upstream/network buffers.
 
 ## Validation and costs
 
-[Initial selected-code checks](2026-10-17-refresh-eviction-performance/raw/bypass-initial-checks/checks.json) pass all four
+[Initial selected-code checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/bypass-initial-checks/checks.json) pass all four
 conformance profiles (memory, filesystem, runtime-memory, runtime-filesystem),
 focused normal/race, vet, site and doc checks. Full Go and broad race initially
 find the old test's expectation of an eviction for a never-retained object; the
 quality gate finds refresh complexity. Both are corrected without weakening
 restart/conflict assertions, increasing a baseline or adding an exemption.
 The unchanged fallback block is moved into the existing cache-read file.
-[Final ten-check run](2026-10-17-refresh-eviction-performance/raw/final-checks/checks.json) passes format, focused normal/
+[Final ten-check run](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-checks/checks.json) passes format, focused normal/
 race twice, full Go, broad storage/runtime/embedded/run-through/S3/public API race,
 vet, quality/file-size/format, site build/tests and document links.
 The production comment ratchet decreases from 4,082 to 4,081. After measurement,
 the four conformance profiles are rerun against the exact final source hashes.
-[Final conformance receipt](2026-10-17-refresh-eviction-performance/raw/final-checks/conformance-final-receipt.json).
+[Final conformance receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-checks/conformance-final-receipt.json).
 Existing live-provider skips remain; Linux qualification does not substitute for
 running Windows/macOS tests.
 
 The rejected candidate's earlier test-helper complexity failure and the resource
 probe's root-owned overlay-directory setup failure are also retained. The latter
 is repaired only in the scratch overlay tree and the measurement is rerun before
-using any result. [Probe setup failure](2026-10-17-refresh-eviction-performance/raw/probe-setup-failure/format-prototypes.log).
+using any result. [Probe setup failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/probe-setup-failure/format-prototypes.log).
 
 Compatibility and resource costs are explicit:
 
@@ -178,7 +181,7 @@ Compatibility and resource costs are explicit:
   No claim is made for inaccurate custom-provider size metadata or network-wide
   memory bounds.
 
-[Final tested hashes](2026-10-17-refresh-eviction-performance/raw/final-checks/environment.json) match the measured source.
+[Final tested hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-refresh-eviction-performance/raw/final-checks/environment.json) match the measured source.
 Export receipts verify lengths and SHA-256 before runner shutdown. A final Railway
 link check covers this report and follow-up links, with a source/report hash
 receipt retained alongside final checks. The benchmark target is untouched; the

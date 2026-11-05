@@ -1,5 +1,8 @@
 # Withdraw the generic COPY snapshot fallback — October 15, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The implementation introduced by `959f3b5` is withdrawn. It replaced a backend
 COPY with GET→PUT for conditioned copies on stores without native conditional
 COPY, causing a severe allocation and latency regression. Those measurements
@@ -40,7 +43,7 @@ emulation. The source is 1 MiB; the test uses call counts rather than timing lim
 
 Against `959f3b5`, six of the 18 cases fail in each of two runs: conditioned base
 store copies issue GET=1, PUT=1 and backend COPY=0. After restoration all 18 cases
-pass in each run. See [before](raw/cost-before.txt) and [after](raw/cost-after.txt).
+pass in each run. See [before](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/cost-before.txt) and [after](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/cost-after.txt).
 The earlier condition-preservation, date-routing and date/ETag precedence tests
 also pass in the same final focused run.
 
@@ -57,8 +60,8 @@ baseline/regressed/restored/restored/regressed/baseline:
 
 Host: Apple M1 Pro, 16 GiB RAM, macOS 14.5 ARM64, Go 1.25.6. No builds or tests ran
 alongside the measurements. Benchmark functions and fixture methods were the same
-for all versions. [Metadata](raw/metadata.json), the
-[runner](raw/measure.py), [parsed samples](raw/summary.json) and raw outputs are
+for all versions. [Metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/metadata.json), the
+[runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/measure.py), [parsed samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/summary.json) and raw outputs are
 retained. Test binaries are not committed.
 
 The 4 KiB adapter benchmark has three 300 ms samples per block. Latencies are
@@ -111,17 +114,17 @@ are the test and benchmark harness. Historical evidence remains available.
 
 Passed:
 
-- Complete Go suite: [output](raw/go-tests.txt).
-- Four conformance profiles: [output](raw/conformance.txt).
+- Complete Go suite: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/go-tests.txt).
+- Four conformance profiles: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/conformance.txt).
 - Race tests for HTTP, all storage backends, runtime and run-through:
-  [output](raw/race.txt).
+  [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/race.txt).
 - Focused cost, condition-preservation and source-date regressions twice:
-  [output](raw/cost-after.txt).
+  [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/cost-after.txt).
 - Vet, formatting, whitespace, Go-quality and file-size checks with unchanged
   baselines.
-- Rebuilt WASM byte comparison and real runtime test: [output](raw/wasm.txt).
-- Seven embedded/WASM-host/stream/asset tests: [output](raw/node.txt).
-- Reproducible generated package output: [output](raw/generated.txt).
+- Rebuilt WASM byte comparison and real runtime test: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/wasm.txt).
+- Seven embedded/WASM-host/stream/asset tests: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/node.txt).
+- Reproducible generated package output: [output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-cost-restoration/raw/generated.txt).
 
 Further atomicity for base-only custom stores remains an unresolved contract
 question. The preserved tests cover built-in atomic COPY and observed-source

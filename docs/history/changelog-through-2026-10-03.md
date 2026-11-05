@@ -57,7 +57,7 @@ describe their original development tree and evidence, not current release statu
   belongs to a package and not to a release: publishing 0.3.0 would not change the answer,
   and afterwards the only thing it could do is fail a job that had already published.
   Today it reports all five as private, so a tag cut before they are made public stops
-  here. See [release readiness](../release-readiness-0.3.0.md).
+  here. See [release readiness](releases/release-readiness-0.3.0.md).
 - Fixed a size claim on the site that was true only for the platform it was written on.
   The four published binaries are 11.50, 11.75, 12.39 and 12.66 MB, so the page's 11.7 MB
   understated what most users download, and `check-site-claims` measured whichever binary
@@ -203,7 +203,7 @@ describe their original development tree and evidence, not current release statu
   consumers and cross-host real-agent evidence remain required.
 - Requires Go 1.25.6 for the pinned MCP SDK. No sandbox or process-isolation claim.
   See [usage](../portable-workspace-usage.md) and
-  [implementation evidence](../implementation-2026-09-29.md), including full-copy
+  [implementation evidence](implementation/implementation-2026-09-29.md), including full-copy
   capture costs and remaining limits.
 
 ### Earlier development history

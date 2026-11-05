@@ -1,5 +1,8 @@
 # Allocate temporary protobuf provenance messages together — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Result and scope
 
 The encoder now allocates one fresh slice of provenance message values and points
@@ -19,7 +22,7 @@ that every request gets faster or allocates fewer bytes.
 
 Baseline is `5d28d18`. `origin/main` was fetched and remains
 `219d1dcfff9807b04660a40313b32127e5be2933`.
-[Exact refs](2026-10-18-outbox-provenance-messages/raw/baseline.json) and the earlier
+[Exact refs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/baseline.json) and the earlier
 [phase profile](2026-10-18-outbox-write-phases.md),
 [rejected write cache](2026-10-18-outbox-write-cache.md) and
 [rejected map clone](2026-10-18-outbox-clone.md) establish completed work.
@@ -45,7 +48,7 @@ baseline. All framing and error returns use the same implementation.
 The initial encoder round-trip/error/resource cases pass the original code before
 experimentation. Only the deliberately rejected full-entry slice fails the early
 error budget; this is not evidence of a pre-existing production correctness bug.
-[Exact case counts, original frame hashes and error allocations](2026-10-18-outbox-provenance-messages/raw/measure/contract-receipt.json)
+[Exact case counts, original frame hashes and error allocations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/measure/contract-receipt.json)
 retain the original, full-slice and bounded-entry results. Expected test exit 1
 means a reproduced candidate regression, not a passing suite.
 
@@ -97,8 +100,8 @@ provenance-field version is run against both the original and final candidate
 before adoption. It passes normally and with race detection. The guard excludes
 the observed 64 MiB caller-buffer retention pattern; it is not an RSS bound or a
 new global quota. Setup and forced GC add bounded test CPU/memory work, not runtime
-storage allocations. [Ownership proof](2026-10-18-outbox-provenance-messages/raw/ownership/plan.json) and
-[final normal/race results](2026-10-18-outbox-provenance-messages/raw/final/green-receipt.json) retain the exact sources
+storage allocations. [Ownership proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/ownership/plan.json) and
+[final normal/race results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/final/green-receipt.json) retain the exact sources
 and observations.
 
 ## Initial entry/provenance grouping: not shipped
@@ -158,8 +161,8 @@ intents. The candidate is the rejected bounded-entry version, not final producti
 | BenchmarkOutboxProtoBlocks/mixed=true/depth=4096/encode | 9.397782 → 10.592740 | +12.72% | -27.05% | +0.27% |
 | BenchmarkOutboxProtoBlocks/mixed=true/depth=4096/encode-4 | 9.640275 → 9.741848 | +1.05% | -27.05% | +0.27% |
 
-[All initial samples, ranges, bytes/counts, process heap/HWM and frame metrics](2026-10-18-outbox-provenance-messages/raw/measure/comparison-analysis.json)
-and [commands/order/binary hashes](2026-10-18-outbox-provenance-messages/raw/measure/comparison-runs.json) are retained.
+[All initial samples, ranges, bytes/counts, process heap/HWM and frame metrics](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/measure/comparison-analysis.json)
+and [commands/order/binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/measure/comparison-runs.json) are retained.
 The allocation reduction does not erase the adverse latency cells. This candidate
 is not used in the product.
 
@@ -219,8 +222,8 @@ after these observations; its exact-source confirmation follows below.
 The initial empty changed-save cell at four CPUs is +14.44%, medium changed save
 is +8.99%, and the 2,048-record one-CPU changed save is +7.23%. These adverse cells
 remain visible. Some unmodified decode/unchanged controls also move in time.
-No universal latency benefit is inferred. [Every provenance-only observation](2026-10-18-outbox-provenance-messages/raw/provenance/comparison-analysis.json)
-and [commands/source hashes](2026-10-18-outbox-provenance-messages/raw/provenance/comparison-runs.json) are retained.
+No universal latency benefit is inferred. [Every provenance-only observation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/provenance/comparison-analysis.json)
+and [commands/source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/provenance/comparison-runs.json) are retained.
 
 ## Exact final-source confirmation and same-binary controls
 
@@ -256,8 +259,8 @@ variability; they do not prove zero implementation effect or turn all first-coho
 regressions into noise. The one-CPU 2,048-record +7.23% is not remeasured here.
 The final-source encode allocation benefit repeats exactly, and the truly empty
 codec is -1.76%/+3.04% at one/four CPUs. No fixed request-latency gain is claimed.
-[All final paired/A/A samples and ranges](2026-10-18-outbox-provenance-messages/raw/confirmation/confirmation-analysis.json)
-and [exact commands, order and binary identities](2026-10-18-outbox-provenance-messages/raw/confirmation/confirmation-runs.json)
+[All final paired/A/A samples and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/confirmation/confirmation-analysis.json)
+and [exact commands, order and binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/confirmation/confirmation-runs.json)
 are retained separately from earlier cohorts.
 
 ## Costs, contracts and remaining work
@@ -282,12 +285,12 @@ gates; focused normal/race; full Go; broad race across storage/runtime/embedded/
 run-through/S3/public packages; all four conformance profiles; vet; site build/tests;
 and documentation links. The focused subset has **50 cases passing twice per mode:
 100 normal and 100 race passes, with no failures or skips**. The tested production
-hash is identical to the confirmed candidate. [Final checks](2026-10-18-outbox-provenance-messages/raw/final/checks.json),
-[source/hash proof](2026-10-18-outbox-provenance-messages/raw/final/green-receipt.json) and [environment](2026-10-18-outbox-provenance-messages/raw/final/environment.json)
+hash is identical to the confirmed candidate. [Final checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/final/checks.json),
+[source/hash proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/final/green-receipt.json) and [environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/final/environment.json)
 retain the evidence. All final Go bytes come from Railway formatting. Report/site/
 link checks run again after this document and evidence are saved. The scratch
 runner is then stopped; the separate target remains removed and unchanged.
-The [artifact manifest](2026-10-18-outbox-provenance-messages/raw/artifact-manifest.json) includes final validation and
+The [artifact manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-provenance-messages/raw/artifact-manifest.json) includes final validation and
 teardown receipts.
 
 The next priority remains decode/entry-path CPU and allocation cost, which has the

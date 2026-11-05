@@ -1,8 +1,11 @@
 # Documentation inventory capture — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The real release candidate's documentation link check fails with `spawnSync git
 ENOBUFS`: its tracked/evidence filenames exceed Node's default 1 MiB synchronous
-output buffer. [Original Railway failure](2026-10-18-doc-inventory/raw/original.log).
+output buffer. [Original Railway failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-doc-inventory/raw/original.log).
 This blocks the existing release standards gate; link validation itself is intact.
 
 Give this one Git inventory call a bounded 16 MiB output buffer. Extract the
@@ -14,13 +17,13 @@ The regression builds a temporary index with 2,200 long evidence names totaling
 more than 1 MiB plus one real README. With the original buffer limit it fails
 specifically with ENOBUFS while all six existing controls pass. With 16 MiB all
 seven tests pass, and the actual repository check validates 277 Markdown files.
-[Red](2026-10-18-doc-inventory/raw/regression-red.log),
-[green](2026-10-18-doc-inventory/raw/regression-green.log),
-[repository check](2026-10-18-doc-inventory/raw/doc-links.log).
+[Red](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-doc-inventory/raw/regression-red.log),
+[green](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-doc-inventory/raw/regression-green.log),
+[repository check](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-doc-inventory/raw/doc-links.log).
 
 All execution ran on the authorized Railway scratch deployment
 `22d4d547-8587-4784-9c32-f29684ee5c71`, Go 1.25.6 / Node 25.9.0, Linux amd64.
-[Final preparation checks](2026-10-18-doc-inventory/raw/checks.json) also cover
+[Final preparation checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-doc-inventory/raw/checks.json) also cover
 native build, version/install/site claims, command references and reproducible
 packaged output. The red test is an expected nonzero proof, not a product pass.
 No benchmark runs. Broader release CI and the four native consumer checks remain

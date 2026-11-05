@@ -1,10 +1,13 @@
 # Bind outbox identities to entry IDs — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Baseline and defect
 
 Baseline `fbe58f7` already rejects overlapping/repeated identities and lossy UTF-8
 identity encoding. `origin/main` was refreshed before this work; exact refs are
-in [baseline.json](2026-10-18-outbox-binding/raw/baseline.json).
+in [baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/baseline.json).
 
 Snapshots return each record's `OutboxEntry.ID`, while mutation/claim/recovery
 operations locate it by the journal map key (protobuf `Identity`). The decoder
@@ -43,14 +46,14 @@ legacy snapshots, for both active and prepared records:
 All **72 distinct regressions failed twice in each mode** (144 failures per
 normal/race run), while all 12 valid controls passed twice in each mode. Each
 mode captured **24 wrong-record acknowledgements/commits with rewritten file
-bytes**. The [red receipt](2026-10-18-outbox-binding/raw/before/red-receipt.json)
+bytes**. The [red receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/before/red-receipt.json)
 asserts the exact failure set and passing controls, not an arbitrary failing exit.
 The harness expects the two regression commands to exit 1; its successful job
 status means that those expected failures occurred.
 
 The initial uploaded test helpers were reduced to the existing five-parameter
 quality limit before any test execution. The guarded
-[test synchronization receipt](2026-10-18-outbox-binding/raw/initial-test-sync-receipt.json)
+[test synchronization receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/initial-test-sync-receipt.json)
 connects the upload-manifest hash to that source; the format stage and source
 copies record the actual tested bytes. Production remained unchanged throughout
 this preparation and the red run.
@@ -82,15 +85,15 @@ of those temporary maps is discarded on error, never published to a live handle.
 All **72 regressions and 12 valid controls pass twice normally and twice under
 race detection**, 168 passing cases in the new matrix per mode, using byte-identical new regression
 and benchmark source from the red run.
-[Green receipt](2026-10-18-outbox-binding/raw/after/green-receipt.json) verifies exact cases and source hashes.
+[Green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/after/green-receipt.json) verifies exact cases and source hashes.
 
 All **16 Railway stages pass**: formatting; focused outbox tests twice normally
 and twice with race detection; full Go suite; broad storage/runtime/embedded/
 run-through/S3/public-package race tests; four conformance profiles (memory,
 filesystem, runtime-memory, runtime-filesystem); vet; site build/tests; documentation
 links; quality/file-size/format gates; final benchmark build; and interleaved
-comparison. [Final commands/results](2026-10-18-outbox-binding/raw/after/checks.json)
-and [baseline commands/results](2026-10-18-outbox-binding/raw/before/checks.json)
+comparison. [Final commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/after/checks.json)
+and [baseline commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/before/checks.json)
 retain every step. No baseline or tolerance was raised.
 
 All compilation, formatting, tests, checks and measurements ran on the same
@@ -136,8 +139,8 @@ The largest absolute difference between median allocated bytes is 3.0 B/op.
 Exact byte/allocation values and timing ranges for every cell remain in the analysis.
 
 Individual samples, timing/allocation ranges, binary hashes and commands remain
-in [comparison analysis](2026-10-18-outbox-binding/raw/after/comparison-analysis.json)
-and [comparison order](2026-10-18-outbox-binding/raw/after/comparison-runs.json).
+in [comparison analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/after/comparison-analysis.json)
+and [comparison order](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-binding/raw/after/comparison-runs.json).
 All results, including regressions, are retained; small sample counts do not
 establish statistical significance. These are codec measurements, not end-to-end
 S3 or cached-read latency promises. Existing full-journal reads and validated-byte

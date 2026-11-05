@@ -1,5 +1,8 @@
 # Further WASM size opportunities — Railway exploration
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The largest measured opportunity is removing native HTTP dependencies from the embedded WASM import closure. An attribution prototype reduced raw size from 6,504,060 to 4,652,200 bytes (28.472%). Brotli size fell 29.886%. This is an experiment, not a validated release patch. Production Go and the shipped SDK binary remain unchanged.
 
 ## Measurements
@@ -31,15 +34,15 @@ The facade experiment substitutes an unsupported-platform attribution stub in th
 
 The production refactor should separate the embedded runtime/API from native workspace implementations and keep the native facade and content sniffing fully functional. Shared API types and adapters should remain canonical. Add a WASM import-boundary regression excluding the native HTTP/server/AWS closure. Then run the full standards, native conformance, SDK, and browser gates, synchronize generated artifacts, and measure startup and operation performance before adoption.
 
-The complete prototype reduces the dependency count from 269 to 123. The [checked dependency analysis](network-probe/analysis.json) identifies every removed package, including `net`, `net/http`, `crypto/tls`, `crypto/x509`, the AWS SDK, and the run-through/S3 server. Required object integrity hashes and secure randomness remain linked.
+The complete prototype reduces the dependency count from 269 to 123. The [checked dependency analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-probe/analysis.json) identifies every removed package, including `net`, `net/http`, `crypto/tls`, `crypto/x509`, the AWS SDK, and the run-through/S3 server. Required object integrity hashes and secure randomness remain linked.
 
 ## Validation limits and evidence
 
 Every built variant passed WebAssembly binary validation, the existing real-memory runtime integration test, and the edge-shaped isolate smoke probe. These checks do not establish full SDK/browser parity, host-backed persistence, or performance neutrality. No production bundle was replaced, native storage behavior changed, or website chart published.
 
-- [First experiment results](probe/result.json), [exact first executed script](probe/executed-probe.mjs), and [first export checksum](first-export.json).
-- [Network experiment results](network-probe/result.json), [checked analysis](network-probe/analysis.json), [exact executed script](network-probe/executed-probe.mjs), and [uploaded Dockerfile](network-probe/uploaded.Dockerfile).
-- [Network export checksum](network-export.json), [first source manifest](first-source.json), and [network source manifest](network-source.json).
+- [First experiment results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/probe/result.json), [exact first executed script](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/probe/executed-probe.mjs), and [first export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/first-export.json).
+- [Network experiment results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-probe/result.json), [checked analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-probe/analysis.json), [exact executed script](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-probe/executed-probe.mjs), and [uploaded Dockerfile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-probe/uploaded.Dockerfile).
+- [Network export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-export.json), [first source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/first-source.json), and [network source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-wasm-size-exploration/network-source.json).
 - Smoke-test logs and full dependency lists accompany each variant in the two evidence directories. Text exports were checksum verified. WASM binaries remain only on the Railway results volume.
 
 The first deployment `94282bb7-0158-403d-a697-29b679c000a2` and network deployment `c268be8c-2ac3-4f33-8b1c-a392f5bc5bc9` both reached `SUCCESS`. Retained artifacts are under `/results/wasm-size-probe-<deployment-id>/`. The runner's latest deployment and unchanged benchmark target were confirmed `REMOVED` after export.

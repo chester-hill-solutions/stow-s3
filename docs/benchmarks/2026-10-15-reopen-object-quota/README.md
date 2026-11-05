@@ -1,5 +1,8 @@
 # Reopen enforces the combined object-slot quota
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `d022378` on `codex/core-copy-quality`; latest fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`.
 
@@ -24,7 +27,7 @@ Backend COPY and the byte-budget correction are unchanged.
   reserved targets. The first fits; the second refuses without signed overflow.
 
 Seven cases failed per baseline run, repeated twice; see
-[original failures](raw/before-tests.log). The correction passes all cases,
+[original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-object-quota/raw/before-tests.log). The correction passes all cases,
 including five repetitions under the race detector (**100 cases**). A refused
 open preserves both existing objects and both uploads/parts. Reopening at an
 adequate cap can publish the reserved target and abort the two uploads without
@@ -47,8 +50,8 @@ No build or test suite ran concurrently with these measurements.
 
 The timings overlap; this is no optimization claim. The production cost is one
 additional subtraction per reconciliation and nine packaged WASM bytes, with
-no measured allocation increase. [All samples and binary hashes](raw/measurements.json)
-and [WASM hashes](raw/wasm.json) are retained. COPY's implementation is unchanged;
+no measured allocation increase. [All samples and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-object-quota/raw/measurements.json)
+and [WASM hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-object-quota/raw/wasm.json) are retained. COPY's implementation is unchanged;
 its existing cost-contract tests are included in the S3 test suite.
 
 Compatibility changes only for an over-cap reopen: it now returns
@@ -63,8 +66,8 @@ race suites, all four conformance profiles, and the twenty-case regression suite
 repeated five times under the race detector. Runtime vet, quality/file-size
 ratchets, formatting and diff checks also pass. The WASM artifact was rebuilt;
 generated-output verification, the WASM smoke test and seven package tests pass.
-See [full tests](raw/full-go.log), [race results](raw/race.log),
-[conformance](raw/conformance-summary.log), and the remaining validation logs in
+See [full tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-object-quota/raw/full-go.log), [race results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-object-quota/raw/race.log),
+[conformance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-reopen-object-quota/raw/conformance-summary.log), and the remaining validation logs in
 `raw`.
 
 The next authorized change addresses the six clean-checkout documentation-link

@@ -135,7 +135,7 @@ const summary = await withStow(async (session) => {
 
 - Source checkouts use `STOW_BIN`. A platform package can supply the binary in a published distribution.
 <!-- repo-only:start -->
-  See the [release checkpoint](../../docs/release-verification-2026-10-14.md) before using registry installation.
+  See the [release checkpoint](../../docs/history/releases/release-verification-2026-10-14.md) before using registry installation.
 <!-- repo-only:end -->
 - `STOW_*`, `S3_*`, and `AWS_*` are stripped from the child environment, so
   ambient cloud configuration cannot turn a local session into a run-through one.

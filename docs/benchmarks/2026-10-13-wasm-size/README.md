@@ -1,5 +1,8 @@
 # WASM size regression — October 13, 2026
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The SDK WASM is back to 6.14 MiB after reaching 9.35 MiB. The same-source Railway
 comparison removes 3,365,444 bytes (34.3%). It is 2,859 bytes above the earlier
 6,432,495-byte artifact, recovering almost all of the recent size growth.
@@ -26,8 +29,8 @@ small stub. Common option types remain available everywhere. The WASM dependency
 closure excludes both the native object-record package and protobuf. Native
 protobuf storage and its durability behavior remain intact.
 
-The [size result](size/result.json), [before dependencies](size/before-dependencies.txt)
-and [after dependencies](size/after-dependencies.txt) record the comparison.
+The [size result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/size/result.json), [before dependencies](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/size/before-dependencies.txt)
+and [after dependencies](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/size/after-dependencies.txt) record the comparison.
 The before artifact reproduces the exact SHA of the previously tested SDK:
 `f4da0cecaa4d19307b77314be57a5b3cf50d9b784c175baead6b0e0a6a4fc2b0`.
 The after artifact is:
@@ -37,15 +40,15 @@ The checked SDK artifact was copied back to source after validation.
 ## Validation
 
 All builds, tests and analysis ran on Railway. The new dependency-boundary
-regression [fails on the original source](size/regression-red.txt) and passes in
+regression [fails on the original source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/size/regression-red.txt) and passes in
 the fixed source's race/coverage suite. Windows cross-compilation verifies the
-unsupported-platform API. The [full receipt](receipt.json) and [log](standards.log)
+unsupported-platform API. The [full receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/receipt.json) and [log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/standards.log)
 record repository standards, all four conformance lanes, Node/WASM tests, SDK
 browser tests and protobuf generated-source verification. Browser tests passed
 33 cases, with the optional 1 GiB and direct-provider qualification cases skipped.
-The [chart receipt](preview-receipt.json) records 13 S3 chart checks, six screenshots
+The [chart receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/preview-receipt.json) records 13 S3 chart checks, six screenshots
 and zero browser errors. Only the SDK WASM changed in the generated-output
-[manifest](generated-change.json).
+[manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-wasm-size/generated-change.json).
 
 Deployment `33e20f9f-c5e1-45cb-80a0-da89acce5a48` reached `SUCCESS`. The runner and
 target were both read back as `REMOVED` after export. No website publication or

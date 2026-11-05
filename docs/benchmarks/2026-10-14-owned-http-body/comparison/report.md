@@ -1,5 +1,8 @@
 # Memory staging and HTTP ownership comparison
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 | Workflow | Version | Files/s | Payload MiB/s | p99 ms | Server high-water MiB |
 |---|---|---|---|---|---|
 | put | baseline | 487.425 | 487.425 | 12.43 | 69.004 |

@@ -1,5 +1,8 @@
 # Railway S3 comparison
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Complete: **true**. Exploratory measurements; qualification protocol incomplete.
 
 3 repetitions, 20 s windows, 5 s warm-up. One target at a time, separate generator, private HTTP, no TLS.

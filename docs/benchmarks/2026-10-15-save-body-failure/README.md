@@ -1,5 +1,8 @@
 # Distinguish opening absence from body-read failure
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `6300249` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This addresses the separate
 [partial-body finding](../2026-10-15-save-read-uncertainty/README.md#next-confirmed-finding--partial-body-failure-still-becomes-absence).
@@ -17,10 +20,10 @@ is an incorrect read/condition rather than a demonstrated overwrite or guard byp
 The body error is injected at the native io.ReadCloser seam; built-in memory
 readers do not naturally emit it.
 
-The [retained probe](raw/original-probe.go.txt) fails twice normally and twice
-under -race before production edits: [normal](raw/original-before.log),
-[race](raw/original-before-race.log). It passes twice in each mode after the fix:
-[normal](raw/original-after.log), [race](raw/original-after-race.log).
+The [retained probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/original-probe.go.txt) fails twice normally and twice
+under -race before production edits: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/original-before.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/original-before-race.log). It passes twice in each mode after the fix:
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/original-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/original-after-race.log).
 
 ReadForSave now uses the existing OpenObject interface and classifies only that
 opening result as absence. Once opening succeeds, all body failures return through
@@ -59,19 +62,19 @@ The new suite contains **22 cases**:
   an internal qualified native memory provider rather than adding that capability.
 
 All final new regression sources were run twice against unchanged production code
-before implementation: [baseline](raw/before-tests.log). Sixteen defect cases fail
+before implementation: [baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/before-tests.log). Sixteen defect cases fail
 per repetition; the controls and ordinary GET checks already pass. The 22 new and
 29 prior marked-read/absence/access/public-wrapper cases all pass twice afterward:
-[after](raw/after-tests.log). The prior marked-error fix is not weakened.
+[after](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/after-tests.log). The prior marked-error fix is not weakened.
 
 Five focused race repetitions pass **255 cases** (110 new and 145 prior cases)
-without skips: [focused race](raw/focused-race.log). Full Go tests, relevant
+without skips: [focused race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/focused-race.log). Full Go tests, relevant
 runtime/storage/S3/run-through/embedded/public race suites, all four conformance
 profiles, relevant vet, unchanged quality/file-size ratchets, formatting,
 documentation links, generated-output verification, WASM smoke and seven package
-integration tests pass. [Full Go](raw/full-go.log), [broad race](raw/broad-race.log),
-[conformance summary](raw/conformance-summary.log), [quality](raw/quality.log) and
-[package tests](raw/package-tests.log) retain results. Each conformance profile
+integration tests pass. [Full Go](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/full-go.log), [broad race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/broad-race.log),
+[conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/conformance-summary.log), [quality](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/quality.log) and
+[package tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/package-tests.log) retain results. Each conformance profile
 keeps two existing skips: opt-in live upstream coverage and mirrored bucket
 creation awaiting an authority decision. No ratchet baseline is raised.
 
@@ -99,8 +102,8 @@ version/case/configuration. Tiny successful reads use 250,000 iterations; openin
 errors/absence 1,000,000; 64 KiB reads 10,000; body failures 100,000. These are serial
 loops even with GOMAXPROCS=8. No agent builds/tests run concurrently; other host
 activity is uncontrolled. Every command, sample/outlier, binary digest, B/op and
-allocation count is retained in [measurements](raw/measurements.json), raw benchmark
-logs and [environment](raw/benchmark-environment.json).
+allocation count is retained in [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/measurements.json), raw benchmark
+logs and [environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/benchmark-environment.json).
 
 | Case | Processors | Median ns/op before → after | Change | Before range | After range |
 |---|---:|---:|---:|---:|---:|
@@ -163,7 +166,7 @@ The shared helper adds a function call on ordinary successful GET; measured cost
 above cover that affected path. No extra provider read or lock hold for I/O is added.
 
 The refreshed packaged WASM grows **4,617,224 → 4,617,893
-bytes (+669 bytes)**. [Artifact metadata](raw/wasm.json) records both digests.
+bytes (+669 bytes)**. [Artifact metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/wasm.json) records both digests.
 Generated-output verification, WASM smoke and package integration tests validate
 the rebuilt artifact.
 
@@ -178,14 +181,14 @@ existing buffered read accepts successful io.Copy without checking the copied
 length against known metadata size. No size/EOF validation is added here.
 
 All four method/length cases fail twice normally and twice under -race on both
-baseline and candidate: [source](raw/next-truncated-read-probe.go.txt),
-[baseline normal](raw/next-truncated-read-before.log),
-[baseline race](raw/next-truncated-read-before-race.log),
-[candidate normal](raw/next-truncated-read.log),
-[candidate race](raw/next-truncated-read-race.log). No data race is reported.
+baseline and candidate: [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-truncated-read-probe.go.txt),
+[baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-truncated-read-before.log),
+[baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-truncated-read-before-race.log),
+[candidate normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-truncated-read.log),
+[candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-truncated-read-race.log). No data race is reported.
 The baseline replay temporarily restores the two original production files after
 all broad tests and package checks finish, then restores the candidate in a
-finally block. [Source digests](raw/next-baseline-comparison.json) confirm exact
+finally block. [Source digests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-baseline-comparison.json) confirm exact
 restoration. This independently confirms the truncation defect predates the
 shared-reader extraction.
 

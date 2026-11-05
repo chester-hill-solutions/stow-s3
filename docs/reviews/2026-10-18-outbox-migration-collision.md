@@ -1,5 +1,8 @@
 # Reject overlapping prepared-record migration — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Defect and baseline
 
 `normalizeDecodedOutboxState` moved an active-map entry marked `Prepared` into the
@@ -15,7 +18,7 @@ active-map entry was not marked Prepared.
 
 `origin/main` was refreshed before this work. The working baseline is `d5782d2`,
 which already includes the completed COPY, recovery and outbox performance work;
-exact refs are in [baseline.json](2026-10-18-outbox-migration-collision/raw/baseline.json).
+exact refs are in [baseline.json](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-migration-collision/raw/baseline.json).
 No completed remediation is repeated.
 
 ## Reproduction before modification
@@ -40,7 +43,7 @@ The constructor test deliberately closes an unexpectedly accepted outbox to
 expose permanent writeback. Each mode recorded 20 accepted-and-rewritten opens.
 Six non-overlapping migration controls passed twice in each mode, including the
 flat-map legacy format. The two unmarked-overlap controls also passed twice.
-The [red verification receipt](2026-10-18-outbox-migration-collision/raw/before/red-receipt.json)
+The [red verification receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-migration-collision/raw/before/red-receipt.json)
 asserts the exact failing case set, repetitions and passing controls; it does not
 merely check for an arbitrary nonzero exit.
 
@@ -65,7 +68,7 @@ After the five-line validation loop was moved, all **55 migration cases passed
 twice normally and twice with race detection** (110 passing cases per mode),
 using byte-identical regression source from the red run. This includes all 47
 originally failing cases and eight controls. The
-[green receipt](2026-10-18-outbox-migration-collision/raw/after/green-receipt.json)
+[green receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-migration-collision/raw/after/green-receipt.json)
 verifies case counts and exact production/test source hashes.
 
 All 14 Railway stages passed: formatting; focused outbox tests twice normally
@@ -73,8 +76,8 @@ and twice with race detection; full Go suite; broad storage/runtime/embedded/
 run-through/S3/public-package race tests; memory, filesystem, runtime-memory and
 runtime-filesystem conformance; vet; site build/tests; documentation links; and
 Go quality/file-size/format gates. No baseline was raised.
-[Exact commands and results](2026-10-18-outbox-migration-collision/raw/after/checks.json)
-and [baseline commands/results](2026-10-18-outbox-migration-collision/raw/before/checks.json)
+[Exact commands and results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-migration-collision/raw/after/checks.json)
+and [baseline commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-migration-collision/raw/before/checks.json)
 are retained. Report/documentation checks are rerun after adding this report.
 
 All formatting, compilation, tests and checks ran on the existing authorized

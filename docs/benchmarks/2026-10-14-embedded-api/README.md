@@ -1,5 +1,8 @@
 # Canonical embedded API and smaller WASM — 2026-10-14
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 The validated SDK WASM decreased from 6,504,060 to **4,610,006 bytes (29.121%)**. Its gzip and Brotli encodings decreased about 30.4%. The exact validated artifact was copied into the SDK distribution and its SHA-256 verified. All builds, tests, compression, and performance measurements ran on Railway.
 
 ## Change
@@ -30,7 +33,7 @@ Six alternating fresh Node processes per variant measured the binary WASM bridge
 
 Each steady workload used five warmup pairs followed by 40 pairs, checking complete returned bytes. These exploratory medians exclude process spawn, `wasm_exec.js` evaluation, the JavaScript SDK facade, network sockets, browser startup, and host persistence. Shared build-host variation is not represented by a capacity guarantee. No website performance claim was changed.
 
-Three matched legacy JSON/base64 working-set samples per version settled at 16 MiB of linear memory. Twenty subsequent read passes added no pages in either version. An earlier concurrent gate observed 256 KiB of first-pass scratch growth. That characterization assertion now checks stable repeated reads while retaining the first-pass growth measurement in the report. The [memory diagnosis](memory-diagnosis/verification/embedded-size/memory.json) and [final samples](final/verification/embedded-size/memory.json) preserve the observations.
+Three matched legacy JSON/base64 working-set samples per version settled at 16 MiB of linear memory. Twenty subsequent read passes added no pages in either version. An earlier concurrent gate observed 256 KiB of first-pass scratch growth. That characterization assertion now checks stable repeated reads while retaining the first-pass growth measurement in the report. The [memory diagnosis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/memory-diagnosis/verification/embedded-size/memory.json) and [final samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/embedded-size/memory.json) preserve the observations.
 
 ## Validation and safeguards
 
@@ -42,10 +45,10 @@ Superseded attempts exposed duplicate coverage accounting, an import placement m
 
 ## Evidence and retained identities
 
-- [Full validation receipt](final/verification/receipt.json), [standards log](final/verification/standards.log), [browser report](final/verification/sdk-browser-report.json), and [export checksum](final/export.json).
-- [Size comparison](final/verification/embedded-size/result.json), [startup/operation samples](final/verification/embedded-size/performance.json), and [generated-output change manifest](final/verification/generated-change.json).
-- [Failing import regression](red.log), [original regression source manifest](red-source.json), and [validated Go source snapshot](validated-go-source.tar.gz).
-- [Archived generated reference and rendered preview](final/verification/rendered-documentation.tar.gz). Raw before/after WASM binaries remain on the Railway results volume.
+- [Full validation receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/receipt.json), [standards log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/standards.log), [browser report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/sdk-browser-report.json), and [export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/export.json).
+- [Size comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/embedded-size/result.json), [startup/operation samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/embedded-size/performance.json), and [generated-output change manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/generated-change.json).
+- [Failing import regression](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/red.log), [original regression source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/red-source.json), and [validated Go source snapshot](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/validated-go-source.tar.gz).
+- [Archived generated reference and rendered preview](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-embedded-api/final/verification/rendered-documentation.tar.gz). Raw before/after WASM binaries remain on the Railway results volume.
 
 Final full-validation deployment: `f46a2abe-b6a3-493f-ac0c-bad635c88846` (`SUCCESS`). Memory diagnosis: `2f130a39-ac00-4ba5-870e-47e925456f8d` (`SUCCESS`, diagnostic only). Recovery deployment: `c60a4545-3a19-43e9-b35d-328f76677108`. Retention root: `/results/embedded-api-final-f46a2abe-b6a3-493f-ac0c-bad635c88846`.
 

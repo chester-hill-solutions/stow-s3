@@ -6,7 +6,7 @@
 **Reconciled:** 2026-09-29 against `5485a36`, source inspection and the recorded
 assessment. This register explains where old work went; it is not a second backlog.
 The reconciliation itself changed documentation only. The subsequent local 0.3.0
-implementation is recorded in [implementation evidence](../implementation-2026-09-29.md);
+implementation is recorded in [implementation evidence](implementation/implementation-2026-09-29.md);
 no release has been certified.
 
 ## Start here
@@ -16,7 +16,7 @@ no release has been certified.
 2. [Product milestone](plans/portable-agent-workspace-goal.md): workflow and adoption criteria.
 3. [MCP/OpenCode integration](plans/mcp-storage-integration-plan.md): S3 technical detail.
 4. [Portable workspace usage](../portable-workspace-usage.md): concrete development API and examples.
-5. [Implementation evidence](../implementation-2026-09-29.md): checks, costs and open gates.
+5. [Implementation evidence](implementation/implementation-2026-09-29.md): checks, costs and open gates.
 6. [ADR index](../adr/README.md): decisions in force, especially ADR 0014's storage boundary.
 7. [Realtime multiplayer experiment](collaboration/realtime-multiplayer-plan.md): proposed caller-layer
    historical RT handover; active collaboration scope/status moved to its standalone repository.
@@ -30,8 +30,8 @@ authority are frozen historical text. Follow the destination below instead.
 | Document | Disposition and current destination |
 | --- | --- |
 | [portable-workspace-usage.md](../portable-workspace-usage.md) | **Current usage.** Concrete local development APIs, commands and boundaries. |
-| [implementation-2026-09-29.md](../implementation-2026-09-29.md) | **Implementation evidence.** Local tests, performance and remaining release/pilot gates. |
-| [compatibility-coverage-2026-09-29.md](../compatibility-coverage-2026-09-29.md) | **Coverage map.** Shared SDK and focused protocol scenarios with explicit unsupported boundaries. |
+| [implementation-2026-09-29.md](implementation/implementation-2026-09-29.md) | **Implementation evidence.** Local tests, performance and remaining release/pilot gates. |
+| [compatibility-coverage-2026-09-29.md](assessments/compatibility-coverage-2026-09-29.md) | **Coverage map.** Shared SDK and focused protocol scenarios with explicit unsupported boundaries. |
 | [plan.md](../plan.md) | **Active work order.** S0 correctness, S1 coherent storage, S2 delivery, S3 MCP/OpenCode, S4 evidence. |
 | [portable-agent-workspace-goal.md](plans/portable-agent-workspace-goal.md) | **Active milestone.** Storage workflow and repeat-use decision. |
 | [mcp-storage-integration-plan.md](plans/mcp-storage-integration-plan.md) | **Active detail.** Expands S3, including separate workspace, selected context and bounded retry/failure. |
@@ -67,8 +67,8 @@ authority are frozen historical text. Follow the destination below instead.
 | [assessment-2026-09-27.md](experiments/assessment-2026-09-27.md) | **Historical assessment.** Includes subsequent repair record; findings are not automatically reopened. |
 | [agent-workspace-pilot.md](experiments/agent-workspace-pilot.md) | **Historical local pilot.** Remaining clean-install/cross-host/real-user proof lives in S2–S4. |
 | [competitive-landscape.md](../competitive-landscape.md) | **Dated research.** Recommendations do not schedule work; refresh material claims for S4 decisions. |
-| [product-assessment-2026-09-29.md](../product-assessment-2026-09-29.md) | **Dated assessment.** Current baseline evidence and limitations; actions owned by S0–S4. |
-| [agent-continuity-pilot-2026-09-29.md](../agent-continuity-pilot-2026-09-29.md) | **Dated experiment.** Synthetic same-host continuity, not real-agent or cross-host proof. |
+| [product-assessment-2026-09-29.md](assessments/product-assessment-2026-09-29.md) | **Dated assessment.** Current baseline evidence and limitations; actions owned by S0–S4. |
+| [agent-continuity-pilot-2026-09-29.md](experiments/agent-continuity-pilot-2026-09-29.md) | **Dated experiment.** Synthetic same-host continuity, not real-agent or cross-host proof. |
 | [assessment evidence](../assessment-evidence/2026-09-29/README.md), [session baseline](../benchmarks/session-baseline.md), [tool baseline](../benchmarks/2026-09-27/tool-performance-baseline.md) | **Evidence only.** Preserve run dates, environments, failures and limitations; no performance promise or work queue. |
 
 ### References that remain active

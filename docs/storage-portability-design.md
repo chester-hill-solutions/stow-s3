@@ -6,7 +6,7 @@
 remaining acceptance tracked by [the canonical plan](plan.md). The text below
 preserves pre-code reasoning and illustrative shapes. For actual names, defaults,
 format boundaries and measured limitations use [portable workspace usage](portable-workspace-usage.md)
-and [implementation evidence](implementation-2026-09-29.md). It is not a release
+and [implementation evidence](history/implementation/implementation-2026-09-29.md). It is not a release
 certification; self-contained Git base bundles remain deferred.
 
 ## 1. One workspace runtime, optional S3 access

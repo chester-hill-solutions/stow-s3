@@ -1,5 +1,8 @@
 # Bounded storage contract audit — 2026-10-16
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Current core correctness status: the [bounded closure register](2026-10-18-correctness-closure.md)
 evaluates nine historical leads: no required fix remains, eight leads are
 closed, and one is optional strictness. Older follow-ups below are historical;
@@ -41,7 +44,7 @@ not the highest-priority demonstrated native failure.
 Reviewed branch `codex/core-copy-quality` at
 `2d708cf80bea044af1325c342c6700da4a79ecc5`. Freshly fetched `origin/main` is
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of this branch.
-[Baseline and fetch](2026-10-16-storage-contract-audit/raw/baseline.json).
+[Baseline and fetch](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/baseline.json).
 Prior fixes remain in place; this is an audit of their cumulative state.
 
 The fixed boundary is native memory, filesystem-record and editable-workspace
@@ -213,8 +216,8 @@ alongside an error and must retain the already documented committed semantics.
 
 ## Evidence and stopping point
 
-The saved [workspace probe](2026-10-16-storage-contract-audit/raw/workspace-probes.go.txt)
-and [filesystem/runtime probe](2026-10-16-storage-contract-audit/raw/filesystem-probes.go.txt)
+The saved [workspace probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/workspace-probes.go.txt)
+and [filesystem/runtime probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/filesystem-probes.go.txt)
 assert the required contracts before any implementation change. Each matrix ran
 twice normally and twice under the race detector with Go 1.25.6:
 
@@ -226,24 +229,24 @@ twice normally and twice under the race detector with Go 1.25.6:
 All 20 adverse leaf executions fail as intended; all 20 healthy controls pass.
 No cases skip and no data race is reported. These are contract failures under
 the race detector, not claims of newly discovered Go data races.
-[Workspace normal](2026-10-16-storage-contract-audit/raw/native-probes.log),
-[workspace race](2026-10-16-storage-contract-audit/raw/native-probes-race.log),
-[filesystem normal](2026-10-16-storage-contract-audit/raw/filesystem-probes.log),
-[filesystem race](2026-10-16-storage-contract-audit/raw/filesystem-probes-race.log).
-The [replay runner](2026-10-16-storage-contract-audit/raw/replay.py.txt) accepts
+[Workspace normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/native-probes.log),
+[workspace race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/native-probes-race.log),
+[filesystem normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/filesystem-probes.log),
+[filesystem race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/filesystem-probes-race.log).
+The [replay runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/replay.py.txt) accepts
 a checkout and output directory. The temporary `_test.go` files were removed after capture.
 They become permanent regression tests only with their respective future fixes.
 
-Fresh static checks pass: [Go vet](2026-10-16-storage-contract-audit/raw/vet.log)
-across the reviewed Go packages and [Go quality/file-size ratchets](2026-10-16-storage-contract-audit/raw/quality.log).
-The preceding baseline already passed [full Go tests](../benchmarks/2026-10-16-prepared-recovery/raw/full-go.log),
-[broad race tests](../benchmarks/2026-10-16-prepared-recovery/raw/broad-race.log)
-and [four conformance profiles](../benchmarks/2026-10-16-prepared-recovery/raw/conformance-summary.log).
+Fresh static checks pass: [Go vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/vet.log)
+across the reviewed Go packages and [Go quality/file-size ratchets](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/quality.log).
+The preceding baseline already passed [full Go tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/full-go.log),
+[broad race tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/broad-race.log)
+and [four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-prepared-recovery/raw/conformance-summary.log).
 Those unchanged-source results are reused, not presented as fresh executions;
 conformance retains its documented mirror-bucket and live-upstream skips.
-The [verification record](2026-10-16-storage-contract-audit/raw/verification.json)
+The [verification record](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/verification.json)
 checks probe counts, prior source hashes and that every tracked Go source/test
-still matches the audit baseline. [Documentation/site checks](2026-10-16-storage-contract-audit/raw/docs.log) pass for this report.
+still matches the audit baseline. [Documentation/site checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-storage-contract-audit/raw/docs.log) pass for this report.
 No benchmarks, implementation, dependency, public API or storage format changes.
 
 This audit stopped at this consolidated inventory. A1 has since been implemented

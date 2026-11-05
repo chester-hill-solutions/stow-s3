@@ -3,7 +3,7 @@
 > **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../storage-foundation-plan.md) is the sole work order. Historical source findings and P01–P16 handover are reconciled with later baseline implementation; they do not reopen completed defects. Former checklists, phase numbers and next steps below do not schedule work.
 
 > Historical pre-code record. Implementation followed on the same date; see
-> [current evidence](../../implementation-2026-09-29.md) and [the canonical plan](../../plan.md).
+> [current evidence](../implementation/implementation-2026-09-29.md) and [the canonical plan](../../plan.md).
 > The findings and "not performed" statements below describe the discovery pass.
 
 ## 1. Plan validation summary
@@ -29,7 +29,7 @@ Evidence levels:
 The installed OpenCode binary reports `v2.0.16` using isolated temporary XDG paths.
 The matching public tag resolves to `3a103fe0aff726a4edc7492f03f7b88195d9e4c9`.
 Pinned source references and local download hashes are recorded in
-[the source manifest](../../assessment-evidence/2026-09-29/pre-code-source-manifest.json).
+[the source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/assessment-evidence/2026-09-29/pre-code-source-manifest.json).
 The lifecycle findings are static analysis, not a successful agent integration.
 
 Documentation verification after this pass: ADR index/digests (14 decisions),

@@ -1,23 +1,26 @@
 # Reject excess provider bytes in runtime reads
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Corrected on 2026-10-16 on `codex/core-copy-quality`, based on `9f33b37`.
 Freshly fetched `origin/main` is `219d1dcfff9807b04660a40313b32127e5be2933`,
 an ancestor of this branch. The previous
 [stream EOF correction](../2026-10-16-stream-completeness/README.md) remains intact.
-[Source and binary identities](raw/environment.json) pin the measured implementation.
+[Source and binary identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/environment.json) pin the measured implementation.
 
 ## Before: contradictory bodies succeed and consume the entire payload
 
 The retained probe advertises three bytes and supplies `old!`. `OpenObject`,
 `GetObject` and `ReadForSave` succeed with four bytes. The guarded path fingerprints
 those wrong bytes; the backend refuses that fingerprint. Six semantic failures
-occur in each [normal](raw/original-before.log) and [race](raw/original-before-race.log)
+occur in each [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/original-before.log) and [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/original-before-race.log)
 run (three cases repeated twice). Source remains in the preceding
-[report](../2026-10-16-stream-completeness/raw/next-excess-probe.go.txt).
+[report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-stream-completeness/raw/next-excess-probe.go.txt).
 This is injected provider inconsistency, not spontaneous native-store corruption.
 
 Before production edits, all **41 new regression cases** were run twice:
-[38 defect cases fail and three controls pass](raw/before-tests.log) per repetition.
+[38 defect cases fail and three controls pass](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/before-tests.log) per repetition.
 The matrix covers raw/adapter/WriterTo/buffered/guarded/public reads, a claimed
 zero-byte body, coalesced EOF, original provider errors, seek positions and
 native/fallback ranges. A finite 1 MiB body advertised as three bytes is consumed
@@ -66,32 +69,32 @@ is added. The private error is shared rather than allocated per overrun.
 
 ## Validation
 
-- [New and prior read regressions](raw/after-tests.log): **193 leaves twice**, all pass.
-- [Focused race matrix](raw/focused-race.log): **198 leaves five times = 990 passes**,
+- [New and prior read regressions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/after-tests.log): **193 leaves twice**, all pass.
+- [Focused race matrix](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/focused-race.log): **198 leaves five times = 990 passes**,
   including policy, captured-version and concurrent-stream tests; no skips or races.
-- The same original three paths pass twice [normally](raw/original-after.log) and
-  [under race](raw/original-after-race.log), with [equivalent post-fix assertions](raw/after-probe.go.txt)
+- The same original three paths pass twice [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/original-after.log) and
+  [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/original-after-race.log), with [equivalent post-fix assertions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/after-probe.go.txt)
   adapted to the zero-object/valid-prefix error contract.
-- [Full Go suite](raw/full-go.log), [broad storage/runtime/S3 race suite](raw/broad-race.log)
-  and [vet](raw/vet.log) pass.
-- [Four conformance profiles](raw/conformance-summary.log) pass: memory,
+- [Full Go suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/full-go.log), [broad storage/runtime/S3 race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/broad-race.log)
+  and [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/vet.log) pass.
+- [Four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/conformance-summary.log) pass: memory,
   filesystem, runtime-memory and runtime-filesystem. Each retains two existing
   skips: opt-in live upstream and mirror bucket creation awaiting an authority decision.
-- [Quality/file-size gates](raw/quality.log), [generated comparison](raw/generated.log),
-  [WASM smoke](raw/wasm-smoke.log), [seven package integration tests](raw/package-tests.log)
-  and [final format/provenance/documentation checks](raw/final-checks.log) pass.
+- [Quality/file-size gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/quality.log), [generated comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/generated.log),
+  [WASM smoke](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/wasm-smoke.log), [seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/package-tests.log)
+  and [final format/provenance/documentation checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/final-checks.log) pass.
 
 Reproducibly rebuilt WASM: 4,618,495 → 4,619,001 bytes, **+506 bytes**.
-[Build output](raw/build-wasm.log), [package build](raw/package-build.log) and
-[hashes](raw/wasm.json) are retained. Complete read-contract tests at this existing
+[Build output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/build-wasm.log), [package build](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/package-build.log) and
+[hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/wasm.json) are retained. Complete read-contract tests at this existing
 seam would have prevented the missing upper-length check; no abstraction is needed.
 
 ## Measurements: safety gain, allocation parity, uncertain latency
 
 Go 1.25.6, Apple M1 Pro, macOS 14.5 ARM64, native memory backend. CPU labels mean
-GOMAXPROCS, not OS affinity. [Compiler flags/experiments](raw/compiler-environment.json)
+GOMAXPROCS, not OS affinity. [Compiler flags/experiments](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/compiler-environment.json)
 are default. No concurrent agent builds/tests ran during timing. Unrelated host
-work was uncontrolled; [mid-run load averages](raw/midrun-host-load.json) were
+work was uncontrolled; [mid-run load averages](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/midrun-host-load.json) were
 20.35 / 28.11 / 22.07. That context does not prove the cause of any sample.
 All **1,952 observations** remain: 1,280 interleaved blocks, 432 direct samples,
 240 focused process samples. No adverse sample is filtered out.
@@ -103,9 +106,9 @@ B/op is cumulative allocation, not RSS or peak heap.
 One ordinary binary includes frozen `9f33b37` stream methods, its WriterTo method
 and original copy-buffer pool, plus unchanged GET/ReadForSave with private renaming.
 Reader method names/count and WriterTo are checked before timing:
-[source](raw/paired-probe.go.txt), [verification](raw/reference-verification.json),
-[plan](raw/plan.json), [all 1,280 blocks](raw/paired.log), [summary](raw/paired-summary.json),
-[parser](raw/analyze-paired.py.txt). Ten alternating ABBA/BAAB cycles run twice at
+[source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/paired-probe.go.txt), [verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/reference-verification.json),
+[plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/plan.json), [all 1,280 blocks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/paired.log), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/paired-summary.json),
+[parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/analyze-paired.py.txt). Ten alternating ABBA/BAAB cycles run twice at
 CPU 1 and 8, with duplicate same-code labels. Allocation and process-wide GC
 counters are sampled outside timing; they include boundary/runtime work.
 
@@ -134,10 +137,10 @@ establish latency parity. Cycle medians are not quotients of the displayed ns me
 ### Direct before/after binaries: every result retained
 
 Both ordinary binaries contain identical final tests and benchmarks. ABBA blocks
-have three repetitions, six samples per case/CPU/version. See [plan](raw/plan.json),
-[runner](raw/measure.py.txt), [raw](raw/direct.log),
-[all parsed samples/ranges/allocations](raw/direct-measurements.json) and
-[parser](raw/analyze-direct.py.txt). `ExcessRead` changes from incorrect success to
+have three repetitions, six samples per case/CPU/version. See [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/plan.json),
+[runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/measure.py.txt), [raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/direct.log),
+[all parsed samples/ranges/allocations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/direct-measurements.json) and
+[parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/analyze-direct.py.txt). `ExcessRead` changes from incorrect success to
 bounded failure: its large reductions are **not equivalent-result speedups**.
 
 | CPU | Benchmark (prefix `Benchmark` omitted) | Median ns before → after | Change |
@@ -196,9 +199,9 @@ processes per row. Duplicate labels execute the identical binary. Each process
 records benchmark time and RUSAGE_CHILDREN user+system CPU deltas. The latter
 includes startup and untimed fixture setup, so it is diagnostic process CPU per
 benchmark iteration, not an isolated operation profile. No other agent test/build
-ran concurrently. [Plan](raw/focused-plan.json), [runner](raw/focused-costs.py.txt),
-[raw](raw/focused-costs.log), [all 240 samples](raw/focused-samples.json),
-[summary](raw/focused-summary.json) and [parser](raw/analyze-focused.py.txt).
+ran concurrently. [Plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/focused-plan.json), [runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/focused-costs.py.txt),
+[raw](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/focused-costs.log), [all 240 samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/focused-samples.json),
+[summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/focused-summary.json) and [parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/analyze-focused.py.txt).
 
 | CPU | Case | Wall benchmark cycle change | Wall same-code variation | Process CPU cycle change | CPU same-code variation |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -243,14 +246,14 @@ no exact-byte parity or peak-memory guarantee is claimed.
 When a provider returns a live reader alongside an opening error, the runtime
 discards access to it without closing it. Six file-backed injected paths reproduce:
 raw stream, adapter, buffered GET, guarded read, fallback range and native range.
-Each [baseline normal](raw/next-open-before.log), [baseline race](raw/next-open-before-race.log),
-[candidate normal](raw/next-open-after.log) and [candidate race](raw/next-open-after-race.log)
+Each [baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/next-open-before.log), [baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/next-open-before-race.log),
+[candidate normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/next-open-after.log) and [candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/next-open-after-race.log)
 run contains twelve expected ownership failures (six cases twice): Close count
 zero and the descriptor still usable by Stat. Original error and accounting are
 preserved, and a healthy retry works. Fixtures manually close every file afterward.
 
-[Probe source](raw/next-open-error-probe.go.txt), [runner](raw/next-probe.py.txt) and
-[frozen baseline](raw/baseline-streams.go.txt) are retained. Baseline replay uses
+[Probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/next-open-error-probe.go.txt), [runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/next-probe.py.txt) and
+[frozen baseline](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-excess-body/raw/baseline-streams.go.txt) are retained. Baseline replay uses
 a Go source overlay; production files were never replaced. To reproduce, copy the
 probe into `internal/runtime/opening_error_review_probe_test.go`, run
 `go test ./internal/runtime -run '^TestReviewOpeningErrorDropsReader$' -count=2 -v`

@@ -54,7 +54,7 @@ execute a supplied continuation prompt against an adopted workspace with fresh
 caller state. Neither a new storage API nor a new continuation entry point is
 required to test task resumability.
 
-The [local model pilot](../../opencode-receiver-remediation-2026-09-29.md) demonstrated
+The [local model pilot](../implementation/opencode-receiver-remediation-2026-09-29.md) demonstrated
 continuation from adopted files and notes, with independently checked output.
 However, the receiver was given a task-specific prompt spelling out the next
 calculation. This is narrower evidence than independently deriving the next

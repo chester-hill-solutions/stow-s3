@@ -1,5 +1,8 @@
 # Refuse exhausted outbox fencing tokens — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Defect and operational consequence
 
 Baseline `cb8dc49` already refuses ID-sequence exhaustion, but its shared fencing
@@ -19,8 +22,8 @@ is asserted. Existing formats can represent the maximum value, so this check is
 not a test that performs 2^64 acquisitions.
 
 `origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
-[Exact baseline refs](2026-10-18-outbox-token-exhaustion/raw/baseline.json) and
-[stale-acknowledgement output](2026-10-18-outbox-token-exhaustion/raw/before/regression-normal.log) are retained.
+[Exact baseline refs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/baseline.json) and
+[stale-acknowledgement output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/before/regression-normal.log) are retained.
 The rejected write-cache optimization remains rejected; its ownership/resource
 regressions remain in the full suite.
 
@@ -29,7 +32,7 @@ regressions remain in the full suite.
 Before implementation changes, tests run twice normally and twice under race
 detection against the original allocator. **32 distinct cases fail twice per
 mode: 64 failures normally and 64 under race. Thirty controls pass twice per mode.**
-[The red receipt](2026-10-18-outbox-token-exhaustion/raw/before/red-receipt.json) verifies names and repetitions.
+[The red receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/before/red-receipt.json) verifies names and repetitions.
 Each mode records four accepted stale acknowledgements and four removed current
 intents: two formats, twice each. Harness success means the expected test exit 1
 was observed, not that the regression tests passed.
@@ -46,8 +49,8 @@ ID-allocation failure atomicity, and existing maximum-token owner renewal/releas
 completion usable. The first run also failed one over-strict JSON/missing-entry
 control: a successful no-op claim is allowed to migrate JSON to native format.
 That fixture now permits migration while checking unchanged semantic state and
-counters. [Initial output](2026-10-18-outbox-token-exhaustion/raw/initial-before/regression-normal.log) and
-[initial test source](2026-10-18-outbox-token-exhaustion/raw/initial-before/source-outbox_token_exhaustion_controls_test.go.txt)
+counters. [Initial output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/initial-before/regression-normal.log) and
+[initial test source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/initial-before/source-outbox_token_exhaustion_controls_test.go.txt)
 remain retained. No implementation was changed to satisfy that control, and no
 quality baseline was raised.
 
@@ -83,18 +86,18 @@ exhaustion error may precede the generic ID error; no error-string API is promis
 
 All **62 cases pass twice normally and twice with race detection**, 124 passes per
 focused mode. Regression and benchmark source bytes match the corrected original
-red run. [Green receipt and hashes](2026-10-18-outbox-token-exhaustion/raw/after/green-receipt.json) verify this.
+red run. [Green receipt and hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/after/green-receipt.json) verify this.
 All **16 final Railway stages pass**: formatting; focused normal/race twice; full Go;
 broad storage/runtime/embedded/run-through/S3/public-package race tests; four
 conformance profiles (memory, filesystem, runtime-memory, runtime-filesystem); vet;
 site build/tests; documentation links; quality/file-size/format gates; benchmark
-build and interleaved comparison. [Exact commands/results](2026-10-18-outbox-token-exhaustion/raw/after/checks.json)
+build and interleaved comparison. [Exact commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/after/checks.json)
 retain every stage.
 
 All Go formatting, builds, tests, race/conformance, code/documentation checks and
 benchmarks run on the authorized Railway scratch deployment. Go 1.25.6, Node
 25.9.0, 4 CPU/4 GiB cgroup, UID 10001. Benchmark TMPDIR is under ext4 `/results`,
-verified before timing. [Filesystem receipt](2026-10-18-outbox-token-exhaustion/raw/after/fixture-filesystem.json)
+verified before timing. [Filesystem receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/after/fixture-filesystem.json)
 and environment records retain actual paths/limits. Local work is reads, editing,
 Git, packaging, hashing and exported-data analysis. Exact Railway-formatted source
 is copied back rather than formatted or tested locally.
@@ -136,9 +139,9 @@ universal speedup is claimed. Every adverse cell is retained.
 | state | 128 | prepare | 1 | 2.668 → 2.628 | -1.48% | 1.0 → 1.0 |
 | state | 128 | prepare | 4 | 2.285 → 2.183 | -4.44% | 1.0 → 1.0 |
 
-[All observations, ranges, iterations and allocated bytes](2026-10-18-outbox-token-exhaustion/raw/after/comparison-analysis.json),
-[commands/order and binary hashes](2026-10-18-outbox-token-exhaustion/raw/after/comparison-runs.json), and the
-[pinned baseline binary receipt](2026-10-18-outbox-token-exhaustion/raw/before/benchmark-binary.json) are retained.
+[All observations, ranges, iterations and allocated bytes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/after/comparison-analysis.json),
+[commands/order and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/after/comparison-runs.json), and the
+[pinned baseline binary receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-token-exhaustion/raw/before/benchmark-binary.json) are retained.
 The new success-path work is a boundary comparison and checked result handling;
 the helper allocates an error only on exhaustion. No new retained cache or buffer
 is introduced. Provider IO variability and map iteration can dominate wall time;

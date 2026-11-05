@@ -1,5 +1,8 @@
 # Committed multipart initiation reserves its session and object capacity
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `452f590` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. Earlier completed corrections
 are retained. This addresses the committed-initiation finding from the
@@ -16,12 +19,12 @@ before registering the session and missing-object reservation.
 The original probe creates **two real uploads under `MaxMultipartUploads: 1`**,
 with two provider calls. The first result is nil even though its upload exists.
 It reproduces twice normally and twice under the race detector before production
-changes: [normal](raw/original-before.log), [race](raw/original-before-race.log).
-The same probe now passes twice in each mode: [normal](raw/original-after.log),
-[race](raw/original-after-race.log).
+changes: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/original-before.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/original-before-race.log).
+The same probe now passes twice in each mode: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/original-after.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/original-after-race.log).
 
 The finalized native/public regressions also ran twice before implementation:
-[original failures](raw/before-tests.log). Four native committed cases, the native
+[original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/before-tests.log). Four native committed cases, the native
 shared-target case, eight public committed cases and the S3 case fail per run;
 success and ordinary-refusal cases pass. They independently demonstrate lost
 identity, missing session/object reservations, admission past the session cap,
@@ -79,7 +82,7 @@ All twenty-six cases pass twice normally and five times under `-race`
 embedded/public-API race suites, all four conformance profiles, relevant vet,
 existing quality/file-size ratchets, formatting/diff checks, generated-output
 verification, WASM smoke and seven package integration tests pass. Logs are in
-`raw`; the [conformance summary](raw/conformance-summary.log) records each profile.
+`raw`; the [conformance summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/conformance-summary.log) records each profile.
 
 ## Comparative costs and measurement limits
 
@@ -104,8 +107,8 @@ Apple M1 Pro, macOS 14.5 ARM64. Serial baseline/candidate/candidate/baseline blo
 contain three fixed 50,000-iteration samples, first at one processor and then eight:
 six samples per version/case/processor count. No agent tests or builds run
 concurrently with measurements; other host activity is uncontrolled. Every sample,
-command and binary hash is retained in [measurements](raw/measurements.json) and
-[environment metadata](raw/benchmark-environment.json).
+command and binary hash is retained in [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/measurements.json) and
+[environment metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/benchmark-environment.json).
 
 | Lifecycle | Median before → after | Timing change | Allocations before → after |
 |---|---:|---:|---:|
@@ -150,7 +153,7 @@ Part buffering, storage formats and configured limits remain unchanged. No
 indexing, checkpointing or substantial optimization is proposed.
 
 The rebuilt packaged WASM remains **4,617,032 bytes**, with a changed digest:
-[artifact comparison](raw/wasm.json).
+[artifact comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/wasm.json).
 
 ## Next confirmed finding — committed abort strands reservations
 
@@ -164,8 +167,8 @@ uploads or retained part bytes. Reported object Usage remains zero bytes/objects
 The probe uses ordinary successful initiation and part upload, so it isolates
 abort behavior and does not depend on the initiation defect corrected here.
 It reproduces twice normally and twice under `-race`, without a reported data
-race: [source](raw/next-abort-probe.go.txt), [normal](raw/next-abort-probe.log),
-[race](raw/next-abort-probe-race.log). Copy the text temporarily to
+race: [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/next-abort-probe.go.txt), [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/next-abort-probe.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-initiation-publication/raw/next-abort-probe-race.log). Copy the text temporarily to
 `pkg/stow/abort_review_probe_test.go`, run only
 `TestReviewCommittedAbortReleasesQuota` with `-count=2`, optionally `-race`, then
 remove it. It reuses this change's public fixture. Abort accounting is deliberately

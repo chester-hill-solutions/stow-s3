@@ -1,5 +1,8 @@
 # Reject native outbox state reuse after writes — 2026-10-18
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 ## Decision
 
 **Reject the write-cache optimization. Production source is restored byte-for-byte
@@ -16,7 +19,7 @@ the baseline, even though both native journal frames were **5,246 bytes**.
 Value equivalence after protobuf serialization did not imply bounded ownership.
 
 `origin/main` was fetched and remains `219d1dcfff9807b04660a40313b32127e5be2933`.
-[Exact refs](2026-10-18-outbox-write-cache/raw/baseline.json) and the
+[Exact refs](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/baseline.json) and the
 [preceding phase investigation](2026-10-18-outbox-write-phases.md) record the baseline.
 Existing storage, S3, durability, migration, ownership and error contracts remain
 unchanged. The active quality objective remains open.
@@ -50,10 +53,10 @@ occur; these are temporary journals.
 | Baseline | 64 | 1,048,576 | 5,246 | 82,648 |
 | Rejected candidate | 64 | 1,048,576 | 5,246 | 67,706,904 |
 
-[Commands, exact samples and exits](2026-10-18-outbox-write-cache/raw/candidate-final/retention-receipt.json),
-[baseline output](2026-10-18-outbox-write-cache/raw/candidate-final/retention-before.log),
-[candidate output](2026-10-18-outbox-write-cache/raw/candidate-final/retention-candidate.log) and
-[executed source](2026-10-18-outbox-write-cache/raw/candidate-final/source-retention_probe_test.go.txt) are retained.
+[Commands, exact samples and exits](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/retention-receipt.json),
+[baseline output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/retention-before.log),
+[candidate output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/retention-candidate.log) and
+[executed source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/source-retention_probe_test.go.txt) are retained.
 These are live Go heap differences for this fixture, not RSS bounds or a service SLA.
 
 The regression adds a generous 16 MiB live-growth ceiling for these 64 small
@@ -61,8 +64,8 @@ persisted entries after the read/GC boundary. It fails twice against the candida
 and passes twice against the baseline before restoration. The large separation
 makes the failure deterministic in these recorded runs. The final normal/race
 suites repeat it on the exact accepted source.
-[Red/green commands and expected exits](2026-10-18-outbox-write-cache/raw/candidate-final/retention-regression-receipt.json)
-and [candidate failures](2026-10-18-outbox-write-cache/raw/candidate-final/retention-regression-candidate-red.log)
+[Red/green commands and expected exits](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/retention-regression-receipt.json)
+and [candidate failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/retention-regression-candidate-red.log)
 remain separate from the 400 timing observations.
 
 The guard is a test fixture, not a new general memory limit. It generates 64 MiB of
@@ -77,8 +80,8 @@ and twice under race detection. Blindly retaining written bytes breaks 13 cases
 twice: text/time canonicalization, historical-attempt reconciliation, token-counter
 clamping and provenance normalization. Four controls continue to pass. Expected
 exit 1 in that probe means successful reproduction, not a passing regression suite.
-[Exact cases/counts](2026-10-18-outbox-write-cache/raw/proof/contract-receipt.json) and
-[proof steps](2026-10-18-outbox-write-cache/raw/proof/checks.json) retain the rejected blind prototype.
+[Exact cases/counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/proof/contract-receipt.json) and
+[proof steps](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/proof/checks.json) retain the rejected blind prototype.
 
 The guarded candidate passes those 17 contracts, including same-handle recovery
 after a real directory-sync permission fault, changed/missing peer bytes and
@@ -166,8 +169,8 @@ allocation count per measured operation.
 
 The initial adverse +22.18% medium enqueue, +17.73% empty renew and +11.65% medium
 prepare cells remain visible. Allocation improvements do not erase those timings.
-[All initial observations, ranges and memory metrics](2026-10-18-outbox-write-cache/raw/proof/comparison-analysis.json)
-and [commands/order/binary hashes](2026-10-18-outbox-write-cache/raw/proof/comparison-runs.json) are retained.
+[All initial observations, ranges and memory metrics](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/proof/comparison-analysis.json)
+and [commands/order/binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/proof/comparison-runs.json) are retained.
 
 ## Longer confirmation and same-binary controls
 
@@ -200,8 +203,8 @@ range from -5.06% to +9.70%. These limited samples show variability but do not p
 zero implementation effect or statistical significance. No universal latency
 improvement is claimed. The large fallback's +11.97% initial / +11.13% confirmation
 is a reproducible cost of eligibility work when the state cannot be reused.
-[Separate confirmation/control samples and ranges](2026-10-18-outbox-write-cache/raw/confirmation/confirmation-analysis.json)
-and [exact commands and matching binary hashes](2026-10-18-outbox-write-cache/raw/confirmation/comparison-runs.json)
+[Separate confirmation/control samples and ranges](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/confirmation/confirmation-analysis.json)
+and [exact commands and matching binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/confirmation/comparison-runs.json)
 are retained rather than pooled with the initial cohort.
 
 ## Rejected candidate source confirmation
@@ -209,8 +212,8 @@ are retained rather than pooled with the initial cohort.
 The first final validation passed all functional/conformance stages but failed the
 comment-line ratchet (4080 versus 4077). The only source repair removes the three
 new explanatory comment lines; the explanation remains in this report. No baseline
-is raised. [The failed quality gate](2026-10-18-outbox-write-cache/raw/initial-final/quality.log) and
-[the exact comment-only diff receipt](2026-10-18-outbox-write-cache/raw/comment-only-repair.json) are retained.
+is raised. [The failed quality gate](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/initial-final/quality.log) and
+[the exact comment-only diff receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/comment-only-repair.json) are retained.
 
 The repaired source reruns the complete final validation and adds 32 measurements
 at GOMAXPROCS 4, ABBA BAAB, 400-ms minimum. The benchmark source and original native
@@ -225,8 +228,8 @@ retained across the three before/after/control cohorts.
 | 4096 | enqueue | 45.908 → 36.993 | -19.42% | -72.96% | -46.03% |
 | 4096 | renew | 21.650 → 17.611 | -18.66% | -73.07% | -46.14% |
 
-[Exact final observations and source hashes](2026-10-18-outbox-write-cache/raw/candidate-final/final-analysis.json) and
-[final commands and binary hashes](2026-10-18-outbox-write-cache/raw/candidate-final/comparison-runs.json) are retained.
+[Exact final observations and source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/final-analysis.json) and
+[final commands and binary hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/comparison-runs.json) are retained.
 
 
 ## Candidate buffer cost and qualification limits
@@ -235,7 +238,7 @@ The candidate retained one native frame in the existing byte cache after a
 successful reusable write. An untimed Railway probe measured length/capacity:
 14/24 bytes when empty, 25,486/25,486 at depth 128 per queue, and
 815,118/815,118 at depth 4,096 per queue.
-[Exact capacity results](2026-10-18-outbox-write-cache/raw/candidate-final/capacity-receipt.json) are retained.
+[Exact capacity results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/capacity-receipt.json) are retained.
 The ordinary large enqueue benchmark's process live heap was about 7.59 → 7.47 MB,
 and allocated bytes were 31.62 → 17.02 MB per two-call cycle. These process values
 include fixtures and preceding subcases; they are not isolated per-handle peaks.
@@ -251,9 +254,9 @@ is introduced to rescue the rejected design.
 The candidate's first final validation passed all functional/conformance stages but
 failed the comment-line ratchet (4080 > 4077). Removing only the three new explanatory
 comment lines restored that gate; all 18 subsequent candidate checks passed before
-the resource failure was found. [The quality failure](2026-10-18-outbox-write-cache/raw/initial-final/quality.log),
-[comment-only change](2026-10-18-outbox-write-cache/raw/comment-only-repair.json) and
-[candidate qualification](2026-10-18-outbox-write-cache/raw/candidate-final/checks.json) are retained. No baseline
+the resource failure was found. [The quality failure](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/initial-final/quality.log),
+[comment-only change](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/comment-only-repair.json) and
+[candidate qualification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/candidate-final/checks.json) are retained. No baseline
 was raised. Green functional gates were evidence, not proof of every resource property.
 
 ## Accepted result and validation
@@ -261,14 +264,14 @@ was raised. Green functional gates were evidence, not proof of every resource pr
 The two production files are restored to their recorded baseline hashes. The
 existing read cache, authoritative reads, native/legacy decoders, full-state writes
 and durability fences remain unchanged. Only regression tests and evidence are
-committed. [Accepted source verification](2026-10-18-outbox-write-cache/raw/final/accepted-source-verification.json)
-and [regression receipt](2026-10-18-outbox-write-cache/raw/final/accepted-receipt.json) check exact bytes and cases.
+committed. [Accepted source verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/final/accepted-source-verification.json)
+and [regression receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/final/accepted-receipt.json) check exact bytes and cases.
 
 All 15 accepted Railway stages pass: formatting and source verification; focused
 normal/race tests twice; full Go suite; broad storage/runtime/embedded/run-through/
 S3/public-package race tests; four conformance profiles (memory, filesystem,
 runtime-memory, runtime-filesystem); vet; site build/tests; documentation links; and
-quality/file-size/format gates. [Accepted commands/results](2026-10-18-outbox-write-cache/raw/final/checks.json)
+quality/file-size/format gates. [Accepted commands/results](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-18-outbox-write-cache/raw/final/checks.json)
 are separate from the rejected candidate's checks.
 
 The final report is checked on the same Railway source. Every timing observation,

@@ -1,5 +1,8 @@
 # Local tool performance baseline
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 **Measured:** 2026-09-27, Toronto local time (timestamps are UTC in the raw files)
 **Machine:** Apple M1 Pro, 8 CPU cores, 16 GiB RAM; macOS 14.5 arm64; Node v25.9.0; pinned Go 1.24.13
 **Purpose:** baseline startup, S3 request, concurrency, workspace lifecycle, and memory costs for the current local implementation.
@@ -12,11 +15,11 @@ node packages/stow-s3/scripts/benchmark-workspace.mjs --memory-only
 
 Raw measurements:
 
-- [Single-session lifecycle](session-lifecycle.json) — 30 runs, 1 MiB payload.
-- [Session memory sweep](session-memory.json) — 10 runs at each of 0, 1, 2, 4, and 8 MiB.
-- [Connections and parallel sessions](concurrency.json) — five runs per point, 1 MiB payload.
-- [Workspace lifecycle and parallel preparation](workspace-lifecycle.json) — seven lifecycle runs per workload and five concurrency runs per point.
-- [Workspace CLI RSS](workspace-memory.json) — one native CLI high-water sample per workload.
+- [Single-session lifecycle](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-09-27/session-lifecycle.json) — 30 runs, 1 MiB payload.
+- [Session memory sweep](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-09-27/session-memory.json) — 10 runs at each of 0, 1, 2, 4, and 8 MiB.
+- [Connections and parallel sessions](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-09-27/concurrency.json) — five runs per point, 1 MiB payload.
+- [Workspace lifecycle and parallel preparation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-09-27/workspace-lifecycle.json) — seven lifecycle runs per workload and five concurrency runs per point.
+- [Workspace CLI RSS](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-09-27/workspace-memory.json) — one native CLI high-water sample per workload.
 
 ## S3 session lifecycle
 

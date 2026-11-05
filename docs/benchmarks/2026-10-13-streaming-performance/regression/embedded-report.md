@@ -1,5 +1,8 @@
 # Embedded storage comparison
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Exploratory: 3 repetitions, 500ms per Go benchmark, CPU settings 4.
 
 Rates below convert Go's decimal MB/s to binary MiB/s. Reads include SHA-256 verification. Quarantine counts input payload once per completed workflow.

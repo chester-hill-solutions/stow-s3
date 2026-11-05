@@ -1,5 +1,8 @@
 # Buffered custom-store PUT preserves committed identity
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `7172a99` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This corrects the buffered PUT
 finding confirmed by the preceding
@@ -16,7 +19,7 @@ receives an empty identity despite the stored object being readable. This was
 identity loss, not a reproduced panic or payload loss on this PUT path.
 
 Four of eight regression cases failed per baseline run, repeated twice before
-implementation: [original failures](raw/before-tests.log). Both new-object and
+implementation: [original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/before-tests.log). Both new-object and
 overwrite cases fail with a generic committed error and with a committed error
 containing public `ErrObjectNotFound`. Success and ordinary refusal cases passed.
 The original probe from the preceding review also reproduced the missing identity
@@ -48,7 +51,7 @@ without a fallback GET or COPY.
 
 All eight cases pass twice normally and five times under the race detector
 (**40 race cases**). The original probe passes normally and under the race detector:
-[normal](raw/original-probe-after.log), [race](raw/original-probe-after-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/original-probe-after.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/original-probe-after-race.log).
 The returned object remains metadata-only, consistent with existing PUT success;
 the payload is retrieved through GET. Callers still receive an error and must
 verify a committed outcome before retrying. This adds no rollback or durability
@@ -82,7 +85,7 @@ Success timing ranges are 24.458–49.047 µs before versus 17.910–27.182 µs 
 at 4 KiB, and 2.585–5.001 ms before versus 2.559–3.545 ms after at 1 MiB.
 The 1 MiB committed-error samples range from 2.368–22.254 ms before and
 2.866–7.396 ms after, including a large baseline outlier. Every sample and binary
-hash is retained in [measurements](raw/measurements.json) and the raw benchmark logs.
+hash is retained in [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/measurements.json) and the raw benchmark logs.
 These host/GC-sensitive samples cannot attribute the observed lower success
 medians to this correction.
 
@@ -97,7 +100,7 @@ change the byte cost. Non-nil errors also incur a committed-marker check.
 No new payload-sized allocation is introduced. No buffering optimization is proposed.
 
 The freshly rebuilt packaged WASM grows from 4,616,726 to 4,617,032 bytes
-(**306 bytes**). Both [artifact hashes](raw/wasm.json) are retained.
+(**306 bytes**). Both [artifact hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/wasm.json) are retained.
 
 ## Validation and next finding
 
@@ -116,8 +119,8 @@ usage stays at zero bytes/zero objects. This is distinct from the already correc
 workspace multipart implementation.
 
 It reproduces twice normally and twice under `-race`, without a reported data race:
-[probe](raw/next-multipart-probe.go.txt), [normal](raw/next-multipart-probe.log),
-[race](raw/next-multipart-probe-race.log). The probe exercises one valid single-part
+[probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/next-multipart-probe.go.txt), [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/next-multipart-probe.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-buffered-put-publication/raw/next-multipart-probe-race.log). The probe exercises one valid single-part
 completion and a synthetic post-publication failure; it is not a new backend or
 full qualification of arbitrary custom multipart behavior. To rerun, copy it to
 `pkg/stow/multipart_review_probe_test.go` and run only

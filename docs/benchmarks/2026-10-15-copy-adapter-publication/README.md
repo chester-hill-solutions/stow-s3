@@ -1,5 +1,8 @@
 # Runtime COPY adapters preserve committed identity
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `b531f15` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This corrects the two remaining
 internal-adapter variants of **F3** in the
@@ -17,7 +20,7 @@ version, ETag, checksums and properties. This is demonstrated identity loss;
 these direct adapter cases did not lose payload bytes or miscount usage.
 
 The new regression failed six publication cases per run, repeated twice before
-implementation: [original failures](raw/before-tests.log). It covers plain COPY,
+implementation: [original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/before-tests.log). It covers plain COPY,
 matching ETag conditions and date-only conditions, each to a new destination and
 an existing destination. Three ordinary-refusal cases already passed.
 The original review independently reproduced both adapter variants twice normally
@@ -43,8 +46,8 @@ destination and leave usage unchanged.
 
 The nine cases pass twice normally and five times under the race detector
 (**45 race cases**). All six original map probes now pass twice normally and twice
-under the race detector: [normal](raw/original-probes-after.log),
-[race](raw/original-probes-after-race.log). All four findings from that original
+under the race detector: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/original-probes-after.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/original-probes-after-race.log). All four findings from that original
 focused review are now corrected locally; this is not an exhaustive correctness
 claim for the codebase.
 
@@ -82,7 +85,7 @@ was not controlled.
 Timing ranges overlap in every case. Plain-success ranges are 2.124–2.478 µs
 before and 2.196–3.810 µs after; conditional-success ranges are 2.263–2.959 µs
 before and 2.244–3.790 µs after. These samples establish neither exact latency
-parity nor a speedup. [Every sample and binary hash](raw/measurements.json) and
+parity nor a speedup. [Every sample and binary hash](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/measurements.json) and
 raw benchmark blocks are retained, including outliers.
 
 Successful COPY has unchanged allocation counts and bytes. A committed error now
@@ -92,7 +95,7 @@ of discarding the result. This is the same conversion already used on success;
 no separate optimization is proposed. Non-nil errors also incur a marker check.
 Other metadata sizes may have different allocation-byte costs. There is no new
 storage operation or payload-size allocation. The freshly rebuilt WASM remains
-4,616,726 bytes, with a new [recorded hash](raw/wasm.json).
+4,616,726 bytes, with a new [recorded hash](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/wasm.json).
 
 ## Validation and next finding
 
@@ -107,8 +110,8 @@ Next confirmed finding: the **buffered custom-store PUT adapter also discards a
 known committed object**. A supported public Store really publishes `body`, then
 returns the object with the committed marker. The outer public PUT returns an
 empty identity, while payload and usage correctly show four bytes/one object.
-This reproduced twice normally: [probe](raw/next-buffered-put-probe.go.txt),
-[output](raw/next-buffered-put-probe.log). It is not a reproduced panic and has
+This reproduced twice normally: [probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/next-buffered-put-probe.go.txt),
+[output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-copy-adapter-publication/raw/next-buffered-put-probe.log). It is not a reproduced panic and has
 not yet been qualified under the race detector. To rerun, copy the probe into
 `pkg/stow/put_review_probe_test.go` and run only
 `TestReviewBufferedPutPreservesCommittedIdentity`; it uses the existing

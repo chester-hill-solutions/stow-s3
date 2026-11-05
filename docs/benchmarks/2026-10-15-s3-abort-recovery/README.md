@@ -1,5 +1,8 @@
 # S3 validation reconciles confirmed missing uploads
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Baseline `553103a` on `codex/core-copy-quality`; freshly fetched `origin/main`
 remains `219d1dcfff9807b04660a40313b32127e5be2933`. This follows the separate
 [direct-abort correction](../2026-10-15-abort-retry/README.md). Earlier completed
@@ -16,10 +19,10 @@ The first conservative response is correct; later confirmed absence must be able
 to reconcile accounting without manufacturing success.
 
 The exact retained HTTP probe fails twice normally and twice under -race before
-production changes: [source](raw/original-probe.go.txt),
-[normal](raw/original-before.log), [race](raw/original-before-race.log).
-It now passes twice in each mode: [normal](raw/original-after.log),
-[race](raw/original-after-race.log). Both HTTP responses retain their existing
+production changes: [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/original-probe.go.txt),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/original-before.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/original-before-race.log).
+It now passes twice in each mode: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/original-after.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/original-after-race.log). Both HTTP responses retain their existing
 meaning, 500 then 404; actual upload/part data is gone and full capacity is reusable.
 
 The production diff changes one runtime method and adds one private helper in the
@@ -79,17 +82,17 @@ The final regression suite contains **51 cases**:
 
 The 49-case regression matrix was also run twice against original multipart.go,
 then the candidate was restored in a finally block:
-[original failures](raw/before-tests.log). Two additional cases then demonstrated
+[original failures](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/before-tests.log). Two additional cases then demonstrated
 that using the existing size helper would accept a committed/missing HEAD chain:
-[original HEAD ambiguity](raw/head-ambiguity-before.log). The helper now inspects
+[original HEAD ambiguity](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/head-ambiguity-before.log). The helper now inspects
 that raw HEAD result instead, retaining reservations on ambiguous replies. These
 tests failed before that guard correction. The retained HTTP probe was reproduced
 before any production edit. All 51 final cases pass twice normally and five times
 under -race (**255 focused race cases**):
-[normal](raw/after-tests.log), [race](raw/focused-race.log).
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/after-tests.log), [race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/focused-race.log).
 
 Full Go tests, relevant runtime/storage/S3/run-through/embedded/public race suites,
-all four conformance profiles ([summary](raw/conformance-summary.log)), relevant
+all four conformance profiles ([summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/conformance-summary.log)), relevant
 vet, unchanged quality/file-size ratchets, formatting/diff checks, documentation
 links, generated-output verification, WASM smoke and seven package integration
 tests pass. The separately failing next-finding probe is removed before broad
@@ -120,8 +123,8 @@ per version/case/configuration. Validation samples have 5,000,000 fixed iteratio
 recovery samples 250,000. No agent builds/tests run concurrently with measurements;
 other host activity is uncontrolled. These loops are serial even with GOMAXPROCS=8.
 All commands, samples/outliers, binary digests and host details are retained in
-raw benchmark logs, [measurements](raw/measurements.json) and
-[environment](raw/benchmark-environment.json).
+raw benchmark logs, [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/measurements.json) and
+[environment](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/benchmark-environment.json).
 
 | Final implementation | Processors | Median ns/op before → after | Change | Before range | After range |
 |---|---:|---:|---:|---:|---:|
@@ -164,7 +167,7 @@ No extra provider read is made for success, wrong resource or unknown upload ID.
 
 The final packaged WASM grows **4,617,032 → 4,617,093 bytes (+61 bytes)**,
 with a new digest. Its baseline and intermediate comparisons are retained in
-[artifact metadata](raw/wasm.json). Generated-output, WASM smoke and package tests
+[artifact metadata](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/wasm.json). Generated-output, WASM smoke and package tests
 verify the refreshed artifact.
 
 ## Measured guard-order revision and stricter HEAD guard
@@ -175,7 +178,7 @@ helper first checks cached identity and only classifies a matching request. This
 is a small local guard reordering based on measured cost, with the same recovery
 conditions, no new structure and the same passing regressions. All initial samples,
 commands and binary hashes remain in `initial-*` raw files and
-[initial measurements](raw/initial-measurements.json).
+[initial measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/initial-measurements.json).
 
 Initial before → candidate medians (ns/op) were: one-processor success/one entry
 81.020 → 74.020 (−8.6%), success/64 76.620 → 74.320 (−3.0%), wrong-key
@@ -189,7 +192,7 @@ target candidate sample reached **4,912 ns/op**; it remains in the raw data.
 
 The cached-route-first version was measured before the stricter HEAD guard was
 added. Its full samples, commands and binary digests are retained in `route-order-*`
-files and [measurements](raw/route-order-measurements.json). Successful medians
+files and [measurements](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/route-order-measurements.json). Successful medians
 ranged −4.2% to +8.2% against their paired baselines; wrong-key overhead was
 35.0–37.6% and untracked-ID overhead 17.1–17.4%. Recovery accounting overhead
 was 61.8–80.6%, with the same allocation deltas. Those candidate measurements
@@ -219,9 +222,9 @@ the published object. The probe verifies that workaround; this is not evidence o
 permanent data loss or a demonstrated quota bypass on the workspace profile.
 
 Both joined-error orders fail twice normally and twice under -race, without
-reported data races: [source](raw/next-completion-lookup-probe.go.txt),
-[normal](raw/next-completion-lookup-probe.log),
-[race](raw/next-completion-lookup-probe-race.log). The host enforced the cleanup
+reported data races: [source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/next-completion-lookup-probe.go.txt),
+[normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/next-completion-lookup-probe.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-s3-abort-recovery/raw/next-completion-lookup-probe-race.log). The host enforced the cleanup
 permission fault; these runs did not skip. The lookup error is deliberately injected
 at the native store seam. No change to completion recovery is included here.
 

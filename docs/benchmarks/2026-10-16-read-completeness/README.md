@@ -1,9 +1,12 @@
 # Reject premature EOF in buffered reads
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Reviewed and corrected on 2026-10-16, based on `32168f8` on
 `codex/core-copy-quality`. Freshly fetched `origin/main` remains
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of this review branch.
-[Source and executable identities](raw/environment.json) pin the measured change.
+[Source and executable identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/environment.json) pin the measured change.
 The preceding [pointer refinement](../2026-10-16-read-result-pointer/README.md)
 and [body-error correction](../2026-10-15-save-body-failure/README.md) are retained.
 
@@ -16,12 +19,12 @@ bytes. The backend refused that fingerprint: no guard bypass or overwritten byte
 was demonstrated. This is reader fault injection against real native memory
 storage, not evidence that MemoryStore spontaneously truncates.
 
-The retained [original repro before](raw/original-before.log) and
-[race repro before](raw/original-before-race.log) each contain eight semantic
+The retained [original repro before](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/original-before.log) and
+[race repro before](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/original-before-race.log) each contain eight semantic
 failures (four cases repeated twice). Its source remains in the preceding
-[report](../2026-10-15-save-body-failure/raw/next-truncated-read-probe.go.txt).
+[report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-15-save-body-failure/raw/next-truncated-read-probe.go.txt).
 The final regression tests were added and run before changing production:
-[32 failing leaves](raw/before-tests.log) are the 16 defect cases repeated twice;
+[32 failing leaves](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/before-tests.log) are the 16 defect cases repeated twice;
 all 11 control cases already passed each repetition.
 
 The private `readOpenedObject` helper now retains `io.Copy`'s byte count and,
@@ -49,23 +52,23 @@ returned with bytes and on the following read. Failure checks include zero resul
 invalid save-condition refusal, reader closure, unchanged accounting and healthy
 full-capacity retry. Existing fixtures and recovery checks are reused.
 
-- [New and prior focused tests](raw/after-tests.log): 83 leaves repeated twice pass.
-- [Focused race tests](raw/focused-race.log): 83 leaves repeated five times,
+- [New and prior focused tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/after-tests.log): 83 leaves repeated twice pass.
+- [Focused race tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/focused-race.log): 83 leaves repeated five times,
   **415 passes**, no skips or race reports.
-- Original repro now passes [normally](raw/original-after.log) and
-  [under race](raw/original-after-race.log), twice each.
-- [Full Go suite](raw/full-go.log), [broad storage/runtime/S3 race suite](raw/broad-race.log),
-  and [vet](raw/vet.log) pass.
-- [Four conformance profiles](raw/conformance-summary.log) pass: memory,
+- Original repro now passes [normally](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/original-after.log) and
+  [under race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/original-after-race.log), twice each.
+- [Full Go suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/full-go.log), [broad storage/runtime/S3 race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/broad-race.log),
+  and [vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/vet.log) pass.
+- [Four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/conformance-summary.log) pass: memory,
   filesystem, runtime-memory and runtime-filesystem. Each retains the two existing
   skips for opt-in live upstream and mirror bucket creation awaiting an authority decision.
-- [Go quality/file-size gates](raw/quality.log), [generated-output comparison](raw/generated.log),
-  [WASM smoke](raw/wasm-smoke.log) and [seven package integration tests](raw/package-tests.log) pass.
-- [Final format, documentation, provenance and cleanup checks](raw/final-checks.log).
+- [Go quality/file-size gates](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/quality.log), [generated-output comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/generated.log),
+  [WASM smoke](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/wasm-smoke.log) and [seven package integration tests](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/package-tests.log) pass.
+- [Final format, documentation, provenance and cleanup checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/final-checks.log).
 
 The packaged WASM was rebuilt with the pinned toolchain and reproducible flags:
 4,618,016 to 4,618,255 bytes, **+239 bytes**.
-[Build output](raw/build-wasm.log) and [artifact hashes](raw/wasm.json) are retained.
+[Build output](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/build-wasm.log) and [artifact hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/wasm.json) are retained.
 
 ## Comparative measurements
 
@@ -79,10 +82,10 @@ cumulative per operation, not RSS or peak memory.
 ### Successful reads with same-code controls
 
 One ordinary test binary includes frozen baseline methods (private names changed)
-and the actual candidate methods. [Reference verification](raw/reference-verification.json),
-[probe source](raw/matched-probe.go.txt), [plan](raw/matched-plan.json),
-[raw 1,280 blocks](raw/matched.log), [summary](raw/matched-summary.json),
-[runner](raw/measure.py.txt) and [parser](raw/analyze-matched.py.txt) are retained.
+and the actual candidate methods. [Reference verification](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/reference-verification.json),
+[probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/matched-probe.go.txt), [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/matched-plan.json),
+[raw 1,280 blocks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/matched.log), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/matched-summary.json),
+[runner](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/measure.py.txt) and [parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/analyze-matched.py.txt) are retained.
 There are 20 balanced ABBA/BAAB cycles per case, repeated twice at CPU 1 and 8;
 two labels execute identical baseline or candidate code to calibrate A/A variation.
 Tiny blocks use 50,000 operations; 64 KiB blocks use 1,000.
@@ -109,9 +112,9 @@ proof or a promise of parity. No general speedup is claimed.
 
 Ordinary before/after binaries contain the identical final benchmark/test sources.
 Each case/CPU/version has six samples in ABBA blocks; fixed iteration counts are
-in the [plan](raw/direct-plan.json). [All 408 samples](raw/direct.log),
-[parsed samples/ranges/allocations](raw/direct-measurements.json) and
-[parser](raw/analyze-direct.py.txt) retain the original eleven cases and six new
+in the [plan](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/direct-plan.json). [All 408 samples](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/direct.log),
+[parsed samples/ranges/allocations](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/direct-measurements.json) and
+[parser](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/analyze-direct.py.txt) retain the original eleven cases and six new
 EOF cases. `after=0/1` below changes from incorrect success to a correct error;
 its lower guarded-read cost is **not an equivalent-result speedup**.
 
@@ -181,11 +184,11 @@ on both the baseline and candidate. Every log has twelve semantic failures and
 no race report. Readers close once, accounting remains unchanged, healthy retry
 returns the original version, and a full-capacity save succeeds.
 
-[Probe source](raw/next-stream-probe.go.txt),
-[baseline normal](raw/next-stream-before.log), [baseline race](raw/next-stream-before-race.log),
-[candidate normal](raw/next-stream-after.log), [candidate race](raw/next-stream-after-race.log),
-and [provenance](raw/next-stream-provenance.json) are retained. Baseline replay used
-a Go source overlay with the [frozen baseline helper](raw/baseline-objects.go.txt);
+[Probe source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-probe.go.txt),
+[baseline normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-before.log), [baseline race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-before-race.log),
+[candidate normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-after.log), [candidate race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-after-race.log),
+and [provenance](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/next-stream-provenance.json) are retained. Baseline replay used
+a Go source overlay with the [frozen baseline helper](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-16-read-completeness/raw/baseline-objects.go.txt);
 production files were never replaced. Stream and adapter sources are unchanged.
 To reproduce, copy the probe into `internal/runtime/stream_read_review_probe_test.go`
 and run `go test ./internal/runtime -run '^TestReviewStreamingReadCompleteness$'

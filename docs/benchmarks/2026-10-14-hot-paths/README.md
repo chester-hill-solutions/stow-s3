@@ -1,5 +1,8 @@
 # Read, quarantine, workspace and browser hot paths — 2026-10-14
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../../evidence-archive.md).
+> Dates and results below describe the original work.
+
 All builds, tests and measurements run on Railway. Website benchmark data remains unchanged.
 
 ## Changes
@@ -86,13 +89,13 @@ Coverage measured 74.63% (11,645/15,604 statements). No quality or coverage floo
 was lowered. The validated SDK assets and Go reference were synchronized after a
 checksum-verified export. Benchmark compute was stopped after synchronization.
 
-- [Initial read probe](read/read-performance/samples.json), including raw native samples and the failing original regression.
-- [Initial disk probe](disk/disk-performance/samples.json), including the slower first copy candidate.
-- [Final source manifest](final/source.json), [source transfer receipt](final/source-upload.json) and [final overlay receipt](final/overlay-upload.json).
-- [Pinned instance tools](final/instance.Dockerfile), [verification controller](final/instance-verify.mjs) and [process supervisor](final/subreaper.py).
-- [Complete qualification receipt](final/verification/receipt.json), [qualification log](final/qualification.log) and [browser report](final/verification/sdk-browser-report.json).
-- [Measured samples and analysis](final/verification/hot-paths/analysis.json), [unchanged-production proof](final/verification/hot-paths/reuse.json), [executor receipt](final/executor.json) and [export checksum](final/export.json).
-- [Validated Go source](final/validated-go-source.tar.gz) and [archived generated reference and previews](final/verification/rendered-documentation.tar.gz).
+- [Initial read probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/read/read-performance/samples.json), including raw native samples and the failing original regression.
+- [Initial disk probe](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/disk/disk-performance/samples.json), including the slower first copy candidate.
+- [Final source manifest](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/source.json), [source transfer receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/source-upload.json) and [final overlay receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/overlay-upload.json).
+- [Pinned instance tools](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/instance.Dockerfile), [verification controller](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/instance-verify.mjs) and [process supervisor](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/subreaper.py).
+- [Complete qualification receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/verification/receipt.json), [qualification log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/qualification.log) and [browser report](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/verification/sdk-browser-report.json).
+- [Measured samples and analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/verification/hot-paths/analysis.json), [unchanged-production proof](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/verification/hot-paths/reuse.json), [executor receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/executor.json) and [export checksum](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/export.json).
+- [Validated Go source](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/validated-go-source.tar.gz) and [archived generated reference and previews](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-14-hot-paths/final/verification/rendered-documentation.tar.gz).
 
 The initial copy candidate reduced allocation but regressed latency. The retained
 version permits a bounded file-to-file transfer and restored comparable copy time. Failed full-source deployment uploads created no new deployment. A verified

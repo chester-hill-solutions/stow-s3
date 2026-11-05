@@ -187,7 +187,7 @@ The public runtime returned by `OpenFilesystem` has no `RefreshUsage` method.
 Editable workspaces retain conservative reconciliation and their separate refresh operation.
 
 <!-- repo-only:start -->
-Local evidence is recorded in [the implementation receipt](implementation-2026-09-30.md).
+Local evidence is recorded in [the implementation receipt](history/implementation/implementation-2026-09-30.md).
 <!-- repo-only:end -->
 
 ## Portable capture and reconciliation
@@ -368,5 +368,5 @@ Stow's filesystem checks protect supported storage operations; arbitrary process
 with host access remain outside this boundary.
 
 <!-- repo-only:start -->
-See [implementation evidence](implementation-2026-09-29.md) for validation and outstanding limits.
+See [implementation evidence](history/implementation/implementation-2026-09-29.md) for validation and outstanding limits.
 <!-- repo-only:end -->

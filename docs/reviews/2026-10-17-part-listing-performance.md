@@ -1,11 +1,14 @@
 # Reduce multipart listing allocations without weakening recovery
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Follow-up: [oversized cache admission](2026-10-17-refresh-eviction-performance.md) addresses the measured oversized-object fallback cost. The measurements below describe this earlier listing change.
 
 Base `5f8f4844f5cfd987eb8e6d7cdb5a1d9af7f98bc2` contains the three preceding
 correctness corrections. A fresh fetch still reports `origin/main`
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor.
-[Baseline and historical variant identities](2026-10-17-part-listing-performance/raw/baseline.json).
+[Baseline and historical variant identities](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/baseline.json).
 This completes one independently reviewable performance change. Durable fallback
 is measured and remains the next item; it is not modified here.
 
@@ -24,13 +27,13 @@ reaper. CPU labels mean GOMAXPROCS 1 and 4, not affinity or concurrent clients.
 The old removed deployment could not be redeployed; a fresh sanitized tracked
 snapshot was uploaded to the same service. The target service remains untouched.
 
-The [first cohort](2026-10-17-part-listing-performance/raw/requalification/run.json)
+The [first cohort](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/requalification/run.json)
 retains **320 observations**, eight per workload/version/CPU, from two ABBA/BAAB
 cycles with 200-ms minimum time and two repetitions per block. Historical source
 overlays reproduce the old code while keeping the current tests and benchmark
 fixtures identical. Those old implementations have known correctness defects;
 they are timing references, not rollback candidates or equivalent-result claims.
-[All baseline metrics/ranges/cycle changes](2026-10-17-part-listing-performance/raw/requalification/summary.json).
+[All baseline metrics/ranges/cycle changes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/requalification/summary.json).
 
 16-part listing reproduces 53.5/54.9 μs historically versus 87.3/94.3 μs currently
 at CPU 1/4, with **115 → 235 allocations**. The earlier 234-allocation report
@@ -47,14 +50,14 @@ The fresh observation remains durable and consistent; no save is removed here.
 
 ## Evidence before selecting the change
 
-The [allocation profile](2026-10-17-part-listing-performance/raw/requalification/alloc-top.log)
-and [escape analysis](2026-10-17-part-listing-performance/raw/requalification/escape.log)
+The [allocation profile](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/requalification/alloc-top.log)
+and [escape analysis](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/requalification/escape.log)
 identify repeated InternalPath/path joining, per-record header buffers and
 reflective sorting. Profiles include fixture setup; they are diagnostic attribution,
 not peak memory or benchmark allocation totals. Benchmark B/op and allocations/op
 come from the timed Go benchmarks themselves.
 
-The [64-observation incremental comparison](2026-10-17-part-listing-performance/raw/stepwise/summary.json)
+The [64-observation incremental comparison](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/stepwise/summary.json)
 measures current code, directory-path reuse, additional shared header scratch,
 and additional generic sorting. It uses forward/reverse variant order and four
 samples per workload/version/CPU. Directory reuse has the lowest 16-part listing
@@ -62,7 +65,7 @@ median at both CPUs and reduces 235 → 203 allocations. Shared scratch reaches
 188, and sorting 185, but does not establish a further latency improvement.
 Those variants add code/helper interfaces and are not retained.
 
-A [128-observation confirmation](2026-10-17-part-listing-performance/raw/short-confirmation/comparison.md)
+A [128-observation confirmation](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/short-confirmation/comparison.md)
 shows mixed latency: small listings are about 6% slower, CPU-1 large listing is
 +1.8%, and CPU-4 small runtime replacement is +10.5%. These adverse measurements
 are preserved, not dismissed. They trigger a second 128-observation confirmation
@@ -82,9 +85,9 @@ with a **one-second minimum**, identical workloads and ABBA/BAAB ordering.
 | 4 | Runtime replace 16 × 1 MiB | 15.370 → 15.358 ms | -0.08% | 6,346,293.5 → 6,342,795.0 | 432 → 400 |
 
 Adverse longer-cohort medians: CPU 1 Runtime replace 1 × 1 KiB: +13.60%; CPU 1 Runtime replace 16 × 1 MiB: +0.78%.
-[Every longer-cohort sample](2026-10-17-part-listing-performance/raw/long-confirmation/samples.json),
-[all ranges and same-code cycle changes](2026-10-17-part-listing-performance/raw/long-confirmation/summary.json).
-The [32-observation identical-binary control](2026-10-17-part-listing-performance/raw/identical-control/comparison.md)
+[Every longer-cohort sample](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/long-confirmation/samples.json),
+[all ranges and same-code cycle changes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/long-confirmation/summary.json).
+The [32-observation identical-binary control](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/identical-control/comparison.md)
 measures the variable small runtime case with two labels using identical binary
 hashes. It is context for storage variation, not grounds to discard a slower
 comparison row. No observation or adverse row is removed. These are bounded sequential
@@ -112,28 +115,28 @@ not a newly failing functional contract. The test covers numeric part ordering,
 independent returned metadata, replacement, pagination, reopen, a damaged final
 header returning no partial result, and successful repair. Existing atomic part,
 corruption, completion and owner/quota recovery regressions remain enabled.
-[Focused counts](2026-10-17-part-listing-performance/raw/test-counts.json).
+[Focused counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/test-counts.json).
 
-The [initial 14-check run](2026-10-17-part-listing-performance/raw/initial-validation/checks.json)
+The [initial 14-check run](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/initial-validation/checks.json)
 passes focused normal/race, broad storage/runtime/embedded/run-through/S3/public
 API race, vet, quality/file-size/format, site build/tests and documentation links.
 Full Go and four conformance profiles fail because the uploaded snapshot omitted
 Git executable bits: provider-script tests cannot execute `live-provider.sh`.
 This is a packaging error, not a product change. The
-[mode-restoration receipt](2026-10-17-part-listing-performance/raw/mode-restoration-receipt.json)
+[mode-restoration receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/mode-restoration-receipt.json)
 verifies script hashes remain unchanged and restores the exact Git modes.
-The [final Railway recheck](2026-10-17-part-listing-performance/raw/after/checks.json)
+The [final Railway recheck](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/after/checks.json)
 verifies those modes, reruns full Go and all four affected conformance profiles,
 and passes. Successful race/quality checks are not needlessly repeated; production
 and regression source hashes are identical between both validation phases.
 The two existing mirror/live-upstream conformance skips remain; focused regressions
-have no skips. [Final result](2026-10-17-part-listing-performance/raw/after/run.json).
+have no skips. [Final result](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/after/run.json).
 The full-suite quality fixture uses the exact parent baseline JSON, not a copy
 of repository history. Isolated prototype Go files are moved beneath a benchmark
 underscore directory before full tests so they are not standalone product packages.
 
-[Applied source receipts](2026-10-17-part-listing-performance/raw/after-sync-receipt.json)
-and [actual tested source hashes](2026-10-17-part-listing-performance/raw/after/environment.json)
+[Applied source receipts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/after-sync-receipt.json)
+and [actual tested source hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-17-part-listing-performance/raw/after/environment.json)
 match the selected measured prototype byte for byte. All builds retain binary
 hashes, compiler flags, source identities, plans, load/cgroup snapshots and mount
 information. Export receipts verify file length and SHA-256 before runner shutdown.

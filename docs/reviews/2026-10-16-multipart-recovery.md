@@ -1,5 +1,8 @@
 # Correct filesystem multipart recovery accounting
 
+> Supporting files omitted from the current tree are preserved in the [evidence archive](../evidence-archive.md).
+> Dates and results below describe the original work.
+
 Corrected from `f4b96adaf4f250f47b1d0c98de6144795130184d` on
 `codex/core-copy-quality`. Freshly fetched `origin/main` is
 `219d1dcfff9807b04660a40313b32127e5be2933`, an ancestor of the baseline.
@@ -30,8 +33,8 @@ corrupt upload listing wrongly succeeds with an empty list, and completion
 reports 404 NoSuchUpload. Healthy listing/completion and genuine absence are
 passing controls.
 
-[Before normal](2026-10-16-multipart-recovery/raw/before-wire.log) and
-[before race](2026-10-16-multipart-recovery/raw/before-race.log) each have **26
+[Before normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/before-wire.log) and
+[before race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/before-race.log) each have **26
 failing adverse leaf executions and 6 passing controls**, with every case repeated
 twice. Existing tests did not cover a native damaged manifest through runtime
 reconstruction and retained-byte admission together.
@@ -78,33 +81,33 @@ The regression tests cover:
 | Healthy listing / completion over S3 | 200 / 200 | 200 / 200 |
 
 All **32 permanent regression leaf executions pass normally and under race**
-(two repetitions in each mode): [normal](2026-10-16-multipart-recovery/raw/after-tests.log),
-[race](2026-10-16-multipart-recovery/raw/after-race.log).
+(two repetitions in each mode): [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/after-tests.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/after-race.log).
 The exact original saved audit quota probe also passes twice normally and twice
-under race: [normal](2026-10-16-multipart-recovery/raw/original-after.log),
-[race](2026-10-16-multipart-recovery/raw/original-after-race.log).
+under race: [normal](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/original-after.log),
+[race](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/original-after-race.log).
 Its temporary test file was removed. No race reports or skips occur in these
 focused runs.
 
-Final checks pass: [full Go suite](2026-10-16-multipart-recovery/raw/full-go.log),
-[broad storage/runtime/adapter/S3 race suite](2026-10-16-multipart-recovery/raw/broad-race.log),
-[Go vet](2026-10-16-multipart-recovery/raw/vet.log),
-[quality/file-size ratchets](2026-10-16-multipart-recovery/raw/quality.log), and
-[documentation/site checks](2026-10-16-multipart-recovery/raw/docs.log).
-All [four conformance profiles](2026-10-16-multipart-recovery/raw/conformance-summary.log)
+Final checks pass: [full Go suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/full-go.log),
+[broad storage/runtime/adapter/S3 race suite](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/broad-race.log),
+[Go vet](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/vet.log),
+[quality/file-size ratchets](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/quality.log), and
+[documentation/site checks](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/docs.log).
+All [four conformance profiles](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/conformance-summary.log)
 pass: memory, filesystem, runtime-memory and runtime-filesystem. The existing
 mirror-bucket decision and live-upstream tests remain skipped in each profile.
-[Full conformance log](2026-10-16-multipart-recovery/raw/conformance-full.log).
+[Full conformance log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/conformance-full.log).
 Conformance ran before test-helper cleanup; later changes affected test arrangement
 and one production comment, with no production behavior change. The final full Go
 and broad race runs include the simplified tests. The
-[source freeze](2026-10-16-multipart-recovery/raw/source-freeze.json) and
-[regression counts](2026-10-16-multipart-recovery/raw/regression-counts.json)
+[source freeze](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/source-freeze.json) and
+[regression counts](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/regression-counts.json)
 identify the final tested sources and outcomes.
 
 The initial quality gate flagged the test functions' complexity. Their setup
 and assertions were split into smaller helpers, and the existing
-[quality/file-size ratchets](2026-10-16-multipart-recovery/raw/quality-final.log)
+[quality/file-size ratchets](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/reviews/2026-10-16-multipart-recovery/raw/quality-final.log)
 now pass without raising a baseline.
 
 ## Costs and limits

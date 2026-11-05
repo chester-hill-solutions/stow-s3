@@ -7,6 +7,9 @@ references or independent implementation queues. Start with the
 
 | Location | Contents |
 | --- | --- |
+| [Release checks](releases/README.md) | Dated readiness, distribution and download verification |
+| [Implementation records](implementation/README.md) | Completed increments and receiver/model evidence |
+| [Assessments](assessments/README.md) | Product evaluation and compatibility coverage |
 | `plans/` | Superseded work orders and retired execution proposals |
 | `collaboration/` | Designs transferred to the standalone GangCode project |
 | `experiments/` | Older assessments, pilots and handoff notes |
@@ -18,3 +21,8 @@ references or independent implementation queues. Start with the
 The old bodies retain their original dates and assertions. Internal links are
 maintained when files move. Fully superseded ADR prose can be recovered through
 the [retired decision register](../adr/README.md#retired-decisions) and Git history.
+
+Review reports, benchmark results and assessment methods have their own indexes:
+[reviews](../reviews/README.md), [benchmarks](../benchmarks/README.md) and
+[assessment evidence](../assessment-evidence/README.md). Bulk historical outputs
+are preserved in the [evidence archive](../evidence-archive.md).
