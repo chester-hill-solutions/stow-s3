@@ -2,7 +2,7 @@
 
 ## Baselines and reproduction
 
-- [Performance testing guide](../performance-testing.md): workload configuration and interpretation.
+- [Performance testing guide](../development/performance-testing.md): workload configuration and interpretation.
 - [Benchmark harness](../../benchmark/README.md): build and remote measurement tools.
 - [Session baseline](session-baseline.md) and [measurement data](session-baseline.json).
 - [Local profile](performance-local.json) and [qualification profile](performance-qualification.json).

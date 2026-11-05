@@ -2,7 +2,7 @@
 
 **Planning status: superseded historical work order — 2026-09-29.**
 [The canonical storage plan](../plan.md) is the only active work order.
-[The disposition register](../planning-index.md) maps this document's old items
+[The disposition register](../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Remaining policy, measurement, delivery and validation work is carried into S0–S4. Old conditional MCP guidance is replaced by the scheduled OpenCode integration.
 
 The entire original body below is retained as history. Its statuses, unchecked
@@ -119,6 +119,6 @@ The baseline identifies two follow-up measurements, not automatic changes: test 
 - [Agent workspace, handoff, and run-through detail](plans/agent-workspace-plan.md)
 - [Deploy-anywhere, portability, and multi-writer detail](plans/deploy-anywhere-plan.md)
 - [Assessment and repair follow-up](experiments/assessment-2026-09-27.md)
-- [Workspace contract](../workspace-contract.md) and [S3 compatibility contract](../compat-contract.md)
+- [Workspace contract](../workspace-contract.md) and [S3 compatibility contract](../contracts/compat-contract.md)
 - [Raw and summarized performance measurements](../benchmarks/2026-09-27/tool-performance-baseline.md)
 - [Current handoff notes](experiments/handoff-2026-09-27.md)

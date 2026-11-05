@@ -2,11 +2,11 @@
 
 `internal/storage/fs` is the durable, on-disk implementation of `storage.Store`. It owns a whole
 data directory, and this page states the contract that any change to it is obliged to keep. The
-object-record format is defined by [ADR 0020](adr/0020-binary-object-records.md); this page covers
+object-record format is defined by [ADR 0020](../adr/0020-binary-object-records.md); this page covers
 the obligations around it.
 
 A workspace is a different backend with its own layout, described in the
-[workspace contract](workspace-contract.md).
+[workspace contract](../workspace-contract.md).
 
 ## The data directory
 

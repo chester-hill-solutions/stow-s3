@@ -2,7 +2,7 @@
 
 **Planning status: superseded work order — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Remaining path, portable-state, distribution and pilot work is carried into S0–S4. MCP is now scheduled explicitly through the OpenCode integration.
 
 The entire original body below is retained as history. Its statuses, unchecked

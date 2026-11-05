@@ -104,7 +104,7 @@ had to be read out of the code before it could be written down:
 The bullets above are the keys worth explaining in place, not the whole vocabulary —
 there are eighteen, and a partial list is how `includeAdopted` came to be declared in
 two of the three drivers while the case file passed anyway. The full field-by-field
-reference is [`docs/workspace-contract-steps.md`](../../docs/workspace-contract-steps.md),
+reference is [`docs/contracts/workspace-contract-steps.md`](../../docs/contracts/workspace-contract-steps.md),
 and a test fails when that page and the drivers disagree.
 
 ### Matchers

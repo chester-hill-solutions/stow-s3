@@ -1,9 +1,9 @@
 # Native object MCP contract
 
-The native object MCP tools wrap [guarded filesystem saves](portable-workspace-usage.md#filesystem-save-receipts-and-recovery).
+The native object MCP tools wrap [guarded filesystem saves](../guides/portable-workspace-usage.md#filesystem-save-receipts-and-recovery).
 They support read-for-save, keyed save, resolution, observation release and capability inspection.
 <!-- repo-only:start -->
-The [dated test record](history/implementation/implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
+The [dated test record](../history/implementation/implementation-2026-09-30.md#native-object-mcp-wrapper-addendum) describes local verification.
 <!-- repo-only:end -->
 
 ## Serving the surface over HTTP
@@ -35,7 +35,7 @@ startup. Workspace mode includes its configured workspace and workspaces
 explicitly added through the enabled handoff-adoption tool.
 Per-caller scoped access is not implemented.
 <!-- repo-only:start -->
-Per-caller scoped access is [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+Per-caller scoped access is [ADR 0016](../adr/0016-scoped-access-encrypted-cache.md).
 <!-- repo-only:end -->
 
 ## Owned profile

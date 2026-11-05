@@ -68,7 +68,7 @@ results to the documentation site. These exploratory measurements do not claim
 sustained production capacity or broad performance superiority. Runtime APIs and
 storage formats are unchanged from v0.3.0.
 
-See the [release notes](docs/releases/v0.3.1.md) and [performance testing guide](docs/performance-testing.md).
+See the [release notes](docs/releases/v0.3.1.md) and [performance testing guide](docs/development/performance-testing.md).
 
 ## 0.3.0 — 2026-10-14
 

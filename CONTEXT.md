@@ -20,7 +20,7 @@ native, Cloudflare Workers and Railway qualification planned. Hosts supply keys 
 persistence; ordinary working directories remain plaintext. These APIs/profiles are
 proposed, not implemented or certified.
 [ADR 0014](docs/adr/0014-storage-product-caller-owned-execution.md) records this scope;
-[the consolidated plan](docs/storage-foundation-plan.md) schedules it. The [planning index](docs/planning-index.md)
+[the consolidated plan](docs/development/storage-foundation-plan.md) schedules it. The [planning index](docs/development/planning-index.md)
 records retired plans and the disposition of their remaining work.
 
 Scoped S3 sessions own a temporary storage server. Durable workspaces outlive a handle.

@@ -137,6 +137,6 @@ the application is written in Go:
 
 <!-- include:examples/stow-recipes/go/start-small/main.go -->
 
-Next: the [getting started guide](../../docs/getting-started.md), the
+Next: the [getting started guide](../../docs/guides/getting-started.md), the
 [TypeScript client](../../packages/stow-s3/README.md) and the
 [Python client](../../packages/stow-s3-py/README.md).

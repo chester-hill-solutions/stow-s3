@@ -25,7 +25,7 @@ The TypeScript package includes its native binary for Linux and macOS on x64 and
 Node.js 20 or newer is required. Python uses a source checkout.
 
 [Documentation](https://stow.chesterhillsolutions.ca/docs/) ·
-[Getting started](docs/getting-started.md) ·
+[Getting started](docs/guides/getting-started.md) ·
 [Release notes](docs/releases/v0.3.5.md) ·
 [Examples](examples/stow-recipes/README.md)
 
@@ -50,18 +50,18 @@ Node.js 20 or newer is required. Python uses a source checkout.
 
 - **S3 service:** use an S3 SDK with memory or filesystem storage.
   TypeScript and Python sessions start a private server and stop it on close.
-  [Run-through mode](docs/run-through.md) adds a remote cache for offline reads.
+  [Run-through mode](docs/guides/run-through.md) adds a remote cache for offline reads.
   Set `STOW_BUCKET` to restrict upstream reads to one bucket.
   Prewarming keys does not restrict later online reads.
 - **Workspace:** prepare a directory, capture checkpoints, compare changes, and transfer work.
   The embedded API and `workspace serve` share one runtime.
   The S3 filesystem backend uses a separate object-record format.
-  Native Go APIs support [guarded saves and recovery receipts](docs/portable-workspace-usage.md#managed-saves-in-native-storage).
-  MCP callers can use the [fixed-bucket object tools](docs/portable-workspace-usage.md#native-object-mcp).
+  Native Go APIs support [guarded saves and recovery receipts](docs/guides/portable-workspace-usage.md#managed-saves-in-native-storage).
+  MCP callers can use the [fixed-bucket object tools](docs/guides/portable-workspace-usage.md#native-object-mcp).
 - **Browser storage:** keep objects and editing history in IndexedDB.
-  [File history](docs/browser-file-history.md) stores whole-file stages.
-  [Project storage](docs/browser-project-storage.md) shares content between multi-file revisions.
-  [Workers](docs/browser-worker-runtime.md) support binary transport and bounded streams.
+  [File history](docs/guides/browser-file-history.md) stores whole-file stages.
+  [Project storage](docs/guides/browser-project-storage.md) shares content between multi-file revisions.
+  [Workers](docs/guides/browser-worker-runtime.md) support binary transport and bounded streams.
   Your application supplies the sync transport.
 
 The [MCP bucket browser](extensions/stow/README.md) adds read-only previews and object references.
@@ -71,7 +71,7 @@ It does not restrict other host processes or their network access.
 Storage quotas do not limit files written directly by those processes.
 
 <!-- repo-only:start -->
-The [storage plan](docs/storage-foundation-plan.md) tracks unfinished work.
+The [storage plan](docs/development/storage-foundation-plan.md) tracks unfinished work.
 The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpoint before each prompt.
 Real interruption, second-host and Linux acceptance tests remain open.
 MCP tool access alone does not ensure a checkpoint after every turn.
@@ -96,7 +96,7 @@ undo and redo. Applications own document semantics and conflict resolution.
 - A run-through cache: local data with an upstream behind it, usable offline.
 - A Go runtime for in-process, memory-backed storage.
 - A WebAssembly runtime for Node.js and browser integrations.
-- [Browser file history](docs/browser-file-history.md) with persisted undo/redo stages,
+- [Browser file history](docs/guides/browser-file-history.md) with persisted undo/redo stages,
   read-through access, and explicit conditional sync to S3-compatible storage.
 - Filesystem persistence for data that must survive a process restart.
 - SigV4 authentication for the S3 endpoint.
@@ -120,7 +120,7 @@ Stow implements the common S3 operations needed by application and test workload
 - presigned requests.
 
 CRC64NVME applies to single objects. Multipart initiation with that algorithm is
-refused. The [S3 compatibility contract](docs/compat-contract.md) records the
+refused. The [S3 compatibility contract](docs/contracts/compat-contract.md) records the
 full detail.
 
 Stow implements a subset of Amazon S3. Versioning, ACLs, bucket policies, lifecycle rules, replication, notifications, tagging, object lock, S3 Select, and KMS-backed encryption are not implemented.
@@ -206,7 +206,7 @@ stow-s3 workspace diff --from cp_a4424a293103532626d4a507 \
 
 Create a handoff with `--archive` to transfer the work.
 The handoff records the archive path relative to the document. Move both files together.
-See the [workspace guide](docs/portable-workspace-usage.md) for supported destination hosts.
+See the [workspace guide](docs/guides/portable-workspace-usage.md) for supported destination hosts.
 
 ```sh
 stow-s3 workspace handoff \
@@ -279,7 +279,7 @@ the document hashes to f7388c05885e824e8..., the sender published 58338f9f00c64e
 This check is optional. Receive the digest through a trusted channel;
 an altered document and its replacement digest can still agree.
 
-See [the task manifest and workspace lifecycle guide](docs/task-manifest.md)
+See [the task manifest and workspace lifecycle guide](docs/contracts/task-manifest.md)
 for the schema, archive safety rules, and limitations. A workspace is filesystem
 isolation for task editing, not an OS sandbox; direct filesystem writes by the
 agent are not hard-limited by Stow's object API quotas. Task manifests can stage
@@ -357,7 +357,7 @@ Run `stow-s3 --version` to check the installed version.
 See the [release notes](docs/releases/v0.3.5.md) for upgrade compatibility.
 
 **The Python client is not yet published to PyPI.** Use a source checkout for Python.
-The [npm publication record](docs/npm-publishing.md#published-035) describes the
+The [npm publication record](docs/development/npm-publishing.md#published-035) describes the
 verified release. Future automated registry publication remains disabled.
 
 The Go module is published:
@@ -626,7 +626,7 @@ func main() {
 
 ## Node.js, WebAssembly, and browser profiles
 
-[Browser project storage](docs/browser-project-storage.md) adds lazy content, shared asset history, atomic multi-file revisions and explicit project sync. [Persistent WASM workers](docs/browser-worker-runtime.md) expose the shared object runtime with bounded binary streams.
+[Browser project storage](docs/guides/browser-project-storage.md) adds lazy content, shared asset history, atomic multi-file revisions and explicit project sync. [Persistent WASM workers](docs/guides/browser-worker-runtime.md) expose the shared object runtime with bounded binary streams.
 
 The Node.js WebAssembly profile provides an in-memory object runtime without an HTTP server:
 
@@ -678,15 +678,15 @@ Local mode remains the default; ambient credentials do not select a provider.
 Reads can fetch and cache upstream objects. Local writes stay authoritative, and
 live propagation requires separate consent.
 
-The [run-through guide](docs/run-through.md) covers configuration, bucket scoping,
-prewarming, TTL and cache limits. The [outbox guide](docs/outbox.md) explains
+The [run-through guide](docs/guides/run-through.md) covers configuration, bucket scoping,
+prewarming, TTL and cache limits. The [outbox guide](docs/guides/outbox.md) explains
 conditional propagation, bounded retries, terminal conflicts and lost replies.
 
 ### Working with the network gone
 
 Explicit offline mode makes no upstream requests. Reads use retained local or
 cached bytes; missing data stays missing. Reconnecting does not authorize live
-writes. See [offline configuration](docs/run-through.md#working-with-the-network-gone).
+writes. See [offline configuration](docs/guides/run-through.md#working-with-the-network-gone).
 
 ## Resetting a data directory
 
@@ -786,7 +786,7 @@ reports improvements above its floor.
 
 The [workspace corpus](conformance/workspace/cases.json) defines shared cases.
 Independent Go, TypeScript and Python drivers check the CLI and wrapper results.
-See the [step vocabulary](docs/workspace-contract-steps.md) for case fields.
+See the [step vocabulary](docs/contracts/workspace-contract-steps.md) for case fields.
 
 `.go-version` and `go.mod` pin the Go toolchain.
 `make check-generated` compares tracked WASM and TypeScript output with a fresh build.

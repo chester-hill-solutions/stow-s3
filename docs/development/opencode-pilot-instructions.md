@@ -6,7 +6,7 @@ pushed Stow commit alongside the prompt so both hosts use the same revision.
 ```text
 Validate Stow's implemented portable-workspace workflow with a real agent.
 
-Read docs/plan.md, docs/portable-workspace-usage.md,
+Read docs/plan.md, docs/guides/portable-workspace-usage.md,
 docs/history/implementation/implementation-2026-09-29.md, and examples/opencode/README.md.
 Follow the README's installation section before running the pilot.
 
@@ -73,7 +73,7 @@ Verify it needs no sender filesystem paths or sender storage credentials.
 If Linux access is unavailable, report this stage blocked, not locally simulated.
 
 REPORT
-Write docs/real-agent-pilot.md with exact versions/commit/commands, task outcomes,
+Write docs/history/experiments/real-agent-pilot.md with exact versions/commit/commands, task outcomes,
 checkpoint IDs, timing samples, recovery and cross-host results, interventions,
 and remaining blockers. Record installation failures as well as runtime failures.
 Fix reproduced implementation bugs with regressions when needed; preserve

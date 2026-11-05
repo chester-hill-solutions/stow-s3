@@ -2,7 +2,7 @@
 
 **Planning status: superseded architecture proposal — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Accepted ADRs and current contracts govern implemented behavior. Storage composition and enforcement work is carried into S0/S1; descriptor and execution expansions are deferred.
 
 The entire original body below is retained as history. Its statuses, unchecked
@@ -102,7 +102,7 @@ This document does **not** decide these. It points at them.
 | Workspace as the default (§6) | [ADR 0007](../../adr/0007-workspace-is-the-default.md), [ADR 0008](../../adr/0008-workspace-backend-real-files.md) |
 | Sessions as capability issuers (§5) | [ADR 0004](../../adr/0004-agent-session-contract.md) |
 | The embedded runtime (§1) | [ADR 0003](../../adr/0003-embedded-runtime.md) |
-| The S3 compatibility surface (§8) | [`docs/compat-contract.md`](../../compat-contract.md) |
+| The S3 compatibility surface (§8) | [`docs/compat-contract.md`](../../contracts/compat-contract.md) |
 | Cross-runtime agreement (§9) | [`docs/workspace-contract.md`](../../workspace-contract.md) §8 |
 
 Read the ADR when the question is *what was decided and why*. Read this document
@@ -295,7 +295,7 @@ Stow = S3 server
 ```
 
 This is what lets S3 compatibility evolve without pushing AWS-specific concepts
-down into the storage model. [`docs/compat-contract.md`](../../compat-contract.md)
+down into the storage model. [`docs/compat-contract.md`](../../contracts/compat-contract.md)
 is the S3 surface; this document is the boundary it sits on.
 
 ### 3.4 Lifetime
@@ -535,7 +535,7 @@ Stow does not need to implement all of Amazon S3. It needs to be exceptionally
 reliable about the subset it claims, and it needs to be honest about where the
 subset ends.
 
-[`docs/compat-contract.md`](../../compat-contract.md) is the authoritative
+[`docs/compat-contract.md`](../../contracts/compat-contract.md) is the authoritative
 capability matrix — supported operations, URL styles, authentication, CORS,
 presigned URLs, and a conformance suite in its section 2. This document does not
 restate it.

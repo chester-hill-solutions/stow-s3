@@ -1,7 +1,7 @@
 ---
 status: accepted
-amended: 2026-10-12
-decision_digest: 42a2974ac46ce8a7
+amended: 2026-11-05
+decision_digest: da6bd2f1417f2167
 supersedes: 0001
 ---
 
@@ -61,7 +61,7 @@ not the intent — which is why they now have the same test.
   Refusing to start would mean a typo stops a dev server that is otherwise
   harmless; falling back to detection would mean the typo re-enabled exactly what
   this record removes.
-- `docs/compat-contract.md` states the mode invariant and the consent requirement
+- `docs/contracts/compat-contract.md` states the mode invariant and the consent requirement
   in the two places that previously described detection and the write policy.
 - `CONTEXT.md` gains a Mode Selection entry and a separate Live-Write Consent
   entry, because a policy that reads as a consent is the confusion this decision
@@ -70,3 +70,5 @@ not the intent — which is why they now have the same test.
 ## Amendments
 
 - 2026-10-12: Point the retired ADR 0001 reference at its Git record. The local-mode invariant is unchanged.
+- 2026-11-05: Updated documentation paths after the folder organization.
+  Decision status and meaning are unchanged.

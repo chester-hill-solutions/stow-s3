@@ -1,18 +1,18 @@
 # Product goal: portable working storage for agents and tools
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../storage-foundation-plan.md) is the sole work order. Product workflow and definition of done are consolidated into the new plan, including W19/W21/W22. The milestone body is retained rationale, not another schedule. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../development/storage-foundation-plan.md) is the sole work order. Product workflow and definition of done are consolidated into the new plan, including W19/W21/W22. The milestone body is retained rationale, not another schedule. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** current storage milestone, aligned 2026-09-29. [The canonical plan](../../plan.md) owns implementation order; [ADR 0014](../../adr/0014-storage-product-caller-owned-execution.md) owns the product boundary. Earlier runner-oriented wording is superseded.
 
 This document defines success for S0–S4; it is not an independent backlog. The
-[planning index](../../planning-index.md) records which old plans were retired and where
+[planning index](../../development/planning-index.md) records which old plans were retired and where
 their remaining work was carried forward.
 
 The [local 0.3.0 implementation](../implementation/implementation-2026-09-29.md) now includes portable
 object payloads and metadata, shared capture/publication guarantees, local MCP and
 an experimental OpenCode caller. Public release, successful real-model cross-host
 continuation and independent adoption remain open. The goal below defines acceptance
-for the completed product; [usage](../../portable-workspace-usage.md) describes the current
+for the completed product; [usage](../../guides/portable-workspace-usage.md) describes the current
 API and limitations.
 
 ## Goal

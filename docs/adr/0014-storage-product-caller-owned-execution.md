@@ -1,7 +1,7 @@
 ---
 status: accepted
-decision_digest: d854ab40054f3815
-amended: 2026-09-29
+decision_digest: fc3fb4398b0ac4a6
+amended: 2026-11-05
 relates_to: 0004, 0007, 0008, 0009, 0010, 0013
 ---
 
@@ -62,12 +62,12 @@ by a demonstrated consumer need.
 
 ### Scope and ordering
 
-`docs/storage-foundation-plan.md` is the single implementation work order, including
+`docs/development/storage-foundation-plan.md` is the single implementation work order, including
 the product milestone and foundation acceptance. `docs/plan.md` preserves the old
 entry point/anchors as a routing page. Specialist documents contribute retained
 design rationale but do not schedule parallel product expansions.
 
-The planning inventory and carry-forward register live in `docs/planning-index.md`.
+The planning inventory and carry-forward register live in `docs/development/planning-index.md`.
 This scheduling decision supersedes older references to a “plan of record,”
 including ADR 0010's reference to the environment implementation plan. Retiring
 those work orders leaves their accepted enforcement and storage decisions in force;
@@ -109,3 +109,5 @@ API are outside the current plan. Arbitrary edge execution is not a storage clai
   extensions and remaining acceptance into docs/storage-foundation-plan.md. Retained
   docs/plan.md as a routing page and old S0–S4 traceability; no storage/execution
   boundary or implemented API changes follow from this scheduling amendment.
+- 2026-11-05: Updated documentation paths after the folder organization.
+  Decision status and meaning are unchanged.

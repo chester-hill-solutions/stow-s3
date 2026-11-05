@@ -1,6 +1,6 @@
 # Distribution spike: can a clean install start a Stow session?
 
-> **Planning disposition, 2026-09-29:** Completed historical experiment. Its initial install result and next steps describe the original run; current public-delivery work is S2. See [the plan](../../plan.md) and [disposition register](../../planning-index.md).
+> **Planning disposition, 2026-09-29:** Completed historical experiment. Its initial install result and next steps describe the original run; current public-delivery work is S2. See [the plan](../../plan.md) and [disposition register](../../development/planning-index.md).
 
 **Status:** complete
 **Date:** 2026-09-25

@@ -25,7 +25,7 @@ The Go executable includes the self-contained UI. Running the server requires no
 Node process, hosted service, OpenAI API key, or provider credentials. The browser
 never writes objects. The `--read-only` profile also refuses the existing save tool
 and bucket creation. Deliberate writable configurations can use the existing
-[guarded-save workflow](../../docs/portable-workspace-usage.md#native-object-mcp);
+[guarded-save workflow](../../docs/guides/portable-workspace-usage.md#native-object-mcp);
 the browser remains read-only in such a configuration.
 
 ## Codex and local ChatGPT Work

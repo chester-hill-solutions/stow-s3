@@ -15,7 +15,7 @@ returned `working_directory` as its cwd. The manifest supports local files,
 directories, and explicit refs from local Git repositories. Git preparation
 uses a fresh shallow checkout of the selected commit; dirty files, older
 history, submodules, and Git LFS payloads are excluded. See
-[`docs/task-manifest.md`](../docs/task-manifest.md) for resume, checkpoint,
+[`docs/contracts/task-manifest.md`](../docs/contracts/task-manifest.md) for resume, checkpoint,
 diff, restore, same-machine handoff, and portable archive commands. This is
 filesystem isolation for task editing, not an OS security sandbox; direct file
 writes by an agent are not hard-limited by Stow's object API quotas.

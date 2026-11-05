@@ -2,7 +2,7 @@
 
 **Planning status: superseded backlog — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Remaining publication, upgrade diagnostics, documentation and maintenance work is carried into S0 and S2. Implemented contribution and test infrastructure is retained.
 
 The entire original body below is retained as history. Its statuses, unchecked

@@ -126,7 +126,7 @@ export function generateReferences() {
   const mcp = mcpReference();
   files.set("docs/api/mcp.md", mcp.markdown);
   inventory.push({ path: "docs/api/mcp.md", title: "MCP API", symbols: mcp.symbols, members: [] });
-  files.set("docs/api/README.md", "# API reference\n\nChoose the interface used by your application. Each reference lists public functions, methods, input types, return types and errors.\n\n" + inventory.map((p) => `- [${p.title}](${p.path.split("/").pop()})`).join("\n") + "\n- [S3 HTTP API](../compat-contract.md): routes, headers, conditions, responses and unsupported operations.\n");
+  files.set("docs/api/README.md", "# API reference\n\nChoose the interface used by your application. Each reference lists public functions, methods, input types, return types and errors.\n\n" + inventory.map((p) => `- [${p.title}](${p.path.split("/").pop()})`).join("\n") + "\n- [S3 HTTP API](../contracts/compat-contract.md): routes, headers, conditions, responses and unsupported operations.\n");
   files.set("docs/api/inventory.json", JSON.stringify(inventory, null, 2) + "\n");
   return files;
 }

@@ -1,13 +1,13 @@
 # Guarded read/edit/save plan
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Conditional-write prerequisite evidence is retained below. Richer identity/save is W01/W02 and declared-input readiness W09; status/order live only in the new plan. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../development/storage-foundation-plan.md) is the sole work order. Conditional-write prerequisite evidence is retained below. Richer identity/save is W01/W02 and declared-input readiness W09; status/order live only in the new plan. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** accepted direction from the 2026-09-29 interview. The conditional-write
 prerequisite, native memory/filesystem guarded surfaces, retained filesystem
 resolution and the native object MCP wrapper are implemented locally. Real consumer
 adoption, further wrappers/backends, Linux execution and input-basis publication
-remain open in the canonical queue. See [managed-save usage](portable-workspace-usage.md#managed-saves-in-native-storage)
-and the [shared admission contract](storage-admission-contract.md). Expands S1-10 in the [canonical plan](plan.md).
+remain open in the canonical queue. See [managed-save usage](../guides/portable-workspace-usage.md#managed-saves-in-native-storage)
+and the [shared admission contract](../storage-admission-contract.md). Expands S1-10 in the [canonical plan](../plan.md).
 
 ## Implementation progress
 
@@ -22,7 +22,7 @@ This first slice guards content ETags only. It does not introduce read-bound tok
 guarded defaults, metadata/history identities, input-basis ready publication or
 lost-reply replay receipts. Existing backend locks qualify in-process writes; arbitrary
 host writers and independent processes do not acquire a compare-and-swap guarantee.
-See [current usage](portable-workspace-usage.md#conditional-object-saves).
+See [current usage](../guides/portable-workspace-usage.md#conditional-object-saves).
 
 ### Verification of the conditional-write prerequisite
 

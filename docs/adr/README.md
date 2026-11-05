@@ -3,7 +3,7 @@
 Accepted and narrowed records govern design. Proposed records do not.
 An accepted design can still have unfinished implementation.
 Use the [usage guides](../README.md) for supported APIs and the
-[storage plan](../storage-foundation-plan.md) for remaining work.
+[storage plan](../development/storage-foundation-plan.md) for remaining work.
 
 ## Current records
 
@@ -31,6 +31,12 @@ Use the [usage guides](../README.md) for supported APIs and the
 | [0021](0021-remote-exposure-requires-consent.md) | A bind beyond loopback needs consent, and the service does not terminate TLS | `accepted` | — | — |
 
 ## Status vocabulary
+
+On November 5, 2026, documentation path maintenance was recorded in
+[0011](0011-local-is-the-default-mode.md),
+[0014](0014-storage-product-caller-owned-execution.md),
+[0015](0015-durable-workspace-notifications.md) and
+[0016](0016-scoped-access-encrypted-cache.md). Their decisions and statuses remain unchanged.
 
 - `accepted`: the decision is in force.
 - `narrowed`: the remaining decision is in force; a later record changes part of it.

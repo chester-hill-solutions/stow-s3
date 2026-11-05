@@ -7,7 +7,7 @@ The Python client is not yet published to PyPI; use a source checkout for Python
 Native package targets are macOS and Linux on arm64/x64.
 Windows workspace capture is unsupported by the current rooted-read implementation.
 <!-- repo-only:start -->
-See the [plan](plan.md) for remaining release tests.
+See the [plan](../plan.md) for remaining release tests.
 <!-- repo-only:end -->
 
 ## Workspace lifetime and S3
@@ -54,7 +54,7 @@ They do not coordinate arbitrary host writers or provide a committed-write repla
 receipt after a lost response. Use managed saves below when metadata changes must also invalidate an observation.
 Filesystem receipts support bounded recovery.
 <!-- repo-only:start -->
-Wrapper support and declared-input checks remain open in [W02/W09](storage-foundation-plan.md).
+Wrapper support and declared-input checks remain open in [W02/W09](../development/storage-foundation-plan.md).
 <!-- repo-only:end -->
 
 ## Managed saves in native storage
@@ -101,7 +101,7 @@ The native object MCP profile below wraps these managed saves. WASM, in-process
 TypeScript and S3 have no managed-save API.
 
 <!-- repo-only:start -->
-Resource ACLs and declared-input publication remain target work in the [shared contract](storage-admission-contract.md).
+Resource ACLs and declared-input publication remain target work in the [shared contract](../storage-admission-contract.md).
 <!-- repo-only:end -->
 
 ### Filesystem save receipts and recovery
@@ -173,7 +173,7 @@ replay window, terminal-only eligibility, recovery-hold checks and a durable
 tombstone; no automatic retirement or outcome override is provided.
 
 <!-- repo-only:start -->
-The [receipt lifecycle proposal](receipt-retirement-proposal.md) specifies the
+The [receipt lifecycle proposal](../design/receipt-retirement-proposal.md) specifies the
 archive ordering, replay behavior, bounded admission and decision required before
 adding retirement.
 <!-- repo-only:end -->
@@ -187,7 +187,7 @@ The public runtime returned by `OpenFilesystem` has no `RefreshUsage` method.
 Editable workspaces retain conservative reconciliation and their separate refresh operation.
 
 <!-- repo-only:start -->
-Local evidence is recorded in [the implementation receipt](history/implementation/implementation-2026-09-30.md).
+Local evidence is recorded in [the implementation receipt](../history/implementation/implementation-2026-09-30.md).
 <!-- repo-only:end -->
 
 ## Portable capture and reconciliation
@@ -307,7 +307,7 @@ tool calls to eight, tool names to 128 bytes, raw tool arguments to 256 KiB and 
 to 256 KiB. Hosts can narrow
 body/observation limits with `--max-object-bytes` and `--max-observations`. Stdio
 requests have a 1 MiB line limit. These payload limits do not imply an RSS ceiling
-or streaming filesystem decoding. See the [object MCP contract](object-mcp-contract.md)
+or streaming filesystem decoding. See the [object MCP contract](../contracts/object-mcp-contract.md)
 for tool arguments, results and limits. This is a native object-record profile;
 resource ACLs, encrypted storage and workspace-host-edit coordination remain open.
 
@@ -336,7 +336,7 @@ To ensure a save between turns, the host must require a confirmed save before ad
 An agent choosing when to call a save tool cannot guarantee this boundary.
 
 <!-- repo-only:start -->
-The [OpenCode example](../examples/opencode/README.md) implements an experimental caller.
+The [OpenCode example](../../examples/opencode/README.md) implements an experimental caller.
 <!-- repo-only:end -->
 
 ## Cost and scope
@@ -368,5 +368,5 @@ Stow's filesystem checks protect supported storage operations; arbitrary process
 with host access remain outside this boundary.
 
 <!-- repo-only:start -->
-See [implementation evidence](history/implementation/implementation-2026-09-29.md) for validation and outstanding limits.
+See [implementation evidence](../history/implementation/implementation-2026-09-29.md) for validation and outstanding limits.
 <!-- repo-only:end -->

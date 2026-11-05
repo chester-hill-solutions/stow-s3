@@ -1,7 +1,7 @@
 ---
 status: accepted
-decision_digest: 454b42c043ae71fd
-amended: 2026-09-29
+decision_digest: dfe46acd88a647da
+amended: 2026-11-05
 relates_to: 0010, 0014, 0015
 ---
 
@@ -85,7 +85,7 @@ policy/notification state. Preserve shared policy/format conformance and verify 
 Go/WASM compatibility rather than creating divergent authorization engines.
 
 Implementation is S1-7/S1-8 and platform evidence is S4-4 in the canonical plan.
-[Protected-cache detail](../protected-cache-plan.md) expands those items. Host adapters
+[Protected-cache detail](../design/protected-cache-plan.md) expands those items. Host adapters
 own bindings, secrets and transport/lifecycle; no hosted identity/control plane is added.
 
 ## Consequences
@@ -107,3 +107,5 @@ own bindings, secrets and transport/lifecycle; no hosted identity/control plane 
 - 2026-09-29: Accepted optional backups prepared for a separately held recovery key,
   enabling qualified recovery without the source host/provider while keeping private
   keys outside backups and external-operation activation separate from data restoration.
+- 2026-11-05: Updated documentation links for the guide, contract, design and
+  development folders. Decision status and meaning are unchanged.

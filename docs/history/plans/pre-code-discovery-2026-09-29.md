@@ -1,6 +1,6 @@
 # Pre-code discovery and engineering handover
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../storage-foundation-plan.md) is the sole work order. Historical source findings and P01–P16 handover are reconciled with later baseline implementation; they do not reopen completed defects. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../development/storage-foundation-plan.md) is the sole work order. Historical source findings and P01–P16 handover are reconciled with later baseline implementation; they do not reopen completed defects. Former checklists, phase numbers and next steps below do not schedule work.
 
 > Historical pre-code record. Implementation followed on the same date; see
 > [current evidence](../implementation/implementation-2026-09-29.md) and [the canonical plan](../../plan.md).
@@ -11,7 +11,7 @@
 **Verdict: Adjust before implementation.** Source discovery against Stow `5485a36`
 supports the storage-first direction, but exposes prerequisites hidden by the old
 feature labels. This report expands [canonical S0–S3](../../plan.md), not a new backlog.
-The [storage design](../../storage-portability-design.md) and [MCP detail](mcp-storage-integration-plan.md)
+The [storage design](../../design/storage-portability-design.md) and [MCP detail](mcp-storage-integration-plan.md)
 contain the proposed contracts. Designs here are recommendations for implementation,
 not shipped guarantees or newly accepted ADRs.
 

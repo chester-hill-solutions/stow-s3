@@ -1,10 +1,10 @@
 # Durable workspace notifications
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Observation/readiness/codecs/diffs/webhooks are W08–W11 and portable notification state W12. Confirmed takeover is settled; its mechanism/evidence is engineering work under W13. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../development/storage-foundation-plan.md) is the sole work order. Observation/readiness/codecs/diffs/webhooks are W08–W11 and portable notification state W12. Confirmed takeover is settled; its mechanism/evidence is engineering work under W13. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** accepted core capability; proposed implementation contract, not shipped.
-**Authority:** [ADR 0015](adr/0015-durable-workspace-notifications.md).
-**Work order:** S1-6 in [the canonical plan](plan.md).
+**Authority:** [ADR 0015](../adr/0015-durable-workspace-notifications.md).
+**Work order:** S1-6 in [the canonical plan](../plan.md).
 
 ## Purpose
 

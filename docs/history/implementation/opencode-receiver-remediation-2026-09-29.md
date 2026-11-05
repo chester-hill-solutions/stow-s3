@@ -32,7 +32,7 @@ dedicated config/catalog/auth provisioning without guessing which base a binary
 uses. This changes the earlier XDG layout; operators must use fresh caller state
 and preserve older failed directories for diagnosis.
 
-The [runbook](../../../examples/opencode/README.md) and [pilot instructions](../../opencode-pilot-instructions.md)
+The [runbook](../../../examples/opencode/README.md) and [pilot instructions](../../development/opencode-pilot-instructions.md)
 now specify cwd, credential/config paths, successful no-op handling, a nonexistent
 adoption root and the explicit real-model gate.
 

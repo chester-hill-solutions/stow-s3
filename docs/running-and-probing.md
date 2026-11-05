@@ -114,8 +114,8 @@ Without credentials the process generates a pair and reports it only to its own 
 Without an admin token the diagnostic routes answer `404` to every caller that is not loopback.
 
 Prefer keeping the process on loopback and terminating TLS in a proxy on the same host: that shape needs no consent flag and exposes no other interface. The proxy must set forwarding headers (for example `X-Forwarded-For`) or restrict `/_stow/*`; otherwise proxy-originated requests can qualify for token-free loopback diagnostics.
-[Run-through mode](run-through.md#serving-a-shared-cache-node) describes that deployment as a shared cache node.
-The [MCP surface](object-mcp-contract.md#serving-the-surface-over-http) can be served over HTTP with the same posture, and its token is separate because it is a caller credential rather than an operations one.
+[Run-through mode](guides/run-through.md#serving-a-shared-cache-node) describes that deployment as a shared cache node.
+The [MCP surface](contracts/object-mcp-contract.md#serving-the-surface-over-http) can be served over HTTP with the same posture, and its token is separate because it is a caller credential rather than an operations one.
 
 TypeScript callers that deliberately bind remotely use `allowInsecureRemote: true`
 and provision `accessKey`, `secretKey` and `adminToken`. The token is passed in
@@ -168,11 +168,11 @@ a `/_stow/health` round trip.
 
 ## See also
 
-- [`docs/task-manifest.md`](task-manifest.md) — the agent workspace lifecycle.
+- [`docs/contracts/task-manifest.md`](contracts/task-manifest.md) — the agent workspace lifecycle.
 <!-- repo-only:start -->
 - [`docs/workspace-contract.md`](workspace-contract.md) — what a workspace is and
   which host can provide one.
 <!-- repo-only:end -->
-- [`docs/compat-contract.md`](compat-contract.md) — the S3 surface, including what
+- [`docs/contracts/compat-contract.md`](contracts/compat-contract.md) — the S3 surface, including what
   is deliberately not implemented.
 - [README](../README.md) — the full reference.

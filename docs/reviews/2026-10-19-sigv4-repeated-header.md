@@ -58,7 +58,7 @@ still pass, so name-case handling and the other refusals are untouched.
 This is a bounded correction of one reproduced defect. It changes how a signed
 header is canonicalized and nothing else: no public API, dependency, storage
 format or quality baseline changes. The
-[S3 compatibility contract](../compat-contract.md) records the new rule, and the
+[S3 compatibility contract](../contracts/compat-contract.md) records the new rule, and the
 closure register marks the lead closed.
 
 The remaining required fixes in the register are C09, a case-insensitive

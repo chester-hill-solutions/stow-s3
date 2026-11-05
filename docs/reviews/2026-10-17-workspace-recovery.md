@@ -50,7 +50,7 @@ Failed initiation makes a best-effort removal of its newly allocated upload
 directory, matching the filesystem backend's existing behavior. It preserves the
 original publication error. Previously acknowledged uploads are not removed.
 If cleanup also fails, unknown retained state still blocks reconciliation.
-The [storage](../compat-contract.md) and [workspace](../workspace-contract.md)
+The [storage](../contracts/compat-contract.md) and [workspace](../workspace-contract.md)
 contracts were clarified before implementation. No dependency, public API,
 storage format, index, cache or migration is added.
 

@@ -159,7 +159,7 @@ There is no automatic cloud-hardware stability guarantee.
 
 Exit zero means the commands completed; inspect `s3.acceptable` and each run's counters.
 Dropped arrivals disqualify a zero-loss claim even when data verification passes.
-These profiles are exploratory. Use the [qualification protocol](../docs/performance-testing.md)
+These profiles are exploratory. Use the [qualification protocol](../docs/development/performance-testing.md)
 before advertising sustained capacity.
 
 Stop both task-owned deployments after exporting results.

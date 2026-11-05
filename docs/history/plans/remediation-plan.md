@@ -2,7 +2,7 @@
 
 **Planning status: superseded execution plan — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Applicable contract and release requirements are carried into S0 and S2, including the current release checklist. The old R0–R11 sequence and version targets are obsolete.
 
 The entire original body below is retained as history. Its statuses, unchecked

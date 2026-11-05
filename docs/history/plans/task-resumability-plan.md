@@ -1,8 +1,8 @@
 # Existing task resumability validation plan
 
 **Superseded scope:** the user clarified that the requested resumability concerns
-uploads/downloads. Use W06/W21 in [the consolidated plan](../../storage-foundation-plan.md);
-the [transfer recipe](../../resumable-transfer-plan.md) is retained design detail.
+uploads/downloads. Use W06/W21 in [the consolidated plan](../../development/storage-foundation-plan.md);
+the [transfer recipe](../../design/resumable-transfer-plan.md) is retained design detail.
 The body below records the earlier agent-task interpretation and does not schedule
 new implementation or consumer integration.
 

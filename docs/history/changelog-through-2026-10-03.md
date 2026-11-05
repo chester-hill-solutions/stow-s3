@@ -202,7 +202,7 @@ describe their original development tree and evidence, not current release statu
   **Not published.** Fresh AWS, R2 and custom-provider receipts, clean published
   consumers and cross-host real-agent evidence remain required.
 - Requires Go 1.25.6 for the pinned MCP SDK. No sandbox or process-isolation claim.
-  See [usage](../portable-workspace-usage.md) and
+  See [usage](../guides/portable-workspace-usage.md) and
   [implementation evidence](implementation/implementation-2026-09-29.md), including full-copy
   capture costs and remaining limits.
 

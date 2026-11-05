@@ -1,6 +1,6 @@
 # Agent continuity: a concrete pilot
 
-> **Planning disposition, 2026-09-29:** Dated synthetic continuity evidence. Remaining real-agent and cross-host validation is scheduled in S3; this report is not a separate work queue. See [the plan](../../plan.md) and [disposition register](../../planning-index.md).
+> **Planning disposition, 2026-09-29:** Dated synthetic continuity evidence. Remaining real-agent and cross-host validation is scheduled in S3; this report is not a separate work queue. See [the plan](../../plan.md) and [disposition register](../../development/planning-index.md).
 
 > **Product decision, 2026-09-29:** [The canonical storage plan](../../plan.md) now governs. Stow owns portable working storage; callers own execution, agent turns and sandboxing. The experiments and earlier recommendations below retain their dated context. Runner/executor requirements are deferred; agent continuity will be evaluated through a thin storage integration, not a separate Stow execution product.
 

@@ -120,7 +120,7 @@ checkpoint export, and import helpers. Results are JSON objects from the Go CLI;
 `WorkspaceCommandError` includes the failed command and stderr. The platform
 binary must be installed or selected with `STOW_BIN`. Workspaces persist beyond
 the process and are separate from disposable `with_session` sessions. See
-[`docs/task-manifest.md`](../../docs/task-manifest.md) for manifest fields,
+[`docs/contracts/task-manifest.md`](../../docs/contracts/task-manifest.md) for manifest fields,
 archive safeguards, and the isolation boundary.
 
 ## License

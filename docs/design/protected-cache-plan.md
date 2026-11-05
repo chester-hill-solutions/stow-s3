@@ -1,11 +1,11 @@
 # Scoped access and encrypted working storage
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Broad scoped/encrypted working storage is W04/W05/W07/W14/W15 and host qualification W17/W18. Cache remains one profile; the body supplies design rationale, not independent ordering. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../development/storage-foundation-plan.md) is the sole work order. Broad scoped/encrypted working storage is W04/W05/W07/W14/W15 and host qualification W17/W18. Cache remains one profile; the body supplies design rationale, not independent ordering. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** accepted direction; proposed contracts, not implemented or deployed.
-**Authority:** [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+**Authority:** [ADR 0016](../adr/0016-scoped-access-encrypted-cache.md).
 **Work order:** S1-7 access control, S1-8 encryption, S4-4 qualification in
-[the canonical plan](plan.md).
+[the canonical plan](../plan.md).
 
 ## Goal and reuse
 

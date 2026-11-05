@@ -1,9 +1,9 @@
 # Portable recovery plan
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Holds/budgets are W03, portable state/takeover W12/W13 and encrypted recovery W14/W15. Accepted directions are consolidated; the retained body is a design reference. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../development/storage-foundation-plan.md) is the sole work order. Holds/budgets are W03, portable state/takeover W12/W13 and encrypted recovery W14/W15. Accepted directions are consolidated; the retained body is a design reference. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** accepted product direction, 2026-09-29; contract and implementation
-proposed. Expands S1-9 in the [canonical plan](plan.md). This covers working
+proposed. Expands S1-9 in the [canonical plan](../plan.md). This covers working
 storage across workspaces, objects, transfers and notifications, including
 upstream propagation. It is not limited to cache recovery or agent execution.
 
@@ -207,7 +207,7 @@ Imported delivery history is evidence, not permission to send to an old endpoint
 ## Engineering contracts to qualify
 
 These are implementation/evidence gates to resolve against the owning code paths,
-not routine approval questions for the user. The [foundation review](history/plans/foundation-review-2026-09-29.md)
+not routine approval questions for the user. The [foundation review](../history/plans/foundation-review-2026-09-29.md)
 sets dependency order and conservative defaults.
 
 - Evidence and mechanism for confirmed responsibility transfer, including source

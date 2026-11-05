@@ -211,7 +211,7 @@ func driverSource(t *testing.T, dir string) string {
 // failure it catches — a driver quietly not implementing a field — is invisible from
 // inside any one language.
 func TestContractStepVocabularyIsDocumented(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("..", "docs", "workspace-contract-steps.md"))
+	raw, err := os.ReadFile(filepath.Join("..", "docs", "contracts", "workspace-contract-steps.md"))
 	if err != nil {
 		t.Fatalf("read the step vocabulary: %v", err)
 	}
@@ -224,7 +224,7 @@ func TestContractStepVocabularyIsDocumented(t *testing.T) {
 	// And the other direction, so the page cannot accumulate fields that were removed.
 	for _, field := range documentedStepFields(doc) {
 		if !contains(declaredGoStepFields(t), field) {
-			t.Errorf("docs/workspace-contract-steps.md documents the step field %q, which no driver declares", field)
+			t.Errorf("docs/contracts/workspace-contract-steps.md documents the step field %q, which no driver declares", field)
 		}
 	}
 }

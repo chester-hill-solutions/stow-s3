@@ -1,6 +1,6 @@
 # Portable working storage: implementation evidence
 
-> **Evidence chronology:** this baseline record predates the [later successful local real-model continuation](opencode-receiver-remediation-2026-09-29.md) and [conditional-write slice](../../guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite). Its no-model/open-gate statements describe that earlier run. Current reconciled status is in the [consolidated plan](../../storage-foundation-plan.md); interruption/second-host/Linux and release/adoption gates remain open. Original test counts/hashes are not refreshed by consolidation.
+> **Evidence chronology:** this baseline record predates the [later successful local real-model continuation](opencode-receiver-remediation-2026-09-29.md) and [conditional-write slice](../../design/guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite). Its no-model/open-gate statements describe that earlier run. Current reconciled status is in the [consolidated plan](../../development/storage-foundation-plan.md); interruption/second-host/Linux and release/adoption gates remain open. Original test counts/hashes are not refreshed by consolidation.
 
 **Date:** 2026-09-29. **Candidate:** unpublished 0.3.0 development tree based on
 `5485a3640dbeeb368324d7e2a223bc17d7d23fc5` (see current Git history for exact base).
@@ -26,7 +26,7 @@ Local runtime evidence is macOS arm64; Linux amd64 also compiles, without a Linu
 Additional S0 regressions cover explicit upstream scope after local bucket creation,
 root identity/ancestor-symlink replacement on reads and capture, special input
 refusal, and expanded shared SDK protocol cases. Case mappings live in the
-[S3 compatibility contract](../../compat-contract.md).
+[S3 compatibility contract](../../contracts/compat-contract.md).
 
 ## Agent integration evidence
 
@@ -126,14 +126,14 @@ Durability acknowledgement remains intact; a larger timeout is not a performance
   ceilings. Enhanced deltas and self-contained Git base bundles remain deferred.
 - Two independent teams' repeated use remains the product acceptance gate.
 
-See [usage](../../portable-workspace-usage.md) and the
+See [usage](../../guides/portable-workspace-usage.md) and the
 [OpenCode example](../../../examples/opencode/README.md) for runnable entry points.
 
 
 ## Foundation execution follow-up on 2026-09-29
 
 This addendum records the current uncommitted development tree on macOS arm64,
-following [W01/W02/W04](../../storage-foundation-plan.md). It does not refresh the earlier
+following [W01/W02/W04](../../development/storage-foundation-plan.md). It does not refresh the earlier
 aggregate receipts or certify Linux, a second host, live providers or publication.
 
 - W01's decision/contract gate is complete: ADR 0010 §§4–5 visibly retain the

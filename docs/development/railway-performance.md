@@ -2,9 +2,9 @@
 
 The `benchmark` environment was created and read back on October 13, 2026,
 in the existing `stow-conformance-scratch` project.
-The [benchmark folder](../benchmark/README.md) now defines the environment with Railway IaC.
+The [benchmark folder](../../benchmark/README.md) now defines the environment with Railway IaC.
 Its private target and runner services have deployed successfully.
-The [first cloud comparison](benchmarks/2026-10-13-railway-performance/README.md)
+The [first cloud comparison](../benchmarks/2026-10-13-railway-performance/README.md)
 completed 378 embedded samples and 45 S3 runs with verified data and zero losses.
 Both compute deployments were stopped after exporting evidence; the services,
 IaC and volume contents remain available.
@@ -80,7 +80,7 @@ The expanded October 13 batch runs all testing and analysis on Railway and
 produces a private website preview before any publication. Go heap allocation
 counters exclude SQLite's C allocations; they are separate from process RSS.
 
-The existing [qualification profile](benchmarks/performance-qualification.json)
+The existing [qualification profile](../benchmarks/performance-qualification.json)
 specifies the longer duration/repetition protocol. A cloud placement alone does
 not qualify a sustained capacity claim. Review failures, dropped arrivals,
 verification, queueing and resource saturation for each advertised workload.

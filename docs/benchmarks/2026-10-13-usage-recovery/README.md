@@ -63,7 +63,7 @@ copied back after hash verification.
 - [Final verification receipt](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/receipt.json) and [complete log](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/standards.log).
 - [Generated SDK hashes](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/generated-change.json) and [quality measurement](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-usage-recovery/verification/go-quality-report.json).
 - [Accounting implementation](../../../internal/runtime/usage_state.go), [multipart transitions](../../../internal/runtime/usage_multipart.go) and [recovery observations](../../../internal/runtime/usage_recovery.go).
-- [Caller guidance](../../portable-workspace-usage.md) and [ADR 0020](../../adr/0020-binary-object-records.md).
+- [Caller guidance](../../guides/portable-workspace-usage.md) and [ADR 0020](../../adr/0020-binary-object-records.md).
 
 Reproduction deployment: `41538d80-5f73-48a3-a9d1-108e4bd52738`, status `SUCCESS`
 with both targeted tests failing as expected.

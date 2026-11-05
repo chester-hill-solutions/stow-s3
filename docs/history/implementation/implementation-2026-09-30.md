@@ -1,6 +1,6 @@
 # Native filesystem guarded-save increment — 2026-09-30
 
-This receipt belongs to [W02](../../storage-foundation-plan.md). It records the bounded
+This receipt belongs to [W02](../../development/storage-foundation-plan.md). It records the bounded
 native filesystem increment, not completion of the foundation or a deployment.
 Local verification runs on macOS arm64; Linux is a supported native code profile
 but still requires its own physical-host evidence.
@@ -126,4 +126,4 @@ Discarded-reply/orderly-reopen tests are synthetic evidence, not killed-process 
 physical power-loss qualification. Linux execution and two real downstream consumers
 remain open. WASM/in-process TypeScript/S3 managed-save APIs, resource ACLs,
 encryption and historical body holds remain separate work. See the
-[object MCP contract](../../object-mcp-contract.md) and [current plan](../../storage-foundation-plan.md).
+[object MCP contract](../../contracts/object-mcp-contract.md) and [current plan](../../development/storage-foundation-plan.md).
