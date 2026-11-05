@@ -60,10 +60,8 @@ type Authority struct {
 	Mask uint32
 }
 
-// All permits every operation.
 func All() Authority { return Authority{Mask: all} }
 
-// None permits nothing.
 func None() Authority { return Authority{0} }
 
 // ReadOnly permits reading and listing, and nothing that changes state or reaches

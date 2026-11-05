@@ -50,7 +50,7 @@ implementation is correct. Each advertised profile needs behavioral evidence.
 | Native memory, existing puts | Content ETag and expected absence under participating locks. | Volatile; environment authority, no resource ACLs. |
 | Native workspace, existing puts | Content ETag and expected absence under participating locks. | Persistent bytes; arbitrary external-edit CAS and general durable save receipts unqualified. |
 | Custom public Store | Conditional comparison only with positive optional support. | Adapter behavior/profile evidence required; support does not certify durability or richer guards. |
-| Existing WASM/embedded wrapper | Forwarded ETag conditions with explicit older-host refusal. | Backend-dependent; no managed identity or resource ACL guarantee. |
+| WASM/embedded memory, managed read/save | Runtime/resource-bound opaque tokens retain core observations for publication comparison. | Volatile; at most 256 observations per runtime, expiring after 15 minutes. No durable request receipts or resource ACL guarantee. Older/custom hosts must advertise support. |
 | Protected native/Railway/Workers | Target, unimplemented qualification. | Trusted namespace/policy, encryption and durable recovery require their own gates. |
 
 The bounded native managed-save slices qualify memory and the owned filesystem
@@ -69,8 +69,9 @@ changes after enrollment, not all earlier ABA history or arbitrary host writes.
 See [usage and fixed retention limits](portable-workspace-usage.md#filesystem-save-receipts-and-recovery)
 and [dated local evidence](implementation-2026-09-30.md). The
 [native object MCP profile](object-mcp-contract.md) exposes these filesystem
-operations through a thin adapter; existing workspace MCP and WASM/in-process
-TypeScript/S3 profiles do not expose the richer managed-save API.
+operations through a thin adapter. WASM/in-process TypeScript exposes the memory-backed
+managed-save profile through bounded observation tokens; request keys and durable
+replay remain refused. Existing workspace MCP and S3 profiles do not expose this API.
 
 ## Trusted identity
 

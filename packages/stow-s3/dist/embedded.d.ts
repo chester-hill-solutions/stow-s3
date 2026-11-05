@@ -1,3 +1,4 @@
+import type { EmbeddedSaveObservation, EmbeddedSaveOptions, EmbeddedSaveResult } from "./embedded-saves.js";
 export declare const EMBEDDED_PROTOCOL_VERSION = 1;
 export declare const EMBEDDED_BINARY_PROTOCOL_VERSION = 2;
 export interface EmbeddedBinaryResponse {
@@ -40,8 +41,8 @@ export interface EmbeddedCapabilities {
     /**
      * Whether the underlying runtime can compare an observation atomically at
      * publication. This is distinct from retained save-request receipts and does
-     * not promise replay resolution. These fields report underlying support;
-     * managed-save operations are not yet exposed by this WASM/TypeScript bridge.
+     * not promise replay resolution. These fields report underlying support; managed-save methods below refuse
+     * operations whose required guarantees are unavailable.
      * Absent on older bridges. A strict caller must refuse unsupported guarantees.
      */
     guardedSaves?: boolean;
@@ -113,12 +114,31 @@ export declare class EmbeddedStow {
     headObject(bucket: string, key: string): EmbeddedObject;
     listObjects(bucket: string, options?: EmbeddedListOptions): EmbeddedObjectPage;
     deleteObject(bucket: string, key: string): void;
+    /**
+     * Observe an object, or its absence, before changing it.
+     *
+     * The bytes come back with the observation, so a caller cannot read one version
+     * and save against another.
+     */
+    readForSave(bucket: string, key: string): EmbeddedSaveObservation;
+    /**
+     * Publish a save that compares at publication, or replaces deliberately.
+     *
+     * A replacement publishes without comparison and still enforces authority and
+     * quotas. Durable replay additionally requires retained request receipts.
+     */
+    saveObject(bucket: string, key: string, data: Uint8Array, options?: EmbeddedSaveOptions): EmbeddedSaveResult;
+    /** Ask what a request key did, instead of writing again. */
+    resolveSave(bucket: string, key: string, requestKey: string): EmbeddedSaveResult;
+    /** Drop a token this caller will not use, rather than waiting for its expiry. */
+    releaseObservation(observationToken: string): void;
+    private requireGuardedSaves;
     copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, destinationKey: string): EmbeddedObject;
     reset(): void;
     close(): void;
     private invoke;
     private ensureOpen;
 }
-export declare function decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array): T;
+export declare function decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array, operation?: unknown): T;
 export declare function fromBridgeObject(object: BridgeObject): EmbeddedObject;
 //# sourceMappingURL=embedded.d.ts.map

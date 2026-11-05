@@ -100,6 +100,10 @@ class AsyncEmbeddedStow {
   putObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedPutOptions, call?: WorkerCallOptions | undefined): Promise<EmbeddedObject>;
   getObject(bucket: string, key: string, options?: WorkerCallOptions | undefined): Promise<EmbeddedObject>;
   getObjectRange(bucket: string, key: string, range: { offset: number; length: number; }, options?: WorkerCallOptions | undefined): Promise<EmbeddedObject>;
+  readForSave(bucket: string, key: string, call?: WorkerCallOptions | undefined): Promise<EmbeddedSaveObservation>;
+  saveObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedSaveOptions, call?: WorkerCallOptions | undefined): Promise<EmbeddedSaveResult>;
+  resolveSave(bucket: string, key: string, requestKey: string, call?: WorkerCallOptions | undefined): Promise<EmbeddedSaveResult>;
+  releaseObservation(observationToken: string, call?: WorkerCallOptions | undefined): Promise<void>;
   putObjectStream(bucket: string, key: string, source: Uint8Array<ArrayBufferLike> | AsyncIterable<Uint8Array<ArrayBufferLike>>, options: EmbeddedStreamPutOptions): Promise<EmbeddedObject>;
   getObjectStream(bucket: string, key: string, options?: { signal?: AbortSignal | undefined; }): Promise<EmbeddedObjectStream>;
   headObject(bucket: string, key: string): Promise<EmbeddedObject>;
@@ -330,6 +334,72 @@ getObjectRange(bucket: string, key: string, range: { offset: number; length: num
 | `options` | `WorkerCallOptions \| undefined` | No | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `Promise<EmbeddedObject>`.
+
+### AsyncEmbeddedStow.readForSave
+
+
+
+```ts
+readForSave(bucket: string, key: string, call?: WorkerCallOptions | undefined): Promise<EmbeddedSaveObservation>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `call` | `WorkerCallOptions \| undefined` | No | — |  |
+
+Returns: `Promise<EmbeddedSaveObservation>`.
+
+### AsyncEmbeddedStow.saveObject
+
+
+
+```ts
+saveObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedSaveOptions, call?: WorkerCallOptions | undefined): Promise<EmbeddedSaveResult>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `EmbeddedSaveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
+| `call` | `WorkerCallOptions \| undefined` | No | — |  |
+
+Returns: `Promise<EmbeddedSaveResult>`.
+
+### AsyncEmbeddedStow.resolveSave
+
+
+
+```ts
+resolveSave(bucket: string, key: string, requestKey: string, call?: WorkerCallOptions | undefined): Promise<EmbeddedSaveResult>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `requestKey` | `string` | Yes | — | Unique persisted request identity for capture or save recovery. |
+| `call` | `WorkerCallOptions \| undefined` | No | — |  |
+
+Returns: `Promise<EmbeddedSaveResult>`.
+
+### AsyncEmbeddedStow.releaseObservation
+
+
+
+```ts
+releaseObservation(observationToken: string, call?: WorkerCallOptions | undefined): Promise<void>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `observationToken` | `string` | Yes | — |  |
+| `call` | `WorkerCallOptions \| undefined` | No | — |  |
+
+Returns: `Promise<void>`.
 
 ### AsyncEmbeddedStow.putObjectStream
 

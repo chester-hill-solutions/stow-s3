@@ -70,6 +70,7 @@ test-python: build
 
 test-wasm: build-wasm
 	$(NPM_INSTALL) && npm run build
+	GOTOOLCHAIN=go$(GO_TOOLCHAIN) GOOS=js GOARCH=wasm go test -exec "$$($(PINNED_GO) env GOROOT)/lib/wasm/go_js_wasm_exec" ./cmd/stow-wasm
 	node --test wasm/runtime.test.mjs
 
 test-agent: build

@@ -115,7 +115,6 @@ func writeBaselineFile(path string, current report) error {
 	return os.WriteFile(path, append(data, '\n'), 0o644)
 }
 
-// measure is the real scan, so run's default is a value.
 func measure() (report, error) { return scan() }
 
 func scan() (report, error) {

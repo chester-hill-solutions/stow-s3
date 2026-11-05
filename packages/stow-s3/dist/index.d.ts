@@ -4,6 +4,7 @@ export { EMBEDDED_PROTOCOL_VERSION, EmbeddedStow, EmbeddedStowError, } from "./e
 export { loadNodeWasmHost, type NodeWasmHost, } from "./node-wasm-host.js";
 export { resetOwnedData, STOW_OWNER_MARKER, StowOwnershipError, } from "./ownership.js";
 export type { EmbeddedBucket, EmbeddedCapabilities, EmbeddedHost, EmbeddedListOptions, EmbeddedObject, EmbeddedObjectPage, EmbeddedPutOptions, EmbeddedStowOptions, EmbeddedUsage, } from "./embedded.js";
+export type { EmbeddedSaveObservation, EmbeddedSaveOptions, EmbeddedSaveResult, } from "./embedded-saves.js";
 export type { AwsSdkV3ConfigOptions, ConnectOptions, ObjectSnapshot, PutFixtureOptions, StartOptions, StowConnection, StowInstance, StowMode, UpstreamConfig, } from "./types.js";
 export { parseReadyLine } from "./start.js";
 export { DEFAULT_SESSION_MAX_BYTES, DEFAULT_SESSION_MAX_OBJECTS, openStow, withStow, } from "./session.js";

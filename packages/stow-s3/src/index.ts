@@ -44,6 +44,12 @@ export type {
 } from "./embedded.js";
 
 export type {
+  EmbeddedSaveObservation,
+  EmbeddedSaveOptions,
+  EmbeddedSaveResult,
+} from "./embedded-saves.js";
+
+export type {
   AwsSdkV3ConfigOptions,
   ConnectOptions,
   ObjectSnapshot,

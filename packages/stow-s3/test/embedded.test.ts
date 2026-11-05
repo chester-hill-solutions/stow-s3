@@ -114,6 +114,79 @@ describe("EmbeddedStow", () => {
     assert.equal(requests.length, 2);
   });
 
+  it("refuses observation-based saves a host cannot honour, and shapes them when it can", () => {
+    const refused: Record<string, unknown>[] = [];
+    const plainHost: EmbeddedHost = {
+      call: (request) => {
+        refused.push(JSON.parse(request) as Record<string, unknown>);
+        return response({ handle: 7, capabilities: {} });
+      },
+    };
+    const plain = EmbeddedStow.open(plainHost);
+    assert.throws(
+      () => plain.readForSave("assets", "a.txt"),
+      (error: unknown) => hasCode(error, "guarded_saves_unsupported"),
+    );
+    assert.throws(
+      () => plain.saveObject("assets", "a.txt", new Uint8Array(), { replace: true }),
+      (error: unknown) => hasCode(error, "guarded_saves_unsupported"),
+    );
+    assert.throws(
+      () => plain.resolveSave("assets", "a.txt", "rk-1"),
+      (error: unknown) => hasCode(error, "save_requests_unsupported"),
+    );
+    assert.equal(refused.length, 1, "a refused save must not reach the bridge");
+    plain.close();
+
+    const sent: Record<string, unknown>[] = [];
+    const capableHost: EmbeddedHost = {
+      call: (request) => {
+        const parsed = JSON.parse(request) as Record<string, unknown>;
+        sent.push(parsed);
+        if (parsed.op === "open") {
+          return response({ handle: 7, capabilities: { guardedSaves: true } });
+        }
+        if (parsed.op === "readForSave") {
+          return response({
+            object: { bucket: "assets", key: "a.txt", size: 3, etag: "'" + 'e' + "'" },
+            absent: false,
+            observationToken: "tok-1",
+          });
+        }
+        return response({
+          object: { bucket: "assets", key: "a.txt", size: 3, etag: "'" + 'e' + "'" },
+          outcome: "committed",
+          replayed: false,
+        });
+      },
+    };
+    const capable = EmbeddedStow.open(capableHost);
+    const observation = capable.readForSave("assets", "a.txt");
+    assert.equal(observation.observationToken, "tok-1");
+    assert.equal(observation.absent, false);
+    const saved = capable.saveObject("assets", "a.txt", new TextEncoder().encode("new"), {
+      observationToken: "tok-1",
+      contentType: "text/plain",
+    });
+    assert.equal(saved.outcome, "committed");
+    const saveRequest = sent.find((request) => request.op === "saveObject");
+    assert.equal(saveRequest?.observationToken, "tok-1");
+    assert.equal(saveRequest?.replace, false);
+    assert.equal(saveRequest?.contentType, "text/plain");
+
+    // An unobserved save and a request key a host cannot retain never reach it.
+    assert.throws(
+      () => capable.saveObject("assets", "a.txt", new Uint8Array(), {}),
+      (error: unknown) => hasCode(error, "invalid_save_condition"),
+    );
+    assert.throws(
+      () => capable.saveObject("assets", "a.txt", new Uint8Array(), { replace: true, requestKey: "rk-1" }),
+      (error: unknown) => hasCode(error, "save_requests_unsupported"),
+    );
+    assert.equal(sent.filter((request) => request.op === "saveObject").length, 1);
+    capable.close();
+  });
+
   it("rejects protocol version mismatches", () => {
     const host: EmbeddedHost = {
       call: () => response({ handle: 7, capabilities: {} }, 2),

@@ -77,7 +77,6 @@ type Input struct {
 	Capabilities  Capabilities
 }
 
-// New builds the protocol message.
 func New(input Input) Message {
 	return Message{
 		ProtocolVersion: ProtocolVersion,

@@ -76,7 +76,7 @@ interface BridgeObject  extends Omit<EmbeddedObject, "data"> {
 
 
 ```ts
-decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array<ArrayBufferLike> | undefined): T
+decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array<ArrayBufferLike> | undefined, operation?: unknown): T
 ```
 
 | Parameter | Type | Required | Default | Meaning |
@@ -84,6 +84,7 @@ decodeEmbeddedResponse<T>(parsed: unknown, version: number, payload?: Uint8Array
 | `parsed` | `unknown` | Yes | — |  |
 | `version` | `number` | Yes | — |  |
 | `payload` | `Uint8Array<ArrayBufferLike> \| undefined` | No | — |  |
+| `operation` | `unknown` | No | — |  |
 
 Returns: `T`.
 
@@ -311,6 +312,10 @@ class EmbeddedStow {
   headObject(bucket: string, key: string): EmbeddedObject;
   listObjects(bucket: string, options?: EmbeddedListOptions): EmbeddedObjectPage;
   deleteObject(bucket: string, key: string): void;
+  readForSave(bucket: string, key: string): EmbeddedSaveObservation;
+  saveObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedSaveOptions): EmbeddedSaveResult;
+  resolveSave(bucket: string, key: string, requestKey: string): EmbeddedSaveResult;
+  releaseObservation(observationToken: string): void;
   copyObject(sourceBucket: string, sourceKey: string, destinationBucket: string, destinationKey: string): EmbeddedObject;
   reset(): void;
   close(): void;
@@ -468,6 +473,68 @@ deleteObject(bucket: string, key: string): void
 | --- | --- | --- | --- | --- |
 | `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
 | `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `void`.
+
+### EmbeddedStow.readForSave
+
+Observe an object, or its absence, before changing it.
+
+```ts
+readForSave(bucket: string, key: string): EmbeddedSaveObservation
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `EmbeddedSaveObservation`.
+
+### EmbeddedStow.saveObject
+
+Publish a save that compares at publication, or replaces deliberately.
+
+```ts
+saveObject(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: EmbeddedSaveOptions): EmbeddedSaveResult
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `EmbeddedSaveOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `EmbeddedSaveResult`.
+
+### EmbeddedStow.resolveSave
+
+Ask what a request key did, instead of writing again.
+
+```ts
+resolveSave(bucket: string, key: string, requestKey: string): EmbeddedSaveResult
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `requestKey` | `string` | Yes | — | Unique persisted request identity for capture or save recovery. |
+
+Returns: `EmbeddedSaveResult`.
+
+### EmbeddedStow.releaseObservation
+
+Drop a token this caller will not use, rather than waiting for its expiry.
+
+```ts
+releaseObservation(observationToken: string): void
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `observationToken` | `string` | Yes | — |  |
 
 Returns: `void`.
 

@@ -24,7 +24,6 @@ type Client interface {
 	ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error)
 }
 
-// S3Client implements Client with the AWS SDK for Go v2.
 type S3Client struct {
 	s3     *s3.Client
 	region string
