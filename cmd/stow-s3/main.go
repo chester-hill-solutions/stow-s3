@@ -104,7 +104,7 @@ func parseBackend(value string) (runtime.Backend, error) {
 		// Reachable as a value but not constructible here: the workspace backend
 		// needs options this command does not carry, and guessing at them would
 		// hand a caller a directory in a shape they did not ask for. See
-		// docs/architecture/environment-implementation.md M1.2.
+		// docs/history/architecture/environment-implementation.md M1.2.
 		return "", fmt.Errorf("--backend %q is not selectable from the CLI yet; use the embedded API", value)
 	default:
 		return "", fmt.Errorf("invalid --backend %q (want filesystem or memory)", value)

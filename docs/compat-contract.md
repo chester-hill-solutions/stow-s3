@@ -475,9 +475,9 @@ See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001
 |--------|-------|--------|
 | **local mode** (the default, always) | Local store only | Local store only |
 | **readThroughCache** | Local miss → fetch upstream, cache locally, serve; hit → serve local with optional revalidation | **Local store only** unless `allowLiveWrites: true` |
-| **mirrorWrites** | Same read-through behavior | Local first; upstream requires live-write consent and durable outbox; startup warning required |
+| **mirrorWrites** | Same read-through behavior | Refused when upstream use is enabled for the object and consent is absent; local when upstream use is unavailable or unauthorized; upstream requires live-write consent and durable outbox; startup warning required |
 
-A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled` and writes stay local.
+A `mirrorWrites` policy configures routing; it does not authorize propagation. Within run-through mode, upstream writes additionally require live-write consent (`STOW_ALLOW_LIVE_WRITES=true` or `--allow-live-writes`), and without it the effective policy reports `mirrorWrites-disabled`: a mutation is refused when upstream use is enabled for the object. With no upstream client, offline mode, or a denied upstream-read grant/policy, it stays local. Consent does not replace the applicable authority or durable-outbox requirements.
 
 <!-- repo-only:start -->
 See `docs/adr/0005-live-write-requires-explicit-consent.md`.
