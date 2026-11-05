@@ -76,6 +76,7 @@ export function parseReadyMessage(line) {
             conditionalWrites: requireBoolean(capabilities, "conditionalWrites"),
             presignedUrls: requireBoolean(capabilities, "presignedUrls"),
             maxBytes: requireNumber(capabilities, "maxBytes"),
+            maxMultipartUploads: capabilities.maxMultipartUploads === undefined ? 0 : requireNumber(capabilities, "maxMultipartUploads"),
             maxObjects: requireNumber(capabilities, "maxObjects"),
             maxRequestBytes: requireNumber(capabilities, "maxRequestBytes"),
             maxConcurrentRequests: capabilities.maxConcurrentRequests === undefined ? 0 : requireNumber(capabilities, "maxConcurrentRequests"),

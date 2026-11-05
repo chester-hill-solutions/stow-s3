@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/authority"
+	"github.com/chester-hill-solutions/stow-s3/internal/capacity"
 	"github.com/chester-hill-solutions/stow-s3/internal/runthrough"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
@@ -112,11 +113,8 @@ func bodyReadError(err error, resource string, limit int64) s3Error {
 
 // storageErrorCase maps one sentinel to the S3 error a client should see.
 //
-// This was a fourteen-case if/else chain, and adding the authority refusal
-// pushed it over the complexity limit. A table is the right shape for it anyway:
-// the entries differ only in which sentinel they match and what they say, so a
-// new mapping is a new row rather than a new branch, and the order — which
-// matters, because the first match wins — is visible at a glance.
+// A table rather than a branch per sentinel, so a new mapping is a new row and the
+// order — which matters, because the first match wins — is visible at a glance.
 type storageErrorCase struct {
 	sentinel   error
 	code       string
@@ -137,11 +135,14 @@ var storageErrorCases = []storageErrorCase{
 	{storage.ErrEntityTooSmall, "EntityTooSmall", "Your proposed upload is smaller than the minimum allowed object size", http.StatusBadRequest},
 	{storage.ErrUploadNotFound, "NoSuchUpload", "The specified multipart upload does not exist", http.StatusNotFound},
 	{storage.ErrNoSuchUpload, "NoSuchUpload", "The specified multipart upload does not exist", http.StatusNotFound},
+	{runtime.ErrResourceUnresolved, "NoSuchUpload", "The specified multipart upload does not exist", http.StatusNotFound},
 	{storage.ErrPreconditionFailed, "PreconditionFailed", "At least one of the pre-conditions you specified did not hold", http.StatusPreconditionFailed},
 	{runtime.ErrQuotaExceeded, "InsufficientStorage", "The runtime storage quota was exceeded", http.StatusInsufficientStorage},
+	{capacity.ErrFull, "InsufficientStorage", "The storage namespace capacity was exceeded", http.StatusInsufficientStorage},
 	{runtime.ErrClosed, "ServiceUnavailable", "The runtime is closed", http.StatusServiceUnavailable},
 	{runtime.ErrInvalidListLimit, "InvalidArgument", "The list limit is invalid", http.StatusBadRequest},
 	{runtime.ErrMultipartUnsupported, "NotImplemented", "Multipart operations are not supported by this runtime profile", http.StatusNotImplemented},
+	{runthrough.ErrLiveWritesDisabled, "AccessDenied", "Access Denied: live writes are not permitted by this environment", http.StatusForbidden},
 }
 
 func mapStorageError(err error, resource string) s3Error {
