@@ -38,7 +38,7 @@ func StartupBanner(cfg Config, mode Mode) string {
 	case WritePolicyMirrorWrites:
 		fmt.Fprintf(&b, "  WARNING: mirrorWrites propagates supported mutations upstream\n")
 	case WritePolicyMirrorWritesDisabled:
-		fmt.Fprintf(&b, "  WARNING: mirrorWrites is configured but propagation is disabled, so writes stay local\n")
+		fmt.Fprintf(&b, "  WARNING: mirrorWrites is configured but upstream writes are not authorized; mutations are refused when upstream use is enabled for the object and stay local otherwise\n")
 	}
 	fmt.Fprintf(&b, "  write policy: %s\n", writePolicy)
 	if mode == ModeLocal {

@@ -8,7 +8,18 @@ and discuss substantial behavior changes before implementation. Read the
 ## Build and test
 
 Go is pinned in `.go-version`; `make` selects that toolchain. Use Node 20 or newer
-for the client and site, and Python 3.10 or newer for the Python client.
+for the client, Node 22.18 or newer for the Cloudflare site tooling, and
+Python 3.10 or newer for the Python client.
+
+Coverage also selects `.go-version` and puts that installation's `bin` first in
+the coverage subprocess's `PATH`. Go 1.25 builds some tools, including `covdata`,
+on demand; an absent prebuilt `covdata` is not evidence of a broken installation.
+With an older launcher and an automatically switched Go 1.25.6, a nested coverage
+command can otherwise use the older `go` outside the module and fail with
+`no such tool "covdata"`. See [the upstream issue](https://github.com/golang/go/issues/75031).
+If pinned-toolchain selection fails, install the full Go version in `.go-version`
+from [Go downloads](https://go.dev/dl/) and retry. Do not copy a different version's
+tools into the module cache or remove testless packages from coverage.
 
 ```sh
 make build build-wasm

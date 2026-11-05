@@ -9,6 +9,7 @@ import { stowBinaryAvailable } from "../dist/bin.js";
 import { verifyObjectReadable } from "../dist/instance.js";
 import { Stow, StowOwnershipError } from "../dist/index.js";
 import { parseReadyLine } from "../dist/start.js";
+import { assertListPage, toListPage } from "./shared-corpus-list.js";
 import { runSharedCorpus } from "./shared-corpus.js";
 
 describe("parseReadyLine", () => {
@@ -291,5 +292,23 @@ integration("integration", { skip: !stowBinaryAvailable() }, () => {
       StowOwnershipError,
     );
     assert.equal(await readFile(keep, "utf8"), "not stow data");
+  });
+});
+
+
+describe("shared listing wire assertions", () => {
+  it("requires V2 KeyCount even when the wire response omits it", () => {
+    const page = toListPage({ IsTruncated: false }, undefined, undefined);
+    assert.throws(() => assertListPage(page, { isTruncated: false, keyCount: 0 }, 0, "v2"), /key count/);
+  });
+  it("requires IsTruncated on final pages in both listing versions", () => {
+    const page = toListPage({}, undefined, 0);
+    for (const version of ["v1", "v2"] as const) {
+      assert.throws(() => assertListPage(page, { isTruncated: false, keyCount: 0 }, 0, version), /truncation/);
+    }
+  });
+  it("accepts V1 without the unsupported KeyCount field", () => {
+    const page = toListPage({ IsTruncated: false }, undefined, undefined);
+    assert.doesNotThrow(() => assertListPage(page, { isTruncated: false, keyCount: 0 }, 0, "v1"));
   });
 });
