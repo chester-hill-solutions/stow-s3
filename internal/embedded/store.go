@@ -251,15 +251,17 @@ func (a *storeAdapter) DeleteObject(ctx context.Context, bucket, key string) err
 
 func (a *storeAdapter) ListObjectsV2(ctx context.Context, bucket string, options storage.ListOptions) (*storage.ListResult, error) {
 	page, err := a.store.ListObjects(ctx, bucket, ListOptions{
-		Prefix: options.Prefix,
-		Cursor: options.ContinuationToken,
-		Limit:  options.MaxKeys,
+		Prefix:    options.Prefix,
+		Delimiter: options.Delimiter,
+		Cursor:    options.ContinuationToken,
+		Limit:     options.MaxKeys,
 	})
 	if err != nil {
 		return nil, translate(err)
 	}
 	result := &storage.ListResult{
 		Objects:               make([]storage.ObjectMeta, 0, len(page.Objects)),
+		CommonPrefixes:        append([]string(nil), page.CommonPrefixes...),
 		IsTruncated:           page.Truncated,
 		ContinuationToken:     options.ContinuationToken,
 		NextContinuationToken: page.NextCursor,

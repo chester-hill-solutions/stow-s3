@@ -187,6 +187,28 @@ describe("EmbeddedStow", () => {
     capable.close();
   });
 
+  it("sends the delimiter for a level listing and maps the grouped rows", () => {
+    const requests: Record<string, unknown>[] = [];
+    const host: EmbeddedHost = {
+      call: (request) => {
+        const parsed = JSON.parse(request) as Record<string, unknown>;
+        requests.push(parsed);
+        if (parsed.op === "open") {
+          return response({ handle: 7, capabilities: {} });
+        }
+        return response({ objects: [], truncated: false, commonPrefixes: ["docs/"] });
+      },
+    };
+    const stow = EmbeddedStow.open(host);
+    const page = stow.listObjects("assets", { prefix: "d", delimiter: "/", limit: 5 });
+    assert.deepEqual(page.commonPrefixes, ["docs/"]);
+    const list = requests.at(-1)?.list as Record<string, unknown>;
+    assert.equal(list.delimiter, "/");
+    assert.equal(list.prefix, "d");
+    assert.equal(list.limit, 5);
+    stow.close();
+  });
+
   it("rejects protocol version mismatches", () => {
     const host: EmbeddedHost = {
       call: () => response({ handle: 7, capabilities: {} }, 2),

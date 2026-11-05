@@ -87,11 +87,37 @@ export class ContentObjectHost implements HostObjectStoreBridge {
     this.catalog.requireBucket(catalog, bucket);
     const options = isRecord(raw) ? raw : {};
     const prefix = typeof options.prefix === "string" ? options.prefix : "";
+    const delimiter = typeof options.delimiter === "string" ? options.delimiter : "";
     const after = typeof options.cursor === "string" ? options.cursor : "";
     const limit = typeof options.limit === "number" && options.limit > 0 ? options.limit : 1000;
-    const all = catalog.objects.filter((entry) => entry.object.bucket === bucket && entry.object.key.startsWith(prefix) && entry.object.key > after).map((entry) => entry.object).sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
-    const objects = all.slice(0, limit);
-    return { objects, truncated: all.length > limit, nextCursor: all.length > limit ? objects.at(-1)?.key : undefined };
+    // One row per key, or per delimiter group, so a page can end on a group and the
+    // cursor names that group rather than a key inside it. Handing back a key from
+    // inside a group would repeat the group on the next page.
+    const rows = new Map<string, EmbeddedObject | null>();
+    for (const entry of catalog.objects) {
+      const { object } = entry;
+      if (object.bucket !== bucket || !object.key.startsWith(prefix)) continue;
+      const rest = object.key.slice(prefix.length);
+      const cut = delimiter === "" ? -1 : rest.indexOf(delimiter);
+      if (cut >= 0) {
+        rows.set(prefix + rest.slice(0, cut + delimiter.length), null);
+        continue;
+      }
+      rows.set(object.key, object);
+    }
+    const encoder = new TextEncoder();
+    const cursorBytes = encoder.encode(after);
+    const ordered = [...rows.entries()].map(([value, object]) => ({ value, object, bytes: encoder.encode(value) }))
+      .filter((row) => compareKeyBytes(row.bytes, cursorBytes) > 0)
+      .sort((left, right) => compareKeyBytes(left.bytes, right.bytes));
+    const page = ordered.slice(0, limit);
+    const truncated = ordered.length > limit;
+    return {
+      objects: page.flatMap(({ object }) => (object === null ? [] : [object])),
+      commonPrefixes: page.flatMap(({ value, object }) => (object === null ? [value] : [])),
+      truncated,
+      nextCursor: truncated ? page[page.length - 1]?.value : undefined,
+    };
   }
   private startPut(request: Record<string, unknown>): { token: string } {
     this.checkStreamLimit();
@@ -169,4 +195,13 @@ function numberField(request: Record<string, unknown>, key: string): number {
 }
 function replaceEntry(catalog: ObjectCatalog, entry: { id: string; object: EmbeddedObject }) {
   return [...catalog.objects.filter((item) => item.object.bucket !== entry.object.bucket || item.object.key !== entry.object.key), entry];
+}
+
+// Match the shared Go paginator: S3 key and cursor order is UTF-8 byte order.
+function compareKeyBytes(left: Uint8Array, right: Uint8Array): number {
+  for (let index = 0; index < Math.min(left.length, right.length); index += 1) {
+    const difference = (left[index] ?? 0) - (right[index] ?? 0);
+    if (difference !== 0) return difference;
+  }
+  return left.length - right.length;
 }

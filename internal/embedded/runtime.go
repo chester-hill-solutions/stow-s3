@@ -102,9 +102,10 @@ func (r *Runtime) HeadObject(ctx context.Context, bucket, key string) (Object, e
 
 func (r *Runtime) ListObjects(ctx context.Context, bucket string, options ListOptions) (ObjectPage, error) {
 	page, err := r.inner.ListObjects(ctx, bucket, stowruntime.ListOptions{
-		Prefix: options.Prefix,
-		Cursor: options.Cursor,
-		Limit:  options.Limit,
+		Prefix:    options.Prefix,
+		Delimiter: options.Delimiter,
+		Cursor:    options.Cursor,
+		Limit:     options.Limit,
 	})
 	if err != nil {
 		return ObjectPage{}, mapError(err)
@@ -114,9 +115,10 @@ func (r *Runtime) ListObjects(ctx context.Context, bucket string, options ListOp
 		objects = append(objects, objectOf(object))
 	}
 	return ObjectPage{
-		Objects:    objects,
-		Truncated:  page.Truncated,
-		NextCursor: page.NextCursor,
+		Objects:        objects,
+		Truncated:      page.Truncated,
+		NextCursor:     page.NextCursor,
+		CommonPrefixes: append([]string(nil), page.CommonPrefixes...),
 	}, nil
 }
 

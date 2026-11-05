@@ -1,3 +1,4 @@
+import { base64Alphabet, bytesToBase64 } from "./embedded-base64.js";
 import type {
   BridgeSaveObservation,
   BridgeSaveResult,
@@ -97,6 +98,8 @@ export interface EmbeddedPutOptions {
 
 export interface EmbeddedListOptions {
   prefix?: string;
+  /** Groups keys that share it into `commonPrefixes`; empty lists every key. */
+  delimiter?: string;
   cursor?: string;
   limit?: number;
 }
@@ -105,6 +108,8 @@ export interface EmbeddedObjectPage {
   objects: EmbeddedObject[];
   truncated: boolean;
   nextCursor?: string;
+  /** The delimiter groups this page collapsed, in row order. */
+  commonPrefixes?: string[];
 }
 
 export interface BridgeObject extends Omit<EmbeddedObject, "data"> {
@@ -115,6 +120,7 @@ interface BridgeObjectPage {
   objects: BridgeObject[];
   truncated: boolean;
   nextCursor?: string;
+  commonPrefixes?: string[];
 }
 
 interface OpenResult {
@@ -122,7 +128,7 @@ interface OpenResult {
   capabilities: EmbeddedCapabilities;
 }
 
-const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 
 export class EmbeddedStowError extends Error {
   readonly code: string;
@@ -223,12 +229,18 @@ export class EmbeddedStow {
     const result = this.invoke<BridgeObjectPage>({
       op: "listObjects",
       bucket,
-      list: { prefix: options.prefix, cursor: options.cursor, limit: options.limit },
+      list: {
+        prefix: options.prefix,
+        delimiter: options.delimiter,
+        cursor: options.cursor,
+        limit: options.limit,
+      },
     });
     return {
       objects: result.objects.map(fromBridgeObject),
       truncated: result.truncated,
       nextCursor: result.nextCursor,
+      commonPrefixes: result.commonPrefixes ?? [],
     };
   }
 
@@ -442,21 +454,6 @@ export function fromBridgeObject(object: BridgeObject): EmbeddedObject {
   };
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
-  let result = "";
-  for (let index = 0; index < bytes.length; index += 3) {
-    const first = bytes[index] ?? 0;
-    const hasSecond = index + 1 < bytes.length;
-    const second = hasSecond ? bytes[index + 1] ?? 0 : 0;
-    const hasThird = index + 2 < bytes.length;
-    const third = hasThird ? bytes[index + 2] ?? 0 : 0;
-    result += base64Alphabet.charAt(first >> 2);
-    result += base64Alphabet.charAt(((first & 3) << 4) | (second >> 4));
-    result += hasSecond ? base64Alphabet.charAt(((second & 15) << 2) | (third >> 6)) : "=";
-    result += hasThird ? base64Alphabet.charAt(third & 63) : "=";
-  }
-  return result;
-}
 
 function base64ToBytes(value: string): Uint8Array {
   const normalized = value.replace(/[\r\n]/g, "");
