@@ -60,13 +60,16 @@ type openResult struct {
 }
 
 type capabilitiesResult struct {
-	Backend           stow.Backend `json:"backend"`
-	MaxBytes          int64        `json:"maxBytes"`
-	MaxObjects        int64        `json:"maxObjects"`
-	Persistent        bool         `json:"persistent"`
-	Multipart         bool         `json:"multipart"`
-	Upstream          bool         `json:"upstream"`
-	ConditionalWrites bool         `json:"conditionalWrites"`
+	Backend             stow.Backend `json:"backend"`
+	MaxBytes            int64        `json:"maxBytes"`
+	MaxObjects          int64        `json:"maxObjects"`
+	Persistent          bool         `json:"persistent"`
+	Multipart           bool         `json:"multipart"`
+	Upstream            bool         `json:"upstream"`
+	ConditionalWrites   bool         `json:"conditionalWrites"`
+	GuardedSaves        bool         `json:"guardedSaves"`
+	DurableSaveRequests bool         `json:"durableSaveRequests"`
+	RecoveryHolds       bool         `json:"recoveryHolds"`
 }
 
 type objectResult struct {
@@ -179,13 +182,16 @@ func openRuntime(req request) (json.RawMessage, error) {
 
 func capabilities(value stow.Capabilities) capabilitiesResult {
 	return capabilitiesResult{
-		Backend:           value.Backend,
-		MaxBytes:          value.MaxBytes,
-		MaxObjects:        value.MaxObjects,
-		Persistent:        value.Persistent,
-		Multipart:         value.Multipart,
-		Upstream:          value.Upstream,
-		ConditionalWrites: value.ConditionalWrites,
+		Backend:             value.Backend,
+		MaxBytes:            value.MaxBytes,
+		MaxObjects:          value.MaxObjects,
+		Persistent:          value.Persistent,
+		Multipart:           value.Multipart,
+		Upstream:            value.Upstream,
+		ConditionalWrites:   value.ConditionalWrites,
+		GuardedSaves:        value.GuardedSaves,
+		DurableSaveRequests: value.DurableSaveRequests,
+		RecoveryHolds:       value.RecoveryHolds,
 	}
 }
 

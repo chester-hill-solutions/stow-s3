@@ -37,6 +37,18 @@ export interface EmbeddedCapabilities {
     upstream: boolean;
     /** Absent on older bridges, which cannot safely accept write conditions. */
     conditionalWrites?: boolean;
+    /**
+     * Whether the underlying runtime can compare an observation atomically at
+     * publication. This is distinct from retained save-request receipts and does
+     * not promise replay resolution. These fields report underlying support;
+     * managed-save operations are not yet exposed by this WASM/TypeScript bridge.
+     * Absent on older bridges. A strict caller must refuse unsupported guarantees.
+     */
+    guardedSaves?: boolean;
+    /** Whether a save request key is retained, so a lost reply can be resolved. */
+    durableSaveRequests?: boolean;
+    /** Whether an observed object's bytes can be protected from mutation until release. */
+    recoveryHolds?: boolean;
     /** Caller-owned maintenance operations offered by the ready-made persistent worker. */
     hostMaintenance?: boolean;
 }

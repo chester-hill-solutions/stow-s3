@@ -27,7 +27,11 @@ test("EmbeddedStow drives the real memory runtime", async () => {
   let embedded;
   try {
     embedded = EmbeddedStow.open(host, { maxBytes: 10, maxObjects: 2 });
-    assert.equal(embedded.capabilities().conditionalWrites, true);
+    const capabilities = embedded.capabilities();
+    assert.equal(capabilities.conditionalWrites, true);
+    assert.equal(capabilities.guardedSaves, true);
+    assert.equal(capabilities.durableSaveRequests, false);
+    assert.equal(capabilities.recoveryHolds, false);
     embedded.createBucket("assets");
     const put = embedded.putObject(
       "assets",
