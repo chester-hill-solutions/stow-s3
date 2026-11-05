@@ -39,14 +39,42 @@ func profileCheckpointRun(t *testing.T, caseName string, fileCount, fileSize, ch
 	defer w.Close()
 	target := captureTarget{dir: w.Dir(), registryDir: registry, workspaceID: w.ID()}
 	parentID := profileParentCheckpoint(t, target, fileSize, changedFiles)
-	beforeLogical, beforeAllocated := checkpointProfileTreeBytes(t, filepath.Join(registry, "checkpoints"))
-	manifest := profileCheckpointPhases(t, target, CheckpointOptions{ParentID: parentID})
-	afterLogical, afterAllocated := checkpointProfileTreeBytes(t, filepath.Join(registry, "checkpoints"))
+	var parent *CheckpointManifest
+	if parentID != "" {
+		loaded, err := LoadCheckpoint(registry, parentID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		parent = &loaded
+	}
+	beforeLogical, beforeAllocated, beforeUnique := checkpointProfileTreeBytes(t, filepath.Join(registry, "checkpoints"))
+	manifest := profileCheckpointPhases(t, target, CheckpointOptions{ParentID: parentID}, parent)
+	afterLogical, afterAllocated, afterUnique := checkpointProfileTreeBytes(t, filepath.Join(registry, "checkpoints"))
 	inputBytes := int64(fileCount * fileSize)
 	verificationTime := profileVerifyCapture(t, w.Dir(), manifest)
 	recoveryTime := profileRestoreCheckpoint(t, registry, manifest, inputBytes)
-	t.Logf("workload=%s files=%d input_bytes=%d payload_bytes_read_estimate=%d payload_bytes_copied=%d added_persistent_logical_bytes=%d added_persistent_allocated_bytes=%d verification=%s restore=%s",
-		caseName, fileCount, inputBytes, inputBytes*3, inputBytes, afterLogical-beforeLogical, afterAllocated-beforeAllocated, verificationTime, recoveryTime)
+	copyBytes := profileCopyEligibilityBytes(manifest.Files, parent)
+	t.Logf("workload=%s files=%d input_bytes=%d payload_bytes_read_no_fallback_estimate=%d payload_bytes_copy_eligibility_estimate=%d added_persistent_logical_bytes=%d added_persistent_allocated_path_bytes=%d added_unique_allocated_bytes=%d verification=%s restore=%s",
+		caseName, fileCount, inputBytes, inputBytes*3, copyBytes, afterLogical-beforeLogical, afterAllocated-beforeAllocated, afterUnique-beforeUnique, verificationTime, recoveryTime)
+}
+
+// profileCopyEligibilityBytes estimates copying when every verified eligible link succeeds.
+// A rejected parent or failed link adds parent reads and a fallback source copy.
+func profileCopyEligibilityBytes(files []CheckpointFile, parent *CheckpointManifest) int64 {
+	var copied int64
+	parentFiles := make(map[string]CheckpointFile)
+	if parent != nil {
+		for _, file := range parent.Files {
+			parentFiles[file.Path] = file
+		}
+	}
+	for _, file := range files {
+		parentFile, found := parentFiles[file.Path]
+		if !found || parentFile.Size != file.Size || parentFile.Mode != file.Mode || parentFile.SHA256 != file.SHA256 {
+			copied += file.Size
+		}
+	}
+	return copied
 }
 
 func profileWorkspace(t *testing.T, fileCount, fileSize int, registry string) *Workspace {
@@ -139,7 +167,7 @@ func checkpointProfileShape(name string) (int, int, int, bool) {
 	}
 }
 
-func profileCheckpointPhases(t *testing.T, target captureTarget, options CheckpointOptions) CheckpointManifest {
+func profileCheckpointPhases(t *testing.T, target captureTarget, options CheckpointOptions, parent *CheckpointManifest) CheckpointManifest {
 	ctx := context.Background()
 	source, err := rooted.Open(target.dir)
 	if err != nil {
@@ -168,7 +196,8 @@ func profileCheckpointPhases(t *testing.T, target captureTarget, options Checkpo
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(stage)
-	phase("copy/hash", copyCheckpointFiles(ctx, source, stage, files))
+	plan := checkpointCopyPlan{source: source, target: stage, registryDir: target.registryDir, parent: parent}
+	phase("copy/hash", copyCheckpointFilesFromParent(ctx, files, plan))
 	manifest, err := target.stageManifest(stage, files, excluded, options)
 	if err != nil {
 		t.Fatal(err)
@@ -182,9 +211,10 @@ func profileCheckpointPhases(t *testing.T, target captureTarget, options Checkpo
 	return manifest
 }
 
-func checkpointProfileTreeBytes(t *testing.T, root string) (int64, int64) {
+func checkpointProfileTreeBytes(t *testing.T, root string) (int64, int64, int64) {
 	t.Helper()
-	var logical, allocated int64
+	var logical, allocated, uniqueAllocated int64
+	seen := make(map[string]bool)
 	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -210,13 +240,36 @@ func checkpointProfileTreeBytes(t *testing.T, root string) (int64, int64) {
 		}
 		if blocks.IsValid() && blocks.CanInt() {
 			allocated += blocks.Int() * 512
+			identity := checkpointProfileFileIdentity(info)
+			if identity == "" || !seen[identity] {
+				uniqueAllocated += blocks.Int() * 512
+			}
+			if identity != "" {
+				seen[identity] = true
+			}
 		} else {
 			allocated += info.Size()
+			uniqueAllocated += info.Size()
 		}
 		return nil
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	return logical, allocated
+	return logical, allocated, uniqueAllocated
+}
+
+func checkpointProfileFileIdentity(info os.FileInfo) string {
+	stat := reflect.ValueOf(info.Sys())
+	if stat.IsValid() && stat.Kind() == reflect.Pointer {
+		stat = stat.Elem()
+	}
+	if !stat.IsValid() {
+		return ""
+	}
+	device, inode := stat.FieldByName("Dev"), stat.FieldByName("Ino")
+	if !device.IsValid() || !inode.IsValid() || !device.CanInterface() || !inode.CanInterface() {
+		return ""
+	}
+	return fmt.Sprintf("%v:%v", device.Interface(), inode.Interface())
 }

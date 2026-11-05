@@ -74,7 +74,11 @@ func TestCheckpointRequestConflictMissingAndCorruption(t *testing.T) {
 	_, err = stow.CaptureCheckpoint(context.Background(), registry, ws.ID(), request)
 	assertCheckpointCode(t, err, "request_conflict")
 	request.Options.MaxFiles = 0
-	if err := os.WriteFile(filepath.Join(registry, "checkpoints", result.Checkpoint.ID, "files", "progress.txt"), []byte("corrupt"), 0o600); err != nil {
+	payload := filepath.Join(registry, "checkpoints", result.Checkpoint.ID, "files", "progress.txt")
+	if err := os.Chmod(payload, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(payload, []byte("corrupt"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	_, err = stow.ResolveCheckpoint(context.Background(), registry, ws.ID(), request)
