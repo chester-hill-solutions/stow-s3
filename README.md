@@ -39,7 +39,9 @@ Node.js 20 or newer is required. Python uses a source checkout.
 - [Run the native server](#quick-start-cli-server)
 - [Embed Go or WebAssembly](#embedded-go-runtime)
 - [Work offline with a read-through cache](#run-through-mode-the-offline-cache)
-- [Install, contribute and troubleshoot](#install)
+- [Installation options](#install)
+- [Diagnose an installation](#diagnostics-stow-doctor)
+- [Contribute](CONTRIBUTING.md)
 
 </details>
 <!-- repo-only:end -->
@@ -98,7 +100,7 @@ undo and redo. Applications own document semantics and conflict resolution.
   read-through access, and explicit conditional sync to S3-compatible storage.
 - Filesystem persistence for data that must survive a process restart.
 - SigV4 authentication for the S3 endpoint.
-- `stow doctor`, a diagnostic that reports both the client and server sides of an
+- `stow-s3 doctor`, a diagnostic that reports both the client and server sides of an
   installation.
 
 Applications use Stow to create buckets and upload or download files through the
@@ -450,7 +452,7 @@ This keeps `boto3` optional.
 
 ## Diagnostics: stow doctor
 
-If a session fails to start, run `stow doctor`.
+If a session fails to start, run `npx stow-doctor`.
 It combines client and server checks into one report:
 
 ```bash
@@ -463,7 +465,7 @@ as warnings rather than failures, so a local-only user is not failed for having
 no upstream S3.
 
 `npx stow-doctor` exits 0 when everything passed and 1 when a required check
-failed. The `stow doctor` subcommand on the server side uses a third code, 2, for
+failed. The `stow-s3 doctor` subcommand on the server side uses a third code, 2, for
 a check that could not be run at all, so a broken installation is
 distinguishable from a healthy one with a failing optional check.
 
@@ -518,11 +520,10 @@ For a temporary in-memory server:
 
 ## Quick start: TypeScript
 
-Start a managed server (see [Install](#install) for why this is not yet an
-`npm install`):
+Install the client, then start a managed server:
 
 ```bash
-export STOW_BIN="$PWD/bin/stow-s3"
+npm install @chester-hill-solutions/stow-s3@0.3.5 @aws-sdk/client-s3
 ```
 
 ```ts
@@ -560,7 +561,9 @@ try {
 }
 ```
 
-`Stow.start()` starts the `stow` executable, waits until it is ready, creates the requested buckets, and returns an AWS SDK configuration. When the executable is not in the repository's `bin/` directory, place `stow` on `PATH` or set `STOW_BIN`.
+`Stow.start()` selects the packaged `stow-s3` binary, waits for readiness,
+creates the requested buckets, and returns an AWS SDK configuration.
+Source builds can select their native binary with `STOW_BIN`.
 
 `Stow.start()` is the long-lived form: the server keeps running until you stop
 it, and it uses the server's default collector settings. For a scoped,
@@ -704,15 +707,21 @@ See [ADR 0006](docs/adr/0006-owned-data-directory-reset.md).
 
 ## Running on another host
 
-The server can bind to a network interface:
+A listener beyond loopback requires explicit consent, provisioned S3 credentials and an admin token.
+Terminate TLS in front of the cleartext socket:
 
 ```bash
-./bin/stow-s3 serve --host 0.0.0.0 --port 9000
+export STOW_LOCAL_ACCESS_KEY_ID="stow-client"
+export STOW_LOCAL_SECRET_ACCESS_KEY="$(openssl rand -hex 32)"
+export STOW_ADMIN_TOKEN="$(openssl rand -hex 24)"
+./bin/stow-s3 serve --host 0.0.0.0 --port 9000 --allow-insecure-remote
 ```
 
-Clients on the same network can then connect to the host's port and use S3 operations. Keep the server behind a firewall or private network boundary. Put it behind a TLS-terminating proxy before sending traffic over an untrusted network.
+Clients use the configured S3 credentials. Keep the listener behind a firewall or private network boundary.
+See [serving beyond loopback](docs/running-and-probing.md#serving-beyond-loopback) for proxy and token handling.
 
-The S3 routes require the generated or configured credentials. Use the current server for local development and controlled private deployments. It is not a hardened public or multi-tenant storage service.
+Use Stow for local development and controlled private deployments.
+It is not a hardened public or multi-tenant storage service.
 
 ## Admin and metrics routes
 
@@ -731,11 +740,10 @@ Use `/_stow/health` for liveness. An unsigned request to `/health` returns `403 
 Outbox mutation routes always require an admin token, including on loopback.
 Read-only routes need no token on loopback. Other addresses require the token.
 
-Set the token with `STOW_ADMIN_TOKEN` rather than the flag, so it does not appear
-in the process list:
+Set `STOW_ADMIN_TOKEN` in the server environment so it does not appear in process arguments.
+For a remote query, provide the same configured value in the client environment:
 
 ```bash
-STOW_ADMIN_TOKEN=$(openssl rand -hex 24) ./bin/stow-s3 serve --host 0.0.0.0
 curl -H "X-Stow-Admin: $STOW_ADMIN_TOKEN" http://host:9000/_stow/metrics
 ```
 
