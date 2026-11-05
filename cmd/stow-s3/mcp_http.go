@@ -13,11 +13,9 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-// The MCP surface over the MCP streamable HTTP transport, sessionless: these tools
-// are request/response over one configured workspace or bucket, and a session table
-// would be state this surface has no use for. Exposure follows the S3 listener's
-// posture (ADR 0021), and the token is a caller credential rather than an
-// operations one, so it is separate from the admin token.
+// MCP uses sessionless streamable HTTP for one configured workspace or bucket.
+// Exposure follows ADR 0021 and the S3 listener's consent requirements.
+// Its caller credential is separate from the operations admin token.
 const (
 	mcpHTTPReadHeaderTimeout = 10 * time.Second
 	mcpHTTPIdleTimeout       = 2 * time.Minute
