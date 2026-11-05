@@ -22,6 +22,12 @@ states the problem and Stow's response before setup. Saved-file handoff, explici
 browser sync and cache retention limits remain visible. The existing brand,
 public documentation routes and section anchors are retained.
 
+The first problem is CI service startup and maintenance: Docker setup, storage
+image pulls, service wiring, readiness and teardown. Lead with the packaged
+native process and the session helper's lifecycle. Keep private buckets as a
+secondary benefit. Do not turn the existing server-startup benchmarks into an
+image-pull or end-to-end CI timing claim; those phases were not measured.
+
 ## Design direction
 
 Replace the current dark, terminal-led presentation with warm ivory, large black headings, forest green actions, thin dividers and generous spacing. Keep monospace for commands and small technical labels. Use the concept's modular containers and documents to make objects, files and checkpoints tangible.
