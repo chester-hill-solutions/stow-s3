@@ -6,6 +6,7 @@
 // The application code takes an S3 client and a bucket and does not know Stow
 // exists. Only the last block is Stow-specific: it runs that code against a
 // private session and cleans it up.
+// #region example
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { withStow } from "@chester-hill-solutions/stow-s3";
 
@@ -31,3 +32,4 @@ await withStow(async ({ s3, bucket }) => {
   const roundTripped = await publishReport(s3, bucket, report);
   console.log("stored reports/latest.json:", JSON.stringify(roundTripped));
 });
+// #endregion example
