@@ -15,7 +15,6 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
-// Config configures the S3-compatible HTTP server.
 type Config struct {
 	Store       storage.Store
 	Auth        AuthFunc
@@ -55,7 +54,6 @@ type Config struct {
 	MaxConcurrentRequests int
 }
 
-// Server is the S3-compatible HTTP server.
 type Server struct {
 	requestSlots chan struct{}
 	config       Config
@@ -111,7 +109,6 @@ func New(cfg Config) (*Server, error) {
 	}, nil
 }
 
-// ListenAndServe binds and serves HTTP. Blocks until the server stops.
 func (s *Server) ListenAndServe() error {
 	s.mu.Lock()
 	if s.closed {
@@ -162,7 +159,6 @@ func (s *Server) ListenAndServe() error {
 	return httpServer.Serve(ln)
 }
 
-// Ready closes after the listener has bound or startup has failed.
 func (s *Server) Ready() <-chan struct{} { return s.ready }
 
 func (s *Server) Addr() string {
@@ -171,7 +167,6 @@ func (s *Server) Addr() string {
 	return s.listenAddr
 }
 
-// Shutdown gracefully stops the server.
 func (s *Server) Shutdown(ctx context.Context) error {
 	s.mu.Lock()
 	s.closed = true
@@ -201,7 +196,6 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return s.closeErr
 }
 
-// ServeHTTP implements http.Handler.
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !s.admitRequest(w, r) {
 		return
