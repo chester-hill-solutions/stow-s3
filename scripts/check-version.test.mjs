@@ -6,6 +6,7 @@ import {
   capabilityProblems,
   readinessProtocolProblems,
   readinessCapabilitySets,
+  optionalLockProblems,
   versionProblems,
 } from "./check-version.mjs";
 
@@ -229,4 +230,48 @@ test("the real readiness extractor includes Go fields with JSON tag options", ()
   });
   assert.deepEqual(sets[0].names, ["a"]);
   assert.deepEqual(capabilityProblems({ sets }), []);
+});
+
+const nativeOptional = {
+  "@chester-hill-solutions/stow-s3-darwin-arm64": "0.3.5",
+  "@chester-hill-solutions/stow-s3-darwin-x64": "0.3.5",
+  "@chester-hill-solutions/stow-s3-linux-arm64": "0.3.5",
+  "@chester-hill-solutions/stow-s3-linux-x64": "0.3.5",
+};
+const optionalLock = () => ({ packages: {
+  "": { optionalDependencies: { ...nativeOptional } },
+  ...Object.fromEntries(Object.keys(nativeOptional).map((name) => [`node_modules/${name}`, { optional: true }])),
+} });
+
+test("unpublished optional carriers retain lock records without claiming registry artifacts exist", () => {
+  assert.deepEqual(optionalLockProblems(nativeOptional, optionalLock()), []);
+  const lock = optionalLock();
+  for (const record of Object.values(lock.packages)) if (record.optional) record.version = "0.3.5";
+  assert.deepEqual(optionalLockProblems(nativeOptional, lock), []);
+});
+
+test("each dropped native carrier lock record is rejected", () => {
+  for (const name of Object.keys(nativeOptional)) {
+    const lock = optionalLock();
+    delete lock.packages[`node_modules/${name}`];
+    assert.ok(optionalLockProblems(nativeOptional, lock).some((problem) => problem.includes(name)));
+  }
+});
+
+test("nonoptional or wrong-version carrier records are rejected", () => {
+  for (const name of Object.keys(nativeOptional)) {
+    const lock = optionalLock();
+    lock.packages[`node_modules/${name}`] = { optional: false };
+    assert.ok(optionalLockProblems(nativeOptional, lock).some((problem) => problem.includes(name)));
+    lock.packages[`node_modules/${name}`] = { optional: true, version: "0.3.4" };
+    assert.ok(optionalLockProblems(nativeOptional, lock).some((problem) => problem.includes(name)));
+  }
+});
+
+test("missing or mismatched root optional dependency edges are rejected", () => {
+  for (const name of Object.keys(nativeOptional)) {
+    const lock = optionalLock();
+    delete lock.packages[""].optionalDependencies[name];
+    assert.ok(optionalLockProblems(nativeOptional, lock).some((problem) => problem.includes(name)));
+  }
 });
