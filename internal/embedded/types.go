@@ -11,11 +11,9 @@ const (
 	BackendMemory     Backend = "memory"
 	BackendFilesystem Backend = "filesystem"
 	BackendHost       Backend = "host"
-	// BackendWorkspace is a directory a caller is working in, whose objects are
-	// real files. It is reported by Workspace.Capabilities and is reachable only
-	// through OpenWorkspace, never through Open: a workspace needs a directory,
-	// and Open has nowhere to put one. Asking Open for it fails with
-	// ErrUnsupportedBackend rather than quietly handing back a memory runtime.
+	// BackendWorkspace exposes a working directory as real files through OpenWorkspace.
+	// Workspace.Capabilities reports it. Open returns ErrUnsupportedBackend because
+	// its Options contain no workspace directory.
 	BackendWorkspace Backend = "workspace"
 )
 
