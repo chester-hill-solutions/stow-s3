@@ -37,6 +37,10 @@ installation claims, ADR lifecycle, documentation links, site pages and generate
 artifacts. Browser changes also need `make test-browser`; install Chromium with
 `npx playwright install chromium` in `packages/stow-s3` first.
 
+Go WASM tests receive a small environment to fit the runtime's startup buffer.
+It retains temporary-directory, Go runtime, timezone, Windows startup and CI
+process-tracking settings. Host compilation retains the full build environment.
+
 Live Railway qualification is separate and writes only disposable test prefixes.
 Use the manual `railway-browser` workflow or the documented local runner in
 [the browser guide](docs/browser-file-history.md#repeatable-browser-and-railway-tests).
