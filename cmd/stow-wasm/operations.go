@@ -135,9 +135,8 @@ func handleCopyObject(ctx context.Context, instance *stow.Runtime, req request) 
 	return marshalObjectResult(object, req)
 }
 
-// handleReadForSave observes an object, or its absence, and returns the token a
-// save publishes against. The bytes travel with it, so a caller cannot observe one
-// version and save against another.
+// handleReadForSave returns an observation token and the matching object's bytes.
+// The token also represents absence, so saves use the exact observed state.
 func handleReadForSave(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
 	object, condition, err := instance.ReadForSave(ctx, req.Bucket, req.Key)
 	if err != nil {
@@ -159,8 +158,7 @@ func handleReadForSave(ctx context.Context, instance *stow.Runtime, req request)
 	return marshalReadForSave(object, result, req)
 }
 
-// handleSaveObject publishes against an observation, or replaces deliberately: a
-// replacement is a choice the caller states, and it still carries the request key.
+// handleSaveObject saves against an observation or explicit replacement, forwarding its request key.
 func handleSaveObject(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
 	condition := stow.ReplacementCondition()
 	if !req.Replace {
@@ -196,8 +194,7 @@ func handleSaveObject(ctx context.Context, instance *stow.Runtime, req request) 
 	return marshalSaveResult(result, req)
 }
 
-// handleResolveSave answers what a request key did, which turns a lost reply into
-// an answer instead of a duplicate write.
+// handleResolveSave resolves a request key after a lost reply without repeating the write.
 func handleResolveSave(ctx context.Context, instance *stow.Runtime, req request) (json.RawMessage, error) {
 	result, err := instance.ResolveSave(ctx, req.Bucket, req.Key, req.RequestKey)
 	if err != nil {

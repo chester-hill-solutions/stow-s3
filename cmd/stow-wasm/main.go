@@ -127,8 +127,7 @@ var state = struct {
 	observations map[int]*observationTable
 }{instances: make(map[int]*stow.Runtime), observations: make(map[int]*observationTable)}
 
-// observationsFor is the retained conditions of one runtime. A condition is bound
-// to the instance that observed it, so the table is per handle.
+// observationsFor retains save conditions for one runtime handle.
 func observationsFor(handle int) *observationTable {
 	state.Lock()
 	defer state.Unlock()
@@ -241,9 +240,7 @@ func failure(code, message string) response {
 	return response{Version: protocolVersion, Error: &errorPayload{Code: code, Message: message}}
 }
 
-// errorCodeTable maps a sentinel to the code a caller branches on. A table, not a
-// switch: the save vocabulary grows, and a switch would grow errorResponse's
-// complexity one case at a time until the ratchet objected to a new error code.
+// errorCodeTable maps save sentinels to caller codes without growing dispatch complexity.
 var errorCodeTable = []struct {
 	err  error
 	code string
