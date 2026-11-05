@@ -2,7 +2,7 @@
 
 **Planning status: superseded design and delivery plan — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Remaining correctness, limits, publication, conformance and lifecycle work is carried into S0–S4. Its revision backlogs and performance targets are historical.
 
 The entire original body below is retained as history. Its statuses, unchecked

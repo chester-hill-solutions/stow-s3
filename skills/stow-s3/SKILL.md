@@ -25,7 +25,7 @@ files, older history, submodules, and Git LFS payloads are excluded. The
 workspace CLI also supports resume, handoff, checkpoint, diff, restore, portable
 checkpoint export/import, `list` to find a workspace again without keeping a note of
 its id, `collect` for TTL reclamation, and `prune` to forget entries whose directory is
-gone. See [`docs/task-manifest.md`](../../docs/task-manifest.md).
+gone. See [`docs/contracts/task-manifest.md`](../../docs/contracts/task-manifest.md).
 
 Reach for a disposable scoped session only when **all** of these hold:
 
@@ -81,7 +81,7 @@ The Go module is published:
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-The [npm publication record](../../docs/npm-publishing.md#published-035) describes
+The [npm publication record](../../docs/development/npm-publishing.md#published-035) describes
 the verified release. Automated registry publication and trusted publishing remain disabled.
 
 The Python client is not yet published to PyPI. Use a source checkout:

@@ -2,7 +2,7 @@
 
 These records describe individual candidates and publication checkpoints.
 Use the [current release notes](../../releases/v0.3.5.md) and
-[npm publication record](../../npm-publishing.md) for current installation.
+[npm publication record](../../development/npm-publishing.md) for current installation.
 
 | Date / candidate | Record |
 | --- | --- |

@@ -1,6 +1,6 @@
 # Stow Workspace Contract
 
-**v0.3.0 workspace additions:** the [portable workspace contract and usage](portable-workspace-usage.md)
+**v0.3.0 workspace additions:** the [portable workspace contract and usage](guides/portable-workspace-usage.md)
 specifies the implemented facade, opt-in v2 snapshots, capture-request reconciliation,
 registry policy and MCP surface. Existing v1 file checkpoints remain supported.
 
@@ -10,7 +10,7 @@ registry policy and MCP surface. Existing v1 file checkpoints remain supported.
 **Scope:** the default agent-facing surface defined by
 `docs/adr/0007-workspace-is-the-default.md`
 **Relationship:** normative for the workspace path; additive to
-`docs/compat-contract.md`, which continues to govern the S3 wire surface. Where
+`docs/contracts/compat-contract.md`, which continues to govern the S3 wire surface. Where
 the two describe the same object, they must agree; where they differ, this
 document describes the workspace and that one describes the wire.
 
@@ -31,7 +31,7 @@ still require the explicit upstream-write authority and durable outbox described
 by ADR 0005.
 
 The additive local preparation format and CLI are specified in
-[`task-manifest.md`](task-manifest.md). It describes filesystem isolation only;
+[`task-manifest.md`](contracts/task-manifest.md). It describes filesystem isolation only;
 it does not claim process or network sandboxing.
 
 ---
@@ -190,7 +190,7 @@ rather than left to be inferred from a boolean.
 
 
 The current task manifest, CLI commands, archive limits, sensitive-path rules,
-and cleanup behavior are documented in [`task-manifest.md`](task-manifest.md).
+and cleanup behavior are documented in [`task-manifest.md`](contracts/task-manifest.md).
 Workspace manifests can set separate cumulative checkpoint payload-byte and
 checkpoint-count limits. Exceeding either refuses the new checkpoint without
 removing an existing one; zero leaves that cap unlimited.
@@ -468,7 +468,7 @@ no synchronization between two, because there is only one.
 ## 8. Conformance cases added to the corpus
 
 These run against the workspace backend through the shared corpus. Keep drivers
-aligned with the checked [step vocabulary](workspace-contract-steps.md) and extend
+aligned with the checked [step vocabulary](contracts/workspace-contract-steps.md) and extend
 shared cases before changing behavior. The [canonical plan](plan.md) schedules
 remaining conformance work; the old DX plan is historical rationale.
 

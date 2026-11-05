@@ -1,10 +1,10 @@
 # MCP storage integration and turn checkpoints
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../storage-foundation-plan.md) is the sole work order. Concrete local adapter/caller APIs are implemented; remaining acceptance is W19. The retained pre-code names, SDK choices and checklist are dated design history; use current usage/source for actual contracts. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../development/storage-foundation-plan.md) is the sole work order. Concrete local adapter/caller APIs are implemented; remaining acceptance is W19. The retained pre-code names, SDK choices and checklist are dated design history; use current usage/source for actual contracts. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** local experimental implementation, 2026-09-29. The stdio adapter and
 caller-controlled OpenCode example are implemented; successful real-model and
-cross-host acceptance remain open. [Usage](../../portable-workspace-usage.md),
+cross-host acceptance remain open. [Usage](../../guides/portable-workspace-usage.md),
 [caller instructions](../../../examples/opencode/README.md) and
 [implementation evidence](../implementation/implementation-2026-09-29.md) describe the concrete API.
 The design below preserves discovery rationale; proposed names are illustrative
@@ -14,7 +14,7 @@ continues to govern storage versus caller-owned execution.
 
 ## Native object profile extension
 
-The separate [object MCP contract](../../object-mcp-contract.md) extends W02 managed saves
+The separate [object MCP contract](../../contracts/object-mcp-contract.md) extends W02 managed saves
 and retained resolution over one configured filesystem bucket. It uses existing
 MCP negotiation and the native core. Its object result and observation lifetime
 are separate from checkpoint requests and editable workspaces. The workspace

@@ -13,7 +13,7 @@ The baseline is `9032c46321d7c12372be16d38aff149ee824f31e` (`9032c46`, streamed 
 
 ## Existing promises and reachable paths
 
-[Compatibility contract, Appendix C](../compat-contract.md#appendix-c--request-and-upstream-transport-boundaries-030) documents an **8 MiB** default per HTTP body and **16 active handlers**, configurable by positive native CLI flags. Excess body bytes receive `EntityTooLarge`; excess handlers receive `SlowDown` before body reads. The contract explicitly excludes process-memory isolation. Storage quotas are separate physical/logical admission contracts. Public/internal Go store readers do not inherit the HTTP body cap; caller/runtime limits remain separate.
+[Compatibility contract, Appendix C](../contracts/compat-contract.md#appendix-c--request-and-upstream-transport-boundaries-030) documents an **8 MiB** default per HTTP body and **16 active handlers**, configurable by positive native CLI flags. Excess body bytes receive `EntityTooLarge`; excess handlers receive `SlowDown` before body reads. The contract explicitly excludes process-memory isolation. Storage quotas are separate physical/logical admission contracts. Public/internal Go store readers do not inherit the HTTP body cap; caller/runtime limits remain separate.
 
 The measured paths are the current filesystem implementation:
 

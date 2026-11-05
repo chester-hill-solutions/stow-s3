@@ -39,7 +39,7 @@ existing contracts. A condition from an uncertain marked read is now unusable:
 SaveObject rejects it as ErrInvalidSaveCondition / SaveNotCommitted before writing.
 A healthy subsequent observation can produce a valid condition and reuse full
 capacity. This is the behavior already documented for empty conditions in
-[portable workspace usage](../../portable-workspace-usage.md).
+[portable workspace usage](../../guides/portable-workspace-usage.md).
 
 ## Regression and validation evidence
 

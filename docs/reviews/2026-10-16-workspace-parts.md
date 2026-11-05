@@ -58,7 +58,7 @@ payload buffer. Header and payload use the existing `atomicfile.WriteParts`
 interface; the payload is not copied into an additional combined record buffer.
 The variable JSON descriptor list and its upsert helper are removed.
 
-The [storage contract](../compat-contract.md) and [workspace contract](../workspace-contract.md)
+The [storage contract](../contracts/compat-contract.md) and [workspace contract](../workspace-contract.md)
 were updated before production implementation. No public API, dependency or
 completed-object format changes. Old raw staged parts are refused by listing
 and completion without migration; runtime reopen that encounters them fails.

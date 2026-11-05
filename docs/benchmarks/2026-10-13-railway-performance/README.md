@@ -83,7 +83,7 @@ No TLS, real scanner, DPI processing, flagged-file retention/promotion, read-thr
 
 Profile the filesystem write and delete paths first. The current implementation [reads and decodes full object records](../../../internal/storage/fs/fs_records.go), stores payloads in JSON records and [scans capacity during mutations](../../../internal/storage/fs/capacity.go). Together with the observed allocations, these are plausible contributors; a CPU/allocation profile and retained-object sweep should establish their contribution before changing the implementation. Memory PUT buffer allocation is a separate optimization candidate.
 
-Then qualify the actual inspection-and-retention use case: memory inspection, promotion of flagged content to disk, a real scanner, scheduled arrival sweeps and a longer soak. Use the [qualification protocol](../../performance-testing.md) before advertising sustained capacity.
+Then qualify the actual inspection-and-retention use case: memory inspection, promotion of flagged content to disk, a real scanner, scheduled arrival sweeps and a longer soak. Use the [qualification protocol](../../development/performance-testing.md) before advertising sustained capacity.
 
 ## Reproduction and evidence
 

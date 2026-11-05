@@ -87,12 +87,12 @@ File-backed operations read the complete journal under the shared lock. A handle
 reuses its validated state only when the freshly read bytes are identical;
 changed bytes are decoded and validated again. It may retain one journal read
 buffer until a write attempt. Cache byte/object limits apply to cached objects.
-See the [Railway comparison](reviews/2026-10-18-outbox-reuse.md) for latency,
+See the [Railway comparison](../reviews/2026-10-18-outbox-reuse.md) for latency,
 allocation and retained-memory measurements, with their workload limits.
 
 Pending/prepared snapshots return owned, ordered values for the requested queue.
-The [snapshot comparison](reviews/2026-10-18-outbox-snapshot.md) measures large
+The [snapshot comparison](../reviews/2026-10-18-outbox-snapshot.md) measures large
 history, uneven queues and concurrent writers, including observed writer tails.
 
-See the [compatibility contract](compat-contract.md#62-read-through-cache-semantics) for propagation rules
-and the [server reference](../README.md#admin-and-metrics-routes) for authentication.
+See the [compatibility contract](../contracts/compat-contract.md#62-read-through-cache-semantics) for propagation rules
+and the [server reference](../../README.md#admin-and-metrics-routes) for authentication.

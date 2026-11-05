@@ -32,7 +32,7 @@ export STOW_BIN="$PWD/bin/stow-s3"
 
 Use `STOW_BIN` to select the source-built native binary during development.
 <!-- repo-only:start -->
-See the [npm publication record](../../docs/npm-publishing.md#published-035) for release verification.
+See the [npm publication record](../../docs/development/npm-publishing.md#published-035) for release verification.
 <!-- repo-only:end -->
 
 ## Usage
@@ -178,13 +178,13 @@ The wrapper also exports resume, same-machine handoff, diff, restore, portable
 checkpoint export, and import helpers. These calls return the CLI's JSON result
 and use the same validation and limits as the Go implementation. They require
 the package's platform binary or `STOW_BIN` when developing from a checkout.
-See [`docs/task-manifest.md`](../../docs/task-manifest.md) for the schema,
+See [`docs/contracts/task-manifest.md`](../../docs/contracts/task-manifest.md) for the schema,
 archive rules, and the filesystem-isolation boundary. This is a persistent
 workspace API; it is separate from the disposable S3 session APIs above.
 
 ### Browser persistence profile
 
-The additive [`@chester-hill-solutions/stow-s3/browser`](../../docs/browser-persistence.md) entry
+The additive [`@chester-hill-solutions/stow-s3/browser`](../../docs/guides/browser-persistence.md) entry
 point coordinates durable commits around the embedded memory profile. The
 `openBrowserEmbeddedStow` wrapper replays the committed generation during async
 open, serializes operations FIFO, and commits each mutation before its promise
@@ -223,7 +223,7 @@ unchanged.
 this profile. Undo/redo and pending sync receipts survive reopen; remote writes
 use an expected ETag or expected absence, and conflicts retain local edits.
 `S3ObjectSyncRemote` is available from the separate `./browser-s3` entry point.
-See [the API and limits](../../docs/browser-file-history.md), or run
+See [the API and limits](../../docs/guides/browser-file-history.md), or run
 `make browser-editor` from the repository root for the offline editor demo.
 
 CLI equivalent:
@@ -257,7 +257,7 @@ It supports shared chunks, atomic revisions, bounded range reads and conditional
 `/worker` exports `AsyncEmbeddedStow`.
 `/browser-wasm` provides `loadBrowserPersistentWasmHost` for durable host storage.
 
-Use the [project guide](../../docs/browser-project-storage.md) or [worker guide](../../docs/browser-worker-runtime.md) to get started.
+Use the [project guide](../../docs/guides/browser-project-storage.md) or [worker guide](../../docs/guides/browser-worker-runtime.md) to get started.
 
 <!-- repo-only:start -->
 See the [1 GiB test record](../../docs/benchmarks/browser-project-2026-10-12.json).

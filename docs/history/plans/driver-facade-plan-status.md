@@ -2,7 +2,7 @@
 
 **Planning status: retired design record — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. The custom S3 client remains retired. Surviving shared-corpus work is carried into S0-4; existing local base-host configuration must not be reimplemented.
 
 The entire original body below is retained as history. Its statuses, unchecked

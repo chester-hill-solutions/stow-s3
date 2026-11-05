@@ -2,7 +2,7 @@
 
 Local-mode tests in this package exercise the real `s3api.Server` with **SigV4 auth** (not `DevBypass`). The shared corpus is run through the AWS SDK for Go v2 (`service/s3`) and the Node AWS SDK v3 (`@aws-sdk/client-s3`).
 
-Contract reference: [docs/compat-contract.md](../docs/compat-contract.md) §2 SDK flows.
+Contract reference: [docs/contracts/compat-contract.md](../docs/contracts/compat-contract.md) §2 SDK flows.
 
 ## Run
 

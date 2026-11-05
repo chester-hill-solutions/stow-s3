@@ -17,8 +17,8 @@ index entry, retaining the upstream baseline used by later propagation. Therefor
 retained distinct-key history, as well as queued work, can grow this journal.
 The cache byte/object limits govern the separate upstream-derived object cache;
 these measurements do not establish a violation of a promised journal memory bound.
-See [cache limits](../run-through.md#cache-limits-and-expiration),
-[the outbox contract](../outbox.md) and the implementation paths
+See [cache limits](../guides/run-through.md#cache-limits-and-expiration),
+[the outbox contract](../guides/outbox.md) and the implementation paths
 `internal/runthrough/cache_read.go`, `cache_policy.go` and `provenance.go`.
 
 ## Method and limits

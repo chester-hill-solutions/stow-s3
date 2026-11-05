@@ -1,6 +1,6 @@
 # Storage product plan alignment
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../storage-foundation-plan.md) is the sole work order. This earlier review/order is superseded. Preserve its dated findings as history; the new plan owns current status and acceptance. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../development/storage-foundation-plan.md) is the sole work order. This earlier review/order is superseded. Preserve its dated findings as history; the new plan owns current status and acceptance. Former checklists, phase numbers and next steps below do not schedule work.
 
 ## 1. Plan validation summary
 
@@ -10,7 +10,7 @@ documentation and ADR lifecycle now reflect that boundary. Existing behavior is
 unchanged; observed implementation gaps remain scheduled, not marked fixed.
 
 The follow-up consolidation inventories all repository planning documents in
-[the disposition register](../../planning-index.md). Old DX, remediation, FOSS, workspace,
+[the disposition register](../../development/planning-index.md). Old DX, remediation, FOSS, workspace,
 portability and architecture work orders are superseded in full. Their surviving
 work is assigned canonical S0–S4 IDs; execution proposals and conditional expansion
 have explicit deferred dispositions. The MCP/OpenCode detail and milestone remain
@@ -156,7 +156,7 @@ state machine or imply arbitrary writers have been stopped by Stow.
 9. **MCP storage adapter and agent guidance:** follow [the integration plan](mcp-storage-integration-plan.md), reuse Go/CLI operations, and verify tool/schema parity plus safe-boundary behavior in one real host. MCP is an access layer, not an execution or turn-detection mechanism.
 
 10. **Planning maintenance:** use [the canonical plan](../../plan.md)'s S0–S4 IDs as the
-    current queue and [the disposition register](../../planning-index.md) for source
+    current queue and [the disposition register](../../development/planning-index.md) for source
     traceability. Keep retired bodies frozen. Verify documentation links, command
     examples and ADR digests when plans change; attach implementation evidence only
     when the corresponding work actually completes.

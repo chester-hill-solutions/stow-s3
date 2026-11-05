@@ -15,12 +15,12 @@ test("public guides omit repository commentary, retain code examples and reject 
 });
 
 test("published guides render examples and turn repo documentation links into site routes", () => {
-  const page = pages.find((entry) => entry.source === "docs/outbox.md");
+  const page = pages.find((entry) => entry.source === "docs/guides/outbox.md");
   const { body, headings } = renderMarkdown('# Outbox\n\n## Recovery\n\n[Cache](run-through.md#working-with-the-network-gone)\n\n```js\nconst value = "<script>";\n```', page, pages);
   assert.match(body, /href="\/docs\/run-through\/#working-with-the-network-gone"/);
   assert.match(body, /&lt;script&gt;/);
   assert.equal(headings[0].id, "recovery");
-  assert.equal(rewriteLink("https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/browser-project-storage.md", page.source, pages), "/docs/browser-projects/");
+  assert.equal(rewriteLink("https://github.com/chester-hill-solutions/stow-s3/blob/main/docs/guides/browser-project-storage.md", page.source, pages), "/docs/browser-projects/");
   const license = "https://github.com/chester-hill-solutions/stow-s3/blob/main/LICENSE";
   const revision = process.env.STOW_SITE_SOURCE_REVISION ?? "main";
   assert.equal(rewriteLink(license, page.source, pages), `https://github.com/chester-hill-solutions/stow-s3/blob/${revision}/LICENSE`);

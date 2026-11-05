@@ -3,7 +3,7 @@
 **Reviewed:** 2026-09-30 against the consolidated Stow plan, its accepted ADRs, the
 current development source and GangCode's standalone repository. This is an
 ownership and integration reference, not another implementation queue or a claim
-that planned capabilities have shipped. Stow's [consolidated plan](storage-foundation-plan.md)
+that planned capabilities have shipped. Stow's [consolidated plan](../development/storage-foundation-plan.md)
 and [GangCode's plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md) retain their work orders.
 
 **Stow owns the durable, authorized storage facts and their delivery. GangCode owns
@@ -131,7 +131,7 @@ profile adds bounded request receipts and reopen resolution. These operations ar
 available directly through the public Go package
 `github.com/chester-hill-solutions/stow-s3/pkg/stow`; GangCode does not need the
 native object MCP wrapper to use them. See the
-[dated implementation evidence](history/implementation/implementation-2026-09-30.md).
+[dated implementation evidence](../history/implementation/implementation-2026-09-30.md).
 
 That object directory uses object records. It is **not** the ordinary editable
 workspace directory used by GangCode's native file tools. Workspace/custom-store,
@@ -160,9 +160,9 @@ certify Linux execution, cross-host takeover or a released artifact.
 
 GangCode's original boundary assigned observation and the collaboration journal
 entirely to the collaboration product. Accepted Stow ADRs
-[0014](adr/0014-storage-product-caller-owned-execution.md),
-[0015](adr/0015-durable-workspace-notifications.md) and
-[0016](adr/0016-scoped-access-encrypted-cache.md) now make that too broad:
+[0014](../adr/0014-storage-product-caller-owned-execution.md),
+[0015](../adr/0015-durable-workspace-notifications.md) and
+[0016](../adr/0016-scoped-access-encrypted-cache.md) now make that too broad:
 
 - Move reusable content reconciliation, storage subscriptions, retained reports,
   storage delivery receipts/retries and artifact holds into Stow's core once their

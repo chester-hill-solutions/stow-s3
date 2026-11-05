@@ -1,7 +1,7 @@
 # Shared identity and storage admission contract
 
 **Decision boundary:** 2026-09-29. This reference resolves the shared contract in
-[W01 of the working-storage plan](storage-foundation-plan.md). It is not a second
+[W01 of the working-storage plan](development/storage-foundation-plan.md). It is not a second
 work queue. Target requirements below govern guarded saves, scoped access,
 retention and publication as they are implemented; they do not advertise new APIs
 or certify a deployment. Existing direct `PutObject` and S3 behavior stays compatible.
@@ -66,9 +66,9 @@ public stores refuse the richer surface even when they support ETag conditions.
 Filesystem admission refreshes full authoritative accounting; no constant-time or
 physical disk-reserve promise follows. Newly assigned generations detect managed
 changes after enrollment, not all earlier ABA history or arbitrary host writes.
-See [usage and fixed retention limits](portable-workspace-usage.md#filesystem-save-receipts-and-recovery)
+See [usage and fixed retention limits](guides/portable-workspace-usage.md#filesystem-save-receipts-and-recovery)
 and [dated local evidence](history/implementation/implementation-2026-09-30.md). The
-[native object MCP profile](object-mcp-contract.md) exposes these filesystem
+[native object MCP profile](contracts/object-mcp-contract.md) exposes these filesystem
 operations through a thin adapter. WASM/in-process TypeScript exposes the memory-backed
 managed-save profile through bounded observation tokens; request keys and durable
 replay remain refused. Existing workspace MCP and S3 profiles do not expose this API.
@@ -765,7 +765,7 @@ Railway, Workers and custom-store matrices can differ while sharing semantic rul
 Introduce operation permissions only alongside an enforced operation and refusal
 coverage, as [ADR 0010](adr/0010-an-enforcement-site-or-not-a-permission.md) requires.
 
-Implementation acceptance remains in the [canonical queue](storage-foundation-plan.md):
+Implementation acceptance remains in the [canonical queue](development/storage-foundation-plan.md):
 two-reader conflicts, same-byte/metadata replacement, explicit absence/replacement,
 wrong bindings, policy expiry/revocation, quota/holds, lost replies, restart and
 crash-boundary evidence on each advertised profile. Cross-process/host and arbitrary

@@ -58,5 +58,5 @@ They cover 4 KiB, 1 MiB and 8 MiB workflows with one and four Go execution threa
 The source checkout was dirty; binary, harness and benchmark source hashes identify the measured inputs.
 Harness copies are audit snapshots; restore them into the repository script paths to reproduce them.
 
-Use the [performance testing guide](../../performance-testing.md) for commands and interpretation.
+Use the [performance testing guide](../../development/performance-testing.md) for commands and interpretation.
 Run the longer qualification profile on a quiet machine before publishing sustained capacity claims.

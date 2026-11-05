@@ -1,6 +1,6 @@
 # Stow: product assessment and independent validation
 
-> **Planning disposition, 2026-09-29:** Dated assessment evidence. Implementation status and work ordering live in the canonical plan; earlier product recommendations are subject to ADR 0014. See [the plan](../../plan.md) and [disposition register](../../planning-index.md).
+> **Planning disposition, 2026-09-29:** Dated assessment evidence. Implementation status and work ordering live in the canonical plan; earlier product recommendations are subject to ADR 0014. See [the plan](../../plan.md) and [disposition register](../../development/planning-index.md).
 
 > **Product decision, 2026-09-29:** [The canonical storage plan](../../plan.md) now governs. Stow owns portable working storage; callers own execution, agent turns and sandboxing. The experiments and earlier recommendations below retain their dated context. Runner/executor requirements are deferred; agent continuity will be evaluated through a thin storage integration, not a separate Stow execution product.
 

@@ -37,7 +37,7 @@ Save the manifest as `task.json` and prepare it:
 stow-s3 workspace prepare --manifest task.json
 ```
 
-The [workspace guide](portable-workspace-usage.md) covers S3 access, portable object checkpoints,
+The [workspace guide](../guides/portable-workspace-usage.md) covers S3 access, portable object checkpoints,
 capture recovery, registry policy and MCP tools. Existing v1 file checkpoints remain supported.
 
 ## Paths and inputs
@@ -230,7 +230,7 @@ Stow does not remove another workspace automatically to make room.
 This manifest limit applies to one preparation request; it is not stored as registry policy.
 Supply it on every request that needs the bound.
 `capabilities.registry_bound` reports the limit, current count and remaining capacity.
-For standing registry policy, see the [workspace guide](portable-workspace-usage.md#retention).
+For standing registry policy, see the [workspace guide](../guides/portable-workspace-usage.md#retention).
 Retention limits exclude filesystem overhead and files written directly into the registry.
 
 ## Client wrappers and isolation
@@ -243,5 +243,5 @@ A workspace is a separate copy for task editing. It is not an OS sandbox.
 An agent can access other paths and network resources permitted to its process.
 Limits apply during preparation and Stow API operations; they do not prevent direct filesystem writes.
 <!-- repo-only:start -->
-See the [Agent Isolate proposal](history/plans/agent-isolate-exploration.md) for a possible execution boundary.
+See the [Agent Isolate proposal](../history/plans/agent-isolate-exploration.md) for a possible execution boundary.
 <!-- repo-only:end -->

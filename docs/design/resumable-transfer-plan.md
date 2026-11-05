@@ -1,11 +1,11 @@
 # Resumable upload and download validation plan
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](storage-foundation-plan.md) is the sole work order. Same-store continuation is W06 and consumer integration W21. The retained recipe is a design reference, not a separate queue. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../development/storage-foundation-plan.md) is the sole work order. Same-store continuation is W06 and consumer integration W21. The retained recipe is a design reference, not a separate queue. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** proposed validation and consumer integration, 2026-09-29. This
-expands S0-4, S1-5 and S4-1 in the [canonical plan](plan.md). The user clarified
+expands S0-4, S1-5 and S4-1 in the [canonical plan](../plan.md). The user clarified
 that resumability means continuing interrupted file transfers. The earlier
-[task continuation plan](history/plans/task-resumability-plan.md) is retained as superseded
+[task continuation plan](../history/plans/task-resumability-plan.md) is retained as superseded
 conversation history and does not schedule work.
 
 The goal is to interrupt a file upload or download, restart the client, and
@@ -21,11 +21,11 @@ exposes missing behavior or needs a small consumer-owned progress record.
 | Partial download | GET supports byte ranges, partial-content responses and conditional read validators. | Retain verified local bytes and object identity; request the remaining range with an unchanged-object condition and validate the response. |
 | Persistent storage | On-disk backends can reopen retained state. | Reconnect to the same retained store using current credentials. Memory-backed or deleted temporary stores cannot retain an upload across server restart. |
 
-Relevant implementations are [filesystem multipart](../internal/storage/fs/fs_multipart.go),
-[workspace multipart](../internal/storage/workspace/multipart.go),
-[S3 multipart handlers](../internal/s3api/handlers_multipart.go), and
-[object GET](../internal/s3api/handlers_bucket.go). The
-[compatibility contract](compat-contract.md) documents range and multipart limits.
+Relevant implementations are [filesystem multipart](../../internal/storage/fs/fs_multipart.go),
+[workspace multipart](../../internal/storage/workspace/multipart.go),
+[S3 multipart handlers](../../internal/s3api/handlers_multipart.go), and
+[object GET](../../internal/s3api/handlers_bucket.go). The
+[compatibility contract](../contracts/compat-contract.md) documents range and multipart limits.
 
 These mechanisms are not proof that every SDK's high-level upload/download
 helper automatically resumes after its process dies. Stow's language wrappers

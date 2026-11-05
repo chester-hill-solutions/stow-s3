@@ -4,7 +4,7 @@ Dated reports retain their original findings and validation scope. Start with
 the [correctness closure register](2026-10-18-correctness-closure.md) for its bounded
 lead list, or the [architecture overview](2026-10-22-architecture-overview.md) for
 the later structural assessment. These records do not replace the
-[current work plan](../storage-foundation-plan.md).
+[current work plan](../development/storage-foundation-plan.md).
 
 Supporting logs, probes and source snapshots are available through the
 [evidence archive](../evidence-archive.md).

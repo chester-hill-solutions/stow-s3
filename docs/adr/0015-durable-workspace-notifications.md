@@ -1,7 +1,7 @@
 ---
 status: accepted
-decision_digest: 7e8a4e66389e51e4
-amended: 2026-09-29
+decision_digest: 59f03d70ee432fe8
+amended: 2026-11-05
 relates_to: 0014, 0009
 ---
 
@@ -115,7 +115,7 @@ effect receipts must not be revived by restoring an old checkpoint. Broader hand
 semantics are specified and tested before they are advertised.
 
 Implementation is scheduled under S1-6 in the canonical plan and expanded in the
-[notification plan](../workspace-notifications-plan.md). The product decision is
+[notification plan](../design/workspace-notifications-plan.md). The product decision is
 accepted; proposed schemas and API names remain design detail until implemented.
 
 ## Consequences
@@ -153,3 +153,5 @@ accepted; proposed schemas and API names remain design detail until implemented.
   publication. Current-input checks default when a basis is supplied; explicit snapshot
   mode preserves intentional historical work. Stow retains drafts on refusal and checks
   only declared storage identities, preserving caller-owned read tracking and execution.
+- 2026-11-05: Updated documentation links for the guide, contract, design and
+  development folders. Decision status and meaning are unchanged.

@@ -36,7 +36,7 @@ Server restart resets the fixture but preserves local history. Reconnecting can 
 The demo's same-origin proxy uses `S3ObjectSyncRemote` and the AWS SDK to talk to
 the real fixture. Production hosts can supply their own proxy or use the S3
 transport directly with scoped credentials and appropriate CORS configuration.
-See [the library contract and limits](../../docs/browser-file-history.md).
+See [the library contract and limits](../../docs/guides/browser-file-history.md).
 
 <!-- repo-only:start -->
 ## Verification
@@ -54,5 +54,5 @@ the artifacts. `npm run test:browser:railway` substitutes the existing Railway
 testing bucket and additionally checks direct browser CORS/conditional requests.
 It creates a unique disposable prefix, temporarily configures the test origin's
 CORS rule, and verifies both object cleanup and policy restoration afterward.
-See [the qualification contract](../../docs/browser-file-history.md#repeatable-browser-and-railway-tests).
+See [the qualification contract](../../docs/guides/browser-file-history.md#repeatable-browser-and-railway-tests).
 <!-- repo-only:end -->

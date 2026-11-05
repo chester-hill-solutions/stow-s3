@@ -43,7 +43,7 @@ process-tracking settings. Host compilation retains the full build environment.
 
 Live Railway qualification is separate and writes only disposable test prefixes.
 Use the manual `railway-browser` workflow or the documented local runner in
-[the browser guide](docs/browser-file-history.md#repeatable-browser-and-railway-tests).
+[the browser guide](docs/guides/browser-file-history.md#repeatable-browser-and-railway-tests).
 
 ## Generated output
 
@@ -78,7 +78,10 @@ retired plans. Move historical designs under `docs/history/` and repair their
 incoming and outgoing links. Only remove an ADR after its replacement is in force;
 record its number and original Git source in `docs/adr/retired.json`.
 
-Keep current guides and contracts in `docs/`, API references in `docs/api/`,
+Keep usage guides in `docs/guides/`, interface contracts in `docs/contracts/`,
+design references in `docs/design/`, and maintainer instructions in
+`docs/development/`. The primary workspace, admission and server entry points
+retain their established paths in `docs/`. Keep API references in `docs/api/`
 and published release notes in `docs/releases/`. File dated release checks,
 assessments and implementation receipts under the matching `docs/history/`
 folder. Add an entry to its index and repair links when moving a document.

@@ -28,8 +28,8 @@ test("machine-specific paths and references outside the repository fail", () => 
 test("site documentation routes validate their sources without a site build", (t) => {
   const root = mkdtempSync(join(tmpdir(), "stow-doc-routes-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  mkdirSync(join(root, "docs"), { recursive: true });
-  writeFileSync(join(root, "docs/browser-file-history.md"), "# Browser history");
+  mkdirSync(join(root, "docs/guides"), { recursive: true });
+  writeFileSync(join(root, "docs/guides/browser-file-history.md"), "# Browser history");
   assert.deepEqual(linkProblems("[History](/docs/browser-file-history/#sync)", "site/agent.md", root), []);
   assert.equal(linkProblems("[Typo](/docs/browser-file-historie/)", "site/agent.md", root).length, 1);
 });

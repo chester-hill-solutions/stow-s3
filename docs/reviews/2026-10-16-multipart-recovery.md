@@ -53,7 +53,7 @@ confirmed upload absence to its existing NoSuchUpload result and reads under the
 store's existing read lock. Enumeration returns manifest failures instead of
 omitting their retained parts. No change to runtime accounting is needed: its
 existing reconciliation already refuses on an error and keeps its prior state.
-The [storage contract](../compat-contract.md) was clarified before implementation.
+The [storage contract](../contracts/compat-contract.md) was clarified before implementation.
 
 The regression tests cover:
 

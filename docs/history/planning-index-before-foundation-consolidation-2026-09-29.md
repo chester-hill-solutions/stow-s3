@@ -1,6 +1,6 @@
 # Planning index and disposition register
 
-> **Frozen before the 2026-09-29 foundation consolidation.** This body records earlier status and ordering; it is not an active queue. Use the [consolidated plan](../storage-foundation-plan.md) and [current disposition map](../planning-index.md).
+> **Frozen before the 2026-09-29 foundation consolidation.** This body records earlier status and ordering; it is not an active queue. Use the [consolidated plan](../development/storage-foundation-plan.md) and [current disposition map](../development/planning-index.md).
 
 
 **Reconciled:** 2026-09-29 against `5485a36`, source inspection and the recorded
@@ -15,7 +15,7 @@ no release has been certified.
    with stable S0–S4 item IDs and the current release acceptance checklist.
 2. [Product milestone](plans/portable-agent-workspace-goal.md): workflow and adoption criteria.
 3. [MCP/OpenCode integration](plans/mcp-storage-integration-plan.md): S3 technical detail.
-4. [Portable workspace usage](../portable-workspace-usage.md): concrete development API and examples.
+4. [Portable workspace usage](../guides/portable-workspace-usage.md): concrete development API and examples.
 5. [Implementation evidence](implementation/implementation-2026-09-29.md): checks, costs and open gates.
 6. [ADR index](../adr/README.md): decisions in force, especially ADR 0014's storage boundary.
 7. [Realtime multiplayer experiment](collaboration/realtime-multiplayer-plan.md): proposed caller-layer
@@ -29,20 +29,20 @@ authority are frozen historical text. Follow the destination below instead.
 
 | Document | Disposition and current destination |
 | --- | --- |
-| [portable-workspace-usage.md](../portable-workspace-usage.md) | **Current usage.** Concrete local development APIs, commands and boundaries. |
+| [portable-workspace-usage.md](../guides/portable-workspace-usage.md) | **Current usage.** Concrete local development APIs, commands and boundaries. |
 | [implementation-2026-09-29.md](implementation/implementation-2026-09-29.md) | **Implementation evidence.** Local tests, performance and remaining release/pilot gates. |
 | [compatibility-coverage-2026-09-29.md](assessments/compatibility-coverage-2026-09-29.md) | **Coverage map.** Shared SDK and focused protocol scenarios with explicit unsupported boundaries. |
 | [plan.md](../plan.md) | **Active work order.** S0 correctness, S1 coherent storage, S2 delivery, S3 MCP/OpenCode, S4 evidence. |
 | [portable-agent-workspace-goal.md](plans/portable-agent-workspace-goal.md) | **Active milestone.** Storage workflow and repeat-use decision. |
 | [mcp-storage-integration-plan.md](plans/mcp-storage-integration-plan.md) | **Active detail.** Expands S3, including separate workspace, selected context and bounded retry/failure. |
-| [resumable-transfer-plan.md](../resumable-transfer-plan.md) | **Proposed validation detail.** Expands S0-4/S1-5/S4-1 with multipart upload/range download continuation and a consumer pilot; new code depends on reproduced gaps. |
-| [portable-recovery-plan.md](../portable-recovery-plan.md) | **Accepted direction; proposed contract.** S1-9 extends saved data with selected transfer progress and pending storage/notification operations, destination authorization and explicit activation. Confirmed takeover is the default for external operations; the confirmation mechanism remains open. Current checkpoint adoption does not carry these operations. |
-| [guarded-storage-plan.md](../guarded-storage-plan.md) | **In progress.** S1-10's public Go/WASM/TypeScript conditional-write prerequisite is implemented locally with explicit support and typed refusal. Guarded read/edit/save defaults and declared-input ready-publication checks remain proposed. Legacy/S3 behavior and caller filesystem coordination stay explicit. |
+| [resumable-transfer-plan.md](../design/resumable-transfer-plan.md) | **Proposed validation detail.** Expands S0-4/S1-5/S4-1 with multipart upload/range download continuation and a consumer pilot; new code depends on reproduced gaps. |
+| [portable-recovery-plan.md](../design/portable-recovery-plan.md) | **Accepted direction; proposed contract.** S1-9 extends saved data with selected transfer progress and pending storage/notification operations, destination authorization and explicit activation. Confirmed takeover is the default for external operations; the confirmation mechanism remains open. Current checkpoint adoption does not carry these operations. |
+| [guarded-storage-plan.md](../design/guarded-storage-plan.md) | **In progress.** S1-10's public Go/WASM/TypeScript conditional-write prerequisite is implemented locally with explicit support and typed refusal. Guarded read/edit/save defaults and declared-input ready-publication checks remain proposed. Legacy/S3 behavior and caller filesystem coordination stay explicit. |
 | [foundation-review-2026-09-29.md](plans/foundation-review-2026-09-29.md) | **Review record.** Consolidates accepted extension dependencies, delegated engineering defaults and qualification gaps across working storage. Canonical IDs retain scheduling authority; no additional user decision is pending. |
-| [workspace-notifications-plan.md](../workspace-notifications-plan.md) | **Active implementation detail.** Accepted core capability under ADR 0015; automatic file change detection first, parent-path subscriptions, durable delivery, optional signed webhooks and complementary explicit reports in S1-6. Same-workspace restart first; notification portability is a separate follow-up. |
-| [protected-cache-plan.md](../protected-cache-plan.md) | **Active implementation detail.** Accepted ACL/encryption direction under ADR 0016; scoped access in S1-7, encrypted persistence in S1-8 and native/Workers/Railway evidence in S4-4. Proposed contracts; no implementation/deployment certification. |
+| [workspace-notifications-plan.md](../design/workspace-notifications-plan.md) | **Active implementation detail.** Accepted core capability under ADR 0015; automatic file change detection first, parent-path subscriptions, durable delivery, optional signed webhooks and complementary explicit reports in S1-6. Same-workspace restart first; notification portability is a separate follow-up. |
+| [protected-cache-plan.md](../design/protected-cache-plan.md) | **Active implementation detail.** Accepted ACL/encryption direction under ADR 0016; scoped access in S1-7, encrypted persistence in S1-8 and native/Workers/Railway evidence in S4-4. Proposed contracts; no implementation/deployment certification. |
 | [task-resumability-plan.md](plans/task-resumability-plan.md) | **Superseded interpretation.** Agent-task proposal retained as history after the user clarified upload/download resumability; no independent work queue. |
-| [storage-portability-design.md](../storage-portability-design.md) | **Design rationale.** Expands S0-7/S1; concrete implemented APIs and limits are in portable-workspace-usage.md. |
+| [storage-portability-design.md](../design/storage-portability-design.md) | **Design rationale.** Expands S0-7/S1; concrete implemented APIs and limits are in portable-workspace-usage.md. |
 | [pre-code-discovery-2026-09-29.md](plans/pre-code-discovery-2026-09-29.md) | **Discovery/handover record.** Verified source observations, proposed choices and slices mapped to canonical IDs; new findings require runtime regressions. |
 | [storage-plan-alignment-2026-09-29.md](plans/storage-plan-alignment-2026-09-29.md) | **Review record.** Explains consolidation and engineering handover; use plan IDs for status. |
 | [realtime-multiplayer-plan.md](collaboration/realtime-multiplayer-plan.md) | **Transferred history/handover.** Current implementation and qualification are owned by the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md); retained source context remains dated. |
@@ -66,7 +66,7 @@ authority are frozen historical text. Follow the destination below instead.
 | [distribution-spike.md](experiments/distribution-spike.md) | **Historical experiment.** Packaging feasibility and old failures retained; current delivery work S2. |
 | [assessment-2026-09-27.md](experiments/assessment-2026-09-27.md) | **Historical assessment.** Includes subsequent repair record; findings are not automatically reopened. |
 | [agent-workspace-pilot.md](experiments/agent-workspace-pilot.md) | **Historical local pilot.** Remaining clean-install/cross-host/real-user proof lives in S2–S4. |
-| [competitive-landscape.md](../competitive-landscape.md) | **Dated research.** Recommendations do not schedule work; refresh material claims for S4 decisions. |
+| [competitive-landscape.md](../design/competitive-landscape.md) | **Dated research.** Recommendations do not schedule work; refresh material claims for S4 decisions. |
 | [product-assessment-2026-09-29.md](assessments/product-assessment-2026-09-29.md) | **Dated assessment.** Current baseline evidence and limitations; actions owned by S0–S4. |
 | [agent-continuity-pilot-2026-09-29.md](experiments/agent-continuity-pilot-2026-09-29.md) | **Dated experiment.** Synthetic same-host continuity, not real-agent or cross-host proof. |
 | [assessment evidence](../assessment-evidence/2026-09-29/README.md), [session baseline](../benchmarks/session-baseline.md), [tool baseline](../benchmarks/2026-09-27/tool-performance-baseline.md) | **Evidence only.** Preserve run dates, environments, failures and limitations; no performance promise or work queue. |
@@ -75,9 +75,9 @@ authority are frozen historical text. Follow the destination below instead.
 
 These are contracts or operating instructions, not obsolete plans:
 
-- [S3 compatibility](../compat-contract.md), [workspace contract](../workspace-contract.md),
-  [preparation manifest](../task-manifest.md), [workspace step vocabulary](../workspace-contract-steps.md).
-- [Browser persistence](../browser-persistence.md), [running and probing](../running-and-probing.md),
+- [S3 compatibility](../contracts/compat-contract.md), [workspace contract](../workspace-contract.md),
+  [preparation manifest](../contracts/task-manifest.md), [workspace step vocabulary](../contracts/workspace-contract-steps.md).
+- [Browser persistence](../guides/browser-persistence.md), [running and probing](../running-and-probing.md),
   [code standards](../CODE_STANDARDS.md), [conformance](../../conformance/CONFORMANCE.md).
 - README, CONTEXT, package docs, contribution/security/support docs, site and agent skill.
 

@@ -98,7 +98,7 @@ used separate XDG directories. Retain failed state for diagnosis.
 Keep the Stow checkout, disposable workspace, registry and caller state in separate
 directories. Use a small fixture for the first run. The manifest directory is the
 base for relative paths; the workspace parent must exist and its root must not.
-Use the existing [task manifest format](../../docs/task-manifest.md), then run
+Use the existing [task manifest format](../../docs/contracts/task-manifest.md), then run
 from the Stow checkout:
 
 ```sh
@@ -239,7 +239,7 @@ example remains experimental until those pass. See the
 
 ## Coordinating agent instructions
 
-The [pasteable pilot instructions](../../docs/opencode-pilot-instructions.md)
+The [pasteable pilot instructions](../../docs/development/opencode-pilot-instructions.md)
 cover installation, real-model work, recovery and cross-host evidence. Run that
 coordinating agent in the Stow checkout; the caller launches the separate file-only
 agent inside the prepared workspace.

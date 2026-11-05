@@ -1,6 +1,6 @@
 # Working-storage foundation review
 
-> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../storage-foundation-plan.md) is the sole work order. Findings, delegated defaults and dependencies are absorbed into the new plan. The retained review is historical and schedules no independent work. Former checklists, phase numbers and next steps below do not schedule work.
+> **Consolidated on 2026-09-29; reference only.** The [new working-storage plan](../../development/storage-foundation-plan.md) is the sole work order. Findings, delegated defaults and dependencies are absorbed into the new plan. The retained review is historical and schedules no independent work. Former checklists, phase numbers and next steps below do not schedule work.
 
 **Status:** planning review, 2026-09-29. Accepted directions are recorded in the
 linked plans and ADRs. The public conditional-write prerequisite is now implemented
@@ -27,7 +27,7 @@ It does not grow an agent executor, arbitrary task queue or collaboration engine
 - Start with shared native runtime/store contracts. Extend existing conditional writes,
   authority, archive verification and durable receipts rather than duplicating them
   in wrappers. Qualify coordination scope; process locks cannot govern all host edits.
-- A supplied [input basis](../../guarded-storage-plan.md#agreed-declared-input-checks)
+- A supplied [input basis](../../design/guarded-storage-plan.md#agreed-declared-input-checks)
   defaults to current-input validation at ready admission. Explicit snapshot mode
   permits intentional historical inputs. No basis means no freshness claim. Preserve
   saved drafts on refusal; never recompute or publish stale output automatically.

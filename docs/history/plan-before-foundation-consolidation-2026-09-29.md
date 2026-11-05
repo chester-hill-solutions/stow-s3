@@ -1,6 +1,6 @@
 # Stow storage product plan
 
-> **Frozen before the 2026-09-29 foundation consolidation.** This body records earlier status and ordering; it is not an active queue. Use the [consolidated plan](../storage-foundation-plan.md) and [current disposition map](../planning-index.md).
+> **Frozen before the 2026-09-29 foundation consolidation.** This body records earlier status and ordering; it is not an active queue. Use the [consolidated plan](../development/storage-foundation-plan.md) and [current disposition map](../development/planning-index.md).
 
 
 **Canonical scope, status and ordering:** 2026-09-29, reconciled against `5485a36` and the recorded assessment. This is the single current implementation work order.
@@ -14,15 +14,15 @@
 | This plan | Governs implementation scope and ordering |
 | [Storage milestone](plans/portable-agent-workspace-goal.md) | Defines the complete workflow and adoption decision |
 | [MCP storage integration](plans/mcp-storage-integration-plan.md) | Concrete S3 integration surface and turn-checkpoint guidance; caller retains execution ownership |
-| [Resumable transfer detail](../resumable-transfer-plan.md) | Proposed S0-4/S1-5/S4-1 validation of multipart upload and range download continuation, followed by consumer integration; code changes follow reproduced gaps |
-| [Portable recovery](../portable-recovery-plan.md) | Accepted data-plus-recovery-state direction; proposed S1-9 contract for cross-host continuation with explicit destination activation |
-| [Guarded storage](../guarded-storage-plan.md) | Accepted guarded saves and optional declared-input checks at ready publication; proposed S1-10 extension of existing conditional writes into public Go/CLI/embedded surfaces |
+| [Resumable transfer detail](../design/resumable-transfer-plan.md) | Proposed S0-4/S1-5/S4-1 validation of multipart upload and range download continuation, followed by consumer integration; code changes follow reproduced gaps |
+| [Portable recovery](../design/portable-recovery-plan.md) | Accepted data-plus-recovery-state direction; proposed S1-9 contract for cross-host continuation with explicit destination activation |
+| [Guarded storage](../design/guarded-storage-plan.md) | Accepted guarded saves and optional declared-input checks at ready publication; proposed S1-10 extension of existing conditional writes into public Go/CLI/embedded surfaces |
 | [Foundation review](plans/foundation-review-2026-09-29.md) | Dependency order, delegated engineering defaults and qualification gaps for the accepted storage extensions; no separate queue |
-| [Workspace notifications](../workspace-notifications-plan.md) | Accepted core capability under ADR 0015; proposed contract and implementation slices for S1-6 |
-| [Protected cache](../protected-cache-plan.md) | Accepted ACL/encryption direction under ADR 0016; proposed access/encryption contracts for S1-7/S1-8 and native, Workers and Railway evidence in S4-4 |
+| [Workspace notifications](../design/workspace-notifications-plan.md) | Accepted core capability under ADR 0015; proposed contract and implementation slices for S1-6 |
+| [Protected cache](../design/protected-cache-plan.md) | Accepted ACL/encryption direction under ADR 0016; proposed access/encryption contracts for S1-7/S1-8 and native, Workers and Railway evidence in S4-4 |
 | [Pre-code discovery](plans/pre-code-discovery-2026-09-29.md) | Source findings, proposed decisions and dependency-ordered implementation slices for the IDs below |
-| [Storage portability design](../storage-portability-design.md) | S0-7/S1 contracts for facade lifetime, complete object snapshots, Git profiles and registry policy |
-| [Planning index and disposition](../planning-index.md) | Complete document inventory, old-item migration map and deferred decisions |
+| [Storage portability design](../design/storage-portability-design.md) | S0-7/S1 contracts for facade lifetime, complete object snapshots, Git profiles and registry policy |
+| [Planning index and disposition](../development/planning-index.md) | Complete document inventory, old-item migration map and deferred decisions |
 | Older DX, remediation, FOSS, workspace, portability and architecture plans | Superseded historical records; their remaining work is carried into the IDs below |
 | [Work-session proposal](plans/work-session-plan.md), [isolate exploration](plans/agent-isolate-exploration.md) | Retired proposals; execution designs require a new scope decision |
 | [Assessment](assessments/product-assessment-2026-09-29.md), [continuity pilot](experiments/agent-continuity-pilot-2026-09-29.md) | Revision-specific observations, including failures and limitations |
@@ -89,7 +89,7 @@ and inactive external operations. This extends S1-8/S1-9; no recovery-key API is
 The subsequent recovery interview accepted cross-host movement of captured data
 plus selected transfer progress and pending storage/notification operations.
 Destination authorization and explicit activation are required; bundle adoption
-does not start external effects. [Portable recovery](../portable-recovery-plan.md)
+does not start external effects. [Portable recovery](../design/portable-recovery-plan.md)
 records this S1-9 extension. Confirmed takeover is the default: external operations
 stay paused until the source relinquishes responsibility or shared ownership prevents
 it from continuing. The confirmation mechanism and consistency contract are engineering
@@ -118,7 +118,7 @@ own checks. Expose permission-safe statuses and blockers; corruption/unsupported
 sections still refuse. This does not introduce a general agent workflow scheduler.
 
 The interview also accepts guarded saves as the default in a new managed read/edit/save
-interface under [S1-10](../guarded-storage-plan.md): compare the caller's read identity,
+interface under [S1-10](../design/guarded-storage-plan.md): compare the caller's read identity,
 refuse stale saves with an explicit conflict and require deliberate unconditional
 replacement. Extend existing conditional-write paths into the public runtime/bridges;
 legacy direct calls and S3 defaults remain supported. Ordinary filesystem edits still
@@ -139,8 +139,8 @@ read-bound identities or input-basis ready publication. See the guarded-storage 
 The numbered S0–S4 work items below govern the storage engineering queue. The authorized collaboration product has moved to its own repository, referenced below.
 The milestone defines storage success and the MCP plan expands S3; neither establishes
 a competing storage order.
-Accepted [ADRs](../adr/README.md), [S3 compatibility](../compat-contract.md),
-[workspace](../workspace-contract.md) and [preparation](../task-manifest.md) contracts
+Accepted [ADRs](../adr/README.md), [S3 compatibility](../contracts/compat-contract.md),
+[workspace](../workspace-contract.md) and [preparation](../contracts/task-manifest.md) contracts
 remain normative. Retiring a plan does not retire an accepted contract or an
 implemented feature. Proposed contracts must be labelled until implemented.
 
@@ -180,7 +180,7 @@ before testing a useful native slice. Existing release and real-consumer gates r
 
 **Development candidate: 0.3.0, implemented locally on 2026-09-29.** The baseline
 assessment and pre-code discovery below are historical inputs. Current commands
-and contracts are in [portable workspace usage](../portable-workspace-usage.md);
+and contracts are in [portable workspace usage](../guides/portable-workspace-usage.md);
 [implementation evidence](implementation/implementation-2026-09-29.md) records validation and
 remaining gates. This candidate has not been published.
 
@@ -352,7 +352,7 @@ ambiguous publication before retrying. Agent-requested saves remain best effort.
 Compare the completed workflow against users' actual tools and let retained use
 determine the next investment.
 
-The [resumable transfer plan](../resumable-transfer-plan.md) expands S0-4/S1-5/S4-1
+The [resumable transfer plan](../design/resumable-transfer-plan.md) expands S0-4/S1-5/S4-1
 with interrupted multipart upload and range download exercises against retained
 storage, then a small cococlips consumer pilot. Server-side operations already
 exist; client progress/retry behavior needs explicit evidence. This follows the
@@ -364,7 +364,7 @@ remain in force; no transfer-resume pass is claimed by the planning change.
 | --- | --- |
 | S4-1 | Use both a meaningful S3 fixture application and OpenCode recovery workflow. Include Git plus fixtures, non-Git data, interrupted work and transfer. Separate missing state from model/task failure. |
 | S4-2 | Run the milestone's two-independent-team repeat-use study; record setup interventions, recovery effort, cost and retained use against actual alternatives. Refresh market research before an investment decision; old landscape snapshots are evidence of their dates only. |
-| S4-3 | Decide deepen/narrow/rework from that evidence. Reconsider deferred work through the [disposition register](../planning-index.md), with a named consumer need and explicit scope decision for execution or hosted services. |
+| S4-3 | Decide deepen/narrow/rework from that evidence. Reconsider deferred work through the [disposition register](../development/planning-index.md), with a named consumer need and explicit scope decision for execution or hosted services. |
 | S4-4 | Qualify the protected-cache profile requested for native services, Railway and Cloudflare Workers under ADR 0016. Native/Railway reuse the service with encrypted persistence and a single-instance volume profile; Workers first proves shared-core execution and minimal platform persistence. Record scoped warm-cache denial, origin outage, policy/key expiry/rotation, restart/redeploy, size/memory limits and supported operations per target. No production-cache or deployment pass is implied. |
 
 **Exit:** evidence beyond internal smoke tests determines expansion. Finishing S0–S3 does not automatically reactivate the deferred execution plan.

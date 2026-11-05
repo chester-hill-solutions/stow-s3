@@ -8,7 +8,7 @@ Published on 2026-10-13 to [Stow](https://stow.chesterhillsolutions.ca/) as Clou
 
 Repositioned on 2026-10-14: the homepage now leads with the category rather than the vision. The hero reads "S3 storage, without the server." under the eyebrow "Embeddable object storage", and the capabilities, path, session and API copy present checkpoints, workspaces and browser persistence as extensions of the embedded object engine. Ephemeral workloads are named alongside testing and agent scenarios at the process level (scoped sessions and the embedded runtime), not as qualified edge or Workers deployment. The retained line "Your work. Stored. Ready to move." now heads the workspace section instead of the hero, so the headline row in the structure table above is superseded. The homepage metadata, the LLM index and the hero and social launch cards changed together; the visual design, section order and fragment targets are unchanged. See the note on the old headline below.
 
-This is a website design and implementation brief. Storage implementation and release status remain governed by the [consolidated storage plan](../docs/storage-foundation-plan.md), including W20 for publication and documentation gates. This brief adds no package capabilities or release claims.
+This is a website design and implementation brief. Storage implementation and release status remain governed by the [consolidated storage plan](../docs/development/storage-foundation-plan.md), including W20 for publication and documentation gates. This brief adds no package capabilities or release claims.
 
 Updated for the November 5, 2026 release: public npm installation is the TypeScript entry path.
 The homepage, guides, agent indexes and ecosystem graphic now describe v0.3.5.

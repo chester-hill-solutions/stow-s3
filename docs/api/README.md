@@ -14,4 +14,4 @@ Choose the interface used by your application. Each reference lists public funct
 - [Go API](go.md)
 - [Python API](python.md)
 - [MCP API](mcp.md)
-- [S3 HTTP API](../compat-contract.md): routes, headers, conditions, responses and unsupported operations.
+- [S3 HTTP API](../contracts/compat-contract.md): routes, headers, conditions, responses and unsupported operations.

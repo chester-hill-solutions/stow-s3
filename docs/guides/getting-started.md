@@ -24,7 +24,7 @@ Both x86_64 (`amd64`) and ARM64 (`arm64`) are supported. Check the archive again
 Then run `stow-s3 --version`.
 
 The Python client is not yet published to PyPI. Use the source steps below for Python
-or to run the repository's development examples. Read the [release notes](releases/v0.3.5.md) before
+or to run the repository's development examples. Read the [release notes](../releases/v0.3.5.md) before
 upgrading a persistent filesystem object store: older versions cannot read new
 version-2 object records.
 
@@ -52,15 +52,15 @@ go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 
 Python installation still requires a source checkout. TypeScript applications can use the npm package above.
 <!-- repo-only:start -->
-See the [npm publication record](npm-publishing.md#published-035) for exact release verification.
+See the [npm publication record](../development/npm-publishing.md#published-035) for exact release verification.
 <!-- repo-only:end -->
 
 ## Choose your storage surface
 
 | Workload | Start with |
 | --- | --- |
-| Runnable examples for tests, local apps and pipelines | [Examples](../examples/stow-recipes/README.md) |
-| Existing S3 SDKs or disposable integration tests | [Native server](running-and-probing.md) and the [TypeScript client](../packages/stow-s3/README.md) |
+| Runnable examples for tests, local apps and pipelines | [Examples](../../examples/stow-recipes/README.md) |
+| Existing S3 SDKs or disposable integration tests | [Native server](../running-and-probing.md) and the [TypeScript client](../../packages/stow-s3/README.md) |
 | An agent's working directory and checkpoints | [Workspace guide](portable-workspace-usage.md) |
 | Small-file offline editing with undo and redo | [Browser file history](browser-file-history.md) |
 | Several files, retained revisions or larger assets | [Browser project storage](browser-project-storage.md) |
@@ -73,7 +73,7 @@ See the [npm publication record](npm-publishing.md#published-035) for exact rele
 make browser-editor
 ```
 
-The [editor walkthrough](../examples/browser-editor/README.md) uses real WASM,
+The [editor walkthrough](../../examples/browser-editor/README.md) uses real WASM,
 IndexedDB and a private local S3 fixture. It demonstrates offline reload, retained
 edits, undo/redo and conditional remote sync.
 
@@ -84,5 +84,5 @@ Browser applications supply the transport and choose when to sync.
 A conflict preserves local work; the application decides how to resolve it.
 Budget storage for retained history. The browser can evict local data.
 
-Read the [compatibility contract](compat-contract.md) for the native S3 subset,
+Read the [compatibility contract](../contracts/compat-contract.md) for the native S3 subset,
 and the relevant browser guide for host and persistence limits.

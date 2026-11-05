@@ -2,7 +2,7 @@
 
 **Planning status: superseded implementation work order — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Completed corrections remain implemented; historical red/status tables are not current defects. Remaining storage work is carried into S0/S1; per-caller authority redesign is deferred.
 
 The entire original body below is retained as history. Its statuses, unchecked
@@ -20,7 +20,7 @@ not current instructions. Accepted ADRs and implemented contracts remain in forc
 **Baseline:** `main` at `1982104`
 **Governs:** the implementation of
 [`stow-environment.md`](stow-environment.md) §3 dimensions and §10 invariants
-**Acceptance surface:** [`docs/compat-contract.md`](../../compat-contract.md) for
+**Acceptance surface:** [`docs/compat-contract.md`](../../contracts/compat-contract.md) for
 everything observable over S3
 
 Normative keywords MUST, MUST NOT, SHOULD, and MAY are used as in RFC 2119.
@@ -275,7 +275,7 @@ This document does not decide these. It points at them.
 | Workspace as the default | [ADR 0007](../../adr/0007-workspace-is-the-default.md), [ADR 0008](../../adr/0008-workspace-backend-real-files.md) |
 | Sessions as capability issuers | [ADR 0004](../../adr/0004-agent-session-contract.md) |
 | The embedded runtime is primary | [ADR 0003](../../adr/0003-embedded-runtime.md) |
-| The S3 wire surface | [`docs/compat-contract.md`](../../compat-contract.md) |
+| The S3 wire surface | [`docs/compat-contract.md`](../../contracts/compat-contract.md) |
 | Cross-runtime agreement | [`docs/workspace-contract.md`](../../workspace-contract.md) §8 |
 | Eight dimensions, ten architectural invariants | [`stow-environment.md`](stow-environment.md) §3, §10 |
 
@@ -622,7 +622,7 @@ buffered twice. Merging MUST be bounded to the page window, and the cache fill
 MUST stream.
 
 The consistency claim is settled and is **eventual** — see §7.4 and
-[`docs/compat-contract.md`](../../compat-contract.md) §6.2. Bounding the fetch
+[`docs/compat-contract.md`](../../contracts/compat-contract.md) §6.2. Bounding the fetch
 weakens no guarantee, because no cross-source guarantee was available to begin
 with. No conformance case may assert ordering or completeness across pages; a
 case may assert that keys from both sources appear, that a duplicate key resolves
@@ -1345,7 +1345,7 @@ is a compatibility claim and lives in the document that owns the S3 surface.
 | 7.2 | **Delete** the `pkg/stow.Store` seam; treat removal as a breaking change | R-910 | ADR 0010 decisions 4, 5 |
 | 7.3 | Keep Track C inside this specification rather than splitting it out | — | — |
 | — | Land the gate tests before reopening M1.3 | R-1001…R-1004 | ADR 0010 decision 6 |
-| 7.4 | Merged `ListObjectsV2` claims **eventual** consistency, not a snapshot | R-707 | [`docs/compat-contract.md`](../../compat-contract.md) §6.2 |
+| 7.4 | Merged `ListObjectsV2` claims **eventual** consistency, not a snapshot | R-707 | [`docs/compat-contract.md`](../../contracts/compat-contract.md) §6.2 |
 
 **No open decisions remain.**
 

@@ -131,7 +131,7 @@ stow-s3 serve --mode run-through \
 Configure that proxy to send forwarding headers (such as `X-Forwarded-For`) or
 restrict `/_stow/*`, so proxied clients cannot inherit token-free loopback diagnostics.
 
-A process that must listen on another interface needs the consent flag and provisioned credentials that [the server guide](running-and-probing.md#serving-beyond-loopback) describes.
+A process that must listen on another interface needs the consent flag and provisioned credentials that [the server guide](../running-and-probing.md#serving-beyond-loopback) describes.
 That shape is for a network you control, and the proxy shape above is still the one to prefer.
 
 Prepare the node the way a single machine is prepared:
@@ -154,7 +154,7 @@ Operational limits to plan around:
 - One process owns one data directory. The directory carries an exclusive lock, so a node scales by serving more clients, not by running several processes over the same directory.
 - Upstream credentials live on the node, which is why the node is the only thing that reaches upstream. Per-client scoped credentials are not implemented yet: every client of a node shares one identity.
 <!-- repo-only:start -->
-Scoped per-caller principals are [ADR 0016](adr/0016-scoped-access-encrypted-cache.md).
+Scoped per-caller principals are [ADR 0016](../adr/0016-scoped-access-encrypted-cache.md).
 <!-- repo-only:end -->
 - The MCP surface is stdio-only, so an agent on another host reaches the node over S3 rather than through MCP.
 
@@ -192,5 +192,5 @@ An explicit `STOW_ALLOW_LIVE_WRITES=false` also prevents propagation.
 See the [outbox guide](outbox.md) for retries and conflict recovery.
 
 <!-- repo-only:start -->
-See [ADR 0005](adr/0005-live-write-requires-explicit-consent.md).
+See [ADR 0005](../adr/0005-live-write-requires-explicit-consent.md).
 <!-- repo-only:end -->

@@ -466,7 +466,7 @@ Enable run-through with `--mode run-through` or `STOW_MODE=run-through` and conf
 Environment precedence is `STOW_*` > `S3_*` > `AWS_*`.
 Credentials alone do not change local mode. `STOW_MODE=local` forces local-only storage.
 <!-- repo-only:start -->
-See [ADR 0011](adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001.
+See [ADR 0011](../adr/0011-local-is-the-default-mode.md), which supersedes ADR 0001.
 <!-- repo-only:end -->
 
 ### 6.1 Policies
@@ -692,7 +692,7 @@ are lexical key markers, not authenticated query-bound provider tokens. Clients
 should replay returned tokens.
 
 <!-- repo-only:start -->
-The [acceptance coverage map](history/assessments/compatibility-coverage-2026-09-29.md) records SDK and raw protocol tests.
+The [acceptance coverage map](../history/assessments/compatibility-coverage-2026-09-29.md) records SDK and raw protocol tests.
 <!-- repo-only:end -->
 
 Resource-policy listings paginate permitted objects and prefixes before choosing

@@ -1,8 +1,8 @@
 # Implementation records
 
 Dated evidence records the boundary tested at that revision. It does not replace
-the [current work plan](../../storage-foundation-plan.md) or
-[supported workspace guide](../../portable-workspace-usage.md).
+the [current work plan](../../development/storage-foundation-plan.md) or
+[supported workspace guide](../../guides/portable-workspace-usage.md).
 
 | Date | Record |
 | --- | --- |

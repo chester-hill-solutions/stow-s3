@@ -80,7 +80,7 @@ The desktop was quieter by the user’s observation, but background processes re
 - [Five-minute report](steady/report.md), [effective config](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/steady/config.json), [summary](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/steady/summary.json) and [raw index](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/steady/suite.json).
 - [Validation record](https://github.com/chester-hill-solutions/stow-s3/blob/e549d047b3b5aa220563a486deb4e7aa8caa4a19/docs/benchmarks/2026-10-13-memory-performance/validation.json): all 22 runs completed, zero operation failures, verified data, no quarantine leftovers, disk reserve maintained, and 12 measurement tests passed after the load runs. All three benchmark commands exited zero; dropped arrivals are reported separately from operation failures.
 - Each suite preserves its harness source snapshot, binary SHA-256, build metadata, SDK lockfile hash and dirty-checkout identity. Scenario JSON files contain per-second arrivals and sampled resources.
-- [Earlier evidence](../2026-10-12-performance/README.md) and [testing guide](../../performance-testing.md).
+- [Earlier evidence](../2026-10-12-performance/README.md) and [testing guide](../../development/performance-testing.md).
 
 Build with `make build`, then run each profile sequentially into a new output directory:
 

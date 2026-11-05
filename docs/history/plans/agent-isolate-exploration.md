@@ -2,7 +2,7 @@
 
 **Planning status: retired product exploration — 2026-09-29.**
 [The canonical storage plan](../../plan.md) is the only active work order.
-[The disposition register](../../planning-index.md) maps this document's old items
+[The disposition register](../../development/planning-index.md) maps this document's old items
 to current work or explicit deferral. Storage continuity is now evaluated through S3/S4. Runner and sandbox ownership require a new explicit product decision.
 
 The entire original body below is retained as history. Its statuses, unchecked
@@ -314,7 +314,7 @@ run.
 ## Related contracts
 
 - [Agent continuity pilot, 2026-09-29](../experiments/agent-continuity-pilot-2026-09-29.md) — measured offline input capture and two-process continuation, including the archive-path workaround; fresh-model and cross-host continuation remain untested.
-- [Agent task manifest](../../task-manifest.md) — current workspace preparation,
+- [Agent task manifest](../../contracts/task-manifest.md) — current workspace preparation,
   lifecycle, and explicit non-sandbox limitation.
 - [Workspace contract](../../workspace-contract.md) — object/file mapping and
   workspace storage behavior.

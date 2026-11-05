@@ -7,8 +7,8 @@ on Railway before measurement and record their source identities and resource li
 Run reproducible storage workloads before publishing capacity claims.
 The suite measures embedded Go storage, the S3 endpoint and a simulated quarantine workflow.
 It does not run a DPI engine or block network traffic.
-The [October 12 local evidence](benchmarks/2026-10-12-performance/README.md) records the first complete exploratory run.
-The [October 13 memory rerun](benchmarks/2026-10-13-memory-performance/README.md) adds longer capacity windows, a quarantine arrival-rate sweep and a five-minute run.
+The [October 12 local evidence](../benchmarks/2026-10-12-performance/README.md) records the first complete exploratory run.
+The [October 13 memory rerun](../benchmarks/2026-10-13-memory-performance/README.md) adds longer capacity windows, a quarantine arrival-rate sweep and a five-minute run.
 The [Railway benchmark setup](railway-performance.md) records the isolated cloud environment and the work needed for matched implementation comparisons.
 
 ## Quick checks
