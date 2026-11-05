@@ -240,14 +240,19 @@ const nativeOptional = {
 };
 const optionalLock = () => ({ packages: {
   "": { optionalDependencies: { ...nativeOptional } },
-  ...Object.fromEntries(Object.keys(nativeOptional).map((name) => [`node_modules/${name}`, { optional: true }])),
+  ...Object.fromEntries(Object.keys(nativeOptional).map((name) => [`node_modules/${name}`, { optional: true, version: "0.3.5" }])),
 } });
 
-test("unpublished optional carriers retain lock records without claiming registry artifacts exist", () => {
+test("optional carriers can declare their version without registry artifact metadata", () => {
   assert.deepEqual(optionalLockProblems(nativeOptional, optionalLock()), []);
-  const lock = optionalLock();
-  for (const record of Object.values(lock.packages)) if (record.optional) record.version = "0.3.5";
-  assert.deepEqual(optionalLockProblems(nativeOptional, lock), []);
+});
+
+test("each native carrier needs a version before npm ci can use its lock record", () => {
+  for (const name of Object.keys(nativeOptional)) {
+    const lock = optionalLock();
+    delete lock.packages[`node_modules/${name}`].version;
+    assert.ok(optionalLockProblems(nativeOptional, lock).some((problem) => problem.includes(name)));
+  }
 });
 
 test("each dropped native carrier lock record is rejected", () => {

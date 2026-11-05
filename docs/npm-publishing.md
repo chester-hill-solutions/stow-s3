@@ -27,6 +27,10 @@ The bootstrap stopped at its immediate integrity check during this processing de
 Each continuation waited for matching public integrity, then skipped completed versions.
 No published version was replaced. Platform packages became available before the core package.
 
+After publication, the four source lock records were resolved against public npmjs with matching SHA-512 checksums.
+The earlier empty optional-package placeholders fail clean installation once these packages are public.
+The version gate now requires each carrier's declared version, and current `main` contains the complete records.
+
 Live-provider compatibility remains **NOT verified for 0.3.5**.
 The existing owner waiver applied only to this first interactive npm release.
 No trusted publisher was configured, and no package was published to PyPI.
