@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Stow — S3 storage, without the server</title>
-  <meta name="description" content="Embeddable object storage for applications, tests and ephemeral workloads. Call the object engine in-process from Go or WebAssembly, or start the native S3 endpoint. Portable checkpoints, workspaces and browser persistence included. Free and open source." />
+  <meta name="description" content="Private S3 buckets for tests, checkpointed files for agents, local browser edits and cached S3 reads. Start locally with Go, TypeScript, Python or WebAssembly." />
   <link rel="canonical" href="https://stow.chesterhillsolutions.ca/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Stow — S3 storage, without the server." />
-  <meta property="og:description" content="Embeddable object storage for applications, tests and ephemeral workloads. Run the object engine in-process or over the native S3 endpoint. No cloud storage service to provision." />
+  <meta property="og:description" content="Keep test data separate, preserve an agent's files, save browser edits locally and cache remote objects. Object storage that starts with your application." />
   <meta property="og:image" content="https://stow.chesterhillsolutions.ca/images/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -17,7 +17,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="/assets/favicon.svg?v=20261013" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/theme.css?v=20261013" />
-  <link rel="stylesheet" href="/assets/stow.css?v=20261013" />
+  <link rel="stylesheet" href="/assets/stow.css?v=20261105" />
   <link rel="stylesheet" href="/assets/code.css?v=20261013" />
   <link rel="stylesheet" href="/assets/benchmarks.css?v=20261014" />
   <link rel="alternate" type="text/markdown" href="/agent.md" title="Agent instructions" />
@@ -39,9 +39,9 @@
       <div class="hero-copy">
         <p class="eyebrow">Embeddable object storage</p>
         <h1 id="hero-title"><span>S3 storage,</span> <span>without the server.</span></h1>
-        <p class="lede">One object model for applications, tests and ephemeral workloads: buckets, objects and conditional writes. Call it in-process from Go or WebAssembly, or over the native S3 endpoint when an ordinary SDK needs one. No cloud storage service to provision.</p>
+        <p class="lede">Your application needs somewhere to put its working data. It should be easy to start fresh in a test, keep an agent's files, or save an edit without a connection. Stow supplies local object storage, file history and portable checkpoints. Embed it in Go or WebAssembly, or connect your S3 client to a native endpoint.</p>
         <div class="cta">
-          <a class="btn btn-primary" href="/docs/getting-started/">Explore the docs <span aria-hidden="true">→</span></a>
+          <a class="btn btn-primary" href="#problem">Find your use case <span aria-hidden="true">→</span></a>
           <a class="text-link" href="https://github.com/chester-hill-solutions/stow-s3">View source <span aria-hidden="true">↗</span></a>
         </div>
         <p class="languages">Go · TypeScript · Python · WebAssembly</p>
@@ -61,21 +61,26 @@
 
     <section class="paths container" id="problem" aria-labelledby="paths-title">
       <div class="section-intro">
-        <h2 id="paths-title">Three surfaces on one engine.</h2>
-        <p>The same buckets, objects and conditional writes — behind a native S3 endpoint, in agent workspaces, or in the browser.</p>
+        <p class="eyebrow">Start with the problem</p>
+        <h2 id="paths-title">Four places storage gets in the way.</h2>
+        <p>Different workloads need different kinds of continuity. Keep a test's data separate, carry saved files forward, or keep working without the network.</p>
       </div>
       <div class="path-grid">
         <article class="path">
           <svg class="path-icon" viewBox="0 0 32 36" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><ellipse cx="16" cy="8" rx="12" ry="5"/><path d="m4 8 3 21c2 5 16 5 18 0l3-21"/></svg>
-          <div><span class="path-number">01</span><h3>Local S3</h3><p>Private storage for development and tests. Use the S3 clients you already know.</p><a class="text-link" href="/docs/server/" aria-label="Explore local S3">Explore <span aria-hidden="true">→</span></a></div>
+          <div><p class="path-category">01 / Tests &amp; pipelines</p><h3>Shared test data makes failures hard to trust.</h3><p>Parallel runs can overwrite the same keys. Leftover objects can change the next result. Cloud setup adds credentials and cleanup before the test even starts.</p><p class="path-response"><strong>With Stow</strong> Give each run a private bucket and generated credentials. Use your application's S3 client, then clean up when the session ends.</p><a class="text-link" href="#test-fixture">Give a test its own bucket <span aria-hidden="true">→</span></a></div>
         </article>
         <article class="path">
           <svg class="path-icon" viewBox="0 0 32 36" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 9h13l6 6v17H5Z"/><path d="M18 9v6h6M10 9V3h13l6 6v17h-5M23 3v6h6"/></svg>
-          <div><span class="path-number">02</span><h3>Agent workspaces</h3><p>Prepare files, capture checkpoints, compare changes and hand off work.</p><a class="text-link" href="/docs/workspaces/" aria-label="Explore agent workspaces">Explore <span aria-hidden="true">→</span></a></div>
+          <div><p class="path-category">02 / Agent workspaces</p><h3>A temporary checkout is easy to lose.</h3><p>An agent edits files on a disposable machine. Before that machine goes away, you need to keep the result, inspect what changed, and move saved work to the next host.</p><p class="path-response"><strong>With Stow</strong> Prepare a task workspace, checkpoint its files, and export a verified archive before cleanup.</p><a class="text-link" href="#agent-fixture">Keep an agent's work <span aria-hidden="true">→</span></a></div>
         </article>
         <article class="path">
           <svg class="path-icon" viewBox="0 0 32 36" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="5" width="28" height="27" rx="2"/><path d="M2 12h28M7 9h1m3 0h1m3 0h1"/></svg>
-          <div><span class="path-number">03</span><h3>Browser storage</h3><p>Persist edits in IndexedDB. Undo, redo and sync explicitly.</p><a class="text-link" href="/docs/browser-projects/" aria-label="Explore browser storage">Explore <span aria-hidden="true">→</span></a></div>
+          <div><p class="path-category">03 / Browser editing</p><h3>A lost connection leaves edits unsent.</h3><p>If saving waits for a server, a dropped connection interrupts the workflow. Reloading the page can lose work that only exists in memory.</p><p class="path-response"><strong>With Stow</strong> Save stages in IndexedDB, undo or redo locally, then sync a selected version with remote conflict detection.</p><a class="text-link" href="#demo">Try editing offline <span aria-hidden="true">→</span></a></div>
+        </article>
+        <article class="path">
+          <svg class="path-icon" viewBox="0 0 32 36" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><ellipse cx="16" cy="8" rx="12" ry="5"/><path d="M4 8v17c0 3 5 5 12 5s12-2 12-5V8M4 16c0 3 5 5 12 5s12-2 12-5"/><path d="m11 29 5-4 5 4M16 25v10"/></svg>
+          <div><p class="path-category">04 / Local read cache</p><h3>A remote object can hold up local work.</h3><p>Your tool needs the same assets or dataset again. Fetching from upstream adds a network dependency; an outage stops reads that only exist remotely.</p><p class="path-response"><strong>With Stow</strong> Fetch through a local disk cache or prewarm known keys. Read retained copies while offline.</p><a class="text-link" href="#cache-fixture">Keep needed files nearby <span aria-hidden="true">→</span></a></div>
         </article>
       </div>
     </section>
@@ -84,134 +89,17 @@
       <div class="session-inner container" id="use-cases">
         <div class="session-copy">
           <p class="eyebrow">Stow in practice</p>
-          <h2 id="session-title">A disposable bucket in one call.</h2>
-          <p>Four practical setups — tests and ephemeral workloads, cached reads, offline browser editing and disposable agent checkouts. Open one to try the offline demo or copy a storage fixture.</p>
-          <p class="source-note">Build from source · TypeScript and Python preview · <a href="/docs/getting-started/">Source setup and first steps <span aria-hidden="true">↗</span></a></p>
+          <h2 id="session-title">Put the right workflow to work.</h2>
+          <p>Start with a private S3 fixture, a saved agent workspace, local browser edits, or cached upstream objects. Open a walkthrough to see what Stow changes and how to set it up.</p>
+          <p class="source-note">TypeScript: npm · Python: source checkout · Go: embedded API · <a href="/docs/getting-started/">Installation and first steps <span aria-hidden="true">↗</span></a></p>
         </div>
         <div class="use-case-accordion">
-      <details class="fixture use-case-panel" id="demo" name="stow-use-cases">
-        <summary><span class="use-case-label">Online / offline</span><span class="use-case-title">Keep editing when the connection drops.</span></summary>
-        <div class="demo-body" id="browser">
-          <div class="walkthrough" data-demo hidden>
-            <div class="demo-heading">
-              <div><h3>Edit offline, then sync a saved stage</h3>
-                <p>This is a simulation: data stays in this tab, and reload clears it.
-                  Run the demo below to try WASM, IndexedDB, and S3.</p></div>
-              <button class="btn btn-ghost" type="button" id="demo-reset">Reset</button>
-            </div>
-            <ol class="demo-steps">
-              <li>Switch offline.</li><li>Edit and save a stage.</li><li>Undo or redo.</li><li>Reconnect, then sync.</li>
-            </ol>
-            <div class="demo-toolbar">
-              <label class="offline-switch"><input type="checkbox" id="demo-offline" /> Work offline</label>
-              <label class="upload-label" for="demo-upload">Open a text file <span>(up to 16 KiB)</span></label>
-              <input type="file" id="demo-upload" accept=".txt,.md,.json,.csv,text/*,application/json" />
-            </div>
-            <div class="demo-panels">
-              <div class="demo-local">
-                <label for="demo-editor"><span id="demo-filename">notes.md</span> <small>Local working copy</small></label>
-                <textarea id="demo-editor" rows="7" spellcheck="false"># notes.md
-
-Save an edit, then sync it to the simulated remote.</textarea>
-                <div class="demo-actions">
-                  <button class="btn btn-primary" type="button" id="demo-save">Save stage</button>
-                  <button class="btn btn-ghost" type="button" id="demo-undo">Undo</button>
-                  <button class="btn btn-ghost" type="button" id="demo-redo">Redo</button>
-                </div>
-                <p class="demo-detail" id="demo-history">1 retained stage</p>
-              </div>
-              <div class="demo-remote">
-                <h4>Simulated remote object</h4>
-                <pre id="demo-remote-content"></pre>
-                <div class="outbox"><span>Pending file</span><b id="demo-pending">0</b></div>
-                <button class="btn btn-primary" type="button" id="demo-sync">Sync selected stage</button>
-                <p class="demo-detail">After reconnecting, choose Sync to publish the selected stage.</p>
-              </div>
-            </div>
-            <p class="demo-message" id="demo-message" role="status" aria-live="polite">The initial stage matches the simulated remote.</p>
-          </div>
-
-          <noscript><p>The interactive walkthrough needs JavaScript. Run the real browser demo from the source checkout below.</p></noscript>
-          <div class="demo-real">
-            <div><h3>Run the real browser demo</h3>
-              <p>WASM, IndexedDB, offline reload, undo/redo, explicit sync, and remote conflicts.
-                A private local S3 fixture supplies the remote.</p></div>
-            <div class="install"><code id="demo-cmd">make browser-editor</code><button type="button" data-copy="#demo-cmd">Copy</button></div>
-            <a href="/docs/browser-editor/">Demo setup &amp; walkthrough &rarr;</a>
-          </div>
-
-          <p class="scope-note">The real file-history API retains whole-file stages; project revisions share unchanged content. Browsers can evict local storage. Sync detects remote conflicts; your app chooses how to resolve them. <a href="/docs/browser-file-history/">Limits and recovery.</a></p>
-        </div>
-      </details>
-      <details class="fixture use-case-panel" name="stow-use-cases" id="cache-fixture">
-        <summary><span class="use-case-label">Memory → disk → S3</span><span class="use-case-title">Keep hot files close. Fetch the rest.</span></summary>
-        <div class="fixture-body" id="layered-cache">
-          <div>
-            <h3>1. Start the disk cache</h3>
-            <p>Build Stow from source, configure upstream credentials in your environment, and replace the endpoint and bucket below. These demo credentials are for the local endpoint.</p>
-            <div class="fixture-code">
-              <div class="fixture-code-heading"><span class="code-file">cache.sh</span><span class="code-language">Shell</span><button type="button" data-copy="#fixture-cache-server" hidden>Copy</button></div>
-              <pre tabindex="0" aria-label="Stow filesystem cache configuration"><code id="fixture-cache-server" data-language="bash">STOW_ENDPOINT=https://s3.example.com \
-STOW_BUCKET=assets \
-stow-s3 serve --mode run-through \
-  --backend filesystem \
-  --port 9000 \
-  --access-key demo-local \
-  --secret-key demo-local-secret \
-  --data-dir ./stow-data \
-  --cache-dir ./stow-cache \
-  --cache-max-bytes 2147483648 \
-  --cache-ttl 24h</code></pre>
-            </div>
-            <p class="fixture-note">The disk layer retains up to 2 GiB with a 24-hour TTL. Stow revalidates cached objects online. Offline reads require retained bytes. <a href="/docs/run-through/">Upstream credentials and offline setup.</a></p>
-          </div>
-          <div>
-            <h3>2. Put a small memory cache in front</h3>
-            <p>Install <code>@aws-sdk/client-s3</code> and <code>lru-cache</code>. Save this as <code>read-assets.mjs</code> and run it with Node. Replace the image key with an object already in your upstream bucket.</p>
-            <div class="fixture-code">
-              <div class="fixture-code-heading"><span class="code-file">read-assets.mjs</span><span class="code-language">JavaScript</span><button type="button" data-copy="#fixture-cache-client" hidden>Copy</button></div>
-              <pre tabindex="0" aria-label="Node memory cache in front of Stow"><code id="fixture-cache-client" data-language="javascript">import { LRUCache } from "lru-cache";
-import { S3Client, CreateBucketCommand,
-  GetObjectCommand } from "@aws-sdk/client-s3";
-
-const memory = new LRUCache({
-  maxSize: 32 * 1024 * 1024,
-  ttl: 30_000,
-  sizeCalculation: bytes =&gt; Math.max(1, bytes.byteLength),
-});
-const s3 = new S3Client({
-  endpoint: "http://127.0.0.1:9000",
-  region: "us-east-1", forcePathStyle: true,
-  credentials: {
-    accessKeyId: "demo-local",
-    secretAccessKey: "demo-local-secret",
-  },
-});
-try {
-  await s3.send(new CreateBucketCommand({ Bucket: "assets" }));
-  async function readAsset(key) {
-    const hit = memory.get(key);
-    if (hit) return hit;
-    const result = await s3.send(new GetObjectCommand({
-      Bucket: "assets", Key: key,
-    }));
-    if (!result.Body) throw new Error("Missing object body");
-    const bytes = await result.Body.transformToByteArray();
-    memory.set(key, bytes);
-    return bytes;
-  }
-  await readAsset("images/cover-v1.png"); // disk → S3 on miss
-  await readAsset("images/cover-v1.png"); // memory hit
-} finally {
-  s3.destroy();
-}</code></pre>
-            </div>
-            <p class="fixture-note">The app owns the <a href="https://isaacs.github.io/node-lru-cache/">memory cache</a>. Its byte budget counts retained payloads, not total process memory. Use versioned keys or invalidate memory entries when content changes.</p>
-          </div>
-        </div>
-      </details>
       <details class="fixture use-case-panel" id="test-fixture" name="stow-use-cases" open>
-        <summary><span class="use-case-label">Tests · pipelines</span><span class="use-case-title">Give every test and pipeline its own bucket.</span></summary>
+        <summary><span class="use-case-label">Tests &amp; pipelines</span><span class="use-case-title">Give each run its own bucket.</span></summary>
+        <div class="use-case-context">
+          <p><strong>The problem</strong> An upload test passes on its own, then fails beside another run using the same bucket and key. A storage mock can miss the SDK requests your application actually sends.</p>
+          <p><strong>With Stow</strong> Start a private local S3 endpoint for the run, exercise the real client, and stop it on exit. Choose a data directory when you need to retain artifacts for inspection. Stow implements a defined S3 compatibility profile.</p>
+        </div>
         <div class="fixture-body">
           <div>
             <h3>Start small: a session, a real S3 client, automatic cleanup</h3>
@@ -274,7 +162,11 @@ try {
         </div>
       </details>
       <details class="fixture use-case-panel" name="stow-use-cases" id="agent-fixture">
-        <summary><span class="use-case-label">GitHub → agent workspace</span><span class="use-case-title">Give an agent a disposable checkout.</span></summary>
+        <summary><span class="use-case-label">Agent workspaces</span><span class="use-case-title">Keep the result when the checkout is gone.</span></summary>
+        <div class="use-case-context">
+          <p><strong>The problem</strong> An agent's changes live in a task directory, alongside inputs and generated files. Deleting the checkout or replacing the host can discard the files needed to review or continue the work.</p>
+          <p><strong>With Stow</strong> Declare the inputs, prepare a workspace, pause its writers and capture a checkpoint. Export the saved files before disposal. Your host still owns agent execution, permissions and restart.</p>
+        </div>
         <div class="fixture-body" id="agent-checkout">
           <div>
             <h3>1. Declare the task checkout</h3>
@@ -324,14 +216,144 @@ stow-s3 workspace destroy --id "$WORKSPACE_ID" \
           </div>
         </div>
       </details>
+      <details class="fixture use-case-panel" id="demo" name="stow-use-cases">
+        <summary><span class="use-case-label">Browser editing</span><span class="use-case-title">Save locally. Sync when you choose.</span></summary>
+        <div class="use-case-context">
+          <p><strong>The problem</strong> A user keeps editing after the connection drops. Sending every save straight to the server leaves the app to handle unsent edits, local history and a remote file that may have changed.</p>
+          <p><strong>With Stow</strong> Save file stages locally and keep undo/redo available. Sync a selected stage when connected; a changed remote version is reported as a conflict for your app to resolve.</p>
+        </div>
+        <div class="demo-body" id="browser">
+          <div class="walkthrough" data-demo hidden>
+            <div class="demo-heading">
+              <div><h3>Edit offline, then sync a saved stage</h3>
+                <p>This is a simulation: data stays in this tab, and reload clears it.
+                  Run the demo below to try WASM, IndexedDB, and S3.</p></div>
+              <button class="btn btn-ghost" type="button" id="demo-reset">Reset</button>
+            </div>
+            <ol class="demo-steps">
+              <li>Switch offline.</li><li>Edit and save a stage.</li><li>Undo or redo.</li><li>Reconnect, then sync.</li>
+            </ol>
+            <div class="demo-toolbar">
+              <label class="offline-switch"><input type="checkbox" id="demo-offline" /> Work offline</label>
+              <label class="upload-label" for="demo-upload">Open a text file <span>(up to 16 KiB)</span></label>
+              <input type="file" id="demo-upload" accept=".txt,.md,.json,.csv,text/*,application/json" />
+            </div>
+            <div class="demo-panels">
+              <div class="demo-local">
+                <label for="demo-editor"><span id="demo-filename">notes.md</span> <small>Local working copy</small></label>
+                <textarea id="demo-editor" rows="7" spellcheck="false"># notes.md
+
+Save an edit, then sync it to the simulated remote.</textarea>
+                <div class="demo-actions">
+                  <button class="btn btn-primary" type="button" id="demo-save">Save stage</button>
+                  <button class="btn btn-ghost" type="button" id="demo-undo">Undo</button>
+                  <button class="btn btn-ghost" type="button" id="demo-redo">Redo</button>
+                </div>
+                <p class="demo-detail" id="demo-history">1 retained stage</p>
+              </div>
+              <div class="demo-remote">
+                <h4>Simulated remote object</h4>
+                <pre id="demo-remote-content"></pre>
+                <div class="outbox"><span>Pending file</span><b id="demo-pending">0</b></div>
+                <button class="btn btn-primary" type="button" id="demo-sync">Sync selected stage</button>
+                <p class="demo-detail">After reconnecting, choose Sync to publish the selected stage.</p>
+              </div>
+            </div>
+            <p class="demo-message" id="demo-message" role="status" aria-live="polite">The initial stage matches the simulated remote.</p>
+          </div>
+
+          <noscript><p>The interactive walkthrough needs JavaScript. Run the real browser demo from the source checkout below.</p></noscript>
+          <div class="demo-real">
+            <div><h3>Run the real browser demo</h3>
+              <p>WASM, IndexedDB, offline reload, undo/redo, explicit sync, and remote conflicts.
+                A private local S3 fixture supplies the remote.</p></div>
+            <div class="install"><code id="demo-cmd">make browser-editor</code><button type="button" data-copy="#demo-cmd">Copy</button></div>
+            <a href="/docs/browser-editor/">Demo setup &amp; walkthrough &rarr;</a>
+          </div>
+
+          <p class="scope-note">The real file-history API retains whole-file stages; project revisions share unchanged content. Browsers can evict local storage. Sync detects remote conflicts; your app chooses how to resolve them. <a href="/docs/browser-file-history/">Limits and recovery.</a></p>
+        </div>
+      </details>
+      <details class="fixture use-case-panel" name="stow-use-cases" id="cache-fixture">
+        <summary><span class="use-case-label">Local read cache</span><span class="use-case-title">Read retained files when upstream is unavailable.</span></summary>
+        <div class="use-case-context">
+          <p><strong>The problem</strong> A local tool needs objects from S3 to do its work. Without a retained copy, an upstream outage or a disconnected host turns a read into a blocked task.</p>
+          <p><strong>With Stow</strong> Fetch through a filesystem cache or prewarm specific keys before going offline. Cached objects remain available within the cache's limits and TTL; an uncached key still needs upstream.</p>
+        </div>
+        <div class="fixture-body" id="layered-cache">
+          <div>
+            <h3>1. Start the disk cache</h3>
+            <p><a href="/docs/getting-started/#install-the-native-server">Install the native server</a>, configure upstream credentials in your environment, and replace the endpoint and bucket below. These demo credentials are for the local endpoint.</p>
+            <div class="fixture-code">
+              <div class="fixture-code-heading"><span class="code-file">cache.sh</span><span class="code-language">Shell</span><button type="button" data-copy="#fixture-cache-server" hidden>Copy</button></div>
+              <pre tabindex="0" aria-label="Stow filesystem cache configuration"><code id="fixture-cache-server" data-language="bash">STOW_ENDPOINT=https://s3.example.com \
+STOW_BUCKET=assets \
+stow-s3 serve --mode run-through \
+  --backend filesystem \
+  --port 9000 \
+  --access-key demo-local \
+  --secret-key demo-local-secret \
+  --data-dir ./stow-data \
+  --cache-dir ./stow-cache \
+  --cache-max-bytes 2147483648 \
+  --cache-ttl 24h</code></pre>
+            </div>
+            <p class="fixture-note">The disk layer retains up to 2 GiB with a 24-hour TTL. Stow revalidates cached objects online. Offline reads require retained bytes. <a href="/docs/run-through/">Upstream credentials and offline setup.</a></p>
+          </div>
+          <div>
+            <h3>2. Put a small memory cache in front</h3>
+            <p>Install <code>@aws-sdk/client-s3</code> and <code>lru-cache</code>. Save this as <code>read-assets.mjs</code> and run it with Node. Replace the image key with an object already in your upstream bucket.</p>
+            <div class="fixture-code">
+              <div class="fixture-code-heading"><span class="code-file">read-assets.mjs</span><span class="code-language">JavaScript</span><button type="button" data-copy="#fixture-cache-client" hidden>Copy</button></div>
+              <pre tabindex="0" aria-label="Node memory cache in front of Stow"><code id="fixture-cache-client" data-language="javascript">import { LRUCache } from "lru-cache";
+import { S3Client, CreateBucketCommand,
+  GetObjectCommand } from "@aws-sdk/client-s3";
+
+const memory = new LRUCache({
+  maxSize: 32 * 1024 * 1024,
+  ttl: 30_000,
+  sizeCalculation: bytes =&gt; Math.max(1, bytes.byteLength),
+});
+const s3 = new S3Client({
+  endpoint: "http://127.0.0.1:9000",
+  region: "us-east-1", forcePathStyle: true,
+  credentials: {
+    accessKeyId: "demo-local",
+    secretAccessKey: "demo-local-secret",
+  },
+});
+try {
+  await s3.send(new CreateBucketCommand({ Bucket: "assets" }));
+  async function readAsset(key) {
+    const hit = memory.get(key);
+    if (hit) return hit;
+    const result = await s3.send(new GetObjectCommand({
+      Bucket: "assets", Key: key,
+    }));
+    if (!result.Body) throw new Error("Missing object body");
+    const bytes = await result.Body.transformToByteArray();
+    memory.set(key, bytes);
+    return bytes;
+  }
+  await readAsset("images/cover-v1.png"); // disk → S3 on miss
+  await readAsset("images/cover-v1.png"); // memory hit
+} finally {
+  s3.destroy();
+}</code></pre>
+            </div>
+            <p class="fixture-note">The app owns the <a href="https://isaacs.github.io/node-lru-cache/">memory cache</a>. Its byte budget counts retained payloads, not total process memory. Use versioned keys or invalidate memory entries when content changes.</p>
+          </div>
+        </div>
+      </details>
         </div>
       </div>
     </section>
 
     <section class="workspace container" id="workspace" aria-labelledby="workspace-title">
       <div>
-        <h2 id="workspace-title">Your work.<br />Stored. Ready to move.</h2>
-        <p>Keep the checkpoint. Carry the work. Immutable snapshots and verified portable archives move a workspace between machines.</p>
+        <h2 id="workspace-title">The next machine needs more than a Git checkout.</h2>
+        <p>An unfinished task can include input data, generated files and edits that were never committed. Capture those files in a checkpoint, export a verified archive, and adopt it into a new workspace.</p>
+        <p class="scope-note">Pause writers before capture. Archives transfer saved files; your host restarts the tools or agent.</p>
         <a class="text-link" href="/docs/workspaces/">Explore workspaces <span aria-hidden="true">→</span></a>
       </div>
       <figure class="handoff" role="img" aria-label="Prepare files, capture an immutable checkpoint, and create a portable archive for handoff.">
