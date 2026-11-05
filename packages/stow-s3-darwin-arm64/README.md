@@ -1,6 +1,6 @@
 # @chester-hill-solutions/stow-s3-darwin-arm64
 
-Native `stow` server binary for darwin arm64.
+Native `stow-s3` server binary for darwin arm64.
 
 This package is an optional dependency of [`@chester-hill-solutions/stow-s3`](https://www.npmjs.com/package/@chester-hill-solutions/stow-s3)
 and is installed automatically on matching platforms. It exists so that

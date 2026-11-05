@@ -43,7 +43,7 @@ behaviour you care about, a plain in-memory fake is less machinery. Stow is
 worth it when the code exercises the SDK itself — signing, multipart, range
 reads, error shapes.
 
-## Checkpoints for agent work (0.3.3)
+## Checkpoints for agent work
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent
 works. Before saving, stop known writers and write objective, progress and next
@@ -61,48 +61,40 @@ See the portable workspace guide and experimental OpenCode example in the reposi
 
 ## Install
 
-**The npm and PyPI install surfaces are not yet usable.** The `v0.2.0` release
-partially published the main npm package to GitHub Packages, but failed before
-publishing its platform packages. PyPI was not published. Do not try those
-install commands first. The Go module is published and is the shortest working
-path.
-
-The current release, **0.3.3**, publishes native downloads for Linux and macOS
-on x86_64 and ARM64 at
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
-npm and PyPI publication is **deferred by the release policy**, not pending:
-publisher setup, live-provider gates and anonymous exact-version installation
-have to pass before it is attempted. The partial 0.2.0 GitHub Packages release
-is historical; its existing artifacts remain immutable. If a publication is
-ever resumed, remove any old scope override to `npm.pkg.github.com`; it would
-send installation requests to the wrong registry.
-
-The [npmjs/OIDC preparation guide](../../docs/npm-publishing.md) records the
-future public registry path and separately authorized bootstrap. It does not
-make npm installation available or configure a trusted publisher.
+Install the TypeScript client from public npmjs:
 
 ```bash
-go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
+npm install @chester-hill-solutions/stow-s3@0.3.5
 ```
 
-For TypeScript or Python, work from a source checkout:
+The package carries its native binary for Linux or macOS on x64 or ARM64.
+No source build or `STOW_BIN` override is needed. Use WSL on Windows.
+Remove any old scope override to `npm.pkg.github.com`.
+
+Standalone v0.3.5 binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
+
+The Go module is published:
+
+```bash
+go get github.com/chester-hill-solutions/stow-s3/pkg/stow
+```
+
+The [npm publication record](../../docs/npm-publishing.md#published-035) describes
+the verified release. Automated registry publication and trusted publishing remain disabled.
+
+The Python client is not yet published to PyPI. Use a source checkout:
 
 ```bash
 git clone https://github.com/chester-hill-solutions/stow-s3
 cd stow-s3
-make build                        # bin/stow-s3 for your platform
+make build
 export STOW_BIN="$PWD/bin/stow-s3"
-
-# TypeScript
-cd packages/stow-s3 && npm install && npm run build && cd ../..
-
-# Python
 pip install -e "packages/stow-s3-py[boto3]"
 ```
 
-A published package ships its own binary and needs no `STOW_BIN`. If the binary
-is missing or unrunnable, `stow-s3 doctor` reports which of the two sides is
-broken rather than failing opaquely.
+If the binary cannot be found or run, `stow-s3 doctor` reports the affected side.
 
 ## Starting and probing a server
 

@@ -1,6 +1,6 @@
 # Planning index and disposition register
 
-**Index updated:** 2026-10-12. This register classifies current guides, retained
+**Index updated:** 2026-11-05. This register classifies current guides, retained
 designs and historical records; it is not an implementation backlog. The
 September 29 reconciliation outcomes below remain a dated snapshot. Retired work
 orders now live under [history](history/README.md).
@@ -9,13 +9,15 @@ orders now live under [history](history/README.md).
 1. [Consolidated working-storage plan](storage-foundation-plan.md): the sole
    scope/order/status queue, W01–W22 and the complete old S0–S4 disposition map.
 2. [Portable workspace usage](portable-workspace-usage.md): actual APIs, commands
-   and limits in the unpublished development tree.
+   and limits for the published 0.3.5 release.
 3. [ADR index](adr/README.md): decisions in force; the custom-store conflict in
    ADR 0010 is explicitly tracked by W01.
 4. [Baseline implementation evidence](implementation-2026-09-29.md),
    [later receiver/model evidence](opencode-receiver-remediation-2026-09-29.md) and
    [conditional slice evidence](guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite):
    dated records with distinct scope. None certifies publication or Linux runtime.
+5. [Current release](releases/v0.3.5.md) and [npm publication record](npm-publishing.md#published-035):
+   native downloads, five public npm packages and anonymous installation verification.
 
 The new plan replaces the previous canonical queue and all independent ordering
 in the detail proposals. It carries the product definition of done, accepted

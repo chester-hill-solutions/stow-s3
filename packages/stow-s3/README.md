@@ -4,9 +4,22 @@ TypeScript APIs for native S3 sessions, workspaces and embedded browser storage.
 
 ## Install
 
-The TypeScript package is not yet published to npm. v0.3.3 ships native binaries
-as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
-Build the TypeScript client from a source checkout:
+Install the public npm package:
+
+```sh
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
+
+Node.js 20 or newer is required. Linux and macOS on x64 or ARM64 receive their native carrier automatically.
+Native process APIs need no Go installation or `STOW_BIN` override.
+Embedded and browser APIs use the included WASM assets.
+Remove any old scope override to `npm.pkg.github.com`; this package is published on npmjs.
+
+Standalone v0.3.5 binaries are also available as
+[GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Use WSL on Windows.
+
+For local development, build a source checkout:
 
 ```sh
 git clone https://github.com/chester-hill-solutions/stow-s3
@@ -17,11 +30,9 @@ npm run build --prefix packages/stow-s3
 export STOW_BIN="$PWD/bin/stow-s3"
 ```
 
-Use `STOW_BIN` for the native process APIs.
-Embedded WASM APIs use the built package assets.
-Registry publication is deferred. Do not rely on a registry install for v0.3.3.
+Use `STOW_BIN` to select the source-built native binary during development.
 <!-- repo-only:start -->
-See the [release checkpoint](../../docs/release-verification-2026-10-14.md) for availability.
+See the [npm publication record](../../docs/npm-publishing.md#published-035) for release verification.
 <!-- repo-only:end -->
 
 ## Usage

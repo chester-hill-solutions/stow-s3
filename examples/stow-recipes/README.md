@@ -9,7 +9,21 @@ session starts a private loopback server, hands back an ordinary client, and
 cleans up. The application code that stores and reads objects does not change
 between examples.
 
-## Build once
+## Install for an application
+
+The TypeScript package is available on public npmjs with its native binary:
+
+```sh
+npm install @chester-hill-solutions/stow-s3@0.3.5 @aws-sdk/client-s3
+```
+
+Linux and macOS on x64 or ARM64 need no Go build or `STOW_BIN` setting.
+The Python client is not yet published to PyPI.
+
+## Run this checkout's examples
+
+The repository examples use the local TypeScript package so they exercise the same source revision.
+Build that source once:
 
 ```sh
 git clone https://github.com/chester-hill-solutions/stow-s3
@@ -18,9 +32,7 @@ make build
 export STOW_BIN="$PWD/bin/stow-s3"
 ```
 
-TypeScript and Python clients are built from a source checkout; they are not yet
-published to npm or PyPI. The TypeScript examples import the AWS SDK and the
-local client, so install both once:
+The TypeScript examples import the AWS SDK and the local client. Install both once:
 
 ```sh
 npm ci --ignore-scripts --omit=optional --prefix packages/stow-s3
@@ -36,8 +48,8 @@ python -m venv .venv
 pip install -e "packages/stow-s3-py[boto3]"
 ```
 
-`STOW_BIN` tells the client which server binary to start. A published package
-would carry its own binary and would not need it.
+`STOW_BIN` selects the source-built server for these repository examples.
+Applications using the published npm package receive their native binary automatically.
 
 ## 1. Start small
 

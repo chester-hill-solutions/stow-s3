@@ -164,7 +164,7 @@ export function optionalLockProblems(optional, lock) {
     const record = lock?.packages?.[`node_modules/${name}`];
     if (!record || record.optional !== true) {
       problems.push(`package-lock.json omits the optional package record for ${name}`);
-    } else if (record.version !== undefined && record.version !== version) {
+    } else if (record.version !== version) {
       problems.push(`package-lock.json ${name} version is ${record.version}, want ${version}`);
     }
     if (lock?.packages?.[""]?.optionalDependencies?.[name] !== version) {

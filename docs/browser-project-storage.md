@@ -6,14 +6,14 @@ Payloads load when needed.
 Sync uploads content before publishing the project manifest.
 Your application controls rendering, document formats and collaboration.
 
-The development package provides:
+The npm package provides:
 
 - `/project`: content storage, revisions and file-history migration;
 - `/worker`: asynchronous object operations and bounded streams;
 - `/browser-wasm`: memory and persistent WASM worker loaders.
 
-These APIs are implemented in the source checkout. The TypeScript package is not
-yet published to npm; v0.3.3 GitHub downloads contain the native server.
+Install these APIs with `npm install @chester-hill-solutions/stow-s3@0.3.5`.
+The package includes its WASM assets. Standalone GitHub downloads contain the native server.
 
 ## A project with reusable assets
 

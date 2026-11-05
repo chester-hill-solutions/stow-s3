@@ -4,16 +4,27 @@ Stow stores objects in a native S3 server, an embedded runtime, or a file worksp
 Browser APIs store editing history in IndexedDB and sync to remote storage.
 Choose the API that matches your application.
 
+## Install the TypeScript client
+
+```sh
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
+
+The package includes the native carrier for your Linux or macOS host on x64 or ARM64.
+Native sessions need no Go installation or `STOW_BIN` setting.
+The package also includes the WASM assets for its embedded and browser entry points.
+Remove any old `@chester-hill-solutions` registry override to `npm.pkg.github.com`.
+
 ## Install the native server
 
 Download the matching Linux or macOS archive from
-[Stow v0.3.3](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
+[Stow v0.3.5](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
 Both x86_64 (`amd64`) and ARM64 (`arm64`) are supported. Check the archive against
 `SHA256SUMS.txt` from that release, extract it and put `stow-s3` on your PATH.
 Then run `stow-s3 --version`.
 
-npm and PyPI publication are deferred. Use the source steps below for TypeScript,
-Python and browser examples. Read the [release notes](releases/v0.3.3.md) before
+The Python client is not yet published to PyPI. Use the source steps below for Python
+or to run the repository's development examples. Read the [release notes](releases/v0.3.5.md) before
 upgrading a persistent filesystem object store: older versions cannot read new
 version-2 object records.
 
@@ -39,9 +50,9 @@ The Go module can be added directly:
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-Use a source checkout for the TypeScript and Python clients; they are not yet published to registries.
+Python installation still requires a source checkout. TypeScript applications can use the npm package above.
 <!-- repo-only:start -->
-See the [release checkpoint](release-verification-2026-10-14.md) for package availability.
+See the [npm publication record](npm-publishing.md#published-035) for exact release verification.
 <!-- repo-only:end -->
 
 ## Choose your storage surface

@@ -1,13 +1,50 @@
 # Stow
 
+<!-- repo-only:start -->
+[![npm](https://img.shields.io/npm/v/@chester-hill-solutions/stow-s3?color=123f30)](https://www.npmjs.com/package/@chester-hill-solutions/stow-s3)
+[![Latest release](https://img.shields.io/github/v/release/chester-hill-solutions/stow-s3?color=123f30)](https://github.com/chester-hill-solutions/stow-s3/releases/latest)
+[![CI](https://github.com/chester-hill-solutions/stow-s3/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/chester-hill-solutions/stow-s3/actions/workflows/ci.yml)
+[![Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-123f30)](LICENSE)
+
+<p align="center">
+  <a href="https://stow.chesterhillsolutions.ca/"><img src="site/images/og.png" alt="Stow: S3 storage, without the server. Objects, files and checkpoints in portable storage containers." width="100%" /></a>
+</p>
+<!-- repo-only:end -->
+
 Stow stores objects, files and checkpoints for applications, agents and tests.
 Use an S3 endpoint, a native file workspace, or an embedded runtime.
 Browser APIs add local editing history and remote sync.
 
 Your application runs the code and controls network access. Stow manages storage.
 
-Start with the [documentation index](docs/README.md) or the
-[public documentation](https://stow.chesterhillsolutions.ca/docs/).
+```sh
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
+
+The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
+Node.js 20 or newer is required. Python uses a source checkout.
+
+[Documentation](https://stow.chesterhillsolutions.ca/docs/) ·
+[Getting started](docs/getting-started.md) ·
+[Release notes](docs/releases/v0.3.5.md) ·
+[Examples](examples/stow-recipes/README.md)
+
+<!-- repo-only:start -->
+<details>
+<summary><strong>Jump to a workflow</strong></summary>
+
+- [Choose a storage surface](#storage-surfaces)
+- [Prepare and checkpoint a workspace](#a-workspace-end-to-end)
+- [Start a disposable S3 session](#quick-start-a-scoped-session)
+- [Run the native server](#quick-start-cli-server)
+- [Embed Go or WebAssembly](#embedded-go-runtime)
+- [Work offline with a read-through cache](#run-through-mode-the-offline-cache)
+- [Installation options](#install)
+- [Diagnose an installation](#diagnostics-stow-doctor)
+- [Contribute](CONTRIBUTING.md)
+
+</details>
+<!-- repo-only:end -->
 
 ## Storage surfaces
 
@@ -63,7 +100,7 @@ undo and redo. Applications own document semantics and conflict resolution.
   read-through access, and explicit conditional sync to S3-compatible storage.
 - Filesystem persistence for data that must survive a process restart.
 - SigV4 authentication for the S3 endpoint.
-- `stow doctor`, a diagnostic that reports both the client and server sides of an
+- `stow-s3 doctor`, a diagnostic that reports both the client and server sides of an
   installation.
 
 Applications use Stow to create buckets and upload or download files through the
@@ -303,31 +340,33 @@ Removal coordinates with active storage operations.
 
 ## Install
 
-Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
+Install the TypeScript client and its native binary from public npmjs:
 
-The [npmjs/OIDC preparation guide](docs/npm-publishing.md) describes the future
-public package path. npm publication and trust configuration remain disabled.
-Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
-against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
-Run `stow-s3 --version` to check the installed version. Use WSL on Windows.
+```bash
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
 
-**TypeScript and Python clients are not yet published to npm or PyPI.**
-Use a source checkout for those clients. Registry publication is deferred for
-v0.3.3. See the [release notes](docs/releases/v0.3.3.md), including the filesystem
-upgrade compatibility note.
-<!-- repo-only:start -->
-The [current release checkpoint](docs/release-verification-2026-10-19.md) records
-validation and distribution. The [October 3 checkpoint](docs/release-verification-2026-10-03.md)
-is historical; its registry blockers do not apply to native GitHub downloads.
-<!-- repo-only:end -->
+The package includes a platform carrier for Linux or macOS on x64 or ARM64.
+No Go installation or `STOW_BIN` override is needed. Use WSL on Windows.
+Remove any old scope override to `npm.pkg.github.com`; these packages use npmjs.
 
-The Go module is published and installs today:
+Standalone native binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Verify the archive against `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
+Run `stow-s3 --version` to check the installed version.
+See the [release notes](docs/releases/v0.3.5.md) for upgrade compatibility.
+
+**The Python client is not yet published to PyPI.** Use a source checkout for Python.
+The [npm publication record](docs/npm-publishing.md#published-035) describes the
+verified release. Future automated registry publication remains disabled.
+
+The Go module is published:
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-TypeScript and Python work from a source checkout:
+For Python or local TypeScript development, use a source checkout:
 
 ```bash
 git clone https://github.com/chester-hill-solutions/stow-s3
@@ -335,28 +374,25 @@ cd stow-s3
 make build                        # bin/stow-s3 for your platform
 export STOW_BIN="$PWD/bin/stow-s3"
 
-# TypeScript client
+# TypeScript development
 cd packages/stow-s3 && npm install && npm run build && cd ../..
 
 # Python client
 pip install -e "packages/stow-s3-py[boto3]"
 ```
 
-`STOW_BIN` tells a client which server binary to run. A published package carries
-its own binary for your platform and does not need it. `stow-s3 doctor` reports
-which side is broken if the binary cannot be found or run.
+`STOW_BIN` selects the source-built binary. The npm package carries its own binary.
+`stow-s3 doctor` reports which side is broken if the binary cannot be found or run.
 
 ## Quick start: a scoped session
 
 A session starts a private server on an ephemeral port and waits for readiness.
 Closing the session stops the server and removes its data directory.
 
-TypeScript (not yet on npm — see [Install](#install)):
+TypeScript:
 
 ```bash
-# from a source checkout
-make build && export STOW_BIN="$PWD/bin/stow-s3"
-cd packages/stow-s3 && npm install && npm run build
+npm install @chester-hill-solutions/stow-s3@0.3.5
 ```
 
 ```ts
@@ -416,7 +452,7 @@ This keeps `boto3` optional.
 
 ## Diagnostics: stow doctor
 
-If a session fails to start, run `stow doctor`.
+If a session fails to start, run `npx stow-doctor`.
 It combines client and server checks into one report:
 
 ```bash
@@ -429,7 +465,7 @@ as warnings rather than failures, so a local-only user is not failed for having
 no upstream S3.
 
 `npx stow-doctor` exits 0 when everything passed and 1 when a required check
-failed. The `stow doctor` subcommand on the server side uses a third code, 2, for
+failed. The `stow-s3 doctor` subcommand on the server side uses a third code, 2, for
 a check that could not be run at all, so a broken installation is
 distinguishable from a healthy one with a failing optional check.
 
@@ -484,11 +520,10 @@ For a temporary in-memory server:
 
 ## Quick start: TypeScript
 
-Start a managed server (see [Install](#install) for why this is not yet an
-`npm install`):
+Install the client, then start a managed server:
 
 ```bash
-export STOW_BIN="$PWD/bin/stow-s3"
+npm install @chester-hill-solutions/stow-s3@0.3.5 @aws-sdk/client-s3
 ```
 
 ```ts
@@ -526,7 +561,9 @@ try {
 }
 ```
 
-`Stow.start()` starts the `stow` executable, waits until it is ready, creates the requested buckets, and returns an AWS SDK configuration. When the executable is not in the repository's `bin/` directory, place `stow` on `PATH` or set `STOW_BIN`.
+`Stow.start()` selects the packaged `stow-s3` binary, waits for readiness,
+creates the requested buckets, and returns an AWS SDK configuration.
+Source builds can select their native binary with `STOW_BIN`.
 
 `Stow.start()` is the long-lived form: the server keeps running until you stop
 it, and it uses the server's default collector settings. For a scoped,
@@ -670,15 +707,21 @@ See [ADR 0006](docs/adr/0006-owned-data-directory-reset.md).
 
 ## Running on another host
 
-The server can bind to a network interface:
+A listener beyond loopback requires explicit consent, provisioned S3 credentials and an admin token.
+Terminate TLS in front of the cleartext socket:
 
 ```bash
-./bin/stow-s3 serve --host 0.0.0.0 --port 9000
+export STOW_LOCAL_ACCESS_KEY_ID="stow-client"
+export STOW_LOCAL_SECRET_ACCESS_KEY="$(openssl rand -hex 32)"
+export STOW_ADMIN_TOKEN="$(openssl rand -hex 24)"
+./bin/stow-s3 serve --host 0.0.0.0 --port 9000 --allow-insecure-remote
 ```
 
-Clients on the same network can then connect to the host's port and use S3 operations. Keep the server behind a firewall or private network boundary. Put it behind a TLS-terminating proxy before sending traffic over an untrusted network.
+Clients use the configured S3 credentials. Keep the listener behind a firewall or private network boundary.
+See [serving beyond loopback](docs/running-and-probing.md#serving-beyond-loopback) for proxy and token handling.
 
-The S3 routes require the generated or configured credentials. Use the current server for local development and controlled private deployments. It is not a hardened public or multi-tenant storage service.
+Use Stow for local development and controlled private deployments.
+It is not a hardened public or multi-tenant storage service.
 
 ## Admin and metrics routes
 
@@ -697,11 +740,10 @@ Use `/_stow/health` for liveness. An unsigned request to `/health` returns `403 
 Outbox mutation routes always require an admin token, including on loopback.
 Read-only routes need no token on loopback. Other addresses require the token.
 
-Set the token with `STOW_ADMIN_TOKEN` rather than the flag, so it does not appear
-in the process list:
+Set `STOW_ADMIN_TOKEN` in the server environment so it does not appear in process arguments.
+For a remote query, provide the same configured value in the client environment:
 
 ```bash
-STOW_ADMIN_TOKEN=$(openssl rand -hex 24) ./bin/stow-s3 serve --host 0.0.0.0
 curl -H "X-Stow-Admin: $STOW_ADMIN_TOKEN" http://host:9000/_stow/metrics
 ```
 
