@@ -1,13 +1,48 @@
 # Stow
 
+<!-- repo-only:start -->
+[![npm](https://img.shields.io/npm/v/@chester-hill-solutions/stow-s3?color=123f30)](https://www.npmjs.com/package/@chester-hill-solutions/stow-s3)
+[![Latest release](https://img.shields.io/github/v/release/chester-hill-solutions/stow-s3?color=123f30)](https://github.com/chester-hill-solutions/stow-s3/releases/latest)
+[![CI](https://github.com/chester-hill-solutions/stow-s3/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/chester-hill-solutions/stow-s3/actions/workflows/ci.yml)
+[![Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-123f30)](LICENSE)
+
+<p align="center">
+  <a href="https://stow.chesterhillsolutions.ca/"><img src="site/images/og.png" alt="Stow: S3 storage, without the server. Objects, files and checkpoints in portable storage containers." width="100%" /></a>
+</p>
+<!-- repo-only:end -->
+
 Stow stores objects, files and checkpoints for applications, agents and tests.
 Use an S3 endpoint, a native file workspace, or an embedded runtime.
 Browser APIs add local editing history and remote sync.
 
 Your application runs the code and controls network access. Stow manages storage.
 
-Start with the [documentation index](docs/README.md) or the
-[public documentation](https://stow.chesterhillsolutions.ca/docs/).
+```sh
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
+
+The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
+Node.js 20 or newer is required. Python uses a source checkout.
+
+[Documentation](https://stow.chesterhillsolutions.ca/docs/) ·
+[Getting started](docs/getting-started.md) ·
+[Release notes](docs/releases/v0.3.5.md) ·
+[Examples](examples/stow-recipes/README.md)
+
+<!-- repo-only:start -->
+<details>
+<summary><strong>Jump to a workflow</strong></summary>
+
+- [Choose a storage surface](#storage-surfaces)
+- [Prepare and checkpoint a workspace](#a-workspace-end-to-end)
+- [Start a disposable S3 session](#quick-start-a-scoped-session)
+- [Run the native server](#quick-start-cli-server)
+- [Embed Go or WebAssembly](#embedded-go-runtime)
+- [Work offline with a read-through cache](#run-through-mode-the-offline-cache)
+- [Install, contribute and troubleshoot](#install)
+
+</details>
+<!-- repo-only:end -->
 
 ## Storage surfaces
 
