@@ -2,7 +2,22 @@
 
 ## Unreleased
 
-## 0.3.4 — release candidate
+## 0.3.5 — 2026-11-05
+
+- Add MCP over streamable HTTP, guarded memory saves through WASM, delimiter
+  listings and classic S3 ListObjects support.
+- Require explicit consent, provisioned credentials and an admin token for
+  native S3 listeners beyond loopback. Remote MCP uses a separate caller token.
+- Fix multipart refusals and upload-ID validation, readiness descriptor
+  ownership, Git seed maintenance races and pinned-toolchain coverage.
+- Defer filesystem listing headers until pagination and reuse verified parent
+  checkpoint payloads while retaining full logical retention charges.
+- Update dependencies, site deployment tooling and architecture documentation.
+
+Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
+[release notes](docs/releases/v0.3.5.md) for migration requirements and qualification limits.
+
+## 0.3.4 — 2026-11-01
 
 Close the three correctness findings the bounded closure review left open after
 v0.3.3. A signed HTTP header now covers every value it carries, so a request
@@ -18,7 +33,7 @@ so a query signed by the pinned Node signer with an encoded name authenticates
 Also correct MCP plugin template copying on newer Node versions, strengthen
 the conditional-write examples, and update the AWS SDKs and development tools.
 Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
-[candidate release notes](docs/releases/v0.3.4.md) for scope and compatibility.
+[release notes](docs/releases/v0.3.4.md) for scope and compatibility.
 The published v0.3.3 archives still carry the three issues their
 [release notes](docs/releases/v0.3.3.md) list.
 
