@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -133,6 +133,40 @@ integration("request body limits", { skip: !stowBinaryAvailable() }, () => {
     for (const maxRequestBytes of [0, -1, 1.5]) {
       await assert.rejects(() => startStowWithReady({ maxRequestBytes }), /positive integer/);
       await assert.rejects(() => startStowWithReady({ maxConcurrentRequests: maxRequestBytes }), /positive integer/);
+    }
+  });
+});
+
+
+describe("explicit remote launcher options", () => {
+  it("forwards consent and isolated admin provisioning without placing a token in argv", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "stow-remote-options-"));
+    const capture = join(directory, "captured.json");
+    const preload = join(directory, "capture.cjs");
+    const previousBinary = process.env.STOW_BIN;
+    const previousNodeOptions = process.env.NODE_OPTIONS;
+    await writeFile(preload, `require("node:fs").writeFileSync(${JSON.stringify(capture)}, JSON.stringify({ args: process.argv.slice(2), token: process.env.STOW_ADMIN_TOKEN })); process.stderr.write("fixture exits before listening"); process.exit(1);`);
+    try {
+      process.env.STOW_BIN = process.execPath;
+      process.env.NODE_OPTIONS = `--require=${JSON.stringify(preload)}`;
+      for (const consent of [false, true]) {
+        await assert.rejects(() => startStowWithReady({
+          dataDir: directory, port: 0, host: "192.0.2.1", timeoutMs: 5000,
+          allowInsecureRemote: consent, adminToken: "fixture-admin-token",
+          accessKey: "fixture-key", secretKey: "fixture-secret", isolatedEnvironment: true,
+        }));
+        const recorded: unknown = JSON.parse(await readFile(capture, "utf8"));
+        assert.deepEqual(recorded, {
+          args: ["--port", "0", "--data-dir", directory, "--host", "192.0.2.1", ...(consent ? ["--allow-insecure-remote"] : []), "--ready-fd", "3"],
+          token: "fixture-admin-token",
+        });
+      }
+    } finally {
+      if (previousBinary === undefined) delete process.env.STOW_BIN;
+      else process.env.STOW_BIN = previousBinary;
+      if (previousNodeOptions === undefined) delete process.env.NODE_OPTIONS;
+      else process.env.NODE_OPTIONS = previousNodeOptions;
+      await rm(directory, { recursive: true, force: true });
     }
   });
 });

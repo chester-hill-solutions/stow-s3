@@ -211,6 +211,7 @@ export function buildChildEnv(options: StartOptions): NodeJS.ProcessEnv {
   if (options.secretKey) {
     childEnv.STOW_LOCAL_SECRET_ACCESS_KEY = options.secretKey;
   }
+  if (options.adminToken !== undefined) childEnv.STOW_ADMIN_TOKEN = options.adminToken;
   return childEnv;
 }
 
@@ -333,6 +334,7 @@ export function assertRequestLimit(limit: number | undefined, label = "maxReques
 }
 
 function appendTransportLimits(args: string[], options: StartOptions): void {
+  if (options.allowInsecureRemote) args.push("--allow-insecure-remote");
   if (options.allowInsecureUpstream) args.push("--allow-insecure-upstream");
   if (options.maxConcurrentRequests !== undefined) args.push("--max-concurrent-requests", String(options.maxConcurrentRequests));
   if (options.maxRequestBytes !== undefined) args.push("--max-request-bytes", String(options.maxRequestBytes));
