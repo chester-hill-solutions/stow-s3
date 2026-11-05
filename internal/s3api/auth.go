@@ -15,7 +15,6 @@ func DevBypass(_ *http.Request) error {
 	return nil
 }
 
-// SigV4Auth returns an AuthFunc backed by the given verifier and credentials.
 func SigV4Auth(v *auth.Verifier, creds auth.Credentials) AuthFunc {
 	return func(r *http.Request) error {
 		return v.Authenticate(r, creds)
