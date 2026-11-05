@@ -1,5 +1,8 @@
 # Real-agent pilot evidence
 
+> Historical receipt for the September 29 source revision below.
+> Use [getting started](getting-started.md) and the [0.3.5 release notes](releases/v0.3.5.md) for current installation.
+
 **Date:** 2026-09-29. **Stow revision:** `f54927668a135146518f56efaf27eca2b7df1578`
 ("Build portable workspaces and experimental agent checkpoint integration"),
 the current `origin/main` at run time. **Version:** `stow-s3 0.3.0`, unpublished,

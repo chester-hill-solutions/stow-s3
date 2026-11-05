@@ -11,6 +11,7 @@ const ALL_PUBLISHED = SURFACE.map((entry) => ({ ...entry, published: true }));
 
 // A surface where nothing is published.
 const NONE_PUBLISHED = SURFACE.map((entry) => ({ ...entry, published: false }));
+const PARTLY_PUBLISHED = SURFACE.map((entry) => ({ ...entry, published: entry.ecosystem === "go" }));
 
 const goEntry = SURFACE.find((entry) => entry.ecosystem === "go");
 
@@ -21,7 +22,7 @@ function docFor(surface, { disclaimer }) {
 }
 
 test("a doc with no disclaimer fails while something is unpublished", () => {
-  const problems = docProblems(SURFACE, "README.md", docFor(SURFACE, { disclaimer: false }));
+  const problems = docProblems(PARTLY_PUBLISHED, "README.md", docFor(PARTLY_PUBLISHED, { disclaimer: false }));
   assert.ok(
     problems.some((p) => p.includes("is unpublished")),
     `expected a disclaimer problem, got ${JSON.stringify(problems)}`,
@@ -29,7 +30,7 @@ test("a doc with no disclaimer fails while something is unpublished", () => {
 });
 
 test("a doc with a disclaimer passes while something is unpublished", () => {
-  const problems = docProblems(SURFACE, "README.md", docFor(SURFACE, { disclaimer: true }));
+  const problems = docProblems(PARTLY_PUBLISHED, "README.md", docFor(PARTLY_PUBLISHED, { disclaimer: true }));
   assert.deepEqual(problems, [], `expected no problems, got ${JSON.stringify(problems)}`);
 });
 
@@ -62,8 +63,7 @@ test("once everything is published, a disclaimer is not forbidden either", () =>
 });
 
 test("an unpublished target must still be named as unpublished when nothing else is", () => {
-  // One published, two not: the disclaimer is still owed, because a reader can
-  // still try an install that 404s.
+  // The disclaimer is owed for every unpublished target.
   const problems = docProblems(NONE_PUBLISHED, "README.md", docFor(NONE_PUBLISHED, { disclaimer: false }));
   assert.ok(
     problems.length >= 2,
@@ -72,10 +72,9 @@ test("an unpublished target must still be named as unpublished when nothing else
 });
 
 test("a published target that no doc mentions is a problem", () => {
-  // The Go module is the one published target today, so a doc that never names
-  // it is the case: a reader is told nothing about how to get it.
+  // The fixture's published Go module must be named in the document.
   const text = "The npm package is not published yet.";
-  const problems = docProblems(SURFACE, "README.md", text);
+  const problems = docProblems(PARTLY_PUBLISHED, "README.md", text);
   assert.ok(
     problems.some((p) => p.includes("does not mention the published")),
     `expected a missing-mention problem, got ${JSON.stringify(problems)}`,
@@ -129,13 +128,13 @@ test("a 401 remedy is not offered for a registry that does not use one", () => {
 });
 
 test("confirmed absence and confirmed availability can match the declaration", () => {
-  const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
+  const npm = { ...SURFACE.find((entry) => entry.ecosystem === "npm"), published: false };
   assert.deepEqual(reachabilityProblems(npm, false, "HTTP 404"), []);
   assert.deepEqual(reachabilityProblems({ ...npm, published: true }, true, "HTTP 200"), []);
 });
 
 test("unpublished npm declarations cannot turn denied or failed reads into absence", () => {
-  const npm = SURFACE.find(entry => entry.ecosystem === "npm");
+  const npm = { ...SURFACE.find(entry => entry.ecosystem === "npm"), published: false };
   for (const detail of ["HTTP 401", "HTTP 403", "HTTP 429", "HTTP 500", "HTTP 503", "ETIMEDOUT"]) {
     assert.match(reachabilityProblems(npm, false, detail)[0], /not evidence of absence/);
   }
@@ -144,7 +143,7 @@ test("unpublished npm declarations cannot turn denied or failed reads into absen
 test("a genuinely reachable package declared unpublished is still a problem", () => {
   // The other direction: something is installable that this file says is not, which
   // is the state that makes a document's "not published" prose wrong.
-  const npm = SURFACE.find((entry) => entry.ecosystem === "npm");
+  const npm = { ...SURFACE.find((entry) => entry.ecosystem === "npm"), published: false };
   const problems = reachabilityProblems(npm, true, "HTTP 200");
   assert.equal(problems.length, 1);
   assert.match(problems[0], /reachable \(HTTP 200\)/);

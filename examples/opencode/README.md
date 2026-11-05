@@ -15,8 +15,9 @@ OpenCode UI sessions are outside this verified admission path.
 
 ## Install and build the pilot
 
-This Stow candidate is **unpublished**. Build the exact source revision on each
-host; installing an older npm/PyPI release does not provide this workflow.
+Stow 0.3.5 is published on npm and as native GitHub downloads.
+This experimental controller is a repository example, not a packaged CLI.
+Build the exact source revision on each pilot host so the controller and binary match.
 
 Prerequisites: macOS or Linux (arm64/x64), Git, Make, Go **1.25.6** (the version in
 `.go-version`), Node.js **24** with npm, and an OpenCode **2.0.16** executable for
@@ -26,8 +27,8 @@ pilot. Install missing toolchains using the host's normal package/version manage
 For a fresh checkout:
 
 ```sh
-git clone https://github.com/chester-hill-solutions/stow.git
-cd stow
+git clone https://github.com/chester-hill-solutions/stow-s3.git
+cd stow-s3
 ```
 
 If the repository already exists, preserve local changes before updating it. On
@@ -49,8 +50,8 @@ packaged native carriers taking precedence over the source-built binary. It is
 not the recipe for the complete quality suite, which needs optional tooling;
 `make test-all` and `make standards` manage their own dependency installation.
 Record the absolute checkout path. `stowBinary` below must name its
-`bin/stow-s3`, and the version check must report 0.3.0. The native binary is built
-for the current host; rebuild on Linux rather than copying a macOS executable.
+`bin/stow-s3`, and its version must match `packages/stow-s3/package.json` at the selected revision.
+The current release is 0.3.5. Rebuild on Linux rather than copying a macOS executable.
 
 ### OpenCode version and credentials
 

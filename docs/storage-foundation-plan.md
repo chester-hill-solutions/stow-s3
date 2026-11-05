@@ -5,6 +5,12 @@ current uncommitted development tree, the accepted interview decisions and dated
 validation records. This is the sole implementation/status queue. Previous S0–S4
 IDs remain traceable below; the W IDs identify the remaining actionable slices.
 
+**Distribution update, 2026-11-05:** v0.3.5 native downloads and all five public npmjs packages are published.
+Anonymous installation and the macOS ARM64 native session/workspace consumer passed.
+The release rehearsal passed packed consumers on all four native platforms.
+See the [release notes](releases/v0.3.5.md) and [npm publication record](npm-publishing.md#published-035).
+Live-provider qualification, PyPI and future automated registry publication remain separate gates.
+
 ## 1. Plan validation summary
 
 **Verdict: Adjust.** Existing storage, conditional-write and caller integration
@@ -37,9 +43,9 @@ not runtime behavior or the status of a release.
 | Existing registry policy | Versioned workspace/checkpoint count and checkpoint-byte caps, publication admission and explicit descendant-protected deletion are implemented. | Aggregate namespace budgets, pending-operation holds and recovery reserve are new work. |
 | Conditional writes | Public Go and WASM/TypeScript now forward content-ETag/expected-absence conditions, advertise support and refuse unsupported/stale requests. [Slice evidence](guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite). | Managed-save consumer adoption, wrapper/resource identity contracts and input-basis publication; see the bounded native slice below. |
 | Native managed saves | Memory and owned filesystem reads/saves compare managed generation, content and metadata. Filesystem request keys retain bounded receipts for lost-reply/reopen resolution. A fixed-bucket native object MCP adapter exposes the same core with bounded expiring observations. [2026-09-30 evidence](implementation-2026-09-30.md). | Two real consumers, further wrapper/backend contracts, Linux runtime evidence, resource ACLs and input-basis publication. |
-| MCP and caller | Local scoped stdio adapter, checkpoint request/resolve receipts, negotiated protocols, MCP SDK 1.8.0/Go 1.25.6 and pinned OpenCode 2.0.16 caller are implemented. | Real interruption/cleanup, Linux/second physical host, and actual OpenCode-to-MCP configuration. |
+| MCP and caller | Scoped stdio and sessionless streamable HTTP adapters, checkpoint request/resolve receipts, negotiated protocols, MCP SDK 1.8.0/Go 1.25.6 and pinned OpenCode 2.0.16 caller are implemented. Remote HTTP uses explicit listener consent and a separate bearer token. | Real interruption/cleanup, Linux/second physical host, and actual OpenCode-to-MCP configuration. |
 | Meaningful agent continuation | Later [receiver remediation](opencode-receiver-remediation-2026-09-29.md) records local real-model continuation, independently checked output and restored checkpoint contents after sender data was removed. | The same-host result does not close the second-host/Linux or interruption gates. |
-| Distribution | 0.3.0 versions, npmjs publication targets, artifact identity/retry checks and local packed consumers are prepared. | Account/publisher setup, actual publication, exact-version anonymous consumers and fresh provider receipts. |
+| Distribution | v0.3.5 native downloads and five npmjs packages are published. Exact-source release CI, four native packed consumers, all five anonymous installs and the macOS ARM64 public-package session/workspace consumer passed. | Fresh provider receipts, direct OIDC permission/trust, PyPI setup and public native-consumer execution on the other supported hosts. The first npm release used the existing version-specific provider waiver. |
 
 The baseline record's aggregate test counts/hashes predate the conditional slice and
 later model follow-up. Keep their dates and scopes; do not relabel them a fresh
@@ -266,7 +272,7 @@ baseline release that makes no such claims. W06/W16/W17/W19/W20 preparation may 
 | W17 | Run an early Workers shared-core/execution/persistence spike with synthetic data. Select a minimal adapter topology and supported operations; reject unsupported native assumptions before building a deployment promise. | W01; existing WASM/browser mechanisms | S4-4 |
 | W18 | Qualify protected native, Railway and Workers profiles separately. Prove warm denial, outage/freshness, key/policy expiry/rotation, restart/redeploy, persistence and resource bounds. Initial edge profile is read-only; write propagation needs separate qualified behavior. | W04, W07, W16; W17 for Workers; W08/W11 only if advertised | S4-4 |
 | W19 | Finish caller acceptance with a meaningful interrupted real-model turn, confirmed cleanup/save, fresh context on Linux/second host and actual OpenCode-to-MCP configuration. Reuse pinned controller/fixtures; distinguish storage failure, successful no-op and task failure. Local meaningful model continuation and stdio negotiation are already complete. | Existing baseline; explicit model/host profile | S3-1–S3-3, S4-1 |
-| W20 | Complete release/provider/install/documentation gates for the selected supported profile. Reuse 0.3.0 alignment and immutable artifact pipeline; reconcile npmjs guidance, account setup, separate fresh AWS/R2/custom receipts and published anonymous macOS/Linux consumers. Preserve legacy-format diagnostics/security/contribution maintenance. | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
+| W20 | Maintain the published 0.3.5 native/npm profile and immutable artifact pipeline. The first npm release and anonymous macOS ARM64 consumer are complete; future OIDC publication, fresh AWS/R2/custom receipts, PyPI and public native-consumer execution on other hosts remain open. Preserve legacy-format diagnostics/security/contribution maintenance. | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
 | W21 | Pilot a meaningful S3 fixture and transfer recipe in a named consumer: cococlips first, pg_backup next if needed. Start with synthetic data; consumer owns progress/reactions. Package convenience APIs follow demonstrated reusable need. Do not mark source-fit proposals as actual integrations. | W06; supported artifact/profile | S4-1 |
 | W22 | Run independent repeat-use study and decide deepen/narrow/rework. Two teams each complete at least three genuine save/reopen/review events over two weeks and retain use; measure setup/recovery effort, correctness and costs against actual alternatives. Research/outreach requires its own actual evidence/authorization. | Usable supported workflow; W19/W21 evidence | S4-2, S4-3 |
 

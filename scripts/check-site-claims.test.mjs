@@ -204,14 +204,16 @@ test("the size claim is measured across every published platform", () => {
   }
 });
 
-test("source checkout is required while package installation is not the supported path", () => {
+test("source checkout remains available for Python and contributors", () => {
   const missing = cleanIndex.replace("git clone https://github.com/chester-hill-solutions/stow-s3", "");
   const problems = siteClaimProblems({ text: site(missing), sizes });
   assert.equal(problems.length, 1, JSON.stringify(problems));
   assert.match(problems[0], /git clone/);
 });
 
-test("the page can omit unpublished npm install instructions and the old registry binding", () => {
+test("the published npm package needs an install command", () => {
   const sourceOnly = cleanIndex.replace("npm install @chester-hill-solutions/stow-s3", "");
-  assert.deepEqual(siteClaimProblems({ text: site(sourceOnly), sizes }), []);
+  const problems = siteClaimProblems({ text: site(sourceOnly), sizes });
+  assert.equal(problems.length, 1, JSON.stringify(problems));
+  assert.match(problems[0], /npm install @chester-hill-solutions\/stow-s3/);
 });

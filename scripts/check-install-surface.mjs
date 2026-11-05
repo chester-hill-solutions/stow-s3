@@ -31,7 +31,7 @@ const SURFACE = [
   {
     ecosystem: "npm",
     name: "@chester-hill-solutions/stow-s3",
-    published: false,
+    published: true,
     // The name a reader would put on a command line.
     command: "npm install @chester-hill-solutions/stow-s3",
     // The path in this repository that backs the package.

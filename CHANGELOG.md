@@ -14,7 +14,8 @@
   checkpoint payloads while retaining full logical retention charges.
 - Update dependencies, site deployment tooling and architecture documentation.
 
-Native GitHub downloads remain selected; npm and PyPI stay deferred. See the
+Native GitHub downloads and the public npmjs packages are available at 0.3.5.
+PyPI and future automated registry publication remain disabled. See the
 [release notes](docs/releases/v0.3.5.md) for migration requirements and qualification limits.
 
 ## 0.3.4 — 2026-11-01

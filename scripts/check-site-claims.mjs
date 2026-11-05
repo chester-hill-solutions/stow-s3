@@ -41,10 +41,9 @@ export const SITE_TEXT_FILES = [
   ),
 ];
 
-// The site should offer the supported paths today: the published Go module
-// and a source checkout. npm/PyPI availability is tracked by the install-surface
-// gate; an old registry binding must not be required to make the page pass.
+// Keep the published npm and Go paths plus source installation for Python and contributors.
 export const REQUIRED_COMMANDS = [
+  "npm install @chester-hill-solutions/stow-s3",
   "git clone https://github.com/chester-hill-solutions/stow-s3",
   "go get github.com/chester-hill-solutions/stow-s3/pkg/stow",
 ];

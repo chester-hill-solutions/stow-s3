@@ -7,7 +7,8 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 
 ## Getting started
 
-- [Getting started](getting-started.md): build a checkout and choose an API.
+- [Getting started](getting-started.md): install from npm or native downloads and choose an API.
+- [v0.3.5 release notes](releases/v0.3.5.md): new capabilities, installation and compatibility.
 - [Running a native server](running-and-probing.md): startup, credentials and probes.
 - [TypeScript client](../packages/stow-s3/README.md) and
   [Python client](../packages/stow-s3-py/README.md).
@@ -50,7 +51,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 - [Contributing](../CONTRIBUTING.md) and [code standards](CODE_STANDARDS.md).
 - [Release verification](release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
   not evidence that a later candidate was published.
-- [npm publishing preparation](npm-publishing.md) describes the disabled npmjs/OIDC path and separately authorized bootstrap.
+- [npm publication record](npm-publishing.md) records the verified 0.3.5 release and remaining automated-publishing requirements.
 
 ## Evidence and history
 

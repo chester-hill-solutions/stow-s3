@@ -1,14 +1,40 @@
-# npmjs publishing preparation
+# npmjs publishing
 
-This is preparation for five public packages: `@chester-hill-solutions/stow-s3`
-and its `-darwin-arm64`, `-darwin-x64`, `-linux-arm64` and `-linux-x64` carriers.
-Public installation remains unverified. Use a source checkout; the install-surface
-declaration stays `published: false`. Historical GitHub Packages release receipts
-describe that earlier registry and are not npmjs readiness evidence.
+The five public Stow packages are published at 0.3.5:
+`@chester-hill-solutions/stow-s3` and its `-darwin-arm64`, `-darwin-x64`,
+`-linux-arm64` and `-linux-x64` carriers. Public installation is verified.
+Historical GitHub Packages receipts describe a separate registry.
 
-`scripts/release-policy.json` still selects `publishPackages: false`. PyPI and
-live-provider paths remain disabled by that policy. This preparation does not
-configure trust, publish or stage a package, or change workflow permissions.
+`scripts/release-policy.json` still selects `publishPackages: false`.
+This release used the separately authorized interactive bootstrap.
+Future automated publication, PyPI publication and trusted publishing remain disabled.
+
+## Published 0.3.5
+
+The November 5, 2026 publication used the exact five tarballs from successful
+[Release rehearsal 42062425692](https://github.com/chester-hill-solutions/stow-s3/actions/runs/42062425692).
+The receipt identifies source `47733b6a9d3c74c3aac1b312519523b962ff7d93` and each SHA-512 integrity.
+[Push CI 42062181393](https://github.com/chester-hill-solutions/stow-s3/actions/runs/42062181393)
+passed for that same source. The published registry integrity matches every artifact.
+
+Each exact version installed anonymously using empty npm configuration and a fresh cache.
+The macOS ARM64 consumer selected its installed carrier, started Stow 0.3.5,
+and prepared and served a persistent workspace. The rehearsal separately passed
+packed consumer checks on all four native platforms.
+
+npm accepted uploads before their versions became publicly readable.
+The bootstrap stopped at its immediate integrity check during this processing delay.
+Each continuation waited for matching public integrity, then skipped completed versions.
+No published version was replaced. Platform packages became available before the core package.
+
+Live-provider compatibility remains **NOT verified for 0.3.5**.
+The existing owner waiver applied only to this first interactive npm release.
+No trusted publisher was configured, and no package was published to PyPI.
+
+The immutable 0.3.5 tarballs retain their prepublication README text.
+GitHub and the live documentation now contain the verified installation instructions.
+npm refreshes its package-page README only with a new package version; see
+[npm README guidance](https://docs.npmjs.com/about-package-readme-files/).
 
 ## Future OIDC requirements
 
@@ -21,8 +47,9 @@ See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) and
 [scoped public packages](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/).
 
 `npm-publish-readiness.json` is a reviewed local assertion, not an account query.
-Every package defaults to unconfirmed. Organization ownership and account 2FA
-alone cannot satisfy it. Future activation requires confirmed public-package,
+Trusted-publisher and direct-publish permissions remain unconfirmed for every package.
+Organization ownership and account 2FA alone cannot satisfy them.
+Future activation requires confirmed public-package,
 trusted-publisher and direct-publish permission records for every package.
 An unvalidated trust must have a recorded creation time and complete its first
 OIDC publish within two days. A verified successful OIDC publish removes that
@@ -99,8 +126,8 @@ never imports this exception. No trusted publisher is configured by this script.
    before starting; PATH and environment fallbacks cannot pass. A failed verification is a
    partial release, not proof of success. Do not replace immutable version bytes.
 
-This preparation does not execute step 4. Account ownership and enabled 2FA do
-not prove package existence, organization publishing rights or OIDC trust.
+The first 0.3.5 publication completed this procedure; see the publication record above.
+Account ownership and enabled 2FA alone do not prove package existence or OIDC trust.
 Trust configuration and future automated publication require separate approval.
-The install-surface declaration stays `published: false` until public installs
-are actually verified. Staged placeholder publication is not used here.
+The install-surface declaration now records the verified public npm installation.
+No staged placeholder was used.

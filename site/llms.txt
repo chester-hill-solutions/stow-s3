@@ -46,24 +46,20 @@ acknowledging an attempted write. Retry and discard require the admin token.
 
 ## Install
 
-Native v0.3.3 binaries for Linux and macOS are distributed through
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
-Verify the archive with the release checksum manifest and run `stow-s3 --version`.
-npm and PyPI publication are deferred; use source checkouts for those clients.
-
-
-The 0.3.3 TypeScript and Python clients are not yet published. Use a source checkout.
-The Go module is published. Native package targets are Linux and macOS on x64 and arm64.
-Use WSL on Windows.
-
 ```bash
-go get github.com/chester-hill-solutions/stow-s3/pkg/stow   # Go, works now
+npm install @chester-hill-solutions/stow-s3@0.3.5
+go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-TypeScript and Python work from a source checkout: `git clone`, `make build`,
-then `export STOW_BIN="$PWD/bin/stow-s3"`, then `npm install && npm run build`
-in `packages/stow-s3` (TypeScript) or `pip install -e
-"packages/stow-s3-py[boto3]"` (Python). A published package carries its own
-binary and does not need `STOW_BIN`.
-If the binary cannot be found or run, `stow-s3 doctor` reports which side is
-broken.
+The npm package includes its native binary for Linux or macOS on x64 or ARM64.
+It needs no source build or `STOW_BIN` override. Use WSL on Windows.
+Remove any old scope override to `npm.pkg.github.com`.
+
+Standalone v0.3.5 binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
+
+The Python client is not yet published to PyPI. Build a source checkout with
+`make build`, set `STOW_BIN="$PWD/bin/stow-s3"`, then install
+`pip install -e "packages/stow-s3-py[boto3]"`.
+If the binary cannot be found or run, `stow-s3 doctor` reports the affected side.

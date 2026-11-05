@@ -45,6 +45,7 @@
           <a class="text-link" href="https://github.com/chester-hill-solutions/stow-s3">View source <span aria-hidden="true">↗</span></a>
         </div>
         <p class="languages">Go · TypeScript · Python · WebAssembly</p>
+        <p class="availability">v0.3.5 is available on <a href="https://www.npmjs.com/package/@chester-hill-solutions/stow-s3">npm</a>. <a href="/docs/releases/v0.3.5/">Read the release notes <span aria-hidden="true">→</span></a></p>
       </div>
       <figure class="hero-art" role="img" aria-label="Three connected storage containers holding objects, files and checkpoints, with a portable archive ready for handoff.">
         <img src="/assets/storage-hero.svg" alt="" width="660" height="530" fetchpriority="high" />
@@ -216,7 +217,7 @@ try {
             <h3>Start small: a session, a real S3 client, automatic cleanup</h3>
             <p>A session starts a private, loopback S3 server with generated credentials and a ready client. Store a real artifact, read it back, and let the callback clean up—even if it throws. Pass <code>s3</code> and <code>bucket</code> to your application's storage code; the code that stores and reads objects does not change.</p>
             <p>TypeScript creates the bucket automatically. Python creates it explicitly. Go uses an embedded object runtime without an HTTP server.</p>
-            <p class="fixture-note">Setup: use a <a href="/docs/getting-started/">source checkout</a>, install the AWS SDK, and set <code>STOW_BIN</code> to your built binary. A session is a separate server process, isolated from your cloud environment and bounded by its own quota.</p>
+            <p class="fixture-note">Setup: <a href="/docs/getting-started/">install the TypeScript package from npm</a> with its native binary. Python uses a source checkout. A session is a separate server process, isolated from your cloud environment and bounded by its own quota.</p>
           </div>
           <div class="examples" data-examples>
           <div class="code-editor-heading" hidden><span class="code-file" data-example-file>start-small.mjs</span><span class="code-language" data-example-language>TypeScript</span></div>
@@ -354,9 +355,9 @@ stow-s3 workspace destroy --id "$WORKSPACE_ID" \
 
     <section class="finale container" aria-labelledby="finale-title">
       <div class="finale-heading"><h2 id="finale-title">Build with storage you control.</h2><a class="btn btn-primary" href="/docs/">Read the documentation <span aria-hidden="true">→</span></a></div>
-      <p class="availability">Free and open source. The native server is available as <a href="https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3">GitHub downloads</a>; the Go module is available now. TypeScript and Python clients are not yet published to npm or PyPI; build from a source checkout.</p>
+      <p class="availability">Free and open source. Install the TypeScript client and its native binary from npm, or download the standalone server from <a href="https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5">GitHub Releases</a>. Linux and macOS on x64 and ARM64 are supported. The Go module is published. The Python client is not yet published to PyPI; use a <a href="/docs/getting-started/#build-a-checkout">source checkout</a> for Python.</p>
       <div class="install-grid">
-        <div><h3>Start from source</h3><div class="install"><code id="install-cmd">git clone https://github.com/chester-hill-solutions/stow-s3</code><button type="button" data-copy="#install-cmd" aria-label="Copy source checkout command">Copy</button></div></div>
+        <div><h3>Add the TypeScript client</h3><div class="install"><code id="install-cmd">npm install @chester-hill-solutions/stow-s3@0.3.5</code><button type="button" data-copy="#install-cmd" aria-label="Copy npm install command">Copy</button></div></div>
         <div><h3>Add the Go module</h3><div class="install"><code id="go-install-cmd">go get github.com/chester-hill-solutions/stow-s3/pkg/stow</code><button type="button" data-copy="#go-install-cmd" aria-label="Copy Go install command">Copy</button></div></div>
       </div>
     </section>

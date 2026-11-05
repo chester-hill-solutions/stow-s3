@@ -10,6 +10,10 @@ Repositioned on 2026-10-14: the homepage now leads with the category rather than
 
 This is a website design and implementation brief. Storage implementation and release status remain governed by the [consolidated storage plan](../docs/storage-foundation-plan.md), including W20 for publication and documentation gates. This brief adds no package capabilities or release claims.
 
+Updated for the November 5, 2026 release: public npm installation is the TypeScript entry path.
+The homepage, guides, agent indexes and ecosystem graphic now describe v0.3.5.
+Python remains source-only; future automated registry publication remains disabled.
+
 ## Design direction
 
 Replace the current dark, terminal-led presentation with warm ivory, large black headings, forest green actions, thin dividers and generous spacing. Keep monospace for commands and small technical labels. Use the concept's modular containers and documents to make objects, files and checkpoints tangible.
@@ -39,10 +43,10 @@ The reference establishes hierarchy and visual language. Rebuild its text, links
 | 3 | Large container illustration beside the hero; language line “Go · TypeScript · Python · WebAssembly” | Decorative art, with any explanatory labels in HTML |
 | 4 | Ruled capability strip | Local by default; S3-compatible APIs; Portable checkpoints; Apache 2.0 |
 | 5 | “Three ways to stow” with three open columns, individual icons and hairline separators | Local S3 to `/docs/server/`; Agent workspaces to `/docs/workspaces/`; Browser storage to `/docs/browser-projects/` |
-| 6 | Pine-green panel: “Give every test its own bucket.” plus scoped-session explanation and a working TypeScript example | TypeScript, Python and Go examples; source setup and API links |
+| 6 | Pine-green panel: “Give every test its own bucket.” plus scoped-session explanation and a working TypeScript example | TypeScript, Python and Go examples; npm setup, Python source setup and API links |
 | 7 | “Keep the checkpoint. Carry the work.” plus Prepare → Checkpoint → Handoff illustration | Workspace guide and task manifests; mention verified portable archives |
 | 8 | Compact browser demo and API overview | Retain the existing sync simulation, real demo instructions, embedded runtime and read-through cache discovery |
-| 9 | “Build with storage you control.” with documentation action and source availability | Copyable source checkout command, Go install command, getting-started link |
+| 9 | “Build with storage you control.” with documentation action and published package availability | Copyable npm and Go install commands, source-checkout guidance for Python |
 | 10 | Minimal footer | License, repository, Chester Hill Solutions attribution and existing AWS trademark context |
 
 The three columns describe entry paths rather than the entire feature inventory. Keep embedded Go/WASM, project revisions, persistent workers, bounded streams and run-through caching discoverable in the API overview and documentation.
@@ -99,7 +103,9 @@ Keep the existing static build and asset deployment model. The work fits HTML, C
 
 ## Product accuracy
 
-Retain the source-checkout availability note for the unpublished TypeScript and Python candidate. Display the full working commands `git clone https://github.com/chester-hill-solutions/stow-s3` and `go get github.com/chester-hill-solutions/stow-s3/pkg/stow`. Derive any version label from the current package rather than treating the concept's 0.3.0 label as permanent.
+Offer `npm install @chester-hill-solutions/stow-s3@0.3.5` for TypeScript and the full Go module command.
+Keep source-checkout instructions for Python and contributors; Python is not published to PyPI.
+Release labels and links must match the current package and published release.
 
 Describe Stow as storage. Callers own execution, network access and conflict resolution. Browser sync is explicit; workspace archives transfer saved files. Keep concise links to S3 compatibility and workspace limits. Advertise qualified host support only, with no invented cloud-platform guarantees or performance figures.
 

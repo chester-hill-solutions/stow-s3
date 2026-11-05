@@ -1,5 +1,8 @@
 # Release readiness for 0.3.0
 
+> Historical readiness assessment for 0.3.0. Its registry instructions and blockers describe that earlier candidate.
+> Current installation uses [Stow 0.3.5](getting-started.md) and the [verified npm publication](npm-publishing.md#published-035).
+
 Superseded for the selected downloads-only distribution by the [2026-10-14 verification checkpoint](release-verification-2026-10-14.md).
 The [2026-10-03 checkpoint](release-verification-2026-10-03.md) records the later registry findings
 for current gates and user actions. The account/visibility conclusions below are

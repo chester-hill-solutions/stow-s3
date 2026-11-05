@@ -303,31 +303,33 @@ Removal coordinates with active storage operations.
 
 ## Install
 
-Download the native server from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
+Install the TypeScript client and its native binary from public npmjs:
 
-The [npmjs/OIDC preparation guide](docs/npm-publishing.md) describes the future
-public package path. npm publication and trust configuration remain disabled.
-Choose Linux or macOS and x86_64 (`amd64`) or ARM64 (`arm64`), verify the archive
-against that release's `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
-Run `stow-s3 --version` to check the installed version. Use WSL on Windows.
+```bash
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
 
-**TypeScript and Python clients are not yet published to npm or PyPI.**
-Use a source checkout for those clients. Registry publication is deferred for
-v0.3.3. See the [release notes](docs/releases/v0.3.3.md), including the filesystem
-upgrade compatibility note.
-<!-- repo-only:start -->
-The [current release checkpoint](docs/release-verification-2026-10-19.md) records
-validation and distribution. The [October 3 checkpoint](docs/release-verification-2026-10-03.md)
-is historical; its registry blockers do not apply to native GitHub downloads.
-<!-- repo-only:end -->
+The package includes a platform carrier for Linux or macOS on x64 or ARM64.
+No Go installation or `STOW_BIN` override is needed. Use WSL on Windows.
+Remove any old scope override to `npm.pkg.github.com`; these packages use npmjs.
 
-The Go module is published and installs today:
+Standalone native binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Verify the archive against `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
+Run `stow-s3 --version` to check the installed version.
+See the [release notes](docs/releases/v0.3.5.md) for upgrade compatibility.
+
+**The Python client is not yet published to PyPI.** Use a source checkout for Python.
+The [npm publication record](docs/npm-publishing.md#published-035) describes the
+verified release. Future automated registry publication remains disabled.
+
+The Go module is published:
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-TypeScript and Python work from a source checkout:
+For Python or local TypeScript development, use a source checkout:
 
 ```bash
 git clone https://github.com/chester-hill-solutions/stow-s3
@@ -335,28 +337,25 @@ cd stow-s3
 make build                        # bin/stow-s3 for your platform
 export STOW_BIN="$PWD/bin/stow-s3"
 
-# TypeScript client
+# TypeScript development
 cd packages/stow-s3 && npm install && npm run build && cd ../..
 
 # Python client
 pip install -e "packages/stow-s3-py[boto3]"
 ```
 
-`STOW_BIN` tells a client which server binary to run. A published package carries
-its own binary for your platform and does not need it. `stow-s3 doctor` reports
-which side is broken if the binary cannot be found or run.
+`STOW_BIN` selects the source-built binary. The npm package carries its own binary.
+`stow-s3 doctor` reports which side is broken if the binary cannot be found or run.
 
 ## Quick start: a scoped session
 
 A session starts a private server on an ephemeral port and waits for readiness.
 Closing the session stops the server and removes its data directory.
 
-TypeScript (not yet on npm — see [Install](#install)):
+TypeScript:
 
 ```bash
-# from a source checkout
-make build && export STOW_BIN="$PWD/bin/stow-s3"
-cd packages/stow-s3 && npm install && npm run build
+npm install @chester-hill-solutions/stow-s3@0.3.5
 ```
 
 ```ts

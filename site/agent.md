@@ -78,41 +78,37 @@ Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
 ## Install
 
-Native v0.3.3 binaries for Linux and macOS are distributed through
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.3).
-Verify the archive with the release checksum manifest and run `stow-s3 --version`.
-npm and PyPI publication are deferred; use source checkouts for those clients.
+Install the TypeScript client from public npmjs:
 
+```bash
+npm install @chester-hill-solutions/stow-s3@0.3.5
+```
 
-The 0.3.3 TypeScript and Python clients are not yet published. Use a source checkout.
-Native package targets are Linux and macOS on x64 and arm64. Use WSL on Windows.
+The package carries its native binary for Linux or macOS on x64 or ARM64.
+No source build or `STOW_BIN` override is needed. Use WSL on Windows.
+Remove any old scope override to `npm.pkg.github.com`.
 
-Go, published and installable now:
+Standalone v0.3.5 binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
+
+The Go module is published:
 
 ```bash
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-TypeScript and Python, from a source checkout:
+The Python client is not yet published to PyPI. Use a source checkout:
 
 ```bash
 git clone https://github.com/chester-hill-solutions/stow-s3
 cd stow-s3
-make build                      # produces bin/stow-s3 for your platform
+make build
 export STOW_BIN="$PWD/bin/stow-s3"
-
-# TypeScript
-cd packages/stow-s3 && npm install && npm run build && cd ../..
-
-# Python
 pip install -e "packages/stow-s3-py[boto3]"
 ```
 
-`STOW_BIN` tells the client which server binary to run. A published package
-carries its own binary and does not need it.
-
-If the binary cannot be found or run, `stow-s3 doctor` reports which of the
-client and server sides is broken instead of failing opaquely.
+If the binary cannot be found or run, `stow-s3 doctor` reports the affected side.
 
 ## Starting a server yourself
 
