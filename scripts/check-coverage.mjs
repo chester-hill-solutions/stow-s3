@@ -26,6 +26,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readPreviousBaseline } from "./baseline-history.mjs";
+import { selectCoverageToolchain } from "./coverage-toolchain.mjs";
 
 // A percentage drop larger than this is treated as a regression even if the
 // covered statement count held, which is the case where statement counts alone
@@ -88,6 +89,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 }
 
 function main() {
+  let toolchain;
+  try { toolchain = selectCoverageToolchain(repoRoot); }
+  catch (error) { console.error(error.message); process.exit(2); }
   mkdirSync(resolve(repoRoot, ".cache"), { recursive: true });
 
   if (process.argv.includes("--baseline")) {
@@ -96,7 +100,7 @@ function main() {
     // floor, so record the lowest reading rather than the luckiest one.
     const samples = [];
     for (let index = 0; index < BASELINE_SAMPLES; index += 1) {
-      samples.push(measure());
+      samples.push(measure(toolchain));
     }
     const floor = lowestPerPackage(samples);
     if (existsSync(baselinePath)) floor.packageOwners = JSON.parse(readFileSync(baselinePath, "utf8")).packageOwners ?? {};
@@ -110,7 +114,7 @@ function main() {
     return;
   }
 
-  const measured = measure();
+  const measured = measure(toolchain);
   if (!existsSync(baselinePath)) {
     console.error(`Coverage baseline missing: ${baselinePath}`);
     process.exit(2);
@@ -186,9 +190,10 @@ function reportThin(measured, baseline) {
 }
 
 // measure runs the suite and reads the profile.
-function measure() {
-  execFileSync("go", ["test", "./...", "-coverpkg=./...", "-coverprofile", profilePath], {
+function measure(toolchain) {
+  execFileSync(toolchain.command, ["test", "./...", "-coverpkg=./...", "-coverprofile", profilePath], {
     cwd: repoRoot,
+    env: toolchain.env,
     stdio: "inherit",
   });
   const owners = existsSync(baselinePath) ? JSON.parse(readFileSync(baselinePath, "utf8")).packageOwners ?? {} : {};

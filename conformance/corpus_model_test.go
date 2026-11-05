@@ -45,6 +45,9 @@ type sharedCorpusCase struct {
 	Delimiter    string `json:"delimiter"`
 	MaxKeys      int    `json:"maxKeys"`
 	EncodingType string `json:"encodingType"`
+	// Marker is the classic ListObjects cursor: it names a row of the listing,
+	// which may be a common prefix rather than a key.
+	Marker string `json:"marker"`
 
 	SourceBucket          string `json:"sourceBucket"`
 	SourceKey             string `json:"sourceKey"`
@@ -106,6 +109,10 @@ type sharedCorpusPage struct {
 	CommonPrefixes []string `json:"commonPrefixes"`
 	KeyCount       int      `json:"keyCount"`
 	IsTruncated    bool     `json:"isTruncated"`
+	// NextMarker is the classic ListObjects cursor this page must report. It is
+	// asserted rather than merely followed, because a page that reports the wrong
+	// cursor is a client that pages into a row it already returned.
+	NextMarker string `json:"nextMarker"`
 }
 
 type sharedCorpusContext struct {
