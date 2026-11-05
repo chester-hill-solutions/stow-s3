@@ -166,7 +166,6 @@ func (s *Server) ListenAndServe() error {
 // Ready closes after the listener has bound or startup has failed.
 func (s *Server) Ready() <-chan struct{} { return s.ready }
 
-// Addr returns the bound listen address (host:port).
 func (s *Server) Addr() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -376,7 +375,6 @@ func (s *Server) adminTokenMatches(r *http.Request) bool {
 	return subtle.ConstantTimeCompare([]byte(presented), []byte(expected)) == 1
 }
 
-// Handler returns an http.Handler for httptest.
 func (s *Server) Handler() http.Handler {
 	return s
 }

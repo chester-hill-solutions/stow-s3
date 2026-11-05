@@ -17,6 +17,8 @@ export interface CorpusPage {
   commonPrefixes?: string[];
   keyCount: number;
   isTruncated: boolean;
+  /** The classic ListObjects cursor this page must report. */
+  nextMarker?: string;
 }
 
 export interface CorpusExpectation {
@@ -70,6 +72,8 @@ export interface CorpusCase {
   delimiter?: string;
   maxKeys?: number;
   encodingType?: string;
+  /** The classic ListObjects cursor: it names a row of the listing, which may be a common prefix. */
+  marker?: string;
   sourceBucket?: string;
   sourceKey?: string;
   destinationBucket?: string;

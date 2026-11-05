@@ -85,6 +85,7 @@ func validateSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 		"conditionalGet":   validateConditionalCorpusCase,
 		"checksumPut":      validateChecksumCorpusCase,
 		"listObjectsV2":    validateListCorpusCase,
+		"listObjectsV1":    validateListV1CorpusCase,
 		"copyObject":       validateCopyCorpusCase,
 		"multipartUpload":  validateMultipartCorpusCase,
 		"rangeGet":         validateRangeCorpusCase,
@@ -162,6 +163,33 @@ func validateListCorpusCase(t *testing.T, testCase sharedCorpusCase) {
 	}
 	if testCase.Bucket == "" || testCase.MaxKeys <= 0 || len(testCase.Expect.Pages) == 0 {
 		t.Fatalf("list case %q requires bucket, maxKeys, and pages", testCase.ID)
+	}
+}
+
+// validateListV1CorpusCase refuses a V1 list case that could pass without the
+// cursor working. Two things distinguish V1 from V2 and both are required here:
+// a truncated page must supply NextMarker with a delimiter or a last Key without
+// one, and V1 has no KeyCount, so a case that states one would be asserting a
+// field the response does not carry.
+func validateListV1CorpusCase(t *testing.T, testCase sharedCorpusCase) {
+	t.Helper()
+	if testCase.Expect.Status >= 400 {
+		validateBucketCorpusCase(t, testCase)
+		return
+	}
+	if testCase.Bucket == "" || len(testCase.Expect.Pages) == 0 {
+		t.Fatalf("list case %q requires bucket and pages", testCase.ID)
+	}
+	if len(testCase.Expect.Pages) > 1 && testCase.MaxKeys <= 0 {
+		t.Fatalf("list case %q pages more than once, so it must state maxKeys", testCase.ID)
+	}
+	for index, page := range testCase.Expect.Pages {
+		if page.KeyCount != 0 {
+			t.Fatalf("list case %q page %d states keyCount, which ListObjects (V1) does not return", testCase.ID, index+1)
+		}
+		if problem := listV1CursorProblem(testCase.Delimiter, page); problem != "" {
+			t.Fatalf("list case %q page %d: %s", testCase.ID, index+1, problem)
+		}
 	}
 }
 
