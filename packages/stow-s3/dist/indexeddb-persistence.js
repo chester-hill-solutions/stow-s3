@@ -14,11 +14,7 @@ export class IndexedDbPersistenceAdapter {
     objectStoreName;
     lockManager;
     lockName;
-    database;
-    namespace;
-    ownership;
-    closePromise;
-    closed = false;
+    lifecycle = { kind: "idle" };
     constructor(options = {}) {
         this.factory = options.indexedDB ?? globalIndexedDb();
         this.databaseName = options.databaseName ?? DEFAULT_DATABASE_NAME;
@@ -30,28 +26,39 @@ export class IndexedDbPersistenceAdapter {
     }
     async open(namespace) {
         validatePersistenceNamespace(namespace);
-        if (this.closed) {
+        if (this.lifecycle.kind !== "idle") {
+            if (this.lifecycle.kind === "opening" || this.lifecycle.kind === "open") {
+                throw new BrowserPersistenceError("already_open", "persistence namespace is already open or opening");
+            }
             throw new BrowserPersistenceError("closed", "persistence adapter is closed");
         }
-        if (this.namespace !== undefined) {
-            throw new BrowserPersistenceError("already_open", "persistence namespace is already open");
-        }
-        const ownershipKey = this.lockName(namespace);
-        this.ownership = await acquireOwnership(ownershipKey, this.lockManager);
+        const completion = this.acquireResources(namespace);
+        this.lifecycle = { kind: "opening", completion };
         try {
-            this.database = await openDatabase(this.factory, this.databaseName, this.manifestStoreName, this.bucketStoreName, this.objectStoreName);
-            this.namespace = namespace;
+            const resources = await completion;
+            // Close owns the pending acquisition once it transitions to closing.
+            if (this.lifecycle.kind !== "opening")
+                throw new BrowserPersistenceError("closed", "persistence adapter is closed");
+            this.lifecycle = { kind: "open", resources };
         }
         catch (error) {
-            const ownership = this.ownership;
-            this.ownership = undefined;
-            if (ownership !== undefined) {
-                try {
-                    await ownership.release();
-                }
-                catch {
-                    // Preserve the database-open failure.
-                }
+            if (this.lifecycle.kind === "opening")
+                this.lifecycle = { kind: "idle" };
+            throw mapAdapterError(error);
+        }
+    }
+    async acquireResources(namespace) {
+        const ownership = await acquireOwnership(this.lockName(namespace), this.lockManager);
+        try {
+            const database = await openDatabase(this.factory, this.databaseName, this.manifestStoreName, this.bucketStoreName, this.objectStoreName);
+            return { database, namespace, ownership };
+        }
+        catch (error) {
+            try {
+                await ownership.release();
+            }
+            catch {
+                // Preserve the database-open failure.
             }
             throw mapAdapterError(error);
         }
@@ -64,11 +71,7 @@ export class IndexedDbPersistenceAdapter {
         };
     }
     async load(namespace) {
-        this.ensureNamespace(namespace);
-        const database = this.database;
-        if (database === undefined) {
-            throw new BrowserPersistenceError("persistence_error", "persistence database is not open");
-        }
+        const { database } = this.resourcesFor(namespace);
         try {
             const raw = await readNamespace(database, namespace, this.stores);
             return raw === null ? null : normalizeSnapshot(raw);
@@ -78,13 +81,9 @@ export class IndexedDbPersistenceAdapter {
         }
     }
     async commit(namespace, expectedGeneration, changes) {
-        this.ensureNamespace(namespace);
+        const { database } = this.resourcesFor(namespace);
         validateGeneration(expectedGeneration);
         const normalizedChanges = changes.map(normalizeChange);
-        const database = this.database;
-        if (database === undefined) {
-            throw new BrowserPersistenceError("persistence_error", "persistence database is not open");
-        }
         try {
             return await commitChanges(database, namespace, expectedGeneration, normalizedChanges, this.stores);
         }
@@ -93,12 +92,8 @@ export class IndexedDbPersistenceAdapter {
         }
     }
     async clear(namespace, expectedGeneration) {
-        this.ensureNamespace(namespace);
+        const { database } = this.resourcesFor(namespace);
         validateGeneration(expectedGeneration);
-        const database = this.database;
-        if (database === undefined) {
-            throw new BrowserPersistenceError("persistence_error", "persistence database is not open");
-        }
         try {
             return await clearNamespace(database, namespace, expectedGeneration, this.stores);
         }
@@ -106,48 +101,57 @@ export class IndexedDbPersistenceAdapter {
             throw mapAdapterError(error);
         }
     }
-    async close() {
-        this.closePromise ??= this.closeInternal();
-        return this.closePromise;
+    close() {
+        const previous = this.lifecycle;
+        if (previous.kind === "closing" || previous.kind === "closed" || previous.kind === "failed")
+            return previous.completion;
+        const completion = Promise.resolve().then(() => this.closeInternal(previous)).then(() => { this.lifecycle = { kind: "closed", completion }; }, (error) => { this.lifecycle = { kind: "failed", completion }; throw mapAdapterError(error); });
+        this.lifecycle = { kind: "closing", completion };
+        return completion;
     }
-    async closeInternal() {
-        this.closed = true;
-        const database = this.database;
-        const ownership = this.ownership;
-        this.database = undefined;
-        this.namespace = undefined;
-        this.ownership = undefined;
-        let firstError;
-        if (database !== undefined) {
+    async closeInternal(previous) {
+        if (previous.kind === "idle")
+            return;
+        let resources;
+        if (previous.kind === "opening") {
             try {
-                database.close();
+                resources = await previous.completion;
             }
-            catch (error) {
-                firstError = error;
-            }
+            catch {
+                return;
+            } // Failed acquisition releases its own ownership.
         }
-        if (ownership !== undefined) {
-            try {
-                await ownership.release();
-            }
-            catch (error) {
-                firstError ??= error;
-            }
+        else
+            resources = previous.resources;
+        let firstError;
+        try {
+            resources.database.close();
+        }
+        catch (error) {
+            firstError = error;
+        }
+        try {
+            await resources.ownership.release();
+        }
+        catch (error) {
+            firstError ??= error;
         }
         if (firstError !== undefined) {
             throw mapAdapterError(firstError);
         }
     }
-    ensureNamespace(namespace) {
-        if (this.closed) {
+    resourcesFor(namespace) {
+        const state = this.lifecycle;
+        if (state.kind !== "open") {
+            if (state.kind === "idle" || state.kind === "opening") {
+                throw new BrowserPersistenceError("persistence_error", "persistence namespace is not open");
+            }
             throw new BrowserPersistenceError("closed", "persistence adapter is closed");
         }
-        if (this.namespace === undefined) {
-            throw new BrowserPersistenceError("persistence_error", "persistence namespace is not open");
-        }
-        if (this.namespace !== namespace) {
+        if (state.resources.namespace !== namespace) {
             throw new BrowserPersistenceError("persistence_error", "persistence namespace does not match");
         }
+        return state.resources;
     }
 }
 function globalIndexedDb() {

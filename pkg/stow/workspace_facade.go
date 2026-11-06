@@ -3,8 +3,6 @@ package stow
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/auth"
 	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
@@ -58,7 +56,7 @@ func (w *Workspace) FacadeWithOptions(options WorkspaceFacadeOptions) (*Workspac
 	}
 	w.lifecycleMu.Lock()
 	defer w.lifecycleMu.Unlock()
-	if w.closed || w.closing {
+	if w.lifecycle != workspaceOpen {
 		return nil, ErrClosed
 	}
 	if w.facade == nil {
@@ -104,40 +102,6 @@ func startWorkspaceFacade(instance *runtime.Instance, options WorkspaceFacadeOpt
 	facade.descriptor = WorkspaceFacade{MaxMultipartUploads: instance.Capabilities().MaxMultipartUploads, MaxRequestBytes: options.MaxRequestBytes, MaxConcurrentRequests: options.MaxConcurrentRequests, Endpoint: "http://" + server.Addr(), Region: region,
 		AccessKeyID: credentials.AccessKeyID, SecretAccessKey: credentials.SecretAccessKey}
 	return facade, nil
-}
-
-func (w *Workspace) closeRuntimeLocked() error {
-	if w.closed {
-		return nil
-	}
-	w.closing = true
-	if w.facade != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := w.facade.server.Shutdown(ctx); err != nil {
-			return err
-		}
-		done := w.facade.done
-		w.facade = nil
-		if err := <-done; err != nil && err != http.ErrServerClosed {
-			return err
-		}
-	}
-	if err := w.Runtime.Close(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (w *Workspace) closeLocked() error {
-	if err := w.closeRuntimeLocked(); err != nil {
-		return err
-	}
-	if err := w.session.Release(); err != nil {
-		return err
-	}
-	w.closed = true
-	return nil
 }
 
 // RefreshUsage accounts for direct filesystem writes at a caller's quiescent boundary.

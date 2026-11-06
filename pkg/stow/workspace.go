@@ -39,9 +39,7 @@ type Workspace struct {
 	maxCheckpointBytes int64
 	maxCheckpoints     int64
 	now                func() time.Time
-	closing            bool
-	closed             bool
-	destroyed          bool
+	lifecycle          workspaceLifecycle
 }
 
 // WorkspaceOptions configures a workspace.
@@ -235,28 +233,6 @@ func (w *Workspace) captureTarget() captureTarget {
 	}
 }
 
-// Close releases the handle. It is the non-destructive half of the split in
-// ADR 0009 section 3: the process and the client go away, and the bytes do not.
-//
-// It also releases the session lock, which is what makes the workspace
-// collectable again. Closing twice is not an error.
-func (w *Workspace) Close() error {
-	w.lifecycleMu.Lock()
-	defer w.lifecycleMu.Unlock()
-	return w.closeLocked()
-}
-
-// assertOpen refuses work on a closed handle, so a lifecycle mistake is a named
-// error rather than a confusing failure from underneath.
-func (w *Workspace) assertOpen() error {
-	w.lifecycleMu.Lock()
-	defer w.lifecycleMu.Unlock()
-	if w.closed || w.closing {
-		return ErrClosed
-	}
-	return nil
-}
-
 // Destroy removes the workspace directory, and only if stow created it. This is the
 // explicit half of the lifecycle split in ADR 0009 section 3: Close releases the
 // handle, Destroy removes the bytes. A workspace stow *adopted* — one pointed at a
@@ -309,7 +285,6 @@ func (w *Workspace) destroyLocked() error {
 	} else if err := remove(); err != nil {
 		return err
 	}
-	w.destroyed = true
 	return w.closeLocked()
 }
 

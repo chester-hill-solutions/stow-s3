@@ -27,6 +27,7 @@ Run individual checks:
 make format-check
 make lint
 make check-go-quality
+make check-state-machines
 make check-ts-quality
 make check-type-escapes
 make check-dry
@@ -50,6 +51,7 @@ npm run check:dry
 | Baseline | Records |
 | --- | --- |
 | `scripts/baselines/go-quality.json` | Go quality identities |
+| `scripts/baselines/state-machines.json` | Implicit lifecycle state identities |
 | `scripts/baselines/lint-ratchet.json` | TypeScript warning counts |
 | `scripts/baselines/type-escapes.json` | TypeScript type escapes |
 | `scripts/baselines/dry.json` | TypeScript duplication counts |
@@ -77,6 +79,39 @@ The Go comment budget counts production `comment-lines` only.
 `comment-ratio` is reported without a floor; removing code can raise that ratio.
 Test comments are excluded from this budget.
 Structural checks, coverage, formatting and vet still apply to tests.
+
+## Explicit state machines
+
+`make check-state-machines` scans production Go and TypeScript using their parsers.
+It detects two or more lifecycle booleans in one struct, class or lexical block,
+and TypeScript lifecycle booleans paired with optional cleanup promises.
+A single boolean remains valid for a two-state lifecycle. Use named states and
+transitions when the lifecycle has additional phases or retry behavior.
+
+Go roots and the TypeScript package come from `config/scan-roots.json`;
+TypeScript scanning covers its `src` directory. Go test files, generated Go files,
+TypeScript declarations and generated `dist` output are excluded. The shared
+name vocabulary is in `config/state-machine-rules.json`; `is`/`has` prefixes and
+leading underscores are recognized. This is a structural heuristic, not proof
+that every implicit state machine has been found. It does not infer aliases,
+arbitrary boolean expressions, cross-scope relationships or domain semantics.
+
+Findings use file, owner, rule and binding names rather than line numbers.
+New findings, stale entries and any identity added to the historical baseline fail.
+`node scripts/check-state-machines.mjs --report` prints findings with locations.
+After removing debt, `--write-baseline` records the reduction and refuses additions.
+The first baseline records existing debt; later baselines may only shrink.
+Parser, scanner and history failures fail the check.
+
+The outbox retains one compatibility baseline for the public and persisted
+`OutboxEntry` fields. Its runtime model lives in
+`internal/runthrough/outbox_lifecycle.go`: publication is prepared or published;
+propagation is ready, retry scheduled or terminal. Claim/preparation leases and
+attempt history are independent of those phases. Publication, failure and lease
+updates use named transitions, with existing mutexes and file transactions owning
+atomicity. A retry schedule becoming due permits an attempt; it does not erase
+history. Releasing ownership retains the obligation to reconcile an earlier
+attempt. Terminal failure prevents further claims until the intent is removed.
 
 ## Go standards
 

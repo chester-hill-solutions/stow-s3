@@ -88,7 +88,7 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	if w.closed || w.closing {
+	if w.lifecycle != workspaceOpen {
 		return CheckpointInfo{}, ErrClosed
 	}
 	// Asked before the capture lock, so a refusal costs nothing. The resource is the

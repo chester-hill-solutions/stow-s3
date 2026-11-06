@@ -274,19 +274,12 @@ func (a *Adapter) completeIntentWithScheduleLocked(ctx context.Context, entry Ou
 	return claim.success()
 }
 
-func outboxRetryDelay(attempts int) time.Duration {
-	if attempts < 1 {
-		attempts = 1
-	}
-	if attempts > 6 {
-		attempts = 6
-	}
-	return time.Duration(1<<uint(attempts-1)) * time.Second
-}
-
 // RetryPending retries due outbox entries. It is safe to call from a worker or
 // at startup; entries that are not due remain queued.
 func (a *Adapter) RetryPending(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	recoveryErr := a.RecoverPrepared(ctx)
 	now := time.Now()
 	blocked := make(map[string]bool)
@@ -298,6 +291,9 @@ func (a *Adapter) RetryPending(ctx context.Context) error {
 		firstErr = recoveryErr
 	}
 	for _, entry := range a.outbox.Pending() {
+		if err := ctx.Err(); err != nil {
+			return errors.Join(firstErr, err)
+		}
 		key := outboxIdentity(entry.Bucket, entry.Key)
 		if blocked[key] {
 			continue
@@ -314,6 +310,9 @@ func (a *Adapter) RetryPending(ctx context.Context) error {
 }
 
 func (a *Adapter) RecoverPrepared(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if a.coordinatedOutbox == nil {
 		return nil
 	}
@@ -323,7 +322,10 @@ func (a *Adapter) RecoverPrepared(ctx context.Context) error {
 	}
 	var firstErr error
 	for _, entry := range entries {
-		if entry.PreparedOwner != "" && (entry.PreparedUntil.After(time.Now().UTC()) || outboxOwnerAlive(entry.PreparedOwner)) {
+		if err := ctx.Err(); err != nil {
+			return errors.Join(firstErr, err)
+		}
+		if entry.preparationLease().heldAt(time.Now().UTC()) {
 			continue
 		}
 		unlock := a.outboxLocks.lock(outboxIdentity(entry.Bucket, entry.Key))
@@ -340,10 +342,10 @@ func (a *Adapter) RecoverPrepared(ctx context.Context) error {
 // for its key. Kept apart from the permission half because they answer different
 // questions.
 func dueForPropagation(current OutboxEntry, pending []OutboxEntry, respectSchedule bool) bool {
-	if current.Terminal {
+	if current.propagationPhase() == outboxTerminal {
 		return false
 	}
-	if respectSchedule && !current.NextAttempt.IsZero() && current.NextAttempt.After(time.Now()) {
+	if respectSchedule && current.propagationPhase() == outboxRetryScheduled && !outboxEntryDue(current, time.Now()) {
 		return false
 	}
 	return isFirstPendingForKey(pending, current)
@@ -383,7 +385,7 @@ func (a *Adapter) orderingEntries() []OutboxEntry {
 }
 
 func (a *Adapter) retryEntry(ctx context.Context, entry OutboxEntry, now time.Time) (bool, error) {
-	if entry.Terminal {
+	if entry.propagationPhase() == outboxTerminal {
 		return false, nil
 	}
 	if !outboxEntryDue(entry, now) {
@@ -398,7 +400,7 @@ func (a *Adapter) retryEntry(ctx context.Context, entry OutboxEntry, now time.Ti
 	if !ok {
 		return false, nil
 	}
-	if !a.upstreamReachable(current.Bucket) || current.Terminal || !outboxEntryDue(current, now) || !isFirstPendingForKey(pending, current) {
+	if !a.upstreamReachable(current.Bucket) || current.propagationPhase() == outboxTerminal || !outboxEntryDue(current, now) || !isFirstPendingForKey(pending, current) {
 		return true, nil
 	}
 	if err := a.completeIntentLocked(ctx, current); err != nil {

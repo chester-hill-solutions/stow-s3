@@ -147,7 +147,7 @@ func normalizeDecodedOutboxState(state outboxState) (outboxState, error) {
 		}
 	}
 	for id, entry := range state.entries {
-		if !entry.Prepared {
+		if entry.publicationPhase() != outboxPrepared {
 			continue
 		}
 		delete(state.entries, id)

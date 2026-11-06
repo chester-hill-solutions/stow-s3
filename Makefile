@@ -108,6 +108,12 @@ format-check:
 check-go-quality:
 	node scripts/check-go-quality.mjs
 
+check-state-machines:
+	$(NPM_INSTALL)
+	node scripts/check-state-machines.mjs
+
+.PHONY: check-state-machines
+
 check-ts-quality:
 	$(NPM_INSTALL) && npm run check:standards
 
@@ -207,4 +213,4 @@ check-mcp-browser:
 	npm test --prefix extensions/stow
 	node extensions/stow/build.mjs --check
 
-standards: format-check lint test-race check-go-quality check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser
+standards: format-check lint test-race check-go-quality check-state-machines check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser

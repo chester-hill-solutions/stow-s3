@@ -13,14 +13,16 @@ export function readPreviousBaseline(repoRoot, relativePath) {
     throw new Error(`Cannot resolve ratchet base ${ref}; check out full history (fetch-depth: 0) or set STOW_BASELINE_REF`);
   }
 
+  let data;
   try {
-    return JSON.parse(execFileSync("git", ["show", `${resolved}:${relativePath}`], {
+    data = execFileSync("git", ["show", `${resolved}:${relativePath}`], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
-    }));
+    });
   } catch {
     // The first baseline may legitimately have no parent version.
     return null;
   }
+  return JSON.parse(data);
 }

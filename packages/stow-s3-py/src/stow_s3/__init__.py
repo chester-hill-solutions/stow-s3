@@ -67,7 +67,7 @@ from .workspace import (
     run_workspace_command,
 )
 
-__version__ = "0.3.6"
+__version__ = "0.3.7"
 
 __all__ = [
     "ServedWorkspace",
