@@ -90,6 +90,7 @@ test-agent-real: build
 	STOW_REQUIRE_REAL_MODEL=1 node --test examples/opencode/real-model.test.mjs
 
 test-benchmark:
+	$(NPM_INSTALL)
 	npm test --prefix benchmark
 
 test-all: build test test-race test-conformance test-node test-python test-wasm test-agent test-benchmark
