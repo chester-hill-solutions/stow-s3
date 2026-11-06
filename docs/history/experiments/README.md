@@ -6,6 +6,7 @@ Use [current guides](../../guides/README.md) for supported workflows and the
 
 | Record | Original scope |
 | --- | --- |
+| [Retired multiplayer prototype](multiplayer-prototype.md) | Ownership-based experiment transferred to GangCode; original code retained in Git history |
 | [Agent continuity: a concrete pilot](agent-continuity-pilot-2026-09-29.md) | Dated experiment or assessment |
 | [Agent workspace local pilot](agent-workspace-pilot.md) | Dated experiment or assessment |
 | [Stow assessment: codebase, tool, idea, and execution](assessment-2026-09-27.md) | Dated experiment or assessment |

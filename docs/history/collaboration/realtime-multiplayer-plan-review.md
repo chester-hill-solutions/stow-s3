@@ -113,9 +113,9 @@ engineering handover requirements, with P1 issues blocking the relevant runtime 
    control acceptance produce bounded calls and no duplicate/stale control.
 
 9. **[P2] Existing receipt names overstate evidence.** The coordinator records listener
-   callbacks as received at [lines 54–58](../../../examples/multiplayer-prototype/coordinator.mjs#L54)
+   callbacks as received at [lines 54–58](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/coordinator.mjs#L54)
    and marks messages applied after an output-changing turn at
-   [lines 123–132](../../../examples/multiplayer-prototype/coordinator.mjs#L123).
+   [lines 123–132](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/coordinator.mjs#L123).
    **Adjustment:** reuse routing mechanics, not their interpretation as model adaptation.
    New UI separates routed, accepted, context-delivered, considered, refreshed and verified
    adaptation. **Verify:** queued-but-never-run and delivered-but-ignored reports cannot
@@ -152,9 +152,9 @@ engineering handover requirements, with P1 issues blocking the relevant runtime 
 | Touchpoint | Reuse / boundary |
 | --- | --- |
 | [ADR 0014](../../adr/0014-storage-product-caller-owned-execution.md), [canonical plan](../../plan.md) | Storage/caller boundary and one work-order authority |
-| [Coordinator lines 64–87](../../../examples/multiplayer-prototype/coordinator.mjs#L64) | Isolated processes, credentials and `onAdmitted`; new scheduler does not inherit exclusive outputs |
-| [Room](../../../examples/multiplayer-prototype/room.mjs) | Participant/subscription/report identities; old report-file watcher is not continuous workspace observation |
-| [Dashboard](../../../examples/multiplayer-prototype/dashboard.mjs) | Artifact confinement/rendering; receipt labels need new semantics |
+| [Coordinator lines 64–87](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/coordinator.mjs#L64) | Isolated processes, credentials and `onAdmitted`; new scheduler does not inherit exclusive outputs |
+| [Room](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/room.mjs) | Participant/subscription/report identities; old report-file watcher is not continuous workspace observation |
+| [Dashboard](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/dashboard.mjs) | Artifact confinement/rendering; receipt labels need new semantics |
 | [OpenCode helper](../../../examples/opencode/opencode.mjs) | Authenticated requests, admission identity and session checks; original footer/post-execution validator stays in the old profile |
 | [Server helper](../../../examples/opencode/server.mjs) | Dedicated HOME/XDG and exact pin; planned async verification/config path is not implemented |
 | [Workspace file helper](../../../examples/opencode/workspace-files.mjs) | Initial/reconciliation scans; avoid full hashing for every event |

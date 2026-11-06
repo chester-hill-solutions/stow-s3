@@ -209,7 +209,7 @@ Stow is an optional storage integration through its public API/CLI; observing an
 existing workspace must not require Stow. The [repository boundary and extraction](realtime-repository-boundary.md)
 is the first implementation prerequisite. Transfer these plans there, then leave a
 project pointer and dated evidence here rather than maintain two active backlogs.
-The existing ownership-based [prototype](../../../examples/multiplayer-prototype/NOTES.md)
+The existing ownership-based [prototype](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/NOTES.md)
 is useful evidence, but it does not yet demonstrate this experience.
 
 ## Delivery plan

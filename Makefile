@@ -1,4 +1,4 @@
-.PHONY: test-browser browser-editor multiplayer multiplayer-real multiplayer-check test-agent test-agent-real build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
+.PHONY: test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -89,18 +89,11 @@ test-browser: build build-wasm
 test-agent-real: build
 	STOW_REQUIRE_REAL_MODEL=1 node --test examples/opencode/real-model.test.mjs
 
-# Throwaway caller-owned collaboration experiment, outside the storage API.
-multiplayer: build
-	node examples/multiplayer-prototype/run.mjs
+test-benchmark:
+	$(NPM_INSTALL)
+	npm test --prefix benchmark
 
-multiplayer-real: build
-	node examples/multiplayer-prototype/run.mjs --real
-
-multiplayer-check: build
-	node examples/multiplayer-prototype/run.mjs --headless
-	node examples/multiplayer-prototype/run.mjs --headless --interrupt-designer
-
-test-all: build test test-race test-conformance test-node test-python test-wasm test-agent
+test-all: build test test-race test-conformance test-node test-python test-wasm test-agent test-benchmark
 
 lint:
 	$(PINNED_GO) vet ./...

@@ -60,7 +60,7 @@ guarded-edit scenario above remains the RT-2–RT-4 expansion contract.
 
 ## 2. What exists and what must change
 
-The [first experiment](../../../examples/multiplayer-prototype/NOTES.md) demonstrated
+The [first experiment](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/NOTES.md) demonstrated
 three overlapping OpenCode admissions, selective reports, controlled interruption,
 fresh-session resumption, reused-session continuation and byte-equivalent local
 checkpoint restoration. It did not demonstrate shared-document editing, human

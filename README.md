@@ -76,8 +76,9 @@ The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpo
 Real interruption, second-host and Linux acceptance tests remain open.
 MCP tool access alone does not ensure a checkpoint after every turn.
 
-The [multiplayer lab](examples/multiplayer-prototype/README.md) is an experimental caller.
-Run `make multiplayer` for the offline demo or `make multiplayer-real` for the local OpenCode model.
+Live collaboration work belongs to [GangCode](docs/design/gangcode-stow-boundary.md).
+The retired ownership-based multiplayer experiment remains in
+[Git history](docs/history/experiments/multiplayer-prototype.md).
 <!-- repo-only:end -->
 ## Checkpoints and editing history
 

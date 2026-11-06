@@ -24,9 +24,9 @@ work from received events while owning their execution and feedback-loop policy.
 
 ## Source to reuse
 
-- `examples/multiplayer-prototype/room.mjs`: publication identity, normalized paths,
+- [Historical room prototype](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/room.mjs): publication identity, normalized paths,
   subscription matching, immutable reports, pending queries and acknowledgements.
-- `examples/multiplayer-prototype/coordinator.mjs`: caller decides readiness after
+- [Historical coordinator](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/coordinator.mjs): caller decides readiness after
   producer settlement. Keep this decision outside the storage API.
 - `pkg/stow/workspace.go`, `pkg/stow/resume.go`: durable workspace identity/lifecycle.
 - `internal/rooted`, `internal/atomicfile`: confined access and durable atomic writes.
