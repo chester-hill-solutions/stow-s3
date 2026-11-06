@@ -88,8 +88,8 @@ The package carries its native binary for Linux or macOS on x64 or ARM64.
 No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
-Standalone v0.3.5 binaries are available from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+Standalone v0.3.6 binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.6).
 Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
 
 The Go module is published:

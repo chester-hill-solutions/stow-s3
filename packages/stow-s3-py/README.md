@@ -5,8 +5,8 @@ A session starts a local server, returns its endpoint and credentials, and stops
 
 ## Install
 
-The Python package is not yet published to PyPI. v0.3.5 ships native binaries
-as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.5).
+The Python package is not yet published to PyPI. v0.3.6 ships native binaries
+as [GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.6).
 Install the Python client from a source checkout. From the repository root:
 
 ```sh
@@ -18,7 +18,7 @@ python3 -m pip install -e 'packages/stow-s3-py[boto3]'
 `boto3` is optional. Omit the extra if you supply another S3 client.
 Use `STOW_BIN` to select the built native server.
 <!-- repo-only:start -->
-See the [release notes](../../docs/releases/v0.3.5.md) for current distribution and compatibility.
+See the [release notes](../../docs/releases/v0.3.6.md) for current distribution and compatibility.
 <!-- repo-only:end -->
 
 ## Use
