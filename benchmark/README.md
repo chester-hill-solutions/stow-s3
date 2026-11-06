@@ -3,6 +3,16 @@
 This folder defines and runs storage comparisons on Railway.
 The IaC partial manages two private services and two 5,120 MB volumes.
 
+The default image remains `Dockerfile`; specialized image recipes live in
+`docker/`. Source filtering and image-mode validation live in `packaging/`.
+Choose one image mode per packaging command. Verification modes require
+`--full`; diagnosis modifiers require their matching parent mode. Invalid
+combinations are rejected before an output directory is created.
+
+Both minimal and full packages exclude `.env` variants, private credential
+folders, dependency caches and old benchmark output directories. Do not add
+credentials to source files; these path exclusions are not a secret scanner.
+
 | Service | Role | Resource ceiling |
 |---|---|---|
 | benchmark-target | Runs one S3 implementation at a time on the same data volume | 2 vCPU, 2 GiB RAM |

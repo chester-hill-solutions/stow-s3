@@ -203,9 +203,9 @@ separates that local model pass from the still-required second-host/Linux and
 real interruption gates.
 
 The user subsequently authorized a separate product exploration. The first
-[throwaway multiplayer caller](../../examples/multiplayer-prototype/README.md) demonstrated
+[throwaway multiplayer caller](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/README.md) demonstrated
 concurrent OpenCode participants, scoped output ownership, file subscriptions and
-portable reports. Its [notes](../../examples/multiplayer-prototype/NOTES.md) are dated
+portable reports. Its [notes](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/NOTES.md) are dated
 evidence. The user then rejected file claims as the product model and specified
 simultaneous shared-file editing, presence/last cursor as the first join message,
 live steer/queue/interrupt controls and low room latency. These refinements are planned

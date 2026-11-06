@@ -184,7 +184,7 @@ is a failed collaboration outcome.
 
 ## Current readiness
 
-The existing [demo](../../../examples/multiplayer-prototype/demo.mjs) explicitly supplies the
+The existing [demo](https://github.com/chester-hill-solutions/stow-s3/blob/9d7c82bd43fc62c9047081dac43ad0cc5f175570/examples/multiplayer-prototype/demo.mjs) explicitly supplies the
 new data contract in its follow-up prompt and uses exclusive output assignments.
 It cannot certify spontaneous adaptation, same-file protection or active-task awareness.
 Reuse its real-run lifecycle and independent artifact-checking pattern. RT-0 starts
