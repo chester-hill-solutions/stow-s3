@@ -1,13 +1,52 @@
 # npmjs publishing
 
-The five public Stow packages are published at 0.3.5:
+The five public Stow packages are published at 0.3.7:
 `@chester-hill-solutions/stow-s3` and its `-darwin-arm64`, `-darwin-x64`,
 `-linux-arm64` and `-linux-x64` carriers. Public installation is verified.
 Historical GitHub Packages receipts describe a separate registry.
 
 `scripts/release-policy.json` still selects `publishPackages: false`.
-This release used the separately authorized interactive bootstrap.
+The 0.3.7 update used a separately authorized interactive publication.
 Future automated publication, PyPI publication and trusted publishing remain disabled.
+
+## Published 0.3.7
+
+The November 6, 2026 npm update follows the published native release at
+source `09d5277b2aace6d82869fc2bce91728607bd8d19`.
+[Tagged Release 42258586060](https://github.com/chester-hill-solutions/stow-s3/actions/runs/42258586060)
+and [push CI 42258449412](https://github.com/chester-hill-solutions/stow-s3/actions/runs/42258449412)
+passed for that exact source, including native builds, wheels and packed npm
+consumers on all four supported platforms.
+
+The four platform packages contain the exact publicly released native binaries.
+The main package derives from that run's `npm-package` artifact
+(`13524257290`); comparing all 340 package files confirmed that only its README
+changed, to install 0.3.7 and link to this record. Source, compiled JavaScript,
+types and WASM assets are unchanged. A clean prepublication consumer installed
+the exact five tarballs and passed session and persistent-workspace checks.
+
+The owner explicitly requested this npm update. The renewed local login was
+verified as `wra-sol`, with read-write access to all five packages. Publication
+used interactive npm authentication, platform packages before core, and immutable
+SHA-512 integrity checks. No credential or OTP was included in the repository.
+
+npm accepted uploads before their versions became publicly readable. The
+continuation preserved acknowledged uploads, waited for matching public metadata,
+and kept the main package behind all four available carriers. No immutable
+version was replaced.
+
+The [publication receipt](../history/releases/npm-0.3.7.json) records each exact
+package hash and public verification. All five versions installed anonymously
+with empty npm configuration and fresh caches. The macOS ARM64 public consumer
+selected its installed carrier, started Stow 0.3.7 and prepared and served a
+persistent workspace. Public native execution on other hosts is not claimed;
+the exact runtime bytes passed the release's four-platform packed consumers.
+
+This publication retains the release's native-local qualification profile.
+Executed AWS S3, Cloudflare R2 and custom-provider compatibility remains **NOT
+verified for 0.3.7**. No provider-qualified claim is made. The automated publisher's
+provider, permission and trust gates remain unchanged; it remains disabled.
+No trusted publisher was configured and no PyPI package was published.
 
 ## Published 0.3.5
 

@@ -2,7 +2,7 @@
 
 Use native workspaces for file editing, checkpoints, capture recovery, S3 access and local MCP tools.
 Native workspace APIs are included in v0.3.7 GitHub downloads and the Go module.
-The TypeScript client is published as `@chester-hill-solutions/stow-s3@0.3.5` on npmjs.
+The TypeScript client is published as `@chester-hill-solutions/stow-s3@0.3.7` on npmjs.
 The Python client is not yet published to PyPI; use a source checkout for Python.
 Native package targets are macOS and Linux on arm64/x64.
 Windows workspace capture is unsupported by the current rooted-read implementation.

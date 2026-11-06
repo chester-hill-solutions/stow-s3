@@ -7,7 +7,7 @@ Choose the API that matches your application.
 ## Install the TypeScript client
 
 ```sh
-npm install @chester-hill-solutions/stow-s3@0.3.5
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 The package includes the native carrier for your Linux or macOS host on x64 or ARM64.
@@ -52,7 +52,7 @@ go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 
 Python installation still requires a source checkout. TypeScript applications can use the npm package above.
 <!-- repo-only:start -->
-See the [npm publication record](../development/npm-publishing.md#published-035) for exact release verification.
+See the [npm publication record](../development/npm-publishing.md#published-037) for exact release verification.
 <!-- repo-only:end -->
 
 ## Choose your storage surface

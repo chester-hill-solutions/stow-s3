@@ -7,7 +7,7 @@ TypeScript APIs for native S3 sessions, workspaces and embedded browser storage.
 Install the public npm package:
 
 ```sh
-npm install @chester-hill-solutions/stow-s3@0.3.5
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 Node.js 20 or newer is required. Linux and macOS on x64 or ARM64 receive their native carrier automatically.
@@ -32,7 +32,7 @@ export STOW_BIN="$PWD/bin/stow-s3"
 
 Use `STOW_BIN` to select the source-built native binary during development.
 <!-- repo-only:start -->
-See the [npm publication record](../../docs/development/npm-publishing.md#published-035) for release verification.
+See the [npm publication record](../../docs/development/npm-publishing.md#published-037) for release verification.
 <!-- repo-only:end -->
 
 ## Usage

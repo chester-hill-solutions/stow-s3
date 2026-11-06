@@ -64,7 +64,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 - [Contributing](../CONTRIBUTING.md) and [code standards](CODE_STANDARDS.md).
 - [Release verification](history/releases/release-verification-2026-10-14.md) records the downloads-only release; it is a dated checkpoint,
   not evidence that a later candidate was published.
-- [npm publication record](development/npm-publishing.md) records the verified 0.3.5 release and remaining automated-publishing requirements.
+- [npm publication record](development/npm-publishing.md) records the verified 0.3.7 release and remaining automated-publishing requirements.
 
 ## Evidence and history
 

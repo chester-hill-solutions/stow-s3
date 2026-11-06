@@ -14,8 +14,8 @@
 - Update the embedded MCP browser's Zod validator to 4.6.6 and refresh compatible
   transitive dependencies with security fixes.
 
-This release selects native GitHub downloads and the Go module. Public npm
-packages remain at 0.3.5; npm and PyPI publication remain disabled.
+Native GitHub downloads, the Go module and all five public npm packages are
+available at 0.3.7. PyPI and automated registry publication remain disabled.
 See the [release notes](docs/releases/v0.3.7.md) for scope and compatibility.
 
 ## 0.3.6 — 2026-11-05
