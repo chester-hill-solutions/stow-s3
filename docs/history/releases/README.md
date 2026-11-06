@@ -1,11 +1,12 @@
 # Historical release checks
 
 These records describe individual candidates and publication checkpoints.
-Use the [current release notes](../../releases/v0.3.5.md) and
+Use the [current release notes](../../releases/v0.3.7.md) and
 [npm publication record](../../development/npm-publishing.md) for current installation.
 
 | Date / candidate | Record |
 | --- | --- |
+| November 6, 2026 / 0.3.7 | [npm package integrity and anonymous consumers](npm-0.3.7.json) |
 | 0.3.0 | [Readiness assessment](release-readiness-0.3.0.md) |
 | October 3, 2026 | [Registry and rehearsal findings](release-verification-2026-10-03.md) |
 | October 14, 2026 | [Downloads-only release verification](release-verification-2026-10-14.md) |

@@ -64,7 +64,7 @@ See the portable workspace guide and experimental OpenCode example in the reposi
 Install the TypeScript client from public npmjs:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.3.5
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 The package carries its native binary for Linux or macOS on x64 or ARM64.
@@ -81,7 +81,7 @@ The Go module is published:
 go get github.com/chester-hill-solutions/stow-s3/pkg/stow
 ```
 
-The [npm publication record](../../docs/development/npm-publishing.md#published-035) describes
+The [npm publication record](../../docs/development/npm-publishing.md#published-037) describes
 the verified release. Automated registry publication and trusted publishing remain disabled.
 
 The Python client is not yet published to PyPI. Use a source checkout:

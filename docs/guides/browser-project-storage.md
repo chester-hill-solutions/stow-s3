@@ -12,7 +12,7 @@ The npm package provides:
 - `/worker`: asynchronous object operations and bounded streams;
 - `/browser-wasm`: memory and persistent WASM worker loaders.
 
-Install these APIs with `npm install @chester-hill-solutions/stow-s3@0.3.5`.
+Install these APIs with `npm install @chester-hill-solutions/stow-s3@0.3.7`.
 The package includes its WASM assets. Standalone GitHub downloads contain the native server.
 
 ## A project with reusable assets
