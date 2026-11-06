@@ -18,13 +18,13 @@ Remove any old `@chester-hill-solutions` registry override to `npm.pkg.github.co
 ## Install the native server
 
 Download the matching Linux or macOS archive from
-[Stow v0.3.6](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.6).
+[Stow v0.3.7](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
 Both x86_64 (`amd64`) and ARM64 (`arm64`) are supported. Check the archive against
 `SHA256SUMS.txt` from that release, extract it and put `stow-s3` on your PATH.
 Then run `stow-s3 --version`.
 
 The Python client is not yet published to PyPI. Use the source steps below for Python
-or to run the repository's development examples. Read the [release notes](../releases/v0.3.6.md) before
+or to run the repository's development examples. Read the [release notes](../releases/v0.3.7.md) before
 upgrading a persistent filesystem object store: older versions cannot read new
 version-2 object records.
 

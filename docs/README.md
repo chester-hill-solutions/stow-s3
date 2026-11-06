@@ -21,7 +21,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 ## Getting started
 
 - [Getting started](guides/getting-started.md): install from npm or native downloads and choose an API.
-- [v0.3.6 release notes](releases/v0.3.6.md): repository cleanup, native downloads and compatibility.
+- [v0.3.7 release notes](releases/v0.3.7.md): lifecycle fixes, native downloads and compatibility.
 - [Running a native server](running-and-probing.md): startup, credentials and probes.
 - [TypeScript client](../packages/stow-s3/README.md) and
   [Python client](../packages/stow-s3-py/README.md).

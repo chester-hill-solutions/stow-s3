@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.3.7 — 2026-11-06
+
+- Make workspace, HTTP server, browser persistence and outbox lifecycles explicit.
+  Preserve active-handler storage during interrupted shutdown and close browser
+  database resources that finish opening after cancellation.
+- Fence outbox updates by lease ownership, stop cancelled propagation, and use
+  bounded exponential retry backoff with jitter.
+- Add an AST-based lifecycle regression gate that rejects new implicit lifecycle
+  flags and additions to its compatibility baseline.
+- Update the embedded MCP browser's Zod validator to 4.6.6 and refresh compatible
+  transitive dependencies with security fixes.
+
+This release selects native GitHub downloads and the Go module. Public npm
+packages remain at 0.3.5; npm and PyPI publication remain disabled.
+See the [release notes](docs/releases/v0.3.7.md) for scope and compatibility.
+
 ## 0.3.6 — 2026-11-05
 
 - Apply consistent private-file exclusions to benchmark source packages, reject

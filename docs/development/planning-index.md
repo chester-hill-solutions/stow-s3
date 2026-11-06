@@ -16,8 +16,8 @@ orders now live under [history](../history/README.md).
    [later receiver/model evidence](../history/implementation/opencode-receiver-remediation-2026-09-29.md) and
    [conditional slice evidence](../design/guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite):
    dated records with distinct scope. None certifies publication or Linux runtime.
-5. [Current release](../releases/v0.3.6.md) and [npm publication record](npm-publishing.md#published-035):
-   v0.3.6 native downloads, the five public 0.3.5 npm packages and their anonymous installation verification.
+5. [Current release](../releases/v0.3.7.md) and [npm publication record](npm-publishing.md#published-035):
+   v0.3.7 native downloads, the five public 0.3.5 npm packages and their anonymous installation verification.
 
 The new plan replaces the previous canonical queue and all independent ordering
 in the detail proposals. It carries the product definition of done, accepted

@@ -15,8 +15,8 @@ Native process APIs need no Go installation or `STOW_BIN` override.
 Embedded and browser APIs use the included WASM assets.
 Remove any old scope override to `npm.pkg.github.com`; this package is published on npmjs.
 
-Standalone v0.3.6 binaries are also available as
-[GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.6).
+Standalone v0.3.7 binaries are also available as
+[GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
 Use WSL on Windows.
 
 For local development, build a source checkout:
