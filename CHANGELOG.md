@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 0.3.6 — 2026-11-05
+
+- Apply consistent private-file exclusions to benchmark source packages, reject
+  invalid image options before copying, and hash the final payload accurately.
+- Retire the obsolete multiplayer prototype and group specialized benchmark
+  Docker recipes under `benchmark/docker/`.
+- Archive generated historical evidence, organize current documentation, and
+  clarify the website's use cases, including Docker startup overhead in CI.
+- Keep source package versions aligned and run benchmark tooling regressions
+  from a clean checkout in required CI.
+
+Native GitHub downloads and the Go module are available at v0.3.6. Public npm
+packages remain at 0.3.5; npm and PyPI publication are disabled for this release.
+See the [release notes](docs/releases/v0.3.6.md) for scope and compatibility.
+
 ## 0.3.5 — 2026-11-05
 
 - Add MCP over streamable HTTP, guarded memory saves through WASM, delimiter

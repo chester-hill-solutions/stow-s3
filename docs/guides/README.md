@@ -7,7 +7,7 @@ Choose a workflow for the application you are building. The
 
 - [Getting started](getting-started.md): install Stow and choose an API.
 - [Running a server](../running-and-probing.md): credentials, startup and probes.
-- [Current release](../releases/v0.3.5.md): installation and compatibility notes.
+- [Current release](../releases/v0.3.6.md): installation and compatibility notes.
 
 ## Native storage
 
