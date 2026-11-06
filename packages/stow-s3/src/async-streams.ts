@@ -18,6 +18,11 @@ export interface AsyncOperationInvoker {
   <T>(request: Record<string, unknown>, data?: Uint8Array, options?: WorkerCallOptions): Promise<T>;
 }
 
+// Cleanup failure returns to open so callers can retry releasing the host token.
+type ReadStreamState =
+  | { kind: "open" }
+  | { kind: "closing" | "closed"; completion: Promise<void> };
+
 export class EmbeddedStreamOperations {
   constructor(private readonly invoke: AsyncOperationInvoker) {}
 
@@ -55,17 +60,15 @@ export class EmbeddedStreamOperations {
     const opened = await this.invoke<{ token: string; object: BridgeObject }>({ op: "openObjectRead", bucket, key });
     const token = opened.token;
     const object = fromBridgeObject(opened.object);
-    let closed = false;
-    let closePromise: Promise<void> | undefined;
+    let state: ReadStreamState = { kind: "open" };
     const close = () => {
-      if (closePromise !== undefined) return closePromise;
-      closed = true;
-      closePromise = this.cleanup("closeObjectRead", token).catch((error: unknown) => {
-        closed = false;
-        closePromise = undefined;
-        throw error;
-      });
-      return closePromise;
+      if (state.kind !== "open") return state.completion;
+      const completion: Promise<void> = this.cleanup("closeObjectRead", token).then(
+        () => { state = { kind: "closed", completion }; },
+        (error: unknown) => { state = { kind: "open" }; throw error; },
+      );
+      state = { kind: "closing", completion };
+      return completion;
     };
     if (options.signal?.aborted) {
       await close();
@@ -75,7 +78,7 @@ export class EmbeddedStreamOperations {
     const chunks = (async function* () {
       let read = 0;
       try {
-        while (!closed && read < object.size) {
+        while (state.kind === "open" && read < object.size) {
           options.signal?.throwIfAborted();
           const length = Math.min(EMBEDDED_STREAM_CHUNK_BYTES, object.size - read);
           const result = await invoke<{ eof: boolean; data?: Uint8Array }>({ op: "readObjectChunk", token, length }, undefined, options);

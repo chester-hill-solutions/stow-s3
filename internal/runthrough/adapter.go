@@ -144,7 +144,7 @@ func (a *Adapter) CacheStats() (hits, misses uint64) {
 // OutboxStats reports pending and terminal entries for admin inspection.
 func (a *Adapter) OutboxStats() (pending, terminal int) {
 	for _, entry := range a.outbox.Pending() {
-		if entry.Terminal {
+		if entry.propagationPhase() == outboxTerminal {
 			terminal++
 			continue
 		}
@@ -198,7 +198,7 @@ func (a *Adapter) DiscardOutboxEntry(id string) error {
 		if entry.ID != id {
 			continue
 		}
-		if entry.PreparedOwner != "" && (entry.PreparedUntil.After(time.Now().UTC()) || outboxOwnerAlive(entry.PreparedOwner)) {
+		if entry.preparationLease().heldAt(time.Now().UTC()) {
 			return ErrOutboxClaimHeld
 		}
 		unlock := a.outboxLocks.lock(outboxIdentity(entry.Bucket, entry.Key))

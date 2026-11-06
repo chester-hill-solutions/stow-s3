@@ -67,8 +67,7 @@ type Server struct {
 	mu           sync.RWMutex
 	ready        chan struct{}
 	readyOnce    sync.Once
-	started      bool
-	closed       bool
+	lifecycle    serverLifecycle
 	closeOnce    sync.Once
 	closeErr     error
 	startTime    time.Time
@@ -110,24 +109,14 @@ func New(cfg Config) (*Server, error) {
 }
 
 func (s *Server) ListenAndServe() error {
-	s.mu.Lock()
-	if s.closed {
-		s.mu.Unlock()
-		s.readyOnce.Do(func() { close(s.ready) })
-		return http.ErrServerClosed
+	if err := s.beginServe(); err != nil {
+		return err
 	}
-	if s.started {
-		s.mu.Unlock()
-		return fmt.Errorf("s3api: server is already started")
-	}
-	s.started = true
-	ready := s.ready
-	s.mu.Unlock()
+	defer s.finishServe()
 
 	addr := fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
-		s.readyOnce.Do(func() { close(ready) })
 		return err
 	}
 	listenAddr := ln.Addr().String()
@@ -154,8 +143,11 @@ func (s *Server) ListenAndServe() error {
 	s.listenAddr = listenAddr
 	s.baseHost = baseHost
 	s.httpServer = httpServer
+	if s.lifecycle == serverStarting {
+		s.lifecycle = serverServing
+	}
 	s.mu.Unlock()
-	s.readyOnce.Do(func() { close(ready) })
+	s.signalReady()
 	return httpServer.Serve(ln)
 }
 
@@ -169,29 +161,32 @@ func (s *Server) Addr() string {
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	s.mu.Lock()
-	s.closed = true
-	started := s.started
-	ready := s.ready
-	httpServer := s.httpServer
+	if s.lifecycle == serverNew {
+		s.signalReady()
+	}
+	if s.lifecycle != serverClosed {
+		s.lifecycle = serverStopping
+	}
 	s.mu.Unlock()
 
-	var shutdownErr error
-	if started && httpServer == nil {
-		select {
-		case <-ready:
-			s.mu.RLock()
-			httpServer = s.httpServer
-			s.mu.RUnlock()
-		case <-ctx.Done():
-			return ctx.Err()
-		}
+	if err := s.waitForStart(ctx); err != nil {
+		return err
 	}
+	s.mu.RLock()
+	httpServer := s.httpServer
+	s.mu.RUnlock()
+	var shutdownErr error
 	if httpServer != nil {
 		shutdownErr = httpServer.Shutdown(ctx)
 	}
-	s.closeOnce.Do(func() { s.closeErr = s.store.Close() })
 	if shutdownErr != nil {
 		return shutdownErr
+	}
+	s.closeOnce.Do(func() { s.closeErr = s.store.Close() })
+	if s.closeErr == nil {
+		s.mu.Lock()
+		s.lifecycle = serverClosed
+		s.mu.Unlock()
 	}
 	return s.closeErr
 }

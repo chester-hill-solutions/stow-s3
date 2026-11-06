@@ -29,7 +29,7 @@ func isFirstPendingForKey(entries []OutboxEntry, target OutboxEntry) bool {
 		if entry.Bucket != target.Bucket || entry.Key != target.Key || entry.ID == target.ID {
 			continue
 		}
-		if entry.Terminal {
+		if entry.propagationPhase() == outboxTerminal {
 			continue
 		}
 		if outboxEntryBefore(entry, target) {

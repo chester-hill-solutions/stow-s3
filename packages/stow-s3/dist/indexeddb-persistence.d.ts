@@ -7,19 +7,16 @@ export declare class IndexedDbPersistenceAdapter implements PersistenceAdapter {
     private readonly objectStoreName;
     private readonly lockManager;
     private readonly lockName;
-    private database;
-    private namespace;
-    private ownership;
-    private closePromise;
-    private closed;
+    private lifecycle;
     constructor(options?: IndexedDbPersistenceAdapterOptions);
     open(namespace: string): Promise<void>;
+    private acquireResources;
     private get stores();
     load(namespace: string): Promise<PersistenceSnapshot | null>;
     commit(namespace: string, expectedGeneration: number, changes: PersistenceChange[]): Promise<number>;
     clear(namespace: string, expectedGeneration: number): Promise<number>;
     close(): Promise<void>;
     private closeInternal;
-    private ensureNamespace;
+    private resourcesFor;
 }
 //# sourceMappingURL=indexeddb-persistence.d.ts.map

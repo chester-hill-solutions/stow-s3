@@ -176,7 +176,7 @@ func (s *outboxState) enqueue(entry OutboxEntry) (OutboxEntry, error) {
 	if err := s.assignID(&entry); err != nil {
 		return OutboxEntry{}, err
 	}
-	entry.Prepared = false
+	entry.admitPublished()
 	s.entries[entry.ID] = entry
 	return entry, nil
 }
@@ -185,7 +185,7 @@ func (s *outboxState) prepare(entry OutboxEntry) (OutboxEntry, error) {
 	if err := s.assignID(&entry); err != nil {
 		return OutboxEntry{}, err
 	}
-	entry.Prepared = true
+	entry.stagePublication()
 	s.prepared[entry.ID] = entry
 	return entry, nil
 }
@@ -204,10 +204,8 @@ func (s *outboxState) prepareOwned(entry OutboxEntry, owner string, lease time.D
 	if err := s.assignID(&entry); err != nil {
 		return OutboxEntry{}, err
 	}
-	entry.Prepared = true
-	entry.PreparedOwner = owner
-	entry.PreparedUntil = time.Now().UTC().Add(lease)
-	entry.PreparedToken = token
+	entry.stagePublication()
+	entry.setPreparationLease(outboxLease{owner: owner, until: time.Now().UTC().Add(lease), token: token})
 	s.nextToken = token
 	s.prepared[entry.ID] = entry
 	return entry, nil
@@ -230,10 +228,12 @@ func (s *outboxState) renewPrepared(id, owner string, token uint64, lease time.D
 	if !ok {
 		return fmt.Errorf("outbox prepared entry %q not found", id)
 	}
-	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
+	ownership := entry.preparationLease()
+	if !ownership.matches(owner, token) {
 		return ErrOutboxClaimLost
 	}
-	entry.PreparedUntil = time.Now().UTC().Add(lease)
+	ownership.until = time.Now().UTC().Add(lease)
+	entry.setPreparationLease(ownership)
 	s.prepared[id] = entry
 	return nil
 }
@@ -250,15 +250,11 @@ func (s *outboxState) commitPrepared(id, owner string, token uint64, version str
 	// A live owner can finish a slow local mutation, and recovery can commit the
 	// expired intent after proving its owner is dead. New prepares stay blocked
 	// until this intent is resolved, so expiry alone cannot authorize a new writer.
-	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
+	if !entry.preparationLease().matches(owner, token) {
 		return OutboxEntry{}, ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)
-	entry.Prepared = false
-	entry.PreparedOwner = ""
-	entry.PreparedUntil = time.Time{}
-	entry.PreparedToken = 0
-	entry.Version = version
+	entry.publishVersion(version)
 	s.entries[id] = entry
 	return entry, nil
 }
@@ -268,7 +264,7 @@ func (s *outboxState) discardPreparedOwned(id, owner string, token uint64) error
 	if !ok {
 		return nil
 	}
-	if !outboxOwnershipMatches(entry.PreparedOwner, entry.PreparedToken, owner, token) {
+	if !entry.preparationLease().matches(owner, token) {
 		return ErrOutboxClaimLost
 	}
 	delete(s.prepared, id)
@@ -288,7 +284,7 @@ func (s *outboxState) markSuccess(id string) error {
 	if !ok {
 		return nil
 	}
-	if entry.ClaimOwner != "" {
+	if entry.propagationLease().present() {
 		return ErrOutboxClaimHeld
 	}
 	delete(s.entries, id)
@@ -300,7 +296,7 @@ func (s *outboxState) discard(id string) error {
 	if !ok {
 		return fmt.Errorf("outbox entry %q not found", id)
 	}
-	if entry.ClaimOwner != "" {
+	if entry.propagationLease().present() {
 		return ErrOutboxClaimHeld
 	}
 	delete(s.entries, id)
@@ -312,22 +308,14 @@ func (s *outboxState) markFailure(id string, cause error, retryAt time.Time) err
 	if !ok {
 		return fmt.Errorf("outbox entry %q not found", id)
 	}
-	if entry.ClaimOwner != "" {
+	if entry.propagationLease().present() {
 		return ErrOutboxClaimHeld
 	}
 	return s.markFailureUnchecked(entry, cause, retryAt)
 }
 
 func (s *outboxState) markFailureUnchecked(entry OutboxEntry, cause error, retryAt time.Time) error {
-	entry.Attempts++
-	entry.NextAttempt = retryAt
-	if cause != nil {
-		entry.LastError = cause.Error()
-	}
-	if classifyRetry(cause) == RetryClassDeterministic {
-		entry.Terminal = true
-		entry.NextAttempt = time.Time{}
-	}
+	entry.recordPropagationFailure(cause, retryAt)
 	s.entries[entry.ID] = entry
 	return nil
 }
@@ -340,15 +328,11 @@ func (s *outboxState) commit(id, version string) (OutboxEntry, error) {
 		}
 		return OutboxEntry{}, fmt.Errorf("outbox prepared entry %q not found", id)
 	}
-	if entry.PreparedOwner != "" {
+	if entry.preparationLease().present() {
 		return OutboxEntry{}, ErrOutboxClaimHeld
 	}
 	delete(s.prepared, id)
-	entry.Prepared = false
-	entry.PreparedOwner = ""
-	entry.PreparedUntil = time.Time{}
-	entry.PreparedToken = 0
-	entry.Version = version
+	entry.publishVersion(version)
 	s.entries[id] = entry
 	return entry, nil
 }
@@ -358,7 +342,7 @@ func (s *outboxState) discardPrepared(id string) error {
 	if !ok {
 		return fmt.Errorf("outbox prepared entry %q not found", id)
 	}
-	if entry.PreparedOwner != "" {
+	if entry.preparationLease().present() {
 		return ErrOutboxClaimHeld
 	}
 	delete(s.prepared, id)

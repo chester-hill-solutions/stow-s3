@@ -255,20 +255,49 @@ test("concurrent stream closes release every real WASM reader slot", async () =>
   }
 });
 
-test("failed stream cleanup remains visible and can be retried", async () => {
-  let closes = 0;
-  const runtime = AsyncEmbeddedStow.attach({
+function streamRuntime(cleanup: () => Promise<void>, calls: unknown[] = []): AsyncEmbeddedStow {
+  return AsyncEmbeddedStow.attach({
     callBinary: async (metadata: string) => {
       const request: Record<string, unknown> = JSON.parse(metadata);
+      calls.push(request.op);
       if (request.op === "openObjectRead") return response({ token: "read", object: { bucket: "assets", key: "key", size: 1, etag: "etag" } });
-      if (request.op === "closeObjectRead" && closes++ === 0) throw new EmbeddedStowError("backpressure", "busy");
+      if (request.op === "closeObjectRead") await cleanup();
+      if (request.op === "readObjectChunk") return response({ eof: true }, new Uint8Array([7]));
       return response(null);
     },
   }, 1, { backend: "memory", maxBytes: 1024, maxObjects: 16, persistent: false, multipart: false, upstream: false });
+}
+
+test("failed stream cleanup remains visible and can be retried", async () => {
+  let closes = 0;
+  const runtime = streamRuntime(async () => {
+    if (closes++ === 0) throw new EmbeddedStowError("backpressure", "busy");
+  });
   const reader = await runtime.getObjectStream("assets", "key");
   await assert.rejects(reader.close(), hasCode("backpressure"));
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of reader.chunks) chunks.push(chunk);
+  assert.deepEqual(chunks, [new Uint8Array([7])]);
   await reader.close();
   assert.equal(closes, 2);
+  await runtime.close();
+});
+
+test("stream close shares pending and completed cleanup and stops new reads", async () => {
+  let finishClose: () => void = () => undefined;
+  const gate = new Promise<void>((resolve) => { finishClose = resolve; });
+  const calls: unknown[] = [];
+  const runtime = streamRuntime(() => gate, calls);
+  const reader = await runtime.getObjectStream("assets", "key");
+  const first = reader.close();
+  assert.equal(reader.close(), first);
+  const iterator = reader.chunks[Symbol.asyncIterator]();
+  const next = iterator.next();
+  finishClose();
+  await first;
+  assert.equal((await next).done, true);
+  assert.equal(reader.close(), first);
+  assert.deepEqual(calls, ["openObjectRead", "closeObjectRead"]);
   await runtime.close();
 });
 

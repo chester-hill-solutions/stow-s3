@@ -46,18 +46,13 @@ export class EmbeddedStreamOperations {
         const opened = await this.invoke({ op: "openObjectRead", bucket, key });
         const token = opened.token;
         const object = fromBridgeObject(opened.object);
-        let closed = false;
-        let closePromise;
+        let state = { kind: "open" };
         const close = () => {
-            if (closePromise !== undefined)
-                return closePromise;
-            closed = true;
-            closePromise = this.cleanup("closeObjectRead", token).catch((error) => {
-                closed = false;
-                closePromise = undefined;
-                throw error;
-            });
-            return closePromise;
+            if (state.kind !== "open")
+                return state.completion;
+            const completion = this.cleanup("closeObjectRead", token).then(() => { state = { kind: "closed", completion }; }, (error) => { state = { kind: "open" }; throw error; });
+            state = { kind: "closing", completion };
+            return completion;
         };
         if (options.signal?.aborted) {
             await close();
@@ -67,7 +62,7 @@ export class EmbeddedStreamOperations {
         const chunks = (async function* () {
             let read = 0;
             try {
-                while (!closed && read < object.size) {
+                while (state.kind === "open" && read < object.size) {
                     options.signal?.throwIfAborted();
                     const length = Math.min(EMBEDDED_STREAM_CHUNK_BYTES, object.size - read);
                     const result = await invoke({ op: "readObjectChunk", token, length }, undefined, options);
