@@ -76,10 +76,11 @@ try {
   const { stdout } = await bounded(exec(binary, ['workspace', 'checkpoint', '--registry-dir', prepared.registry_dir,
     '--id', prepared.workspace_id, '--portable', '--request-key', randomUUID(), '--timeout', '30s'], { cwd: workspaceRoot, timeout: deadline }), 'checkpoint capture');
   const checkpoint = JSON.parse(stdout);
-  assert.ok(checkpoint.checkpoint_id);
+  assert.equal(checkpoint.result.outcome, 'committed');
+  assert.ok(checkpoint.result.checkpoint.id);
   const changed = 'live bytes after checkpoint\n';
   await writeFile(join(workspaceRoot, 'docs/state.txt'), changed);
-  const checkpointClient = await connect([...base, '--resources-only', '--checkpoint-id', checkpoint.checkpoint_id]);
+  const checkpointClient = await connect([...base, '--resources-only', '--checkpoint-id', checkpoint.result.checkpoint.id]);
   assert.equal((await bounded(checkpointClient.listTools(), 'checkpoint list tools')).tools.length, 0);
   assert.equal((await bounded(checkpointClient.listPrompts(), 'checkpoint list prompts')).prompts.length, 0);
   const cpOverviewURI = (await bounded(checkpointClient.listResources(), 'checkpoint list resources')).resources[0].uri;
