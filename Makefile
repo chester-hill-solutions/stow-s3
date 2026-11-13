@@ -76,7 +76,7 @@ test-wasm: build-wasm
 	node --test wasm/runtime.test.mjs
 
 test-agent: build
-	node --test examples/opencode/*.test.mjs
+	node --test examples/opencode/*.test.mjs examples/workspace-resources/*.test.mjs
 
 browser-editor: build build-wasm
 	$(NPM_INSTALL) && npm run build

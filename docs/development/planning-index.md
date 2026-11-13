@@ -1,13 +1,19 @@
 # Planning index and disposition register
 
-**Index updated:** 2026-11-05. This register classifies current guides, retained
+**Index updated:** 2026-11-11. This register classifies current guides, retained
 designs and historical records; it is not an implementation backlog. The
 September 29 reconciliation outcomes below remain a dated snapshot. Retired work
 orders now live under [history](../history/README.md).
 ## Start here
 
 1. [Consolidated working-storage plan](storage-foundation-plan.md): the sole
-   scope/order/status queue, W01–W22 and the complete old S0–S4 disposition map.
+   scope/order/status queue, W01–W28 and the complete old S0–S4 disposition map.
+   W23–W28 expand workspace access through MCP; mounting and executable discovery
+   remain conditional on named consumer evidence.
+   The [workspace execution breakdown](../design/workspace-resource-plan.md#enumerated-execution-backlog)
+   records scoped Luna assignments and decision/verification gates under those IDs.
+   [W24 A–H](../design/workspace-resource-plan.md#w24-execution-backlog) now specifies
+   paged scoped resources, optional browser integration and actual-host acceptance.
 2. [Portable workspace usage](../guides/portable-workspace-usage.md): actual APIs, commands
    and limits for the published 0.3.7 release.
 3. [ADR index](../adr/README.md): decisions in force; the custom-store conflict in
@@ -28,7 +34,9 @@ and deferred boundary together. Existing contracts and ADRs remain normative.
 
 | Document | Current disposition |
 | --- | --- |
-| [storage-foundation-plan.md](storage-foundation-plan.md) | **Sole active work order.** Baseline, W01–W22, dependencies, acceptance and legacy traceability. |
+| [storage-foundation-plan.md](storage-foundation-plan.md) | **Sole active work order.** Baseline, W01–W28, dependencies, acceptance and legacy traceability. |
+| [workspace-resource-plan.md](../design/workspace-resource-plan.md) | **Implementation and extension detail.** W23 resources are implemented and qualified locally; [evidence](../reviews/2026-11-11-workspace-resources.md). W24 host usability is qualified for the declared local profile ([receipt](../reviews/2026-11-11-workspace-resource-hosts.md)); W25 local saved views/ranges/adoption are [qualified](../reviews/2026-11-11-checkpoint-resources.md), with second-machine and strict fresh-model gates open ([attempt dispositions](../reviews/2026-11-11-checkpoint-resources.md#corrected-fresh-context-attempt)); W26's [native read-observation foundation](../reviews/2026-11-11-workspace-editor-observations.md) is qualified locally; publication/receipts/recovery/MCP editing remain planned under its [reviewed native contract](../contracts/workspace-editing-contract.md). W27 mounting and W28 executable discovery require consumer gates. Reuses existing foundation and qualification/release/adoption gates; no independent work queue. |
+| [aboiteau-native-consumer.md](../design/aboiteau-native-consumer.md) | **Named native consumer requirements.** Aboiteau startup/shared-file/R2-recovery repair and later reader adoption; maps to W19/W20/W21 and W23–W26. No completed pilot, protected-profile, editing or release claim; no independent queue. |
 | [browser-project-plan.md](../design/browser-project-plan.md) | **Execution record for the authorized browser extension.** Ordering remains linked from the canonical plan; usage is [browser-project-storage.md](../guides/browser-project-storage.md), decision ADR 0019. |
 | [gangcode-stow-boundary.md](../design/gangcode-stow-boundary.md) | **Ownership/integration reference.** Storage facts and durable delivery belong to Stow; agent meaning, context and coordination belong to GangCode. No independent queue. |
 | [plan.md](../plan.md) | **Routing page.** Preserves old entry point/anchors; no separate queue. |

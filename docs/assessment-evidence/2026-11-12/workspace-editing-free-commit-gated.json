@@ -1,0 +1,461 @@
+{
+  "status": "failed",
+  "category": "evidence_rejected",
+  "stage": "stage2_model",
+  "opencodeVersion": "opencode v2.2.7",
+  "requestedSelector": "openrouter/openrouter/free",
+  "modelPrompts": 2,
+  "elapsedMs": 63089,
+  "deadlineMs": 300000,
+  "receiverWorkspaceId": "ws_af30220d3c82b86e",
+  "sourceWorkspaceId": "ws_00fe90ec86cf4d94",
+  "sourcePathsRemovedBeforeStage2": true,
+  "stageResults": [
+    {
+      "name": "stage1",
+      "workspaceId": "ws_00fe90ec86cf4d94",
+      "requestKey": "0eea1f06-47d9-4dca-b568-e9d6fadc809c",
+      "modelRequests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "baidu/ernie-5.5-flash-preview:free",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+          "status": 200
+        }
+      ],
+      "toolTrace": [
+        {
+          "name": "stow_workspace_file_read_for_save",
+          "status": "completed",
+          "failed": false,
+          "resultValid": true
+        },
+        {
+          "name": "stow_workspace_file_read_for_save",
+          "status": "completed",
+          "failed": false,
+          "resultValid": true
+        },
+        {
+          "name": "stow_workspace_file_save",
+          "status": "completed",
+          "failed": false,
+          "resultValid": true
+        }
+      ],
+      "schemaEnforcement": {
+        "requests": 4,
+        "initialReadRequired": true,
+        "initialReadVerified": true,
+        "initialReadPhaseCount": 1,
+        "editingPhaseCount": 2,
+        "commitProofCount": 1,
+        "terminalAfterCommitCount": 1,
+        "terminalGeneration": "3b8efe57a84e39b27f4673f23c5bec37",
+        "schemaEnforced": true,
+        "fullToolCatalog": true,
+        "toolCount": 4
+      },
+      "toolCallCount": 3,
+      "modelRequestCount": 4,
+      "diagnosticPaths": {
+        "stdout": "/private/tmp/w26-editing-model-commit-gated.stage1.jsonl",
+        "stderr": "/private/tmp/w26-editing-model-commit-gated.stage1.stderr"
+      },
+      "checkpointId": "cp_68e2ed9aaa05eba2961e8ec3",
+      "savedStateSHA256": "99c985f7e905640b3d3f48ba313c83d737a63656830df97abca1fe21cb98b1a4",
+      "savedStateBytes": 66,
+      "generation": "3b8efe57a84e39b27f4673f23c5bec37",
+      "terminalResult": {
+        "total_units": 26,
+        "entry_count": 5,
+        "outcome": "committed",
+        "path": "docs/STATE.json",
+        "request_key": "0eea1f06-47d9-4dca-b568-e9d6fadc809c",
+        "generation": "3b8efe57a84e39b27f4673f23c5bec37"
+      }
+    }
+  ],
+  "currentStage": {
+    "name": "stage2",
+    "workspaceId": "ws_af30220d3c82b86e",
+    "requestKey": "54b5f5b1-ac5a-4c41-8881-70164a4f38f4",
+    "toolCallCount": 4,
+    "modelRequestCount": 4,
+    "modelRequests": [
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "baidu/ernie-5.5-flash-preview:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "baidu/ernie-5.5-flash-preview:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      }
+    ],
+    "schemaEnforcement": {
+      "requests": 4,
+      "initialReadRequired": true,
+      "initialReadVerified": true,
+      "initialReadPhaseCount": 1,
+      "editingPhaseCount": 2,
+      "commitProofCount": 1,
+      "terminalAfterCommitCount": 1,
+      "terminalGeneration": "0461e3e2cfd541a83bcdbf03452fe7e0",
+      "schemaEnforced": true,
+      "fullToolCatalog": true,
+      "toolCount": 4
+    },
+    "toolTrace": [
+      {
+        "name": "stow_workspace_file_read_for_save",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "stow_workspace_file_read_for_save",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "stow_workspace_file_read_for_save",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "stow_workspace_file_save",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true
+      }
+    ]
+  },
+  "requestMetadata": {
+    "count": 8,
+    "requests": [
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "baidu/ernie-5.5-flash-preview:free",
+        "status": 200
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      },
+      {
+        "stage": "stage2",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "baidu/ernie-5.5-flash-preview:free",
+        "status": 200
+      },
+      {
+        "stage": "stage2",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "stage": "stage2",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "baidu/ernie-5.5-flash-preview:free",
+        "status": 200
+      },
+      {
+        "stage": "stage2",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      }
+    ],
+    "paidFallbackObserved": false
+  },
+  "retainedRoot": "/var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/stow-w26-editing-pilot-vx2HLm",
+  "diagnosticPrefix": "/private/tmp/w26-editing-model-commit-gated",
+  "version": 1,
+  "date": "2026-11-12",
+  "workId": "W26.F.4",
+  "profile": "native macOS ARM64 / OpenCode v2.2.7 / OpenRouter Free Router / stdio managed editing / committed-save-gated terminal schema / host_quiesced",
+  "acceptance": "failed strict stage-input evidence policy; both model saves functionally verified separately",
+  "strictFailureDetails": {
+    "reason": "editing trace read a path outside the stage inputs",
+    "stage": "stage2",
+    "extraRead": "docs/batch-a.csv",
+    "prescribedStageInputs": [
+      "docs/STATE.json",
+      "docs/batch-b.csv"
+    ],
+    "configuredReadRoots": [
+      "docs"
+    ],
+    "extraReadWithinConfiguredReadScope": true,
+    "authorizationViolation": false,
+    "acceptanceRuleChanged": false,
+    "originalPilotReceiptSHA256": "240863e3bee60457dfa09ee2832de70524cfa7277a06f5172b20e86bdb1bb4a9"
+  },
+  "functionalOutcome": {
+    "stage1AcceptedByStrictPilot": true,
+    "bothModelSavesObservedCommitted": true,
+    "stage2SavedStateVerifiedAfterFailure": true,
+    "finalCheckpointVerifiedAfterFailure": true,
+    "strictEndToEndPilotPassed": false
+  },
+  "stage2ReportedTerminalResult": {
+    "total_units": 56,
+    "entry_count": 7,
+    "outcome": "committed",
+    "path": "docs/STATE.json",
+    "request_key": "54b5f5b1-ac5a-4c41-8881-70164a4f38f4",
+    "generation": "0461e3e2cfd541a83bcdbf03452fe7e0"
+  },
+  "postFailureHostVerification": {
+    "status": "verified_after_failed_pilot",
+    "originalPilotStatus": "failed",
+    "originalPilotReceiptUnchangedSHA256": "240863e3bee60457dfa09ee2832de70524cfa7277a06f5172b20e86bdb1bb4a9",
+    "actor": "independent host; no additional model prompt or save",
+    "hostCalls": [
+      "stow_workspace_file_resolve_save",
+      "stow_workspace_file_read_for_save",
+      "stow_workspace_file_release_observation",
+      "stow_checkpoint_create"
+    ],
+    "save": {
+      "outcome": "committed",
+      "replayed": true,
+      "path": "docs/STATE.json",
+      "generation": "0461e3e2cfd541a83bcdbf03452fe7e0",
+      "requestKey": "54b5f5b1-ac5a-4c41-8881-70164a4f38f4"
+    },
+    "actualState": {
+      "total_units": 56,
+      "entry_count": 7,
+      "next_batch": null
+    },
+    "savedStateSHA256": "8beb16d5259e655251b0011de89722302bce0170604c2233ee01ea15d3c34123",
+    "savedStateBytes": 52,
+    "checkpointId": "cp_54fb5afab2697663e93243e3",
+    "checkpointRequestKey": "9d0de90b-a541-420f-8248-7e9d4d2086e7",
+    "checkpointStateSHA256": "8beb16d5259e655251b0011de89722302bce0170604c2233ee01ea15d3c34123",
+    "checkpointStateBytes": 52,
+    "checkpointExactBytesVerified": true,
+    "CSVsUnchanged": true
+  },
+  "counts": {
+    "modelTaskPrompts": 2,
+    "providerCompletions": 8,
+    "modelFileToolCalls": 7,
+    "modelReads": 5,
+    "modelSaves": 2,
+    "additionalModelPromptsAfterFailure": 0,
+    "additionalSavesAfterFailure": 0
+  },
+  "stowBinarySHA256": "ca9fc0b1ba1d33032344a8b4d58354799a1923508313882c5c3bfc1e0de08a9e",
+  "opencodeBinarySHA256": "b9d576000191d7f441198076f6d50a843064259709ed31f7de995cbfc540d85f",
+  "sourceSHA256": {
+    "examples/workspace-resources/editing-fixture.mjs": "b7951336a2c8c6df750208433d011669b4133c15499351451a4ac4b25d21e77c",
+    "examples/workspace-resources/editing-host.mjs": "74f6e5d66591d1c9a6301c5a61873d04576fb2c967fd5b48cd7b6ad06395e833",
+    "examples/workspace-resources/editing-host.test.mjs": "140c97c5536f0caa5d5c09180c79e8d992344e931ea1b9d382f1f25280326ac4",
+    "examples/workspace-resources/editing-pilot.test.mjs": "59d99c31bb29f906d2d34f367711335bd3c54a751d8630e6a166e43f82d04ecb",
+    "examples/workspace-resources/editing-runner.mjs": "9d9a88e913ed7e50baddd43600e4542e054ed54efcf60f357b3cdf9fa52640e9",
+    "examples/workspace-resources/editing-verifier.mjs": "ccea9e56d4d5f1876755b74e0b4b32481cf822a065bcabfc39aeef1e723e6b9d",
+    "examples/workspace-resources/free-only.mjs": "2c52baaa08906b9c6f10f2c5ba26f829852735e9ef6815c26fd42824951646f0",
+    "examples/workspace-resources/run.mjs": "eb7c5ecdd8adf388c8f21c3998d86cf8da8117a767748e6ca232d76f37aaf314"
+  },
+  "executedSourceArchive": "/private/tmp/w26-free-commit-source",
+  "rawEvidence": {
+    "/private/tmp/w26-editing-model-commit-gated-trace.json": {
+      "sha256": "240863e3bee60457dfa09ee2832de70524cfa7277a06f5172b20e86bdb1bb4a9",
+      "bytes": 7555
+    },
+    "/private/tmp/w26-editing-model-commit-gated.stage1.jsonl": {
+      "sha256": "5860b572e4ae4f5172a8512befff2bf823c40429790dda04e6d7053dec14daca",
+      "bytes": 8412
+    },
+    "/private/tmp/w26-editing-model-commit-gated.stage1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/private/tmp/w26-editing-model-commit-gated.stage2.jsonl": {
+      "sha256": "e4f21a7f940052d21f5f544c5a6cdc9b3e839de834b003302c4e1ca6f3bfbc66",
+      "bytes": 10347
+    },
+    "/private/tmp/w26-editing-model-commit-gated.stage2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/private/tmp/w26-free-commit-host-followup.json": {
+      "sha256": "0c60ec873a3bbb9f12fa39f640381548f3240d3f29de721c442bba0060c1a0b1",
+      "bytes": 1157
+    },
+    "/private/tmp/w26-free-commit-host-followup.mjs": {
+      "sha256": "438a013bc94987bc18bcafc48c58c0e7cd361d50395537d7cff542e9bf513c0a",
+      "bytes": 4526
+    }
+  },
+  "cleanup": {
+    "processInspectionSucceeded": true,
+    "remainingPilotProcesses": [],
+    "modelRunnerExitCode": 1
+  },
+  "callerReportedUsage": {
+    "inputTokens": 14817,
+    "outputTokens": 641,
+    "reasoningTokens": 871,
+    "reportedCost": 0,
+    "billingIndependentlyVerified": false
+  },
+  "checks": {
+    "agentSuite": {
+      "passed": 50,
+      "failed": 0,
+      "skipped": 1,
+      "log": "/private/tmp/w26-free-commit-agent-tests.log"
+    },
+    "focusedProxyTests": {
+      "passed": 7,
+      "failed": 0
+    },
+    "fileSizeRatchet": {
+      "status": "passed",
+      "log": "/private/tmp/w26-free-commit-file-size.log"
+    },
+    "nativeGoFilesUnchanged": 860,
+    "priorReceiptsUnchangedSHA256": {
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-local.json": "38b83b8a99b5b77251ec5430ed0f5b7ad210b77cfae6345cb1f52875b35d6816",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-required-read.json": "5a69f59ddc8b7d1c328cc2c49b19887ff578529e9b2bdcebe9f1225a6130c202",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-direct.json": "ceef5d26db3ea1647b83361055611dadad0f5d19c97f4d1eabd8da5724c5e6f6",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json": "a30ef3f4b741cc910c00827a8eec070ac8b2be49c5ec6cf3b9e1f592fb25b0ff",
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local.json": "93e1fc9ead14b108c532a35593a0b3f478c50bebe199af9439df4a4ac1f74b57",
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json": "bda667bf335d7a637dae9ceebe89e0f936213e9e2947022d8bd07f4a1e2639d5"
+    },
+    "preExistingMissingDistPreserved": 270,
+    "independentReview": "Strict failure is an extra stage-input read within the configured grant. Two correct managed saves and post-failure host/checkpoint validation are separate facts; no failed result reclassified.",
+    "documentationLinks": {
+      "status": "passed",
+      "markdownFiles": 339,
+      "log": "/private/tmp/w26-free-commit-final-doc-links.log"
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "/private/tmp/w26-free-commit-final-diff-check.log"
+    }
+  },
+  "noProviderPreflight": [
+    {
+      "path": "/private/tmp/w26-editing-commit-gated-mock-attempt1.json",
+      "sha256": "958c3edd65c4dc046b7560c8402593629fd13ff9c3eabdae201e19c0f92bcdb9",
+      "status": "failed",
+      "stage": "stage1_model",
+      "modelPrompts": 0,
+      "elapsedMs": 1303
+    },
+    {
+      "path": "/private/tmp/w26-editing-commit-gated-mock-escalated.json",
+      "sha256": "aab5b0d4e425fb1732b0e15b7e15d63e9aabef01aa1c0f1905dbbc05ea98288b",
+      "status": "failed",
+      "stage": "stage2_model",
+      "modelPrompts": 2,
+      "elapsedMs": 14466
+    },
+    {
+      "path": "/private/tmp/w26-editing-commit-gated-diagnostic.json",
+      "sha256": "40b7bce59efc7ce8f0a116927b4302bda2da2582af793507853198d9cd73f1c6",
+      "status": "passed",
+      "stage": null,
+      "modelPrompts": 2,
+      "elapsedMs": 9421
+    }
+  ],
+  "verificationHistory": [
+    "User authorized one new free-only attempt after the caller repair. All earlier failed and successful receipts were preserved.",
+    "Caller now forces an initial state read, requires tool calls without terminal schema during editing, and enables generation-bound strict JSON with tool_choice=none only after a correlated committed save. No numeric answers are inserted into the prompt or schema.",
+    "Two mock runs remained failed: pre-launch setup with zero requests; then a local 502/retry before a correct second-stage result. A separate fresh diagnostic mock passed cleanly through both stages; the earlier 502 did not reproduce and was not reclassified.",
+    "The real attempt used two fresh OpenCode contexts and eight HTTP 200 openrouter/free requests. Stage one passed strict evidence, durable resolution and checkpoint/handoff; the original workspace, registry and staging were removed before stage two.",
+    "Stage two read the correct saved state and next batch, also read the previous batch within the docs grant, then made one correct committed save and generation-matching final response. The unchanged verifier rejected that additional read under its per-stage input policy.",
+    "The original failed trace remains unchanged. A separate host-only follow-up explicitly recovered the owner, resolved the save with replay=true, checked current bytes and unchanged CSVs, captured a new checkpoint and verified its exact bytes. It performed no model prompt or file save.",
+    "No paid fallback, task retry, UI change, native-code change, commit or deployment occurred."
+  ],
+  "remainingGates": [
+    "Strict OpenCode/Free Router stage-input trace qualification remains open; this failed receipt must not be rescored as passed.",
+    "A future decision may clarify whether extra reads within the configured grant belong in the benchmark; any changed rule needs a fresh run, not retrospective acceptance.",
+    "W25 selected immutable-view model acceptance, Linux, second physical host and protected-policy/release profiles remain open."
+  ],
+  "publication": {
+    "committed": false,
+    "deployed": false
+  }
+}

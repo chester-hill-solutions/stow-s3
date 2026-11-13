@@ -2,10 +2,7 @@ package stow
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -121,13 +118,7 @@ func discardOnFailure(resultErr error, ws *Workspace, committed *bool) error {
 // returns the directory an agent can use. A failed prepare removes only the
 // root this call created.
 func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr error) {
-	if options.Dir == "" {
-		return nil, fmt.Errorf("stow: prepare requires a workspace Dir")
-	}
-	if len(options.Inputs) == 0 && len(options.Repositories) == 0 {
-		return nil, fmt.Errorf("stow: prepare requires at least one input")
-	}
-	root, err := validatePrepareRoot(options.Dir)
+	root, err := validatePrepareOptions(options)
 	if err != nil {
 		return nil, err
 	}
@@ -288,57 +279,4 @@ func checkSeedLimits(ws *Workspace, bytes, objects int64) error {
 		return fmt.Errorf("stow: seeded objects %d exceed workspace limit %d", objects, limits.MaxObjects)
 	}
 	return nil
-}
-
-func workspaceFingerprint(root string) (string, error) {
-	hash := sha256.New()
-	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if path == filepath.Join(root, ".stow") {
-			return filepath.SkipDir
-		}
-		if path != root && strings.EqualFold(entry.Name(), ".git") {
-			if entry.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if entry.IsDir() {
-			return nil
-		}
-		info, err := entry.Info()
-		if err != nil {
-			return err
-		}
-		if !info.Mode().IsRegular() {
-			return fmt.Errorf("unexpected non-regular file in prepared workspace: %s", path)
-		}
-		rel, err := filepath.Rel(root, path)
-		if err != nil {
-			return err
-		}
-		if _, err := io.WriteString(hash, filepath.ToSlash(rel)+"\x00"); err != nil {
-			return err
-		}
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		_, copyErr := io.Copy(hash, file)
-		closeErr := file.Close()
-		if copyErr != nil {
-			return copyErr
-		}
-		if closeErr != nil {
-			return closeErr
-		}
-		_, err = io.WriteString(hash, "\x00")
-		return err
-	})
-	if err != nil {
-		return "", err
-	}
-	return "sha256:" + hex.EncodeToString(hash.Sum(nil)), nil
 }

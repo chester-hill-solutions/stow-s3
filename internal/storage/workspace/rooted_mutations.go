@@ -9,6 +9,10 @@ import (
 )
 
 func (s *Store) writeAtomic(path string, data []byte) error {
+	return s.writeAtomicMode(path, data, 0644, true)
+}
+
+func (s *Store) writeAtomicMode(path string, data []byte, mode os.FileMode, createParents bool) error {
 	root, err := s.readRoot()
 	if err != nil {
 		return err
@@ -18,7 +22,10 @@ func (s *Store) writeAtomic(path string, data []byte) error {
 	if err != nil {
 		return err
 	}
-	return root.WriteAtomic(relative, data, 0644)
+	if createParents {
+		return root.WriteAtomic(relative, data, mode)
+	}
+	return root.WriteAtomicExistingParent(relative, data, mode)
 }
 
 func (s *Store) removeConfined(path string) error {

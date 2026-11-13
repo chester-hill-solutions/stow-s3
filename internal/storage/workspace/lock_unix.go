@@ -8,6 +8,14 @@ import (
 	"syscall"
 )
 
+func openSessionLockFile(path string) (*os.File, error) {
+	fd, err := syscall.Open(path, syscall.O_CREAT|syscall.O_RDWR|syscall.O_NOFOLLOW|syscall.O_CLOEXEC, 0o644)
+	if err != nil {
+		return nil, err
+	}
+	return os.NewFile(uintptr(fd), path), nil
+}
+
 // tryLock takes an exclusive advisory lock on f without blocking, and reports
 // whether it succeeded. A failure that is not contention is returned as an
 // error rather than being reported as "somebody else holds it", because those

@@ -21,6 +21,9 @@ Your application runs the code and controls network access. Stow manages storage
 npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
+The repository also contains an unreleased 0.4.0 candidate. It is not available
+to install yet; the command above still selects the current public release.
+
 The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
 Node.js 20 or newer is required. Python uses a source checkout.
 

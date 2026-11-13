@@ -10,6 +10,9 @@ Install the public npm package:
 npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
+The repository also contains an unreleased 0.4.0 candidate. It is not available
+to install yet; the command above still selects the current public release.
+
 Node.js 20 or newer is required. Linux and macOS on x64 or ARM64 receive their native carrier automatically.
 Native process APIs need no Go installation or `STOW_BIN` override.
 Embedded and browser APIs use the included WASM assets.

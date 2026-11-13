@@ -13,6 +13,24 @@ Supporting logs, probes and source snapshots are available through the
 
 | Date | Report |
 | --- | --- |
+| 2026-11-12 | [Aboiteau cached-image consumer retry](2026-11-12-aboiteau-consumer-retry.md) — retry failed before the lifecycle stream after a main-container OOM event; retry and prior containers were later confirmed removed |
+| 2026-11-12 | [Aboiteau cached-image consumer recheck](2026-11-12-aboiteau-consumer-recheck.md) — 21 checks passed, but the QEMU smoke failed during final observation and container cleanup remains unconfirmed |
+| 2026-11-12 | [Direct Luna checkpoint continuation](2026-11-12-checkpoint-luna-continuation.md) — fresh same-host model read saved state and inputs through resource-only MCP after sender removal; broader W25 gates remain open |
+| 2026-11-12 | [Workspace editing proxy diagnostics repair](2026-11-12-workspace-editing-proxy-repair.md) — bounded guard/upstream telemetry and corrected paid-fallback classification; no live-model qualification |
+| 2026-11-12 | [Scope-aligned Free Router workspace editing attempt](2026-11-12-workspace-editing-scope-aligned.md) — stage one saved correctly, but a local proxy 502/retry caused strict trace rejection; no stage two ran |
+| 2026-11-12 | [Free Router commit-gated workspace editing attempt](2026-11-12-workspace-editing-free-commit-gated.md) — both saves committed, but an extra stage-two read outside the stage inputs failed strict trace verification |
+| 2026-11-12 | [Direct Luna workspace editing and continuation](2026-11-12-workspace-editing-luna-direct.md) — two fresh agents completed native MCP edits across an adopted checkpoint on one host; broader caller/platform gates remain open |
+| 2026-11-12 | [Workspace editing required-read pilot](2026-11-12-workspace-editing-required-read.md) — second live attempt failed after one verified state read; no batch read/save |
+| 2026-11-12 | [Workspace editing model pilot](2026-11-12-workspace-editing-model.md) — live model gate failed; strict MCP evidence rejected a schema-only response |
+| 2026-11-12 | [Workspace editing CLI/MCP and SDK verification](2026-11-12-workspace-editing-mcp.md) |
+| 2026-11-11 | [Native workspace save recovery verification](2026-11-11-workspace-editor-recovery.md) |
+| 2026-11-11 | [Internal workspace durable save-request verification](2026-11-11-workspace-editor-durable-requests.md) |
+| 2026-11-11 | [Internal workspace file publication verification](2026-11-11-workspace-editor-publication.md) |
+| 2026-11-11 | [Native workspace editor observation verification](2026-11-11-workspace-editor-observations.md) |
+| 2026-11-11 | [Native workspace file-save contract review](2026-11-11-workspace-editing-contract.md) — design only |
+| 2026-11-11 | [Local checkpoint file resource qualification](2026-11-11-checkpoint-resources.md) |
+| 2026-11-11 | [Workspace resource paging and host qualification](2026-11-11-workspace-resource-hosts.md) |
+| 2026-11-11 | [Native workspace resource qualification](2026-11-11-workspace-resources.md) |
 | 2026-10-22 | [Architecture review: historical observations and dispositions](2026-10-22-architecture-overview.md) |
 | 2026-10-19 | [Workspace uncertainty and create-only overwrite — 2026-10-19](2026-10-19-workspace-uncertainty.md) |
 | 2026-10-19 | [SigV4 repeated signed headers — 2026-10-19](2026-10-19-sigv4-repeated-header.md) |

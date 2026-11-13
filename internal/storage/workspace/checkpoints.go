@@ -20,7 +20,21 @@ func (r *Registry) ForgetCheckpoints(workspaceID string) error {
 		return err
 	}
 	defer lock.Release()
+	if err := r.CheckWorkspaceRecoveryHolds(workspaceID); err != nil {
+		return err
+	}
+	if err := r.checkWorkspaceFileSaveBarrier(workspaceID); err != nil {
+		return err
+	}
 	return r.forgetCheckpoints(workspaceID)
+}
+
+func (r *Registry) checkWorkspaceFileSaveBarrier(workspaceID string) error {
+	entry, found, err := r.Lookup(workspaceID)
+	if err != nil || !found {
+		return err
+	}
+	return CheckWorkspaceFileSaveBarrier(entry.Dir, entry.ID, entry.Bucket)
 }
 
 func (r *Registry) forgetCheckpoints(workspaceID string) error {
@@ -53,11 +67,23 @@ func (r *Registry) forgetCheckpoints(workspaceID string) error {
 		if json.Unmarshal(data, &reference) != nil || reference.ID != entry.Name() || reference.WorkspaceID != workspaceID {
 			continue
 		}
-		if err := os.RemoveAll(checkpointDir); err != nil {
-			return fmt.Errorf("workspace: remove checkpoint %s: %w", entry.Name(), err)
+		if err := removeCheckpointDirectory(r.dir, entry.Name(), checkpointDir); err != nil {
+			return err
 		}
 	}
 	return syncRegistryDirectory(root)
+}
+
+func removeCheckpointDirectory(registryDir, checkpointID, checkpointDir string) error {
+	lock, err := AcquireCheckpointRemoval(registryDir, checkpointID)
+	if err != nil {
+		return err
+	}
+	defer lock.Release()
+	if err := os.RemoveAll(checkpointDir); err != nil {
+		return fmt.Errorf("workspace: remove checkpoint %s: %w", checkpointID, err)
+	}
+	return nil
 }
 
 // RemoveWorkspace holds exclusion until workspace bytes, checkpoints and identity are gone.
@@ -67,7 +93,15 @@ func (r *Registry) RemoveWorkspace(id string, remove func() error) error {
 		return err
 	}
 	defer lock.Release()
+	attachment, err := acquireAttachmentRemoval(r.dir, id)
+	if err != nil {
+		return err
+	}
+	defer attachment.Release()
 	if err := r.CheckWorkspaceRecoveryHolds(id); err != nil {
+		return err
+	}
+	if err := r.checkWorkspaceFileSaveBarrier(id); err != nil {
 		return err
 	}
 	if err := remove(); err != nil {
