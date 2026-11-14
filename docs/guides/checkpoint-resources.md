@@ -4,11 +4,12 @@ This native development profile exposes one selected checkpoint through MCP
 resources. It serves captured filesystem files from v1 and v2 checkpoints.
 The [workspace resource guide](workspace-resources.md) covers current working files.
 
-**Availability:** this is an unreleased 0.4.0 candidate profile. It requires a
-binary built from this checkout; published v0.3.7 binaries do not include these
-flags or resources. See the [candidate notes](../releases/v0.4.0.md).
+**Availability:** use a v0.4.0 native binary from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0)
+or build from source. The npm 0.3.7 binaries do not include these flags or
+resources. See the [release notes](../releases/v0.4.0.md).
 
-Build this checkout with `make build`. Pause writers and use the existing
+Use the downloaded binary or build this checkout with `make build`. Pause writers and use the existing
 `workspace checkpoint` command to capture saved work, then select the returned
 checkpoint ID:
 
@@ -88,7 +89,7 @@ checkpoint identity and receiver working identity remain distinct. Existing
 connections do not silently expand to the receiver.
 
 Installed native consumers on Linux and macOS, x64 and ARM64, verify saved
-bytes after changing the live file. See the [candidate notes](../releases/v0.4.0.md)
+bytes after changing the live file. See the [release notes](../releases/v0.4.0.md)
 for revision-bound release evidence. Cross-machine continuation, named model
 providers and protected saved-version access policy require separate evidence.
 This profile remains read-only; managed editing uses its own connection.

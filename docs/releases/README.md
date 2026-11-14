@@ -1,18 +1,17 @@
 # Release notes
 
-The 0.4.0 candidate is unreleased and is not yet available from npm, PyPI, or
-GitHub Downloads. Its native release qualification has passed on Linux and
-macOS, x64 and ARM64; see its candidate notes for evidence and limits.
+The current native and Go release is [v0.4.0](v0.4.0.md), with qualified
+Linux and macOS binaries on x64 and ARM64. Public npm packages remain at
+[v0.3.7](v0.3.7.md); automated npm and PyPI publication remain disabled.
 
-The current native, Go and npm release is [v0.3.7](v0.3.7.md).
 The Python client is not yet published to PyPI. See [getting started](../guides/getting-started.md)
 for installation and the [npm publication record](../development/npm-publishing.md)
 for verification and remaining publishing automation work.
 
 | Version | Notes |
 | --- | --- |
-| 0.4.0 | [Unreleased candidate](v0.4.0.md); native qualification passed; publication is pending. |
-| 0.3.7 | [Current native, Go and npm release](v0.3.7.md) |
+| 0.4.0 | [Current native and Go release](v0.4.0.md) |
+| 0.3.7 | [Current public npm packages](v0.3.7.md) |
 | 0.3.6 | [Release notes](v0.3.6.md) |
 | 0.3.5 | [Release notes](v0.3.5.md) |
 | 0.3.4 | [Release notes](v0.3.4.md) |

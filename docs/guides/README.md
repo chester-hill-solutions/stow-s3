@@ -7,8 +7,8 @@ Choose a workflow for the application you are building. The
 
 - [Getting started](getting-started.md): install Stow and choose an API.
 - [Running a server](../running-and-probing.md): credentials, startup and probes.
-- [v0.4.0 candidate](../releases/v0.4.0.md): new MCP workspace files, managed saves and checkpoint reads.
-- [Current public release](../releases/v0.3.7.md): installation and compatibility notes.
+- [v0.4.0 release](../releases/v0.4.0.md): new MCP workspace files, managed saves and checkpoint reads.
+- [Public npm packages](../releases/v0.3.7.md): npm installation and compatibility notes.
 
 ## Native storage
 

@@ -21,17 +21,19 @@ Your application runs the code and controls network access. Stow manages storage
 npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
-The [v0.4.0 candidate](docs/releases/v0.4.0.md) adds scoped MCP workspace file
-resources, managed file saves and immutable checkpoint reads. Native release
-qualification has passed on Linux and macOS, x64 and ARM64. It is not published
-yet; the install command above selects the current public release.
+[Stow v0.4.0](docs/releases/v0.4.0.md) adds scoped MCP workspace file resources,
+managed file saves and immutable checkpoint reads. Native binaries are available
+for Linux and macOS, x64 and ARM64, from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
+The npm install command above selects the published 0.3.7 package; npm 0.4.0
+and PyPI publication remain disabled.
 
 The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
 Node.js 20 or newer is required. Python uses a source checkout.
 
 [Documentation](https://stow.chesterhillsolutions.ca/docs/) ·
 [Getting started](docs/guides/getting-started.md) ·
-[v0.4.0 candidate notes](docs/releases/v0.4.0.md) ·
+[v0.4.0 release notes](docs/releases/v0.4.0.md) ·
 [Examples](examples/stow-recipes/README.md)
 
 <!-- repo-only:start -->
@@ -63,7 +65,7 @@ Node.js 20 or newer is required. Python uses a source checkout.
   The S3 filesystem backend uses a separate object-record format.
   Native Go APIs support [guarded saves and recovery receipts](docs/guides/portable-workspace-usage.md#managed-saves-in-native-storage).
   MCP callers can use the [fixed-bucket object tools](docs/guides/portable-workspace-usage.md#native-object-mcp).
-  The v0.4.0 candidate adds [scoped file resources](docs/guides/workspace-resources.md),
+  Native v0.4.0 adds [scoped file resources](docs/guides/workspace-resources.md),
   [managed file saves](docs/guides/workspace-file-saves.md) and
   [selected checkpoint reads](docs/guides/checkpoint-resources.md).
 - **Browser storage:** keep objects and editing history in IndexedDB.
@@ -82,7 +84,7 @@ Storage quotas do not limit files written directly by those processes.
 The [storage plan](docs/development/storage-foundation-plan.md) tracks unfinished work.
 The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpoint before each prompt.
 Named host/model interruption and second-host acceptance remain separate from
-the native Linux/macOS release checks recorded in the candidate notes.
+the native Linux/macOS release checks recorded in the release notes.
 MCP tool access alone does not ensure a checkpoint after every turn.
 
 Live collaboration work belongs to [GangCode](docs/design/gangcode-stow-boundary.md).
@@ -360,11 +362,11 @@ The package includes a platform carrier for Linux or macOS on x64 or ARM64.
 No Go installation or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`; these packages use npmjs.
 
-Standalone v0.3.7 native binaries are available from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
+Standalone v0.4.0 native binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
 Verify the archive against `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
 Run `stow-s3 --version` to check the installed version.
-See the [release notes](docs/releases/v0.3.7.md) for upgrade compatibility.
+See the [release notes](docs/releases/v0.4.0.md) for upgrade compatibility.
 
 **The Python client is not yet published to PyPI.** Use a source checkout for Python.
 The [npm publication record](docs/development/npm-publishing.md#published-037) describes the

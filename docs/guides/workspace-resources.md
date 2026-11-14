@@ -1,13 +1,14 @@
 # Connect a host to workspace files
 
 This development profile lets an MCP host read the ordinary files of an existing
-registered workspace. Build the native executable from this checkout with
+registered workspace. Use a v0.4.0 native executable, or build this checkout with
 `make build`. The connection needs the registry directory and workspace ID from
 workspace preparation; it does not adopt an arbitrary directory as an object store.
 
-**Availability:** this is an unreleased 0.4.0 candidate profile. It requires a
-binary built from this checkout; published v0.3.7 binaries do not include these
-flags or resources. See the [candidate notes](../releases/v0.4.0.md).
+**Availability:** use a v0.4.0 native binary from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0)
+or build from source. The npm 0.3.7 binaries do not include these flags or
+resources. See the [release notes](../releases/v0.4.0.md).
 
 ```sh
 /absolute/path/to/stow-s3 mcp \
@@ -72,7 +73,7 @@ continues to use its own bucket profile.
 
 | Caller | Evidence and scope |
 | --- | --- |
-| Installed native release artifacts | Linux/macOS x64/ARM64 consumers passed resource browsing, managed save/resolve and immutable checkpoint reads; see the [candidate notes](../releases/v0.4.0.md) |
+| Installed native release artifacts | Linux/macOS x64/ARM64 consumers passed resource browsing, managed save/resolve and immutable checkpoint reads; see the [release notes](../releases/v0.4.0.md) |
 | Native Go API | Scoped reader and bounded metadata observations; focused race regressions |
 | MCP Go client | Resource routing, paging, expiry, confinement and profile regressions |
 | Independent TypeScript MCP client | Passed scoped 235-entry traversal against the actual native stdio server |

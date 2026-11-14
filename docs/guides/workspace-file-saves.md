@@ -2,14 +2,14 @@
 
 **Qualification:** installed native consumers on Linux and macOS, x64 and
 ARM64, exercise observed-token saves, receipt resolution and subsequent saved
-checkpoint reads. The [candidate notes](../releases/v0.4.0.md) link the exact
+checkpoint reads. The [release notes](../releases/v0.4.0.md) link the exact
 release checks. Host-quiesced coordination is required; native protocol checks
 do not qualify every model provider or external host.
 
-**Availability:** the editing flags and tools described here are part of an
-unreleased 0.4.0 candidate and require a binary built from this checkout.
-Published v0.3.7 binaries do not include them. See the
-[candidate notes](../releases/v0.4.0.md).
+**Availability:** the editing flags and tools require a v0.4.0 native binary
+from [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0)
+or a source build. The npm 0.3.7 binaries do not include them. See the
+[release notes](../releases/v0.4.0.md).
 
 Use the managed file tools when a host needs comparison before replacement and
 a retained result after a lost reply. The host prepares the workspace, supplies
@@ -19,7 +19,7 @@ The advisory writer Session does not fence those other writers.
 
 ## Connect
 
-Build the native executable from this checkout. The workspace must already be
+Use the v0.4.0 native executable or build from source. The workspace must already be
 registered, with the selected directories present.
 
 ```sh

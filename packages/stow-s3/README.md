@@ -10,18 +10,18 @@ Install the public npm package:
 npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
-The [v0.4.0 candidate](../../docs/releases/v0.4.0.md) adds opt-in native MCP
-workspace file resources, managed saves and checkpoint reads. Its native release
-checks pass on Linux and macOS, x64 and ARM64. Version 0.4.0 is not published;
-the command above still selects the public 0.3.7 package.
+[Native v0.4.0](../../docs/releases/v0.4.0.md) adds opt-in MCP workspace file
+resources, managed saves and checkpoint reads on Linux and macOS, x64 and ARM64.
+Use its standalone binary for these profiles. The npm package remains at 0.3.7;
+version 0.4.0 is not published to npm.
 
 Node.js 20 or newer is required. Linux and macOS on x64 or ARM64 receive their native carrier automatically.
 Native process APIs need no Go installation or `STOW_BIN` override.
 Embedded and browser APIs use the included WASM assets.
 Remove any old scope override to `npm.pkg.github.com`; this package is published on npmjs.
 
-Standalone v0.3.7 binaries are also available as
-[GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
+Standalone v0.4.0 binaries are available as
+[GitHub downloads](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
 Use WSL on Windows.
 
 For local development, build a source checkout:

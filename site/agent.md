@@ -76,10 +76,10 @@ must own prompt admission to guarantee its chosen turn boundary. Full chat state
 process memory, credentials and external side effects are outside a checkpoint.
 Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
-## v0.4.0 candidate: MCP workspace files
+## v0.4.0: MCP workspace files
 
-The [v0.4.0 candidate](/docs/releases/v0.4.0/) is not published. Use a
-candidate source build; public v0.3.7 binaries do not include these profiles.
+Use a [v0.4.0 native binary](/docs/releases/v0.4.0/) or build from source.
+The npm 0.3.7 binaries do not include these profiles.
 Native release checks cover Linux and macOS on x64 and ARM64. Named model
 providers and live App hosts need separate compatibility evidence.
 
@@ -107,8 +107,8 @@ The package carries its native binary for Linux or macOS on x64 or ARM64.
 No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
-Standalone v0.3.7 binaries are available from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
+Standalone v0.4.0 binaries are available from
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
 Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
 
 The Go module is published:
