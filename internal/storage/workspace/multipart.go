@@ -109,6 +109,11 @@ func (s *Store) CreateMultipartUpload(ctx context.Context, bucket, key string, o
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return nil, err
+	}
 	uploadID, err := storage.NewUploadID()
 	if err != nil {
 		return nil, err
@@ -181,6 +186,9 @@ func (s *Store) UploadPart(ctx context.Context, uploadID string, partNumber int,
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return nil, err
+	}
 
 	_, err := s.loadUpload(uploadID)
 	if err != nil {
@@ -219,6 +227,9 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return nil, err
+	}
 
 	state, err := s.loadUpload(uploadID)
 	if err != nil {
@@ -308,6 +319,9 @@ func (s *Store) AbortMultipartUpload(_ context.Context, uploadID string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return err
+	}
 	if _, err := s.loadUpload(uploadID); err != nil {
 		return err
 	}

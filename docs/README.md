@@ -21,7 +21,8 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 ## Getting started
 
 - [Getting started](guides/getting-started.md): install from npm or native downloads and choose an API.
-- [v0.3.7 release notes](releases/v0.3.7.md): lifecycle fixes, native downloads and compatibility.
+- [v0.4.0 release notes](releases/v0.4.0.md): native MCP workspace resources, managed saves and saved-file reads.
+- [v0.3.7 release notes](releases/v0.3.7.md): the current public npm packages.
 - [Running a native server](running-and-probing.md): startup, credentials and probes.
 - [TypeScript client](../packages/stow-s3/README.md) and
   [Python client](../packages/stow-s3-py/README.md).
@@ -31,6 +32,9 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 
 - [Portable workspace usage](guides/portable-workspace-usage.md): preparation,
   checkpoints, guarded saves, handoff and adoption.
+- [MCP workspace resources](guides/workspace-resources.md): scoped working-file reads and directory pages.
+- [Managed file saves](guides/workspace-file-saves.md): compare before replacement and resolve an interrupted reply.
+- [MCP checkpoint files](guides/checkpoint-resources.md): read immutable saved bytes and verify ranges.
 - [Task manifests](contracts/task-manifest.md): inputs, Git checkouts and workspace limits.
 <!-- repo-only:start -->
 - [Workspace contract](workspace-contract.md) and [shared conformance vocabulary](contracts/workspace-contract-steps.md).

@@ -1,0 +1,203 @@
+{
+  "version": 1,
+  "date": "2026-11-12",
+  "qualified_at_utc": "2026-11-12T06:26:02.602376+00:00",
+  "work_ids": [
+    "W26.E.1",
+    "W26.E.2"
+  ],
+  "status": "local_cli_mcp_and_two_client_sdk_profile_qualified",
+  "profile": "macOS ARM64; host_quiesced; native CLI stdio and loopback HTTP with real Go/TypeScript SDK clients",
+  "go_toolchain": "1.25.6",
+  "typescript_mcp_sdk_version": "1.32.1",
+  "coordination": "host_quiesced",
+  "external_writers_fenced": false,
+  "editing_default": false,
+  "cli_mcp_editing_qualified": true,
+  "two_client_sdk_qualified": true,
+  "mcp_only_model_editing_qualified": false,
+  "linux_runtime_qualified": false,
+  "cross_host_qualified": false,
+  "power_loss_qualified": false,
+  "protected_multitenant_profile_qualified": false,
+  "provider_calls": 0,
+  "ui_implementation_work": false,
+  "commits": 0,
+  "deployments": 0,
+  "required_flags": [
+    "--workspace-files",
+    "--workspace-edit",
+    "--write-root RELATIVE_DIR",
+    "--coordination host_quiesced"
+  ],
+  "explicit_recovery_flag": "--recover-file-saves",
+  "recovery_fallback": false,
+  "editing_incompatible_modes": [
+    "object",
+    "resources-only",
+    "selected checkpoint",
+    "browser"
+  ],
+  "tools": [
+    "stow_workspace_file_read_for_save",
+    "stow_workspace_file_save",
+    "stow_workspace_file_resolve_save",
+    "stow_workspace_file_release_observation"
+  ],
+  "ownership": "one registered Workspace/Runtime/editor; ResumeWith or explicit ResumeWorkspaceForFileRecovery; no OpenWorkspace reconstruction or quota/grant overrides",
+  "scope": "editing tools cannot select registry/root/workspace/bucket; configured read roots and explicit writable roots retain native confinement",
+  "bounds": {
+    "decoded_file_bytes": 65536,
+    "encoded_arguments_bytes": 262144,
+    "encoded_tool_result_bytes": 262144,
+    "live_observations": 64,
+    "observation_lifetime_seconds": 300,
+    "shared_active_editing_and_resource_calls": 8,
+    "deadline_seconds_max": 10
+  },
+  "wire_semantics": {
+    "body": "exactly one text/data_base64, including empty",
+    "condition": "exactly one observation_token/replace=true",
+    "observe_base64": "complete; optional text omitted first if full result would exceed budget",
+    "undisclosed_observation": "released on final response failure",
+    "save_resolve": "original generation, canonical key and cloned metadata; no body",
+    "zero_mode": "pointer field retains mode=0 on observations",
+    "known_pre_native_save_refusal": "not_committed",
+    "unproven_or_missing_receipt": "unknown",
+    "known_terminal_fallback": "outcome and committed marker retained",
+    "error_privacy": "new editing-tool responses sanitize raw host paths/tokens; existing checkpoint tools retain their existing protocol"
+  },
+  "sdk_evidence": {
+    "test": "extensions/stow/test/workspace-editing.test.mjs",
+    "server": "one actual loopback HTTP subprocess, two independent Client/StreamableHTTP transports sharing one editor",
+    "concurrency": "same observed basis and distinct tokens; exactly one committed save and one not_committed/conflict",
+    "lost_reply": "custom fetch consumes a completed real save response and throws; one interception/no automatic retry observed; caller does not reissue save",
+    "oracle": "captured response is test-only; committed results require nonempty generation, object/size/ETag/date and no payload fields",
+    "checkpoint": "explicit separate checkpoint_create after confirmed save",
+    "restart": "SIGKILL and Wait; offline later bytes; explicit recovery flag; Resolve original result",
+    "later_payload_preserved": [
+      "bytes",
+      "device",
+      "inode",
+      "nanosecond mtime"
+    ],
+    "limits": "completed-response loss plus process death, not every mid-publication MCP phase; native D2 seven-phase backend qualification remains a separate dependency"
+  },
+  "native_sha256": "ca9fc0b1ba1d33032344a8b4d58354799a1923508313882c5c3bfc1e0de08a9e",
+  "native_backup": "/private/tmp/stow-w26-e-qualified-s3",
+  "wasm_sha256": "d8278c57d7b9f2011f51ad2cecc8dec9992240547991b7e9468030501cd2f10c",
+  "browser_gzip_sha256": "472f16fbddf378ed261e0f3c5872991bd47a67ca797dab8a2a5034ab7de290cf",
+  "native_foundation_modified": false,
+  "wasm_and_browser_unchanged_from_d2": true,
+  "source_sha256": {
+    "cmd/stow-s3/mcp.go": "162e47818b6d1404b10ee511e7ba57d37e1316d432645a5e0ada1e27860529be",
+    "cmd/stow-s3/mcp_workspace_editing_test.go": "631d79e75a18537ec5047f0068d959d5dcc9677018171f6382152fa6800e440e",
+    "internal/mcpstorage/workspace_browser.go": "7f4df52de2a923c8e369f59d7da87324bdaab2219604a5baca351061bcacf25b",
+    "internal/mcpstorage/workspace_editing.go": "0d0769d0e3aa2e67e2f6111399963950945a9bf2f4a68790dfc05bd322e1ebf5",
+    "internal/mcpstorage/workspace_editing_results.go": "4cbb936e74b3888099e951426df4bc9b850ecec152653d1c239b65171cfb7857",
+    "internal/mcpstorage/workspace_editing_test.go": "e28ed390f17c35c1eefcc6cc801f3a839564929db2052bf6cc3b4f6c3749fc9d",
+    "internal/mcpstorage/workspace_editing_tools.go": "b9674adf0707bd838bfd097665870e95f908da5bf9995bde737b300d05558528",
+    "internal/mcpstorage/workspace_resources.go": "5a4ae65875c3c07bdcbcd0dc5b8698daa32b25d0b3bfed663052cdabbac37eff",
+    "extensions/stow/test/workspace-editing.test.mjs": "1c9003bd59e2dd8f4ad559a3396612ed90ac23177c543203b78facee883ee732",
+    "scripts/api-mcp.mjs": "9bfef5d8ed432601a4cf5cb79d279e75c875a57d23c9a1857ffe7ea007a27340",
+    "scripts/mcp-api-reference.py": "91f8b2bc95578b82005a5f7593a23c18a0e166b587ea6808f6e64d0a0eb4a5b6"
+  },
+  "source_files_recorded": 11,
+  "gate_go_source_files": 860,
+  "gate_go_source_manifest": "/private/tmp/w26-e-gate-source.json",
+  "gate_go_source_manifest_sha256": "14ebf0ad1e7da6350869953d5f6c83beb02a6df0dccc3f86e5080e6d08acecb4",
+  "recorded_go_and_nongo_sources_unchanged_during_gates": true,
+  "artifacts_unchanged_during_gates": true,
+  "verification": {
+    "new_go_test_methods": 12,
+    "go_test_methods_by_file": {
+      "cmd/stow-s3/mcp_workspace_editing_test.go": [
+        "TestMCPWorkspaceEditModeValidation",
+        "TestMCPWorkspaceEditInvalidModeHasNoFilesystemEffects",
+        "TestMCPWorkspaceEditRefusesLiveOwnerBeforeMetadataWrites",
+        "TestMCPWorkspaceEditStdioSaveAndExplicitRecoveryRestart"
+      ],
+      "internal/mcpstorage/workspace_editing_test.go": [
+        "TestWorkspaceEditingToolsSaveResolveAndRelease",
+        "TestWorkspaceEditingSaveReceiptRetainsRelativePathAndMetadata",
+        "TestWorkspaceEditingPayloadBoundsAndScopes",
+        "TestWorkspaceEditingRejectsLiveOwnerWithoutChangingSource",
+        "TestWorkspaceEditingRequiresExplicitMarkedSaveRecovery",
+        "TestWorkspaceEditingLargeReadsKeepBase64AndDropOptionalText",
+        "TestWorkspaceEditingRawArgumentBounds",
+        "TestWorkspaceEditingTerminalResponseBounds"
+      ]
+    },
+    "new_sdk_test_methods": 1,
+    "focused_backend_races": "passed",
+    "focused_cli_races": "passed",
+    "independent_review": "accepted one full production review and focused response/oracle repair recheck",
+    "sdk_initial_candidate": "passed",
+    "sdk_final_candidate": "passed with strengthened metadata/body/generation oracle",
+    "standards": "passed",
+    "full_go_race_suite": "passed",
+    "api_generation_pages": 13,
+    "script_tests_passed": 246,
+    "extension_tests_passed": 28,
+    "agent_tests_passed": 40,
+    "agent_tests_skipped": 1,
+    "conformance_profiles": {
+      "memory": "passed",
+      "filesystem": "passed",
+      "runtime_memory": "passed",
+      "runtime_filesystem": "passed"
+    },
+    "coverage_percent": 78.13,
+    "coverage_statements_hit": 16232,
+    "coverage_statements_total": 20775,
+    "coverage_profile": "/private/tmp/w26-e-coverage-qualified.out",
+    "coverage_profile_sha256": "e404c0e1e0bc2bbfb44063d8e1733ddb060de14710f1967dbf6293b9849486f5",
+    "coverage_obsolete_source_locations": 0,
+    "environment": {
+      "GOFLAGS": "-p=1 -count=1",
+      "GOTOOLCHAIN": "go1.25.6",
+      "STOW_REAL_MODEL_CONFIG": "",
+      "STOW_REQUIRE_REAL_MODEL": "0"
+    },
+    "baselines_raised": false,
+    "existing_assertions_or_timeouts_weakened": false,
+    "default_parallel_gate_run": false,
+    "full_race_seconds": {
+      "mcpstorage": 11.73,
+      "filesystem": 112.404,
+      "workspace": 45.03,
+      "public_stow": 47.252
+    },
+    "initial_sdk_fixture_repair": "A diagnostic attempted JSON.stringify on an SDK client; corrected serialization only, with assertions and production unchanged. Initial failure excerpt exists in tool session; first log was overwritten, not separately retained.",
+    "final_doc_links": "Local documentation links OK (335 Markdown files)",
+    "final_diff_check": "passed",
+    "final_source_artifact_and_omission_checks": "passed: 11 source hashes, frozen 860-file Go manifest, artifact hashes, unchanged baselines, exact 270 distribution omissions"
+  },
+  "orchestration": {
+    "backend_owner": "retained gpt-6-luna / medium",
+    "cli_and_sdk_owner": "retained gpt-6-luna / medium",
+    "reviewer": "retained gpt-6-luna / medium; read-only",
+    "parent": "scope, protocol decisions, integration, docs and acceptance"
+  },
+  "preexisting_distribution_omissions_restored": 270,
+  "preserved_coexisting_sources_match": true,
+  "logs": {
+    "backend_races": "/private/tmp/w26-e1-a-test.log",
+    "backend_recheck_races": "/private/tmp/w26-e1a-recheck-race.log",
+    "backend_recheck_quality": "/private/tmp/w26-e1a-recheck-quality.log",
+    "backend_recheck_filesize": "/private/tmp/w26-e1a-recheck-filesize.log",
+    "cli_focused": "/private/tmp/w26-e1b-focused.log",
+    "cli_races": "/private/tmp/w26-e1b-race.log",
+    "cli_quality": "/private/tmp/w26-e1b-quality.log",
+    "cli_filesize": "/private/tmp/w26-e1b-filesize.log",
+    "sdk_initial": "/private/tmp/w26-e2-sdk.log",
+    "sdk_final": "/private/tmp/w26-e2-sdk-final.log",
+    "build": "/private/tmp/w26-e-build.log",
+    "package_build": "/private/tmp/w26-e-package-build.log",
+    "api": "/private/tmp/w26-e-api.log",
+    "standards": "/private/tmp/w26-e-standards.log",
+    "conformance": "/private/tmp/w26-e-conformance.log",
+    "final_doc_links": "/private/tmp/w26-e-final-doc-links.log",
+    "final_diff_check": "/private/tmp/w26-e-final-diff-check.log"
+  }
+}

@@ -1,0 +1,485 @@
+{
+  "version": 1,
+  "date": "2026-11-12",
+  "workId": "W26.F.6",
+  "status": "passed_local_no_provider",
+  "profile": "native macOS ARM64 / OpenCode v2.2.7 / local fake provider / native Stow MCP / host_quiesced",
+  "scope": "Caller diagnostics and request metadata repair; no new real-model qualification",
+  "fixes": [
+    "Proxy records bounded failureKind, guard/upstream phase and upstreamAttempted without raw exceptions or request content.",
+    "Runner receipts preserve task stage and proxyStage separately, and count catalog/history refusals.",
+    "A null-model error or a blocked non-free selection is not paidFallbackObserved; blocked selections and null-model errors have separate counts.",
+    "Direct handler fallback context stays per request when callers reuse options."
+  ],
+  "acceptance": {
+    "strictSaveAndCheckpointGatesUnchanged": true,
+    "priorVerdictsReclassified": false,
+    "externalProviderRequests": 0,
+    "realModelPrompts": 0,
+    "syntheticTaskPrompts": 2,
+    "fakeCompletions": 9,
+    "finalCheckpointVerified": true,
+    "original502CauseEstablished": false,
+    "startupDefectClaimedFixed": false
+  },
+  "checks": {
+    "focusedTests": {
+      "passed": 25,
+      "failed": 0,
+      "log": "/private/tmp/w26-proxy-diagnostics-final.log"
+    },
+    "integratedTests": {
+      "passed": 56,
+      "failed": 0,
+      "skipped": 1,
+      "log": "/private/tmp/w26-proxy-repair-agent-tests.log"
+    },
+    "fileSizeRatchet": {
+      "status": "passed",
+      "log": "/private/tmp/w26-proxy-repair-file-size.log"
+    },
+    "independentReview": "Cleared bounded diagnostic propagation, exact free-only guard and save gates, truthful fallback reporting, task/proxy phase separation and reused-options regression.",
+    "nativeGoFilesUnchanged": 860,
+    "nativeAdditionalFrozenFilesUnchanged": 3,
+    "priorReceiptsUnchangedSHA256": {
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json": "bda667bf335d7a637dae9ceebe89e0f936213e9e2947022d8bd07f4a1e2639d5",
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local.json": "93e1fc9ead14b108c532a35593a0b3f478c50bebe199af9439df4a4ac1f74b57",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-free-commit-gated.json": "f0570033b00ade219d77303eff46fff62454a2c18932f66bf060be055638f914",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-direct.json": "ceef5d26db3ea1647b83361055611dadad0f5d19c97f4d1eabd8da5724c5e6f6",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json": "a30ef3f4b741cc910c00827a8eec070ac8b2be49c5ec6cf3b9e1f592fb25b0ff",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-mcp.json": "2d22262824540e6671469626d0ef5246366d8beabd3b6dffa90aa2ffe9e814ed",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-local.json": "38b83b8a99b5b77251ec5430ed0f5b7ad210b77cfae6345cb1f52875b35d6816",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-required-read.json": "5a69f59ddc8b7d1c328cc2c49b19887ff578529e9b2bdcebe9f1225a6130c202",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-scope-aligned.json": "9ff67082a3fa5015779dd2d83f03bc110812f694b52aa18f61605b07e05e9052"
+    },
+    "preExistingMissingDistPreserved": 270,
+    "documentationLinks": {
+      "status": "passed",
+      "markdownFiles": 341,
+      "log": "/private/tmp/w26-proxy-repair-doc-links.log"
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "/private/tmp/w26-proxy-repair-final-diff-check.log"
+    }
+  },
+  "noProviderCallerRun": {
+    "status": "passed",
+    "opencodeVersion": "opencode v2.2.7",
+    "requestedSelector": "openrouter/openrouter/free",
+    "modelPrompts": 2,
+    "elapsedMs": 10676,
+    "deadlineMs": 60000,
+    "receiverWorkspaceId": "ws_65942456d165c370",
+    "sourceWorkspaceId": "ws_49b692087f4eb189",
+    "sourcePathsRemovedBeforeStage2": true,
+    "stageResults": [
+      {
+        "name": "stage1",
+        "workspaceId": "ws_49b692087f4eb189",
+        "requestKey": "2c30591d-b159-453e-a5f4-0899367171b5",
+        "modelRequests": [
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          }
+        ],
+        "toolTrace": [
+          {
+            "name": "stow_workspace_file_read_for_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          },
+          {
+            "name": "stow_workspace_file_read_for_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          },
+          {
+            "name": "stow_workspace_file_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          }
+        ],
+        "schemaEnforcement": {
+          "requests": 4,
+          "initialReadRequired": true,
+          "initialReadVerified": true,
+          "initialReadPhaseCount": 1,
+          "editingPhaseCount": 2,
+          "commitProofCount": 1,
+          "terminalAfterCommitCount": 1,
+          "terminalGeneration": "00deb2a0777fb98a5a35e6e0b720157b",
+          "schemaEnforced": true,
+          "catalogRefusalCount": 0,
+          "historyRefusalCount": 0,
+          "fullToolCatalog": true,
+          "toolCount": 4
+        },
+        "toolCallCount": 3,
+        "modelRequestCount": 4,
+        "diagnosticPaths": {
+          "stdout": "/private/tmp/w26-proxy-repair-final-mock.stage1.jsonl",
+          "stderr": "/private/tmp/w26-proxy-repair-final-mock.stage1.stderr"
+        },
+        "checkpointId": "cp_a432b0b0e6a6f7ba9599c16d",
+        "savedStateSHA256": "99c985f7e905640b3d3f48ba313c83d737a63656830df97abca1fe21cb98b1a4",
+        "savedStateBytes": 66,
+        "generation": "00deb2a0777fb98a5a35e6e0b720157b",
+        "terminalResult": {
+          "total_units": 26,
+          "entry_count": 5,
+          "outcome": "committed",
+          "path": "docs/STATE.json",
+          "request_key": "2c30591d-b159-453e-a5f4-0899367171b5",
+          "generation": "00deb2a0777fb98a5a35e6e0b720157b"
+        }
+      },
+      {
+        "name": "stage2",
+        "workspaceId": "ws_65942456d165c370",
+        "requestKey": "5284a3b0-ab21-4e7f-b3bc-1f6412f06be4",
+        "modelRequests": [
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/chat/completions",
+            "requestedModel": "openrouter/free",
+            "resolvedModel": "openrouter/free",
+            "status": 200,
+            "proxyStage": "upstream",
+            "failureKind": "none",
+            "upstreamAttempted": true
+          }
+        ],
+        "toolTrace": [
+          {
+            "name": "stow_workspace_file_read_for_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          },
+          {
+            "name": "stow_workspace_file_read_for_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          },
+          {
+            "name": "stow_workspace_file_read_for_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          },
+          {
+            "name": "stow_workspace_file_save",
+            "status": "completed",
+            "failed": false,
+            "resultValid": true
+          }
+        ],
+        "schemaEnforcement": {
+          "requests": 5,
+          "initialReadRequired": true,
+          "initialReadVerified": true,
+          "initialReadPhaseCount": 1,
+          "editingPhaseCount": 3,
+          "commitProofCount": 1,
+          "terminalAfterCommitCount": 1,
+          "terminalGeneration": "39327060382faee69353fb4c2e19c090",
+          "schemaEnforced": true,
+          "catalogRefusalCount": 0,
+          "historyRefusalCount": 0,
+          "fullToolCatalog": true,
+          "toolCount": 4
+        },
+        "toolCallCount": 4,
+        "modelRequestCount": 5,
+        "diagnosticPaths": {
+          "stdout": "/private/tmp/w26-proxy-repair-final-mock.stage2.jsonl",
+          "stderr": "/private/tmp/w26-proxy-repair-final-mock.stage2.stderr"
+        },
+        "checkpointId": "cp_bc9eae8038c5ef2af9620022",
+        "savedStateSHA256": "8beb16d5259e655251b0011de89722302bce0170604c2233ee01ea15d3c34123",
+        "savedStateBytes": 52,
+        "generation": "39327060382faee69353fb4c2e19c090",
+        "terminalResult": {
+          "total_units": 56,
+          "entry_count": 7,
+          "outcome": "committed",
+          "path": "docs/STATE.json",
+          "request_key": "5284a3b0-ab21-4e7f-b3bc-1f6412f06be4",
+          "generation": "39327060382faee69353fb4c2e19c090"
+        },
+        "checkpointStateSHA256": "8beb16d5259e655251b0011de89722302bce0170604c2233ee01ea15d3c34123",
+        "checkpointStateBytes": 52,
+        "checkpointStateVerified": true
+      }
+    ],
+    "requestMetadata": {
+      "count": 9,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage1",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage1",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage1",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage1",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage2",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage2",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage2",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage2",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/chat/completions",
+          "requestedModel": "openrouter/free",
+          "resolvedModel": "openrouter/free",
+          "status": 200,
+          "stage": "stage2",
+          "proxyStage": "upstream",
+          "failureKind": "none",
+          "upstreamAttempted": true
+        }
+      ],
+      "paidFallbackObserved": false,
+      "nonFreeModelRequestCount": 0,
+      "nullModelErrorCount": 0
+    },
+    "retainedRoot": "/var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/stow-w26-editing-pilot-iuyF9D",
+    "diagnosticPrefix": "/private/tmp/w26-proxy-repair-final-mock"
+  },
+  "sourceSHA256": {
+    "examples/workspace-resources/checkpoint-fixture.mjs": "50fb4e2bbdfa9ec49432ee1aa46b0fdbf9aaeca6d4c4c8df331b6604347e0ccd",
+    "examples/workspace-resources/checkpoint-pilot.test.mjs": "37d57f6fa430058bcbaaec10cc7636d50c9748456e7143828806333ee3f078a3",
+    "examples/workspace-resources/checkpoint-runner.mjs": "4ab16d3b5fb853a56ee9a15d8edd6a513826ee941ae2a1896eb3293807737619",
+    "examples/workspace-resources/checkpoint-verifier.mjs": "65399ad91faa5074bfdf21d82bd912975e935b372cafb6460dbeddd956f6e68c",
+    "examples/workspace-resources/editing-fixture.mjs": "af1c4fb5d4a712a3aff95da605face3524d151194880b4143f713f59ba7b0a3b",
+    "examples/workspace-resources/editing-host.mjs": "a09693e9f876a0f76abde7d13fa78d6a2f06b5a28f76957833b3fcc030aaaf32",
+    "examples/workspace-resources/editing-host.test.mjs": "088b32d56d89ed95a2a822c3025407a4106d23f486f3cadc40594a6da357d92d",
+    "examples/workspace-resources/editing-pilot.test.mjs": "233c3acccb0dc40adebbb37abf1bc4c18421367683ae3002e59ceb57beb74f6b",
+    "examples/workspace-resources/editing-proxy-diagnostics.test.mjs": "90f515e8fe726184b0597222a36ec55caffc16c1178ead49dad66f621230c89e",
+    "examples/workspace-resources/editing-runner.mjs": "966eea853538392576a729a57f7ae378f2f31b9f97ee47abd17ebb6bc0908381",
+    "examples/workspace-resources/editing-verifier.mjs": "fcfd57c81438ac225f9387da6c78709c9bcae1b6c5a8c10c51e2bbd419ac52be",
+    "examples/workspace-resources/free-only.mjs": "ae58e776824ca97f257336a6949c6dda85895af1503ecb19cb38df3fe6a3d733",
+    "examples/workspace-resources/free-only.test.mjs": "96691dfb9443dcd71d7dc17f7625bbf555ae18b502a6380ccac6828043ad10b9",
+    "examples/workspace-resources/receiver-continuation.mjs": "dd28701e13af355183ed8cfe62bf43899acaec6f7a73efd733d175f35463dbaf",
+    "examples/workspace-resources/run.mjs": "eb7c5ecdd8adf388c8f21c3998d86cf8da8117a767748e6ca232d76f37aaf314"
+  },
+  "sourceArchive": "/private/tmp/w26-proxy-repair-source",
+  "stowBinarySHA256": "ca9fc0b1ba1d33032344a8b4d58354799a1923508313882c5c3bfc1e0de08a9e",
+  "opencodeBinarySHA256": "b9d576000191d7f441198076f6d50a843064259709ed31f7de995cbfc540d85f",
+  "rawEvidence": {
+    "/private/tmp/w26-proxy-repair-final-mock.json": {
+      "sha256": "3733a7764405dbe481d36f7e23b311f0204a585d4130d08a93f3723c2974d78a",
+      "bytes": 10671
+    },
+    "/private/tmp/w26-proxy-repair-final-mock.stage1.jsonl": {
+      "sha256": "3999f1c43bb6ad6887a845dcb6d28d6f3a6c1cc3f5768e5928be9d11c233b18a",
+      "bytes": 8285
+    },
+    "/private/tmp/w26-proxy-repair-final-mock.stage1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/private/tmp/w26-proxy-repair-final-mock.stage2.jsonl": {
+      "sha256": "01859655a3cb88448524aee4f02af72c16bddeefa6b4d31e48ae5d03da3002ed",
+      "bytes": 10791
+    },
+    "/private/tmp/w26-proxy-repair-final-mock.stage2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/private/tmp/w26-proxy-502-diagnostic.mjs": {
+      "sha256": "9f02ce9d4f4fc3bb979644d0138a588fea21b3490cc8d323be36a08f874c8edc",
+      "bytes": 1891
+    },
+    "/private/tmp/w26-proxy-repair-agent-tests.log": {
+      "sha256": "d50865654f40142b515b4c9d9d459c60b28e004504508f3e925d049fcdacf960",
+      "bytes": 5341
+    },
+    "/private/tmp/w26-proxy-diagnostics-final.log": {
+      "sha256": "c1778473e5c5561a310c26cb69efea423dbd14df987633245f347f60189ba437",
+      "bytes": 2526
+    },
+    "/private/tmp/opencode-proxy-repair-final-mock.mjs": {
+      "sha256": "6b79fafe117cc118e1a3cc6f452be006151c30accbbb36486c1e30881216f28e",
+      "bytes": 13043
+    }
+  },
+  "diagnosis": {
+    "preFixReproduction": "Incomplete catalog and fake fetch exception both yielded the generic local 502 and an erroneous paid-fallback flag. Focused regressions now distinguish them and verify no diagnostic sentinel leakage.",
+    "historicalF5Cause": "Unconfirmed; the former generic error did not retain enough information. No old trace was reclassified.",
+    "freshObservedRequest": "Instrumented no-provider actual-CLI run saw a main edit request with all four Stow tools, not an auxiliary title/summary request; it passed without reproducing 502."
+  },
+  "remainingGates": [
+    "Historical F.5 local 502 root cause remains unconfirmed; future failures now retain safe classified evidence.",
+    "Strict live OpenCode/Free Router two-stage editing remains unqualified; F.6 is local caller verification only.",
+    "Direct Luna model profile remains separately qualified on one host; W25 immutable model flow, Linux, second physical host and protected/release profiles remain open."
+  ],
+  "publication": {
+    "committed": false,
+    "deployed": false
+  },
+  "cleanup": {
+    "processInspectionSucceeded": true,
+    "candidateProcessesChecked": 21,
+    "remainingFinalMockProcesses": [],
+    "finalMockExitCode": 0
+  }
+}

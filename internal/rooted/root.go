@@ -9,8 +9,7 @@ import (
 	"strings"
 )
 
-// ErrUnsupported reports a host that cannot open a regular file without following a
-// symbolic link, atomically. Reporting absence instead is the answer guaranteed wrong.
+// ErrUnsupported reports unavailable atomic no-follow regular-file opening.
 var ErrUnsupported = errors.New("rooted: safe regular-file opening is unsupported on this platform")
 
 // ErrSymlink reports a path component that is a symbolic link. Its target is not part of the workspace, so a caller may treat it as absence.
@@ -18,6 +17,8 @@ var ErrSymlink = errors.New("rooted: symbolic links are not readable")
 
 // ErrNotRegular reports a path that is not a regular file. It holds no object.
 var ErrNotRegular = errors.New("rooted: file must be regular")
+
+var ErrNotDirectory = errors.New("rooted: file must be a directory")
 
 func Supported() bool { return safeRegularOpenSupported }
 
@@ -69,6 +70,35 @@ func (r *Root) OpenFile(relative string) (*os.File, error) {
 
 func (r *Root) OpenRegularFile(relative string) (*os.File, error) {
 	return r.openFile(relative, true)
+}
+
+// OpenDirectory opens a directory without waiting on a special file if the path
+// changes between the no-link check and open. The descriptor's identity and type
+// are checked before it is returned.
+func (r *Root) OpenDirectory(relative string) (*os.File, error) {
+	if err := r.Check(); err != nil {
+		return nil, err
+	}
+	if !filepath.IsLocal(relative) {
+		return nil, fmt.Errorf("rooted: path is not local")
+	}
+	info, err := r.statWithoutLinks(relative)
+	if err != nil {
+		return nil, err
+	}
+	if !info.IsDir() {
+		return nil, ErrNotDirectory
+	}
+	file, err := openDirectory(r.root, relative)
+	if err != nil {
+		return nil, err
+	}
+	actual, err := file.Stat()
+	if err != nil || !actual.IsDir() || !os.SameFile(info, actual) {
+		file.Close()
+		return nil, ErrNotDirectory
+	}
+	return file, nil
 }
 
 func (r *Root) openFile(relative string, regular bool) (*os.File, error) {

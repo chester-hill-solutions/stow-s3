@@ -24,13 +24,15 @@ inspect exclusions. A saved checkpoint does not imply task success or passing te
 Full chat state, process memory, credentials and remote side effects are not restored.`
 
 type Config struct {
-	RegistryDir string
-	WorkspaceID string
-	MaxBytes    int64
-	MaxFiles    int64
-	Timeout     time.Duration
-	ExportRoot  string
-	AdoptRoot   string
+	RegistryDir  string
+	WorkspaceID  string
+	CheckpointID string
+	ReadRoots    []string
+	MaxBytes     int64
+	MaxFiles     int64
+	Timeout      time.Duration
+	ExportRoot   string
+	AdoptRoot    string
 }
 
 type adapter struct {

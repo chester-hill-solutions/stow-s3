@@ -81,3 +81,24 @@ test("packed and anonymous consumers use empty configuration and no GitHub scope
     assert.doesNotMatch(block, /--@chester-hill-solutions:registry|npm\.pkg\.github\.com/);
   }
 });
+
+test("packed native consumer exercises installed-carrier MCP resources, editing, and checkpoint", () => {
+  const packed = step("Install packed packages outside the checkout");
+  assert.match(packed, /cp scripts\/smoke-npm-consumer\.mjs scripts\/smoke-mcp-consumer\.mjs scripts\/assert-consumer-binary\.mjs/);
+  assert.match(packed, /@modelcontextprotocol\/sdk@1\.32\.1/);
+  assert.match(packed, /node smoke-mcp-consumer\.mjs/);
+  assert.match(packed, /env -u STOW_BIN -u NODE_PATH/);
+  assert.match(packed, /cd "\$RUNNER_TEMP\/npm-consumer"/);
+  assert.match(workflow, /consumer:\n[\s\S]*matrix:[\s\S]*runner: ubuntu-24\.04[\s\S]*runner: ubuntu-24\.04-arm[\s\S]*runner: macos-15-intel[\s\S]*runner: macos-15/);
+});
+
+test("release test job checks committed generated output before any regeneration", () => {
+  const testJob = workflow.slice(workflow.indexOf("  test:"), workflow.indexOf("  build:"));
+  const generatedCheck = testJob.indexOf("- name: Verify generated output");
+  assert.ok(generatedCheck >= 0);
+  assert.match(testJob.slice(generatedCheck), /run: make check-generated/);
+  for (const regeneration of ["make test-all", "make build", "npm pack"]) {
+    const regenerationIndex = testJob.indexOf(regeneration);
+    assert.ok(regenerationIndex > generatedCheck, `${regeneration} must follow the generated-output check`);
+  }
+});

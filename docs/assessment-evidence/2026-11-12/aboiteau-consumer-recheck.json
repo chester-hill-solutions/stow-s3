@@ -1,0 +1,397 @@
+{
+  "version": 1,
+  "date": "2026-11-12",
+  "workId": "W21.Aboiteau.L1",
+  "status": "failed",
+  "qualificationPassed": false,
+  "disposition": "The final account-seed lifecycle observer failed; the full consumer smoke did not pass. A product storage/race defect is not established.",
+  "profile": {
+    "consumer": "Aboiteau / cf-opencode",
+    "checkout": "/Users/ladmin/WebProjects/cf-opencode",
+    "controllerSHA256": "e70c25065a74c2d5384df19dd8c1612949b1b08d790b368a72cd0f5212cdd3a3",
+    "localImageID": "sha256:8ae47350f2de6630c1dad9625fd686898c685855ca7f8da8689a4bf09cd09284",
+    "registryManifestDigest": null,
+    "containerPlatform": "linux/amd64",
+    "hostPlatform": "macOS ARM64",
+    "dockerDaemonPlatform": "linux/aarch64",
+    "emulation": true,
+    "dockerServerVersion": "24.0.6",
+    "stowDeclaredRelease": "0.3.7",
+    "stowBinarySHA256": "780c3ccf89abdb4355e1b943ab686693d7436bd08cefdffd0f315226815f27da",
+    "freshVersionCLIProbe": "Separate auxiliary Docker exec timed out after 15 seconds; no new version string was recorded.",
+    "currentStowDevelopmentArtifactQualified": false
+  },
+  "test": {
+    "sourceScript": "/Users/ladmin/WebProjects/cf-opencode/scripts/smoke-container.sh",
+    "executedScript": "/private/tmp/stow-real-consumer-m27hjpkw/smoke-cached-image.sh",
+    "wrapperChanges": [
+      "Resolve ROOT to the existing consumer checkout.",
+      "Skip rebuilding the immutable cached image after matching every Docker COPY source.",
+      "Retain the private WORK artifacts after normal cleanup."
+    ],
+    "assertionsChanged": false,
+    "containerCleanupLogicChanged": false,
+    "localModelInferenceInvoked": false,
+    "cloudOrR2OperationsInvoked": false,
+    "consumerSourceModified": false,
+    "nativeCheckpointMCPResourcesExercised": false,
+    "archiveInterface": "Consumer HTTP /checkpoint and /restore workspace/state parts; not Stow MCP checkpoint resource operations."
+  },
+  "execution": {
+    "startedAt": 1794515480054,
+    "image": "sha256:8ae47350f2de6630c1dad9625fd686898c685855ca7f8da8689a4bf09cd09284",
+    "containerNames": [
+      "stow-proof-m27hjpkw",
+      "stow-proof-m27hjpkw-account-seed",
+      "stow-proof-m27hjpkw-cold"
+    ],
+    "ports": [
+      65007,
+      65017,
+      65027
+    ],
+    "overallDeadlineSeconds": 900,
+    "modelInferenceInvoked": false,
+    "cloudOperationsInvoked": false,
+    "sourceUnmodified": true,
+    "hostArchitecture": "arm64",
+    "containerPlatform": "linux/amd64",
+    "emulation": true,
+    "endedAt": 1794516098191,
+    "exitCode": -15,
+    "elapsedMs": 618137
+  },
+  "outcome": {
+    "passedSmokeCheckpoints": 21,
+    "passedChecks": [
+      "control server healthy",
+      "control token required",
+      "configured",
+      "credential denials written to OpenCode config",
+      "OpenCode and native Stow running",
+      "pinned native Stow binary verified",
+      "native Stow readiness credentials are ephemeral and OpenCode uses them",
+      "native workspace S3 and file APIs round-trip",
+      "OpenCode proxy reachable",
+      "workspace checkpoint contains the marker",
+      "unchanged workspace checkpoint is skipped",
+      "state checkpoint contains the marker",
+      "workspace restore round-trip",
+      "escaping workspace symlink refused",
+      "workspace recovered after refusal",
+      "state restore round-trip",
+      "missing registry fails closed and valid state restores the original identity",
+      "conversation checkpoints preserve identity; account seed excludes it and ephemeral credentials",
+      "account state checkpoint",
+      "conversation state archive rejected before recipient mutation",
+      "preexisting workspace refuses startup without identity or child processes"
+    ],
+    "lifecycleObserver": {
+      "mode": "host-lifecycle-race",
+      "ok": false,
+      "kind": "seed",
+      "errorPhase": "observe-completed-state",
+      "errorClass": "Error",
+      "operationStatus": 200,
+      "startStatus": 200
+    },
+    "finalLifecycleAssertionsObserved": false,
+    "coldFreshContainerRestoreReached": false,
+    "sourceContainerRemovalStageReached": false,
+    "subclaimsAreNotFullQualification": true
+  },
+  "safeProbeResults": {
+    "probe-main-native-process-check.json": {
+      "mode": "native-process-check",
+      "ok": true,
+      "readinessValid": true,
+      "opencodeAgentUID": true,
+      "stowAgentUID": true,
+      "opencodeS3EnvironmentMatchesReadiness": true,
+      "stowProcessUsesPinnedBinary": true,
+      "kernelExecutableMatchesExpected": true,
+      "opencodeProcessIdentityMatches": true,
+      "stowProcessIdentityMatches": true,
+      "opencodeProcessCount": 1,
+      "stowProcessCount": 1
+    },
+    "probe-main-workspace-root-native-first.json": {
+      "mode": "workspace-root-native-first",
+      "ok": true,
+      "readinessValid": true,
+      "workspaceIDPresent": true,
+      "rootMatches": true,
+      "workingDirectoryMatches": true,
+      "registryMatches": true,
+      "bucketMatches": true,
+      "endpointLoopback": true,
+      "directFileToS3GetMatches": true,
+      "s3PutToWorkspaceFileMatches": true,
+      "metadataBytesMatch": true,
+      "metadataTypeMatches": true,
+      "s3ClientConstructed": true
+    },
+    "probe-main-workspace-root-native-restarted.json": {
+      "mode": "workspace-root-native-restarted",
+      "ok": true,
+      "readinessValid": true,
+      "workspaceIDPresent": true,
+      "rootMatches": true,
+      "workingDirectoryMatches": true,
+      "registryMatches": true,
+      "bucketMatches": true,
+      "endpointLoopback": true,
+      "directFileToS3GetMatches": true,
+      "s3PutToWorkspaceFileMatches": true,
+      "metadataBytesMatch": true,
+      "metadataTypeMatches": true,
+      "s3ClientConstructed": true
+    },
+    "probe-root-main-archive-boundary-check.json": {
+      "mode": "archive-boundary-check",
+      "ok": true,
+      "readyFileAbsentFromArchives": true,
+      "generatedCredentialsAbsentFromArchives": true,
+      "workspaceMetadataPresent": true,
+      "stateIdentityAndRegistryPresent": true,
+      "accountSeedExcludesStowAndInitialized": true,
+      "accountDatabaseBackupIsConsistent": true
+    },
+    "probe-root-main-native-process-count-check.json": {
+      "mode": "native-process-count-check",
+      "ok": true,
+      "opencodeProcessCount": 0,
+      "stowProcessCount": 0,
+      "identityExists": true
+    },
+    "probe-root-second-native-process-count-check.json": {
+      "mode": "native-process-count-check",
+      "ok": true,
+      "opencodeProcessCount": 0,
+      "stowProcessCount": 0,
+      "identityExists": false
+    }
+  },
+  "archiveDigests": {
+    "state-without-registry.tar.gz": {
+      "bytes": 9157,
+      "sha256": "98fad2de3f416f7d1663c9a335fc78f2795df9b9887e198f243fb2228b8eae8a"
+    },
+    "workspace.tar.gz": {
+      "bytes": 831,
+      "sha256": "cc9169d0165b7d7e74545b68a1076dd14e866ab18d5160624a39947a14bc7498"
+    },
+    "account.tar.gz": {
+      "bytes": 8876,
+      "sha256": "1eb9eedede0b2aec306e1970680fa3f9cf6dba221cd406d72ad7ec8e3407b690"
+    },
+    "state.tar.gz": {
+      "bytes": 9355,
+      "sha256": "0f447b246bd76b15f2d3f9c2bb634353fbf77a513e6d0eeedacb438cc836029a"
+    }
+  },
+  "environmentObservations": {
+    "dockerAfterFailure": [
+      {
+        "command": "info",
+        "timeout": true,
+        "elapsedMs": 12030
+      },
+      {
+        "command": "ps",
+        "timeout": true,
+        "elapsedMs": 12017
+      }
+    ],
+    "directUnixSocketPing": {
+      "localUnixEndpoint": true,
+      "socketExists": true,
+      "pingExitCode": 28,
+      "pingOK": false
+    },
+    "engineProvider": {
+      "contextName": "desktop-linux",
+      "dockerExecutableResolved": "/Applications/Docker.app/Contents/Resources/bin/docker",
+      "rdctlAvailable": false,
+      "colimaAvailable": false
+    },
+    "causeEstablished": false,
+    "notes": "Docker queries timed out after the observation failure. This does not establish whether the original cause was the observer, consumer, daemon, or emulation."
+  },
+  "cleanup": {
+    "daemonUnavailable": true,
+    "globalDaemonRestarted": false,
+    "ownedContainerChecks": [
+      {
+        "name": "stow-proof-m27hjpkw",
+        "state": "inspection_timed_out",
+        "cleanupVerified": false,
+        "removalNotAttempted": true
+      },
+      {
+        "name": "stow-proof-m27hjpkw-account-seed",
+        "state": "inspection_timed_out",
+        "cleanupVerified": false,
+        "removalNotAttempted": true
+      },
+      {
+        "name": "stow-proof-m27hjpkw-cold",
+        "state": "inspection_timed_out",
+        "cleanupVerified": false,
+        "removalNotAttempted": true
+      }
+    ]
+  },
+  "controlledHostStop": {
+    "ownedShells": [
+      {
+        "pid": 39944,
+        "pgid": 39944,
+        "termSent": true,
+        "exitedAfterTerm": true
+      }
+    ],
+    "artifactCandidates": []
+  },
+  "possibleRemainingOwnedContainers": [
+    "stow-proof-m27hjpkw",
+    "stow-proof-m27hjpkw-account-seed"
+  ],
+  "coldContainerCreatedByThisRun": false,
+  "checks": {
+    "consumerContracts": {
+      "passed": 32,
+      "failed": 0,
+      "expectCalls": 105,
+      "files": 4,
+      "log": "/private/tmp/stow-consumer-contract-tests.log"
+    },
+    "imageSourceProvenance": {
+      "matchedCOPYFiles": 12,
+      "allMatched": true,
+      "path": "/private/tmp/stow-real-consumer-m27hjpkw/image-provenance.json"
+    },
+    "consumerSourceSHA256": {
+      "/Users/ladmin/WebProjects/cf-opencode/Dockerfile": "4959837f1b08363eb1fba32653f69f220454d2b6ff6b3d1f76a09bf5f8a724aa",
+      "/Users/ladmin/WebProjects/cf-opencode/scripts/smoke-container.sh": "9f62e67af82e53f5e8909701a2b54282196031bf6f4c68b3224384dc10c0da75",
+      "/Users/ladmin/WebProjects/cf-opencode/scripts/stow-s3-probe.ts": "7177433ce59b1cbdf85e3a2373e6d57436363266c82097879c8712cf31c2b9f6",
+      "/Users/ladmin/WebProjects/cf-opencode/scripts/control-lifecycle-race.mjs": "63be667d58436596d8c6ab06332a45f90b4f5eb5366c4595c4da7c6cf8f429eb",
+      "/Users/ladmin/WebProjects/cf-opencode/control-server.ts": "e70c25065a74c2d5384df19dd8c1612949b1b08d790b368a72cd0f5212cdd3a3",
+      "/Users/ladmin/WebProjects/cf-opencode/entrypoint.sh": "3b83aee13df4acf266736da93140baf75472ec6edb549e1d6e66cf288786585f",
+      "/Users/ladmin/WebProjects/cf-opencode/stow-workspace.ts": "b3d824995ee1672be49e449bdbd0a24253a734862e5767fe8660e2cf01f69317",
+      "/Users/ladmin/WebProjects/cf-opencode/control-lifecycle.ts": "3de4676efa9edeec3e5d2cac5aec1a78a9c5c8a81d3dd11a4887c9a7e4c38c93",
+      "/Users/ladmin/WebProjects/cf-opencode/runtime/opencode/package.json": "fe89ba2e21af17d70d53ac69d0570663fe9ee43e559483d2d68831ea01368bf6",
+      "/Users/ladmin/WebProjects/cf-opencode/runtime/opencode/bun.lock": "d965226a19c2137d0812434bd9479df68d670565e69a1dde424c949b636ddb54",
+      "/Users/ladmin/WebProjects/cf-opencode/runtime/opencode/server.ts": "ea4e282c7cbd9c21552b825abffe0efbb85e356ce0e431887fef05adf22df283",
+      "/Users/ladmin/WebProjects/cf-opencode/runtime/opencode/options.ts": "81bd889f50bcfd3fbae2eedf9ac84819329cd7a5f9e9e81f6d6a84cfc4238c07",
+      "/Users/ladmin/WebProjects/cf-opencode/src/permissions.ts": "1b713e1de2cd2d28dc779e21879fab89946ff8ca02cff9f8652df4f998d003a9",
+      "/Users/ladmin/WebProjects/cf-opencode/src/control-auth.ts": "6b30d7c78667a72f8886585b6481a0a0d2b65d9a6dd1f81fbd3d3505434d7b2f",
+      "/Users/ladmin/WebProjects/cf-opencode/src/tar.ts": "b794d6916315cd81fbace6ccf910d2f271b44e36aa4967a458e58cff2bda6aba",
+      "/Users/ladmin/WebProjects/cf-opencode/src/accounting-policy.ts": "efc873596610954c44528db6727cb7dbc19c6b52f29e3d19512adde7c029d21a"
+    },
+    "consumerSourceUnchangedAfterTest": true,
+    "priorReceiptsUnchangedSHA256": {
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json": "bda667bf335d7a637dae9ceebe89e0f936213e9e2947022d8bd07f4a1e2639d5",
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local.json": "93e1fc9ead14b108c532a35593a0b3f478c50bebe199af9439df4a4ac1f74b57",
+      "docs/assessment-evidence/2026-11-12/checkpoint-luna-continuation.json": "0d3704bd271d4561c6b78a4a025257406af5d1747ec46ab8d68fbb8419a25acb",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-free-commit-gated.json": "f0570033b00ade219d77303eff46fff62454a2c18932f66bf060be055638f914",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-direct.json": "ceef5d26db3ea1647b83361055611dadad0f5d19c97f4d1eabd8da5724c5e6f6",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json": "a30ef3f4b741cc910c00827a8eec070ac8b2be49c5ec6cf3b9e1f592fb25b0ff",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-mcp.json": "2d22262824540e6671469626d0ef5246366d8beabd3b6dffa90aa2ffe9e814ed",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-local.json": "38b83b8a99b5b77251ec5430ed0f5b7ad210b77cfae6345cb1f52875b35d6816",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-required-read.json": "5a69f59ddc8b7d1c328cc2c49b19887ff578529e9b2bdcebe9f1225a6130c202",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-proxy-repair.json": "4dae236346204a374e3cd62de31f653a761e433cbca2533010bd7250d59214ac",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-scope-aligned.json": "9ff67082a3fa5015779dd2d83f03bc110812f694b52aa18f61605b07e05e9052"
+    },
+    "independentWrapperReview": "Accepted only the three declared wrapper differences; real controller assertions, loopback networking, no host mounts and no inference route unchanged.",
+    "independentResultReview": "Accepted failed/inconclusive observer classification, not a race/storage defect or full qualification pass; post-failure daemon queries timed out and cleanup remains unverified.",
+    "documentationLinks": {
+      "status": "passed",
+      "markdownFiles": 343,
+      "log": "/private/tmp/stow-real-consumer-m27hjpkw/doc-links.log"
+    },
+    "fileSizeRatchet": {
+      "status": "passed",
+      "log": "/private/tmp/stow-real-consumer-m27hjpkw/file-size.log"
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "/private/tmp/stow-real-consumer-m27hjpkw/diff-check.log"
+    },
+    "preExistingMissingDistPreserved": 270
+  },
+  "rawEvidence": {
+    "/private/tmp/stow-real-consumer-m27hjpkw/run.json": {
+      "sha256": "c7ed33a0540bb53152864846dd6da3fccc9948070107386683127ae91af767e8",
+      "bytes": 584
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/smoke.log": {
+      "sha256": "c4f7cfa83cbc6f8d3f80861c6b760e660debf737a74bf04abacb9ec50708941a",
+      "bytes": 1828
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/wrapper.diff": {
+      "sha256": "b06d83b6efe5fe568a27e82b6b30ab54dc736aeb7ab92c139e4838808ecdfbc4",
+      "bytes": 973
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/smoke-cached-image.sh": {
+      "sha256": "e867bfe0b3989a2831d9ed43fa9fe363685f86b62429c76d83d3779c2fe9b804",
+      "bytes": 28866
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/image-provenance.json": {
+      "sha256": "87dd36e226816ed92864db073bce666ac49f658f959f5f8b0a7278733fd9a84f",
+      "bytes": 1947
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/source-baseline.json": {
+      "sha256": "e5b2cead15ee238641152c69f4e631c01958e20be40da37034274c7c147c0345",
+      "bytes": 2134
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/seed-race-observation.json": {
+      "sha256": "e071551e5b2e55211e7197d44de458f2d7843dcda1f93b49324330acc2c9646e",
+      "bytes": 156
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/safe-probes.json": {
+      "sha256": "4d4bda68629174a686ab75b34b56238d9872518ed65e9b1559c411ccf6e54824",
+      "bytes": 2264
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/archive-digests.json": {
+      "sha256": "b121ea399074cdb423211fa99da8747b3ca5cc8941f24ad5a6cc56e0ecaaa852",
+      "bytes": 525
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/docker-after-failure.json": {
+      "sha256": "49d2104605b7d386ec5fe3f09b12e16c53ba341c6b701b5b78c2bb66ed43cb4f",
+      "bytes": 153
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/docker-direct-ping.json": {
+      "sha256": "e137e6297dc9e3c90c4601ce03466abe4cb364854c7eb11b9b6f931453942ac3",
+      "bytes": 97
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/host-test-stop.json": {
+      "sha256": "47130ee30d88be5ce1dfceb5717fc39fd5afd7de7a35ae303947edb662afe6a2",
+      "bytes": 162
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/cleanup.json": {
+      "sha256": "91621c9e6f5bbb516b81ad7fdbfc13ab3f86d56c22b57379ed0675a1d2c4ac87",
+      "bytes": 581
+    },
+    "/private/tmp/stow-real-consumer-m27hjpkw/engine-provider.json": {
+      "sha256": "e709092cdbcd62a742884df049b96f56ca070dbdef0c9cc96c76dab709f00196",
+      "bytes": 180
+    },
+    "/private/tmp/stow-consumer-contract-tests.log": {
+      "sha256": "09d2fd9f7569e2d3383f4498c3186e338f80464112596a7885a87d767f797780",
+      "bytes": 3477
+    }
+  },
+  "retainedRoot": "/private/tmp/stow-real-consumer-m27hjpkw",
+  "retainedPrivateWork": "/var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/cf-opencode-smoke.331yBm",
+  "nextAction": "Recover the local Docker engine with operator authorization, verify/remove only owned test containers, then repeat the unchanged smoke or use a native amd64 host. Do not restart/reset global infrastructure automatically.",
+  "remainingGates": [
+    "Full local consumer smoke, including final seed/start observation and fresh-container cold restore, remains unqualified by this run.",
+    "Current development MCP saved-read/edit Linux profile and a second physical host remain separate.",
+    "Existing native-amd64 CI and C2 cloud receipts are historical consumer evidence, not a pass for this failed recheck."
+  ],
+  "publication": {
+    "committed": false,
+    "deployed": false
+  }
+}

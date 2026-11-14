@@ -1,11 +1,9 @@
 package stow
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -103,6 +101,9 @@ func (w *Workspace) CreateCheckpoint(ctx context.Context, options CheckpointOpti
 	}
 	defer lock.Release()
 	if err := ctx.Err(); err != nil {
+		return CheckpointInfo{}, err
+	}
+	if err := w.store.CheckFileSaveMarker(); err != nil {
 		return CheckpointInfo{}, err
 	}
 	return captureCheckpoint(ctx, w.captureTarget(), options)
@@ -258,22 +259,7 @@ func LoadCheckpoint(registryDir, id string) (CheckpointManifest, error) {
 	if err != nil {
 		return CheckpointManifest{}, fmt.Errorf("stow: read checkpoint %s: %w", id, err)
 	}
-	var manifest CheckpointManifest
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&manifest); err != nil {
-		return CheckpointManifest{}, fmt.Errorf("stow: decode checkpoint %s: %w", id, err)
-	}
-	if err := decoder.Decode(&struct{}{}); err != io.EOF {
-		return CheckpointManifest{}, fmt.Errorf("stow: trailing checkpoint manifest data")
-	}
-	if !supportedCheckpointVersion(manifest.Version) || manifest.ID != id {
-		return CheckpointManifest{}, fmt.Errorf("stow: checkpoint %s has an unsupported or mismatched manifest", id)
-	}
-	if err := validateCheckpointManifest(manifest); err != nil {
-		return CheckpointManifest{}, err
-	}
-	return manifest, nil
+	return decodeCheckpointManifest(id, data)
 }
 
 func validateCheckpointManifest(manifest CheckpointManifest) error {

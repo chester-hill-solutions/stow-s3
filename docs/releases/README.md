@@ -1,13 +1,17 @@
 # Release notes
 
-The current native, Go and npm release is [v0.3.7](v0.3.7.md).
+The current native and Go release is [v0.4.0](v0.4.0.md), with qualified
+Linux and macOS binaries on x64 and ARM64. Public npm packages remain at
+[v0.3.7](v0.3.7.md); automated npm and PyPI publication remain disabled.
+
 The Python client is not yet published to PyPI. See [getting started](../guides/getting-started.md)
 for installation and the [npm publication record](../development/npm-publishing.md)
 for verification and remaining publishing automation work.
 
 | Version | Notes |
 | --- | --- |
-| 0.3.7 | [Current native, Go and npm release](v0.3.7.md) |
+| 0.4.0 | [Current native and Go release](v0.4.0.md) |
+| 0.3.7 | [Current public npm packages](v0.3.7.md) |
 | 0.3.6 | [Release notes](v0.3.6.md) |
 | 0.3.5 | [Release notes](v0.3.5.md) |
 | 0.3.4 | [Release notes](v0.3.4.md) |

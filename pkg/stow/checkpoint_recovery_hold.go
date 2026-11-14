@@ -19,6 +19,9 @@ func captureWithRecoveryHold(ctx context.Context, target captureTarget, request 
 	if request.Hold == nil {
 		return captureCheckpoint(ctx, target, request.Options)
 	}
+	if err := workspace.CheckWorkspaceFileSaveBarrier(target.dir, target.workspaceID, target.bucket); err != nil {
+		return CheckpointInfo{}, err
+	}
 	registry, err := openRegistryReadOnly(target.registryDir, "")
 	if err != nil {
 		return CheckpointInfo{}, err

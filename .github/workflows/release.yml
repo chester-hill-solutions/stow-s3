@@ -59,14 +59,14 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: packages/stow-s3/package-lock.json
+      - name: Verify generated output
+        run: make check-generated
       - name: Verify tests
         run: make test-all
       - name: Verify build and standards
         run: |
           make build
           make standards
-      - name: Verify generated output
-        run: make check-generated
       - name: Pack verified npm package
         working-directory: packages/stow-s3
         run: |
@@ -240,12 +240,13 @@ jobs:
         run: |
           node scripts/pack-platform-package.mjs "dist/native/stow-${{ matrix.target }}.tar.gz" dist/platform
           mkdir -p "$RUNNER_TEMP/npm-consumer"
-          cp scripts/smoke-npm-consumer.mjs scripts/assert-consumer-binary.mjs "$RUNNER_TEMP/npm-consumer/"
+          cp scripts/smoke-npm-consumer.mjs scripts/smoke-mcp-consumer.mjs scripts/assert-consumer-binary.mjs "$RUNNER_TEMP/npm-consumer/"
           cp dist/platform/*.tgz dist/npm/*.tgz "$RUNNER_TEMP/npm-consumer/"
           cd "$RUNNER_TEMP/npm-consumer"
           touch "$RUNNER_TEMP/packed-user-npmrc" "$RUNNER_TEMP/packed-global-npmrc"
-          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/packed-user-npmrc" --globalconfig="$RUNNER_TEMP/packed-global-npmrc" ./*.tgz
+          env -u NODE_AUTH_TOKEN -u NPM_TOKEN -u NPM_CONFIG_USERCONFIG npm install --ignore-scripts --registry=https://registry.npmjs.org --userconfig="$RUNNER_TEMP/packed-user-npmrc" --globalconfig="$RUNNER_TEMP/packed-global-npmrc" ./*.tgz @modelcontextprotocol/sdk@1.32.1
           env -u STOW_BIN -u NODE_PATH node smoke-npm-consumer.mjs "${RELEASE_VERSION#v}"
+          env -u STOW_BIN -u NODE_PATH node smoke-mcp-consumer.mjs
 
   live_gate:
     name: Live provider gate

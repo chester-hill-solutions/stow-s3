@@ -7,13 +7,17 @@ Choose a workflow for the application you are building. The
 
 - [Getting started](getting-started.md): install Stow and choose an API.
 - [Running a server](../running-and-probing.md): credentials, startup and probes.
-- [Current release](../releases/v0.3.7.md): installation and compatibility notes.
+- [v0.4.0 release](../releases/v0.4.0.md): new MCP workspace files, managed saves and checkpoint reads.
+- [Public npm packages](../releases/v0.3.7.md): npm installation and compatibility notes.
 
 ## Native storage
 
 | Guide | Covers |
 | --- | --- |
 | [Portable workspaces](portable-workspace-usage.md) | Preparation, checkpoints, guarded saves and handoff |
+| [Workspace resources](workspace-resources.md) | Scoped MCP file reads, directory pages and optional workspace browser |
+| [Managed workspace file saves](workspace-file-saves.md) | Opt-in editing, retained save results, recovery and explicit checkpoint continuation |
+| [Checkpoint resources](checkpoint-resources.md) | Selected saved-file views, bounded verified ranges and attachment lifetime |
 | [Filesystem store](filesystem-store.md) | Object records, data directories, ownership and locks |
 | [Run-through cache](run-through.md) | Offline reads and explicit upstream selection |
 | [Durable outbox](outbox.md) | Queued writes, retries and uncertain outcomes |

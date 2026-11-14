@@ -12,6 +12,16 @@ The npm update was separately authorized and published interactively.
 See the [release notes](../releases/v0.3.7.md) and [npm publication record](npm-publishing.md#published-037).
 Live-provider qualification, PyPI and future automated registry publication remain separate gates.
 
+**Workspace access extension, 2026-11-11:** W23–W26 plan discoverable workspace
+files through MCP, host usability, saved views/portable continuation and guarded
+editing. W27 filesystem attachment and W28 executable discovery are conditional
+on named consumer evidence. The [detailed plan](../design/workspace-resource-plan.md)
+preserves the storage boundary and reuses foundation work. W23 is implemented and
+qualified locally in the development tree: independent review, standards, four
+conformance profiles and final reader/MCP races passed. The
+[qualification record](../reviews/2026-11-11-workspace-resources.md) keeps native
+evidence separate from remaining host, platform and release gates.
+
 ## 1. Plan validation summary
 
 **Verdict: Adjust.** Existing storage, conditional-write and caller integration
@@ -276,6 +286,25 @@ baseline release that makes no such claims. W06/W16/W17/W19/W20 preparation may 
 | W20 | Maintain the published 0.3.7 native/npm profile and immutable artifact pipeline. Interactive publication and the anonymous macOS ARM64 consumer are complete; future OIDC publication, fresh AWS/R2/custom receipts, PyPI and public native-consumer execution on other hosts remain open. Preserve legacy-format diagnostics/security/contribution maintenance. | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
 | W21 | Pilot a meaningful S3 fixture and transfer recipe in a named consumer: cococlips first, pg_backup next if needed. Start with synthetic data; consumer owns progress/reactions. Package convenience APIs follow demonstrated reusable need. Do not mark source-fit proposals as actual integrations. | W06; supported artifact/profile | S4-1 |
 | W22 | Run independent repeat-use study and decide deepen/narrow/rework. Two teams each complete at least three genuine save/reopen/review events over two weeks and retain use; measure setup/recovery effort, correctness and costs against actual alternatives. Research/outreach requires its own actual evidence/authorization. | Usable supported workflow; W19/W21 evidence | S4-2, S4-3 |
+| W23 | **Complete for the local native development profile, 2026-11-11.** The [v1 resource contract](../contracts/workspace-resources-contract.md) and native reader expose overview, bounded complete direct-child observations and regular files, with independent shared read leases and an exclusive registered-removal guard. Opt-in `--workspace-files`/`--resources-only` preserve defaults. Independent review, standards, four conformance profiles and final affected races passed; [qualification](../reviews/2026-11-11-workspace-resources.md) covers privacy (including Unicode aliases), bounds, identity, collection, close and kill release. Actual host usability stays W24; platform/release gates remain separate. | Existing workspace/MCP baseline; W04 for protected claims | Workspace access extension, 2026-11-11 |
+| W24 | **Complete for the declared local native profiles, 2026-11-11.** Static folder scope, bounded metadata observations/resource pages and optional same-bundle browser are implemented. Independent TypeScript traversal, rendered keyboard/zoom fixtures, standards, four storage conformance profiles and agent fixtures pass. Actual OpenCode v2.2.7 + OpenRouter Free Router completed the synthetic review through eight MCP resource calls and a continuation page; [qualification](../reviews/2026-11-11-workspace-resource-hosts.md) and [receipt](../assessment-evidence/2026-11-11/workspace-resources-host.json) retain the initial setup/verifier corrections. Native commands are reused without language wrappers or page tools. Live App hosts, Linux/second-host and protected/release profiles remain separate gates. | W23; W04 for protected profiles; W16/W19/W20 for qualification/release | Workspace access extension, 2026-11-11 |
+| W25 | **Partially complete: local saved-view/range/adoption profile and same-host direct Luna checkpoint continuation qualified, 2026-11-12; second machine unavailable.** [Checkpoint resource qualification](../reviews/2026-11-11-checkpoint-resources.md) and [Luna continuation review](../reviews/2026-11-12-checkpoint-luna-continuation.md). The direct model read saved prior state and input bytes through resource-only MCP after sender removal; host verification checked whole JSON, exact resource content and changed live inputs. The two earlier OpenCode / Free Router attempts remain failed under strict acceptance: the [first](../assessment-evidence/2026-11-11/checkpoint-model-local.json) failed after a malformed read; the [corrected attempt](../assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json) failed strict terminal JSON formatting. Both receipts remain unchanged. [Local execution breakdown](../design/workspace-resource-plan.md#w25-local-execution-boundary) and [contract](../contracts/checkpoint-resources-contract.md) cover ephemeral retention, verified bounded file/range resources and local adoption. Broader W03/W05 profiles, Linux and cross-host qualification stay open. Add authorized checkpoint trees/files, bounded retained-view lifetime and saved-file ranges; return receiver-local resource roots after existing verified adoption. Prove saved/working divergence, prune/integrity behavior and meaningful fresh-context continuation with source unavailable on a second host. Use local writes until W26 qualifies. | W23/W24; qualified W03; W05 for scoped saved views; W19 | Workspace access extension, 2026-11-11 |
+| W26 | **Partially complete: native C/D, E.1/E.2 CLI/MCP/SDK and direct Luna MCP editing/continuation qualified locally; OpenCode / Free Router remains unqualified, 2026-11-12.** [D.2 verification](../reviews/2026-11-11-workspace-editor-recovery.md) qualifies public native SaveFile/ResolveSave, explicit owning recovery, retained authority/limits and capture/cleanup barriers for macOS ARM64 `host_quiesced`. Thirty new functional test methods and seven SIGKILL scenarios passed with independent review, full standards/races, agent fixtures, four conformance profiles and final uncached coverage. The [native contract](../contracts/workspace-editing-contract.md) retains honest unknown outcomes and the host-writer boundary. [E.1/E.2 CLI/MCP and SDK qualification](../reviews/2026-11-12-workspace-editing-mcp.md) covers writable-root opt-in, owner reuse, two-client conflict and lost-reply/reopen. The [direct Luna result](../reviews/2026-11-12-workspace-editing-luna-direct.md) and [repeat receipt](../assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json) record fresh contexts completing native MCP edits and continuation after sender removal on one host; neither claims process-wide filesystem isolation. The OpenCode / Free Router runs remain unqualified: [F.1](../reviews/2026-11-12-workspace-editing-model.md) made no MCP calls; [F.2](../reviews/2026-11-12-workspace-editing-required-read.md) read STATE but did not read the batch or save; [F.4](../reviews/2026-11-12-workspace-editing-free-commit-gated.md) committed both stages but strict trace verification rejected an extra stage-two read outside its allowed inputs; [F.5](../reviews/2026-11-12-workspace-editing-scope-aligned.md) saved correct stage-one state but strict verification rejected a local proxy 502/retry, so stage two did not run. F.6 repaired bounded proxy telemetry and receipt accounting; the no-provider fake CLI flow passed two synthetic stages and exact checkpoint verification, without qualifying a live model run. A separate host-only follow-up verified the F.5 replay and exact state without changing the failed result. Linux, second-host, protected-policy and deployment gates remain open. | W02 workspace capability, W03, W04, W23/W24 | Workspace access extension, 2026-11-11 |
+| W27 | **Conditional:** a named shell-only consumer and repeat-use evidence must justify filesystem attachment. Compare local directories, checkpoint materialization, existing S3 adapters and an MCP-backed mount first. If justified, qualify one OS/read-only Stow checkpoint profile, lifecycle/cache/range/name behavior and real CLI tools. No arbitrary MCP or writable POSIX compatibility claim. | W25; W16/W22 evidence; consumer gate | Workspace access extension, 2026-11-11 |
+| W28 | **Conditional:** a named caller must need executable discovery beyond ordinary README/scripts. Evaluate a small versioned descriptor and one caller-owned adapter, bound to verified saved bytes. Prove no execution from read/list/import and caller-owned runtime, sandbox and effects. No Stow runner or plugin registry. | W25; named caller gate; independent of W27 | Workspace access extension, 2026-11-11 |
+
+**Workspace access ordering:** W23 → W24 → W25; W26 follows W23/W24 and
+workspace-qualified W02/W04, and can progress independently of saved-view work.
+The [execution breakdown](../design/workspace-resource-plan.md#enumerated-execution-backlog)
+records W23 A–G, Luna ownership, the parent-owned attachment/lifetime decision,
+serialized file ownership and independent review. A–G are complete for the local
+native development profile. No second-host or release gate is closed.
+W23's bounded local proof may start without completing protected deployment work.
+Existing W03/W04/W05 prerequisites gate stronger retention, scope and remote
+claims. Integrate resource change hints only after W08/W09 qualify; do not build
+another notification journal. W16/W19/W20/W22 own performance, caller evidence,
+release and repeat-use qualification for this extension. W27/W28 may remain
+unimplemented after a successful core release if their consumer gates do not pass.
 
 **Active code slices:** W04 resource/background ACLs; independent W06
 ordinary-SDK transfer continuation. W03 holds and namespace admission are landed
@@ -286,6 +315,28 @@ mutation. The wrapper contract is implemented. Native filesystem
 interruption/reopen evidence is local macOS arm64; physical Linux execution and
 two real consumers remain open. W04 resource/background ACLs remain open. No
 deployment or release is implied.
+
+### Aboiteau native consumer intake — 2026-11-11; rechecks — 2026-11-12
+
+The intake captured the earlier `cf-opencode` generic filesystem-store path as a
+historical gap. B2 later integrated native Workspace prepare/identity/readiness,
+and the consumer plan records B2 native-amd64 CI and C2 R2 recovery as passed.
+The current controller source matched the cached image used for two local
+rechecks. See the [consumer requirements and outcome](../design/aboiteau-native-consumer.md),
+[first review](../reviews/2026-11-12-aboiteau-consumer-recheck.md) and
+[retry review](../reviews/2026-11-12-aboiteau-consumer-retry.md).
+
+Both QEMU full-smoke attempts on the local aarch64 Docker daemon failed before
+full completion. The first stopped at its final container-state observation;
+the authorized retry stopped before the lifecycle stream, with a main-container
+OOM event recorded. Neither result establishes a specific consumer bug. After
+the authorized Docker Desktop restart, the earlier and retry-owned containers
+were confirmed absent. The 32 host contract tests passed separately. These
+attempts do not replace prior native-amd64 CI or C2 evidence, and do not close
+the local container-smoke, broader platform, protected ACL, W22 repeat-use or
+public W26 editing gates. No consumer source, cloud resource or model changed or
+ran. Stow owns storage; the consumer owns execution, authorization and external
+persistence.
 
 ### Legacy item disposition
 
@@ -373,3 +424,44 @@ own repo; optional public Stow integration does not make Stow its execution owne
 ## Browser project storage extension on 2026-10-12
 
 The authorized browser remediation extends the embedded profile under [ADR 0019](../adr/0019-browser-project-content.md): asynchronous host-backed objects, binary/chunk transport, lazy durable content, atomic project history and conditional manifest publication. [Usage and limits](../guides/browser-project-storage.md), [execution status](../design/browser-project-plan.md), and [large-workload evidence](../benchmarks/browser-project-2026-10-12.json) record this slice. It does not change the remaining notification, encryption or deployment qualifications in W01–W22.
+
+
+## 0.4.0 release candidate qualification
+
+This execution prepares `codex/release-v0.4.0` from main `506b4ed` plus the
+authorized W23–W26 source snapshot. The original dirty checkout, its missing
+tracked dist files, and prior successful and failed receipts remain untouched.
+This work authorizes an isolated candidate, draft PR and non-publishing CI
+rehearsal. Tagging and publication remain a final separate step.
+
+| ID | Owner | Work and acceptance |
+| --- | --- | --- |
+| RC1 | workspace_adapter / parent acceptance | Synchronize 0.4.0 Go, npm/carrier and Python metadata; record unreleased scope; version and release-plan tests pass. |
+| RC2 | release_artifact_probe / parent acceptance | Exercise installed same-run native carriers through resource-only reads, observed-token save/resolve, and immutable checkpoint reads; four native consumer matrix jobs pass. |
+| RC3 | parent | Regenerate committed artifacts; pass test-all, standards, check-generated, browser tests and fresh native Linux functional/race checks at the candidate revision. Repair reproduced failures without weakening gates. |
+| RC4 | workspace_review | Independently review release metadata, workflow/probe correctness, generated output and scoped claims; resolve actionable findings. |
+| RC5 | parent | Freeze source in a candidate commit; push draft PR and dispatch non-publishing release rehearsal; preserve exact run, artifact hashes and platform results. No tag or publication. |
+
+Model-host Free Router failures, mount/second-host adoption and W22 repeat-use
+gates remain recorded limitations, not claims supplied by this candidate. Old
+0.3.7 container failures do not qualify or disqualify the new artifact. Native
+GitHub runners supply Linux evidence without another local Docker restart.
+
+Local qualification note (2026-11-13): the candidate native build and initial
+source/version ratchets passed. Broad Go and cross-platform site checks were
+interrupted deliberately when the host reported only about 2 GiB free; those
+runs are not passing evidence. Full qualification moves to the exact candidate
+revision on native CI. The candidate WASM build completed. Prior test logs and
+the source snapshot remain in `/private/tmp/stow-release-prep-20261113`.
+
+Qualification iteration at `d294ebb` (native CI on 2026-11-13): 13 normal CI
+jobs and all four native build/wheel jobs passed. Standards exposed a missing
+native build prerequisite and Mac-only screenshot paths; release agent tests
+exposed a missing pinned MCP SDK installation. These were test setup failures,
+not waived checks. The repair declares shared MCP test dependencies, makes the
+browser gate build its native fixture, and uses per-test portable screenshot
+directories. On 2026-11-14 the repaired agent suite and all 28 MCP browser tests
+passed locally, including rendered keyboard/zoom checks and generated UI checks.
+Final revision-bound CI, packed-artifact results and publication status are
+tracked in [PR #139](https://github.com/chester-hill-solutions/stow-s3/pull/139);
+failed and interrupted receipts remain preserved.

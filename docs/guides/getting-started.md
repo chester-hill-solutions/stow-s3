@@ -4,6 +4,19 @@ Stow stores objects in a native S3 server, an embedded runtime, or a file worksp
 Browser APIs store editing history in IndexedDB and sync to remote storage.
 Choose the API that matches your application.
 
+## Use MCP workspace files
+
+[Stow v0.4.0](../releases/v0.4.0.md) adds opt-in
+[MCP workspace file resources](workspace-resources.md),
+[managed file saves](workspace-file-saves.md) and
+[selected checkpoint reads](checkpoint-resources.md). Use the v0.4.0 native
+binary for Linux or macOS on x64 or ARM64, or build from source. The npm
+packages remain at 0.3.7 and do not include these new native profiles.
+
+Follow the native installation steps below, run `stow-s3 --version`, then use
+the guide for your chosen MCP profile. Existing object-store format and upgrade
+requirements still apply when opening persistent data.
+
 ## Install the TypeScript client
 
 ```sh
@@ -18,7 +31,7 @@ Remove any old `@chester-hill-solutions` registry override to `npm.pkg.github.co
 ## Install the native server
 
 Download the matching Linux or macOS archive from
-[Stow v0.3.7](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
+[Stow v0.4.0](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
 Both x86_64 (`amd64`) and ARM64 (`arm64`) are supported. Check the archive against
 `SHA256SUMS.txt` from that release, extract it and put `stow-s3` on your PATH.
 Then run `stow-s3 --version`.

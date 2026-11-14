@@ -34,12 +34,13 @@ type Entry struct {
 	// PolicyVersion is zero for registry entries written before resume preserved
 	// authority and normalized quota limits. Such entries must not be reopened
 	// with today's permissive defaults.
-	PolicyVersion      int    `json:"policy_version,omitempty"`
-	AuthorityMask      uint32 `json:"authority_mask,omitempty"`
-	MaxBytes           int64  `json:"max_bytes,omitempty"`
-	MaxObjects         int64  `json:"max_objects,omitempty"`
-	MaxCheckpointBytes int64  `json:"max_checkpoint_bytes,omitempty"`
-	MaxCheckpoints     int64  `json:"max_checkpoints,omitempty"`
+	PolicyVersion       int    `json:"policy_version,omitempty"`
+	AuthorityMask       uint32 `json:"authority_mask,omitempty"`
+	MaxBytes            int64  `json:"max_bytes,omitempty"`
+	MaxObjects          int64  `json:"max_objects,omitempty"`
+	MaxMultipartUploads int64  `json:"max_multipart_uploads,omitempty"`
+	MaxCheckpointBytes  int64  `json:"max_checkpoint_bytes,omitempty"`
+	MaxCheckpoints      int64  `json:"max_checkpoints,omitempty"`
 	// Owned mirrors the workspace manifest. The collector uses it to refuse
 	// adopted workspaces outright, which is the single most important safety
 	// property in this file: an adopted workspace is somebody's project, and no
@@ -193,11 +194,14 @@ func (r *Registry) Lookup(id string) (Entry, bool, error) {
 // Destroy converge on the same end state: the bytes go, and so does the name
 // they were filed under.
 func (r *Registry) Forget(id string) error {
-	lock, err := AcquireMutation(r.dir)
+	lock, err := AcquireMutationCapture(r.dir, id)
 	if err != nil {
 		return err
 	}
 	defer lock.Release()
+	if err := r.checkWorkspaceFileSaveBarrier(id); err != nil {
+		return err
+	}
 	return r.forget(id)
 }
 
@@ -298,7 +302,11 @@ func (r *Registry) Collect(now time.Time) ([]Reclaim, error) {
 			continue
 		}
 		if err := r.RemoveWorkspace(entry.ID, func() error { return r.reclaimCurrent(entry.ID, now) }); err != nil {
-			out[len(out)-1].Reason = "unreadable: " + err.Error()
+			if errors.Is(err, ErrWorkspaceInUse) {
+				out[len(out)-1].Reason = "in-use"
+			} else {
+				out[len(out)-1].Reason = "unreadable: " + err.Error()
+			}
 		}
 
 	}

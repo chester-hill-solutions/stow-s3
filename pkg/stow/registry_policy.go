@@ -126,6 +126,11 @@ func DeleteCheckpoint(ctx context.Context, registryDir, id string) error {
 		return err
 	}
 	defer lock.Release()
+	checkpointLock, err := workspace.AcquireCheckpointRemoval(registryDir, id)
+	if err != nil {
+		return err
+	}
+	defer checkpointLock.Release()
 	if _, err := LoadCheckpoint(registryDir, id); err != nil {
 		return err
 	}

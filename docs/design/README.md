@@ -6,6 +6,7 @@ research or implementation history. Their proposed APIs are not shipment claims.
 
 | Reference | Topic |
 | --- | --- |
+| [Workspace resources](workspace-resource-plan.md) | W23/W24 native resources and local host qualification; W25–W28 continuation, editing and conditional integration gates |
 | [Stow and GangCode boundary](gangcode-stow-boundary.md) | Storage ownership and caller-owned coordination |
 | [Storage portability](storage-portability-design.md) | Portable workspace design rationale |
 | [Guarded read/edit/save](guarded-storage-plan.md) | Conditional writes and observed input identity |

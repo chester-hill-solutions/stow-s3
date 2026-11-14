@@ -64,6 +64,9 @@ func (w *Workspace) closeLocked() error {
 	if w.lifecycle == workspaceClosed {
 		return nil
 	}
+	if w.editor != nil {
+		w.editor.closeLocked()
+	}
 	if err := w.closeRuntimeLocked(); err != nil {
 		return err
 	}

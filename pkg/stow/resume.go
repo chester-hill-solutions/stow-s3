@@ -57,25 +57,44 @@ func resumeWith(options WorkspaceOptions, id string) (*Workspace, error) {
 	if err != nil {
 		return nil, err
 	}
-	policy, maxBytes, maxObjects, maxCheckpointBytes, maxCheckpoints, err := resumedPolicy(entry, resolved)
+	policy, maxBytes, maxObjects, maxMultipart, maxCheckpointBytes, maxCheckpoints, err := resumedPolicy(entry, resolved)
 	if err != nil {
 		return nil, err
 	}
+	if err := workspace.ValidateRegisteredSessionRoot(entry.Dir); err != nil {
+		return nil, err
+	}
+	session, err := workspace.AcquireSession(entry.Dir)
+	if err != nil {
+		return nil, fmt.Errorf("stow: claim workspace: %w", err)
+	}
+	claimed := true
+	defer func() {
+		if claimed {
+			_ = session.Release()
+		}
+	}()
+	if err := workspace.ValidateRegisteredWorkspace(entry.Dir, id, entry.Bucket, entry.Owned); err != nil {
+		return nil, fmt.Errorf("stow: registered workspace identity is unavailable")
+	}
 	ws, err := OpenWorkspace(WorkspaceOptions{
-		Dir:                entry.Dir,
-		Bucket:             entry.Bucket,
-		MaxBytes:           maxBytes,
-		MaxObjects:         maxObjects,
-		MaxCheckpointBytes: maxCheckpointBytes,
-		MaxCheckpoints:     maxCheckpoints,
-		Authority:          &policy,
-		TTL:                time.Duration(entry.TTLSeconds) * time.Second,
-		RegistryDir:        registryDir,
-		Now:                resolved.Now,
+		Dir:                 entry.Dir,
+		Bucket:              entry.Bucket,
+		MaxBytes:            maxBytes,
+		MaxObjects:          maxObjects,
+		MaxMultipartUploads: maxMultipart,
+		MaxCheckpointBytes:  maxCheckpointBytes,
+		MaxCheckpoints:      maxCheckpoints,
+		Authority:           &policy,
+		TTL:                 time.Duration(entry.TTLSeconds) * time.Second,
+		RegistryDir:         registryDir,
+		Now:                 resolved.Now,
+		ownerSession:        session,
 	})
 	if err != nil {
 		return nil, err
 	}
+	claimed = false
 	if ws.ID() != id {
 		// The directory is authoritative, so this means the registry and the
 		// workspace disagree about who they are. Carrying on would silently
@@ -101,34 +120,48 @@ func lookupWorkspaceEntry(registry *workspace.Registry, id string) (workspace.En
 	return entry, nil
 }
 
-func resumedPolicy(entry workspace.Entry, options WorkspaceOptions) (Authority, int64, int64, int64, int64, error) {
+func resumedPolicy(entry workspace.Entry, options WorkspaceOptions) (Authority, int64, int64, int64, int64, int64, error) {
 	if entry.PolicyVersion != 1 {
-		return Authority{}, 0, 0, 0, 0, fmt.Errorf("stow: workspace %s has no supported persisted access policy; reopen it explicitly with OpenWorkspace or recreate it before resuming", entry.ID)
+		return Authority{}, 0, 0, 0, 0, 0, fmt.Errorf("stow: workspace %s has no supported persisted access policy; reopen it explicitly with OpenWorkspace or recreate it before resuming", entry.ID)
 	}
 	policy := Authority{Mask: entry.AuthorityMask}
 	if options.Authority != nil {
 		if !policy.IsSupersetOf(*options.Authority) {
-			return Authority{}, 0, 0, 0, 0, fmt.Errorf("stow: resume authority would widen the workspace policy")
+			return Authority{}, 0, 0, 0, 0, 0, fmt.Errorf("stow: resume authority would widen the workspace policy")
 		}
 		policy = *options.Authority
 	}
 	maxBytes, err := resumeLimit("MaxBytes", entry.MaxBytes, options.MaxBytes)
 	if err != nil {
-		return Authority{}, 0, 0, 0, 0, err
+		return Authority{}, 0, 0, 0, 0, 0, err
 	}
 	maxObjects, err := resumeLimit("MaxObjects", entry.MaxObjects, options.MaxObjects)
 	if err != nil {
-		return Authority{}, 0, 0, 0, 0, err
+		return Authority{}, 0, 0, 0, 0, 0, err
+	}
+	maxMultipart, err := resumeLimit("MaxMultipartUploads", entry.MaxMultipartUploads, options.MaxMultipartUploads)
+	if err != nil {
+		return Authority{}, 0, 0, 0, 0, 0, err
 	}
 	maxCheckpointBytes, err := resumeLimit("MaxCheckpointBytes", entry.MaxCheckpointBytes, options.MaxCheckpointBytes)
 	if err != nil {
-		return Authority{}, 0, 0, 0, 0, err
+		return Authority{}, 0, 0, 0, 0, 0, err
 	}
 	maxCheckpoints, err := resumeLimit("MaxCheckpoints", entry.MaxCheckpoints, options.MaxCheckpoints)
 	if err != nil {
-		return Authority{}, 0, 0, 0, 0, err
+		return Authority{}, 0, 0, 0, 0, 0, err
 	}
-	return policy, maxBytes, maxObjects, maxCheckpointBytes, maxCheckpoints, nil
+	return policy, maxBytes, maxObjects, maxMultipart, maxCheckpointBytes, maxCheckpoints, nil
+}
+
+func resumeMultipartLimit(persisted, requested int64) (int64, error) {
+	if persisted == 0 {
+		if requested > 1 || requested < 0 {
+			return 0, fmt.Errorf("stow: resume MaxMultipartUploads would widen the legacy workspace limit")
+		}
+		return 1, nil
+	}
+	return resumeLimit("MaxMultipartUploads", persisted, requested)
 }
 
 func resumeLimit(name string, persisted, requested int64) (int64, error) {
@@ -406,20 +439,21 @@ func (w *Workspace) register(registryDir string, ttlSeconds, maxWorkspaces int64
 	w.registryDir = registry.Dir()
 	now := w.nowFunc()()
 	return registry.RegisterWithLimit(workspace.Entry{
-		ID:                 w.id,
-		Dir:                w.dir,
-		WorkingDirectory:   w.workingDirectory,
-		Bucket:             w.bucket,
-		Created:            now,
-		LastUsed:           now,
-		TTLSeconds:         ttlSeconds,
-		PolicyVersion:      1,
-		AuthorityMask:      w.Runtime.Authority().Mask,
-		MaxBytes:           w.Runtime.Capabilities().MaxBytes,
-		MaxObjects:         w.Runtime.Capabilities().MaxObjects,
-		MaxCheckpointBytes: w.maxCheckpointBytes,
-		MaxCheckpoints:     w.maxCheckpoints,
-		Owned:              w.store.IsOwned(),
+		ID:                  w.id,
+		Dir:                 w.dir,
+		WorkingDirectory:    w.workingDirectory,
+		Bucket:              w.bucket,
+		Created:             now,
+		LastUsed:            now,
+		TTLSeconds:          ttlSeconds,
+		PolicyVersion:       1,
+		AuthorityMask:       w.Runtime.Authority().Mask,
+		MaxBytes:            w.Runtime.Capabilities().MaxBytes,
+		MaxObjects:          w.Runtime.Capabilities().MaxObjects,
+		MaxMultipartUploads: w.Runtime.Capabilities().MaxMultipartUploads,
+		MaxCheckpointBytes:  w.maxCheckpointBytes,
+		MaxCheckpoints:      w.maxCheckpoints,
+		Owned:               w.store.IsOwned(),
 	}, maxWorkspaces)
 }
 

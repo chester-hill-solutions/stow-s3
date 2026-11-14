@@ -4,6 +4,8 @@ package workspace
 
 import "os"
 
+func openSessionLockFile(_ string) (*os.File, error) { return nil, ErrLockUnsupported }
+
 // tryLock cannot establish liveness here, so it never claims a lock.
 func tryLock(_ *os.File) (bool, error) {
 	return false, ErrLockUnsupported

@@ -20,14 +20,8 @@ const LockName = "session.lock"
 // ErrUnsupported rather than pretending to work.
 var ErrLockUnsupported = errors.New("advisory file locks are unsupported on this host")
 
-// SessionLockSupported reports whether this host can establish workspace liveness
-// with an advisory file lock.
-//
-// It is exported so a caller — and a test outside this package — can ask, rather
-// than discovering the answer by getting ErrLockUnsupported back from an
-// operation it believed had worked. Where it is false a workspace is never
-// collectable and TTL collection refuses instead of guessing, which ADR 0009
-// makes a correctness property rather than a policy.
+// SessionLockSupported reports whether this host can establish workspace liveness.
+// Unsupported hosts refuse collection instead of guessing (ADR 0009).
 func SessionLockSupported() bool { return lockSupported }
 
 // ErrWorkspaceInUse is returned when a caller asks to reclaim a workspace that a
@@ -52,6 +46,11 @@ type Session struct {
 	path string
 }
 
+type sessionIdentityPaths struct {
+	root, metadata, lock   string
+	rootInfo, metadataInfo os.FileInfo
+}
+
 func LockSupported() bool { return lockSupported }
 
 // AcquireSession takes the liveness lock for a workspace root.
@@ -60,13 +59,20 @@ func LockSupported() bool { return lockSupported }
 // acquisition in the same process would succeed at the kernel level only if the
 // first released, so callers hold exactly one.
 func AcquireSession(root string) (*Session, error) {
-	path := filepath.Join(InternalPath(root), LockName)
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return nil, fmt.Errorf("workspace: prepare session lock: %w", err)
+	rootInfo, metadataInfo, err := prepareSessionDirectories(root)
+	if err != nil {
+		return nil, err
 	}
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0o644)
+	metadataPath := InternalPath(root)
+	path := filepath.Join(InternalPath(root), LockName)
+	file, err := openSessionLockFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("workspace: open session lock: %w", err)
+	}
+	identity := sessionIdentityPaths{root: root, metadata: metadataPath, lock: path, rootInfo: rootInfo, metadataInfo: metadataInfo}
+	if err := validateSessionFileIdentity(file, identity); err != nil {
+		file.Close()
+		return nil, err
 	}
 	acquired, err := tryLock(file)
 	if err != nil {
@@ -77,7 +83,69 @@ func AcquireSession(root string) (*Session, error) {
 		file.Close()
 		return nil, fmt.Errorf("%w: %s", ErrWorkspaceInUse, root)
 	}
+	if err := validateSessionFileIdentity(file, identity); err != nil {
+		_ = unlockFile(file)
+		_ = file.Close()
+		return nil, err
+	}
 	return &Session{file: file, path: path}, nil
+}
+
+func prepareSessionDirectories(root string) (os.FileInfo, os.FileInfo, error) {
+	if root == "" {
+		return nil, nil, fmt.Errorf("workspace: session root is required")
+	}
+	rootInfo, err := os.Lstat(root)
+	if errors.Is(err, os.ErrNotExist) {
+		if err := os.MkdirAll(root, 0o755); err != nil {
+			return nil, nil, fmt.Errorf("workspace: prepare session root: %w", err)
+		}
+		rootInfo, err = os.Lstat(root)
+	}
+	if err != nil || !rootInfo.IsDir() || rootInfo.Mode()&os.ModeSymlink != 0 {
+		return nil, nil, fmt.Errorf("workspace: session root must be a real directory")
+	}
+	metadataPath := InternalPath(root)
+	if err := os.Mkdir(metadataPath, 0o755); err != nil && !errors.Is(err, os.ErrExist) {
+		return nil, nil, fmt.Errorf("workspace: prepare session metadata: %w", err)
+	}
+	metadataInfo, err := os.Lstat(metadataPath)
+	if err != nil || !metadataInfo.IsDir() || metadataInfo.Mode()&os.ModeSymlink != 0 {
+		return nil, nil, fmt.Errorf("workspace: session metadata must be a real directory")
+	}
+	return rootInfo, metadataInfo, nil
+}
+
+func ValidateRegisteredSessionRoot(root string) error {
+	rootInfo, err := os.Lstat(root)
+	if err != nil || !rootInfo.IsDir() || rootInfo.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("workspace: registered root is unavailable")
+	}
+	metadataInfo, err := os.Lstat(InternalPath(root))
+	if err != nil || !metadataInfo.IsDir() || metadataInfo.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("workspace: registered metadata directory is unavailable")
+	}
+	return nil
+}
+
+func validateSessionFileIdentity(file *os.File, paths sessionIdentityPaths) error {
+	lockInfo, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	pathInfo, err := os.Lstat(paths.lock)
+	if err != nil {
+		return err
+	}
+	currentRoot, err := os.Lstat(paths.root)
+	if err != nil {
+		return err
+	}
+	currentMetadata, err := os.Lstat(paths.metadata)
+	if err != nil || !os.SameFile(lockInfo, pathInfo) || !os.SameFile(paths.rootInfo, currentRoot) || !os.SameFile(paths.metadataInfo, currentMetadata) {
+		return fmt.Errorf("workspace: session path identity changed")
+	}
+	return nil
 }
 
 // ProbeLiveness reports whether a live session holds a workspace.

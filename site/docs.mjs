@@ -1,6 +1,7 @@
 export const pages = [
   { route: "/docs/", title: "Documentation", source: "docs/README.md", group: "Start here" },
   { route: "/docs/getting-started/", title: "Getting started", source: "docs/guides/getting-started.md", group: "Start here" },
+  { route: "/docs/releases/v0.4.0/", title: "v0.4.0 release notes", source: "docs/releases/v0.4.0.md", group: "Start here" },
   { route: "/docs/releases/v0.3.7/", title: "v0.3.7 release notes", source: "docs/releases/v0.3.7.md", group: "Start here" },
   { route: "/docs/releases/v0.3.6/", title: "v0.3.6 release notes", source: "docs/releases/v0.3.6.md", group: "Start here" },
   { route: "/docs/releases/v0.3.5/", title: "v0.3.5 release notes", source: "docs/releases/v0.3.5.md", group: "Start here" },
@@ -14,6 +15,9 @@ export const pages = [
   { route: "/docs/outbox/", title: "Durable outbox", source: "docs/guides/outbox.md", group: "Native storage" },
   { route: "/docs/server/", title: "Running a server", source: "docs/running-and-probing.md", group: "Native storage" },
   { route: "/docs/mcp/", title: "Native object MCP", source: "docs/contracts/object-mcp-contract.md", group: "Native storage" },
+  { route: "/docs/workspace-resources/", title: "MCP workspace files", source: "docs/guides/workspace-resources.md", group: "Native storage" },
+  { route: "/docs/workspace-file-saves/", title: "Managed file saves", source: "docs/guides/workspace-file-saves.md", group: "Native storage" },
+  { route: "/docs/checkpoint-resources/", title: "MCP checkpoint files", source: "docs/guides/checkpoint-resources.md", group: "Native storage" },
   { route: "/docs/mcp-browser/", title: "MCP bucket browser", source: "extensions/stow/README.md", group: "Native storage" },
   { route: "/docs/browser-file-history/", title: "File history and sync", source: "docs/guides/browser-file-history.md", group: "Browser storage" },
   { route: "/docs/browser-projects/", title: "Project revisions", source: "docs/guides/browser-project-storage.md", group: "Browser storage" },

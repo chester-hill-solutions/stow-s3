@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "date": "2026-11-11",
+  "profile": "native macOS ARM64; same-machine synthetic fresh OpenCode checkpoint calculation",
+  "status": "failed",
+  "strict_pilot_qualified": false,
+  "cross_host_qualified": false,
+  "linux_runtime_qualified": false,
+  "interrupted_real_model_turn_qualified": false,
+  "model_editing_qualified": false,
+  "result_saved_by_caller": false,
+  "top_level_prompts": 1,
+  "provider_completion_requests": 9,
+  "automatic_retry": false,
+  "opencode_version": "opencode v2.2.7",
+  "stow_binary_sha256": "fbc60871fc4ef18c4c19283af4e38b60acc1c826e066368f9d5a037b0d798beb",
+  "harness_sha256": {
+    "examples/workspace-resources/checkpoint-runner.mjs": "e32429afd4ee3f4619df05a95b1886a3e7a9c46c74809c86ad660480d130c0a8",
+    "examples/workspace-resources/checkpoint-fixture.mjs": "50fb4e2bbdfa9ec49432ee1aa46b0fdbf9aaeca6d4c4c8df331b6604347e0ccd",
+    "examples/workspace-resources/checkpoint-verifier.mjs": "65399ad91faa5074bfdf21d82bd912975e935b372cafb6460dbeddd956f6e68c",
+    "examples/workspace-resources/run.mjs": "eb7c5ecdd8adf388c8f21c3998d86cf8da8117a767748e6ca232d76f37aaf314",
+    "examples/workspace-resources/free-only.mjs": "2c52baaa08906b9c6f10f2c5ba26f829852735e9ef6815c26fd42824951646f0"
+  },
+  "attempt_prompt": "Use only MCP resource tools. List Stow resources and read the checkpoint overview URI below. Continue the prior calculation using the saved progress and next-batch data, then return only JSON shaped as {total_units:number,entry_count:number,sources:[PROGRESS_URI,DATA_URI]}. Include the exact resource URIs you used. Do not use shell or filesystem tools.\n\nCheckpoint resource root: stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/v1",
+  "attempt": {
+    "status": "failed",
+    "stage": "evidence_verification",
+    "category": "evidence_rejected",
+    "requestedSelector": "openrouter/openrouter/free",
+    "sourceWorkspaceId": "ws_4e53881e5b5c740f",
+    "sourceCheckpointId": "cp_a92dfc38281d153ed0eb31f9",
+    "importedSourceCheckpointId": "cp_a92dfc38281d153ed0eb31f9",
+    "receiverWorkspaceId": "ws_a30adf531e9de600",
+    "receiverCheckpointId": "cp_4672cd766510e24d2fdd9fa3",
+    "sourcePathsRemovedBeforeModel": true,
+    "taskRootURI": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/v1",
+    "answerVerified": false,
+    "diagnosticPath": "/private/tmp/stow-w25-checkpoint-model-events.jsonl",
+    "resourceToolTrace": [
+      {
+        "name": "opencode_list_mcp_resources",
+        "status": "completed",
+        "uri": "",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/v1",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 656,
+        "contentSHA256": "515d6ff3b1719d559b812cd3ec2915cdbcdf01b4f67e46b15fbb8f669d5d605e"
+      },
+      {
+        "name": "opencode_list_mcp_resources",
+        "status": "completed",
+        "uri": "",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "error",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/files/",
+        "failed": true,
+        "resultValid": false
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/tree/v1/Lg",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 516,
+        "contentSHA256": "6e891e1e8e0b2fa86faa3eaa3defa4facfd7dd034e8a77dcacaa275869469b67"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/tree/v1/aW5wdXRz",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 1031,
+        "contentSHA256": "aff8f65a07e916ec1abbbfa2dc139a067c5a0fed68e0b1a0879449c1fa5ae36d"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 107,
+        "contentSHA256": "b3cfa5bb266260c9812a1edc3615129f78ee9c7444efa6e4ada2c43066b92c6f"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/files/aW5wdXRzL25leHQtYmF0Y2guY3N2",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 30,
+        "contentSHA256": "4834e5fee97ac3e65fd8d95f0201e5c5d1ddb66d6f58c789c0b4401cad0ff594"
+      }
+    ],
+    "modelRequests": [
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "dots-studio/dots-3-note-preview:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "cohere/north-mini-code:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "liquid/lfm-3-1.7b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      }
+    ]
+  },
+  "observed_subclaims": {
+    "terminalResult": {
+      "total_units": 66,
+      "entry_count": 5,
+      "sources": [
+        "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+        "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/files/aW5wdXRzL25leHQtYmF0Y2guY3N2"
+      ]
+    },
+    "answerCorrect": true,
+    "exactSavedProgressReturned": true,
+    "exactSavedDataReturned": true,
+    "resourceCalls": 8,
+    "failedCalls": [
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "error",
+        "uri": "stow://workspaces/ws_a30adf531e9de600/checkpoints/cp_4672cd766510e24d2fdd9fa3/files/"
+      }
+    ],
+    "modelRequests": 9
+  },
+  "verification": {
+    "independent_review": "accepted verifier and narrower runtime subclaims; strict pilot failure retained",
+    "focused_w24_checkpoint_tests_passed": 13,
+    "standards": "passed after package distribution prerequisite build",
+    "agent_tests_passed": 40,
+    "agent_tests_skipped": 1,
+    "extension_tests_passed": 27,
+    "script_tests_passed": 246,
+    "coverage_percent": 74.78,
+    "coverage_statements_hit": 14320,
+    "coverage_statements_total": 19150,
+    "recorded_prior_runtime_events_revalidated": 8
+  },
+  "cleanup": {
+    "temporary_directories_remaining": 0,
+    "matching_pilot_child_processes_remaining": 0
+  },
+  "next_attempt": {
+    "prompt_guidance": "follow overview root_uri, tree entry uri and next_uri verbatim; never invent a directory file URI",
+    "prompt_prefix": "Use only MCP resource tools. List Stow resources and read the checkpoint overview URI below. Follow its root_uri verbatim, then follow each tree entry uri and next_uri verbatim. Never construct or request a /files/ URI for a directory, and never invent resource URIs. Continue the prior calculation using the saved progress and next-batch data, then return only JSON shaped as {total_units:number,entry_count:number,sources:[PROGRESS_URI,DATA_URI]}. Include the exact resource URIs you used. Do not use shell or filesystem tools.\n\nCheckpoint resource root: ",
+    "runner_sha256": "4ab16d3b5fb853a56ee9a15d8edd6a513826ee941ae2a1896eb3293807737619",
+    "syntax_and_agent_checks": "passed",
+    "live_attempted": false
+  }
+}
