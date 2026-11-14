@@ -262,11 +262,12 @@ refusal. None falls back to unscoped authority. Without the flag, the legacy ver
 consults no policy, including a denying record that exists but was not named.
 
 `--policy` combined with `--request-key` or `--resolve` is explicitly unsupported
-and refuses before receipt lookup, reconciliation or capture in the development
-CLI. Published v0.4.0 silently ignored the policy flag on these paths; this guard
-is a post-v0.4.0 correction, not a guarantee supplied by that released binary. The receipt APIs
-have no principal parameter; this profile does not invent a policy-aware receipt
-contract or claim that the legacy public entry points gained authorization.
+and refuses before receipt lookup, reconciliation or capture in the v0.4.1 CLI.
+Published v0.4.0 silently ignored the policy flag on these paths; use direct
+capture for policy enforcement on that release. This is a patch correction, not a
+change to receipt semantics. The receipt APIs have no principal parameter; this
+profile does not invent a policy-aware receipt contract or claim that the legacy
+public entry points gained authorization. See the [v0.4.1 release notes](releases/v0.4.1.md).
 
 The CLI disk-backed source runs before capture locking, outside `runtime.Instance`.
 It does not qualify disk I/O as the cheap/nonblocking source required on runtime
