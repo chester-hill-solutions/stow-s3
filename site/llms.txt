@@ -20,13 +20,21 @@ backoff, and stops on remote conflicts or an unknown upstream baseline. Recovery
 checks the remote ETag, content type, metadata, and requested checksum before
 acknowledging an attempted write. Retry and discard require the admin token.
 
+## v0.4.1 patch
+
+[v0.4.1 notes](/docs/releases/v0.4.1/) describe a native CLI correction:
+`workspace checkpoint --policy` refuses when combined with `--request-key` or
+`--resolve`. Published v0.4.0 ignored the flag in receipt-backed modes; use direct
+capture for policy enforcement on that release. The patch adds no new receipt API
+or resumable-transfer SDK. npm packages remain at v0.3.7; Python is source-only.
+
 ## v0.4.0
 
 [Native v0.4.0](/docs/releases/v0.4.0/) adds opt-in MCP workspace file resources,
 managed file saves and selected immutable checkpoint reads on Linux and macOS,
 x64 and ARM64. Download the native release or build from source using the
 [getting-started guide](/docs/getting-started/#use-mcp-workspace-files).
-The npm packages remain at v0.3.7.
+The npm packages remain at v0.3.7; Python remains source-only and PyPI publication is disabled.
 
 - [MCP workspace files](/docs/workspace-resources/): scoped directory pages and bounded working-file reads.
 - [Managed file saves](/docs/workspace-file-saves/): observed-token comparison, retained receipts and uncertain-reply recovery.
@@ -70,8 +78,8 @@ The npm package includes its native binary for Linux or macOS on x64 or ARM64.
 It needs no source build or `STOW_BIN` override. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
-Standalone v0.4.0 binaries are available from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
+Native binaries are distributed through the
+[v0.4.1 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.1).
 Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
 
 The Python client is not yet published to PyPI. Build a source checkout with

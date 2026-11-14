@@ -21,19 +21,20 @@ Your application runs the code and controls network access. Stow manages storage
 npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
-[Stow v0.4.0](docs/releases/v0.4.0.md) adds scoped MCP workspace file resources,
-managed file saves and immutable checkpoint reads. Native binaries are available
-for Linux and macOS, x64 and ARM64, from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
-The npm install command above selects the published 0.3.7 package; npm 0.4.0
-and PyPI publication remain disabled.
+[Stow v0.4.1](docs/releases/v0.4.1.md) hardens policy handling for receipt-backed
+workspace checkpoint modes. [v0.4.0](docs/releases/v0.4.0.md) introduced scoped
+MCP workspace file resources, managed file saves and immutable checkpoint reads.
+Native binaries are distributed through the
+[v0.4.1 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.1).
+The npm install command above selects the public 0.3.7 package. Python remains
+source-only; PyPI and automated registry publication are disabled.
 
 The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
 Node.js 20 or newer is required. Python uses a source checkout.
 
 [Documentation](https://stow.chesterhillsolutions.ca/docs/) ·
 [Getting started](docs/guides/getting-started.md) ·
-[v0.4.0 release notes](docs/releases/v0.4.0.md) ·
+[v0.4.1 release notes](docs/releases/v0.4.1.md) ·
 [Examples](examples/stow-recipes/README.md)
 
 <!-- repo-only:start -->
@@ -364,11 +365,13 @@ The package includes a platform carrier for Linux or macOS on x64 or ARM64.
 No Go installation or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`; these packages use npmjs.
 
-Standalone v0.4.0 native binaries are available from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.0).
-Verify the archive against `SHA256SUMS.txt`, extract it and put `stow-s3` on your PATH.
+Standalone v0.4.1 native binaries are listed on the
+[v0.4.1 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.1).
+Verify the archive against its
+[SHA256SUMS.txt](https://github.com/chester-hill-solutions/stow-s3/releases/download/v0.4.1/SHA256SUMS.txt),
+extract it and put `stow-s3` on your PATH.
 Run `stow-s3 --version` to check the installed version.
-See the [release notes](docs/releases/v0.4.0.md) for upgrade compatibility.
+See the [v0.4.1 release notes](docs/releases/v0.4.1.md) for upgrade compatibility.
 
 **The Python client is not yet published to PyPI.** Use a source checkout for Python.
 The [npm publication record](docs/development/npm-publishing.md#published-037) describes the
