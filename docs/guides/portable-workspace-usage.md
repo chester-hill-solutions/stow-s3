@@ -200,10 +200,6 @@ stow-s3 workspace checkpoint --id WORKSPACE_ID --registry-dir /absolute/registry
 
 Persist the key and exact options before calling. Pause all writers first.
 
-Pass `--policy /path/to/revision.json` to apply a stored capture policy.
-Without it, capture uses the environment's permissions only.
-Stow rereads the policy for each decision, so later revocation can take effect.
-
 After an uncertain reply, use `--resolve` with the same arguments.
 Resolution creates no new checkpoint.
 The response includes `version`, `result` and a typed `error` on failure.
@@ -222,6 +218,32 @@ acknowledging durability on supported local filesystems. An error after rename
 can have an unknown durable outcome; resolution verifies the saved payloads and
 reestablishes the synchronization barrier. Locking failure is an error. This is
 not a snapshot primitive for actively changing arbitrary filesystems.
+
+### Direct capture with a stored policy
+
+For a policy-checked capture, use direct mode:
+
+```sh
+stow-s3 workspace checkpoint --id WORKSPACE_ID --registry-dir /absolute/registry \
+  --policy /path/to/revision.json --portable
+```
+
+The native CLI binds the local administrator's environment permissions and reads
+the named policy for each capture admission. A missing, damaged or expired named
+record is an error; an explicit policy denial is a distinct refusal. With no
+`--policy` flag, the legacy unscoped profile applies.
+
+`--policy` cannot be combined with `--request-key` or `--resolve`; those
+combinations refuse before reading or creating a receipt in the development
+CLI. Published v0.4.0 ignores the policy flag in receipt mode; use direct capture
+for policy enforcement on that release. The receipt workflow above has no
+policy-aware capture/resolve contract. Direct mode has no keyed
+lost-reply resolution, so an error can leave an unknown capture outcome.
+
+A policy revision changed before the next admission is observed. An already
+admitted capture is not cancelled by a later revision. This is a local file-backed
+policy source, not an authenticated multi-tenant service or OS sandbox; ordinary
+host file access still requires external enforcement.
 
 ## What travels
 

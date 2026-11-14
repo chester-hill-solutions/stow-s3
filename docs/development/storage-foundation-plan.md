@@ -14,6 +14,13 @@ Public npm packages remain at **0.3.7**; Python is source-only. Automated npm/OI
 and PyPI publication remain disabled. Native release CI is not second-physical-host,
 model-host, protected-deployment or repeat-use acceptance.
 
+**Post-release native qualification — 2026-11-14:** W04.A now qualifies the native
+CLI's direct `workspace checkpoint --policy` profile. Source [`c18892504f9ac1385a571242cef007bbeb98e9e3`](https://github.com/chester-hill-solutions/stow-s3/commit/c18892504f9ac1385a571242cef007bbeb98e9e3)
+repairs a reproduced flag-dispatch bypass and adds revision/failure regressions.
+This is a development correction after v0.4.0, not a claim that the published
+binary already rejects policy-plus-receipt modes. See W04 and the
+[direct-capture contract](../storage-admission-contract.md#threading-a-principal-into-the-out-of-session-capture).
+
 ## 1. Plan validation summary
 
 **Verdict: Adjust.** Existing storage, conditional-write and caller integration
@@ -44,7 +51,7 @@ not runtime behavior. It records the already published release; it publishes not
 | Storage and workspace | Shared directory/S3 runtime, bounded transport, conditional writes, portable-v2 capture/diff/archive/restore, Git provenance and recipient-local reconstruction. [Baseline](../history/implementation/implementation-2026-09-29.md). | Named workload/provider and physical second-host evidence; no enhanced deltas or self-contained Git bases. CRC64NVME multipart remains unsupported. |
 | Guarded saves | Native object managed saves and bounded request receipts; workspace file observation/save/resolve, recovery ownership and capture/cleanup barriers. [Object evidence](../history/implementation/implementation-2026-09-30.md), [workspace contract](../contracts/workspace-editing-contract.md), [CLI/MCP/SDK qualification](../reviews/2026-11-12-workspace-editing-mcp.md). | Additional wrapper/store coordination, protected-policy profiles, two real consumers and receipt lifecycle beyond current bounds. W02/W26. |
 | Retention and capacity | Registry caps/deletion, persisted dependency holds, native filesystem object holds and admission bookkeeping are landed. | Registry expiry races, physical disk-full/headroom, protected and broader adapter accounting. W03. |
-| Resource policy | Resource selectors/intersection, per-decision policy Source, object/multipart/copy/list/batch gates, workspace capture and run-through/background checks exist in source and regression tests. | Named host Source wiring/freshness and supported-profile qualification. Source/test coverage does not certify multi-tenant endpoints or OS isolation. W04/W05/W18. |
+| Resource policy | Core selectors/intersection, per-decision Source, object/multipart/copy/list/batch, capture and run-through/background gates exist. The native CLI direct-capture Source now has named revision/expiry/unknown-policy qualification and an explicit unsupported-mode guard. | Runtime-host cheap/nonblocking Source/freshness bindings, policy-aware receipts and protected-profile evidence remain separate W04/W05/W18 work. No multi-tenant or OS-isolation certification. |
 | Resumable transfers | Consumer-owned uploader/downloader; ordinary AWS SDK upload and download retained-server-restart tests, memory loss and filesystem overwrite refusal. [W06.A evidence](https://github.com/chester-hill-solutions/stow-s3/pull/140). | Remaining SDK prefix/body failure cases and measured workload report in W06.B/C; portable unfinished operations remain W12. |
 | Workspace access | W23/W24 resource reader/host usability and W25/W26 native saved-view/editing APIs are included in v0.4.0. Local OpenCode 2.2.7 / Free Router read-only review passed; direct Luna saved-state and editing continuation passed on one host. | Real second-host/interruption and protected-profile acceptance. Failed Free Router editing/strict-output runs remain failed, not superseded by native CI. W19/W25/W26. |
 | MCP / callers | Scoped stdio and sessionless HTTP, explicit remote-listener consent/bearer token, request/resolve receipts and caller-owned continuation fixtures. | Qualify the named caller/model/version with the published binary; caller owns execution and shutdown. W19/W21. |
@@ -116,8 +123,11 @@ retain rationale/examples, not independent work orders or stronger implemented c
 
 ## 5. API impact and validation notes
 
-This consolidation changes no API. The defaults below distinguish accepted targets
-from current implementation; each W row states what remains. Future extensions add contracts;
+The W04 CLI correction rejects `--policy` combined with `--request-key` or
+`--resolve`, where the flag was previously ignored. It adds no public Go policy
+or receipt API; direct capture and legacy unscoped receipt contracts remain. The
+defaults below distinguish accepted targets from current implementation; each W
+row states what remains. Future extensions add contracts;
 freeze versioning, capability refusal and replay meaning before emitting new state.
 Preserve current S3/legacy unconditional behavior, caller-owned execution, separate
 live-write consent and explicit upstream selection/bucket scope.
@@ -278,7 +288,7 @@ only backlog; the milestone below decomposes those IDs without a second queue.
 | W01 | **Complete, 2026-09-29.** ADR 0010 §§4–5 visibly retain the qualified Store seam; [shared admission contract](../storage-admission-contract.md) defines trusted namespace/resource/scope, comparison, effect/reason and capability semantics. Public conditional adapter compatibility tests passed locally. The target identity/policy model is not a shipping namespace/ACL API; remaining legacy authority gaps stay in W04/W20. | Existing source/ADRs | S0-2, S1-7, S1-10 |
 | W02 | **Partial; native object saves and W26 workspace editing shipped.** Reuse managed observations, generation/content/metadata checks, bounded request receipts and reopen resolution; see [object contract](../contracts/object-mcp-contract.md) and [workspace contract](../contracts/workspace-editing-contract.md). Qualify additional wrappers/custom stores, declared coordination and two real consumers; do not reimplement the native editor. **Deferred receipt lifecycle:** the native filesystem object-save profile's current 1,024-record / 8 MiB bounds fail closed. Before extending them, decide archive owner/durability/access/budgets/marker growth versus an explicit replay horizon with permanent refusal. The [retirement proposal](../design/receipt-retirement-proposal.md) approves neither option; unknown evidence never means no effect, and current generation must remain retained. | W01 | S1-10 |
 | W03 | **Partially landed:** persisted recovery dependency holds now exist at both levels. The registry holds checkpoints and refuses cleanup/capture that would strand them, on a checksummed journal with an identity marker, so a missing or unreadable journal blocks deletion rather than forgetting the dependency. Object-level holds exist on the native filesystem store: a consumer pins the bytes it read, and put, guarded save, delete and batch delete are refused until the owner releases, across a close and reopen. An unreadable hold journal refuses mutation for the same reason the registry's does. Admission reserves transition bookkeeping before publication and withdraws the reservation when the effect fails, so a failed write cannot leave a store permanently unable to admit; payload and recovery budgets are accounted separately and the reserve is excluded from payload growth. Focused store, capacity and SDK tests, the resume conformance suite and full standards passed locally, and the landed paths then ran green on ubuntu-latest (Build, Conformance, Test, Lint, Ratcheted standards, and the TypeScript corpus lanes). Still open: registry-level expiry races, adapter disk-full behaviour, protected profiles, and any physical-headroom claim. | W01 | S1-4, S1-9 |
-| W04 | **Partial; core enforcement landed.** `internal/policy`, per-decision `Options.Policy`, resource/multipart/copy/list/batch checks, `Instance.Authorize`, authorized capture and background outbox/read-through checks are implemented. [Reach](../../internal/runtime/policy_reach_test.go) and [Source](../../internal/runtime/policy_source_test.go) tests guard revocation, widening and unavailable-policy semantics. Next: qualify one named native host-supplied Source and its freshness/identity wiring. Extend gates only for a reproduced missing path; no new policy engine. Preserve nil/unscoped compatibility and the exported, unimplemented `EnvironmentPromote`. Protected endpoint/encrypted/Workers/Railway claims remain W18. | W01 | S0-2, S1-7 |
+| W04 | **Partial overall; W04.A qualified for native direct CLI capture, 2026-11-14.** Core resource/multipart/copy/list/batch, capture and background gates remain implemented. The existing local-admin `capturePrincipal` rereads a persisted policy per capture admission; [Source tests](../../cmd/stow-s3/workspace_policy_source_test.go) prove same-principal allow-to-deny revision, typed missing/damaged/expired errors and no new checkpoint. Source [`c18892504f9ac1385a571242cef007bbeb98e9e3`](https://github.com/chester-hill-solutions/stow-s3/commit/c18892504f9ac1385a571242cef007bbeb98e9e3) also repairs one reproduced W04.B bypass: [mode regressions](../../cmd/stow-s3/workspace_policy_modes_test.go) verify explicit refusal of `--policy` with keyed capture/replay/resolve, no metadata disclosure or state change, and preserved unscoped receipt behavior. Published v0.4.0 still ignores that flag combination; the correction is unreleased. [Profile limits](../storage-admission-contract.md#threading-a-principal-into-the-out-of-session-capture): local `authority.All()`/LocalNamespace, no cached revision at admission, no cancellation of already admitted captures. Disk lookup is outside the runtime mutex and does not qualify a cheap/nonblocking embedded-host Source. Existing runtime reach/Source and outbox revocation tests remain gates. Runtime-host identity/freshness, policy-aware receipt APIs and protected/encrypted/Railway/Workers profiles remain open under W04/W05/W18. Preserve nil/unscoped compatibility and `EnvironmentPromote`; further W04.B changes require a reproducer. | W01 | S0-2, S1-7 |
 | W05 | **Partial prerequisite; scoped artifact contract remains planned.** Workspace capture authorization and external authorized capture exist. Extend explicit scoped export/restore/diff and versioned completeness only where current checkpoint contracts do not cover them. Prove forbidden/full refusal, destination authorization, metadata disclosure and preservation outside scope. Existing checkpoint reads are not universal protected historical-version access; refuse unsupported deltas. | W04 | S1-2, S1-7 |
 | W06 | **Partial; upload and download restart conformance implemented.** Reuse [consumer-owned resume](../../examples/resumable-transfer/download.go) and [upload tests](../../conformance/resume_upload_test.go). **W06.A implemented, 2026-11-14:** [download tests](../../conformance/resume_download_test.go), source `5e433f7a7dacdf5b2b4ec64a41ff878272165902`, exercise retained filesystem/runtimefs/workspace restart, exact bounded ranges/validators/bytes and completed reopen without another GET. Memory restart refuses missing remote data without changing the prefix/state. The first W06.B case also refuses overwritten objects with SDK PreconditionFailed/412 and unchanged prefix/state (filesystem profile). [PR #140](https://github.com/chester-hill-solutions/stow-s3/pull/140) records integrated qualification; [conformance scope](../../conformance/CONFORMANCE.md#retained-store-transfer-continuation) fixes bounds and exclusions. Remaining: SDK corrupt/truncated-prefix and interrupted-body cases plus measured W06.C workload evidence. Signed-link expiry requires a named signed-link profile. Product APIs are unchanged; portable unfinished payloads remain W12. | Existing multipart/range | S0-4, S1-5, S4-1 |
 | W07 | Implement bounded encrypted native persistence and independent namespace key lifecycle across retained/staging paths. Prove tamper/wrong-key refusal, range/validators, crash publication, interrupted rotation, emergency revocation and explicit plaintext boundaries. | W03, W04 | S1-8 |
@@ -307,8 +317,9 @@ only backlog; the milestone below decomposes those IDs without a second queue.
 ### Next milestone: supported continuation
 
 **Outcome:** qualify a supported native storage continuation workflow using the
-published surface. W06.A is implemented; the next open slice is W04.A, with
-remaining W06.B/C work independently dispatchable. Success adds precise access,
+published surface. W06.A is implemented and W04.A is qualified for the native
+direct CLI profile below. The next open slices are the remaining W06.B/C failure
+cases and workload report; stronger protected-host work remains profile-specific. Success adds precise access,
 transfer and consumer evidence without adding execution, a filesystem mount or
 new UI. The W06 implementation does not imply consumer or second-host runs.
 
@@ -323,16 +334,28 @@ new UI. The W06 implementation does not imply consumer or second-host runs.
    and correct If-Match, 206 and Content-Range behavior. Keep memory restart loss
    explicit. No new transfer journal/SDK wrapper; change product code only for a
    reproduced defect. Does not depend on completing protected deployment.
-2. **W04.A — native host policy-Source qualification (independent of W06.A).**
-   Bound the profile first: existing native runtime with a host-issued identity and
-   host-supplied Source, with a stated maximum-stale policy and cheap/nonblocking
-   lookup. Trace that constructor and background callbacks through existing gates.
-   Reuse `TestEveryOperationReachesThePolicy`,
-   `TestTheSourceIsConsultedPerDecisionAndNotOnceAtOpen` and the outbox revocation
-   tests. Verify changed revision, expiry, damaged/unavailable source, attenuation
-   and deny/outage distinction at the named caller. Add only uncovered regressions.
-   No universal multi-tenant endpoint or protected editor claim follows. **W04.B**
-   is conditional: only fix a concrete reachable bypass reproduced by this audit.
+2. **W04.A — native direct CLI policy-Source qualification (qualified).**
+   Named host: `workspace checkpoint --policy`, local administrator authority and
+   `LocalNamespace`, using `capturePrincipal`/`policystore` before capture locking.
+   Source [`c18892504f9ac1385a571242cef007bbeb98e9e3`](https://github.com/chester-hill-solutions/stow-s3/commit/c18892504f9ac1385a571242cef007bbeb98e9e3) and the linked W04 tests qualify
+   a persisted successor on the same principal, stale/damaged/missing-policy errors
+   distinct from denial, and refusal without a new checkpoint. Local macOS ARM64
+   focused/race tests and the built native CLI reproduction pass; integrated
+   qualification is tracked with that source revision's associated review/CI.
+
+   A completed policy replacement before the next read is observed; no cached
+   revision is reused. This states no latency bound while file I/O is blocked,
+   cross-host refresh, or cancellation after admission. Disk lookup is outside the
+   runtime's cheap/nonblocking Source requirement. Existing core tests retain
+   environment attenuation and background revocation coverage; this CLI has no
+   background-source adapter. Protected endpoint/runtime-host wrappers remain
+   W04/W18, not implied by the CLI result.
+
+   **W04.B — reproduced flag bypass repaired:** policy-enabled keyed capture,
+   replay and resolve now refuse explicitly before registry/receipt handling.
+   Policy-aware receipt operations remain unsupported, pending an explicit
+   authorization/replay contract. v0.4.0's published binary does not contain this
+   correction. Additional W04.B fixes require a new concrete reproducer.
 3. **W06.B/C — remaining refusal cases and measured report after W06.A.**
    Remote overwrite/If-Match conflict is covered on the filesystem profile in
    PR #140. Extend the same fixture for corrupt/truncated saved prefix and
@@ -371,16 +394,17 @@ revision-bound receipts. Planning review is not an implementation receipt.
 `examples/resumable-transfer/download.go` is a reuse boundary, changed only after a
 failing reproducer. Run `go test ./conformance -run TestResume -count=1` and
 `go test ./examples/resumable-transfer -count=1`; integrated acceptance adds
-`go test ./conformance/... -count=1` and affected races. W04.A is initially a
-read-only native Source wiring audit of `internal/runtime/types.go`,
-`internal/runtime/policy_source_test.go`, `internal/runthrough/policy_gate_test.go`
-and `pkg/stow` authorized capture callers; lock the actual host constructor before
-adding a regression there. Run
-`go test ./internal/runtime ./internal/runthrough ./pkg/stow -run Policy -count=1`;
-include any newly named constructor/source tests explicitly rather than relying on
-a name filter. W04.B requires a demonstrated missing call before file ownership is
-assigned. For W06.A, these commands are now regression/CI gates; PR #140 records results.
-W04 commands remain future acceptance, not qualification supplied by the W06 tests.
+`go test ./conformance/... -count=1` and affected races. W04.A maintenance owns the native
+CLI source/mode regression tests and existing constructor; it must not build a
+second policy engine. Run focused CLI tests with `Policy|CapturePrincipal|Checkpoint`
+and affected races across `./cmd/stow-s3 ./internal/runtime ./internal/runthrough
+./pkg/stow`, explicitly including `Policy|Capture|Checkpoint|Source|Revocation`.
+Core `TestEveryOperationReachesThePolicy`, per-decision Source and outbox-revocation
+cases remain shared gates, with full CI at the committed revision. A new embedded
+host Source/freshness wrapper or policy-aware receipt API needs its own supported
+profile/contract before dispatch. W04.B requires a demonstrated missed path before
+file ownership is assigned. W06.A commands are regression/CI gates; PR #140 records
+that slice's results. Neither qualification closes physical second-host acceptance.
 
 **Later dependency order:** W03/W04 qualification gates stronger W05 retention/scope;
 W07/W08 lead into W09–W11, and owned recovery sections W12 precede W13 activation.
@@ -490,11 +514,11 @@ own repo; optional public Stow integration does not make Stow its execution owne
    detailed designs retain stable paths/anchors; accepted ADRs and current usage remain
    active references. The [previous queue](../history/plan-before-foundation-consolidation-2026-09-29.md)
    is frozen history, with every old item accounted for above.
-7. For this documentation reconciliation, run `git diff --check`,
-   `make check-doc-links` and `make check-adr-index`; inspect generated changes and
-   retain only intentional source docs. No runtime/API behavior changed, so a fresh
-   native/model/provider suite is not claimed. Backout is a documentation revert;
-   historical plans/anchors and receipts remain available.
+7. For documentation-only edits run `git diff --check`, `make check-doc-links`
+   and `make check-adr-index`. Implemented slices additionally use their affected
+   source tests and revision-bound integrated CI; document validation does not
+   refresh native/model/provider evidence. Backout is a documentation revert or
+   the owning implementation commit's reversal, preserving historical receipts.
 8. Treat publication, deployment, provider mutations and consumer integrations as concrete
    later work with their applicable authorization/evidence. This reconciliation performs
    none of them and does not reopen settled interview choices.

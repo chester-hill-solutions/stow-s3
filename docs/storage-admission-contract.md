@@ -247,11 +247,32 @@ entry point refuses nothing.** Widening it to refuse would have been a breaking 
 to a published API dressed as a security fix, and quietly tightening a flag's behaviour
 is the failure mode this document keeps recording.
 
-The CLI closes the loop. `workspace checkpoint --policy <path>` loads a persisted
-revision through `policystore` and reads it **per decision**, not once at startup, so a
-revocation is in force when it is issued rather than when the process began. Without
-the flag the verb consults nothing, which is tested against a policy denying capture
-that is present on disk and simply not named.
+The native CLI's **direct capture** profile closes the loop.
+`workspace checkpoint --policy <path>` binds local administrator authority
+(`authority.All()`, `LocalNamespace`) and loads the named revision through
+`policystore` **per admission decision**. There is no cached revision: a completed
+policy replacement before that read is observed by the next decision. This does
+not establish a wall-clock bound while file I/O is blocked or a cross-host refresh
+protocol. The policy check precedes the capture lock; revocation after admission
+need not cancel an in-flight capture.
+
+A missing explicitly named record propagates `ErrNoRecord`; a damaged record or
+expired revision also remains an unknown-policy error, distinct from a policy
+refusal. None falls back to unscoped authority. Without the flag, the legacy verb
+consults no policy, including a denying record that exists but was not named.
+
+`--policy` combined with `--request-key` or `--resolve` is explicitly unsupported
+and refuses before receipt lookup, reconciliation or capture in the development
+CLI. Published v0.4.0 silently ignored the policy flag on these paths; this guard
+is a post-v0.4.0 correction, not a guarantee supplied by that released binary. The receipt APIs
+have no principal parameter; this profile does not invent a policy-aware receipt
+contract or claim that the legacy public entry points gained authorization.
+
+The CLI disk-backed source runs before capture locking, outside `runtime.Instance`.
+It does not qualify disk I/O as the cheap/nonblocking source required on runtime
+multipart paths. A host embedding that runtime must supply its own bounded source
+and freshness contract; protected endpoints, narrower host identity, encrypted
+persistence and OS isolation remain separately qualified profiles.
 
 ### The deny case cannot distinguish a check from no check
 
