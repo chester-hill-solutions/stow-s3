@@ -1,29 +1,27 @@
 # Planning index and disposition register
 
-**Index updated:** 2026-11-11. This register classifies current guides, retained
+**Index updated:** 2026-11-14. This register classifies current guides, retained
 designs and historical records; it is not an implementation backlog. The
 September 29 reconciliation outcomes below remain a dated snapshot. Retired work
 orders now live under [history](../history/README.md).
+
 ## Start here
 
 1. [Consolidated working-storage plan](storage-foundation-plan.md): the sole
-   scope/order/status queue, W01–W28 and the complete old S0–S4 disposition map.
-   W23–W28 expand workspace access through MCP; mounting and executable discovery
-   remain conditional on named consumer evidence.
-   The [workspace execution breakdown](../design/workspace-resource-plan.md#enumerated-execution-backlog)
-   records scoped Luna assignments and decision/verification gates under those IDs.
-   [W24 A–H](../design/workspace-resource-plan.md#w24-execution-backlog) now specifies
-   paged scoped resources, optional browser integration and actual-host acceptance.
+   scope, ordering, status and dispatch authority, W01–W28 and the legacy S0–S4
+   disposition map. Supporting documents below are design, contract, usage or
+   dated evidence references; they do not create work or dispatch instructions.
 2. [Portable workspace usage](../guides/portable-workspace-usage.md): actual APIs, commands
-   and limits for the published 0.3.7 release.
+   and limits. See the [release notes](../releases/v0.4.0.md) and [npm publication
+   record](npm-publishing.md#published-037) for artifact/version facts: native/Go
+   v0.4.0, npm v0.3.7; Python remains source-only.
 3. [ADR index](../adr/README.md): decisions in force; the custom-store conflict in
-   ADR 0010 is explicitly tracked by W01.
+   ADR 0010 was resolved by W01; its remaining promotion-symbol documentation
+   conflict is tracked in the canonical queue.
 4. [Baseline implementation evidence](../history/implementation/implementation-2026-09-29.md),
    [later receiver/model evidence](../history/implementation/opencode-receiver-remediation-2026-09-29.md) and
    [conditional slice evidence](../design/guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite):
    dated records with distinct scope. None certifies publication or Linux runtime.
-5. [Current release](../releases/v0.3.7.md) and [npm publication record](npm-publishing.md#published-037):
-   v0.3.7 native downloads, the five public 0.3.7 npm packages and their anonymous installation verification.
 
 The new plan replaces the previous canonical queue and all independent ordering
 in the detail proposals. It carries the product definition of done, accepted
@@ -34,20 +32,23 @@ and deferred boundary together. Existing contracts and ADRs remain normative.
 
 | Document | Current disposition |
 | --- | --- |
-| [storage-foundation-plan.md](storage-foundation-plan.md) | **Sole active work order.** Baseline, W01–W28, dependencies, acceptance and legacy traceability. |
-| [workspace-resource-plan.md](../design/workspace-resource-plan.md) | **Implementation and extension detail.** W23 resources are implemented and qualified locally; [evidence](../reviews/2026-11-11-workspace-resources.md). W24 host usability is qualified for the declared local profile ([receipt](../reviews/2026-11-11-workspace-resource-hosts.md)); W25 local saved views/ranges/adoption are [qualified](../reviews/2026-11-11-checkpoint-resources.md), with second-machine and strict fresh-model gates open ([attempt dispositions](../reviews/2026-11-11-checkpoint-resources.md#corrected-fresh-context-attempt)); W26's [native read-observation foundation](../reviews/2026-11-11-workspace-editor-observations.md) is qualified locally; publication/receipts/recovery/MCP editing remain planned under its [reviewed native contract](../contracts/workspace-editing-contract.md). W27 mounting and W28 executable discovery require consumer gates. Reuses existing foundation and qualification/release/adoption gates; no independent work queue. |
-| [aboiteau-native-consumer.md](../design/aboiteau-native-consumer.md) | **Named native consumer requirements.** Aboiteau startup/shared-file/R2-recovery repair and later reader adoption; maps to W19/W20/W21 and W23–W26. No completed pilot, protected-profile, editing or release claim; no independent queue. |
-| [browser-project-plan.md](../design/browser-project-plan.md) | **Execution record for the authorized browser extension.** Ordering remains linked from the canonical plan; usage is [browser-project-storage.md](../guides/browser-project-storage.md), decision ADR 0019. |
+| [storage-foundation-plan.md](storage-foundation-plan.md) | **Sole scope, ordering, status and dispatch authority.** W01–W28, dependencies, acceptance and legacy traceability. |
+| [workspace-resource-plan.md](../design/workspace-resource-plan.md) | **Frozen design and dated execution reference.** Workspace detail maps to canonical W23–W28; the canonical plan owns all current status and next work. |
+| [aboiteau-native-consumer.md](../design/aboiteau-native-consumer.md) | **Named consumer requirements and dated evidence reference.** Requirements map to canonical W items; no independent queue or status authority. |
+| [browser-project-plan.md](../design/browser-project-plan.md) | **Completed ADR 0019 implementation record.** Current maintenance and release status route to the canonical plan; usage is [browser-project-storage.md](../guides/browser-project-storage.md). |
+| [plan-storage-scale-and-transfer.md](../design/plan-storage-scale-and-transfer.md) | **Dated design/evaluation reference, not an active queue.** COPY REPLACE streaming and checkpoint payload reuse have since been implemented; general persistent ordered listing index is not claimed. Any further scale work requires measured workload evidence under W16 and canonical dispatch. |
+| [receipt-retirement-proposal.md](../design/receipt-retirement-proposal.md) | **Unresolved lifecycle proposal, not authorized work.** Current bounded receipt/replay and recovery-hold behavior is governed by W02/W03 and their contracts; archive ownership/durability/budgets versus a declared replay horizon remains a deferred decision. |
 | [gangcode-stow-boundary.md](../design/gangcode-stow-boundary.md) | **Ownership/integration reference.** Storage facts and durable delivery belong to Stow; agent meaning, context and coordination belong to GangCode. No independent queue. |
 | [plan.md](../plan.md) | **Routing page.** Preserves old entry point/anchors; no separate queue. |
+| [site/redesign-plan.md](../../site/redesign-plan.md) | **Completed design and publication record.** Current site/release status routes to the canonical plan. |
 | [portable-workspace-usage.md](../guides/portable-workspace-usage.md) | **Current usage.** Concrete supported development APIs, commands and limits. |
 | [implementation-2026-09-29.md](../history/implementation/implementation-2026-09-29.md) | **Dated baseline evidence.** Earlier aggregate validation and costs; later evidence is separately linked. |
-| [opencode-receiver-remediation-2026-09-29.md](../history/implementation/opencode-receiver-remediation-2026-09-29.md) | **Dated later evidence.** Local meaningful model continuation complete; interruption/second-host/Linux remain W19. |
+| [opencode-receiver-remediation-2026-09-29.md](../history/implementation/opencode-receiver-remediation-2026-09-29.md) | **Dated later evidence.** Historical receiver/model results; current acceptance status routes to the canonical plan. |
 | [compatibility-coverage-2026-09-29.md](../history/assessments/compatibility-coverage-2026-09-29.md) | **Evidence/coverage map.** Existing SDK/protocol coverage; uncovered work belongs to W06/W16/W20. |
 | [portable-agent-workspace-goal.md](../history/plans/portable-agent-workspace-goal.md) | **Superseded milestone ordering; retained rationale.** Product/workflow/adoption acceptance absorbed into the new plan and W19/W21/W22. |
-| [mcp-storage-integration-plan.md](../history/plans/mcp-storage-integration-plan.md) | **Superseded detail work order; retained design history.** Actual adapter/caller already implemented; remaining acceptance W19, usage/source govern concrete names. |
+| [mcp-storage-integration-plan.md](../history/plans/mcp-storage-integration-plan.md) | **Superseded detail work order; retained design history.** Current status and remaining acceptance route to the canonical plan. |
 | [resumable-transfer-plan.md](../design/resumable-transfer-plan.md) | **Retained transfer design reference.** Same-store SDK continuation W06; consumer recipe W21. No independent checklist. |
-| [guarded-storage-plan.md](../design/guarded-storage-plan.md) | **Retained contract/slice evidence.** Conditional forwarding implemented locally; richer identity/save W01/W02 and input basis W09. |
+| [guarded-storage-plan.md](../design/guarded-storage-plan.md) | **Retained contract/slice evidence.** Current scope and status route to the canonical plan. |
 | [workspace-notifications-plan.md](../design/workspace-notifications-plan.md) | **Retained notification design reference.** Core observation/readiness/codecs/diffs/webhooks W08–W11; portable state W12. Proposed API bodies are not shipment claims. |
 | [protected-cache-plan.md](../design/protected-cache-plan.md) | **Retained broad storage design reference.** Access W04/W05, encryption W07/W14/W15, host qualification W17/W18. Cache is a profile. |
 | [portable-recovery-plan.md](../design/portable-recovery-plan.md) | **Retained recovery design reference.** Holds/budgets W03, sections/takeover W12/W13 and envelopes W14/W15. Confirmed-takeover default is settled; proof is engineering work. |
@@ -57,12 +58,15 @@ and deferred boundary together. Existing contracts and ADRs remain normative.
 | [storage-plan-alignment-2026-09-29.md](../history/plans/storage-plan-alignment-2026-09-29.md) | **Historical review.** Previous consolidation/handover, superseded by the current plan. |
 | [task-resumability-plan.md](../history/plans/task-resumability-plan.md) | **Superseded interpretation.** Agent-task continuation is not the clarified transfer-resume scope. |
 | [realtime-multiplayer-plan.md](../history/collaboration/realtime-multiplayer-plan.md), [engineering](../history/collaboration/realtime-multiplayer-engineering.md), [review](../history/collaboration/realtime-multiplayer-plan-review.md), [evaluation](../history/collaboration/realtime-collaboration-evaluation.md), [boundary](../history/collaboration/realtime-repository-boundary.md) | **Transferred history.** Active scope/status live in the [standalone collaboration plan](https://github.com/chester-hill-solutions/gangcode/blob/main/docs/plan.md). No RT work queue in Stow. |
-| [remediation-plan.md](../history/plans/remediation-plan.md), [agent-dx-plan.md](../history/plans/agent-dx-plan.md), [agentic-dx-10-plan.md](../history/plans/agentic-dx-10-plan.md), [agent-workspace-plan.md](../history/plans/agent-workspace-plan.md) | **Previously superseded work orders.** Baseline repairs retained; remaining storage/workload/release/consumer gates are in W01–W22. Old versions/checklists do not schedule work. |
-| [deploy-anywhere-plan.md](../history/plans/deploy-anywhere-plan.md), [foss-readiness-plan.md](../history/plans/foss-readiness-plan.md) | **Previously superseded.** Narrow native/Workers/Railway scope W17/W18; release/docs/maintenance W20. No blanket host expansion. |
+| [remediation-plan.md](../history/plans/remediation-plan.md), [agent-dx-plan.md](../history/plans/agent-dx-plan.md), [agentic-dx-10-plan.md](../history/plans/agentic-dx-10-plan.md), [agent-workspace-plan.md](../history/plans/agent-workspace-plan.md) | **Previously superseded work orders.** Retain as dated design and implementation history; current scope and status route to canonical W01–W28. |
+| [deploy-anywhere-plan.md](../history/plans/deploy-anywhere-plan.md), [foss-readiness-plan.md](../history/plans/foss-readiness-plan.md) | **Previously superseded plans.** Preserve as historical design records; current supported scope and status route to the canonical plan. |
 | [environment architecture](../history/architecture/stow-environment.md), [environment implementation](../history/architecture/environment-implementation.md) | **Superseded proposals/order.** Existing composition preserved; any ADR/API contradiction is W01, not silent resurrection of old milestones. |
 | [work-session-plan.md](../history/plans/work-session-plan.md), [agent-isolate-exploration.md](../history/plans/agent-isolate-exploration.md) | **Retired execution proposals.** Execution/sandbox/control-plane work remains outside the storage plan. |
 | [driver-facade-plan-status.md](../history/plans/driver-facade-plan-status.md) | **Retired design.** AWS SDK/shared corpus retained; custom first-party S3-client replacement remains rejected. |
 | [history/plan-through-2026-09-28.md](../history/plan-through-2026-09-28.md) | **Earlier frozen queue.** Original dates/status only. |
+| [remediation-plan-2026-10-14.md](../history/plans/remediation-plan-2026-10-14.md) | **Historical code-evaluation/remediation record.** The bounded closure register and dated receipts preserve outcomes; no current queue. |
+| [2026-10-15-cleanup-release-proposal.md](../reviews/2026-10-15-cleanup-release-proposal.md) | **Dated v0.3.2 release record.** Historical distribution/validation statements only; no current queue. |
+| [opencode-pilot-instructions.md](opencode-pilot-instructions.md) | **Operating instructions for a real-agent pilot.** This runbook is not a plan or status authority; pilot scope and current acceptance route to the canonical plan. |
 | [previous September 29 queue](../history/plan-before-foundation-consolidation-2026-09-29.md), [previous disposition register](../history/planning-index-before-foundation-consolidation-2026-09-29.md) | **Frozen before this consolidation.** Preserve earlier assertions and mappings; new plan owns present status. |
 | [handoff-2026-09-27.md](../history/experiments/handoff-2026-09-27.md) | **Obsolete handoff.** Do not use it as resume instructions. |
 | [distribution-spike.md](../history/experiments/distribution-spike.md), [assessment-2026-09-27.md](../history/experiments/assessment-2026-09-27.md), [agent-workspace-pilot.md](../history/experiments/agent-workspace-pilot.md) | **Dated experiments.** No independent work queue or current release claim. |

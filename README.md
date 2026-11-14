@@ -81,7 +81,9 @@ It does not restrict other host processes or their network access.
 Storage quotas do not limit files written directly by those processes.
 
 <!-- repo-only:start -->
-The [storage plan](docs/development/storage-foundation-plan.md) tracks unfinished work.
+The [canonical storage plan](docs/development/storage-foundation-plan.md) alone tracks
+scope, status and next work; the [planning index](docs/development/planning-index.md)
+routes older design and evidence records.
 The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpoint before each prompt.
 Named host/model interruption and second-host acceptance remain separate from
 the native Linux/macOS release checks recorded in the release notes.

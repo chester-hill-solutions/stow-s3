@@ -1,5 +1,7 @@
 # Browser project storage remediation
 
+> **Authority notice — 2026-11-14:** This is a completed, dated implementation/evidence record for the authorized ADR 0019 browser extension. The [canonical working-storage plan](../development/storage-foundation-plan.md) alone owns current scope, ordering, status and dispatch; remaining maintenance and release qualifications map to W16/W20. The historical stages and criteria below do not schedule new work.
+
 The browser storage path will keep durable content authoritative, load payloads on demand, share immutable chunks between revisions, and publish coherent project versions. Existing embedded and file-history APIs remain compatible. The caller owns document semantics and rendering.
 
 ## Execution stages

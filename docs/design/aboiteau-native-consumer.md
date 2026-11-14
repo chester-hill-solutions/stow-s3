@@ -1,5 +1,7 @@
 # Aboiteau native workspace consumer
 
+> **Authority notice — 2026-11-14:** Frozen named-consumer requirements and dated evidence reference. The [canonical working-storage plan](../development/storage-foundation-plan.md) alone owns current scope, ordering, status and dispatch; the mapped W items here do not create a separate queue. Historical smoke outcomes below remain unchanged.
+
 Status: native B2 startup integration and C2 R2 recovery are recorded as passed in
 the consumer plan. Two local cached-image smoke runs under QEMU failed/inconclusive.
 The first stalled during final observation; after an authorized Docker Desktop

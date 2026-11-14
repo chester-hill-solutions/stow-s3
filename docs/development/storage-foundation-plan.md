@@ -1,33 +1,25 @@
 # Consolidated working-storage plan
 
-**Canonical work order:** 2026-09-29. Reconciled against HEAD `f549276` plus the
-current uncommitted development tree, the accepted interview decisions and dated
-validation records. This is the sole implementation/status queue. Previous S0–S4
-IDs remain traceable below; the W IDs identify the remaining actionable slices.
+**Sole canonical scope, status, ordering and dispatch queue — reconciled 2026-11-14**
+against published v0.4.0, source revision
+`3bb3e890bbe56f11dd783c2ccfb9bd2813156919`, accepted ADRs/contracts and dated
+qualification records. W01–W28 and the legacy S0–S4 mappings remain stable.
+The [planning index](planning-index.md) records document dispositions, not another backlog.
+Older plans retain design rationale, anchors and dated receipts; their checklists,
+assignments and “next” instructions no longer schedule work.
 
-**Distribution update, 2026-11-06:** v0.3.7 native downloads and all five public npmjs packages are published.
-Anonymous installation and the macOS ARM64 native session/workspace consumer passed.
-The tagged release passed packed consumers on all four native platforms.
-The npm update was separately authorized and published interactively.
-See the [release notes](../releases/v0.3.7.md) and [npm publication record](npm-publishing.md#published-037).
-Live-provider qualification, PyPI and future automated registry publication remain separate gates.
-
-**Workspace access extension, 2026-11-11:** W23–W26 plan discoverable workspace
-files through MCP, host usability, saved views/portable continuation and guarded
-editing. W27 filesystem attachment and W28 executable discovery are conditional
-on named consumer evidence. The [detailed plan](../design/workspace-resource-plan.md)
-preserves the storage boundary and reuses foundation work. W23 is implemented and
-qualified locally in the development tree: independent review, standards, four
-conformance profiles and final reader/MCP races passed. The
-[qualification record](../reviews/2026-11-11-workspace-resources.md) keeps native
-evidence separate from remaining host, platform and release gates.
+**Release baseline:** [v0.4.0](../releases/v0.4.0.md) native Linux/macOS x64/ARM64
+binaries and the Go module are published. The site and release documentation are live.
+Public npm packages remain at **0.3.7**; Python is source-only. Automated npm/OIDC
+and PyPI publication remain disabled. Native release CI is not second-physical-host,
+model-host, protected-deployment or repeat-use acceptance.
 
 ## 1. Plan validation summary
 
 **Verdict: Adjust.** Existing storage, conditional-write and caller integration
 work provides the foundation; it must not be reimplemented because older plans
-still use future tense. The remaining work combines guarded editing, scoped access,
-retention, encrypted persistence, notifications and portable recovery. Release,
+still use future tense. Remaining work qualifies the implemented editing/access/transfer paths and extends
+retention, encrypted persistence, notifications and portable recovery where still absent. Release,
 cross-host evidence and adoption are separate gates.
 
 Stow owns portable working storage for agents, tools, applications and tests:
@@ -41,43 +33,61 @@ The user delegated routine technical choices. Resolve API names, bounds, codecs,
 fixtures and adapter design through implementation evidence. Escalate only an
 unresolved consequential product, custody or compatibility choice. No user answer
 is needed to execute this planning order. This reconciliation changes documentation,
-not runtime behavior or the status of a release.
+not runtime behavior. It records the already published release; it publishes nothing.
 
 ## 2. What the plan already covers well
 
 ### Reconciled baseline: preserve, do not rebuild
 
-| Capability | Current status and evidence | Remaining qualification |
+| Capability | Implemented / qualified baseline | Remaining qualification or extension |
 | --- | --- | --- |
-| Storage correctness | Local relocated handoff, CRC64NVME single-object uploads, metadata normalization, confinement, request/transport limits and coordinated durable capture are implemented. [Baseline evidence](../history/implementation/implementation-2026-09-29.md). | Required provider profiles, second-host behavior and regression maintenance. CRC64NVME multipart remains unsupported. |
-| Working-storage workflow | Same-runtime directory/S3 facade, usage refresh, file-v1/portable-v2 checkpoint capture/diff/archive/restore, relative cwd, declared Git provenance and recipient-local-source reconstruction are implemented locally. | Workload costs, supported Linux runtime and independent use. Enhanced deltas/self-contained Git bases are not implied. |
-| Existing registry policy | Versioned workspace/checkpoint count and checkpoint-byte caps, publication admission and explicit descendant-protected deletion are implemented. | Aggregate namespace budgets, pending-operation holds and recovery reserve are new work. |
-| Conditional writes | Public Go and WASM/TypeScript now forward content-ETag/expected-absence conditions, advertise support and refuse unsupported/stale requests. [Slice evidence](../design/guarded-storage-plan.md#verification-of-the-conditional-write-prerequisite). | Managed-save consumer adoption, wrapper/resource identity contracts and input-basis publication; see the bounded native slice below. |
-| Native managed saves | Memory and owned filesystem reads/saves compare managed generation, content and metadata. Filesystem request keys retain bounded receipts for lost-reply/reopen resolution. A fixed-bucket native object MCP adapter exposes the same core with bounded expiring observations. [2026-09-30 evidence](../history/implementation/implementation-2026-09-30.md). | Two real consumers, further wrapper/backend contracts, Linux runtime evidence, resource ACLs and input-basis publication. |
-| MCP and caller | Scoped stdio and sessionless streamable HTTP adapters, checkpoint request/resolve receipts, negotiated protocols, MCP SDK 1.8.0/Go 1.25.6 and pinned OpenCode 2.0.16 caller are implemented. Remote HTTP uses explicit listener consent and a separate bearer token. | Real interruption/cleanup, Linux/second physical host, and actual OpenCode-to-MCP configuration. |
-| Meaningful agent continuation | Later [receiver remediation](../history/implementation/opencode-receiver-remediation-2026-09-29.md) records local real-model continuation, independently checked output and restored checkpoint contents after sender data was removed. | The same-host result does not close the second-host/Linux or interruption gates. |
-| Distribution | v0.3.7 native downloads and five npmjs packages are published. Exact-source release CI, four native packed consumers, all five anonymous installs and the macOS ARM64 public-package session/workspace consumer passed. | Fresh provider receipts, direct OIDC permission/trust, PyPI setup and public native-consumer execution on the other supported hosts. The first npm release used the existing version-specific provider waiver. |
+| Storage and workspace | Shared directory/S3 runtime, bounded transport, conditional writes, portable-v2 capture/diff/archive/restore, Git provenance and recipient-local reconstruction. [Baseline](../history/implementation/implementation-2026-09-29.md). | Named workload/provider and physical second-host evidence; no enhanced deltas or self-contained Git bases. CRC64NVME multipart remains unsupported. |
+| Guarded saves | Native object managed saves and bounded request receipts; workspace file observation/save/resolve, recovery ownership and capture/cleanup barriers. [Object evidence](../history/implementation/implementation-2026-09-30.md), [workspace contract](../contracts/workspace-editing-contract.md), [CLI/MCP/SDK qualification](../reviews/2026-11-12-workspace-editing-mcp.md). | Additional wrapper/store coordination, protected-policy profiles, two real consumers and receipt lifecycle beyond current bounds. W02/W26. |
+| Retention and capacity | Registry caps/deletion, persisted dependency holds, native filesystem object holds and admission bookkeeping are landed. | Registry expiry races, physical disk-full/headroom, protected and broader adapter accounting. W03. |
+| Resource policy | Resource selectors/intersection, per-decision policy Source, object/multipart/copy/list/batch gates, workspace capture and run-through/background checks exist in source and regression tests. | Named host Source wiring/freshness and supported-profile qualification. Source/test coverage does not certify multi-tenant endpoints or OS isolation. W04/W05/W18. |
+| Resumable transfers | Consumer-owned uploader/downloader and ordinary AWS SDK **upload** retained-server-restart conformance exist. | Ordinary SDK **download** restart/refusal conformance and measured profile report. W06; portable unfinished operations remain W12. |
+| Workspace access | W23/W24 resource reader/host usability and W25/W26 native saved-view/editing APIs are included in v0.4.0. Local OpenCode 2.2.7 / Free Router read-only review passed; direct Luna saved-state and editing continuation passed on one host. | Real second-host/interruption and protected-profile acceptance. Failed Free Router editing/strict-output runs remain failed, not superseded by native CI. W19/W25/W26. |
+| MCP / callers | Scoped stdio and sessionless HTTP, explicit remote-listener consent/bearer token, request/resolve receipts and caller-owned continuation fixtures. | Qualify the named caller/model/version with the published binary; caller owns execution and shutdown. W19/W21. |
+| Distribution | v0.4.0 native/Go published; four-platform native, wheel-carrier and packed npm/MCP consumers passed release CI. Site/docs deployed. npm public distribution remains 0.3.7. | Fresh required live-provider receipts and future registry trust/publication decisions are separate W20 work. |
 
-The baseline record's aggregate test counts/hashes predate the conditional slice and
-later model follow-up. Keep their dates and scopes; do not relabel them a fresh
-whole-tree receipt. The conditional slice separately passed full Go race/standards,
-four local conformance profiles, focused wrapper/browser tests and real WASM checks.
-Local evidence is macOS arm64; Linux compilation alone is not a runtime pass.
+### Browser project storage extension on 2026-10-12
+
+The browser extension under [ADR 0019](../adr/0019-browser-project-content.md) is
+implemented: asynchronous host-backed content, chunk transport, atomic project
+history and conditional manifest publication. [Usage](../guides/browser-project-storage.md)
+and the [dated workload receipt](../benchmarks/browser-project-2026-10-12.json)
+remain authoritative for their scope. The completed [execution record](../design/browser-project-plan.md)
+is frozen; ongoing regression/performance work belongs to W16/W20.
+
+### 0.4.0 release candidate qualification
+
+The candidate ladder RC1–RC5 is **closed by publication**, not an active queue.
+[PR #139](https://github.com/chester-hill-solutions/stow-s3/pull/139) merged at
+`3bb3e89`; [main CI](https://github.com/chester-hill-solutions/stow-s3/actions/runs/43619657925)
+and the [tagged release workflow](https://github.com/chester-hill-solutions/stow-s3/actions/runs/43619704722)
+passed. Four public native archives/checksums and the public Go module were verified.
+The release uses a native-download policy; the live-provider job was explicitly
+skipped, and npm/PyPI v0.4 publication was not enabled. W20 owns future release work.
+
+Earlier disk-space interruptions and candidate test-setup failures remain historical
+non-passes. They were followed by corrected, revision-bound qualification; they are
+not evidence of a remaining release blocker. The original dirty checkout and its
+missing tracked dist files were preserved. Older local/model/browser receipts keep
+their original dates and limits; release CI does not relabel them new field studies.
 
 ## 3. Gaps, conflicts, or redundancies to fix
 
-| Finding | Source and resolution | Work owner |
+| Finding | Reconciled disposition | Work owner |
 | --- | --- | --- |
-| Custom-store ADR contradicts public API | Accepted [ADR 0010 §§4–5](../adr/0010-an-enforcement-site-or-not-a-permission.md) removes Options.Store/Store; current [public adapter](../../pkg/stow/store.go) and conditional slice preserve it. Reconcile explicitly before extending this seam. Resolved on 2026-09-29: ADR 0010 §§4–5 now retain the qualified opt-in seam, backed by public Runtime adapter tests. Remaining fidelity gaps are explicit; the original enforcement decisions remain in force. | W01 |
-| Legacy authority decisions still have open enforcement | The destroy bypass was reproduced on disposable restricted workspaces and fixed, including after Close and constructor rollback. [Ungated](../../internal/authority/authority.go) now retains only unimplemented `environment.promote`; its public symbol needs explicit compatibility/versioning disposition. Explicit host `DestroyRegisteredWorkspace`/CLI administration retains liveness, capture exclusion, ownership and durable identity checks without widening actor grants. Resource/background ACL admission remains unqualified. No full authority matrix claim. | W04, W20 |
-| Completed defects still appear open | Previous queue/disposition text calls handoff/checksum/metadata fixes and standards unfinished. Close those local implementation entries using evidence; carry only named remaining qualification. | Baseline above; W16, W19–W22 |
-| Transfer primitives confused with resume | Multipart/range operations exist; a restarted client recipe and portable unfinished payloads are unverified. Prove same-store continuation before portable sections. | W06, W12 |
-| Saved bytes confused with current inputs | Conditional ETags guard content only. Fresh resource identity and ready-publication checks need a core admission boundary, not wrapper check-then-write. | W01, W02, W09 |
-| Quotas confused with recovery capacity | Current registry caps have no dependency holds, unified namespace accounting or reserved physical headroom. Qualify logical and adapter guarantees separately. | W03 |
-| Local claims confused with cross-host ownership | Copying a lease/outbox or restoring an old backup cannot prove one current sender. Require current takeover evidence/fencing and reconcile uncertain effects. | W12, W13 |
-| Authorization denial confused with outage | Legacy [cache fallback](../../internal/runthrough/cache_read.go) serves cached data after non-not-found upstream errors. Protected profiles must distinguish denial/revocation from transient failure and persist freshness deadlines. This is a protected-profile gap, not a newly reproduced legacy defect. | W04, W16, W18 |
-| Receipt confused with retention release | HTTP acceptance ends retries; explicit consumer release ends only its output hold. Partial revocation pauses the whole immutable report. | W09, W11 |
-| Proposed hosts/formats confused with shipment | No notification .proto, encrypted persistence, portable operation schema or protected Workers/Railway deployment is implemented. Selected defaults stay planned until their acceptance evidence exists. | W07–W15, W17, W18 |
+| Future tense schedules landed work | Resource-policy and upload-restart implementations already exist. W23–W26 native APIs shipped in v0.4.0. Replace duplicate implementation with named remaining qualification. | W04/W06/W19/W20/W23–W26 |
+| Compatibility text conflicts with current symbol | ADR 0010 still directs removal in its original decision/consequences, while its later enforcement amendment records `environment.promote` as ungated and current code exports `EnvironmentPromote`. **Open documentation conflict:** reconcile those specific ADR consequences before any promotion/API change. The compatibility default for current work is to preserve the symbol and explicit ungated status; no incidental breaking removal or claim of enforced promotion. | W01/W04/W20 |
+| Runtime gates mistaken for a protected host | Per-call Source and background checks exist, but trusted identity, host freshness bounds and endpoint/direct-filesystem access still require profile qualification. Ordinary unscoped APIs preserve compatibility. | W04/W05/W18 |
+| Transfer primitives mistaken for complete continuation | Upload restart is qualified in repository conformance; download unit tests are not SDK/server-restart acceptance. Portable unfinished payloads remain a separate extension. | W06/W12 |
+| Bounded receipts mistaken for an approved retirement policy | Current receipts fail closed at bounds. The retirement proposal does not select archive ownership/durability/budgets or a replay horizon. Preserve unknown outcomes; do not silently evict or re-execute old keys. | W02/W03, deferred decision |
+| Scale proposal mistaken for an unstarted backlog | Sized streaming/COPY REPLACE and verified parent-checkpoint payload reuse are implemented. Unsized buffered writes and broader index/dedup changes require a measured named need. No general persistent ordered index claim. | W16 |
+| Logical quotas mistaken for physical recovery space | Holds/admission landed; physical headroom, disk-full behavior and broader adapter guarantees require independent evidence. | W03 |
+| Saved bytes mistaken for readiness or takeover | Current bytes do not establish current inputs, one sender, consumer release or permission. Ready reports, portable operation sections and confirmed takeover remain separate planned contracts. | W09/W11/W12/W13 |
+| Accepted target mistaken for shipped profile | Durable notification schema/delivery, encrypted persistence, recovery envelopes and protected Workers/Railway profiles remain planned. | W07–W15/W17/W18 |
 
 Old proposal bodies remain design/history references, with leading supersession
 notices. Actual usage, source and dated evidence resolve implemented names/defaults.
@@ -88,10 +98,10 @@ shared editing, presence, harness observation and controls; no RT work is schedu
 
 | Concern | Reuse boundary |
 | --- | --- |
-| Identity, grants, write conditions | [authority](../../internal/authority/authority.go), [runtime operations](../../internal/runtime/objects.go), [public options](../../pkg/stow/types.go), [custom-store declaration](../../pkg/stow/store.go), [workspace writes](../../internal/storage/workspace/objects.go). |
+| Identity, grants, write conditions | [policy reach tests](../../internal/runtime/policy_reach_test.go), [per-call Source tests](../../internal/runtime/policy_source_test.go), [outbox funnel](../../internal/runthrough/outbox_adapter.go), [authority](../../internal/authority/authority.go), [runtime operations](../../internal/runtime/objects.go), [public options](../../pkg/stow/types.go), [custom-store declaration](../../pkg/stow/store.go), [workspace writes](../../internal/storage/workspace/objects.go). |
 | Capture, lifecycle and receipts | [capture request/resolve](../../pkg/stow/checkpoint_request.go), [registry admission](../../internal/storage/workspace/admission.go), [registry policy/deletion](../../pkg/stow/registry_policy.go), existing capture/cleanup locks and atomic publication. |
 | Portable data and Git | [archive](../../pkg/stow/checkpoint_archive.go), [handoff](../../pkg/stow/handoff.go), existing checkpoint import/restore/diff and Git provenance paths. Do not copy raw .stow or create another registry. |
-| Transfer | [filesystem multipart](../../internal/storage/fs/fs_multipart.go), [workspace multipart](../../internal/storage/workspace/multipart.go), [S3 multipart](../../internal/s3api/handlers_multipart.go) and existing range/conditional GET handlers. |
+| Transfer | [consumer-owned resume example](../../examples/resumable-transfer/download.go), [SDK upload restart tests](../../conformance/resume_upload_test.go), [filesystem multipart](../../internal/storage/fs/fs_multipart.go), [workspace multipart](../../internal/storage/workspace/multipart.go), [S3 multipart](../../internal/s3api/handlers_multipart.go) and existing range/conditional GET handlers. |
 | Origin/cache and pending writes | [cache read](../../internal/runthrough/cache_read.go), [cache policy](../../internal/runthrough/cache_policy.go), [write policy](../../internal/runthrough/writepolicy.go), durable outbox claims/retry and transport policy. Reuse mechanisms only where semantics match; webhook POST is not an S3 mutation. |
 | API surfaces | [MCP](../../internal/mcpstorage/server.go), existing native CLI/workspace commands, [WASM bridge](../../cmd/stow-wasm/main.go), [embedded wrapper](../../packages/stow-s3/src/embedded.ts), [persistent wrapper](../../packages/stow-s3/src/persistent-embedded.ts), Python/TypeScript lifecycle wrappers. Keep wrappers thin. |
 | Qualification | Shared [conformance](../../conformance/CONFORMANCE.md), [coverage map](../history/assessments/compatibility-coverage-2026-09-29.md), existing release/provider/script checks, portable workload benchmarks and OpenCode fixtures. Extend uncovered cases rather than copying test suites. |
@@ -106,7 +116,8 @@ retain rationale/examples, not independent work orders or stronger implemented c
 
 ## 5. API impact and validation notes
 
-This consolidation changes no API. Implementing the work below adds contracts;
+This consolidation changes no API. The defaults below distinguish accepted targets
+from current implementation; each W row states what remains. Future extensions add contracts;
 freeze versioning, capability refusal and replay meaning before emitting new state.
 Preserve current S3/legacy unconditional behavior, caller-owned execution, separate
 live-write consent and explicit upstream selection/bucket scope.
@@ -256,20 +267,20 @@ implied by Stow policy/encryption.
 
 ### One open work queue
 
-W01 is **complete** for the shared decision/contract gate; W02 and W04 are
-**in progress**, with bounded native implementation slices described below. Other items are **planned** except where a prerequisite is explicitly complete.
-Dependencies refer to qualified supported profiles, not universal capability. Native
-slices can ship/test independently; future Workers/full-recovery work does not block a
-baseline release that makes no such claims. W06/W16/W17/W19/W20 preparation may start early.
+Status is profile-specific: **complete/released** closes only the named contract,
+**partial** carries explicit remaining acceptance, **planned** is absent extension,
+and **conditional/deferred** has no implementation dispatch until its stated gate.
+Dependencies mean qualified profiles, not universal capability. Stable W IDs are the
+only backlog; the milestone below decomposes those IDs without a second queue.
 
 | ID | Slice and completion evidence | Depends on | Legacy trace |
 | --- | --- | --- | --- |
 | W01 | **Complete, 2026-09-29.** ADR 0010 §§4–5 visibly retain the qualified Store seam; [shared admission contract](../storage-admission-contract.md) defines trusted namespace/resource/scope, comparison, effect/reason and capability semantics. Public conditional adapter compatibility tests passed locally. The target identity/policy model is not a shipping namespace/ACL API; remaining legacy authority gaps stay in W04/W20. | Existing source/ADRs | S0-2, S1-7, S1-10 |
-| W02 | **In progress:** native memory and owned macOS/Linux filesystem `ReadForSave`/`SaveObject` implement runtime/resource observations, generation/content/metadata comparison, absence/replacement and effect outcomes. Filesystem request keys retain bounded receipts; replay preserves newer bytes, and reopen resolution verifies publication or keeps uncertainty paused. The [native object MCP profile](../contracts/object-mcp-contract.md) wraps that core with expiring observations, mandatory request keys and bounded calls/payloads. [2026-09-30 local evidence](../history/implementation/implementation-2026-09-30.md) records core and adapter checks. Workspace/custom stores, existing workspace MCP and WASM/in-process TypeScript/S3 managed-save surfaces remain unqualified. Prove two real consumers, further wrapper contracts, Linux execution and declared coordination. Conditional forwarding prerequisite is locally complete. | W01 | S1-10 |
+| W02 | **Partial; native object saves and W26 workspace editing shipped.** Reuse managed observations, generation/content/metadata checks, bounded request receipts and reopen resolution; see [object contract](../contracts/object-mcp-contract.md) and [workspace contract](../contracts/workspace-editing-contract.md). Qualify additional wrappers/custom stores, declared coordination and two real consumers; do not reimplement the native editor. **Deferred receipt lifecycle:** the native filesystem object-save profile's current 1,024-record / 8 MiB bounds fail closed. Before extending them, decide archive owner/durability/access/budgets/marker growth versus an explicit replay horizon with permanent refusal. The [retirement proposal](../design/receipt-retirement-proposal.md) approves neither option; unknown evidence never means no effect, and current generation must remain retained. | W01 | S1-10 |
 | W03 | **Partially landed:** persisted recovery dependency holds now exist at both levels. The registry holds checkpoints and refuses cleanup/capture that would strand them, on a checksummed journal with an identity marker, so a missing or unreadable journal blocks deletion rather than forgetting the dependency. Object-level holds exist on the native filesystem store: a consumer pins the bytes it read, and put, guarded save, delete and batch delete are refused until the owner releases, across a close and reopen. An unreadable hold journal refuses mutation for the same reason the registry's does. Admission reserves transition bookkeeping before publication and withdraws the reservation when the effect fails, so a failed write cannot leave a store permanently unable to admit; payload and recovery budgets are accounted separately and the reserve is excluded from payload growth. Focused store, capacity and SDK tests, the resume conformance suite and full standards passed locally, and the landed paths then ran green on ubuntu-latest (Build, Conformance, Test, Lint, Ratcheted standards, and the TypeScript corpus lanes). Still open: registry-level expiry races, adapter disk-full behaviour, protected profiles, and any physical-headroom claim. | W01 | S1-4, S1-9 |
-| W04 | **In progress:** legacy `Workspace.Destroy` now enforces its retained authority before any lifecycle/registry mutation, including after Close. Private constructor rollback preserves cleanup for newly created unfinished workspaces. Focused races, full standards, four local conformance profiles and shared TypeScript/Python workspace contracts passed. Enforce resource ACLs through every supported access/background path; qualify denial versus outage, persisted freshness/expiry, isolation and attenuation. Reuse existing authority/consent and preserve legacy profiles. `internal/policy` now implements the contract's resource identity, scope selectors and effective-access rule: environment authority intersected with policy, explicit-deny precedence, default denial, selectors scoped by namespace/collection/kind that never exchange object key-prefix and workspace path-subtree semantics, and a freshness deadline reported distinctly from a refusal. `authority.Intersect` is the single implementation of that intersection, because `With` only adds and therefore widens. Denial versus outage was already qualified — `ErrNotAuthorized` maps to 403 AccessDenied ahead of the storage and upstream tables. Nothing consults a policy yet, so no profile has changed behaviour. A revision can now be persisted. `policy.Record` carries a host-issued revision identity, a sequence and an absolute deadline, sealed by a digest over the canonical encoding; `policystore.Store` writes it atomically under a file lock and refuses a write whose expected sequence is not the stored one, so a revocation cannot lose a race to a re-grant. The store is a separate package because `internal/policy` is in the embedded runtime's dependency closure, which a test asserts must not link the filesystem. The deadline is absolute rather than a TTL, because a stored lifetime is re-based on every load and a restart inside the freshness window would extend the permission once per restart. Isolation is tested with eight concurrent writers that all believe they are first, and exactly one is. An earlier "Still open" clause in this row listed enforcement on the non-object paths (checkpoints, background retries, run-through propagation, scoped enumeration counts), saved-version selectors, and per-operation revision lookup; all of those are now settled below, and saved-version selectors were removed rather than wired up because there is nothing to select. Wiring this found a second bypass: an operation naming no resource was answered by the environment alone, so a policy denying `bucket.create` or `environment.reset` was written and did nothing, and a widening policy refused only the operations on a resource. `Set.Denies` now answers operations with no locator - a deny is honoured wherever it can be attributed, an allow needs a resource - and `TestEveryOperationReachesThePolicy` derives its table from `authority.Defined()`, so an operation with no case fails rather than waiting to be found. Moving the bucket operations to a new gate spelling then made `authority`'s enforcement detector demand an `Ungated` entry for enforced operations, the third time it has needed widening; a rename has teeth there. The run-through propagation funnel now consults a policy through `Config.ResourcePolicy`, so a revocation effective between an enqueue and the per-second drain stops the write rather than only having been checked when the caller asked for it. The routing question (`upstreamReachable`) and the permission question (`upstreamEnabled`, and the funnel) are deliberately separate functions: merging them put one check on the propagation path twice, and because the pre-filter runs first it answered for the funnel, leaving every test green with the funnel's copy deleted. That was found by a deliberate break rather than by reading, and it is why the split is recorded here. The workspace is now a resource a policy can decide about, which it could not be: a workspace is a registered resource whose `Destroy` consulted the environment only, so a policy could not deny it however it was written, and `KindWorkspace` was a selector nothing could reach — defined, persisted, matched, and built by no enforcement point anywhere. `policy.Workspace(id, path)` names the resource and `Instance.Authorize` is the seam, exported rather than left to each caller because resolving the revision and deciding must have one implementation. Three rules fell out and each was found by a test failing for a reason that was not the intended one. A selector with no locator is the collection as a whole, because `Exact: ""` and `Prefix: ""` are indistinguishable in a literal and the alternative makes a whole workspace unnameable; the deny test had been passing for the wrong reason, since with nothing matching, default denial refused the destroy. Default denial spans kinds, and that is not a bug: an object-only policy refuses a workspace destroy, and the tempting fix — a policy constraining only the kinds it names — is a widening, because a policy naming no object entries would then grant every object operation; `TestAPolicyNamingNoKindGrantsNothingAtAll` is the assertion it would fail. And a policy is a complete statement, not a patch: naming one workspace denies destroy for every workspace it does not name. A policy refusal is now its own type rather than `authority.ErrNotAuthorized`, whose message names the environment as the thing that refused and which reported a narrowed grant that never existed — a caller told to look at its `Authority` for a policy denial goes to the wrong place. `Set.Denies` became `Set.Deny` returning the refusal, and `policy.IsRefusal` is how a caller tells the two apart without parsing prose. Both were found the moment the predicate existed: the reach test's non-object cases had been passing because the environment refused, which the old assertion could not distinguish. Checkpoint capture was the first non-object path to gain a policy, and it needed a vocabulary change because it had no operation to be denied with: `workspace.capture` is new rather than a reuse of `object.read`, since a capture copies the workspace's bytes into a durable artefact that can be exported and adopted elsewhere, so it changes state even though it discloses nothing a reader could not already read, and `ReadOnly` withholds it for that reason. It is asked on the workspace root, before the capture lock, so a refusal costs nothing and holds nothing. Enforcing it in `pkg/stow` rather than `internal/runtime` broke the policy reach test in a way worth recording, because the fix is the interesting part: a test cannot assert what it cannot reach, the reach test derives its table from `authority.Defined()` and lives in `internal/runtime`, and it had no verb for an operation belonging to a caller of the runtime. Its two honest answers were to declare the operation ungated - which would have said it was unenforced while it is enforced, the one answer this ratchet exists to make impossible - or to record where it is enforced instead. `authority.EnforcedElsewhere` is that record, and `TestEnforcedElsewhereNamesASiteThatConsultsTheOperation` checks every entry, because a claim about a file the package cannot otherwise see is a hole with a comment over it unless something verifies it. Widening the enforcement detector to recognise `Authorize` was the fourth such widening. Four deliberate breaks: removing the check, pointing it at a different operation, dropping `Authorize` from the detector, and naming a site that does not exist. The second is the one worth noting, because the deny case passed through it - with `workspace.capture` denied, a check for any other operation is still refused by default denial, so only the allow case distinguishes them, exactly as in the workspace slice. The out-of-session half then needed a principal named rather than inferred, because `stow.CheckpointOf` opens no runtime on purpose - that is the operation, since claiming the session is what an orchestrator must not do - so it has no authority to read off one. `CapturePrincipal` carries the environment grant and the policy, `CheckpointOfAuthorized` consults them before the capture lock, and `CheckpointOf` keeps its signature by delegating with `authority.All()` and no policy, which is what preserves its behaviour; a test asserts that consequence so the delegation cannot quietly become a gate. That delegation is the honest reading: the legacy entry point refuses nothing, and widening it would be a breaking change to a published API dressed as a security fix. `workspace checkpoint --policy` closes the loop through `policystore`, reading per decision rather than at startup so a revocation is in force when issued; without the flag the verb consults nothing, tested against a denying policy present on disk and not named. A `Source` that cannot answer returns its own error rather than a refusal, so an outage is not reported as a permission decision. Nothing on that list is open: `checkResource` calls `currentPolicy()` on every operation rather than caching a revision at open, so the object paths already resolve per decision and a revocation takes effect when it is issued. An earlier version of this row listed it as still open, which was wrong and would have had someone redo finished work. Saved-version selectors are off this list rather than open: there is nothing to select. `storage.Store` has no versioned read, the public `pkg/stow.Object` exposes an ETag and no version identifier, the S3 surface refuses `versionId`, and two writes to one key leave the first unreadable. A selector naming a saved version could never match, which is the `KindWorkspace` shape - defined, persisted, matched, built by no enforcement point - and that was removed rather than wired up. The contract's version language is about retained historical content, and the only retained historical content Stow has is a checkpoint, so this was never a separate piece of work: it is the same question as checkpoint authorization. The two items this row listed earlier as open under "the remaining background paths" are done, and the earlier "enforcement on the non-object paths" clause naming background retries and run-through propagation no longer holds either. Propagation and the retry worker are enforced at the outbox funnel, which asks per entry rather than only on the path that enqueued it, and every upstream read passes `upstreamEnabled`. That was verified by enumerating every call site that touches `a.upstream` rather than by reading, because the one candidate that checks routing but not permission - `recordUpstreamState` - turned out to be downstream of `decideUpstreamWrite`, which made it a false alarm. `Options.Policy` is a `policy.Source` consulted per decision, so a revocation is effective when it is issued rather than when the process restarts, and a later revision wider than an earlier one is caught where it is read. It is a function type rather than an interface so a nil `*Set` cannot read as set and fail open. A source that cannot say returns its own error rather than a refusal, because a caller handed "you may not" during an outage cannot tell it was "I do not know". `Source` must be cheap and must not block, since the multipart paths consult it under the instance mutex; the maximum stale-policy interval is a host-supplied wrapper's to state. Getting the ordering wrong — resolving the policy after the environment check — reported the environment's reason instead of `ErrWidening`, and the widening test from the previous slice caught it. `internal/runtime` now consults a policy per resource, through `Options.Policy` (nil means no policy, so the default is unchanged). Three check functions divide the surface: `checkResource` for a named object, `checkUpload` for a multipart handle — where the resource is resolved from the instance's own record rather than the store, because the store's answer would have to be read before authorization — and `check` for operations naming no resource. `TestObjectChecksNameAResource` fails if an object operation reaches for the last one, so bypass-by-omission cannot land silently. Wiring it found and fixed a real defect: `CopyObjectCond` checked only the destination, so a write-only environment could copy object content out of the environment. Both ends are now authorized, source first. | W01 | S0-2, S1-7 |
-| W05 | Add explicit scoped capture/export/restore/diff admission and versioned completeness. Prove forbidden/full refusal, destination checks, metadata disclosure and preservation outside scope; refuse unsupported deltas. | W04 | S1-2, S1-7 |
-| W06 | **In progress:** implement a consumer-owned ordinary-SDK transfer example and continuation tests using existing multipart/range storage. Prove client and retained-server restart, source/remote changes, corrupt progress, expired links, lost part/completion replies and exact bytes without resending acknowledged data. Measure supported backends; add only reproduced missing storage behavior. No restart result is claimed before verification. | Existing multipart/range | S0-4, S1-5, S4-1 |
+| W04 | **Partial; core enforcement landed.** `internal/policy`, per-decision `Options.Policy`, resource/multipart/copy/list/batch checks, `Instance.Authorize`, authorized capture and background outbox/read-through checks are implemented. [Reach](../../internal/runtime/policy_reach_test.go) and [Source](../../internal/runtime/policy_source_test.go) tests guard revocation, widening and unavailable-policy semantics. Next: qualify one named native host-supplied Source and its freshness/identity wiring. Extend gates only for a reproduced missing path; no new policy engine. Preserve nil/unscoped compatibility and the exported, unimplemented `EnvironmentPromote`. Protected endpoint/encrypted/Workers/Railway claims remain W18. | W01 | S0-2, S1-7 |
+| W05 | **Partial prerequisite; scoped artifact contract remains planned.** Workspace capture authorization and external authorized capture exist. Extend explicit scoped export/restore/diff and versioned completeness only where current checkpoint contracts do not cover them. Prove forbidden/full refusal, destination authorization, metadata disclosure and preservation outside scope. Existing checkpoint reads are not universal protected historical-version access; refuse unsupported deltas. | W04 | S1-2, S1-7 |
+| W06 | **Partial; upload implementation/restart conformance landed.** Reuse [consumer-owned resume](../../examples/resumable-transfer/download.go) and [ordinary SDK upload tests](../../conformance/resume_upload_test.go): retained fs/runtimefs/workspace restart, acknowledged-part no-resend, lost replies, changed source/state/remote and memory loss. Next: SDK range-download restart and failure cases, then publish exact backend/workload bounds. Expired signed-link testing is conditional on a named signed-link profile. Add product behavior only for reproduced defects; portable unfinished payloads are W12. | Existing multipart/range | S0-4, S1-5, S4-1 |
 | W07 | Implement bounded encrypted native persistence and independent namespace key lifecycle across retained/staging paths. Prove tamper/wrong-key refusal, range/validators, crash publication, interrupted rotation, emergency revocation and explicit plaintext boundaries. | W03, W04 | S1-8 |
 | W08 | Implement content reconciliation, durable baseline/journal, parent matching, bounded replay/acks and explicit observation lifetime. Define the primary generated Protobuf envelope/ProtoJSON compatibility now. Prove external/managed edits, missed hints, gaps, overlap, restart and concurrent observers without duplicating the store. | W03, W04 | S1-6 |
 | W09 | Publish immutable ready versions with holds, guarded declared-input checks and separate consumer acceptance/release state. Prove changed inputs preserve drafts, strict atomic-coverage refusal, snapshot/omitted modes, multi-consumer delayed fetch, lost/out-of-order receipts and revocation. | W02, W03, W05, W08 | S1-6, S1-10 |
@@ -279,42 +290,99 @@ baseline release that makes no such claims. W06/W16/W17/W19/W20 preparation may 
 | W13 | Qualify confirmed takeover/fencing and uncertain-effect reconciliation for portable external operations. Prove current source release/shared ownership, source restart, two recipients and stale backups; absence of evidence leaves sends paused. No forced failover. | W04, W12 | S1-9 |
 | W14 | Add recipient-encrypted handoff using the verified archive/envelope and protected staging. Prove wrong recipient, namespace/scope binding, destination authorization and inactive effects. Data-only export can precede portable operation sections. | W05, W07; W12 for recovery sections | S1-8, S1-9 |
 | W15 | Add opt-in separately held recovery-key backup support. Prove fresh-host recovery with original provider absent, rotated/wrong/missing keys, protected staging, current grants and no revived sends. Host retains custody/scheduling. | W14 | S1-8, S1-9 |
-| W16 | Maintain workload/compatibility evidence: capture/transfer retained bytes, upstream fills, list/index size, encrypted range peaks and namespace concurrency. Publish enforced limits and coverage; reproduce new gaps before fixes. Existing local measurements remain dated, not universal promises. **Refreshed 2026-10-19:** the marketing comparison the website publishes was measured against a revision 152 commits behind the released build, and was re-measured against it — the smoke profile, 54 S3 cases, the analysis, the published dataset, the site rebuild against that dataset and the Chromium chart verification. The measured tree's product source is byte-identical to the published `v0.3.3` tag, and the two batches are reported as separate runs rather than a paired causal estimate, because the peers moved between batches too. [Evidence](../benchmarks/2026-10-19-marketing-comparison). The benchmark module's dependency files and a CI guard that compiles its tests now keep that harness buildable after a main-module bump. | Existing baseline; repeat for each changed profile | S0-3–S0-6, S1-5 |
+| W16 | **Maintenance / measured extensions.** Preserve dated [comparison evidence](../benchmarks/2026-10-19-marketing-comparison) and browser workload receipts; measure changed capture/transfer/list/index/range/concurrency profiles. Sized `PutObjectStream` and S3 COPY REPLACE staging are implemented; unsized readers may buffer. Verified parent-checkpoint payload linking is implemented, not universal deduplication. The [scale proposal](../design/plan-storage-scale-and-transfer.md) is a frozen design reference: further streaming, a general persistent ordered index or broader COW/dedup needs a named measured bottleneck, bounds and regression acceptance. | Existing baseline; repeat for each changed profile | S0-3–S0-6, S1-5 |
 | W17 | Run an early Workers shared-core/execution/persistence spike with synthetic data. Select a minimal adapter topology and supported operations; reject unsupported native assumptions before building a deployment promise. | W01; existing WASM/browser mechanisms | S4-4 |
 | W18 | Qualify protected native, Railway and Workers profiles separately. Prove warm denial, outage/freshness, key/policy expiry/rotation, restart/redeploy, persistence and resource bounds. Initial edge profile is read-only; write propagation needs separate qualified behavior. | W04, W07, W16; W17 for Workers; W08/W11 only if advertised | S4-4 |
-| W19 | Finish caller acceptance with a meaningful interrupted real-model turn, confirmed cleanup/save, fresh context on Linux/second host and actual OpenCode-to-MCP configuration. Reuse pinned controller/fixtures; distinguish storage failure, successful no-op and task failure. Local meaningful model continuation and stdio negotiation are already complete. | Existing baseline; explicit model/host profile | S3-1–S3-3, S4-1 |
-| W20 | Maintain the published 0.3.7 native/npm profile and immutable artifact pipeline. Interactive publication and the anonymous macOS ARM64 consumer are complete; future OIDC publication, fresh AWS/R2/custom receipts, PyPI and public native-consumer execution on other hosts remain open. Preserve legacy-format diagnostics/security/contribution maintenance. | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
-| W21 | Pilot a meaningful S3 fixture and transfer recipe in a named consumer: cococlips first, pg_backup next if needed. Start with synthetic data; consumer owns progress/reactions. Package convenience APIs follow demonstrated reusable need. Do not mark source-fit proposals as actual integrations. | W06; supported artifact/profile | S4-1 |
+| W19 | **Partial caller acceptance.** Existing OpenCode/MCP configuration, local read-only Free Router review and same-host direct Luna continuation are recorded; do not repeat setup as missing implementation. Qualify the published binary with a named caller/model: meaningful interrupted turn, confirmed cleanup/save and fresh context on a second physical host. Reuse pinned controllers/fixtures; distinguish storage failure, successful no-op and task failure. Native Linux release CI does not close caller/physical-host acceptance. | Existing baseline; explicit model/host profile | S3-1–S3-3, S4-1 |
+| W20 | **v0.4.0 native/Go release complete; ongoing maintenance.** Exact-source CI, four native build/carrier/packed MCP consumers, verified public archives/checksums, Go resolution and deployed site/docs close the release ladder. npm remains 0.3.7; Python source-only; future npm OIDC/PyPI and fresh required AWS/R2/custom receipts remain separate work. Retain legacy-format diagnostics, reproducible artifacts and scoped provider exceptions. See [release baseline](../releases/v0.4.0.md). | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
+| W21 | **Consumer pilot remaining.** Use the existing Aboiteau native storage integration as the first available host/controller acceptance target, with a published v0.4 binary, synthetic state and caller-owned interruption/recovery. Preserve prior B2/C2 receipts and failed local QEMU attempts separately. An S3 transfer pilot in cococlips (pg_backup if needed) follows demonstrated access/ownership and W06 evidence; these are source-fit candidates, not completed integrations. No new Stow runner/client SDK. | W06; supported artifact/profile | S4-1 |
 | W22 | Run independent repeat-use study and decide deepen/narrow/rework. Two teams each complete at least three genuine save/reopen/review events over two weeks and retain use; measure setup/recovery effort, correctness and costs against actual alternatives. Research/outreach requires its own actual evidence/authorization. | Usable supported workflow; W19/W21 evidence | S4-2, S4-3 |
-| W23 | **Complete for the local native development profile, 2026-11-11.** The [v1 resource contract](../contracts/workspace-resources-contract.md) and native reader expose overview, bounded complete direct-child observations and regular files, with independent shared read leases and an exclusive registered-removal guard. Opt-in `--workspace-files`/`--resources-only` preserve defaults. Independent review, standards, four conformance profiles and final affected races passed; [qualification](../reviews/2026-11-11-workspace-resources.md) covers privacy (including Unicode aliases), bounds, identity, collection, close and kill release. Actual host usability stays W24; platform/release gates remain separate. | Existing workspace/MCP baseline; W04 for protected claims | Workspace access extension, 2026-11-11 |
-| W24 | **Complete for the declared local native profiles, 2026-11-11.** Static folder scope, bounded metadata observations/resource pages and optional same-bundle browser are implemented. Independent TypeScript traversal, rendered keyboard/zoom fixtures, standards, four storage conformance profiles and agent fixtures pass. Actual OpenCode v2.2.7 + OpenRouter Free Router completed the synthetic review through eight MCP resource calls and a continuation page; [qualification](../reviews/2026-11-11-workspace-resource-hosts.md) and [receipt](../assessment-evidence/2026-11-11/workspace-resources-host.json) retain the initial setup/verifier corrections. Native commands are reused without language wrappers or page tools. Live App hosts, Linux/second-host and protected/release profiles remain separate gates. | W23; W04 for protected profiles; W16/W19/W20 for qualification/release | Workspace access extension, 2026-11-11 |
-| W25 | **Partially complete: local saved-view/range/adoption profile and same-host direct Luna checkpoint continuation qualified, 2026-11-12; second machine unavailable.** [Checkpoint resource qualification](../reviews/2026-11-11-checkpoint-resources.md) and [Luna continuation review](../reviews/2026-11-12-checkpoint-luna-continuation.md). The direct model read saved prior state and input bytes through resource-only MCP after sender removal; host verification checked whole JSON, exact resource content and changed live inputs. The two earlier OpenCode / Free Router attempts remain failed under strict acceptance: the [first](../assessment-evidence/2026-11-11/checkpoint-model-local.json) failed after a malformed read; the [corrected attempt](../assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json) failed strict terminal JSON formatting. Both receipts remain unchanged. [Local execution breakdown](../design/workspace-resource-plan.md#w25-local-execution-boundary) and [contract](../contracts/checkpoint-resources-contract.md) cover ephemeral retention, verified bounded file/range resources and local adoption. Broader W03/W05 profiles, Linux and cross-host qualification stay open. Add authorized checkpoint trees/files, bounded retained-view lifetime and saved-file ranges; return receiver-local resource roots after existing verified adoption. Prove saved/working divergence, prune/integrity behavior and meaningful fresh-context continuation with source unavailable on a second host. Use local writes until W26 qualifies. | W23/W24; qualified W03; W05 for scoped saved views; W19 | Workspace access extension, 2026-11-11 |
-| W26 | **Partially complete: native C/D, E.1/E.2 CLI/MCP/SDK and direct Luna MCP editing/continuation qualified locally; OpenCode / Free Router remains unqualified, 2026-11-12.** [D.2 verification](../reviews/2026-11-11-workspace-editor-recovery.md) qualifies public native SaveFile/ResolveSave, explicit owning recovery, retained authority/limits and capture/cleanup barriers for macOS ARM64 `host_quiesced`. Thirty new functional test methods and seven SIGKILL scenarios passed with independent review, full standards/races, agent fixtures, four conformance profiles and final uncached coverage. The [native contract](../contracts/workspace-editing-contract.md) retains honest unknown outcomes and the host-writer boundary. [E.1/E.2 CLI/MCP and SDK qualification](../reviews/2026-11-12-workspace-editing-mcp.md) covers writable-root opt-in, owner reuse, two-client conflict and lost-reply/reopen. The [direct Luna result](../reviews/2026-11-12-workspace-editing-luna-direct.md) and [repeat receipt](../assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json) record fresh contexts completing native MCP edits and continuation after sender removal on one host; neither claims process-wide filesystem isolation. The OpenCode / Free Router runs remain unqualified: [F.1](../reviews/2026-11-12-workspace-editing-model.md) made no MCP calls; [F.2](../reviews/2026-11-12-workspace-editing-required-read.md) read STATE but did not read the batch or save; [F.4](../reviews/2026-11-12-workspace-editing-free-commit-gated.md) committed both stages but strict trace verification rejected an extra stage-two read outside its allowed inputs; [F.5](../reviews/2026-11-12-workspace-editing-scope-aligned.md) saved correct stage-one state but strict verification rejected a local proxy 502/retry, so stage two did not run. F.6 repaired bounded proxy telemetry and receipt accounting; the no-provider fake CLI flow passed two synthetic stages and exact checkpoint verification, without qualifying a live model run. A separate host-only follow-up verified the F.5 replay and exact state without changing the failed result. Linux, second-host, protected-policy and deployment gates remain open. | W02 workspace capability, W03, W04, W23/W24 | Workspace access extension, 2026-11-11 |
+| W23 | **Released v0.4.0 native profile.** Opt-in live workspace overview, bounded complete direct-child observations, regular-file resources, shared read leases and exclusive registered-removal guard. [Contract](../contracts/workspace-resources-contract.md) and [dated qualification](../reviews/2026-11-11-workspace-resources.md). Maintain platform regressions; host/second-host/protected claims remain separate. | Existing workspace/MCP baseline; W04 for protected claims | Workspace access extension, 2026-11-11 |
+| W24 | **Released native host-usability surface; named local read-only pilot passed.** Static folder scope, bounded metadata/pages and optional same-bundle browser; [qualification](../reviews/2026-11-11-workspace-resource-hosts.md) records OpenCode 2.2.7 / Free Router resource review. Native release CI closes its platform/artifact gates, not live App-host or second-physical-host acceptance. No new UI work is scheduled. | W23; W04 for protected profiles; W16/W19/W20 for qualification/release | Workspace access extension, 2026-11-11 |
+| W25 | **Native APIs released; same-host direct Luna continuation qualified; physical second host open.** Authorized saved trees/files/ranges, bounded ephemeral lifetime and verified local adoption are covered by the [contract](../contracts/checkpoint-resources-contract.md) and [qualification](../reviews/2026-11-11-checkpoint-resources.md). [Direct Luna receipt](../reviews/2026-11-12-checkpoint-luna-continuation.md) proves meaningful saved-input continuation after sender removal on one host. Both earlier Free Router strict-output failures remain failed. Remaining: second-host fresh context with source unavailable, broader W03/W05 protected retention/scope profiles and actual caller acceptance. | W23/W24; qualified W03; W05 for scoped saved views; W19 | Workspace access extension, 2026-11-11 |
+| W26 | **Native SaveFile/ResolveSave, CLI/MCP/SDK and recovery shipped v0.4.0; model/host qualification partial.** [Recovery](../reviews/2026-11-11-workspace-editor-recovery.md) and [CLI/MCP/SDK](../reviews/2026-11-12-workspace-editing-mcp.md) cover request identity, owner reuse, lost reply/reopen and barriers. [Direct Luna editing](../reviews/2026-11-12-workspace-editing-luna-direct.md) and its [repeat receipt](../assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json) passed on one host. Free Router F.1/F.2/F.4/F.5 remain unqualified for their recorded reasons; F.6 fake-CLI telemetry repair is not live-model acceptance (see [frozen evidence detail](../design/workspace-resource-plan.md)). Four-platform native CI does not close physical second-host, protected-policy or deployment gates. Honor `host_quiesced`, honest unknown outcomes and refusal of unsupported policy modes; no OS sandbox claim. | W02 workspace capability, W03, W04, W23/W24 | Workspace access extension, 2026-11-11 |
 | W27 | **Conditional:** a named shell-only consumer and repeat-use evidence must justify filesystem attachment. Compare local directories, checkpoint materialization, existing S3 adapters and an MCP-backed mount first. If justified, qualify one OS/read-only Stow checkpoint profile, lifecycle/cache/range/name behavior and real CLI tools. No arbitrary MCP or writable POSIX compatibility claim. | W25; W16/W22 evidence; consumer gate | Workspace access extension, 2026-11-11 |
 | W28 | **Conditional:** a named caller must need executable discovery beyond ordinary README/scripts. Evaluate a small versioned descriptor and one caller-owned adapter, bound to verified saved bytes. Prove no execution from read/list/import and caller-owned runtime, sandbox and effects. No Stow runner or plugin registry. | W25; named caller gate; independent of W27 | Workspace access extension, 2026-11-11 |
 
-**Workspace access ordering:** W23 → W24 → W25; W26 follows W23/W24 and
-workspace-qualified W02/W04, and can progress independently of saved-view work.
-The [execution breakdown](../design/workspace-resource-plan.md#enumerated-execution-backlog)
-records W23 A–G, Luna ownership, the parent-owned attachment/lifetime decision,
-serialized file ownership and independent review. A–G are complete for the local
-native development profile. No second-host or release gate is closed.
-W23's bounded local proof may start without completing protected deployment work.
-Existing W03/W04/W05 prerequisites gate stronger retention, scope and remote
-claims. Integrate resource change hints only after W08/W09 qualify; do not build
-another notification journal. W16/W19/W20/W22 own performance, caller evidence,
-release and repeat-use qualification for this extension. W27/W28 may remain
-unimplemented after a successful core release if their consumer gates do not pass.
+### Next milestone: supported continuation
 
-**Active code slices:** W04 resource/background ACLs; independent W06
-ordinary-SDK transfer continuation. W03 holds and namespace admission are landed
-and verified locally, with registry expiry races and protected profiles still
-open. W02 consumer adoption of the bounded native object MCP workflow remains
-open, carrying original request meaning and resolving uncertainty before any new
-mutation. The wrapper contract is implemented. Native filesystem
-interruption/reopen evidence is local macOS arm64; physical Linux execution and
-two real consumers remain open. W04 resource/background ACLs remain open. No
-deployment or release is implied.
+**Outcome:** qualify a supported native storage continuation workflow using the
+published surface. Success adds precise access/transfer/consumer evidence without
+adding execution, a filesystem mount or new UI. This is the next dispatch order,
+not a claim that implementation or consumer runs occurred during reconciliation.
+
+1. **W06.A — SDK download across retained-server restart (first executable slice).**
+   Extend conformance beside `conformance/resume_upload_test.go`, reusing its
+   `resumeHost`/`resumeSource`/`resumeWire` helpers and the existing `Downloader`.
+   Seed through the ordinary AWS SDK; persist one verified bounded range; stop and
+   reopen the same fs/runtimefs/workspace profile; recreate client/downloader and
+   complete from that offset. Accept only exact final bytes/digest, no prefix resend,
+   and correct If-Match, 206 and Content-Range behavior. Keep memory restart loss
+   explicit. No new transfer journal/SDK wrapper; change product code only for a
+   reproduced defect. Does not depend on completing protected deployment.
+2. **W04.A — native host policy-Source qualification (independent of W06.A).**
+   Bound the profile first: existing native runtime with a host-issued identity and
+   host-supplied Source, with a stated maximum-stale policy and cheap/nonblocking
+   lookup. Trace that constructor and background callbacks through existing gates.
+   Reuse `TestEveryOperationReachesThePolicy`,
+   `TestTheSourceIsConsultedPerDecisionAndNotOnceAtOpen` and the outbox revocation
+   tests. Verify changed revision, expiry, damaged/unavailable source, attenuation
+   and deny/outage distinction at the named caller. Add only uncovered regressions.
+   No universal multi-tenant endpoint or protected editor claim follows. **W04.B**
+   is conditional: only fix a concrete reachable bypass reproduced by this audit.
+3. **W06.B/C — refusal cases and bounded report after W06.A.** Extend that same
+   fixture for remote overwrite/If-Match conflict, corrupt/truncated saved prefix
+   and interrupted body where not covered. Preserve the prefix; never mix object
+   versions. Record exact profiles, bytes, parts, limits and commands. Signed-link
+   expiry requires a separately named signed-link profile, not endpoint credentials.
+   Upload conformance already passes; portable multipart/private state stays W12.
+4. **W19/W21, closing W25/W26 evidence where applicable — published-binary consumer.**
+   Reuse Aboiteau's native controller or another available named host, synthetic data
+   and a pinned caller/model configuration. First reconcile/reuse existing native
+   amd64 receipts; run only missing scenarios: meaningful interrupted turn, confirmed
+   save/cleanup, fresh receiver with sender state unavailable, then a genuinely
+   separate physical host. Record binary digest, host/caller/model versions, source
+   revision, effects and exact success/failure. Native Linux CI is already release
+   evidence. If no second host is available, leave that gate open; another local
+   container is not a substitute. Provider/cloud/model mutations use applicable
+   existing authorization; this planning task performs none.
+5. **W22 — independent repeat use after a usable qualified workflow.** Two teams,
+   three genuine save/reopen/review events each over two weeks, with setup/recovery
+   effort, correctness and retained use compared to their actual alternatives.
+   Outreach requires explicit authorization; no outreach is scheduled by this edit.
+   The result determines deepen/narrow/rework and whether W27/W28 deserve a proposal.
+
+**Ownership and verification:** parent owns contracts, profile/compatibility choices,
+acceptance and integrated status. Future bounded implementation/test tasks go to
+`gpt-6-luna` at `medium` effort, one owning subsystem/file set per task, with a separate review
+of behavior and claims. W06.A/B share fixtures and serialize edits; W04 can proceed
+independently. Before dispatch, each task names exact owned files, test commands,
+profile, done-when and stop condition; an unknown host/caller is a missing evidence
+input, not a reason to invent infrastructure. Update this queue with resulting
+revision-bound receipts. Planning review is not an implementation receipt.
+
+**Initial dispatch bindings:** W06.A owns new
+`conformance/resume_download_test.go` and only required instrumentation in
+`conformance/resume_harness_test.go`; W06.B follows under that owner. Existing
+`examples/resumable-transfer/download.go` is a reuse boundary, changed only after a
+failing reproducer. Run `go test ./conformance -run TestResume -count=1` and
+`go test ./examples/resumable-transfer -count=1`; integrated acceptance adds
+`go test ./conformance/... -count=1` and affected races. W04.A is initially a
+read-only native Source wiring audit of `internal/runtime/types.go`,
+`internal/runtime/policy_source_test.go`, `internal/runthrough/policy_gate_test.go`
+and `pkg/stow` authorized capture callers; lock the actual host constructor before
+adding a regression there. Run
+`go test ./internal/runtime ./internal/runthrough ./pkg/stow -run Policy -count=1`;
+include any newly named constructor/source tests explicitly rather than relying on
+a name filter. W04.B requires a demonstrated missing call before file ownership is
+assigned. Tests listed here are future acceptance commands, not runs from this edit.
+
+**Later dependency order:** W03/W04 qualification gates stronger W05 retention/scope;
+W07/W08 lead into W09–W11, and owned recovery sections W12 precede W13 activation.
+Data-only W14 need not wait for every notification section; W15 follows W14.
+Workers W17 and protected three-target W18 remain separately qualified profiles.
+W23–W26 maintenance uses W16/W19/W20/W22 rather than a second extension backlog.
+W27/W28 stay conditional on their named consumer gates even after a successful release.
 
 ### Aboiteau native consumer intake — 2026-11-11; rechecks — 2026-11-12
 
@@ -333,8 +401,9 @@ OOM event recorded. Neither result establishes a specific consumer bug. After
 the authorized Docker Desktop restart, the earlier and retry-owned containers
 were confirmed absent. The 32 host contract tests passed separately. These
 attempts do not replace prior native-amd64 CI or C2 evidence, and do not close
-the local container-smoke, broader platform, protected ACL, W22 repeat-use or
-public W26 editing gates. No consumer source, cloud resource or model changed or
+the local consumer container-smoke, second-host/protected ACL or W22 repeat-use
+gates. Public native W26 editing was subsequently released in v0.4.0; this old
+consumer failure does not reopen that release gate. No consumer source, cloud resource or model changed or
 ran. Stow owns storage; the consumer owns execution, authorization and external
 persistence.
 
@@ -385,7 +454,7 @@ persistence.
 
 Execution registries, model brokers, sandbox/CPU allocation, full chat/process-memory
 restoration, hosted accounts/scheduler/remote MCP, automatic forced takeover, general
-collaborative editing and AWS ACL/IAM/SSE APIs are not scheduled. Streaming/deduplication,
+collaborative editing and AWS ACL/IAM/SSE APIs are not scheduled. Further streaming/index/deduplication optimization,
 new compilers, extra hosts/handles/pools, Windows expansion, self-contained Git base
 bundles and enhanced deltas require a measured named need and supported contract.
 The retired custom S3-client replacement and old release ladders remain retired.
@@ -416,52 +485,11 @@ own repo; optional public Stow integration does not make Stow its execution owne
    detailed designs retain stable paths/anchors; accepted ADRs and current usage remain
    active references. The [previous queue](../history/plan-before-foundation-consolidation-2026-09-29.md)
    is frozen history, with every old item accounted for above.
-7. Treat publication, deployment, provider mutations and consumer integrations as concrete
+7. For this documentation reconciliation, run `git diff --check`,
+   `make check-doc-links` and `make check-adr-index`; inspect generated changes and
+   retain only intentional source docs. No runtime/API behavior changed, so a fresh
+   native/model/provider suite is not claimed. Backout is a documentation revert;
+   historical plans/anchors and receipts remain available.
+8. Treat publication, deployment, provider mutations and consumer integrations as concrete
    later work with their applicable authorization/evidence. This reconciliation performs
    none of them and does not reopen settled interview choices.
-
-
-## Browser project storage extension on 2026-10-12
-
-The authorized browser remediation extends the embedded profile under [ADR 0019](../adr/0019-browser-project-content.md): asynchronous host-backed objects, binary/chunk transport, lazy durable content, atomic project history and conditional manifest publication. [Usage and limits](../guides/browser-project-storage.md), [execution status](../design/browser-project-plan.md), and [large-workload evidence](../benchmarks/browser-project-2026-10-12.json) record this slice. It does not change the remaining notification, encryption or deployment qualifications in W01–W22.
-
-
-## 0.4.0 release candidate qualification
-
-This execution prepares `codex/release-v0.4.0` from main `506b4ed` plus the
-authorized W23–W26 source snapshot. The original dirty checkout, its missing
-tracked dist files, and prior successful and failed receipts remain untouched.
-This work authorizes an isolated candidate, draft PR and non-publishing CI
-rehearsal. Tagging and publication remain a final separate step.
-
-| ID | Owner | Work and acceptance |
-| --- | --- | --- |
-| RC1 | workspace_adapter / parent acceptance | Synchronize 0.4.0 Go, npm/carrier and Python metadata; record unreleased scope; version and release-plan tests pass. |
-| RC2 | release_artifact_probe / parent acceptance | Exercise installed same-run native carriers through resource-only reads, observed-token save/resolve, and immutable checkpoint reads; four native consumer matrix jobs pass. |
-| RC3 | parent | Regenerate committed artifacts; pass test-all, standards, check-generated, browser tests and fresh native Linux functional/race checks at the candidate revision. Repair reproduced failures without weakening gates. |
-| RC4 | workspace_review | Independently review release metadata, workflow/probe correctness, generated output and scoped claims; resolve actionable findings. |
-| RC5 | parent | Freeze source in a candidate commit; push draft PR and dispatch non-publishing release rehearsal; preserve exact run, artifact hashes and platform results. No tag or publication. |
-
-Model-host Free Router failures, mount/second-host adoption and W22 repeat-use
-gates remain recorded limitations, not claims supplied by this candidate. Old
-0.3.7 container failures do not qualify or disqualify the new artifact. Native
-GitHub runners supply Linux evidence without another local Docker restart.
-
-Local qualification note (2026-11-13): the candidate native build and initial
-source/version ratchets passed. Broad Go and cross-platform site checks were
-interrupted deliberately when the host reported only about 2 GiB free; those
-runs are not passing evidence. Full qualification moves to the exact candidate
-revision on native CI. The candidate WASM build completed. Prior test logs and
-the source snapshot remain in `/private/tmp/stow-release-prep-20261113`.
-
-Qualification iteration at `d294ebb` (native CI on 2026-11-13): 13 normal CI
-jobs and all four native build/wheel jobs passed. Standards exposed a missing
-native build prerequisite and Mac-only screenshot paths; release agent tests
-exposed a missing pinned MCP SDK installation. These were test setup failures,
-not waived checks. The repair declares shared MCP test dependencies, makes the
-browser gate build its native fixture, and uses per-test portable screenshot
-directories. On 2026-11-14 the repaired agent suite and all 28 MCP browser tests
-passed locally, including rendered keyboard/zoom checks and generated UI checks.
-Final revision-bound CI, packed-artifact results and publication status are
-tracked in [PR #139](https://github.com/chester-hill-solutions/stow-s3/pull/139);
-failed and interrupted receipts remain preserved.

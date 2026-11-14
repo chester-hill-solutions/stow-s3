@@ -2,7 +2,7 @@
 
 **Superseded work order:** 2026-09-29. The new [consolidated working-storage plan](development/storage-foundation-plan.md) is the sole scope, implementation order and status queue. It reconciles the locally implemented baseline, the conditional-write prerequisite, accepted foundation decisions and outstanding release/host/adoption gates.
 
-The [previous queue](history/plan-before-foundation-consolidation-2026-09-29.md) and [previous disposition register](history/planning-index-before-foundation-consolidation-2026-09-29.md) are frozen history. The [current planning index](development/planning-index.md) records document dispositions only. Old S0–S4 IDs map to W01–W22 in the new plan.
+The [previous queue](history/plan-before-foundation-consolidation-2026-09-29.md) and [previous disposition register](history/planning-index-before-foundation-consolidation-2026-09-29.md) are frozen history. The [current planning index](development/planning-index.md) records document dispositions only. Old S0–S4 IDs map into W01–W22; the authorized workspace extension adds W23–W28 in the canonical plan.
 
 ## Compatibility anchors
 
