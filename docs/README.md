@@ -21,6 +21,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 ## Getting started
 
 - [Getting started](guides/getting-started.md): install from npm or native downloads and choose an API.
+- [v0.4.1 release notes](releases/v0.4.1.md): policy-mode correction and retained-transfer conformance.
 - [v0.4.0 release notes](releases/v0.4.0.md): native MCP workspace resources, managed saves and saved-file reads.
 - [v0.3.7 release notes](releases/v0.3.7.md): the current public npm packages.
 - [Running a native server](running-and-probing.md): startup, credentials and probes.
