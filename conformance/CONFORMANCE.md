@@ -50,6 +50,41 @@ unsupported-operation cases remain in the protocol tests, not in this corpus.
 | SigV4 enforced | `TestSigV4RejectsUnsigned` |
 | Shared declarative corpus | `TestSharedCorpus` (Go v2; memory/filesystem/runtime adapter) and the Node shared-corpus suite |
 
+## Retained-store transfer continuation
+
+The consumer-owned [resume example](../examples/resumable-transfer/download.go)
+uses ordinary AWS SDK v2 calls and durable local progress. Upload restart and
+lost-reply cases live in [resume_upload_test.go](resume_upload_test.go). The
+[download tests](resume_download_test.go) add:
+
+- `TestResumeDownloadRetainedRestartNoPrefixResend`: filesystem, runtimefs and
+  workspace servers reopen the same retained store. A fresh SDK client/downloader
+  resumes from the verified prefix, checks If-Match/ETag, 206, Content-Range and
+  lengths, and verifies exact final bytes/SHA-256. A fresh completed downloader
+  performs no further GET, including a full GET without Range.
+- `TestResumeDownloadMemoryRestartDoesNotClaimRetention`: memory restart loses the
+  remote object; a 404 missing-bucket/key refusal preserves the local prefix and state.
+- `TestResumeDownloadRefusesOverwrittenRemoteAfterRestart`: on the filesystem
+  profile, an SDK overwrite after restart produces PreconditionFailed/412 against
+  the saved validator, with the prefix and state byte-for-byte unchanged.
+
+Run with `go test ./conformance -run TestResume -count=1` and
+`go test ./examples/resumable-transfer -count=1`. The download fixture is
+5 MiB + 317 bytes in 1 MiB ranges under a 32 MiB test ceiling: six successful
+range responses transfer exactly 5,243,197 payload bytes in total. The first
+1 MiB is retained before restart. These are correctness bounds, not throughput,
+peak-memory or large-media measurements.
+
+The test-source commit is `5e433f7a7dacdf5b2b4ec64a41ff878272165902`;
+[PR #140](https://github.com/chester-hill-solutions/stow-s3/pull/140) records
+integrated CI qualification. New download scenarios and example tests passed
+locally on macOS ARM64; a later combined local run exhausted disk during existing
+upload cases, so that combined run is not passing evidence. Native CI supplies
+broader gates without weakening them. This coverage does not qualify a live S3
+provider, physical second host, portable unfinished multipart state, signed-link
+expiry or W06.C workload costs. Remaining work stays in the
+[canonical plan](../docs/development/storage-foundation-plan.md).
+
 ## Live-provider matrix
 
 `.github/workflows/live.yml` is both manually dispatchable and reusable by the

@@ -16,9 +16,11 @@ readiness and reactions. The
 notification API is planned, not shipped.
 Resource-scoped ACLs and authenticated encrypted object/cache persistence are accepted
 core additions under [ADR 0016](docs/adr/0016-scoped-access-encrypted-cache.md), with
-native, Cloudflare Workers and Railway qualification planned. Hosts supply keys and
-persistence; ordinary working directories remain plaintext. These APIs/profiles are
-proposed, not implemented or certified.
+native resource-policy gates implemented and further host/profile qualification
+tracked in the canonical plan. Authenticated encrypted persistence and protected
+Cloudflare Workers/Railway profiles remain planned. Hosts supply trusted identity,
+policy freshness, keys and persistence; ordinary working directories remain plaintext.
+Runtime gates do not certify an authenticated multi-tenant host or OS sandbox.
 [ADR 0014](docs/adr/0014-storage-product-caller-owned-execution.md) records this scope;
 [the consolidated plan](docs/development/storage-foundation-plan.md) schedules it. The [planning index](docs/development/planning-index.md)
 records retired plans and the disposition of their remaining work.

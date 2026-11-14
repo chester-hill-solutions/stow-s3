@@ -24,14 +24,27 @@ type resumeWire struct {
 	parts        map[int]int
 	partBytes    int64
 	rangeBytes   int64
+	rangeGets    []resumeRangeRecord
+	getRequests  int
 	listPages    int
 	completions  int
 	dropPart     bool
 	dropComplete bool
 }
 
+type resumeRangeRecord struct {
+	RequestRange string
+	IfMatch      string
+	Status       int
+	ContentRange string
+	ETag         string
+	Length       int64
+	BytesRead    int64
+}
+
 func (w *resumeWire) RoundTrip(request *http.Request) (*http.Response, error) {
 	query := request.URL.Query()
+	rangeIndex := w.recordGet(request)
 	w.mu.Lock()
 	drop := false
 	if request.Method == http.MethodPut && query.Get("partNumber") != "" {
@@ -63,23 +76,63 @@ func (w *resumeWire) RoundTrip(request *http.Request) (*http.Response, error) {
 		_ = response.Body.Close()
 		return nil, errors.New("synthetic reply loss after server response")
 	}
-	if request.Header.Get("Range") != "" && response.StatusCode == http.StatusPartialContent {
-		response.Body = &resumeRangeBody{ReadCloser: response.Body, wire: w}
+	if rangeIndex >= 0 {
+		w.mu.Lock()
+		w.rangeGets[rangeIndex].Status = response.StatusCode
+		w.rangeGets[rangeIndex].ContentRange = response.Header.Get("Content-Range")
+		w.rangeGets[rangeIndex].ETag = response.Header.Get("ETag")
+		w.rangeGets[rangeIndex].Length = response.ContentLength
+		w.mu.Unlock()
+		if response.StatusCode == http.StatusPartialContent {
+			response.Body = &resumeRangeBody{ReadCloser: response.Body, wire: w, index: rangeIndex}
+		}
 	}
 	return response, nil
 }
 
+func (w *resumeWire) recordGet(request *http.Request) int {
+	if request.Method != http.MethodGet {
+		return -1
+	}
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.getRequests++
+	if request.Header.Get("Range") == "" {
+		return -1
+	}
+	index := len(w.rangeGets)
+	w.rangeGets = append(w.rangeGets, resumeRangeRecord{
+		RequestRange: request.Header.Get("Range"),
+		IfMatch:      request.Header.Get("If-Match"),
+	})
+	return index
+}
+
 type resumeRangeBody struct {
 	io.ReadCloser
-	wire *resumeWire
+	wire  *resumeWire
+	index int
 }
 
 func (b *resumeRangeBody) Read(data []byte) (int, error) {
 	n, err := b.ReadCloser.Read(data)
 	b.wire.mu.Lock()
 	b.wire.rangeBytes += int64(n)
+	b.wire.rangeGets[b.index].BytesRead += int64(n)
 	b.wire.mu.Unlock()
 	return n, err
+}
+
+func (w *resumeWire) rangeSnapshot() []resumeRangeRecord {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return append([]resumeRangeRecord(nil), w.rangeGets...)
+}
+
+func (w *resumeWire) getRequestCount() int {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.getRequests
 }
 
 type resumeHost struct {

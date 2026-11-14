@@ -1,5 +1,7 @@
 # Plan: storage scale and transfer
 
+> **Authority notice — 2026-11-14:** Frozen design/evaluation reference only. The [canonical working-storage plan](../development/storage-foundation-plan.md) alone owns scope, ordering, status and dispatch. Streaming COPY REPLACE and checkpoint payload reuse have since been implemented; a general persistent ordered listing index is not claimed. Further scale work requires measured workload evidence under W16 and canonical dispatch. The baseline, “not started” statement, done criteria and sequencing below are dated assertions, not current instructions.
+
 **Date:** 2026-10-14. **Baseline:** `main` @ `9cb61c2`.
 
 Three findings from the code evaluation need a design change rather than a

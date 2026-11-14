@@ -1,5 +1,7 @@
 # Workspace access through MCP resources
 
+> **Authority notice — 2026-11-14:** This is a frozen implementation-detail and evidence reference. The [canonical working-storage plan](../development/storage-foundation-plan.md) alone owns scope, ordering, status and dispatch. W23–W28 identifiers and the dated results below remain useful context; embedded assignments, checklists and “next” language do not schedule work. Use the canonical plan's [current continuation milestone](../development/storage-foundation-plan.md#next-milestone-supported-continuation) for all next slices.
+
 **Status:** W23/W24 qualified for the declared local native profiles on 2026-11-11; see the [W24 qualification](../reviews/2026-11-11-workspace-resource-hosts.md). W25 local saved views/ranges/adoption are [qualified](../reviews/2026-11-11-checkpoint-resources.md); broader W25, W26–W28 and unverified platform/live App-host gates remain open.
 **Source baseline:** `68132194` plus the W23 working-tree changes.
 **Work order:** W23–W28 in the [consolidated plan](../development/storage-foundation-plan.md)
