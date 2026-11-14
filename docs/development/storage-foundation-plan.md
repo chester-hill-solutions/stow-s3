@@ -280,7 +280,7 @@ only backlog; the milestone below decomposes those IDs without a second queue.
 | W03 | **Partially landed:** persisted recovery dependency holds now exist at both levels. The registry holds checkpoints and refuses cleanup/capture that would strand them, on a checksummed journal with an identity marker, so a missing or unreadable journal blocks deletion rather than forgetting the dependency. Object-level holds exist on the native filesystem store: a consumer pins the bytes it read, and put, guarded save, delete and batch delete are refused until the owner releases, across a close and reopen. An unreadable hold journal refuses mutation for the same reason the registry's does. Admission reserves transition bookkeeping before publication and withdraws the reservation when the effect fails, so a failed write cannot leave a store permanently unable to admit; payload and recovery budgets are accounted separately and the reserve is excluded from payload growth. Focused store, capacity and SDK tests, the resume conformance suite and full standards passed locally, and the landed paths then ran green on ubuntu-latest (Build, Conformance, Test, Lint, Ratcheted standards, and the TypeScript corpus lanes). Still open: registry-level expiry races, adapter disk-full behaviour, protected profiles, and any physical-headroom claim. | W01 | S1-4, S1-9 |
 | W04 | **Partial; core enforcement landed.** `internal/policy`, per-decision `Options.Policy`, resource/multipart/copy/list/batch checks, `Instance.Authorize`, authorized capture and background outbox/read-through checks are implemented. [Reach](../../internal/runtime/policy_reach_test.go) and [Source](../../internal/runtime/policy_source_test.go) tests guard revocation, widening and unavailable-policy semantics. Next: qualify one named native host-supplied Source and its freshness/identity wiring. Extend gates only for a reproduced missing path; no new policy engine. Preserve nil/unscoped compatibility and the exported, unimplemented `EnvironmentPromote`. Protected endpoint/encrypted/Workers/Railway claims remain W18. | W01 | S0-2, S1-7 |
 | W05 | **Partial prerequisite; scoped artifact contract remains planned.** Workspace capture authorization and external authorized capture exist. Extend explicit scoped export/restore/diff and versioned completeness only where current checkpoint contracts do not cover them. Prove forbidden/full refusal, destination authorization, metadata disclosure and preservation outside scope. Existing checkpoint reads are not universal protected historical-version access; refuse unsupported deltas. | W04 | S1-2, S1-7 |
-| W06 | **Partial; upload implementation/restart conformance landed.** Reuse [consumer-owned resume](../../examples/resumable-transfer/download.go) and [ordinary SDK upload tests](../../conformance/resume_upload_test.go): retained fs/runtimefs/workspace restart, acknowledged-part no-resend, lost replies, changed source/state/remote and memory loss. Next: SDK range-download restart and failure cases, then publish exact backend/workload bounds. Expired signed-link testing is conditional on a named signed-link profile. Add product behavior only for reproduced defects; portable unfinished payloads are W12. | Existing multipart/range | S0-4, S1-5, S4-1 |
+| W06 | **Partial; upload and download restart conformance implemented.** Reuse [consumer-owned resume](../../examples/resumable-transfer/download.go) and [upload tests](../../conformance/resume_upload_test.go). **W06.A implemented, 2026-11-14:** [download tests](../../conformance/resume_download_test.go), source `5e433f7a7dacdf5b2b4ec64a41ff878272165902`, exercise retained filesystem/runtimefs/workspace restart, exact bounded ranges/validators/bytes and completed reopen without another GET. Memory restart refuses missing remote data without changing the prefix/state. The first W06.B case also refuses overwritten objects with SDK PreconditionFailed/412 and unchanged prefix/state (filesystem profile). [PR #140](https://github.com/chester-hill-solutions/stow-s3/pull/140) records integrated qualification; [conformance scope](../../conformance/CONFORMANCE.md#retained-store-transfer-continuation) fixes bounds and exclusions. Remaining: SDK corrupt/truncated-prefix and interrupted-body cases plus measured W06.C workload evidence. Signed-link expiry requires a named signed-link profile. Product APIs are unchanged; portable unfinished payloads remain W12. | Existing multipart/range | S0-4, S1-5, S4-1 |
 | W07 | Implement bounded encrypted native persistence and independent namespace key lifecycle across retained/staging paths. Prove tamper/wrong-key refusal, range/validators, crash publication, interrupted rotation, emergency revocation and explicit plaintext boundaries. | W03, W04 | S1-8 |
 | W08 | Implement content reconciliation, durable baseline/journal, parent matching, bounded replay/acks and explicit observation lifetime. Define the primary generated Protobuf envelope/ProtoJSON compatibility now. Prove external/managed edits, missed hints, gaps, overlap, restart and concurrent observers without duplicating the store. | W03, W04 | S1-6 |
 | W09 | Publish immutable ready versions with holds, guarded declared-input checks and separate consumer acceptance/release state. Prove changed inputs preserve drafts, strict atomic-coverage refusal, snapshot/omitted modes, multi-consumer delayed fetch, lost/out-of-order receipts and revocation. | W02, W03, W05, W08 | S1-6, S1-10 |
@@ -307,12 +307,15 @@ only backlog; the milestone below decomposes those IDs without a second queue.
 ### Next milestone: supported continuation
 
 **Outcome:** qualify a supported native storage continuation workflow using the
-published surface. Success adds precise access/transfer/consumer evidence without
+published surface. W06.A is implemented; the next open slice is W04.A, with
+remaining W06.B/C work independently dispatchable. Success adds precise access/transfer/consumer evidence without
 adding execution, a filesystem mount or new UI. This is the next dispatch order,
-not a claim that implementation or consumer runs occurred during reconciliation.
+the 2026-11-14 W06 implementation does not imply consumer or second-host runs.
 
-1. **W06.A — SDK download across retained-server restart (first executable slice).**
-   Extend conformance beside `conformance/resume_upload_test.go`, reusing its
+1. **W06.A — SDK download across retained-server restart (implemented).**
+   The [implementation and qualification record](https://github.com/chester-hill-solutions/stow-s3/pull/140)
+   closes the code gap; preserve the acceptance below as regression requirements,
+   rather than dispatching it again. The tests extend conformance beside `conformance/resume_upload_test.go`, reusing its
    `resumeHost`/`resumeSource`/`resumeWire` helpers and the existing `Downloader`.
    Seed through the ordinary AWS SDK; persist one verified bounded range; stop and
    reopen the same fs/runtimefs/workspace profile; recreate client/downloader and
@@ -330,9 +333,10 @@ not a claim that implementation or consumer runs occurred during reconciliation.
    and deny/outage distinction at the named caller. Add only uncovered regressions.
    No universal multi-tenant endpoint or protected editor claim follows. **W04.B**
    is conditional: only fix a concrete reachable bypass reproduced by this audit.
-3. **W06.B/C — refusal cases and bounded report after W06.A.** Extend that same
-   fixture for remote overwrite/If-Match conflict, corrupt/truncated saved prefix
-   and interrupted body where not covered. Preserve the prefix; never mix object
+3. **W06.B/C — remaining refusal cases and measured report after W06.A.**
+   Remote overwrite/If-Match conflict is covered on the filesystem profile in
+   PR #140. Extend the same fixture for corrupt/truncated saved prefix and
+   interrupted body where not covered; broaden overwrite profiles only for a named gap. Preserve the prefix; never mix object
    versions. Record exact profiles, bytes, parts, limits and commands. Signed-link
    expiry requires a separately named signed-link profile, not endpoint credentials.
    Upload conformance already passes; portable multipart/private state stays W12.
@@ -375,7 +379,8 @@ adding a regression there. Run
 `go test ./internal/runtime ./internal/runthrough ./pkg/stow -run Policy -count=1`;
 include any newly named constructor/source tests explicitly rather than relying on
 a name filter. W04.B requires a demonstrated missing call before file ownership is
-assigned. Tests listed here are future acceptance commands, not runs from this edit.
+assigned. For W06.A, these commands are now regression/CI gates; PR #140 records results.
+W04 commands remain future acceptance, not qualification supplied by the W06 tests.
 
 **Later dependency order:** W03/W04 qualification gates stronger W05 retention/scope;
 W07/W08 lead into W09–W11, and owned recovery sections W12 precede W13 activation.
