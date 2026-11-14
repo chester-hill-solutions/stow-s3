@@ -2,6 +2,9 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import { test } from 'node:test';
 import { build } from 'esbuild';
@@ -17,6 +20,8 @@ const browserPath = browserPaths.find(path => existsSync(path));
 test('generated workspace view navigates through an SDK bridge and survives keyboard and 200% zoom', {
   skip: browserPath ? false : 'No system Chrome or Chromium was found for rendered browser verification.',
 }, async t => {
+  const screenshots = await mkdtemp(join(tmpdir(), 'stow-workspace-browser-'));
+  t.after(() => rm(screenshots, { recursive: true, force: true }));
   const built = await build({ absWorkingDir: root, entryPoints: ['test/workspace-host-fixture.ts'], bundle: true,
     format: 'esm', platform: 'browser', target: 'es2022', write: false });
   const hostScript = built.outputFiles[0].text;
@@ -51,7 +56,7 @@ test('generated workspace view navigates through an SDK bridge and survives keyb
   }
   await frame.getByText('3 items shown. Read-only workspace.').waitFor();
   await frame.getByText('Workspace ID: ui-test · Read roots: .', { exact: true }).waitFor();
-  await page.screenshot({ path: '/private/tmp/stow-workspace-normal.png' });
+  await page.screenshot({ path: join(screenshots, 'normal.png') });
   await page.setViewportSize({ width: 320, height: 720 });
 
   await frame.locator('body').evaluate(element => element.focus());
@@ -108,9 +113,9 @@ test('generated workspace view navigates through an SDK bridge and survives keyb
   assert.ok(dimensions.scrollWidth <= dimensions.width, `horizontal overflow at narrow 200% zoom: ${JSON.stringify(dimensions)}`);
   assert.equal(dimensions.clipped, false, 'breadcrumb labels must wrap instead of clipping at narrow 200% zoom');
   assert.ok(dimensions.scrollWidth <= dimensions.width, 'vertical zoom must leave the view scrollable');
-  await page.screenshot({ path: '/private/tmp/stow-workspace-200-zoom.png' });
+  await page.screenshot({ path: join(screenshots, '200-zoom.png') });
   await page.frames()[1].evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForFunction(() => document.querySelector('#workspace-frame')?.contentWindow?.scrollY && document.querySelector('#workspace-frame')?.contentWindow?.scrollY > 0);
-  await page.screenshot({ path: '/private/tmp/stow-workspace-200-zoom-preview.png' });
+  await page.screenshot({ path: join(screenshots, '200-zoom-preview.png') });
   assert.equal(errors.length, 0, errors.join('\n'));
 });

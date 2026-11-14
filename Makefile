@@ -75,7 +75,12 @@ test-wasm: build-wasm
 	  -exec 'node "$(CURDIR)/scripts/run-go-wasm-test.mjs"' ./cmd/stow-wasm
 	node --test wasm/runtime.test.mjs
 
-test-agent: build
+# Both suites use the pinned MCP SDK from the browser extension.
+.PHONY: mcp-test-deps
+mcp-test-deps:
+	npm ci --ignore-scripts --prefix extensions/stow
+
+test-agent: build mcp-test-deps
 	node --test examples/opencode/*.test.mjs examples/workspace-resources/*.test.mjs
 
 browser-editor: build build-wasm
@@ -205,9 +210,8 @@ check-doc-links: check-site
 check-scripts:
 	node --test scripts/*.test.mjs
 
-check-mcp-browser:
+check-mcp-browser: build mcp-test-deps
 	$(NPM_INSTALL)
-	npm ci --ignore-scripts --prefix extensions/stow
 	npm run check --prefix extensions/stow
 	cd extensions/stow && node ../../packages/stow-s3/node_modules/eslint/bin/eslint.js src/ *.mjs test/ --max-warnings=0
 	npm test --prefix extensions/stow

@@ -453,3 +453,15 @@ interrupted deliberately when the host reported only about 2 GiB free; those
 runs are not passing evidence. Full qualification moves to the exact candidate
 revision on native CI. The candidate WASM build completed. Prior test logs and
 the source snapshot remain in `/private/tmp/stow-release-prep-20261113`.
+
+Qualification iteration at `d294ebb` (native CI on 2026-11-13): 13 normal CI
+jobs and all four native build/wheel jobs passed. Standards exposed a missing
+native build prerequisite and Mac-only screenshot paths; release agent tests
+exposed a missing pinned MCP SDK installation. These were test setup failures,
+not waived checks. The repair declares shared MCP test dependencies, makes the
+browser gate build its native fixture, and uses per-test portable screenshot
+directories. On 2026-11-14 the repaired agent suite and all 28 MCP browser tests
+passed locally, including rendered keyboard/zoom checks and generated UI checks.
+Final revision-bound CI, packed-artifact results and publication status are
+tracked in [PR #139](https://github.com/chester-hill-solutions/stow-s3/pull/139);
+failed and interrupted receipts remain preserved.
