@@ -45,7 +45,7 @@ not runtime behavior. It records the already published release; it publishes not
 | Guarded saves | Native object managed saves and bounded request receipts; workspace file observation/save/resolve, recovery ownership and capture/cleanup barriers. [Object evidence](../history/implementation/implementation-2026-09-30.md), [workspace contract](../contracts/workspace-editing-contract.md), [CLI/MCP/SDK qualification](../reviews/2026-11-12-workspace-editing-mcp.md). | Additional wrapper/store coordination, protected-policy profiles, two real consumers and receipt lifecycle beyond current bounds. W02/W26. |
 | Retention and capacity | Registry caps/deletion, persisted dependency holds, native filesystem object holds and admission bookkeeping are landed. | Registry expiry races, physical disk-full/headroom, protected and broader adapter accounting. W03. |
 | Resource policy | Resource selectors/intersection, per-decision policy Source, object/multipart/copy/list/batch gates, workspace capture and run-through/background checks exist in source and regression tests. | Named host Source wiring/freshness and supported-profile qualification. Source/test coverage does not certify multi-tenant endpoints or OS isolation. W04/W05/W18. |
-| Resumable transfers | Consumer-owned uploader/downloader and ordinary AWS SDK **upload** retained-server-restart conformance exist. | Ordinary SDK **download** restart/refusal conformance and measured profile report. W06; portable unfinished operations remain W12. |
+| Resumable transfers | Consumer-owned uploader/downloader; ordinary AWS SDK upload and download retained-server-restart tests, memory loss and filesystem overwrite refusal. [W06.A evidence](https://github.com/chester-hill-solutions/stow-s3/pull/140). | Remaining SDK prefix/body failure cases and measured workload report in W06.B/C; portable unfinished operations remain W12. |
 | Workspace access | W23/W24 resource reader/host usability and W25/W26 native saved-view/editing APIs are included in v0.4.0. Local OpenCode 2.2.7 / Free Router read-only review passed; direct Luna saved-state and editing continuation passed on one host. | Real second-host/interruption and protected-profile acceptance. Failed Free Router editing/strict-output runs remain failed, not superseded by native CI. W19/W25/W26. |
 | MCP / callers | Scoped stdio and sessionless HTTP, explicit remote-listener consent/bearer token, request/resolve receipts and caller-owned continuation fixtures. | Qualify the named caller/model/version with the published binary; caller owns execution and shutdown. W19/W21. |
 | Distribution | v0.4.0 native/Go published; four-platform native, wheel-carrier and packed npm/MCP consumers passed release CI. Site/docs deployed. npm public distribution remains 0.3.7. | Fresh required live-provider receipts and future registry trust/publication decisions are separate W20 work. |
@@ -308,9 +308,9 @@ only backlog; the milestone below decomposes those IDs without a second queue.
 
 **Outcome:** qualify a supported native storage continuation workflow using the
 published surface. W06.A is implemented; the next open slice is W04.A, with
-remaining W06.B/C work independently dispatchable. Success adds precise access/transfer/consumer evidence without
-adding execution, a filesystem mount or new UI. This is the next dispatch order,
-the 2026-11-14 W06 implementation does not imply consumer or second-host runs.
+remaining W06.B/C work independently dispatchable. Success adds precise access,
+transfer and consumer evidence without adding execution, a filesystem mount or
+new UI. The W06 implementation does not imply consumer or second-host runs.
 
 1. **W06.A — SDK download across retained-server restart (implemented).**
    The [implementation and qualification record](https://github.com/chester-hill-solutions/stow-s3/pull/140)
@@ -365,8 +365,8 @@ profile, done-when and stop condition; an unknown host/caller is a missing evide
 input, not a reason to invent infrastructure. Update this queue with resulting
 revision-bound receipts. Planning review is not an implementation receipt.
 
-**Initial dispatch bindings:** W06.A owns new
-`conformance/resume_download_test.go` and only required instrumentation in
+**Ownership boundaries:** W06 test maintenance owns
+`conformance/resume_download_test.go` and required instrumentation in
 `conformance/resume_harness_test.go`; W06.B follows under that owner. Existing
 `examples/resumable-transfer/download.go` is a reuse boundary, changed only after a
 failing reproducer. Run `go test ./conformance -run TestResume -count=1` and
