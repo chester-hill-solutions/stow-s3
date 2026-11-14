@@ -76,6 +76,25 @@ must own prompt admission to guarantee its chosen turn boundary. Full chat state
 process memory, credentials and external side effects are outside a checkpoint.
 Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
+## v0.4.0 candidate: MCP workspace files
+
+The [v0.4.0 candidate](/docs/releases/v0.4.0/) is not published. Use a
+candidate source build; public v0.3.7 binaries do not include these profiles.
+Native release checks cover Linux and macOS on x64 and ARM64. Named model
+providers and live App hosts need separate compatibility evidence.
+
+- [Working-file resources](/docs/workspace-resources/) expose scoped directory
+  pages and bounded reads. Resource-only mode exposes no tools or prompts.
+- [Checkpoint resources](/docs/checkpoint-resources/) read one host-selected
+  immutable saved view, even after the live workspace changes.
+- [Managed file saves](/docs/workspace-file-saves/) require an editing connection
+  and `host_quiesced` coordination. Read an observation before comparing and
+  replacing bytes, persist a random request key, and accept only `committed`
+  as proof of a save. Resolve an uncertain reply with the original key.
+
+File saves do not capture a checkpoint or run an agent. The host keeps other
+writers quiescent, chooses read/write roots and owns execution and network access.
+
 ## Install
 
 Install the TypeScript client from public npmjs:

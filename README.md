@@ -21,15 +21,17 @@ Your application runs the code and controls network access. Stow manages storage
 npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
-The repository also contains an unreleased 0.4.0 candidate. It is not available
-to install yet; the command above still selects the current public release.
+The [v0.4.0 candidate](docs/releases/v0.4.0.md) adds scoped MCP workspace file
+resources, managed file saves and immutable checkpoint reads. Native release
+qualification has passed on Linux and macOS, x64 and ARM64. It is not published
+yet; the install command above selects the current public release.
 
 The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
 Node.js 20 or newer is required. Python uses a source checkout.
 
 [Documentation](https://stow.chesterhillsolutions.ca/docs/) ·
 [Getting started](docs/guides/getting-started.md) ·
-[Release notes](docs/releases/v0.3.7.md) ·
+[v0.4.0 candidate notes](docs/releases/v0.4.0.md) ·
 [Examples](examples/stow-recipes/README.md)
 
 <!-- repo-only:start -->
@@ -61,6 +63,9 @@ Node.js 20 or newer is required. Python uses a source checkout.
   The S3 filesystem backend uses a separate object-record format.
   Native Go APIs support [guarded saves and recovery receipts](docs/guides/portable-workspace-usage.md#managed-saves-in-native-storage).
   MCP callers can use the [fixed-bucket object tools](docs/guides/portable-workspace-usage.md#native-object-mcp).
+  The v0.4.0 candidate adds [scoped file resources](docs/guides/workspace-resources.md),
+  [managed file saves](docs/guides/workspace-file-saves.md) and
+  [selected checkpoint reads](docs/guides/checkpoint-resources.md).
 - **Browser storage:** keep objects and editing history in IndexedDB.
   [File history](docs/guides/browser-file-history.md) stores whole-file stages.
   [Project storage](docs/guides/browser-project-storage.md) shares content between multi-file revisions.
@@ -76,7 +81,8 @@ Storage quotas do not limit files written directly by those processes.
 <!-- repo-only:start -->
 The [storage plan](docs/development/storage-foundation-plan.md) tracks unfinished work.
 The [OpenCode example](examples/opencode/README.md) requires a confirmed checkpoint before each prompt.
-Real interruption, second-host and Linux acceptance tests remain open.
+Named host/model interruption and second-host acceptance remain separate from
+the native Linux/macOS release checks recorded in the candidate notes.
 MCP tool access alone does not ensure a checkpoint after every turn.
 
 Live collaboration work belongs to [GangCode](docs/design/gangcode-stow-boundary.md).

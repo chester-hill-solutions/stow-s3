@@ -1,9 +1,10 @@
 # Managed workspace file saves
 
-**Development status, 2026-11-12:** native save/recovery, CLI/MCP bindings and
-two-client SDK interoperability are locally qualified on macOS ARM64 with
-host_quiesced coordination. This is not a published release or model
-qualification.
+**Qualification:** installed native consumers on Linux and macOS, x64 and
+ARM64, exercise observed-token saves, receipt resolution and subsequent saved
+checkpoint reads. The [candidate notes](../releases/v0.4.0.md) link the exact
+release checks. Host-quiesced coordination is required; native protocol checks
+do not qualify every model provider or external host.
 
 **Availability:** the editing flags and tools described here are part of an
 unreleased 0.4.0 candidate and require a binary built from this checkout.
@@ -127,8 +128,14 @@ identity. File saving does not implicitly capture, run an agent or assert task
 success. Interrupted checkpoint capture uses the existing checkpoint resolve
 workflow; it is a separate request from the file save.
 
+See the [editing contract](../contracts/workspace-editing-contract.md) for
+operation semantics and refusal rules.
+
+<!-- repo-only:start -->
 See the [editing contract](../contracts/workspace-editing-contract.md),
 [execution plan](../design/workspace-resource-plan.md#w26-prerequisite-audit-and-execution-boundary)
 and the [CLI/MCP qualification](../reviews/2026-11-12-workspace-editing-mcp.md).
 The [native qualification](../reviews/2026-11-11-workspace-editor-recovery.md)
 separately records backend process-kill boundaries.
+
+<!-- repo-only:end -->

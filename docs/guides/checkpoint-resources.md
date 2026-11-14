@@ -87,13 +87,25 @@ local ID; launch a new resource server using that returned ID. Imported source
 checkpoint identity and receiver working identity remain distinct. Existing
 connections do not silently expand to the receiver.
 
+Installed native consumers on Linux and macOS, x64 and ARM64, verify saved
+bytes after changing the live file. See the [candidate notes](../releases/v0.4.0.md)
+for revision-bound release evidence. Cross-machine continuation, named model
+providers and protected saved-version access policy require separate evidence.
+This profile remains read-only; managed editing uses its own connection.
+
+<!-- repo-only:start -->
 The local qualification exercises source removal, adoption and byte verification
-on this machine. Cross-machine continuation, Linux execution and strict
-fresh-model acceptance remain open. [Local model attempts](../reviews/2026-11-11-checkpoint-resources.md#corrected-fresh-context-attempt)
+on this machine. Cross-machine continuation and named model-provider acceptance remain separate
+from the native platform release checks. [Local model attempts](../reviews/2026-11-11-checkpoint-resources.md#corrected-fresh-context-attempt)
 returned the correct saved-input result. The corrected run completed all resource
 reads but failed the strict terminal JSON format gate. These file-resource roots do not claim protected saved-version
 access policy or guarded editing.
 
+<!-- repo-only:end -->
+
 The [contract](../contracts/checkpoint-resources-contract.md) defines identity,
-integrity and retention. The [canonical plan](../development/storage-foundation-plan.md)
-owns local and cross-host qualification status.
+integrity and retention.
+<!-- repo-only:start -->
+The [canonical plan](../development/storage-foundation-plan.md) owns local and
+cross-host qualification status.
+<!-- repo-only:end -->

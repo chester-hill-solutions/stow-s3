@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 0.4.0 candidate
+
+- Browse scoped working files through MCP resources with paged directories and bounded reads.
+- Read a selected immutable checkpoint through resources, including verified byte ranges.
+- Opt into managed file saves with observed-token comparison, retained request receipts and explicit recovery.
+- Refuse checkpoint capture and cleanup while a file save remains unresolved; add workspace browser navigation.
+
+Native release qualification passes on Linux and macOS, x64 and ARM64.
+The candidate is not published; public native and npm downloads remain at 0.3.7,
+and PyPI publication remains disabled. See the [candidate notes](docs/releases/v0.4.0.md)
+for usage, limits and qualification evidence.
+
 ## 0.3.7 — 2026-11-06
 
 - Make workspace, HTTP server, browser persistence and outbox lifecycles explicit.

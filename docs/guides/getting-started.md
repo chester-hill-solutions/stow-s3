@@ -4,6 +4,26 @@ Stow stores objects in a native S3 server, an embedded runtime, or a file worksp
 Browser APIs store editing history in IndexedDB and sync to remote storage.
 Choose the API that matches your application.
 
+## Try the v0.4.0 candidate
+
+The [v0.4.0 candidate](../releases/v0.4.0.md) adds opt-in
+[MCP workspace file resources](workspace-resources.md),
+[managed file saves](workspace-file-saves.md) and
+[selected checkpoint reads](checkpoint-resources.md). Its native checks pass on
+Linux and macOS, x64 and ARM64. It is not published to GitHub Releases, npm or
+PyPI yet. Use a checkout of the candidate branch and the build steps below;
+the public install commands still select 0.3.7.
+
+```sh
+git clone --branch codex/release-v0.4.0 https://github.com/chester-hill-solutions/stow-s3
+cd stow-s3
+make build
+./bin/stow-s3 --version
+```
+
+Then follow the guide for the MCP profile you need. Keep existing object-store
+format and upgrade requirements in mind when opening persistent data.
+
 ## Install the TypeScript client
 
 ```sh

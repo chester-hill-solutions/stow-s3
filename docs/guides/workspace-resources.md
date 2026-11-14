@@ -72,6 +72,7 @@ continues to use its own bucket profile.
 
 | Caller | Evidence and scope |
 | --- | --- |
+| Installed native release artifacts | Linux/macOS x64/ARM64 consumers passed resource browsing, managed save/resolve and immutable checkpoint reads; see the [candidate notes](../releases/v0.4.0.md) |
 | Native Go API | Scoped reader and bounded metadata observations; focused race regressions |
 | MCP Go client | Resource routing, paging, expiry, confinement and profile regressions |
 | Independent TypeScript MCP client | Passed scoped 235-entry traversal against the actual native stdio server |
@@ -83,6 +84,11 @@ The [OpenCode Free Router recipe](../../examples/workspace-resources/README.md)
 includes a private provider-profile template and an isolated resource-only task.
 It uses a guarded free route and synthetic files, with no global host settings changed.
 
+See the [resource contract](../contracts/workspace-resources-contract.md) for
+identity, read limits and confinement. Named model providers, live App hosts and
+protected cross-host access require separate qualification.
+
+<!-- repo-only:start -->
 See the [resource contract](../contracts/workspace-resources-contract.md),
 [execution plan](../design/workspace-resource-plan.md#w24-execution-backlog) and
 [qualification record](../reviews/2026-11-11-workspace-resource-hosts.md) for exact scope and
@@ -90,3 +96,5 @@ measured results. The [canonical queue](../development/storage-foundation-plan.m
 qualification status. Protected multi-tenant access, strict fresh-model
 acceptance and a second physical host remain separate gates. CLI/MCP managed
 file saves have their own [local qualification](../reviews/2026-11-12-workspace-editing-mcp.md).
+
+<!-- repo-only:end -->

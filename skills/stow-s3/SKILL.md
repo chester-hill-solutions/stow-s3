@@ -71,6 +71,14 @@ The package carries its native binary for Linux or macOS on x64 or ARM64.
 No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
+The [v0.4.0 candidate](../../docs/releases/v0.4.0.md) is source-only until
+publication. It adds [MCP working-file resources](../../docs/guides/workspace-resources.md),
+[managed file saves](../../docs/guides/workspace-file-saves.md) and
+[selected checkpoint reads](../../docs/guides/checkpoint-resources.md).
+These flags are absent from published v0.3.7 binaries. Managed saves require
+host-quiesced writers; retain the request key and resolve uncertain replies
+rather than treating file-resource reads as save observations.
+
 Standalone v0.3.7 binaries are available from
 [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.3.7).
 Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
