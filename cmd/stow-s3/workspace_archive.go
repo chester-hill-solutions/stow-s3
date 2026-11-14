@@ -183,12 +183,15 @@ func checkpointWorkspaceCommand(args []string) error {
 	resolve := flags.Bool("resolve", false, "Resolve an existing request without capturing")
 	timeout := flags.Duration("timeout", 0, "Capture deadline; required with --request-key")
 	portable := flags.Bool("portable", false, "Include logical buckets, objects and metadata")
-	policyPath := flags.String("policy", "", "Persisted policy revision to decide the capture by (empty consults no policy)")
+	policyPath := flags.String("policy", "", "Persisted policy revision for direct captures; request-backed captures/resolution do not support policies")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
 	if *id == "" {
 		return errors.New("workspace checkpoint requires --id")
+	}
+	if *policyPath != "" && (*requestKey != "" || *resolve) {
+		return errors.New("workspace checkpoint --policy cannot be combined with --request-key or --resolve; request-backed capture and resolution do not support policy authorization")
 	}
 	selection := chosen()
 	registry, err := selection.resolve("")
