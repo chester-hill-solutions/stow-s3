@@ -1,0 +1,24 @@
+{
+  "samples": 24,
+  "profiles": [
+    "memory",
+    "filesystem",
+    "runtimefs",
+    "workspace"
+  ],
+  "directions": [
+    "download",
+    "upload"
+  ],
+  "repetitions": 3,
+  "expectedBytes": 5243197,
+  "expectedSha256": "6af7f69a62e921b301ace3584ea2727e0c34d2799f9276eccf172fcd5bb99a85",
+  "verified": [
+    "raw record equality with summary samples",
+    "exact size, limit and final SHA-256",
+    "six exact download ranges, no extra GET and zero range retries",
+    "two upload parts sent once each and one completion attempt",
+    "median, minimum and maximum recomputed for every reported metric"
+  ],
+  "scope": "Independent parent check of exported raw evidence; no added performance run"
+}

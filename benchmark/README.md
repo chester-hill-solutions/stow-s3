@@ -176,6 +176,34 @@ Stop both task-owned deployments after exporting results.
 The IaC definitions and result volume remain available for the next run.
 Do not delete volumes containing evidence during routine cleanup.
 
+## Resumable transfer cost probe
+
+Package the consumer-owned AWS SDK transfer fixture separately:
+
+```sh
+node benchmark/pack.mjs benchmark/context --resume-transfer
+railway up benchmark/context --path-as-root --no-gitignore --project <project-id> --environment <environment-id> --service benchmark-runner --detach
+```
+
+Use the existing benchmark environment IDs above. Observe `SUCCESS` for that
+deployment, then invoke the probe through scoped Railway SSH:
+
+```sh
+railway ssh --project <project-id> --environment <environment-id> --service benchmark-runner -- node benchmark/resume-transfer.mjs
+railway service files --project <project-id> --environment <environment-id> --service benchmark-runner download /app/verification/resume-transfer ./benchmark/results/resume-transfer --json
+```
+
+This runs three fresh processes per direction and profile, using a 5 MiB + 317
+byte fixture, 5 MiB upload parts and 1 MiB download ranges. Filesystem, runtimefs
+and workspace reopen the retained store; memory keeps the server running and
+replaces only the client. Uploads reconcile lost part/completion replies.
+The probe checks final bytes/digests and payload accounting without speed
+thresholds. It uses container ephemeral storage, not the persistent result volume.
+Process-wide Go allocation deltas combine client and server; Linux high-water
+RSS includes setup. Neither metric isolates Stow's own memory requirement.
+Export the raw evidence before stopping this task-owned runner deployment.
+Do not run performance measurements locally.
+
 ## Verification
 
 The Railway Docker build runs the embedded Go race tests, one-iteration native cases
