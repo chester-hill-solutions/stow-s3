@@ -9,5 +9,6 @@ the [current work plan](../../development/storage-foundation-plan.md) or
 | September 29, 2026 | [Baseline implementation and validation](implementation-2026-09-29.md) |
 | September 29, 2026 | [OpenCode receiver and model continuation](opencode-receiver-remediation-2026-09-29.md) |
 | September 30, 2026 | [Native filesystem guarded saves](implementation-2026-09-30.md) |
+| November 14, 2026 | [Interrupted cross-host workspace continuation](2026-11-14-interrupted-cross-host.md) |
 
 [All historical documentation](../README.md)

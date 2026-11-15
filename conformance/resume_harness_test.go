@@ -20,16 +20,17 @@ import (
 )
 
 type resumeWire struct {
-	mu           sync.Mutex
-	parts        map[int]int
-	partBytes    int64
-	rangeBytes   int64
-	rangeGets    []resumeRangeRecord
-	getRequests  int
-	listPages    int
-	completions  int
-	dropPart     bool
-	dropComplete bool
+	mu                      sync.Mutex
+	parts                   map[int]int
+	partBytes               int64
+	rangeBytes              int64
+	rangeGets               []resumeRangeRecord
+	interruptNextRangeAfter int64
+	getRequests             int
+	listPages               int
+	completions             int
+	dropPart                bool
+	dropComplete            bool
 }
 
 type resumeRangeRecord struct {
@@ -39,7 +40,11 @@ type resumeRangeRecord struct {
 	ContentRange string
 	ETag         string
 	Length       int64
-	BytesRead    int64
+	// BytesRead and FaultBytes are client body-wrapper reads, not TCP egress.
+	BytesRead  int64
+	FaultAfter int64
+	FaultBytes int64
+	Faulted    bool
 }
 
 func (w *resumeWire) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -84,7 +89,14 @@ func (w *resumeWire) RoundTrip(request *http.Request) (*http.Response, error) {
 		w.rangeGets[rangeIndex].Length = response.ContentLength
 		w.mu.Unlock()
 		if response.StatusCode == http.StatusPartialContent {
-			response.Body = &resumeRangeBody{ReadCloser: response.Body, wire: w, index: rangeIndex}
+			w.mu.Lock()
+			failAfter := w.interruptNextRangeAfter
+			w.interruptNextRangeAfter = 0
+			if failAfter > 0 {
+				w.rangeGets[rangeIndex].FaultAfter = failAfter
+			}
+			w.mu.Unlock()
+			response.Body = &resumeRangeBody{ReadCloser: response.Body, wire: w, index: rangeIndex, failAfter: failAfter}
 		}
 	}
 	return response, nil
@@ -110,12 +122,30 @@ func (w *resumeWire) recordGet(request *http.Request) int {
 
 type resumeRangeBody struct {
 	io.ReadCloser
-	wire  *resumeWire
-	index int
+	wire      *resumeWire
+	index     int
+	failAfter int64
+	readBytes int64
+	failure   error
 }
 
 func (b *resumeRangeBody) Read(data []byte) (int, error) {
+	if b.failure != nil {
+		return 0, b.failure
+	}
+	if b.failAfter > 0 && b.readBytes >= b.failAfter {
+		b.failure = errors.New("synthetic range response body interruption")
+		b.wire.mu.Lock()
+		b.wire.rangeGets[b.index].Faulted = true
+		b.wire.rangeGets[b.index].FaultBytes = b.readBytes
+		b.wire.mu.Unlock()
+		return 0, b.failure
+	}
+	if b.failAfter > 0 && int64(len(data)) > b.failAfter-b.readBytes {
+		data = data[:b.failAfter-b.readBytes]
+	}
 	n, err := b.ReadCloser.Read(data)
+	b.readBytes += int64(n)
 	b.wire.mu.Lock()
 	b.wire.rangeBytes += int64(n)
 	b.wire.rangeGets[b.index].BytesRead += int64(n)
@@ -133,6 +163,16 @@ func (w *resumeWire) getRequestCount() int {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	return w.getRequests
+}
+
+func (w *resumeWire) interruptNextRangeBodyAfter(bytes int64) bool {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.interruptNextRangeAfter != 0 {
+		return false
+	}
+	w.interruptNextRangeAfter = bytes
+	return true
 }
 
 type resumeHost struct {
