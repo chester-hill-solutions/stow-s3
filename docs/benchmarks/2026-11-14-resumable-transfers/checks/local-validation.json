@@ -1,0 +1,51 @@
+{
+  "source": "f8c0b2c5893a37ea97117614394fc53c261b80e0",
+  "host": "macOS ARM64; Go1.25.6; Node24.22.3",
+  "checks": [
+    {
+      "command": "go test ./conformance -run TestResume -count=1",
+      "result": "pass"
+    },
+    {
+      "command": "go test ./examples/resumable-transfer -count=1",
+      "result": "pass"
+    },
+    {
+      "command": "go test ./conformance/... -count=1",
+      "result": "pass"
+    },
+    {
+      "command": "go test ./conformance -run TestResumeDownload -count=1",
+      "result": "pass after final helper refactor"
+    },
+    {
+      "command": "go test -race ./conformance -run TestResumeDownload -count=1",
+      "result": "pass after final helper refactor"
+    },
+    {
+      "command": "go test -race ./examples/resumable-transfer -count=1",
+      "result": "pass"
+    },
+    {
+      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c ./conformance",
+      "result": "pass; compile only, no local performance run"
+    },
+    {
+      "command": "node scripts/check-go-quality.mjs",
+      "result": "pass, 15 existing baseline identities; no baseline changes"
+    },
+    {
+      "command": "node scripts/check-file-size.mjs",
+      "result": "pass, zero baseline entries, maximum500lines"
+    },
+    {
+      "command": "node --test benchmark/test/*.test.mjs",
+      "result": "21pass, zero failures/skips"
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    }
+  ],
+  "logsDisposition": "Disposable local logs remain in ignored checks/ or private temporary output; integrated CI logs are retained by GitHub Actions at the PR source revision."
+}

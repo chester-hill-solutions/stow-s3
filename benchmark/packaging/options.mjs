@@ -13,6 +13,7 @@ const modes = {
   "--embedded-api-red": { image: "embedded-api-red" },
   "--read-performance": { image: "read-performance", extra: ["scripts/wasm-isolate-host.mjs", "scripts/wasm-agent-workload.mjs"] },
   "--disk-performance": { image: "disk-performance" },
+  "--resume-transfer": { image: "resume-transfer", extra: ["conformance", "examples/resumable-transfer"] },
   "--owned-body": { image: "owned-body" },
   "--wasm-size-probe": { image: "wasm-size-probe", extra: ["wasm", "scripts/wasm-isolate-probe.mjs", "scripts/wasm-isolate-host.mjs"] },
 };

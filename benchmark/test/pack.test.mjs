@@ -104,6 +104,19 @@ test("the controlled mode selects its recipe from the image folder", async t => 
   assert.deepEqual(receipt.dirtyFiles, []);
 });
 
+test("resume transfer packaging includes the SDK conformance fixture and consumer example", async t => {
+  const f = await fixture(t);
+  await f.put("conformance/resume_download_test.go", "package conformance_test\n");
+  await f.put("examples/resumable-transfer/download.go", "package resumetransfer\n");
+  const result = f.run(["--resume-transfer"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(await readFile(join(f.root, "context/benchmark/Dockerfile"), "utf8"),
+    await readFile(join(f.root, "benchmark/docker/resume-transfer.Dockerfile"), "utf8"));
+  await access(join(f.root, "context/conformance/resume_download_test.go"));
+  await access(join(f.root, "context/examples/resumable-transfer/download.go"));
+  await verifyReceipt(join(f.root, "context"));
+});
+
 test("full size verification uses the verification image with its size flag", async t => {
   const f = await fixture(t);
   const result = f.run(["--full", "--size"]);
