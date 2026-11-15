@@ -10,6 +10,10 @@ It does not run a DPI engine or block network traffic.
 The [October 12 local evidence](../benchmarks/2026-10-12-performance/README.md) records the first complete exploratory run.
 The [October 13 memory rerun](../benchmarks/2026-10-13-memory-performance/README.md) adds longer capacity windows, a quarantine arrival-rate sweep and a five-minute run.
 The [Railway benchmark setup](railway-performance.md) records the isolated cloud environment and the work needed for matched implementation comparisons.
+The [November 14 transfer report](../benchmarks/2026-11-14-resumable-transfers/README.md)
+records bounded SDK upload/download continuation costs across four profiles;
+its [dedicated probe](../../benchmark/README.md#resumable-transfer-cost-probe)
+uses fresh combined client/server processes and remains separate from capacity testing.
 
 ## Quick checks
 
