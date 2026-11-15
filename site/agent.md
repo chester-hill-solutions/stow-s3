@@ -79,9 +79,9 @@ Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 ## v0.4.0: MCP workspace files
 
 These profiles were introduced in v0.4.0. Use the current native binary from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.1)
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2)
 or build from source.
-The npm 0.3.7 binaries do not include these profiles.
+The npm 0.4.2 carriers include these native profiles.
 Native release checks cover Linux and macOS on x64 and ARM64. Named model
 providers and live App hosts need separate compatibility evidence.
 
@@ -97,6 +97,13 @@ providers and live App hosts need separate compatibility evidence.
 File saves do not capture a checkpoint or run an agent. The host keeps other
 writers quiescent, chooses read/write roots and owns execution and network access.
 
+## v0.4.2: dependency maintenance
+
+[v0.4.2 notes](/docs/releases/v0.4.2/) cover AWS SDK and lint updates, download-recovery
+qualification and the npm update from 0.3.7. The matching npm carriers include
+the v0.4.0 workspace features and v0.4.1 policy correction.
+Automated registry publication and PyPI publication remain disabled.
+
 ## v0.4.1: checkpoint policy mode correction
 
 The [v0.4.1 release notes](/docs/releases/v0.4.1/) describe a patch to the native
@@ -111,7 +118,7 @@ receipt API or resumable-transfer SDK.
 Install the TypeScript client from public npmjs:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.3.7
+npm install @chester-hill-solutions/stow-s3@0.4.2
 ```
 
 The package carries its native binary for Linux or macOS on x64 or ARM64.
@@ -119,7 +126,7 @@ No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
 Native binaries are distributed from the
-[v0.4.1 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.1); see
+[v0.4.2 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2); see
 the [v0.4.1 patch notes](/docs/releases/v0.4.1/) for the checkpoint policy-mode correction.
 Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
 
