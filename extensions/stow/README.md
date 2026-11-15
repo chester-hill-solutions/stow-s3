@@ -8,6 +8,15 @@ It lists 50 objects per page and previews at most 64 KiB per object, or the conf
 Select objects to attach up to ten resource references to composer context.
 References resolve current bytes, not historical versions.
 
+The same bundle also contains an opt-in workspace view. For an existing registered
+workspace, start the native server with `--workspace-files --browser`, its
+`--registry-dir` and `--workspace-id`, and optional repeated `--read-root` relative
+directories. Call `stow_workspace_browser` in a compatible App host. The view
+navigates directory resource pages and reads current file bytes; composer
+attachment requires host support. The [workspace resource guide](../../docs/guides/workspace-resources.md)
+documents setup, bounds and qualification. Use `--resources-only` without
+`--browser` when the caller needs resources alone.
+
 ## Run the native server
 
 Build this checkout with `make build`. Supply an existing native Stow object-store
@@ -84,4 +93,16 @@ scope, Unicode keys, preview bounds and absence of save observations. UI host
 fixtures cover initial-result handling, plain-text rendering, prefix/cursor
 paging, explicit attachments, composer removals, unsupported capabilities and
 late preview responses. They do not establish live ChatGPT host compatibility.
+
+## Workspace view source
+
+The opt-in workspace view vendors Button, Breadcrumb, Checkbox, `cn`, and the
+small i18n provider from `@chester-hill-solutions/ui-kit` 0.9.1 (MIT). Sources
+are under `src/workspace/ui/` and `src/workspace/lib/`; their provenance and
+license are retained in `src/workspace/CHS_UI_KIT_LICENSE.txt`. Relative imports
+were adjusted for this local layout. Tailwind 4.3.3 compiles only theme tokens
+and utilities from the vendored source. It does not include preflight or the
+kit's global base stylesheet, so the legacy bucket view keeps its existing CSS
+and vanilla controls. Workspace-specific theme variables and layout rules are
+scoped to `#workspace-root`.
 <!-- repo-only:end -->

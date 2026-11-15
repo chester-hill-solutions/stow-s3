@@ -1,0 +1,239 @@
+{
+  "version": 1,
+  "date": "2026-11-14",
+  "status": "passed",
+  "profile": "published v0.4.1 / direct gpt-6-luna medium / actual interrupted macOS ARM64 sender / fresh native Linux amd64 cloud receiver / official MCP SDK / host_quiesced",
+  "fixtureSourceCommit": "4403956407302c565475444e8ccc778821e85bab",
+  "artifacts": {
+    "version": "0.4.1",
+    "releaseSource": "7364b1d84276f32760f1ab10dfaf0825f270289c",
+    "artifacts": [
+      {
+        "platform": "stow-darwin-arm64",
+        "archiveSha256": "513259fcb03f7bb3ee04097ae857dd60a73716d072e5a27014c8cba53f6bcec6",
+        "binarySha256": "d90d94fbde3af98093e9c67983beffe522d7d76408cd2dcf0ab454b3fe7c8901",
+        "binaryPath": "${PUBLIC_BINARY_DIRECTORY}/stow-darwin-arm64/stow-s3",
+        "build": {
+          "toolchain": "go1.25.6",
+          "CGO_ENABLED": "0",
+          "GOARCH": "arm64",
+          "GOOS": "darwin",
+          "vcs.revision": "7364b1d84276f32760f1ab10dfaf0825f270289c",
+          "vcs.modified": "false"
+        }
+      },
+      {
+        "platform": "stow-linux-amd64",
+        "archiveSha256": "3d1037a512c7142edceb84d466929ff4b7e22f6d4ef603738c0a1312fa6cfaaa",
+        "binarySha256": "764cf2887d41308b89165ac0a151220c845fcacca872f52d97165ec6509f8705",
+        "binaryPath": "${PUBLIC_BINARY_DIRECTORY}/stow-linux-amd64/stow-s3",
+        "build": {
+          "toolchain": "go1.25.6",
+          "CGO_ENABLED": "0",
+          "GOARCH": "amd64",
+          "GOOS": "linux",
+          "vcs.revision": "7364b1d84276f32760f1ab10dfaf0825f270289c",
+          "vcs.modified": "false"
+        }
+      }
+    ],
+    "senderVersionOutput": "stow-s3 0.4.1"
+  },
+  "senderHost": {
+    "hostname": "sender-macos-arm64",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "node": "v24.22.3",
+    "binarySha256": "d90d94fbde3af98093e9c67983beffe522d7d76408cd2dcf0ab454b3fe7c8901",
+    "version": "stow-s3 0.4.1",
+    "sdkVersion": "1.32.1"
+  },
+  "receiverHost": {
+    "hostname": "receiver-native-linux-amd64",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC 9655P 96-Core Processor",
+    "node": "v25.9.0",
+    "binarySha256": "764cf2887d41308b89165ac0a151220c845fcacca872f52d97165ec6509f8705",
+    "version": "stow-s3 0.4.1",
+    "sdkVersion": "1.32.1",
+    "cpuQuota": "400000 100000",
+    "memoryLimit": "4294967296"
+  },
+  "models": {
+    "sender": {
+      "agent": "/root/w19_sender_luna",
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "forkTurns": "none",
+      "outcome": "interrupted"
+    },
+    "receiver": {
+      "agent": "/root/w19_receiver_luna",
+      "model": "gpt-6-luna",
+      "reasoningEffort": "medium",
+      "forkTurns": "none",
+      "outcome": "completed"
+    }
+  },
+  "actualModelPairs": 1,
+  "modelRetries": 0,
+  "perHostDeadlineMs": 300000,
+  "interruption": {
+    "agent": "/root/w19_sender_luna",
+    "model": "gpt-6-luna",
+    "reasoningEffort": "medium",
+    "forkTurns": "none",
+    "interruptionTool": "collaboration.interrupt_agent",
+    "returnedPreviousStatus": "running",
+    "postInterruptObservation": {
+      "tool": "collaboration.list_agents",
+      "agentStatus": "interrupted"
+    },
+    "gatePreviouslyObserved": true,
+    "modelTerminalPresent": false,
+    "recordedAt": "2026-11-15T01:11:49.473126+00:00"
+  },
+  "deployment": {
+    "projectId": "${RAILWAY_PROJECT_ID}",
+    "environmentId": "${RAILWAY_ENVIRONMENT_ID}",
+    "serviceId": "${RAILWAY_SERVICE_ID}",
+    "id": "${TASK_DEPLOYMENT_ID}",
+    "observedBeforeRun": "SUCCESS",
+    "observedAfterExport": "REMOVED",
+    "taskComputeStopped": true,
+    "volumesDeleted": false
+  },
+  "acceptance": {
+    "modelGeneratedProgressBeforeInterruption": true,
+    "sourcePathsRemovedBeforeTransfer": true,
+    "transferFiles": [
+      "incoming.json",
+      "stage1-handoff.json",
+      "stage1.tar.gz"
+    ],
+    "freshReceiverWithoutTranscriptOrExpectedAnswer": true,
+    "sourceAndReceiverWorkspaceIDsDiffer": true,
+    "matchingImportedStateDigestVerified": true,
+    "finalMutableAndImmutableBytesMatch": true,
+    "forwardedModelToolCalls": {
+      "sender": 3,
+      "receiver": 3
+    },
+    "senderHeldUnforwardedReads": 1,
+    "hostRecoveryFlag": "--recover-file-saves",
+    "hostSaveResolutionReplayedBothStages": true
+  },
+  "limitations": [
+    "Only this cooperative direct Luna/official SDK caller profile",
+    "Remote model SDK processes ran on Linux; model orchestration used the same parent tool service",
+    "No OS sandbox, protected tenancy, hardware attestation, production deployment or arbitrary caller claim",
+    "Interruption followed a known committed progress save; no mid-save power-loss proof",
+    "Receiver model edited an adopted mutable workspace; resource-only saved-view model access on a second host remains open",
+    "Aboiteau B2/C2 prior receipts were reused, not rerun or upgraded to published v0.4.1",
+    "Earlier failed Free Router and QEMU attempts remain failed",
+    "No W22 independent-team or sustained repeat-use evidence",
+    "No OpenRouter credential access, external outreach or Cloudflare/R2 mutation"
+  ],
+  "scriptedSmoke": {
+    "passed": true,
+    "actualModelAcceptance": false,
+    "purpose": "Private caller lifecycle sanity check before the actual model pair; separate fixture roots"
+  },
+  "evidenceBundle": {
+    "name": "stow-v0.4.1-cross-host-continuation-evidence-20261114.zip",
+    "sha256": "b0284deb3c4ad8d8da5820beecbce7738bc6e907cc6470facd187ad6af967a75",
+    "bytes": 34305,
+    "url": "https://github.com/chester-hill-solutions/stow-s3/releases/download/v0.4.1/stow-v0.4.1-cross-host-continuation-evidence-20261114.zip",
+    "publicDownloadVerified": true,
+    "verification": {
+      "method": "Anonymous curl --disable --fail --location; outer SHA-256, all ZIP member checksums and original checkpoint archive checked",
+      "checkedAt": "2026-11-15T01:34:00.930216+00:00",
+      "entries": 21
+    }
+  },
+  "sender": {
+    "sourceWorkspaceId": "ws_cf0d4a342b57b6d9",
+    "checkpointId": "cp_880abd24e43c300a424a5a48",
+    "savedStateSHA256": "99c985f7e905640b3d3f48ba313c83d737a63656830df97abca1fe21cb98b1a4",
+    "savedStateBytes": 66,
+    "hostRecovery": {
+      "enabled": true,
+      "argument": "--recover-file-saves"
+    },
+    "proxyClosed": true,
+    "nativeServerExit": {
+      "code": 0,
+      "term": null
+    },
+    "sourcePathsRemovedBeforeReceiver": true,
+    "sourcePaths": [
+      "${SENDER_ROOT}/source-workspace",
+      "${SENDER_ROOT}/source-registry",
+      "${SENDER_ROOT}/source-tree"
+    ],
+    "savedState": {
+      "total_units": 26,
+      "entry_count": 5,
+      "next_batch": "docs/batch-b.csv"
+    },
+    "saveGeneration": "ba1c81ddd3c34c93e75c3d2c7419ec92",
+    "resolveOutcome": "committed",
+    "replayed": true,
+    "modelToolCalls": 3,
+    "heldRead": {
+      "name": "stow_workspace_file_read_for_save",
+      "input": {
+        "path": "docs/batch-b.csv"
+      },
+      "requestId": 1,
+      "requestedAt": "2026-11-15T01:11:17.806Z",
+      "forwarded": false,
+      "committedStateSaveCount": 1
+    },
+    "modelTerminalPresent": false,
+    "allFourBridgePIDsExited": true
+  },
+  "receiver": {
+    "receiverWorkspaceId": "ws_ed1dcfe0766db5dc",
+    "sourceWorkspaceId": "ws_cf0d4a342b57b6d9",
+    "sourceCheckpointId": "cp_880abd24e43c300a424a5a48",
+    "receiverParentCheckpointId": "cp_a7fdb9cb56ad1ec9fa3704b1",
+    "checkpointId": "cp_aea840ae7acb4756c5d9d99c",
+    "terminal": {
+      "total_units": 56,
+      "entry_count": 7,
+      "outcome": "committed",
+      "path": "docs/STATE.json",
+      "request_key": "8128bf13-0419-48d7-84ec-98be58770548",
+      "generation": "c30b45a7673b6e43a906c3658573de17"
+    },
+    "replayed": true,
+    "checkpointStateSHA256": "8beb16d5259e655251b0011de89722302bce0170604c2233ee01ea15d3c34123",
+    "checkpointStateBytes": 52,
+    "checkpointStateVerified": true,
+    "proxyClosed": true,
+    "nativeServerExit": {
+      "code": 0,
+      "term": null
+    },
+    "initialStateSHA256": "99c985f7e905640b3d3f48ba313c83d737a63656830df97abca1fe21cb98b1a4",
+    "initialStateBytes": 66,
+    "modelToolCalls": 3,
+    "hostRecoveryFlagFromFrozenDriver": "--recover-file-saves",
+    "bridgeExitCodes": [
+      0,
+      0,
+      0
+    ],
+    "nativeChildrenAfterCompletion": [],
+    "oldModelEndpointRefusedConnection": true
+  },
+  "publicationSanitization": {
+    "publishedTemplatesDifferFromExecutedBytes": true,
+    "changes": "Only host routing/configuration and identifying host paths/names are anonymized or made configurable. Checkpoint archive/payload bytes and result digests are unchanged. Original execution source hashes remain in the sanitized receipt for attribution; SHA256SUMS identifies these published templates. Substitute ${...} path roles when using transfer descriptor templates.",
+    "hostnamesAreRoleLabels": true,
+    "credentialsIncluded": false
+  }
+}

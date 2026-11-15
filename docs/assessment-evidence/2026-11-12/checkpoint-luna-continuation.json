@@ -1,0 +1,353 @@
+{
+  "version": 1,
+  "date": "2026-11-12",
+  "workId": "W25.L1",
+  "status": "passed",
+  "profile": "same-host macOS ARM64 / fresh direct gpt-6-luna / official MCP SDK 1.32.1 / native selected-checkpoint resources / read-only inputs scope",
+  "qualification": "Local fresh-context immutable-checkpoint reading and calculation; broader W25 remains partial",
+  "model": {
+    "task": "/root/w25_luna_checkpoint",
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "fork_turns": "none",
+    "taskPrompts": 1,
+    "automaticTaskRetries": 0,
+    "elapsedMs": 79383,
+    "deadlineMs": 300000,
+    "withinDeadline": true,
+    "expectedAnswerInTask": false,
+    "usageAvailable": false
+  },
+  "taskPrompt": "Complete one saved-checkpoint continuation task. Use ONLY the resource bridge commands below for data access. Do not inspect any source/config/fixture files, working directories, prior conversations, or host verification files. Do not use web, native filesystem reads, other MCP tools, preflight/help bridge actions, or write files. Generic exec is available solely to invoke the bridge.\n\nInvoke commands through functions.exec and tools.exec_command, then display the command output with text(). First run:\nnode /private/tmp/stow-w25-luna-1794513499472-d20d453b/resource-bridge.mjs list\n\nFor each resource read, run:\nnode /private/tmp/stow-w25-luna-1794513499472-d20d453b/resource-bridge.mjs read 'EXACT_RETURNED_URI'\n\nRead this checkpoint overview after listing:\nstow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/v1\n\nFollow the overview root_uri, then tree-entry uri and next_uri values verbatim. Never invent URIs or use a file URI for a directory. Read the saved progress and next-batch CSV discovered through that tree. Continue the calculation: add the CSV units to the saved prior total, and add its number of data rows to the saved prior entry count. Use the saved checkpoint data only.\n\nMake each call sequentially. If any bridge command fails, stop without retrying and report failure; do not fabricate an answer. The bridge enforces a five-minute deadline for this one task.\n\nReturn ONLY a raw JSON object with exactly total_units (number), entry_count (number), and sources (array containing the exact saved progress resource URI first and saved CSV resource URI second). No Markdown fences, commentary, or trailing prose.",
+  "sourceWorkspaceId": "ws_c2e33377658fbb58",
+  "sourceCheckpointId": "cp_beb87d8ec7fbf9672f0d7c11",
+  "importedSourceCheckpointId": "cp_beb87d8ec7fbf9672f0d7c11",
+  "receiverWorkspaceId": "ws_cb298568de15d9b3",
+  "receiverCheckpointId": "cp_93db3de5f6324c80a514a0bd",
+  "sourcePathsRemovedBeforeModel": true,
+  "sourcePathsAbsentAfterModel": true,
+  "workingInputs": {
+    "progressBytes": 55,
+    "progressSHA256": "0922462cd960b5086106982b5c1f3c093cc1785a0736cc188d766c5a8d687d3e",
+    "batchBytes": 34,
+    "batchSHA256": "b833d3d42b7d22761bad01a91c125e566061fd049eddd15cfdd3d2fdf6c30c56"
+  },
+  "savedInputs": {
+    "progressBytes": 107,
+    "progressSHA256": "b3cfa5bb266260c9812a1edc3615129f78ee9c7444efa6e4ada2c43066b92c6f",
+    "batchBytes": 30,
+    "batchSHA256": "4834e5fee97ac3e65fd8d95f0201e5c5d1ddb66d6f58c789c0b4401cad0ff594"
+  },
+  "workingInputsDivergedBeforeAndAfterModel": true,
+  "verification": {
+    "status": "passed",
+    "terminalResult": {
+      "total_units": 66,
+      "entry_count": 5,
+      "sources": [
+        "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+        "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/files/aW5wdXRzL25leHQtYmF0Y2guY3N2"
+      ]
+    },
+    "wholeTerminalJSONVerified": true,
+    "unchangedCheckpointVerifierPassed": true,
+    "returnedURIChainVerified": true,
+    "senderPathsAbsentAfterModel": true,
+    "liveInputsStillDiverge": true,
+    "resourceCallCount": 7,
+    "readCount": 5,
+    "normalizedTrace": [
+      {
+        "name": "list_mcp_resources",
+        "mcpMethod": "resources/list",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "list_mcp_resources",
+        "mcpMethod": "resources/templates/list",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "read_mcp_resource",
+        "mcpMethod": "resources/read",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true,
+        "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/v1",
+        "contentBytes": 656,
+        "contentSHA256": "9d2fd0a3526bb216ecd1e04affdd48670d194a3f932b5770feff49f0696cdb35"
+      },
+      {
+        "name": "read_mcp_resource",
+        "mcpMethod": "resources/read",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true,
+        "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/tree/v1/Lg",
+        "contentBytes": 516,
+        "contentSHA256": "86eacff8431ecfe2211ed6b41fda3f84bdc3cc514718ff75fa3adfc92e3a5536"
+      },
+      {
+        "name": "read_mcp_resource",
+        "mcpMethod": "resources/read",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true,
+        "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/tree/v1/aW5wdXRz",
+        "contentBytes": 1030,
+        "contentSHA256": "5f1ac26ed0539cf6dc9317318a910cc7b1a366e07ec9d7b299c2e71a56483944"
+      },
+      {
+        "name": "read_mcp_resource",
+        "mcpMethod": "resources/read",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true,
+        "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+        "contentBytes": 107,
+        "contentSHA256": "b3cfa5bb266260c9812a1edc3615129f78ee9c7444efa6e4ada2c43066b92c6f"
+      },
+      {
+        "name": "read_mcp_resource",
+        "mcpMethod": "resources/read",
+        "status": "completed",
+        "failed": false,
+        "resultValid": true,
+        "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/files/aW5wdXRzL25leHQtYmF0Y2guY3N2",
+        "contentBytes": 30,
+        "contentSHA256": "4834e5fee97ac3e65fd8d95f0201e5c5d1ddb66d6f58c789c0b4401cad0ff594"
+      }
+    ],
+    "terminalSHA256": "653dac18b55f6f7b176e2affe833405784b16d61b715639478569a4854e8e73e",
+    "traceSHA256": "2ad0aa80bc875423d031b911dffc987ed0053371cae555475997531e1722b63c",
+    "resultSavedByCaller": false
+  },
+  "resourceTrace": [
+    {
+      "name": "list_mcp_resources",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true
+    },
+    {
+      "name": "list_mcp_resources",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true
+    },
+    {
+      "name": "read_mcp_resource",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true,
+      "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/v1",
+      "contentBytes": 656,
+      "contentSHA256": "9d2fd0a3526bb216ecd1e04affdd48670d194a3f932b5770feff49f0696cdb35"
+    },
+    {
+      "name": "read_mcp_resource",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true,
+      "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/tree/v1/Lg",
+      "contentBytes": 516,
+      "contentSHA256": "86eacff8431ecfe2211ed6b41fda3f84bdc3cc514718ff75fa3adfc92e3a5536"
+    },
+    {
+      "name": "read_mcp_resource",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true,
+      "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/tree/v1/aW5wdXRz",
+      "contentBytes": 1030,
+      "contentSHA256": "5f1ac26ed0539cf6dc9317318a910cc7b1a366e07ec9d7b299c2e71a56483944"
+    },
+    {
+      "name": "read_mcp_resource",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true,
+      "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+      "contentBytes": 107,
+      "contentSHA256": "b3cfa5bb266260c9812a1edc3615129f78ee9c7444efa6e4ada2c43066b92c6f"
+    },
+    {
+      "name": "read_mcp_resource",
+      "status": "completed",
+      "failed": false,
+      "resultValid": true,
+      "uri": "stow://workspaces/ws_cb298568de15d9b3/checkpoints/cp_93db3de5f6324c80a514a0bd/files/aW5wdXRzL25leHQtYmF0Y2guY3N2",
+      "contentBytes": 30,
+      "contentSHA256": "4834e5fee97ac3e65fd8d95f0201e5c5d1ddb66d6f58c789c0b4401cad0ff594"
+    }
+  ],
+  "counts": {
+    "modelDirectedResourceRequests": 7,
+    "resourceCatalogRequests": 2,
+    "resourceReads": 5,
+    "resourceFailures": 0,
+    "nativeSaveCallsByModel": 0,
+    "externalOpenRouterRequests": 0
+  },
+  "isolation": {
+    "selectedCheckpointOnly": true,
+    "readRoots": [
+      "inputs"
+    ],
+    "nativeToolsAvailable": 0,
+    "nativePromptsAvailable": 0,
+    "genericExecAvailable": true,
+    "processWideFilesystemIsolationQualified": false
+  },
+  "evidenceLimits": {
+    "priorProgressSeededByHost": true,
+    "interruptedRealModelTurnQualified": false,
+    "conversationRestorationClaimed": false,
+    "secondPhysicalHostQualified": false,
+    "linuxQualified": false,
+    "protectedPolicyQualified": false,
+    "openCodeFreeRouterQualified": false,
+    "resultSavedIntoWorkspaceByCaller": false,
+    "resultWrittenOrCheckpointedByModel": false
+  },
+  "checks": {
+    "checkpointFixtureAndVerifierTests": {
+      "passed": 4,
+      "failed": 0,
+      "log": "/private/tmp/w25-luna-checkpoint-tests.log"
+    },
+    "nativeGoFrozenFilesUnchanged": 860,
+    "nativeAdditionalFrozenFilesUnchanged": 3,
+    "callerSourceFrozenFilesUnchanged": 15,
+    "frozenHostFilesUnchanged": 6,
+    "hostPreflightTraceUnchangedDuringModel": true,
+    "modelTraceEmptyAtDispatch": true,
+    "priorReceiptsUnchangedSHA256": {
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json": "bda667bf335d7a637dae9ceebe89e0f936213e9e2947022d8bd07f4a1e2639d5",
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local.json": "93e1fc9ead14b108c532a35593a0b3f478c50bebe199af9439df4a4ac1f74b57",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-free-commit-gated.json": "f0570033b00ade219d77303eff46fff62454a2c18932f66bf060be055638f914",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-direct.json": "ceef5d26db3ea1647b83361055611dadad0f5d19c97f4d1eabd8da5724c5e6f6",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json": "a30ef3f4b741cc910c00827a8eec070ac8b2be49c5ec6cf3b9e1f592fb25b0ff",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-mcp.json": "2d22262824540e6671469626d0ef5246366d8beabd3b6dffa90aa2ffe9e814ed",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-local.json": "38b83b8a99b5b77251ec5430ed0f5b7ad210b77cfae6345cb1f52875b35d6816",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-required-read.json": "5a69f59ddc8b7d1c328cc2c49b19887ff578529e9b2bdcebe9f1225a6130c202",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-proxy-repair.json": "4dae236346204a374e3cd62de31f653a761e433cbca2533010bd7250d59214ac",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-scope-aligned.json": "9ff67082a3fa5015779dd2d83f03bc110812f694b52aa18f61605b07e05e9052"
+    },
+    "independentReview": "Accepted local direct Luna/MCP read-only profile: all seven resource requests and exact saved-byte result verified; preflight refusal separate; no OS sandbox, OpenCode, interrupted real turn or cross-host claim.",
+    "preExistingMissingDistPreserved": 270,
+    "documentationLinks": {
+      "status": "passed",
+      "markdownFiles": 342,
+      "log": "/private/tmp/w25-luna-doc-links.log"
+    },
+    "fileSizeRatchet": {
+      "status": "passed",
+      "log": "/private/tmp/w25-luna-file-size.log"
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "/private/tmp/w25-luna-diff-check.log"
+    }
+  },
+  "stowBinarySHA256": "ca9fc0b1ba1d33032344a8b4d58354799a1923508313882c5c3bfc1e0de08a9e",
+  "sourceSHA256": {
+    "examples/workspace-resources/free-only.test.mjs": "96691dfb9443dcd71d7dc17f7625bbf555ae18b502a6380ccac6828043ad10b9",
+    "examples/workspace-resources/checkpoint-fixture.mjs": "50fb4e2bbdfa9ec49432ee1aa46b0fdbf9aaeca6d4c4c8df331b6604347e0ccd",
+    "examples/workspace-resources/run.mjs": "eb7c5ecdd8adf388c8f21c3998d86cf8da8117a767748e6ca232d76f37aaf314",
+    "examples/workspace-resources/checkpoint-pilot.test.mjs": "37d57f6fa430058bcbaaec10cc7636d50c9748456e7143828806333ee3f078a3",
+    "examples/workspace-resources/editing-verifier.mjs": "fcfd57c81438ac225f9387da6c78709c9bcae1b6c5a8c10c51e2bbd419ac52be",
+    "examples/workspace-resources/checkpoint-runner.mjs": "4ab16d3b5fb853a56ee9a15d8edd6a513826ee941ae2a1896eb3293807737619",
+    "examples/workspace-resources/editing-host.mjs": "a09693e9f876a0f76abde7d13fa78d6a2f06b5a28f76957833b3fcc030aaaf32",
+    "examples/workspace-resources/editing-proxy-diagnostics.test.mjs": "90f515e8fe726184b0597222a36ec55caffc16c1178ead49dad66f621230c89e",
+    "examples/workspace-resources/editing-pilot.test.mjs": "233c3acccb0dc40adebbb37abf1bc4c18421367683ae3002e59ceb57beb74f6b",
+    "examples/workspace-resources/receiver-continuation.mjs": "dd28701e13af355183ed8cfe62bf43899acaec6f7a73efd733d175f35463dbaf",
+    "examples/workspace-resources/free-only.mjs": "ae58e776824ca97f257336a6949c6dda85895af1503ecb19cb38df3fe6a3d733",
+    "examples/workspace-resources/checkpoint-verifier.mjs": "65399ad91faa5074bfdf21d82bd912975e935b372cafb6460dbeddd956f6e68c",
+    "examples/workspace-resources/editing-runner.mjs": "966eea853538392576a729a57f7ae378f2f31b9f97ee47abd17ebb6bc0908381",
+    "examples/workspace-resources/editing-fixture.mjs": "af1c4fb5d4a712a3aff95da605face3524d151194880b4143f713f59ba7b0a3b",
+    "examples/workspace-resources/editing-host.test.mjs": "088b32d56d89ed95a2a822c3025407a4106d23f486f3cadc40594a6da357d92d"
+  },
+  "executedSourceArchive": "/private/tmp/stow-w25-luna-1794513499472-d20d453b/executed-source",
+  "rawEvidence": {
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/model-resource-trace.jsonl": {
+      "sha256": "2ad0aa80bc875423d031b911dffc987ed0053371cae555475997531e1722b63c",
+      "bytes": 5683
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/catalog-preflight-trace.jsonl": {
+      "sha256": "2d7eea617dfa5a21746d89d7f342d6b6244ce85e1ea9f89b09c403b9a18338b3",
+      "bytes": 3150
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/host-read-preflight.jsonl": {
+      "sha256": "9ebfb503e84f4e8caf4abbf683fa5bdd67eb985103db6e488b643c08a2dca8ca",
+      "bytes": 3235
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/model-final.txt": {
+      "sha256": "653dac18b55f6f7b176e2affe833405784b16d61b715639478569a4854e8e73e",
+      "bytes": 275
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/model-task.txt": {
+      "sha256": "a73af93da93046beec48e59ff0928091641499aaa3a84fa214d05494ae92c73d",
+      "bytes": 1663
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/host-verification.json": {
+      "sha256": "8d6f15e6c7fc44c382a725749eb467af7ff6d2e77e5f25112408f57ab2ae38d0",
+      "bytes": 3140
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/dispatch.json": {
+      "sha256": "d7db363718d9cb7cc6553d5f18ba40d6e108313eb1b56ca749dc90eb1404e472",
+      "bytes": 2984
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/completion.json": {
+      "sha256": "5ded11674277f0d9b6f5aca2ffb2f766d62612161e4dd5d64e09778b447cac78",
+      "bytes": 155
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/resource-bridge.mjs": {
+      "sha256": "e9ed236ca10f2566d1f86922cfd90b01102b89d763562c7972fd6689aa915b7b",
+      "bytes": 10366
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/bridge-config.json": {
+      "sha256": "0596a0c65c678bf61f23cfbadd3c38c163d4acdced3f841cb1839292dbc835c7",
+      "bytes": 918
+    },
+    "/private/tmp/stow-w25-luna-1794513499472-d20d453b/host-fixture.private.json": {
+      "sha256": "7344d42c3bd65c4321bf17ff0949e87139f30b32e2a1da270d081e5310a56ee8",
+      "bytes": 1878
+    },
+    "/private/tmp/w25-luna-verify.mjs": {
+      "sha256": "236cf75e7d27cbc51223f8e0be0faefc41b160756c4973e011f9be1518365f1f",
+      "bytes": 4037
+    },
+    "/private/tmp/w25-luna-checkpoint-tests.log": {
+      "sha256": "63ef1c7057213e92f9067e7104e3861dd1f5eba5c7300c71254b8d71b5d2edcf",
+      "bytes": 521
+    }
+  },
+  "retainedRoot": "/private/tmp/stow-w25-luna-1794513499472-d20d453b",
+  "publication": {
+    "committed": false,
+    "deployed": false
+  },
+  "remainingGates": [
+    "Use the workflow in a named real CLI consumer.",
+    "Linux and a second physical host remain unqualified.",
+    "Protected saved-version policy, real interrupted-work continuation and release qualification remain separate.",
+    "Earlier OpenCode/Free Router failed receipts remain failed; direct Luna evidence does not qualify that caller."
+  ],
+  "taskPromptRecord": {
+    "path": "/private/tmp/stow-w25-luna-1794513499472-d20d453b/model-task.txt",
+    "recordedAfterRun": true,
+    "source": "Verbatim initial spawn_agent task text retained by parent; actual dispatch is recorded in the agent tool call."
+  },
+  "cleanup": {
+    "processInspectionSucceeded": true,
+    "candidateProcessesChecked": 21,
+    "remainingPilotProcesses": [],
+    "retainedSyntheticReceiverForReview": true,
+    "retainedRoot": "/private/tmp/stow-w25-luna-1794513499472-d20d453b"
+  }
+}

@@ -22,10 +22,20 @@ var ErrNotDestructible = errors.New("workspace is not one stow created")
 // caller already has, so "this directory contains a stow manifest" is not evidence
 // that its contents belong to stow.
 func (s *Store) Destroy() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, err := os.Lstat(s.root); errors.Is(err, os.ErrNotExist) {
+		return s.closeLocked()
+	} else if err != nil {
+		return fmt.Errorf("workspace store: inspect before destroy: %w", err)
+	}
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return err
+	}
 	if err := s.assertDestructible(); err != nil {
 		return err
 	}
-	if err := s.Close(); err != nil {
+	if err := s.closeLocked(); err != nil {
 		return fmt.Errorf("workspace store: close before destroy: %w", err)
 	}
 	if err := os.RemoveAll(s.root); err != nil {

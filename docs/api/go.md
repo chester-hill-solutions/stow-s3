@@ -48,7 +48,7 @@ _ = object
 
 ## Symbols
 
-[AddRecoveryHold](#addrecoveryhold) · [AdoptHandoff](#adopthandoff) · [AdoptHandoffArchive](#adopthandoffarchive) · [AllowAll](#allowall) · [AllowNone](#allownone) · [ApplyDelta](#applydelta) · [ApplyDeltaWithOptions](#applydeltawithoptions) · [Authority](#authority) · [Backend](#backend) · [BackendFilesystem](#backendfilesystem) · [BackendHost](#backendhost) · [BackendMemory](#backendmemory) · [BackendWorkspace](#backendworkspace) · [Bucket](#bucket) · [BucketCreate](#bucketcreate) · [BucketDelete](#bucketdelete) · [BucketList](#bucketlist) · [Capabilities](#capabilities) · [CapacityHost](#capacityhost) · [CapacityHostOptions](#capacityhostoptions) · [CapacityNamespace](#capacitynamespace) · [CapacityNamespaceOptions](#capacitynamespaceoptions) · [CapacitySnapshot](#capacitysnapshot) · [CaptureCheckpoint](#capturecheckpoint) · [CapturePrincipal](#captureprincipal) · [CheckpointArchiveOptions](#checkpointarchiveoptions) · [CheckpointArchivePreview](#checkpointarchivepreview) · [CheckpointBucketChange](#checkpointbucketchange) · [CheckpointChange](#checkpointchange) · [CheckpointError](#checkpointerror) · [CheckpointFile](#checkpointfile) · [CheckpointHold](#checkpointhold) · [CheckpointInfo](#checkpointinfo) · [CheckpointManifest](#checkpointmanifest) · [CheckpointObject](#checkpointobject) · [CheckpointObjectChange](#checkpointobjectchange) · [CheckpointOf](#checkpointof) · [CheckpointOfAuthorized](#checkpointofauthorized) · [CheckpointOptions](#checkpointoptions) · [CheckpointProvenance](#checkpointprovenance) · [CheckpointRepository](#checkpointrepository) · [CheckpointRequest](#checkpointrequest) · [CheckpointResult](#checkpointresult) · [Collect](#collect) · [CollectOptions](#collectoptions) · [CollectResult](#collectresult) · [CompareCheckpoints](#comparecheckpoints) · [ComparePortableCheckpoints](#compareportablecheckpoints) · [ConditionalWriteStore](#conditionalwritestore) · [CopyStore](#copystore) · [CreateDelta](#createdelta) · [DecodeDelta](#decodedelta) · [DefaultWorkspaceRegistryDir](#defaultworkspaceregistrydir) · [DefaultWorkspaceRegistryDirForTeam](#defaultworkspaceregistrydirforteam) · [DeleteCheckpoint](#deletecheckpoint) · [DeltaChange](#deltachange) · [DeltaChangeAdded](#deltachangeadded) · [DeltaChangeChanged](#deltachangechanged) · [DeltaChangeDeleted](#deltachangedeleted) · [DeltaDocument](#deltadocument) · [DeltaDocumentDigest](#deltadocumentdigest) · [DeltaOptions](#deltaoptions) · [DeltaVersion](#deltaversion) · [DestroyRegisteredWorkspace](#destroyregisteredworkspace) · [DiscardRecoveryHold](#discardrecoveryhold) · [EncodeDelta](#encodedelta) · [EnvironmentDestroy](#environmentdestroy) · [EnvironmentPromote](#environmentpromote) · [EnvironmentReset](#environmentreset) · [ErrBucketExists](#errbucketexists) · [ErrBucketNotEmpty](#errbucketnotempty) · [ErrBucketNotFound](#errbucketnotfound) · [ErrCapacityConflict](#errcapacityconflict) · [ErrCapacityFull](#errcapacityfull) · [ErrCapacityInvalid](#errcapacityinvalid) · [ErrCapacityUnknown](#errcapacityunknown) · [ErrClosed](#errclosed) · [ErrConditionalWritesUnsupported](#errconditionalwritesunsupported) · [ErrDeltaConflict](#errdeltaconflict) · [ErrDeltaDigestMismatch](#errdeltadigestmismatch) · [ErrDeltaTooLarge](#errdeltatoolarge) · [ErrDeltaVersionUnsupported](#errdeltaversionunsupported) · [ErrGuardedSavesUnsupported](#errguardedsavesunsupported) · [ErrHandoffDigestMismatch](#errhandoffdigestmismatch) · [ErrInvalidBucket](#errinvalidbucket) · [ErrInvalidKey](#errinvalidkey) · [ErrInvalidListLimit](#errinvalidlistlimit) · [ErrInvalidRecoveryHold](#errinvalidrecoveryhold) · [ErrInvalidSaveCondition](#errinvalidsavecondition) · [ErrInvalidSaveRequest](#errinvalidsaverequest) · [ErrMutationCommitted](#errmutationcommitted) · [ErrNotAuthorized](#errnotauthorized) · [ErrObjectNotFound](#errobjectnotfound) · [ErrPreconditionFailed](#errpreconditionfailed) · [ErrQuotaExceeded](#errquotaexceeded) · [ErrRecoveryHeld](#errrecoveryheld) · [ErrRecoveryHoldConflict](#errrecoveryholdconflict) · [ErrRecoveryHoldCorrupt](#errrecoveryholdcorrupt) · [ErrRecoveryHoldFull](#errrecoveryholdfull) · [ErrRecoveryHoldNotFound](#errrecoveryholdnotfound) · [ErrRecoveryHoldsUnsupported](#errrecoveryholdsunsupported) · [ErrSaveConflict](#errsaveconflict) · [ErrSaveRequestConflict](#errsaverequestconflict) · [ErrSaveRequestFull](#errsaverequestfull) · [ErrSaveRequestNotCommitted](#errsaverequestnotcommitted) · [ErrSaveRequestNotFound](#errsaverequestnotfound) · [ErrSaveRequestsUnsupported](#errsaverequestsunsupported) · [ErrSaveRequestUnknown](#errsaverequestunknown) · [ErrUnsupportedBackend](#errunsupportedbackend) · [ExportCheckpoint](#exportcheckpoint) · [ExportHandoff](#exporthandoff) · [FilesystemOptions](#filesystemoptions) · [GetRegistryPolicy](#getregistrypolicy) · [GitRepositoryInput](#gitrepositoryinput) · [Handoff](#handoff) · [HandoffArchive](#handoffarchive) · [HandoffError](#handofferror) · [HandoffExportOptions](#handoffexportoptions) · [ImportCheckpoint](#importcheckpoint) · [ImportHandoff](#importhandoff) · [List](#list) · [ListOptions](#listoptions) · [ListRecoveryHolds](#listrecoveryholds) · [ListWorkspacesOptions](#listworkspacesoptions) · [LoadCheckpoint](#loadcheckpoint) · [LookupWorkspace](#lookupworkspace) · [MaxDeltaBytes](#maxdeltabytes) · [MaxRecoveryHoldBytes](#maxrecoveryholdbytes) · [MaxRecoveryHoldPeakBytes](#maxrecoveryholdpeakbytes) · [MaxRecoveryHolds](#maxrecoveryholds) · [MaxRecoveryReferences](#maxrecoveryreferences) · [MultipartOptions](#multipartoptions) · [MultipartStore](#multipartstore) · [MultipartUpload](#multipartupload) · [Object](#object) · [ObjectDelete](#objectdelete) · [ObjectList](#objectlist) · [ObjectPage](#objectpage) · [ObjectRange](#objectrange) · [ObjectRead](#objectread) · [ObjectRecoveryHoldOptions](#objectrecoveryholdoptions) · [ObjectRecoveryReference](#objectrecoveryreference) · [ObjectWrite](#objectwrite) · [Open](#open) · [OpenCapacityHost](#opencapacityhost) · [OpenFilesystem](#openfilesystem) · [OpenWorkspace](#openworkspace) · [Operation](#operation) · [Options](#options) · [Part](#part) · [PortableCheckpointDiff](#portablecheckpointdiff) · [PreparedRepository](#preparedrepository) · [PreparedWorkspace](#preparedworkspace) · [PrepareOptions](#prepareoptions) · [PrepareWorkspace](#prepareworkspace) · [PreviewCheckpointArchive](#previewcheckpointarchive) · [Prune](#prune) · [PruneOptions](#pruneoptions) · [PruneResult](#pruneresult) · [PutOptions](#putoptions) · [RangeStore](#rangestore) · [ReadCheckpointFile](#readcheckpointfile) · [ReadHandoff](#readhandoff) · [ReadHandoffReader](#readhandoffreader) · [ReadOnly](#readonly) · [ReadWrite](#readwrite) · [RecoveryHold](#recoveryhold) · [RecoveryHoldPage](#recoveryholdpage) · [RecoveryHoldQuery](#recoveryholdquery) · [RecoveryHoldRequest](#recoveryholdrequest) · [RecoveryReference](#recoveryreference) · [RegistryPolicy](#registrypolicy) · [ReleaseRecoveryHold](#releaserecoveryhold) · [ReplacementCondition](#replacementcondition) · [ResolveCheckpoint](#resolvecheckpoint) · [ResolveRegistryDir](#resolveregistrydir) · [RestoreCheckpoint](#restorecheckpoint) · [RestoreCheckpointWithGit](#restorecheckpointwithgit) · [Resume](#resume) · [ResumeIn](#resumein) · [ResumeWith](#resumewith) · [Runtime](#runtime) · [SaveCommitted](#savecommitted) · [SaveCondition](#savecondition) · [SaveNotCommitted](#savenotcommitted) · [SaveOptions](#saveoptions) · [SaveOutcome](#saveoutcome) · [SaveResult](#saveresult) · [SaveUnknown](#saveunknown) · [SetRegistryPolicy](#setregistrypolicy) · [StagedObject](#stagedobject) · [StagedWriteStore](#stagedwritestore) · [Store](#store) · [StreamingStore](#streamingstore) · [StreamingWriteStore](#streamingwritestore) · [StreamPutOptions](#streamputoptions) · [UpstreamRead](#upstreamread) · [UpstreamWrite](#upstreamwrite) · [Usage](#usage) · [ValidateHandoff](#validatehandoff) · [VerifyDeltaDigest](#verifydeltadigest) · [Workspace](#workspace) · [WorkspaceFacade](#workspacefacade) · [WorkspaceFacadeOptions](#workspacefacadeoptions) · [WorkspaceInput](#workspaceinput) · [WorkspaceListing](#workspacelisting) · [WorkspaceOptions](#workspaceoptions) · [WorkspaceReference](#workspacereference) · [WorkspaceSummary](#workspacesummary) · [WorkspaceTaskManifest](#workspacetaskmanifest)
+[AddRecoveryHold](#addrecoveryhold) · [AdoptHandoff](#adopthandoff) · [AdoptHandoffArchive](#adopthandoffarchive) · [AllowAll](#allowall) · [AllowNone](#allownone) · [ApplyDelta](#applydelta) · [ApplyDeltaWithOptions](#applydeltawithoptions) · [Authority](#authority) · [Backend](#backend) · [BackendFilesystem](#backendfilesystem) · [BackendHost](#backendhost) · [BackendMemory](#backendmemory) · [BackendWorkspace](#backendworkspace) · [Bucket](#bucket) · [BucketCreate](#bucketcreate) · [BucketDelete](#bucketdelete) · [BucketList](#bucketlist) · [Capabilities](#capabilities) · [CapacityHost](#capacityhost) · [CapacityHostOptions](#capacityhostoptions) · [CapacityNamespace](#capacitynamespace) · [CapacityNamespaceOptions](#capacitynamespaceoptions) · [CapacitySnapshot](#capacitysnapshot) · [CaptureCheckpoint](#capturecheckpoint) · [CapturePrincipal](#captureprincipal) · [CheckpointArchiveOptions](#checkpointarchiveoptions) · [CheckpointArchivePreview](#checkpointarchivepreview) · [CheckpointBucketChange](#checkpointbucketchange) · [CheckpointChange](#checkpointchange) · [CheckpointError](#checkpointerror) · [CheckpointFile](#checkpointfile) · [CheckpointHold](#checkpointhold) · [CheckpointInfo](#checkpointinfo) · [CheckpointManifest](#checkpointmanifest) · [CheckpointObject](#checkpointobject) · [CheckpointObjectChange](#checkpointobjectchange) · [CheckpointOf](#checkpointof) · [CheckpointOfAuthorized](#checkpointofauthorized) · [CheckpointOptions](#checkpointoptions) · [CheckpointProvenance](#checkpointprovenance) · [CheckpointReadDirectory](#checkpointreaddirectory) · [CheckpointReader](#checkpointreader) · [CheckpointReaderOptions](#checkpointreaderoptions) · [CheckpointReadReference](#checkpointreadreference) · [CheckpointReadResult](#checkpointreadresult) · [CheckpointRepository](#checkpointrepository) · [CheckpointRequest](#checkpointrequest) · [CheckpointResult](#checkpointresult) · [Collect](#collect) · [CollectOptions](#collectoptions) · [CollectResult](#collectresult) · [CompareCheckpoints](#comparecheckpoints) · [ComparePortableCheckpoints](#compareportablecheckpoints) · [ConditionalWriteStore](#conditionalwritestore) · [CopyStore](#copystore) · [CreateDelta](#createdelta) · [DecodeDelta](#decodedelta) · [DefaultWorkspaceRegistryDir](#defaultworkspaceregistrydir) · [DefaultWorkspaceRegistryDirForTeam](#defaultworkspaceregistrydirforteam) · [DeleteCheckpoint](#deletecheckpoint) · [DeltaChange](#deltachange) · [DeltaChangeAdded](#deltachangeadded) · [DeltaChangeChanged](#deltachangechanged) · [DeltaChangeDeleted](#deltachangedeleted) · [DeltaDocument](#deltadocument) · [DeltaDocumentDigest](#deltadocumentdigest) · [DeltaOptions](#deltaoptions) · [DeltaVersion](#deltaversion) · [DestroyRegisteredWorkspace](#destroyregisteredworkspace) · [DiscardRecoveryHold](#discardrecoveryhold) · [EncodeDelta](#encodedelta) · [EnvironmentDestroy](#environmentdestroy) · [EnvironmentPromote](#environmentpromote) · [EnvironmentReset](#environmentreset) · [ErrBucketExists](#errbucketexists) · [ErrBucketNotEmpty](#errbucketnotempty) · [ErrBucketNotFound](#errbucketnotfound) · [ErrCapacityConflict](#errcapacityconflict) · [ErrCapacityFull](#errcapacityfull) · [ErrCapacityInvalid](#errcapacityinvalid) · [ErrCapacityUnknown](#errcapacityunknown) · [ErrCheckpointInUse](#errcheckpointinuse) · [ErrCheckpointReadClosed](#errcheckpointreadclosed) · [ErrCheckpointReadExpired](#errcheckpointreadexpired) · [ErrCheckpointReadTooLarge](#errcheckpointreadtoolarge) · [ErrCheckpointReadUnavailable](#errcheckpointreadunavailable) · [ErrClosed](#errclosed) · [ErrConditionalWritesUnsupported](#errconditionalwritesunsupported) · [ErrDeltaConflict](#errdeltaconflict) · [ErrDeltaDigestMismatch](#errdeltadigestmismatch) · [ErrDeltaTooLarge](#errdeltatoolarge) · [ErrDeltaVersionUnsupported](#errdeltaversionunsupported) · [ErrGuardedSavesUnsupported](#errguardedsavesunsupported) · [ErrHandoffDigestMismatch](#errhandoffdigestmismatch) · [ErrInvalidBucket](#errinvalidbucket) · [ErrInvalidKey](#errinvalidkey) · [ErrInvalidListLimit](#errinvalidlistlimit) · [ErrInvalidRecoveryHold](#errinvalidrecoveryhold) · [ErrInvalidSaveCondition](#errinvalidsavecondition) · [ErrInvalidSaveRequest](#errinvalidsaverequest) · [ErrMutationCommitted](#errmutationcommitted) · [ErrNotAuthorized](#errnotauthorized) · [ErrObjectNotFound](#errobjectnotfound) · [ErrPreconditionFailed](#errpreconditionfailed) · [ErrQuotaExceeded](#errquotaexceeded) · [ErrRecoveryHeld](#errrecoveryheld) · [ErrRecoveryHoldConflict](#errrecoveryholdconflict) · [ErrRecoveryHoldCorrupt](#errrecoveryholdcorrupt) · [ErrRecoveryHoldFull](#errrecoveryholdfull) · [ErrRecoveryHoldNotFound](#errrecoveryholdnotfound) · [ErrRecoveryHoldsUnsupported](#errrecoveryholdsunsupported) · [ErrSaveConflict](#errsaveconflict) · [ErrSaveRequestConflict](#errsaverequestconflict) · [ErrSaveRequestFull](#errsaverequestfull) · [ErrSaveRequestNotCommitted](#errsaverequestnotcommitted) · [ErrSaveRequestNotFound](#errsaverequestnotfound) · [ErrSaveRequestsUnsupported](#errsaverequestsunsupported) · [ErrSaveRequestUnknown](#errsaverequestunknown) · [ErrUnsupportedBackend](#errunsupportedbackend) · [ErrWorkspaceEditorClosed](#errworkspaceeditorclosed) · [ErrWorkspaceEditorUnavailable](#errworkspaceeditorunavailable) · [ErrWorkspaceObservationFull](#errworkspaceobservationfull) · [ErrWorkspaceObservationInvalid](#errworkspaceobservationinvalid) · [ErrWorkspaceReadChanged](#errworkspacereadchanged) · [ErrWorkspaceReaderClosed](#errworkspacereaderclosed) · [ErrWorkspaceReadTooLarge](#errworkspacereadtoolarge) · [ErrWorkspaceReadUnavailable](#errworkspacereadunavailable) · [ExportCheckpoint](#exportcheckpoint) · [ExportHandoff](#exporthandoff) · [FilesystemOptions](#filesystemoptions) · [GetRegistryPolicy](#getregistrypolicy) · [GitRepositoryInput](#gitrepositoryinput) · [Handoff](#handoff) · [HandoffArchive](#handoffarchive) · [HandoffError](#handofferror) · [HandoffExportOptions](#handoffexportoptions) · [ImportCheckpoint](#importcheckpoint) · [ImportHandoff](#importhandoff) · [List](#list) · [ListOptions](#listoptions) · [ListRecoveryHolds](#listrecoveryholds) · [ListWorkspacesOptions](#listworkspacesoptions) · [LoadCheckpoint](#loadcheckpoint) · [LookupWorkspace](#lookupworkspace) · [MaxDeltaBytes](#maxdeltabytes) · [MaxRecoveryHoldBytes](#maxrecoveryholdbytes) · [MaxRecoveryHoldPeakBytes](#maxrecoveryholdpeakbytes) · [MaxRecoveryHolds](#maxrecoveryholds) · [MaxRecoveryReferences](#maxrecoveryreferences) · [MultipartOptions](#multipartoptions) · [MultipartStore](#multipartstore) · [MultipartUpload](#multipartupload) · [Object](#object) · [ObjectDelete](#objectdelete) · [ObjectList](#objectlist) · [ObjectPage](#objectpage) · [ObjectRange](#objectrange) · [ObjectRead](#objectread) · [ObjectRecoveryHoldOptions](#objectrecoveryholdoptions) · [ObjectRecoveryReference](#objectrecoveryreference) · [ObjectWrite](#objectwrite) · [Open](#open) · [OpenCapacityHost](#opencapacityhost) · [OpenCheckpointReader](#opencheckpointreader) · [OpenFilesystem](#openfilesystem) · [OpenWorkspace](#openworkspace) · [OpenWorkspaceReader](#openworkspacereader) · [Operation](#operation) · [Options](#options) · [Part](#part) · [PortableCheckpointDiff](#portablecheckpointdiff) · [PreparedRepository](#preparedrepository) · [PreparedWorkspace](#preparedworkspace) · [PrepareOptions](#prepareoptions) · [PrepareWorkspace](#prepareworkspace) · [PreviewCheckpointArchive](#previewcheckpointarchive) · [Prune](#prune) · [PruneOptions](#pruneoptions) · [PruneResult](#pruneresult) · [PutOptions](#putoptions) · [RangeStore](#rangestore) · [ReadCheckpointFile](#readcheckpointfile) · [ReadHandoff](#readhandoff) · [ReadHandoffReader](#readhandoffreader) · [ReadOnly](#readonly) · [ReadWrite](#readwrite) · [RecoveryHold](#recoveryhold) · [RecoveryHoldPage](#recoveryholdpage) · [RecoveryHoldQuery](#recoveryholdquery) · [RecoveryHoldRequest](#recoveryholdrequest) · [RecoveryReference](#recoveryreference) · [RegistryPolicy](#registrypolicy) · [ReleaseRecoveryHold](#releaserecoveryhold) · [ReplacementCondition](#replacementcondition) · [ResolveCheckpoint](#resolvecheckpoint) · [ResolveRegistryDir](#resolveregistrydir) · [RestoreCheckpoint](#restorecheckpoint) · [RestoreCheckpointWithGit](#restorecheckpointwithgit) · [Resume](#resume) · [ResumeIn](#resumein) · [ResumeWith](#resumewith) · [ResumeWorkspaceForFileRecovery](#resumeworkspaceforfilerecovery) · [Runtime](#runtime) · [SaveCommitted](#savecommitted) · [SaveCondition](#savecondition) · [SaveNotCommitted](#savenotcommitted) · [SaveOptions](#saveoptions) · [SaveOutcome](#saveoutcome) · [SaveResult](#saveresult) · [SaveUnknown](#saveunknown) · [SetRegistryPolicy](#setregistrypolicy) · [StagedObject](#stagedobject) · [StagedWriteStore](#stagedwritestore) · [Store](#store) · [StreamingStore](#streamingstore) · [StreamingWriteStore](#streamingwritestore) · [StreamPutOptions](#streamputoptions) · [UpstreamRead](#upstreamread) · [UpstreamWrite](#upstreamwrite) · [Usage](#usage) · [ValidateHandoff](#validatehandoff) · [VerifyDeltaDigest](#verifydeltadigest) · [Workspace](#workspace) · [WorkspaceDirectoryObservation](#workspacedirectoryobservation) · [WorkspaceEditOptions](#workspaceeditoptions) · [WorkspaceEditor](#workspaceeditor) · [WorkspaceFacade](#workspacefacade) · [WorkspaceFacadeOptions](#workspacefacadeoptions) · [WorkspaceFileRead](#workspacefileread) · [WorkspaceFileSaveRequest](#workspacefilesaverequest) · [WorkspaceFileSaveResult](#workspacefilesaveresult) · [WorkspaceInput](#workspaceinput) · [WorkspaceListing](#workspacelisting) · [WorkspaceOptions](#workspaceoptions) · [WorkspaceReadEntry](#workspacereadentry) · [WorkspaceReader](#workspacereader) · [WorkspaceReaderOptions](#workspacereaderoptions) · [WorkspaceReadFile](#workspacereadfile) · [WorkspaceReference](#workspacereference) · [WorkspaceSummary](#workspacesummary) · [WorkspaceTaskManifest](#workspacetaskmanifest)
 
 ## AddRecoveryHold
 
@@ -720,6 +720,142 @@ type CheckpointProvenance struct {
 }
 ```
 
+## CheckpointReadDirectory
+
+
+
+```go
+type CheckpointReadDirectory struct {
+	Entries	[]WorkspaceReadEntry
+	Offset	int
+	Total	int
+}
+```
+
+## CheckpointReader
+
+
+
+```go
+type CheckpointReader struct {
+
+}// contains filtered or unexported fields
+```
+
+### CheckpointReader.Close
+
+Release this handle. Do not submit new operations after closing it.
+
+```go
+func (r *CheckpointReader) Close() error
+```
+
+Returns: `error`.
+
+### CheckpointReader.ReadDirectory
+
+
+
+```go
+func (r *CheckpointReader) ReadDirectory(ctx context.Context, path string, offset, limit int) (CheckpointReadDirectory, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+| `offset` | `int` | Yes | — |  |
+| `limit` | `int` | Yes | — | Maximum results per page; limits and defaults depend on the listing API. |
+
+Returns: `CheckpointReadDirectory, error`.
+
+### CheckpointReader.ReadFile
+
+
+
+```go
+func (r *CheckpointReader) ReadFile(ctx context.Context, path string) (CheckpointReadResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+
+Returns: `CheckpointReadResult, error`.
+
+### CheckpointReader.ReadRange
+
+Read byte offsets from start inclusive to end exclusive.
+
+```go
+func (r *CheckpointReader) ReadRange(ctx context.Context, path string, offset, length int64) (CheckpointReadResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+| `offset` | `int64` | Yes | — |  |
+| `length` | `int64` | Yes | — |  |
+
+Returns: `CheckpointReadResult, error`.
+
+### CheckpointReader.Reference
+
+
+
+```go
+func (r *CheckpointReader) Reference() CheckpointReadReference
+```
+
+Returns: `CheckpointReadReference`.
+
+## CheckpointReaderOptions
+
+
+
+```go
+type CheckpointReaderOptions struct {
+	RegistryDir	string
+	WorkspaceID	string
+	CheckpointID	string
+	ReadRoots	[]string
+	Lifetime	time.Duration
+	MaxVerifyBytes	int64
+}
+```
+
+## CheckpointReadReference
+
+
+
+```go
+type CheckpointReadReference struct {
+	WorkspaceID	string
+	CheckpointID	string
+	Version		int
+	ManifestSHA256	string
+	CreatedAt	time.Time
+	ExpiresAt	time.Time
+	ReadRoots	[]string
+}
+```
+
+## CheckpointReadResult
+
+
+
+```go
+type CheckpointReadResult struct {
+	Path	string
+	Data	[]byte
+	Offset	int64
+	Size	int64
+	SHA256	string
+}
+```
+
 ## CheckpointRepository
 
 
@@ -1133,6 +1269,46 @@ var ErrCapacityInvalid = capacity.ErrInvalid
 var ErrCapacityUnknown = capacity.ErrUnknown
 ```
 
+## ErrCheckpointInUse
+
+
+
+```go
+var ErrCheckpointInUse = workspace.ErrCheckpointInUse
+```
+
+## ErrCheckpointReadClosed
+
+
+
+```go
+var ErrCheckpointReadClosed = errors.New("stow: checkpoint reader is closed")
+```
+
+## ErrCheckpointReadExpired
+
+
+
+```go
+var ErrCheckpointReadExpired = errors.New("stow: checkpoint reader expired")
+```
+
+## ErrCheckpointReadTooLarge
+
+
+
+```go
+var ErrCheckpointReadTooLarge = errors.New("stow: checkpoint resource is too large")
+```
+
+## ErrCheckpointReadUnavailable
+
+
+
+```go
+var ErrCheckpointReadUnavailable = errors.New("stow: checkpoint resource is unavailable")
+```
+
 ## ErrClosed
 
 
@@ -1408,6 +1584,70 @@ var ErrSaveRequestUnknown = embedded.ErrSaveRequestUnknown
 
 ```go
 var ErrUnsupportedBackend = embedded.ErrUnsupportedBackend
+```
+
+## ErrWorkspaceEditorClosed
+
+
+
+```go
+var ErrWorkspaceEditorClosed = errors.New("stow: workspace file editor is closed")
+```
+
+## ErrWorkspaceEditorUnavailable
+
+
+
+```go
+var ErrWorkspaceEditorUnavailable = errors.New("stow: workspace file editor unavailable")
+```
+
+## ErrWorkspaceObservationFull
+
+
+
+```go
+var ErrWorkspaceObservationFull = errors.New("stow: workspace file observation capacity reached")
+```
+
+## ErrWorkspaceObservationInvalid
+
+
+
+```go
+var ErrWorkspaceObservationInvalid = errors.New("stow: workspace file observation is invalid or expired")
+```
+
+## ErrWorkspaceReadChanged
+
+
+
+```go
+var ErrWorkspaceReadChanged = errors.New("stow: workspace resource changed during read")
+```
+
+## ErrWorkspaceReaderClosed
+
+
+
+```go
+var ErrWorkspaceReaderClosed = errors.New("stow: workspace reader is closed")
+```
+
+## ErrWorkspaceReadTooLarge
+
+
+
+```go
+var ErrWorkspaceReadTooLarge = errors.New("stow: workspace resource is too large")
+```
+
+## ErrWorkspaceReadUnavailable
+
+
+
+```go
+var ErrWorkspaceReadUnavailable = errors.New("stow: workspace resource is unavailable")
 ```
 
 ## ExportCheckpoint
@@ -1880,6 +2120,21 @@ func OpenCapacityHost(options CapacityHostOptions) (*CapacityHost, error)
 
 Returns: `*CapacityHost, error`.
 
+## OpenCheckpointReader
+
+
+
+```go
+func OpenCheckpointReader(ctx context.Context, options CheckpointReaderOptions) (*CheckpointReader, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `options` | `CheckpointReaderOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `*CheckpointReader, error`.
+
 ## OpenFilesystem
 
 OpenFilesystem owns one exclusively locked durable directory; Reset is unavailable.
@@ -1896,7 +2151,7 @@ Returns: `*Runtime, error`.
 
 ## OpenWorkspace
 
-OpenWorkspace opens a workspace rooted at options.Dir.
+OpenWorkspace opens options.Dir without a process, listener or ambient credentials.
 
 ```go
 func OpenWorkspace(options WorkspaceOptions) (*Workspace, error)
@@ -1907,6 +2162,20 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error)
 | `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
 
 Returns: `*Workspace, error`.
+
+## OpenWorkspaceReader
+
+OpenWorkspaceReader attaches to an existing workspace without opening a writer session or changing its manifest, index, registry entry or workspace identity.
+
+```go
+func OpenWorkspaceReader(options WorkspaceReaderOptions) (*WorkspaceReader, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `WorkspaceReaderOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `*WorkspaceReader, error`.
 
 ## Operation
 
@@ -2365,6 +2634,21 @@ ResumeWith is Resume with options, chiefly so the registry location and the cloc
 
 ```go
 func ResumeWith(options WorkspaceOptions, id string) (*Workspace, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `WorkspaceOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
+| `id` | `string` | Yes | — | Stable identity of this workspace, file stage, revision or immutable record. |
+
+Returns: `*Workspace, error`.
+
+## ResumeWorkspaceForFileRecovery
+
+ResumeWorkspaceForFileRecovery opens an existing registered workspace for resolving receipts.
+
+```go
+func ResumeWorkspaceForFileRecovery(options WorkspaceOptions, id string) (*Workspace, error)
 ```
 
 | Parameter | Type | Required | Default | Meaning |
@@ -2989,7 +3273,7 @@ Returns: `error`.
 
 ## Workspace
 
-Workspace is a bounded artifact workspace: a real directory a caller works in, and a bucket over the same bytes.
+Workspace is a real working directory and bucket over the same bytes (ADR 0007).
 
 ```go
 type Workspace struct {
@@ -3111,6 +3395,20 @@ func (w *Workspace) MaxCheckpoints() int64
 
 Returns: `int64`.
 
+### Workspace.OpenFileEditor
+
+
+
+```go
+func (w *Workspace) OpenFileEditor(options WorkspaceEditOptions) (*WorkspaceEditor, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `WorkspaceEditOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `*WorkspaceEditor, error`.
+
 ### Workspace.Path
 
 Path returns where a key's bytes live, and whether they are there.
@@ -3159,6 +3457,167 @@ func (w *Workspace) WorkingDirectory() string
 
 Returns: `string`.
 
+## WorkspaceDirectoryObservation
+
+
+
+```go
+type WorkspaceDirectoryObservation struct {
+
+}// contains filtered or unexported fields
+```
+
+### WorkspaceDirectoryObservation.Len
+
+
+
+```go
+func (o *WorkspaceDirectoryObservation) Len() int
+```
+
+Returns: `int`.
+
+### WorkspaceDirectoryObservation.MetadataBytes
+
+
+
+```go
+func (o *WorkspaceDirectoryObservation) MetadataBytes() int64
+```
+
+Returns: `int64`.
+
+### WorkspaceDirectoryObservation.ObservedAt
+
+
+
+```go
+func (o *WorkspaceDirectoryObservation) ObservedAt() time.Time
+```
+
+Returns: `time.Time`.
+
+### WorkspaceDirectoryObservation.Page
+
+
+
+```go
+func (o *WorkspaceDirectoryObservation) Page(ctx context.Context, offset, limit int) ([]WorkspaceReadEntry, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `offset` | `int` | Yes | — |  |
+| `limit` | `int` | Yes | — | Maximum results per page; limits and defaults depend on the listing API. |
+
+Returns: `[]WorkspaceReadEntry, error`.
+
+### WorkspaceDirectoryObservation.Path
+
+
+
+```go
+func (o *WorkspaceDirectoryObservation) Path() string
+```
+
+Returns: `string`.
+
+## WorkspaceEditOptions
+
+
+
+```go
+type WorkspaceEditOptions struct {
+	ReadRoots		[]string
+	WriteRoots		[]string
+	Coordination		string
+	MaxFileBytes		int64
+	MaxObservations		int
+	ObservationLifetime	time.Duration
+}
+```
+
+## WorkspaceEditor
+
+
+
+```go
+type WorkspaceEditor struct {
+
+}// contains filtered or unexported fields
+```
+
+### WorkspaceEditor.Close
+
+Release this handle. Do not submit new operations after closing it.
+
+```go
+func (e *WorkspaceEditor) Close() error
+```
+
+Returns: `error`.
+
+### WorkspaceEditor.ReadForSave
+
+Read bytes and metadata with an opaque condition, including observed absence. The condition grants no permission.
+
+```go
+func (e *WorkspaceEditor) ReadForSave(ctx context.Context, path string) (WorkspaceFileRead, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+
+Returns: `WorkspaceFileRead, error`.
+
+### WorkspaceEditor.ReleaseObservation
+
+
+
+```go
+func (e *WorkspaceEditor) ReleaseObservation(token string) error
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `token` | `string` | Yes | — | Opaque identity returned by the corresponding observation or migration operation. |
+
+Returns: `error`.
+
+### WorkspaceEditor.ResolveSave
+
+Resolve the original request key without starting another save. Missing evidence leaves the effect unknown.
+
+```go
+func (e *WorkspaceEditor) ResolveSave(ctx context.Context, path, requestKey string) (WorkspaceFileSaveResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+| `requestKey` | `string` | Yes | — | Unique persisted request identity for capture or save recovery. |
+
+Returns: `WorkspaceFileSaveResult, error`.
+
+### WorkspaceEditor.SaveFile
+
+SaveFile publishes bytes against a prior observation or an explicit replacement.
+
+```go
+func (e *WorkspaceEditor) SaveFile(ctx context.Context, request WorkspaceFileSaveRequest) (WorkspaceFileSaveResult, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `request` | `WorkspaceFileSaveRequest` | Yes | — |  |
+
+Returns: `WorkspaceFileSaveResult, error`.
+
 ## WorkspaceFacade
 
 WorkspaceFacade describes the loopback S3 endpoint owned by a Workspace.
@@ -3183,6 +3642,51 @@ Facade starts one authenticated loopback server sharing this workspace's runtime
 type WorkspaceFacadeOptions struct {
 	MaxRequestBytes		int64
 	MaxConcurrentRequests	int
+}
+```
+
+## WorkspaceFileRead
+
+
+
+```go
+type WorkspaceFileRead struct {
+	Path			string
+	Data			[]byte
+	Absent			bool
+	SHA256			string
+	Mode			os.FileMode
+	Modified		time.Time
+	Generation		string
+	ObservationToken	string
+	ExpiresAt		time.Time
+}
+```
+
+## WorkspaceFileSaveRequest
+
+WorkspaceFileSaveRequest names one idempotent save in an attached workspace.
+
+```go
+type WorkspaceFileSaveRequest struct {
+	Path			string
+	Data			[]byte
+	RequestKey		string
+	ObservationToken	string
+	Replace			bool
+}
+```
+
+## WorkspaceFileSaveResult
+
+WorkspaceFileSaveResult reports the original receipt without returning file bytes.
+
+```go
+type WorkspaceFileSaveResult struct {
+	Object		Object
+	Generation	string
+	Outcome		SaveOutcome
+	Replayed	bool
 }
 ```
 
@@ -3211,7 +3715,7 @@ type WorkspaceListing struct {
 
 ## WorkspaceOptions
 
-WorkspaceOptions configures a workspace.
+WorkspaceOptions configures a workspace with a required directory.
 
 ```go
 type WorkspaceOptions struct {
@@ -3231,6 +3735,121 @@ type WorkspaceOptions struct {
 	Now			func() time.Time
 
 }// contains filtered or unexported fields
+```
+
+## WorkspaceReadEntry
+
+WorkspaceReadEntry describes one direct child of a directory.
+
+```go
+type WorkspaceReadEntry struct {
+	Name	string	`json:"name"`
+	Path	string	`json:"path"`
+	Kind	string	`json:"kind"`
+	Size	int64	`json:"size"`
+}
+```
+
+## WorkspaceReader
+
+WorkspaceReader is a confined, read-only attachment to one registered workspace.
+
+```go
+type WorkspaceReader struct {
+
+}// contains filtered or unexported fields
+```
+
+### WorkspaceReader.Close
+
+Release this handle. Do not submit new operations after closing it.
+
+```go
+func (r *WorkspaceReader) Close() error
+```
+
+Returns: `error`.
+
+### WorkspaceReader.ObserveDirectory
+
+
+
+```go
+func (r *WorkspaceReader) ObserveDirectory(ctx context.Context, path string) (*WorkspaceDirectoryObservation, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+
+Returns: `*WorkspaceDirectoryObservation, error`.
+
+### WorkspaceReader.ReadDirectory
+
+ReadDirectory returns a complete, sorted observation of one directory's direct visible children.
+
+```go
+func (r *WorkspaceReader) ReadDirectory(ctx context.Context, path string) ([]WorkspaceReadEntry, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+
+Returns: `[]WorkspaceReadEntry, error`.
+
+### WorkspaceReader.ReadFile
+
+ReadFile returns the current bytes of a regular workspace file, within the configured decoded-byte bound.
+
+```go
+func (r *WorkspaceReader) ReadFile(ctx context.Context, path string) (WorkspaceReadFile, error)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `ctx` | `context.Context` | Yes | — | Context for cancellation and deadlines. |
+| `path` | `string` | Yes | — | Local path selected for this file or archive operation. |
+
+Returns: `WorkspaceReadFile, error`.
+
+### WorkspaceReader.Reference
+
+Reference returns the resolved host-side identity and paths.
+
+```go
+func (r *WorkspaceReader) Reference() WorkspaceReference
+```
+
+Returns: `WorkspaceReference`.
+
+## WorkspaceReaderOptions
+
+WorkspaceReaderOptions selects one registered workspace and narrows its read bounds.
+
+```go
+type WorkspaceReaderOptions struct {
+	RegistryDir	string
+	WorkspaceID	string
+	MaxFileBytes	int64
+	MaxEntries	int
+	ReadRoots	[]string
+}
+```
+
+## WorkspaceReadFile
+
+WorkspaceReadFile contains bounded current bytes from the live working view.
+
+```go
+type WorkspaceReadFile struct {
+	Path		string
+	Data		[]byte
+	ContentType	string
+	Modified	time.Time
+}
 ```
 
 ## WorkspaceReference

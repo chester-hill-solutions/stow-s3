@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "date": "2026-11-11",
+  "profile": "native macOS ARM64; same-machine synthetic fresh OpenCode checkpoint calculation",
+  "attempt_number": 2,
+  "status": "failed",
+  "strict_pilot_qualified": false,
+  "failure_reason": "terminal JSON was followed by explanatory prose",
+  "prior_attempt": "checkpoint-model-local.json",
+  "top_level_prompts": 1,
+  "provider_completion_requests": 6,
+  "automatic_retry": false,
+  "opencode_version": "opencode v2.2.7",
+  "stow_binary_sha256": "fbc60871fc4ef18c4c19283af4e38b60acc1c826e066368f9d5a037b0d798beb",
+  "harness_sha256": {
+    "examples/workspace-resources/checkpoint-runner.mjs": "4ab16d3b5fb853a56ee9a15d8edd6a513826ee941ae2a1896eb3293807737619",
+    "examples/workspace-resources/checkpoint-fixture.mjs": "50fb4e2bbdfa9ec49432ee1aa46b0fdbf9aaeca6d4c4c8df331b6604347e0ccd",
+    "examples/workspace-resources/checkpoint-verifier.mjs": "65399ad91faa5074bfdf21d82bd912975e935b372cafb6460dbeddd956f6e68c",
+    "examples/workspace-resources/run.mjs": "eb7c5ecdd8adf388c8f21c3998d86cf8da8117a767748e6ca232d76f37aaf314",
+    "examples/workspace-resources/free-only.mjs": "2c52baaa08906b9c6f10f2c5ba26f829852735e9ef6815c26fd42824951646f0"
+  },
+  "attempt_prompt": "Use only MCP resource tools. List Stow resources and read the checkpoint overview URI below. Follow its root_uri verbatim, then follow each tree entry uri and next_uri verbatim. Never construct or request a /files/ URI for a directory, and never invent resource URIs. Continue the prior calculation using the saved progress and next-batch data, then return only JSON shaped as {total_units:number,entry_count:number,sources:[PROGRESS_URI,DATA_URI]}. Include the exact resource URIs you used. Do not use shell or filesystem tools.\n\nCheckpoint resource root: stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/v1",
+  "attempt": {
+    "status": "failed",
+    "stage": "evidence_verification",
+    "category": "evidence_rejected",
+    "requestedSelector": "openrouter/openrouter/free",
+    "sourceWorkspaceId": "ws_51eb264df50f748c",
+    "sourceCheckpointId": "cp_15f0c397cd3d5fabb9262d2d",
+    "importedSourceCheckpointId": "cp_15f0c397cd3d5fabb9262d2d",
+    "receiverWorkspaceId": "ws_e231253de2b94dd7",
+    "receiverCheckpointId": "cp_5e02af983b7d3f8ff0ee7824",
+    "sourcePathsRemovedBeforeModel": true,
+    "taskRootURI": "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/v1",
+    "answerVerified": false,
+    "diagnosticPath": "/private/tmp/stow-w25-checkpoint-model-attempt2-events.jsonl",
+    "resourceToolTrace": [
+      {
+        "name": "opencode_list_mcp_resources",
+        "status": "completed",
+        "uri": "",
+        "failed": false,
+        "resultValid": true
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/v1",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 656,
+        "contentSHA256": "4204757a2dcb11f0a5f1e32a369559ffd29b0ad542ee96840de283653b7853a9"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/tree/v1/Lg",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 516,
+        "contentSHA256": "92b0d3afbaff21e0fd0b79767a80f2808719a9d760ed62bef109ad1b65b4487a"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/tree/v1/aW5wdXRz",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 1031,
+        "contentSHA256": "999f93ef4f673cfc4b2e0c97c0b4507caf9c9290379ff9c6378cccabc803f6ae"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 107,
+        "contentSHA256": "b3cfa5bb266260c9812a1edc3615129f78ee9c7444efa6e4ada2c43066b92c6f"
+      },
+      {
+        "name": "opencode_read_mcp_resource",
+        "status": "completed",
+        "uri": "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/files/aW5wdXRzL25leHQtYmF0Y2guY3N2",
+        "failed": false,
+        "resultValid": true,
+        "contentBytes": 30,
+        "contentSHA256": "4834e5fee97ac3e65fd8d95f0201e5c5d1ddb66d6f58c789c0b4401cad0ff594"
+      }
+    ],
+    "modelRequests": [
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "cohere/north-mini-code:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-lightning:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "recursive/flint-v1.0:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "cohere/north-mini-code:free",
+        "status": 200
+      }
+    ]
+  },
+  "observed_subclaims": {
+    "canonical_resource_calls_completed": 6,
+    "resource_errors": 0,
+    "saved_files": {
+      "inputs/progress.txt": {
+        "exact_content_verified": true,
+        "byte_length": 107,
+        "sha256": "b3cfa5bb266260c9812a1edc3615129f78ee9c7444efa6e4ada2c43066b92c6f"
+      },
+      "inputs/next-batch.csv": {
+        "exact_content_verified": true,
+        "byte_length": 30,
+        "sha256": "4834e5fee97ac3e65fd8d95f0201e5c5d1ddb66d6f58c789c0b4401cad0ff594"
+      }
+    },
+    "embedded_json_result": {
+      "total_units": 66,
+      "entry_count": 5,
+      "sources": [
+        "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/files/aW5wdXRzL3Byb2dyZXNzLnR4dA",
+        "stow://workspaces/ws_e231253de2b94dd7/checkpoints/cp_5e02af983b7d3f8ff0ee7824/files/aW5wdXRzL25leHQtYmF0Y2guY3N2"
+      ]
+    },
+    "embedded_result_correct": true,
+    "terminal_message_shape": "one fenced JSON object followed by explanatory prose",
+    "diagnostic_extraction_only": true,
+    "strict_terminal_parser_unchanged": true
+  },
+  "cross_host_qualified": false,
+  "linux_runtime_qualified": false,
+  "interrupted_real_model_turn_qualified": false,
+  "model_editing_qualified": false,
+  "result_saved_by_caller": false,
+  "third_attempt_run": false,
+  "cleanup": {
+    "temporary_directories_remaining": 0,
+    "matching_pilot_child_processes_remaining": 0
+  }
+}

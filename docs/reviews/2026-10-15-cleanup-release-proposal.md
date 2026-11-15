@@ -1,5 +1,7 @@
 # Stow v0.3.2
 
+> **Authority notice — 2026-11-14:** Dated v0.3.2 release record, retained as history. The [canonical working-storage plan](../development/storage-foundation-plan.md) alone owns current release scope and status. Distribution and validation statements below describe this release-era context and do not schedule work.
+
 This patch fixes concurrent stream cleanup, stale workspace multipart identities,
 and late preparation/checkpoint budget checks. The public runtime API is unchanged.
 

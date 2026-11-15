@@ -56,8 +56,12 @@ with tempfile.TemporaryDirectory(prefix="stow-api-docs-") as directory:
     for name in ["export", "adopt"]:
         (root / name).mkdir()
     workspace = catalog(binary, ["--registry-dir", str(root / "registry"), "--workspace-id", task["workspace_id"], "--timeout", "30s", "--max-bytes", "1048576", "--max-files", "100", "--export-root", str(root / "export"), "--adopt-root", str(root / "adopt")])
+    browser = catalog(binary, ["--registry-dir", str(root / "registry"), "--workspace-id", task["workspace_id"], "--timeout", "30s", "--workspace-files", "--browser"])
+    browser = [tool for tool in browser if tool["name"] == "stow_workspace_browser"]
+    editing = catalog(binary, ["--registry-dir", str(root / "registry"), "--workspace-id", task["workspace_id"], "--timeout", "30s", "--workspace-files", "--workspace-edit", "--write-root", ".", "--coordination", "host_quiesced"])
+    editing = [tool for tool in editing if tool["name"].startswith("stow_workspace_file_")]
     tools = []
-    for profile, entries in [("Object storage", objects), ("Workspaces", workspace)]:
+    for profile, entries in [("Object storage", objects), ("Workspaces", workspace), ("Workspace browser (opt-in)", browser), ("Workspace file editing (opt-in)", editing)]:
         for tool in entries:
             tools.append({"name": tool["name"], "profile": profile, "description": tool["description"], "inputSchema": tool["inputSchema"], "outputSchema": tool.get("outputSchema")})
     print(json.dumps(sorted(tools, key=lambda tool: tool["name"])))

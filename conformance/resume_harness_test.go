@@ -20,18 +20,36 @@ import (
 )
 
 type resumeWire struct {
-	mu           sync.Mutex
-	parts        map[int]int
-	partBytes    int64
-	rangeBytes   int64
-	listPages    int
-	completions  int
-	dropPart     bool
-	dropComplete bool
+	mu                      sync.Mutex
+	parts                   map[int]int
+	partBytes               int64
+	rangeBytes              int64
+	rangeGets               []resumeRangeRecord
+	interruptNextRangeAfter int64
+	getRequests             int
+	listPages               int
+	completions             int
+	dropPart                bool
+	dropComplete            bool
+}
+
+type resumeRangeRecord struct {
+	RequestRange string
+	IfMatch      string
+	Status       int
+	ContentRange string
+	ETag         string
+	Length       int64
+	// BytesRead and FaultBytes are client body-wrapper reads, not TCP egress.
+	BytesRead  int64
+	FaultAfter int64
+	FaultBytes int64
+	Faulted    bool
 }
 
 func (w *resumeWire) RoundTrip(request *http.Request) (*http.Response, error) {
 	query := request.URL.Query()
+	rangeIndex := w.recordGet(request)
 	w.mu.Lock()
 	drop := false
 	if request.Method == http.MethodPut && query.Get("partNumber") != "" {
@@ -63,23 +81,98 @@ func (w *resumeWire) RoundTrip(request *http.Request) (*http.Response, error) {
 		_ = response.Body.Close()
 		return nil, errors.New("synthetic reply loss after server response")
 	}
-	if request.Header.Get("Range") != "" && response.StatusCode == http.StatusPartialContent {
-		response.Body = &resumeRangeBody{ReadCloser: response.Body, wire: w}
+	if rangeIndex >= 0 {
+		w.mu.Lock()
+		w.rangeGets[rangeIndex].Status = response.StatusCode
+		w.rangeGets[rangeIndex].ContentRange = response.Header.Get("Content-Range")
+		w.rangeGets[rangeIndex].ETag = response.Header.Get("ETag")
+		w.rangeGets[rangeIndex].Length = response.ContentLength
+		w.mu.Unlock()
+		if response.StatusCode == http.StatusPartialContent {
+			w.mu.Lock()
+			failAfter := w.interruptNextRangeAfter
+			w.interruptNextRangeAfter = 0
+			if failAfter > 0 {
+				w.rangeGets[rangeIndex].FaultAfter = failAfter
+			}
+			w.mu.Unlock()
+			response.Body = &resumeRangeBody{ReadCloser: response.Body, wire: w, index: rangeIndex, failAfter: failAfter}
+		}
 	}
 	return response, nil
 }
 
+func (w *resumeWire) recordGet(request *http.Request) int {
+	if request.Method != http.MethodGet {
+		return -1
+	}
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.getRequests++
+	if request.Header.Get("Range") == "" {
+		return -1
+	}
+	index := len(w.rangeGets)
+	w.rangeGets = append(w.rangeGets, resumeRangeRecord{
+		RequestRange: request.Header.Get("Range"),
+		IfMatch:      request.Header.Get("If-Match"),
+	})
+	return index
+}
+
 type resumeRangeBody struct {
 	io.ReadCloser
-	wire *resumeWire
+	wire      *resumeWire
+	index     int
+	failAfter int64
+	readBytes int64
+	failure   error
 }
 
 func (b *resumeRangeBody) Read(data []byte) (int, error) {
+	if b.failure != nil {
+		return 0, b.failure
+	}
+	if b.failAfter > 0 && b.readBytes >= b.failAfter {
+		b.failure = errors.New("synthetic range response body interruption")
+		b.wire.mu.Lock()
+		b.wire.rangeGets[b.index].Faulted = true
+		b.wire.rangeGets[b.index].FaultBytes = b.readBytes
+		b.wire.mu.Unlock()
+		return 0, b.failure
+	}
+	if b.failAfter > 0 && int64(len(data)) > b.failAfter-b.readBytes {
+		data = data[:b.failAfter-b.readBytes]
+	}
 	n, err := b.ReadCloser.Read(data)
+	b.readBytes += int64(n)
 	b.wire.mu.Lock()
 	b.wire.rangeBytes += int64(n)
+	b.wire.rangeGets[b.index].BytesRead += int64(n)
 	b.wire.mu.Unlock()
 	return n, err
+}
+
+func (w *resumeWire) rangeSnapshot() []resumeRangeRecord {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return append([]resumeRangeRecord(nil), w.rangeGets...)
+}
+
+func (w *resumeWire) getRequestCount() int {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.getRequests
+}
+
+func (w *resumeWire) interruptNextRangeBodyAfter(bytes int64) bool {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.interruptNextRangeAfter != 0 {
+		return false
+	}
+	w.interruptNextRangeAfter = bytes
+	return true
 }
 
 type resumeHost struct {

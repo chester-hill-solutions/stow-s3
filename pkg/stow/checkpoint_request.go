@@ -77,7 +77,7 @@ func checkpointRequestOperation(ctx context.Context, registryDir, workspaceID st
 		return result, err
 	}
 	target := captureTarget{
-		dir: reference.Dir, registryDir: registryDir, workspaceID: workspaceID,
+		dir: reference.Dir, bucket: reference.Bucket, registryDir: registryDir, workspaceID: workspaceID,
 		maxCheckpointBytes: reference.MaxCheckpointBytes, maxCheckpoints: reference.MaxCheckpoints,
 		receipt: &receipt,
 	}

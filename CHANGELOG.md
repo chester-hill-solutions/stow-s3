@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.4.0 — 2026-11-14
+
+- Browse scoped working files through MCP resources with paged directories and bounded reads.
+- Read a selected immutable checkpoint through resources, including verified byte ranges.
+- Opt into managed file saves with observed-token comparison, retained request receipts and explicit recovery.
+- Refuse checkpoint capture and cleanup while a file save remains unresolved; add workspace browser navigation.
+
+Native GitHub downloads and the Go module are available at v0.4.0 on Linux
+and macOS, x64 and ARM64. Public npm packages remain at 0.3.7; npm and PyPI
+publication remain disabled. See the [release notes](docs/releases/v0.4.0.md)
+for usage, limits and qualification evidence.
+
 ## 0.3.7 — 2026-11-06
 
 - Make workspace, HTTP server, browser persistence and outbox lifecycles explicit.

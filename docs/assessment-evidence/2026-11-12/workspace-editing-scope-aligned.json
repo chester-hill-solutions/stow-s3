@@ -1,0 +1,360 @@
+{
+  "status": "failed",
+  "category": "evidence_rejected",
+  "stage": "stage1_model",
+  "opencodeVersion": "opencode v2.2.7",
+  "requestedSelector": "openrouter/openrouter/free",
+  "modelPrompts": 1,
+  "elapsedMs": 43151,
+  "deadlineMs": 300000,
+  "receiverWorkspaceId": "ws_ce151a543f2e405c",
+  "sourceWorkspaceId": "ws_ce151a543f2e405c",
+  "sourcePathsRemovedBeforeStage2": false,
+  "stageResults": [],
+  "currentStage": {
+    "name": "stage1",
+    "workspaceId": "ws_ce151a543f2e405c",
+    "requestKey": "fc340ca9-7642-47d4-ae1e-70af2b9b13e3",
+    "toolCallCount": 0,
+    "modelRequestCount": 5,
+    "modelRequests": [
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": null,
+        "resolvedModel": null,
+        "status": 502
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "liquid/lfm-3-1.7b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      }
+    ],
+    "schemaEnforcement": {
+      "requests": 5,
+      "initialReadRequired": true,
+      "initialReadVerified": true,
+      "initialReadPhaseCount": 1,
+      "editingPhaseCount": 2,
+      "commitProofCount": 1,
+      "terminalAfterCommitCount": 1,
+      "terminalGeneration": "880fae7e9c3ac44dd2765f12ec5712b6",
+      "schemaEnforced": true,
+      "fullToolCatalog": true,
+      "toolCount": 4
+    },
+    "toolTrace": []
+  },
+  "requestMetadata": {
+    "count": 5,
+    "requests": [
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": null,
+        "resolvedModel": null,
+        "status": 502
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "liquid/lfm-3-1.7b:free",
+        "status": 200
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "status": 200
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      },
+      {
+        "stage": "stage1",
+        "method": "POST",
+        "path": "/api/v1/chat/completions",
+        "requestedModel": "openrouter/free",
+        "resolvedModel": "nvidia/nemotron-3.5-super-vl:free",
+        "status": 200
+      }
+    ],
+    "paidFallbackObserved": true
+  },
+  "retainedRoot": "/var/folders/f3/n5tk3w792px0vctvqjytc6t00000gn/T/stow-w26-editing-pilot-5LnibK",
+  "diagnosticPrefix": "/private/tmp/w26-editing-model-scope-aligned",
+  "version": 1,
+  "date": "2026-11-12",
+  "workId": "W26.F.5",
+  "profile": "native macOS ARM64 / OpenCode v2.2.7 / OpenRouter Free Router / scope-aligned managed editing / host_quiesced",
+  "acceptance": "failed strict error/retry gate in stage one; correct stage-one save verified separately",
+  "prospectiveReadPolicy": {
+    "readRoots": [
+      "docs"
+    ],
+    "extraSuccessfulReadsWithinGrantAllowed": true,
+    "canonicalComponentBoundariesRequired": true,
+    "exactPriorStateAndNamedBatchBeforeSaveRequired": true,
+    "oneTokenBoundSaveRequired": true,
+    "earlierTracesReclassified": false
+  },
+  "strictFailureDetails": {
+    "event": "retry",
+    "status": 502,
+    "message": "free model proxy unavailable",
+    "reason": "OpenCode reported an error",
+    "localFailureCause": "not established; generic proxy exception suppressed its cause",
+    "stage2Started": false
+  },
+  "rawReportedPaidFallbackFlagInterpretation": {
+    "rawValue": true,
+    "confirmedPaidFallback": false,
+    "reason": "failedReceipt treats a null-model local 502 as non-free; all four successful upstream records request openrouter/free and resolve to :free models; fixed upstream selector guard remains active",
+    "billingIndependentlyVerified": false
+  },
+  "rawModelToolEvents": [
+    {
+      "name": "stow_stow_workspace_file_read_for_save",
+      "status": "completed",
+      "path": "docs/STATE.json",
+      "outcome": "observed",
+      "generation": null
+    },
+    {
+      "name": "stow_stow_workspace_file_read_for_save",
+      "status": "completed",
+      "path": "docs/batch-a.csv",
+      "outcome": "observed",
+      "generation": null
+    },
+    {
+      "name": "stow_stow_workspace_file_read_for_save",
+      "status": "completed",
+      "path": "docs/batch-a.csv",
+      "outcome": "observed",
+      "generation": null
+    },
+    {
+      "name": "stow_stow_workspace_file_save",
+      "status": "completed",
+      "path": "docs/STATE.json",
+      "outcome": "committed",
+      "generation": "880fae7e9c3ac44dd2765f12ec5712b6"
+    }
+  ],
+  "postFailureHostVerification": {
+    "status": "verified_after_failed_pilot",
+    "originalPilotStatus": "failed",
+    "originalPilotReceiptUnchangedSHA256": "21a3ef2e59339c2cc4dea72ed03bfbedb76fe45816f9c53eb1d72e30fce2746b",
+    "actor": "independent host; no additional model prompt or save",
+    "hostCalls": [
+      "stow_workspace_file_resolve_save",
+      "stow_workspace_file_read_for_save",
+      "stow_workspace_file_release_observation",
+      "stow_checkpoint_create"
+    ],
+    "save": {
+      "outcome": "committed",
+      "replayed": true,
+      "path": "docs/STATE.json",
+      "generation": "880fae7e9c3ac44dd2765f12ec5712b6",
+      "requestKey": "fc340ca9-7642-47d4-ae1e-70af2b9b13e3"
+    },
+    "actualState": {
+      "total_units": 26,
+      "entry_count": 5,
+      "next_batch": "docs/batch-b.csv"
+    },
+    "savedStateSHA256": "99c985f7e905640b3d3f48ba313c83d737a63656830df97abca1fe21cb98b1a4",
+    "savedStateBytes": 66,
+    "checkpointId": "cp_817852b1bb504e408b509a3a",
+    "checkpointRequestKey": "be6fa48b-e10e-4f00-9f2a-c582099cbace",
+    "checkpointStateSHA256": "99c985f7e905640b3d3f48ba313c83d737a63656830df97abca1fe21cb98b1a4",
+    "checkpointStateBytes": 66,
+    "checkpointExactBytesVerified": true,
+    "CSVsUnchanged": true
+  },
+  "counts": {
+    "modelTaskPrompts": 1,
+    "requestRecords": 5,
+    "successfulFreeCompletions": 4,
+    "providerRetryEvents": 1,
+    "modelFileToolCalls": 4,
+    "modelReads": 3,
+    "modelSaves": 1,
+    "taskRetries": 0,
+    "additionalModelPromptsAfterFailure": 0,
+    "additionalSavesAfterFailure": 0
+  },
+  "callerReportedUsage": {
+    "inputTokens": 8358,
+    "outputTokens": 345,
+    "reasoningTokens": 1124,
+    "reportedCost": 0,
+    "billingIndependentlyVerified": false
+  },
+  "stowBinarySHA256": "ca9fc0b1ba1d33032344a8b4d58354799a1923508313882c5c3bfc1e0de08a9e",
+  "opencodeBinarySHA256": "b9d576000191d7f441198076f6d50a843064259709ed31f7de995cbfc540d85f",
+  "sourceSHA256": {
+    "examples/workspace-resources/editing-fixture.mjs": "af1c4fb5d4a712a3aff95da605face3524d151194880b4143f713f59ba7b0a3b",
+    "examples/workspace-resources/editing-host.mjs": "185526196a7e1bb92bbdb5c8fdf7959cef1b281b9cc9df9cf470099ce74332ef",
+    "examples/workspace-resources/editing-host.test.mjs": "088b32d56d89ed95a2a822c3025407a4106d23f486f3cadc40594a6da357d92d",
+    "examples/workspace-resources/editing-pilot.test.mjs": "233c3acccb0dc40adebbb37abf1bc4c18421367683ae3002e59ceb57beb74f6b",
+    "examples/workspace-resources/editing-runner.mjs": "427b89f37fc6a1d7cc92cd8f45baaa8f0b796182569becef66c90cd3e998f696",
+    "examples/workspace-resources/editing-verifier.mjs": "fcfd57c81438ac225f9387da6c78709c9bcae1b6c5a8c10c51e2bbd419ac52be",
+    "examples/workspace-resources/free-only.mjs": "2c52baaa08906b9c6f10f2c5ba26f829852735e9ef6815c26fd42824951646f0",
+    "examples/workspace-resources/run.mjs": "eb7c5ecdd8adf388c8f21c3998d86cf8da8117a767748e6ca232d76f37aaf314"
+  },
+  "executedSourceArchive": "/private/tmp/w26-scope-aligned-source",
+  "rawEvidence": {
+    "/private/tmp/w26-editing-model-scope-aligned-trace.json": {
+      "sha256": "21a3ef2e59339c2cc4dea72ed03bfbedb76fe45816f9c53eb1d72e30fce2746b",
+      "bytes": 3521
+    },
+    "/private/tmp/w26-editing-model-scope-aligned.stage1.jsonl": {
+      "sha256": "30bef2e55e8e3e63b601f9a9c2dd28c2b7c0cc83279a2aa63a87e757ec43e5f7",
+      "bytes": 10419
+    },
+    "/private/tmp/w26-editing-model-scope-aligned.stage1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/private/tmp/w26-scope-aligned-host-followup.json": {
+      "sha256": "fe77881cec0d81013954e798fcd0e6474dd638c03453e1b38b78215e2c395f32",
+      "bytes": 1171
+    },
+    "/private/tmp/w26-scope-aligned-host-followup.mjs": {
+      "sha256": "24d0d707cb2963ac1b729f39f79df22a275fed539f43ae15550ef13ba199eb2e",
+      "bytes": 4543
+    },
+    "/private/tmp/w26-editing-scope-aligned-mock-attempt2.json": {
+      "sha256": "785a4225091c18207f95f4586b50e105410f6a7811c01399372f540bec47eff0",
+      "bytes": 8675
+    }
+  },
+  "checks": {
+    "focusedHostAndFixtureTests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "agentSuite": {
+      "passed": 50,
+      "failed": 0,
+      "skipped": 1,
+      "log": "/private/tmp/w26-scope-aligned-agent-tests-attempt2.log"
+    },
+    "initialAgentSuite": {
+      "passed": 48,
+      "failed": 2,
+      "skipped": 1,
+      "log": "/private/tmp/w26-scope-aligned-agent-tests.log",
+      "cause": "readRoots omitted from history function parameters; fixed before live source freeze"
+    },
+    "fileSizeRatchet": {
+      "status": "passed",
+      "log": "/private/tmp/w26-scope-aligned-file-size-final.log"
+    },
+    "priorReceiptsUnchangedSHA256": {
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local-attempt2.json": "bda667bf335d7a637dae9ceebe89e0f936213e9e2947022d8bd07f4a1e2639d5",
+      "docs/assessment-evidence/2026-11-11/checkpoint-model-local.json": "93e1fc9ead14b108c532a35593a0b3f478c50bebe199af9439df4a4ac1f74b57",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-free-commit-gated.json": "f0570033b00ade219d77303eff46fff62454a2c18932f66bf060be055638f914",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-direct.json": "ceef5d26db3ea1647b83361055611dadad0f5d19c97f4d1eabd8da5724c5e6f6",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-luna-repeat.json": "a30ef3f4b741cc910c00827a8eec070ac8b2be49c5ec6cf3b9e1f592fb25b0ff",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-mcp.json": "2d22262824540e6671469626d0ef5246366d8beabd3b6dffa90aa2ffe9e814ed",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-local.json": "38b83b8a99b5b77251ec5430ed0f5b7ad210b77cfae6345cb1f52875b35d6816",
+      "docs/assessment-evidence/2026-11-12/workspace-editing-model-required-read.json": "5a69f59ddc8b7d1c328cc2c49b19887ff578529e9b2bdcebe9f1225a6130c202"
+    },
+    "nativeGoFilesUnchanged": 860,
+    "independentReview": "Explicit scope propagation, canonical boundaries, independent extra-read negatives and opposite-batch positives verified after focused wiring fix.",
+    "preExistingMissingDistPreserved": 270,
+    "documentationLinks": {
+      "status": "passed",
+      "log": "/private/tmp/w26-scope-aligned-doc-links.log",
+      "markdownFiles": 340
+    },
+    "diffWhitespace": {
+      "status": "passed",
+      "log": "/private/tmp/w26-scope-aligned-diff-check.log"
+    },
+    "resultReview": "Independent read-only review confirms failed disposition, separately sourced JSONL tool calls, post-failure host verification, and unverified billing."
+  },
+  "noProviderPreflight": [
+    {
+      "status": "interrupted",
+      "prefix": "/private/tmp/w26-editing-scope-aligned-mock",
+      "exitCode": 130,
+      "externalProviderCalls": 0,
+      "fakeRequests": 1,
+      "reason": "parent paused on integrated test failure; artifacts retained"
+    },
+    {
+      "path": "/private/tmp/w26-editing-scope-aligned-mock-attempt2.json",
+      "status": "passed",
+      "elapsedMs": 8629,
+      "modelPrompts": 2,
+      "fakeCompletions": 9,
+      "extraStage2Read": "docs/batch-a.csv",
+      "checkpointExactBytesVerified": true
+    }
+  ],
+  "verificationHistory": [
+    "Prospective scope policy corrected before a fresh run; no prior verdict was rescored.",
+    "Full no-provider tests and a fresh mock passed before executed sources were frozen.",
+    "One live task prompt encountered a generic local 502 followed by one provider retry. Four successful Free Router requests then completed three reads and one correct save.",
+    "Strict parsing rejected the retry/error, so stage two and handoff did not start. No task retry followed.",
+    "A separate host-only follow-up recovered the owner, resolved the original committed save as a replay, read the exact saved state and unchanged CSVs, and verified a new checkpoint. This does not alter the failed pilot verdict."
+  ],
+  "remainingGates": [
+    "Diagnose and instrument the local proxy 502/readiness failure; correct null-model paid-fallback reporting before another separately authorized live run.",
+    "OpenCode/Free Router strict two-stage editing remains unqualified.",
+    "W25 selected immutable-view model flow, Linux, second physical host, protected-policy and release/deployment qualification remain open."
+  ],
+  "publication": {
+    "committed": false,
+    "deployed": false
+  },
+  "cleanup": {
+    "processInspectionSucceeded": true,
+    "candidateProcessesChecked": 21,
+    "remainingPilotProcesses": [],
+    "modelRunnerExitCode": 1
+  },
+  "rawModelToolEventsSource": {
+    "path": "/private/tmp/w26-editing-model-scope-aligned.stage1.jsonl",
+    "method": "Independent extraction of retained tool_use events; no strict parsing replay or reclassification. Original currentStage.toolTrace remains empty because the error gate rejected before tool extraction."
+  }
+}

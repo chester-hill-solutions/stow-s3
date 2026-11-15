@@ -1,5 +1,7 @@
 # Proposed native save-receipt lifecycle
 
+> **Authority notice — 2026-11-14:** Frozen unresolved design proposal; it grants no implementation authority. The [canonical working-storage plan](../development/storage-foundation-plan.md) alone owns scope, ordering, status and dispatch. Current bounded receipt/replay and recovery-hold work is governed by W02/W03 and their contracts. Archive ownership, durability and budgets versus a declared replay horizon remain a deferred lifecycle decision; preserve the safety analysis below as reference.
+
 This is a proposal, not an implemented retirement API. The current filesystem
 profile retains at most 1024 terminal receipts within its 8 MiB bookkeeping bound,
 and refuses new keyed saves when full. Missing evidence never proves no effect.

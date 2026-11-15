@@ -37,7 +37,7 @@ func profileCheckpointRun(t *testing.T, caseName string, fileCount, fileSize, ch
 	registry := filepath.Join(t.TempDir(), "registry")
 	w := profileWorkspace(t, fileCount, fileSize, registry)
 	defer w.Close()
-	target := captureTarget{dir: w.Dir(), registryDir: registry, workspaceID: w.ID()}
+	target := captureTarget{dir: w.Dir(), bucket: w.Bucket(), registryDir: registry, workspaceID: w.ID()}
 	parentID := profileParentCheckpoint(t, target, fileSize, changedFiles)
 	var parent *CheckpointManifest
 	if parentID != "" {

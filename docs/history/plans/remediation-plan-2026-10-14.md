@@ -1,5 +1,7 @@
 # Remediation plan: code evaluation findings
 
+> **Authority notice — 2026-11-14:** Historical code-evaluation and remediation record. The [canonical working-storage plan](../../development/storage-foundation-plan.md) alone owns current scope, ordering, status and dispatch. Preserve the dated closure register, results and receipts below; older findings and follow-ups do not schedule work.
+
 Current core correctness status: the [bounded closure register](../../reviews/2026-10-18-correctness-closure.md)
 evaluates nine historical leads: no required fix remains, eight leads are
 closed, and one is optional strictness. Older follow-ups below are historical;

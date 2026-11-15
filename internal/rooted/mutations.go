@@ -52,6 +52,13 @@ func (r *Root) WriteAtomic(relative string, data []byte, perm os.FileMode) error
 	return atomicfile.WriteRoot(r.root, relative, data, perm)
 }
 
+func (r *Root) WriteAtomicExistingParent(relative string, data []byte, perm os.FileMode) error {
+	if err := r.mutationParents(relative, false); err != nil {
+		return err
+	}
+	return atomicfile.WriteRoot(r.root, relative, data, perm)
+}
+
 // Remove unlinks a leaf without following it, including a symlink leaf.
 func (r *Root) Remove(relative string) error {
 	if err := r.mutationParents(relative, false); err != nil {

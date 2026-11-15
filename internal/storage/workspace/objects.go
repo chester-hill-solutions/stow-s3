@@ -40,6 +40,9 @@ func (s *Store) PutObject(ctx context.Context, bucket, key string, body io.Reade
 // already holds the lock, can assemble an object without deadlocking on a
 // non-reentrant mutex.
 func (s *Store) putLocked(_ context.Context, bucket, key string, body io.Reader, opts storage.PutOptions) (*storage.ObjectMeta, error) {
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return nil, err
+	}
 	// peekLocked, not peek: the lock is already held, and peek would take it a
 	// second time whenever the key has no manifest entry or a stale one.
 	existing, err := s.peekLocked(bucket, key)
@@ -168,6 +171,9 @@ func (s *Store) DeleteObject(ctx context.Context, bucket, key string) error {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return err
+	}
 
 	absPath, err := s.locate(bucket, key)
 	if err != nil {
@@ -273,11 +279,38 @@ func (s *Store) ListObjectsV2(ctx context.Context, bucket string, opts storage.L
 	}
 
 	s.mu.RLock()
-	all, err := s.listAll(bucket)
+	err := s.checkFileSaveMarkerLocked()
+	var all []storage.ObjectMeta
+	if err == nil {
+		all, err = s.listAll(bucket)
+	}
 	s.mu.RUnlock()
 	if err != nil {
 		return nil, err
 	}
+	return paginateWorkspaceObjects(all, opts), nil
+}
+
+func (view quotaStoreView) ListObjectsV2(ctx context.Context, bucket string, opts storage.ListOptions) (*storage.ListResult, error) {
+	if err := view.Store.checkOpen(); err != nil {
+		return nil, err
+	}
+	if !view.Store.bucketExists(bucket) {
+		return nil, storage.ErrBucketNotFound
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	view.Store.mu.RLock()
+	all, err := view.Store.listAll(bucket)
+	view.Store.mu.RUnlock()
+	if err != nil {
+		return nil, err
+	}
+	return paginateWorkspaceObjects(all, opts), nil
+}
+
+func paginateWorkspaceObjects(all []storage.ObjectMeta, opts storage.ListOptions) *storage.ListResult {
 	filtered := make([]storage.ObjectMeta, 0, len(all))
 	for _, meta := range all {
 		if opts.Prefix == "" || strings.HasPrefix(meta.Key, opts.Prefix) {
@@ -285,7 +318,7 @@ func (s *Store) ListObjectsV2(ctx context.Context, bucket string, opts storage.L
 		}
 	}
 	sort.Slice(filtered, func(i, j int) bool { return filtered[i].Key < filtered[j].Key })
-	return storage.PaginateObjects(filtered, opts), nil
+	return storage.PaginateObjects(filtered, opts)
 }
 
 // listAll returns every object in a bucket, from the tree and from the manifest

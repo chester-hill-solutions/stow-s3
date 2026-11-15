@@ -6,6 +6,41 @@ type Item = { type: 'resource_link'; uri: string; name: string; mimeType: string
 type Page = { bucket: string; items: Item[]; truncated: boolean; next_cursor?: string; max_bytes: number };
 const app = new App({ name: 'Stow bucket browser', version: '0.3.0' });
 const extensions = new OpenAIExtensions(app);
+const bootstrapText = document.querySelector<HTMLScriptElement>('#stow-bootstrap')?.textContent ?? null;
+function parseBootstrap(value: string | null): { mode: 'workspace'; overview_uri: string } | undefined {
+  if (!value) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (typeof parsed === 'object' && parsed !== null && 'mode' in parsed && parsed.mode === 'workspace' &&
+        'overview_uri' in parsed && typeof parsed.overview_uri === 'string') {
+      return { mode: 'workspace', overview_uri: parsed.overview_uri };
+    }
+  } catch { return undefined; }
+  return undefined;
+}
+const bootstrap = parseBootstrap(bootstrapText);
+if (bootstrap?.mode === 'workspace') {
+  const workspaceRoot = document.querySelector<HTMLElement>('#workspace-root');
+  const legacyRoot = document.querySelector<HTMLElement>('#legacy-app');
+  if (!workspaceRoot || !legacyRoot) throw new Error('Missing workspace browser mount.');
+  workspaceRoot.hidden = false;
+  legacyRoot.hidden = true;
+  const workspaceContext: { reconcile?: () => void } = {};
+  function applyWorkspaceContext() {
+    const context = app.getHostContext();
+    if (context?.theme) applyDocumentTheme(context.theme);
+    if (context?.styles?.variables) applyHostStyleVariables(context.styles.variables);
+    workspaceContext.reconcile?.();
+  }
+  app.addEventListener('hostcontextchanged', applyWorkspaceContext);
+  app.ontoolresult = () => {};
+  await app.connect();
+  applyWorkspaceContext();
+  const module = await import('./workspace/WorkspaceView.js');
+  const controller = module.mountWorkspace(workspaceRoot, app, bootstrap.overview_uri, extensions.modelContext);
+  workspaceContext.reconcile = () => controller.reconcileComposer();
+  applyWorkspaceContext();
+} else {
 function element<T extends Element>(selector: string): T {
   const found = document.querySelector<T>(selector);
   if (!found) throw new Error(`Missing browser element: ${selector}`);
@@ -120,3 +155,4 @@ app.ontoolresult = result => { try { render(result.structuredContent); } catch {
 await app.connect();
 applyHostContext();
 if (page) render(page); else await load();
+}

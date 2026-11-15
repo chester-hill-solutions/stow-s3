@@ -105,7 +105,7 @@ func CheckpointOfAuthorized(ctx context.Context, registryDir, id string, options
 		return CheckpointInfo{}, err
 	}
 	return captureCheckpoint(ctx, captureTarget{
-		dir: reference.Dir, registryDir: registryDir, workspaceID: reference.ID,
+		dir: reference.Dir, bucket: reference.Bucket, registryDir: registryDir, workspaceID: reference.ID,
 		maxCheckpointBytes: reference.MaxCheckpointBytes, maxCheckpoints: reference.MaxCheckpoints,
 	}, options)
 }

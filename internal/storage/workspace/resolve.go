@@ -109,6 +109,9 @@ func (s *Store) resolve(bucket, key string) (string, os.FileInfo, ManifestEntry,
 // resolveLocked also persists stale metadata while holding the caller's write lock.
 // Conditional writes use it to avoid reacquiring the non-reentrant lock via resolve.
 func (s *Store) resolveLocked(bucket, key string) (string, os.FileInfo, ManifestEntry, error) {
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return "", nil, ManifestEntry{}, err
+	}
 	absPath, err := s.locate(bucket, key)
 	if err != nil {
 		return "", nil, ManifestEntry{}, err

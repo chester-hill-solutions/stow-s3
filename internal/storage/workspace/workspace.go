@@ -31,11 +31,19 @@ type Store struct {
 	// Now is the store's clock, replaceable in tests.
 	Now func() time.Time
 
-	mu     sync.RWMutex
-	closed bool
+	mu                     sync.RWMutex
+	closed                 bool
+	fileSaveUsageRevision  uint64
+	fileSaveBlocked        bool
+	fileSaveJournal        *workspaceFileSaveJournal
+	fileSaveJournalBlocked bool
+	fileSavePayloadWriter  func(string, []byte, os.FileMode) error
+	fileSavePhaseFault     func(string) error
+	fileSaveRecoveryOwner  bool
 }
 
 var _ storage.Store = (*Store)(nil)
+var _ storage.QuotaStoreProvider = (*Store)(nil)
 
 // Options configures a workspace store.
 type Options struct {
@@ -72,6 +80,9 @@ type Options struct {
 func New(options Options) (*Store, error) {
 	if options.Root == "" {
 		return nil, fmt.Errorf("workspace store: Root is required")
+	}
+	if err := refuseUnrecoveredWorkspaceFileSaveJournal(options.Root); err != nil {
+		return nil, err
 	}
 	if options.Bucket != "" {
 		if err := storage.ValidateBucketName(options.Bucket); err != nil {
@@ -201,6 +212,10 @@ func (s *Store) Path(bucket, key string) (string, bool) {
 func (s *Store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.closeLocked()
+}
+
+func (s *Store) closeLocked() error {
 	if s.closed {
 		return nil
 	}
@@ -208,6 +223,9 @@ func (s *Store) Close() error {
 		return err
 	}
 	s.closed = true
+	if s.fileSaveRecoveryOwner || s.fileSaveJournalBlocked {
+		return nil
+	}
 	// Close is one of only two places identity changes, so the identity document
 	// is written here alongside the index. The other is creation.
 	s.manifest.LastUsed = s.now().UTC()

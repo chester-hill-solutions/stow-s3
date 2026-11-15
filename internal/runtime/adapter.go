@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/authority"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
@@ -34,6 +35,10 @@ func NewStoreAdapter(instance *Instance) (*StoreAdapter, error) {
 // store. OpenWithStore is the internal seam the native server uses to retain a
 // filesystem or run-through backing store.
 func OpenWithStore(options Options, store storage.Store, resetStore func() (storage.Store, error)) (*Instance, error) {
+	return openWithStore(options, store, resetStore, false)
+}
+
+func openWithStore(options Options, store storage.Store, resetStore func() (storage.Store, error), receiptResolution bool) (*Instance, error) {
 	if store == nil {
 		return nil, errors.New("runtime: store is required")
 	}
@@ -47,7 +52,19 @@ func OpenWithStore(options Options, store storage.Store, resetStore func() (stor
 		resetStore,
 		isPersistentBackend(normalized.Backend),
 	)
-	if err := instance.initialize(context.Background()); err != nil {
+	if receiptResolution {
+		if err := validateWorkspaceFileReceiptResolution(instance); err != nil {
+			return nil, err
+		}
+		if err := instance.authority.Check(authority.ObjectRead); err != nil {
+			return nil, err
+		}
+	}
+	initialize := instance.initialize
+	if receiptResolution {
+		initialize = instance.initializeWorkspaceFileReceiptResolution
+	}
+	if err := initialize(context.Background()); err != nil {
 		return nil, err
 	}
 	return instance, nil

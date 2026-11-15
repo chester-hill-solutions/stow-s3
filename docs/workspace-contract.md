@@ -4,6 +4,13 @@
 specifies the implemented facade, opt-in v2 snapshots, capture-request reconciliation,
 registry policy and MCP surface. Existing v1 file checkpoints remain supported.
 
+**Development addition, 2026-11-11:** the optional
+[read-only workspace resource profile](contracts/workspace-resources-contract.md)
+adds native reader leases, scoped MCP file pages and an optional browser. The
+[native qualification](reviews/2026-11-11-workspace-resources.md) and
+[resource-host qualification](reviews/2026-11-11-workspace-resource-hosts.md) do not
+amend the published 0.3.7 profile or qualify later saved-view/editing features.
+
 
 **Status:** workspace core implemented; this contract also records future language surfaces
 **Date:** 2026-09-25

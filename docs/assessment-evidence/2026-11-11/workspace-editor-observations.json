@@ -1,0 +1,89 @@
+{
+  "native_sha256": "8e3bb6773841dbdebf42a5b3be6da831010b8d55627ecf7c04b5c7d6570f2240",
+  "wasm_sha256": "32713cc19c5963356d3df8123a6135c082d30b8b8f2f5057459dc3db372faa29",
+  "go_toolchain": "1.25.6",
+  "source_sha256": {
+    "internal/storage/errors.go": "e500bcc302a161889135fadf54ee939407bbed9d3f08571386fb4185e5aa7cdf",
+    "internal/storage/workspace_file_read.go": "b45cba27365d0d896272185bac4a2307165ceb2a88041f93f4841016d1f26d80",
+    "internal/runtime/workspace_file_read.go": "8b790f4ca8d45f6775b4fe1b1654eb72c3849332536ea9b4c2f5d9225e9f3857",
+    "internal/storage/workspace/path_read.go": "71c449070600f5bd3383ada7f51b2b533851efc2270901eab1f7d81d96af83d3",
+    "pkg/stow/workspace.go": "9f71d017304b79ddc5880a3495f22aebbe0b26ede25465597b28f64d619aaed9",
+    "pkg/stow/workspace_lifecycle.go": "0d335a0e7d1deda2411143ff03df7a37664951149eac5182bc4d5526895950d5",
+    "pkg/stow/workspace_editor.go": "4f1160634e0857c0359132fc68c1bf81c2a67170c2871022bcef7160eaa32eb8",
+    "pkg/stow/workspace_editor_read.go": "ef3dd64f6cd38038fc33782a72b0ce0ffed268ac638a17076b953a694e25a330",
+    "pkg/stow/workspace_editor_test.go": "094f45a660eb27b6dd7ea1ada8ee623fb9cb97426cf59e7e375d9855652897a6"
+  },
+  "version": 1,
+  "date": "2026-11-11",
+  "profile": "native macOS ARM64; owning Workspace editor read observations",
+  "status": "local_c1_profile_qualified",
+  "work_id": "W26.C.1",
+  "operations": [
+    "OpenFileEditor",
+    "ReadForSave",
+    "ReleaseObservation",
+    "Close"
+  ],
+  "mutation_qualified": false,
+  "durable_save_requests_qualified": false,
+  "mcp_editing_qualified": false,
+  "generic_workspace_guarded_saves_enabled": false,
+  "linux_runtime_qualified": false,
+  "cross_host_qualified": false,
+  "provider_calls": 0,
+  "bounds": {
+    "max_file_bytes": 65536,
+    "max_live_observations": 64,
+    "max_observation_lifetime_seconds": 300,
+    "max_distinct_read_roots": 16,
+    "max_distinct_write_roots": 16
+  },
+  "verification": {
+    "focused_editor_race_tests_passed": 9,
+    "independent_review": "accepted production and focused test recheck",
+    "native_and_wasm_build": "passed",
+    "api_generation_pages": 13,
+    "standards": "passed",
+    "agent_tests_passed": 40,
+    "agent_tests_skipped": 1,
+    "script_tests_passed": 246,
+    "extension_tests_passed": 27,
+    "coverage_percent": 74.59,
+    "coverage_statements_hit": 14582,
+    "coverage_statements_total": 19550,
+    "conformance_profiles": {
+      "memory": "passed",
+      "filesystem": "passed",
+      "runtime_memory": "passed",
+      "runtime_filesystem": "passed"
+    },
+    "go_gate_environment": {
+      "GOFLAGS": "-p=1",
+      "GOTOOLCHAIN": "go1.25.6"
+    },
+    "default_parallel_gate_passed": false,
+    "production_or_test_timeout_changed": false,
+    "baselines_raised": false
+  },
+  "diagnosis": {
+    "parallel_gate": "FS package exhausted 600s total budget; checkpoint 100ms setup expired",
+    "allocation_isolated_seconds": 4.46,
+    "allocation_isolated_pass_cases": 4,
+    "allocation_measured_mib_range": [
+      8.42,
+      8.75
+    ],
+    "allocation_budget_mib": 10,
+    "active_expiry_isolated_passes": 20,
+    "active_expiry_isolated_seconds": 6.06,
+    "serialized_fs_race_seconds": 212.981,
+    "source_changes_for_gate_failures": false
+  },
+  "logs": {
+    "focused": "/private/tmp/w26-c1-focused.log",
+    "standards": "/private/tmp/w26-c1-standards-serialized.log",
+    "conformance": "/private/tmp/w26-c1-conformance.log",
+    "initial_listener_failure": "/private/tmp/w26-c1-standards.log",
+    "parallel_gate_failure": "/private/tmp/w26-c1-standards-recheck.log"
+  }
+}

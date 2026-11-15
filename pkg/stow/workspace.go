@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -15,14 +17,9 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
-// Workspace is a bounded artifact workspace: a real directory a caller works in, and
-// a bucket over the same bytes. It is the default surface described in ADR 0007, and
-// its contract is docs/workspace-contract.md. The embedded *Runtime supplies the object
-// operations, so quotas and accounting have one choke point and a workspace is not a
-// second implementation of PutObject.
-//
-// Closing releases the handle and deletes nothing: a workspace outlives the process
-// that opened it (ADR 0009), and removal is an explicit Destroy.
+// Workspace is a real working directory and bucket over the same bytes (ADR 0007).
+// Its Runtime owns object operations and accounting; see docs/workspace-contract.md.
+// Close preserves data; explicit registered removal refuses active read attachments.
 type Workspace struct {
 	lifecycleMu sync.Mutex
 	facade      *workspaceServer
@@ -33,6 +30,9 @@ type Workspace struct {
 	bucket             string
 	id                 string
 	store              *workspace.Store
+	instance           *runtime.Instance
+	policyConfigured   bool
+	editor             *WorkspaceEditor
 	session            *workspace.Session
 	registry           *workspace.Registry
 	registryDir        string
@@ -42,15 +42,11 @@ type Workspace struct {
 	lifecycle          workspaceLifecycle
 }
 
-// WorkspaceOptions configures a workspace.
-//
-// Dir is the only required field, and it is required on purpose: a workspace is
-// a place, not a container of opaque bytes.
+// WorkspaceOptions configures a workspace with a required directory.
 type WorkspaceOptions struct {
 	maxRegistryWorkspaces int64
-	// Dir is the workspace directory. It is created if absent, and adopted with
-	// whatever it already holds if not, so pointing a workspace at a directory a
-	// caller is already working in is the normal case rather than a special one.
+	// Dir is created if absent and adopted with existing contents otherwise.
+	// It remains an ordinary directory available to host tools.
 	Dir string
 	// Bucket overrides the generated workspace bucket name. The bucket's objects
 	// are the directory itself, so a key like output/report.pdf is at
@@ -80,37 +76,28 @@ type WorkspaceOptions struct {
 	// policy is consulted, which is what a workspace has always done. It is a
 	// policy.Source, so a revocation takes effect without a reopen.
 	Policy policy.Source
-	// TTL is the collection window the workspace records for itself. A collector
-	// reclaims a workspace that is past its TTL and whose session is gone; see
-	// Collect. The collector is not automatic, so a caller that wants the window
-	// honoured has to run one — recording a TTL does not schedule a sweep, and a
-	// workspace left past its TTL is retained until something collects it.
+	// TTL records eligibility for explicit Collect after writer and read attachments
+	// close. Collection is not automatic; an expired workspace stays until a
+	// collector runs.
 	TTL time.Duration
 	// RegistryDir places the machine's workspace registry. Empty takes the
 	// default under the user's configuration directory. Tests set it so they
 	// never touch a real one.
 	RegistryDir string
-	// Team files this workspace under one team's partition of the registry, so two teams
-	// sharing a machine — two jobs on one CI runner, say — never see each other's
-	// workspaces, checkpoints, or sweeps. It is a directory partition, not a label:
-	// RegistryDir is the root and Team is a directory inside it, so the two compose.
+	// Team partitions RegistryDir into directories for workspaces and checkpoints.
+	// This is storage organization, not a trusted per-caller identity or ACL.
 	Team string
-	// Adopted marks a workspace the caller is taking over rather than scratch space
-	// stow made. It is what keeps Destroy's refusal honest: a caller's project is not
-	// stow's to delete.
+	// Adopted directories belong to callers and are never deleted by Destroy.
 	Adopted bool
 	// Now is injectable for tests.
-	Now   func() time.Time
-	owned bool
+	Now          func() time.Time
+	owned        bool
+	ownerSession *workspace.Session
 }
 
-// OpenWorkspace opens a workspace rooted at options.Dir.
-//
-// It starts no process, opens no listener, and reads no ambient environment, so there is
-// nothing to clean up on a crash and nothing for a host to leak credentials for. Where a
-// client cannot embed the runtime, the scoped S3 session in the TypeScript and Python
-// packages remains the supported alternative; see ADR 0007 section 3 for why Python is
-// the exception.
+// OpenWorkspace opens options.Dir without a process, listener or ambient credentials.
+// It claims the writer session; OpenWorkspaceReader attaches without that claim.
+// TypeScript/Python callers can use the scoped CLI wrappers; see ADR 0007.
 func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	if options.Dir == "" {
 		return nil, fmt.Errorf("stow: workspace Dir is required")
@@ -122,13 +109,23 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 	if bucket == "" {
 		bucket = generatedBucketName()
 	}
+	session, rootExisted, err := claimWorkspaceSession(options)
+	if err != nil {
+		return nil, err
+	}
+	sessionHeld := true
+	defer func() {
+		if sessionHeld {
+			_ = session.Release()
+		}
+	}()
 
 	store, err := workspace.New(workspace.Options{
 		Root:           options.Dir,
 		Bucket:         bucket,
 		TTLSeconds:     int64(options.TTL.Seconds()),
 		Now:            options.Now,
-		InitiallyOwned: options.owned,
+		InitiallyOwned: options.owned || !rootExisted,
 		Adopted:        options.Adopted,
 	})
 	if err != nil {
@@ -148,15 +145,6 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		return nil, fmt.Errorf("stow: open workspace: %w", err)
 	}
 
-	// A live session holds an advisory lock for as long as this handle exists, which is
-	// what lets a collector establish that nobody is using the workspace rather than
-	// guess, and the kernel releases it even if this process is killed outright.
-	session, err := workspace.AcquireSession(store.Root())
-	if err != nil {
-		_ = store.Close()
-		return nil, fmt.Errorf("stow: claim workspace: %w", err)
-	}
-
 	ws := &Workspace{
 		Runtime:          embedded.WrapInstance(instance),
 		dir:              store.Root(),
@@ -164,26 +152,22 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		bucket:           store.WorkspaceBucket(),
 		id:               store.ID(),
 		store:            store,
+		instance:         instance,
+		policyConfigured: options.Policy != nil,
 		session:          session,
 	}
 	ws.now = options.Now
 	ws.maxCheckpointBytes = options.MaxCheckpointBytes
 	ws.maxCheckpoints = options.MaxCheckpoints
-	// The workspace bucket is bootstrapped through the store rather than the runtime,
-	// because it is a construction step and not a caller operation. The runtime carries
-	// the authority the caller asked for, so routing this through it would evaluate the
-	// grant against the act of issuing it, and a read-only authority — which withholds
-	// bucket.create — could not open a workspace at all. The store returns early for
-	// this bucket, so it materialises nothing; it only keeps the grant from being
-	// consulted about a bucket the workspace is made of.
+	// Bootstrap through the store: opening a read-only handle must not require
+	// bucket.create. The workspace bucket already exists logically and this call
+	// materializes nothing.
 	if err := store.CreateBucket(context.Background(), ws.bucket); err != nil {
 		_ = ws.Close()
 		return nil, fmt.Errorf("stow: create workspace bucket: %w", err)
 	}
-	// The registry directory is resolved once, here, and the resolved path is what gets
-	// recorded. Resolving it per consumer would let the workspace's own entry and a later
-	// resume disagree about which partition this belongs to, and a disagreement about a
-	// namespace is not recoverable by retrying.
+	// Resolve this partition once so registration, resume and read attachments agree.
+	// Team is part of the trusted registry path, not identity authorization.
 	registryDir, err := ResolveRegistryDir(options.RegistryDir, options.Team)
 	if err != nil {
 		_ = ws.Close()
@@ -193,7 +177,24 @@ func OpenWorkspace(options WorkspaceOptions) (*Workspace, error) {
 		_ = ws.Close()
 		return nil, err
 	}
+	sessionHeld = false
 	return ws, nil
+}
+
+func claimWorkspaceSession(options WorkspaceOptions) (*workspace.Session, bool, error) {
+	if options.ownerSession != nil {
+		return options.ownerSession, true, nil
+	}
+	_, err := os.Lstat(options.Dir)
+	rootExisted := err == nil
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, false, fmt.Errorf("stow: inspect workspace root: %w", err)
+	}
+	session, err := workspace.AcquireSession(options.Dir)
+	if err != nil {
+		return nil, false, fmt.Errorf("stow: claim workspace: %w", err)
+	}
+	return session, rootExisted, nil
 }
 
 // Dir is the absolute workspace directory, stable for the workspace's life.
@@ -227,7 +228,7 @@ func (w *Workspace) Path(key string) (string, bool) {
 // handle's own checkpoints and an external one run the same code.
 func (w *Workspace) captureTarget() captureTarget {
 	return captureTarget{
-		dir: w.dir, registryDir: w.registryDir, workspaceID: w.id,
+		dir: w.dir, registryDir: w.registryDir, workspaceID: w.id, bucket: w.bucket,
 		maxCheckpointBytes: w.maxCheckpointBytes, maxCheckpoints: w.maxCheckpoints,
 		now: w.now,
 	}

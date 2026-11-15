@@ -7,11 +7,13 @@ import (
 	"time"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/rooted"
+	"github.com/chester-hill-solutions/stow-s3/internal/storage/workspace"
 )
 
 type captureTarget struct {
 	receipt     *checkpointReceipt
 	dir         string
+	bucket      string
 	registryDir string
 	workspaceID string
 	// maxCheckpointBytes and maxCheckpoints are the workspace's retention caps,
@@ -33,7 +35,7 @@ func captureCheckpoint(ctx context.Context, target captureTarget, options Checkp
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	if err := ctx.Err(); err != nil {
+	if err := target.checkCaptureSource(ctx); err != nil {
 		return CheckpointInfo{}, err
 	}
 	if err := target.validateParent(options.ParentID); err != nil {
@@ -86,6 +88,13 @@ func captureCheckpoint(ctx context.Context, target captureTarget, options Checkp
 		ID: manifest.ID, WorkspaceID: target.workspaceID, ParentID: options.ParentID,
 		Created: manifest.Created, Files: int64(len(before)), Bytes: size, Excluded: manifest.Excluded,
 	}, nil
+}
+
+func (t captureTarget) checkCaptureSource(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return workspace.CheckWorkspaceFileSaveBarrier(t.dir, t.workspaceID, t.bucket)
 }
 
 func loadCheckpointParent(registryDir, parentID string) (*CheckpointManifest, error) {

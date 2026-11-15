@@ -1,5 +1,9 @@
 # Development and maintenance
 
+The [canonical working-storage plan](storage-foundation-plan.md) is the sole scope,
+status, ordering and dispatch queue. Design plans and pilot instructions provide
+reference detail; the [planning index](planning-index.md) records their dispositions.
+
 Start with [contributing](../../CONTRIBUTING.md) and the
 [code standards](../CODE_STANDARDS.md).
 

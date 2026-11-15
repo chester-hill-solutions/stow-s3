@@ -133,6 +133,17 @@ func TestDeleteCheckpointRespectsReaderGateAndLineage(t *testing.T) {
 	if !errors.Is(err, workspace.ErrCaptureInProgress) {
 		t.Fatalf("delete during read = %v", err)
 	}
+	checkpointLease, err := workspace.AcquireCheckpointReadAttachment(registry, second.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = stow.DeleteCheckpoint(ctx, registry, second.ID)
+	if !errors.Is(err, workspace.ErrCheckpointInUse) {
+		t.Fatalf("delete during checkpoint attachment = %v", err)
+	}
+	if err := checkpointLease.Release(); err != nil {
+		t.Fatal(err)
+	}
 	if err := stow.DeleteCheckpoint(ctx, registry, second.ID); err != nil {
 		t.Fatal(err)
 	}

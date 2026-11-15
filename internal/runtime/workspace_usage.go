@@ -36,7 +36,7 @@ func (i *Instance) refreshUsageObservationLocked(ctx context.Context) error {
 		}
 	}
 	options := i.options
-	options.MaxBytes, options.MaxObjects = math.MaxInt64, math.MaxInt64
+	options.MaxBytes, options.MaxObjects, options.MaxMultipartUploads = math.MaxInt64, math.MaxInt64, math.MaxInt64
 	snapshot, err := i.snapshotUsage(ctx, options)
 	if err != nil {
 		return err

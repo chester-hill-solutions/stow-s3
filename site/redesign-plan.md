@@ -1,5 +1,7 @@
 # Stow website redesign plan
 
+> **Authority notice — 2026-11-14:** Completed, dated design and publication record. The [canonical working-storage plan](../docs/development/storage-foundation-plan.md) alone owns current product/release scope and status; website maintenance and release claims route through W20. Historical copy, version assertions and implementation steps below describe their dated context and do not schedule current work.
+
 Use the [landing page concept](design/stow-landing-concept.png) to redesign the homepage, documentation theme and social preview around portable working storage. The design should help visitors understand Stow, choose an API and reach a working example quickly.
 
 Implemented in the working tree on 2026-10-13: the homepage, shared documentation theme, illustrations, language examples, retained walkthrough and six social graphics are complete. Local build tests, documentation links, site claims and installation checks pass. Browser checks cover 320–1440px layouts, keyboard tabs, copying, the offline walkthrough and examples with JavaScript disabled.

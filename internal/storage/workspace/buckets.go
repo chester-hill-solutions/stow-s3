@@ -144,6 +144,9 @@ func (s *Store) CreateBucket(_ context.Context, name string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return err
+	}
 	if err := os.MkdirAll(s.bucketDir(name), 0o755); err != nil {
 		return fmt.Errorf("workspace store: create bucket: %w", err)
 	}
@@ -161,6 +164,9 @@ func (s *Store) DeleteBucket(_ context.Context, name string) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := s.checkFileSaveMarkerLocked(); err != nil {
+		return err
+	}
 	dir := s.bucketDir(name)
 	if !s.bucketExists(name) {
 		return storage.ErrBucketNotFound
