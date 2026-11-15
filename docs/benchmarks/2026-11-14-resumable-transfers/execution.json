@@ -1,0 +1,30 @@
+{
+  "projectId": "8d90188e-0f1e-4c47-9379-9399ae06e6fa",
+  "environmentId": "3cd200cb-c94f-4e4d-9335-0f6c1b7e9411",
+  "serviceId": "83497842-c51d-420e-8ba1-181589730ad4",
+  "deploymentId": "e4516806-40d1-459c-b798-10e86c443295",
+  "observedBeforeRun": "SUCCESS",
+  "observedAfterExportAndStop": "REMOVED",
+  "source": {
+    "commit": "f8c0b2c5893a37ea97117614394fc53c261b80e0",
+    "dirtyFiles": [],
+    "payloadSha256": "49fd7f8c2a53880d8b5ce73d6279e5fb411b541b1e46c5c15cba083d750a325c",
+    "note": "Explicit source snapshot; includes uncommitted benchmark files, excludes credentials and caches"
+  },
+  "binarySha256": "ed3f4f1ff863d492f442de5a9b5d165aedf4f4b8188ed41a297f6f702a96ae0f",
+  "deploymentMetadataImageDigest": "sha256:dcf242fd8e01c0ffa089e8ecaae21bed4168bf25e24f26973ca346caf355a9c1",
+  "remoteOutput": "/app/verification/resume-transfer",
+  "exportedFiles": 51,
+  "samples": 24,
+  "rawChecksums": "raw/SHA256SUMS",
+  "taskComputeStopped": true,
+  "existingVolumesDeleted": false,
+  "productionChanges": false,
+  "commands": [
+    "node benchmark/pack.mjs <private-context> --resume-transfer",
+    "railway up <private-context> --path-as-root --no-gitignore --project <projectId> --environment <environmentId> --service <serviceId> --detach --json",
+    "railway ssh --project <projectId> --environment <environmentId> --service <serviceId> -- node benchmark/resume-transfer.mjs",
+    "railway service files --project <projectId> --environment <environmentId> --service <serviceId> download /app/verification/resume-transfer <private-export> --json",
+    "railway down --project <projectId> --environment <environmentId> --service <serviceId> --yes"
+  ]
+}
