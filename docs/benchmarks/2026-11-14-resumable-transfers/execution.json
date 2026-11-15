@@ -16,7 +16,6 @@
   "remoteOutput": "/app/verification/resume-transfer",
   "exportedFiles": 51,
   "samples": 24,
-  "rawChecksums": "raw/SHA256SUMS",
   "taskComputeStopped": true,
   "existingVolumesDeleted": false,
   "productionChanges": false,
@@ -26,5 +25,8 @@
     "railway ssh --project <projectId> --environment <environmentId> --service <serviceId> -- node benchmark/resume-transfer.mjs",
     "railway service files --project <projectId> --environment <environmentId> --service <serviceId> download /app/verification/resume-transfer <private-export> --json",
     "railway down --project <projectId> --environment <environmentId> --service <serviceId> --yes"
-  ]
+  ],
+  "retainedDataset": "dataset.json",
+  "datasetChecksums": "SHA256SUMS",
+  "rawExportDisposition": "Original per-sample JSON/log export retained in ignored working output; all 24 JSON records, host/resources and summary are included in dataset.json"
 }

@@ -19,8 +19,8 @@ unchanged. This is a small-fixture accounting result, not a capacity claim.
 - The S3 server, SDK client, fixtures and verifier share each Go test process.
   Each of the 24 samples starts a fresh process. Storage is the container's
   ephemeral overlay filesystem, not the Railway persistent result volume.
-- Raw [host metadata](raw/host.json), [resource counters](raw/batch-resources.json)
-  and [summary with every sample](raw/summary.json) retain the observations.
+- The [compact dataset](dataset.json) retains host metadata, batch resource
+  counters, all 24 original sample records and the recomputed summary.
   There was no increase in CPU throttling or memory pressure/OOM counters during
   the batch. Source/binary/deployment and export receipts are in
   [execution.json](execution.json).
@@ -98,13 +98,16 @@ transfers, signed-link expiry, live AWS/R2 behavior or physical second-host use.
 Use the [Railway-only probe recipe](../../../benchmark/README.md#resumable-transfer-cost-probe).
 It refuses an existing output bundle/file. Export raw evidence before stopping
 the task-owned deployment; keep existing result volumes. No measurement was run
-locally. [SHA256SUMS](raw/SHA256SUMS) identifies every raw export file.
+locally. [SHA256SUMS](SHA256SUMS) identifies the committed dataset. Individual exported
+JSON records are reproduced in its `samples` array; disposable per-process logs
+and duplicate raw files stay in ignored working output under repository policy.
 
 Local macOS ARM64 correctness checks passed: focused resume/example tests, full
 conformance, focused download races and the full example race suite. Linux amd64
 cross-compilation includes the opt-in cost tests. The unchanged Go quality and
 file-size gates, 21 benchmark-tool tests and whitespace checks pass. The
-[check logs](checks/) and [independent exported-data verification](checks/evidence-verification.json)
+[local check receipt](checks/local-validation.json) and
+[independent exported-data verification](checks/evidence-verification.json)
 retain these results; CI qualification is recorded with the associated PR.
 Opt-in cost tests skip in ordinary CI; only this Railway receipt qualifies costs.
 The [canonical plan](../../development/storage-foundation-plan.md#next-milestone-supported-continuation)

@@ -23,6 +23,7 @@ the [evidence archive](../evidence-archive.md); they are not current performance
 
 | Date | Report |
 | --- | --- |
+| 2026-11-14 | [Bounded same-store transfer continuation — failure qualification and Railway costs](2026-11-14-resumable-transfers/README.md) |
 | 2026-10-19 | [Refreshed marketing comparisons — October 19, 2026](2026-10-19-marketing-comparison/README.md) |
 | 2026-10-16 | [Reject premature EOF in runtime streams](2026-10-16-stream-completeness/README.md) |
 | 2026-10-16 | [Pair refreshed bodies with their captured metadata and upstream state](2026-10-16-runthrough-version/README.md) |
