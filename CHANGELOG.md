@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.4.2 — 2026-11-15
+
+- Update Go and JavaScript AWS SDK dependencies and synchronize benchmark checksums.
+- Update ESLint and typescript-eslint while preserving the existing standards gates.
+- Add download-recovery conformance, bounded transfer-cost tooling and dated continuation evidence.
+- Package the native workspace resources, managed saves and checkpoint reads for the npm update from 0.3.7.
+
+See the [release notes](docs/releases/v0.4.2.md) for distribution and compatibility limits.
+Automated npm and PyPI publication remain disabled.
+
 ## 0.4.0 — 2026-11-14
 
 - Browse scoped working files through MCP resources with paged directories and bounded reads.
