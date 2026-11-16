@@ -326,6 +326,14 @@ jobs:
           go build ./...
           go vet ./...
 
+      # The Conformance job runs on Linux only. The suite shells out to
+      # conformance/live-provider.sh, whose shebang resolves to macOS's
+      # /bin/bash 3.2, and a bash 4 expansion there failed every case for
+      # developers while CI stayed green. Running the suite here puts the
+      # platform's own shell in front of the tests that depend on it.
+      - name: Conformance
+        run: make test-conformance
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
