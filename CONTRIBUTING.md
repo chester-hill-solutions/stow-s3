@@ -60,6 +60,20 @@ make check-generated
 The check compares the saved output with a fresh build. Rebuilding before taking
 that comparison's first digest would hide a stale artifact.
 
+The embedded browser bundle is generated as well. `extensions/stow/build.mjs`
+writes `internal/mcpstorage/browser.html.gz` and the licence files under
+`extensions/stow/plugin/`. Regenerate them after changing extension source, or
+after changing a dependency in `extensions/stow/package.json`:
+
+```sh
+npm ci --prefix extensions/stow
+node extensions/stow/build.mjs
+```
+
+`make standards` runs `build.mjs --check`, which fails when the committed bundle
+differs from a fresh build. A dependency bump that changes the bundle needs the
+regenerated files in the same pull request. Dependabot cannot do this step.
+
 Site HTML is generated from Markdown into ignored `site/.build/`. Commit the
 source, route manifest, assets and lockfile; do not commit build output, local
 previews, private configuration or credentials. See [site deployment](site/README.md).
