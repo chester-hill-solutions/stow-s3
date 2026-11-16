@@ -24,7 +24,10 @@ parse_bool() {
   local name=$1
   local default=$2
   local value=${!name:-}
-  value=${value,,}
+  # bash 3.2, the system bash on macOS, has no ${value,,}. A developer runs this
+  # script through the conformance tests, so the lowercase has to work there and
+  # not only on the bash 4+ CI image.
+  value=$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')
   value=${value//$'\n'/}
   value=${value//$'\r'/}
   value=${value#"${value%%[![:space:]]*}"}
@@ -73,7 +76,7 @@ classify_endpoint() {
   if [[ -z $authority || $authority == *[[:space:]]* ]]; then
     fail "STOW_ENDPOINT is not a valid HTTPS endpoint"
   fi
-  host=${authority,,}
+  host=$(printf '%s' "$authority" | tr '[:upper:]' '[:lower:]')
   if [[ $host == *.amazonaws.com || $host == *.amazonaws.com.cn ]]; then
     printf 'aws-s3'
   elif [[ $host == *.r2.cloudflarestorage.com ]]; then
