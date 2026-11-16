@@ -443,6 +443,23 @@ When a client invokes an unsupported API, stow MUST return S3-compatible XML err
 | **Batch operations** | `s3:CreateJob` | `501` | `NotImplemented` | — |
 | **Tagging APIs** | `GetObjectTagging`, `PutObjectTagging` | `501` | `NotImplemented` | `x-amz-tagging` header on PutObject ignored |
 | **Website / logging / accelerate** | Website configuration endpoints | `501` | `NotImplemented` | — |
+| **Object cache/display metadata** | `PUT`, `CreateMultipartUpload` or `CopyObject` with `Cache-Control`, `Content-Disposition`, `Content-Encoding`, `Content-Language` or `Expires` | `501` | `NotImplemented` | Refused before mutation; object and upload inventories unchanged. `x-amz-meta-*` and `Content-Type` stay supported |
+
+**Object properties the record cannot carry.** The stored object has a content
+type and `x-amz-meta-*` pairs and no field for the five headers above. Accepting
+one would return `200` for metadata the next `HEAD` cannot return, so they are
+refused at dispatch, before any mutation, on every write that can set them: plain
+`PUT`, `CreateMultipartUpload`, and `CopyObject` with `x-amz-metadata-directive:
+REPLACE`. A malformed multipart selector that falls through to `PUT` is refused
+the same way. `Content-Encoding: aws-chunked` is included: Stow does not decode
+that payload framing, so accepting the header would store the framing rather than
+the bytes. A `GET` or `HEAD` carrying one of these names is not refused, because
+there it is a request parameter rather than an object property.
+
+Run-through mode has the same boundary. The upstream adapter is reached through
+the stored object model, which has the same missing fields, so the property would
+be dropped before it reached the provider — refusing it is not a reduction in
+upstream capability, it is the same silent loss made visible.
 
 **Error XML shape (all errors):**
 

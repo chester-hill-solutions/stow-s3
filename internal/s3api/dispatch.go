@@ -177,5 +177,14 @@ func unsupportedSemanticMarker(r *http.Request, q url.Values) (code, message str
 		strings.EqualFold(r.Header.Get("X-Amz-Server-Side-Encryption"), "aws:kms:dsse") {
 		return "InvalidArgument", "KMS encryption is not supported", true
 	}
+	if r.Method == http.MethodPut || (r.Method == http.MethodPost && q.Has("uploads")) {
+		for _, header := range []string{
+			"Cache-Control", "Content-Disposition", "Content-Encoding", "Content-Language", "Expires",
+		} {
+			if len(r.Header.Values(header)) != 0 {
+				return "NotImplemented", header + " object metadata is not supported", true
+			}
+		}
+	}
 	return "", "", false
 }
