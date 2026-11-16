@@ -24,6 +24,17 @@ updates:
           - minor
           - patch
     labels: ["dependencies"]
+    # golang.org/x/sys v0.50.0 and golang.org/x/sync v0.25.0 declare `go 1.26.0`
+    # in their own go.mod. The repository pins Go 1.25.6 in .go-version and the
+    # workflows run with GOTOOLCHAIN=local, so those bumps fail every lane on the
+    # toolchain floor rather than on anything in the change itself. They stay
+    # ignored until a toolchain upgrade is scheduled, not until they are wanted.
+    # Delete these entries when .go-version moves to 1.26.
+    ignore:
+      - dependency-name: "golang.org/x/sys"
+        versions: [">=0.50.0"]
+      - dependency-name: "golang.org/x/sync"
+        versions: [">=0.25.0"]
 
   # The TypeScript client and independent app/site tools have separate lockfiles.
   # The platform carrier
