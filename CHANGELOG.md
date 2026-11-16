@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Refuse `Cache-Control`, `Content-Disposition`, `Content-Encoding`,
+  `Content-Language` and `Expires` on object writes with `501 NotImplemented`
+  before any mutation. The record has no field for them, so accepting the write
+  acknowledged metadata the next `HEAD` could not return. `Content-Type` and
+  `x-amz-meta-*` are unchanged, and reads carrying those header names are not
+  refused. See the [compatibility contract](docs/contracts/compat-contract.md).
 - Clear the remaining npm audit findings without changing shipped behaviour:
   patch the MCP SDK in the extension, which moves its transitive `hono` to the
   fixed release; update the site's `wrangler` toolchain, which carries a fixed
