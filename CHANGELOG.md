@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Clear the remaining npm audit findings without changing shipped behaviour:
+  patch the MCP SDK in the extension, which moves its transitive `hono` to the
+  fixed release; update the site's `wrangler` toolchain, which carries a fixed
+  `undici`; and update the TypeScript package's ESLint chain. Lint, escape and
+  DRY ratchets stay at zero.
+- The extension bundle never contained `hono`; it is a dependency of the MCP
+  SDK's Node server, and the extension ships only the bundled browser HTML and
+  plugin metadata.
+
 ## 0.4.2 — 2026-11-15
 
 - Update Go and JavaScript AWS SDK dependencies and synchronize benchmark checksums.
