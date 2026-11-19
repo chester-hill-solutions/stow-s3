@@ -66,7 +66,7 @@ concurrency:
 jobs:
   upstream:
     name: ${{ matrix.label }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 30
     environment: ${{ matrix.provider }}
     strategy:

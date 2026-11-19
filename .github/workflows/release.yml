@@ -29,7 +29,7 @@ env:
 jobs:
   plan:
     name: Resolve release distribution
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     outputs:
       publish_packages: ${{ steps.plan.outputs.publish_packages }}
       notes_file: ${{ steps.plan.outputs.notes_file }}
@@ -42,7 +42,7 @@ jobs:
 
   test:
     name: Verify release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -88,11 +88,11 @@ jobs:
         include:
           - os: linux
             arch: amd64
-            runner: ubuntu-24.04
+            runner: railway
             platform_tag: manylinux_2_17_x86_64
           - os: linux
             arch: arm64
-            runner: ubuntu-24.04-arm
+            runner: railway
             platform_tag: manylinux_2_17_aarch64
           - os: darwin
             arch: amd64
@@ -216,7 +216,7 @@ jobs:
       matrix:
         include:
           - target: linux-amd64
-            runner: ubuntu-24.04
+            runner: railway
           - target: linux-arm64
             runner: ubuntu-24.04-arm
           - target: darwin-amd64
@@ -264,7 +264,7 @@ jobs:
   release:
     name: Release${{ github.event_name == 'workflow_dispatch' && ' rehearsal (publishes nothing)' || '' }}
     needs: [plan, build, test, consumer, live_gate]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     # A skipped live-provider job is allowed only by the explicit downloads-only
     # plan. All build, test and packed-consumer jobs must still succeed.
     if: always() && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') && needs.plan.result == 'success' && needs.build.result == 'success' && needs.test.result == 'success' && needs.consumer.result == 'success' && (needs.plan.outputs.publish_packages == 'false' || needs.live_gate.result == 'success')
