@@ -14,7 +14,8 @@ const root = resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
 const skill = resolve(root, "plugins", "stow", "skills", "stow-s3", "SKILL.md");
 const permissions = [
   { action: "*", resource: "*", effect: "deny" },
-  { action: "skill", resource: "*", effect: "allow" },
+  { action: "skill", resource: "*", effect: "deny" },
+  { action: "skill", resource: "stow-s3", effect: "allow" },
 ];
 const projectConfig = {
   $schema: "https://opencode.ai/config.json",
@@ -32,8 +33,9 @@ const runsOverride = value("--runs") ? Number(value("--runs")) : 0;
 const model = value("--model");
 const judgeModel = value("--judge-model");
 const maxCost = value("--max-cost-usd") ? Number(value("--max-cost-usd")) : Infinity;
+const concurrency = Math.max(1, Number(value("--concurrency", "1")));
 const jsonPath = value("--json");
-const timeoutSeconds = Number(value("--timeout", "180"));
+const timeoutSeconds = Number(value("--timeout", "300"));
 const keepTemp = args.includes("--keep-temp");
 
 const glob = new RegExp(`^${caseGlob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`);
@@ -53,20 +55,28 @@ function project(withSkill) {
   return dir;
 }
 
-async function subject(prompt, withSkill) {
+async function subject(prompt, withSkill, timeout) {
   const dir = project(withSkill);
   try {
     const command = ["run", "--agent", "eval", "--format", "json"];
     if (model) command.push("--model", model);
     command.push(prompt);
-    const { stdout } = await run("opencode", command, { cwd: dir, env: { ...process.env, PWD: dir }, timeout: timeoutSeconds * 1000, maxBuffer: 32 * 1024 * 1024 });
+    let stdout = "";
+    let failure = "";
+    try {
+      const result = await run("opencode", command, { cwd: dir, env: { ...process.env, PWD: dir }, timeout: (timeout || timeoutSeconds) * 1000, maxBuffer: 32 * 1024 * 1024 });
+      stdout = result.stdout;
+    } catch (error) {
+      stdout = error.stdout ?? "";
+      failure = error.killed ? `timed out after ${timeout || timeoutSeconds}s` : `exited ${error.code ?? "?"}`;
+    }
     const events = stdout.split("\n").filter(Boolean).flatMap((line) => {
       try { return [JSON.parse(line)]; } catch { return []; }
     });
     const texts = events.filter((event) => event.type === "text").map((event) => event.part.text).filter(Boolean);
     const tools = events.filter((event) => event.type === "tool").map((event) => ({ tool: event.part.tool, input: event.part.state?.input ?? {} }));
     const cost = events.filter((event) => event.type === "step_finish").reduce((total, event) => total + (event.part.cost ?? 0), 0);
-    return { text: texts.join("\n"), tools, cost };
+    return { text: texts.join("\n"), tools, cost, failure };
   } finally {
     if (keepTemp) console.error(`kept ${dir}`);
     else rmSync(dir, { recursive: true, force: true });
@@ -80,7 +90,13 @@ async function judge(criteria, result) {
     const command = ["run", "--agent", "eval", "--format", "json"];
     if (judgeModel ?? model) command.push("--model", judgeModel ?? model);
     command.push(prompt);
-    const { stdout } = await run("opencode", command, { cwd: dir, env: { ...process.env, PWD: dir }, timeout: timeoutSeconds * 1000, maxBuffer: 8 * 1024 * 1024 });
+    let stdout = "";
+    try {
+      const result = await run("opencode", command, { cwd: dir, env: { ...process.env, PWD: dir }, timeout: timeoutSeconds * 1000, maxBuffer: 8 * 1024 * 1024 });
+      stdout = result.stdout;
+    } catch (error) {
+      stdout = error.stdout ?? "";
+    }
     const text = stdout.split("\n").flatMap((line) => {
       try {
         const event = JSON.parse(line);
@@ -93,7 +109,8 @@ async function judge(criteria, result) {
         return event.type === "step_finish" ? [event.part?.cost ?? 0] : [];
       } catch { return []; }
     }).reduce((total, value) => total + value, 0);
-    return { pass: /^\s*PASS\b/i.test(text) && !/^\s*FAIL\b/i.test(text), verdict: text.slice(0, 200), cost };
+    const decided = /^\s*PASS\b/i.test(text) && !/^\s*FAIL\b/i.test(text);
+    return { pass: decided, verdict: text ? text.slice(0, 200) : "judge failed or timed out", cost };
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -106,7 +123,7 @@ function toolCalls(result, grader) {
 }
 
 async function scoreCase(testCase, arm) {
-  const result = await subject(testCase.prompt, arm === "with");
+  const result = await subject(testCase.prompt, arm === "with", testCase.timeoutSeconds);
   let scored = 0;
   let passed = 0;
   let cost = result.cost;
@@ -134,32 +151,48 @@ async function scoreCase(testCase, arm) {
     }
     throw new Error(`unsupported grader type ${grader.fields.type} in ${testCase.name}/${grader.name}`);
   }
-  return { score: scored === 0 ? 0 : passed / scored, passed, scored, cost, skillFired, verdicts };
+  return { score: scored === 0 ? 0 : passed / scored, passed, scored, cost, skillFired, failure: result.failure ?? "", verdicts };
 }
 
 const report = { started: new Date().toISOString(), model: model ?? "(default)", cases: [], cost: 0 };
+const results = new Map();
 for (const testCase of cases) {
   const runs = runsOverride || testCase.runs;
-  const perArm = { with: [], baseline: [] };
+  results.set(testCase.name, { with: new Array(runs), baseline: new Array(runs) });
+}
+const tasks = [];
+for (const testCase of cases) {
+  const runs = runsOverride || testCase.runs;
   for (let index = 0; index < runs; index++) {
-    for (const arm of ["with", "baseline"]) {
-      if (report.cost > maxCost) {
-        console.error(`cost ceiling reached at $${report.cost.toFixed(3)}; stopping`);
-        break;
-      }
-      const result = await scoreCase(testCase, arm);
-      report.cost += result.cost;
-      perArm[arm].push(result);
-      console.log(`${testCase.name} ${arm} run ${index + 1}/${runs}: score ${result.score.toFixed(2)} skill=${result.skillFired} $${result.cost.toFixed(4)}`);
-    }
+    for (const arm of ["with", "baseline"]) tasks.push({ testCase, index, arm, runs });
   }
-  const mean = (results) => results.length === 0 ? 0 : results.reduce((total, item) => total + item.score, 0) / results.length;
+}
+let next = 0;
+const workers = Array.from({ length: Math.min(concurrency, tasks.length) }, async () => {
+  while (next < tasks.length) {
+    const task = tasks[next++];
+    if (report.cost > maxCost) {
+      results.get(task.testCase.name)[task.arm][task.index] = { score: 0, cost: 0, skillFired: false, verdicts: [], failure: "cost ceiling" };
+      continue;
+    }
+    const result = await scoreCase(task.testCase, task.arm);
+    report.cost += result.cost;
+    results.get(task.testCase.name)[task.arm][task.index] = result;
+    console.log(`${task.testCase.name} ${task.arm} run ${task.index + 1}/${task.runs}: score ${result.score.toFixed(2)} skill=${result.skillFired} $${result.cost.toFixed(4)}${result.failure ? ` (${result.failure})` : ""}`);
+  }
+});
+await Promise.all(workers);
+
+for (const testCase of cases) {
+  const perArm = results.get(testCase.name);
+  const mean = (items) => items.length === 0 ? 0 : items.reduce((total, item) => total + (item?.score ?? 0), 0) / items.length;
   report.cases.push({
     name: testCase.name, kind: testCase.kind, heldout: testCase.heldout,
     with: Number(mean(perArm.with).toFixed(3)), baseline: Number(mean(perArm.baseline).toFixed(3)),
     delta: Number((mean(perArm.with) - mean(perArm.baseline)).toFixed(3)),
-    skillFired: perArm.with.some((item) => item.skillFired),
-    verdicts: perArm.with.flatMap((item) => item.verdicts),
+    skillFired: perArm.with.some((item) => item?.skillFired),
+    verdicts: perArm.with.flatMap((item) => item?.verdicts ?? []),
+    failures: perArm.with.map((item) => item?.failure).filter(Boolean),
   });
 }
 report.totalCost = Number(report.cost.toFixed(4));

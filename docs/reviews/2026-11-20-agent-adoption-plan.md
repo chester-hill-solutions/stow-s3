@@ -88,12 +88,13 @@ transcript judge against a human reading the same traces, and hold out a set the
 copy is not tuned on. The eval and its traces live in the repository.
 
 The cases and their design are in
-[the conversion eval record](2026-11-20-conversion-eval.md); they are authored
-and structurally validated. A host-neutral runner
-(`scripts/conversion-eval.mjs`) executes the same cases on OpenCode with a
+[the conversion eval record](2026-11-20-conversion-eval.md). A host-neutral
+runner (`scripts/conversion-eval.mjs`) executes them on OpenCode with a
 locked-down agent, because the Claude path needs a login this environment does
-not have. Its first run found that the live install docs pinned an npm version
-that was never published; that is fixed and gated.
+not have. Measured 2026-11-20: **12/12 positives ask, 8/8 negatives stay
+silent, baseline 0.00 on every positive** (`$0.64`). The advertised skill
+description, not the body, is the effective artefact; its first run also found
+that the live install docs pinned an npm version that was never published.
 
 Targets are directional until the set has at least twenty tasks: half of the S3
 tasks and a quarter of the durability tasks asking, **and** the negative
