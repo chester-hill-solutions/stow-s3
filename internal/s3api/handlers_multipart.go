@@ -47,9 +47,6 @@ func initiationOptions(r *http.Request) (storage.MultipartOptions, *s3Error) {
 	if err != nil {
 		return storage.MultipartOptions{}, &s3Error{Code: "InvalidArgument", Message: err.Error(), StatusCode: http.StatusBadRequest}
 	}
-	if algorithm == "CRC64NVME" {
-		return storage.MultipartOptions{}, &s3Error{Code: "NotImplemented", Message: "CRC64NVME multipart full-object checksums are not supported; send --checksum-algorithm CRC32 (or CRC32C, SHA1, SHA256) for objects above the single-PUT cap", StatusCode: http.StatusNotImplemented}
-	}
 	return storage.MultipartOptions{
 		ContentType:       contentType,
 		Metadata:          metadata,
@@ -130,10 +127,6 @@ func (s *Server) handleUploadPart(ctx context.Context, w http.ResponseWriter, r 
 }
 
 func (s *Server) handleCompleteMultipartUpload(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket, key, uploadID string) {
-	if r.Header.Get("x-amz-checksum-crc64nvme") != "" || r.Header.Get("x-amz-checksum-type") != "" {
-		writeError(w, r, s3Error{Code: "NotImplemented", Message: "Multipart completion checksum types are not supported; send --checksum-algorithm CRC32 (or CRC32C, SHA1, SHA256) instead", Resource: resourcePath(bucket, key), StatusCode: http.StatusNotImplemented})
-		return
-	}
 	if !s.validateMultipartRoute(ctx, w, r, routeInfo{bucket: bucket, key: key}, uploadID) {
 		return
 	}
@@ -159,17 +152,57 @@ func (s *Server) handleCompleteMultipartUpload(ctx context.Context, w http.Respo
 	// EntityTooSmall. A client gets the same answer whichever store is underneath,
 	// and a store used directly enforces the same rule instead of accepting what
 	// the S3 layer would have refused.
-	meta, err := s.multipart.CompleteMultipartUpload(ctx, uploadID, parts)
+	meta, err := s.completeMultipart(ctx, uploadID, parts, r)
 	if err != nil {
 		writeError(w, r, mapStorageError(err, resourcePath(bucket, key)))
 		return
 	}
-	writeXML(w, r, http.StatusOK, completeMultipartUploadResult{
+	if meta.ChecksumAlgorithm != "" {
+		w.Header().Set("x-amz-checksum-"+strings.ToLower(meta.ChecksumAlgorithm), meta.ChecksumValue)
+		w.Header().Set("x-amz-checksum-type", "FULL_OBJECT")
+	}
+	result := completeMultipartUploadResult{
 		Bucket:   bucket,
 		Key:      key,
 		ETag:     meta.ETag,
 		Location: "/" + bucket + "/" + key,
-	})
+	}
+	switch storage.NormalizeChecksumAlgorithm(meta.ChecksumAlgorithm) {
+	case "CRC32":
+		result.ChecksumCRC32 = meta.ChecksumValue
+	case "CRC32C":
+		result.ChecksumCRC32C = meta.ChecksumValue
+	case "CRC64NVME":
+		result.ChecksumCRC64NVME = meta.ChecksumValue
+	case "SHA1":
+		result.ChecksumSHA1 = meta.ChecksumValue
+	case "SHA256":
+		result.ChecksumSHA256 = meta.ChecksumValue
+	}
+	if meta.ChecksumAlgorithm != "" {
+		result.ChecksumType = "FULL_OBJECT"
+	}
+	writeXML(w, r, http.StatusOK, result)
+}
+
+func (s *Server) completeMultipart(ctx context.Context, uploadID string, parts []storage.PartInfo, r *http.Request) (*storage.ObjectMeta, error) {
+	claim := storage.CompletionClaim{Type: r.Header.Get("x-amz-checksum-type")}
+	if claim.Type != "" && storage.NormalizeChecksumAlgorithm(claim.Type) != "FULL_OBJECT" {
+		return nil, storage.ErrChecksumTypeUnsupported
+	}
+	algorithm, value, err := checksumHeaderValues(r)
+	if err != nil {
+		return nil, err
+	}
+	claim.Algorithm, claim.Value = algorithm, value
+	if claim.Value == "" && claim.Type == "" {
+		return s.multipart.CompleteMultipartUpload(ctx, uploadID, parts)
+	}
+	checksummer, ok := s.multipart.(storage.MultipartChecksumStore)
+	if !ok {
+		return nil, storage.ErrChecksumTypeUnsupported
+	}
+	return checksummer.CompleteMultipartUploadWithChecksum(ctx, uploadID, parts, claim)
 }
 
 func (s *Server) handleAbortMultipartUpload(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket, key, uploadID string) {

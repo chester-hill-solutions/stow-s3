@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Multipart uploads accept CRC64NVME with full-object completion, which is what
+  an AWS client sends by default. The completion claim is verified against the
+  assembled object before publication and reported by the complete response,
+  `HEAD` and `GET`; composite checksums remain refused. See
+  [ADR 0024](docs/adr/0024-multipart-checksums-are-object-state.md).
+
 - A settled workspace file-save journal no longer blocks its workspace. Opening
   classifies the journal by the barrier's rule — matching identity and no pending
   record — so `workspace resume`, `workspace serve` and `workspace destroy` work

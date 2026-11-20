@@ -227,3 +227,36 @@ func TestCopyAndBatchDelete(t *testing.T) {
 		t.Errorf("the deleted key is still readable: %v", err)
 	}
 }
+
+func TestCompleteMultipartUploadVerifiesFullObjectChecksum(t *testing.T) {
+	store, _ := newStore(t)
+	ctx := context.Background()
+	payload := "multipart checksum payload"
+	want, err := storage.ComputeChecksum("CRC64NVME", []byte(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	upload, err := store.CreateMultipartUpload(ctx, bucket, "output/checked.bin", storage.MultipartOptions{ChecksumAlgorithm: "CRC64NVME"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.UploadPart(ctx, upload.UploadID, 1, strings.NewReader(payload)); err != nil {
+		t.Fatal(err)
+	}
+	parts, err := store.ListParts(ctx, upload.UploadID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.CompleteMultipartUploadWithChecksum(ctx, upload.UploadID, parts,
+		storage.CompletionClaim{Algorithm: "CRC64NVME", Value: "AAAAAA==", Type: "FULL_OBJECT"}); !errors.Is(err, storage.ErrChecksumMismatch) {
+		t.Fatalf("mismatched claim = %v", err)
+	}
+	meta, err := store.CompleteMultipartUploadWithChecksum(ctx, upload.UploadID, parts,
+		storage.CompletionClaim{Algorithm: "CRC64NVME", Value: want, Type: "FULL_OBJECT"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if meta.ChecksumAlgorithm != "CRC64NVME" || meta.ChecksumValue != want {
+		t.Fatalf("completed metadata checksum = %q %q", meta.ChecksumAlgorithm, meta.ChecksumValue)
+	}
+}

@@ -2,7 +2,6 @@ package fs
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -147,7 +146,15 @@ func (s *FilesystemStore) UploadPart(_ context.Context, uploadID string, partNum
 	}, nil
 }
 
-func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
+func (s *FilesystemStore) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
+	return s.completeMultipartUpload(uploadID, parts, storage.CompletionClaim{})
+}
+
+func (s *FilesystemStore) CompleteMultipartUploadWithChecksum(_ context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
+	return s.completeMultipartUpload(uploadID, parts, claim)
+}
+
+func (s *FilesystemStore) completeMultipartUpload(uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
 	if err := storage.ValidateMultipartPartNumbers(parts); err != nil {
 		return nil, err
 	}
@@ -166,34 +173,8 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 	if err != nil {
 		return nil, err
 	}
-
-	// Resolve and check every part before assembling any of it, so a completion
-	// that is going to be refused costs no assembly and leaves nothing behind.
-	chunks := make([][]byte, 0, len(parts))
-	sizes := make([]int64, 0, len(parts))
-	partETags := make([]string, 0, len(parts))
-	var total int64
-	for _, p := range parts {
-		partPath := filepath.Join(dir, fmt.Sprintf("part-%05d", p.PartNumber))
-		data, err := os.ReadFile(partPath)
-		if err != nil {
-			return nil, storage.ErrInvalidPart
-		}
-		storedETag := storage.ETagForBytes(data)
-		if p.ETag == "" || !storage.ETagEqual(p.ETag, storedETag) {
-			return nil, storage.ErrInvalidPart
-		}
-		chunks = append(chunks, data)
-		sizes = append(sizes, int64(len(data)))
-		partETags = append(partETags, storedETag)
-		total += int64(len(data))
-	}
-	if err := storage.ValidateMinPartSizes(sizes); err != nil {
-		return nil, err
-	}
-
-	upload := manifest.upload(uploadID)
-	if err := verifyMultipartChecksum(upload.Options, chunks); err != nil {
+	upload, chunks, total, partETags, err := resolveFilesystemCompletion(dir, manifest, uploadID, parts, claim)
+	if err != nil {
 		return nil, err
 	}
 
@@ -233,6 +214,42 @@ func (s *FilesystemStore) CompleteMultipartUpload(_ context.Context, uploadID st
 		return &meta, storage.CommittedError(fmt.Errorf("cleanup multipart upload: %w", err))
 	}
 	return &meta, nil
+}
+
+func resolveFilesystemCompletion(dir string, manifest multipartManifest, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (storage.MultipartUpload, [][]byte, int64, []string, error) {
+	chunks := make([][]byte, 0, len(parts))
+	sizes := make([]int64, 0, len(parts))
+	partETags := make([]string, 0, len(parts))
+	var total int64
+	for _, p := range parts {
+		partPath := filepath.Join(dir, fmt.Sprintf("part-%05d", p.PartNumber))
+		data, err := os.ReadFile(partPath)
+		if err != nil {
+			return storage.MultipartUpload{}, nil, 0, nil, storage.ErrInvalidPart
+		}
+		storedETag := storage.ETagForBytes(data)
+		if p.ETag == "" || !storage.ETagEqual(p.ETag, storedETag) {
+			return storage.MultipartUpload{}, nil, 0, nil, storage.ErrInvalidPart
+		}
+		chunks = append(chunks, data)
+		sizes = append(sizes, int64(len(data)))
+		partETags = append(partETags, storedETag)
+		total += int64(len(data))
+	}
+	if err := storage.ValidateMinPartSizes(sizes); err != nil {
+		return storage.MultipartUpload{}, nil, 0, nil, err
+	}
+	upload := manifest.upload(uploadID)
+	opts, err := upload.Options.ApplyClaim(claim)
+	if err != nil {
+		return storage.MultipartUpload{}, nil, 0, nil, err
+	}
+	upload.Options = opts
+	upload.Options, err = storage.ResolveMultipartChecksum(upload.Options, chunks...)
+	if err != nil {
+		return storage.MultipartUpload{}, nil, 0, nil, err
+	}
+	return upload, chunks, total, partETags, nil
 }
 
 func (s *FilesystemStore) ValidateMultipartUpload(_ context.Context, uploadID, bucket, key string) error {
@@ -384,26 +401,4 @@ func readMultipartManifest(dir string) (multipartManifest, error) {
 		return m, fmt.Errorf("invalid multipart manifest bucket or key")
 	}
 	return m, nil
-}
-
-// The validated part buffers are the publication source; checksum them without
-// allocating a second concatenated payload.
-func verifyMultipartChecksum(opts storage.MultipartOptions, parts [][]byte) error {
-	if opts.ChecksumValue == "" {
-		return nil
-	}
-	if storage.NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm) == "" {
-		return storage.VerifyChecksum(storage.MultipartPutOptions(opts), nil)
-	}
-	digest, err := storage.NewChecksumDigest(opts.ChecksumAlgorithm)
-	if err != nil {
-		return err
-	}
-	for _, part := range parts {
-		_, _ = digest.Write(part)
-	}
-	if base64.StdEncoding.EncodeToString(digest.Sum(nil)) != opts.ChecksumValue {
-		return storage.ErrChecksumMismatch
-	}
-	return nil
 }

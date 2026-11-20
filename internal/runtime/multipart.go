@@ -134,6 +134,14 @@ func (i *Instance) ListPartsPage(ctx context.Context, uploadID string, opts stor
 }
 
 func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
+	return i.completeMultipartUpload(ctx, uploadID, parts, storage.CompletionClaim{})
+}
+
+func (i *Instance) CompleteMultipartUploadWithChecksum(ctx context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
+	return i.completeMultipartUpload(ctx, uploadID, parts, claim)
+}
+
+func (i *Instance) completeMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
 	if err := i.checkContext(ctx); err != nil {
 		return nil, err
 	}
@@ -159,7 +167,7 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	if err := i.admitCompletion(uploadID, parts, oldSize, exists); err != nil {
 		return nil, err
 	}
-	meta, err := i.multipartStore.CompleteMultipartUpload(ctx, uploadID, parts)
+	meta, err := i.completeThroughStore(ctx, uploadID, parts, claim)
 	if !i.finishCompletion(uploadID, oldSize, meta, exists, err) {
 		return nil, err
 	}
@@ -168,6 +176,17 @@ func (i *Instance) CompleteMultipartUpload(ctx context.Context, uploadID string,
 	}
 	clone := *meta
 	return &clone, err
+}
+
+func (i *Instance) completeThroughStore(ctx context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
+	if claim.Value == "" && claim.Type == "" {
+		return i.multipartStore.CompleteMultipartUpload(ctx, uploadID, parts)
+	}
+	checksummer, ok := i.multipartStore.(storage.MultipartChecksumStore)
+	if !ok {
+		return nil, storage.ErrChecksumTypeUnsupported
+	}
+	return checksummer.CompleteMultipartUploadWithChecksum(ctx, uploadID, parts, claim)
 }
 
 func (i *Instance) reconcileCompletionError(ctx context.Context, uploadID string, cause error) error {

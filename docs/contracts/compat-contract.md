@@ -89,18 +89,14 @@ big-endian NVMe CRC64 value; known vectors and the installed AWS CLI default-upl
 profile cover its variant. A mismatching value fails with `400 BadDigest`.
 Partial (`206`) and unchanged (`304`) responses omit whole-object checksum headers.
 
-CRC64NVME multipart initiation returns `501 NotImplemented`; completion requests
-carrying CRC64NVME or an explicit checksum type are also refused. Multipart
-full-object/composite checksum completion is not implemented. A part checksum may
-be checked independently, but that does not establish a completed-object checksum.
-Upstream composite checksums are not relabeled as full-object checksums in the
-local cache. Existing multipart ETag behavior remains supported.
-
-A client that only needs an object larger than the 8 MiB single-PUT cap can send
-`--checksum-algorithm CRC32` (the AWS CLI flag) or set the request's checksum
-algorithm to `CRC32`/`CRC32C`/`SHA1`/`SHA256`, which multipart accepts today.
-The refusal names that path. [ADR 0024](../adr/0024-multipart-checksums-are-part-and-object-state.md)
-records the decision that will remove the divergence.
+CRC64NVME multipart is supported for full-object completion. The algorithm is
+fixed at initiation; a completion claim is verified against the assembled object
+before publication. The complete response reports `x-amz-checksum-crc64nvme`
+with `x-amz-checksum-type: FULL_OBJECT`; `HEAD` and `GET` report the value. A mismatching
+value fails with `400 BadDigest`. Composite checksums are refused with
+`501 NotImplemented` rather than relabelled, and existing multipart ETag behavior
+is unchanged. [ADR 0024](../adr/0024-multipart-checksums-are-object-state.md)
+records the decision.
 
 Conditional writes and reads return different statuses:
 

@@ -142,11 +142,17 @@ type initiateMultipartUploadResult struct {
 }
 
 type completeMultipartUploadResult struct {
-	XMLName  xml.Name `xml:"CompleteMultipartUploadResult"`
-	Bucket   string   `xml:"Bucket"`
-	Key      string   `xml:"Key"`
-	ETag     string   `xml:"ETag"`
-	Location string   `xml:"Location"`
+	XMLName           xml.Name `xml:"CompleteMultipartUploadResult"`
+	Bucket            string   `xml:"Bucket"`
+	Key               string   `xml:"Key"`
+	ETag              string   `xml:"ETag"`
+	Location          string   `xml:"Location"`
+	ChecksumCRC32     string   `xml:"ChecksumCRC32,omitempty"`
+	ChecksumCRC32C    string   `xml:"ChecksumCRC32C,omitempty"`
+	ChecksumCRC64NVME string   `xml:"ChecksumCRC64NVME,omitempty"`
+	ChecksumSHA1      string   `xml:"ChecksumSHA1,omitempty"`
+	ChecksumSHA256    string   `xml:"ChecksumSHA256,omitempty"`
+	ChecksumType      string   `xml:"ChecksumType,omitempty"`
 }
 
 type listPartsResult struct {

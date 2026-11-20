@@ -213,6 +213,14 @@ func (s *Store) UploadPart(ctx context.Context, uploadID string, partNumber int,
 // CompleteMultipartUpload assembles the staged parts into the key's own file,
 // which is the same atomic write a single PutObject uses.
 func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo) (*storage.ObjectMeta, error) {
+	return s.completeMultipartUpload(ctx, uploadID, parts, storage.CompletionClaim{})
+}
+
+func (s *Store) CompleteMultipartUploadWithChecksum(ctx context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
+	return s.completeMultipartUpload(ctx, uploadID, parts, claim)
+}
+
+func (s *Store) completeMultipartUpload(ctx context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
 	if err := s.checkOpen(); err != nil {
 		return nil, err
 	}
@@ -231,18 +239,11 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 		return nil, err
 	}
 
-	state, err := s.loadUpload(uploadID)
+	state, assembled, etags, options, err := s.resolveCompletion(uploadID, parts, claim)
 	if err != nil {
 		return nil, err
 	}
-	assembled, etags, err := s.assemble(uploadID, parts)
-	if err != nil {
-		return nil, err
-	}
-	// The object properties come from the upload rather than from the bytes:
-	// they were fixed when the upload was initiated, and no part of a multipart
-	// upload may change them.
-	opts := storage.MultipartPutOptions(state.Options)
+	opts := storage.MultipartPutOptions(options)
 	if opts.ContentType == "" {
 		opts.ContentType = detectContentTypeFromBytes(assembled)
 	}
@@ -265,6 +266,26 @@ func (s *Store) CompleteMultipartUpload(ctx context.Context, uploadID string, pa
 		return meta, storage.CommittedError(fmt.Errorf("workspace store: clear upload: %w", err))
 	}
 	return meta, nil
+}
+
+func (s *Store) resolveCompletion(uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*uploadState, []byte, []string, storage.MultipartOptions, error) {
+	state, err := s.loadUpload(uploadID)
+	if err != nil {
+		return nil, nil, nil, storage.MultipartOptions{}, err
+	}
+	assembled, etags, err := s.assemble(uploadID, parts)
+	if err != nil {
+		return nil, nil, nil, storage.MultipartOptions{}, err
+	}
+	options, err := state.Options.ApplyClaim(claim)
+	if err != nil {
+		return nil, nil, nil, storage.MultipartOptions{}, err
+	}
+	options, err = storage.ResolveMultipartChecksum(options, assembled)
+	if err != nil {
+		return nil, nil, nil, storage.MultipartOptions{}, err
+	}
+	return state, assembled, etags, options, nil
 }
 
 // assemble concatenates the requested parts in order.

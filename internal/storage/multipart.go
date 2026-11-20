@@ -1,6 +1,11 @@
 package storage
 
-import "time"
+import (
+	"context"
+	"encoding/base64"
+	"errors"
+	"time"
+)
 
 // The rules every backend applies when a multipart upload finishes. They live
 // here rather than in each store because they are one rule stated four times
@@ -49,6 +54,60 @@ func ValidateMinPartSizes(sizes []int64) error {
 // A checksum *algorithm* alone is not a claim. An initiation carries no body, so it can
 // supply only the algorithm the client intends to use, named before the object exists.
 // There is no value to check, and VerifyChecksum rightly refuses one without it.
+
+type CompletionClaim struct {
+	Algorithm string
+	Value     string
+	Type      string
+}
+
+type MultipartChecksumStore interface {
+	CompleteMultipartUploadWithChecksum(ctx context.Context, uploadID string, parts []PartInfo, claim CompletionClaim) (*ObjectMeta, error)
+}
+
+var ErrChecksumTypeUnsupported = errors.New("multipart checksum type is not supported")
+
+func (o MultipartOptions) ApplyClaim(claim CompletionClaim) (MultipartOptions, error) {
+	if claim.Type != "" && NormalizeChecksumAlgorithm(claim.Type) != "FULL_OBJECT" {
+		return o, ErrChecksumTypeUnsupported
+	}
+	if claim.Value == "" {
+		if claim.Algorithm != "" && NormalizeChecksumAlgorithm(o.ChecksumAlgorithm) != "" &&
+			NormalizeChecksumAlgorithm(o.ChecksumAlgorithm) != NormalizeChecksumAlgorithm(claim.Algorithm) {
+			return o, ErrChecksumMismatch
+		}
+		return o, nil
+	}
+	algorithm := NormalizeChecksumAlgorithm(claim.Algorithm)
+	if algorithm == "" || NormalizeChecksumAlgorithm(o.ChecksumAlgorithm) != "" && NormalizeChecksumAlgorithm(o.ChecksumAlgorithm) != algorithm {
+		return o, ErrChecksumMismatch
+	}
+	o.ChecksumAlgorithm, o.ChecksumValue = algorithm, claim.Value
+	return o, nil
+}
+
+func ResolveMultipartChecksum(opts MultipartOptions, chunks ...[]byte) (MultipartOptions, error) {
+	algorithm := NormalizeChecksumAlgorithm(opts.ChecksumAlgorithm)
+	if algorithm == "" {
+		return opts, nil
+	}
+	digest, err := NewChecksumDigest(algorithm)
+	if err != nil {
+		return opts, err
+	}
+	for _, chunk := range chunks {
+		if _, err := digest.Write(chunk); err != nil {
+			return opts, err
+		}
+	}
+	value := base64.StdEncoding.EncodeToString(digest.Sum(nil))
+	if opts.ChecksumValue != "" && opts.ChecksumValue != value {
+		return opts, ErrChecksumMismatch
+	}
+	opts.ChecksumAlgorithm, opts.ChecksumValue = algorithm, value
+	return opts, nil
+}
+
 func MultipartPutOptions(opts MultipartOptions) PutOptions {
 	put := PutOptions{
 		ContentType: opts.ContentType,

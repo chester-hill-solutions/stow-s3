@@ -9,7 +9,15 @@ import (
 	"time"
 )
 
-func (s *MemoryStore) CompleteMultipartUpload(_ context.Context, uploadID string, parts []PartInfo) (*ObjectMeta, error) {
+func (s *MemoryStore) CompleteMultipartUpload(ctx context.Context, uploadID string, parts []PartInfo) (*ObjectMeta, error) {
+	return s.completeMultipartUpload(uploadID, parts, CompletionClaim{})
+}
+
+func (s *MemoryStore) CompleteMultipartUploadWithChecksum(_ context.Context, uploadID string, parts []PartInfo, claim CompletionClaim) (*ObjectMeta, error) {
+	return s.completeMultipartUpload(uploadID, parts, claim)
+}
+
+func (s *MemoryStore) completeMultipartUpload(uploadID string, parts []PartInfo, claim CompletionClaim) (*ObjectMeta, error) {
 	if err := ValidateMultipartPartNumbers(parts); err != nil {
 		return nil, err
 	}
@@ -20,6 +28,10 @@ func (s *MemoryStore) CompleteMultipartUpload(_ context.Context, uploadID string
 	mp, bucket, ok := s.findMultipart(uploadID)
 	if !ok {
 		return nil, ErrUploadNotFound
+	}
+	opts, err := mp.upload.Options.ApplyClaim(claim)
+	if err != nil {
+		return nil, err
 	}
 
 	// Every part is resolved and checked before anything is assembled. A
@@ -59,7 +71,8 @@ func (s *MemoryStore) CompleteMultipartUpload(_ context.Context, uploadID string
 	for _, part := range selected {
 		combined = append(combined, part.data...)
 	}
-	if err := VerifyChecksum(MultipartPutOptions(mp.upload.Options), combined); err != nil {
+	opts, err = ResolveMultipartChecksum(opts, combined)
+	if err != nil {
 		return nil, err
 	}
 
@@ -68,8 +81,10 @@ func (s *MemoryStore) CompleteMultipartUpload(_ context.Context, uploadID string
 	if err != nil {
 		return nil, err
 	}
+	upload := mp.upload
+	upload.Options = opts
 	meta := Completion{
-		Upload:      mp.upload,
+		Upload:      upload,
 		ETag:        etag,
 		Size:        int64(len(combined)),
 		VersionID:   versionID,

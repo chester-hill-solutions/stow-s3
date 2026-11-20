@@ -239,6 +239,10 @@ func (a *StoreAdapter) CompleteMultipartUpload(ctx context.Context, uploadID str
 	return a.instance.CompleteMultipartUpload(ctx, uploadID, parts)
 }
 
+func (a *StoreAdapter) CompleteMultipartUploadWithChecksum(ctx context.Context, uploadID string, parts []storage.PartInfo, claim storage.CompletionClaim) (*storage.ObjectMeta, error) {
+	return a.instance.CompleteMultipartUploadWithChecksum(ctx, uploadID, parts, claim)
+}
+
 func (a *StoreAdapter) AbortMultipartUpload(ctx context.Context, uploadID string) error {
 	return a.instance.AbortMultipartUpload(ctx, uploadID)
 }
