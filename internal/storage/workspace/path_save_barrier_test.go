@@ -15,6 +15,39 @@ import (
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 )
 
+func TestWorkspaceFileSaveJournalClassificationDecidesOrdinaryOpen(t *testing.T) {
+	t.Run("settled journal reopens", func(t *testing.T) {
+		store := newFileSaveJournalStore(t)
+		request := newWorkspaceFileSaveRequest(t, store, "settled-open", "note", []byte("saved"))
+		if _, err := store.SaveWorkspaceFile(context.Background(), "bucket", request); err != nil {
+			t.Fatal(err)
+		}
+		root, bucket := store.root, store.manifest.Bucket
+		if err := store.Close(); err != nil {
+			t.Fatal(err)
+		}
+		reopened, err := New(Options{Root: root, Bucket: bucket})
+		if err != nil {
+			t.Fatalf("open with a settled journal: %v", err)
+		}
+		defer reopened.Close()
+		if _, err := reopened.PutObject(context.Background(), bucket, "after", bytes.NewReader([]byte("write")), storage.PutOptions{}); err != nil {
+			t.Fatalf("object write with a settled journal: %v", err)
+		}
+	})
+	t.Run("pending journal refuses", func(t *testing.T) {
+		store := newFileSaveJournalStore(t)
+		leavePendingWorkspaceFileSave(t, store)
+		root, bucket := store.root, store.manifest.Bucket
+		if err := store.Close(); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := New(Options{Root: root, Bucket: bucket}); !errors.Is(err, storage.ErrWorkspaceFileBlocked) {
+			t.Fatalf("open with a pending journal: %v", err)
+		}
+	})
+}
+
 func TestWorkspaceFileSaveBarrierMissingAndTerminalReady(t *testing.T) {
 	if err := CheckWorkspaceFileSaveBarrier(filepath.Join(t.TempDir(), "missing"), "ws-missing", "bucket"); err != nil {
 		t.Fatalf("missing root: %v", err)
@@ -405,5 +438,44 @@ func TestWorkspaceFileSaveBarrierAllowsTerminalRegistryCleanup(t *testing.T) {
 	}
 	if _, found, err := registry.Lookup(id); err != nil || found {
 		t.Fatalf("terminal workspace registry found=%v error=%v", found, err)
+	}
+}
+
+func TestOrdinaryWorkspaceNewRefusesUnprovableFileSaveMarkersBeforeMutation(t *testing.T) {
+	for _, testCase := range []struct {
+		name   string
+		marker string
+		link   bool
+		want   error
+	}{
+		{name: "exact", marker: "file-saves", want: storage.ErrWorkspaceFileBlocked},
+		{name: "alias", marker: "File-Saves", want: storage.ErrWorkspaceFileUnsupported},
+		{name: "symlink", marker: "file-saves", link: true, want: storage.ErrWorkspaceFileBlocked},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			root := t.TempDir()
+			if err := os.Mkdir(filepath.Join(root, ".stow"), 0o700); err != nil {
+				t.Fatal(err)
+			}
+			markerPath := filepath.Join(root, ".stow", testCase.marker)
+			if testCase.link {
+				target := t.TempDir()
+				if err := os.Symlink(target, markerPath); err != nil {
+					t.Skipf("symlink unavailable: %v", err)
+				}
+			} else if err := os.Mkdir(markerPath, 0o700); err != nil {
+				t.Fatal(err)
+			}
+			// A journal with no manifest behind it cannot be shown to belong to
+			// this workspace, so it is refused as unknown rather than trusted.
+			if _, err := New(Options{Root: root, Bucket: "bucket"}); !errors.Is(err, testCase.want) {
+				t.Fatalf("New with marker=%q: %v", testCase.marker, err)
+			}
+			for _, name := range []string{"keys", "manifest.json", "index.json"} {
+				if _, err := os.Lstat(filepath.Join(root, ".stow", name)); !os.IsNotExist(err) {
+					t.Fatalf("New mutated %s before refusing marker: %v", name, err)
+				}
+			}
+		})
 	}
 }

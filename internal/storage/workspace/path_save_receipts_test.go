@@ -442,38 +442,6 @@ func TestWorkspaceFileSaveTerminalAndCleanupFaultKeepKnownReceipt(t *testing.T) 
 	}
 }
 
-func TestOrdinaryWorkspaceNewRefusesFileSaveMarkersBeforeMutation(t *testing.T) {
-	for _, testCase := range []struct {
-		name   string
-		marker string
-		link   bool
-	}{{name: "exact", marker: "file-saves"}, {name: "alias", marker: "File-Saves"}, {name: "symlink", marker: "file-saves", link: true}} {
-		t.Run(testCase.name, func(t *testing.T) {
-			root := t.TempDir()
-			if err := os.Mkdir(filepath.Join(root, ".stow"), 0o700); err != nil {
-				t.Fatal(err)
-			}
-			markerPath := filepath.Join(root, ".stow", testCase.marker)
-			if testCase.link {
-				target := t.TempDir()
-				if err := os.Symlink(target, markerPath); err != nil {
-					t.Fatal(err)
-				}
-			} else if err := os.Mkdir(markerPath, 0o700); err != nil {
-				t.Fatal(err)
-			}
-			if _, err := New(Options{Root: root, Bucket: "bucket"}); !errors.Is(err, storage.ErrWorkspaceFileUnsupported) {
-				t.Fatalf("New with marker=%q: %v", testCase.marker, err)
-			}
-			for _, name := range []string{"keys", "manifest.json", "index.json"} {
-				if _, err := os.Lstat(filepath.Join(root, ".stow", name)); !os.IsNotExist(err) {
-					t.Fatalf("New mutated %s before refusing marker: %v", name, err)
-				}
-			}
-		})
-	}
-}
-
 func newWorkspaceFileSaveStoreForTest(t *testing.T) *Store {
 	t.Helper()
 	store := newFileSaveJournalStore(t)

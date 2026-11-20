@@ -247,8 +247,16 @@ readable under their existing leases.
 
 Qualified open/resume inspects the marker and journal **before** ordinary
 Store initialization can write index state. Ordinary ResumeWith/OpenWorkspace
-claims the Session before initialization and refuses any journal-bearing root,
-including terminal-only state. The recovery-aware owning bootstrap claims the
+claims the Session before initialization and classifies the journal by the
+barrier's own rule: an absent journal opens, an intact journal opens
+(matching identity, only journal documents, no pending record), and anything
+else refuses as blocked. A terminal-only journal is a settled state rather than
+a lockout, so a workspace that has saved is still resumable, servable and
+destructible. Refusal is reserved for a journal whose effect is in doubt, and
+resolving it is the recovery path's job rather than the constructor's. An
+editing session that opens a workspace holding an intact journal joins that
+journal instead of refusing the workspace it was asked to edit. The
+recovery-aware owning bootstrap claims the
 existing session, pins registry/root identity, loads the journal/index without
 adoption writes, and exposes resolution even while normal admission is paused.
 Reuse registered limits and authority; do not open a second independent Store or

@@ -302,7 +302,12 @@ func (s *Store) CheckWorkspaceFileSaveEditorOpen() error {
 		return storage.ErrWorkspaceFileBlocked
 	}
 	if s.fileSaveJournal == nil {
-		return storage.ErrWorkspaceFileUnsupported
+		journal, err := loadWorkspaceFileSaveJournal(root, s.manifest.WorkspaceID, s.manifest.Bucket)
+		if err != nil {
+			return storage.ErrWorkspaceFileBlocked
+		}
+		s.fileSaveJournal = journal
+		return nil
 	}
 	journal, err := loadWorkspaceFileSaveJournal(root, s.manifest.WorkspaceID, s.manifest.Bucket)
 	if err != nil || journal.identity.JournalID != s.fileSaveJournal.identity.JournalID {
@@ -331,7 +336,10 @@ func (s *Store) checkFileSaveMarkerLocked() error {
 	if err != nil {
 		return storage.ErrWorkspaceFileBlocked
 	}
-	if s.fileSaveJournal == nil || s.fileSaveJournal.identity.WorkspaceID != s.manifest.WorkspaceID || s.fileSaveJournal.identity.Bucket != s.manifest.Bucket {
+	if s.fileSaveJournal == nil {
+		return CheckWorkspaceFileSaveBarrier(s.root, s.manifest.WorkspaceID, s.manifest.Bucket)
+	}
+	if s.fileSaveJournal.identity.WorkspaceID != s.manifest.WorkspaceID || s.fileSaveJournal.identity.Bucket != s.manifest.Bucket {
 		return storage.ErrWorkspaceFileUnsupported
 	}
 	identity, _, err := readWorkspaceFileSaveIdentity(root, s.manifest.WorkspaceID, s.manifest.Bucket)
@@ -347,17 +355,25 @@ func (s *Store) checkFileSaveMarkerLocked() error {
 	return CheckWorkspaceFileSaveBarrier(s.root, s.manifest.WorkspaceID, s.manifest.Bucket)
 }
 
-func refuseUnrecoveredWorkspaceFileSaveJournal(rootPath string) error {
-	info, err := os.Lstat(rootPath)
-	if errors.Is(err, os.ErrNotExist) {
+func refuseBlockedWorkspaceFileSaveJournal(rootPath string) error {
+	present, err := workspaceFileSaveMarkerPresent(rootPath)
+	if err != nil {
+		return err
+	}
+	if !present {
 		return nil
 	}
-	if err != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
-		return storage.ErrWorkspaceFileUnsupported
+	root, err := rooted.Open(rootPath)
+	if err != nil {
+		return storage.ErrWorkspaceFileBlocked
 	}
-	marker, err := workspaceFileSaveMarkerPresent(rootPath)
-	if err != nil || marker {
-		return storage.ErrWorkspaceFileUnsupported
+	defer root.Close()
+	manifest := &Manifest{}
+	if err := readRecoveryDocument(root, "manifest.json", manifest); err != nil {
+		return storage.ErrWorkspaceFileBlocked
+	}
+	if err := checkWorkspaceFileSaveBarrierRoot(root, manifest.WorkspaceID, manifest.Bucket); err != nil {
+		return storage.ErrWorkspaceFileBlocked
 	}
 	return nil
 }
@@ -379,8 +395,8 @@ func workspaceFileSaveMarkerPresent(rootPath string) (bool, error) {
 	exact, folded, readErr := findWorkspaceFileSaveMarker(metadata)
 	closeErr := metadata.Close()
 	finalInfo, finalErr := os.Lstat(metadataPath)
-	if statErr != nil || !os.SameFile(metadataInfo, openedInfo) || finalErr != nil || !os.SameFile(metadataInfo, finalInfo) || readErr != nil || closeErr != nil || folded || exact {
-		return exact || folded, storage.ErrWorkspaceFileUnsupported
+	if statErr != nil || !os.SameFile(metadataInfo, openedInfo) || finalErr != nil || !os.SameFile(metadataInfo, finalInfo) || readErr != nil || closeErr != nil || folded {
+		return false, storage.ErrWorkspaceFileUnsupported
 	}
-	return false, nil
+	return exact, nil
 }
