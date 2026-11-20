@@ -6,6 +6,7 @@ import {
   lowestPerPackage,
   mergeCoverageProfile,
   packageProblems,
+  platformPackages,
   statementsByPackage,
   thinPackages,
 } from "./check-coverage.mjs";
@@ -194,5 +195,26 @@ test("percentage differences are rounded to two places before comparison", () =>
     coverageProblems(measured(4000, 64.001), measured(4000, 65.0), null, 0.999)
       .length,
     1,
+  );
+});
+
+test("a package with platform-specific files is held to the aggregate, not a floor from another OS", () => {
+  const profile = "mode: set\nexample/app/parent_linux.go:1.1,2.1 2 1\nexample/app/parent_linux.go:3.1,4.1 8 0\n";
+  const packages = statementsByPackage(profile);
+  const platforms = platformPackages(profile);
+  assert.deepEqual([...platforms], ["example/app"]);
+  assert.deepEqual(
+    packageProblems(
+      packages,
+      { "example/app": { coveredStatements: 10, totalStatements: 12 } },
+      undefined,
+      0,
+      platforms,
+    ),
+    [],
+  );
+  assert.match(
+    packageProblems(packages, { "example/app": { coveredStatements: 10 } })[0],
+    /covered statements fell/,
   );
 });

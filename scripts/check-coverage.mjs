@@ -280,6 +280,7 @@ export function coverageProblems(
       baseline.packages,
       previous?.packages,
       floorTolerance,
+      measured.platformPackages,
     ),
   );
   return problems;
@@ -305,6 +306,7 @@ export function packageProblems(
   baseline,
   previous,
   floorTolerance = 0,
+  platformPackages = new Set(),
 ) {
   const problems = [];
   if (measured === undefined || baseline === undefined) {
@@ -318,6 +320,9 @@ export function packageProblems(
     return problems;
   }
   for (const [name, floor] of Object.entries(baseline)) {
+    // The statement set differs by platform, so the recorded floor measures a
+    // different body of code. The aggregate above still counts this package.
+    if (platformPackages.has(name)) continue;
     const got = measured[name];
     if (got === undefined) {
       // The package is gone, or stopped being built. Both need a decision: a deleted
@@ -402,6 +407,7 @@ function coverageFromProfile(profile, owners = {}) {
     coveredStatements,
     totalStatements,
     packages: statementsByPackage(profile, owners),
+    platformPackages: platformPackages(profile),
   };
 }
 
@@ -414,6 +420,24 @@ function coverageFromProfile(profile, owners = {}) {
 // declared name says nothing about where the code lives.
 function packageOf(nameWithFile) {
   return nameWithFile.replace(/\/[^/]*$/, "");
+}
+
+// GOOS/GOARCH file suffixes. A package built from these has a different statement
+// set on each platform, so a per-package floor recorded on one platform is not a
+// measurement of the other: parentwatch is 22/34 statements on macOS and 10/26 on
+// Linux, and the macOS floor failed the Linux release job while coverage had not
+// changed. Those packages are held to the aggregate floor only.
+export function platformPackages(profile) {
+  // Function-local: main() runs before a const declared below it would be
+  // initialized, and reading that const there is a temporal-dead-zone error.
+  const platformFile = /_(?:aix|android|darwin|dragonfly|freebsd|illumos|ios|js|linux|netbsd|openbsd|plan9|solaris|wasip1|windows)(?:_[a-z0-9]+)?\.go$/;
+  const names = new Set();
+  for (const line of profile.split("\n")) {
+    const match = /^(.+):\d+\.\d+,\d+\.\d+ \d+ \d+$/.exec(line);
+    if (match === null || !platformFile.test(match[1])) continue;
+    names.add(packageOf(match[1]));
+  }
+  return names;
 }
 
 // statementsByPackage is the per-package measurement, as a pure function of a profile
