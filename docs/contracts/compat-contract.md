@@ -95,8 +95,11 @@ before publication. The complete response reports `x-amz-checksum-crc64nvme`
 with `x-amz-checksum-type: FULL_OBJECT`; `HEAD` and `GET` report the value. A mismatching
 value fails with `400 BadDigest`. Composite checksums are refused with
 `501 NotImplemented` rather than relabelled, and existing multipart ETag behavior
-is unchanged. [ADR 0024](../adr/0024-multipart-checksums-are-object-state.md)
-records the decision.
+is unchanged.
+
+<!-- repo-only:start -->
+[ADR 0024](../adr/0024-multipart-checksums-are-object-state.md) records the decision.
+<!-- repo-only:end -->
 
 Conditional writes and reads return different statuses:
 

@@ -364,6 +364,11 @@ npm install @chester-hill-solutions/stow-s3@0.4.2
 
 The package includes a platform carrier for Linux or macOS on x64 or ARM64.
 No Go installation or `STOW_BIN` override is needed. Use WSL on Windows.
+
+No daemon, no root, loopback-only, one data directory. Verify an install with
+`npx stow-doctor`. If a task needs S3 or work that must survive a restart, the
+[agent install card](site/agent.md#asking-for-an-install) states the ask and
+the fallback.
 Remove any old scope override to `npm.pkg.github.com`; these packages use npmjs.
 
 Standalone v0.4.2 native binaries are listed on the
