@@ -17,6 +17,18 @@ export type {
   PutObjectChange,
 } from "./browser-types.js";
 export { IndexedDbPersistenceAdapter } from "./indexeddb-persistence.js";
+export { IndexedDbAdapter, IndexedDbAdapterError } from "./indexeddb-adapter.js";
+export type {
+  AdapterCondition,
+  AdapterConditionalPutOptions,
+  AdapterListOptions,
+  AdapterListResult,
+  AdapterObject,
+  AdapterObjectMetadata,
+  AdapterPutOptions,
+  IndexedDbAdapterErrorCode,
+  IndexedDbAdapterOptions,
+} from "./indexeddb-adapter.js";
 export {
   BrowserEmbeddedStow,
   openBrowserEmbeddedStow,

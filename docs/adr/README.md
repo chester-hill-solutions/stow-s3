@@ -30,6 +30,7 @@ Use the [usage guides](../README.md) for supported APIs and the
 | [0020](0020-binary-object-records.md) | Filesystem objects use protobuf metadata and raw payloads | `accepted` | — | — |
 | [0021](0021-remote-exposure-requires-consent.md) | A bind beyond loopback needs consent, and the service does not terminate TLS | `accepted` | — | — |
 | [0022](0022-a-file-save-journal-is-a-state.md) | A file-save journal is a state, not a lockout | `accepted` | — | — |
+| [0023](0023-a-persistence-adapter-is-five-operations.md) | A persistence adapter is five operations | `accepted` | — | — |
 
 ## Status vocabulary
 

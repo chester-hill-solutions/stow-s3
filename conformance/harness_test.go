@@ -2,8 +2,6 @@ package conformance_test
 
 import (
 	"context"
-	"crypto/sha256"
-	"fmt"
 	"net/http"
 	"os"
 	"sync"
@@ -15,11 +13,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
+	"github.com/chester-hill-solutions/stow-s3/conformance/corpus"
+	"github.com/chester-hill-solutions/stow-s3/internal/adapterbridge"
 	"github.com/chester-hill-solutions/stow-s3/internal/auth"
 	"github.com/chester-hill-solutions/stow-s3/internal/runtime"
 	"github.com/chester-hill-solutions/stow-s3/internal/s3api"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 	"github.com/chester-hill-solutions/stow-s3/internal/storage/fs"
+	"github.com/chester-hill-solutions/stow-s3/pkg/stow/persistence/directory"
 )
 
 const testRegion = auth.DefaultRegion
@@ -73,6 +74,16 @@ func newConformanceStore(t *testing.T) storage.Store {
 		return store
 	case "runtime":
 		return newRuntimeConformanceStore(t)
+	case "adapter":
+		backend, err := directory.Open(t.TempDir())
+		if err != nil {
+			t.Fatalf("directory adapter: %v", err)
+		}
+		store, err := adapterbridge.Bind(backend)
+		if err != nil {
+			t.Fatalf("adapter bridge: %v", err)
+		}
+		return store
 	default:
 		t.Fatalf("unknown STOW_CONFORMANCE_BACKEND %q", os.Getenv("STOW_CONFORMANCE_BACKEND"))
 		return nil
@@ -190,22 +201,8 @@ func newS3Client(t *testing.T, endpoint string, creds auth.Credentials, status *
 	})
 }
 
-func uniqueBucket(t *testing.T, parts ...string) string {
-	t.Helper()
-	name := t.Name()
-	for _, p := range parts {
-		name += "/" + p
-	}
-	sum := sha256.Sum256([]byte(name))
-	return fmt.Sprintf("conf-%x", sum[:8])
-}
+func uniqueBucket(t *testing.T, parts ...string) string { return corpus.UniqueBucket(t, parts...) }
 
 func createBucket(ctx context.Context, t *testing.T, client *s3.Client, bucket string) {
-	t.Helper()
-	_, err := client.CreateBucket(ctx, &s3.CreateBucketInput{
-		Bucket: aws.String(bucket),
-	})
-	if err != nil {
-		t.Fatalf("CreateBucket(%q): %v", bucket, err)
-	}
+	corpus.CreateBucket(ctx, t, client, bucket)
 }

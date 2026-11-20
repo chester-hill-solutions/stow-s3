@@ -74,3 +74,12 @@ back the whole batch on either a WASM operation failure or a persistence failure
 The [file history API](browser-file-history.md) uses this batch operation.
 The [editor example](../../examples/browser-editor/README.md) exercises real WASM,
 IndexedDB, reload recovery, offline access and explicit sync to a native S3 fixture.
+
+## Objects without the embedded runtime
+
+A host that already stores objects itself does not need snapshot persistence.
+`IndexedDbAdapter` implements the five-operation
+[persistence adapter contract](../contracts/persistence-adapter.md#reference-implementations)
+over one IndexedDB object store: get, put, list, delete and conditional put, with
+a SHA-256 entity tag. It is exported from the `browser` entry and qualified by
+the Playwright browser suite.

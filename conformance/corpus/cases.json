@@ -373,7 +373,10 @@
       "metadata": {
         "x-amz-meta-foo": "bar",
         "x-amz-meta-owner": "dev"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "range-partial-object",
@@ -775,7 +778,10 @@
       "expect": {
         "status": 400,
         "errorCode": "InvalidPart"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "multipart-reject-duplicate",
@@ -792,7 +798,10 @@
       "expect": {
         "status": 400,
         "errorCode": "InvalidPart"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "multipart-reject-unsorted",
@@ -813,7 +822,10 @@
       "expect": {
         "status": 400,
         "errorCode": "InvalidPart"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "multipart-reject-wrong-etag",
@@ -830,7 +842,10 @@
       "expect": {
         "status": 400,
         "errorCode": "InvalidPart"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "multipart-reject-short-nonfinal",
@@ -851,7 +866,10 @@
       "expect": {
         "status": 400,
         "errorCode": "EntityTooSmall"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "multipart-reject-aborted",
@@ -868,7 +886,10 @@
       "expect": {
         "status": 404,
         "errorCode": "NoSuchUpload"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "multipart-reject-repeated",
@@ -885,7 +906,10 @@
       "expect": {
         "status": 404,
         "errorCode": "NoSuchUpload"
-      }
+      },
+      "requires": [
+        "multipart"
+      ]
     },
     {
       "id": "presigned-get",

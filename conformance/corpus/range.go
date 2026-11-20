@@ -1,4 +1,4 @@
-package conformance_test
+package corpus
 
 import (
 	"fmt"
@@ -10,15 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-// runCorpusRangeGet reads part of an object the setup seeded.
-//
-// The range is written into the corpus as the header a client would send, and the
-// answer is checked on three surfaces: status, bytes, and the whole Content-Range.
-// Status and body together are what a client reads, and they are not sufficient: a
-// server can return the right bytes for a range it mis-parsed, or a correct
-// Content-Range beside a body from the wrong offset. Asserting the full
-// `bytes <first>-<last>/<size>` string also pins the total, the part a truncated read
-// reports wrongly most often.
 func runCorpusRangeGet(corpusContext *sharedCorpusContext) {
 	corpusContext.t.Helper()
 	testCase := corpusContext.testCase
@@ -44,14 +35,6 @@ func runCorpusRangeGet(corpusContext *sharedCorpusContext) {
 	}
 }
 
-// assertCorpusRangeRefusalTotal re-reads the 416 through a HeadObject-sized
-// probe to confirm the total the refusal reported is the real object size, and
-// not a number the range parser produced on its way to refusing.
-//
-// A 416 carries `Content-Range: bytes * /<size>`, and that size is the only
-// thing a client can use to work out what it should ask for instead. Reporting
-// a wrong total there sends the caller into a loop of unsatisfiable requests,
-// and nothing else in the corpus would notice.
 func assertCorpusRangeRefusalTotal(corpusContext *sharedCorpusContext, testCase sharedCorpusCase) {
 	corpusContext.t.Helper()
 	head, err := corpusContext.env.Client.HeadObject(corpusContext.ctx, &s3.HeadObjectInput{
@@ -77,10 +60,6 @@ func assertCorpusRangeRefusalTotal(corpusContext *sharedCorpusContext, testCase 
 	}
 }
 
-// parseCorpusContentRangeTotal pulls the object size out of a Content-Range
-// value, accepting both the `bytes <first>-<last>/<size>` and `bytes */<size>`
-// forms. It is deliberately a parser rather than a string comparison: the case
-// states one expected value and the check has to read the total out of it.
 func parseCorpusContentRangeTotal(contentRange string) (int64, error) {
 	const prefix = "bytes "
 	if !strings.HasPrefix(contentRange, prefix) {

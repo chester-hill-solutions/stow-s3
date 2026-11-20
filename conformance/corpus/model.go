@@ -1,4 +1,4 @@
-package conformance_test
+package corpus
 
 import (
 	"bytes"
@@ -26,6 +26,7 @@ type sharedCorpusCase struct {
 	Quiet                bool                    `json:"quiet"`
 	ID                   string                  `json:"id"`
 	Operation            string                  `json:"operation"`
+	Requires             []string                `json:"requires"`
 	Bucket               string                  `json:"bucket"`
 	Key                  string                  `json:"key"`
 	Body                 string                  `json:"body"`
@@ -45,9 +46,7 @@ type sharedCorpusCase struct {
 	Delimiter    string `json:"delimiter"`
 	MaxKeys      int    `json:"maxKeys"`
 	EncodingType string `json:"encodingType"`
-	// Marker is the classic ListObjects cursor: it names a row of the listing,
-	// which may be a common prefix rather than a key.
-	Marker string `json:"marker"`
+	Marker       string `json:"marker"`
 
 	SourceBucket          string `json:"sourceBucket"`
 	SourceKey             string `json:"sourceKey"`
@@ -60,9 +59,6 @@ type sharedCorpusCase struct {
 	Parts                []sharedCorpusPart `json:"parts"`
 	ListMultipartUploads bool               `json:"listMultipartUploads"`
 
-	// Range is a raw HTTP Range header value, sent verbatim. The corpus states
-	// the header a client would write rather than a parsed form, because the
-	// parsing rules are the thing under test.
 	Range string `json:"range"`
 }
 
@@ -81,27 +77,23 @@ type sharedCorpusPart struct {
 }
 
 type sharedCorpusExpectation struct {
-	Deleted           []string          `json:"deleted"`
-	Status            int               `json:"status"`
-	Body              string            `json:"body"`
-	ContentType       string            `json:"contentType"`
-	Metadata          map[string]string `json:"metadata"`
-	ErrorCode         string            `json:"errorCode"`
-	ETag              string            `json:"etag"`
-	BodyLength        int64             `json:"bodyLength"`
-	ChecksumAlgorithm string            `json:"checksumAlgorithm"`
-	ChecksumValue     string            `json:"checksumValue"`
-	// ContentRange is the full header value, `bytes <first>-<last>/<size>`, or
-	// `bytes */<size>` on an unsatisfiable request. Asserting the whole string
-	// rather than the span alone is what catches a server that reports the
-	// right bytes against the wrong total.
-	ContentRange   string             `json:"contentRange"`
-	Contents       []string           `json:"contents"`
-	CommonPrefixes []string           `json:"commonPrefixes"`
-	KeyCount       int                `json:"keyCount"`
-	IsTruncated    *bool              `json:"isTruncated"`
-	Pages          []sharedCorpusPage `json:"pages"`
-	PartNumbers    []int              `json:"partNumbers"`
+	Deleted           []string           `json:"deleted"`
+	Status            int                `json:"status"`
+	Body              string             `json:"body"`
+	ContentType       string             `json:"contentType"`
+	Metadata          map[string]string  `json:"metadata"`
+	ErrorCode         string             `json:"errorCode"`
+	ETag              string             `json:"etag"`
+	BodyLength        int64              `json:"bodyLength"`
+	ChecksumAlgorithm string             `json:"checksumAlgorithm"`
+	ChecksumValue     string             `json:"checksumValue"`
+	ContentRange      string             `json:"contentRange"`
+	Contents          []string           `json:"contents"`
+	CommonPrefixes    []string           `json:"commonPrefixes"`
+	KeyCount          int                `json:"keyCount"`
+	IsTruncated       *bool              `json:"isTruncated"`
+	Pages             []sharedCorpusPage `json:"pages"`
+	PartNumbers       []int              `json:"partNumbers"`
 }
 
 type sharedCorpusPage struct {
@@ -109,34 +101,31 @@ type sharedCorpusPage struct {
 	CommonPrefixes []string `json:"commonPrefixes"`
 	KeyCount       int      `json:"keyCount"`
 	IsTruncated    bool     `json:"isTruncated"`
-	// NextMarker is the classic ListObjects cursor this page must report. It is
-	// asserted rather than merely followed, because a page that reports the wrong
-	// cursor is a client that pages into a row it already returned.
-	NextMarker string `json:"nextMarker"`
+	NextMarker     string   `json:"nextMarker"`
 }
 
 type sharedCorpusContext struct {
 	t        *testing.T
 	testCase sharedCorpusCase
-	env      *testEnv
+	env      *Env
 	ctx      context.Context
 	buckets  map[string]string
 }
 
-func newSharedCorpusContext(t *testing.T, testCase sharedCorpusCase) *sharedCorpusContext {
+func newSharedCorpusContext(t *testing.T, env *Env, testCase sharedCorpusCase) *sharedCorpusContext {
 	t.Helper()
 	corpusContext := &sharedCorpusContext{
 		t:        t,
 		testCase: testCase,
-		env:      newTestEnv(t),
+		env:      env,
 		ctx:      context.Background(),
 		buckets:  make(map[string]string),
 	}
 	for _, logicalBucket := range testCase.logicalBuckets() {
-		corpusContext.buckets[logicalBucket] = uniqueBucket(t, "corpus", testCase.ID, logicalBucket)
+		corpusContext.buckets[logicalBucket] = UniqueBucket(t, "corpus", testCase.ID, logicalBucket)
 	}
 	for _, logicalBucket := range sortedMapKeys(corpusContext.buckets) {
-		createBucket(corpusContext.ctx, t, corpusContext.env.Client, corpusContext.buckets[logicalBucket])
+		CreateBucket(corpusContext.ctx, t, corpusContext.env.Client, corpusContext.buckets[logicalBucket])
 	}
 	return corpusContext
 }

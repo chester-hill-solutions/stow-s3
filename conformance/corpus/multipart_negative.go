@@ -1,4 +1,4 @@
-package conformance_test
+package corpus
 
 import (
 	"bytes"

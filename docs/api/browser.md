@@ -44,7 +44,137 @@ const status = await files.sync("note.txt");
 
 ## Symbols
 
-[BROWSER_PERSISTENCE_FORMAT_VERSION](#browser_persistence_format_version) · [BrowserEmbeddedStow](#browserembeddedstow) · [BrowserFileHistory](#browserfilehistory) · [BrowserFileHistoryOptions](#browserfilehistoryoptions) · [BrowserObjectMutation](#browserobjectmutation) · [BrowserPersistenceError](#browserpersistenceerror) · [BrowserPersistenceErrorCode](#browserpersistenceerrorcode) · [DeleteBucketChange](#deletebucketchange) · [DeleteObjectChange](#deleteobjectchange) · [FileHistoryError](#filehistoryerror) · [FileHistoryErrorCode](#filehistoryerrorcode) · [FileHistoryExport](#filehistoryexport) · [FileHistoryStatus](#filehistorystatus) · [FileReadResult](#filereadresult) · [FileSaveOptions](#filesaveoptions) · [FileSaveReceipt](#filesavereceipt) · [FileVersion](#fileversion) · [IndexedDbPersistenceAdapter](#indexeddbpersistenceadapter) · [IndexedDbPersistenceAdapterOptions](#indexeddbpersistenceadapteroptions) · [LockManagerLike](#lockmanagerlike) · [ObjectSyncRemote](#objectsyncremote) · [openBrowserEmbeddedStow](#openbrowserembeddedstow) · [PersistenceAdapter](#persistenceadapter) · [PersistenceChange](#persistencechange) · [PersistenceSnapshot](#persistencesnapshot) · [PersistentEmbeddedStowOptions](#persistentembeddedstowoptions) · [PutBucketChange](#putbucketchange) · [PutObjectChange](#putobjectchange) · [RemoteObjectBasis](#remoteobjectbasis) · [SyncRemoteObject](#syncremoteobject) · [SyncRemoteWrite](#syncremotewrite)
+[AdapterCondition](#adaptercondition) · [AdapterConditionalPutOptions](#adapterconditionalputoptions) · [AdapterListOptions](#adapterlistoptions) · [AdapterListResult](#adapterlistresult) · [AdapterObject](#adapterobject) · [AdapterObjectMetadata](#adapterobjectmetadata) · [AdapterPutOptions](#adapterputoptions) · [BROWSER_PERSISTENCE_FORMAT_VERSION](#browser_persistence_format_version) · [BrowserEmbeddedStow](#browserembeddedstow) · [BrowserFileHistory](#browserfilehistory) · [BrowserFileHistoryOptions](#browserfilehistoryoptions) · [BrowserObjectMutation](#browserobjectmutation) · [BrowserPersistenceError](#browserpersistenceerror) · [BrowserPersistenceErrorCode](#browserpersistenceerrorcode) · [DeleteBucketChange](#deletebucketchange) · [DeleteObjectChange](#deleteobjectchange) · [FileHistoryError](#filehistoryerror) · [FileHistoryErrorCode](#filehistoryerrorcode) · [FileHistoryExport](#filehistoryexport) · [FileHistoryStatus](#filehistorystatus) · [FileReadResult](#filereadresult) · [FileSaveOptions](#filesaveoptions) · [FileSaveReceipt](#filesavereceipt) · [FileVersion](#fileversion) · [IndexedDbAdapter](#indexeddbadapter) · [IndexedDbAdapterError](#indexeddbadaptererror) · [IndexedDbAdapterErrorCode](#indexeddbadaptererrorcode) · [IndexedDbAdapterOptions](#indexeddbadapteroptions) · [IndexedDbPersistenceAdapter](#indexeddbpersistenceadapter) · [IndexedDbPersistenceAdapterOptions](#indexeddbpersistenceadapteroptions) · [LockManagerLike](#lockmanagerlike) · [ObjectSyncRemote](#objectsyncremote) · [openBrowserEmbeddedStow](#openbrowserembeddedstow) · [PersistenceAdapter](#persistenceadapter) · [PersistenceChange](#persistencechange) · [PersistenceSnapshot](#persistencesnapshot) · [PersistentEmbeddedStowOptions](#persistentembeddedstowoptions) · [PutBucketChange](#putbucketchange) · [PutObjectChange](#putobjectchange) · [RemoteObjectBasis](#remoteobjectbasis) · [SyncRemoteObject](#syncremoteobject) · [SyncRemoteWrite](#syncremotewrite)
+
+## AdapterCondition
+
+
+
+```ts
+interface AdapterCondition {
+  ifMatch?: string | undefined;
+  ifAbsent?: boolean | undefined;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `ifMatch` | `string \| undefined` | Yes | Write only when the current content ETag matches; empty means unset. |
+| `ifAbsent` | `boolean \| undefined` | Yes |  |
+
+## AdapterConditionalPutOptions
+
+
+
+```ts
+interface AdapterConditionalPutOptions  extends AdapterPutOptions {
+  condition: AdapterCondition;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `condition` | `AdapterCondition` | No |  |
+| `contentType` | `string \| undefined` | Yes | MIME content type attached to the object or file. |
+| `metadata` | `Record<string, string> \| undefined` | Yes | User metadata included in storage and sync comparisons. |
+
+## AdapterListOptions
+
+
+
+```ts
+interface AdapterListOptions {
+  prefix?: string | undefined;
+  delimiter?: string | undefined;
+  continuationToken?: string | undefined;
+  startAfter?: string | undefined;
+  maxKeys?: number | undefined;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `prefix` | `string \| undefined` | Yes | Only list keys beginning with this prefix. |
+| `delimiter` | `string \| undefined` | Yes |  |
+| `continuationToken` | `string \| undefined` | Yes |  |
+| `startAfter` | `string \| undefined` | Yes |  |
+| `maxKeys` | `number \| undefined` | Yes |  |
+
+## AdapterListResult
+
+
+
+```ts
+interface AdapterListResult {
+  objects: AdapterObjectMetadata[];
+  commonPrefixes: string[];
+  isTruncated: boolean;
+  nextContinuationToken: string;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `objects` | `AdapterObjectMetadata[]` | No | Objects returned by the listing or persistence snapshot. |
+| `commonPrefixes` | `string[]` | No |  |
+| `isTruncated` | `boolean` | No |  |
+| `nextContinuationToken` | `string` | No |  |
+
+## AdapterObject
+
+
+
+```ts
+interface AdapterObject {
+  metadata: AdapterObjectMetadata;
+  data: Uint8Array<ArrayBufferLike>;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `metadata` | `AdapterObjectMetadata` | No | User metadata included in storage and sync comparisons. |
+| `data` | `Uint8Array<ArrayBufferLike>` | No | Object bytes. Input ownership and size rules depend on the method. |
+
+## AdapterObjectMetadata
+
+
+
+```ts
+interface AdapterObjectMetadata {
+  key: string;
+  size: number;
+  etag: string;
+  modified: string;
+  contentType: string;
+  metadata: Record<string, string>;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | No | Object or file key within the selected bucket or project. |
+| `size` | `number` | No | Total object or content size in bytes; stream uploads require an exact declaration. |
+| `etag` | `string` | No | Content validator returned by the store or provider. |
+| `modified` | `string` | No |  |
+| `contentType` | `string` | No | MIME content type attached to the object or file. |
+| `metadata` | `Record<string, string>` | No | User metadata included in storage and sync comparisons. |
+
+## AdapterPutOptions
+
+
+
+```ts
+interface AdapterPutOptions {
+  contentType?: string | undefined;
+  metadata?: Record<string, string> | undefined;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `contentType` | `string \| undefined` | Yes | MIME content type attached to the object or file. |
+| `metadata` | `Record<string, string> \| undefined` | Yes | User metadata included in storage and sync comparisons. |
 
 ## BROWSER_PERSISTENCE_FORMAT_VERSION
 
@@ -722,6 +852,185 @@ interface FileVersion {
 | `label` | `string \| undefined` | Yes | Optional revision label; it does not prevent retention from removing the revision. |
 | `contentType` | `string \| undefined` | Yes | MIME content type attached to the object or file. |
 | `metadata` | `Record<string, string> \| undefined` | Yes | User metadata included in storage and sync comparisons. |
+
+## IndexedDbAdapter
+
+
+
+```ts
+class IndexedDbAdapter {
+  static open(options?: IndexedDbAdapterOptions): Promise<IndexedDbAdapter>;
+  get(bucket: string, key: string): Promise<AdapterObject>;
+  put(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: AdapterPutOptions): Promise<AdapterObjectMetadata>;
+  conditionalPut(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options: AdapterConditionalPutOptions): Promise<AdapterObjectMetadata>;
+  delete(bucket: string, key: string): Promise<void>;
+  list(bucket: string, options?: AdapterListOptions): Promise<AdapterListResult>;
+  close(): void;
+}
+```
+
+### IndexedDbAdapter.open
+
+Open a handle. Retain it until operations finish, then close it.
+
+```ts
+open(options?: IndexedDbAdapterOptions): Promise<IndexedDbAdapter>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `options` | `IndexedDbAdapterOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `Promise<IndexedDbAdapter>`.
+
+### IndexedDbAdapter.get
+
+
+
+```ts
+get(bucket: string, key: string): Promise<AdapterObject>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `Promise<AdapterObject>`.
+
+### IndexedDbAdapter.put
+
+
+
+```ts
+put(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options?: AdapterPutOptions): Promise<AdapterObjectMetadata>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `AdapterPutOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `Promise<AdapterObjectMetadata>`.
+
+### IndexedDbAdapter.conditionalPut
+
+
+
+```ts
+conditionalPut(bucket: string, key: string, data: Uint8Array<ArrayBufferLike>, options: AdapterConditionalPutOptions): Promise<AdapterObjectMetadata>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+| `data` | `Uint8Array<ArrayBufferLike>` | Yes | — | Object bytes. Input ownership and size rules depend on the method. |
+| `options` | `AdapterConditionalPutOptions` | Yes | — | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `Promise<AdapterObjectMetadata>`.
+
+### IndexedDbAdapter.delete
+
+
+
+```ts
+delete(bucket: string, key: string): Promise<void>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `key` | `string` | Yes | — | Object or file key within the selected bucket or project. |
+
+Returns: `Promise<void>`.
+
+### IndexedDbAdapter.list
+
+
+
+```ts
+list(bucket: string, options?: AdapterListOptions): Promise<AdapterListResult>
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `bucket` | `string` | Yes | — | Bucket name. Create it before storing objects. |
+| `options` | `AdapterListOptions` | No | {} | Configuration for this operation; the parameter type lists the accepted settings. |
+
+Returns: `Promise<AdapterListResult>`.
+
+### IndexedDbAdapter.close
+
+Release this handle. Do not submit new operations after closing it.
+
+```ts
+close(): void
+```
+
+Returns: `void`.
+
+## IndexedDbAdapterError
+
+
+
+```ts
+class IndexedDbAdapterError  extends Error {
+  readonly code: IndexedDbAdapterErrorCode;
+  constructor(code: IndexedDbAdapterErrorCode, message: string);
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `code` | `IndexedDbAdapterErrorCode` | No | Structured error code; inspect the code rather than matching message text. |
+| `name` | `string` | No | Name identifying this bucket, head, protection or error class. |
+| `message` | `string` | No | Human-readable error message. |
+| `stack` | `string \| undefined` | Yes | JavaScript stack trace, when available. |
+| `cause` | `unknown` | Yes | Underlying error cause, when provided. |
+
+### IndexedDbAdapterError.constructor
+
+function Object() { [native code] }
+
+```ts
+constructor(code: IndexedDbAdapterErrorCode, message: string)
+```
+
+| Parameter | Type | Required | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| `code` | `IndexedDbAdapterErrorCode` | Yes | — | Structured error code; inspect the code rather than matching message text. |
+| `message` | `string` | Yes | — | Human-readable error message. |
+
+Returns: `IndexedDbAdapterError`.
+
+## IndexedDbAdapterErrorCode
+
+
+
+```ts
+type IndexedDbAdapterErrorCode = "not_found" | "precondition_failed" | "invalid" | "closed" | "unsupported";
+```
+
+## IndexedDbAdapterOptions
+
+
+
+```ts
+interface IndexedDbAdapterOptions {
+  databaseName?: string | undefined;
+  indexedDB?: IDBFactory | undefined;
+  now?: (() => number) | undefined;
+}
+```
+
+| Field | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `databaseName` | `string \| undefined` | Yes | IndexedDB database name; namespaces partition records within it. |
+| `indexedDB` | `IDBFactory \| undefined` | Yes | Optional IDBFactory override for the storage adapter. |
+| `now` | `(() => number) \| undefined` | Yes |  |
 
 ## IndexedDbPersistenceAdapter
 

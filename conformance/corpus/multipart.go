@@ -1,4 +1,4 @@
-package conformance_test
+package corpus
 
 import (
 	"bytes"
@@ -19,11 +19,6 @@ func runCorpusMultipart(corpusContext *sharedCorpusContext) {
 		Bucket: aws.String(bucket),
 		Key:    aws.String(testCase.Key),
 	}
-	// The object properties fixed at initiation. They are part of the request
-	// rather than an extra step, and the expectation below is that the completed
-	// object carries them: a multipart upload that drops the content type and
-	// metadata its initiation named publishes an object indistinguishable from one
-	// written with no options.
 	if testCase.ContentType != "" {
 		input.ContentType = aws.String(testCase.ContentType)
 	}
@@ -92,13 +87,6 @@ func runCorpusMultipart(corpusContext *sharedCorpusContext) {
 	assertCorpusMultipartProperties(corpusContext, bucket, testCase)
 }
 
-// assertCorpusMultipartProperties checks that the completed object carries the
-// properties the initiation fixed.
-//
-// HeadObject rather than the completion response, because the completed object is
-// the thing the properties are about: a client that uploads with a content type
-// and metadata and reads them back later is the case, and the response to the
-// completing call is not where it observes them.
 func assertCorpusMultipartProperties(corpusContext *sharedCorpusContext, bucket string, testCase sharedCorpusCase) {
 	corpusContext.t.Helper()
 	if testCase.Expect.ContentType == "" && len(testCase.Expect.Metadata) == 0 {

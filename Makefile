@@ -27,6 +27,7 @@ test-conformance:
 	STOW_CONFORMANCE_BACKEND=filesystem $(PINNED_GO) test ./conformance/... -count=1 -v
 	STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=memory $(PINNED_GO) test ./conformance/... -count=1 -v
 	STOW_CONFORMANCE_BACKEND=runtime STOW_CONFORMANCE_RUNTIME_BACKEND=filesystem $(PINNED_GO) test ./conformance/... -count=1 -v
+	STOW_CONFORMANCE_BACKEND=adapter $(PINNED_GO) test ./conformance/... -count=1 -v
 
 # NPM_INSTALL installs everything, then removes exactly the thing that breaks
 # the tests: the four bundled carrier binaries.

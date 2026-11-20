@@ -10,6 +10,23 @@
   surfaces and is resolved with `mcp --workspace-edit --recover-file-saves`. See
   [ADR 0022](docs/adr/0022-a-file-save-journal-is-a-state.md).
 
+- Add a persistence adapter contract: five operations (get, put, list, delete,
+  conditional put) that a platform can implement to supply Stow's storage, with
+  `stow.OpenAdapter` bridging them to the embedded runtime. The directory
+  reference reuses the filesystem store, `pkg/stow/persistence/adaptertest` is
+  the shared pass/fail suite, and the S3 corpus runs through the bridge as an
+  `adapter` backend. See [the contract](docs/contracts/persistence-adapter.md)
+  and [ADR 0023](docs/adr/0023-a-persistence-adapter-is-five-operations.md).
+- Corpus cases can declare `requires`; a backend that lacks a capability skips
+  the case and says so instead of failing or silently passing. The shared corpus
+  is also importable: `conformance/corpus.RunAdapter` runs every supported case
+  against a host's own `persistence.Adapter`, and `corpus.Run` runs them against
+  an existing S3 endpoint.
+- `IndexedDbAdapter` implements the five persistence operations over IndexedDB
+  and is exported from the browser entry, with a Playwright qualification lane.
+- The front page shows the three verbs a workspace is for: prepare, checkpoint,
+  resume.
+
 - Refuse `Cache-Control`, `Content-Disposition`, `Content-Encoding`,
   `Content-Language` and `Expires` on object writes with `501 NotImplemented`
   before any mutation. The record has no field for them, so accepting the write

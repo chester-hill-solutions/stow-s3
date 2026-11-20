@@ -1,4 +1,4 @@
-package conformance_test
+package corpus
 
 import (
 	"bytes"
@@ -15,9 +15,9 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-func runSharedCorpusCase(t *testing.T, testCase sharedCorpusCase) {
+func runSharedCorpusCase(t *testing.T, env *Env, testCase sharedCorpusCase) {
 	t.Helper()
-	corpusContext := newSharedCorpusContext(t, testCase)
+	corpusContext := newSharedCorpusContext(t, env, testCase)
 	seedCorpusSetup(t, corpusContext)
 	switch testCase.Operation {
 	case "signedRequest":
@@ -119,11 +119,6 @@ func runCorpusConditionalGet(corpusContext *sharedCorpusContext) {
 		IfMatch:     optionalString(testCase.IfMatch),
 		IfNoneMatch: optionalString(testCase.IfNoneMatch),
 	})
-	// Anything other than 200 arrives from the SDK as an error, and 304 is the
-	// case that is easy to get wrong: Not Modified is a successful answer that
-	// carries no body, so the SDK reports it as a NotModified API error rather
-	// than a GetObjectOutput. Measured against aws-sdk-go-v2, which is also what
-	// a caller of a real S3 endpoint sees.
 	if testCase.Expect.Status != http.StatusOK {
 		assertCorpusError(corpusContext.t, err, testCase.Expect)
 		return
@@ -168,7 +163,6 @@ func applyCorpusChecksum(input *s3.PutObjectInput, testCase sharedCorpusCase) {
 	case "SHA256":
 		input.ChecksumSHA256 = aws.String(value)
 	default:
-		// The corpus validator limits this to algorithms implemented by the service.
 	}
 }
 
@@ -186,7 +180,7 @@ func assertCorpusETag(t *testing.T, etag string) {
 	}
 }
 
-func assertCorpusStatus(t *testing.T, env *testEnv, want int) {
+func assertCorpusStatus(t *testing.T, env *Env, want int) {
 	t.Helper()
 	if got := env.Status.StatusCode(); got != want {
 		t.Fatalf("response status = %d, want %d", got, want)

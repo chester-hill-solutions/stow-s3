@@ -21,18 +21,56 @@ case is isolated, declares its own setup and expected SDK-visible result, and is
 executed by both runners:
 
 - the Go runner in `corpus_*.go` uses the AWS SDK for Go v2 and the configured
-  conformance store (`STOW_CONFORMANCE_BACKEND`, including the runtime adapter);
+  conformance store (`STOW_CONFORMANCE_BACKEND`: `memory`, `filesystem`,
+  `runtime`, or `adapter`);
 - the Node runner in `packages/stow-s3/test/shared-corpus.ts` uses
   `@aws-sdk/client-s3` against a fresh local instance for each case.
 
-The corpus currently covers put/get round-trips (including opaque and empty
-keys), conditional reads/writes and checksum writes, paginated `ListObjectsV2`
-with prefix, delimiter and `encoding-type=url`, cross-bucket copy with
-`REPLACE` metadata and copy preconditions, and a two-part multipart lifecycle
-with upload/parts listing. A case may add setup objects, request options, and
-expectations (`status`, body, metadata, error code, ETag, checksum, list pages, or part
-numbers) without adding a second hand-written SDK suite. Raw HTTP safety and
-unsupported-operation cases remain in the protocol tests, not in this corpus.
+A case can declare `requires`. The runner skips a case whose requirement the
+configured backend does not provide, and reports it as a skip rather than a
+pass, so a capability the backend lacks is visible instead of silent. Today the
+only requirement is `multipart`, which the `adapter` backend does not offer.
+
+### Run the corpus against a persistence adapter
+
+The corpus is importable. A host with a Go adapter runs every case in its own
+repository:
+
+```go
+import (
+	"testing"
+
+	"github.com/chester-hill-solutions/stow-s3/conformance/corpus"
+	"github.com/chester-hill-solutions/stow-s3/pkg/stow/persistence"
+)
+
+func TestMyAdapter(t *testing.T) {
+	corpus.RunAdapter(t, func(t *testing.T) persistence.Adapter {
+		return myAdapter(t)
+	})
+}
+```
+
+`RunAdapter` starts a private SigV4 server per case over
+`stow.OpenAdapter`'s bridge, runs the case, and reports pass, fail or skip. The
+adapter contract has no multipart operation, so multipart cases skip and say so.
+
+A host whose storage is already an S3 endpoint runs the same cases with
+`corpus.Run`, which builds the client from an endpoint and credentials:
+
+```go
+corpus.Run(t, func(t *testing.T) *corpus.Env {
+	return &corpus.Env{
+		Endpoint:    "http://127.0.0.1:9000",
+		Credentials: corpus.Credentials{AccessKeyID: "...", SecretAccessKey: "..."},
+	}
+})
+```
+
+The cases are embedded in the package, so the runner reads the same
+`cases.json` every SDK driver uses. The `adapter` value for
+`STOW_CONFORMANCE_BACKEND` runs the directory reference through the same path in
+this repository's suite.
 
 ## Coverage (local mode)
 

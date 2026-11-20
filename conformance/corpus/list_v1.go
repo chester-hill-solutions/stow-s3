@@ -1,17 +1,8 @@
-package conformance_test
-
-// The classic ListObjects (V1) corpus adapter.
-//
-// V1 is the listing a client sends when it never learned the list-type marker,
-// and its cursor is a row of the listing rather than an opaque token: a marker
-// can name a common prefix. Delimiter pages use NextMarker; flat pages use the last Key.
-// Each page's cursor is asserted rather than merely followed, because a page
-// that reports the wrong cursor sends a client back into a row it already has.
+package corpus
 
 import (
 	"net/http"
 	"slices"
-	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -80,8 +71,6 @@ func runCorpusListObjectsV1(corpusContext *sharedCorpusContext) {
 	}
 }
 
-// corpusMaxKeys omits the limit when a case does not state one, so the server's
-// default page is exercised rather than a limit the case did not ask for.
 func corpusMaxKeys(maxKeys int) *int32 {
 	if maxKeys <= 0 {
 		return nil
@@ -104,23 +93,4 @@ func listV1CursorProblem(delimiter string, page sharedCorpusPage) string {
 		return "truncated delimiter page needs NextMarker"
 	}
 	return ""
-}
-
-func TestListV1CorpusRequiresTheCorrectCursorSource(t *testing.T) {
-	for _, testCase := range []struct {
-		delimiter string
-		page      sharedCorpusPage
-		invalid   bool
-	}{
-		{"", sharedCorpusPage{IsTruncated: true, Contents: []string{"key"}}, false},
-		{"/", sharedCorpusPage{IsTruncated: true, NextMarker: "group/"}, false},
-		{"", sharedCorpusPage{IsTruncated: true}, true},
-		{"", sharedCorpusPage{IsTruncated: true, Contents: []string{"key"}, NextMarker: "key"}, true},
-		{"/", sharedCorpusPage{IsTruncated: true}, true},
-		{"/", sharedCorpusPage{NextMarker: "group/"}, true},
-	} {
-		if problem := listV1CursorProblem(testCase.delimiter, testCase.page); (problem != "") != testCase.invalid {
-			t.Errorf("delimiter=%q page=%+v: %q", testCase.delimiter, testCase.page, problem)
-		}
-	}
 }

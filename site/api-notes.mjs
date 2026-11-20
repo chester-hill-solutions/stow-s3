@@ -82,6 +82,7 @@ export const apiNotes = {
 
 export const operationNotes = {
   open: "Open a handle. Retain it until operations finish, then close it.",
+  openAdapter: "Open an embedded runtime over a persistence.Adapter. The adapter supplies get, put, list, delete and conditional put; multipart is not part of that contract and stays unsupported.",
   openPersistent: "Open a host-backed runtime in the selected namespace.",
   attach: "Wrap an existing open receipt without allocating a second runtime.",
   capabilities: "Return the operations and limits supported by this handle.",

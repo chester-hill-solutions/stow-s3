@@ -1,4 +1,4 @@
-package conformance_test
+package corpus
 
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -28,7 +28,7 @@ func runCorpusSignedRequest(c *sharedCorpusContext) {
 	if err != nil {
 		c.t.Fatal(err)
 	}
-	signed, _, err := v4.NewSigner().PresignHTTP(c.ctx, aws.Credentials{AccessKeyID: c.env.Creds.AccessKeyID, SecretAccessKey: c.env.Creds.SecretAccessKey}, request, "UNSIGNED-PAYLOAD", "s3", testRegion, time.Now().Add(time.Duration(c.testCase.SigningOffsetSeconds)*time.Second))
+	signed, _, err := v4.NewSigner().PresignHTTP(c.ctx, aws.Credentials{AccessKeyID: c.env.Credentials.AccessKeyID, SecretAccessKey: c.env.Credentials.SecretAccessKey}, request, "UNSIGNED-PAYLOAD", "s3", testRegion, time.Now().Add(time.Duration(c.testCase.SigningOffsetSeconds)*time.Second))
 	if err != nil {
 		c.t.Fatal(err)
 	}
