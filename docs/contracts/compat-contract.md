@@ -96,6 +96,12 @@ be checked independently, but that does not establish a completed-object checksu
 Upstream composite checksums are not relabeled as full-object checksums in the
 local cache. Existing multipart ETag behavior remains supported.
 
+A client that only needs an object larger than the 8 MiB single-PUT cap can send
+`--checksum-algorithm CRC32` (the AWS CLI flag) or set the request's checksum
+algorithm to `CRC32`/`CRC32C`/`SHA1`/`SHA256`, which multipart accepts today.
+The refusal names that path. [ADR 0024](../adr/0024-multipart-checksums-are-part-and-object-state.md)
+records the decision that will remove the divergence.
+
 Conditional writes and reads return different statuses:
 
 | Request | Condition | Response |

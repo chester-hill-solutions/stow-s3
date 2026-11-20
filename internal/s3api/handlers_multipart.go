@@ -48,7 +48,7 @@ func initiationOptions(r *http.Request) (storage.MultipartOptions, *s3Error) {
 		return storage.MultipartOptions{}, &s3Error{Code: "InvalidArgument", Message: err.Error(), StatusCode: http.StatusBadRequest}
 	}
 	if algorithm == "CRC64NVME" {
-		return storage.MultipartOptions{}, &s3Error{Code: "NotImplemented", Message: "CRC64NVME multipart full-object checksums are not supported", StatusCode: http.StatusNotImplemented}
+		return storage.MultipartOptions{}, &s3Error{Code: "NotImplemented", Message: "CRC64NVME multipart full-object checksums are not supported; send --checksum-algorithm CRC32 (or CRC32C, SHA1, SHA256) for objects above the single-PUT cap", StatusCode: http.StatusNotImplemented}
 	}
 	return storage.MultipartOptions{
 		ContentType:       contentType,
@@ -131,7 +131,7 @@ func (s *Server) handleUploadPart(ctx context.Context, w http.ResponseWriter, r 
 
 func (s *Server) handleCompleteMultipartUpload(ctx context.Context, w http.ResponseWriter, r *http.Request, bucket, key, uploadID string) {
 	if r.Header.Get("x-amz-checksum-crc64nvme") != "" || r.Header.Get("x-amz-checksum-type") != "" {
-		writeError(w, r, s3Error{Code: "NotImplemented", Message: "Multipart completion checksum types are not supported", Resource: resourcePath(bucket, key), StatusCode: http.StatusNotImplemented})
+		writeError(w, r, s3Error{Code: "NotImplemented", Message: "Multipart completion checksum types are not supported; send --checksum-algorithm CRC32 (or CRC32C, SHA1, SHA256) instead", Resource: resourcePath(bucket, key), StatusCode: http.StatusNotImplemented})
 		return
 	}
 	if !s.validateMultipartRoute(ctx, w, r, routeInfo{bucket: bucket, key: key}, uploadID) {

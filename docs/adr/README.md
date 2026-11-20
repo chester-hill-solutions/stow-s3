@@ -31,6 +31,7 @@ Use the [usage guides](../README.md) for supported APIs and the
 | [0021](0021-remote-exposure-requires-consent.md) | A bind beyond loopback needs consent, and the service does not terminate TLS | `accepted` | — | — |
 | [0022](0022-a-file-save-journal-is-a-state.md) | A file-save journal is a state, not a lockout | `accepted` | — | — |
 | [0023](0023-a-persistence-adapter-is-five-operations.md) | A persistence adapter is five operations | `accepted` | — | — |
+| [0024](0024-multipart-checksums-are-part-and-object-state.md) | Multipart checksums are part state and object state | `proposed` | — | — |
 
 ## Status vocabulary
 
