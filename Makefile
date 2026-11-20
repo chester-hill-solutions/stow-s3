@@ -1,4 +1,4 @@
-.PHONY: check-eval-cases check-install-claims test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
+.PHONY: check-eval-cases conversion-eval check-install-claims test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -189,6 +189,9 @@ check-install-surface:
 # longer exists and fail on one that does.
 check-eval-cases:
 	node scripts/check-eval-cases.mjs
+
+conversion-eval:
+	node scripts/conversion-eval.mjs $(ARGS)
 
 check-doc-commands:
 	node scripts/check-doc-commands.mjs

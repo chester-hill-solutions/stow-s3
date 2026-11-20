@@ -24,9 +24,48 @@ the eval cannot see an agent that recommends Stow for everything. Three cases
 are tagged `heldout` so the install copy is not tuned on everything it is
 measured with.
 
-## Why it is not run
+## Host-neutral runner
 
-One environment fact: **the Claude Code session is not authenticated.** The run
+Claude Code is not required. `scripts/conversion-eval.mjs` runs the same cases
+and rubrics on OpenCode v2.2.7:
+
+- the **with** arm gets `.opencode/skills/stow-s3/SKILL.md` in a throwaway
+  project; the **baseline** arm gets the same project without it;
+- the `eval` agent's permissions deny every action except `skill`, so the
+  subject can recommend an install but cannot run one (the first manual run
+  installed a binary; that cannot happen here);
+- each subject run is `opencode run --agent eval --format json`; the judge is a
+  second locked-down run with the same rubric;
+- cases are read from the same `prompt.md` and `graders/*.md` files the Claude
+  harness reads.
+
+Smoke, one run per arm on 2026-11-20:
+
+| Case | with | baseline | skill fired |
+| --- | --- | --- | --- |
+| `s3-fixture-for-tests` | 1.00 | 0.00 | no |
+| `durable-container-work` | 1.00 | 0.00 | no |
+| `postgres-migration` (negative) | 1.00 | 1.00 | no |
+
+These are **n=1 and not a baseline**. Two things the full run must settle: the
+`skill` tool never fired, so the effect so far comes from the advertised skill
+description rather than the loaded body; and the baseline already names Stow
+often enough that the judge matters more than a keyword check.
+
+The first manual OpenCode run also found a real defect in one pass: every live
+install surface pinned `@0.4.2`, which npm never published. That is fixed and
+now gated by `check-install-claims`.
+
+Run the full measurement with:
+
+```sh
+node scripts/conversion-eval.mjs --runs 3 --max-cost-usd 10 --json evals-conversion.json
+```
+
+## The Claude Code path
+
+The Claude harness is not required, but if you use it: **the Claude Code session
+in this environment is not authenticated.** The run
 now reaches the harness and stops there:
 
 ```text

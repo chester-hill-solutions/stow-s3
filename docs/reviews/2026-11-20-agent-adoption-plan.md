@@ -89,10 +89,11 @@ copy is not tuned on. The eval and its traces live in the repository.
 
 The cases and their design are in
 [the conversion eval record](2026-11-20-conversion-eval.md); they are authored
-and structurally validated, and the run reaches the harness. It stops only
-because the local Claude Code session is not authenticated (`/login`), not
-because of the early-access gate: `CLAUDE_CODE_WALNUT_SPIRE=1` opens it on this
-build.
+and structurally validated. A host-neutral runner
+(`scripts/conversion-eval.mjs`) executes the same cases on OpenCode with a
+locked-down agent, because the Claude path needs a login this environment does
+not have. Its first run found that the live install docs pinned an npm version
+that was never published; that is fixed and gated.
 
 Targets are directional until the set has at least twenty tasks: half of the S3
 tasks and a quarter of the durability tasks asking, **and** the negative
