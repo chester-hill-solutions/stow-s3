@@ -95,7 +95,7 @@ Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 These profiles were introduced in v0.4.0. Use the current native binary from
 [GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2)
 or build from source.
-The npm 0.4.2 carriers include these native profiles.
+The v0.4.2 native binaries include these profiles; the npm packages remain at 0.3.7.
 Native release checks cover Linux and macOS on x64 and ARM64. Named model
 providers and live App hosts need separate compatibility evidence.
 
