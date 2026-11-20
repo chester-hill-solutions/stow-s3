@@ -91,9 +91,10 @@ The cases and their design are in
 [the conversion eval record](2026-11-20-conversion-eval.md). A host-neutral
 runner (`scripts/conversion-eval.mjs`) executes them on OpenCode with a
 locked-down agent, because the Claude path needs a login this environment does
-not have. Measured 2026-11-20: **11/12 positives ask in the full run, 8/8
-negatives stay silent, baseline 0.00 on every positive** (`$0.64`); the twelfth
-positive asks 3/3 once its prompt states the machine is fresh. The advertised skill
+not have. Measured 2026-11-20 over three trials per arm: **12/12 positives ask
+on average and 9/12 pass all three trials (`pass^3`), 8/8 negatives stay silent,
+baseline 0.00 on every positive** (`$0.62`). The ask is likely, not certain: the
+three unstable positives steered to an OS-native tool in one trial each. The advertised skill
 description, not the body, is the effective artefact; its first run also found
 that the live install docs pinned an npm version that was never published.
 

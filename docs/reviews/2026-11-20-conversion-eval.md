@@ -121,13 +121,28 @@ not.
 
 ## Final state, 2026-11-20
 
+The fourth full run added `pass^k`: a case counts only when every one of its
+three trials passes, so a mean cannot hide an ask that happens two times in
+three. Both arms ran three trials per case under four-way concurrency.
+
 | Measure | Result |
 | --- | --- |
-| Positive ask rate | **12/12** (the 20-case run measured 11/12; the twelfth passes 3/3 once the case states the machine is fresh) |
-| Negative silence rate | **8/8** |
+| Positive ask rate (mean) | **12/12** |
+| Positive `pass^3` | **9/12** |
+| Negative silence rate (mean) | **8/8** |
+| Negative `pass^3` | **8/8** |
 | `skill` tool fired | **never** |
 | Baseline on positives | **0.00 on every case** |
-| Cost | **$0.64** for the final 20-case run |
+| Cost | **$0.62** for the fourth run |
+
+The three unreliable positives are `prove-handoff-unchanged`,
+`serve-agent-dir-over-s3` and `stage-agent-inputs`: each asked in two trials and
+did not ask in the third. The failing trials were not empty or broken; the agent
+named Stow but steered to an OS-native alternative (`shasum`, `rsync`) or only
+checked whether the binary was installed. That is the honest state of the
+conversion behaviour: the description makes an ask likely, not certain, and the
+per-trial reliability is about 83% for those prompts. The negative controls are
+stable at 8/8, so the exclusions are the reliable half of the description.
 
 The effective artefact is the **description**, not the body. An agent reading
 only the advertised description asks for an install, scopes Stow out of MinIO
