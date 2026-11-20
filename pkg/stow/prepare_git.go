@@ -39,6 +39,7 @@ func prepareGitInput(root, hooksDirectory string, input GitRepositoryInput, tota
 	if err != nil {
 		return PreparedRepository{}, err
 	}
+	totals.prefix = input.Destination
 	checkoutBudget := *totals
 	if err := admitGitTree(source, commit, &checkoutBudget); err != nil {
 		return PreparedRepository{}, err
@@ -53,7 +54,7 @@ func prepareGitInput(root, hooksDirectory string, input GitRepositoryInput, tota
 	if err := fetchAndCheckout(destination, hooksDirectory, source, commit, &checkoutBudget); err != nil {
 		return PreparedRepository{}, err
 	}
-	bytes, objects, err := measureGitSeed(destination, totals.includeSensitive)
+	bytes, objects, err := measureGitSeed(destination, totals)
 	if err != nil {
 		return PreparedRepository{}, err
 	}
@@ -99,7 +100,7 @@ func fetchAndCheckout(destination, hooksDirectory, source, commit string, budget
 	if err := os.Remove(filepath.Join(destination, ".git", "FETCH_HEAD")); err != nil {
 		return fmt.Errorf("stow: remove temporary Git fetch metadata: %w", err)
 	}
-	bytes, objects, err := measureGitSeed(destination, budget.includeSensitive)
+	bytes, objects, err := measureGitSeed(destination, budget)
 	if err != nil {
 		return err
 	}
@@ -116,7 +117,18 @@ func fetchAndCheckout(destination, hooksDirectory, source, commit string, budget
 	return nil
 }
 
-func measureGitSeed(root string, includeSensitive bool) (int64, int64, error) {
+func skipSensitiveGitPath(path, rel string, totals *seedContext) (bool, error) {
+	if totals.includeSensitive || !sensitiveSeedPath(rel) {
+		return false, nil
+	}
+	if err := totals.excludeSensitive(portableSeedJoin(totals.prefix, rel)); err != nil {
+		return false, err
+	}
+	_ = os.Remove(path)
+	return true, nil
+}
+
+func measureGitSeed(root string, totals *seedContext) (int64, int64, error) {
 	var totalBytes, totalObjects int64
 	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
@@ -135,8 +147,10 @@ func measureGitSeed(root string, includeSensitive bool) (int64, int64, error) {
 				return fmt.Errorf("stow: Git input path is not portable: %s", portableRel)
 			}
 		}
-		if !includeSensitive && sensitiveSeedPath(rel) {
-			return fmt.Errorf("stow: sensitive-looking Git input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", rel)
+		if skipped, skipErr := skipSensitiveGitPath(path, rel, totals); skipErr != nil {
+			return skipErr
+		} else if skipped {
+			return nil
 		}
 		info, err := entry.Info()
 		if err != nil {

@@ -273,28 +273,45 @@ func TestPrepareWorkspaceRejectsNonPortableDestinationSegments(t *testing.T) {
 	}
 }
 
-func TestPrepareWorkspaceRequiresExplicitSensitiveInputOptIn(t *testing.T) {
+func TestPrepareWorkspaceSkipsSensitiveInputsUnlessAsked(t *testing.T) {
 	source := t.TempDir()
 	if err := os.WriteFile(filepath.Join(source, ".env.local"), []byte("TOKEN=example"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	makeOptions := func(root string, include bool) stow.PrepareOptions {
+	makeOptions := func(root string, include bool, policy string) stow.PrepareOptions {
 		return stow.PrepareOptions{
 			WorkspaceOptions:       stow.WorkspaceOptions{Dir: root, RegistryDir: filepath.Join(t.TempDir(), "registry")},
 			Inputs:                 []stow.WorkspaceInput{{Source: source, Destination: "repo"}},
 			IncludeSensitiveInputs: include,
+			SensitivePaths:         policy,
 		}
 	}
-	root := filepath.Join(t.TempDir(), "denied")
-	if _, err := stow.PrepareWorkspace(makeOptions(root, false)); err == nil {
-		t.Fatal("PrepareWorkspace copied sensitive-looking file without opt-in")
+	skipped, err := stow.PrepareWorkspace(makeOptions(filepath.Join(t.TempDir(), "skipped"), false, ""))
+	if err != nil {
+		t.Fatalf("prepare with a skipped .env.local: %v", err)
 	}
-	if _, err := os.Lstat(root); !os.IsNotExist(err) {
-		t.Fatalf("rejected prepare left a partial root: %v", err)
+	defer skipped.Workspace.Close()
+	if _, statErr := os.Stat(filepath.Join(skipped.Workspace.Dir(), "repo", ".env.local")); !os.IsNotExist(statErr) {
+		t.Fatalf("sensitive-looking file was copied: %v", statErr)
 	}
-	included, err := stow.PrepareWorkspace(makeOptions(filepath.Join(t.TempDir(), "included"), true))
+	if len(skipped.Excluded) != 1 || skipped.Excluded[0] != "repo/.env.local" {
+		t.Fatalf("excluded = %v", skipped.Excluded)
+	}
+
+	refusedRoot := filepath.Join(t.TempDir(), "refused")
+	if _, err := stow.PrepareWorkspace(makeOptions(refusedRoot, false, "refuse")); err == nil {
+		t.Fatal("refuse policy accepted a sensitive-looking file")
+	}
+	if _, err := os.Lstat(refusedRoot); !os.IsNotExist(err) {
+		t.Fatalf("refused prepare left a partial root: %v", err)
+	}
+
+	included, err := stow.PrepareWorkspace(makeOptions(filepath.Join(t.TempDir(), "included"), true, ""))
 	if err != nil {
 		t.Fatalf("explicit sensitive-input opt-in: %v", err)
 	}
 	defer included.Workspace.Close()
+	if _, statErr := os.Stat(filepath.Join(included.Workspace.Dir(), "repo", ".env.local")); statErr != nil {
+		t.Fatalf("included file missing: %v", statErr)
+	}
 }

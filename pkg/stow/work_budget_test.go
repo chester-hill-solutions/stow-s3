@@ -21,7 +21,7 @@ func TestPrepareRejectsOversizedInputBeforeDestinationMutation(t *testing.T) {
 	if err := os.WriteFile(blocked, []byte("unchanged"), 0600); err != nil {
 		t.Fatal(err)
 	}
-	_, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
+	_, _, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
 		WorkspaceOptions: WorkspaceOptions{MaxBytes: 1},
 		Inputs:           []WorkspaceInput{{Source: source, Destination: "blocked/file"}},
 	})
@@ -42,7 +42,7 @@ func TestPrepareSharesBudgetAcrossInputs(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		_, _, _, err := seedPreparedWorkspace(root, PrepareOptions{WorkspaceOptions: options, Inputs: []WorkspaceInput{{Source: source}}})
+		_, _, _, _, err := seedPreparedWorkspace(root, PrepareOptions{WorkspaceOptions: options, Inputs: []WorkspaceInput{{Source: source}}})
 		if err == nil || !strings.Contains(err.Error(), "workspace limit") {
 			t.Fatalf("budget not enforced: %v", err)
 		}
@@ -106,7 +106,7 @@ func TestPrepareRechecksInputSizeBeforeCopy(t *testing.T) {
 func TestPrepareAdmitsGitTreeBeforeCheckout(t *testing.T) {
 	source := budgetGitSource(t)
 	root := t.TempDir()
-	_, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
+	_, _, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
 		WorkspaceOptions: WorkspaceOptions{MaxBytes: 1},
 		Repositories:     []GitRepositoryInput{{Source: source, Destination: "repo", Ref: "HEAD"}},
 	})
@@ -121,14 +121,14 @@ func TestPrepareAdmitsGitTreeBeforeCheckout(t *testing.T) {
 func TestPrepareSharesBudgetBetweenGitAndFiles(t *testing.T) {
 	source := budgetGitSource(t)
 	options := PrepareOptions{Repositories: []GitRepositoryInput{{Source: source, Destination: "repo", Ref: "HEAD"}}}
-	_, objects, _, err := seedPreparedWorkspace(t.TempDir(), options)
+	_, objects, _, _, err := seedPreparedWorkspace(t.TempDir(), options)
 	if err != nil {
 		t.Fatal(err)
 	}
 	options.MaxObjects = objects
 	options.Inputs = []WorkspaceInput{{Source: filepath.Join(source, "file"), Destination: "extra"}}
 	root := t.TempDir()
-	_, _, _, err = seedPreparedWorkspace(root, options)
+	_, _, _, _, err = seedPreparedWorkspace(root, options)
 	if err == nil || !strings.Contains(err.Error(), "workspace limit") {
 		t.Fatalf("Git and files did not share a budget: %v", err)
 	}
@@ -141,7 +141,7 @@ func TestPrepareAdmitsGitMetadataBeforeCheckout(t *testing.T) {
 	source := budgetGitSource(t)
 	for _, limits := range []WorkspaceOptions{{MaxBytes: 7}, {MaxObjects: 1}} {
 		root := t.TempDir()
-		_, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
+		_, _, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
 			WorkspaceOptions: limits,
 			Repositories:     []GitRepositoryInput{{Source: source, Destination: "repo", Ref: "HEAD"}},
 		})

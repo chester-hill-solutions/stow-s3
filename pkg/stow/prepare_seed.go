@@ -58,6 +58,9 @@ func validPortableRelativePath(path string) bool {
 
 type seedContext struct {
 	includeSensitive bool
+	refuseSensitive  bool
+	excluded         map[string]struct{}
+	prefix           string
 	bytes            int64
 	objects          int64
 	maxBytes         int64
@@ -92,7 +95,7 @@ func copySeed(source, destination string, totals *seedContext) error {
 		return copySeedDirectory(source, destination, totals)
 	}
 	if !totals.includeSensitive && sensitiveSeedPath(filepath.Base(source)) {
-		return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", filepath.Base(source))
+		return totals.excludeSensitive(portableSeedJoin(totals.prefix, filepath.Base(source)))
 	}
 	return copySeedFile(source, destination, info, totals)
 }
@@ -136,9 +139,29 @@ func copySeedEntry(sourceRoot, destinationRoot, path string, entry os.DirEntry, 
 		return os.MkdirAll(destination, 0o755)
 	}
 	if !totals.includeSensitive && sensitiveSeedPath(relative) {
-		return fmt.Errorf("sensitive-looking input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", relative)
+		return totals.excludeSensitive(portableSeedJoin(totals.prefix, relative))
 	}
 	return copySeedFile(path, destination, info, totals)
+}
+
+func (s *seedContext) excludeSensitive(relative string) error {
+	clean := filepath.ToSlash(filepath.Clean(relative))
+	if s.refuseSensitive {
+		return fmt.Errorf("stow: sensitive-looking input %s is excluded by default; set sensitive_paths=skip to omit it or include_sensitive_inputs to copy it", clean)
+	}
+	if s.excluded == nil {
+		s.excluded = map[string]struct{}{}
+	}
+	s.excluded[clean] = struct{}{}
+	return nil
+}
+
+func portableSeedJoin(prefix, relative string) string {
+	relative = filepath.ToSlash(filepath.Clean(relative))
+	if prefix == "" || prefix == "." {
+		return relative
+	}
+	return filepath.ToSlash(filepath.Join(prefix, relative))
 }
 
 func sensitiveSeedPath(path string) bool {

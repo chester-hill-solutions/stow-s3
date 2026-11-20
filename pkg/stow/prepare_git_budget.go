@@ -58,7 +58,7 @@ func admitGitTreeEntry(entry string, projected *seedContext) error {
 		return fmt.Errorf("Git input path is not portable: %s", path)
 	}
 	if !projected.includeSensitive && sensitiveSeedPath(path) {
-		return fmt.Errorf("sensitive-looking Git input %s is excluded by default (set include_sensitive_inputs explicitly to include it)", path)
+		return projected.excludeSensitive(portableSeedJoin(projected.prefix, path))
 	}
 	size, err := strconv.ParseInt(fields[3], 10, 64)
 	if err != nil {

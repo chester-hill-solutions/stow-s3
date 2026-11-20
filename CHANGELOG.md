@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Preparing a workspace skips common credential paths (`.env`, `.npmrc`, SSH keys and
+  the like) and reports them in `excluded_sensitive_paths` instead of aborting the
+  whole prepare. `include_sensitive_inputs: true` still copies them, and
+  `sensitive_paths: "refuse"` preserves the previous refusal. Git inputs remove a
+  skipped path from the checkout rather than leaving it in the workspace.
+
 - Workspace editing accepts a configurable file bound: `--max-file-bytes` raises
   it from 64 KiB to at most 1 MiB, and the save, observation and response paths
   follow it. The default is unchanged, and the refusal still names the limit.

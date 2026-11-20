@@ -27,6 +27,7 @@ type workspaceResult struct {
 	Team             string                    `json:"team,omitempty"`
 	SeededBytes      int64                     `json:"seeded_bytes,omitempty"`
 	SeededObjects    int64                     `json:"seeded_objects,omitempty"`
+	Excluded         []string                  `json:"excluded_sensitive_paths,omitempty"`
 	BaseIdentity     string                    `json:"base_identity,omitempty"`
 	Repositories     []stow.PreparedRepository `json:"repositories,omitempty"`
 	Capabilities     workspaceCapabilities     `json:"capabilities"`
@@ -212,6 +213,7 @@ func prepareWorkspaceCommand(args []string) error {
 	}
 	defer prepared.Workspace.Close()
 	result := makeWorkspaceResult(prepared.Workspace, prepared.SeededBytes, prepared.SeededObjects)
+	result.Excluded = append([]string(nil), prepared.Excluded...)
 	result.Team = manifest.Team
 	// Set here rather than in makeWorkspaceResult, which three other verbs share and
 	// none of which has a bound: only a prepare that asked for one has a count.
@@ -297,6 +299,7 @@ func prepareWorkspaceFromManifest(manifest stow.WorkspaceTaskManifest) (*stow.Pr
 		Inputs:                 manifest.Inputs,
 		Repositories:           manifest.Repositories,
 		IncludeSensitiveInputs: manifest.IncludeSensitiveInputs,
+		SensitivePaths:         manifest.SensitivePaths,
 		MaxWorkspaces:          manifest.MaxWorkspaces,
 	})
 	if err != nil {

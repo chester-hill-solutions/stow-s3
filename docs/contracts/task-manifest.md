@@ -27,7 +27,8 @@ Run the agent with the returned `working_directory` as its current directory.
   "ttl_seconds": 604800,
   "registry_dir": "../stow-registry",
   "team": "platform",
-  "include_sensitive_inputs": false
+  "include_sensitive_inputs": false,
+  "sensitive_paths": "skip"
 }
 ```
 
@@ -51,8 +52,9 @@ Preparation rejects duplicate file destinations, absolute destinations, parent t
 symlinks and non-regular input files. Destination names must satisfy portable filesystem naming rules,
 including restrictions on Windows device names and unsupported characters.
 
-Preparation rejects common credential paths such as `.env`, `.npmrc`, `.netrc`, SSH keys and cloud credentials by default.
-Set `include_sensitive_inputs: true` to include them.
+Preparation skips common credential paths such as `.env`, `.npmrc`, `.netrc`, SSH keys and cloud credentials by default,
+and lists them in the result's `excluded_sensitive_paths`. Set `include_sensitive_inputs: true` to copy them, or
+`sensitive_paths: "refuse"` to abort the prepare instead (the behaviour before this default was introduced).
 This checks filenames, not file contents; it is not secret scanning.
 
 ## Git inputs
@@ -64,7 +66,9 @@ The task copy has no source remote.
 
 Uncommitted files, untracked files, older history, submodules and Git LFS payloads are not included.
 Repository checkouts accept regular files only. Symbolic links are rejected.
-Sensitive paths in the selected tree also require `include_sensitive_inputs: true`.
+Sensitive paths in the selected tree follow the same policy: skipped and reported by default, copied with
+`include_sensitive_inputs: true`, refused with `sensitive_paths: "refuse"`. A skipped Git path is removed from the
+checkout, so it is not left in the workspace.
 
 ### From a GitHub URL
 

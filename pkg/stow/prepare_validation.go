@@ -14,6 +14,9 @@ func validatePrepareOptions(options PrepareOptions) (string, error) {
 	if len(options.Inputs) == 0 && len(options.Repositories) == 0 {
 		return "", fmt.Errorf("stow: prepare requires at least one input")
 	}
+	if _, _, err := resolveSensitivePolicy(options); err != nil {
+		return "", err
+	}
 	root, err := validatePrepareRoot(options.Dir)
 	if err != nil {
 		return "", err

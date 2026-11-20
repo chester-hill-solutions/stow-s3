@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/chester-hill-solutions/stow-s3/internal/embedded"
@@ -44,6 +45,7 @@ type PrepareOptions struct {
 	Inputs                 []WorkspaceInput     `json:"inputs,omitempty"`
 	Repositories           []GitRepositoryInput `json:"repositories,omitempty"`
 	IncludeSensitiveInputs bool                 `json:"include_sensitive_inputs,omitempty"`
+	SensitivePaths         string               `json:"sensitive_paths,omitempty"`
 	// MaxWorkspaces narrows the standing registry cap for this prepare; zero adds no call-specific cap.
 	MaxWorkspaces int64 `json:"max_workspaces,omitempty"`
 }
@@ -72,6 +74,7 @@ type WorkspaceTaskManifest struct {
 	RegistryDir            string `json:"registry_dir,omitempty"`
 	Bucket                 string `json:"bucket,omitempty"`
 	IncludeSensitiveInputs bool   `json:"include_sensitive_inputs,omitempty"`
+	SensitivePaths         string `json:"sensitive_paths,omitempty"`
 }
 
 // PreparedWorkspace is the ready-to-launch result. WorkingDirectory is the
@@ -82,6 +85,7 @@ type PreparedWorkspace struct {
 	SeededBytes      int64
 	SeededObjects    int64
 	BaseIdentity     string
+	Excluded         []string
 	Repositories     []PreparedRepository
 	// RegistryEntries is how many workspaces the registry held when this one was
 	// added, so a caller can see its headroom instead of discovering the bound by
@@ -142,7 +146,7 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 
 	limits := ws.Capabilities()
 	options.MaxBytes, options.MaxObjects = limits.MaxBytes, limits.MaxObjects
-	bytes, objects, repositories, err := seedPreparedWorkspace(root, options)
+	bytes, objects, repositories, excluded, err := seedPreparedWorkspace(root, options)
 	if err != nil {
 		return nil, err
 	}
@@ -170,22 +174,55 @@ func PrepareWorkspace(options PrepareOptions) (_ *PreparedWorkspace, resultErr e
 	committed = true
 	return &PreparedWorkspace{
 		Workspace: ws, WorkingDirectory: workingDirectory,
-		SeededBytes: bytes, SeededObjects: objects, BaseIdentity: baseIdentity,
+		SeededBytes: bytes, SeededObjects: objects, BaseIdentity: baseIdentity, Excluded: excluded,
 		Repositories:    repositories,
 		RegistryEntries: entries + 1, MaxWorkspaces: options.MaxWorkspaces,
 	}, nil
 }
 
-func seedPreparedWorkspace(root string, options PrepareOptions) (int64, int64, []PreparedRepository, error) {
-	totals := &seedContext{includeSensitive: options.IncludeSensitiveInputs, maxBytes: options.MaxBytes, maxObjects: options.MaxObjects}
+func seedPreparedWorkspace(root string, options PrepareOptions) (int64, int64, []PreparedRepository, []string, error) {
+	include, refuse, err := resolveSensitivePolicy(options)
+	if err != nil {
+		return 0, 0, nil, nil, err
+	}
+	totals := &seedContext{includeSensitive: include, refuseSensitive: refuse, excluded: map[string]struct{}{},
+		maxBytes: options.MaxBytes, maxObjects: options.MaxObjects}
 	repositories, err := cloneGitRepositories(root, options.Repositories, totals)
 	if err != nil {
-		return 0, 0, nil, err
+		return 0, 0, nil, nil, err
 	}
 	if err := seedWorkspaceInputs(root, options.Inputs, totals); err != nil {
-		return 0, 0, nil, err
+		return 0, 0, nil, nil, err
 	}
-	return totals.bytes, totals.objects, repositories, nil
+	return totals.bytes, totals.objects, repositories, sortedExcluded(totals.excluded), nil
+}
+
+func resolveSensitivePolicy(options PrepareOptions) (bool, bool, error) {
+	switch strings.ToLower(strings.TrimSpace(options.SensitivePaths)) {
+	case "", "skip":
+		return options.IncludeSensitiveInputs, false, nil
+	case "include":
+		return true, false, nil
+	case "refuse":
+		if options.IncludeSensitiveInputs {
+			return false, false, fmt.Errorf("stow: include_sensitive_inputs and sensitive_paths=refuse conflict")
+		}
+		return false, true, nil
+	default:
+		return false, false, fmt.Errorf("stow: unknown sensitive_paths %q; use skip, include or refuse", options.SensitivePaths)
+	}
+}
+
+func sortedExcluded(excluded map[string]struct{}) []string {
+	if len(excluded) == 0 {
+		return nil
+	}
+	values := make([]string, 0, len(excluded))
+	for value := range excluded {
+		values = append(values, value)
+	}
+	sort.Strings(values)
+	return values
 }
 
 func openPreparedWorkspace(options WorkspaceOptions, root string) (*Workspace, error) {
@@ -230,6 +267,7 @@ func seedWorkspaceInputs(root string, inputs []WorkspaceInput, totals *seedConte
 		if err != nil {
 			return fmt.Errorf("stow: invalid input destination %q: %w", input.Destination, err)
 		}
+		totals.prefix = input.Destination
 		if err := copySeed(input.Source, destination, totals); err != nil {
 			return fmt.Errorf("stow: seed %q: %w", input.Source, err)
 		}

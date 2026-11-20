@@ -13,7 +13,7 @@ func TestGitSeedDoesNotStartMaintenanceBeforeAdmission(t *testing.T) {
 	trace := filepath.Join(t.TempDir(), "trace.json")
 	t.Setenv("GIT_TRACE2_EVENT", trace)
 	root := t.TempDir()
-	_, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
+	_, _, _, _, err := seedPreparedWorkspace(root, PrepareOptions{
 		Repositories: []GitRepositoryInput{{Source: source, Destination: "repo", Ref: "HEAD"}},
 	})
 	if err != nil {
