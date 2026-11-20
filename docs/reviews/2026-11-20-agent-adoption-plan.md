@@ -66,7 +66,7 @@ the three verbs and the ask, not only the API.
 | MCP tool descriptions at the published bar: 3–4 sentences covering what it does, when to use it **and when not to**, parameters, what is returned, and the next call | Review against the cited guidance plus the existing behaviour contract test; a one-clause description fails | 1.5 d |
 | `outputSchema` where the result is structured, and `ToolAnnotations` (`readOnlyHint`, `destructiveHint`, `openWorldHint`) | Schema validation on every tool result; annotations never the only statement of safety | 1 d |
 | Discovery: plugin marketplace listing and MCP Registry `server.json` | A cold agent can find Stow through a documented surface; the skill is treated as the closing surface, not the discovery surface | 1 d |
-| First-run examples for OpenCode, Claude, Codex, plain Node and Python | Each starts, stores, reads and exits clean | 2 d |
+| First-run examples for OpenCode, Claude, Codex, plain Node and Python | [Agent host setup](../guides/agent-hosts.md) covers each host, the zero-config object server, and a first prompt that stores and reads | 2 d |
 | "Check us in one command" on the front page | Points at the adapter contract and the importable corpus | 0.5 d |
 
 ## Phase 4 — Measure conversion, not usage

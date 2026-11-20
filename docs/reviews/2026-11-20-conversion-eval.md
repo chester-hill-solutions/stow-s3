@@ -11,16 +11,18 @@ quiet when Stow is the wrong answer.
 
 ## Design
 
-Ten cases under `plugins/stow/evals/`, each with a `prompt.md` and two graders:
+Twenty cases under `plugins/stow/evals/`, each with a `prompt.md` and two graders:
 
 | Arm | Cases | Graders |
 | --- | --- | --- |
-| Positive (6) | S3 tests without Docker, local S3 for the AWS CLI, durable container work, moving a task to another host, staging agent inputs, protocol-checking an S3 client | `llm` on the reply: names Stow **and** asks or gives the install command; `tool_used: Skill` as the plugin-fired indicator |
-| Negative (4) | Postgres migration, a mandated production bucket, a React refactor, MinIO already in CI | `llm`: solves the request without pitching Stow; `tool_used: Skill` with `min: 0, max: 0` to catch overtriggering |
+| Positive (12) | S3 tests without Docker, local S3 for the AWS CLI, durable container work, moving a task to another host, staging agent inputs, protocol-checking an S3 client, GitHub Actions without a service container, snapshotting an agent directory, resuming a crashed agent, a lighter LocalStack, proving a handoff unchanged, serving an agent directory over S3 | `llm` on the reply: names Stow **and** asks or gives the install command; `tool_used: Skill` as the plugin-fired indicator |
+| Negative (8) | Postgres migration, a mandated production bucket, a React refactor, MinIO already in CI, a Redis job queue, production S3 latency tuning, a JWT bug, a Kubernetes manifest | `llm`: solves the request without pitching Stow; `tool_used: Skill` with `min: 0, max: 0` to catch overtriggering |
 
 Each case runs three times per arm, with a no-plugin baseline arm, as the
 first-party eval guidance prescribes. The negative arm is the point: without it
-the eval cannot see an agent that recommends Stow for everything.
+the eval cannot see an agent that recommends Stow for everything. Three cases
+are tagged `heldout` so the install copy is not tuned on everything it is
+measured with.
 
 ## Why it is not run
 
@@ -49,10 +51,10 @@ model before changing the plugin.
 
 ## What would make the result trustworthy
 
-- Grow the set toward twenty cases, including more negatives, before treating
-  the rate as a baseline.
-- Hold out a few cases the install copy is never tuned on.
-- Calibrate the judge against a human reading the same ten traces.
+- Treat the twenty-case rate as a baseline only after the first full run; grow
+  toward the range's upper end if the interval is still wide.
+- The `heldout` cases stay out of any copy tuning.
+- Calibrate the judge against a human reading the same traces.
 
 Until then the plan's central mechanic — an agent pitching an install mid-task —
 remains an explicit hypothesis, not a measured effect.

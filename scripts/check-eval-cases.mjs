@@ -42,6 +42,7 @@ if (!existsSync(casesDir)) {
 const cases = readdirSync(casesDir, { withFileTypes: true }).filter((entry) => entry.isDirectory() && entry.name !== "results");
 let positive = 0;
 let negative = 0;
+let heldout = 0;
 for (const entry of cases) {
   const dir = resolve(casesDir, entry.name);
   const promptPath = resolve(dir, "prompt.md");
@@ -58,6 +59,7 @@ for (const entry of cases) {
   if (tags.includes("positive")) positive++;
   else if (tags.includes("negative")) negative++;
   else problems.push(`${entry.name}: tag the case positive or negative`);
+  if (tags.includes("heldout")) heldout++;
   if (!/^runs:\s*[3-9]|^runs:\s*[1-9][0-9]+/m.test(readFileSync(promptPath, "utf8"))) {
     problems.push(`${entry.name}: runs must be at least 3`);
   }
@@ -84,4 +86,5 @@ if (problems.length) {
   console.error(problems.join("\n"));
   process.exit(1);
 }
-console.log(`Eval cases OK (${cases.length} cases: ${positive} positive, ${negative} negative)`);
+if (heldout === 0) console.log("warning: no held-out cases; the set will be tuned on the same data it is measured with");
+console.log(`Eval cases OK (${cases.length} cases: ${positive} positive, ${negative} negative, ${heldout} held out)`);
