@@ -51,6 +51,12 @@ stow-s3 serve --port 0 --data-dir .stow-test
 Create a bucket with any SDK, then use its normal endpoint settings. No Docker,
 no daemon, no credentials beyond the generated pair the readiness line prints.
 
+## Version scope
+
+These notes describe the **0.4.3 native build**. The published 0.4.2 binary and
+npm 0.3.7 predate the SIGKILL-safe save, the configurable edit bound and
+CRC64NVME multipart completion.
+
 ## Limits worth knowing
 
 - Workspace edit bound: 64 KiB by default, `--max-file-bytes` up to 1 MiB.

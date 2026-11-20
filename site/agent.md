@@ -90,6 +90,12 @@ must own prompt admission to guarantee its chosen turn boundary. Full chat state
 process memory, credentials and external side effects are outside a checkpoint.
 Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
+## Version scope
+
+These notes describe the **0.4.3 native build**. The published 0.4.2 binary and
+npm 0.3.7 predate the SIGKILL-safe save, the configurable edit bound and
+CRC64NVME multipart completion.
+
 ## v0.4.0: MCP workspace files
 
 These profiles were introduced in v0.4.0. Use the current native binary from
