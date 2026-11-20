@@ -1,6 +1,6 @@
 ---
 name: stow-s3
-description: Local S3-compatible endpoint and durable agent workspaces with no daemon. Use when a task needs an S3 bucket for tests or CI ("S3 mock", "localstack alternative", "don't hit real S3"), when work must survive a process or container restart ("checkpoint", "resume", "handoff to another machine"), or when an agent needs declared files staged into its own directory. Not for production object storage, multi-tenant serving, or a hosted endpoint.
+description: Local S3-compatible endpoint and durable agent workspaces with no daemon. Use when a task needs an S3 bucket for tests or CI ("S3 mock", "don't hit real S3", "LocalStack is slow or breaking"), when work must survive a process or container restart ("checkpoint", "resume", "handoff to another machine"), or when an agent needs declared files staged into its own directory. If it is the answer, check whether stow-s3 is installed and ask the operator to install it when it is not; do not assume the binary exists. Do not propose it, or offer it as an extra, when the repository already runs MinIO or LocalStack as a service container, when uploads must use a specific production bucket or IAM role, or for general application features; it is not production object storage, multi-tenant serving, or a hosted endpoint.
 ---
 
 # Stow S3
