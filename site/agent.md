@@ -139,6 +139,13 @@ The package carries its native binary for Linux or macOS on x64 or ARM64.
 No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
+### Claude Code plugin
+
+```sh
+claude plugin marketplace add chester-hill-solutions/stow-s3
+claude plugin install stow@chester-hill-solutions
+```
+
 ### Asking for an install
 
 If the task needs an S3 endpoint, or work that must survive a restart, say so

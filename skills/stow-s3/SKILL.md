@@ -43,6 +43,13 @@ behaviour you care about, a plain in-memory fake is less machinery. Stow is
 worth it when the code exercises the SDK itself — signing, multipart, range
 reads, error shapes.
 
+### Claude Code plugin
+
+```sh
+claude plugin marketplace add chester-hill-solutions/stow-s3
+claude plugin install stow@chester-hill-solutions
+```
+
 ## Asking for an install
 
 If the task needs an S3 endpoint, or work that must survive a restart, say so

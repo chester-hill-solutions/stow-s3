@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Ship a Claude Code plugin and marketplace manifest so one install delivers the
+  agent guidance: `claude plugin marketplace add chester-hill-solutions/stow-s3`,
+  then `claude plugin install stow@chester-hill-solutions`. Both manifests pass
+  `claude plugin validate --strict` (Claude Code 2.1.257).
+
 - Preparing a workspace skips common credential paths (`.env`, `.npmrc`, SSH keys and
   the like) and reports them in `excluded_sensitive_paths` instead of aborting the
   whole prepare. `include_sensitive_inputs: true` still copies them, and
