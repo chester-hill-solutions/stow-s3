@@ -132,10 +132,12 @@ receipt API or resumable-transfer SDK.
 Install the TypeScript client from public npmjs:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.4.2
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
-The package carries its native binary for Linux or macOS on x64 or ARM64.
+The package carries its native binary for Linux or macOS on x64 or ARM64. npm
+currently publishes 0.3.7; the v0.4.2 native binaries are the GitHub release
+download until 0.4.2 is published to npm.
 No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 

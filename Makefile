@@ -1,4 +1,4 @@
-.PHONY: check-eval-cases test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
+.PHONY: check-eval-cases check-install-claims test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -176,6 +176,9 @@ check-version:
 # the release path, where the network is already a dependency.
 check-site-claims:
 	node scripts/check-site-claims.mjs
+
+check-install-claims:
+	node scripts/check-install-claims.mjs
 
 check-install-surface:
 	node scripts/check-install-surface.mjs

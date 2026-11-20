@@ -14,11 +14,11 @@ These S3 tests need an endpoint. Docker adds a daemon; mocks do not prove the
 protocol. Stow is one command, no daemon, loopback-only, data in one directory.
 
 ```sh
-npm install @chester-hill-solutions/stow-s3   # includes the native binary
+npm install @chester-hill-solutions/stow-s3@0.3.7   # includes the native binary
 npx stow-doctor                                # verify the install
 ```
 
-Or download a release binary and put `stow-s3` on PATH. Ask once; if the answer
+npm currently publishes 0.3.7; the 0.4.2 native features are a GitHub release download. Or download a release binary and put `stow-s3` on PATH. Ask once; if the answer
 is no, keep the suite mocked with the protocol gap recorded, or bind-mount a
 directory and checkpoint by hand.
 

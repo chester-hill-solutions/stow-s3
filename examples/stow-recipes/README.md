@@ -14,7 +14,7 @@ between examples.
 The TypeScript package is available on public npmjs with its native binary:
 
 ```sh
-npm install @chester-hill-solutions/stow-s3@0.3.5 @aws-sdk/client-s3
+npm install @chester-hill-solutions/stow-s3@0.3.7 @aws-sdk/client-s3
 ```
 
 Linux and macOS on x64 or ARM64 need no Go build or `STOW_BIN` setting.

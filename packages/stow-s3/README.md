@@ -7,12 +7,12 @@ TypeScript APIs for native S3 sessions, workspaces and embedded browser storage.
 Install the public npm package:
 
 ```sh
-npm install @chester-hill-solutions/stow-s3@0.4.2
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
-[Version 0.4.2](../../docs/releases/v0.4.2.md) includes the native MCP workspace
-resources, managed saves and checkpoint reads introduced in v0.4.0.
-Its matching carrier supports these profiles on Linux and macOS, x64 and ARM64.
+The **0.4.2 native binaries** include the MCP workspace resources, managed saves
+and checkpoint reads introduced in v0.4.0; npm currently publishes **0.3.7** and
+its matching carrier. Install 0.4.2 from the GitHub release until npm follows.
 
 Node.js 20 or newer is required. Linux and macOS on x64 or ARM64 receive their native carrier automatically.
 Native process APIs need no Go installation or `STOW_BIN` override.

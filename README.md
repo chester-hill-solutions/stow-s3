@@ -18,7 +18,7 @@ Browser APIs add local editing history and remote sync.
 Your application runs the code and controls network access. Stow manages storage.
 
 ```sh
-npm install @chester-hill-solutions/stow-s3@0.4.2
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 [Stow v0.4.2](docs/releases/v0.4.2.md) updates dependencies and download-recovery
@@ -27,7 +27,9 @@ policy handling. [v0.4.0](docs/releases/v0.4.0.md) introduced scoped
 MCP workspace file resources, managed file saves and immutable checkpoint reads.
 Native binaries are distributed through the
 [v0.4.2 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2).
-The npm package includes the matching native binary. Python remains source-only;
+npm publishes **0.3.7** with its matching native binary; the v0.4.2 native
+profiles are a GitHub release download until 0.4.2 is published to npm. Python
+remains source-only;
 PyPI and automated registry publication are disabled.
 
 The TypeScript package includes its native binary for Linux and macOS on x64 and ARM64.
@@ -359,7 +361,7 @@ Removal coordinates with active storage operations.
 Install the TypeScript client and its native binary from public npmjs:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.4.2
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 The package includes a platform carrier for Linux or macOS on x64 or ARM64.
@@ -415,7 +417,7 @@ Closing the session stops the server and removes its data directory.
 TypeScript:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.4.2
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 ```ts
@@ -546,7 +548,7 @@ For a temporary in-memory server:
 Install the client, then start a managed server:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.4.2 @aws-sdk/client-s3
+npm install @chester-hill-solutions/stow-s3@0.3.7 @aws-sdk/client-s3
 ```
 
 ```ts
