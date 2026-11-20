@@ -1,4 +1,4 @@
-.PHONY: test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
+.PHONY: check-eval-cases test-browser browser-editor test-agent test-agent-real test-benchmark build build-wasm test test-race check-density test-conformance test-node test-python test-wasm test-all lint format-check check-go-quality check-ts-quality check-type-escapes check-dry check-file-size check-coverage check-version check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-site check-scripts standards check-generated check-mcp-browser benchmark
 
 BINARY := bin/stow-s3
 GO_TOOLCHAIN := $(shell tr -d '\r\n' < .go-version)
@@ -184,6 +184,9 @@ check-install-surface:
 # binary, so this target builds it rather than trusting whatever is in bin/. A
 # gate that checked prose against a stale binary would pass on a flag that no
 # longer exists and fail on one that does.
+check-eval-cases:
+	node scripts/check-eval-cases.mjs
+
 check-doc-commands:
 	node scripts/check-doc-commands.mjs
 
@@ -221,4 +224,4 @@ check-mcp-browser: build mcp-test-deps
 	npm test --prefix extensions/stow
 	node extensions/stow/build.mjs --check
 
-standards: format-check lint test-race check-go-quality check-state-machines check-file-size check-coverage check-version check-site-claims check-install-surface check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser
+standards: format-check lint test-race check-go-quality check-state-machines check-file-size check-coverage check-version check-site-claims check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser
