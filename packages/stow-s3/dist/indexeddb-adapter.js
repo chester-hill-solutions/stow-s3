@@ -205,15 +205,19 @@ function groupOf(key, prefix, delimiter) {
     return index === -1 ? "" : prefix + relative.slice(0, index + delimiter.length);
 }
 function listRange(bucket, prefix, options) {
+    // Every range carries the prefix's upper bound. A continuation used to drop
+    // it, so page two of a prefixed listing walked past the prefix and returned
+    // keys the caller never asked for. The group skip keeps the same bound.
+    const upper = [bucket, prefix + "\uffff"];
     const continuation = decodeContinuation(options.continuationToken);
     const after = continuation.after ?? options.startAfter;
     if (continuation.group !== undefined) {
-        return IDBKeyRange.lowerBound([bucket, continuation.group + "\uffff"], true);
+        return IDBKeyRange.bound([bucket, continuation.group + "\uffff"], upper, true);
     }
     if (after !== undefined && after !== "") {
-        return IDBKeyRange.lowerBound([bucket, after], true);
+        return IDBKeyRange.bound([bucket, after], upper, true);
     }
-    return IDBKeyRange.bound([bucket, prefix], [bucket, prefix + "\uffff"]);
+    return IDBKeyRange.bound([bucket, prefix], upper);
 }
 function encodeContinuation(after, group) {
     const value = group !== "" ? { group } : { after };

@@ -111,3 +111,29 @@ test("persistence adapter paginates within a delimiter group without repeating i
   });
   expect(outcome).toEqual({ first: ["a/"], second: ["b/"], third: [], thirdObjects: ["root.txt"], truncated: false });
 });
+
+test("persistence adapter keeps the prefix on the second page", async ({ page }) => {
+  await page.goto("/");
+  const outcome = await page.evaluate(async () => {
+    const { IndexedDbAdapter } = await import("/runtime/browser.js");
+    const adapter = await IndexedDbAdapter.open({ databaseName: `adapter-prefix-pages-${crypto.randomUUID()}` });
+    const encoder = new TextEncoder();
+    try {
+      for (const key of ["a/1.txt", "a/2.txt", "b/1.txt"]) {
+        await adapter.put("alpha", key, encoder.encode(key));
+      }
+      const first = await adapter.list("alpha", { prefix: "a/", maxKeys: 1 });
+      const second = await adapter.list("alpha", {
+        prefix: "a/", maxKeys: 1, continuationToken: first.nextContinuationToken,
+      });
+      return {
+        first: first.objects.map((object) => object.key),
+        second: second.objects.map((object) => object.key),
+        truncated: second.isTruncated,
+      };
+    } finally {
+      adapter.close();
+    }
+  });
+  expect(outcome).toEqual({ first: ["a/1.txt"], second: ["a/2.txt"], truncated: false });
+});
