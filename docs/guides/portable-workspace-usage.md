@@ -175,6 +175,14 @@ to reapply the body. A retirement API would need caller acknowledgement of the
 replay window, terminal-only eligibility, recovery-hold checks and a durable
 tombstone; no automatic retirement or outcome override is provided.
 
+A settled journal is not a blocked workspace. `workspace resume`, `workspace serve`
+and `workspace destroy` classify the journal before opening: matching identity with
+no pending record opens normally, and a second editing session adopts the journal
+rather than refusing it. Only a pending or unverifiable record refuses those
+surfaces, and `mcp --workspace-edit --recover-file-saves` is how it is resolved.
+Do not delete `.stow/file-saves` to make a workspace openable; that discards the
+evidence the refusal is about.
+
 <!-- repo-only:start -->
 The [receipt lifecycle proposal](../design/receipt-retirement-proposal.md) specifies the
 archive ordering, replay behavior, bounded admission and decision required before

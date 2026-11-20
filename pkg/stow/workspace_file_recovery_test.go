@@ -89,7 +89,7 @@ func assertPendingRecoveryResolution(t *testing.T, recovered *Workspace, root st
 	}
 }
 
-func TestResumeWorkspaceForFileRecoveryRefusesOrdinaryOpenAndForeignState(t *testing.T) {
+func TestResumeWorkspaceForFileRecoveryOpensSettledJournalAndRefusesForeignState(t *testing.T) {
 	root, registryDir := recoveryWorkspacePaths(t)
 	owner, editor, request := createCommittedWorkspaceSave(t, root, registryDir)
 	if err := editor.Close(); err != nil {
@@ -98,11 +98,17 @@ func TestResumeWorkspaceForFileRecoveryRefusesOrdinaryOpenAndForeignState(t *tes
 	if err := owner.Close(); err != nil {
 		t.Fatal(err)
 	}
-	before := recoverySnapshot(t, root, registryDir, owner.ID())
-	if _, err := ResumeWith(WorkspaceOptions{RegistryDir: registryDir}, owner.ID()); !errors.Is(err, storage.ErrWorkspaceFileUnsupported) {
-		t.Fatalf("ordinary resume with journal = %v", err)
+	// A settled journal is a state, not a lockout. The workspace it belongs to
+	// reopens through the ordinary path, which is the seam a committed save used
+	// to break for resume, serve and destroy alike.
+	settled, err := ResumeWith(WorkspaceOptions{RegistryDir: registryDir}, owner.ID())
+	if err != nil {
+		t.Fatalf("ordinary resume with a settled journal: %v", err)
 	}
-	assertRecoverySnapshot(t, root, registryDir, owner.ID(), before)
+	if err := settled.Close(); err != nil {
+		t.Fatal(err)
+	}
+	before := recoverySnapshot(t, root, registryDir, owner.ID())
 	if _, err := ResumeWorkspaceForFileRecovery(WorkspaceOptions{RegistryDir: registryDir}, "ws_ffffffffffffffff"); err == nil {
 		t.Fatal("foreign workspace identity was accepted")
 	}

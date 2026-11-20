@@ -81,7 +81,7 @@ func New(options Options) (*Store, error) {
 	if options.Root == "" {
 		return nil, fmt.Errorf("workspace store: Root is required")
 	}
-	if err := refuseUnrecoveredWorkspaceFileSaveJournal(options.Root); err != nil {
+	if err := refuseBlockedWorkspaceFileSaveJournal(options.Root); err != nil {
 		return nil, err
 	}
 	if options.Bucket != "" {
