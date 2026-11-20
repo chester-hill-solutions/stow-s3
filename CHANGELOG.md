@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Agent host setup for Claude Code, Codex, OpenCode, Node and Python: the plugin
+  install, the zero-config object-mode MCP entry for each host, and a first
+  prompt that stores and reads a key. See the
+  [host guide](docs/guides/agent-hosts.md).
+
 - Ship a Claude Code plugin and marketplace manifest so one install delivers the
   agent guidance: `claude plugin marketplace add chester-hill-solutions/stow-s3`,
   then `claude plugin install stow@chester-hill-solutions`. Both manifests pass

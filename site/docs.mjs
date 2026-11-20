@@ -15,6 +15,7 @@ export const pages = [
   { route: "/docs/task-manifests/", title: "Task manifests", source: "docs/contracts/task-manifest.md", group: "Native storage" },
   { route: "/docs/run-through/", title: "Run-through cache", source: "docs/guides/run-through.md", group: "Native storage" },
   { route: "/docs/persistence-adapter/", title: "Persistence adapter", source: "docs/contracts/persistence-adapter.md", group: "Native storage" },
+  { route: "/docs/agent-hosts/", title: "Agent host setup", source: "docs/guides/agent-hosts.md", group: "Native storage" },
   { route: "/docs/outbox/", title: "Durable outbox", source: "docs/guides/outbox.md", group: "Native storage" },
   { route: "/docs/server/", title: "Running a server", source: "docs/running-and-probing.md", group: "Native storage" },
   { route: "/docs/mcp/", title: "Native object MCP", source: "docs/contracts/object-mcp-contract.md", group: "Native storage" },
