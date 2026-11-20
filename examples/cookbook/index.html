@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="text-scale" content="scale">
+  <title>Stow · Crowdsource Cookbook</title>
+  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <a class="skip" href="#page">Skip to the recipe</a>
+
+  <header class="masthead">
+    <div class="volume-heading">
+      <span class="brand">stow <span>/ cookbook</span></span>
+      <span class="eyebrow">Volume 01 · collected and revised</span>
+    </div>
+    <div class="header-status">
+      <span id="ready">Opening the volume…</span>
+      <span class="source-note">Stored in IndexedDB · works offline</span>
+    </div>
+    <div class="header-actions">
+      <button id="agent-open" class="btn btn-ghost" type="button" popovertarget="agent-panel" popovertargetaction="show">Agent</button>
+      <button id="dev-toggle" class="btn btn-ghost" type="button" aria-expanded="false" aria-controls="dev-plane">Dev plane</button>
+    </div>
+  </header>
+
+  <main class="book">
+    <nav class="index" aria-label="Recipe index">
+      <h2>Index</h2>
+      <label class="sr-only" for="search">Find a recipe</label>
+      <input id="search" class="find" type="search" placeholder="Find a recipe" autocomplete="off">
+      <ol id="recipe-list" class="index-list"></ol>
+      <p id="no-results" class="scope-note" hidden>No recipe matches that search.</p>
+      <button id="export" class="text-link export" type="button">Export volume ↓</button>
+    </nav>
+
+    <section class="page" id="page" aria-label="Recipe page">
+      <div class="page-top">
+        <span id="recipe-position" class="eyebrow">Recipe</span>
+        <div class="page-tools">
+          <label class="cook-label">Recorded by
+            <input id="contributor" type="text" value="You" maxlength="32" aria-label="Your name">
+          </label>
+          <button id="undo" class="btn btn-ghost" type="button" disabled>↶ Previous</button>
+          <button id="redo" class="btn btn-ghost" type="button" disabled>↷ Next</button>
+          <button id="save" class="btn btn-primary" type="button" disabled>Record edition</button>
+        </div>
+      </div>
+
+      <div class="view-tabs" role="tablist" aria-label="Recipe view">
+        <button id="tab-card" role="tab" type="button" aria-selected="true">Recipe card</button>
+        <button id="tab-edit" role="tab" type="button" aria-selected="false">Edit recipe</button>
+      </div>
+
+      <div id="card-view">
+        <p id="loading" class="scope-note">Opening the volume…</p>
+        <article id="recipe-card" class="recipe-card" hidden>
+          <figure id="cover-figure" class="cover" hidden>
+            <img id="cover-image" alt="">
+            <figcaption id="cover-caption" class="scope-note"></figcaption>
+          </figure>
+          <header class="recipe-heading">
+            <h1 id="recipe-title"></h1>
+            <p id="recipe-meta" class="recipe-meta"></p>
+          </header>
+          <div class="recipe-columns">
+            <section class="ingredients">
+              <h2>Ingredients</h2>
+              <ul id="ingredient-list"></ul>
+            </section>
+            <section class="method">
+              <h2>Method</h2>
+              <ol id="method-list"></ol>
+            </section>
+          </div>
+          <section class="photographs">
+            <h2>Photographs <span id="image-count" class="count"></span></h2>
+            <p id="photo-empty" class="scope-note">No photographs recorded for this recipe yet.</p>
+            <div id="gallery" class="gallery"></div>
+            <label class="btn btn-ghost upload">Add photograph
+              <input id="image-upload" type="file" accept="image/*" multiple hidden>
+            </label>
+          </section>
+        </article>
+      </div>
+
+      <div id="edit-view" hidden>
+        <label class="field">
+          <span>Title</span>
+          <input id="edit-title" type="text" maxlength="120">
+        </label>
+        <label class="field">
+          <span>Serves and time</span>
+          <input id="edit-meta" type="text" maxlength="120">
+        </label>
+        <label class="field">
+          <span>Ingredients <small>one per line</small></span>
+          <textarea id="edit-ingredients" rows="10" spellcheck="true"></textarea>
+        </label>
+        <label class="field">
+          <span>Method <small>one step per line</small></span>
+          <textarea id="edit-method" rows="10" spellcheck="true"></textarea>
+        </label>
+        <p class="scope-note">The card is saved in Stow as one markdown file per recipe. Recording an edition keeps the previous version.</p>
+      </div>
+
+      <footer class="page-footer">
+        <span id="local-status" role="status">Opening storage…</span>
+        <span class="source-note">Stored in Stow · IndexedDB on this device</span>
+      </footer>
+      <div id="message-wrap" hidden>
+        <p id="message" role="alert"></p>
+        <button id="retry" class="btn btn-ghost" type="button" hidden>Reload the volume</button>
+      </div>
+    </section>
+
+    <aside class="margin" aria-label="Editions">
+      <h2>Editions</h2>
+      <div class="edition-summary">
+        <span><strong id="edition-count">0</strong><span id="edition-noun"> editions retained</span></span>
+      </div>
+      <p class="scope-note">Each recorded change is a durable Stow checkpoint. Choose one to compare it with the current card.</p>
+      <ol id="history" class="edition-list"></ol>
+      <details id="diff-panel" class="fixture diff-panel" hidden>
+        <summary><span id="diff-title">Compare edition</span></summary>
+        <div class="fixture-body">
+          <p id="diff-summary" class="scope-note"></p>
+          <div id="diff" class="diff"></div>
+        </div>
+      </details>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <span>Go WASM · IndexedDB · Stow file history</span>
+    <span>Seed recipes are also kept in R2 bucket <code>crowdsource-cookbook</code>.</span>
+  </footer>
+
+  <dialog id="agent-panel" popover="manual" aria-labelledby="agent-title">
+    <div class="agent-head">
+      <h2 id="agent-title">Agent</h2>
+      <button id="agent-close" class="btn btn-ghost" type="button" popovertarget="agent-panel" popovertargetaction="hide" aria-label="Close agent panel">Close</button>
+    </div>
+    <p class="scope-note">Give the agent a task. It calls Stow directly and logs every operation. Commands are parsed locally — no model, no network.</p>
+    <form id="agent-form">
+      <label class="sr-only" for="agent-input">Agent instruction</label>
+      <input id="agent-input" type="text" autocomplete="off" placeholder="list recipes" autofocus>
+      <button class="btn btn-primary" type="submit">Run</button>
+    </form>
+    <div class="agent-examples">
+      <button type="button" title="list recipes" data-example="list recipes">List recipes</button>
+      <button type="button" title="add ingredient 1 tsp vanilla to shakshuka" data-example="add ingredient 1 tsp vanilla to shakshuka">Add ingredient</button>
+      <button type="button" title="record edition for shakshuka by Ada" data-example="record edition for shakshuka by Ada">Record edition</button>
+      <button type="button" title="add Shakerato | ingredients: 60 ml espresso, 30 ml milk, ice | steps: Brew espresso.; Shake with ice and milk.; Strain into a glass." data-example="add Shakerato | ingredients: 60 ml espresso, 30 ml milk, ice | steps: Brew espresso.; Shake with ice and milk.; Strain into a glass.">Add recipe</button>
+    </div>
+    <ol id="agent-log" class="agent-log" aria-live="polite"></ol>
+  </dialog>
+
+  <section id="dev-plane" class="dev-plane" aria-label="Stow dev plane" hidden>
+    <header class="dev-head">
+      <h2>Stow dev plane</h2>
+      <span class="live-dot" aria-hidden="true"></span>
+      <span id="dev-stats" class="dev-stats"></span>
+      <div class="dev-actions">
+        <button id="dev-refresh" class="btn btn-ghost" type="button">Refresh</button>
+        <button id="dev-clear" class="btn btn-ghost" type="button">Clear log</button>
+        <button id="dev-close" class="btn btn-ghost" type="button" aria-label="Close dev plane">Close</button>
+      </div>
+    </header>
+    <div class="dev-grid">
+      <section class="dev-pane">
+        <h3>Bridge calls</h3>
+        <div id="dev-calls" class="dev-calls"></div>
+      </section>
+      <section class="dev-pane">
+        <h3>Objects</h3>
+        <div id="dev-objects" class="dev-objects"></div>
+      </section>
+      <section class="dev-pane">
+        <h3>Runtime</h3>
+        <div id="dev-runtime" class="dev-runtime"></div>
+      </section>
+    </div>
+  </section>
+
+  <script src="/runtime/wasm_exec.js"></script>
+  <script type="module" src="/app.mjs"></script>
+</body>
+</html>

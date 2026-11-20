@@ -4,6 +4,7 @@
 | --- | --- |
 | [Storage recipes](stow-recipes/README.md) | S3 fixtures, retained artifacts, processing and conditional writes |
 | [Browser editor](browser-editor/README.md) | Local edit history, offline reload and explicit remote sync |
+| [Crowdsource Cookbook](cookbook/README.md) | Local-first recipe editions built on browser file history, diffs and object uploads |
 | [Resumable transfers](resumable-transfer/) | Interrupted upload and download workflows |
 | [OpenCode integration](opencode/README.md) | Caller-owned agent execution with confirmed storage checkpoints |
 | [Storage dogfood](storage-dogfood/README.md) | Storage workload and integration checks |
