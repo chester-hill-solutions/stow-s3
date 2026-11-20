@@ -28,7 +28,7 @@ repository's prose.
 | W-A2 | Sensitive-path exclusion instead of abort (finding 4) | 1 d | A | not started |
 | W-A3 | `--max-file-bytes` for workspace editing (finding 5) | 0.5–1 d | A | not started |
 | W-B1 | CRC64NVME multipart full-object checksums (finding 3) | 4–5 d | B | not started |
-| W-C1 | Outcome, timestamp and import polish (findings 6, 7) | 1–1.5 d | A | not started |
+| W-C1 | Outcome, timestamp and import polish (findings 6, 7) | 1–1.5 d | A | partly done: outcome codes, `next`, `omitzero` and import idempotency; admin flag, inspect disclosure and the streaming-SigV4 message remain |
 
 Tracks A and B do not touch the same files and can run in parallel. Ship one
 release, 0.4.3.

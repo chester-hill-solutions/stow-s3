@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Workspace editing refusals report `not_committed` and carry a machine-readable
+  `next` step, so an agent is not sent into a `resolve_save` loop for a call that
+  had no effect; `unknown` is reserved for an effect that is genuinely
+  undetermined. Zero timestamps no longer appear as year-one values, and
+  importing the same checkpoint archive twice returns the existing checkpoint
+  instead of failing.
+
 - Multipart uploads accept CRC64NVME with full-object completion, which is what
   an AWS client sends by default. The completion claim is verified against the
   assembled object before publication and reported by the complete response,

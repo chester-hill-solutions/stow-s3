@@ -29,15 +29,16 @@ type workspaceFileToolResult struct {
 	Text             *string                    `json:"text,omitempty"`
 	SHA256           string                     `json:"sha256,omitempty"`
 	Mode             *uint32                    `json:"mode,omitempty"`
-	Modified         time.Time                  `json:"modified,omitempty"`
+	Modified         time.Time                  `json:"modified,omitzero"`
 	Generation       string                     `json:"generation,omitempty"`
 	ObservationToken string                     `json:"observation_token,omitempty"`
-	ExpiresAt        time.Time                  `json:"expires_at,omitempty"`
+	ExpiresAt        time.Time                  `json:"expires_at,omitzero"`
 	Replayed         bool                       `json:"replayed,omitempty"`
 	Committed        bool                       `json:"committed,omitempty"`
 	Released         bool                       `json:"released,omitempty"`
 	Object           *workspaceFileObjectResult `json:"object,omitempty"`
 	Error            *objectFailure             `json:"error,omitempty"`
+	Next             string                     `json:"next,omitempty"`
 }
 
 type workspaceToolError struct{ code string }
@@ -67,13 +68,21 @@ func cloneWorkspaceFileMetadata(source map[string]string) map[string]string {
 
 func finishWorkspaceFileTool(value workspaceFileToolResult, err error) (*mcp.CallToolResult, workspaceFileToolResult, error) {
 	value.Version = 1
-	if value.Outcome == "" {
-		value.Outcome = "unknown"
-	}
 	if err != nil {
 		value.Error = workspaceFileFailure(err)
 		value.Committed = value.Committed || errors.Is(err, stow.ErrMutationCommitted)
 	}
+	if value.Outcome == "" {
+		switch {
+		case value.Committed:
+			value.Outcome = string(stow.SaveCommitted)
+		case errors.Is(err, stow.ErrSaveRequestUnknown):
+			value.Outcome = string(stow.SaveUnknown)
+		default:
+			value.Outcome = string(stow.SaveNotCommitted)
+		}
+	}
+	value.Next = workspaceFileNext(value)
 	response, encodeErr := encodeWorkspaceFileTool(value)
 	if encodeErr == nil && len(mustMarshalWorkspaceResult(response)) <= maxResponseBytes {
 		return response, value, nil
@@ -105,8 +114,37 @@ func mustMarshalWorkspaceResult(response *mcp.CallToolResult) []byte {
 }
 
 func boundedWorkspaceFailure(original workspaceFileToolResult) workspaceFileToolResult {
-	return workspaceFileToolResult{Version: 1, Outcome: original.Outcome, Replayed: original.Replayed,
+	bounded := workspaceFileToolResult{Version: 1, Outcome: original.Outcome, Replayed: original.Replayed,
 		Committed: original.Committed, Generation: original.Generation, Error: &objectFailure{Code: "response_too_large", Message: "workspace file response exceeds its limit"}}
+	bounded.Next = workspaceFileNext(bounded)
+	return bounded
+}
+
+func workspaceFileNext(value workspaceFileToolResult) string {
+	if value.Error == nil {
+		return ""
+	}
+	if value.Committed {
+		return "the save is committed; call stow_workspace_file_resolve_save with the same path and request_key"
+	}
+	switch value.Error.Code {
+	case "invalid_observation":
+		return "call stow_workspace_file_read_for_save and pass the new observation_token"
+	case "payload_too_large":
+		return "reduce the payload below the workspace file bound"
+	case "closed":
+		return "reopen the editing session with mcp --workspace-edit"
+	case "canceled":
+		return "retry the call"
+	case "response_too_large":
+		return "return the path instead of the bytes"
+	case "unavailable":
+		return "start mcp with --workspace-files --workspace-edit and a --write-root"
+	}
+	if value.Outcome == string(stow.SaveUnknown) {
+		return "call stow_workspace_file_resolve_save with the same path and request_key before retrying"
+	}
+	return ""
 }
 
 func workspaceFileFailure(err error) *objectFailure {

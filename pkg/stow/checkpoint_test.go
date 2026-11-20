@@ -270,8 +270,12 @@ func TestCheckpointArchiveRoundTripsToAnotherRegistryAndRestores(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ImportCheckpoint: %v", err)
 	}
-	if _, err := stow.ImportCheckpoint(context.Background(), destinationRegistry, bytes.NewReader(archive.Bytes()), stow.CheckpointArchiveOptions{}); err == nil {
-		t.Fatal("duplicate import replaced an existing checkpoint")
+	repeated, err := stow.ImportCheckpoint(context.Background(), destinationRegistry, bytes.NewReader(archive.Bytes()), stow.CheckpointArchiveOptions{})
+	if err != nil {
+		t.Fatalf("importing the same archive twice: %v", err)
+	}
+	if repeated.ID != imported.ID {
+		t.Fatalf("repeated import ID = %s, want %s", repeated.ID, imported.ID)
 	}
 	if _, err := stow.LoadCheckpoint(destinationRegistry, checkpoint.ID); err != nil {
 		t.Fatalf("duplicate import damaged the existing checkpoint: %v", err)

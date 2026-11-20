@@ -212,6 +212,26 @@ func extractCheckpointFile(ctx context.Context, input io.Reader, stage, name str
 	return nil
 }
 
+func existingCheckpointIsIdentical(checkpointRoot string, manifest CheckpointManifest) (bool, error) {
+	data, err := os.ReadFile(filepath.Join(checkpointRoot, manifest.ID, "manifest.json"))
+	if err != nil {
+		return false, err
+	}
+	var stored CheckpointManifest
+	if err := json.Unmarshal(data, &stored); err != nil {
+		return false, err
+	}
+	want, err := json.Marshal(manifest)
+	if err != nil {
+		return false, err
+	}
+	got, err := json.Marshal(stored)
+	if err != nil {
+		return false, err
+	}
+	return bytes.Equal(want, got), nil
+}
+
 func publishImportedCheckpoint(ctx context.Context, stage, checkpointRoot string, manifest CheckpointManifest) error {
 	registryDir := filepath.Dir(checkpointRoot)
 	lock, err := workspace.AcquireMutationCapture(registryDir, manifest.WorkspaceID)
@@ -220,7 +240,14 @@ func publishImportedCheckpoint(ctx context.Context, stage, checkpointRoot string
 	}
 	defer lock.Release()
 	if _, err := os.Lstat(filepath.Join(checkpointRoot, manifest.ID)); err == nil {
-		return fmt.Errorf("stow: checkpoint %s already exists", manifest.ID)
+		identical, matchErr := existingCheckpointIsIdentical(checkpointRoot, manifest)
+		if matchErr != nil {
+			return matchErr
+		}
+		if identical {
+			return nil
+		}
+		return fmt.Errorf("stow: checkpoint %s already exists with different content", manifest.ID)
 	} else if !os.IsNotExist(err) {
 		return err
 	}
