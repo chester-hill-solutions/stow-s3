@@ -55,8 +55,8 @@ before working around it. The ask, in one breath:
 > otherwise download a release binary and put `stow-s3` on PATH. Verify with
 > `npx stow-doctor`. Shall I install it?
 
-Fallback if the answer is no: keep the suite mocked and record the protocol gap,
-or bind-mount a directory and checkpoint by hand.
+Ask once per task. If the answer is no, take it, keep the fallback (a mock with
+the protocol gap recorded, or a bind mount checkpointed by hand), and continue.
 
 ### Moving work to another machine
 

@@ -1,5 +1,7 @@
 # Agent adoption plan, 2026-11-20
 
+**Research basis:** [what the first-party sources say about agent tool adoption](2026-11-20-agent-tool-adoption-best-practices.md).
+
 **Status:** active for the adoption workstream only. The
 [consolidated plan](../development/storage-foundation-plan.md) remains the sole
 scope and dispatch authority; this record orders adoption work and states the
@@ -44,6 +46,7 @@ small fixes so the first refusal does not contradict the packaging.
 | Kill-and-resume demo: prepare → save → `SIGKILL` → resume → checkpoint byte-identical | Runs in CI under 30 s; linked from the front page | 1 d |
 | `doctor --json` as evidence: version, endpoint, data dir, backend, ready, limits | One screen, no prose, sub-second | 0.5 d |
 | Install card in `README.md`, `site/index.html`, `site/agent.md`, `skills/stow-s3/SKILL.md` and the MCP description | npm, binary and MCP commands each tested in a clean container; uninstall documented | 1 d |
+| Plugin and marketplace artefact in this repository, bundling the skill with the MCP server; `server.json` for the registry | `claude plugin validate` passes; one install delivers guidance and server; registry entry carries name plus install pointer (its description is capped at 100 characters) | 2 d |
 
 The skill file is the storefront most agents read. It should teach the trigger,
 the three verbs and the ask, not only the API.
@@ -60,31 +63,45 @@ the three verbs and the ask, not only the API.
 
 | Item | Acceptance | Effort |
 | --- | --- | --- |
-| MCP tool descriptions written as affordances: when to use, what is returned, what to do next | Contract test that descriptions match behaviour | 1 d |
+| MCP tool descriptions at the published bar: 3–4 sentences covering what it does, when to use it **and when not to**, parameters, what is returned, and the next call | Review against the cited guidance plus the existing behaviour contract test; a one-clause description fails | 1.5 d |
+| `outputSchema` where the result is structured, and `ToolAnnotations` (`readOnlyHint`, `destructiveHint`, `openWorldHint`) | Schema validation on every tool result; annotations never the only statement of safety | 1 d |
+| Discovery: plugin marketplace listing and MCP Registry `server.json` | A cold agent can find Stow through a documented surface; the skill is treated as the closing surface, not the discovery surface | 1 d |
 | First-run examples for OpenCode, Claude, Codex, plain Node and Python | Each starts, stores, reads and exits clean | 2 d |
 | "Check us in one command" on the front page | Points at the adapter contract and the importable corpus | 0.5 d |
 
 ## Phase 4 — Measure conversion, not usage
 
-Ten tasks that need S3 or durable work, run against a fresh agent with no prior
-context. Each trace is scored:
+Twenty to fifty tasks, **balanced**: tasks that need S3 or durable work, and
+negative controls where the right answer is to use nothing, a mock, or an
+existing fixture. Each task has a reference trace and a grader; each trial runs
+in a clean environment; every trace is read before a number is quoted.
+
+Each trace is scored:
 
 - worked around it (Docker, mock, live credentials)
 - named Stow but did not ask
 - **named Stow and asked the principal to install it**
+- asked, was refused, and dropped it (a first-class outcome, not a failure)
 
-Targets: at least half of S3-test tasks and a quarter of durability tasks reach
-the third outcome. The eval and its traces live in the repository.
+Report `pass^k` over at least three trials, not a single run. Calibrate the
+transcript judge against a human reading the same traces, and hold out a set the
+copy is not tuned on. The eval and its traces live in the repository.
 
-Proxy metrics only, no telemetry: package and release downloads, MCP registry
-listings, example and skill runs, issue text mentioning an install.
+Targets are directional until the set has at least twenty tasks: half of the S3
+tasks and a quarter of the durability tasks asking, **and** the negative
+controls not pitching Stow. An eval without negatives cannot detect the
+overtriggering failure the sources warn about.
+
+Package and release downloads, registry listings and issue text are context, not
+the measurement; there is no telemetry, so the eval is the only conversion
+signal.
 
 ## Sequencing
 
 1. Week 1: Phase 0, in parallel across the five items.
 2. Week 2: Phase 1; first external test with the proof and the card.
-3. Week 3: Phase 2, and start Phase 3.
-4. Week 4: Phase 4, then iterate on the weakest trigger.
+3. Week 3: Phase 2, then Phase 3 including the plugin/marketplace artefact.
+4. Weeks 4-5: Phase 4 with the balanced set and trials, then iterate on the weakest trigger.
 
 Release 0.4.3 carries the proof and the card at the end of week 2. Handoff
 follows in 0.4.4 if it slips.
@@ -93,7 +110,8 @@ follows in 0.4.4 if it slips.
 
 | Risk | Mitigation |
 | --- | --- |
-| The ask reads as self-serving | The skill frames it as unblocking the principal's task, and states the fallback |
+| The ask reads as self-serving | The skill frames it as unblocking the principal's task, states the fallback, and asks once per task; a refusal ends the ask |
+| The skill-authored ask has no documented prior art | Treat it as the plan's hypothesis, not its assumption; the host's permission UI is what actually gates installation, and the eval records refusals |
 | Overclaiming S3 parity | Link the compatibility contract; let the corpus be the proof |
 | Install friction kills the ask | One command per ecosystem, no root, no daemon, uninstall is deleting one directory |
 | A demo that is not reproducible | It runs in CI, not in a post |
