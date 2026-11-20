@@ -11,7 +11,6 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-// One bound for a managed file, owned by the storage contract.
 const maxWorkspaceFilePayloadBytes = storage.MaxWorkspaceFileBytes
 const maxWorkspaceFileTextBytes = 64 << 10
 

@@ -30,9 +30,6 @@ type Config struct {
 	ReadRoots    []string
 	MaxBytes     int64
 	MaxFiles     int64
-	// MaxFileBytes is the effective workspace editing bound; zero means the
-	// default 64 KiB. Inspect reports this value so an agent can size a save
-	// against the bound the serving process actually enforces.
 	MaxFileBytes int64
 	Timeout      time.Duration
 	ExportRoot   string
