@@ -382,6 +382,9 @@ func verifyPayloadHash(r *http.Request, sr signedRequest) error {
 	if strings.EqualFold(sr.payloadHash, unsignedPayload) {
 		return nil
 	}
+	if strings.HasPrefix(strings.ToUpper(sr.payloadHash), "STREAMING-") {
+		return authError("NotImplemented", "streaming SigV4 payloads (%s) are not supported; sign the full body's x-amz-content-sha256 or send UNSIGNED-PAYLOAD", sr.payloadHash)
+	}
 	if len(sr.payloadHash) != 64 {
 		return authError("AccessDenied", "invalid x-amz-content-sha256")
 	}

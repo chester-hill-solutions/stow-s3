@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- A streaming SigV4 request is refused by name (`STREAMING-AWS4-HMAC-SHA256-PAYLOAD`)
+  with the supported alternatives, instead of being reported as an invalid
+  content hash. A committed save is proven to survive `SIGKILL`: the workspace
+  resumes, the bytes are intact and a checkpoint captures them.
+
 - Workspace editing refusals report `not_committed` and carry a machine-readable
   `next` step, so an agent is not sent into a `resolve_save` loop for a call that
   had no effect; `unknown` is reserved for an effect that is genuinely

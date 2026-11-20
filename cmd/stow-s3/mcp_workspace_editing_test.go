@@ -316,3 +316,66 @@ func snapshotFiles(t *testing.T, paths []string) map[string][]byte {
 	}
 	return snapshot
 }
+
+// TestWorkspaceSurvivesAKilledEditingSession is the claim the adoption plan is
+// built on: a save that committed is still there after the process is killed,
+// and the workspace resumes and checkpoints without intervention.
+func TestWorkspaceSurvivesAKilledEditingSession(t *testing.T) {
+	source := t.TempDir()
+	if err := os.WriteFile(filepath.Join(source, "note.txt"), []byte("initial bytes"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	root := filepath.Join(t.TempDir(), "task")
+	registry := filepath.Join(t.TempDir(), "registry")
+	prepared, err := stow.PrepareWorkspace(stow.PrepareOptions{
+		WorkspaceOptions: stow.WorkspaceOptions{Dir: root, RegistryDir: registry},
+		WorkingDirectory: "docs",
+		Inputs:           []stow.WorkspaceInput{{Source: source, Destination: "docs"}},
+	})
+	if err != nil {
+		t.Fatalf("PrepareWorkspace: %v", err)
+	}
+	fixture := workspaceEditFixture{root: root, registry: registry, workspaceID: prepared.Workspace.ID()}
+	if err := prepared.Workspace.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	process := startWorkspaceEditProcess(t, fixture, false)
+	observed := callWorkspaceEditTool(t, process.session, "stow_workspace_file_read_for_save", map[string]string{"path": "docs/note.txt"})
+	if observed.Outcome != "observed" {
+		t.Fatalf("observation = %+v", observed)
+	}
+	saved := callWorkspaceEditTool(t, process.session, "stow_workspace_file_save", map[string]string{
+		"path": "docs/note.txt", "text": "survived the kill", "request_key": "kill-resume", "observation_token": observed.ObservationToken,
+	})
+	if saved.Outcome != "committed" {
+		t.Fatalf("save = %+v", saved)
+	}
+	if err := process.command.Process.Kill(); err != nil {
+		t.Fatal(err)
+	}
+	_, _ = process.command.Process.Wait()
+	process.closed = true
+
+	resumed, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, fixture.workspaceID)
+	if err != nil {
+		t.Fatalf("resume after SIGKILL: %v", err)
+	}
+	if got, err := os.ReadFile(filepath.Join(root, "docs", "note.txt")); err != nil || string(got) != "survived the kill" {
+		t.Fatalf("saved bytes after SIGKILL = %q, %v", got, err)
+	}
+	if err := resumed.Close(); err != nil {
+		t.Fatal(err)
+	}
+	captured, err := stow.CaptureCheckpoint(context.Background(), registry, fixture.workspaceID,
+		stow.CheckpointRequest{Key: "kill-resume-checkpoint"})
+	if err != nil {
+		t.Fatalf("checkpoint after SIGKILL: %v", err)
+	}
+	if captured.Checkpoint.ID == "" || captured.Checkpoint.Files != 1 {
+		t.Fatalf("checkpoint = %+v", captured.Checkpoint)
+	}
+	if err := stow.DestroyRegisteredWorkspace(context.Background(), registry, fixture.workspaceID); err != nil {
+		t.Fatalf("destroy: %v", err)
+	}
+}
