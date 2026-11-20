@@ -33,8 +33,15 @@ const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclud
 
 const problems = [];
 const pattern = /npm install[^\n`"']*@chester-hill-solutions\/stow-s3@(\d+\.\d+\.\d+)/g;
+// A second @version immediately after the first is a malformed pin that the
+// version match above still satisfies. It shipped once in the skill, which told
+// a reader to install `stow-s3@0.3.7@0.3.7` while this gate stayed green.
+const doubled = /@chester-hill-solutions\/stow-s3@\d+\.\d+\.\d+@/g;
 for (const file of files) {
   const text = readFileSync(resolve(root, file), "utf8");
+  for (const match of text.matchAll(doubled)) {
+    problems.push(`${file}: has a doubled version pin (${match[0]}); the install command is malformed`);
+  }
   for (const match of text.matchAll(pattern)) {
     if (match[1] !== published) {
       problems.push(`${file}: pins @chester-hill-solutions/stow-s3@${match[1]}, but npm publishes ${published}`);

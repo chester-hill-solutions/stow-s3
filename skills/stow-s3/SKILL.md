@@ -100,7 +100,7 @@ See the portable workspace guide and experimental OpenCode example in the reposi
 Install the TypeScript client from public npmjs:
 
 ```bash
-npm install @chester-hill-solutions/stow-s3@0.3.7@0.3.7
+npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 The package carries its native binary for Linux or macOS on x64 or ARM64.

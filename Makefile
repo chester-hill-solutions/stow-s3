@@ -230,4 +230,4 @@ check-mcp-browser: build mcp-test-deps
 	npm test --prefix extensions/stow
 	node extensions/stow/build.mjs --check
 
-standards: format-check lint test-race check-go-quality check-state-machines check-file-size check-coverage check-version check-site-claims check-install-surface check-eval-cases check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser
+standards: format-check lint test-race check-go-quality check-state-machines check-file-size check-coverage check-version check-site-claims check-install-surface check-install-claims check-eval-cases check-doc-commands check-adr-index check-doc-links check-api-reference check-scripts check-ts-quality check-generated check-mcp-browser
