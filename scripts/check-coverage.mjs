@@ -320,8 +320,7 @@ export function packageProblems(
     return problems;
   }
   for (const [name, floor] of Object.entries(baseline)) {
-    // The statement set differs by platform, so the recorded floor measures a
-    // different body of code. The aggregate above still counts this package.
+    // Different body of code per platform; the aggregate still counts it.
     if (platformPackages.has(name)) continue;
     const got = measured[name];
     if (got === undefined) {
@@ -422,14 +421,11 @@ function packageOf(nameWithFile) {
   return nameWithFile.replace(/\/[^/]*$/, "");
 }
 
-// GOOS/GOARCH file suffixes. A package built from these has a different statement
-// set on each platform, so a per-package floor recorded on one platform is not a
-// measurement of the other: parentwatch is 22/34 statements on macOS and 10/26 on
-// Linux, and the macOS floor failed the Linux release job while coverage had not
-// changed. Those packages are held to the aggregate floor only.
+// GOOS/GOARCH suffixes. Such a package has a different statement set per platform,
+// so a floor recorded on one is not a measurement of the other: parentwatch is
+// 22/34 on macOS and 10/26 on Linux. Held to the aggregate floor only.
 export function platformPackages(profile) {
-  // Function-local: main() runs before a const declared below it would be
-  // initialized, and reading that const there is a temporal-dead-zone error.
+  // Function-local: main() runs before a const declared below it is initialized.
   const platformFile = /_(?:aix|android|darwin|dragonfly|freebsd|illumos|ios|js|linux|netbsd|openbsd|plan9|solaris|wasip1|windows)(?:_[a-z0-9]+)?\.go$/;
   const names = new Set();
   for (const line of profile.split("\n")) {
