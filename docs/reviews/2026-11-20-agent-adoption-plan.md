@@ -89,8 +89,10 @@ copy is not tuned on. The eval and its traces live in the repository.
 
 The cases and their design are in
 [the conversion eval record](2026-11-20-conversion-eval.md); they are authored
-and structurally validated, but not yet run (the native harness is early-access
-gated and the CLI session in this environment is unauthenticated).
+and structurally validated, and the run reaches the harness. It stops only
+because the local Claude Code session is not authenticated (`/login`), not
+because of the early-access gate: `CLAUDE_CODE_WALNUT_SPIRE=1` opens it on this
+build.
 
 Targets are directional until the set has at least twenty tasks: half of the S3
 tasks and a quarter of the durability tasks asking, **and** the negative

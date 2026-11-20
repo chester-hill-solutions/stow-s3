@@ -26,23 +26,34 @@ measured with.
 
 ## Why it is not run
 
-Two environment facts, both outside the repository:
+One environment fact: **the Claude Code session is not authenticated.** The run
+now reaches the harness and stops there:
 
-1. `claude plugin eval` reports **"`plugin eval` is currently in early access"**
-   and exits `1` on Claude Code 2.1.257 for this account.
-2. The fallback, a plain `claude -p` run per case, fails with **"OAuth session
-   expired and could not be refreshed"**, so no child session can start.
+```text
+s3-fixture-for-tests run 1/1 [with]: score 0.00 error: exit 1: Not logged in · Please run /login
+install-ask: grader threw: judge call failed: Failed to authenticate: OAuth session expired
+⚠ a run could not authenticate — every remaining run would fail the same way
+```
+
+The early-access gate is not a blocker. Claude Code 2.1.257 reports
+"`plugin eval` is currently in early access", but `CLAUDE_CODE_WALNUT_SPIRE=1`
+enables it (or update to 2.1.269 or later, where the command is generally
+available). The only human step left is `/login` in an interactive session or
+refreshing the CLI's OAuth credentials.
 
 `scripts/check-eval-cases.mjs` validates the tree's shape — frontmatter keys,
 grader types, rubrics, at least three runs, and both arms present — so a typo
-cannot hide until the harness opens. It does not score anything.
+cannot hide behind the credential. It does not score anything.
 
 ## Running it when access and a session exist
 
 ```sh
-claude plugin eval plugins/stow --runs 3 --ablation with-without \
-  --judge-model sonnet --no-publish --json evals-conversion.json
+CLAUDE_CODE_WALNUT_SPIRE=1 claude plugin eval plugins/stow --runs 3 \
+  --ablation with-without --judge-model sonnet --no-publish \
+  --json evals-conversion.json
 ```
+
+On Claude Code 2.1.269 or later the environment variable is unnecessary.
 
 Report `pass^k` per arm, not a single run, and read the traces before quoting
 the delta. A positive case that fires the skill but scores negative is more
