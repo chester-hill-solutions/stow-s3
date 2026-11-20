@@ -36,10 +36,18 @@ type workspaceFileReleaseInput struct {
 }
 
 func (host *WorkspaceFiles) addWorkspaceEditingTools() {
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_read_for_save", Description: "Read one bounded workspace file and receive a volatile observation token for a guarded save."}, host.readWorkspaceFileForSave)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_save", Description: "Save bounded text or base64 bytes using the observed token or deliberate replacement and a persistent request key."}, host.saveWorkspaceFile)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_resolve_save", Description: "Resolve the retained result for the original workspace file save request."}, host.resolveWorkspaceFileSave)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_release_observation", Description: "Release a volatile workspace file observation; saved receipts remain retained."}, host.releaseWorkspaceFileObservation)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_read_for_save", Title: "Read a workspace file for saving",
+		Description: "Read one file in the configured workspace and return its bytes, digest, mode and a short-lived observation token. Use it before a guarded save, or to see what a tracked file contains; do not use it as a general filesystem reader outside the configured read roots. The token expires, so save promptly and read again if it has. Returns outcome observed with data_base64, text below 64 KiB, sha256 and observation_token; refusals carry a next step.",
+		Annotations: readOnlyTool("Read a workspace file for saving")}, host.readWorkspaceFileForSave)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_save", Title: "Save a workspace file",
+		Description: "Save exactly one file using the observation token from stow_workspace_file_read_for_save, or replace true to overwrite deliberately. Use it for edits inside the configured write roots; do not use it outside them, and do not retry an uncertain save with a new request key. Persist request_key before calling: retrying with the same key returns the original receipt and never writes twice. Returns outcome committed, not_committed or unknown, the object metadata, and a next step on refusal.",
+		Annotations: writeTool("Save a workspace file", true)}, host.saveWorkspaceFile)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_resolve_save", Title: "Resolve a workspace file save",
+		Description: "Return the retained result of an earlier workspace save by path and request key, without writing anything. Use it after a timeout, a dropped reply or outcome unknown; do not use it to start a new save or to test whether some other request happened. It is safe to call repeatedly. Returns the same receipt with replayed true.",
+		Annotations: readOnlyTool("Resolve a workspace file save")}, host.resolveWorkspaceFileSave)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_workspace_file_release_observation", Title: "Release a workspace file observation",
+		Description: "Release a live observation token so it cannot be used for a save and stops counting against the observation limit. Use it when the edit will not happen; do not release a token you are about to save with. Releasing an unknown or expired token is an error, not a no-op. Returns released true; saved receipts are unaffected.",
+		Annotations: writeTool("Release a workspace file observation", false)}, host.releaseWorkspaceFileObservation)
 }
 
 func (host *WorkspaceFiles) readWorkspaceFileForSave(ctx context.Context, _ *mcp.CallToolRequest, input workspaceFileReadInput) (*mcp.CallToolResult, workspaceFileToolResult, error) {

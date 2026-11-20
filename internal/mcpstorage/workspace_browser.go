@@ -38,7 +38,7 @@ func (host *WorkspaceFiles) EnableBrowser() error {
 	mcp.AddTool(host.Server, &mcp.Tool{
 		Name:        "stow_workspace_browser",
 		Title:       "Stow workspace browser",
-		Description: "Browse the configured workspace through bounded read-only resources.",
+		Description: "Open the read-only workspace browser through bounded resources. Use it when a human wants to look at the working files; it never edits or saves. Returns a launch descriptor pointing at the workspace overview resource.",
 		Annotations: annotations,
 		Meta:        mcp.Meta{"ui": browserToolUI{ResourceURI: workspaceBrowserURI}, "openai/ui": browserEntrypoints{Entrypoints: []browserEntry{{Type: "global"}, {Type: "thread"}}}},
 	}, host.launchWorkspaceBrowser)

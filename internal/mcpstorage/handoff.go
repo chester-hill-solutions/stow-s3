@@ -51,10 +51,14 @@ func (a *adapter) configureRoots() error {
 
 func (a *adapter) addHandoffTools(server *mcp.Server) {
 	if a.config.ExportRoot != "" {
-		mcp.AddTool(server, &mcp.Tool{Name: "stow_handoff_export", Description: "Export a checkpoint to a new named bundle in the configured transfer directory. No automatic retries."}, a.export)
+		mcp.AddTool(server, &mcp.Tool{Name: "stow_handoff_export", Title: "Export a handoff bundle",
+			Description: "Export a checkpoint into a named, verified bundle under the configured transfer directory. Use it to move work to another machine or archive it; it does not delete the source checkpoint. Returns the bundle path and archive digest, which is what the receiver checks. No automatic retries.",
+			Annotations: writeTool("Export a handoff bundle", false)}, a.export)
 	}
 	if a.config.ExportRoot != "" && a.config.AdoptRoot != "" {
-		mcp.AddTool(server, &mcp.Tool{Name: "stow_handoff_adopt", Description: "Adopt a named transfer bundle into a new directory under the configured destination root. Receiver grants storage access; no commands run."}, a.adopt)
+		mcp.AddTool(server, &mcp.Tool{Name: "stow_handoff_adopt", Title: "Adopt a handoff bundle",
+			Description: "Adopt a named transfer bundle into a new directory under the configured destination root. Use it on the receiving machine after export; it never runs commands and never overwrites an existing root. Returns the new workspace identity and the adopted checkpoint. The receiver grants storage access.",
+			Annotations: writeTool("Adopt a handoff bundle", false)}, a.adopt)
 	}
 }
 

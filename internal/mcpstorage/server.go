@@ -61,11 +61,21 @@ func New(config Config) (*mcp.Server, error) {
 		return nil, err
 	}
 	server := mcp.NewServer(&mcp.Implementation{Name: "stow-storage", Version: "1"}, &mcp.ServerOptions{Instructions: Guide})
-	mcp.AddTool(server, &mcp.Tool{Name: "stow_workspace_inspect", Description: "Inspect the configured workspace without opening or claiming it."}, a.inspectWorkspace)
-	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_create", Description: "Capture quiescent working data. Persist a random request key before calling; reuse it to reconcile a lost reply."}, a.capture)
-	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_resolve", Description: "Resolve a previous capture using its original key and options without creating a new checkpoint."}, a.resolve)
-	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_inspect", Description: "Inspect bounded pages of saved checkpoint entries and exclusions."}, a.inspectCheckpoint)
-	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_diff", Description: "Compare two checkpoints in the configured workspace."}, a.diff)
+	mcp.AddTool(server, &mcp.Tool{Name: "stow_workspace_inspect", Title: "Inspect a workspace",
+		Description: "Inspect the configured workspace: identity, working directory, bucket, limits, features and any file-save barrier. Use it before planning work, or when a call reports an unknown workspace state; it does not open or claim the workspace. Returns the same shape workspace prepare and resume print.",
+		Annotations: readOnlyTool("Inspect a workspace")}, a.inspectWorkspace)
+	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_create", Title: "Create a checkpoint",
+		Description: "Capture the workspace's current files into a new checkpoint. Persist a random request key before calling and reuse it to reconcile a lost reply instead of capturing again. Stop known writers first: this is a quiescent capture, not a live snapshot. Returns outcome, checkpoint id, file and byte totals, and excluded paths.",
+		Annotations: writeTool("Create a checkpoint", false)}, a.capture)
+	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_resolve", Title: "Resolve a checkpoint capture",
+		Description: "Return the result of a previous checkpoint capture using its original key and options, without capturing again. Use it after a timeout or an uncertain reply; a missing receipt is not proof that no checkpoint exists. Returns the same result with replayed true.",
+		Annotations: readOnlyTool("Resolve a checkpoint capture")}, a.resolve)
+	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_inspect", Title: "Inspect a checkpoint",
+		Description: "Inspect bounded pages of a saved checkpoint's entries and excluded paths. Use it to answer what a checkpoint contains before restoring or handing it off; it does not read file contents. Returns one page plus a cursor.",
+		Annotations: readOnlyTool("Inspect a checkpoint")}, a.inspectCheckpoint)
+	mcp.AddTool(server, &mcp.Tool{Name: "stow_checkpoint_diff", Title: "Compare checkpoints",
+		Description: "Compare two checkpoints in the configured workspace and report added, changed and deleted paths. Use it to summarise what a task changed; it does not compare working files against a checkpoint. Returns the diff document.",
+		Annotations: readOnlyTool("Compare checkpoints")}, a.diff)
 	a.addHandoffTools(server)
 	server.AddResource(&mcp.Resource{URI: "stow://guides/checkpoints/v1", Name: "Checkpoint workflow", MIMEType: "text/plain"}, func(context.Context, *mcp.ReadResourceRequest) (*mcp.ReadResourceResult, error) {
 		return &mcp.ReadResourceResult{Contents: []*mcp.ResourceContents{{URI: "stow://guides/checkpoints/v1", MIMEType: "text/plain", Text: Guide}}}, nil

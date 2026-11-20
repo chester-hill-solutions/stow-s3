@@ -33,11 +33,21 @@ type objectReleaseInput struct {
 type objectCapabilitiesInput struct{}
 
 func (host *ObjectServer) addTools() {
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_read_for_save", Description: "Read bounded bytes and an opaque live comparison token, including observed absence."}, host.readObject)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_save", Description: "Save with a live observation or deliberate replacement and persisted request key. Preserve original inputs on retries."}, host.saveObject)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_resolve_save", Description: "Resolve the original retained request after interruption or reopen without starting a new save."}, host.resolveObject)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_release_observation", Description: "Release a volatile read observation. Repeating release is safe; receipts remain retained."}, host.releaseObservation)
-	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_capabilities", Description: "Inspect the configured object profile and adapter bounds without disclosing host paths."}, host.objectCapabilities)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_read_for_save", Title: "Read an object for saving",
+		Description: "Read one object's bytes and metadata from the configured bucket and return a short-lived comparison token. Use it before a guarded save, or to check what a key contains; do not use it to browse the bucket, which stow_browser pages by prefix. The token expires, so save promptly. Returns outcome observed, base64 bytes, ETag and observation_token; refusals carry a next step.",
+		Annotations: readOnlyTool("Read an object for saving")}, host.readObject)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_save", Title: "Save an object",
+		Description: "Save one object using the observation token from stow_object_read_for_save, or replace true to overwrite deliberately. Persist request_key before calling: retrying with the same key returns the original receipt instead of a second write, and that is the only safe retry. Do not reuse a key for a different body or path. Returns outcome committed, not_committed or unknown, metadata, and a next step on refusal.",
+		Annotations: writeTool("Save an object", true)}, host.saveObject)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_resolve_save", Title: "Resolve an object save",
+		Description: "Return the retained result of an earlier object save, identified by its original request key. Use it after a timeout, a dropped reply or outcome unknown; never use it to start a new save. It is safe to call repeatedly. Returns the same receipt with replayed true.",
+		Annotations: readOnlyTool("Resolve an object save")}, host.resolveObject)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_release_observation", Title: "Release an object observation",
+		Description: "Release a live object observation token and stop counting it against the observation limit. Use it when the edit will not happen; an unknown or expired token is an error. Saved receipts are unaffected.",
+		Annotations: writeTool("Release an object observation", false)}, host.releaseObservation)
+	mcp.AddTool(host.Server, &mcp.Tool{Name: "stow_object_capabilities", Title: "Inspect object capabilities",
+		Description: "Report the configured object profile: allowed bucket, byte and object bounds, observation limits and whether saves are enabled. Use it when a call was refused for a bound you do not know. Read-only, and it does not disclose host paths.",
+		Annotations: readOnlyTool("Inspect object capabilities")}, host.objectCapabilities)
 	host.Server.AddReceivingMiddleware(host.limitCalls)
 }
 
