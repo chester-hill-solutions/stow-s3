@@ -93,8 +93,10 @@ CRC64NVME multipart is supported for full-object completion. The algorithm is
 fixed at initiation; a completion claim is verified against the assembled object
 before publication. The complete response reports `x-amz-checksum-crc64nvme`
 with `x-amz-checksum-type: FULL_OBJECT`; `HEAD` and `GET` report the value. A mismatching
-value fails with `400 BadDigest`. Composite checksums are refused with
-`501 NotImplemented` rather than relabelled, and existing multipart ETag behavior
+value fails with `400 BadDigest`. A completion that omits `x-amz-checksum-type` is
+treated as full-object and reported as `FULL_OBJECT`. Composite checksums are refused with
+`501 NotImplemented` rather than relabelled, and run-through mode does not yet forward a
+completion claim, so it refuses one rather than verifying it. Existing multipart ETag behavior
 is unchanged.
 
 <!-- repo-only:start -->

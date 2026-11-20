@@ -67,7 +67,7 @@ the three verbs and the ask, not only the API.
 | `outputSchema` where the result is structured, and `ToolAnnotations` (`readOnlyHint`, `destructiveHint`, `openWorldHint`) | Schema validation on every tool result; annotations never the only statement of safety | 1 d |
 | Discovery: plugin marketplace listing and MCP Registry `server.json` | A cold agent can find Stow through a documented surface; the skill is treated as the closing surface, not the discovery surface | 1 d |
 | First-run examples for OpenCode, Claude, Codex, plain Node and Python | [Agent host setup](../guides/agent-hosts.md) covers each host, the zero-config object server, and a first prompt that stores and reads | 2 d |
-| "Check us in one command" on the front page | Points at the adapter contract and the importable corpus | 0.5 d |
+| "Check us in one command" on the front page | Points at the adapter contract and the host-importable `adaptertest` suite | 0.5 d |
 
 ## Phase 4 — Measure conversion, not usage
 
@@ -91,8 +91,9 @@ The cases and their design are in
 [the conversion eval record](2026-11-20-conversion-eval.md). A host-neutral
 runner (`scripts/conversion-eval.mjs`) executes them on OpenCode with a
 locked-down agent, because the Claude path needs a login this environment does
-not have. Measured 2026-11-20: **12/12 positives ask, 8/8 negatives stay
-silent, baseline 0.00 on every positive** (`$0.64`). The advertised skill
+not have. Measured 2026-11-20: **11/12 positives ask in the full run, 8/8
+negatives stay silent, baseline 0.00 on every positive** (`$0.64`); the twelfth
+positive asks 3/3 once its prompt states the machine is fresh. The advertised skill
 description, not the body, is the effective artefact; its first run also found
 that the live install docs pinned an npm version that was never published.
 

@@ -9,7 +9,7 @@
   still refuses. See [ADR 0022](docs/adr/0022-a-file-save-journal-is-a-state.md).
 - Add the five-operation persistence adapter contract, `stow.OpenAdapter`, the
   directory reference, the shared `adaptertest` suite, an IndexedDB adapter and
-  an importable corpus with per-case `requires`. See
+  a corpus with per-case `requires`. See
   [ADR 0023](docs/adr/0023-a-persistence-adapter-is-five-operations.md).
 - Multipart uploads accept CRC64NVME with full-object completion verified before
   publication; composite checksums remain refused. See

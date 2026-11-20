@@ -89,3 +89,11 @@ addition rather than a claim of this change.
   values stay verified-but-unpersisted, which removes the part-record change
   this record originally proposed. The refusal it replaced named
   `--checksum-algorithm CRC32` and no longer exists for CRC64NVME.
+- 2026-11-20: Correction. Run-through does not forward the completion claim yet:
+  its adapter implements the three-argument completion, so a default AWS client
+  still receives `ErrChecksumTypeUnsupported` in run-through mode. The direct
+  stores (memory, filesystem and workspace) implement full-object completion.
+  Forwarding the algorithm, type and value upstream is the next addition, not a
+  claim of this release. A completion with no `x-amz-checksum-type` is treated as
+  full-object and reported as `FULL_OBJECT`; a client that sends `COMPOSITE` is
+  refused.

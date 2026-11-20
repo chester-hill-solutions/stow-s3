@@ -51,12 +51,17 @@ func TestMyAdapter(t *testing.T) {
 }
 ```
 
-`RunAdapter` starts a private SigV4 server per case over
-`stow.OpenAdapter`'s bridge, runs the case, and reports pass, fail or skip. The
-adapter contract has no multipart operation, so multipart cases skip and say so.
+`RunAdapter` starts a private SigV4 server per case over the adapter bridge
+(`internal/adapterbridge.Bind`), runs the case, and reports pass, fail or skip.
+The adapter contract has no multipart operation, so multipart cases skip and say
+so. The package imports `internal/...` for the bridge, signing and server, so it
+is this repository's lane rather than a package a host imports; a host qualifies
+its adapter with `pkg/stow/persistence/adaptertest`, which is
+[importable](../docs/contracts/persistence-adapter.md#verifying-an-implementation).
 
-A host whose storage is already an S3 endpoint runs the same cases with
-`corpus.Run`, which builds the client from an endpoint and credentials:
+Inside this module's tests, a storage that is already an S3 endpoint runs the
+same cases with `corpus.Run`, which builds the client from an endpoint and
+credentials:
 
 ```go
 corpus.Run(t, func(t *testing.T) *corpus.Env {
@@ -67,8 +72,8 @@ corpus.Run(t, func(t *testing.T) *corpus.Env {
 })
 ```
 
-The cases are embedded in the package, so the runner reads the same
-`cases.json` every SDK driver uses. The `adapter` value for
+The cases are read from `cases.json` next to the runner, so a run needs a source
+checkout; it is the same file every SDK driver uses. The `adapter` value for
 `STOW_CONFORMANCE_BACKEND` runs the directory reference through the same path in
 this repository's suite.
 

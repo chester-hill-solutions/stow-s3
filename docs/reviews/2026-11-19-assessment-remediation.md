@@ -1,7 +1,10 @@
 # Assessment remediation, 2026-11-19
 
-**Status:** in progress. W-A1 is implemented in this tree; W-A2, W-A3, W-B1 and
-W-C1 are not started. This is a dated remediation record, not a work queue: the
+**Status:** implemented in this tree for 0.4.3 and measured 2026-11-20. The one
+deliberate remainder is object-surface outcome classification: the S3-object MCP
+tools still default to `unknown` for a pre-flight refusal, while the workspace
+save surface reports `not_committed` and carries `next`. This is a dated
+remediation record, not a work queue: the
 [consolidated plan](../development/storage-foundation-plan.md) remains the only
 dispatch authority.
 
@@ -25,10 +28,10 @@ repository's prose.
 | ID | Item | Effort | Track | Status |
 | --- | --- | --- | --- | --- |
 | W-A1 | A journal is a state, not a lockout (findings 1, 2) | 2–3 d | A | done |
-| W-A2 | Sensitive-path exclusion instead of abort (finding 4) | 1 d | A | not started |
-| W-A3 | `--max-file-bytes` for workspace editing (finding 5) | 0.5–1 d | A | not started |
-| W-B1 | CRC64NVME multipart full-object checksums (finding 3) | 4–5 d | B | not started |
-| W-C1 | Outcome, timestamp and import polish (findings 6, 7) | 1–1.5 d | A | partly done: outcome codes, `next`, `omitzero` and import idempotency; admin flag, inspect disclosure and the streaming-SigV4 message remain |
+| W-A2 | Sensitive-path exclusion instead of abort (finding 4) | 1 d | A | done |
+| W-A3 | `--max-file-bytes` for workspace editing (finding 5) | 0.5–1 d | A | done; `stow_workspace_inspect` reports the effective bound |
+| W-B1 | CRC64NVME multipart full-object checksums (finding 3) | 4–5 d | B | done on the direct stores; run-through does not forward the claim yet |
+| W-C1 | Outcome, timestamp and import polish (findings 6, 7) | 1–1.5 d | A | done for the workspace save surface: outcome codes, `next`, `omitzero`, import idempotency, admin-flag deprecation and the streaming-SigV4 message. Object-surface outcomes remain as noted above |
 
 Tracks A and B do not touch the same files and can run in parallel. Ship one
 release, 0.4.3.

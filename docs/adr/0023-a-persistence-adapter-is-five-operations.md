@@ -76,3 +76,9 @@ currency the five operations have for "the version I read".
   is qualified by the Playwright browser lane rather than by Node, which has no
   IndexedDB. The shared corpus is importable so a host runs it against its own
   adapter instead of trusting this repository's run.
+- 2026-11-20: Correction. The S3 corpus is **not** host-importable:
+  `conformance/corpus` imports `internal/...` for its bridge, signing and server,
+  and Go forbids a separate module from importing those.
+  `pkg/stow/persistence/adaptertest` is the importable host suite; the S3 corpus
+  stays this repository's lane and runs as the `adapter` backend in
+  `make test-conformance`.
