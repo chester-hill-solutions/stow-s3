@@ -30,6 +30,10 @@ type Config struct {
 	ReadRoots    []string
 	MaxBytes     int64
 	MaxFiles     int64
+	// MaxFileBytes is the effective workspace editing bound; zero means the
+	// default 64 KiB. Inspect reports this value so an agent can size a save
+	// against the bound the serving process actually enforces.
+	MaxFileBytes int64
 	Timeout      time.Duration
 	ExportRoot   string
 	AdoptRoot    string
@@ -47,6 +51,12 @@ func New(config Config) (*mcp.Server, error) {
 	}
 	if config.MaxBytes <= 0 || config.MaxFiles <= 0 || config.Timeout <= 0 {
 		return nil, fmt.Errorf("MCP requires positive capture bounds and timeout")
+	}
+	if config.MaxFileBytes < 0 || config.MaxFileBytes > 1<<20 {
+		return nil, fmt.Errorf("workspace file bound must be between 0 and 1048576")
+	}
+	if config.MaxFileBytes == 0 {
+		config.MaxFileBytes = 65536
 	}
 	dir, err := filepath.Abs(config.RegistryDir)
 	if err != nil {

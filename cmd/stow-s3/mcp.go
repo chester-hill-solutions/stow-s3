@@ -244,6 +244,7 @@ func mcpServerFor(objectMode bool, options *mcpCommandOptions) (*mcp.Server, fun
 		return objects.Server, objects.Close, nil
 	}
 	if options.workspaceEdit {
+		options.workspace.MaxFileBytes = options.maxFileBytes
 		files, err := mcpstorage.NewWorkspaceEditing(options.workspace, stow.WorkspaceEditOptions{
 			WriteRoots: append([]string(nil), options.writeRoots...), Coordination: options.coordination,
 			MaxFileBytes: options.maxFileBytes,

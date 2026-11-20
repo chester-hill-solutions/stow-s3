@@ -28,7 +28,7 @@ func (a *adapter) inspectWorkspace(_ context.Context, _ *mcp.CallToolRequest, in
 	if err != nil {
 		return finish(result{}, err)
 	}
-	return finish(result{Outcome: "ok", Workspace: &workspaceView{ID: ref.ID, Directory: ref.Dir, Bucket: ref.Bucket, MaxCheckpointBytes: ref.MaxCheckpointBytes, MaxCheckpoints: ref.MaxCheckpoints}}, nil)
+	return finish(result{Outcome: "ok", Workspace: &workspaceView{ID: ref.ID, Directory: ref.Dir, Bucket: ref.Bucket, MaxCheckpointBytes: ref.MaxCheckpointBytes, MaxCheckpoints: ref.MaxCheckpoints, MaxFileBytes: a.config.MaxFileBytes}}, nil)
 }
 
 func (a *adapter) request(input captureInput) (stow.CheckpointRequest, error) {

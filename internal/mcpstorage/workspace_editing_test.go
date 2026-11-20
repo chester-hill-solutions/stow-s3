@@ -17,6 +17,10 @@ import (
 )
 
 func workspaceEditingFixture(t *testing.T, roots []string) (*WorkspaceFiles, *mcp.ClientSession, Config) {
+	return workspaceEditingFixtureWithBound(t, roots, 0)
+}
+
+func workspaceEditingFixtureWithBound(t *testing.T, roots []string, maxFileBytes int64) (*WorkspaceFiles, *mcp.ClientSession, Config) {
 	t.Helper()
 	registry := filepath.Join(t.TempDir(), "registry")
 	root := filepath.Join(t.TempDir(), "work")
@@ -37,8 +41,8 @@ func workspaceEditingFixture(t *testing.T, roots []string) (*WorkspaceFiles, *mc
 	if err := owner.Close(); err != nil {
 		t.Fatal(err)
 	}
-	config := Config{RegistryDir: registry, WorkspaceID: owner.ID(), ReadRoots: roots, MaxBytes: 1 << 20, MaxFiles: 100, Timeout: 5 * time.Second}
-	host, err := NewWorkspaceEditing(config, stow.WorkspaceEditOptions{Coordination: "host_quiesced", WriteRoots: []string{"docs"}}, false)
+	config := Config{RegistryDir: registry, WorkspaceID: owner.ID(), ReadRoots: roots, MaxBytes: 1 << 20, MaxFiles: 100, MaxFileBytes: maxFileBytes, Timeout: 5 * time.Second}
+	host, err := NewWorkspaceEditing(config, stow.WorkspaceEditOptions{Coordination: "host_quiesced", WriteRoots: []string{"docs"}, MaxFileBytes: maxFileBytes}, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -476,5 +480,17 @@ func assertWorkspaceFilesEqual(t *testing.T, paths []string, expected [][]byte) 
 		if err != nil || !bytes.Equal(actual, expected[index]) {
 			t.Fatalf("workspace file changed at %s: err=%v", filepath.Base(path), err)
 		}
+	}
+}
+
+func TestWorkspaceInspectReportsTheEffectiveFileBound(t *testing.T) {
+	_, session, config := workspaceEditingFixtureWithBound(t, nil, 262144)
+	args, err := json.Marshal(workspaceInput{WorkspaceID: config.WorkspaceID})
+	if err != nil {
+		t.Fatal(err)
+	}
+	inspected := invoke(t, session, "stow_workspace_inspect", args)
+	if inspected.Workspace == nil || inspected.Workspace.MaxFileBytes != 262144 {
+		t.Fatalf("inspect did not report the configured bound: %+v", inspected.Workspace)
 	}
 }

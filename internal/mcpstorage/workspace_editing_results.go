@@ -133,7 +133,7 @@ func workspaceFileNext(value workspaceFileToolResult) string {
 	case "invalid_observation":
 		return "call stow_workspace_file_read_for_save and pass the new observation_token"
 	case "payload_too_large":
-		return "reduce the payload below the workspace file bound"
+		return "reduce the payload; the bound is 65536 bytes by default and --max-file-bytes raises it to at most 1048576"
 	case "closed":
 		return "reopen the editing session with mcp --workspace-edit"
 	case "canceled":

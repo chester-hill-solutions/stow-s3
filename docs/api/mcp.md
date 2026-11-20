@@ -302,6 +302,9 @@ Workspaces. Capture the workspace's current files into a new checkpoint. Persist
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -309,7 +312,8 @@ Workspaces. Capture the workspace's current files into a new checkpoint. Persist
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },
@@ -872,6 +876,9 @@ Workspaces. Compare two checkpoints in the configured workspace and report added
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -879,7 +886,8 @@ Workspaces. Compare two checkpoints in the configured workspace and report added
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },
@@ -1438,6 +1446,9 @@ Workspaces. Inspect bounded pages of a saved checkpoint's entries and excluded p
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -1445,7 +1456,8 @@ Workspaces. Inspect bounded pages of a saved checkpoint's entries and excluded p
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },
@@ -2011,6 +2023,9 @@ Workspaces. Return the result of a previous checkpoint capture using its origina
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -2018,7 +2033,8 @@ Workspaces. Return the result of a previous checkpoint capture using its origina
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },
@@ -2578,6 +2594,9 @@ Workspaces. Adopt a named transfer bundle into a new directory under the configu
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -2585,7 +2604,8 @@ Workspaces. Adopt a named transfer bundle into a new directory under the configu
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },
@@ -3146,6 +3166,9 @@ Workspaces. Export a checkpoint into a named, verified bundle under the configur
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -3153,7 +3176,8 @@ Workspaces. Export a checkpoint into a named, verified bundle under the configur
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },
@@ -5328,6 +5352,9 @@ Workspaces. Inspect the configured workspace: identity, working directory, bucke
         },
         "max_checkpoints": {
           "type": "integer"
+        },
+        "max_file_bytes": {
+          "type": "integer"
         }
       },
       "required": [
@@ -5335,7 +5362,8 @@ Workspaces. Inspect the configured workspace: identity, working directory, bucke
         "directory",
         "bucket",
         "max_checkpoint_bytes",
-        "max_checkpoints"
+        "max_checkpoints",
+        "max_file_bytes"
       ],
       "additionalProperties": false
     },

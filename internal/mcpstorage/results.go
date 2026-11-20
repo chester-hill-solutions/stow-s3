@@ -25,6 +25,7 @@ type workspaceView struct {
 	Bucket             string `json:"bucket"`
 	MaxCheckpointBytes int64  `json:"max_checkpoint_bytes"`
 	MaxCheckpoints     int64  `json:"max_checkpoints"`
+	MaxFileBytes       int64  `json:"max_file_bytes"`
 }
 
 type entry struct {

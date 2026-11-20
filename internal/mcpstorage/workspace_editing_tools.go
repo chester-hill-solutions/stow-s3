@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"unicode/utf8"
 
+	"github.com/chester-hill-solutions/stow-s3/internal/storage"
 	"github.com/chester-hill-solutions/stow-s3/pkg/stow"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-const maxWorkspaceFilePayloadBytes = 1 << 20
+// One bound for a managed file, owned by the storage contract.
+const maxWorkspaceFilePayloadBytes = storage.MaxWorkspaceFileBytes
 const maxWorkspaceFileTextBytes = 64 << 10
 
 type workspaceFileReadInput struct {
