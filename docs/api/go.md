@@ -2265,6 +2265,7 @@ type PreparedWorkspace struct {
 	SeededBytes		int64
 	SeededObjects		int64
 	BaseIdentity		string
+	Excluded		[]string
 	Repositories		[]PreparedRepository
 	RegistryEntries		int64
 	MaxWorkspaces		int64
@@ -2282,6 +2283,7 @@ type PrepareOptions struct {
 	Inputs			[]WorkspaceInput	`json:"inputs,omitempty"`
 	Repositories		[]GitRepositoryInput	`json:"repositories,omitempty"`
 	IncludeSensitiveInputs	bool			`json:"include_sensitive_inputs,omitempty"`
+	SensitivePaths		string			`json:"sensitive_paths,omitempty"`
 	MaxWorkspaces		int64			`json:"max_workspaces,omitempty"`
 }
 ```
@@ -3925,5 +3927,6 @@ type WorkspaceTaskManifest struct {
 	RegistryDir		string			`json:"registry_dir,omitempty"`
 	Bucket			string			`json:"bucket,omitempty"`
 	IncludeSensitiveInputs	bool			`json:"include_sensitive_inputs,omitempty"`
+	SensitivePaths		string			`json:"sensitive_paths,omitempty"`
 }
 ```

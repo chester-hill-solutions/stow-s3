@@ -238,7 +238,7 @@ Object storage. Browse a bounded page in the configured bucket by key prefix. Th
 ```
 ## stow_checkpoint_create
 
-Workspaces. Capture quiescent working data. Persist a random request key before calling; reuse it to reconcile a lost reply.
+Workspaces. Capture the workspace's current files into a new checkpoint. Persist a random request key before calling and reuse it to reconcile a lost reply instead of capturing again. Stop known writers first: this is a quiescent capture, not a live snapshot. Returns outcome, checkpoint id, file and byte totals, and excluded paths.
 
 ### Input
 
@@ -811,7 +811,7 @@ Workspaces. Capture quiescent working data. Persist a random request key before 
 ```
 ## stow_checkpoint_diff
 
-Workspaces. Compare two checkpoints in the configured workspace.
+Workspaces. Compare two checkpoints in the configured workspace and report added, changed and deleted paths. Use it to summarise what a task changed; it does not compare working files against a checkpoint. Returns the diff document.
 
 ### Input
 
@@ -1381,7 +1381,7 @@ Workspaces. Compare two checkpoints in the configured workspace.
 ```
 ## stow_checkpoint_inspect
 
-Workspaces. Inspect bounded pages of saved checkpoint entries and exclusions.
+Workspaces. Inspect bounded pages of a saved checkpoint's entries and excluded paths. Use it to answer what a checkpoint contains before restoring or handing it off; it does not read file contents. Returns one page plus a cursor.
 
 ### Input
 
@@ -1947,7 +1947,7 @@ Workspaces. Inspect bounded pages of saved checkpoint entries and exclusions.
 ```
 ## stow_checkpoint_resolve
 
-Workspaces. Resolve a previous capture using its original key and options without creating a new checkpoint.
+Workspaces. Return the result of a previous checkpoint capture using its original key and options, without capturing again. Use it after a timeout or an uncertain reply; a missing receipt is not proof that no checkpoint exists. Returns the same result with replayed true.
 
 ### Input
 
@@ -2520,7 +2520,7 @@ Workspaces. Resolve a previous capture using its original key and options withou
 ```
 ## stow_handoff_adopt
 
-Workspaces. Adopt a named transfer bundle into a new directory under the configured destination root. Receiver grants storage access; no commands run.
+Workspaces. Adopt a named transfer bundle into a new directory under the configured destination root. Use it on the receiving machine after export; it never runs commands and never overwrites an existing root. Returns the new workspace identity and the adopted checkpoint. The receiver grants storage access.
 
 ### Input
 
@@ -3087,7 +3087,7 @@ Workspaces. Adopt a named transfer bundle into a new directory under the configu
 ```
 ## stow_handoff_export
 
-Workspaces. Export a checkpoint to a new named bundle in the configured transfer directory. No automatic retries.
+Workspaces. Export a checkpoint into a named, verified bundle under the configured transfer directory. Use it to move work to another machine or archive it; it does not delete the source checkpoint. Returns the bundle path and archive digest, which is what the receiver checks. No automatic retries.
 
 ### Input
 
@@ -3655,7 +3655,7 @@ Workspaces. Export a checkpoint to a new named bundle in the configured transfer
 ```
 ## stow_object_capabilities
 
-Object storage. Inspect the configured object profile and adapter bounds without disclosing host paths.
+Object storage. Report the configured object profile: allowed bucket, byte and object bounds, observation limits and whether saves are enabled. Use it when a call was refused for a bound you do not know. Read-only, and it does not disclose host paths.
 
 ### Input
 
@@ -3887,7 +3887,7 @@ Object storage. Find up to 50 object references by key prefix in the configured 
 ```
 ## stow_object_read_for_save
 
-Object storage. Read bounded bytes and an opaque live comparison token, including observed absence.
+Object storage. Read one object's bytes and metadata from the configured bucket and return a short-lived comparison token. Use it before a guarded save, or to check what a key contains; do not use it to browse the bucket, which stow_browser pages by prefix. The token expires, so save promptly. Returns outcome observed, base64 bytes, ETag and observation_token; refusals carry a next step.
 
 ### Input
 
@@ -4059,7 +4059,7 @@ Object storage. Read bounded bytes and an opaque live comparison token, includin
 ```
 ## stow_object_release_observation
 
-Object storage. Release a volatile read observation. Repeating release is safe; receipts remain retained.
+Object storage. Release a live object observation token and stop counting it against the observation limit. Use it when the edit will not happen; an unknown or expired token is an error. Saved receipts are unaffected.
 
 ### Input
 
@@ -4231,7 +4231,7 @@ Object storage. Release a volatile read observation. Repeating release is safe; 
 ```
 ## stow_object_resolve_save
 
-Object storage. Resolve the original retained request after interruption or reopen without starting a new save.
+Object storage. Return the retained result of an earlier object save, identified by its original request key. Use it after a timeout, a dropped reply or outcome unknown; never use it to start a new save. It is safe to call repeatedly. Returns the same receipt with replayed true.
 
 ### Input
 
@@ -4407,7 +4407,7 @@ Object storage. Resolve the original retained request after interruption or reop
 ```
 ## stow_object_save
 
-Object storage. Save with a live observation or deliberate replacement and persisted request key. Preserve original inputs on retries.
+Object storage. Save one object using the observation token from stow_object_read_for_save, or replace true to overwrite deliberately. Persist request_key before calling: retrying with the same key returns the original receipt instead of a second write, and that is the only safe retry. Do not reuse a key for a different body or path. Returns outcome committed, not_committed or unknown, metadata, and a next step on refusal.
 
 ### Input
 
@@ -4602,7 +4602,7 @@ Object storage. Save with a live observation or deliberate replacement and persi
 ```
 ## stow_workspace_browser
 
-Workspace browser (opt-in). Browse the configured workspace through bounded read-only resources.
+Workspace browser (opt-in). Open the read-only workspace browser through bounded resources. Use it when a human wants to look at the working files; it never edits or saves. Returns a launch descriptor pointing at the workspace overview resource.
 
 ### Input
 
@@ -4635,7 +4635,7 @@ Workspace browser (opt-in). Browse the configured workspace through bounded read
 ```
 ## stow_workspace_file_read_for_save
 
-Workspace file editing (opt-in). Read one bounded workspace file and receive a volatile observation token for a guarded save.
+Workspace file editing (opt-in). Read one file in the configured workspace and return its bytes, digest, mode and a short-lived observation token. Use it before a guarded save, or to see what a tracked file contains; do not use it as a general filesystem reader outside the configured read roots. The token expires, so save promptly and read again if it has. Returns outcome observed with data_base64, text below 64 KiB, sha256 and observation_token; refusals carry a next step.
 
 ### Input
 
@@ -4773,6 +4773,9 @@ Workspace file editing (opt-in). Read one bounded workspace file and receive a v
         "message"
       ],
       "additionalProperties": false
+    },
+    "next": {
+      "type": "string"
     }
   },
   "required": [
@@ -4786,7 +4789,7 @@ Workspace file editing (opt-in). Read one bounded workspace file and receive a v
 ```
 ## stow_workspace_file_release_observation
 
-Workspace file editing (opt-in). Release a volatile workspace file observation; saved receipts remain retained.
+Workspace file editing (opt-in). Release a live observation token so it cannot be used for a save and stops counting against the observation limit. Use it when the edit will not happen; do not release a token you are about to save with. Releasing an unknown or expired token is an error, not a no-op. Returns released true; saved receipts are unaffected.
 
 ### Input
 
@@ -4924,6 +4927,9 @@ Workspace file editing (opt-in). Release a volatile workspace file observation; 
         "message"
       ],
       "additionalProperties": false
+    },
+    "next": {
+      "type": "string"
     }
   },
   "required": [
@@ -4937,7 +4943,7 @@ Workspace file editing (opt-in). Release a volatile workspace file observation; 
 ```
 ## stow_workspace_file_resolve_save
 
-Workspace file editing (opt-in). Resolve the retained result for the original workspace file save request.
+Workspace file editing (opt-in). Return the retained result of an earlier workspace save by path and request key, without writing anything. Use it after a timeout, a dropped reply or outcome unknown; do not use it to start a new save or to test whether some other request happened. It is safe to call repeatedly. Returns the same receipt with replayed true.
 
 ### Input
 
@@ -5079,6 +5085,9 @@ Workspace file editing (opt-in). Resolve the retained result for the original wo
         "message"
       ],
       "additionalProperties": false
+    },
+    "next": {
+      "type": "string"
     }
   },
   "required": [
@@ -5092,7 +5101,7 @@ Workspace file editing (opt-in). Resolve the retained result for the original wo
 ```
 ## stow_workspace_file_save
 
-Workspace file editing (opt-in). Save bounded text or base64 bytes using the observed token or deliberate replacement and a persistent request key.
+Workspace file editing (opt-in). Save exactly one file using the observation token from stow_workspace_file_read_for_save, or replace true to overwrite deliberately. Use it for edits inside the configured write roots; do not use it outside them, and do not retry an uncertain save with a new request key. Persist request_key before calling: retrying with the same key returns the original receipt and never writes twice. Returns outcome committed, not_committed or unknown, the object metadata, and a next step on refusal.
 
 ### Input
 
@@ -5252,6 +5261,9 @@ Workspace file editing (opt-in). Save bounded text or base64 bytes using the obs
         "message"
       ],
       "additionalProperties": false
+    },
+    "next": {
+      "type": "string"
     }
   },
   "required": [
@@ -5265,7 +5277,7 @@ Workspace file editing (opt-in). Save bounded text or base64 bytes using the obs
 ```
 ## stow_workspace_inspect
 
-Workspaces. Inspect the configured workspace without opening or claiming it.
+Workspaces. Inspect the configured workspace: identity, working directory, bucket, limits, features and any file-save barrier. Use it before planning work, or when a call reports an unknown workspace state; it does not open or claim the workspace. Returns the same shape workspace prepare and resume print.
 
 ### Input
 
