@@ -19,6 +19,8 @@ type workspaceFileObjectResult struct {
 	LastModified time.Time         `json:"last_modified"`
 }
 
+const maxWorkspaceFileResponseBytes = 2 << 20
+
 type workspaceFileToolResult struct {
 	Version          int                        `json:"version"`
 	Outcome          string                     `json:"outcome"`
@@ -84,13 +86,13 @@ func finishWorkspaceFileTool(value workspaceFileToolResult, err error) (*mcp.Cal
 	}
 	value.Next = workspaceFileNext(value)
 	response, encodeErr := encodeWorkspaceFileTool(value)
-	if encodeErr == nil && len(mustMarshalWorkspaceResult(response)) <= maxResponseBytes {
+	if encodeErr == nil && len(mustMarshalWorkspaceResult(response)) <= maxWorkspaceFileResponseBytes {
 		return response, value, nil
 	}
 	if value.Text != nil {
 		value.Text = nil
 		response, encodeErr = encodeWorkspaceFileTool(value)
-		if encodeErr == nil && len(mustMarshalWorkspaceResult(response)) <= maxResponseBytes {
+		if encodeErr == nil && len(mustMarshalWorkspaceResult(response)) <= maxWorkspaceFileResponseBytes {
 			return response, value, nil
 		}
 	}

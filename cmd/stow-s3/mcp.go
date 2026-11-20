@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -30,6 +31,7 @@ type mcpCommandOptions struct {
 	writeRoots          repeatedStringFlag
 	coordination        string
 	recoverFileSaves    bool
+	maxFileBytes        int64
 }
 
 func mcpCommand(args []string) (err error) {
@@ -73,7 +75,7 @@ func mcpCommand(args []string) (err error) {
 		}
 		return runMCPHTTP(ctx, server, options.httpAddr, options.token)
 	}
-	return server.Run(ctx, &mcp.StdioTransport{MaxLineLength: 1 << 20})
+	return server.Run(ctx, &mcp.StdioTransport{MaxLineLength: 4 << 20})
 }
 
 func registerMCPFlags(flags *flag.FlagSet) *mcpCommandOptions {
@@ -104,6 +106,7 @@ func registerMCPFlags(flags *flag.FlagSet) *mcpCommandOptions {
 	flags.Var(&options.writeRoots, "write-root", "Limit workspace file editing to this existing relative directory; repeatable")
 	flags.StringVar(&options.coordination, "coordination", "", "Workspace edit coordination; requires host_quiesced")
 	flags.BoolVar(&options.recoverFileSaves, "recover-file-saves", false, "Open workspace file-save recovery state; requires --workspace-edit")
+	flags.Int64Var(&options.maxFileBytes, "max-file-bytes", 0, "Maximum workspace edit bytes up to 1048576; 0 uses 65536")
 	return options
 }
 
@@ -148,7 +151,7 @@ func validateMCPStorageFlags(flags *flag.FlagSet, visited map[string]bool, objec
 	}
 	disallowed := []string{"object-dir", "bucket", "max-objects", "max-object-bytes", "max-observations", "create-bucket", "read-only"}
 	if objectMode {
-		disallowed = []string{"registry-dir", "workspace-id", "checkpoint-id", "max-files", "export-root", "adopt-root", "timeout", "workspace-files", "resources-only", "read-root", "workspace-edit", "write-root", "coordination", "recover-file-saves"}
+		disallowed = []string{"registry-dir", "workspace-id", "checkpoint-id", "max-files", "export-root", "adopt-root", "timeout", "workspace-files", "resources-only", "read-root", "workspace-edit", "write-root", "coordination", "recover-file-saves", "max-file-bytes"}
 	}
 	for _, name := range disallowed {
 		if visited[name] {
@@ -189,7 +192,7 @@ func validateWorkspaceMCPFlags(flags *flag.FlagSet, visited map[string]bool, mod
 }
 
 func validateWorkspaceEditFlags(flags *flag.FlagSet, visited map[string]bool, mode mcpModeValidation) error {
-	editOptions := []string{"write-root", "coordination", "recover-file-saves"}
+	editOptions := []string{"write-root", "coordination", "recover-file-saves", "max-file-bytes"}
 	if !mode.workspaceEdit {
 		for _, name := range editOptions {
 			if visited[name] {
@@ -210,18 +213,23 @@ func validateWorkspaceEditFlags(flags *flag.FlagSet, visited map[string]bool, mo
 			return fmt.Errorf("--write-root must not be empty")
 		}
 	}
+	if options.maxFileBytes < 0 || options.maxFileBytes > 1<<20 {
+		return fmt.Errorf("--max-file-bytes must be between 0 and 1048576")
+	}
 	return nil
 }
 
 type workspaceEditFlags struct {
 	writeRoots   []string
 	coordination string
+	maxFileBytes int64
 }
 
 func parseWorkspaceEditFlags(flags *flag.FlagSet) workspaceEditFlags {
 	writeRoots, _ := flags.Lookup("write-root").Value.(*repeatedStringFlag)
+	maxFileBytes, _ := strconv.ParseInt(flags.Lookup("max-file-bytes").Value.String(), 10, 64)
 	return workspaceEditFlags{writeRoots: append([]string(nil), (*writeRoots)...),
-		coordination: flags.Lookup("coordination").Value.String()}
+		coordination: flags.Lookup("coordination").Value.String(), maxFileBytes: maxFileBytes}
 }
 
 // mcpServerFor builds the surface for the selected mode. Both transports share it,
@@ -238,6 +246,7 @@ func mcpServerFor(objectMode bool, options *mcpCommandOptions) (*mcp.Server, fun
 	if options.workspaceEdit {
 		files, err := mcpstorage.NewWorkspaceEditing(options.workspace, stow.WorkspaceEditOptions{
 			WriteRoots: append([]string(nil), options.writeRoots...), Coordination: options.coordination,
+			MaxFileBytes: options.maxFileBytes,
 		}, options.recoverFileSaves)
 		if err != nil {
 			return nil, nil, err

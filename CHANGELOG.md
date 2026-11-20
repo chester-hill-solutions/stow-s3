@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Workspace editing accepts a configurable file bound: `--max-file-bytes` raises
+  it from 64 KiB to at most 1 MiB, and the save, observation and response paths
+  follow it. The default is unchanged, and the refusal still names the limit.
+
 - A streaming SigV4 request is refused by name (`STREAMING-AWS4-HMAC-SHA256-PAYLOAD`)
   with the supported alternatives, instead of being reported as an invalid
   content hash. A committed save is proven to survive `SIGKILL`: the workspace

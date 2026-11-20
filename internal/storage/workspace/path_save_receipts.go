@@ -48,7 +48,7 @@ func (s *Store) workspaceFileSaveMeaning(bucket string, request storage.Workspac
 func validWorkspaceFileSaveRequest(bucket string, request storage.WorkspaceFileSaveRequest) bool {
 	write := request.Write
 	if !validWorkspaceFileSaveRequestKey(request.RequestKey) || bucket == "" || storage.ValidateBucketName(bucket) != nil ||
-		storage.ValidateKey(write.Path) != nil || write.MaxFileBytes < 1 || write.MaxFileBytes > 64<<10 || int64(len(write.Data)) > write.MaxFileBytes ||
+		storage.ValidateKey(write.Path) != nil || write.MaxFileBytes < 1 || write.MaxFileBytes > storage.MaxWorkspaceFileBytes || int64(len(write.Data)) > write.MaxFileBytes ||
 		write.Replace && write.Basis != nil || write.Basis != nil && (write.Basis.Path != write.Path || len(write.Basis.Data) != 0 || write.Basis.Identity == nil) {
 		return false
 	}

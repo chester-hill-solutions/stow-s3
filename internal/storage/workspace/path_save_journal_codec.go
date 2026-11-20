@@ -132,7 +132,7 @@ func validWorkspaceFileSaveEntryText(entry *ManifestEntry) bool {
 }
 
 func validateWorkspaceFileSaveRecordMeaning(record workspaceFileSaveRecord) error {
-	if !workspaceFileSaveDigest(record.Meaning, 64) || !workspaceFileSaveDigest(record.PayloadDigest, 64) || record.PayloadSize < 0 || record.PayloadSize > 64<<10 {
+	if !workspaceFileSaveDigest(record.Meaning, 64) || !workspaceFileSaveDigest(record.PayloadDigest, 64) || record.PayloadSize < 0 || record.PayloadSize > storage.MaxWorkspaceFileBytes {
 		return storage.ErrInvalidSaveRequest
 	}
 	if record.Mode&^uint32(0o777) != 0 {

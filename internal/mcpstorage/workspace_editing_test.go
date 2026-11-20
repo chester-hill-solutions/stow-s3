@@ -59,7 +59,7 @@ func invokeWorkspaceFile(t *testing.T, session *mcp.ClientSession, name string, 
 		t.Fatal(err)
 	}
 	wire, err := json.Marshal(response)
-	if err != nil || len(wire) > maxResponseBytes {
+	if err != nil || len(wire) > maxWorkspaceFileResponseBytes {
 		t.Fatalf("response bytes=%d error=%v", len(wire), err)
 	}
 	body, err := json.Marshal(response.StructuredContent)
@@ -211,7 +211,7 @@ func TestWorkspaceEditingPayloadBoundsAndScopes(t *testing.T) {
 	if invalid.Error == nil || invalid.Error.Code != "invalid" || invalid.Outcome != string(stow.SaveNotCommitted) {
 		t.Fatalf("invalid base64=%+v", invalid)
 	}
-	large := invokeWorkspaceFile(t, session, "stow_workspace_file_save", workspaceFileSaveInput{Path: "docs/new.txt", Text: stringPointer(strings.Repeat("x", maxObjectPayload+1)), RequestKey: "large", Replace: true})
+	large := invokeWorkspaceFile(t, session, "stow_workspace_file_save", workspaceFileSaveInput{Path: "docs/new.txt", Text: stringPointer(strings.Repeat("x", maxWorkspaceFilePayloadBytes+1)), RequestKey: "large", Replace: true})
 	if large.Error == nil || large.Error.Code != "payload_too_large" || large.Outcome != string(stow.SaveNotCommitted) {
 		t.Fatalf("large save=%+v", large)
 	}
@@ -359,7 +359,7 @@ func TestWorkspaceEditingRawArgumentBounds(t *testing.T) {
 
 func assertWorkspaceEditingRawArgumentRefused(t *testing.T, session *mcp.ClientSession) {
 	t.Helper()
-	oversized, _ := json.Marshal(map[string]string{"path": strings.Repeat("x", maxResponseBytes)})
+	oversized, _ := json.Marshal(map[string]string{"path": strings.Repeat("x", maxWorkspaceFileResponseBytes)})
 	response, err := session.CallTool(t.Context(), &mcp.CallToolParams{Name: "stow_workspace_file_save", Arguments: json.RawMessage(oversized)})
 	if err != nil || response == nil || !response.IsError {
 		t.Fatalf("raw argument response=%v err=%v", response, err)
@@ -385,7 +385,7 @@ func assertWorkspaceEditingSDKErrorSanitized(t *testing.T, session *mcp.ClientSe
 }
 
 func TestWorkspaceEditingTerminalResponseBounds(t *testing.T) {
-	large := strings.Repeat("x", maxResponseBytes)
+	large := strings.Repeat("x", maxWorkspaceFileResponseBytes)
 	data := large
 	value := workspaceFileToolResult{Outcome: "committed", Replayed: true, Committed: true, Generation: "generation-1", DataBase64: &data}
 	original, err := encodeWorkspaceFileTool(value)

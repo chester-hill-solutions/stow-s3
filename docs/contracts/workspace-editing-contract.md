@@ -120,8 +120,10 @@ D.2 adds SaveFile, ResolveSave and explicit owning recovery:
     (*WorkspaceEditor).Close() error
 
 Options contain ReadRoots, WriteRoots, Coordination, MaxFileBytes,
-MaxObservations and ObservationLifetime. Defaults and maxima are 64 KiB per file,
-64 live observations and five minutes per observation; callers may lower them.
+MaxObservations and ObservationLifetime. The file bound defaults to 64 KiB and
+may be raised to 1 MiB; the MCP surface exposes it as `--max-file-bytes`.
+Observations default to 64 live entries and five minutes each. Callers may set
+any value within those limits.
 An editor's lifetime ends on its Close or the owner's Close. Closing it clears
 volatile observations, not durable receipts or a pending recovery barrier.
 
@@ -200,7 +202,7 @@ including its new generation, before effect. Same key with a changed path, body,
 basis or mode policy is a request conflict, never a new operation.
 
 Bounds are 1,024 terminal records, 8 MiB charged journal bytes and 64 KiB per
-record, plus one pending slot in the same charged byte budget. Reserve the
+record document (digests rather than payload bytes), plus one pending slot in the same charged byte budget. Reserve the
 worst-case pending/terminal transition space before publication. This is logical
 accounting, not a physical disk-headroom guarantee. Full capacity refuses new requests while existing
 receipts and resolution remain accessible. No automatic receipt eviction,
@@ -290,11 +292,12 @@ the registry, root, workspace identity or bucket.
 The four tools are stow_workspace_file_read_for_save, stow_workspace_file_save,
 stow_workspace_file_resolve_save and stow_workspace_file_release_observation.
 They reuse the one native editor; no second quota, receipt or observation cache
-is added. Saves accept exactly one text or data_base64 body, bounded to 64 KiB,
+is added. Saves accept exactly one text or data_base64 body, bounded by the editor's
+MaxFileBytes (64 KiB by default, up to 1 MiB),
 and exactly one observation_token or replace=true. Empty bodies are valid.
 Release preserves the native invalid/expired observation semantics.
 
-Observe returns complete base64 bytes and optional UTF-8 text, plus path,
+Observe returns complete base64 bytes, and UTF-8 text below 64 KiB, plus path,
 absence, digest, mode, time, generation and an opaque expiring token. Optional
 text is omitted when necessary to fit the response budget. Save/resolve return
 the original outcome, generation, replay flag and metadata without payload.

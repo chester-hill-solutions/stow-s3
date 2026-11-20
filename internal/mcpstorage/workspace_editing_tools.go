@@ -10,6 +10,9 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
+const maxWorkspaceFilePayloadBytes = 1 << 20
+const maxWorkspaceFileTextBytes = 64 << 10
+
 type workspaceFileReadInput struct {
 	Path string `json:"path"`
 }
@@ -54,7 +57,7 @@ func (host *WorkspaceFiles) readWorkspaceFileForSave(ctx context.Context, _ *mcp
 	result := workspaceFileToolResult{Outcome: "observed", Available: true, Path: file.Path, Absent: file.Absent,
 		DataBase64: &dataBase64, SHA256: file.SHA256, Mode: &mode,
 		Modified: file.Modified, Generation: file.Generation, ObservationToken: file.ObservationToken, ExpiresAt: file.ExpiresAt}
-	if utf8.Valid(file.Data) {
+	if utf8.Valid(file.Data) && len(file.Data) < maxWorkspaceFileTextBytes {
 		text := string(file.Data)
 		result.Text = &text
 	}
@@ -85,16 +88,16 @@ func workspaceFileInputBytes(input workspaceFileSaveInput) ([]byte, error) {
 		return nil, workspaceToolError{"invalid"}
 	}
 	if input.Text != nil {
-		if len(*input.Text) > maxObjectPayload {
+		if len(*input.Text) > maxWorkspaceFilePayloadBytes {
 			return nil, workspaceToolError{"payload_too_large"}
 		}
 		return []byte(*input.Text), nil
 	}
-	if len(*input.DataBase64) > base64.StdEncoding.EncodedLen(maxObjectPayload) {
+	if len(*input.DataBase64) > base64.StdEncoding.EncodedLen(maxWorkspaceFilePayloadBytes) {
 		return nil, workspaceToolError{"payload_too_large"}
 	}
 	data, err := base64.StdEncoding.Strict().DecodeString(*input.DataBase64)
-	if err != nil || len(data) > maxObjectPayload {
+	if err != nil || len(data) > maxWorkspaceFilePayloadBytes {
 		return nil, workspaceToolError{"invalid"}
 	}
 	return data, nil
@@ -156,7 +159,7 @@ func workspaceFileCallName(method string, request mcp.Request) string {
 
 func workspaceEditArgumentsTooLarge(request mcp.Request) bool {
 	call := request.(*mcp.CallToolRequest)
-	return len(call.Params.Arguments) > maxResponseBytes || len(call.Params.Name) > 128
+	return len(call.Params.Arguments) > maxWorkspaceFileResponseBytes || len(call.Params.Name) > 128
 }
 
 func workspaceEditErrorResult(code string) (mcp.Result, error) {
@@ -179,7 +182,7 @@ func boundWorkspaceEditResult(result mcp.Result) (mcp.Result, error) {
 		return workspaceEditErrorResult("invalid")
 	}
 	wire, err := json.Marshal(tool)
-	if err == nil && len(wire) <= maxResponseBytes {
+	if err == nil && len(wire) <= maxWorkspaceFileResponseBytes {
 		return result, nil
 	}
 	value := workspaceFileToolResult{Outcome: "unknown"}

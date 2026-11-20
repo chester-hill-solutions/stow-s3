@@ -76,7 +76,7 @@ func (s *Store) validateWorkspaceFileWrite(bucket string, request storage.Worksp
 	if request.Replace == (request.Basis != nil) || (request.Basis != nil && len(request.Basis.Data) != 0) {
 		return storage.ErrInvalidKey
 	}
-	if request.MaxFileBytes < 1 || request.MaxFileBytes > 64<<10 || int64(len(request.Data)) > request.MaxFileBytes {
+	if request.MaxFileBytes < 1 || request.MaxFileBytes > storage.MaxWorkspaceFileBytes || int64(len(request.Data)) > request.MaxFileBytes {
 		return storage.ErrWorkspaceFileTooLarge
 	}
 	return nil

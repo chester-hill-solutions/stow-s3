@@ -240,7 +240,7 @@ func (s *Store) proveWorkspaceFileSave(record workspaceFileSaveRecord) (workspac
 		return workspaceFileSaveProof{}, storage.WorkspaceFileObservation{}, storage.ErrSaveRequestUnknown
 	}
 	defer root.Close()
-	observation, err := readWorkspacePath(context.Background(), root, pathReadRequest{key: record.Path, maxBytes: 64 << 10, entry: record.PlannedEntry, indexed: true})
+	observation, err := readWorkspacePath(context.Background(), root, pathReadRequest{key: record.Path, maxBytes: max(record.PayloadSize, 1), entry: record.PlannedEntry, indexed: true})
 	if err != nil || observation.Size != record.PayloadSize || observation.Digest != record.PayloadDigest || observation.Mode != record.Mode {
 		return workspaceFileSaveProof{}, storage.WorkspaceFileObservation{}, storage.ErrSaveRequestUnknown
 	}

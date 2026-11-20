@@ -132,6 +132,8 @@ type ListPartsResult struct {
 	IsTruncated          bool
 }
 
+const MaxWorkspaceFileBytes = 1 << 20
+
 type PartInfo struct {
 	PartNumber   int
 	ETag         string

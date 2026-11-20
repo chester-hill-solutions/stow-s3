@@ -16,7 +16,7 @@ import (
 const (
 	workspaceFileCoordinationHostQuiesced = "host_quiesced"
 	defaultWorkspaceEditorMaxBytes        = int64(64 * 1024)
-	maxWorkspaceEditorBytes               = int64(64 * 1024)
+	maxWorkspaceEditorBytes               = int64(1 << 20)
 	defaultWorkspaceEditorObservations    = 64
 	maxWorkspaceEditorObservations        = 64
 	defaultWorkspaceEditorLifetime        = 5 * time.Minute

@@ -217,7 +217,7 @@ func TestWorkspaceEditorRejectsInvalidOptionsAndMissingReadGrant(t *testing.T) {
 	assertWorkspaceEditorInvalidOptions(t, ws, []stow.WorkspaceEditOptions{
 		{Coordination: "", ReadRoots: []string{"."}, WriteRoots: []string{"."}},
 		{Coordination: "host_quiesced", ReadRoots: []string{"."}},
-		{Coordination: "host_quiesced", ReadRoots: []string{"."}, WriteRoots: []string{"."}, MaxFileBytes: 65 * 1024},
+		{Coordination: "host_quiesced", ReadRoots: []string{"."}, WriteRoots: []string{"."}, MaxFileBytes: (1 << 20) + 1},
 		{Coordination: "host_quiesced", ReadRoots: []string{"docs"}, WriteRoots: []string{"."}},
 	})
 	duplicates := make([]string, maxWorkspaceEditorTestRoots)

@@ -26,6 +26,9 @@ func TestMCPWorkspaceEditModeValidation(t *testing.T) {
 		want bool
 	}{
 		{name: "valid edit", args: valid},
+		{name: "custom file bound", args: append(append([]string(nil), valid...), "--max-file-bytes", "262144")},
+		{name: "max file bytes needs edit", args: []string{"--max-file-bytes", "1024"}, want: true},
+		{name: "max file bytes outside bound", args: append(append([]string(nil), valid...), "--max-file-bytes", "2000000"), want: true},
 		{name: "explicit recovery", args: append(append([]string(nil), valid...), "--recover-file-saves")},
 		{name: "explicitly disabled edit", args: []string{"--workspace-edit=false"}},
 		{name: "requires workspace files", args: []string{"--workspace-edit", "--write-root", "docs", "--coordination", "host_quiesced"}, want: true},
@@ -230,7 +233,7 @@ type workspaceEditResult struct {
 	Error            *struct{ Code string } `json:"error"`
 }
 
-func startWorkspaceEditProcess(t *testing.T, fixture workspaceEditFixture, recover bool) *workspaceEditProcess {
+func startWorkspaceEditProcess(t *testing.T, fixture workspaceEditFixture, recover bool, extraArgs ...string) *workspaceEditProcess {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 	t.Cleanup(cancel)
@@ -238,6 +241,7 @@ func startWorkspaceEditProcess(t *testing.T, fixture workspaceEditFixture, recov
 	if recover {
 		extra = append(extra, "--recover-file-saves")
 	}
+	extra = append(extra, extraArgs...)
 	args := append([]string{"mcp", "--registry-dir", fixture.registry, "--workspace-id", fixture.workspaceID, "--timeout", "10s"}, extra...)
 	process := &workspaceEditProcess{stderr: &syncBuffer{}, command: exec.Command(launcherBinary(t), args...)}
 	process.command.Stderr = process.stderr
@@ -378,4 +382,37 @@ func TestWorkspaceSurvivesAKilledEditingSession(t *testing.T) {
 	if err := stow.DestroyRegisteredWorkspace(context.Background(), registry, fixture.workspaceID); err != nil {
 		t.Fatalf("destroy: %v", err)
 	}
+}
+
+func TestWorkspaceEditSavesAboveSixtyFourKiBWithAConfiguredBound(t *testing.T) {
+	fixture := newWorkspaceEditFixture(t)
+	payload := bytes.Repeat([]byte("a"), 100<<10)
+	if err := os.WriteFile(filepath.Join(fixture.root, "docs", "large.bin"), payload, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	owner, err := stow.OpenWorkspace(stow.WorkspaceOptions{Dir: fixture.root, RegistryDir: fixture.registry})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixture.workspaceID = owner.ID()
+	if err := owner.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	process := startWorkspaceEditProcess(t, fixture, false, "--max-file-bytes", "262144")
+	observed := callWorkspaceEditTool(t, process.session, "stow_workspace_file_read_for_save", map[string]string{"path": "docs/large.bin"})
+	if observed.Outcome != "observed" || observed.DataBase64 == "" {
+		t.Fatalf("observation = %+v error=%+v", observed, observed.Error)
+	}
+	saved := callWorkspaceEditTool(t, process.session, "stow_workspace_file_save", map[string]string{
+		"path": "docs/large.bin", "text": string(payload), "request_key": "large-save", "observation_token": observed.ObservationToken,
+	})
+	if saved.Outcome != "committed" || saved.Object == nil {
+		t.Fatalf("save = %+v error=%+v", saved, saved.Error)
+	}
+	info, err := os.Stat(filepath.Join(fixture.root, "docs", "large.bin"))
+	if err != nil || info.Size() != int64(len(payload)) {
+		t.Fatalf("stored size = %v, %v", info, err)
+	}
+	closeWorkspaceEditProcess(t, process)
 }
