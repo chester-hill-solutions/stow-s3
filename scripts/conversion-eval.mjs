@@ -191,10 +191,27 @@ for (const testCase of cases) {
     with: Number(mean(perArm.with).toFixed(3)), baseline: Number(mean(perArm.baseline).toFixed(3)),
     delta: Number((mean(perArm.with) - mean(perArm.baseline)).toFixed(3)),
     skillFired: perArm.with.some((item) => item?.skillFired),
+    runs: {
+      with: perArm.with.map((item) => Number((item?.score ?? 0).toFixed(3))),
+      baseline: perArm.baseline.map((item) => Number((item?.score ?? 0).toFixed(3))),
+    },
     verdicts: perArm.with.flatMap((item) => item?.verdicts ?? []),
     failures: perArm.with.map((item) => item?.failure).filter(Boolean),
   });
 }
+
+// pass^k is the fraction of cases that passed in every one of the k trials: a case
+// that asks on one run and stays quiet on the next is not a reliable conversion, and
+// a mean hides that. A trial passes only at a full score; partial credit does not.
+const k = runsOverride || cases[0]?.runs || 0;
+const reliable = (kind) => {
+  const matching = report.cases.filter((testCase) => testCase.kind === kind);
+  const passed = matching.filter(
+    (testCase) => testCase.runs.with.length > 0 && testCase.runs.with.every((score) => score === 1),
+  );
+  return { passed: passed.length, total: matching.length };
+};
+report.passAtK = { trials: k, positive: reliable("positive"), negative: reliable("negative") };
 report.totalCost = Number(report.cost.toFixed(4));
 if (jsonPath) writeFileSync(jsonPath, JSON.stringify(report, null, 2));
 console.log("\nCASE                                  WITH  BASE  DELTA SKILL");
@@ -207,4 +224,8 @@ const askRate = positives.length ? positives.filter((item) => item.with > 0).len
 const silenceRate = negatives.length ? negatives.filter((item) => item.with === 1).length / negatives.length : 0;
 console.log(`\npositive ask rate (mean score > 0): ${(askRate * 100).toFixed(0)}% of ${positives.length}`);
 console.log(`negative silence rate (score 1.0): ${(silenceRate * 100).toFixed(0)}% of ${negatives.length}`);
+console.log(
+  `pass^${report.passAtK.trials}: positives ${report.passAtK.positive.passed}/${report.passAtK.positive.total}, ` +
+    `negatives ${report.passAtK.negative.passed}/${report.passAtK.negative.total}`,
+);
 console.log(`cost $${report.totalCost}`);
