@@ -33,6 +33,8 @@ test("persistence adapter implements the five operations over IndexedDB", async 
         summary.staleConflict = error.code;
       }
       await adapter.conditionalPut("alpha", "a/one.txt", encoder.encode("three"), { condition: { ifMatch: second.etag } });
+      const final = await adapter.get("alpha", "a/one.txt");
+      summary.body = new TextDecoder().decode(final.data);
       await adapter.put("alpha", "b/two.txt", encoder.encode("two"));
       await adapter.put("alpha", "top.txt", encoder.encode("top"));
       const prefixed = await adapter.list("alpha", { prefix: "a/" });
