@@ -21,6 +21,7 @@ Choose a guide for your application. The [full reference](../README.md) covers t
 ## Getting started
 
 - [Getting started](guides/getting-started.md): install from npm or native downloads and choose an API.
+- [v0.4.3 release notes](releases/v0.4.3.md): prepared in this tree; a settled file-save journal is a state, a persistence adapter contract, and CRC64NVME multipart checksums.
 - [v0.4.2 release notes](releases/v0.4.2.md): dependency maintenance and download-recovery qualification.
 - [v0.4.1 release notes](releases/v0.4.1.md): policy-mode correction and retained-transfer conformance.
 - [v0.4.0 release notes](releases/v0.4.0.md): native MCP workspace resources, managed saves and saved-file reads.

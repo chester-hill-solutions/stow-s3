@@ -1,6 +1,7 @@
 export const pages = [
   { route: "/docs/", title: "Documentation", source: "docs/README.md", group: "Start here" },
   { route: "/docs/getting-started/", title: "Getting started", source: "docs/guides/getting-started.md", group: "Start here" },
+  { route: "/docs/releases/v0.4.3/", title: "v0.4.3 release notes", source: "docs/releases/v0.4.3.md", group: "Start here" },
   { route: "/docs/releases/v0.4.2/", title: "v0.4.2 release notes", source: "docs/releases/v0.4.2.md", group: "Start here" },
   { route: "/docs/releases/v0.4.1/", title: "v0.4.1 release notes", source: "docs/releases/v0.4.1.md", group: "Start here" },
   { route: "/docs/releases/v0.4.0/", title: "v0.4.0 release notes", source: "docs/releases/v0.4.0.md", group: "Start here" },

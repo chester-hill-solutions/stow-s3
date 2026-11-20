@@ -2,83 +2,34 @@
 
 ## Unreleased
 
-- Agent host setup for Claude Code, Codex, OpenCode, Node and Python: the plugin
-  install, the zero-config object-mode MCP entry for each host, and a first
-  prompt that stores and reads a key. See the
-  [host guide](docs/guides/agent-hosts.md).
+## 0.4.3 — 2026-11-20
 
-- Ship a Claude Code plugin and marketplace manifest so one install delivers the
-  agent guidance: `claude plugin marketplace add chester-hill-solutions/stow-s3`,
-  then `claude plugin install stow@chester-hill-solutions`. Both manifests pass
-  `claude plugin validate --strict` (Claude Code 2.1.257).
-
-- Preparing a workspace skips common credential paths (`.env`, `.npmrc`, SSH keys and
-  the like) and reports them in `excluded_sensitive_paths` instead of aborting the
-  whole prepare. `include_sensitive_inputs: true` still copies them, and
-  `sensitive_paths: "refuse"` preserves the previous refusal. Git inputs remove a
-  skipped path from the checkout rather than leaving it in the workspace.
-
-- Workspace editing accepts a configurable file bound: `--max-file-bytes` raises
-  it from 64 KiB to at most 1 MiB, and the save, observation and response paths
-  follow it. The default is unchanged, and the refusal still names the limit.
-
-- A streaming SigV4 request is refused by name (`STREAMING-AWS4-HMAC-SHA256-PAYLOAD`)
-  with the supported alternatives, instead of being reported as an invalid
-  content hash. A committed save is proven to survive `SIGKILL`: the workspace
-  resumes, the bytes are intact and a checkpoint captures them.
-
-- Workspace editing refusals report `not_committed` and carry a machine-readable
-  `next` step, so an agent is not sent into a `resolve_save` loop for a call that
-  had no effect; `unknown` is reserved for an effect that is genuinely
-  undetermined. Zero timestamps no longer appear as year-one values, and
-  importing the same checkpoint archive twice returns the existing checkpoint
-  instead of failing.
-
-- Multipart uploads accept CRC64NVME with full-object completion, which is what
-  an AWS client sends by default. The completion claim is verified against the
-  assembled object before publication and reported by the complete response,
-  `HEAD` and `GET`; composite checksums remain refused. See
+- A settled workspace file-save journal no longer blocks its workspace; opening
+  classifies it by the barrier's rule, and a pending or unverifiable journal
+  still refuses. See [ADR 0022](docs/adr/0022-a-file-save-journal-is-a-state.md).
+- Add the five-operation persistence adapter contract, `stow.OpenAdapter`, the
+  directory reference, the shared `adaptertest` suite, an IndexedDB adapter and
+  an importable corpus with per-case `requires`. See
+  [ADR 0023](docs/adr/0023-a-persistence-adapter-is-five-operations.md).
+- Multipart uploads accept CRC64NVME with full-object completion verified before
+  publication; composite checksums remain refused. See
   [ADR 0024](docs/adr/0024-multipart-checksums-are-object-state.md).
+- Workspace editing refusals report `not_committed` and a machine-readable
+  `next` step; zero timestamps no longer appear as year-one values, and a
+  repeated checkpoint import returns the existing checkpoint.
+- Workspace editing accepts `--max-file-bytes` up to 1 MiB, and preparing a
+  workspace skips credential paths and reports them in
+  `excluded_sensitive_paths` instead of aborting.
+- A streaming SigV4 request is refused by name, a committed save is proven to
+  survive `SIGKILL`, and object writes refuse property headers the record cannot
+  return with `501 NotImplemented` before mutating.
+- Ship a Claude Code plugin and marketplace manifest, an agent host setup guide
+  for five hosts, and a balanced 20-case conversion eval with a host-neutral
+  runner. Install docs are gated against the npm publication receipt.
 
-- A settled workspace file-save journal no longer blocks its workspace. Opening
-  classifies the journal by the barrier's rule — matching identity and no pending
-  record — so `workspace resume`, `workspace serve` and `workspace destroy` work
-  after an MCP editing session, and a second editing session adopts the journal it
-  finds. A pending or unverifiable journal still refuses every one of those
-  surfaces and is resolved with `mcp --workspace-edit --recover-file-saves`. See
-  [ADR 0022](docs/adr/0022-a-file-save-journal-is-a-state.md).
-
-- Add a persistence adapter contract: five operations (get, put, list, delete,
-  conditional put) that a platform can implement to supply Stow's storage, with
-  `stow.OpenAdapter` bridging them to the embedded runtime. The directory
-  reference reuses the filesystem store, `pkg/stow/persistence/adaptertest` is
-  the shared pass/fail suite, and the S3 corpus runs through the bridge as an
-  `adapter` backend. See [the contract](docs/contracts/persistence-adapter.md)
-  and [ADR 0023](docs/adr/0023-a-persistence-adapter-is-five-operations.md).
-- Corpus cases can declare `requires`; a backend that lacks a capability skips
-  the case and says so instead of failing or silently passing. The shared corpus
-  is also importable: `conformance/corpus.RunAdapter` runs every supported case
-  against a host's own `persistence.Adapter`, and `corpus.Run` runs them against
-  an existing S3 endpoint.
-- `IndexedDbAdapter` implements the five persistence operations over IndexedDB
-  and is exported from the browser entry, with a Playwright qualification lane.
-- The front page shows the three verbs a workspace is for: prepare, checkpoint,
-  resume.
-
-- Refuse `Cache-Control`, `Content-Disposition`, `Content-Encoding`,
-  `Content-Language` and `Expires` on object writes with `501 NotImplemented`
-  before any mutation. The record has no field for them, so accepting the write
-  acknowledged metadata the next `HEAD` could not return. `Content-Type` and
-  `x-amz-meta-*` are unchanged, and reads carrying those header names are not
-  refused. See the [compatibility contract](docs/contracts/compat-contract.md).
-- Clear the remaining npm audit findings without changing shipped behaviour:
-  patch the MCP SDK in the extension, which moves its transitive `hono` to the
-  fixed release; update the site's `wrangler` toolchain, which carries a fixed
-  `undici`; and update the TypeScript package's ESLint chain. Lint, escape and
-  DRY ratchets stay at zero.
-- The extension bundle never contained `hono`; it is a dependency of the MCP
-  SDK's Node server, and the extension ships only the bundled browser HTML and
-  plugin metadata.
+See the [release notes](docs/releases/v0.4.3.md) for distribution and
+compatibility limits. npm remains at 0.3.7; automated npm and PyPI publication
+remain disabled.
 
 ## 0.4.2 — 2026-11-15
 
