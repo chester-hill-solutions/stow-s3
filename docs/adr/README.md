@@ -29,6 +29,7 @@ Use the [usage guides](../README.md) for supported APIs and the
 | [0019](0019-browser-project-content.md) | Browser projects use durable content references and the shared embedded runtime | `accepted` | — | — |
 | [0020](0020-binary-object-records.md) | Filesystem objects use protobuf metadata and raw payloads | `accepted` | — | — |
 | [0021](0021-remote-exposure-requires-consent.md) | A bind beyond loopback needs consent, and the service does not terminate TLS | `accepted` | — | — |
+| [0022](0022-a-file-save-journal-is-a-state.md) | A file-save journal is a state, not a lockout | `accepted` | — | — |
 
 ## Status vocabulary
 

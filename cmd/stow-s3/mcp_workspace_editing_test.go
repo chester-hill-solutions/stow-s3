@@ -140,6 +140,62 @@ func TestMCPWorkspaceEditStdioSaveAndExplicitRecoveryRestart(t *testing.T) {
 	_ = readOnlyRecovery.Close()
 }
 
+// TestCommittedEditingSessionLeavesWorkspaceOpenable crosses the seam no test
+// crossed: resume, write and destroy after an editing session.
+func TestCommittedEditingSessionLeavesWorkspaceOpenable(t *testing.T) {
+	source := t.TempDir()
+	if err := os.WriteFile(filepath.Join(source, "note.txt"), []byte("initial bytes"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	root := filepath.Join(t.TempDir(), "task")
+	registry := filepath.Join(t.TempDir(), "registry")
+	prepared, err := stow.PrepareWorkspace(stow.PrepareOptions{
+		WorkspaceOptions: stow.WorkspaceOptions{Dir: root, RegistryDir: registry},
+		WorkingDirectory: "docs",
+		Inputs:           []stow.WorkspaceInput{{Source: source, Destination: "docs"}},
+	})
+	if err != nil {
+		t.Fatalf("PrepareWorkspace: %v", err)
+	}
+	fixture := workspaceEditFixture{root: root, registry: registry, workspaceID: prepared.Workspace.ID()}
+	if err := prepared.Workspace.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	process := startWorkspaceEditProcess(t, fixture, false)
+	observed := callWorkspaceEditTool(t, process.session, "stow_workspace_file_read_for_save", map[string]string{"path": "docs/note.txt"})
+	if observed.Outcome != "observed" || observed.ObservationToken == "" {
+		t.Fatalf("observation = %+v", observed)
+	}
+	saved := callWorkspaceEditTool(t, process.session, "stow_workspace_file_save", map[string]string{
+		"path": "docs/note.txt", "text": "saved by an editing session", "request_key": "cli-save-openable", "observation_token": observed.ObservationToken,
+	})
+	if saved.Outcome != "committed" {
+		t.Fatalf("save = %+v", saved)
+	}
+	closeWorkspaceEditProcess(t, process)
+
+	resumed, err := stow.ResumeWith(stow.WorkspaceOptions{RegistryDir: registry}, fixture.workspaceID)
+	if err != nil {
+		t.Fatalf("resume after a committed save: %v", err)
+	}
+	if _, err := resumed.PutObject(context.Background(), resumed.Bucket(), "docs/after.txt", []byte("served"), stow.PutOptions{}); err != nil {
+		t.Fatalf("write after a committed save: %v", err)
+	}
+	if data, err := os.ReadFile(filepath.Join(root, "docs", "after.txt")); err != nil || string(data) != "served" {
+		t.Fatalf("payload after a committed save = %q, %v", data, err)
+	}
+	if err := resumed.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := stow.DestroyRegisteredWorkspace(context.Background(), registry, fixture.workspaceID); err != nil {
+		t.Fatalf("destroy after a committed save: %v", err)
+	}
+	if _, err := os.Lstat(root); !os.IsNotExist(err) {
+		t.Fatalf("workspace root still present after destroy: %v", err)
+	}
+}
+
 type workspaceEditFixture struct {
 	root, registry, workspaceID string
 }

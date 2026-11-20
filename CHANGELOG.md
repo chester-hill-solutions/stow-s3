@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- A settled workspace file-save journal no longer blocks its workspace. Opening
+  classifies the journal by the barrier's rule — matching identity and no pending
+  record — so `workspace resume`, `workspace serve` and `workspace destroy` work
+  after an MCP editing session, and a second editing session adopts the journal it
+  finds. A pending or unverifiable journal still refuses every one of those
+  surfaces and is resolved with `mcp --workspace-edit --recover-file-saves`. See
+  [ADR 0022](docs/adr/0022-a-file-save-journal-is-a-state.md).
+
 - Refuse `Cache-Control`, `Content-Disposition`, `Content-Encoding`,
   `Content-Language` and `Expires` on object writes with `501 NotImplemented`
   before any mutation. The record has no field for them, so accepting the write
