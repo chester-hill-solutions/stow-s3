@@ -58,6 +58,20 @@ before working around it. The ask, in one breath:
 Fallback if the answer is no: keep the suite mocked and record the protocol gap,
 or bind-mount a directory and checkpoint by hand.
 
+### Moving work to another machine
+
+```sh
+stow-s3 workspace handoff --id "$WORKSPACE_ID" --checkpoint-id "$CHECKPOINT_ID" \
+  --archive work.tar.gz --output handoff.json
+# move handoff.json and work.tar.gz to the next host, then:
+stow-s3 workspace adopt --handoff handoff.json --root ./work
+```
+
+Adopt verifies the archive's SHA-256 before writing anything, gives the
+workspace a new identity on the receiving machine, and keeps the checkpoint id.
+Pass `--expect-sha256` with a digest received out of band to verify the transfer
+itself, not only the archive.
+
 ## Checkpoints for agent work
 
 Prepare a separate workspace and hold it with `workspace serve` while the agent

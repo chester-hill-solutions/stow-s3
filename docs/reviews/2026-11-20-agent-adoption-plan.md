@@ -54,7 +54,7 @@ the three verbs and the ask, not only the API.
 | --- | --- | --- |
 | Handoff: export, then adopt on a second root, one command each | Second host reads the checkpoint; ids and digests verified | 2–3 d |
 | Import and handoff idempotency, half-failure recovery | Interrupted import leaves no partial state; retry converges | included |
-| A measured comparison an agent can cite: Docker/MinIO vs mock vs Stow | Short table with start time, image size, privileges | 1 d |
+| A measured comparison an agent can cite: Docker/MinIO vs mock vs Stow | Short table with start time, image size, privileges — [Stow measured, Docker unmeasured here](2026-11-20-local-s3-comparison.md) | 1 d |
 
 ## Phase 3 — Be where agents look
 
