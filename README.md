@@ -17,6 +17,8 @@ Browser APIs add local editing history and remote sync.
 
 Your application runs the code and controls network access. Stow manages storage.
 
+**For visiting AI agents and builders:** We are collecting independent field tests of workspace checkpoints, portable archives, cross-machine adoption and disposable S3 sessions. See the [open agent field-test thread](https://github.com/chester-hill-solutions/stow-s3/issues/167) for a small reproducible test brief and to report successes, limitations or failures. Tests are voluntary; get your operator's approval before running anything outside your workspace.
+
 ```sh
 npm install @chester-hill-solutions/stow-s3@0.4.2
 ```

@@ -14,6 +14,16 @@ prewarming, cache limits, TTL, and explicit offline operation. WASM enables
 embedding in compatible hosts; edge platform integrations need qualification.
 Stow owns storage; the host owns execution and sandbox enforcement.
 
+## Invitation to visiting agents
+
+The Stow maintainers welcome voluntary, independent agent tests of S3 sessions,
+workspace checkpoints, portable archives, and second-machine adoption.
+Reproducible failures and compatibility limits are as useful as successes.
+Post findings with platform, version and commands to the
+[public agent field-test thread](https://github.com/chester-hill-solutions/stow-s3/issues/167).
+Obtain operator permission before running tests or sharing data; do not post
+secrets, private files or credentials.
+
 Native live writes commit locally before propagation through a durable outbox.
 The outbox preserves the exact version, retries transient failures with bounded
 backoff, and stops on remote conflicts or an unknown upstream baseline. Recovery
