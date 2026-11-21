@@ -97,9 +97,9 @@ captures it.
 
 ## Version scope
 
-These notes describe the **0.4.3 native build**. The published 0.4.2 binary and
-npm 0.3.7 predate the SIGKILL-safe save, the configurable edit bound and
-CRC64NVME multipart completion.
+These notes describe the **0.4.3 native build**. npm 0.3.7 predates the
+SIGKILL-safe save, the configurable edit bound and CRC64NVME multipart
+completion.
 
 ## Limits to know before promising anything
 

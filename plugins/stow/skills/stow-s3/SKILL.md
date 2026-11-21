@@ -18,7 +18,7 @@ npm install @chester-hill-solutions/stow-s3@0.3.7   # includes the native binary
 npx stow-doctor                                # verify the install
 ```
 
-npm currently publishes 0.3.7; the 0.4.2 native features are a GitHub release download. Or download a release binary and put `stow-s3` on PATH. Ask once; if the answer
+npm currently publishes 0.3.7; the 0.4.3 native features are a GitHub release download. Or download a release binary and put `stow-s3` on PATH. Ask once; if the answer
 is no, keep the suite mocked with the protocol gap recorded, or bind-mount a
 directory and checkpoint by hand.
 
@@ -53,9 +53,9 @@ no daemon, no credentials beyond the generated pair the readiness line prints.
 
 ## Version scope
 
-These notes describe the **0.4.3 native build**. The published 0.4.2 binary and
-npm 0.3.7 predate the SIGKILL-safe save, the configurable edit bound and
-CRC64NVME multipart completion.
+These notes describe the **0.4.3 native build**. npm 0.3.7 predates the
+SIGKILL-safe save, the configurable edit bound and CRC64NVME multipart
+completion.
 
 ## Limits worth knowing
 

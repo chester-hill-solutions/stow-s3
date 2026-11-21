@@ -92,16 +92,16 @@ Use the [workspace guide](/docs/workspaces/) for capture and recovery options.
 
 ## Version scope
 
-These notes describe the **0.4.3 native build**. The published 0.4.2 binary and
-npm 0.3.7 predate the SIGKILL-safe save, the configurable edit bound and
-CRC64NVME multipart completion.
+These notes describe the **0.4.3 native build**. npm 0.3.7 predates the
+SIGKILL-safe save, the configurable edit bound and CRC64NVME multipart
+completion.
 
 ## v0.4.0: MCP workspace files
 
 These profiles were introduced in v0.4.0. Use the current native binary from
-[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2)
+[GitHub Releases](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.3)
 or build from source.
-The v0.4.2 native binaries include these profiles; the npm packages remain at 0.3.7.
+The v0.4.3 native binaries include these profiles; the npm packages remain at 0.3.7.
 Native release checks cover Linux and macOS on x64 and ARM64. Named model
 providers and live App hosts need separate compatibility evidence.
 
@@ -116,6 +116,14 @@ providers and live App hosts need separate compatibility evidence.
 
 File saves do not capture a checkpoint or run an agent. The host keeps other
 writers quiescent, chooses read/write roots and owns execution and network access.
+
+## v0.4.3: journal, adapter and multipart checksums
+
+[v0.4.3 notes](/docs/releases/v0.4.3/) settle the file-save journal so a
+completed save no longer blocks the workspace, add the five-operation persistence
+adapter with a directory and IndexedDB implementation, accept CRC64NVME
+multipart checksums, and make workspace edit refusals say what to do next.
+npm remains at 0.3.7; the native binaries are the GitHub release download.
 
 ## v0.4.2: dependency maintenance
 
@@ -142,8 +150,8 @@ npm install @chester-hill-solutions/stow-s3@0.3.7
 ```
 
 The package carries its native binary for Linux or macOS on x64 or ARM64. npm
-currently publishes 0.3.7; the v0.4.2 native binaries are the GitHub release
-download until 0.4.2 is published to npm.
+currently publishes 0.3.7; the v0.4.3 native binaries are the GitHub release
+download until 0.4.3 is published to npm.
 No source build or `STOW_BIN` override is needed. Use WSL on Windows.
 Remove any old scope override to `npm.pkg.github.com`.
 
@@ -170,7 +178,7 @@ Ask once per task. If the answer is no, take it, keep the fallback (a mock with
 the protocol gap recorded, or a bind mount checkpointed by hand), and continue.
 
 Native binaries are distributed from the
-[v0.4.2 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2); see
+[v0.4.3 GitHub release](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.3); see
 the [v0.4.1 patch notes](/docs/releases/v0.4.1/) for the checkpoint policy-mode correction.
 Verify the archive with `SHA256SUMS.txt` and run `stow-s3 --version`.
 

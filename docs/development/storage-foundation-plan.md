@@ -1,27 +1,25 @@
 # Consolidated working-storage plan
 
-**Sole canonical scope, status, ordering and dispatch queue — reconciled 2026-11-19**
-against published v0.4.2, source revision
-`709c9fcea1db7302c4edb89376fa99f7c9c94eae`, accepted ADRs/contracts and dated
-qualification records. W01–W28 and the legacy S0–S4 mappings remain stable.
+**Sole canonical scope, status, ordering and dispatch queue — reconciled 2026-11-20**
+against published v0.4.3, accepted ADRs/contracts and dated qualification
+records. W01–W28 and the legacy S0–S4 mappings remain stable.
 The [planning index](planning-index.md) records document dispositions, not another backlog.
 Older plans retain design rationale, anchors and dated receipts; their checklists,
 assignments and “next” instructions no longer schedule work.
 
 **Release baseline:** [v0.4.0](../releases/v0.4.0.md) introduced the native workspace
 profiles; [v0.4.1](../releases/v0.4.1.md) is the native/Go patch for checkpoint-policy
-mode handling; [v0.4.2](../releases/v0.4.2.md) is the dependency-maintenance patch and remains
-the current published native release; [v0.4.3](../releases/v0.4.3.md) is prepared
-in this tree (journal-as-state, the persistence adapter, CRC64NVME multipart and
-the agent surfaces) and its tag and binaries follow the authorized release step.
+mode handling; [v0.4.2](../releases/v0.4.2.md) is the dependency-maintenance patch;
+[v0.4.3](../releases/v0.4.3.md) is the current native release (journal-as-state,
+the persistence adapter, CRC64NVME multipart and the agent surfaces).
 Native distribution is Linux/macOS x64/ARM64. The versioned
-[release record](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2)
+[release record](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.3)
 provides archive checksums and publication identity; the site uses the release documentation.
 **npm publication is behind the native release:** the public registry serves only
 through **0.3.7** (checked 2026-11-20), although the 0.4.3 carriers are prepared
-in-repo and the 0.4.2 carriers were never published. The install instructions now say 0.3.7 and `check-install-claims` holds
-them to the publication receipt; publishing the 0.4.2 carriers remains open W20
-work.
+in-repo and the 0.4.2 carriers were never published. The install instructions say
+0.3.7 and `check-install-claims` holds them to the publication receipt; publishing
+the 0.4.3 carriers, and the unpublished 0.4.2 ones, remains open W20 work.
 Python is source-only. Automated npm/OIDC and PyPI publication remain disabled.
 Native release CI is not second-physical-host, model-host, protected-deployment
 or repeat-use acceptance.
@@ -67,7 +65,7 @@ not runtime behavior. It records the already published release; it publishes not
 | Resumable transfers | Consumer-owned uploader/downloader; SDK retained restart, memory loss, overwrite refusal and damaged-prefix/progress/interrupted-body cases. [W06.B/C evidence](../benchmarks/2026-11-14-resumable-transfers/README.md) records 24 bounded Railway cost samples. | Named published-binary consumer and physical second host remain W19/W21; signed-link expiry needs its own profile; portable unfinished operations remain W12. |
 | Workspace access | W23–W26 native APIs shipped in v0.4.0. Local Free Router read-only review and same-host Luna saved-view/editing evidence remain. [Published v0.4.1 direct Luna interruption/continuation](../history/implementation/2026-11-14-interrupted-cross-host.md) passed from macOS ARM64 to a separate native Linux amd64 cloud host. | Resource-only saved-view access on a second host and protected profiles remain open; the new run reads an adopted mutable workspace. Earlier Free Router editing/strict-output failures remain failed. W19/W25/W26. |
 | MCP / callers | Scoped stdio and sessionless HTTP, explicit remote-listener consent/bearer token, request/resolve receipts and caller-owned continuation fixtures. [Direct Luna/SDK caller qualification](../history/implementation/2026-11-14-interrupted-cross-host.md) records published artifacts, interruption, recovery and cross-host adoption. | Other caller/application profiles remain W19/W21; the consumer still owns execution, quiescence and shutdown. |
-| Distribution | Native/Go v0.4.2 is the current release: it carries the v0.4.1 checkpoint-policy correction and the v0.4.2 dependency maintenance, while v0.4.0 introduced workspace resources/saves. The versioned release record owns archive/source identity and installed-consumer qualification. npm public distribution remains 0.3.7; the prepared 0.4.2 carriers are unpublished. | Fresh required live-provider receipts, publication of the prepared 0.4.2 npm carriers, and future registry trust/publication decisions are separate W20 work. |
+| Distribution | Native/Go v0.4.3 is the current release: it carries the journal fix, the persistence adapter, CRC64NVME multipart and the agent surfaces on top of v0.4.2's dependency maintenance and v0.4.1's checkpoint-policy correction. The versioned release record owns archive/source identity and installed-consumer qualification. npm public distribution remains 0.3.7; the prepared 0.4.3 carriers and the unpublished 0.4.2 ones are not in the registry. | Fresh required live-provider receipts, publication of the prepared 0.4.3 npm carriers, and future registry trust/publication decisions are separate W20 work. |
 
 ### Browser project storage extension on 2026-10-12
 
@@ -316,8 +314,8 @@ only backlog; the milestone below decomposes those IDs without a second queue.
 | W17 | Run an early Workers shared-core/execution/persistence spike with synthetic data. Select a minimal adapter topology and supported operations; reject unsupported native assumptions before building a deployment promise. | W01; existing WASM/browser mechanisms | S4-4 |
 | W18 | Qualify protected native, Railway and Workers profiles separately. Prove warm denial, outage/freshness, key/policy expiry/rotation, restart/redeploy, persistence and resource bounds. Initial edge profile is read-only; write propagation needs separate qualified behavior. | W04, W07, W16; W17 for Workers; W08/W11 only if advertised | S4-4 |
 | W19 | **Partial; published-binary direct Luna profile qualified, 2026-11-14.** [Receipt and method](../history/implementation/2026-11-14-interrupted-cross-host.md) prove a model-written progress save, an actual midturn interruption with post-interrupt status, confirmed owner/bridge shutdown, explicit save-receipt recovery, checkpoint export and sender deletion, then fresh-context continuation on a separate native Linux cloud host. Both macOS ARM64 and Linux amd64 use verified public v0.4.1 binaries; no local QEMU substitute. This direct `gpt-6-luna`/medium official-SDK profile does not qualify Aboiteau, other callers, OS isolation or protected tenancy. Earlier OpenCode/Free Router outcomes remain unchanged. | Existing baseline; explicit model/host profile | S3-1–S3-3, S4-1 |
-| W20 | **Native/Go v0.4.2 published; v0.4.3 prepared in this tree.** [Release notes](../releases/v0.4.2.md) carry the dependency-maintenance patch, the download-recovery conformance and the v0.4.1 policy correction. Use the [versioned release record](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.2) for immutable archives/checksums and publication identity. The install surfaces now pin **0.3.7**, which is what the public registry serves (checked 2026-11-20), and `check-install-claims` compares every pinned version against the publication receipt. Publishing the prepared 0.4.3 carriers, and the unpublished 0.4.2 ones, remains open; an unbacked install claim is a defect, not a release fact. Normal CI plus the four-platform native/wheel/packed MCP release gate apply before tagging; rehearsal publishes nothing. npm remains 0.3.7, Python source-only and registry/OIDC publication disabled. Fresh required AWS/R2/custom receipts and future registry setup remain separate work. Preserve legacy-format diagnostics, reproducible artifacts and scoped provider exceptions. | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
-| W21 | **Application consumer pilot remaining; direct caller acceptance qualified.** The [interrupted direct Luna host](../history/implementation/2026-11-14-interrupted-cross-host.md) closes the bounded alternate caller profile, not Aboiteau application adoption. Reuse Aboiteau B2 native-amd64 and C2 R2 receipts; its current Dockerfile/source patch and smoke digest do not select the current published native artifact (v0.4.2; npm is 0.3.7). Next qualify an explicit public-artifact pin in the actual consumer/controller before claiming its newer-version acceptance. Preserve failed QEMU runs. cococlips/pg_backup remain source-fit S3 transfer candidates after demonstrated access/ownership. No new Stow runner/client SDK. | W06; supported artifact/profile | S4-1 |
+| W20 | **Native/Go v0.4.3 published.** [Release notes](../releases/v0.4.3.md) carry the journal fix, the persistence adapter, CRC64NVME multipart and the agent surfaces. Use the [versioned release record](https://github.com/chester-hill-solutions/stow-s3/releases/tag/v0.4.3) for immutable archives/checksums and publication identity. The install surfaces now pin **0.3.7**, which is what the public registry serves (checked 2026-11-20), and `check-install-claims` compares every pinned version against the publication receipt. Publishing the prepared 0.4.3 carriers, and the unpublished 0.4.2 ones, remains open; an unbacked install claim is a defect, not a release fact. Normal CI plus the four-platform native/wheel/packed MCP release gate apply before tagging; rehearsal publishes nothing. npm remains 0.3.7, Python source-only and registry/OIDC publication disabled. Fresh required AWS/R2/custom receipts and future registry setup remain separate work. Preserve legacy-format diagnostics, reproducible artifacts and scoped provider exceptions. | Applicable feature evidence, W16, required Linux/provider checks | S2-1–S2-5 |
+| W21 | **Application consumer pilot remaining; direct caller acceptance qualified.** The [interrupted direct Luna host](../history/implementation/2026-11-14-interrupted-cross-host.md) closes the bounded alternate caller profile, not Aboiteau application adoption. Reuse Aboiteau B2 native-amd64 and C2 R2 receipts; its current Dockerfile/source patch and smoke digest do not select the current published native artifact (v0.4.3; npm is 0.3.7). Next qualify an explicit public-artifact pin in the actual consumer/controller before claiming its newer-version acceptance. Preserve failed QEMU runs. cococlips/pg_backup remain source-fit S3 transfer candidates after demonstrated access/ownership. No new Stow runner/client SDK. | W06; supported artifact/profile | S4-1 |
 | W22 | Run independent repeat-use study and decide deepen/narrow/rework. Two teams each complete at least three genuine save/reopen/review events over two weeks and retain use; measure setup/recovery effort, correctness and costs against actual alternatives. Research/outreach requires its own actual evidence/authorization. | Usable supported workflow; W19/W21 evidence | S4-2, S4-3 |
 | W23 | **Released v0.4.0 native profile.** Opt-in live workspace overview, bounded complete direct-child observations, regular-file resources, shared read leases and exclusive registered-removal guard. [Contract](../contracts/workspace-resources-contract.md) and [dated qualification](../reviews/2026-11-11-workspace-resources.md). Maintain platform regressions; host/second-host/protected claims remain separate. | Existing workspace/MCP baseline; W04 for protected claims | Workspace access extension, 2026-11-11 |
 | W24 | **Released native host-usability surface; named local read-only pilot passed.** Static folder scope, bounded metadata/pages and optional same-bundle browser; [qualification](../reviews/2026-11-11-workspace-resource-hosts.md) records OpenCode 2.2.7 / Free Router resource review. Native release CI closes its platform/artifact gates, not live App-host or second-physical-host acceptance. No new UI work is scheduled. | W23; W04 for protected profiles; W16/W19/W20 for qualification/release | Workspace access extension, 2026-11-11 |
@@ -394,7 +392,7 @@ new UI. The W06 implementation does not imply consumer or second-host runs.
    **Next:** reuse Aboiteau's B2 native-amd64 and C2 R2 receipts, then select and
    verify the published artifact in its actual controller/image. Intake found a
    source-plus-patch build and a different hardcoded smoke digest, so those prior
-   receipts cannot certify the current published native release (v0.4.2) without
+   receipts cannot certify the current published native release (v0.4.3) without
    an explicit new pin. Qualify
    only missing version/caller scenarios, using synthetic state and caller-owned
    interruption/cleanup. Do not repeat the failed local QEMU attempts as a stand-in

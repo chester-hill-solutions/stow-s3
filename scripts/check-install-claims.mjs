@@ -25,8 +25,8 @@ const published = versions.sort((left, right) => {
 
 const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
   cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024,
-}).split("\0").filter((path) => /\.(md|html)$/.test(path) && existsSync(resolve(root, path)))
-  .filter((path) => path === "README.md" || path === "site/index.html" || path === "site/agent.md"
+}).split("\0").filter((path) => /\.(md|html|txt)$/.test(path) && existsSync(resolve(root, path)))
+  .filter((path) => path === "README.md" || path === "site/index.html" || path === "site/agent.md" || path === "site/llms.txt"
     || path.startsWith("packages/") || path.startsWith("skills/") || path.startsWith("plugins/")
     || path.startsWith("docs/guides/") || path.startsWith("examples/")
     || path === "docs/development/storage-foundation-plan.md");
