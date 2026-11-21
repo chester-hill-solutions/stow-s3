@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -60,7 +60,7 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -106,7 +106,7 @@ jobs:
 
   conformance:
     name: Conformance
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     steps:
       # This job's contract file is the shared one, and two other jobs read it too,
@@ -131,7 +131,7 @@ jobs:
 
   node:
     name: TypeScript package and shared corpus
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -165,7 +165,7 @@ jobs:
 
   python:
     name: Python client
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -210,7 +210,7 @@ jobs:
 
   wasm:
     name: WASM memory profile
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -229,7 +229,7 @@ jobs:
 
   browser:
     name: Browser persistence and sync (Chromium)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -266,7 +266,7 @@ jobs:
 
   standards:
     name: Ratcheted standards
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -336,7 +336,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, railway]
     timeout-minutes: 10
     steps:
       - name: Checkout
