@@ -23,6 +23,9 @@
 - A streaming SigV4 request is refused by name, a committed save is proven to
   survive `SIGKILL`, and object writes refuse property headers the record cannot
   return with `501 NotImplemented` before mutating.
+- Clear the remaining npm audit findings without changing shipped behaviour:
+  patch the MCP SDK in the extension, the site's `wrangler` toolchain and the
+  TypeScript package's ESLint chain. Lint, escape and DRY ratchets stay at zero.
 - Ship a Claude Code plugin and marketplace manifest, an agent host setup guide
   for five hosts, and a balanced 20-case conversion eval with a host-neutral
   runner. Install docs are gated against the npm publication receipt.
